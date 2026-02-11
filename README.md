@@ -121,3 +121,35 @@ See `docs/10-coherence-ops-integration.md` for how RAL/Σ OVERWATCH maps to DLR/
 
 
 
+
+
+## New in vNext (Scaffold Features)
+- **Policy Packs**: versioned enforcement bundles (`/policy_packs/`)
+- **Degrade Ladder Engine**: executable degrade selection (`/engine/degrade_ladder.py`)
+- **Verifier library**: read-after-write + invariants (`/verifiers/`)
+- **Replay harness**: deterministic replay scaffolding (`/tools/replay_episode.py`)
+- **OpenTelemetry hooks**: exporter placeholder (`/adapters/otel/`)
+
+Docs:
+- `docs/11-policy-packs.md`
+- `docs/12-degrade-ladder.md`
+- `docs/13-verifiers.md`
+- `docs/14-replay.md`
+- `docs/15-otel.md`
+
+
+### Policy stamping (vNext)
+Sealed episodes now record `policyPackId/version/hash` and the chosen `degrade.step` + rationale.
+
+
+## 60-second demo (one command)
+```bash
+python tools/run_supervised.py \
+  --decisionType AccountQuarantine \
+  --policy policy_packs/packs/demo_policy_pack_v1.json \
+  --telemetry endToEndMs=95 p99Ms=160 jitterMs=70 \
+  --context ttlBreachesCount=0 maxFeatureAgeMs=180 \
+  --verification pass \
+  --out episodes_out
+```
+See `docs/16-run-supervised.md`.
