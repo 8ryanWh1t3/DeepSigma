@@ -1,85 +1,109 @@
 # Σ OVERWATCH Dashboard
 
-Real-time monitoring dashboard for the Σ OVERWATCH agentic AI control plane.
+Real-time monitoring dashboard for the **Σ OVERWATCH** agentic AI control plane.
 
-## Zero-Install Demo
+## 🚀 Zero-Install Demo
 
-**No build step required.** Open [`demo.html`](demo.html) in any browser for the full dashboard experience:
+Open the all-in-one demo directly in your browser — no build step, no dependencies:
 
-```bash
-# Clone and open — that's it
-open dashboard/demo.html
-```
+➡ [`dashboard/demo.html`](./demo.html)
 
-Or download just the single file from GitHub and double-click it. The demo loads React + Recharts from CDN and runs entirely client-side with generated mock data. All 4 views (Overview, Episodes, Drift, Export) work out of the box with auto-refreshing data.
+### Demo Features
+
+| Feature | Description |
+|---------|-------------|
+| 🎨 Dark/Light Theme | Toggle with the theme button or press `T` |
+| 🔍 Search & Filter | Search episodes by agent/ID, filter by status or severity |
+| 📊 Sortable Tables | Click any column header to sort ascending/descending |
+| 📈 System Health Gauge | SVG ring gauge showing overall system health |
+| 🕸️ Radar Chart | Agent comparison radar for success rate & freshness |
+| 📉 Area Charts | Gradient-filled area charts for deadline vs duration |
+| 🍩 Donut Chart | Decision status distribution with inner ring |
+| 🔔 Toast Notifications | Auto-popup alerts for high-severity drift events |
+| ⌨️ Keyboard Shortcuts | `1-4` switch views, `R` refresh, `T` toggle theme |
+| 📤 JSON & CSV Export | Download all data in either format |
+| ♻️ Auto-Refresh | 5-second polling with toggle control |
 
 ## Features
 
-- **Overview** — KPI cards (success rate, avg latency, drift events, active agents), deadline vs duration trend chart, decision status pie chart, agent performance bar chart, drift distribution
-- - **Episodes** — Tabular view of recent DecisionEpisodes with status, deadline, duration, freshness, and outcome
-  - - **Drift** — Live drift event feed with severity coloring, patch hints, and episode correlation
-    - - **Export** — One-click JSON export of all episodes, drifts, and agent metrics
-     
-      - ## Tech Stack
-     
-      - - React 18 + TypeScript
-        - - Vite (dev server + build)
-          - - Tailwind CSS (dark theme)
-            - - Recharts (charts/graphs)
-              - - Lucide React (icons)
-                - - Zustand (state management, ready for extension)
-                 
-                  - ## Quick Start
-                 
-                  - ```bash
-                    cd dashboard
-                    npm install
-                    npm run dev
-                    ```
+### Overview
+- **KPI Cards** — Success rate, average latency, drift events, active agents, system health
+- **Deadline vs Actual Duration** — Area chart with gradient fills
+- **Decision Status Distribution** — Interactive donut chart
+- **Agent Comparison Radar** — Multi-axis radar for cross-agent metrics
+- **Agent Performance** — Grouped bar chart (success rate + latency)
+- **Drift Events by Type** — Horizontal bar chart breakdown
 
-                    Opens at `http://localhost:3000`.
+### Episodes
+- Searchable, filterable, sortable table of the last 50 decision episodes
+- Visual freshness progress bars with color-coded thresholds
+- Status badges (success, timeout, degraded, failed)
+- Real-time result count
 
-                    ## Build
+### Drift Monitoring
+- Severity summary cards (high / medium / low counts)
+- Filterable drift event feed with severity dropdown
+- Timestamps and patch hints on each event
+- Toast notifications for high-severity drifts
 
-                    ```bash
-                    npm run build
-                    ```
+### Export
+- One-click JSON or CSV download
+- Data summary with episode, drift, agent, and data point counts
 
-                    Output in `dist/`.
+## Tech Stack (Build Version)
 
-                    ## Data
+| Tool | Purpose |
+|------|---------|
+| React 18 | UI framework |
+| TypeScript | Type safety |
+| Recharts | Charts (Area, Bar, Line, Pie, Radar) |
+| Tailwind CSS | Styling |
+| Vite | Dev server + build |
+| Zustand | State management (planned) |
+| Lucide React | Icons |
 
-                    Currently uses generated mock data (`src/mockData.ts`) that simulates:
-                    - 100 DecisionEpisodes with realistic timing, freshness, and status distributions
-                    - - Drift events (~15% of episodes) with severity levels and patch hints
-                      - - Per-agent metrics (success rate, latency percentiles, freshness)
-                       
-                        - Auto-refreshes every 5 seconds (toggleable).
-                       
-                        - ## Connecting to Real Data
-                       
-                        - Replace the mock data generators in `App.tsx` with API calls to your Overwatch backend:
-                       
-                        - ```typescript
-                          // Replace generateMockEpisodes() with:
-                          const response = await fetch('/api/episodes');
-                          const episodes = await response.json();
-                          ```
+## Quickstart
 
-                          ## Project Structure
+```bash
+cd dashboard
+npm install
+npm run dev
+```
 
-                          ```
-                            demo.html             # Zero-install single-file demo (just open in browser)
-                          dashboard/
-                            index.html            # Entry HTML
-                            package.json          # Dependencies
-                            vite.config.ts        # Vite configuration
-                            tsconfig.json         # TypeScript config
-                            tailwind.config.js    # Tailwind CSS config
-                            postcss.config.js     # PostCSS config
-                            src/
-                              main.tsx            # React entry point
-                              App.tsx             # Main dashboard component
-                              mockData.ts         # Demo data generator
-                              index.css           # Tailwind + global styles
-                          ```
+Open [http://localhost:3000](http://localhost:3000)
+
+## Build
+
+```bash
+npm run build
+```
+
+Output in `dist/` — deploy to any static host.
+
+## Data
+
+Mock data generators produce realistic:
+- **DecisionEpisodes** — 100 episodes with deadline/duration/status/freshness/AL6 scores/action contracts
+- **DriftEvents** — ~15 events per refresh with type, severity, patch hints, delta, threshold
+- **AgentMetrics** — 4 agents with success rate, latency percentiles, freshness, episode/drift counts
+
+To connect real data, replace the generators in `src/mockData.ts` with API calls to your OVERWATCH backend.
+
+## Project Structure
+
+```
+dashboard/
+├── demo.html          # Zero-dependency all-in-one demo
+├── index.html         # Vite entry point
+├── package.json       # Dependencies
+├── vite.config.ts     # Vite configuration
+├── tsconfig.json      # TypeScript config
+├── tailwind.config.js # Tailwind config
+├── postcss.config.js  # PostCSS config
+├── README.md          # This file
+└── src/
+    ├── App.tsx        # Main dashboard with all views
+    ├── main.tsx       # React entry point
+    ├── mockData.ts    # Data generators + TypeScript interfaces
+    └── index.css      # Tailwind directives + dark theme
+```
