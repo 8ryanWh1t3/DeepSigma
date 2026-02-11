@@ -1,14 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Σ OVERWATCH Dashboard — Demo</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>Σ</text></svg>"/>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script src="https://unpkg.com/recharts@2.10.3/umd/Recharts.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sigma OVERWATCH Dashboard Demo</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{font-family:Inter,system-ui,Avenir,Helvetica,Arial,sans-serif;color-scheme:dark}
@@ -16,361 +11,371 @@ body{background:#020617;color:#f1f5f9;min-height:100vh}
 ::-webkit-scrollbar{width:8px;height:8px}
 ::-webkit-scrollbar-track{background:#0f172a}
 ::-webkit-scrollbar-thumb{background:#334155;border-radius:4px}
-::-webkit-scrollbar-thumb:hover{background:#475569}
-
 .header{border-bottom:1px solid #1e293b;background:#0f172a;position:sticky;top:0;z-index:50}
-.header-inner{max-width:1280px;margin:0 auto;padding:16px;display:flex;align-items:center;justify-content:space-between}
+.header-inner{max-width:1280px;margin:0 auto;padding:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
 .logo{font-size:1.5rem;font-weight:700;color:#60a5fa}
-.logo-sub{font-size:0.875rem;color:#94a3b8;margin-left:12px}
-.controls{display:flex;align-items:center;gap:16px;font-size:0.875rem;color:#94a3b8}
+.logo-sub{font-size:.875rem;color:#94a3b8;margin-left:12px}
+.controls{display:flex;align-items:center;gap:16px;font-size:.875rem;color:#94a3b8}
 .controls label{display:flex;align-items:center;gap:6px;cursor:pointer}
 .controls input[type=checkbox]{accent-color:#60a5fa}
-.ts{font-size:0.75rem;color:#64748b}
-
+.ts{font-size:.75rem;color:#64748b}
 nav{border-bottom:1px solid #1e293b;background:#0f172a}
 nav .inner{max-width:1280px;margin:0 auto;padding:0 16px;display:flex;gap:4px}
-nav button{padding:12px 16px;font-size:0.875rem;font-weight:500;border:none;background:none;color:#94a3b8;cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s}
+nav button{padding:12px 16px;font-size:.875rem;font-weight:500;border:none;background:none;color:#94a3b8;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
 nav button:hover{color:#cbd5e1}
 nav button.active{color:#60a5fa;border-bottom-color:#3b82f6}
-
 main{max-width:1280px;margin:0 auto;padding:24px}
-
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 @media(max-width:900px){.grid4{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:500px){.grid4{grid-template-columns:1fr}}
-
 .kpi{background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:16px}
 .kpi-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.kpi-label{color:#94a3b8;font-size:0.875rem}
-.kpi-icon{color:#60a5fa}
+.kpi-label{color:#94a3b8;font-size:.875rem}
+.kpi-icon{color:#60a5fa;font-size:1.25rem}
 .kpi-value{font-size:1.5rem;font-weight:700}
-.kpi-trend{font-size:0.75rem;color:#64748b}
-
-.card{background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:24px;margin-top:24px}
+.kpi-trend{font-size:.75rem;color:#64748b}
+.card{background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:24px;margin-bottom:24px}
 .card h3{font-size:1.125rem;font-weight:600;margin-bottom:16px}
-
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
 @media(max-width:900px){.grid2{grid-template-columns:1fr}}
-.span2{grid-column:1/-1}
-
-table{width:100%;font-size:0.875rem;border-collapse:collapse}
+table{width:100%;font-size:.875rem;border-collapse:collapse}
 thead{border-bottom:1px solid #334155}
 th{text-align:left;padding:8px 12px;color:#cbd5e1;font-weight:500}
 td{padding:8px 12px}
-tr{border-bottom:1px solid #1e293b}
-tr:hover{background:#1e293b}
-.badge{padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:500;display:inline-block}
+tbody tr{border-bottom:1px solid #1e293b}
+tbody tr:hover{background:#1e293b}
+.badge{padding:2px 8px;border-radius:4px;font-size:.75rem;font-weight:500}
 .badge-success{background:#064e3b;color:#6ee7b7}
 .badge-timeout{background:#7f1d1d;color:#fca5a5}
 .badge-degraded{background:#78350f;color:#fcd34d}
 .badge-failed{background:#581c87;color:#d8b4fe}
-.mono{font-family:monospace;font-size:0.75rem;color:#94a3b8}
-
+.mono{font-family:monospace;font-size:.75rem;color:#94a3b8}
 .drift-item{padding:12px;border-radius:6px;margin-bottom:8px}
 .drift-high{background:rgba(127,29,29,.2);border:1px solid #991b1b}
 .drift-medium{background:rgba(120,53,15,.2);border:1px solid #92400e}
 .drift-low{background:rgba(30,58,138,.2);border:1px solid #1e3a8a}
 .drift-header{display:flex;justify-content:space-between;align-items:flex-start}
 .drift-title{font-weight:600;text-transform:capitalize}
-.drift-ep{font-family:monospace;font-size:0.75rem;color:#94a3b8;margin-top:4px}
-.drift-hint{font-size:0.875rem;color:#cbd5e1;margin-top:8px}
-.sev{padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:500;white-space:nowrap}
+.drift-ep{font-family:monospace;font-size:.75rem;color:#94a3b8;margin-top:4px}
+.drift-hint{font-size:.875rem;color:#cbd5e1;margin-top:8px}
+.sev{padding:2px 8px;border-radius:4px;font-size:.75rem;font-weight:500;white-space:nowrap}
 .sev-high{background:#7f1d1d;color:#fca5a5}
 .sev-medium{background:#78350f;color:#fcd34d}
 .sev-low{background:#1e3a8a;color:#93c5fd}
-
 .export-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
 .export-stat{padding:16px;background:#1e293b;border-radius:6px}
-.export-stat-label{font-size:0.875rem;color:#94a3b8}
+.export-stat-label{font-size:.875rem;color:#94a3b8}
 .export-stat-value{font-size:1.5rem;font-weight:700}
-.btn{background:#2563eb;color:#fff;font-weight:600;padding:8px 16px;border:none;border-radius:6px;cursor:pointer;transition:background .15s}
+.btn{background:#2563eb;color:#fff;font-weight:600;padding:8px 16px;border:none;border-radius:6px;cursor:pointer}
 .btn:hover{background:#1d4ed8}
-.note{font-size:0.75rem;color:#64748b;margin-top:16px}
-
+.btn-green{background:#059669}
+.btn-green:hover{background:#047857}
+.note{font-size:.75rem;color:#64748b;margin-top:16px}
 .scroll-box{max-height:600px;overflow-y:auto}
-.flex-center{display:flex;align-items:center;gap:8px}
+.chart-wrap{position:relative;width:100%;height:280px;margin-top:8px}
+.chart-wrap canvas{width:100%!important;height:100%!important}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.bar-label{width:130px;font-size:.8rem;color:#94a3b8;text-align:right;flex-shrink:0}
+.bar-track{flex:1;height:22px;background:#1e293b;border-radius:4px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:8px;font-size:.7rem;color:#fff;font-weight:600;transition:width .5s}
+.pie-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;justify-content:center}
+.pie-legend-item{display:flex;align-items:center;gap:6px;font-size:.8rem;color:#94a3b8}
+.pie-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.hidden{display:none}
 </style>
 </head>
 <body>
 <div id="root"></div>
-<script type="text/babel">
-const { useState, useEffect, useCallback } = React;
-const { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } = Recharts;
+<script>
+// ── Data generators ──
+var AGENTS=['ReasoningAgent','PlannerAgent','ExecutorAgent','VerifierAgent'];
+var DECISIONS=['Execute trade','Approve transaction','Route request','Generate response','Allocate resources'];
+var DTYPES=['time','freshness','fallback','bypass','verify','outcome'];
+var PHINTS=['TTL policy','deadline config','fallback strategy','bypass conditions'];
 
-/* ── Mock Data ─────────────────────────────────────────── */
-const AGENTS = ['ReasoningAgent','PlannerAgent','ExecutorAgent','VerifierAgent'];
-const DECISIONS = ['Execute trade','Approve transaction','Route request','Generate response','Allocate resources'];
-const DRIFT_TYPES = ['time','freshness','fallback','bypass','verify','outcome'];
-const PATCH_HINTS = ['TTL policy','deadline configuration','fallback strategy','bypass conditions'];
-
-function mockEpisodes(n=100){
-  const now=Date.now(), eps=[];
-  for(let i=0;i<n;i++){
-    const dl=500+Math.random()*4500, dur=dl*(0.5+Math.random()*0.9);
-    const st=dur>dl?'timeout':Math.random()>.9?'degraded':Math.random()>.95?'failed':'success';
-    eps.push({id:`ep_${now}_${i}`,agent:AGENTS[Math.random()*4|0],ts:now-(n-i)*5000,
+function mkEpisodes(n){
+  n=n||100;var now=Date.now(),eps=[];
+  for(var i=0;i<n;i++){
+    var dl=500+Math.random()*4500,dur=dl*(0.5+Math.random()*0.9);
+    var st=dur>dl?'timeout':Math.random()>.9?'degraded':Math.random()>.95?'failed':'success';
+    eps.push({id:'ep_'+now+'_'+i,agent:AGENTS[Math.random()*4|0],ts:now-(n-i)*5000,
       deadline:dl,duration:dur,status:st,freshness:95+Math.random()*5,
-      dataAge:Math.random()*5000,distance:Math.random()*15|0,
-      variability:100+Math.random()*50,drag:Math.random()*200,
       decision:DECISIONS[Math.random()*5|0],
       verification:Math.random()>.1?'Verified':'Skipped',
       outcome:st==='success'?'Committed':'Rolled back'});
   }
   return eps;
 }
-
-function mockDrifts(n=100){
-  const now=Date.now(), out=[];
-  for(let i=0;i<n*.15;i++){
-    out.push({id:`drift_${now}_${i}`,epId:`ep_${now}_${Math.random()*n|0}`,
-      type:DRIFT_TYPES[Math.random()*6|0],
+function mkDrifts(n){
+  n=n||100;var now=Date.now(),out=[];
+  for(var i=0;i<n*.15;i++){
+    out.push({id:'drift_'+now+'_'+i,epId:'ep_'+now+'_'+(Math.random()*n|0),
+      type:DTYPES[Math.random()*6|0],
       severity:Math.random()>.7?'high':Math.random()>.5?'medium':'low',
       ts:now-(n-i)*500,
-      patch:`Review ${PATCH_HINTS[Math.random()*4|0]}`});
+      patch:'Review '+PHINTS[Math.random()*4|0]});
   }
   return out;
 }
-
-function mockMetrics(){
-  return AGENTS.map(a=>({agent:a,successRate:85+Math.random()*14,
+function mkMetrics(){
+  return AGENTS.map(function(a){return{agent:a,successRate:85+Math.random()*14,
     avgLatency:150+Math.random()*200,p95:300+Math.random()*300,
-    p99:450+Math.random()*350,timeoutRate:Math.random()*8,
-    degradedRate:Math.random()*5,freshness:92+Math.random()*8}));
+    p99:450+Math.random()*350,freshness:92+Math.random()*8};});
 }
 
-/* ── SVG Icons (inline) ────────────────────────────────── */
-const Icon=({d,size=20})=>(
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={d}/></svg>
-);
-const TrendingUp=()=><Icon d="M22 7l-8.5 8.5-5-5L2 17"/>;
-const ClockIcon=()=><Icon d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 6v6l4 2"/>;
-const ZapIcon=()=><Icon d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>;
-const ActivityIcon=()=><Icon d="M22 12h-4l-3 9L9 3l-3 9H2"/>;
-const AlertIcon=()=><Icon d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM12 8v4M12 16h.01"/>;
+// ── State ──
+var state={episodes:[],drifts:[],metrics:[],view:'overview',auto:true,ts:''};
+function loadData(){
+  state.episodes=mkEpisodes(100);state.drifts=mkDrifts(100);state.metrics=mkMetrics();
+  state.ts=new Date().toLocaleTimeString();render();
+}
+var interval=null;
+function toggleAuto(on){
+  state.auto=on;
+  if(interval)clearInterval(interval);
+  if(on)interval=setInterval(loadData,5000);
+  render();
+}
+function setView(v){state.view=v;render();}
 
-/* ── KPI Card ──────────────────────────────────────────── */
-function KPI({icon,label,value,trend}){
-  return(
-    <div className="kpi">
-      <div className="kpi-top"><span className="kpi-label">{label}</span><span className="kpi-icon">{icon}</span></div>
-      <div className="kpi-value">{value}</div>
-      <div className="kpi-trend">{trend}</div>
-    </div>
-  );
+// ── Rendering ──
+function h(tag,attrs){
+  var el=document.createElement(tag);
+  if(attrs)Object.keys(attrs).forEach(function(k){
+    if(k==='className')el.className=attrs[k];
+    else if(k==='innerHTML')el.innerHTML=attrs[k];
+    else if(k==='textContent')el.textContent=attrs[k];
+    else if(k==='onclick')el.onclick=attrs[k];
+    else if(k==='checked'){el.checked=attrs[k];el.setAttribute('type','checkbox');}
+    else if(k==='style'&&typeof attrs[k]==='object')Object.assign(el.style,attrs[k]);
+    else el.setAttribute(k,attrs[k]);
+  });
+  for(var i=2;i<arguments.length;i++){
+    var c=arguments[i];
+    if(typeof c==='string')el.appendChild(document.createTextNode(c));
+    else if(c)el.appendChild(c);
+  }
+  return el;
 }
 
-/* ── Overview ──────────────────────────────────────────── */
-function Overview({episodes,drifts,metrics}){
-  const sr=episodes.length?(episodes.filter(e=>e.status==='success').length/episodes.length*100).toFixed(1):0;
-  const al=episodes.length?(episodes.reduce((s,e)=>s+e.duration,0)/episodes.length).toFixed(0):0;
-  const trend=episodes.sort((a,b)=>a.ts-b.ts).slice(-30).map(e=>({time:new Date(e.ts).toLocaleTimeString(),duration:Math.round(e.duration),deadline:Math.round(e.deadline)}));
-  const statusDist=[
-    {name:'Success',value:episodes.filter(e=>e.status==='success').length},
-    {name:'Timeout',value:episodes.filter(e=>e.status==='timeout').length},
-    {name:'Degraded',value:episodes.filter(e=>e.status==='degraded').length},
-    {name:'Failed',value:episodes.filter(e=>e.status==='failed').length}
-  ];
-  const driftDist=drifts.reduce((a,d)=>{const f=a.find(x=>x.name===d.type);f?f.value++:a.push({name:d.type,value:1});return a;},[]);
-  const COLORS=['#10b981','#f59e0b','#ef4444','#8b5cf6'];
-  const ttStyle={backgroundColor:'#1e293b',border:'1px solid #475569',color:'#f1f5f9'};
-
-  return(
-    <div>
-      <div className="grid4">
-        <KPI icon={<TrendingUp/>} label="Success Rate" value={sr+'%'} trend="+2.5%"/>
-        <KPI icon={<ClockIcon/>} label="Avg Latency" value={al+'ms'} trend="-5%"/>
-        <KPI icon={<ZapIcon/>} label="Drift Events" value={drifts.length} trend={drifts.length>5?'+1':'-1'}/>
-        <KPI icon={<ActivityIcon/>} label="Active Agents" value={metrics.length} trend="Stable"/>
-      </div>
-
-      <div className="grid2">
-        <div className="card">
-          <h3>Deadline vs Actual Duration</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={trend}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#334155"/>
-              <XAxis dataKey="time" stroke="#64748b" tick={{fontSize:11}}/>
-              <YAxis stroke="#64748b"/>
-              <Tooltip contentStyle={ttStyle}/>
-              <Legend/>
-              <Line type="monotone" dataKey="deadline" stroke="#60a5fa" name="Deadline" dot={false}/>
-              <Line type="monotone" dataKey="duration" stroke="#ef4444" name="Actual" dot={false}/>
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="card">
-          <h3>Decision Status Distribution</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie data={statusDist} cx="50%" cy="50%" outerRadius={90} dataKey="value" label={({name,value})=>`${name}: ${value}`}>
-                {statusDist.map((_,i)=><Cell key={i} fill={COLORS[i]}/>)}
-              </Pie>
-              <Tooltip contentStyle={ttStyle}/>
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="card span2">
-          <h3>Agent Performance</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={metrics}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#334155"/>
-              <XAxis dataKey="agent" stroke="#64748b"/>
-              <YAxis stroke="#64748b"/>
-              <Tooltip contentStyle={ttStyle}/>
-              <Legend/>
-              <Bar dataKey="successRate" fill="#10b981" name="Success Rate %"/>
-              <Bar dataKey="avgLatency" fill="#f59e0b" name="Avg Latency (ms)"/>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="card span2">
-          <h3>Drift Events by Type</h3>
-          <ResponsiveContainer width="100%" height={280}>
-            <BarChart data={driftDist}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#334155"/>
-              <XAxis dataKey="name" stroke="#64748b"/>
-              <YAxis stroke="#64748b"/>
-              <Tooltip contentStyle={ttStyle}/>
-              <Bar dataKey="value" fill="#a855f7" name="Count"/>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-    </div>
-  );
+function renderKPI(icon,label,value,trend){
+  return h('div',{className:'kpi'},
+    h('div',{className:'kpi-top'},h('span',{className:'kpi-label',textContent:label}),h('span',{className:'kpi-icon',textContent:icon})),
+    h('div',{className:'kpi-value',textContent:value}),
+    h('div',{className:'kpi-trend',textContent:trend}));
 }
 
-/* ── Episodes ──────────────────────────────────────────── */
-function Episodes({episodes}){
-  const badge={success:'badge-success',timeout:'badge-timeout',degraded:'badge-degraded',failed:'badge-failed'};
-  return(
-    <div className="card" style={{marginTop:0}}>
-      <h3>Recent Decision Episodes</h3>
-      <div style={{overflowX:'auto'}}>
-        <table>
-          <thead><tr><th>Episode ID</th><th>Agent</th><th>Status</th><th>Deadline</th><th>Duration</th><th>Freshness</th><th>Outcome</th></tr></thead>
-          <tbody>
-            {episodes.slice(-25).reverse().map(e=>(
-              <tr key={e.id}>
-                <td className="mono">{e.id.slice(0,18)}…</td>
-                <td>{e.agent}</td>
-                <td><span className={`badge ${badge[e.status]}`}>{e.status}</span></td>
-                <td>{e.deadline.toFixed(0)}ms</td>
-                <td>{e.duration.toFixed(0)}ms</td>
-                <td>{e.freshness.toFixed(1)}%</td>
-                <td>{e.outcome}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+function drawLineChart(container,data){
+  var canvas=document.createElement('canvas');
+  var w=container.clientWidth||600,ht=260;
+  canvas.width=w*2;canvas.height=ht*2;canvas.style.width=w+'px';canvas.style.height=ht+'px';
+  var ctx=canvas.getContext('2d');ctx.scale(2,2);
+  var pad={t:20,r:20,b:30,l:50};
+  var cw=w-pad.l-pad.r,ch=ht-pad.t-pad.b;
+  var maxV=0;data.forEach(function(d){maxV=Math.max(maxV,d.deadline,d.duration);});
+  maxV=maxV*1.1||1;
+  // grid
+  ctx.strokeStyle='#334155';ctx.lineWidth=0.5;
+  for(var i=0;i<=4;i++){var y=pad.t+ch*(i/4);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cw,y);ctx.stroke();
+    ctx.fillStyle='#64748b';ctx.font='10px sans-serif';ctx.textAlign='right';
+    ctx.fillText(Math.round(maxV*(1-i/4))+'ms',pad.l-6,y+3);}
+  // lines
+  function drawL(key,color){
+    ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=1.5;
+    data.forEach(function(d,i){var x=pad.l+cw*(i/(data.length-1||1)),y=pad.t+ch*(1-d[key]/maxV);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.stroke();}
+  drawL('deadline','#60a5fa');drawL('duration','#ef4444');
+  // legend
+  ctx.fillStyle='#60a5fa';ctx.fillRect(pad.l,ht-12,12,3);ctx.fillStyle='#94a3b8';ctx.font='10px sans-serif';ctx.textAlign='left';ctx.fillText('Deadline',pad.l+16,ht-8);
+  ctx.fillStyle='#ef4444';ctx.fillRect(pad.l+90,ht-12,12,3);ctx.fillStyle='#94a3b8';ctx.fillText('Actual',pad.l+106,ht-8);
+  container.appendChild(canvas);
 }
 
-/* ── Drift ─────────────────────────────────────────────── */
-function Drift({drifts}){
-  return(
-    <div className="card" style={{marginTop:0}}>
-      <h3 className="flex-center"><AlertIcon/> Drift Events</h3>
-      <div className="scroll-box" style={{marginTop:12}}>
-        {drifts.slice(-25).reverse().map(d=>(
-          <div key={d.id} className={`drift-item drift-${d.severity}`}>
-            <div className="drift-header">
-              <div>
-                <div className="drift-title">{d.type} Drift</div>
-                <div className="drift-ep">{d.epId.slice(0,24)}…</div>
-                <div className="drift-hint">{d.patch}</div>
-              </div>
-              <span className={`sev sev-${d.severity}`}>{d.severity}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+function drawPie(container,slices){
+  var canvas=document.createElement('canvas');
+  var size=240;canvas.width=size*2;canvas.height=size*2;canvas.style.width=size+'px';canvas.style.height=size+'px';
+  var ctx=canvas.getContext('2d');ctx.scale(2,2);
+  var total=0;slices.forEach(function(s){total+=s.value;});
+  var cx=size/2,cy=size/2,r=size/2-20,angle=-Math.PI/2;
+  slices.forEach(function(s){
+    var sweep=total>0?(s.value/total)*Math.PI*2:0;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,angle,angle+sweep);ctx.closePath();
+    ctx.fillStyle=s.color;ctx.fill();
+    // label
+    if(s.value>0){var mid=angle+sweep/2;var lx=cx+Math.cos(mid)*(r*0.65);var ly=cy+Math.sin(mid)*(r*0.65);
+      ctx.fillStyle='#fff';ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(s.value,lx,ly);}
+    angle+=sweep;
+  });
+  var wrap=h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center'}});
+  wrap.appendChild(canvas);
+  var legend=h('div',{className:'pie-legend'});
+  slices.forEach(function(s){
+    legend.appendChild(h('div',{className:'pie-legend-item'},
+      h('span',{className:'pie-legend-dot',style:{background:s.color}}),
+      h('span',{textContent:s.name+': '+s.value})));
+  });
+  wrap.appendChild(legend);container.appendChild(wrap);
 }
 
-/* ── Export ─────────────────────────────────────────────── */
-function Export({episodes,drifts,metrics}){
-  const doExport=(fmt)=>{
-    if(fmt==='json'){
-      const d=JSON.stringify({episodes,drifts,metrics,timestamp:new Date().toISOString()},null,2);
-      dl(d,'application/json',`overwatch-${new Date().toISOString().slice(0,10)}.json`);
-    } else {
-      const hdr='id,agent,status,deadline,duration,freshness,outcome\n';
-      const rows=episodes.map(e=>`${e.id},${e.agent},${e.status},${e.deadline.toFixed(0)},${e.duration.toFixed(0)},${e.freshness.toFixed(1)},${e.outcome}`).join('\n');
-      dl(hdr+rows,'text/csv',`overwatch-episodes-${new Date().toISOString().slice(0,10)}.csv`);
-    }
-  };
-  const dl=(content,type,name)=>{const b=new Blob([content],{type});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);};
-
-  return(
-    <div className="card" style={{marginTop:0}}>
-      <h3>Export Dashboard Data</h3>
-      <div className="export-grid">
-        <div className="export-stat"><div className="export-stat-label">Decision Episodes</div><div className="export-stat-value">{episodes.length}</div></div>
-        <div className="export-stat"><div className="export-stat-label">Drift Events</div><div className="export-stat-value">{drifts.length}</div></div>
-        <div className="export-stat"><div className="export-stat-label">Agents Tracked</div><div className="export-stat-value">{metrics.length}</div></div>
-        <div className="export-stat"><div className="export-stat-label">Data Points</div><div className="export-stat-value">{episodes.length*7+drifts.length*4}</div></div>
-      </div>
-      <div style={{display:'flex',gap:12}}>
-        <button className="btn" onClick={()=>doExport('json')}>Export JSON</button>
-        <button className="btn" onClick={()=>doExport('csv')} style={{background:'#059669'}}>Export CSV</button>
-      </div>
-      <p className="note">Exports all decision episodes, drift events, and agent metrics for offline analysis.</p>
-    </div>
-  );
+function renderOverview(){
+  var eps=state.episodes,dr=state.drifts,met=state.metrics;
+  var sr=eps.length?((eps.filter(function(e){return e.status==='success'}).length/eps.length)*100).toFixed(1):'0';
+  var al=eps.length?(eps.reduce(function(s,e){return s+e.duration},0)/eps.length).toFixed(0):'0';
+  var frag=document.createDocumentFragment();
+  var kpis=h('div',{className:'grid4'});
+  kpis.appendChild(renderKPI('\u2191',  'Success Rate',sr+'%','+2.5%'));
+  kpis.appendChild(renderKPI('\u23f1',  'Avg Latency',al+'ms','-5%'));
+  kpis.appendChild(renderKPI('\u26a1',  'Drift Events',''+dr.length,dr.length>5?'+1':'-1'));
+  kpis.appendChild(renderKPI('\u2261',  'Active Agents',''+met.length,'Stable'));
+  frag.appendChild(kpis);
+  var grid=h('div',{className:'grid2',style:{marginTop:'24px'}});
+  // line chart
+  var lc=h('div',{className:'card'});lc.appendChild(h('h3',{textContent:'Deadline vs Actual Duration'}));
+  var lcWrap=h('div',{className:'chart-wrap'});lc.appendChild(lcWrap);grid.appendChild(lc);
+  // pie chart
+  var pc=h('div',{className:'card'});pc.appendChild(h('h3',{textContent:'Decision Status Distribution'}));
+  var pcWrap=h('div',{style:{display:'flex',justifyContent:'center',padding:'16px 0'}});pc.appendChild(pcWrap);grid.appendChild(pc);
+  frag.appendChild(grid);
+  // agent bars
+  var ab=h('div',{className:'card'});ab.appendChild(h('h3',{textContent:'Agent Performance'}));
+  met.forEach(function(m){
+    ab.appendChild(h('div',{className:'bar-row'},
+      h('span',{className:'bar-label',textContent:m.agent}),
+      h('div',{className:'bar-track'},h('div',{className:'bar-fill',style:{width:m.successRate.toFixed(0)+'%',background:'#10b981'},textContent:m.successRate.toFixed(1)+'%'}))));
+    ab.appendChild(h('div',{className:'bar-row'},
+      h('span',{className:'bar-label',style:{fontSize:'.7rem'},textContent:'latency'}),
+      h('div',{className:'bar-track'},h('div',{className:'bar-fill',style:{width:Math.min(m.avgLatency/5,100)+'%',background:'#f59e0b'},textContent:m.avgLatency.toFixed(0)+'ms'}))));
+  });
+  frag.appendChild(ab);
+  // drift bars
+  var dd={};dr.forEach(function(d){dd[d.type]=(dd[d.type]||0)+1;});
+  var db=h('div',{className:'card'});db.appendChild(h('h3',{textContent:'Drift Events by Type'}));
+  var maxDr=Math.max.apply(null,Object.values(dd).concat([1]));
+  Object.keys(dd).forEach(function(k){
+    db.appendChild(h('div',{className:'bar-row'},
+      h('span',{className:'bar-label',textContent:k}),
+      h('div',{className:'bar-track'},h('div',{className:'bar-fill',style:{width:(dd[k]/maxDr*100)+'%',background:'#a855f7'},textContent:''+dd[k]}))));
+  });
+  frag.appendChild(db);
+  // draw canvases after DOM attach
+  setTimeout(function(){
+    var sorted=eps.slice().sort(function(a,b){return a.ts-b.ts}).slice(-30).map(function(e){return{deadline:Math.round(e.deadline),duration:Math.round(e.duration)};});
+    drawLineChart(lcWrap,sorted);
+    var sd=[{name:'Success',value:eps.filter(function(e){return e.status==='success'}).length,color:'#10b981'},
+      {name:'Timeout',value:eps.filter(function(e){return e.status==='timeout'}).length,color:'#f59e0b'},
+      {name:'Degraded',value:eps.filter(function(e){return e.status==='degraded'}).length,color:'#ef4444'},
+      {name:'Failed',value:eps.filter(function(e){return e.status==='failed'}).length,color:'#8b5cf6'}];
+    drawPie(pcWrap,sd);
+  },0);
+  return frag;
 }
 
-/* ── App ───────────────────────────────────────────────── */
-function App(){
-  const [episodes,setEpisodes]=useState([]);
-  const [drifts,setDrifts]=useState([]);
-  const [metrics,setMetrics]=useState([]);
-  const [view,setView]=useState('overview');
-  const [auto,setAuto]=useState(true);
-  const [ts,setTs]=useState('');
-
-  const load=useCallback(()=>{setEpisodes(mockEpisodes(100));setDrifts(mockDrifts(100));setMetrics(mockMetrics());setTs(new Date().toLocaleTimeString());},[]);
-
-  useEffect(()=>{load();if(auto){const id=setInterval(load,5000);return()=>clearInterval(id);}},[auto,load]);
-
-  const views=['overview','episodes','drift','export'];
-
-  return(
-    <div>
-      <header className="header">
-        <div className="header-inner">
-          <div style={{display:'flex',alignItems:'center'}}>
-            <span className="logo">Σ OVERWATCH</span>
-            <span className="logo-sub">Control Plane Dashboard</span>
-          </div>
-          <div className="controls">
-            <label><input type="checkbox" checked={auto} onChange={e=>setAuto(e.target.checked)}/> Auto-Refresh (5s)</label>
-            <span className="ts">Updated: {ts}</span>
-          </div>
-        </div>
-      </header>
-
-      <nav><div className="inner">
-        {views.map(v=><button key={v} className={view===v?'active':''} onClick={()=>setView(v)}>{v[0].toUpperCase()+v.slice(1)}</button>)}
-      </div></nav>
-
-      <main>
-        {view==='overview'&&<Overview episodes={episodes} drifts={drifts} metrics={metrics}/>}
-        {view==='episodes'&&<Episodes episodes={episodes}/>}
-        {view==='drift'&&<Drift drifts={drifts}/>}
-        {view==='export'&&<Export episodes={episodes} drifts={drifts} metrics={metrics}/>}
-      </main>
-    </div>
-  );
+function renderEpisodes(){
+  var card=h('div',{className:'card'});
+  card.appendChild(h('h3',{textContent:'Recent Decision Episodes'}));
+  var wrap=h('div',{style:{overflowX:'auto'}});
+  var t=h('table');
+  t.appendChild(h('thead',null,h('tr',null,
+    h('th',{textContent:'Episode ID'}),h('th',{textContent:'Agent'}),h('th',{textContent:'Status'}),
+    h('th',{textContent:'Deadline'}),h('th',{textContent:'Duration'}),h('th',{textContent:'Freshness'}),h('th',{textContent:'Outcome'}))));
+  var tb=h('tbody');
+  var badge={success:'badge-success',timeout:'badge-timeout',degraded:'badge-degraded',failed:'badge-failed'};
+  state.episodes.slice(-25).reverse().forEach(function(e){
+    tb.appendChild(h('tr',null,
+      h('td',{className:'mono',textContent:e.id.substring(0,18)+'...'}),
+      h('td',{textContent:e.agent}),
+      h('td',null,h('span',{className:'badge '+badge[e.status],textContent:e.status})),
+      h('td',{textContent:e.deadline.toFixed(0)+'ms'}),
+      h('td',{textContent:e.duration.toFixed(0)+'ms'}),
+      h('td',{textContent:e.freshness.toFixed(1)+'%'}),
+      h('td',{textContent:e.outcome})));
+  });
+  t.appendChild(tb);wrap.appendChild(t);card.appendChild(wrap);return card;
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+function renderDrift(){
+  var card=h('div',{className:'card'});
+  card.appendChild(h('h3',{textContent:'\u26a0 Drift Events'}));
+  var box=h('div',{className:'scroll-box'});
+  state.drifts.slice(-25).reverse().forEach(function(d){
+    var cls='drift-item drift-'+d.severity;
+    box.appendChild(h('div',{className:cls},
+      h('div',{className:'drift-header'},
+        h('div',null,
+          h('div',{className:'drift-title',textContent:d.type+' Drift'}),
+          h('div',{className:'drift-ep',textContent:d.epId.substring(0,24)+'...'}),
+          h('div',{className:'drift-hint',textContent:d.patch})),
+        h('span',{className:'sev sev-'+d.severity,textContent:d.severity}))));
+  });
+  card.appendChild(box);return card;
+}
+
+function renderExport(){
+  var card=h('div',{className:'card'});
+  card.appendChild(h('h3',{textContent:'Export Dashboard Data'}));
+  var grid=h('div',{className:'export-grid'});
+  grid.appendChild(h('div',{className:'export-stat'},h('div',{className:'export-stat-label',textContent:'Decision Episodes'}),h('div',{className:'export-stat-value',textContent:''+state.episodes.length})));
+  grid.appendChild(h('div',{className:'export-stat'},h('div',{className:'export-stat-label',textContent:'Drift Events'}),h('div',{className:'export-stat-value',textContent:''+state.drifts.length})));
+  grid.appendChild(h('div',{className:'export-stat'},h('div',{className:'export-stat-label',textContent:'Agents Tracked'}),h('div',{className:'export-stat-value',textContent:''+state.metrics.length})));
+  grid.appendChild(h('div',{className:'export-stat'},h('div',{className:'export-stat-label',textContent:'Data Points'}),h('div',{className:'export-stat-value',textContent:''+(state.episodes.length*7+state.drifts.length*4)})));
+  card.appendChild(grid);
+  var btns=h('div',{style:{display:'flex',gap:'12px'}});
+  btns.appendChild(h('button',{className:'btn',textContent:'Export JSON',onclick:function(){doExport('json')}}));
+  btns.appendChild(h('button',{className:'btn btn-green',textContent:'Export CSV',onclick:function(){doExport('csv')}}));
+  card.appendChild(btns);
+  card.appendChild(h('p',{className:'note',textContent:'Exports all decision episodes, drift events, and agent metrics for offline analysis.'}));
+  return card;
+}
+
+function doExport(fmt){
+  var content,type,name,d=new Date().toISOString().slice(0,10);
+  if(fmt==='json'){
+    content=JSON.stringify({episodes:state.episodes,drifts:state.drifts,metrics:state.metrics,timestamp:new Date().toISOString()},null,2);
+    type='application/json';name='overwatch-'+d+'.json';
+  }else{
+    content='id,agent,status,deadline,duration,freshness,outcome\n';
+    state.episodes.forEach(function(e){content+=e.id+','+e.agent+','+e.status+','+e.deadline.toFixed(0)+','+e.duration.toFixed(0)+','+e.freshness.toFixed(1)+','+e.outcome+'\n';});
+    type='text/csv';name='overwatch-episodes-'+d+'.csv';
+  }
+  var blob=new Blob([content],{type:type});var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download=name;a.click();URL.revokeObjectURL(url);
+}
+
+function render(){
+  var root=document.getElementById('root');root.innerHTML='';
+  // header
+  var hdr=h('header',{className:'header'},
+    h('div',{className:'header-inner'},
+      h('div',{style:{display:'flex',alignItems:'center'}},
+        h('span',{className:'logo',textContent:'\u03a3 OVERWATCH'}),
+        h('span',{className:'logo-sub',textContent:'Control Plane Dashboard'})),
+      h('div',{className:'controls'},
+        (function(){var lbl=h('label',null);
+          var cb=document.createElement('input');cb.type='checkbox';cb.checked=state.auto;
+          cb.addEventListener('change',function(){toggleAuto(this.checked);});
+          lbl.appendChild(cb);lbl.appendChild(document.createTextNode(' Auto-Refresh (5s)'));return lbl;})(),
+        h('span',{className:'ts',textContent:'Updated: '+state.ts}))));
+  root.appendChild(hdr);
+  // nav
+  var nav=h('nav',null,h('div',{className:'inner'}));
+  ['overview','episodes','drift','export'].forEach(function(v){
+    nav.firstChild.appendChild(h('button',{className:state.view===v?'active':'',textContent:v[0].toUpperCase()+v.slice(1),
+      onclick:function(){setView(v);}}));
+  });
+  root.appendChild(nav);
+  // main
+  var main=h('main');
+  if(state.view==='overview')main.appendChild(renderOverview());
+  else if(state.view==='episodes')main.appendChild(renderEpisodes());
+  else if(state.view==='drift')main.appendChild(renderDrift());
+  else if(state.view==='export')main.appendChild(renderExport());
+  root.appendChild(main);
+}
+
+// boot
+loadData();
+interval=setInterval(loadData,5000);
 </script>
 </body>
 </html>
