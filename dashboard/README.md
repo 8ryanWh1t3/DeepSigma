@@ -2,6 +2,17 @@
 
 Real-time monitoring dashboard for the Σ OVERWATCH agentic AI control plane.
 
+## Zero-Install Demo
+
+**No build step required.** Open [`demo.html`](demo.html) in any browser for the full dashboard experience:
+
+```bash
+# Clone and open — that's it
+open dashboard/demo.html
+```
+
+Or download just the single file from GitHub and double-click it. The demo loads React + Recharts from CDN and runs entirely client-side with generated mock data. All 4 views (Overview, Episodes, Drift, Export) work out of the box with auto-refreshing data.
+
 ## Features
 
 - **Overview** — KPI cards (success rate, avg latency, drift events, active agents), deadline vs duration trend chart, decision status pie chart, agent performance bar chart, drift distribution
@@ -58,6 +69,7 @@ Real-time monitoring dashboard for the Σ OVERWATCH agentic AI control plane.
                           ## Project Structure
 
                           ```
+                            demo.html             # Zero-install single-file demo (just open in browser)
                           dashboard/
                             index.html            # Entry HTML
                             package.json          # Dependencies
