@@ -1,0 +1,17 @@
+{
+  "driftId": "dr_48c08d7c758a",
+  "episodeId": "ep_1f20efeb6d3c",
+  "driftType": "time",
+  "severity": "yellow",
+  "detectedAt": "2026-02-11T06:34:14Z",
+  "evidenceRefs": [
+    "ev_login_rate_30s",
+    "ev_geo_entropy_5m"
+  ],
+  "recommendedPatchType": "cache_bundle_change",
+  "fingerprint": {
+    "key": "AccountQuarantine::P99_SPIKE",
+    "version": "1.0"
+  },
+  "notes": "Tool latency spike triggered degrade ladder; used cache bundle."
+}

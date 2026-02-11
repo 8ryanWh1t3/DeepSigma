@@ -1,0 +1,215 @@
+{
+  "name": "sigma-overwatch-mcp",
+  "version": "0.1.0-scaffold",
+  "tools": [
+    {
+      "name": "overwatch.submit_task",
+      "description": "Start a supervised decision episode by decisionType (loads DTE) and returns a session_id.",
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "decisionType",
+          "payload",
+          "actor"
+        ],
+        "properties": {
+          "decisionType": {
+            "type": "string"
+          },
+          "payload": {
+            "type": "object"
+          },
+          "actor": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "version": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "required": [
+          "session_id"
+        ],
+        "properties": {
+          "session_id": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "overwatch.tool_execute",
+      "description": "Execute a governed tool call (context phase) with timing + freshness metadata.",
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "session_id",
+          "tool",
+          "input"
+        ],
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "tool": {
+            "type": "string"
+          },
+          "input": {
+            "type": "object"
+          }
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "required": [
+          "result",
+          "capturedAt"
+        ],
+        "properties": {
+          "result": {
+            "type": "object"
+          },
+          "capturedAt": {
+            "type": "string"
+          },
+          "sourceRef": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "overwatch.action_dispatch",
+      "description": "Dispatch a state-changing action with Safe Action Contract enforcement.",
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "session_id",
+          "action_contract"
+        ],
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "action_contract": {
+            "type": "object"
+          }
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "required": [
+          "ack"
+        ],
+        "properties": {
+          "ack": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "name": "overwatch.verify_run",
+      "description": "Run a verifier (e.g., read-after-write) and return pass/fail/inconclusive.",
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "session_id",
+          "method",
+          "details"
+        ],
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "method": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object"
+          }
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "name": "overwatch.episode_seal",
+      "description": "Seal and return the DecisionEpisode (audit-grade record) for the session.",
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "session_id",
+          "episode"
+        ],
+        "properties": {
+          "session_id": {
+            "type": "string"
+          },
+          "episode": {
+            "type": "object"
+          }
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "required": [
+          "sealed"
+        ],
+        "properties": {
+          "sealed": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "name": "overwatch.drift_emit",
+      "description": "Emit a drift event tied to a sealed episode.",
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "drift"
+        ],
+        "properties": {
+          "drift": {
+            "type": "object"
+          }
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "required": [
+          "ok"
+        ],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  ]
+}

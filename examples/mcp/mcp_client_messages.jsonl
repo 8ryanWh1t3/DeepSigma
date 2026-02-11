@@ -1,0 +1,3 @@
+{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}
+{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"overwatch.submit_task","arguments":{"decisionType":"AccountQuarantine","payload":{"account":"svc-demo"},"actor":{"id":"demo-agent","version":"0.1.0"}}}}
+{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"overwatch.tool_execute","arguments":{"session_id":"REPLACE_SESSION","tool":"feature_fetch","input":{"feature":"login_rate_30s"}}}}

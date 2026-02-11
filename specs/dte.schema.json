@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/dte.schema.json",
+  "title": "Decision Timing Envelope (DTE)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["decisionType", "version", "deadlineMs", "stageBudgetsMs", "freshness", "limits", "degradeLadder", "verification", "safeAction"],
+  "properties": {
+    "decisionType": { "type": "string", "minLength": 1 },
+    "version": { "type": "string", "minLength": 1 },
+    "description": { "type": "string" },
+    "deadlineMs": { "type": "integer", "minimum": 1 },
+    "stageBudgetsMs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["context", "plan", "act", "verify"],
+      "properties": {
+        "context": { "type": "integer", "minimum": 0 },
+        "plan": { "type": "integer", "minimum": 0 },
+        "act": { "type": "integer", "minimum": 0 },
+        "verify": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["defaultTtlMs"],
+      "properties": {
+        "defaultTtlMs": { "type": "integer", "minimum": 0 },
+        "featureTtls": {
+          "type": "object",
+          "additionalProperties": { "type": "integer", "minimum": 0 },
+          "description": "Per-feature TTL overrides (ms)."
+        },
+        "allowStaleIfSafe": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, supervisor may allow stale context only when action tier is below configured thresholds and DTE allows."
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxHops", "maxFanout", "maxToolCalls", "maxChainDepth"],
+      "properties": {
+        "maxHops": { "type": "integer", "minimum": 0 },
+        "maxFanout": { "type": "integer", "minimum": 0 },
+        "maxToolCalls": { "type": "integer", "minimum": 0 },
+        "maxChainDepth": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "degradeLadder": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["step"],
+        "properties": {
+          "step": {
+            "type": "string",
+            "enum": ["cache_bundle", "small_model", "rules_only", "hitl", "abstain", "bypass"]
+          },
+          "maxExtraMs": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Optional additional time this step may consume."
+          }
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requiredAboveBlastRadius"],
+      "properties": {
+        "requiredAboveBlastRadius": {
+          "type": "string",
+          "enum": ["none", "tiny", "small", "medium", "large"],
+          "description": "Verification becomes mandatory for actions strictly above this tier."
+        },
+        "methods": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Allowed verification method identifiers."
+        },
+        "verifyTimeoutMs": { "type": "integer", "minimum": 0, "default": 0 }
+      }
+    },
+    "safeAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requireIdempotency", "requireRollbackAbove", "blastRadiusMax"],
+      "properties": {
+        "requireIdempotency": { "type": "boolean" },
+        "requireRollbackAbove": {
+          "type": "string",
+          "enum": ["none", "tiny", "small", "medium", "large"]
+        },
+        "blastRadiusMax": {
+          "type": "string",
+          "enum": ["tiny", "small", "medium", "large"]
+        },
+        "allowedActionTypes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Optional allowlist of action types for this decision type."
+        }
+      }
+    },
+    "policyPack": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "policyPackHash": { "type": "string" },
+        "policyPackVersion": { "type": "string" }
+      }
+    }
+  }
+}

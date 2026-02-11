@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/drift.schema.json",
+  "title": "Drift Event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["driftId", "episodeId", "driftType", "severity", "detectedAt", "evidenceRefs", "recommendedPatchType", "fingerprint"],
+  "properties": {
+    "driftId": { "type": "string", "minLength": 1 },
+    "episodeId": { "type": "string", "minLength": 1 },
+    "driftType": {
+      "type": "string",
+      "enum": ["time", "freshness", "fallback", "bypass", "verify", "outcome", "fanout", "contention"]
+    },
+    "severity": { "type": "string", "enum": ["green", "yellow", "red"] },
+    "detectedAt": { "type": "string", "format": "date-time" },
+    "evidenceRefs": { "type": "array", "items": { "type": "string" } },
+    "recommendedPatchType": {
+      "type": "string",
+      "enum": ["dte_change", "ttl_change", "cache_bundle_change", "routing_change", "verification_change", "action_scope_tighten", "manual_review"]
+    },
+    "fingerprint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "version"],
+      "properties": { "key": { "type": "string" }, "version": { "type": "string" } }
+    },
+    "notes": { "type": "string" }
+  }
+}

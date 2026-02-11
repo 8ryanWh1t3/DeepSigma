@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/episode.schema.json",
+  "title": "Sealed Decision Episode",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["episodeId", "decisionType", "startedAt", "endedAt", "decisionWindowMs", "actor", "dteRef", "context", "plan", "actions", "verification", "outcome", "telemetry", "seal"],
+  "properties": {
+    "episodeId": { "type": "string", "minLength": 1 },
+    "decisionType": { "type": "string", "minLength": 1 },
+    "startedAt": { "type": "string", "format": "date-time" },
+    "endedAt": { "type": "string", "format": "date-time" },
+    "decisionWindowMs": { "type": "integer", "minimum": 1 },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": { "type": "string", "enum": ["agent", "human", "system"] },
+        "id": { "type": "string" },
+        "version": { "type": "string" }
+      }
+    },
+    "dteRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decisionType", "version"],
+      "properties": { "decisionType": { "type": "string" }, "version": { "type": "string" }, "policyPackHash": { "type": "string" } }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["snapshotId", "capturedAt", "ttlMs", "maxFeatureAgeMs", "ttlBreachesCount", "evidenceRefs"],
+      "properties": {
+        "snapshotId": { "type": "string" },
+        "capturedAt": { "type": "string", "format": "date-time" },
+        "ttlMs": { "type": "integer", "minimum": 0 },
+        "maxFeatureAgeMs": { "type": "integer", "minimum": 0 },
+        "ttlBreachesCount": { "type": "integer", "minimum": 0 },
+        "evidenceRefs": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["planner", "summary"],
+      "properties": { "planner": { "type": "string", "enum": ["llm", "rules", "hybrid"] }, "summary": { "type": "string" }, "planRef": { "type": "string" } }
+    },
+    "actions": { "type": "array", "minItems": 0, "items": { "$ref": "https://sigma-overwatch.dev/schemas/action_contract.schema.json" } },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "result"],
+      "properties": {
+        "required": { "type": "boolean" },
+        "method": { "type": "string" },
+        "result": { "type": "string", "enum": ["pass", "fail", "inconclusive", "na"] },
+        "details": { "type": "object" }
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code"],
+      "properties": {
+        "code": { "type": "string", "enum": ["success", "partial", "fail", "abstain", "bypassed"] },
+        "reason": { "type": "string" },
+        "effects": { "type": "object" }
+      }
+    },
+    "telemetry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["endToEndMs", "stageMs", "p95Ms", "p99Ms", "jitterMs", "fallbackUsed", "fallbackStep", "hopCount", "fanout"],
+      "properties": {
+        "endToEndMs": { "type": "integer", "minimum": 0 },
+        "stageMs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["context", "plan", "act", "verify"],
+          "properties": { "context": { "type": "integer", "minimum": 0 }, "plan": { "type": "integer", "minimum": 0 }, "act": { "type": "integer", "minimum": 0 }, "verify": { "type": "integer", "minimum": 0 } }
+        },
+        "p95Ms": { "type": "integer", "minimum": 0 },
+        "p99Ms": { "type": "integer", "minimum": 0 },
+        "jitterMs": { "type": "integer", "minimum": 0 },
+        "fallbackUsed": { "type": "boolean" },
+        "fallbackStep": { "type": "string" },
+        "hopCount": { "type": "integer", "minimum": 0 },
+        "fanout": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "seal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sealedAt", "sealHash"],
+      "properties": { "sealedAt": { "type": "string", "format": "date-time" }, "sealHash": { "type": "string" } }
+    }
+  }
+}

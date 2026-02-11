@@ -1,0 +1,65 @@
+{
+  "episodeId": "ep_2bda18077e1a",
+  "decisionType": "AccountQuarantine",
+  "startedAt": "2026-02-11T06:34:13Z",
+  "endedAt": "2026-02-11T06:34:13Z",
+  "decisionWindowMs": 120,
+  "actor": {
+    "type": "agent",
+    "id": "demo-agent",
+    "version": "0.1.0"
+  },
+  "dteRef": {
+    "decisionType": "AccountQuarantine",
+    "version": "1.0.0",
+    "policyPackHash": "pph_demo_9f3c"
+  },
+  "context": {
+    "snapshotId": "snap_5715bb9d43",
+    "capturedAt": "2026-02-11T06:34:13Z",
+    "ttlMs": 250,
+    "maxFeatureAgeMs": 900,
+    "ttlBreachesCount": 1,
+    "evidenceRefs": [
+      "ev_login_rate_30s",
+      "ev_geo_entropy_5m"
+    ]
+  },
+  "plan": {
+    "planner": "rules",
+    "summary": "Apply DTE, evaluate risk, propose safe quarantine action.",
+    "planRef": "plan_demo_001"
+  },
+  "actions": [],
+  "verification": {
+    "required": false,
+    "method": "read_after_write",
+    "result": "na",
+    "details": {}
+  },
+  "outcome": {
+    "code": "abstain",
+    "reason": "TTL breach: context stale beyond DTE freshness gate.",
+    "effects": {}
+  },
+  "telemetry": {
+    "endToEndMs": 55,
+    "stageMs": {
+      "context": 28,
+      "plan": 18,
+      "act": 30,
+      "verify": 0
+    },
+    "p95Ms": 40,
+    "p99Ms": 55,
+    "jitterMs": 6,
+    "fallbackUsed": true,
+    "fallbackStep": "abstain",
+    "hopCount": 2,
+    "fanout": 3
+  },
+  "seal": {
+    "sealedAt": "2026-02-11T06:34:13Z",
+    "sealHash": "396ebc6690dba6ac0e82ae1765aa5bc8676b91406883963f7dc065c13d78b533"
+  }
+}

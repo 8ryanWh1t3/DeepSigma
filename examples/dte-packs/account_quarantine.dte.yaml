@@ -1,0 +1,46 @@
+decisionType: "AccountQuarantine"
+version: "1.0.0"
+description: "Quarantine a suspicious service account when risk triggers."
+
+deadlineMs: 120
+stageBudgetsMs:
+  context: 35
+  plan: 25
+  act: 40
+  verify: 20
+
+freshness:
+  defaultTtlMs: 250
+  featureTtls:
+    login_rate_30s: 250
+    geo_entropy_5m: 2000
+    failed_auth_burst: 500
+  allowStaleIfSafe: false
+
+limits:
+  maxHops: 3
+  maxFanout: 6
+  maxToolCalls: 10
+  maxChainDepth: 4
+
+degradeLadder:
+  - step: "cache_bundle"
+  - step: "small_model"
+  - step: "rules_only"
+  - step: "hitl"
+  - step: "abstain"
+
+verification:
+  requiredAboveBlastRadius: "small"
+  methods: ["read_after_write", "health_check"]
+  verifyTimeoutMs: 20
+
+safeAction:
+  requireIdempotency: true
+  requireRollbackAbove: "small"
+  blastRadiusMax: "medium"
+  allowedActionTypes: ["quarantine_account", "disable_token", "open_ticket"]
+
+policyPack:
+  policyPackVersion: "pp-2026.02"
+  policyPackHash: "pph_demo_9f3c"

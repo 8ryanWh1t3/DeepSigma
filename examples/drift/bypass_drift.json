@@ -1,0 +1,17 @@
+{
+  "driftId": "dr_e7c0974c7e71",
+  "episodeId": "ep_63be6ee2865e",
+  "driftType": "bypass",
+  "severity": "red",
+  "detectedAt": "2026-02-11T06:34:14Z",
+  "evidenceRefs": [
+    "ev_login_rate_30s",
+    "ev_geo_entropy_5m"
+  ],
+  "recommendedPatchType": "action_scope_tighten",
+  "fingerprint": {
+    "key": "AccountQuarantine::UNSAFE_ACTION",
+    "version": "1.0"
+  },
+  "notes": "Action blocked: missing idempotency/rollback contract."
+}

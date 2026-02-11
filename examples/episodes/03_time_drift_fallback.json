@@ -1,0 +1,102 @@
+{
+  "episodeId": "ep_1f20efeb6d3c",
+  "decisionType": "AccountQuarantine",
+  "startedAt": "2026-02-11T06:34:13Z",
+  "endedAt": "2026-02-11T06:34:13Z",
+  "decisionWindowMs": 120,
+  "actor": {
+    "type": "agent",
+    "id": "demo-agent",
+    "version": "0.1.0"
+  },
+  "dteRef": {
+    "decisionType": "AccountQuarantine",
+    "version": "1.0.0",
+    "policyPackHash": "pph_demo_9f3c"
+  },
+  "context": {
+    "snapshotId": "snap_5715bb9d43",
+    "capturedAt": "2026-02-11T06:34:13Z",
+    "ttlMs": 250,
+    "maxFeatureAgeMs": 140,
+    "ttlBreachesCount": 0,
+    "evidenceRefs": [
+      "ev_login_rate_30s",
+      "ev_geo_entropy_5m"
+    ]
+  },
+  "plan": {
+    "planner": "rules",
+    "summary": "Apply DTE, evaluate risk, propose safe quarantine action.",
+    "planRef": "plan_demo_001"
+  },
+  "actions": [
+    {
+      "actionId": "act_quarantine_001",
+      "actionType": "quarantine_account",
+      "blastRadiusTier": "small",
+      "targetRefs": [
+        {
+          "type": "account",
+          "id": "svc-demo"
+        }
+      ],
+      "constraints": {
+        "rateLimitPerMin": 60,
+        "scope": "single-account"
+      },
+      "authorization": {
+        "mode": "auto",
+        "policyRef": "demo_policy_v1",
+        "approver": ""
+      },
+      "idempotencyKey": "idem_cada08d918602a9c",
+      "rollbackPlan": {
+        "type": "revert",
+        "instructions": {
+          "actionType": "unquarantine_account"
+        },
+        "timeoutMs": 2000
+      },
+      "execution": {
+        "executionSloMs": 40,
+        "timeoutMs": 45,
+        "retryPolicy": {
+          "maxRetries": 1,
+          "backoffMs": 10
+        }
+      }
+    }
+  ],
+  "verification": {
+    "required": true,
+    "method": "read_after_write",
+    "result": "pass",
+    "details": {}
+  },
+  "outcome": {
+    "code": "partial",
+    "reason": "Tool latency spike triggered degrade ladder; used cache bundle.",
+    "effects": {}
+  },
+  "telemetry": {
+    "endToEndMs": 135,
+    "stageMs": {
+      "context": 28,
+      "plan": 18,
+      "act": 30,
+      "verify": 59
+    },
+    "p95Ms": 80,
+    "p99Ms": 140,
+    "jitterMs": 45,
+    "fallbackUsed": true,
+    "fallbackStep": "cache_bundle",
+    "hopCount": 2,
+    "fanout": 3
+  },
+  "seal": {
+    "sealedAt": "2026-02-11T06:34:13Z",
+    "sealHash": "f2395cad687ff9ac0205c094a6700b48a87fd4be3a6369243750835990516c57"
+  }
+}

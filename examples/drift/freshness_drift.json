@@ -1,0 +1,17 @@
+{
+  "driftId": "dr_3559d19c170e",
+  "episodeId": "ep_2bda18077e1a",
+  "driftType": "freshness",
+  "severity": "yellow",
+  "detectedAt": "2026-02-11T06:34:14Z",
+  "evidenceRefs": [
+    "ev_login_rate_30s",
+    "ev_geo_entropy_5m"
+  ],
+  "recommendedPatchType": "ttl_change",
+  "fingerprint": {
+    "key": "AccountQuarantine::TTL_BREACH",
+    "version": "1.0"
+  },
+  "notes": "TTL breach: context stale beyond DTE freshness gate."
+}

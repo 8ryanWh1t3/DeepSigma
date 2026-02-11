@@ -1,0 +1,63 @@
+{
+  "episodeId": "ep_63be6ee2865e",
+  "decisionType": "AccountQuarantine",
+  "startedAt": "2026-02-11T06:34:13Z",
+  "endedAt": "2026-02-11T06:34:13Z",
+  "decisionWindowMs": 120,
+  "actor": {
+    "type": "agent",
+    "id": "demo-agent",
+    "version": "0.1.0"
+  },
+  "dteRef": {
+    "decisionType": "AccountQuarantine",
+    "version": "1.0.0",
+    "policyPackHash": "pph_demo_9f3c"
+  },
+  "context": {
+    "snapshotId": "snap_5715bb9d43",
+    "capturedAt": "2026-02-11T06:34:13Z",
+    "ttlMs": 250,
+    "maxFeatureAgeMs": 110,
+    "ttlBreachesCount": 0,
+    "evidenceRefs": [
+      "ev_login_rate_30s",
+      "ev_geo_entropy_5m"
+    ]
+  },
+  "plan": {
+    "planner": "rules",
+    "summary": "Apply DTE, evaluate risk, propose safe quarantine action.",
+    "planRef": "plan_demo_001"
+  },
+  "actions": [],
+  "verification": {
+    "required": false,
+    "result": "na"
+  },
+  "outcome": {
+    "code": "bypassed",
+    "reason": "Action blocked: missing idempotency/rollback contract.",
+    "effects": {}
+  },
+  "telemetry": {
+    "endToEndMs": 40,
+    "stageMs": {
+      "context": 28,
+      "plan": 18,
+      "act": 30,
+      "verify": 0
+    },
+    "p95Ms": 30,
+    "p99Ms": 40,
+    "jitterMs": 5,
+    "fallbackUsed": true,
+    "fallbackStep": "bypass",
+    "hopCount": 2,
+    "fanout": 3
+  },
+  "seal": {
+    "sealedAt": "2026-02-11T06:34:13Z",
+    "sealHash": "9a5b338f743b11e453eb9e72ce3e69fd49f37af6ea39349c472fee869e84d659"
+  }
+}
