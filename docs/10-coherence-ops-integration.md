@@ -147,3 +147,13 @@ To support RAL, data records must carry **freshness + provenance + operability**
 
 ## 7) One-line integration statement (canonical)
 **Coherence Ops defines the governance loop. RAL/Σ OVERWATCH enforces it at runtime and emits sealed episodes + drift that automatically populate DLR / RS / DS / MG — powered by an LLM Data Model with timestamps, TTL, provenance, and action contracts.**
+
+
+## 8) Policy stamping (vNext)
+Every sealed DecisionEpisode SHOULD include:
+- `policy.policyPackId`
+- `policy.policyPackVersion`
+- `policy.policyPackHash`
+- `degrade.step` + `degrade.rationale`
+
+This makes enforcement portable and auditable across environments.

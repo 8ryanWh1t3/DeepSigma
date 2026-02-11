@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/policy_pack.schema.json",
+  "title": "PolicyPack",
+  "type": "object",
+  "required": [
+    "policyPackId",
+    "version",
+    "issuedAt",
+    "rules"
+  ],
+  "properties": {
+    "policyPackId": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "issuedAt": {
+      "type": "string",
+      "description": "ISO-8601 timestamp"
+    },
+    "issuer": {
+      "type": "string"
+    },
+    "signature": {
+      "type": "string",
+      "description": "Optional detached signature (base64)"
+    },
+    "rules": {
+      "type": "object",
+      "description": "DecisionType keyed rules",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "dteDefaults": {
+            "type": "object"
+          },
+          "degradeLadder": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "blastRadiusRequirements": {
+            "type": "object"
+          },
+          "requiredVerifiers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "toolAllowlist": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "toolDenylist": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

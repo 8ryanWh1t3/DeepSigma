@@ -1,0 +1,46 @@
+{
+  "policyPackId": "demo_policy_pack",
+  "version": "1.0.0",
+  "issuedAt": "2026-02-11T19:55:03Z",
+  "issuer": "Deep Sigma",
+  "rules": {
+    "AccountQuarantine": {
+      "dteDefaults": {
+        "decisionWindowMs": 120,
+        "ttlMs": 250,
+        "maxFeatureAgeMs": 200
+      },
+      "degradeLadder": [
+        "cache_bundle",
+        "rules_only",
+        "hitl",
+        "abstain"
+      ],
+      "blastRadiusRequirements": {
+        "small": {
+          "verificationRequired": true,
+          "authorizationMode": "auto"
+        },
+        "medium": {
+          "verificationRequired": true,
+          "authorizationMode": "hitl"
+        },
+        "large": {
+          "verificationRequired": true,
+          "authorizationMode": "hitl",
+          "twoPerson": true
+        }
+      },
+      "requiredVerifiers": [
+        "read_after_write"
+      ],
+      "toolAllowlist": [
+        "feature_fetch",
+        "ontology_read",
+        "ontology_action",
+        "ticket_create"
+      ]
+    }
+  },
+  "policyPackHash": "ede103a7047c998e0bd29b7170e529ea1c72c43194adc10f148183a3c30cc4f7"
+}

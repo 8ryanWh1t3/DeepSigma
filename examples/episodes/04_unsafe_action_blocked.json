@@ -58,6 +58,24 @@
   },
   "seal": {
     "sealedAt": "2026-02-11T06:34:13Z",
-    "sealHash": "9a5b338f743b11e453eb9e72ce3e69fd49f37af6ea39349c472fee869e84d659"
+    "sealHash": "17e8408baaff88e73b0e8e3e47c96df139f012b26d16d92c442606f708360952"
+  },
+  "policy": {
+    "policyPackId": "demo_policy_pack",
+    "policyPackVersion": "1.0.0",
+    "policyPackHash": "ede103a7047c998e0bd29b7170e529ea1c72c43194adc10f148183a3c30cc4f7"
+  },
+  "degrade": {
+    "step": "none",
+    "rationale": {
+      "reason": "within_envelope",
+      "remaining_ms": 80
+    },
+    "ladder": [
+      "cache_bundle",
+      "rules_only",
+      "hitl",
+      "abstain"
+    ]
   }
 }

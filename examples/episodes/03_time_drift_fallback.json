@@ -97,6 +97,26 @@
   },
   "seal": {
     "sealedAt": "2026-02-11T06:34:13Z",
-    "sealHash": "f2395cad687ff9ac0205c094a6700b48a87fd4be3a6369243750835990516c57"
+    "sealHash": "bcd2c485616b05adfe07a35a8bebc65684cf01c422e7420bc7f59a52da85c250"
+  },
+  "policy": {
+    "policyPackId": "demo_policy_pack",
+    "policyPackVersion": "1.0.0",
+    "policyPackHash": "ede103a7047c998e0bd29b7170e529ea1c72c43194adc10f148183a3c30cc4f7"
+  },
+  "degrade": {
+    "step": "cache_bundle",
+    "rationale": {
+      "reason": "time_pressure",
+      "remaining_ms": 0,
+      "p99_ms": 140,
+      "jitter_ms": 45
+    },
+    "ladder": [
+      "cache_bundle",
+      "rules_only",
+      "hitl",
+      "abstain"
+    ]
   }
 }

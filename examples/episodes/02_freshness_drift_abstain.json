@@ -60,6 +60,25 @@
   },
   "seal": {
     "sealedAt": "2026-02-11T06:34:13Z",
-    "sealHash": "396ebc6690dba6ac0e82ae1765aa5bc8676b91406883963f7dc065c13d78b533"
+    "sealHash": "ef65f340ed29d57cf54bb665221278962d1ac98e71c83fc7725267a09d880b1b"
+  },
+  "policy": {
+    "policyPackId": "demo_policy_pack",
+    "policyPackVersion": "1.0.0",
+    "policyPackHash": "ede103a7047c998e0bd29b7170e529ea1c72c43194adc10f148183a3c30cc4f7"
+  },
+  "degrade": {
+    "step": "abstain",
+    "rationale": {
+      "reason": "freshness_gate",
+      "ttl_breaches": 1,
+      "max_feature_age_ms": 900
+    },
+    "ladder": [
+      "cache_bundle",
+      "rules_only",
+      "hitl",
+      "abstain"
+    ]
   }
 }
