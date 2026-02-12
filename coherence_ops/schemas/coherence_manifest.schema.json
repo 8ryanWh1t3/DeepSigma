@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/coherence_manifest.schema.json",
+  "title": "Coherence Manifest",
+  "description": "System-level declaration of Coherence Ops artifact coverage.",
+  "type": "object",
+  "required": [
+    "system_id",
+    "version",
+    "artifacts"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "system_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "kind",
+          "schema_version",
+          "compliance",
+          "source"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "dlr",
+              "rs",
+              "ds",
+              "mg"
+            ]
+          },
+          "schema_version": {
+            "type": "string"
+          },
+          "compliance": {
+            "type": "string",
+            "enum": [
+              "full",
+              "partial",
+              "scaffold",
+              "missing"
+            ]
+          },
+          "source": {
+            "type": "string"
+          },
+          "refresh_cadence_seconds": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "description": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object"
+    }
+  }
+}
