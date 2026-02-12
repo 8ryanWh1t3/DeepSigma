@@ -1,0 +1,79 @@
+{
+  "record_id": "rec_3nt1ty01-aaaa-4bbb-8ccc-ddddeeee0005",
+  "record_type": "Entity",
+  "created_at": "2025-06-01T09:00:00Z",
+  "observed_at": "2026-02-12T14:55:00Z",
+  "source": {
+    "system": "core-banking-api/v2",
+    "actor": {
+      "type": "system",
+      "id": "crm-sync-job"
+    },
+    "environment": "production"
+  },
+  "provenance": {
+    "chain": [
+      {
+        "type": "claim",
+        "statement": "Customer entity for account ACC-9921 synced from core banking system"
+      },
+      {
+        "type": "source",
+        "ref": "core-banking-api/v2/customers/ACC-9921",
+        "captured_at": "2026-02-12T14:55:00Z"
+      }
+    ]
+  },
+  "confidence": {
+    "score": 0.99,
+    "explanation": "Authoritative source — core banking system of record"
+  },
+  "ttl": 86400000,
+  "assumption_half_life": 604800000,
+  "labels": {
+    "domain": "customer",
+    "sensitivity": "confidential",
+    "project": "account-protection",
+    "tags": [
+      "customer",
+      "account",
+      "active",
+      "high-value"
+    ]
+  },
+  "links": [
+    {
+      "rel": "part_of",
+      "target": "rec_3nt1ty00-aaaa-4bbb-8ccc-org-finance-001"
+    }
+  ],
+  "content": {
+    "entity_type": "Customer",
+    "entity_id": "ACC-9921",
+    "display_name": "Acme Corp — Operating Account",
+    "status": "active",
+    "tier": "enterprise",
+    "region": "US-TX",
+    "created_date": "2025-06-01",
+    "last_activity_at": "2026-02-12T14:50:00Z",
+    "risk_score": 0.72,
+    "attributes": {
+      "account_type": "operating",
+      "currency": "USD",
+      "average_daily_balance_tier": "high"
+    }
+  },
+  "seal": {
+    "hash": "sha256:d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5",
+    "sealed_at": "2026-02-12T14:55:01Z",
+    "version": 14,
+    "patch_log": [
+      {
+        "patched_at": "2026-02-12T14:55:01Z",
+        "author": "crm-sync-job",
+        "reason": "Scheduled daily sync — updated last_activity_at and risk_score",
+        "new_hash": "sha256:d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5"
+      }
+    ]
+  }
+}
