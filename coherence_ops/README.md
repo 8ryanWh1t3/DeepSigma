@@ -1,41 +1,38 @@
 # Coherence Ops
 
-Governance framework for agentic AI — implements the four canonical
-artifacts (**DLR / RS / DS / MG**) and the coherence audit loop that
-connects RAL / Σ OVERWATCH runtime exhaust to structured governance,
-learning, and memory.
+Governance framework for agentic AI — implements the four canonical artifacts (**DLR / RS / DS / MG**) and the coherence audit loop that connects RAL / \u03a3 OVERWATCH runtime exhaust to structured governance, learning, and memory.
 
 ## Architecture
 
 ```
 Sealed Episodes + Drift Events (from RAL)
-            │
-            ▼
+         │
+         ▼
 ┌───────────────────────────────────────────┐
-│          coherence_ops                     │
-│                                            │
-│  ┌─────────┐  ┌────────┐  ┌────────────┐  │
-│  │  DLR    │  │   RS   │  │     DS     │  │
-│  │ Builder │  │Session │  │ Collector  │  │
-│  └────┬────┘  └───┬────┘  └─────┬──────┘  │
-│       │           │             │          │
-│       ▼           ▼             ▼          │
-│  ┌─────────────────────────────────────┐   │
-│  │         Memory Graph (MG)           │   │
-│  │  episodes · actions · drift · patches│   │
-│  └─────────────────────────────────────┘   │
-│       │           │             │          │
-│       ▼           ▼             ▼          │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐ │
-│  │ Auditor  │  │  Scorer  │  │Reconciler│ │
-│  └──────────┘  └──────────┘  └──────────┘ │
+│              coherence_ops                │
+│                                           │
+│  ┌─────────┐  ┌────────┐  ┌────────────┐ │
+│  │   DLR   │  │   RS   │  │     DS     │ │
+│  │ Builder │  │Session │  │ Collector  │ │
+│  └────┬────┘  └───┬────┘  └─────┬──────┘ │
+│       │           │             │         │
+│       ▼           ▼             ▼         │
+│  ┌─────────────────────────────────────┐  │
+│  │        Memory Graph (MG)            │  │
+│  │ episodes · actions · drift · patches│  │
+│  └─────────────────────────────────────┘  │
+│       │           │             │         │
+│       ▼           ▼             ▼         │
+│  ┌──────────┐ ┌──────────┐ ┌──────────┐  │
+│  │ Auditor  │ │ Scorer   │ │Reconciler│  │
+│  └──────────┘ └──────────┘ └──────────┘  │
 └───────────────────────────────────────────┘
 ```
 
 ## Modules
 
 | Module | Class | Purpose |
-|--------|-------|---------|
+|---|---|---|
 | `manifest.py` | `CoherenceManifest` | System-level declaration of artifact coverage |
 | `dlr.py` | `DLRBuilder` | Build Decision Log Records from sealed episodes |
 | `rs.py` | `ReflectionSession` | Aggregate episodes into learning summaries |
@@ -44,22 +41,55 @@ Sealed Episodes + Drift Events (from RAL)
 | `audit.py` | `CoherenceAuditor` | Cross-artifact consistency checks |
 | `scoring.py` | `CoherenceScorer` | Unified 0–100 coherence score (A/B/C/D/F) |
 | `reconciler.py` | `Reconciler` | Detect and propose repairs for inconsistencies |
+| `cli.py` | — | CLI entrypoint: `audit`, `score`, `mg export`, `demo` |
 
 ## The Four Canonical Artifacts
 
 | Artifact | Full Name | Question It Answers |
-|----------|-----------|-------------------|
+|---|---|---|
 | **DLR** | Decision Log Record | What policy governed this decision, and was it followed? |
 | **RS** | Reflection Session | What happened, what degraded, what should we learn? |
 | **DS** | Drift Signal | What is breaking, how often, and how badly? |
 | **MG** | Memory Graph | What happened before, why, and what changed as a result? |
 
+## CLI
+
+```bash
+# Run from the repo root
+
+# Coherence audit
+python -m coherence_ops audit ./coherence_ops/examples/sample_episodes.json
+
+# Coherence score
+python -m coherence_ops score ./coherence_ops/examples/sample_episodes.json
+python -m coherence_ops score ./coherence_ops/examples/sample_episodes.json --json
+
+# Memory Graph export
+python -m coherence_ops mg export ./coherence_ops/examples/ --format=json
+python -m coherence_ops mg export ./coherence_ops/examples/ --format=graphml
+python -m coherence_ops mg export ./coherence_ops/examples/ --format=neo4j-csv
+
+# Ship-it demo (the Stark/Jobs moment)
+python -m coherence_ops demo
+```
+
+The `demo` command prints:
+1. **Coherence score** with per-dimension breakdown
+2. **Top 3 drift fingerprints** with severity and recommended patches
+3. **"Why did we do this?"** query result from the Memory Graph
+
+Every output includes **seal / version / patch** metadata (stub hash today, real hash when sealed).
+
 ## Quick Start
 
 ```python
 from coherence_ops import (
-    CoherenceManifest, DLRBuilder, ReflectionSession,
-    DriftSignalCollector, MemoryGraph, CoherenceScorer,
+    CoherenceManifest,
+    DLRBuilder,
+    ReflectionSession,
+    DriftSignalCollector,
+    MemoryGraph,
+    CoherenceScorer,
 )
 
 # 1. Build DLR from sealed episodes
@@ -88,12 +118,36 @@ report = scorer.score()
 print(f"Coherence: {report.overall_score}/100 ({report.grade})")
 ```
 
+## Examples
+
+End-to-end examples live in `examples/`:
+
+| File | Description |
+|---|---|
+| `sample_episodes.json` | 3 sealed DecisionEpisodes (deploy, scale, rollback) |
+| `sample_drift.json` | 5 drift events (green/yellow/red) |
+| `e2e_seal_to_report.py` | Full pipeline: sealed episode → CoherenceReport JSON |
+
+Run the end-to-end examples:
+```bash
+python -m coherence_ops.examples.e2e_seal_to_report
+```
+
 ## Schemas
 
 - `schemas/coherence_manifest.schema.json` — manifest structure
 - `schemas/coherence_report.schema.json` — audit report structure
 
-## Integration with RAL
+## Related Resources
 
-See `docs/10-coherence-ops-integration.md` for the full mapping between
-RAL runtime artifacts and Coherence Ops canonical artifacts.
+> **Mermaid Diagrams** — Visual architecture of the coherence pipeline:
+> [`mermaid/coherence_ops_pipeline.mmd`](../mermaid/coherence_ops_pipeline.mmd) |
+> [`mermaid/coherence_ops_data_flow.mmd`](../mermaid/coherence_ops_data_flow.mmd) |
+> [`mermaid/coherence_ops_scoring.mmd`](../mermaid/coherence_ops_scoring.mmd)
+
+> **Wiki** — Full mapping between RAL runtime artifacts and Coherence Ops:
+> [Coherence Ops Integration](https://github.com/8ryanWh1t3/DeepSigma/wiki/Coherence-Ops-Integration) |
+> [Coherence Ops Architecture](https://github.com/8ryanWh1t3/DeepSigma/wiki/Coherence-Ops-Architecture) |
+> [DLR / RS / DS / MG Deep Dive](https://github.com/8ryanWh1t3/DeepSigma/wiki/DLR-RS-DS-MG-Artifacts)
+
+> **Integration Guide** — `docs/10-coherence-ops-integration.md`
