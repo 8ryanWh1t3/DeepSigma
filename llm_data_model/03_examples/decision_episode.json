@@ -1,0 +1,146 @@
+{
+  "record_id": "rec_d3c1s001-aaaa-4bbb-8ccc-ddddeeee0002",
+  "record_type": "DecisionEpisode",
+  "created_at": "2026-02-12T15:01:00Z",
+  "observed_at": "2026-02-12T15:00:05Z",
+  "source": {
+    "system": "overwatch-supervisor-v1",
+    "actor": {
+      "type": "system",
+      "id": "supervisor-main"
+    },
+    "environment": "production"
+  },
+  "provenance": {
+    "chain": [
+      {
+        "type": "claim",
+        "statement": "AccountQuarantine decision for ACC-9921 completed within DTE deadline"
+      },
+      {
+        "type": "evidence",
+        "ref": "rec_c1a1m001-aaaa-4bbb-8ccc-ddddeeee0001",
+        "method": "ral_supervised_execution"
+      },
+      {
+        "type": "source",
+        "ref": "overwatch-supervisor/episodes",
+        "captured_at": "2026-02-12T15:01:00Z"
+      }
+    ]
+  },
+  "confidence": {
+    "score": 1,
+    "explanation": "Sealed decision episode — outcome is deterministic and verified"
+  },
+  "ttl": 0,
+  "assumption_half_life": 0,
+  "labels": {
+    "domain": "fraud",
+    "sensitivity": "high",
+    "project": "account-protection",
+    "tags": [
+      "decision",
+      "quarantine",
+      "sealed",
+      "verified"
+    ]
+  },
+  "links": [
+    {
+      "rel": "derived_from",
+      "target": "rec_c1a1m001-aaaa-4bbb-8ccc-ddddeeee0001"
+    },
+    {
+      "rel": "verified_by",
+      "target": "rec_3v3nt003-aaaa-4bbb-8ccc-ddddeeee0004"
+    }
+  ],
+  "content": {
+    "episode_id": "ep-quarantine-acc9921-20260212",
+    "decision_type": "AccountQuarantine",
+    "started_at": "2026-02-12T15:00:05Z",
+    "ended_at": "2026-02-12T15:00:10Z",
+    "decision_window_ms": 500,
+    "actor": {
+      "type": "agent",
+      "id": "agent-fd-003",
+      "version": "3.1.0"
+    },
+    "dte_ref": {
+      "decision_type": "AccountQuarantine",
+      "version": "1.2.0",
+      "policy_pack_hash": "sha256:abc123"
+    },
+    "context": {
+      "snapshot_id": "snap-20260212-150005",
+      "captured_at": "2026-02-12T15:00:05Z",
+      "ttl_ms": 30000,
+      "max_feature_age_ms": 180,
+      "ttl_breaches_count": 0,
+      "evidence_refs": [
+        "rec_c1a1m001-aaaa-4bbb-8ccc-ddddeeee0001"
+      ]
+    },
+    "plan": {
+      "planner": "llm",
+      "summary": "Quarantine account ACC-9921 pending manual review"
+    },
+    "actions": [
+      {
+        "action_id": "act-quarantine-001",
+        "action_type": "account_quarantine",
+        "blast_radius_tier": "small",
+        "target_refs": [
+          {
+            "type": "account",
+            "id": "ACC-9921"
+          }
+        ],
+        "authorization": {
+          "mode": "auto",
+          "policy_ref": "policy-fraud-v2"
+        },
+        "idempotency_key": "quarantine-acc9921-20260212",
+        "rollback_plan": {
+          "type": "revert",
+          "instructions": {
+            "action": "unquarantine"
+          },
+          "timeout_ms": 86400000
+        }
+      }
+    ],
+    "verification": {
+      "required": true,
+      "method": "read_after_write",
+      "result": "pass"
+    },
+    "outcome": {
+      "code": "success",
+      "reason": "Account quarantined and verified"
+    },
+    "telemetry": {
+      "end_to_end_ms": 95,
+      "stage_ms": {
+        "context": 15,
+        "plan": 30,
+        "act": 35,
+        "verify": 15
+      },
+      "p95_ms": 120,
+      "p99_ms": 160,
+      "jitter_ms": 8,
+      "fallback_used": false,
+      "fallback_step": "none",
+      "hop_count": 1,
+      "fanout": 1
+    }
+  },
+  "seal": {
+    "hash": "sha256:b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9",
+    "sealed_at": "2026-02-12T15:01:00Z",
+    "version": 1,
+    "patch_log": []
+  }
+}
