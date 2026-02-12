@@ -1,0 +1,123 @@
+{
+  "record_id": "rec_d0c0m001-aaaa-4bbb-8ccc-ddddeeee0003",
+  "record_type": "Document",
+  "created_at": "2026-01-15T10:00:00Z",
+  "observed_at": "2026-01-15T10:00:00Z",
+  "source": {
+    "system": "policy-authoring-tool",
+    "actor": {
+      "type": "human",
+      "id": "policy-admin-jdoe"
+    },
+    "environment": "production"
+  },
+  "provenance": {
+    "chain": [
+      {
+        "type": "claim",
+        "statement": "DTE definition for AccountQuarantine v1.2.0 authored and approved"
+      },
+      {
+        "type": "evidence",
+        "ref": "approval-ticket-POL-2026-0042",
+        "method": "manual_review"
+      },
+      {
+        "type": "source",
+        "ref": "policy-authoring-tool/dte-editor",
+        "captured_at": "2026-01-15T10:00:00Z"
+      }
+    ]
+  },
+  "confidence": {
+    "score": 1,
+    "explanation": "Policy document authored by authorized admin and approved through governance workflow"
+  },
+  "ttl": 0,
+  "assumption_half_life": 0,
+  "labels": {
+    "domain": "policy",
+    "sensitivity": "internal",
+    "project": "account-protection",
+    "tags": [
+      "dte",
+      "account-quarantine",
+      "v1.2.0"
+    ]
+  },
+  "links": [
+    {
+      "rel": "supersedes",
+      "target": "rec_d0c0m000-aaaa-4bbb-8ccc-ddddeeee0003"
+    }
+  ],
+  "content": {
+    "document_type": "DTE",
+    "title": "AccountQuarantine Decision Timing Envelope",
+    "version": "1.2.0",
+    "decision_type": "AccountQuarantine",
+    "deadline_ms": 500,
+    "stage_budgets_ms": {
+      "context": 100,
+      "plan": 150,
+      "act": 150,
+      "verify": 100
+    },
+    "freshness": {
+      "default_ttl_ms": 30000,
+      "allow_stale_if_safe": false
+    },
+    "limits": {
+      "max_hops": 3,
+      "max_fanout": 2,
+      "max_tool_calls": 5,
+      "max_chain_depth": 3
+    },
+    "degrade_ladder": [
+      {
+        "step": "cache_bundle",
+        "max_extra_ms": 50
+      },
+      {
+        "step": "small_model",
+        "max_extra_ms": 100
+      },
+      {
+        "step": "rules_only",
+        "max_extra_ms": 20
+      },
+      {
+        "step": "hitl",
+        "max_extra_ms": 0
+      },
+      {
+        "step": "abstain",
+        "max_extra_ms": 0
+      }
+    ],
+    "verification": {
+      "required_above_blast_radius": "tiny",
+      "methods": [
+        "read_after_write"
+      ]
+    },
+    "safe_action": {
+      "require_idempotency": true,
+      "require_rollback_above": "tiny",
+      "blast_radius_max": "small"
+    }
+  },
+  "seal": {
+    "hash": "sha256:1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b",
+    "sealed_at": "2026-01-15T10:00:01Z",
+    "version": 2,
+    "patch_log": [
+      {
+        "patched_at": "2026-01-20T14:30:00Z",
+        "author": "policy-admin-jdoe",
+        "reason": "Increased plan budget from 100ms to 150ms after P99 analysis",
+        "new_hash": "sha256:1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b"
+      }
+    ]
+  }
+}
