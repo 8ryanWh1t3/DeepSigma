@@ -1,0 +1,271 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/canonical_record.schema.json",
+  "title": "Canonical Record Envelope",
+  "description": "The standard wrapper for every object in the LLM Data Model. Ensures provenance, TTL, sealing, and graph-linking.",
+  "type": "object",
+  "required": [
+    "record_id",
+    "record_type",
+    "created_at",
+    "observed_at",
+    "source",
+    "provenance",
+    "confidence",
+    "ttl",
+    "labels",
+    "links",
+    "content",
+    "seal"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "record_id": {
+      "type": "string",
+      "pattern": "^rec_[a-f0-9\\-]{36}$",
+      "description": "Stable UUID prefixed with rec_. Never reused."
+    },
+    "record_type": {
+      "type": "string",
+      "enum": [
+        "Claim",
+        "DecisionEpisode",
+        "Event",
+        "Document",
+        "Entity",
+        "Metric"
+      ],
+      "description": "The kind of record this envelope wraps."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the record was created in the system."
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the underlying fact was observed in the real world."
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "system"
+      ],
+      "properties": {
+        "system": {
+          "type": "string",
+          "description": "The system or service that produced this record."
+        },
+        "actor": {
+          "type": "object",
+          "required": [
+            "type",
+            "id"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "agent",
+                "human",
+                "system"
+              ]
+            },
+            "id": {
+              "type": "string"
+            }
+          }
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "production",
+            "staging",
+            "development",
+            "test"
+          ]
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "chain"
+      ],
+      "properties": {
+        "chain": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "claim",
+                  "evidence",
+                  "source"
+                ]
+              },
+              "statement": {
+                "type": "string"
+              },
+              "ref": {
+                "type": "string"
+              },
+              "method": {
+                "type": "string"
+              },
+              "captured_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      }
+    },
+    "confidence": {
+      "type": "object",
+      "required": [
+        "score",
+        "explanation"
+      ],
+      "properties": {
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "explanation": {
+          "type": "string"
+        }
+      }
+    },
+    "ttl": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Time-to-live in milliseconds. 0 = perpetual."
+    },
+    "assumption_half_life": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Half-life of the assumption in milliseconds."
+    },
+    "labels": {
+      "type": "object",
+      "required": [
+        "domain"
+      ],
+      "properties": {
+        "domain": {
+          "type": "string"
+        },
+        "sensitivity": {
+          "type": "string",
+          "enum": [
+            "public",
+            "internal",
+            "confidential",
+            "restricted",
+            "high"
+          ]
+        },
+        "project": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "rel",
+          "target"
+        ],
+        "properties": {
+          "rel": {
+            "type": "string",
+            "enum": [
+              "supports",
+              "contradicts",
+              "derived_from",
+              "supersedes",
+              "part_of",
+              "caused_by",
+              "verified_by"
+            ]
+          },
+          "target": {
+            "type": "string",
+            "description": "record_id of the linked record."
+          }
+        }
+      }
+    },
+    "content": {
+      "type": "object",
+      "description": "Type-specific payload. Structure varies by record_type."
+    },
+    "seal": {
+      "type": "object",
+      "required": [
+        "hash",
+        "sealed_at",
+        "version"
+      ],
+      "properties": {
+        "hash": {
+          "type": "string",
+          "description": "SHA-256 hash prefixed with sha256:"
+        },
+        "sealed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "patch_log": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "patched_at",
+              "author",
+              "reason",
+              "new_hash"
+            ],
+            "properties": {
+              "patched_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "author": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
+              },
+              "new_hash": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
