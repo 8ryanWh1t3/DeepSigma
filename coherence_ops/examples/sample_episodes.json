@@ -1,0 +1,153 @@
+[
+  {
+    "episodeId": "ep-demo-001",
+    "decisionType": "deploy",
+    "sealedAt": "2026-02-12T10:00:00Z",
+    "dteRef": {
+      "deadlineIso": "2026-02-12T10:05:00Z",
+      "ttlSeconds": 300,
+      "freshnessGate": "pass"
+    },
+    "actions": [
+      {
+        "type": "deploy_model",
+        "blastRadiusTier": "medium",
+        "idempotencyKey": "idem-deploy-001",
+        "rollbackPlan": "revert to v2.3",
+        "authorization": {
+          "mode": "human_approved"
+        },
+        "targetRefs": [
+          "model-svc/v2.4"
+        ]
+      }
+    ],
+    "verification": {
+      "result": "pass",
+      "verifierId": "smoke-test-v1"
+    },
+    "policy": {
+      "packId": "policy-pack-prod-v3",
+      "packHash": "sha256:abc123def456",
+      "evaluatedAt": "2026-02-12T09:59:50Z",
+      "result": "allow"
+    },
+    "outcome": {
+      "code": "success",
+      "detail": "model v2.4 deployed"
+    },
+    "degrade": {
+      "step": "none"
+    },
+    "context": {
+      "evidenceRefs": [
+        "evidence:deploy-checklist-001"
+      ]
+    },
+    "seal": {
+      "sealHash": "sha256:seal001aaa",
+      "sealedAt": "2026-02-12T10:00:00Z"
+    }
+  },
+  {
+    "episodeId": "ep-demo-002",
+    "decisionType": "scale",
+    "sealedAt": "2026-02-12T10:15:00Z",
+    "dteRef": {
+      "deadlineIso": "2026-02-12T10:20:00Z",
+      "ttlSeconds": 300,
+      "freshnessGate": "pass"
+    },
+    "actions": [
+      {
+        "type": "scale_replicas",
+        "blastRadiusTier": "low",
+        "idempotencyKey": "idem-scale-002",
+        "rollbackPlan": "scale back to 3 replicas",
+        "authorization": {
+          "mode": "auto"
+        },
+        "targetRefs": [
+          "inference-svc"
+        ]
+      }
+    ],
+    "verification": {
+      "result": "pass",
+      "verifierId": "replica-health-check"
+    },
+    "policy": {
+      "packId": "policy-pack-prod-v3",
+      "packHash": "sha256:abc123def456",
+      "evaluatedAt": "2026-02-12T10:14:55Z",
+      "result": "allow"
+    },
+    "outcome": {
+      "code": "success",
+      "detail": "scaled to 5 replicas"
+    },
+    "degrade": {
+      "step": "none"
+    },
+    "context": {
+      "evidenceRefs": [
+        "evidence:load-metrics-002"
+      ]
+    },
+    "seal": {
+      "sealHash": "sha256:seal002bbb",
+      "sealedAt": "2026-02-12T10:15:00Z"
+    }
+  },
+  {
+    "episodeId": "ep-demo-003",
+    "decisionType": "rollback",
+    "sealedAt": "2026-02-12T10:30:00Z",
+    "dteRef": {
+      "deadlineIso": "2026-02-12T10:32:00Z",
+      "ttlSeconds": 120,
+      "freshnessGate": "pass"
+    },
+    "actions": [
+      {
+        "type": "rollback_model",
+        "blastRadiusTier": "high",
+        "idempotencyKey": "idem-rollback-003",
+        "rollbackPlan": "no further rollback available",
+        "authorization": {
+          "mode": "human_approved"
+        },
+        "targetRefs": [
+          "model-svc/v2.4"
+        ]
+      }
+    ],
+    "verification": {
+      "result": "fail",
+      "verifierId": "smoke-test-v1"
+    },
+    "policy": {
+      "packId": "policy-pack-prod-v3",
+      "packHash": "sha256:abc123def456",
+      "evaluatedAt": "2026-02-12T10:29:50Z",
+      "result": "allow"
+    },
+    "outcome": {
+      "code": "partial",
+      "detail": "rollback executed but verification failed"
+    },
+    "degrade": {
+      "step": "safe_subset"
+    },
+    "context": {
+      "evidenceRefs": [
+        "evidence:incident-003",
+        "evidence:deploy-checklist-001"
+      ]
+    },
+    "seal": {
+      "sealHash": "sha256:seal003ccc",
+      "sealedAt": "2026-02-12T10:30:00Z"
+    }
+  }
+]
