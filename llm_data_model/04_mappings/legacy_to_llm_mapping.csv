@@ -1,0 +1,33 @@
+legacy_system,legacy_field,legacy_type,envelope_field,envelope_type,transform,notes
+SQL_CRM,id,INT,record_id,string,"uuid_from_hash('crm', id)","Prefix with rec_ + deterministic UUID from source"
+SQL_CRM,created_date,DATETIME,created_at,date-time,iso8601(created_date),Direct conversion to ISO-8601
+SQL_CRM,created_date,DATETIME,observed_at,date-time,iso8601(created_date),"Same as created_at when no separate observation time"
+SQL_CRM,system_name,VARCHAR,source.system,string,lower(system_name),Normalize to lowercase
+SQL_CRM,user_id,VARCHAR,source.actor.id,string,passthrough,Direct mapping
+SQL_CRM,user_type,VARCHAR,source.actor.type,enum,"map({'AUTOMATED':'agent','MANUAL':'human','BATCH':'system'})",Translate to envelope enum
+SQL_CRM,department,VARCHAR,labels.domain,string,lower(department),Business domain tag
+SQL_CRM,classification,VARCHAR,labels.sensitivity,enum,"map({'PUBLIC':'public','INTERNAL':'internal','CONFIDENTIAL':'confidential','RESTRICTED':'restricted'})",Security classification
+SQL_CRM,project_code,VARCHAR,labels.project,string,passthrough,Direct mapping
+SQL_CRM,data_payload,JSON,content,object,json_parse(data_payload),Parse JSON blob into content
+SQL_CRM,related_ids,VARCHAR,links,array,"split_to_links(related_ids, 'derived_from')","Comma-separated IDs become link array"
+SQL_CRM,n/a,n/a,provenance.chain,array,default_chain(source),Auto-generate minimal provenance chain
+SQL_CRM,n/a,n/a,confidence.score,number,0.0,Legacy has no confidence — set to unscored
+SQL_CRM,n/a,n/a,confidence.explanation,string,"'unscored — migrated from legacy CRM'",Static explanation
+SQL_CRM,n/a,n/a,ttl,integer,86400000,"Default 24h TTL for migrated records"
+SQL_CRM,n/a,n/a,seal.hash,string,sha256(record),Compute on ingestion
+SQL_CRM,n/a,n/a,seal.sealed_at,date-time,now(),Seal at migration time
+SQL_CRM,n/a,n/a,seal.version,integer,1,First version
+SharePoint,ListItemId,INT,record_id,string,"uuid_from_hash('sp', ListItemId)",Deterministic UUID
+SharePoint,Created,DATETIME,created_at,date-time,iso8601(Created),Direct conversion
+SharePoint,Modified,DATETIME,observed_at,date-time,iso8601(Modified),Last modified = latest observation
+SharePoint,Author,PERSON,source.actor.id,string,email(Author),Extract email
+SharePoint,ContentType,STRING,record_type,enum,sp_content_type_map(ContentType),Map SP content types to envelope types
+SharePoint,Title,STRING,content.title,string,passthrough,Direct mapping
+SharePoint,Body,HTML,content.body,string,strip_html(Body),HTML to plain text
+Palantir,objectRid,STRING,record_id,string,"uuid_from_hash('palantir', objectRid)",Deterministic UUID
+Palantir,objectTypeRid,STRING,record_type,enum,palantir_type_map(objectTypeRid),Map Palantir object types
+Palantir,properties,OBJECT,content,object,flatten_properties(properties),Flatten nested property bag
+PowerPlatform,activityid,GUID,record_id,string,"'rec_' + activityid",Direct GUID reuse with prefix
+PowerPlatform,createdon,DATETIME,created_at,date-time,iso8601(createdon),Direct conversion
+PowerPlatform,modifiedon,DATETIME,observed_at,date-time,iso8601(modifiedon),Latest modification
+PowerPlatform,ownerid,LOOKUP,source.actor.id,string,resolve_lookup(ownerid),Resolve Dataverse lookup
