@@ -1,0 +1,89 @@
+[
+  {
+    "driftId": "drift-001",
+    "episodeId": "ep-demo-003",
+    "driftType": "verify",
+    "severity": "red",
+    "detectedAt": "2026-02-12T10:30:05Z",
+    "fingerprint": {
+      "key": "verify:smoke-test-v1:fail",
+      "version": 1
+    },
+    "expectedBehaviour": "verification pass after rollback",
+    "actualBehaviour": "smoke-test-v1 returned fail",
+    "recommendedPatchType": "escalate_to_human",
+    "metadata": {
+      "verifierId": "smoke-test-v1"
+    }
+  },
+  {
+    "driftId": "drift-002",
+    "episodeId": "ep-demo-003",
+    "driftType": "outcome",
+    "severity": "yellow",
+    "detectedAt": "2026-02-12T10:30:10Z",
+    "fingerprint": {
+      "key": "outcome:partial:rollback",
+      "version": 1
+    },
+    "expectedBehaviour": "full success on rollback",
+    "actualBehaviour": "partial outcome — degraded to safe_subset",
+    "recommendedPatchType": "adjust_degrade_ladder",
+    "metadata": {
+      "outcomeCode": "partial"
+    }
+  },
+  {
+    "driftId": "drift-003",
+    "episodeId": "ep-demo-001",
+    "driftType": "time",
+    "severity": "green",
+    "detectedAt": "2026-02-12T10:00:15Z",
+    "fingerprint": {
+      "key": "time:deploy:near_deadline",
+      "version": 1
+    },
+    "expectedBehaviour": "complete well within DTE budget",
+    "actualBehaviour": "completed with <60s remaining on 300s budget",
+    "recommendedPatchType": "increase_dte_budget",
+    "metadata": {
+      "remainingSeconds": 55
+    }
+  },
+  {
+    "driftId": "drift-004",
+    "episodeId": "ep-demo-003",
+    "driftType": "verify",
+    "severity": "red",
+    "detectedAt": "2026-02-12T10:31:00Z",
+    "fingerprint": {
+      "key": "verify:smoke-test-v1:fail",
+      "version": 1
+    },
+    "expectedBehaviour": "verification pass on retry",
+    "actualBehaviour": "smoke-test-v1 still failing after rollback",
+    "recommendedPatchType": "escalate_to_human",
+    "metadata": {
+      "verifierId": "smoke-test-v1",
+      "retryAttempt": 2
+    }
+  },
+  {
+    "driftId": "drift-005",
+    "episodeId": "ep-demo-003",
+    "driftType": "verify",
+    "severity": "red",
+    "detectedAt": "2026-02-12T10:32:00Z",
+    "fingerprint": {
+      "key": "verify:smoke-test-v1:fail",
+      "version": 1
+    },
+    "expectedBehaviour": "verification pass on second retry",
+    "actualBehaviour": "smoke-test-v1 persistent failure",
+    "recommendedPatchType": "escalate_to_human",
+    "metadata": {
+      "verifierId": "smoke-test-v1",
+      "retryAttempt": 3
+    }
+  }
+]
