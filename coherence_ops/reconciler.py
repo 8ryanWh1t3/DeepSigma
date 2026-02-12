@@ -19,7 +19,7 @@ from typing import Any, Dict, List, Optional
 
 from coherence_ops.dlr import DLRBuilder
 from coherence_ops.ds import DriftSignalCollector
-from coherence_ops.mg import MemoryGraph, NodeKind
+from coherence_ops.mg import MemoryGraph
 
 logger = logging.getLogger(__name__)
 
@@ -130,7 +130,6 @@ class Reconciler:
         if self.dlr is None or self.mg is None:
             return proposals
         stats = self.mg.query("stats")
-        mg_episodes = stats.get("nodes_by_kind", {}).get("episode", 0)
         for entry in self.dlr.entries:
             result = self.mg.query("why", episode_id=entry.episode_id)
             if result.get("node") is None:
