@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/coherence_report.schema.json",
+  "title": "Coherence Audit Report",
+  "description": "Output of a coherence audit or scoring run.",
+  "type": "object",
+  "required": [
+    "audit_id",
+    "run_at",
+    "manifest_system_id",
+    "findings",
+    "passed"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "audit_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "manifest_system_id": {
+      "type": "string"
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "check_name",
+          "severity",
+          "message"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "check_name": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "info",
+              "warning",
+              "critical"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "passed": {
+      "type": "boolean"
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "total_findings": {
+          "type": "integer"
+        },
+        "critical": {
+          "type": "integer"
+        },
+        "warnings": {
+          "type": "integer"
+        },
+        "info": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}
