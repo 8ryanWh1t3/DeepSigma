@@ -16,9 +16,9 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from coherence_ops.dlr import DLRBuilder, DLREntry
+from coherence_ops.dlr import DLRBuilder
 from coherence_ops.ds import DriftSignalCollector
-from coherence_ops.mg import MemoryGraph, NodeKind
+from coherence_ops.mg import MemoryGraph
 from coherence_ops.rs import ReflectionSession
 from coherence_ops.manifest import CoherenceManifest, ArtifactKind, ComplianceLevel
 
