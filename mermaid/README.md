@@ -17,6 +17,14 @@ GitHub renders Mermaid diagrams natively in `.md` files.
 | 08 | [Module Dependencies](08-module-dependencies.md) | Graph | Python import dependency graph across all packages |
 | 09 | [AL6 Dimensions](09-al6-dimensions.md) | Mindmap | The six dimensions of agentic reliability |
 | 10 | [Integration Map](10-integration-map.md) | Graph | Connections to MCP, OpenClaw, OTel, Foundry, Power Platform |
+| 11 | [Canonical Record Envelope](11-canonical-record-envelope.md) | Graph | Structure of the universal record wrapper |
+| 12 | [Record Type Relationships](12-record-type-relationships.md) | ER Diagram | How the 6 record types relate via graph edges |
+| 13 | [Provenance Chain](13-provenance-chain.md) | Flowchart | Claim → Evidence → Source trust chain + evidence tree |
+| 14 | [Seal & Patch Lifecycle](14-seal-patch-lifecycle.md) | State Diagram | Record sealing, immutability, and patch flow |
+| 15 | [Retrieval Pipeline](15-retrieval-pipeline.md) | Flowchart | Hybrid vector + keyword + graph query execution |
+| 16 | [Ingestion Flow](16-ingestion-flow.md) | Flowchart | Legacy systems → connectors → canonical store |
+| 17 | [Data Lifecycle](17-data-lifecycle.md) | State Diagram + Gantt | Active → expired → warm → archived → purged |
+| 18 | [Knowledge Graph Ontology](18-knowledge-graph-ontology.md) | Graph | Node types, edge types, fraud investigation subgraph |
 
 ## Diagram Types Used
 
