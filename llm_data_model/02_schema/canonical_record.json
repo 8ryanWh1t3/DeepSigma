@@ -1,0 +1,77 @@
+{
+  "_comment": "Canonical Record Envelope — reference example (Claim type)",
+  "record_id": "rec_a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "record_type": "Claim",
+  "created_at": "2026-02-12T15:00:00Z",
+  "observed_at": "2026-02-12T14:58:30Z",
+  "source": {
+    "system": "fraud-detection-agent-v3",
+    "actor": {
+      "type": "agent",
+      "id": "agent-fd-003"
+    },
+    "environment": "production"
+  },
+  "provenance": {
+    "chain": [
+      {
+        "type": "claim",
+        "statement": "Account ACC-9921 shows anomalous transfer pattern"
+      },
+      {
+        "type": "evidence",
+        "ref": "rec_evt_transfer_burst_2026-02-12",
+        "method": "statistical_anomaly_detection"
+      },
+      {
+        "type": "source",
+        "ref": "core-banking-api/v2/transactions",
+        "captured_at": "2026-02-12T14:58:00Z"
+      }
+    ]
+  },
+  "confidence": {
+    "score": 0.87,
+    "explanation": "3-sigma deviation in 15-minute transfer volume; corroborated by geo-IP mismatch"
+  },
+  "ttl": 300000,
+  "assumption_half_life": 600000,
+  "labels": {
+    "domain": "fraud",
+    "sensitivity": "high",
+    "project": "account-protection",
+    "tags": [
+      "anomaly",
+      "transfer",
+      "geo-mismatch"
+    ]
+  },
+  "links": [
+    {
+      "rel": "derived_from",
+      "target": "rec_evt_transfer_burst_2026-02-12"
+    },
+    {
+      "rel": "supports",
+      "target": "rec_entity_acc_9921"
+    },
+    {
+      "rel": "caused_by",
+      "target": "rec_evt_geo_ip_mismatch_2026-02-12"
+    }
+  ],
+  "content": {
+    "account_id": "ACC-9921",
+    "anomaly_type": "transfer_burst",
+    "transfer_count_15m": 47,
+    "baseline_transfer_count_15m": 3,
+    "geo_source": "Lagos, NG",
+    "geo_expected": "Austin, TX"
+  },
+  "seal": {
+    "hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sealed_at": "2026-02-12T15:00:01Z",
+    "version": 1,
+    "patch_log": []
+  }
+}
