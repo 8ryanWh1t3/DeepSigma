@@ -1,0 +1,79 @@
+{
+  "record_id": "rec_c1a1m001-aaaa-4bbb-8ccc-ddddeeee0001",
+  "record_type": "Claim",
+  "created_at": "2026-02-12T15:00:00Z",
+  "observed_at": "2026-02-12T14:58:30Z",
+  "source": {
+    "system": "fraud-detection-agent-v3",
+    "actor": {
+      "type": "agent",
+      "id": "agent-fd-003"
+    },
+    "environment": "production"
+  },
+  "provenance": {
+    "chain": [
+      {
+        "type": "claim",
+        "statement": "Account ACC-9921 shows anomalous transfer pattern consistent with account takeover"
+      },
+      {
+        "type": "evidence",
+        "ref": "rec_3v3nt001-aaaa-4bbb-8ccc-ddddeeee0004",
+        "method": "statistical_anomaly_detection"
+      },
+      {
+        "type": "source",
+        "ref": "core-banking-api/v2/transactions",
+        "captured_at": "2026-02-12T14:58:00Z"
+      }
+    ]
+  },
+  "confidence": {
+    "score": 0.87,
+    "explanation": "3-sigma deviation in 15-minute transfer volume (47 vs baseline 3); corroborated by geo-IP mismatch (Lagos NG vs expected Austin TX)"
+  },
+  "ttl": 300000,
+  "assumption_half_life": 600000,
+  "labels": {
+    "domain": "fraud",
+    "sensitivity": "high",
+    "project": "account-protection",
+    "tags": [
+      "anomaly",
+      "transfer-burst",
+      "geo-mismatch",
+      "account-takeover"
+    ]
+  },
+  "links": [
+    {
+      "rel": "derived_from",
+      "target": "rec_3v3nt001-aaaa-4bbb-8ccc-ddddeeee0004"
+    },
+    {
+      "rel": "supports",
+      "target": "rec_3nt1ty01-aaaa-4bbb-8ccc-ddddeeee0005"
+    },
+    {
+      "rel": "caused_by",
+      "target": "rec_3v3nt002-aaaa-4bbb-8ccc-ddddeeee0004"
+    }
+  ],
+  "content": {
+    "account_id": "ACC-9921",
+    "anomaly_type": "transfer_burst",
+    "transfer_count_15m": 47,
+    "baseline_transfer_count_15m": 3,
+    "deviation_sigma": 3.2,
+    "geo_source": "Lagos, NG",
+    "geo_expected": "Austin, TX",
+    "recommended_action": "quarantine"
+  },
+  "seal": {
+    "hash": "sha256:a7f3e2d1c0b9a8f7e6d5c4b3a2f1e0d9c8b7a6f5e4d3c2b1a0f9e8d7c6b5a4f3",
+    "sealed_at": "2026-02-12T15:00:01Z",
+    "version": 1,
+    "patch_log": []
+  }
+}
