@@ -1,0 +1,87 @@
+{
+  "record_id": "rec_3v3nt001-aaaa-4bbb-8ccc-ddddeeee0004",
+  "record_type": "Event",
+  "created_at": "2026-02-12T15:02:00Z",
+  "observed_at": "2026-02-12T15:01:30Z",
+  "source": {
+    "system": "overwatch-drift-detector",
+    "actor": {
+      "type": "system",
+      "id": "drift-detector-main"
+    },
+    "environment": "production"
+  },
+  "provenance": {
+    "chain": [
+      {
+        "type": "claim",
+        "statement": "Freshness drift detected on feature geo_ip_lookup for AccountQuarantine decisions"
+      },
+      {
+        "type": "evidence",
+        "ref": "rec_d3c1s001-aaaa-4bbb-8ccc-ddddeeee0002",
+        "method": "drift_signal_collection"
+      },
+      {
+        "type": "source",
+        "ref": "overwatch-drift-detector/signals",
+        "captured_at": "2026-02-12T15:01:30Z"
+      }
+    ]
+  },
+  "confidence": {
+    "score": 0.95,
+    "explanation": "Feature age 45000ms exceeded TTL 30000ms in 3 consecutive episodes over last 5 minutes"
+  },
+  "ttl": 900000,
+  "assumption_half_life": 1800000,
+  "labels": {
+    "domain": "drift",
+    "sensitivity": "internal",
+    "project": "account-protection",
+    "tags": [
+      "drift",
+      "freshness",
+      "geo-ip",
+      "yellow-severity"
+    ]
+  },
+  "links": [
+    {
+      "rel": "derived_from",
+      "target": "rec_d3c1s001-aaaa-4bbb-8ccc-ddddeeee0002"
+    },
+    {
+      "rel": "supports",
+      "target": "rec_c1a1m001-aaaa-4bbb-8ccc-ddddeeee0001"
+    }
+  ],
+  "content": {
+    "drift_id": "drift-fresh-geo-20260212-150130",
+    "episode_id": "ep-quarantine-acc9921-20260212",
+    "drift_type": "freshness",
+    "severity": "yellow",
+    "detected_at": "2026-02-12T15:01:30Z",
+    "evidence_refs": [
+      "rec_d3c1s001-aaaa-4bbb-8ccc-ddddeeee0002"
+    ],
+    "recommended_patch_type": "ttl_change",
+    "fingerprint": {
+      "key": "AccountQuarantine:freshness:geo_ip_lookup",
+      "version": "1"
+    },
+    "details": {
+      "feature": "geo_ip_lookup",
+      "actual_age_ms": 45000,
+      "allowed_ttl_ms": 30000,
+      "breach_count": 3,
+      "window_minutes": 5
+    }
+  },
+  "seal": {
+    "hash": "sha256:c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4",
+    "sealed_at": "2026-02-12T15:02:00Z",
+    "version": 1,
+    "patch_log": []
+  }
+}
