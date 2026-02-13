@@ -117,11 +117,35 @@ See `/adapters/mcp/` for a minimal MCP JSON-RPC stdio server scaffold exposing O
 
 
 ## Coherence Ops integration
+
 See `docs/10-coherence-ops-integration.md` for how RAL/Σ OVERWATCH maps to DLR/RS/DS/MG and the LLM Data Model.
 
+## LLM Data Model
 
+The `llm_data_model/` directory contains the canonical data model for LLM-powered agentic systems. It defines record types (DecisionEpisode, DriftEvent, RepairProposal, CoherenceReport, MetricRecord), a field dictionary, JSON Schema validation, and worked examples. See [`llm_data_model/README.md`](./llm_data_model/README.md) for the full specification.
 
+## Mermaid Diagrams
 
+The `mermaid/` directory contains 27 Mermaid diagrams providing visual documentation of system architecture, data flows, and operational concepts. Categories include Overwatch Core, Coherence Ops, LLM Data Model, and RDF Semantic Layer. See [`mermaid/README.md`](./mermaid/README.md) for the full catalogue.
+
+## Repo Structure
+
+| Directory | Description |
+|-----------|-------------|
+| `adapters/` | Integration adapters — OpenClaw, MCP JSON-RPC, OpenTelemetry hooks |
+| `coherence_ops/` | Coherence scoring, audit, reconciliation CLI and library (DLR/RS/DS/MG) |
+| `dashboard/` | Interactive monitoring dashboard — React + zero-install `demo.html` |
+| `docs/` | Architecture docs, integration guides, schema references |
+| `engine/` | Core engine — degrade ladder, supervisor scaffold, policy stamping |
+| `examples/` | Demo stack and quickstart scripts |
+| `llm_data_model/` | Canonical LLM data model — record types, schemas, field dictionary, validation |
+| `mermaid/` | 27 Mermaid diagrams — architecture, data flow, and operational visuals |
+| `policy_packs/` | Versioned policy enforcement bundles |
+| `rdf/` | RDF semantic layer — OWL ontology, SHACL shapes, SPARQL queries |
+| `specs/` | JSON Schema contracts — DTE, Action, Episode, Drift |
+| `tests/` | Unit and integration tests |
+| `tools/` | CLI tools — supervised runner, replay harness |
+| `verifiers/` | Verification library — read-after-write, invariant checks |
 
 ## New in vNext (Scaffold Features)
 - **Policy Packs**: versioned enforcement bundles (`/policy_packs/`)
