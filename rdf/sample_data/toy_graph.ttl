@@ -1,0 +1,20 @@
+@prefix : <http://deepsigma.ai/coherence#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+:SRC_policyMemo a :Source ;
+  :hasBlobLocation <https://sharepoint.example/doc/42> .
+
+:EV_policyMemo a :Evidence ;
+  :derivedFrom :SRC_policyMemo .
+
+:CL_governanceInvariant a :Claim ;
+  :supportedBy :EV_policyMemo .
+
+:ASM_tempAssumption a :Assumption ;
+  :halfLifeDays 180 ;
+  :reviewOwner "governance-steward" ;
+  :expiresOn "2026-08-12T00:00:00Z"^^xsd:dateTime .
+
+:DEC_policyAdoption a :Decision ;
+  :referencesClaim :CL_governanceInvariant ;
+  :sealedAt "2026-02-13T00:10:00Z"^^xsd:dateTime .

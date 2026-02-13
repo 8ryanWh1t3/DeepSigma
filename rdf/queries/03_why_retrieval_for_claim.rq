@@ -1,0 +1,12 @@
+PREFIX ds:   <https://deepsigma.ai/ns/coherence#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+
+# Plug in a claim IRI to get the "why chain":
+# Claim → Evidence → SourceArtifact → SharePoint URL (prov:wasDerivedFrom)
+SELECT ?claim ?evidence ?artifact ?sourceUrl
+WHERE {
+  VALUES ?claim { ds:Claim_C19 }  # <- replace with your claim IRI
+  ?claim ds:hasEvidence ?evidence .
+  ?evidence ds:usesSource ?artifact .
+  OPTIONAL { ?artifact prov:wasDerivedFrom ?sourceUrl . }
+}

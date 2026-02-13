@@ -1,0 +1,12 @@
+flowchart LR
+  SP[SharePoint<br/>Blob Storage]
+  EX[Extractor<br/>Claim/Evidence/Source]
+  RDF[(RDF Store)]
+  SHACL[SHACL<br/>Constitution]
+  Q[SPARQL<br/>Executive Queries]
+  LLM[LLM<br/>Graph-first Context]
+  OPS[Coherence Ops<br/>DLR/RS/DS/MG]
+  PATCH[Drift→Patch Loop]
+
+  SP --> EX --> RDF --> SHACL --> Q --> LLM --> OPS
+  OPS --> PATCH --> RDF

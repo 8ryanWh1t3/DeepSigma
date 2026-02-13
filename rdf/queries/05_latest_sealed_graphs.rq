@@ -1,0 +1,12 @@
+PREFIX ds:   <https://deepsigma.ai/ns/coherence#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+
+# Pattern: Each sealed named graph has metadata:
+#   ?g prov:generatedAtTime ?t .
+# This returns the latest seal time per graph.
+SELECT ?g (MAX(?t) AS ?latestSealTime)
+WHERE {
+  ?g prov:generatedAtTime ?t .
+}
+GROUP BY ?g
+ORDER BY DESC(?latestSealTime)

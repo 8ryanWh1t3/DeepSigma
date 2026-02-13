@@ -1,0 +1,15 @@
+PREFIX ds:   <https://deepsigma.ai/ns/coherence#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+
+# Decisions that rely on assumptions already expired (as of today)
+SELECT ?decision ?assumption ?expiresOn ?owner
+WHERE {
+  ?decision a ds:DecisionEpisode ;
+            ds:basedOn ?assumption ;
+            prov:wasAttributedTo ?owner .
+  ?assumption a ds:Assumption ;
+              ds:expiresOn ?expiresOn .
+  FILTER (?expiresOn < xsd:date(NOW()))
+}
+ORDER BY ?expiresOn

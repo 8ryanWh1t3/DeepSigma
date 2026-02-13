@@ -1,0 +1,12 @@
+PREFIX : <http://deepsigma.ai/coherence#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+# Assumptions that have expired (or are about to).
+# Implement "now" binding in your runtime; this is a template.
+
+SELECT ?assumption ?expiresOn
+WHERE {
+  ?assumption a :Assumption ;
+              :expiresOn ?expiresOn .
+  # FILTER (?expiresOn < NOW())  # vendor-dependent
+}

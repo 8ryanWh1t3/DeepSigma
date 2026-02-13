@@ -1,0 +1,9 @@
+PREFIX : <http://deepsigma.ai/coherence#>
+
+# Open drift = drift events without a resolving patch.
+
+SELECT ?drift
+WHERE {
+  ?drift a :DriftEvent .
+  FILTER NOT EXISTS { ?drift :resolvedByPatch ?patch . }
+}

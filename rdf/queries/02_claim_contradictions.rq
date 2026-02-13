@@ -1,0 +1,11 @@
+PREFIX ds: <https://deepsigma.ai/ns/coherence#>
+
+# Claims that have both supporting and contradicting evidence.
+SELECT ?claim (COUNT(DISTINCT ?supportE) AS ?supportCount) (COUNT(DISTINCT ?contraE) AS ?contraCount)
+WHERE {
+  ?supportE a ds:Evidence ; ds:supports ?claim .
+  ?contraE  a ds:Evidence ; ds:contradicts ?claim .
+}
+GROUP BY ?claim
+HAVING (COUNT(DISTINCT ?supportE) > 0 && COUNT(DISTINCT ?contraE) > 0)
+ORDER BY DESC(?contraCount) DESC(?supportCount)

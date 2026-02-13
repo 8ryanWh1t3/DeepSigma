@@ -1,0 +1,69 @@
+@prefix : <http://deepsigma.ai/coherence#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+#################################################################
+# SHACL "Constitution Layer" (v0.1)
+# Enforces minimal Truth/Reasoning/Memory invariants.
+#################################################################
+
+:ClaimShape a sh:NodeShape ;
+  sh:targetClass :Claim ;
+  sh:property [
+    sh:path :supportedBy ;
+    sh:minCount 1 ;
+    sh:message "Claim must have at least one Evidence via :supportedBy." ;
+  ] ;
+  sh:property [
+    sh:path :supportedBy ;
+    sh:class :Evidence ;
+    sh:message "supportedBy must point to an Evidence node." ;
+  ] .
+
+:EvidenceShape a sh:NodeShape ;
+  sh:targetClass :Evidence ;
+  sh:property [
+    sh:path :derivedFrom ;
+    sh:minCount 1 ;
+    sh:message "Evidence must have at least one Source via :derivedFrom." ;
+  ] ;
+  sh:property [
+    sh:path :derivedFrom ;
+    sh:class :Source ;
+    sh:message "derivedFrom must point to a Source node." ;
+  ] .
+
+:DecisionShape a sh:NodeShape ;
+  sh:targetClass :Decision ;
+  sh:property [
+    sh:path :referencesClaim ;
+    sh:minCount 1 ;
+    sh:message "Decision must reference at least one Claim via :referencesClaim." ;
+  ] ;
+  sh:property [
+    sh:path :sealedAt ;
+    sh:datatype xsd:dateTime ;
+    sh:message "Decision should include sealedAt as an xsd:dateTime." ;
+    sh:minCount 0 ;
+  ] .
+
+:AssumptionShape a sh:NodeShape ;
+  sh:targetClass :Assumption ;
+  sh:property [
+    sh:path :expiresOn ;
+    sh:datatype xsd:dateTime ;
+    sh:minCount 1 ;
+    sh:message "Assumption must include expiresOn (xsd:dateTime)." ;
+  ] ;
+  sh:property [
+    sh:path :halfLifeDays ;
+    sh:datatype xsd:integer ;
+    sh:minCount 1 ;
+    sh:message "Assumption must include halfLifeDays (integer)." ;
+  ] ;
+  sh:property [
+    sh:path :reviewOwner ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:message "Assumption must include reviewOwner (string)." ;
+  ] .

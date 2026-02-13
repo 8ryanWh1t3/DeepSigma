@@ -1,0 +1,11 @@
+PREFIX ds: <https://deepsigma.ai/ns/coherence#>
+
+# Drift events and their patches, plus originating decision episodes if present.
+SELECT ?decision ?drift ?patch
+WHERE {
+  OPTIONAL { ?decision a ds:DecisionEpisode ; ds:driftedInto ?drift . }
+  ?drift a ds:DriftEvent ;
+         ds:patchedBy ?patch .
+  ?patch a ds:Patch .
+}
+ORDER BY ?decision ?drift

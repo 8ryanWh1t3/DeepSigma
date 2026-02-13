@@ -1,0 +1,12 @@
+PREFIX : <http://deepsigma.ai/coherence#>
+
+# DLR "WHY" retrieval
+# Returns the claim(s), evidence, and source(s) supporting a decision.
+# Bind to a decision IRI or filter by ID in your implementation.
+
+SELECT ?claim ?evidence ?source
+WHERE {
+  ?decision :referencesClaim ?claim .
+  ?claim :supportedBy ?evidence .
+  ?evidence :derivedFrom ?source .
+}

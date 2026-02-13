@@ -1,0 +1,22 @@
+@prefix ds:   <https://deepsigma.ai/ns/coherence#> .
+@prefix sp:   <https://deepsigma.ai/ns/sharepoint#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+ds:DecisionEpisode_778 a ds:DecisionEpisode ;
+  prov:wasAttributedTo ds:Person_Javad ;
+  ds:decides ds:Claim_C19 ;
+  ds:basedOn ds:Assumption_A12 .
+
+ds:Assumption_A12 a ds:Assumption ;
+  ds:expiresOn "2026-06-01"^^xsd:date .
+
+ds:Claim_C19 a ds:Claim ;
+  ds:hasEvidence ds:Evidence_E55 .
+
+ds:Evidence_E55 a ds:Evidence ;
+  ds:supports ds:Claim_C19 ;
+  ds:usesSource sp:Doc_9f3b2d2e .
+
+sp:Doc_9f3b2d2e a ds:SourceArtifact ;
+  prov:wasDerivedFrom <https://sharepoint.example/sites/site/doclib/ATPS_SOP_v7.docx> .

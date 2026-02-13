@@ -1,0 +1,51 @@
+@prefix ds:    <https://deepsigma.ai/ns/coherence#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+
+ds: a owl:Ontology ;
+  rdfs:label "Coherence Ops Core Ontology" .
+
+### Core classes (Core 8)
+ds:Claim           a owl:Class ; rdfs:label "Claim" .
+ds:Evidence        a owl:Class ; rdfs:label "Evidence" .
+ds:SourceArtifact  a owl:Class ; rdfs:label "Source Artifact" .
+ds:DecisionEpisode a owl:Class ; rdfs:label "Decision Episode" .
+ds:Assumption      a owl:Class ; rdfs:label "Assumption" .
+ds:Outcome         a owl:Class ; rdfs:label "Outcome" .
+ds:DriftEvent      a owl:Class ; rdfs:label "Drift Event" .
+ds:Patch           a owl:Class ; rdfs:label "Patch" .
+
+### Key predicates
+ds:supports     a owl:ObjectProperty ; rdfs:label "supports" ;
+  rdfs:domain ds:Evidence ; rdfs:range ds:Claim .
+
+ds:contradicts  a owl:ObjectProperty ; rdfs:label "contradicts" ;
+  rdfs:domain ds:Evidence ; rdfs:range ds:Claim .
+
+ds:hasEvidence  a owl:ObjectProperty ; rdfs:label "has evidence" ;
+  rdfs:domain ds:Claim ; rdfs:range ds:Evidence .
+
+ds:basedOn      a owl:ObjectProperty ; rdfs:label "based on" ;
+  rdfs:domain ds:DecisionEpisode ; rdfs:range ds:Assumption .
+
+ds:decides      a owl:ObjectProperty ; rdfs:label "decides" ;
+  rdfs:domain ds:DecisionEpisode ; rdfs:range ds:Claim .
+
+ds:usesSource   a owl:ObjectProperty ; rdfs:label "uses source artifact" ;
+  rdfs:domain ds:Evidence ; rdfs:range ds:SourceArtifact .
+
+ds:resultedIn   a owl:ObjectProperty ; rdfs:label "resulted in" ;
+  rdfs:domain ds:DecisionEpisode ; rdfs:range ds:Outcome .
+
+ds:driftedInto  a owl:ObjectProperty ; rdfs:label "drifted into" ;
+  rdfs:domain ds:DecisionEpisode ; rdfs:range ds:DriftEvent .
+
+ds:patchedBy    a owl:ObjectProperty ; rdfs:label "patched by" ;
+  rdfs:domain ds:DriftEvent ; rdfs:range ds:Patch .
+
+### Assumption half-life hook
+ds:expiresOn    a owl:DatatypeProperty ; rdfs:label "expires on" ;
+  rdfs:domain ds:Assumption ; rdfs:range xsd:date .

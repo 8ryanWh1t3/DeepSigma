@@ -1,0 +1,15 @@
+@prefix : <http://deepsigma.ai/coherence#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+:SRC_42 a :Source ;
+  :hasBlobLocation <https://sharepoint.example/doc/42> .
+
+:EV_1 a :Evidence ;
+  :derivedFrom :SRC_42 .
+
+:CL_1 a :Claim ;
+  :supportedBy :EV_1 .
+
+:DEC_1 a :Decision ;
+  :referencesClaim :CL_1 ;
+  :sealedAt "2026-02-13T00:10:00Z"^^xsd:dateTime .

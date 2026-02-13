@@ -1,0 +1,34 @@
+@prefix ds:    <https://deepsigma.ai/ns/coherence#> .
+@prefix sh:    <http://www.w3.org/ns/shacl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+
+ds:ClaimShape a sh:NodeShape ;
+  sh:targetClass ds:Claim ;
+  sh:property [
+    sh:path ds:hasEvidence ;
+    sh:minCount 1 ;
+    sh:message "Every Claim must have at least one Evidence link (ds:hasEvidence)." ;
+  ] .
+
+ds:DecisionEpisodeShape a sh:NodeShape ;
+  sh:targetClass ds:DecisionEpisode ;
+  sh:property [
+    sh:path prov:wasAttributedTo ;
+    sh:minCount 1 ;
+    sh:message "Every DecisionEpisode must have an owner/attribution (prov:wasAttributedTo)." ;
+  ] ;
+  sh:property [
+    sh:path ds:decides ;
+    sh:minCount 1 ;
+    sh:message "Every DecisionEpisode must decide at least one Claim (ds:decides)." ;
+  ] .
+
+ds:AssumptionShape a sh:NodeShape ;
+  sh:targetClass ds:Assumption ;
+  sh:property [
+    sh:path ds:expiresOn ;
+    sh:datatype xsd:date ;
+    sh:minCount 1 ;
+    sh:message "Every Assumption must include an expiration date (ds:expiresOn)." ;
+  ] .

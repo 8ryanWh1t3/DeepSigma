@@ -1,0 +1,78 @@
+@prefix : <http://deepsigma.ai/coherence#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+#################################################################
+# Minimal Coherence Ops Ontology (v0.1)
+#################################################################
+
+:Decision   a owl:Class .
+:Claim      a owl:Class .
+:Evidence   a owl:Class .
+:Source     a owl:Class .
+:Assumption a owl:Class .
+:DriftEvent a owl:Class .
+:Patch      a owl:Class .
+:Policy     a owl:Class .
+:Actor      a owl:Class .
+:Authority  a owl:Class .
+:Domain     a owl:Class .
+:Episode    a owl:Class .
+
+#################################################################
+# Core Properties
+#################################################################
+
+:referencesClaim a owl:ObjectProperty ;
+  rdfs:domain :Decision ;
+  rdfs:range  :Claim .
+
+:supportedBy a owl:ObjectProperty ;
+  rdfs:domain :Claim ;
+  rdfs:range  :Evidence .
+
+:derivedFrom a owl:ObjectProperty ;
+  rdfs:domain :Evidence ;
+  rdfs:range  :Source .
+
+:belongsToDomain a owl:ObjectProperty ;
+  rdfs:domain :Decision ;
+  rdfs:range  :Domain .
+
+:triggeredDrift a owl:ObjectProperty ;
+  rdfs:domain :Decision ;
+  rdfs:range  :DriftEvent .
+
+:resolvedByPatch a owl:ObjectProperty ;
+  rdfs:domain :DriftEvent ;
+  rdfs:range  :Patch .
+
+:supersedes a owl:ObjectProperty ;
+  rdfs:domain :Patch ;
+  rdfs:range  :Patch .
+
+#################################################################
+# Datatype Properties
+#################################################################
+
+:hasBlobLocation a owl:DatatypeProperty ;
+  rdfs:domain :Source ;
+  rdfs:range  xsd:anyURI .
+
+:sealedAt a owl:DatatypeProperty ;
+  rdfs:domain :Decision ;
+  rdfs:range  xsd:dateTime .
+
+:expiresOn a owl:DatatypeProperty ;
+  rdfs:domain :Assumption ;
+  rdfs:range  xsd:dateTime .
+
+:halfLifeDays a owl:DatatypeProperty ;
+  rdfs:domain :Assumption ;
+  rdfs:range  xsd:integer .
+
+:reviewOwner a owl:DatatypeProperty ;
+  rdfs:domain :Assumption ;
+  rdfs:range  xsd:string .

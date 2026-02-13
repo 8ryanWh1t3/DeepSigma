@@ -1,0 +1,11 @@
+PREFIX : <http://deepsigma.ai/coherence#>
+
+# Impact propagation: which decisions depend on a given policy/source?
+
+SELECT DISTINCT ?decision
+WHERE {
+  ?decision :referencesClaim ?claim .
+  ?claim :supportedBy ?evidence .
+  ?evidence :derivedFrom ?source .
+  # FILTER (?source = :AR19011)  # example anchor
+}
