@@ -26,9 +26,10 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Infrastructure
 
-- **CI**: GitHub Actions with pytest (3.10/3.11/3.12), ruff lint, and schema validation
+- **CI**: GitHub Actions with pytest (3.10/3.11/3.12), ruff lint, schema validation, and integration tests
 - **Packaging**: `pyproject.toml` with console scripts (`overwatch`, `overwatch-validate`, `coherence`)
 - **Repo Governance**: SECURITY.md, CODEOWNERS, Dependabot, issue/PR templates, CONTRIBUTING.md
+- **Testing**: unit tests (degrade ladder, policy loader) + integration test (full coherence pipeline end-to-end: episode → seal → score → drift → audit → reconcile → patch → re-score)
 
 ### One-Command Demo
 
