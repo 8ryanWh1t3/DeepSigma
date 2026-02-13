@@ -1,59 +1,120 @@
 #!/usr/bin/env python3
-"""Validate example JSON artifacts against Σ OVERWATCH schemas.
+"""Validate example JSON artifacts against \u03a3 OVERWATCH schemas.
 
 Usage:
-  python tools/validate_examples.py
+    python tools/validate_examples.py
 
 Requires:
-  pip install jsonschema pyyaml
-"""
+    pip install jsonschema referencing
 
+Validates:
+    - examples/episodes/*.json   against specs/episode.schema.json
+    - examples/drift/*.json      against specs/drift.schema.json
+    - llm_data_model/03_examples/*.json against llm_data_model/02_schema/jsonschema/canonical_record.schema.json
+"""
 from __future__ import annotations
 
 import json
 from pathlib import Path
-from jsonschema import Draft202012Validator, RefResolver
+
+from jsonschema import Draft202012Validator
+
+# ---------------------------------------------------------------------------
+# Use the modern 'referencing' library instead of the deprecated RefResolver.
+# Falls back gracefully if referencing is not installed.
+# ---------------------------------------------------------------------------
+try:
+    import referencing
+    from referencing import Registry
+    from referencing.jsonschema import DRAFT202012
+
+    HAS_REFERENCING = True
+except ImportError:
+    HAS_REFERENCING = False
 
 ROOT = Path(__file__).resolve().parents[1]
+
 
 def load_schema(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
-def build_resolver() -> RefResolver:
-    # Map schema $id URLs to local files
-    store = {}
+
+def build_registry() -> "Registry | None":
+    """Build a referencing.Registry from all local schema files.
+
+    Maps each schema's $id to the local file so that external $ref URLs
+    (like https://sigma-overwatch.dev/schemas/action_contract.schema.json)
+    resolve locally without network access.
+    """
+    if not HAS_REFERENCING:
+        return None
+
+    resources = []
+    # Collect schemas from specs/
     for p in (ROOT / "specs").glob("*.json"):
         sch = load_schema(p)
         if "$id" in sch:
-            store[sch["$id"]] = sch
-    return RefResolver.from_schema(store.get("https://sigma-overwatch.dev/schemas/episode.schema.json", {}), store=store)
+            resource = referencing.Resource.from_contents(sch, default_specification=DRAFT202012)
+            resources.append((sch["$id"], resource))
 
-def validate(schema_path: Path, json_path: Path) -> None:
+    # Collect schemas from llm_data_model/02_schema/jsonschema/
+    schema_dir = ROOT / "llm_data_model" / "02_schema" / "jsonschema"
+    if schema_dir.exists():
+        for p in schema_dir.glob("*.json"):
+            sch = load_schema(p)
+            if "$id" in sch:
+                resource = referencing.Resource.from_contents(sch, default_specification=DRAFT202012)
+                resources.append((sch["$id"], resource))
+
+    return Registry().with_resources(resources)
+
+
+def validate(schema_path: Path, json_path: Path, registry=None) -> None:
     schema = load_schema(schema_path)
-    resolver = build_resolver()
-    validator = Draft202012Validator(schema, resolver=resolver)
+
+    if registry is not None:
+        validator = Draft202012Validator(schema, registry=registry)
+    else:
+        # Fallback: no $ref resolution (works for schemas without external refs)
+        validator = Draft202012Validator(schema)
+
     data = json.loads(json_path.read_text(encoding="utf-8"))
     errors = sorted(validator.iter_errors(data), key=lambda e: e.path)
     if errors:
-        print(f"❌ {json_path.relative_to(ROOT)} failed ({len(errors)} errors)")
+        print(f"\u274c {json_path.relative_to(ROOT)} failed ({len(errors)} errors)")
         for e in errors[:10]:
             loc = ".".join([str(x) for x in e.path]) or "<root>"
             print(f"  - {loc}: {e.message}")
         raise SystemExit(1)
     else:
-        print(f"✅ {json_path.relative_to(ROOT)} ok")
+        print(f"\u2705 {json_path.relative_to(ROOT)} ok")
+
 
 def main():
+    registry = build_registry()
+
+    # --- Episode examples ---
     episode_schema = ROOT / "specs" / "episode.schema.json"
-    drift_schema = ROOT / "specs" / "drift.schema.json"
-
     for p in sorted((ROOT / "examples" / "episodes").glob("*.json")):
-        validate(episode_schema, p)
+        validate(episode_schema, p, registry=registry)
 
+    # --- Drift examples ---
+    drift_schema = ROOT / "specs" / "drift.schema.json"
     for p in sorted((ROOT / "examples" / "drift").glob("*.json")):
-        validate(drift_schema, p)
+        validate(drift_schema, p, registry=registry)
+
+    # --- LLM Data Model examples ---
+    llm_schema_path = ROOT / "llm_data_model" / "02_schema" / "jsonschema" / "canonical_record.schema.json"
+    llm_examples_dir = ROOT / "llm_data_model" / "03_examples"
+    if llm_schema_path.exists() and llm_examples_dir.exists():
+        print()
+        for p in sorted(llm_examples_dir.glob("*.json")):
+            validate(llm_schema_path, p, registry=registry)
+    else:
+        print("\n\u26a0\ufe0f  LLM Data Model schema or examples not found — skipped")
 
     print("\nAll example artifacts validated.")
+
 
 if __name__ == "__main__":
     main()
