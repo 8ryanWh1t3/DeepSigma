@@ -19,7 +19,6 @@ Exercises:
 import json
 import pytest
 from pathlib import Path
-from dataclasses import asdict
 from datetime import datetime, timezone
 
 from engine.policy_loader import load_policy_pack, get_rules
