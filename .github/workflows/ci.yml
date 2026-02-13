@@ -18,14 +18,16 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install dependencies
+      - name: Install package
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest jsonschema
+          pip install -e ".[dev]"
       - name: Run unit tests
         run: |
           python -m pytest tests/ -v --tb=short
+      - name: Validate examples against schemas
+        run: |
+          python tools/validate_examples.py
 
   lint:
     runs-on: ubuntu-latest
