@@ -37,6 +37,10 @@ jobs:
         run: |
           python tools/validate_examples.py
 
+      - name: Validate LLM Data Model examples
+        run: |
+          python llm_data_model/05_validation/validate_examples.py
+
   lint:
     runs-on: ubuntu-latest
     steps:
