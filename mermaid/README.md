@@ -25,6 +25,10 @@ GitHub renders Mermaid diagrams natively in `.md` files.
 | 16 | [Ingestion Flow](16-ingestion-flow.md) | Flowchart | Legacy systems → connectors → canonical store |
 | 17 | [Data Lifecycle](17-data-lifecycle.md) | State Diagram + Gantt | Active → expired → warm → archived → purged |
 | 18 | [Knowledge Graph Ontology](18-knowledge-graph-ontology.md) | Graph | Node types, edge types, fraud investigation subgraph |
+| 19 | [Design Principles Cycle](19-design-principles-cycle.md) | Graph | Six design principles and their reinforcement loop |
+| 20 | [Validation Gate](20-validation-gate.md) | Flowchart | Quality rules ingestion gate (QR-001 through QR-052) |
+| 21 | [Coherence Ops Alignment](21-coherence-ops-alignment.md) | Graph | DLR/RS/DS/MG → canonical record type mapping + scoring dimensions |
+| 22 | [Query Pattern Routing](22-query-pattern-routing.md) | Graph | 20 query patterns by caller role and retrieval method |
 
 ## Diagram Types Used
 
@@ -35,6 +39,7 @@ GitHub renders Mermaid diagrams natively in `.md` files.
 - **stateDiagram** — state machines and lifecycles
 - **mindmap** — hierarchical concept maps
 - **pie** — proportional breakdowns
+- **gantt** — timeline and lifecycle stages
 
 ## Viewing
 
