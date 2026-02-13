@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/overwatch-logo.png" alt="Σ OVERWATCH" width="160" />
+  <img src="docs/assets/overwatch-logo.svg" alt="Σ OVERWATCH" width="160" />
 </p>
 
 
@@ -144,7 +144,8 @@ Sealed episodes now record `policyPackId/version/hash` and the chosen `degrade.s
 
 ## 60-second demo (one command)
 ```bash
-python tools/run_supervised.py \
+# Ensure project root is on PYTHONPATH
+PYTHONPATH=. python tools/run_supervised.py \
   --decisionType AccountQuarantine \
   --policy policy_packs/packs/demo_policy_pack_v1.json \
   --telemetry endToEndMs=95 p99Ms=160 jitterMs=70 \
