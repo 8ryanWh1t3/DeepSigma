@@ -1,0 +1,136 @@
+{
+  "record_id": "rec_a1b2c3d4-0006-4aaa-9bbb-ccccdddd0006",
+  "record_type": "Metric",
+  "created_at": "2026-02-12T16:00:00Z",
+  "observed_at": "2026-02-12T15:55:00Z",
+  "source": {
+    "system": "overwatch-metrics-collector",
+    "actor": {
+      "type": "system",
+      "id": "al6-scorer-main"
+    },
+    "environment": "production"
+  },
+  "provenance": {
+    "chain": [
+      {
+        "type": "source",
+        "ref": "overwatch-metrics-collector/al6",
+        "captured_at": "2026-02-12T15:55:00Z"
+      },
+      {
+        "type": "evidence",
+        "ref": "rec_e0e00004-aaaa-4bbb-8ccc-ddddeeee0004",
+        "method": "rolling_window_aggregation"
+      }
+    ]
+  },
+  "confidence": {
+    "score": 0.92,
+    "explanation": "AL6 scores computed from 47 sealed episodes in the last 60-minute window; 2 episodes excluded due to incomplete sealing"
+  },
+  "ttl": 300000,
+  "assumption_half_life": 600000,
+  "labels": {
+    "domain": "reliability",
+    "sensitivity": "internal",
+    "project": "account-protection",
+    "tags": [
+      "al6",
+      "slo",
+      "freshness",
+      "latency",
+      "metric-snapshot"
+    ]
+  },
+  "links": [
+    {
+      "rel": "derived_from",
+      "target": "rec_d3c10001-aaaa-4bbb-8ccc-ddddeeee0002"
+    },
+    {
+      "rel": "supports",
+      "target": "rec_e0e00004-aaaa-4bbb-8ccc-ddddeeee0004"
+    }
+  ],
+  "content": {
+    "metric_type": "al6_snapshot",
+    "window": {
+      "start": "2026-02-12T14:55:00Z",
+      "end": "2026-02-12T15:55:00Z",
+      "duration_ms": 3600000
+    },
+    "decision_type": "AccountQuarantine",
+    "episode_count": 47,
+    "al6_scores": {
+      "deadline": {
+        "p50_ms": 82,
+        "p95_ms": 145,
+        "p99_ms": 198,
+        "budget_ms": 250,
+        "slo_met": true,
+        "breach_count": 0
+      },
+      "distance": {
+        "avg_hops": 2.3,
+        "max_hops": 4,
+        "budget_hops": 5,
+        "slo_met": true,
+        "breach_count": 0
+      },
+      "data_freshness": {
+        "avg_feature_age_ms": 12400,
+        "max_feature_age_ms": 45000,
+        "ttl_ms": 30000,
+        "slo_met": false,
+        "breach_count": 3,
+        "stale_features": [
+          "geo_ip_lookup"
+        ]
+      },
+      "variability": {
+        "p95_ms": 145,
+        "p99_ms": 198,
+        "jitter_ms": 53,
+        "slo_met": true,
+        "breach_count": 0
+      },
+      "drag": {
+        "avg_queue_ms": 8,
+        "avg_lock_ms": 3,
+        "avg_io_ms": 22,
+        "total_contention_ms": 33,
+        "budget_ms": 50,
+        "slo_met": true,
+        "breach_count": 0
+      },
+      "degrade": {
+        "fallback_count": 2,
+        "bypass_count": 0,
+        "abstain_count": 1,
+        "total_degrades": 3,
+        "degrade_rate": 0.064
+      }
+    },
+    "slo_summary": {
+      "dimensions_passing": 5,
+      "dimensions_total": 6,
+      "overall_healthy": false,
+      "failing_dimensions": [
+        "data_freshness"
+      ]
+    },
+    "comparison": {
+      "previous_window_start": "2026-02-12T13:55:00Z",
+      "deadline_p95_delta_ms": -12,
+      "freshness_breach_delta": 1,
+      "degrade_rate_delta": 0.021
+    }
+  },
+  "seal": {
+    "hash": "sha256:f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2",
+    "sealed_at": "2026-02-12T16:00:00Z",
+    "version": 1,
+    "patch_log": []
+  }
+}
