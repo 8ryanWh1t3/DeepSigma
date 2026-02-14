@@ -1,6 +1,5 @@
 """Unit tests for coherence_ops.dlr — Decision Log Record builder."""
 import json
-import pytest
 from coherence_ops.dlr import DLRBuilder, DLREntry
 
 
