@@ -1,0 +1,806 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://deepsigma.dev/specs/iris_query.schema.json",
+    "title": "IRIS Query / Response Schema",
+    "description": "JSON Schema for the IRIS Interface Layer query/response contract. Defines operator query inputs, structured responses with provenance chains linking back to episodes, PRIME verdicts, and MG seals. Reference: specs/prime_gate.schema.json for structural consistency.",
+
+    "definitions": {
+
+      "QueryType": {
+              "type": "string",
+              "enum": ["WHY", "WHAT_CHANGED", "WHAT_DRIFTED", "RECALL", "STATUS"],
+              "description": "Supported IRIS query types. WHY = 'Why did we decide X?' (MG lookup + DLR context). WHAT_CHANGED = 'What changed?' (DLR diff). WHAT_DRIFTED = 'What is drifting?' (DS scan). RECALL = 'What do we know about X?' (MG traversal). STATUS = 'How healthy are we?' (CoherenceScorer composite)."
+      },
+
+      "ResolutionStatus": {
+              "type": "string",
+              "enum": ["RESOLVED", "PARTIAL", "NOT_FOUND", "ERROR"],
+              "description": "Outcome status of an IRIS resolution. RESOLVED = full answer produced. PARTIAL = some data found but incomplete. NOT_FOUND = no matching data. ERROR = resolver failure."
+      },
+
+          "ArtifactRef": {
+                  "type": "string",
+                  "enum": ["DLR", "RS", "DS", "MG", "PRIME"],
+                  "description": "Canonical artifact identifiers in the Coherence Ops pipeline"
+          },
+
+          "ProvenanceLinkRole": {
+                  "type": "string",
+                  "enum": ["source", "evidence", "context", "verdict", "seal"],
+                  "description": "Role a provenance link plays in the resolution chain. source = primary data origin. evidence = supporting evidence ref. context = enrichment context. verdict = PRIME gate verdict link. seal = MG seal reference."
+          },
+
+          "ProvenanceLink": {
+                  "type": "object",
+                  "description": "A single link in the provenance chain. Every IRIS response includes an ordered list of these, tracing exactly which artifacts produced the answer.",
+                  "required": ["artifact", "ref_id", "role"],
+                  "additionalProperties": false,
+                  "properties": {
+                            "artifact": {
+                                        "$ref": "#/definitions/ArtifactRef",
+                                        "description": "Which canonical artifact this link references"
+                            },
+                            "ref_id": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "description": "Identifier within the artifact (e.g. episode ID, DLR ID, drift ID, seal hash, PRIME verdict hash)"
+                            },
+                            "role": {
+                                        "$ref": "#/definitions/ProvenanceLinkRole"
+                            },
+                            "detail": {
+                                        "type": "string",
+                                        "description": "Human-readable description of what this link contributes"
+                            },
+                            "episode_id": {
+                                        "type": "string",
+                                        "description": "Episode ID this link traces back to, when applicable"
+                            },
+                            "seal_hash": {
+                                        "type": "string",
+                                        "description": "MG seal hash for tamper-evidence, when the link references a sealed record"
+                            },
+                            "prime_verdict": {
+                                        "$ref": "#/definitions/PRIMEVerdictRef",
+                                        "description": "PRIME verdict reference when this link traces back to a gate evaluation"
+                            }
+                  }
+          },
+
+          "PRIMEVerdictRef": {
+                  "type": "object",
+                  "description": "Lightweight reference to a PRIME Threshold Gate verdict, linking IRIS provenance back to the governance gate. See specs/prime_gate.schema.json for the full PRIMEVerdict schema.",
+                  "required": ["verdict", "composite_score"],
+                  "additionalProperties": false,
+                  "properties": {
+                            "verdict": {
+                                        "type": "string",
+                                        "enum": ["APPROVE", "DEFER", "ESCALATE"],
+                                        "description": "The PRIME gate verdict (mirrors specs/prime_gate.schema.json#/definitions/Verdict)"
+                            },
+                            "composite_score": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "maximum": 1,
+                                        "description": "PRIME composite score (T×0.4 + R×0.3 + M×0.15 + C×0.15)"
+                            },
+                            "gate_version": {
+                                        "type": "string",
+                                        "description": "Version of the PRIME gate that produced this verdict"
+                            },
+                            "context_hash": {
+                                        "type": "string",
+                                        "description": "Hash of the PRIMEContext input for audit linkage"
+                            },
+                            "escalation_factors": {
+                                        "type": "array",
+                                        "items": { "type": "string" },
+                                        "description": "Escalation triggers from the PRIME evaluation"
+                            }
+                  }
+          },
+
+          "MGSealRef": {
+                  "type": "object",
+                  "description": "Reference to a Memory Graph seal, providing tamper-evident linkage back to sealed episodes and patch lineage.",
+                  "required": ["seal_id"],
+                  "additionalProperties": false,
+                  "properties": {
+                            "seal_id": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "description": "Unique identifier of the sealed record in the Memory Graph"
+                            },
+                            "seal_hash": {
+                                        "type": "string",
+                                        "description": "SHA-256 hash of the sealed content for tamper detection"
+                            },
+                            "version": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "description": "Version number of the sealed record"
+                            },
+                            "lineage": {
+                                        "type": "array",
+                                        "items": { "type": "string" },
+                                        "description": "Ordered hash chain of patch lineage from MemoryInvariant"
+                            },
+                            "sealed_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "description": "ISO-8601 timestamp when the record was sealed"
+                            }
+                  }
+          },
+
+          "EpisodeRef": {
+                  "type": "object",
+                  "description": "Lightweight reference to a sealed DecisionEpisode, linking IRIS provenance back to the source episode. See specs/episode.schema.json for the full schema.",
+                  "required": ["episode_id"],
+                  "additionalProperties": false,
+                  "properties": {
+                            "episode_id": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "description": "The episodeId from the sealed DecisionEpisode"
+                            },
+                            "decision_type": {
+                                        "type": "string",
+                                        "description": "The decisionType from the episode"
+                            },
+                            "outcome_code": {
+                                        "type": "string",
+                                        "enum": ["success", "partial", "fail", "abstain", "bypassed"],
+                                        "description": "Outcome code from the episode (mirrors episode.schema.json)"
+                            },
+                            "sealed_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "description": "When the episode was sealed"
+                            },
+                            "seal_hash": {
+                                        "type": "string",
+                                        "description": "Seal hash from the episode for integrity verification"
+                            }
+                  }
+          },
+
+          "DLREntryRef": {
+                  "type": "object",
+                  "description": "Reference to a Decision Log Record entry produced by the DLR builder.",
+                  "required": ["dlr_id", "episode_id"],
+                  "additionalProperties": false,
+                  "properties": {
+                            "dlr_id": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "description": "Deterministic DLR identifier (dlr-{sha256[:12]})"
+                            },
+                            "episode_id": {
+                                        "type": "string",
+                                        "minLength": 1
+                            },
+                            "decision_type": {
+                                        "type": "string"
+                            },
+                            "outcome_code": {
+                                        "type": "string",
+                                        "enum": ["success", "partial", "fail", "abstain", "bypassed", "unknown"]
+                            },
+                            "policy_stamp": {
+                                        "type": ["object", "null"],
+                                        "description": "Policy pack stamp if present, null if missing",
+                                        "properties": {
+                                                      "policyPackId": { "type": "string" },
+                                                      "policyPackVersion": { "type": "string" },
+                                                      "policyPackHash": { "type": "string" }
+                                        }
+                            },
+                            "degrade_step": {
+                                        "type": ["string", "null"],
+                                        "description": "Active degrade step, or null/none"
+                            }
+                  }
+          },
+
+          "DriftBucketRef": {
+                  "type": "object",
+                  "description": "Reference to a drift fingerprint bucket from the Drift Signal Collector.",
+                  "required": ["fingerprint_key", "drift_type", "count", "worst_severity"],
+                  "additionalProperties": false,
+                  "properties": {
+                            "fingerprint_key": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "description": "Drift fingerprint key for deduplication and recurrence tracking"
+                            },
+                            "drift_type": {
+                                        "type": "string",
+                                        "enum": ["time", "freshness", "fallback", "bypass", "verify", "outcome", "fanout", "contention"],
+                                        "description": "Canonical drift type (mirrors drift.schema.json)"
+                            },
+                            "count": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "description": "Number of occurrences of this fingerprint"
+                            },
+                            "worst_severity": {
+                                        "type": "string",
+                                        "enum": ["green", "yellow", "red"],
+                                        "description": "Highest severity observed for this fingerprint"
+                            },
+                            "first_seen": {
+                                        "type": "string",
+                                        "format": "date-time"
+                            },
+                            "last_seen": {
+                                        "type": "string",
+                                        "format": "date-time"
+                            },
+                            "episode_ids": {
+                                        "type": "array",
+                                        "items": { "type": "string" },
+                                        "description": "Episode IDs affected by this drift fingerprint"
+                            },
+                            "recommended_patches": {
+                                        "type": "array",
+                                        "items": {
+                                                      "type": "string",
+                                                      "enum": ["dte_change", "ttl_change", "cache_bundle_change", "routing_change", "verification_change", "action_scope_tighten", "manual_review"]
+                                        },
+                                        "description": "Recommended patch types (mirrors drift.schema.json#/properties/recommendedPatchType)"
+                            }
+                  }
+          },
+
+          "CoherenceDimensionScore": {
+                  "type": "object",
+                  "description": "Score for a single coherence dimension, as produced by CoherenceScorer.",
+                  "required": ["name", "score", "weight"],
+                  "additionalProperties": false,
+                  "properties": {
+                            "name": {
+                                        "type": "string",
+                                        "enum": ["policy_adherence", "outcome_health", "drift_control", "memory_completeness"],
+                                        "description": "Coherence dimension name"
+                            },
+                            "score": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "maximum": 100,
+                                        "description": "Dimension score (0–100)"
+                            },
+                            "weight": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "maximum": 1,
+                                        "description": "Weight of this dimension in the composite score"
+                            },
+                            "details": {
+                                        "type": "object",
+                                        "description": "Dimension-specific detail fields"
+                            }
+                  }
+          },
+
+          "IRISConfig": {
+                  "type": "object",
+                  "description": "Configuration for the IRIS engine. Controls response time targets, provenance depth, and default query parameters.",
+                  "additionalProperties": false,
+                  "properties": {
+                            "response_time_target_ms": {
+                                        "type": "number",
+                                        "exclusiveMinimum": 0,
+                                        "default": 60000,
+                                        "description": "Maximum wall-clock time (ms) before IRIS logs a performance warning. Target: sub-60-second response."
+                            },
+                            "max_provenance_depth": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "default": 50,
+                                        "description": "Maximum number of provenance links in a single response chain"
+                            },
+                            "default_time_window_seconds": {
+                                        "type": "number",
+                                        "exclusiveMinimum": 0,
+                                        "default": 3600,
+                                        "description": "Default lookback window for time-scoped queries (e.g. WHAT_CHANGED)"
+                            },
+                            "default_limit": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "default": 20,
+                                        "description": "Default maximum number of results per query"
+                            },
+                            "include_raw_artifacts": {
+                                        "type": "boolean",
+                                        "default": false,
+                                        "description": "Whether to include full raw artifact payloads in response data"
+                            }
+                  }
+          },
+
+          "IRISQuery": {
+                  "type": "object",
+                  "description": "Operator query submitted to the IRIS engine. The query_type determines which resolver handles the request and which artifacts are consulted.",
+                  "required": ["query_type"],
+                  "additionalProperties": false,
+                  "properties": {
+                            "query_type": {
+                                        "$ref": "#/definitions/QueryType"
+                            },
+                            "text": {
+                                        "type": "string",
+                                        "description": "Free-text operator query (e.g. 'Why did we quarantine account X?', 'What is drifting?')"
+                            },
+                            "episode_id": {
+                                        "type": "string",
+                                        "description": "Target episode ID. Required for WHY and RECALL queries."
+                            },
+                            "decision_type": {
+                                        "type": "string",
+                                        "description": "Filter by decision type (e.g. 'AccountQuarantine', 'ScaleOut')"
+                            },
+                            "time_window_seconds": {
+                                        "type": "number",
+                                        "exclusiveMinimum": 0,
+                                        "default": 3600,
+                                        "description": "Lookback window in seconds for time-scoped queries"
+                            },
+                            "limit": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "default": 20,
+                                        "description": "Maximum number of results to return"
+                            },
+                            "metadata": {
+                                        "type": "object",
+                                        "description": "Additional operator-supplied context for the query"
+                            }
+                  },
+                  "allOf": [
+                            {
+                                        "if": {
+                                                      "properties": { "query_type": { "const": "WHY" } }
+                                        },
+                                        "then": {
+                                                      "required": ["query_type", "episode_id"]
+                                        }
+                            },
+                            {
+                                        "if": {
+                                                      "properties": { "query_type": { "const": "RECALL" } }
+                                        },
+                                        "then": {
+                                                      "required": ["query_type", "episode_id"]
+                                        }
+                            }
+                  ]
+          },
+
+          "WHYResponseData": {
+                  "type": "object",
+                  "description": "Resolver-specific data payload for WHY queries. Combines MG provenance with DLR policy context.",
+                  "additionalProperties": true,
+                  "properties": {
+                            "mg_provenance": {
+                                        "type": "object",
+                                        "description": "Memory Graph provenance for the episode",
+                                        "properties": {
+                                                      "episode_id": { "type": "string" },
+                                                      "node": {
+                                                                      "type": ["object", "null"],
+                                                                      "description": "The MG GraphNode for this episode"
+                                                      },
+                                                      "evidence_refs": {
+                                                                      "type": "array",
+                                                                      "items": { "type": "string" },
+                                                                      "description": "Evidence node IDs linked to the episode"
+                                                      },
+                                                      "actions": {
+                                                                      "type": "array",
+                                                                      "items": { "type": "string" },
+                                                                      "description": "Action node IDs produced by the episode"
+                                                      }
+                                        }
+                            },
+                            "mg_drift": {
+                                        "type": "array",
+                                        "items": { "type": "object" },
+                                        "description": "Drift event nodes linked to the episode in MG"
+                            },
+                            "dlr_entry": {
+                                        "$ref": "#/definitions/DLREntryRef",
+                                        "description": "Matching DLR entry with policy context"
+                            }
+                  }
+          },
+
+          "WHAT_CHANGEDResponseData": {
+                  "type": "object",
+                  "description": "Resolver-specific data payload for WHAT_CHANGED queries. DLR diff with MG patch and DS drift enrichment.",
+                  "additionalProperties": true,
+                  "properties": {
+                            "total_entries": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "description": "Total DLR entries analysed"
+                            },
+                            "outcome_distribution": {
+                                        "type": "object",
+                                        "additionalProperties": { "type": "integer" },
+                                        "description": "Count of episodes by outcome code"
+                            },
+                            "degraded_episodes": {
+                                        "type": "array",
+                                        "items": { "type": "string" },
+                                        "description": "Episode IDs with active degrade steps"
+                            },
+                            "policy_missing": {
+                                        "type": "array",
+                                        "items": { "type": "string" },
+                                        "description": "Episode IDs missing policy stamps"
+                            },
+                            "patch_count": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "description": "Number of patch nodes in the Memory Graph"
+                            },
+                            "drift_summary": {
+                                        "type": "object",
+                                        "description": "Drift signal summary from DS",
+                                        "properties": {
+                                                      "total_signals": { "type": "integer", "minimum": 0 },
+                                                      "by_severity": {
+                                                                      "type": "object",
+                                                                      "properties": {
+                                                                                        "green": { "type": "integer" },
+                                                                                        "yellow": { "type": "integer" },
+                                                                                        "red": { "type": "integer" }
+                                                                      }
+                                                      }
+                                        }
+                            }
+                  }
+          },
+
+          "WHAT_DRIFTEDResponseData": {
+                  "type": "object",
+                  "description": "Resolver-specific data payload for WHAT_DRIFTED queries. DS scan results with MG resolution cross-reference.",
+                  "additionalProperties": true,
+                  "properties": {
+                            "total_signals": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "description": "Total drift signals ingested"
+                            },
+                            "by_type": {
+                                        "type": "object",
+                                        "additionalProperties": { "type": "integer" },
+                                        "description": "Signal count by drift type"
+                            },
+                            "by_severity": {
+                                        "type": "object",
+                                        "properties": {
+                                                      "green": { "type": "integer" },
+                                                      "yellow": { "type": "integer" },
+                                                      "red": { "type": "integer" }
+                                        },
+                                        "description": "Signal count by severity"
+                            },
+                            "top_buckets": {
+                                        "type": "array",
+                                        "items": { "$ref": "#/definitions/DriftBucketRef" },
+                                        "description": "Top drift fingerprint buckets sorted by severity × count"
+                            },
+                            "top_recurring": {
+                                        "type": "array",
+                                        "items": { "type": "string" },
+                                        "description": "Fingerprint keys of the most recurring drift patterns"
+                            },
+                            "mg_drift_nodes": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "description": "Number of drift nodes in the Memory Graph"
+                            },
+                            "mg_patch_nodes": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "description": "Number of patch nodes in the Memory Graph"
+                            },
+                            "resolution_ratio": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "maximum": 1,
+                                        "description": "Ratio of resolved drifts (patch_nodes / drift_nodes)"
+                            }
+                  }
+          },
+
+          "RECALLResponseData": {
+                  "type": "object",
+                  "description": "Resolver-specific data payload for RECALL queries. Full MG graph traversal results with DLR enrichment.",
+                  "additionalProperties": true,
+                  "properties": {
+                            "provenance": {
+                                        "type": "object",
+                                        "description": "MG 'why' query result (node, evidence_refs, actions)"
+                            },
+                            "drift_events": {
+                                        "type": "array",
+                                        "items": { "type": "object" },
+                                        "description": "Drift event nodes linked to the episode"
+                            },
+                            "patches": {
+                                        "type": "array",
+                                        "items": { "type": "object" },
+                                        "description": "Patch nodes linked to the episode's drift"
+                            },
+                            "dlr_entry": {
+                                        "$ref": "#/definitions/DLREntryRef",
+                                        "description": "Matching DLR entry for decision context"
+                            }
+                  }
+          },
+
+          "STATUSResponseData": {
+                  "type": "object",
+                  "description": "Resolver-specific data payload for STATUS queries. CoherenceScorer composite with per-dimension breakdown.",
+                  "additionalProperties": true,
+                  "properties": {
+                            "overall_score": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "maximum": 100,
+                                        "description": "Unified coherence score (0–100)"
+                            },
+                            "grade": {
+                                        "type": "string",
+                                        "enum": ["A", "B", "C", "D", "F"],
+                                        "description": "Letter grade derived from overall_score"
+                            },
+                            "dimensions": {
+                                        "type": "array",
+                                        "items": { "$ref": "#/definitions/CoherenceDimensionScore" },
+                                        "minItems": 4,
+                                        "maxItems": 4,
+                                        "description": "Per-dimension breakdown (policy_adherence, outcome_health, drift_control, memory_completeness)"
+                            },
+                            "mg_stats": {
+                                        "type": "object",
+                                        "description": "Memory Graph statistics",
+                                        "properties": {
+                                                      "total_nodes": { "type": "integer", "minimum": 0 },
+                                                      "total_edges": { "type": "integer", "minimum": 0 },
+                                                      "nodes_by_kind": {
+                                                                      "type": "object",
+                                                                      "additionalProperties": { "type": "integer" }
+                                                      },
+                                                      "edges_by_kind": {
+                                                                      "type": "object",
+                                                                      "additionalProperties": { "type": "integer" }
+                                                      }
+                                        }
+                            },
+                            "drift_headline": {
+                                        "type": "object",
+                                        "description": "Drift summary headline",
+                                        "properties": {
+                                                      "total": { "type": "integer", "minimum": 0 },
+                                                      "red": { "type": "integer", "minimum": 0 },
+                                                      "recurring": { "type": "integer", "minimum": 0 }
+                                        }
+                            }
+                  }
+          },
+
+          "IRISResponse": {
+                  "type": "object",
+                  "description": "Structured response from the IRIS engine. Every response includes a provenance chain linking back to episodes, PRIME verdicts, and MG seals.",
+                  "required": ["query_id", "query_type", "status", "summary", "provenance_chain", "confidence", "resolved_at", "elapsed_ms"],
+                  "additionalProperties": false,
+                  "properties": {
+                            "query_id": {
+                                        "type": "string",
+                                        "pattern": "^iris-[a-f0-9]{12}$",
+                                        "description": "Deterministic query identifier (iris-{sha256[:12]})"
+                            },
+                            "query_type": {
+                                        "$ref": "#/definitions/QueryType"
+                            },
+                            "status": {
+                                        "$ref": "#/definitions/ResolutionStatus"
+                            },
+                            "summary": {
+                                        "type": "string",
+                                        "description": "Human-readable summary of the resolution"
+                            },
+                            "data": {
+                                        "type": "object",
+                                        "description": "Resolver-specific structured data payload. Shape depends on query_type: WHY → WHYResponseData, WHAT_CHANGED → WHAT_CHANGEDResponseData, WHAT_DRIFTED → WHAT_DRIFTEDResponseData, RECALL → RECALLResponseData, STATUS → STATUSResponseData."
+                            },
+                            "provenance_chain": {
+                                        "type": "array",
+                                        "items": { "$ref": "#/definitions/ProvenanceLink" },
+                                        "description": "Ordered list of artifact references that produced this answer. Traces back to episodes, PRIME verdicts, and MG seals."
+                            },
+                            "confidence": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "maximum": 1,
+                                        "description": "Estimate of answer completeness (0.0 = no data, 1.0 = fully resolved)"
+                            },
+                            "resolved_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "description": "ISO-8601 timestamp when the resolution completed"
+                            },
+                            "elapsed_ms": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "description": "Wall-clock resolution time in milliseconds. Target: < 60000 ms."
+                            },
+                            "warnings": {
+                                        "type": "array",
+                                        "items": { "type": "string" },
+                                        "description": "Performance or data-quality warnings (e.g. response time exceeded target)"
+                            }
+                  }
+          }
+    },
+
+    "type": "object",
+    "description": "A complete IRIS query/response record. Top-level document pairs the input query with its resolved response and engine configuration.",
+    "required": ["query", "response"],
+    "additionalProperties": false,
+    "properties": {
+          "query": {
+                  "$ref": "#/definitions/IRISQuery"
+          },
+          "response": {
+                  "$ref": "#/definitions/IRISResponse"
+          },
+          "config": {
+                  "$ref": "#/definitions/IRISConfig",
+                  "description": "Engine configuration active at query time"
+          },
+          "episode_refs": {
+                  "type": "array",
+                  "items": { "$ref": "#/definitions/EpisodeRef" },
+                  "description": "Sealed episode references consulted during resolution"
+          },
+          "prime_verdict_refs": {
+                  "type": "array",
+                  "items": { "$ref": "#/definitions/PRIMEVerdictRef" },
+                  "description": "PRIME gate verdicts referenced in the provenance chain (links to specs/prime_gate.schema.json)"
+          },
+          "mg_seal_refs": {
+                  "type": "array",
+                  "items": { "$ref": "#/definitions/MGSealRef" },
+                  "description": "Memory Graph seal references for tamper-evident audit linkage"
+          }
+    },
+
+    "examples": [
+          {
+                  "query": {
+                            "query_type": "WHY",
+                            "episode_id": "ep-deploy-001",
+                            "text": "Why did we decide to quarantine this account?"
+                  },
+                  "response": {
+                            "query_id": "iris-a1b2c3d4e5f6",
+                            "query_type": "WHY",
+                            "status": "RESOLVED",
+                            "summary": "Episode 'ep-deploy-001' found in Memory Graph with 2 evidence ref(s) and 1 action(s). DLR record 'dlr-7f8a9b0c1d2e' shows decision type 'AccountQuarantine' with outcome 'success'. Policy stamp present — decision was policy-governed.",
+        "data": {
+                    "mg_provenance": {
+                                  "episode_id": "ep-deploy-001",
+                                  "node": {
+                                                  "node_id": "ep-deploy-001",
+                                                  "kind": "episode",
+                                                  "label": "AccountQuarantine"
+                                  },
+                                  "evidence_refs": ["evidence:fraud-signal-42", "evidence:velocity-check-7"],
+                                  "actions": ["ep-deploy-001:action:0"]
+                    },
+                    "dlr_entry": {
+                                  "dlr_id": "dlr-7f8a9b0c1d2e",
+                                  "episode_id": "ep-deploy-001",
+                                  "decision_type": "AccountQuarantine",
+                                  "outcome_code": "success",
+                                  "policy_stamp": {
+                                                  "policyPackId": "pp-fraud-v2",
+                                                  "policyPackVersion": "2.1.0",
+                                                  "policyPackHash": "sha256:abc123"
+                                  },
+                                  "degrade_step": null
+                    }
+        },
+        "provenance_chain": [
+                    {
+                                  "artifact": "MG",
+                                  "ref_id": "ep-deploy-001",
+                                  "role": "source",
+                                  "detail": "Memory Graph node: AccountQuarantine"
+                    },
+                    {
+                                  "artifact": "MG",
+                                  "ref_id": "evidence:fraud-signal-42",
+                                  "role": "evidence",
+                                  "detail": "Evidence reference from Memory Graph"
+                    },
+                    {
+                                  "artifact": "DLR",
+                                  "ref_id": "dlr-7f8a9b0c1d2e",
+                                  "role": "context",
+                                  "detail": "Policy stamp: true, outcome: success"
+                    }
+        ],
+        "confidence": 0.8,
+        "resolved_at": "2026-02-14T22:30:00Z",
+        "elapsed_ms": 12.45,
+        "warnings": []
+},
+      "episode_refs": [
+                {
+                            "episode_id": "ep-deploy-001",
+                            "decision_type": "AccountQuarantine",
+                            "outcome_code": "success",
+                            "sealed_at": "2026-02-14T22:00:00Z",
+                            "seal_hash": "sha256:def456"
+                }
+      ],
+      "prime_verdict_refs": [
+                {
+                            "verdict": "APPROVE",
+                            "composite_score": 0.85,
+                            "gate_version": "1.0.0",
+                            "context_hash": "a1b2c3d4e5f67890",
+                            "escalation_factors": []
+                }
+      ],
+      "mg_seal_refs": [
+                {
+                            "seal_id": "ep-deploy-001",
+                            "seal_hash": "sha256:def456",
+                            "version": 1,
+                            "lineage": [],
+                            "sealed_at": "2026-02-14T22:00:00Z"
+                }
+      ]
+},
+    {
+            "query": {
+                      "query_type": "STATUS"
+            },
+            "response": {
+                      "query_id": "iris-f6e5d4c3b2a1",
+                      "query_type": "STATUS",
+                      "status": "RESOLVED",
+                      "summary": "System coherence: 78.5/100 (grade B). policy_adherence: 85.0/100 (weight 25%). outcome_health: 72.0/100 (weight 30%). drift_control: 65.0/100 (weight 25%). memory_completeness: 90.0/100 (weight 20%).",
+                      "data": {
+                                  "overall_score": 78.5,
+                                  "grade": "B",
+                                  "dimensions": [
+                                                { "name": "policy_adherence", "score": 85.0, "weight": 0.25, "details": { "stamped": 17, "total": 20 } },
+                                                { "name": "outcome_health", "score": 72.0, "weight": 0.30, "details": { "success_rate": 0.8, "verification_pass_rate": 0.9 } },
+                                                { "name": "drift_control", "score": 65.0, "weight": 0.25, "details": { "total_signals": 8, "red_count": 1, "recurring_patterns": 2 } },
+                                                { "name": "memory_completeness", "score": 90.0, "weight": 0.20, "details": { "episode_nodes": 18, "expected_episodes": 20, "total_nodes": 45 } }
+                                  ],
+                                  "drift_headline": { "total": 8, "red": 1, "recurring": 2 }
+                      },
+                      "provenance_chain": [
+                                  { "artifact": "DLR", "ref_id": "scorer", "role": "source", "detail": "Policy adherence dimension" },
+                                  { "artifact": "RS", "ref_id": "scorer", "role": "source", "detail": "Outcome health dimension" },
+                                  { "artifact": "DS", "ref_id": "scorer", "role": "source", "detail": "Drift control dimension" },
+                                  { "artifact": "MG", "ref_id": "scorer", "role": "source", "detail": "Memory completeness dimension" }
+                      ],
+                      "confidence": 0.785,
+                      "resolved_at": "2026-02-14T22:35:00Z",
+                      "elapsed_ms": 8.21,
+                      "warnings": []
+            }
+    }
+]
+}
