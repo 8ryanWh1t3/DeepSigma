@@ -1,7 +1,6 @@
 """Unit tests for coherence_ops.ds — Drift Signal Collector (Decision Scaffold)."""
 import json
-import pytest
-from coherence_ops.ds import DriftSignalCollector, DriftBucket, DriftSummary
+from coherence_ops.ds import DriftSignalCollector, DriftSummary
 
 
 def _drift(drift_type="freshness", severity="yellow", fp_key="AQ:freshness:geo",
