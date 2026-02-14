@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import sys
+from dataclasses import asdict
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
@@ -26,7 +27,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from coherence_ops import (
+from coherence_ops import (  # noqa: E402
     CoherenceManifest,
     DLRBuilder,
     ReflectionSession,
@@ -35,9 +36,8 @@ from coherence_ops import (
     CoherenceAuditor,
     CoherenceScorer,
 )
-from coherence_ops.manifest import ArtifactDeclaration, ArtifactKind, ComplianceLevel
-from coherence_ops.scoring import CoherenceReport
-from dataclasses import asdict
+from coherence_ops.manifest import ArtifactDeclaration, ArtifactKind, ComplianceLevel  # noqa: E402
+from coherence_ops.scoring import CoherenceReport  # noqa: E402
 
 
 # ===================================================================
@@ -135,7 +135,7 @@ def example_happy_path():
 
     # Show RS summary
     summary = rs.summarise()
-    print(f"\n  RS takeaways:")
+    print("\n  RS takeaways:")
     for t in summary.takeaways:
         print(f"    - {t}")
 
@@ -188,7 +188,7 @@ def example_stress_path():
 
     # Show the top recurring drift fingerprints
     ds_summary = ds.summarise()
-    print(f"\n  Top recurring drift fingerprints:")
+    print("\n  Top recurring drift fingerprints:")
     for fp in ds_summary.top_recurring:
         bucket = next(b for b in ds_summary.buckets if b.fingerprint_key == fp)
         print(f"    {fp}  count={bucket.count}  "
@@ -197,7 +197,7 @@ def example_stress_path():
 
     # Show "why did we do this?" for the rollback episode
     why = mg.query("why", episode_id="ep-demo-003")
-    print(f"\n  Why did we do ep-demo-003 (rollback)?")
+    print("\n  Why did we do ep-demo-003 (rollback)?")
     print(f"    Evidence refs: {why['evidence_refs']}")
     print(f"    Actions taken: {why['actions']}")
 
