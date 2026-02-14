@@ -1,7 +1,6 @@
 """Unit tests for coherence_ops.mg — Memory Graph node/edge creation."""
 import json
-import pytest
-from coherence_ops.mg import MemoryGraph, NodeKind, EdgeKind, GraphNode, GraphEdge
+from coherence_ops.mg import MemoryGraph
 
 
 def _episode(episode_id="ep-1", decision_type="AccountQuarantine"):
