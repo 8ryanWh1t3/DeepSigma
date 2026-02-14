@@ -5,15 +5,21 @@ coherence audit loop that connects RAL / Sigma OVERWATCH runtime exhaust
 to structured governance, learning, and memory.
 
 Public API:
-    CoherenceManifest   — system-level declaration of artifact coverage
-    DLRBuilder          — build Decision Log Records from sealed episodes
-    ReflectionSession   — aggregate episodes into learning summaries
-    DriftSignalCollector — collect and structure runtime drift signals
-    MemoryGraph          — build provenance / recall graph
-    CoherenceAuditor    — periodic cross-artifact consistency checks
-    CoherenceScorer     — compute unified coherence score
-    Reconciler          — detect and resolve cross-artifact inconsistencies
-"""
+
+    CoherenceManifest  — system-level declaration of artifact coverage
+        DLRBuilder         — build Decision Log Records from sealed episodes
+            ReflectionSession  — aggregate episodes into learning summaries
+                DriftSignalCollector — collect and structure runtime drift signals
+                    MemoryGraph        — build provenance / recall graph
+                        CoherenceAuditor   — periodic cross-artifact consistency checks
+                            CoherenceScorer    — compute unified coherence score
+                                Reconciler         — detect and resolve cross-artifact inconsistencies
+                                    IRISEngine         — operator query resolution engine (Phase 2)
+                                        IRISQuery          — structured query input for IRIS
+                                            IRISResponse       — structured response with provenance chain
+                                                QueryType          — WHY | WHAT_CHANGED | WHAT_DRIFTED | RECALL | STATUS
+                                                    IRISConfig         — configuration for the IRIS engine
+                                                    """
 
 from __future__ import annotations
 
@@ -27,14 +33,20 @@ from coherence_ops.mg import MemoryGraph
 from coherence_ops.audit import CoherenceAuditor
 from coherence_ops.scoring import CoherenceScorer
 from coherence_ops.reconciler import Reconciler
+from coherence_ops.iris import IRISEngine, IRISQuery, IRISResponse, QueryType, IRISConfig
 
 __all__ = [
-    "CoherenceManifest",
-    "DLRBuilder",
-    "ReflectionSession",
-    "DriftSignalCollector",
-    "MemoryGraph",
-    "CoherenceAuditor",
-    "CoherenceScorer",
-    "Reconciler",
+        "CoherenceManifest",
+        "DLRBuilder",
+        "ReflectionSession",
+        "DriftSignalCollector",
+        "MemoryGraph",
+        "CoherenceAuditor",
+        "CoherenceScorer",
+        "Reconciler",
+        "IRISEngine",
+        "IRISQuery",
+        "IRISResponse",
+        "QueryType",
+        "IRISConfig",
 ]
