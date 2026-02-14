@@ -21,7 +21,7 @@ import sys
 import xml.etree.ElementTree as ET
 from dataclasses import asdict
 from pathlib import Path
-from typing import List, Dict, Any, Tuple
+from typing import Any, Dict, List
 
 # ---------------------------------------------------------------------------
 # Ensure repo root is importable
@@ -30,7 +30,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from coherence_ops import (
+from coherence_ops import (  # noqa: E402
     CoherenceManifest,
     DLRBuilder,
     ReflectionSession,
@@ -39,8 +39,7 @@ from coherence_ops import (
     CoherenceAuditor,
     CoherenceScorer,
 )
-from coherence_ops.manifest import ArtifactDeclaration, ArtifactKind, ComplianceLevel
-from coherence_ops.scoring import CoherenceReport
+from coherence_ops.manifest import ArtifactDeclaration, ArtifactKind, ComplianceLevel  # noqa: E402
 
 
 # ===================================================================
