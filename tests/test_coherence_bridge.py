@@ -157,7 +157,7 @@ class TestCoherenceBridge:
         """Full bridge: all four pillars produce valid output from same input."""
         # DLR
         dlr_builder = DLRBuilder()
-        dlr_entries = dlr_builder.from_episodes(EPISODES)
+        dlr_builder.from_episodes(EPISODES)
         dlr_json = json.loads(dlr_builder.to_json())
 
         # RS
