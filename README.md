@@ -90,7 +90,7 @@ Interactive monitoring dashboard with real-time visualizations. **Zero-install d
 ➡ [`dashboard/demo.html`](./dashboard/demo.html)
 
 
-Features: dark/light theme, system health gauge, radar charts, searchable tables, keyboard shortcuts (`1-4` views, `R` refresh, `T` theme), toast alerts, JSON/CSV export.
+Features: dark/light theme, system health gauge, radar charts, searchable tables, keyboard shortcuts (`1-5` views, `R` refresh, `T` theme), toast alerts, JSON/CSV export.
 
 
 Full React build version: see [`/dashboard`](./dashboard/) with `npm install && npm run dev`.
