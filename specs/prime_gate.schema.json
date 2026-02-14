@@ -1,0 +1,259 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deepsigma.dev/specs/prime_gate.schema.json",
+  "title": "PRIME Threshold Gate Schema",
+  "description": "JSON Schema for PRIME gate inputs, outputs, and configuration. Defines the contract for the Truth-Reasoning-Memory invariant evaluation pipeline.",
+  "definitions": {
+    "ConfidenceBand": {
+      "type": "string",
+      "enum": ["HIGH", "MODERATE", "LOW", "CONTESTED"],
+      "description": "Classification of claim confidence level"
+    },
+    "Verdict": {
+      "type": "string",
+      "enum": ["APPROVE", "DEFER", "ESCALATE"],
+      "description": "PRIME gate decision output"
+    },
+    "TruthInvariant": {
+      "type": "object",
+      "description": "Truth facet: claim-evidence-source chain with disconfirmer tracking",
+      "required": ["claim"],
+      "properties": {
+        "claim": {
+          "type": "string",
+          "description": "The assertion being evaluated"
+        },
+        "evidence": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Supporting evidence for the claim"
+        },
+        "sources": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Provenance sources for the evidence"
+        },
+        "confidence": {
+          "$ref": "#/definitions/ConfidenceBand",
+          "default": "MODERATE"
+        },
+        "disconfirmers": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Active counter-evidence or contradictions"
+        }
+      }
+    },
+    "Assumption": {
+      "type": "object",
+      "required": ["statement"],
+      "properties": {
+        "statement": {
+          "type": "string",
+          "description": "The assumption being tracked"
+        },
+        "basis": {
+          "type": "string",
+          "description": "Why this assumption was made"
+        },
+        "expires_at": {
+          "type": "number",
+          "description": "Unix timestamp when this assumption should be re-evaluated"
+        },
+        "created_at": {
+          "type": "number",
+          "description": "Unix timestamp when assumption was recorded"
+        }
+      }
+    },
+    "ReasoningInvariant": {
+      "type": "object",
+      "description": "Reasoning facet: facts vs interpretation separation with assumption TTL",
+      "properties": {
+        "facts": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Verified factual statements"
+        },
+        "interpretations": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Derived interpretations (not verified facts)"
+        },
+        "assumptions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Assumption" },
+          "description": "Active assumptions with expiry tracking"
+        }
+      }
+    },
+    "MemoryInvariant": {
+      "type": "object",
+      "description": "Memory facet: seal-version-patch lineage chain",
+      "properties": {
+        "seal_id": {
+          "type": "string",
+          "description": "Unique identifier for the sealed decision record"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1,
+          "description": "Current version number"
+        },
+        "patches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "description": { "type": "string" },
+              "applied_at": { "type": "number" },
+              "version": { "type": "integer" }
+            }
+          },
+          "description": "Ordered list of patches applied"
+        },
+        "lineage": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Hash chain of patch lineage"
+        }
+      }
+    },
+    "PRIMEConfig": {
+      "type": "object",
+      "description": "Configuration for PRIME gate thresholds and behavior",
+      "properties": {
+        "approve_threshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.7,
+          "description": "Minimum composite score for APPROVE verdict"
+        },
+        "defer_threshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.4,
+          "description": "Minimum composite score for DEFER (below this = ESCALATE)"
+        },
+        "min_evidence_ratio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.5
+        },
+        "min_fact_ratio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.3
+        },
+        "max_expired_assumptions": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 2,
+          "description": "Max expired assumptions before escalation trigger"
+        },
+        "temperature_ceiling": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.8,
+          "description": "System temperature threshold for escalation"
+        },
+        "require_seal": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether a memory seal_id is required"
+        },
+        "contested_claim_policy": {
+          "type": "string",
+          "enum": ["defer", "escalate"],
+          "default": "defer",
+          "description": "How to handle claims with active disconfirmers"
+        }
+      }
+    },
+    "PRIMEContext": {
+      "type": "object",
+      "description": "Input to the PRIME threshold gate",
+      "required": ["truth"],
+      "properties": {
+        "truth": { "$ref": "#/definitions/TruthInvariant" },
+        "reasoning": { "$ref": "#/definitions/ReasoningInvariant" },
+        "memory": { "$ref": "#/definitions/MemoryInvariant" },
+        "raw_output": {
+          "type": "string",
+          "description": "Raw LLM output being evaluated"
+        },
+        "coherence_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Current coherence score from CoherenceScorer"
+        },
+        "temperature": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Current system temperature (drift accumulation)"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Additional context metadata"
+        }
+      }
+    },
+    "PRIMEVerdict": {
+      "type": "object",
+      "description": "Output from the PRIME threshold gate with full lineage",
+      "required": ["verdict", "confidence", "composite_score"],
+      "properties": {
+        "verdict": { "$ref": "#/definitions/Verdict" },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "reasoning": {
+          "type": "string",
+          "description": "Human-readable decision reasoning"
+        },
+        "truth_score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "reasoning_score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "memory_score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "composite_score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "escalation_factors": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Reasons for escalation if applicable"
+        },
+        "lineage": {
+          "type": "object",
+          "description": "Decision provenance and audit trail",
+          "properties": {
+            "gate_version": { "type": "string" },
+            "config": { "$ref": "#/definitions/PRIMEConfig" },
+            "context_hash": { "type": "string" },
+            "memory_version": { "type": "integer" },
+            "seal_id": { "type": "string" }
+          }
+        },
+        "timestamp": {
+          "type": "number",
+          "description": "Unix timestamp of verdict"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "description": "A PRIME gate evaluation record",
+  "required": ["context", "verdict"],
+  "properties": {
+    "context": { "$ref": "#/definitions/PRIMEContext" },
+    "config": { "$ref": "#/definitions/PRIMEConfig" },
+    "verdict": { "$ref": "#/definitions/PRIMEVerdict" }
+  }
+}
