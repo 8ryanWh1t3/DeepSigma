@@ -16,8 +16,13 @@ Usage:
 """
 from __future__ import annotations
 
+import argparse
+import json
 import sys
+import uuid
+from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any, Dict
 
 # Ensure the project root is on sys.path so engine.* imports work
 # without requiring PYTHONPATH=. to be set manually.
@@ -25,15 +30,8 @@ _REPO_ROOT = str(Path(__file__).resolve().parents[1])
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 
-import argparse
-import json
-import uuid
-from pathlib import Path
-from datetime import datetime, timezone
-from typing import Any, Dict
-
-from engine.policy_loader import load_policy_pack, get_rules
-from engine.degrade_ladder import DegradeSignal, choose_degrade_step
+from engine.policy_loader import load_policy_pack, get_rules  # noqa: E402
+from engine.degrade_ladder import DegradeSignal, choose_degrade_step  # noqa: E402
 
 
 def iso_now() -> str:
