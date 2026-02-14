@@ -141,7 +141,7 @@ def cmd_audit(args):
     print()
 
     # Seal stub in output
-    print(f"Seal: stub-sha256 (v0.1.0)")
+    print("Seal: stub-sha256 (v0.1.0)")
     print(f"Pipeline: episodes={len(episodes)} drift={len(drift_events)}")
 
 
@@ -171,7 +171,7 @@ def cmd_score(args):
             bar = "#" * int(dim.score / 5) + "-" * (20 - int(dim.score / 5))
             print(f"  {dim.name:25s} {dim.score:6.1f}  [{bar}]  (w={dim.weight})")
         print()
-        print(f"Seal: stub-sha256 | Version: 0.1.0 | Patch: 0")
+        print("Seal: stub-sha256 | Version: 0.1.0 | Patch: 0")
 
 
 def cmd_mg_export(args):
@@ -326,7 +326,7 @@ def cmd_demo(args):
     target_ep = "ep-demo-003"
     why = mg.query("why", episode_id=target_ep)
     drift_q = mg.query("drift", episode_id=target_ep)
-    patches_q = mg.query("patches", episode_id=target_ep)
+    mg.query("patches", episode_id=target_ep)  # patches data not displayed yet
 
     print(f'  "Why did we do this?"  (episode: {target_ep})')
     node = why.get("node", {})
