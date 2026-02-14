@@ -1,4 +1,4 @@
-# 17 — PRIME Threshold Gate
+# 18 — PRIME Threshold Gate
 
 > Converting LLM probability gradients into decision-grade actions.
 
