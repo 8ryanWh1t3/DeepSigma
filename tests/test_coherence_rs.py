@@ -1,7 +1,6 @@
 """Unit tests for coherence_ops.rs — Reflection Session (Reality Snapshot)."""
 import json
-import pytest
-from coherence_ops.rs import ReflectionSession, ReflectionSummary, Divergence
+from coherence_ops.rs import ReflectionSession, ReflectionSummary
 
 
 def _ep(episode_id="ep-1", outcome="success", degrade="none", verify="pass"):
