@@ -1,6 +1,5 @@
 """Unit tests for the full coherence bridge: episode -> all four pillars."""
 import json
-import pytest
 from coherence_ops.dlr import DLRBuilder
 from coherence_ops.rs import ReflectionSession
 from coherence_ops.ds import DriftSignalCollector
