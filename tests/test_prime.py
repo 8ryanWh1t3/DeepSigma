@@ -12,7 +12,6 @@ from coherence_ops.prime import (
     PRIMEGate,
     PRIMEConfig,
     PRIMEContext,
-    PRIMEVerdict,
     TruthInvariant,
     ReasoningInvariant,
     MemoryInvariant,
