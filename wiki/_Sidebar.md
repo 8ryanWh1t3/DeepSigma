@@ -21,6 +21,8 @@
   - [Policy Pack Schema](Policy-Pack-Schema)
   - [Claim Schema](Unified-Atomic-Claims)
   - [DLR Schema](Unified-Atomic-Claims)
+  - [Canon Schema](Canon)
+  - [Retcon Schema](Retcon)
 - **Integrations**
   - [MCP](MCP)
   - [LangChain](LangChain)
@@ -35,6 +37,8 @@
   - [Coherence Ops Mapping](Coherence-Ops-Mapping)
   - [IRIS](IRIS)
   - [Unified Atomic Claims](Unified-Atomic-Claims)
+  - [Canon](Canon)
+  - [Retcon](Retcon)
   - [LLM Data Model](LLM-Data-Model)
 - **Meta**
   - [Contributing](Contributing)
