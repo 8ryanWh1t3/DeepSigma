@@ -19,8 +19,8 @@
   - [DTE Schema](DTE-Schema)
   - [Drift Schema](Drift-Schema)
   - [Policy Pack Schema](Policy-Pack-Schema)
-  -   - [Claim Schema](Unified-Atomic-Claims)
-      -   - [DLR Schema](Unified-Atomic-Claims)
+  - [Claim Schema](Unified-Atomic-Claims)
+  - [DLR Schema](Unified-Atomic-Claims)
 - **Integrations**
   - [MCP](MCP)
   - [LangChain](LangChain)
