@@ -1,0 +1,152 @@
+@prefix ds:   <https://deepsigma.ai/ns/coherence#> .
+@prefix ex:   <https://deepsigma.ai/ns/examples/> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# =============================================================================
+# CLAIM PRIMITIVE — Sample Instance Graph
+# Mirrors llm_data_model/03_examples/claim_primitive_example.json
+# Scenario: SIGINT pattern match — Account Quarantine recommendation
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# CLAIM-2026-0001 — The Atomic Claim
+# -----------------------------------------------------------------------------
+
+ex:CLAIM-2026-0001
+    a ds:AtomicClaim ;
+    ds:claimId "CLAIM-2026-0001" ;
+    ds:statement "SIGINT pattern match detected: Account X-4491 shows lateral movement consistent with credential stuffing, confidence band 0.82–0.91 across three sensor types." ;
+    ds:owner "IntelOps Truth Owner" ;
+    ds:claimVersion "1.0.0" ;
+
+    # Confidence
+    ds:confidenceScore 0.87 ;
+    ds:confidenceExplanation "Three independent sensor types converge (network flow, auth log, endpoint telemetry). Pattern matches known credential-stuffing TTPs with r=0.89 correlation." ;
+
+    # Epistemic type & status
+    ds:hasTruthType ds:Inference ;
+    ds:hasStatusLight ds:Green ;
+
+    # Timestamps
+    ds:timestampCreated "2026-02-14T09:15:00Z"^^xsd:dateTime ;
+    ds:timestampObserved "2026-02-14T08:47:00Z"^^xsd:dateTime ;
+
+    # Scope
+    ds:hasScope ex:CLAIM-2026-0001-scope ;
+
+    # Sources
+    ds:hasClaimSource ex:CLAIM-2026-0001-src1 ,
+                      ex:CLAIM-2026-0001-src2 ,
+                      ex:CLAIM-2026-0001-src3 ;
+
+    # Evidence
+    ds:hasClaimEvidence ex:CLAIM-2026-0001-ev1 ,
+                        ex:CLAIM-2026-0001-ev2 ;
+
+    # Half-life
+    ds:halfLifeValue 96 ;
+    ds:hasHalfLifeUnit ds:Hours ;
+    ds:halfLifeExpiresAt "2026-02-18T09:15:00Z"^^xsd:dateTime ;
+    ds:refreshTrigger "expiry" ;
+
+    # Seal
+    ds:hasSeal ex:CLAIM-2026-0001-seal ;
+
+    # Provenance chain
+    ds:hasProvenanceLink ex:CLAIM-2026-0001-prov1 ,
+                         ex:CLAIM-2026-0001-prov2 ,
+                         ex:CLAIM-2026-0001-prov3 ;
+
+    # Classification & tags
+    ds:hasClassification ds:Restricted ;
+    ds:tag "sigint" , "credential-stuffing" , "account-quarantine" , "x-4491" .
+
+# -----------------------------------------------------------------------------
+# Scope
+# -----------------------------------------------------------------------------
+
+ex:CLAIM-2026-0001-scope
+    a ds:ClaimScope ;
+    ds:scopeWhere "Perimeter Auth Cluster — US-EAST-1" ;
+    ds:scopeWhen "next 96 hours" ;
+    ds:scopeContext "Under sustained auth load > 500 req/min to /oauth/token" .
+
+# -----------------------------------------------------------------------------
+# Sources
+# -----------------------------------------------------------------------------
+
+ex:CLAIM-2026-0001-src1
+    a ds:ClaimSource ;
+    ds:sourceRef "sensor://netflow/cluster-east/2026-02-14" ;
+    ds:sourceType "sensor" ;
+    ds:hasReliability ds:HighReliability ;
+    ds:sourceCapturedAt "2026-02-14T08:50:00Z"^^xsd:dateTime .
+
+ex:CLAIM-2026-0001-src2
+    a ds:ClaimSource ;
+    ds:sourceRef "log://auth-service/event-stream/2026-02-14" ;
+    ds:sourceType "sensor" ;
+    ds:hasReliability ds:HighReliability ;
+    ds:sourceCapturedAt "2026-02-14T08:52:00Z"^^xsd:dateTime .
+
+ex:CLAIM-2026-0001-src3
+    a ds:ClaimSource ;
+    ds:sourceRef "api://endpoint-telemetry/x-4491/snapshot" ;
+    ds:sourceType "api" ;
+    ds:hasReliability ds:MediumReliability ;
+    ds:sourceCapturedAt "2026-02-14T08:55:00Z"^^xsd:dateTime .
+
+# -----------------------------------------------------------------------------
+# Evidence
+# -----------------------------------------------------------------------------
+
+ex:CLAIM-2026-0001-ev1
+    a ds:ClaimEvidence ;
+    ds:evidenceRef "trace://correlation-engine/run-20260214-0847" ;
+    ds:evidenceType "trace" ;
+    ds:evidenceMethod "statistical_anomaly_detection" ;
+    ds:evidenceSummary "Cross-sensor correlation identified lateral movement pattern across 3 auth endpoints over 28 min window. Correlation coefficient r=0.89." .
+
+ex:CLAIM-2026-0001-ev2
+    a ds:ClaimEvidence ;
+    ds:evidenceRef "metric://threat-intel/ttp-match/credential-stuffing-v3" ;
+    ds:evidenceType "metric" ;
+    ds:evidenceMethod "ttp_pattern_matching" ;
+    ds:evidenceSummary "Matched against credential-stuffing TTP signature v3 with 91% similarity score." .
+
+# -----------------------------------------------------------------------------
+# Seal
+# -----------------------------------------------------------------------------
+
+ex:CLAIM-2026-0001-seal
+    a ds:ClaimSeal ;
+    ds:sealHash "sha256:a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2" ;
+    ds:sealedAt "2026-02-14T09:15:00Z"^^xsd:dateTime ;
+    ds:sealVersion 1 .
+
+# -----------------------------------------------------------------------------
+# Provenance Chain
+# -----------------------------------------------------------------------------
+
+ex:CLAIM-2026-0001-prov1
+    a ds:ProvenanceLink ;
+    ds:provenanceLinkType "claim" ;
+    ds:provenanceLinkRef "CLAIM-2026-0001" ;
+    ds:provenanceLinkRole "root_assertion" .
+
+ex:CLAIM-2026-0001-prov2
+    a ds:ProvenanceLink ;
+    ds:provenanceLinkType "evidence" ;
+    ds:provenanceLinkRef "trace://correlation-engine/run-20260214-0847" ;
+    ds:provenanceLinkRole "corroborating_evidence" .
+
+ex:CLAIM-2026-0001-prov3
+    a ds:ProvenanceLink ;
+    ds:provenanceLinkType "source" ;
+    ds:provenanceLinkRef "sensor://netflow/cluster-east/2026-02-14" ;
+    ds:provenanceLinkRole "primary_source" .
+
+# =============================================================================
+# END OF SAMPLE INSTANCE
+# =============================================================================
