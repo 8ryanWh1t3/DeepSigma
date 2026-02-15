@@ -1,0 +1,762 @@
+@prefix rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:    <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:   <http://www.w3.org/2004/02/skos/core#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix coh:    <https://deepsigma.io/ontology/coherence-ops#> .
+@prefix gap:    <https://deepsigma.io/ontology/gap-analysis#> .
+
+# =============================================================================
+# COHERENCE OPS — FORMAL ONTOLOGY
+# Extracted from: Whimsical "Everything" Map + 284 LinkedIn Posts + Repo Plan
+# Deep Sigma / Coherence Ops Framework
+# Generated: 2025-02-14
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# ONTOLOGY DECLARATION
+# -----------------------------------------------------------------------------
+
+<https://deepsigma.io/ontology/coherence-ops>
+    a owl:Ontology ;
+    rdfs:label "Coherence Ops Framework Ontology"@en ;
+    dcterms:title "Deep Sigma — Coherence Operations Formal Ontology"@en ;
+    dcterms:description """
+        Formal representation of the Coherence Ops framework covering:
+        brand hierarchy, architectural layers, operational modes, instruments,
+        four-pillar model, PRIME governance gate, and integration adapters.
+        Derived from 284 LinkedIn posts, the Whimsical concept map, and the
+        sigma-overwatch repository implementation plan (P0–P5).
+    """@en ;
+    dcterms:creator "Deep Sigma" ;
+    dcterms:created "2025-02-14"^^xsd:date ;
+    owl:versionInfo "0.1.0" ;
+    rdfs:seeAlso <https://github.com/deep-sigma/sigma-overwatch> .
+
+
+# =============================================================================
+# CLASSES — FRAMEWORK TAXONOMY
+# =============================================================================
+
+# --- Top-Level Abstract Classes -----------------------------------------------
+
+coh:FrameworkConcept
+    a owl:Class ;
+    rdfs:label "Framework Concept"@en ;
+    rdfs:comment "Any named concept in the Coherence Ops universe." .
+
+coh:Layer
+    a owl:Class ;
+    rdfs:subClassOf coh:FrameworkConcept ;
+    rdfs:label "Architectural Layer"@en ;
+    rdfs:comment "A structural layer in the Coherence Ops stack." .
+
+coh:Pillar
+    a owl:Class ;
+    rdfs:subClassOf coh:FrameworkConcept ;
+    rdfs:label "Pillar"@en ;
+    rdfs:comment "One of the four foundational pillars of Coherence Ops." .
+
+coh:OperationalMode
+    a owl:Class ;
+    rdfs:subClassOf coh:FrameworkConcept ;
+    rdfs:label "Operational Mode"@en ;
+    rdfs:comment "A domain-specific configuration bundle (policy pack + PRIME thresholds + IRIS templates)." .
+
+coh:Instrument
+    a owl:Class ;
+    rdfs:subClassOf coh:FrameworkConcept ;
+    rdfs:label "Instrument"@en ;
+    rdfs:comment "A coherence measurement or assessment tool." .
+
+coh:Invariant
+    a owl:Class ;
+    rdfs:subClassOf coh:FrameworkConcept ;
+    rdfs:label "Invariant"@en ;
+    rdfs:comment "A truth/reasoning/memory invariant enforced by the PRIME gate." .
+
+coh:Adapter
+    a owl:Class ;
+    rdfs:subClassOf coh:FrameworkConcept ;
+    rdfs:label "Adapter"@en ;
+    rdfs:comment "An integration adapter connecting Coherence Ops to external systems." .
+
+coh:Metaphor
+    a owl:Class ;
+    rdfs:subClassOf coh:FrameworkConcept ;
+    rdfs:label "Metaphor"@en ;
+    rdfs:comment "An explanatory model or analogy used to communicate framework concepts." .
+
+coh:Pattern
+    a owl:Class ;
+    rdfs:subClassOf coh:FrameworkConcept ;
+    rdfs:label "Pattern"@en ;
+    rdfs:comment "A recurring architectural or operational pattern in the framework." .
+
+
+# --- Governance Sub-Classes ---------------------------------------------------
+
+coh:GovernanceAction
+    a owl:Class ;
+    rdfs:label "Governance Action"@en ;
+    rdfs:comment "An action output by the PRIME Threshold Gate." ;
+    owl:oneOf ( coh:Approve coh:Defer coh:Escalate ) .
+
+coh:DriftType
+    a owl:Class ;
+    rdfs:label "Drift Type"@en ;
+    rdfs:comment "A category of coherence drift detected by the Drift Scan pillar." .
+
+coh:ThreatLevel
+    a owl:Class ;
+    rdfs:label "Threat Level"@en ;
+    rdfs:comment "CTI threat classification." ;
+    owl:oneOf ( coh:ThreatGreen coh:ThreatYellow coh:ThreatRed ) .
+
+coh:DegradeTier
+    a owl:Class ;
+    rdfs:label "Degrade Tier"@en ;
+    rdfs:comment "A tier in the degrade ladder escalation model." .
+
+
+# =============================================================================
+# PROPERTIES
+# =============================================================================
+
+# --- Structural Relations -----------------------------------------------------
+
+coh:hasLayer
+    a owl:ObjectProperty ;
+    rdfs:label "has layer"@en ;
+    rdfs:domain coh:FrameworkConcept ;
+    rdfs:range coh:Layer .
+
+coh:hasPillar
+    a owl:ObjectProperty ;
+    rdfs:label "has pillar"@en ;
+    rdfs:domain coh:Layer ;
+    rdfs:range coh:Pillar .
+
+coh:hasMode
+    a owl:ObjectProperty ;
+    rdfs:label "has operational mode"@en ;
+    rdfs:domain coh:FrameworkConcept ;
+    rdfs:range coh:OperationalMode .
+
+coh:hasInstrument
+    a owl:ObjectProperty ;
+    rdfs:label "has instrument"@en ;
+    rdfs:domain coh:FrameworkConcept ;
+    rdfs:range coh:Instrument .
+
+coh:enforcesInvariant
+    a owl:ObjectProperty ;
+    rdfs:label "enforces invariant"@en ;
+    rdfs:domain coh:Layer ;
+    rdfs:range coh:Invariant .
+
+coh:queriesThrough
+    a owl:ObjectProperty ;
+    rdfs:label "queries through"@en ;
+    rdfs:comment "Relationship: an operator interface queries a pillar or layer." ;
+    rdfs:domain coh:Layer ;
+    rdfs:range coh:Pillar .
+
+coh:triggersInstrument
+    a owl:ObjectProperty ;
+    rdfs:label "triggers instrument"@en ;
+    rdfs:domain coh:Pillar ;
+    rdfs:range coh:Instrument .
+
+coh:escalatesTo
+    a owl:ObjectProperty ;
+    rdfs:label "escalates to"@en ;
+    rdfs:domain coh:DegradeTier ;
+    rdfs:range coh:DegradeTier .
+
+coh:dependsOn
+    a owl:ObjectProperty ;
+    rdfs:label "depends on"@en ;
+    rdfs:comment "Implementation dependency between concepts." ;
+    rdfs:domain coh:FrameworkConcept ;
+    rdfs:range coh:FrameworkConcept .
+
+coh:analogTo
+    a owl:ObjectProperty ;
+    rdfs:label "analogous to"@en ;
+    rdfs:domain coh:Metaphor ;
+    rdfs:range coh:FrameworkConcept .
+
+# --- Data Properties ----------------------------------------------------------
+
+coh:postCount
+    a owl:DatatypeProperty ;
+    rdfs:label "LinkedIn post count"@en ;
+    rdfs:comment "Number of posts (out of 284) that reference this concept." ;
+    rdfs:domain coh:FrameworkConcept ;
+    rdfs:range xsd:integer .
+
+coh:postPercentage
+    a owl:DatatypeProperty ;
+    rdfs:label "content coverage percentage"@en ;
+    rdfs:domain coh:FrameworkConcept ;
+    rdfs:range xsd:decimal .
+
+coh:repoStatus
+    a owl:DatatypeProperty ;
+    rdfs:label "repository implementation status"@en ;
+    rdfs:comment "One of: implemented, partial, planned, content-only." ;
+    rdfs:domain coh:FrameworkConcept ;
+    rdfs:range xsd:string .
+
+coh:implementationPhase
+    a owl:DatatypeProperty ;
+    rdfs:label "implementation phase"@en ;
+    rdfs:comment "The repo plan phase: pre, P0, P1, P2, P3, P4, P5." ;
+    rdfs:domain coh:FrameworkConcept ;
+    rdfs:range xsd:string .
+
+coh:gapType
+    a owl:DatatypeProperty ;
+    rdfs:label "gap type"@en ;
+    rdfs:comment "CONTENT>CODE, CODE>CONTENT, PARTIAL_GAP, ALIGNED, or LOW_SIGNAL." ;
+    rdfs:domain coh:FrameworkConcept ;
+    rdfs:range xsd:string .
+
+
+# =============================================================================
+# INDIVIDUALS — BRAND HIERARCHY
+# =============================================================================
+
+coh:DeepSigma
+    a coh:FrameworkConcept ;
+    rdfs:label "Deep Sigma"@en ;
+    rdfs:comment "Umbrella brand and research organization." ;
+    coh:postCount 34 ;
+    coh:postPercentage 12.0 ;
+    coh:repoStatus "implemented" ;
+    coh:implementationPhase "P0" ;
+    coh:gapType "ALIGNED" ;
+    coh:hasLayer coh:CoherenceOps .
+
+coh:CoherenceOps
+    a coh:FrameworkConcept, coh:Layer ;
+    rdfs:label "Coherence Ops"@en ;
+    rdfs:comment "The operational framework for managing decision coherence." ;
+    coh:postCount 142 ;
+    coh:postPercentage 50.0 ;
+    coh:repoStatus "implemented" ;
+    coh:implementationPhase "P0" ;
+    coh:gapType "ALIGNED" ;
+    coh:hasPillar coh:DLR, coh:RS, coh:DS, coh:MG ;
+    coh:hasLayer coh:PRIMELayer, coh:IRISLayer ;
+    coh:hasMode coh:FranOPS, coh:IntelOps, coh:ReflectionOps ;
+    coh:hasInstrument coh:CTI, coh:DAT, coh:DDR, coh:ITCO .
+
+coh:SigmaOverwatch
+    a coh:FrameworkConcept ;
+    rdfs:label "Σ OVERWATCH"@en ;
+    rdfs:comment "The runtime engine — the executable substrate of Coherence Ops." ;
+    coh:postCount 7 ;
+    coh:postPercentage 2.5 ;
+    coh:repoStatus "implemented" ;
+    coh:implementationPhase "P0" ;
+    coh:gapType "CODE>CONTENT" ;
+    coh:dependsOn coh:CoherenceOps .
+
+
+# =============================================================================
+# INDIVIDUALS — ARCHITECTURAL LAYERS
+# =============================================================================
+
+# --- PRIME Layer (P1) ---------------------------------------------------------
+
+coh:PRIMELayer
+    a coh:Layer ;
+    rdfs:label "PRIME Threshold Gate"@en ;
+    rdfs:comment """
+        Governance layer converting LLM probability gradients into
+        decision-grade actions (APPROVE/DEFER/ESCALATE) using
+        Truth-Reasoning-Memory invariants.
+    """@en ;
+    coh:postCount 37 ;
+    coh:postPercentage 13.0 ;
+    coh:repoStatus "implemented" ;
+    coh:implementationPhase "P1" ;
+    coh:gapType "ALIGNED" ;
+    coh:enforcesInvariant coh:TruthInvariant, coh:ReasoningInvariant, coh:MemoryInvariant ;
+    coh:dependsOn coh:DLR, coh:RS, coh:DS, coh:MG .
+
+coh:Approve   a coh:GovernanceAction ; rdfs:label "APPROVE" .
+coh:Defer     a coh:GovernanceAction ; rdfs:label "DEFER" .
+coh:Escalate  a coh:GovernanceAction ; rdfs:label "ESCALATE" .
+
+# --- IRIS Layer (P2) ----------------------------------------------------------
+
+coh:IRISLayer
+    a coh:Layer ;
+    rdfs:label "IRIS Interface"@en ;
+    rdfs:comment """
+        Operator-facing query resolution engine. Handles WHY, WHAT_CHANGED,
+        WHAT_DRIFTED, RECALL, STATUS queries with sub-60-second response target.
+        Terminal access to the PRIME layer.
+    """@en ;
+    coh:postCount 15 ;
+    coh:postPercentage 5.3 ;
+    coh:repoStatus "planned" ;
+    coh:implementationPhase "P2" ;
+    coh:gapType "CONTENT>CODE" ;
+    coh:queriesThrough coh:DLR, coh:DS, coh:MG ;
+    coh:dependsOn coh:PRIMELayer .
+
+
+# =============================================================================
+# INDIVIDUALS — FOUR PILLARS
+# =============================================================================
+
+coh:DLR
+    a coh:Pillar ;
+    rdfs:label "Decision Lineage Record"@en ;
+    skos:altLabel "DLR" ;
+    rdfs:comment "What we decided, why, with blast radius and rollback capability. The gradient becomes a commitment." ;
+    coh:postCount 121 ;
+    coh:postPercentage 42.6 ;
+    coh:repoStatus "implemented" ;
+    coh:implementationPhase "pre" ;
+    coh:gapType "ALIGNED" ;
+    coh:triggersInstrument coh:CTI .
+
+coh:RS
+    a coh:Pillar ;
+    rdfs:label "Reasoning Summary"@en ;
+    skos:altLabel "RS" ;
+    rdfs:comment "Judgment versus reality — facts vs interpretation, assumptions with expiry, rejected options and rationale." ;
+    coh:postCount 59 ;
+    coh:postPercentage 20.8 ;
+    coh:repoStatus "implemented" ;
+    coh:implementationPhase "pre" ;
+    coh:gapType "ALIGNED" .
+
+coh:DS
+    a coh:Pillar ;
+    rdfs:label "Drift Scan"@en ;
+    skos:altLabel "DS" ;
+    rdfs:comment "Where reality diverged from commitments — expired assumptions, outcome divergence, coherence decay detection." ;
+    coh:postCount 80 ;
+    coh:postPercentage 28.2 ;
+    coh:repoStatus "implemented" ;
+    coh:implementationPhase "pre" ;
+    coh:gapType "ALIGNED" ;
+    coh:triggersInstrument coh:CTI, coh:DAT .
+
+coh:MG
+    a coh:Pillar ;
+    rdfs:label "Memory Graph"@en ;
+    skos:altLabel "MG" ;
+    rdfs:comment "Institutional recall with lineage — 60 seconds or it doesn't exist. Seal-version-patch immutability." ;
+    coh:postCount 80 ;
+    coh:postPercentage 28.2 ;
+    coh:repoStatus "implemented" ;
+    coh:implementationPhase "pre" ;
+    coh:gapType "ALIGNED" .
+
+
+# =============================================================================
+# INDIVIDUALS — INVARIANTS (Truth-Reasoning-Memory)
+# =============================================================================
+
+coh:TruthInvariant
+    a coh:Invariant ;
+    rdfs:label "Truth Invariant"@en ;
+    rdfs:comment "Claim — Evidence — Source (+ provenance, confidence). No claim ships without evidence chain." ;
+    coh:postCount 26 ;
+    coh:repoStatus "implemented" ;
+    coh:implementationPhase "P1" .
+
+coh:ReasoningInvariant
+    a coh:Invariant ;
+    rdfs:label "Reasoning Invariant"@en ;
+    rdfs:comment "Facts vs interpretation, assumptions with expiry (TTL/half-life), rejected options with rationale." ;
+    coh:postCount 26 ;
+    coh:repoStatus "implemented" ;
+    coh:implementationPhase "P1" .
+
+coh:MemoryInvariant
+    a coh:Invariant ;
+    rdfs:label "Memory Invariant"@en ;
+    rdfs:comment "Seal — Version — Patch. No overwrite, only evolution. Immutable institutional memory." ;
+    coh:postCount 113 ;
+    coh:repoStatus "implemented" ;
+    coh:implementationPhase "P1" .
+
+
+# =============================================================================
+# INDIVIDUALS — OPERATIONAL MODES (P3)
+# =============================================================================
+
+coh:FranOPS
+    a coh:OperationalMode ;
+    rdfs:label "FranOPS"@en ;
+    rdfs:comment """
+        Franchise Operations Coherence. Tuned for multi-location consistency,
+        playbook drift detection, operational standard enforcement, brand
+        coherence scoring.
+    """@en ;
+    coh:postCount 50 ;
+    coh:postPercentage 17.6 ;
+    coh:repoStatus "planned" ;
+    coh:implementationPhase "P3" ;
+    coh:gapType "CONTENT>CODE" ;
+    coh:dependsOn coh:PRIMELayer .
+
+coh:IntelOps
+    a coh:OperationalMode ;
+    rdfs:label "IntelOps"@en ;
+    rdfs:comment """
+        Intelligence Operations Coherence. Tuned for source provenance,
+        claim verification, confidence band tracking, information freshness
+        enforcement, compartmentalized access.
+    """@en ;
+    coh:postCount 40 ;
+    coh:postPercentage 14.1 ;
+    coh:repoStatus "planned" ;
+    coh:implementationPhase "P3" ;
+    coh:gapType "CONTENT>CODE" ;
+    coh:dependsOn coh:PRIMELayer .
+
+coh:ReflectionOps
+    a coh:OperationalMode ;
+    rdfs:label "ReflectionOps"@en ;
+    rdfs:comment """
+        Learning and Improvement Cycles. Tuned for reflection session cadence,
+        divergence tracking, institutional memory accumulation, pattern detection.
+    """@en ;
+    coh:postCount 28 ;
+    coh:postPercentage 9.9 ;
+    coh:repoStatus "planned" ;
+    coh:implementationPhase "P3" ;
+    coh:gapType "CONTENT>CODE" ;
+    coh:dependsOn coh:PRIMELayer .
+
+
+# =============================================================================
+# INDIVIDUALS — INSTRUMENTS (P4)
+# =============================================================================
+
+coh:CTI
+    a coh:Instrument ;
+    rdfs:label "Coherence Threat Index"@en ;
+    skos:altLabel "CTI" ;
+    rdfs:comment "Measures coherence threat level (green/yellow/red) with dimensional breakdown. Most-referenced concept in content." ;
+    coh:postCount 236 ;
+    coh:postPercentage 83.1 ;
+    coh:repoStatus "partial" ;
+    coh:implementationPhase "P4" ;
+    coh:gapType "PARTIAL_GAP" ;
+    rdfs:comment "Exists in CoherenceScorer internals but not exposed as named first-class metric." .
+
+coh:DAT
+    a coh:Instrument ;
+    rdfs:label "Dynamic Assertion Testing"@en ;
+    skos:altLabel "DAT" ;
+    rdfs:comment "Coherence test suite: takes assertions about system state, runs them against current data, reports drift." ;
+    coh:postCount 4 ;
+    coh:postPercentage 1.4 ;
+    coh:repoStatus "planned" ;
+    coh:implementationPhase "P4" ;
+    coh:gapType "LOW_SIGNAL" ;
+    coh:dependsOn coh:DS, coh:CTI .
+
+coh:DDR
+    a coh:Instrument ;
+    rdfs:label "Deep Dive Review"@en ;
+    skos:altLabel "DDR" ;
+    rdfs:comment "Generates comprehensive review document for a decision class or drift pattern, pulling from all four pillars." ;
+    coh:postCount 8 ;
+    coh:postPercentage 2.8 ;
+    coh:repoStatus "planned" ;
+    coh:implementationPhase "P4" ;
+    coh:gapType "LOW_SIGNAL" ;
+    coh:dependsOn coh:DLR, coh:RS, coh:DS, coh:MG .
+
+coh:ITCO
+    a coh:Instrument ;
+    rdfs:label "Integrated Truth & Coherence Operations"@en ;
+    skos:altLabel "ITCO" ;
+    rdfs:comment "Composite pipeline: DAT → CTI scoring → DDR when thresholds breach." ;
+    coh:postCount 4 ;
+    coh:postPercentage 1.4 ;
+    coh:repoStatus "planned" ;
+    coh:implementationPhase "P4" ;
+    coh:gapType "LOW_SIGNAL" ;
+    coh:dependsOn coh:DAT, coh:CTI, coh:DDR .
+
+
+# =============================================================================
+# INDIVIDUALS — ARCHITECTURE PATTERNS
+# =============================================================================
+
+coh:TemperatureRegulation
+    a coh:Pattern ;
+    rdfs:label "Temperature Regulation"@en ;
+    rdfs:comment "System temperature rises when drift accumulates, cools when patches resolve. Triggers degrade ladder escalation." ;
+    coh:postCount 3 ;
+    coh:repoStatus "planned" ;
+    coh:implementationPhase "P4" ;
+    coh:gapType "CODE>CONTENT" .
+
+coh:AL6
+    a coh:Pattern ;
+    rdfs:label "AL6 Dimensions"@en ;
+    rdfs:comment "Six-dimensional coherence model. In repo but barely surfaced in content." ;
+    coh:postCount 1 ;
+    coh:repoStatus "partial" ;
+    coh:implementationPhase "P5" ;
+    coh:gapType "CODE>CONTENT" .
+
+coh:DTE
+    a coh:Pattern ;
+    rdfs:label "DTE Contracts"@en ;
+    rdfs:comment "Dimensional resolution contracts. In repo but barely surfaced in content." ;
+    coh:postCount 3 ;
+    coh:repoStatus "partial" ;
+    coh:implementationPhase "P5" ;
+    coh:gapType "CODE>CONTENT" .
+
+coh:DegradeLadder
+    a coh:Pattern ;
+    rdfs:label "Degrade Ladder"@en ;
+    rdfs:comment "Escalation model for coherence degradation — tiered response from monitoring through emergency intervention." ;
+    coh:postCount 8 ;
+    coh:repoStatus "partial" ;
+    coh:implementationPhase "P5" ;
+    coh:gapType "CODE>CONTENT" .
+
+coh:SealVersionPatch
+    a coh:Pattern ;
+    rdfs:label "Seal-Version-Patch"@en ;
+    rdfs:comment "Memory immutability pattern — no overwrite, only evolution. Core to the Memory Invariant." ;
+    coh:postCount 113 ;
+    coh:repoStatus "implemented" ;
+    coh:implementationPhase "pre" ;
+    coh:gapType "ALIGNED" .
+
+coh:DimensionalResolution
+    a coh:Pattern ;
+    rdfs:label "Dimensional Resolution"@en ;
+    rdfs:comment "Core principle: resolving complexity through dimensional decomposition rather than binary compression." ;
+    coh:postCount 4 ;
+    coh:repoStatus "partial" ;
+    coh:implementationPhase "pre" ;
+    coh:gapType "CODE>CONTENT" .
+
+coh:PolicyPack
+    a coh:Pattern ;
+    rdfs:label "Policy Pack"@en ;
+    rdfs:comment "Pre-configured policy bundle for an operational mode — thresholds, drift rules, IRIS templates." ;
+    coh:postCount 2 ;
+    coh:repoStatus "planned" ;
+    coh:implementationPhase "P3" ;
+    coh:gapType "LOW_SIGNAL" ;
+    coh:dependsOn coh:PRIMELayer .
+
+
+# =============================================================================
+# INDIVIDUALS — INTEGRATION ADAPTERS
+# =============================================================================
+
+coh:MCPServer
+    a coh:Adapter ;
+    rdfs:label "MCP Server"@en ;
+    rdfs:comment "Model Context Protocol adapter — built, underexposed in content." ;
+    coh:postCount 2 ;
+    coh:repoStatus "implemented" ;
+    coh:implementationPhase "pre" ;
+    coh:gapType "CODE>CONTENT" .
+
+coh:OpenClaw
+    a coh:Adapter ;
+    rdfs:label "OpenClaw"@en ;
+    rdfs:comment "Integration adapter — built, zero content coverage." ;
+    coh:postCount 0 ;
+    coh:repoStatus "implemented" ;
+    coh:implementationPhase "pre" ;
+    coh:gapType "CODE>CONTENT" .
+
+coh:OpenTelemetry
+    a coh:Adapter ;
+    rdfs:label "OpenTelemetry"@en ;
+    rdfs:comment "Observability adapter — built, minimal content coverage." ;
+    coh:postCount 1 ;
+    coh:repoStatus "implemented" ;
+    coh:implementationPhase "pre" ;
+    coh:gapType "CODE>CONTENT" .
+
+coh:RDFBundle
+    a coh:Adapter ;
+    rdfs:label "RDF/OWL Ontology Bundle"@en ;
+    rdfs:comment "27-file semantic bundle with OWL/RDFS ontologies, SHACL validation shapes, and SPARQL queries." ;
+    coh:postCount 97 ;
+    coh:repoStatus "implemented" ;
+    coh:implementationPhase "pre" ;
+    coh:gapType "ALIGNED" .
+
+
+# =============================================================================
+# INDIVIDUALS — METAPHORS & MODELS
+# =============================================================================
+
+coh:FerrariChassis
+    a coh:Metaphor ;
+    rdfs:label "Ferrari/Chassis Metaphor"@en ;
+    rdfs:comment "AI is the Ferrari engine. Coherence Ops is the chassis + brakes + telemetry + black box recorder." ;
+    coh:postCount 5 ;
+    coh:repoStatus "content-only" ;
+    coh:gapType "NARRATIVE" ;
+    coh:analogTo coh:CoherenceOps .
+
+coh:IcebergModel
+    a coh:Metaphor ;
+    rdfs:label "Iceberg Model"@en ;
+    rdfs:comment "Enterprise AI stack: copilots above water, context engineering/data contracts/provenance/decision memory below." ;
+    coh:postCount 1 ;
+    coh:repoStatus "content-only" ;
+    coh:gapType "NARRATIVE" ;
+    coh:analogTo coh:CoherenceOps .
+
+coh:BinaryToDiamond
+    a coh:Metaphor ;
+    rdfs:label "Binary-to-Diamond Model"@en ;
+    rdfs:comment """
+        The core PRIME conceptual model: raw binary → LLM discovers facets →
+        name the facets → PRIME threshold gate cuts edges → Coherence Ops
+        keeps the diamond true over time.
+    """@en ;
+    coh:postCount 9 ;
+    coh:repoStatus "content-only" ;
+    coh:gapType "NARRATIVE" ;
+    coh:analogTo coh:PRIMELayer .
+
+coh:MUTHUR
+    a coh:Metaphor ;
+    rdfs:label "MU-TH-UR Analogy"@en ;
+    rdfs:comment """
+        Alien (1979) structural parallel: MU-TH-UR = institutional authority
+        encoded in silicon. Maps to PRIME (sealed directives), IRIS (terminal
+        access), DLR (Special Order 937), MG (ship intelligence).
+    """@en ;
+    coh:postCount 1 ;
+    coh:repoStatus "content-only" ;
+    coh:gapType "NARRATIVE" ;
+    coh:analogTo coh:PRIMELayer, coh:IRISLayer, coh:DLR, coh:MG .
+
+
+# =============================================================================
+# INDIVIDUALS — ADVANCED CONCEPTS
+# =============================================================================
+
+coh:PortfolioManagement
+    a coh:FrameworkConcept ;
+    rdfs:label "Portfolio Coherence Management"@en ;
+    rdfs:comment "Track multiple decision domains as a portfolio, detect cross-domain drift, compute portfolio-level CTI." ;
+    coh:postCount 6 ;
+    coh:repoStatus "planned" ;
+    coh:implementationPhase "P5" ;
+    coh:gapType "LOW_SIGNAL" ;
+    coh:dependsOn coh:CTI, coh:DS .
+
+coh:PromptTranslator
+    a coh:FrameworkConcept ;
+    rdfs:label "Prompt-to-Coherence Translator"@en ;
+    rdfs:comment "Compiles natural language prompts into Coherence Ops primitives: Types, Policies, Events, Renderers." ;
+    coh:postCount 1 ;
+    coh:repoStatus "planned" ;
+    coh:implementationPhase "P5" ;
+    coh:gapType "LOW_SIGNAL" .
+
+coh:Supervisor
+    a coh:FrameworkConcept ;
+    rdfs:label "Supervisor"@en ;
+    rdfs:comment "Supervision pipeline orchestrator. In repo, zero content coverage." ;
+    coh:postCount 0 ;
+    coh:repoStatus "implemented" ;
+    coh:implementationPhase "pre" ;
+    coh:gapType "CODE>CONTENT" .
+
+coh:VerifierLibrary
+    a coh:FrameworkConcept ;
+    rdfs:label "Verifier Library"@en ;
+    rdfs:comment "Collection of verification functions. In repo, minimal content coverage." ;
+    coh:postCount 2 ;
+    coh:repoStatus "implemented" ;
+    coh:implementationPhase "pre" ;
+    coh:gapType "CODE>CONTENT" .
+
+coh:ReplayHarness
+    a coh:FrameworkConcept ;
+    rdfs:label "Replay Harness"@en ;
+    rdfs:comment "Decision replay and testing infrastructure. In repo, light content coverage." ;
+    coh:postCount 5 ;
+    coh:repoStatus "implemented" ;
+    coh:implementationPhase "pre" ;
+    coh:gapType "CODE>CONTENT" .
+
+
+# =============================================================================
+# INDIVIDUALS — THREAT LEVELS & DEGRADE TIERS
+# =============================================================================
+
+coh:ThreatGreen  a coh:ThreatLevel ; rdfs:label "Green — Nominal" .
+coh:ThreatYellow a coh:ThreatLevel ; rdfs:label "Yellow — Elevated" .
+coh:ThreatRed    a coh:ThreatLevel ; rdfs:label "Red — Critical" .
+
+coh:DegradeTier0 a coh:DegradeTier ; rdfs:label "Tier 0 — Monitoring" .
+coh:DegradeTier1 a coh:DegradeTier ; rdfs:label "Tier 1 — Alert" ; coh:escalatesTo coh:DegradeTier2 .
+coh:DegradeTier2 a coh:DegradeTier ; rdfs:label "Tier 2 — Intervention" ; coh:escalatesTo coh:DegradeTier3 .
+coh:DegradeTier3 a coh:DegradeTier ; rdfs:label "Tier 3 — Emergency" .
+
+
+# =============================================================================
+# GAP ANALYSIS METADATA
+# =============================================================================
+
+gap:GapAnalysis
+    a owl:NamedIndividual ;
+    rdfs:label "Coherence Ops Gap Analysis — Feb 2025"@en ;
+    dcterms:description """
+        Cross-reference of 284 LinkedIn posts against sigma-overwatch repo
+        implementation status. Key findings:
+        
+        CONTENT > CODE gaps (high post count, no repo presence):
+        - FranOPS (50 posts, P3 planned)
+        - IntelOps (40 posts, P3 planned)
+        - ReflectionOps (28 posts, P3 planned)
+        - IRIS (15 posts, P2 planned)
+        
+        CODE > CONTENT gaps (shipped code, minimal content):
+        - OpenClaw (0 posts, implemented)
+        - Supervisor (0 posts, implemented)
+        - Confidence Bands (1 post, implemented)
+        - AL6 (1 post, partial)
+        - MCP Server (2 posts, implemented)
+        - OpenTelemetry (1 post, implemented)
+        - Verifier Library (2 posts, implemented)
+        - Policy Pack (2 posts, planned)
+        
+        PARTIAL gaps (in repo but not fully exposed):
+        - CTI (236 posts but only in scorer internals, not named metric)
+        - DTE (3 posts, in repo)
+        - Degrade Ladder (8 posts, in repo)
+        - AL6 (1 post, in repo)
+        
+        Analysis date: 2025-02-14.
+        Total concepts mapped: 39.
+        Post corpus: 284 LinkedIn posts.
+    """@en ;
+    dcterms:created "2025-02-14"^^xsd:date .
+
+
+# =============================================================================
+# END OF ONTOLOGY
+# =============================================================================
