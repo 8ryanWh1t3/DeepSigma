@@ -1,0 +1,84 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://sigma-overwatch.dev/schemas/canon.schema.json",
+    "title": "Canon — Blessed Claim Memory",
+    "description": "A Canon promotes a set of claim IDs from DLR decisions to long-term institutional memory. Canon entries are the blessed, curated subset of claims that an organization treats as ground truth until superseded.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["canonId", "title", "claimIds", "blessedBy", "blessedAt", "scope", "version", "seal"],
+    "properties": {
+          "canonId": {
+                  "type": "string",
+                  "pattern": "^CANON-[0-9]{4}-[0-9]{4,}$",
+                  "description": "Stable identifier. Format: CANON-YYYY-NNNN."
+          },
+          "title": {
+                  "type": "string",
+                  "minLength": 5,
+                  "description": "Human-readable title for this canon entry."
+          },
+          "description": {
+                  "type": "string",
+                  "description": "Extended description of what this canon represents."
+          },
+          "claimIds": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": { "type": "string" },
+                  "description": "Ordered list of claim IDs promoted to canon. First = primary."
+          },
+          "dlrIds": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "DLR IDs that produced the decisions leading to these claims."
+          },
+          "blessedBy": {
+                  "type": "string",
+                  "description": "Role or authority that approved this canon entry."
+          },
+          "blessedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "When this canon entry was approved."
+          },
+          "expiresAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "When this canon entry should be reviewed for renewal."
+          },
+          "scope": {
+                  "type": "object",
+                  "required": ["domain"],
+                  "additionalProperties": false,
+                  "properties": {
+                            "domain": { "type": "string", "description": "Knowledge domain (e.g., 'security-policy', 'franchise-ops')." },
+                            "region": { "type": "string", "description": "Geographic or organizational scope." },
+                            "context": { "type": "string", "description": "Additional context." }
+                  }
+          },
+          "version": {
+                  "type": "string",
+                  "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+                  "description": "Semantic version of this canon entry."
+          },
+          "supersedes": {
+                  "type": "string",
+                  "description": "Prior canonId this entry replaces."
+          },
+          "seal": {
+                  "type": "object",
+                  "required": ["hash", "sealedAt", "version"],
+                  "additionalProperties": false,
+                  "properties": {
+                            "hash": { "type": "string", "description": "SHA-256 of canon content at seal time." },
+                            "sealedAt": { "type": "string", "format": "date-time" },
+                            "version": { "type": "integer", "minimum": 1 }
+                  }
+          },
+          "tags": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Free-form tags for search and filtering."
+          }
+    }
+}
