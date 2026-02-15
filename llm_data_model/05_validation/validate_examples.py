@@ -152,11 +152,21 @@ def main() -> int:
         return 1
 
     all_errors: list = []
+
+    # Files that use standalone schemas and don't follow the canonical envelope
+    standalone_schemas = {
+        "claim_primitive_example.json",
+        "dlr_claim_native_example.json",
+    }
     for fpath in example_files:
         try:
             record = load_json(fpath)
         except json.JSONDecodeError as exc:
             all_errors.append(f"  [{fpath.name}] Invalid JSON: {exc}")
+            continue
+
+        if fpath.name in standalone_schemas:
+            print(f"  SKIP  {fpath.name}  [standalone schema]")
             continue
 
         errors = validate_envelope(record, fpath.name)
