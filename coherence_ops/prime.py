@@ -14,7 +14,7 @@ import json
 import time
 from dataclasses import dataclass, field, asdict
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 
 class Verdict(str, Enum):
