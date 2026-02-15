@@ -1,0 +1,100 @@
+{
+    "claimId": "CLAIM-2026-0001",
+    "statement": "SIGINT pattern X matches pre-action signature Y at 94% correlation across Theater A intercepts.",
+    "scope": {
+          "where": "Theater A",
+          "when": "next 96 hours",
+          "context": "Active collection posture, elevated SIGINT tasking"
+    },
+    "truthType": "observation",
+    "confidence": {
+          "score": 0.94,
+          "explanation": "Pattern match at 94% correlation across 12 independent intercepts; 3 HUMINT reports corroborate timing."
+    },
+    "statusLight": "green",
+    "sources": [
+          {
+                  "ref": "SRC-NSA-2026-THEATER-A-0442",
+                  "type": "sensor",
+                  "capturedAt": "2026-02-14T08:30:00Z",
+                  "reliability": "high"
+          },
+          {
+                  "ref": "SRC-HUMINT-2026-0118",
+                  "type": "human",
+                  "capturedAt": "2026-02-14T06:15:00Z",
+                  "reliability": "medium"
+          }
+    ],
+    "evidence": [
+          {
+                  "ref": "EVD-TRACE-2026-A-0442-SIGINT",
+                  "type": "trace",
+                  "method": "pattern_correlation_engine_v4",
+                  "summary": "12 intercepts matched against baseline signature Y with 94% mean correlation, 91% minimum."
+          },
+          {
+                  "ref": "EVD-HUMINT-2026-0118-DEBRIEF",
+                  "type": "excerpt",
+                  "method": "structured_debrief",
+                  "summary": "Source reports pre-positioning activity consistent with signature Y timeline."
+          }
+    ],
+    "owner": "IntelOps Truth Owner",
+    "timestampCreated": "2026-02-14T09:00:00Z",
+    "timestampObserved": "2026-02-14T08:30:00Z",
+    "version": "1.0.0",
+    "halfLife": {
+          "value": 24,
+          "unit": "hours",
+          "expiresAt": "2026-02-15T09:00:00Z",
+          "refreshTrigger": "expiry"
+    },
+    "graph": {
+          "dependsOn": ["CLAIM-2026-0000"],
+          "contradicts": [],
+          "supports": [],
+          "patches": []
+    },
+    "provenanceChain": [
+          {
+                  "type": "claim",
+                  "ref": "CLAIM-2026-0001",
+                  "role": "root_assertion"
+          },
+          {
+                  "type": "evidence",
+                  "ref": "EVD-TRACE-2026-A-0442-SIGINT",
+                  "role": "primary_evidence"
+          },
+          {
+                  "type": "evidence",
+                  "ref": "EVD-HUMINT-2026-0118-DEBRIEF",
+                  "role": "corroborating_evidence"
+          },
+          {
+                  "type": "source",
+                  "ref": "SRC-NSA-2026-THEATER-A-0442",
+                  "role": "primary_source"
+          },
+          {
+                  "type": "source",
+                  "ref": "SRC-HUMINT-2026-0118",
+                  "role": "corroborating_source"
+          }
+    ],
+    "classificationTag": "restricted",
+    "tags": [
+          "sigint",
+          "pattern-match",
+          "pre-action",
+          "theater-a",
+          "high-confidence"
+    ],
+    "seal": {
+          "hash": "sha256:b8e4f2a1d3c5e7f9a0b2c4d6e8f0a1b3c5d7e9f1a2b4c6d8e0f2a4b6c8d0e2f4",
+          "sealedAt": "2026-02-14T09:00:01Z",
+          "version": 1,
+          "patchLog": []
+    }
+}
