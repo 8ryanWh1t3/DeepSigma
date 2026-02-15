@@ -1,0 +1,163 @@
+{
+    "dlrId": "DLR-a7f3e2d1c0b9",
+    "episodeId": "ep-quarantine-001",
+    "decisionType": "AccountQuarantine",
+    "recordedAt": "2026-02-14T09:05:00Z",
+    "claims": {
+          "context": [
+                  {
+                            "claimId": "CLAIM-2026-0001",
+                            "truthType": "observation",
+                            "confidenceAtDecision": 0.94,
+                            "statusLightAtDecision": "green",
+                            "wasFresh": true,
+                            "role": "trigger"
+                  },
+                  {
+                            "claimId": "CLAIM-2026-0000",
+                            "truthType": "observation",
+                            "confidenceAtDecision": 0.99,
+                            "statusLightAtDecision": "green",
+                            "wasFresh": true,
+                            "role": "baseline"
+                  }
+          ],
+          "rationale": [
+                  {
+                            "claimId": "CLAIM-2026-0002",
+                            "truthType": "inference",
+                            "confidenceAtDecision": 0.88,
+                            "statusLightAtDecision": "green",
+                            "wasFresh": true,
+                            "role": "risk_assessment"
+                  },
+                  {
+                            "claimId": "CLAIM-2026-0003",
+                            "truthType": "assumption",
+                            "confidenceAtDecision": 0.75,
+                            "statusLightAtDecision": "yellow",
+                            "wasFresh": true,
+                            "role": "threat_model"
+                  }
+          ],
+          "action": [
+                  {
+                            "claimId": "CLAIM-2026-0010",
+                            "truthType": "norm",
+                            "confidenceAtDecision": 1.0,
+                            "statusLightAtDecision": "green",
+                            "wasFresh": true,
+                            "role": "policy_mandate"
+                  },
+                  {
+                            "claimId": "CLAIM-2026-0011",
+                            "truthType": "constraint",
+                            "confidenceAtDecision": 1.0,
+                            "statusLightAtDecision": "green",
+                            "wasFresh": true,
+                            "role": "regulatory_boundary"
+                  }
+          ],
+          "verification": [
+                  {
+                            "claimId": "CLAIM-2026-0020",
+                            "truthType": "observation",
+                            "confidenceAtDecision": 0.92,
+                            "statusLightAtDecision": "green",
+                            "wasFresh": true,
+                            "role": "post_action_check"
+                  }
+          ],
+          "outcome": [
+                  {
+                            "claimId": "CLAIM-2026-0030",
+                            "truthType": "observation",
+                            "confidenceAtDecision": 0.95,
+                            "statusLightAtDecision": "green",
+                            "wasFresh": true,
+                            "role": "result_confirmation"
+                  }
+          ]
+    },
+    "rationaleGraph": {
+          "rootClaims": ["CLAIM-2026-0001"],
+          "edges": [
+                  {
+                            "from": "CLAIM-2026-0001",
+                            "to": "CLAIM-2026-0002",
+                            "rel": "informs",
+                            "weight": 0.94
+                  },
+                  {
+                            "from": "CLAIM-2026-0000",
+                            "to": "CLAIM-2026-0001",
+                            "rel": "supports",
+                            "weight": 0.99
+                  },
+                  {
+                            "from": "CLAIM-2026-0002",
+                            "to": "CLAIM-2026-0010",
+                            "rel": "justifies",
+                            "weight": 0.88
+                  },
+                  {
+                            "from": "CLAIM-2026-0003",
+                            "to": "CLAIM-2026-0010",
+                            "rel": "justifies",
+                            "weight": 0.75
+                  },
+                  {
+                            "from": "CLAIM-2026-0011",
+                            "to": "CLAIM-2026-0010",
+                            "rel": "supports",
+                            "weight": 1.0
+                  },
+                  {
+                            "from": "CLAIM-2026-0020",
+                            "to": "CLAIM-2026-0030",
+                            "rel": "verifies",
+                            "weight": 0.92
+                  }
+          ]
+    },
+    "dteRef": {
+          "decisionType": "AccountQuarantine",
+          "version": "1.2.0",
+          "policyPackHash": "sha256:abc123def456"
+    },
+    "policyStamp": {
+          "policyPackId": "policy-pack-fraud-v2",
+          "policyPackVersion": "2.1.0",
+          "policyPackHash": "sha256:abc123def456",
+          "evaluatedAt": "2026-02-14T09:04:55Z",
+          "result": "allow"
+    },
+    "actionSummary": {
+          "blastRadiusTier": "medium",
+          "idempotencyKey": "idem-quarantine-acc9921-001",
+          "rollbackType": "restore",
+          "authMode": "auto"
+    },
+    "verificationResult": {
+          "required": true,
+          "method": "read_after_write",
+          "result": "pass"
+    },
+    "outcome": {
+          "code": "success",
+          "reason": "Account ACC-9921 quarantined; all downstream transactions blocked within 200ms."
+    },
+    "freshnessSnapshot": {
+          "allClaimsFresh": true,
+          "expiredClaims": [],
+          "stalestClaimAge": "0m (all within halfLife)"
+    },
+    "coherenceScore": 87.5,
+    "tags": ["fraud", "quarantine", "auto-action", "high-confidence"],
+    "seal": {
+          "hash": "sha256:c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5",
+          "sealedAt": "2026-02-14T09:05:01Z",
+          "version": 1,
+          "patchLog": []
+    }
+}
