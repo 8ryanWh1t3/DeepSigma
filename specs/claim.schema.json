@@ -1,0 +1,301 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://sigma-overwatch.dev/schemas/claim.schema.json",
+    "title": "Claim — Universal Atomic Primitive",
+    "description": "The indivisible unit of asserted truth across IntelOps, ReOps, and FranOps. Every higher-order structure (DLR, Canon, Drift, Retcon, Patch) is composed of Claims.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+          "claimId",
+          "statement",
+          "scope",
+          "truthType",
+          "confidence",
+          "statusLight",
+          "sources",
+          "evidence",
+          "owner",
+          "timestampCreated",
+          "version",
+          "halfLife",
+          "seal"
+    ],
+    "properties": {
+          "claimId": {
+                  "type": "string",
+                  "pattern": "^CLAIM-[0-9]{4}-[0-9]{4,}$",
+                  "description": "Stable domain-level identifier. Format: CLAIM-YYYY-NNNN. Never reused."
+          },
+          "statement": {
+                  "type": "string",
+                  "minLength": 10,
+                  "description": "One sentence, testable assertion. This is the atomic truth being claimed."
+          },
+          "scope": {
+                  "type": "object",
+                  "required": ["where"],
+                  "additionalProperties": false,
+                  "description": "Where and when this claim applies.",
+                  "properties": {
+                            "where": {
+                                        "type": "string",
+                                        "description": "System, org, region, or domain boundary."
+                            },
+                            "when": {
+                                        "type": "string",
+                                        "description": "Temporal boundary (e.g., 'next 96 hours', '2026-Q1', 'perpetual')."
+                            },
+                            "context": {
+                                        "type": "string",
+                                        "description": "Additional scoping context (e.g., 'under load > 10k RPS')."
+                            }
+                  }
+          },
+          "truthType": {
+                  "type": "string",
+                  "enum": [
+                            "observation",
+                            "inference",
+                            "assumption",
+                            "forecast",
+                            "norm",
+                            "constraint"
+                  ],
+                  "description": "Epistemic category. observation = directly measured. inference = derived from evidence. assumption = taken as given. forecast = predictive. norm = policy/standard. constraint = hard boundary."
+          },
+          "confidence": {
+                  "type": "object",
+                  "required": ["score"],
+                  "additionalProperties": false,
+                  "properties": {
+                            "score": {
+                                        "type": "number",
+                                        "minimum": 0.00,
+                                        "maximum": 1.00,
+                                        "description": "0.00–1.00. Machine-comparable confidence."
+                            },
+                            "explanation": {
+                                        "type": "string",
+                                        "description": "Human-readable rationale for the score."
+                            }
+                  }
+          },
+          "statusLight": {
+                  "type": "string",
+                  "enum": ["green", "yellow", "red"],
+                  "description": "Derived signal. green = confidence >= 0.80 AND >= 1 strong source. yellow = 0.50–0.79 OR mixed sources. red = < 0.50 OR unresolved contradiction."
+          },
+          "sources": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                            "type": "object",
+                            "required": ["ref"],
+                            "additionalProperties": false,
+                            "properties": {
+                                        "ref": {
+                                                      "type": "string",
+                                                      "description": "Pointer to source (URL, doc ID, email ref, event ref). May be redacted."
+                                        },
+                                        "type": {
+                                                      "type": "string",
+                                                      "enum": ["url", "document", "email", "event", "sensor", "api", "human", "redacted"],
+                                                      "description": "Kind of source."
+                                        },
+                                        "capturedAt": {
+                                                      "type": "string",
+                                                      "format": "date-time",
+                                                      "description": "When source data was captured."
+                                        },
+                                        "reliability": {
+                                                      "type": "string",
+                                                      "enum": ["high", "medium", "low", "unknown"],
+                                                      "description": "Assessed reliability of this source."
+                                        }
+                            }
+                  }
+          },
+          "evidence": {
+                  "type": "array",
+                  "items": {
+                            "type": "object",
+                            "required": ["ref"],
+                            "additionalProperties": false,
+                            "properties": {
+                                        "ref": {
+                                                      "type": "string",
+                                                      "description": "Pointer to artifact (file, excerpt, sensor output, log, record_id)."
+                                        },
+                                        "type": {
+                                                      "type": "string",
+                                                      "enum": ["file", "excerpt", "sensor", "log", "trace", "metric", "record"],
+                                                      "description": "Kind of evidence artifact."
+                                        },
+                                        "method": {
+                                                      "type": "string",
+                                                      "description": "How the evidence was gathered (e.g., 'statistical_anomaly_detection')."
+                                        },
+                                        "summary": {
+                                                      "type": "string",
+                                                      "description": "Brief human-readable description of what this evidence shows."
+                                        }
+                            }
+                  }
+          },
+          "owner": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Accountable role or function (not necessarily a person). e.g., 'IntelOps Truth Owner', 'FranOps Compliance Lead'."
+          },
+          "timestampCreated": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "When this claim was first asserted."
+          },
+          "timestampObserved": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "When the underlying fact was observed in the real world. May differ from timestampCreated."
+          },
+          "version": {
+                  "type": "string",
+                  "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+                  "description": "Semantic version (e.g., 1.0.0). Monotonically increasing."
+          },
+          "halfLife": {
+                  "type": "object",
+                  "required": ["value", "unit"],
+                  "additionalProperties": false,
+                  "description": "Validity window. After one half-life, confidence should be halved.",
+                  "properties": {
+                            "value": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "exclusiveMinimum": false,
+                                        "description": "Numeric duration. 0 = perpetual (e.g., immutable constraints)."
+                            },
+                            "unit": {
+                                        "type": "string",
+                                        "enum": ["hours", "days", "ms"],
+                                        "description": "Time unit for half-life."
+                            },
+                            "expiresAt": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "description": "Computed expiry timestamp. timestampCreated + halfLife."
+                            },
+                            "refreshTrigger": {
+                                        "type": "string",
+                                        "description": "What event forces refresh: 'expiry', 'contradiction', 'new_source', 'schedule', or free-text."
+                            }
+                  }
+          },
+          "graph": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "description": "Claim lineage — typed edges to other claims.",
+                  "properties": {
+                            "dependsOn": {
+                                        "type": "array",
+                                        "items": { "type": "string" },
+                                        "description": "claimIds this claim requires to be true."
+                            },
+                            "contradicts": {
+                                        "type": "array",
+                                        "items": { "type": "string" },
+                                        "description": "claimIds in active conflict with this claim."
+                            },
+                            "supersedes": {
+                                        "type": "string",
+                                        "description": "Prior claimId/version this claim replaces. Never overwrite — always supersede."
+                            },
+                            "patches": {
+                                        "type": "array",
+                                        "items": { "type": "string" },
+                                        "description": "Patch IDs that modified this claim's meaning or confidence."
+                            },
+                            "supports": {
+                                        "type": "array",
+                                        "items": { "type": "string" },
+                                        "description": "claimIds this claim provides evidence for."
+                            }
+                  }
+          },
+          "seal": {
+                  "type": "object",
+                  "required": ["hash", "sealedAt", "version"],
+                  "additionalProperties": false,
+                  "description": "Immutable seal. Once sealed, claim is append-only via patch_log.",
+                  "properties": {
+                            "hash": {
+                                        "type": "string",
+                                        "description": "SHA-256 of claim content at seal time, prefixed with sha256:"
+                            },
+                            "sealedAt": {
+                                        "type": "string",
+                                        "format": "date-time"
+                            },
+                            "version": {
+                                        "type": "integer",
+                                        "minimum": 1
+                            },
+                            "patchLog": {
+                                        "type": "array",
+                                        "items": {
+                                                      "type": "object",
+                                                      "required": ["patchedAt", "author", "reason", "newHash"],
+                                                      "additionalProperties": false,
+                                                      "properties": {
+                                                                      "patchedAt": {
+                                                                                        "type": "string",
+                                                                                        "format": "date-time"
+                                                                      },
+                                                                      "author": {
+                                                                                        "type": "string"
+                                                                      },
+                                                                      "reason": {
+                                                                                        "type": "string"
+                                                                      },
+                                                                      "newHash": {
+                                                                                        "type": "string"
+                                                                      }
+                                                      }
+                                        }
+                            }
+                  }
+          },
+          "provenanceChain": {
+                  "type": "array",
+                  "description": "Ordered Claim -> Evidence -> Source links for full trust lineage.",
+                  "items": {
+                            "type": "object",
+                            "required": ["type", "ref"],
+                            "additionalProperties": false,
+                            "properties": {
+                                        "type": {
+                                                      "type": "string",
+                                                      "enum": ["claim", "evidence", "source"]
+                                        },
+                                        "ref": {
+                                                      "type": "string",
+                                                      "description": "Pointer to the linked artifact (claimId, evidence ref, source ref)."
+                                        },
+                                        "role": {
+                                                      "type": "string",
+                                                      "description": "Role in the chain (e.g., 'root_assertion', 'corroborating_evidence', 'primary_source')."
+                                        }
+                            }
+                  }
+          },
+          "classificationTag": {
+                  "type": "string",
+                  "enum": ["public", "internal", "restricted", "secret"],
+                  "description": "Access classification. Environment-specific."
+          },
+          "tags": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Free-form tags for search, filtering, and domain grouping."
+          }
+    }
+}
