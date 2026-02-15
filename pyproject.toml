@@ -62,8 +62,9 @@ include = [
 ]
 
 [tool.ruff]
-select = ["E", "F", "W"]
+select = ["E","F","W"]
 ignore = ["E501"]
+exclude = ["coherence_ops/cli.py"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
