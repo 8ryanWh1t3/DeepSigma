@@ -1,6 +1,7 @@
 # Mermaid Diagrams
 
 Visual documentation for **Σ OVERWATCH / RAL** and **Coherence Ops**.
+
 GitHub renders Mermaid diagrams natively in `.md` files.
 
 ## Diagrams
@@ -33,19 +34,20 @@ GitHub renders Mermaid diagrams natively in `.md` files.
 | 24 | SHACL Validation Gate | Flowchart | SHACL shape checks → conform/fail → seal or fix loop |
 | 25 | SharePoint → RDF Pipeline | Flowchart | SP extraction → normalize → emit → validate → serve |
 | 26 | Named Graph Sealing | State Diagram | Draft → sealed → drifted → patched immutability lifecycle |
+| 27 | Claim Primitive | Graph + Mindmap + Flowchart + State | AtomicClaim structure, graph topology, truth types, status light derivation, seal lifecycle |
+| 28 | DLR Claim-Native | Flowchart + Graph + ER + Graph | Decision flow, rationale graph, before/after comparison, entity relationships, composability hub |
 
 ## Diagram Types Used
 
 - `graph` — directed graphs (architecture, dependencies)
-- `sequenceDiagram` — interaction flows between components
-- `erDiagram` — entity-relationship models
-- `flowchart` — decision logic and data flow
-- `stateDiagram` — state machines and lifecycles
-- `mindmap` — hierarchical concept maps
-- `pie` — proportional breakdowns
-- `gantt` — timeline and lifecycle stages
-
-## Viewing
-
-Click any `.md` file on GitHub to see the rendered diagrams.
-Mermaid is supported natively — no extensions required.
+- - `sequenceDiagram` — interaction flows between components
+  - - `erDiagram` — entity-relationship models
+    - - `flowchart` — decision logic and data flow
+      - - `stateDiagram` — state machines and lifecycles
+        - - `mindmap` — hierarchical concept maps
+          - - `pie` — proportional breakdowns
+            - - `gantt` — timeline and lifecycle stages
+             
+              - ## Viewing
+             
+              - Click any `.md` file on GitHub to see the rendered diagrams. Mermaid is supported natively — no extensions required.
