@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "deepsigma"
-version = "0.1.0"
+version = "0.2.0"
 description = "Σ OVERWATCH — Reality Await Layer (RAL) control plane for agentic AI"
 readme = "README.md"
 license = {text = "MIT"}
@@ -64,7 +64,7 @@ include = [
 [tool.ruff]
 select = ["E","F","W"]
 ignore = ["E501"]
-exclude = ["coherence_ops/cli.py", "coherence_ops/iris.py"]
+exclude = ["coherence_ops/cli.py"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
