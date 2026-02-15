@@ -756,6 +756,56 @@ gap:GapAnalysis
     """@en ;
     dcterms:created "2025-02-14"^^xsd:date .
 
+# =============================================================================
+# INDIVIDUALS — CLAIM PRIMITIVE (Unified Atomic Claims)
+# Added 2026-02-15 — integrates specs/claim.schema.json into framework ontology
+# =============================================================================
+
+coh:ClaimPrimitive
+    a coh:Pattern ;
+    rdfs:label "Claim Primitive"@en ;
+    rdfs:comment """
+        The Universal Atomic Claim — indivisible unit of asserted truth.
+        Carries confidence, status light, half-life, seal, and graph edges.
+        Every DLR, Canon, Drift, Retcon, and Patch composes from Claims.
+        Defined in specs/claim.schema.json; RDF module in
+        rdf/ontology/claim_primitive.ttl.
+    """@en ;
+    coh:postCount 0 ;
+    coh:repoStatus "implemented" ;
+    coh:implementationPhase "pre" ;
+    coh:gapType "ALIGNED" ;
+    coh:dependsOn coh:TruthInvariant, coh:ReasoningInvariant, coh:MemoryInvariant .
+
+coh:ClaimNativeDLR
+    a coh:Pattern ;
+    rdfs:label "Claim-Native DLR"@en ;
+    rdfs:comment """
+        Refactored Decision Lineage Record that composes from AtomicClaim
+        references rather than embedding raw text. Each DLR entry points
+        to claim IDs with a rationale graph. Defined in specs/dlr.schema.json.
+    """@en ;
+    coh:postCount 0 ;
+    coh:repoStatus "implemented" ;
+    coh:implementationPhase "pre" ;
+    coh:gapType "ALIGNED" ;
+    coh:dependsOn coh:ClaimPrimitive, coh:DLR .
+
+coh:UnifiedAtomicClaims
+    a coh:Pattern ;
+    rdfs:label "Unified Atomic Claims"@en ;
+    rdfs:comment """
+        Architecture pattern: all Coherence Ops structures compose from
+        typed, sealed, graph-linked atomic claims. Eliminates free-text
+        assertions. Enables claim-native DLRs, IRIS graph walking,
+        and drift detection via contradicts/supersedes edges.
+    """@en ;
+    coh:postCount 0 ;
+    coh:repoStatus "implemented" ;
+    coh:implementationPhase "pre" ;
+    coh:gapType "CODE>CONTENT" ;
+    coh:dependsOn coh:ClaimPrimitive, coh:ClaimNativeDLR .
+
 
 # =============================================================================
 # END OF ONTOLOGY
