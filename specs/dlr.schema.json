@@ -1,0 +1,301 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://sigma-overwatch.dev/schemas/dlr.schema.json",
+    "title": "Decision Log Record (DLR) — Claim-Native",
+    "description": "A claim-native DLR. Each DLR is a list of claimIds forming a rationale graph, plus the policy/action/verification/outcome metadata from the sealed episode that produced them. DLR answers: what claims governed this decision, were they fresh, and was the policy followed?",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+          "dlrId",
+          "episodeId",
+          "decisionType",
+          "recordedAt",
+          "claims",
+          "rationaleGraph",
+          "dteRef",
+          "outcome",
+          "seal"
+    ],
+    "properties": {
+          "dlrId": {
+                  "type": "string",
+                  "pattern": "^DLR-[a-f0-9]{12,}$",
+                  "description": "Deterministic ID derived from episodeId. Format: DLR-<sha256-prefix>."
+          },
+          "episodeId": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The sealed DecisionEpisode this DLR was extracted from."
+          },
+          "decisionType": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The decision class (e.g., AccountQuarantine, deploy, scale)."
+          },
+          "recordedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "When this DLR was created."
+          },
+          "claims": {
+                  "type": "object",
+                  "required": ["context", "rationale", "action", "verification", "outcome"],
+                  "additionalProperties": false,
+                  "description": "Categorised claim references that governed this decision.",
+                  "properties": {
+                            "context": {
+                                        "type": "array",
+                                        "items": {
+                                                      "$ref": "#/$defs/claimRef"
+                                        },
+                                        "description": "Claims that established the decision context (evidence, situational awareness)."
+                            },
+                            "rationale": {
+                                        "type": "array",
+                                        "items": {
+                                                      "$ref": "#/$defs/claimRef"
+                                        },
+                                        "description": "Claims that formed the reasoning basis (inferences, assumptions, forecasts)."
+                            },
+                            "action": {
+                                        "type": "array",
+                                        "items": {
+                                                      "$ref": "#/$defs/claimRef"
+                                        },
+                                        "description": "Claims that justified the chosen action (norms, constraints, policy assertions)."
+                            },
+                            "verification": {
+                                        "type": "array",
+                                        "items": {
+                                                      "$ref": "#/$defs/claimRef"
+                                        },
+                                        "description": "Claims produced by verification (observations confirming or denying the action result)."
+                            },
+                            "outcome": {
+                                        "type": "array",
+                                        "items": {
+                                                      "$ref": "#/$defs/claimRef"
+                                        },
+                                        "description": "Claims summarising the decision outcome (what actually happened)."
+                            }
+                  }
+          },
+          "rationaleGraph": {
+                  "type": "object",
+                  "required": ["edges"],
+                  "additionalProperties": false,
+                  "description": "The directed graph of claim dependencies that forms the decision rationale.",
+                  "properties": {
+                            "edges": {
+                                        "type": "array",
+                                        "items": {
+                                                      "type": "object",
+                                                      "required": ["from", "to", "rel"],
+                                                      "additionalProperties": false,
+                                                      "properties": {
+                                                                      "from": {
+                                                                                        "type": "string",
+                                                                                        "description": "Source claimId."
+                                                                      },
+                                                                      "to": {
+                                                                                        "type": "string",
+                                                                                        "description": "Target claimId."
+                                                                      },
+                                                                      "rel": {
+                                                                                        "type": "string",
+                                                                                        "enum": [
+                                                                                                            "depends_on",
+                                                                                                            "supports",
+                                                                                                            "contradicts",
+                                                                                                            "supersedes",
+                                                                                                            "informs",
+                                                                                                            "justifies",
+                                                                                                            "verifies"
+                                                                                          ],
+                                                                                        "description": "Relationship type between claims in this decision."
+                                                                      },
+                                                                      "weight": {
+                                                                                        "type": "number",
+                                                                                        "minimum": 0,
+                                                                                        "maximum": 1,
+                                                                                        "description": "Optional edge weight (confidence propagation)."
+                                                                      }
+                                                      }
+                                        }
+                            },
+                            "rootClaims": {
+                                        "type": "array",
+                                        "items": { "type": "string" },
+                                        "description": "The entry-point claimIds — the claims that initiated this decision."
+                            }
+                  }
+          },
+          "dteRef": {
+                  "type": "object",
+                  "required": ["decisionType", "version"],
+                  "additionalProperties": false,
+                  "description": "Reference to the DTE that governed timing.",
+                  "properties": {
+                            "decisionType": { "type": "string" },
+                            "version": { "type": "string" },
+                            "policyPackHash": { "type": "string" }
+                  }
+          },
+          "policyStamp": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "description": "Policy pack evaluation result at decision time.",
+                  "properties": {
+                            "policyPackId": { "type": "string" },
+                            "policyPackVersion": { "type": "string" },
+                            "policyPackHash": { "type": "string" },
+                            "evaluatedAt": { "type": "string", "format": "date-time" },
+                            "result": {
+                                        "type": "string",
+                                        "enum": ["allow", "deny", "degrade"]
+                            }
+                  }
+          },
+          "actionSummary": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "description": "Condensed action contract metadata from the episode.",
+                  "properties": {
+                            "blastRadiusTier": {
+                                        "type": "string",
+                                        "enum": ["tiny", "small", "medium", "large"]
+                            },
+                            "idempotencyKey": { "type": "string" },
+                            "rollbackType": {
+                                        "type": "string",
+                                        "enum": ["none", "compensate", "restore", "revert"]
+                            },
+                            "authMode": {
+                                        "type": "string",
+                                        "enum": ["auto", "hitl", "blocked"]
+                            }
+                  }
+          },
+          "verificationResult": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "description": "Verification outcome from the sealed episode.",
+                  "properties": {
+                            "required": { "type": "boolean" },
+                            "method": { "type": "string" },
+                            "result": {
+                                        "type": "string",
+                                        "enum": ["pass", "fail", "inconclusive", "na"]
+                            }
+                  }
+          },
+          "outcome": {
+                  "type": "object",
+                  "required": ["code"],
+                  "additionalProperties": false,
+                  "description": "Decision outcome.",
+                  "properties": {
+                            "code": {
+                                        "type": "string",
+                                        "enum": ["success", "partial", "fail", "abstain", "bypassed"]
+                            },
+                            "reason": { "type": "string" }
+                  }
+          },
+          "degradeStep": {
+                  "type": "string",
+                  "description": "If a degrade ladder was triggered, which step was taken."
+          },
+          "freshnessSnapshot": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "description": "Freshness state of claims at decision time.",
+                  "properties": {
+                            "allClaimsFresh": { "type": "boolean" },
+                            "expiredClaims": {
+                                        "type": "array",
+                                        "items": { "type": "string" },
+                                        "description": "claimIds that were past their halfLife at decision time."
+                            },
+                            "stalestClaimAge": {
+                                        "type": "string",
+                                        "description": "Human-readable age of the oldest claim (e.g., '2h 15m past expiry')."
+                            }
+                  }
+          },
+          "coherenceScore": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100,
+                  "description": "Coherence score at time of DLR creation (if available)."
+          },
+          "tags": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Free-form tags for filtering."
+          },
+          "seal": {
+                  "type": "object",
+                  "required": ["hash", "sealedAt", "version"],
+                  "additionalProperties": false,
+                  "description": "Immutable seal for the DLR itself.",
+                  "properties": {
+                            "hash": { "type": "string" },
+                            "sealedAt": { "type": "string", "format": "date-time" },
+                            "version": { "type": "integer", "minimum": 1 },
+                            "patchLog": {
+                                        "type": "array",
+                                        "items": {
+                                                      "type": "object",
+                                                      "required": ["patchedAt", "author", "reason", "newHash"],
+                                                      "additionalProperties": false,
+                                                      "properties": {
+                                                                      "patchedAt": { "type": "string", "format": "date-time" },
+                                                                      "author": { "type": "string" },
+                                                                      "reason": { "type": "string" },
+                                                                      "newHash": { "type": "string" }
+                                                      }
+                                        }
+                            }
+                  }
+          }
+    },
+    "$defs": {
+          "claimRef": {
+                  "type": "object",
+                  "required": ["claimId"],
+                  "additionalProperties": false,
+                  "description": "A reference to a Claim primitive with decision-time snapshot metadata.",
+                  "properties": {
+                            "claimId": {
+                                        "type": "string",
+                                        "description": "Reference to a Claim primitive (CLAIM-YYYY-NNNN)."
+                            },
+                            "truthType": {
+                                        "type": "string",
+                                        "enum": ["observation", "inference", "assumption", "forecast", "norm", "constraint"],
+                                        "description": "Snapshot of the claim's truthType at decision time."
+                            },
+                            "confidenceAtDecision": {
+                                        "type": "number",
+                                        "minimum": 0,
+                                        "maximum": 1,
+                                        "description": "Snapshot of claim confidence at decision time."
+                            },
+                            "statusLightAtDecision": {
+                                        "type": "string",
+                                        "enum": ["green", "yellow", "red"],
+                                        "description": "Snapshot of claim statusLight at decision time."
+                            },
+                            "wasFresh": {
+                                        "type": "boolean",
+                                        "description": "Whether the claim was within its halfLife at decision time."
+                            },
+                            "role": {
+                                        "type": "string",
+                                        "description": "Role this claim played in the decision (e.g., 'trigger', 'constraint', 'evidence', 'justification')."
+                            }
+                  }
+          }
+    }
+}
