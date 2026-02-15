@@ -129,7 +129,6 @@ class DLRBuilder:
 # Conforms to specs/dlr.schema.json
 # ======================================================================
 
-undefined
 
 @dataclass
 class ClaimRef:
