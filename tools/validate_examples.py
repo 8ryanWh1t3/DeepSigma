@@ -104,14 +104,22 @@ def main():
         validate(drift_schema, p, registry=registry)
 
     # --- LLM Data Model examples ---
-    llm_schema_path = ROOT / "llm_data_model" / "02_schema" / "jsonschema" / "canonical_record.schema.json"
+    # Schema overrides: files that use standalone schemas instead of canonical_record
+    llm_schema_overrides = {
+        "claim_primitive_example.json": ROOT / "specs" / "claim.schema.json",
+        "dlr_claim_native_example.json": ROOT / "specs" / "dlr.schema.json",
+    }
+
+    llm_default_schema = ROOT / "llm_data_model" / "02_schema" / "jsonschema" / "canonical_record.schema.json"
     llm_examples_dir = ROOT / "llm_data_model" / "03_examples"
-    if llm_schema_path.exists() and llm_examples_dir.exists():
+
+    if llm_default_schema.exists() and llm_examples_dir.exists():
         print()
         for p in sorted(llm_examples_dir.glob("*.json")):
-            validate(llm_schema_path, p, registry=registry)
+            schema = llm_schema_overrides.get(p.name, llm_default_schema)
+            validate(schema, p, registry=registry)
     else:
-        print("\n\u26a0\ufe0f  LLM Data Model schema or examples not found — skipped")
+        print("\n\u26a0\ufe0f LLM Data Model schema or examples not found \u2014 skipped")
 
     print("\nAll example artifacts validated.")
 
