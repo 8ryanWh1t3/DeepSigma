@@ -31,6 +31,7 @@
   - [Replay & Testing](Replay-and-Testing)
 - **Governance**
   - [Coherence Ops Mapping](Coherence-Ops-Mapping)
+  - [IRIS](IRIS)
   - [LLM Data Model](LLM-Data-Model)
 - **Meta**
   - [Contributing](Contributing)

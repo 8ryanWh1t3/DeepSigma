@@ -20,7 +20,7 @@ Open the all-in-one demo directly in your browser — no build step, no dependen
 | 📉 Area Charts | Gradient-filled area charts for deadline vs duration |
 | 🍩 Donut Chart | Decision status distribution with inner ring |
 | 🔔 Toast Notifications | Auto-popup alerts for high-severity drift events |
-| ⌨️ Keyboard Shortcuts | `1-4` switch views, `R` refresh, `T` toggle theme |
+| ⌨️ Keyboard Shortcuts | `1-5` switch views, `R` refresh, `T` toggle theme |
 | 📤 JSON & CSV Export | Download all data in either format |
 | ♻️ Auto-Refresh | 5-second polling with toggle control |
 

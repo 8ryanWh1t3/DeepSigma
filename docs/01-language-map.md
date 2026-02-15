@@ -1,15 +1,15 @@
 # Language Map — LinkedIn Content → Repository Code
 
-If you found this repository through Deep Sigma’s LinkedIn content, this page maps the concepts you’ve read about to their implementations in code.
+If you found this repository through Deep Sigma's LinkedIn content, this page maps the concepts you've read about to their implementations in code.
 
 ---
 
 ## How the Pieces Fit
 
 ```
-Deep Sigma          ← brand / research program / body of work
-  └─ Coherence Ops  ← the operational framework (methodology)
-       └─ Σ OVERWATCH  ← the runtime engine (software)
+Deep Sigma           ← brand / research program / body of work
+└─ Coherence Ops     ← the operational framework (methodology)
+   └─ Σ OVERWATCH    ← the runtime engine (software)
 ```
 
 **Deep Sigma** is the brand. **Coherence Ops** is the framework. **Σ OVERWATCH** is the engine that executes it.
@@ -52,7 +52,7 @@ LinkedIn content primarily uses "Coherence Ops" and "Deep Sigma" language. This 
 | LinkedIn Concept | Repo Location | Status |
 |-----------------|---------------|--------|
 | PRIME (threshold gate) | `coherence_ops/prime.py` | 🔜 Planned — Phase 1 |
-| IRIS (operator interface) | `coherence_ops/iris.py` | 🔜 Planned — Phase 2 |
+| IRIS (operator interface) | `coherence_ops/iris.py`, `specs/iris_query.schema.json`, `docs/18-iris.md` | ✅ Implemented — Phase 2 |
 | FranOPS (franchise operations mode) | `coherence_ops/modes/franops.py` | 🔜 Planned — Phase 3 |
 | IntelOps (intelligence operations mode) | `coherence_ops/modes/intelops.py` | 🔜 Planned — Phase 3 |
 | ReflectionOps (reflection operations mode) | `coherence_ops/modes/reflectionops.py` | 🔜 Planned — Phase 3 |
@@ -101,6 +101,8 @@ LinkedIn content primarily uses "Coherence Ops" and "Deep Sigma" language. This 
 **"I want to see the semantic layer"** → `rdf/README.md`
 
 **"I want to see the architecture visually"** → `mermaid/README.md` (27 diagrams)
+
+**"I want to query the system"** → `docs/18-iris.md` for IRIS interface documentation
 
 **"I want to contribute"** → `CONTRIBUTING.md` and check the [roadmap](wiki/Roadmap.md)
 
