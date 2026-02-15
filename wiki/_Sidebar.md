@@ -19,6 +19,8 @@
   - [DTE Schema](DTE-Schema)
   - [Drift Schema](Drift-Schema)
   - [Policy Pack Schema](Policy-Pack-Schema)
+  -   - [Claim Schema](Unified-Atomic-Claims)
+      -   - [DLR Schema](Unified-Atomic-Claims)
 - **Integrations**
   - [MCP](MCP)
   - [LangChain](LangChain)
@@ -32,6 +34,7 @@
 - **Governance**
   - [Coherence Ops Mapping](Coherence-Ops-Mapping)
   - [IRIS](IRIS)
+  - [Unified Atomic Claims](Unified-Atomic-Claims)
   - [LLM Data Model](LLM-Data-Model)
 - **Meta**
   - [Contributing](Contributing)
