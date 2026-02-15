@@ -1,0 +1,485 @@
+@prefix ds:    <https://deepsigma.ai/ns/coherence#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+# =============================================================================
+# CLAIM PRIMITIVE — OWL Ontology Module (v1.0)
+# Formal representation of specs/claim.schema.json
+# Extends coherence_ops_core.ttl with the Unified Atomic Claim model.
+# =============================================================================
+
+<https://deepsigma.ai/ns/coherence/claim-primitive>
+    a owl:Ontology ;
+    rdfs:label "Claim Primitive Ontology Module"@en ;
+    dcterms:title "Coherence Ops — Claim Primitive v1.0"@en ;
+    dcterms:description """
+        Formal OWL representation of the Universal Atomic Claim primitive.
+        Every higher-order structure (DLR, Canon, Drift, Retcon, Patch)
+        composes from AtomicClaim instances.
+        Maps 1:1 to specs/claim.schema.json.
+    """@en ;
+    dcterms:creator "Deep Sigma" ;
+    dcterms:created "2026-02-15"^^xsd:date ;
+    owl:versionInfo "1.0.0" ;
+    owl:imports <https://deepsigma.ai/ns/coherence> ;
+    rdfs:seeAlso <https://github.com/8ryanWh1t3/DeepSigma/blob/main/specs/claim.schema.json> .
+
+# =============================================================================
+# CLASSES
+# =============================================================================
+
+ds:AtomicClaim
+    a owl:Class ;
+    rdfs:subClassOf ds:Claim ;
+    rdfs:label "Atomic Claim"@en ;
+    rdfs:comment """
+        The indivisible unit of asserted truth. Carries its own confidence,
+        status light, half-life, seal, and graph edges. Never decomposed
+        further — only composed upward into DLR, Canon, etc.
+    """@en .
+
+ds:ClaimScope
+    a owl:Class ;
+    rdfs:label "Claim Scope"@en ;
+    rdfs:comment "Where-when-context boundary for a claim."@en .
+
+ds:ClaimSource
+    a owl:Class ;
+    rdfs:subClassOf ds:SourceArtifact ;
+    rdfs:label "Claim Source"@en ;
+    rdfs:comment "A typed, reliability-assessed pointer to source material."@en .
+
+ds:ClaimEvidence
+    a owl:Class ;
+    rdfs:subClassOf ds:Evidence ;
+    rdfs:label "Claim Evidence"@en ;
+    rdfs:comment "A typed evidence artifact with method and summary."@en .
+
+ds:ClaimSeal
+    a owl:Class ;
+    rdfs:label "Claim Seal"@en ;
+    rdfs:comment "Immutable seal snapshot. Once sealed, append-only via patch log."@en .
+
+ds:PatchLogEntry
+    a owl:Class ;
+    rdfs:label "Patch Log Entry"@en ;
+    rdfs:comment "A single entry in the seal's patch log — records who patched, when, and why."@en .
+
+ds:ProvenanceLink
+    a owl:Class ;
+    rdfs:label "Provenance Link"@en ;
+    rdfs:comment "Ordered node in the Claim → Evidence → Source trust lineage."@en .
+
+# =============================================================================
+# NAMED INDIVIDUALS — Enumerations
+# =============================================================================
+
+# --- Truth Types (epistemic category) ----------------------------------------
+
+ds:TruthType a owl:Class ;
+    rdfs:label "Truth Type"@en ;
+    rdfs:comment "Epistemic category of a claim."@en ;
+    owl:oneOf (
+              ds:Observation ds:Inference ds:Assumption
+              ds:Forecast ds:Norm ds:Constraint
+          ) .
+
+ds:Observation  a ds:TruthType ; rdfs:label "observation"  ; rdfs:comment "Directly measured." .
+ds:Inference    a ds:TruthType ; rdfs:label "inference"    ; rdfs:comment "Derived from evidence." .
+ds:Assumption   a ds:TruthType ; rdfs:label "assumption"   ; rdfs:comment "Taken as given." .
+ds:Forecast     a ds:TruthType ; rdfs:label "forecast"     ; rdfs:comment "Predictive." .
+ds:Norm         a ds:TruthType ; rdfs:label "norm"         ; rdfs:comment "Policy or standard." .
+ds:Constraint   a ds:TruthType ; rdfs:label "constraint"   ; rdfs:comment "Hard boundary." .
+
+# --- Status Light ------------------------------------------------------------
+
+ds:StatusLight a owl:Class ;
+    rdfs:label "Status Light"@en ;
+    rdfs:comment "Derived traffic-light signal."@en ;
+    owl:oneOf ( ds:Green ds:Yellow ds:Red ) .
+
+ds:Green  a ds:StatusLight ; rdfs:label "green"  ; rdfs:comment "confidence >= 0.80 AND >= 1 strong source." .
+ds:Yellow a ds:StatusLight ; rdfs:label "yellow" ; rdfs:comment "0.50–0.79 OR mixed sources." .
+ds:Red    a ds:StatusLight ; rdfs:label "red"    ; rdfs:comment "< 0.50 OR unresolved contradiction." .
+
+# --- Source Reliability -------------------------------------------------------
+
+ds:SourceReliability a owl:Class ;
+    rdfs:label "Source Reliability"@en ;
+    owl:oneOf ( ds:HighReliability ds:MediumReliability ds:LowReliability ds:UnknownReliability ) .
+
+ds:HighReliability    a ds:SourceReliability ; rdfs:label "high" .
+ds:MediumReliability  a ds:SourceReliability ; rdfs:label "medium" .
+ds:LowReliability     a ds:SourceReliability ; rdfs:label "low" .
+ds:UnknownReliability a ds:SourceReliability ; rdfs:label "unknown" .
+
+# --- Classification Tags -----------------------------------------------------
+
+ds:ClassificationTag a owl:Class ;
+    rdfs:label "Classification Tag"@en ;
+    owl:oneOf ( ds:Public ds:Internal ds:Restricted ds:Secret ) .
+
+ds:Public     a ds:ClassificationTag ; rdfs:label "public" .
+ds:Internal   a ds:ClassificationTag ; rdfs:label "internal" .
+ds:Restricted a ds:ClassificationTag ; rdfs:label "restricted" .
+ds:Secret     a ds:ClassificationTag ; rdfs:label "secret" .
+
+# --- Half-Life Units ---------------------------------------------------------
+
+ds:HalfLifeUnit a owl:Class ;
+    rdfs:label "Half-Life Unit"@en ;
+    owl:oneOf ( ds:Hours ds:Days ds:Milliseconds ) .
+
+ds:Hours        a ds:HalfLifeUnit ; rdfs:label "hours" .
+ds:Days         a ds:HalfLifeUnit ; rdfs:label "days" .
+ds:Milliseconds a ds:HalfLifeUnit ; rdfs:label "ms" .
+
+# =============================================================================
+# OBJECT PROPERTIES — Structural Relations
+# =============================================================================
+
+ds:hasScope
+    a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "has scope"@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range ds:ClaimScope .
+
+ds:hasClaimSource
+    a owl:ObjectProperty ;
+    rdfs:label "has claim source"@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range ds:ClaimSource .
+
+ds:hasClaimEvidence
+    a owl:ObjectProperty ;
+    rdfs:label "has claim evidence"@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range ds:ClaimEvidence .
+
+ds:hasSeal
+    a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "has seal"@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range ds:ClaimSeal .
+
+ds:hasPatchLogEntry
+    a owl:ObjectProperty ;
+    rdfs:label "has patch log entry"@en ;
+    rdfs:domain ds:ClaimSeal ;
+    rdfs:range ds:PatchLogEntry .
+
+ds:hasProvenanceLink
+    a owl:ObjectProperty ;
+    rdfs:label "has provenance link"@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range ds:ProvenanceLink .
+
+# --- Truth Type & Status Light (functional — one per claim) ------------------
+
+ds:hasTruthType
+    a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "has truth type"@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range ds:TruthType .
+
+ds:hasStatusLight
+    a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "has status light"@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range ds:StatusLight .
+
+ds:hasReliability
+    a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "has reliability"@en ;
+    rdfs:domain ds:ClaimSource ;
+    rdfs:range ds:SourceReliability .
+
+ds:hasClassification
+    a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "has classification"@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range ds:ClassificationTag .
+
+ds:hasHalfLifeUnit
+    a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "has half-life unit"@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range ds:HalfLifeUnit .
+
+# --- Graph Edges (claim-to-claim topology) -----------------------------------
+
+ds:dependsOnClaim
+    a owl:ObjectProperty ;
+    rdfs:label "depends on claim"@en ;
+    rdfs:comment "This claim requires the target claim to be true."@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range ds:AtomicClaim .
+
+ds:contradictsClaim
+    a owl:ObjectProperty, owl:SymmetricProperty ;
+    rdfs:label "contradicts claim"@en ;
+    rdfs:comment "Active conflict between two claims."@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range ds:AtomicClaim .
+
+ds:supersedesClaim
+    a owl:ObjectProperty, owl:FunctionalProperty ;
+    rdfs:label "supersedes claim"@en ;
+    rdfs:comment "This claim replaces the target. Never overwrite — always supersede."@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range ds:AtomicClaim .
+
+ds:supportsClaim
+    a owl:ObjectProperty ;
+    rdfs:label "supports claim"@en ;
+    rdfs:comment "This claim provides evidence for the target claim."@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range ds:AtomicClaim .
+
+ds:patchedByClaim
+    a owl:ObjectProperty ;
+    rdfs:label "patched by"@en ;
+    rdfs:comment "Patch IDs that modified this claim's meaning or confidence."@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range ds:Patch .
+
+# =============================================================================
+# DATATYPE PROPERTIES
+# =============================================================================
+
+# --- Core identity & statement -----------------------------------------------
+
+ds:claimId
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "claim ID"@en ;
+    rdfs:comment "Stable identifier. Format: CLAIM-YYYY-NNNN. Never reused."@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range xsd:string .
+
+ds:statement
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "statement"@en ;
+    rdfs:comment "One sentence, testable assertion."@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range xsd:string .
+
+ds:owner
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "owner"@en ;
+    rdfs:comment "Accountable role or function."@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range xsd:string .
+
+ds:claimVersion
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "claim version"@en ;
+    rdfs:comment "Semantic version (e.g., 1.0.0). Monotonically increasing."@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range xsd:string .
+
+# --- Confidence --------------------------------------------------------------
+
+ds:confidenceScore
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "confidence score"@en ;
+    rdfs:comment "0.00–1.00. Machine-comparable confidence."@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range xsd:decimal .
+
+ds:confidenceExplanation
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "confidence explanation"@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range xsd:string .
+
+# --- Timestamps --------------------------------------------------------------
+
+ds:timestampCreated
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "timestamp created"@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range xsd:dateTime .
+
+ds:timestampObserved
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "timestamp observed"@en ;
+    rdfs:comment "When the underlying fact was observed in the real world."@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range xsd:dateTime .
+
+# --- Half-Life ---------------------------------------------------------------
+
+ds:halfLifeValue
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "half-life value"@en ;
+    rdfs:comment "Numeric duration. 0 = perpetual."@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range xsd:decimal .
+
+ds:halfLifeExpiresAt
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "half-life expires at"@en ;
+    rdfs:comment "Computed expiry: timestampCreated + halfLife."@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range xsd:dateTime .
+
+ds:refreshTrigger
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "refresh trigger"@en ;
+    rdfs:comment "Event that forces refresh: expiry, contradiction, new_source, schedule."@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range xsd:string .
+
+# --- Scope properties --------------------------------------------------------
+
+ds:scopeWhere
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "scope where"@en ;
+    rdfs:domain ds:ClaimScope ;
+    rdfs:range xsd:string .
+
+ds:scopeWhen
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "scope when"@en ;
+    rdfs:domain ds:ClaimScope ;
+    rdfs:range xsd:string .
+
+ds:scopeContext
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "scope context"@en ;
+    rdfs:domain ds:ClaimScope ;
+    rdfs:range xsd:string .
+
+# --- Source properties --------------------------------------------------------
+
+ds:sourceRef
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "source ref"@en ;
+    rdfs:domain ds:ClaimSource ;
+    rdfs:range xsd:string .
+
+ds:sourceType
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "source type"@en ;
+    rdfs:comment "One of: url, document, email, event, sensor, api, human, redacted."@en ;
+    rdfs:domain ds:ClaimSource ;
+    rdfs:range xsd:string .
+
+ds:sourceCapturedAt
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "source captured at"@en ;
+    rdfs:domain ds:ClaimSource ;
+    rdfs:range xsd:dateTime .
+
+# --- Evidence properties ------------------------------------------------------
+
+ds:evidenceRef
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "evidence ref"@en ;
+    rdfs:domain ds:ClaimEvidence ;
+    rdfs:range xsd:string .
+
+ds:evidenceType
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "evidence type"@en ;
+    rdfs:comment "One of: file, excerpt, sensor, log, trace, metric, record."@en ;
+    rdfs:domain ds:ClaimEvidence ;
+    rdfs:range xsd:string .
+
+ds:evidenceMethod
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "evidence method"@en ;
+    rdfs:domain ds:ClaimEvidence ;
+    rdfs:range xsd:string .
+
+ds:evidenceSummary
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "evidence summary"@en ;
+    rdfs:domain ds:ClaimEvidence ;
+    rdfs:range xsd:string .
+
+# --- Seal properties ----------------------------------------------------------
+
+ds:sealHash
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "seal hash"@en ;
+    rdfs:comment "SHA-256 of claim content at seal time."@en ;
+    rdfs:domain ds:ClaimSeal ;
+    rdfs:range xsd:string .
+
+ds:sealedAt
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "sealed at"@en ;
+    rdfs:domain ds:ClaimSeal ;
+    rdfs:range xsd:dateTime .
+
+ds:sealVersion
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "seal version"@en ;
+    rdfs:domain ds:ClaimSeal ;
+    rdfs:range xsd:integer .
+
+# --- Patch log entry properties -----------------------------------------------
+
+ds:patchedAt
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "patched at"@en ;
+    rdfs:domain ds:PatchLogEntry ;
+    rdfs:range xsd:dateTime .
+
+ds:patchAuthor
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "patch author"@en ;
+    rdfs:domain ds:PatchLogEntry ;
+    rdfs:range xsd:string .
+
+ds:patchReason
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "patch reason"@en ;
+    rdfs:domain ds:PatchLogEntry ;
+    rdfs:range xsd:string .
+
+ds:patchNewHash
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "patch new hash"@en ;
+    rdfs:domain ds:PatchLogEntry ;
+    rdfs:range xsd:string .
+
+# --- Provenance link properties -----------------------------------------------
+
+ds:provenanceLinkType
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "provenance link type"@en ;
+    rdfs:comment "One of: claim, evidence, source."@en ;
+    rdfs:domain ds:ProvenanceLink ;
+    rdfs:range xsd:string .
+
+ds:provenanceLinkRef
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "provenance link ref"@en ;
+    rdfs:domain ds:ProvenanceLink ;
+    rdfs:range xsd:string .
+
+ds:provenanceLinkRole
+    a owl:DatatypeProperty, owl:FunctionalProperty ;
+    rdfs:label "provenance link role"@en ;
+    rdfs:domain ds:ProvenanceLink ;
+    rdfs:range xsd:string .
+
+# --- Tags --------------------------------------------------------------------
+
+ds:tag
+    a owl:DatatypeProperty ;
+    rdfs:label "tag"@en ;
+    rdfs:comment "Free-form tag for search, filtering, and domain grouping."@en ;
+    rdfs:domain ds:AtomicClaim ;
+    rdfs:range xsd:string .
+
+# =============================================================================
+# END OF CLAIM PRIMITIVE ONTOLOGY MODULE
+# =============================================================================
