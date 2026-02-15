@@ -1,101 +1,42 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from enum import Enum
-from typing import Any, Dict, List
-
-
-# NOTE: This module must remain import-safe because coherence_ops/__init__.py exports
-# QueryType, IRISQuery, IRISResponse, IRISConfig, and IRISEngine.
-
-
-class QueryType(str, Enum):
-    """Supported IRIS query types."""
-
+class QueryType:
     WHY = "WHY"
-    WHAT_CHANGED = "WHAT_CHANGED"
-    WHAT_DRIFTED = "WHAT_DRIFTED"
-    RECALL = "RECALL"
-    STATUS = "STATUS"
 
-
-class ResolutionStatus(str, Enum):
-    """Resolution status returned by IRIS."""
-
-    RESOLVED = "RESOLVED"
-    PARTIAL = "PARTIAL"
+class ResolutionStatus:
     NOT_FOUND = "NOT_FOUND"
-    ERROR = "ERROR"
 
-
-@dataclass
-class ProvenanceLink:
-    artifact: str
-    ref_id: str
-    role: str
-    detail: str = ""
-
-
-@dataclass
 class IRISQuery:
-    query_type: QueryType
-    text: str = ""
-    episode_id: str = ""
-    decision_type: str = ""
-    time_window_seconds: float = 3600.0
-    limit: int = 20
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    def __init__(self, query_type=QueryType.WHY, text=""):
+        self.query_type = query_type
+        self.text = text
 
-
-@dataclass
 class IRISResponse:
-    query_id: str
-    query_type: QueryType
-    status: ResolutionStatus
-    summary: str
-    data: Dict[str, Any] = field(default_factory=dict)
-    provenance_chain: List[ProvenanceLink] = field(default_factory=list)
-    confidence: float = 0.0
-    resolved_at: str = ""
-    elapsed_ms: float = 0.0
-    warnings: List[str] = field(default_factory=list)
+    def __init__(self, query_id, query_type, status, summary, warnings=None):
+        self.query_id = query_id
+        self.query_type = query_type
+        self.status = status
+        self.summary = summary
+        self.warnings = list(warnings or [])
 
-
-@dataclass
 class IRISConfig:
-    response_time_target_ms: float = 60_000
+    def __init__(self, response_time_target_ms=60_000):
+        self.response_time_target_ms = response_time_target_ms
 
-    def validate(self) -> List[str]:
-        issues: List[str] = []
+    def validate(self):
+        issues = []
         if self.response_time_target_ms <= 0:
             issues.append("response_time_target_ms must be positive")
         return issues
 
-
 class IRISEngine:
-    """Minimal operator query resolution engine (stub)."""
-
-    def __init__(
-        self,
-        dlr_builder: object | None = None,
-        rs: object | None = None,
-        ds: object | None = None,
-        mg: object | None = None,
-        config: IRISConfig | None = None,
-    ) -> None:
-        self.dlr = dlr_builder
-        self.rs = rs
-        self.ds = ds
-        self.mg = mg
+    def __init__(self, config=None):
         self.config = config or IRISConfig()
-
         issues = self.config.validate()
         if issues:
-            raise ValueError(f"Invalid IRISConfig: {'; '.join(issues)}")
+            raise ValueError("Invalid IRISConfig: " + "; ".join(issues))
 
-    def resolve(self, query: IRISQuery) -> IRISResponse:
-        """Return a stub response to keep module import-safe."""
-
+    def resolve(self, query):
         return IRISResponse(
             query_id="stub",
             query_type=query.query_type,
