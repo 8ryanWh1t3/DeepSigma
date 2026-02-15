@@ -27,6 +27,22 @@ Organized by layer — from brand identity through runtime architecture to opera
 
 ---
 
+## Unified Atomic Claims (v0.2.0)
+
+| Term | Definition |
+|------|-----------|
+| **AtomicClaim** | The universal primitive for all assertions in Coherence Ops. Contains: claimId, statement, truthType, evidence chain, confidence score, half-life, graph topology (dependsOn, contradicts, supersedes, supports), and a cryptographic seal. Every decision, observation, or conclusion is modelled as an AtomicClaim. |
+| **Claim Primitive** | The JSON Schema specification (`specs/claim.schema.json`) defining the AtomicClaim structure. Draft 2020-12, `additionalProperties: false`. |
+| **Claim-Native DLR** | A Decision Lineage Record that uses AtomicClaims as first-class citizens rather than opaque text fields. Each DLR entry carries typed claim references with roles (supporting, primary, dissenting, rejected) and a rationale graph of edges between claims. |
+| **Canon** | A "blessed" claim that has been validated, reviewed, and graduated to institutional memory. Governed by `specs/canon.schema.json`. Canon claims have a promotion chain showing who blessed them and when. |
+| **Retcon** | A retroactive correction to a claim. Instead of overwriting, Coherence Ops creates a retcon record linking the corrected claim to its replacement with a full audit trail. Governed by `specs/retcon.schema.json`. |
+| **Status Light** | Derived health indicator for a claim: ✅ GREEN (confidence ≥ 0.7, not expired, sealed), ⚠️ YELLOW (confidence 0.4–0.7, or nearing half-life), 🔴 RED (confidence < 0.4, expired, or unsealed). |
+| **Half-Life** | Every claim has a temporal decay parameter. When the half-life expires, the claim’s confidence degrades and the status light shifts toward YELLOW/RED. Enforces the principle: no assertion lives forever without re-validation. |
+| **Claim Graph Topology** | The web of relationships between claims: `dependsOn` (prerequisite), `contradicts` (opposing), `supersedes` (replaces), `supports` (reinforces). Stored as edges in the MemoryGraph and traversed by IRIS for provenance queries. |
+| **ClaimNativeDLRBuilder** | Python class in `coherence_ops/dlr.py` that constructs claim-native DLR entries from sealed episodes and their associated claims. |
+
+---
+
 ## The Four Pillars (Coherence Ops Artifacts)
 
 | Term | Abbreviation | Definition |
