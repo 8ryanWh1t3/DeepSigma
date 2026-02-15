@@ -1,0 +1,195 @@
+# =============================================================================
+# CLAIM PRIMITIVE — SPARQL Query Pack
+# Queries for the Unified Atomic Claim model.
+# Designed for the ds: namespace (https://deepsigma.ai/ns/coherence#).
+# =============================================================================
+
+PREFIX ds:   <https://deepsigma.ai/ns/coherence#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+# =============================================================================
+# Q1: Claims by Status Light
+# Returns all claims grouped by their traffic-light status.
+# Use case: Dashboard overview — how many green/yellow/red claims?
+# =============================================================================
+
+# SELECT ?claimId ?statement ?statusLabel ?confidence
+# WHERE {
+#   ?claim a ds:AtomicClaim ;
+#          ds:claimId ?claimId ;
+#          ds:statement ?statement ;
+#          ds:confidenceScore ?confidence ;
+#          ds:hasStatusLight ?status .
+#   ?status rdfs:label ?statusLabel .
+# }
+# ORDER BY ?statusLabel DESC(?confidence)
+
+# =============================================================================
+# Q2: Red Claims — Immediate Attention
+# Returns only claims with status light = Red (< 0.50 or contradiction).
+# Use case: Triage — what needs human review right now?
+# =============================================================================
+
+# SELECT ?claimId ?statement ?confidence ?owner ?created
+# WHERE {
+#   ?claim a ds:AtomicClaim ;
+#          ds:claimId ?claimId ;
+#          ds:statement ?statement ;
+#          ds:confidenceScore ?confidence ;
+#          ds:owner ?owner ;
+#          ds:timestampCreated ?created ;
+#          ds:hasStatusLight ds:Red .
+# }
+# ORDER BY ASC(?confidence)
+
+# =============================================================================
+# Q3: Full Provenance Chain (WHY query)
+# Given a claimId, trace Claim -> Evidence -> Source.
+# Use case: IRIS WHY resolution — "why do we believe this?"
+# =============================================================================
+
+# SELECT ?claimId ?evidenceRef ?evidenceMethod ?evidenceSummary
+#        ?sourceRef ?sourceType ?reliability
+# WHERE {
+#   ?claim a ds:AtomicClaim ;
+#          ds:claimId ?claimId ;
+#          ds:hasClaimEvidence ?evidence ;
+#          ds:hasClaimSource ?source .
+#   ?evidence ds:evidenceRef ?evidenceRef ;
+#             ds:evidenceMethod ?evidenceMethod ;
+#             ds:evidenceSummary ?evidenceSummary .
+#   ?source ds:sourceRef ?sourceRef ;
+#           ds:sourceType ?sourceType ;
+#           ds:hasReliability ?rel .
+#   ?rel rdfs:label ?reliability .
+#   FILTER(?claimId = "CLAIM-2026-0001")
+# }
+
+# =============================================================================
+# Q4: Contradiction Detection
+# Finds all pairs of claims that contradict each other.
+# Use case: Drift Scan — identify active conflicts in the claim graph.
+# =============================================================================
+
+# SELECT ?claimA ?stmtA ?claimB ?stmtB
+# WHERE {
+#   ?a a ds:AtomicClaim ;
+#      ds:claimId ?claimA ;
+#      ds:statement ?stmtA ;
+#      ds:contradictsClaim ?b .
+#   ?b a ds:AtomicClaim ;
+#      ds:claimId ?claimB ;
+#      ds:statement ?stmtB .
+#   FILTER(STR(?claimA) < STR(?claimB))
+# }
+
+# =============================================================================
+# Q5: Expired Half-Lives
+# Finds claims whose half-life has expired (expiresAt < NOW).
+# Use case: Staleness detection — what claims need refresh?
+# =============================================================================
+
+# SELECT ?claimId ?statement ?confidence ?expiresAt ?refreshTrigger ?owner
+# WHERE {
+#   ?claim a ds:AtomicClaim ;
+#          ds:claimId ?claimId ;
+#          ds:statement ?statement ;
+#          ds:confidenceScore ?confidence ;
+#          ds:halfLifeExpiresAt ?expiresAt ;
+#          ds:refreshTrigger ?refreshTrigger ;
+#          ds:owner ?owner .
+#   FILTER(?expiresAt < NOW())
+# }
+# ORDER BY ASC(?expiresAt)
+
+# =============================================================================
+# Q6: Claim Dependency Graph
+# Returns the full dependency tree for a given claim.
+# Use case: Impact analysis — what breaks if this claim is invalidated?
+# =============================================================================
+
+# SELECT ?rootClaim ?depClaim ?depStatement ?depConfidence ?depStatus
+# WHERE {
+#   ?root a ds:AtomicClaim ;
+#         ds:claimId ?rootClaim .
+#   ?root ds:dependsOnClaim+ ?dep .
+#   ?dep a ds:AtomicClaim ;
+#        ds:claimId ?depClaim ;
+#        ds:statement ?depStatement ;
+#        ds:confidenceScore ?depConfidence ;
+#        ds:hasStatusLight ?status .
+#   ?status rdfs:label ?depStatus .
+#   FILTER(?rootClaim = "CLAIM-2026-0001")
+# }
+
+# =============================================================================
+# Q7: Supersession Chain
+# Traces the version history of a claim through supersedes links.
+# Use case: Memory audit — how did this claim evolve?
+# =============================================================================
+
+# SELECT ?currentId ?currentVersion ?previousId ?sealedAt
+# WHERE {
+#   ?current a ds:AtomicClaim ;
+#            ds:claimId ?currentId ;
+#            ds:claimVersion ?currentVersion ;
+#            ds:supersedesClaim ?previous .
+#   ?previous ds:claimId ?previousId .
+#   ?current ds:hasSeal ?seal .
+#   ?seal ds:sealedAt ?sealedAt .
+# }
+# ORDER BY DESC(?sealedAt)
+
+# =============================================================================
+# Q8: Claims by Truth Type
+# Groups claims by epistemic category.
+# Use case: Reasoning audit — what is the assumption vs observation ratio?
+# =============================================================================
+
+# SELECT ?truthLabel (COUNT(?claim) AS ?count)
+#        (AVG(?confidence) AS ?avgConfidence)
+# WHERE {
+#   ?claim a ds:AtomicClaim ;
+#          ds:confidenceScore ?confidence ;
+#          ds:hasTruthType ?tt .
+#   ?tt rdfs:label ?truthLabel .
+# }
+# GROUP BY ?truthLabel
+# ORDER BY DESC(?count)
+
+# =============================================================================
+# Q9: Claims by Classification
+# Returns claim counts per classification tag.
+# Use case: Security review — what is the distribution of access levels?
+# =============================================================================
+
+# SELECT ?classLabel (COUNT(?claim) AS ?count)
+# WHERE {
+#   ?claim a ds:AtomicClaim ;
+#          ds:hasClassification ?cls .
+#   ?cls rdfs:label ?classLabel .
+# }
+# GROUP BY ?classLabel
+# ORDER BY DESC(?count)
+
+# =============================================================================
+# Q10: Seal Integrity Check
+# Lists all claims and their seal hashes for verification.
+# Use case: Memory Invariant enforcement — are all seals intact?
+# =============================================================================
+
+# SELECT ?claimId ?sealHash ?sealedAt ?sealVersion
+# WHERE {
+#   ?claim a ds:AtomicClaim ;
+#          ds:claimId ?claimId ;
+#          ds:hasSeal ?seal .
+#   ?seal ds:sealHash ?sealHash ;
+#         ds:sealedAt ?sealedAt ;
+#         ds:sealVersion ?sealVersion .
+# }
+# ORDER BY DESC(?sealedAt)
+
+# =============================================================================
+# END OF CLAIM PRIMITIVE QUERY PACK
+# =============================================================================
