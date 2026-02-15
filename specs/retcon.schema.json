@@ -1,0 +1,91 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://sigma-overwatch.dev/schemas/retcon.schema.json",
+    "title": "Retcon — Retroactive Claim Correction",
+    "description": "A Retcon retroactively corrects one or more claims when new evidence reveals the original assertion was wrong. Unlike a Patch (which adjusts confidence or metadata), a Retcon replaces the statement itself and creates a new superseding claim.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["retconId", "originalClaimId", "newClaimId", "reason", "authorizedBy", "retconAt", "seal"],
+    "properties": {
+          "retconId": {
+                  "type": "string",
+                  "pattern": "^RETCON-[0-9]{4}-[0-9]{4,}$",
+                  "description": "Stable identifier. Format: RETCON-YYYY-NNNN."
+          },
+          "originalClaimId": {
+                  "type": "string",
+                  "description": "The claim ID being retroactively corrected."
+          },
+          "newClaimId": {
+                  "type": "string",
+                  "description": "The new claim ID that supersedes the original. Must have graph.supersedes pointing to originalClaimId."
+          },
+          "affectedClaimIds": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Other claim IDs impacted by this retcon (dependents, canon entries, DLR references)."
+          },
+          "affectedDlrIds": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "DLR IDs whose rationale graph references the original claim."
+          },
+          "affectedCanonIds": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Canon IDs that included the original claim."
+          },
+          "reason": {
+                  "type": "string",
+                  "minLength": 10,
+                  "description": "Explanation of why the retcon is necessary."
+          },
+          "newEvidence": {
+                  "type": "array",
+                  "items": {
+                            "type": "object",
+                            "required": ["ref"],
+                            "additionalProperties": false,
+                            "properties": {
+                                        "ref": { "type": "string" },
+                                        "type": { "type": "string" },
+                                        "summary": { "type": "string" }
+                            }
+                  },
+                  "description": "Evidence that triggered the retcon."
+          },
+          "impactAssessment": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                            "blastRadius": { "type": "string", "enum": ["low", "medium", "high", "critical"], "description": "How many downstream artifacts are affected." },
+                            "dependentClaimCount": { "type": "integer", "minimum": 0 },
+                            "requiresCanonUpdate": { "type": "boolean" },
+                            "requiresDlrReissue": { "type": "boolean" }
+                  }
+          },
+          "authorizedBy": {
+                  "type": "string",
+                  "description": "Role or authority that approved the retcon."
+          },
+          "retconAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "When the retcon was executed."
+          },
+          "seal": {
+                  "type": "object",
+                  "required": ["hash", "sealedAt", "version"],
+                  "additionalProperties": false,
+                  "properties": {
+                            "hash": { "type": "string" },
+                            "sealedAt": { "type": "string", "format": "date-time" },
+                            "version": { "type": "integer", "minimum": 1 }
+                  }
+          },
+          "tags": {
+                  "type": "array",
+                  "items": { "type": "string" }
+          }
+    }
+}
