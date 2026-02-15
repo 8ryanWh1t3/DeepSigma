@@ -32,6 +32,10 @@ LinkedIn content primarily uses "Coherence Ops" and "Deep Sigma" language. This 
 | Drift → Patch loop | `tools/drift_to_patch.py` | ✅ Implemented |
 | Seal / Sealing | `specs/episode.schema.json` | ✅ Schema + runtime |
 | Claim–Evidence–Source chain | `rdf/ontology/`, `llm_data_model/` | ✅ Schema + ontology |
+| Claim Primitive (atomic truth unit) | `specs/claim.schema.json`, `coherence_ops/dlr.py` | ✅ Schema + runtime |
+| Canon (blessed claim memory) | `specs/canon.schema.json` | ✅ Schema |
+| Retcon (retroactive correction) | `specs/retcon.schema.json` | ✅ Schema |
+| Claim-Native DLR | `specs/dlr.schema.json`, `coherence_ops/dlr.py` | ✅ Schema + builder |
 | Provenance | `rdf/queries/`, `coherence_ops/mg.py` | ✅ Graph + SPARQL |
 | Truth–Reasoning–Memory | All four pillars + schemas | ✅ Distributed across pillars |
 
@@ -52,7 +56,7 @@ LinkedIn content primarily uses "Coherence Ops" and "Deep Sigma" language. This 
 | LinkedIn Concept | Repo Location | Status |
 |-----------------|---------------|--------|
 | PRIME (threshold gate) | `coherence_ops/prime.py` | 🔜 Planned — Phase 1 |
-| IRIS (operator interface) | `coherence_ops/iris.py`, `specs/iris_query.schema.json`, `docs/18-iris.md` | ✅ Implemented — Phase 2 |
+| IRIS (operator interface) | `coherence_ops/iris.py`, `specs/iris_query.schema.json`, `docs/18-iris.md` | ✅ Implemented — claim-graph queries |
 | FranOPS (franchise operations mode) | `coherence_ops/modes/franops.py` | 🔜 Planned — Phase 3 |
 | IntelOps (intelligence operations mode) | `coherence_ops/modes/intelops.py` | 🔜 Planned — Phase 3 |
 | ReflectionOps (reflection operations mode) | `coherence_ops/modes/reflectionops.py` | 🔜 Planned — Phase 3 |
@@ -100,7 +104,7 @@ LinkedIn content primarily uses "Coherence Ops" and "Deep Sigma" language. This 
 
 **"I want to see the semantic layer"** → `rdf/README.md`
 
-**"I want to see the architecture visually"** → `mermaid/README.md` (27 diagrams)
+**"I want to see the architecture visually"** → `mermaid/README.md` (28 diagrams)
 
 **"I want to query the system"** → `docs/18-iris.md` for IRIS interface documentation
 
@@ -108,4 +112,4 @@ LinkedIn content primarily uses "Coherence Ops" and "Deep Sigma" language. This 
 
 ---
 
-*This map is updated as new features land. Last updated: 2026-02-14.*
+*This map is updated as new features land. Last updated: 2026-02-15.*
