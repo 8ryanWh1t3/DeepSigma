@@ -126,23 +126,35 @@ The `llm_data_model/` directory contains the canonical data model for LLM-powere
 
 ## Mermaid Diagrams
 
-The `mermaid/` directory contains 27 Mermaid diagrams providing visual documentation of system architecture, data flows, and operational concepts. Categories include Overwatch Core, Coherence Ops, LLM Data Model, and RDF Semantic Layer. See [`mermaid/README.md`](./mermaid/README.md) for the full catalogue.
+The `mermaid/` directory contains 28 Mermaid diagrams providing visual documentation of system architecture, data flows, and operational concepts. Categories include Overwatch Core, Coherence Ops, LLM Data Model, and RDF Semantic Layer. See [`mermaid/README.md`](./mermaid/README.md) for the full catalogue.
+
+## Unified Atomic Claims (v0.2.0)
+
+The Claim Primitive is the universal atomic unit of truth in Deep Sigma. Every assertion — from sensor readings to strategic conclusions — is modelled as an **AtomicClaim** with statement, evidence chain, confidence score, half-life, and cryptographic seal.
+
+- **Spec**: `specs/claim.schema.json` — JSON Schema (Draft 2020-12)
+- **DLR Integration**: `specs/dlr.schema.json` — claim-native Decision Lineage Records
+- **RDF**: `rdf/ontology/claim_primitive.ttl` — OWL ontology + SHACL shapes + SPARQL queries
+- **Python**: `coherence_ops/` — `ClaimNativeDLRBuilder`, `MemoryGraph.add_claim()`, `IRISEngine`
+- **Docs**: `docs/19-claim-primitive.md`, `docs/20-dlr-claim-native.md`
+
+See the [wiki page](wiki/Unified-Atomic-Claims.md) for the full design rationale.
 
 ## Repo Structure
 
 | Directory | Description |
 |-----------|-------------|
 | `adapters/` | Integration adapters — OpenClaw, MCP JSON-RPC, OpenTelemetry hooks |
-| `coherence_ops/` | Coherence scoring, audit, reconciliation CLI and library (DLR/RS/DS/MG) |
+| `coherence_ops/` | Coherence scoring, audit, reconciliation CLI and library (DLR/RS/DS/MG) — now claim-native (v0.2.0) |
 | `dashboard/` | Interactive monitoring dashboard — React + zero-install `demo.html` |
 | `docs/` | Architecture docs, integration guides, schema references |
 | `engine/` | Core engine — degrade ladder, supervisor scaffold, policy stamping |
 | `examples/` | Demo stack and quickstart scripts |
 | `llm_data_model/` | Canonical LLM data model — record types, schemas, field dictionary, validation |
-| `mermaid/` | 27 Mermaid diagrams — architecture, data flow, and operational visuals |
+| `mermaid/` | 28 Mermaid diagrams — architecture, data flow, and operational visuals |
 | `policy_packs/` | Versioned policy enforcement bundles |
 | `rdf/` | RDF semantic layer — OWL ontology, SHACL shapes, SPARQL queries |
-| `specs/` | JSON Schema contracts — DTE, Action, Episode, Drift |
+| `specs/` | JSON Schema contracts — DTE, Action, Episode, Drift, Claim, DLR, Canon, Retcon |
 | `tests/` | Unit and integration tests |
 | `tools/` | CLI tools — supervised runner, replay harness |
 | `verifiers/` | Verification library — read-after-write, invariant checks |
