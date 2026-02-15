@@ -1,0 +1,336 @@
+@prefix ds:   <https://deepsigma.ai/ns/coherence#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# =============================================================================
+# CLAIM PRIMITIVE — SHACL Validation Shapes
+# Enforces the same constraints as specs/claim.schema.json
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# AtomicClaim — root shape
+# -----------------------------------------------------------------------------
+
+ds:AtomicClaimShape
+    a sh:NodeShape ;
+    sh:targetClass ds:AtomicClaim ;
+    rdfs:label "Atomic Claim Shape"@en ;
+    rdfs:comment "Validates an AtomicClaim instance against the Claim Primitive v1.0 spec."@en ;
+
+    # --- Required scalar properties ---
+    sh:property [
+              sh:path ds:claimId ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:pattern "^CLAIM-[0-9]{4}-[0-9]{4,}$" ;
+                              sh:message "claimId is required and must match CLAIM-YYYY-NNNN." ;
+                          ] ;
+    sh:property [
+              sh:path ds:statement ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:minLength 10 ;
+                              sh:message "statement is required (min 10 chars)." ;
+                          ] ;
+    sh:property [
+              sh:path ds:owner ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:minLength 1 ;
+                              sh:message "owner is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:claimVersion ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:pattern "^[0-9]+\\.[0-9]+\\.[0-9]+$" ;
+                              sh:message "claimVersion is required (semver format)." ;
+                          ] ;
+
+    # --- Confidence ---
+    sh:property [
+              sh:path ds:confidenceScore ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:decimal ;
+                              sh:minInclusive 0.00 ;
+              sh:maxInclusive 1.00 ;
+              sh:message "confidenceScore is required (0.00–1.00)." ;
+                             ] ;
+
+    # --- Timestamps ---
+    sh:property [
+              sh:path ds:timestampCreated ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:dateTime ;
+                              sh:message "timestampCreated is required (xsd:dateTime)." ;
+                          ] ;
+    sh:property [
+              sh:path ds:timestampObserved ;
+                              sh:maxCount 1 ;
+                              sh:datatype xsd:dateTime ;
+                              sh:message "timestampObserved must be xsd:dateTime if present." ;
+                          ] ;
+
+    # --- Truth Type (required, enum via class) ---
+    sh:property [
+              sh:path ds:hasTruthType ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:class ds:TruthType ;
+                              sh:message "hasTruthType is required and must be one of: Observation, Inference, Assumption, Forecast, Norm, Constraint." ;
+                          ] ;
+
+    # --- Status Light (required, enum via class) ---
+    sh:property [
+              sh:path ds:hasStatusLight ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:class ds:StatusLight ;
+                              sh:message "hasStatusLight is required and must be one of: Green, Yellow, Red." ;
+                          ] ;
+
+    # --- Sources (min 1) ---
+    sh:property [
+              sh:path ds:hasClaimSource ;
+                              sh:minCount 1 ;
+                              sh:class ds:ClaimSource ;
+                              sh:message "At least one ClaimSource is required." ;
+                          ] ;
+
+    # --- Evidence ---
+    sh:property [
+              sh:path ds:hasClaimEvidence ;
+                              sh:class ds:ClaimEvidence ;
+                              sh:message "ClaimEvidence links must point to ClaimEvidence instances." ;
+                          ] ;
+
+    # --- Scope (required) ---
+    sh:property [
+              sh:path ds:hasScope ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:class ds:ClaimScope ;
+                              sh:message "hasScope is required (exactly one ClaimScope)." ;
+                          ] ;
+
+    # --- Seal (required) ---
+    sh:property [
+              sh:path ds:hasSeal ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:class ds:ClaimSeal ;
+                              sh:message "hasSeal is required (exactly one ClaimSeal)." ;
+                          ] ;
+
+    # --- Half-Life ---
+    sh:property [
+              sh:path ds:halfLifeValue ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:decimal ;
+                              sh:minInclusive 0 ;
+                              sh:message "halfLifeValue is required (>= 0)." ;
+                          ] ;
+    sh:property [
+              sh:path ds:hasHalfLifeUnit ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:class ds:HalfLifeUnit ;
+                              sh:message "hasHalfLifeUnit is required (Hours, Days, or Milliseconds)." ;
+                          ] ;
+
+    # --- Classification (optional, but constrained) ---
+    sh:property [
+              sh:path ds:hasClassification ;
+                              sh:maxCount 1 ;
+                              sh:class ds:ClassificationTag ;
+                              sh:message "hasClassification must be one of: Public, Internal, Restricted, Secret." ;
+                          ] ;
+
+    # --- Graph edges (all optional, typed) ---
+    sh:property [
+              sh:path ds:dependsOnClaim ;
+                              sh:class ds:AtomicClaim ;
+                              sh:message "dependsOnClaim targets must be AtomicClaim instances." ;
+                          ] ;
+    sh:property [
+              sh:path ds:contradictsClaim ;
+                              sh:class ds:AtomicClaim ;
+                              sh:message "contradictsClaim targets must be AtomicClaim instances." ;
+                          ] ;
+    sh:property [
+              sh:path ds:supersedesClaim ;
+                              sh:maxCount 1 ;
+                              sh:class ds:AtomicClaim ;
+                              sh:message "supersedesClaim must be a single AtomicClaim (if present)." ;
+                          ] ;
+    sh:property [
+              sh:path ds:supportsClaim ;
+                              sh:class ds:AtomicClaim ;
+                              sh:message "supportsClaim targets must be AtomicClaim instances." ;
+                          ] ;
+    sh:property [
+              sh:path ds:patchedByClaim ;
+                              sh:class ds:Patch ;
+                              sh:message "patchedByClaim targets must be Patch instances." ;
+                          ] .
+
+# -----------------------------------------------------------------------------
+# ClaimScope shape
+# -----------------------------------------------------------------------------
+
+ds:ClaimScopeShape
+    a sh:NodeShape ;
+    sh:targetClass ds:ClaimScope ;
+    rdfs:label "Claim Scope Shape"@en ;
+
+    sh:property [
+              sh:path ds:scopeWhere ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:message "scopeWhere is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:scopeWhen ;
+                              sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:message "scopeWhen must be a string if present." ;
+                          ] ;
+    sh:property [
+              sh:path ds:scopeContext ;
+                              sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:message "scopeContext must be a string if present." ;
+                          ] .
+
+# -----------------------------------------------------------------------------
+# ClaimSource shape
+# -----------------------------------------------------------------------------
+
+ds:ClaimSourceShape
+    a sh:NodeShape ;
+    sh:targetClass ds:ClaimSource ;
+    rdfs:label "Claim Source Shape"@en ;
+
+    sh:property [
+              sh:path ds:sourceRef ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:message "sourceRef is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:sourceType ;
+                              sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:in ( "url" "document" "email" "event" "sensor" "api" "human" "redacted" ) ;
+                              sh:message "sourceType must be one of: url, document, email, event, sensor, api, human, redacted." ;
+                          ] ;
+    sh:property [
+              sh:path ds:hasReliability ;
+                              sh:maxCount 1 ;
+                              sh:class ds:SourceReliability ;
+                              sh:message "hasReliability must be one of: HighReliability, MediumReliability, LowReliability, UnknownReliability." ;
+                          ] ;
+    sh:property [
+              sh:path ds:sourceCapturedAt ;
+                              sh:maxCount 1 ;
+                              sh:datatype xsd:dateTime ;
+                              sh:message "sourceCapturedAt must be xsd:dateTime if present." ;
+                          ] .
+
+# -----------------------------------------------------------------------------
+# ClaimEvidence shape
+# -----------------------------------------------------------------------------
+
+ds:ClaimEvidenceShape
+    a sh:NodeShape ;
+    sh:targetClass ds:ClaimEvidence ;
+    rdfs:label "Claim Evidence Shape"@en ;
+
+    sh:property [
+              sh:path ds:evidenceRef ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:message "evidenceRef is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:evidenceType ;
+                              sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:in ( "file" "excerpt" "sensor" "log" "trace" "metric" "record" ) ;
+                              sh:message "evidenceType must be one of: file, excerpt, sensor, log, trace, metric, record." ;
+                          ] ;
+    sh:property [
+              sh:path ds:evidenceMethod ;
+                              sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:message "evidenceMethod must be a string if present." ;
+                          ] ;
+    sh:property [
+              sh:path ds:evidenceSummary ;
+                              sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:message "evidenceSummary must be a string if present." ;
+                          ] .
+
+# -----------------------------------------------------------------------------
+# ClaimSeal shape
+# -----------------------------------------------------------------------------
+
+ds:ClaimSealShape
+    a sh:NodeShape ;
+    sh:targetClass ds:ClaimSeal ;
+    rdfs:label "Claim Seal Shape"@en ;
+
+    sh:property [
+              sh:path ds:sealHash ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:message "sealHash is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:sealedAt ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:dateTime ;
+                              sh:message "sealedAt is required (xsd:dateTime)." ;
+                          ] ;
+    sh:property [
+              sh:path ds:sealVersion ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:integer ;
+                              sh:minInclusive 1 ;
+                              sh:message "sealVersion is required (integer >= 1)." ;
+                          ] .
+
+# -----------------------------------------------------------------------------
+# PatchLogEntry shape
+# -----------------------------------------------------------------------------
+
+ds:PatchLogEntryShape
+    a sh:NodeShape ;
+    sh:targetClass ds:PatchLogEntry ;
+    rdfs:label "Patch Log Entry Shape"@en ;
+
+    sh:property [
+              sh:path ds:patchedAt ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:dateTime ;
+                              sh:message "patchedAt is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:patchAuthor ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:message "patchAuthor is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:patchReason ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:message "patchReason is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:patchNewHash ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:message "patchNewHash is required." ;
+                          ] .
+
+# =============================================================================
+# END OF CLAIM PRIMITIVE SHACL SHAPES
+# =============================================================================
