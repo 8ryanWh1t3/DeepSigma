@@ -220,9 +220,9 @@ python -m coherence_ops.examples.drift_patch_cycle
 **Expected output:**
 
 ```
-BASELINE  XX.XX (A)
-DRIFT     XX.XX (C)   red=1
-PATCH     XX.XX (B)   patch=RETCON  drift_resolved=true
+BASELINE  90.00 (A)
+DRIFT    85.75 (B)   red=1
+PATCH    90.00 (A)   patch=RETCON  drift_resolved=true
 Artifacts: examples/demo-stack/drift_patch_cycle_run/
 ```
 
