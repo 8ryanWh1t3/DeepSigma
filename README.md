@@ -2,191 +2,189 @@
   <img src="docs/assets/overwatch-logo.svg" alt="Σ OVERWATCH" width="160" />
 </p>
 
-
-
-
-<h1 align="center">Σ OVERWATCH</h1>
-
-
-
-
-<p align="center"><b>The control plane for agentic AI:</b> deadlines • freshness • safe actions • verification • sealed episodes</p>
-
-
-
+<h1 align="center">Institutional Decision Infrastructure</h1>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/AL6-Governed-blue" />
-  <img src="https://img.shields.io/badge/DTE-Enforced-blue" />
-  <img src="https://img.shields.io/badge/TTL-Freshness%20Gates-blue" />
-  <img src="https://img.shields.io/badge/Safe%20Actions-Contracts-blue" />
-  <img src="https://img.shields.io/badge/Outcomes-Verified-blue" />
-  <img src="https://img.shields.io/badge/Episodes-Sealed-blue" />
-  <img src="https://img.shields.io/badge/Drift-Patch-blue" />
+  <strong>Truth · Reasoning · Memory</strong><br/>
+  The control plane that makes every institutional decision auditable, reproducible, and self-correcting.
 </p>
 
-
-
+<p align="center">
+  <img src="https://shields.io/badge/Category-Institutional_Decision_Infrastructure-blue" />
+  <img src="https://shields.io/badge/Triad-Truth·Reasoning·Memory-green" />
+  <img src="https://shields.io/badge/Loop-Drift→Patch-orange" />
+</p>
 
 ---
 
+## The Category in 60 Seconds
 
+Most AI governance frameworks tell you **what to worry about**.
+Σ OVERWATCH tells you **what to do** — at the artifact level, in real time.
 
+Every institutional decision flows through three primitives:
 
-## What is Σ OVERWATCH?
-**Σ OVERWATCH makes agentic automation production-safe.**  
-It wraps any agent stack and enforces **Decision Timing Envelopes (DTE)**: deadlines, stage budgets, TTL freshness gates, degrade ladders, safe action contracts (idempotency/rollback), mandatory verification, and **sealed DecisionEpisodes** for audit and drift→patch learning.
+| Primitive | Purpose | Artifact |
+|-----------|---------|----------|
+| **Truth** | What do we know right now? | **Decision Ledger Record (DLR)** — immutable log of every decision, claim, and evidence link |
+| **Reasoning** | Why did we choose this? | **Reasoning Scaffold (RS)** — structured argument map with weighted claims and counter-claims |
+| **Memory** | What did we learn? | **Decision Scaffold (DS)** + **Memory Graph (MG)** — reusable templates and organizational knowledge |
 
+When reality changes, **Drift** is detected automatically.
+When drift exceeds tolerance, a **Patch** is proposed, reviewed, and sealed.
+This is the **Drift → Patch loop** — the heartbeat of institutional self-correction.
 
+---
 
+## Quickstart: Clone → Run Demo → Understand (< 3 min)
 
-> We don’t sell agents. We sell the ability to trust agents.
-
-
-
-
-## Why it exists
-Agentic AI is hot. Production success is not.  
-Most failures aren’t “model errors” — they’re **late decisions**, **stale context**, **tail-latency spikes**, and **unsafe actions** shipped without rollback + verification.
-
-
-
-
-## The simple model (AL6)
-Agentic reliability is 6 dimensions:
-1) **Deadline** (decision window ms)
-2) **Distance** (hops/fan-out)
-3) **Data Freshness** (TTL/snapshot age)
-4) **Variability** (P95/P99 + jitter)
-5) **Drag** (queue/lock/IO contention)
-6) **Degrade** (fallback/bypass/abstain)
-
-
-
-
-## Contracts
-- **DTE** (`/specs/dte.schema.json`) — deadlines + budgets + TTL + degrade ladder  
-- **Action Contract** (`/specs/action_contract.schema.json`) — blast radius + idempotency + rollback + auth mode  
-- **DecisionEpisode** (`/specs/episode.schema.json`) — sealed truth→reasoning→action→verify→outcome  
-- **Drift** (`/specs/drift.schema.json`) — time/freshness/fallback/bypass/verify/outcome drift → patch hints  
-
-
-
-
-## Quickstart
-See `/examples/demo-stack/` for a 3-minute demo (scaffolded):
-- ✅ meets deadline + TTL → act → verify → seal
-- ❌ stale feature → degrade → abstain → drift
-- ❌ tool spike → circuit breaker → fallback → drift
-- ❌ unsafe action → blocked (no idempotency/rollback) → drift
-
-
-## Dashboard
-
-
-Interactive monitoring dashboard with real-time visualizations. **Zero-install demo** — just open in your browser:
-
-
-➡ [`dashboard/demo.html`](./dashboard/demo.html)
-
-
-Features: dark/light theme, system health gauge, radar charts, searchable tables, keyboard shortcuts (`1-5` views, `R` refresh, `T` theme), toast alerts, JSON/CSV export.
-
-
-Full React build version: see [`/dashboard`](./dashboard/) with `npm install && npm run dev`.
-
-
-## OpenClaw integration (scaffold)
-See `/adapters/openclaw/` for the planned adapter: **Skill Runner → Action Contract → Verify → Seal**.
-
-
-
-
-
-
-
-
-## MCP transport (scaffold)
-See `/adapters/mcp/` for a minimal MCP JSON-RPC stdio server scaffold exposing Overwatch primitives as MCP tools.
-
-
-
-
-
-
-
-
-## Coherence Ops integration
-
-See `docs/10-coherence-ops-integration.md` for how RAL/Σ OVERWATCH maps to DLR/RS/DS/MG and the LLM Data Model.
-
-## LLM Data Model
-
-The `llm_data_model/` directory contains the canonical data model for LLM-powered agentic systems. It defines record types (DecisionEpisode, DriftEvent, RepairProposal, CoherenceReport, MetricRecord), a field dictionary, JSON Schema validation, and worked examples. See [`llm_data_model/README.md`](./llm_data_model/README.md) for the full specification.
-
-## Mermaid Diagrams
-
-The `mermaid/` directory contains 28 Mermaid diagrams providing visual documentation of system architecture, data flows, and operational concepts. Categories include Overwatch Core, Coherence Ops, LLM Data Model, and RDF Semantic Layer. See [`mermaid/README.md`](./mermaid/README.md) for the full catalogue.
-
-## Unified Atomic Claims (v0.2.0)
-
-The Claim Primitive is the universal atomic unit of truth in Deep Sigma. Every assertion — from sensor readings to strategic conclusions — is modelled as an **AtomicClaim** with statement, evidence chain, confidence score, half-life, and cryptographic seal.
-
-- **Spec**: `specs/claim.schema.json` — JSON Schema (Draft 2020-12)
-- **DLR Integration**: `specs/dlr.schema.json` — claim-native Decision Lineage Records
-- **RDF**: `rdf/ontology/claim_primitive.ttl` — OWL ontology + SHACL shapes + SPARQL queries
-- **Python**: `coherence_ops/` — `ClaimNativeDLRBuilder`, `MemoryGraph.add_claim()`, `IRISEngine`
-- **Docs**: `docs/19-claim-primitive.md`, `docs/20-dlr-claim-native.md`
-
-See the [wiki page](wiki/Unified-Atomic-Claims.md) for the full design rationale.
-
-## Repo Structure
-
-| Directory | Description |
-|-----------|-------------|
-| `adapters/` | Integration adapters — OpenClaw, MCP JSON-RPC, OpenTelemetry hooks |
-| `coherence_ops/` | Coherence scoring, audit, reconciliation CLI and library (DLR/RS/DS/MG) — now claim-native (v0.2.0) |
-| `dashboard/` | Interactive monitoring dashboard — React + zero-install `demo.html` |
-| `docs/` | Architecture docs, integration guides, schema references |
-| `engine/` | Core engine — degrade ladder, supervisor scaffold, policy stamping |
-| `examples/` | Demo stack and quickstart scripts |
-| `llm_data_model/` | Canonical LLM data model — record types, schemas, field dictionary, validation |
-| `mermaid/` | 28 Mermaid diagrams — architecture, data flow, and operational visuals |
-| `policy_packs/` | Versioned policy enforcement bundles |
-| `rdf/` | RDF semantic layer — OWL ontology, SHACL shapes, SPARQL queries |
-| `specs/` | JSON Schema contracts — DTE, Action, Episode, Drift, Claim, DLR, Canon, Retcon |
-| `tests/` | Unit and integration tests |
-| `tools/` | CLI tools — supervised runner, replay harness |
-| `verifiers/` | Verification library — read-after-write, invariant checks |
-
-## New in vNext (Scaffold Features)
-- **Policy Packs**: versioned enforcement bundles (`/policy_packs/`)
-- **Degrade Ladder Engine**: executable degrade selection (`/engine/degrade_ladder.py`)
-- **Verifier library**: read-after-write + invariants (`/verifiers/`)
-- **Replay harness**: deterministic replay scaffolding (`/tools/replay_episode.py`)
-- **OpenTelemetry hooks**: exporter placeholder (`/adapters/otel/`)
-
-Docs:
-- `docs/11-policy-packs.md`
-- `docs/12-degrade-ladder.md`
-- `docs/13-verifiers.md`
-- `docs/14-replay.md`
-- `docs/15-otel.md`
-
-
-### Policy stamping (vNext)
-Sealed episodes now record `policyPackId/version/hash` and the chosen `degrade.step` + rationale.
-
-
-## 60-second demo (one command)
 ```bash
-# Ensure project root is on PYTHONPATH
-PYTHONPATH=. python tools/run_supervised.py \
-  --decisionType AccountQuarantine \
-  --policy policy_packs/packs/demo_policy_pack_v1.json \
-  --telemetry endToEndMs=95 p99Ms=160 jitterMs=70 \
-  --context ttlBreachesCount=0 maxFeatureAgeMs=180 \
-  --verification pass \
-  --out episodes_out
+git clone https://github.com/8ryanWh1t3/DeepSigma.git
+cd DeepSigma
+
+# 1. Read the category declaration
+cat category/declaration.md
+
+# 2. Walk the end-to-end demo
+cat examples/demo_walkthrough.md
+
+# 3. Inspect a sample sealed episode
+cat examples/sample_decision_episode_001.json | python -m json.tool
 ```
-See `docs/16-run-supervised.md`.
+
+**That's it.** You now understand Truth · Reasoning · Memory, and you've seen the Drift → Patch loop in action.
+
+---
+
+## The Four Core Artifacts
+
+### 1. Decision Ledger Record (DLR)
+The immutable audit log. Every decision gets a DLR that captures: who decided, what evidence was available, what claims were made, what outcome was chosen, and when it was sealed.
+
+→ [Full Spec](canonical/dlr_spec.md) · [JSON Schema](specs/dlr.schema.json)
+
+### 2. Reasoning Scaffold (RS)
+The argument map. Before a decision is sealed, the RS lays out every claim, counter-claim, evidence link, and confidence weight — so reviewers can audit *why*, not just *what*.
+
+→ [Full Spec](canonical/rs_spec.md) · [JSON Schema](specs/reasoning_scaffold.schema.json)
+
+### 3. Decision Scaffold (DS)
+The reusable template. Once a decision pattern works, the DS extracts it into a repeatable framework — like an Office template for institutional judgment.
+
+→ [Full Spec](canonical/ds_spec.md) · [JSON Schema](specs/decision_scaffold.schema.json)
+
+### 4. Memory Graph (MG)
+The organizational brain. Every sealed episode feeds back into the MG, creating a living knowledge graph of what the institution has decided, learned, and corrected.
+
+→ [Full Spec](canonical/mg_spec.md)
+
+---
+
+## The Drift → Patch Loop
+
+```
+  ┌─────────────────────────────────────────────┐
+  │                                             │
+  │   DECIDE ──→ SEAL ──→ MONITOR              │
+  │     │                    │                  │
+  │     │              drift detected?          │
+  │     │                    │                  │
+  │     │              yes ──┤──→ PATCH         │
+  │     │                    │      │           │
+  │     │                    │    review        │
+  │     │                    │      │           │
+  │     │                    │    seal          │
+  │     │                    │      │           │
+  │     └────── MEMORY ←────┘──────┘           │
+  │                                             │
+  └─────────────────────────────────────────────┘
+```
+
+1. **Decide** — Populate a DLR + RS with claims, evidence, and a chosen outcome.
+2. **Seal** — Lock the episode with a cryptographic hash; it becomes immutable.
+3. **Monitor** — Runtime checks compare current state to sealed assumptions.
+4. **Drift** — When assumptions no longer hold, a drift event fires.
+5. **Patch** — A new DLR is proposed to correct the drift, referencing the original.
+6. **Memory** — The sealed correction feeds back into the Memory Graph.
+
+→ [Drift-Patch Workflow](runtime/drift_patch_workflow.md) · [Sealing Protocol](runtime/sealing_protocol.md)
+
+---
+
+## Architecture
+
+```
+DeepSigma/
+├── category/           # What category this creates and why
+│   ├── declaration.md  # The category manifesto
+│   └── positioning.md  # Competitive positioning & differentiation
+├── canonical/          # The doctrine — normative specs for all artifacts
+│   ├── prime_constitution.md
+│   ├── dlr_spec.md
+│   ├── rs_spec.md
+│   ├── ds_spec.md
+│   ├── mg_spec.md
+│   └── unified_atomic_claims_spec.md
+├── ontology/           # Conceptual model — triad, relationships, drift model
+│   ├── triad.md
+│   ├── artifact_relationships.md
+│   └── drift_patch_model.md
+├── runtime/            # Operational runbooks — how to execute the loop
+│   ├── drift_patch_workflow.md
+│   ├── sealing_protocol.md
+│   └── encode_episode.md
+├── metrics/            # Coherence SLOs and measurement
+│   └── coherence_slos.md
+├── roadmap/            # Quarterly milestones
+│   └── README.md
+├── examples/           # Working demos and sample data
+│   ├── demo_walkthrough.md
+│   └── sample_decision_episode_001.json
+├── specs/              # JSON schemas for all artifacts
+├── coherence_ops/      # Python library (DLR, RS, DS, MG)
+├── docs/               # Extended documentation
+└── wiki/               # Detailed reference pages
+```
+
+---
+
+## Naming Guide
+
+| Term | Abbreviation | Definition |
+|------|-------------|------------|
+| Decision Ledger Record | DLR | Immutable decision audit log |
+| Reasoning Scaffold | RS | Structured argument map |
+| Decision Scaffold | DS | Reusable decision template |
+| Memory Graph | MG | Organizational knowledge graph |
+| Truth · Reasoning · Memory | Triad | The three primitives |
+| Drift | — | When sealed assumptions no longer hold |
+| Patch | — | A corrective DLR that references the drifted original |
+| Sealed Episode | — | An immutable, hashed decision record |
+| Coherence SLO | — | Service-level objective for decision quality |
+
+---
+
+## Who This Is For
+
+- **Compliance officers** who need auditable decision trails
+- **AI/ML teams** who need reproducible reasoning chains
+- **Enterprise architects** who need a decision control plane
+- **Risk managers** who need drift detection before failures compound
+- **Anyone** who has said: "Why did we decide that, and would we decide it the same way today?"
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. All contributions must maintain consistency with the Truth · Reasoning · Memory triad and the four canonical artifact types.
+
+## License
+
+See [LICENSE](LICENSE) for details.
+
+---
+
+<p align="center">
+  <strong>Σ OVERWATCH</strong><br/>
+  We don't sell agents. We sell the ability to trust them.
+</p>
