@@ -1,3 +1,10 @@
+---
+title: "Navigation Index"
+version: "1.0.0"
+status: "Living Document"
+last_updated: "2026-02-16"
+---
+
 # 🗺️ Navigation Index
 
 > **What:** Complete map of every directory and key file in the repo.
