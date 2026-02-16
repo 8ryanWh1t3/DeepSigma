@@ -5,6 +5,18 @@ All notable changes to Σ OVERWATCH / DeepSigma will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] — 2026-02-17
+
+### Fixed
+
+- claim.schema.json: Removed Draft 4 exclusiveMinimum: false for Draft 2020-12 compatibility
+- prime.py: Wired contested_claim_policy: "escalate" through to ESCALATE verdict
+- test_schema_claim.py: Corrected claimId → claimIds assertion for canon schema
+
+### Changed
+
+- Added GitHub repository topics for discoverability
+
 ## [0.3.0] — 2026-02-16 — "Living Memory"
 
 ### Added — Money Demo (Drift → Patch in One Command)
