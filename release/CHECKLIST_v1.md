@@ -1,3 +1,10 @@
+---
+title: "Release Readiness Checklist — v1"
+version: "1.0.0"
+status: "Living Document"
+last_updated: "2026-02-16"
+---
+
 # Release Readiness Checklist — v1
 
 > **What:** Gate-check before any tagged release.
