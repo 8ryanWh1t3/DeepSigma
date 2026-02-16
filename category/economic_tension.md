@@ -1,3 +1,10 @@
+---
+title: "Economic Tension — What Breaks Without Coherence Ops"
+version: "1.0.0"
+status: "Canonical"
+last_updated: "2026-02-16"
+---
+
 # What Breaks Without Coherence Ops
 
 > Every institution makes decisions. Almost none can prove what was decided, why, or whether the reasoning still holds. This is not a documentation problem. It is a structural failure mode that compounds with every decision made.
