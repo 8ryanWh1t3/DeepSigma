@@ -1,3 +1,10 @@
+---
+title: "Boardroom Brief — Institutional Decision Infrastructure"
+version: "1.0.0"
+status: "Canonical"
+last_updated: "2026-02-16"
+---
+
 # Boardroom Brief: Institutional Decision Infrastructure
 
 *Reading time: 2 minutes. No diagrams. No jargon.*
