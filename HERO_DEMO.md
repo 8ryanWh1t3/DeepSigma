@@ -1,3 +1,10 @@
+---
+title: "Hero Demo — Decision → Seal → Drift → Patch → Memory"
+version: "1.0.0"
+status: "Canonical"
+last_updated: "2026-02-16"
+---
+
 # 🔁 Hero Demo: Decision → Seal → Drift → Patch → Memory
 
 **What:** Walk the complete Drift → Patch loop using real repo artifacts in under 5 minutes.
