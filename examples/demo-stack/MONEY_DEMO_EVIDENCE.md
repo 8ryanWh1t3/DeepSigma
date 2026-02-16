@@ -1,10 +1,17 @@
+---
+title: "Money Demo Evidence — v0.3 Drift → Patch Cycle"
+version: "0.3.0"
+status: "Release Evidence"
+last_updated: "2026-02-16"
+---
+
 # Money Demo Evidence — v0.3 Drift → Patch Cycle
 
-**Date:** 2026-02-16
-**Script:** `coherence_ops/examples/drift_patch_cycle.py`
-**Test:** `tests/test_money_demo.py`
-
----
+| Field | Value |
+|-------|-------|
+| Date | 2026-02-16 |
+| Script | `coherence_ops/examples/drift_patch_cycle.py` |
+| Test | `tests/test_money_demo.py` |
 
 ## Command
 
@@ -12,17 +19,27 @@
 python -m coherence_ops.examples.drift_patch_cycle
 ```
 
-## Console Output (Expected)
+## Console Output (Deterministic)
 
 ```
-BASELINE  XX.XX (A)
-DRIFT     XX.XX (C)   red=1
-PATCH     XX.XX (A)   patch=RETCON  drift_resolved=true
+BASELINE  90.00 (A)
+DRIFT    85.75 (B) red=1
+PATCH    90.00 (A) patch=RETCON drift_resolved=true
 Artifacts: examples/demo-stack/drift_patch_cycle_run/
 ✅ All contract checks passed.
 ```
 
-Exact scores depend on the sample episode data and the four scoring dimensions (policy_adherence, outcome_health, drift_control, memory_completeness). The contract guarantees:
+**Score derivation (4 dimensions, deterministic from 3 sample episodes):**
+
+| Dimension | Weight | Baseline | Drift | After |
+|-----------|--------|----------|-------|-------|
+| policy_adherence | 0.25 | 100.00 | 100.00 | 100.00 |
+| outcome_health | 0.30 | 66.67 | 66.67 | 66.67 |
+| drift_control | 0.25 | 100.00 | 83.00 | 100.00 |
+| memory_completeness | 0.20 | 100.00 | 100.00 | 100.00 |
+| **overall** | | **90.00 (A)** | **85.75 (B)** | **90.00 (A)** |
+
+The contract guarantees:
 
 - DRIFT score is strictly less than BASELINE score (drift_control penalty for 1 red signal)
 - PATCH score is strictly greater than DRIFT score (drift signal resolved)
@@ -53,13 +70,13 @@ The `memory_graph_diff.json` file contains:
   "removed_nodes": [],
   "added_edges": [
     ["drift-cycle-001", "resolved_by", "patch-cycle-001"],
-    ["<episode-id>", "triggered", "drift-cycle-001"]
+    ["ep-demo-001", "triggered", "drift-cycle-001"]
   ],
   "removed_edges": [],
   "notes": {
-    "baseline_score": "<XX.XX>",
-    "drift_score": "<XX.XX>",
-    "after_score": "<XX.XX>"
+    "baseline_score": 90.0,
+    "drift_score": 85.75,
+    "after_score": 90.0
   }
 }
 ```
@@ -69,14 +86,14 @@ Key evidence:
 - **Patch node added:** `patch-cycle-001` (NodeKind.PATCH)
 - **Drift node added:** `drift-cycle-001` (NodeKind.DRIFT)
 - **resolved_by edge:** `[drift-cycle-001, "resolved_by", patch-cycle-001]` (EdgeKind.RESOLVED_BY)
-- **triggered edge:** `[<episode-id>, "triggered", drift-cycle-001]` (EdgeKind.TRIGGERED)
+- **triggered edge:** `[ep-demo-001, "triggered", drift-cycle-001]` (EdgeKind.TRIGGERED)
 
 ## Contract Checks
 
 The script runs three internal assertions before printing the final status:
 
 1. **Artifacts present** — all 8 files exist and are non-empty
-2. **Score monotonicity** — drift_score < baseline_score AND after_score > drift_score
+2. **Score monotonicity** — `drift_score < baseline_score` AND `after_score > drift_score`
 3. **Diff integrity** — patch node ID in added_nodes, resolved_by edge in added_edges
 
 If any check fails, the script exits with code 1 and prints a diagnostic.
@@ -97,7 +114,8 @@ The smoke test (`tests/test_money_demo.py`) runs the demo end-to-end and verifie
 
 ## CI Gate
 
-The Money Demo contract test runs in CI on every push to main and every pull request. See `.github/workflows/ci.yml`, step "Run Money Demo contract test".
+The Money Demo contract test runs in CI on every push to `main` and every pull request.
+See `.github/workflows/ci.yml`, step "Run Money Demo contract test".
 
 ---
 
