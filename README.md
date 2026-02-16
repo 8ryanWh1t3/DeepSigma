@@ -61,6 +61,13 @@ python -m coherence_ops.examples.e2e_seal_to_report
 python -m coherence_ops iris query --type WHY --target ep-001
 ```
 
+**Drift → Patch in 60 seconds** (v0.3.0):
+
+```bash
+python -m coherence_ops.examples.drift_patch_cycle
+# BASELINE 90.00 (A) → DRIFT 85.75 (B) → PATCH 90.00 (A)
+```
+
 👉 Full walkthrough: [HERO_DEMO.md](HERO_DEMO.md) — 8 steps, every artifact touched.
 
 ---
