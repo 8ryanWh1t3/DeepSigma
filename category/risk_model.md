@@ -1,3 +1,10 @@
+---
+title: "Risk Model — Decision Entropy and Drift Economics"
+version: "1.0.0"
+status: "Canonical"
+last_updated: "2026-02-16"
+---
+
 # Risk Model: Decision Entropy and Drift Economics
 
 **What:** A conceptual model for how institutional decision quality decays over time.
