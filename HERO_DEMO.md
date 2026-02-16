@@ -209,6 +209,25 @@ You walked the complete Drift → Patch loop:
 | 7 | Memory | MG export | `python -m coherence_ops mg export ...` |
 | 8 | Ship-it | Score + IRIS | `python -m coherence_ops demo ...` |
 
+## Run the Money Demo
+
+One command proves the full Drift → Patch loop with observable score changes:
+
+```bash
+python -m coherence_ops.examples.drift_patch_cycle
+```
+
+**Expected output:**
+
+```
+BASELINE  XX.XX (A)
+DRIFT     XX.XX (C)   red=1
+PATCH     XX.XX (B)   patch=RETCON  drift_resolved=true
+Artifacts: examples/demo-stack/drift_patch_cycle_run/
+```
+
+Artifacts are written to [`examples/demo-stack/drift_patch_cycle_run/`](examples/demo-stack/drift_patch_cycle_run/) including three coherence reports, three memory graph snapshots, a diff, and a Mermaid diagram (`loop.mmd`).
+
 ---
 
 ## Where to Go Next
