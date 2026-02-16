@@ -78,8 +78,8 @@ class TestCanonSchema(unittest.TestCase):
         self.assertIn("properties", self.schema)
 
     def test_has_claim_id(self):
-        """Canon schema must reference claimId."""
-        self.assertIn("claimId", self.schema.get("properties", {}))
+        """Canon schema must reference claimIds."""
+        self.assertIn("claimIds", self.schema.get("properties", {}))
 
 
 class TestRetconSchema(unittest.TestCase):
