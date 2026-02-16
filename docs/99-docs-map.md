@@ -1,3 +1,10 @@
+---
+title: "Docs De-Duplication Map"
+version: "1.0.0"
+status: "Living Document"
+last_updated: "2026-02-16"
+---
+
 # Docs De-Duplication Map
 
 > **What:** A routing table that tells you where to find every topic — and flags where content overlaps.
