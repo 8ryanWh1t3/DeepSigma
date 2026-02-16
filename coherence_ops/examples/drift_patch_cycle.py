@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""v0.3 Money Demo — Drift → Patch Cycle.
+"""v0.3 Money Demo — Drift → Patch Cycle (Hardened).
 
 One command runs a visible, repeatable loop:
   Decision → Seal → Drift → Patch → Memory diff → Coherence improves
@@ -7,18 +7,30 @@ One command runs a visible, repeatable loop:
 Usage:
     python -m coherence_ops.examples.drift_patch_cycle
 
-Produces deterministic artifacts in:
+Re-run behaviour:
+    Deterministic overwrite — artifacts are written to a fixed output
+    directory and overwritten on every run.  The NOW constant pins all
+    timestamps so output is byte-identical across runs.
+
+Artifacts produced in:
     examples/demo-stack/drift_patch_cycle_run/
+        report_baseline.json
+        report_drift.json
+        report_after.json
+        memory_graph_before.json
+        memory_graph_drift.json
+        memory_graph_after.json
+        memory_graph_diff.json
+        loop.mmd
 """
 
 from __future__ import annotations
 
 import json
-import os
 import sys
 from dataclasses import asdict
-from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any, Dict, List
 
 # ---------------------------------------------------------------------------
 # Ensure the repo root is on sys.path so `coherence_ops` is importable
@@ -40,10 +52,26 @@ from coherence_ops.scoring import CoherenceReport  # noqa: E402
 
 
 # ===================================================================
-# Constants
+# Constants (pinned for determinism)
 # ===================================================================
 OUTPUT_DIR = _REPO_ROOT / "examples" / "demo-stack" / "drift_patch_cycle_run"
 NOW = "2026-02-16T15:00:00Z"
+
+# Deterministic IDs
+DRIFT_ID = "drift-cycle-001"
+PATCH_ID = "patch-cycle-001"
+
+# Required artifact filenames
+REQUIRED_ARTIFACTS: List[str] = [
+    "report_baseline.json",
+    "report_drift.json",
+    "report_after.json",
+    "memory_graph_before.json",
+    "memory_graph_drift.json",
+    "memory_graph_after.json",
+    "memory_graph_diff.json",
+    "loop.mmd",
+]
 
 
 # ===================================================================
@@ -157,11 +185,79 @@ def _compute_diff(before: dict, after: dict,
     }
 
 
-def _write(path: Path, data: dict) -> None:
-    """Write JSON to disk."""
+def _write(path: Path, data: Any) -> None:
+    """Write JSON (or plain text for .mmd) to disk."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, indent=2, default=str) + "\n",
-                    encoding="utf-8")
+    if isinstance(data, str):
+        path.write_text(data, encoding="utf-8")
+    else:
+        path.write_text(json.dumps(data, indent=2, default=str) + "\n",
+                        encoding="utf-8")
+
+
+def _build_mermaid(ep_id: str) -> str:
+    """Generate a Mermaid flowchart for the Drift → Patch loop."""
+    return f"""flowchart LR
+    EP["{ep_id}\nSealed Episode"] --> DRIFT["{DRIFT_ID}\nbypass / red"]
+    DRIFT -->|resolved_by| PATCH["{PATCH_ID}\nRETCON"]
+    PATCH --> MG["Memory Graph\nUpdated"]
+    MG --> SCORE["Coherence Score\nImproved"]
+"""
+
+
+# ===================================================================
+# Contract assertions (soft-fail with clear messages)
+# ===================================================================
+
+class ContractViolation(Exception):
+    """Raised when a Money Demo contract is violated."""
+
+
+def _assert_artifacts_written(out_dir: Path) -> List[str]:
+    """Verify all required artifact files exist. Returns list of issues."""
+    issues: List[str] = []
+    for name in REQUIRED_ARTIFACTS:
+        p = out_dir / name
+        if not p.exists():
+            issues.append(f"MISSING artifact: {p.relative_to(_REPO_ROOT)}")
+        elif p.stat().st_size == 0:
+            issues.append(f"EMPTY artifact: {p.relative_to(_REPO_ROOT)}")
+    return issues
+
+
+def _assert_score_integrity(baseline: float, drift: float, after: float) -> List[str]:
+    """Verify score monotonicity: baseline > drift and after > drift."""
+    issues: List[str] = []
+    if not (drift < baseline):
+        issues.append(
+            f"SCORE CONTRACT: drift ({drift:.2f}) must be < baseline ({baseline:.2f})")
+    if not (after > drift):
+        issues.append(
+            f"SCORE CONTRACT: after ({after:.2f}) must be > drift ({drift:.2f})")
+    return issues
+
+
+def _assert_diff_integrity(diff: dict) -> List[str]:
+    """Verify memory_graph_diff contains patch node and resolved_by edge."""
+    issues: List[str] = []
+    added_nodes = diff.get("added_nodes", [])
+    added_edges = diff.get("added_edges", [])
+
+    if PATCH_ID not in added_nodes:
+        issues.append(f"DIFF CONTRACT: patch node '{PATCH_ID}' not in added_nodes")
+    if DRIFT_ID not in added_nodes:
+        issues.append(f"DIFF CONTRACT: drift node '{DRIFT_ID}' not in added_nodes")
+
+    resolved_edges = [e for e in added_edges if len(e) >= 3 and e[1] == "resolved_by"]
+    if not resolved_edges:
+        issues.append("DIFF CONTRACT: no resolved_by edge found in added_edges")
+    else:
+        expected = [DRIFT_ID, "resolved_by", PATCH_ID]
+        if expected not in added_edges:
+            issues.append(
+                f"DIFF CONTRACT: expected edge {expected}, got {resolved_edges}")
+
+    return issues
 
 
 # ===================================================================
@@ -170,7 +266,7 @@ def _write(path: Path, data: dict) -> None:
 
 def main() -> None:
     episodes = _load_episodes()
-    # Use the first episode's ID for the drift/patch cycle
+    # Use the first episode’s ID for the drift/patch cycle
     ep_id = episodes[0].get("episodeId", "ep-demo-001")
 
     # ----- 0) BASELINE (sealed, no drift) -----
@@ -184,7 +280,7 @@ def main() -> None:
 
     # ----- 1) DRIFT (inject a real drift signal) -----
     drift_event = {
-        "driftId": "drift-cycle-001",
+        "driftId": DRIFT_ID,
         "episodeId": ep_id,
         "driftType": "bypass",
         "severity": "red",
@@ -203,8 +299,8 @@ def main() -> None:
 
     # ----- 2) PATCH (apply patch + resolve drift) -----
     patch_record = {
-        "patchId": "patch-cycle-001",
-        "driftId": "drift-cycle-001",
+        "patchId": PATCH_ID,
+        "driftId": DRIFT_ID,
         "patchType": "RETCON",
         "appliedAt": NOW,
         "description": "Retcon: bypass gate drift resolved by re-evaluation",
@@ -217,7 +313,7 @@ def main() -> None:
     report_after, _, _, _, mg_after = _run_pipeline(
         episodes, drift_events=[], session_id="rs-patched"
     )
-    # Apply patch to the MG so the diff shows the patch node + resolved_by edge
+    # Apply drift + patch to the MG so the diff shows the nodes + edges
     mg_after.add_drift(drift_event)
     mg_after.add_patch(patch_record)
     mg_after_snap = _mg_snapshot(mg_after)
@@ -231,6 +327,9 @@ def main() -> None:
         baseline_score, drift_score, after_score,
     )
 
+    # ----- Build Mermaid diagram -----
+    mermaid = _build_mermaid(ep_id)
+
     # ----- Write Artifacts -----
     _write(OUTPUT_DIR / "report_baseline.json", _report_to_dict(report_base))
     _write(OUTPUT_DIR / "report_drift.json", _report_to_dict(report_drift))
@@ -239,6 +338,13 @@ def main() -> None:
     _write(OUTPUT_DIR / "memory_graph_drift.json", mg_drift_snap)
     _write(OUTPUT_DIR / "memory_graph_after.json", mg_after_snap)
     _write(OUTPUT_DIR / "memory_graph_diff.json", diff)
+    _write(OUTPUT_DIR / "loop.mmd", mermaid)
+
+    # ----- Contract Checks (soft-fail) -----
+    all_issues: List[str] = []
+    all_issues.extend(_assert_artifacts_written(OUTPUT_DIR))
+    all_issues.extend(_assert_score_integrity(baseline_score, drift_score, after_score))
+    all_issues.extend(_assert_diff_integrity(diff))
 
     # ----- Console Output (cinematic) -----
     red_count = sum(
@@ -251,6 +357,15 @@ def main() -> None:
         f"   patch=RETCON  drift_resolved=true"
     )
     print(f"Artifacts: {OUTPUT_DIR.relative_to(_REPO_ROOT)}/")
+
+    if all_issues:
+        print()
+        print("\u26a0\ufe0f  Contract issues detected:")
+        for issue in all_issues:
+            print(f"  - {issue}")
+        sys.exit(1)
+    else:
+        print("\u2705 All contract checks passed.")
 
 
 if __name__ == "__main__":
