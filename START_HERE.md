@@ -1,3 +1,10 @@
+---
+title: "Start Here — Institutional Decision Infrastructure"
+version: "1.0.0"
+status: "Canonical"
+last_updated: "2026-02-16"
+---
+
 # Σ OVERWATCH — Start Here
 
 **What:** Institutional Decision Infrastructure — the control plane that makes every institutional decision auditable, reproducible, and self-correcting.
