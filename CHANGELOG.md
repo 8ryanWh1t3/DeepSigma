@@ -5,6 +5,32 @@ All notable changes to Σ OVERWATCH / DeepSigma will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] — 2026-02-16 — "Living Memory"
+
+### Added — Money Demo (Drift → Patch in One Command)
+
+- **Money Demo script** (`coherence_ops/examples/drift_patch_cycle.py`): One-command Drift → Patch loop producing 8 deterministic artifacts (3 reports, 3 MG snapshots, diff, Mermaid diagram)
+- **CI contract gate**: Money Demo smoke test runs on every push to `main` and every PR (`.github/workflows/ci.yml`)
+- **Coherence SLO definitions**: 8 enforceable SLOs aligned to Money Demo outputs (`metrics/coherence_slos.md`)
+- **Smoke test suite**: 16 pytest tests covering artifacts, score monotonicity, diff integrity, and Mermaid output (`tests/test_money_demo.py`)
+- **Evidence file**: `examples/demo-stack/MONEY_DEMO_EVIDENCE.md` with deterministic scores, artifact manifest, and contract checks
+- **Issue #8 closeout**: `docs/issue_closeouts/issue_8_demo_loop.md`
+
+### Changed
+
+- `HERO_DEMO.md` — Added "Run the Money Demo" section with deterministic score output
+- `metrics/coherence_slos.md` — Updated to v1.1.0 with Money Demo SLOs
+- `coherence_ops/__init__.py` — Version bump to 0.3.0
+- `pyproject.toml` — Version bump to 0.3.0
+
+### Scores (Deterministic)
+
+| State | Score | Grade |
+|-------|-------|-------|
+| Baseline | 90.00 | A |
+| Drift | 85.75 | B |
+| After Patch | 90.00 | A |
+
 ## [0.2.0] — 2026-02-15
 
 ### Added — Unified Atomic Claims
