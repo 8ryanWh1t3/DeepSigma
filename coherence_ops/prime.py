@@ -185,9 +185,9 @@ class PRIMEGate:
 
         if context.truth.is_contested:
             if self.config.contested_claim_policy == "escalate":
-                escalation_factors.append("contested_claim: active disconfirmers present")
+                escalation_factors.append("contested_claim_escalate: active disconfirmers present")
             elif self.config.contested_claim_policy == "defer":
-                escalation_factors.append("contested_claim: deferred for review")
+                escalation_factors.append("contested_claim_defer: deferred for review")
 
         if self.config.require_seal and not context.memory.seal_id:
             escalation_factors.append("missing_seal: memory seal required but absent")
