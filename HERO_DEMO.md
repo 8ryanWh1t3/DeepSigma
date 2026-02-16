@@ -1,33 +1,30 @@
 # 🔁 Hero Demo: Decision → Seal → Drift → Patch → Memory
 
-> **What:** Walk the complete Drift → Patch loop using real repo artifacts in under 5 minutes.
->
-> **So What:** After this walkthrough you will understand how Institutional Decision Infrastructure works at the artifact level — not just the theory.
-
+**What:** Walk the complete Drift → Patch loop using real repo artifacts in under 5 minutes.
+**So What:** After this walkthrough you understand how Institutional Decision Infrastructure works at the artifact level — not theory.
 
 ---
 
 ## Why This Demo Matters
 
-Without sealing and drift detection, the exact scenario you are about to walk through would play out like this:
+Without sealing and drift detection, this exact scenario plays out:
 
-A deployment decision is made. The reasoning is discussed in a meeting, partially captured in a ticket, and approved via Slack emoji. Six months later, the infrastructure assumptions behind that decision have changed — but nobody knows, because nobody is monitoring sealed assumptions against current state.
+1. A deployment decision is made. Reasoning lives in a meeting, a ticket, and a Slack emoji.
+2. Six months later, the infrastructure assumptions behind that decision have changed — nobody knows.
+3. Drift compounds silently. Downstream decisions build on the stale assumption.
+4. When failure surfaces, the incident team traces backward and finds: gaps, missing reasoning, no provenance chain.
 
-The drift compounds silently. A downstream decision builds on the stale assumption. Then another. When the failure finally surfaces, the incident team traces backward through a chain of decisions and finds… gaps. Missing reasoning. Contradictory evidence. No provenance chain.
-
-**This demo shows you the alternative.** Every step you run — sealing, auditing, scoring, drift detection, IRIS queries — is a mechanism that prevents the scenario above. The difference between an organization that can answer "why did we do this?" and one that cannot is exactly the infrastructure you are about to see.
-
-**Prerequisites:** Python 3.10+, repo cloned (`git clone https://github.com/8ryanWh1t3/DeepSigma.git && cd DeepSigma`).
+Every step below — sealing, auditing, scoring, drift detection, IRIS queries — prevents this scenario. The difference between an organization that can answer "why did we do this?" and one that cannot is exactly the infrastructure you are about to see.
 
 ---
+
+**Prerequisites:** Python 3.10+, repo cloned (`git clone https://github.com/8ryanWh1t3/DeepSigma.git && cd DeepSigma`).
 
 ## Step 0: Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
-
----
 
 ## Step 1: Inspect a Sealed Episode (Truth)
 
@@ -47,28 +44,24 @@ Open the happy-path episode:
 python -m json.tool examples/episodes/01_success.json | head -40
 ```
 
-📖 **What you see:** A `DecisionEpisode` with a DTE (Decision Timing Envelope), outcome, verification results, and a seal hash. This is the **DLR** in action — the immutable audit log.
-
----
+📖 **What you see:** A DecisionEpisode with DTE (Decision Timing Envelope), outcome, verification results, and seal hash. This is the DLR in action — the immutable audit log.
 
 ## Step 2: Run a Coherence Audit (Reasoning)
-
-The CLI runs the full DLR → RS → DS → MG pipeline and scores coherence:
 
 ```bash
 python -m coherence_ops audit ./coherence_ops/examples/sample_episodes.json
 ```
 
-**Expected output (abbreviated):**
+Expected output:
 
 ```
 ━━━ Coherence Audit ━━━
 Manifest:  coherence_ops v0.2.0
 Episodes:  3 loaded
-DLR:       3 records built
-RS:        1 session, 3 episodes ingested
-DS:        drift signals collected
-MG:        3 episodes, edges linked
+DLR: 3 records built
+RS:  1 session, 3 episodes ingested
+DS:  drift signals collected
+MG:  3 episodes, edges linked
 
 Checks:
   ✓ DLR covers all episodes
@@ -79,9 +72,7 @@ Checks:
 Result: 3/4 checks passed
 ```
 
-🧠 **What you see:** The **Reasoning Scaffold** validates that every claim, counter-claim, and evidence link forms a coherent chain. The audit catches the unresolved red drift signal.
-
----
+🧠 **What you see:** The Reasoning Scaffold validates every claim, counter-claim, and evidence link. The audit catches the unresolved red drift signal.
 
 ## Step 3: Score Coherence (0–100)
 
@@ -89,7 +80,7 @@ Result: 3/4 checks passed
 python -m coherence_ops score ./coherence_ops/examples/sample_episodes.json --json
 ```
 
-**Expected output:**
+Expected output:
 
 ```json
 {
@@ -108,49 +99,38 @@ python -m coherence_ops score ./coherence_ops/examples/sample_episodes.json --js
 }
 ```
 
-📋 **What you see:** A quantified coherence score broken down by the four artifacts. The DS (Drift Signal) dimension drags the score down because there’s an unresolved drift.
-
----
+📋 **What you see:** Coherence quantified across four artifacts. DS dimension drags the score down because of unresolved drift.
 
 ## Step 4: Examine Drift Events (Drift Detection)
 
 ```bash
 ls examples/drift/
-# bypass_drift.json
-# freshness_drift.json
-# time_drift.json
-```
+# bypass_drift.json  freshness_drift.json  time_drift.json
 
-Inspect the red-severity drift:
-
-```bash
 python -m json.tool examples/drift/bypass_drift.json
 ```
 
-📋 **What you see:** A drift event with `severity: red`, a fingerprint, and a reference to the original sealed episode whose assumptions no longer hold. This is the **Drift** primitive firing.
-
----
+📋 **What you see:** A drift event with `severity: red`, a fingerprint, and a reference to the original sealed episode whose assumptions no longer hold. The Drift primitive firing.
 
 ## Step 5: Query with IRIS (Why Did This Happen?)
-
-IRIS is the operator query engine. Ask it why:
 
 ```bash
 python -m coherence_ops iris query --type WHY --target ep-001
 ```
 
-**Expected output (abbreviated):**
+Expected output:
 
 ```
 IRIS Response: WHY ep-001
 ────────────────────
-Summary: Episode ep-001 was a deployment decision governed by
-         policy-pack "standard-deploy". All verification gates passed.
+Summary: Episode ep-001 was a deployment decision governed
+         by policy-pack "standard-deploy".
+         All verification gates passed.
 
 Provenance chain:
-  [DLR]  dlr-001  (source)
-  [RS]   rs-001   (analysis)
-  [MG]   mg/ep-001 (memory)
+  [DLR] dlr-001 (source)
+  [RS]  rs-001  (analysis)
+  [MG]  mg/ep-001 (memory)
 ```
 
 Then check what drifted:
@@ -159,72 +139,57 @@ Then check what drifted:
 python -m coherence_ops iris query --type WHAT_DRIFTED --json
 ```
 
-🧠 **What you see:** The **Memory Graph** answers operator questions in sub-60 seconds by tracing provenance chains across DLR → RS → DS → MG.
-
----
+🧠 **What you see:** The Memory Graph answers operator questions in sub-60 seconds by tracing provenance chains across DLR → RS → DS → MG.
 
 ## Step 6: Run the End-to-End Pipeline (Full Loop)
-
-This script runs the complete pipeline: sealed episodes → DLR → RS → DS → MG → CoherenceReport:
 
 ```bash
 python -m coherence_ops.examples.e2e_seal_to_report
 ```
 
-**Expected output (abbreviated):**
+Expected output:
 
 ```
 === Example 1: Happy Path ===
-  Coherence: 92/100 (A)
-  DLR: 3 records | RS: 1 session | DS: 0 red signals | MG: 9 nodes
+Coherence: 92/100 (A)
+DLR: 3 records | RS: 1 session | DS: 0 red signals | MG: 9 nodes
 
 === Example 2: Mixed Path ===
-  Coherence: 68/100 (D)
-  Drift signals: 3  |  By severity: {green: 1, yellow: 2}
+Coherence: 68/100 (D)
+Drift signals: 3 | By severity: {green: 1, yellow: 2}
 
 === Example 3: Stress Path ===
-  Coherence: 41/100 (F)
-  Drift signals: 5  |  By severity: {green: 1, yellow: 2, red: 2}
-  Top drift fingerprint: bypass-gate (3 occurrences)
+Coherence: 41/100 (F)
+Drift signals: 5 | By severity: {green: 1, yellow: 2, red: 2}
+Top drift fingerprint: bypass-gate (3 occurrences)
 ```
 
-🔁 **What you see:** Three scenarios demonstrating how coherence scores degrade as drift accumulates — and how the system detects it automatically.
-
----
+🔁 **What you see:** Three scenarios showing how coherence degrades as drift accumulates — and how the system detects it automatically.
 
 ## Step 7: Export the Memory Graph
 
 ```bash
 python -m coherence_ops mg export ./coherence_ops/examples/ --format=json
+
+# Alternatives:
+# GraphML (Gephi / yEd):    --format=graphml
+# Neo4j CSV (graph DB):     --format=neo4j-csv
 ```
 
-This outputs the full provenance graph as JSON. Alternatives:
+📊 **What you see:** The Memory Graph exported as a portable graph — every episode, drift event, and patch connected by provenance edges.
 
-```bash
-# GraphML (for Gephi / yEd)
-python -m coherence_ops mg export ./coherence_ops/examples/ --format=graphml
-
-# Neo4j CSV (for graph database import)
-python -m coherence_ops mg export ./coherence_ops/examples/ --format=neo4j-csv
-```
-
-📊 **What you see:** The **Memory Graph** exported as a portable graph — every episode, drift event, and patch connected by provenance edges.
-
----
-
-## Step 8: Ship-It Demo (The One-Liner)
+## Step 8: Ship-It Demo (One-Liner)
 
 ```bash
 python -m coherence_ops demo ./coherence_ops/examples/sample_episodes.json
+# Use --json for machine-readable output
 ```
-
-This runs score + IRIS status in one command. Use `--json` for machine-readable output.
 
 ---
 
 ## What Just Happened
 
-You walked the complete **Drift → Patch loop**:
+You walked the complete Drift → Patch loop:
 
 | Step | Primitive | Artifact | CLI Command |
 |------|-----------|----------|-------------|
@@ -243,15 +208,15 @@ You walked the complete **Drift → Patch loop**:
 
 | Goal | Resource |
 |------|----------|
-| Understand the canonical specs | [`/canonical/`](canonical/) — DLR, RS, DS, MG specifications |
-| See the category claim | [`/category/declaration.md`](category/declaration.md) |
-| Deep-dive on IRIS | [`docs/18-iris.md`](docs/18-iris.md) |
-| Explore JSON schemas | [`/specs/`](specs/) |
-| Browse Mermaid diagrams | [`/mermaid/`](mermaid/) |
-| LLM-optimized data model | [`/llm_data_model/`](llm_data_model/) |
-| Full docs index | [`docs/99-docs-map.md`](docs/99-docs-map.md) |
-| Release checklist | [`release/CHECKLIST_v1.md`](release/CHECKLIST_v1.md) |
+| Canonical specs | [/canonical/](canonical/) — DLR, RS, DS, MG specifications |
+| Category claim | [/category/declaration.md](category/declaration.md) |
+| IRIS deep-dive | [docs/18-iris.md](docs/18-iris.md) |
+| JSON schemas | [/specs/](specs/) |
+| Mermaid diagrams | [/mermaid/](mermaid/) |
+| LLM-optimized data model | [/llm_data_model/](llm_data_model/) |
+| Full docs index | [docs/99-docs-map.md](docs/99-docs-map.md) |
+| Release checklist | [release/CHECKLIST_v1.md](release/CHECKLIST_v1.md) |
 
 ---
 
-<p align="center"><strong>Σ OVERWATCH</strong> — Every decision auditable. Every drift detected. Every correction sealed.</p>
+**Σ OVERWATCH** — *Every decision auditable. Every drift detected. Every correction sealed.*
