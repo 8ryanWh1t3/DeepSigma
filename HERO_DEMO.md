@@ -4,6 +4,19 @@
 >
 > **So What:** After this walkthrough you will understand how Institutional Decision Infrastructure works at the artifact level — not just the theory.
 
+
+---
+
+## Why This Demo Matters
+
+Without sealing and drift detection, the exact scenario you are about to walk through would play out like this:
+
+A deployment decision is made. The reasoning is discussed in a meeting, partially captured in a ticket, and approved via Slack emoji. Six months later, the infrastructure assumptions behind that decision have changed — but nobody knows, because nobody is monitoring sealed assumptions against current state.
+
+The drift compounds silently. A downstream decision builds on the stale assumption. Then another. When the failure finally surfaces, the incident team traces backward through a chain of decisions and finds… gaps. Missing reasoning. Contradictory evidence. No provenance chain.
+
+**This demo shows you the alternative.** Every step you run — sealing, auditing, scoring, drift detection, IRIS queries — is a mechanism that prevents the scenario above. The difference between an organization that can answer "why did we do this?" and one that cannot is exactly the infrastructure you are about to see.
+
 **Prerequisites:** Python 3.10+, repo cloned (`git clone https://github.com/8ryanWh1t3/DeepSigma.git && cd DeepSigma`).
 
 ---
