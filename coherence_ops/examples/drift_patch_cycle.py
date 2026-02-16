@@ -360,12 +360,12 @@ def main() -> None:
 
     if all_issues:
         print()
-        print("\u26a0\ufe0f  Contract issues detected:")
+        print("⚠️  Contract issues detected:")
         for issue in all_issues:
             print(f"  - {issue}")
         sys.exit(1)
     else:
-        print("\u2705 All contract checks passed.")
+        print("✅ All contract checks passed.")
 
 
 if __name__ == "__main__":
