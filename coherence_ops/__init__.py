@@ -3,7 +3,7 @@
 Implements the four canonical artifacts (DLR / RS / DS / MG),
 the coherence audit loop that connects RAL / Sigma OVERWATCH
 runtime exhaust to structured governance, learning, and memory,
-and the Unified Atomic Claims layer (v0.2.0).
+and the Unified Atomic Claims layer, and the Money Demo (v0.3.0).
 
 Public API
 ----------
@@ -26,7 +26,7 @@ ResolutionStatus   — OK | PARTIAL | NOT_FOUND | ERROR
 """
 from __future__ import annotations
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 from coherence_ops.manifest import CoherenceManifest
 from coherence_ops.dlr import (
