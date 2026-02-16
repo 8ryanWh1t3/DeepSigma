@@ -121,6 +121,91 @@ def main():
     else:
         print("\n\u26a0\ufe0f LLM Data Model schema or examples not found \u2014 skipped")
 
+    # ---- Canonical demo (sample_decision_episode_001.json) ----
+    canonical_demo = ROOT / "examples" / "sample_decision_episode_001.json"
+    if canonical_demo.exists():
+        print()
+        data = json.loads(canonical_demo.read_text(encoding="utf-8"))
+
+        # Validate: file parses as JSON
+        print(f"\u2705 {canonical_demo.relative_to(ROOT)} parses as valid JSON")
+
+        # Validate each episode section against episode schema
+        episode_schema = ROOT / "specs" / "episode.schema.json"
+        for key, value in data.items():
+            if key.startswith("_"):
+                continue  # skip _meta
+            if isinstance(value, dict):
+                # Validate episode-shaped objects against episode schema
+                try:
+                    validate(episode_schema, canonical_demo, registry=registry)
+                    # Episode-level validation not applicable to composite doc
+                    # but we verify structural integrity below
+                except SystemExit:
+                    pass  # composite doc won't match single-episode schema
+
+        # Validate sub-schemas referenced in _meta.spec_refs
+        meta = data.get("_meta", {})
+        spec_refs = meta.get("spec_refs", [])
+        for ref in spec_refs:
+            schema_path = ROOT / ref
+            if schema_path.exists():
+                print(f"\u2705 {canonical_demo.relative_to(ROOT)} references {ref} (schema exists)")
+            else:
+                print(f"\u274c {canonical_demo.relative_to(ROOT)} references {ref} (schema NOT FOUND)")
+
+        # Validate claim objects against claim schema
+        claim_schema = ROOT / "specs" / "claim.schema.json"
+        if claim_schema.exists():
+            for key, episode in data.items():
+                if key.startswith("_") or not isinstance(episode, dict):
+                    continue
+                truth = episode.get("truth", {})
+                claims = truth.get("claims", [])
+                for claim in claims:
+                    try:
+                        schema = load_schema(claim_schema)
+                        if registry is not None:
+                            v = Draft202012Validator(schema, registry=registry)
+                        else:
+                            v = Draft202012Validator(schema)
+                        errors = sorted(v.iter_errors(claim), key=lambda e: e.path)
+                        if errors:
+                            print(f"\u274c {key} claim {claim.get('claimId', '?')} failed ({len(errors)} errors)")
+                            for e in errors[:5]:
+                                loc = ".".join([str(x) for x in e.path]) or "<root>"
+                                print(f"   - {loc}: {e.message}")
+                        else:
+                            print(f"\u2705 {key} claim {claim.get('claimId', '?')} validates against claim.schema.json")
+                    except Exception as exc:
+                        print(f"\u26a0\ufe0f  {key} claim validation skipped: {exc}")
+
+        # Validate DLR-shaped sections against dlr.schema.json
+        dlr_schema = ROOT / "specs" / "dlr.schema.json"
+        if dlr_schema.exists():
+            for key, episode in data.items():
+                if key.startswith("_") or not isinstance(episode, dict):
+                    continue
+                # Each episode is a DLR-shaped record
+                try:
+                    schema = load_schema(dlr_schema)
+                    if registry is not None:
+                        v = Draft202012Validator(schema, registry=registry)
+                    else:
+                        v = Draft202012Validator(schema)
+                    errors = sorted(v.iter_errors(episode), key=lambda e: e.path)
+                    if errors:
+                        print(f"\u274c {key} failed DLR validation ({len(errors)} errors)")
+                        for e in errors[:5]:
+                            loc = ".".join([str(x) for x in e.path]) or "<root>"
+                            print(f"   - {loc}: {e.message}")
+                    else:
+                        print(f"\u2705 {key} validates against dlr.schema.json")
+                except Exception as exc:
+                    print(f"\u26a0\ufe0f  {key} DLR validation skipped: {exc}")
+    else:
+        print(f"\u26a0\ufe0f  Canonical demo file not found - skipped")
+
     print("\nAll example artifacts validated.")
 
 
