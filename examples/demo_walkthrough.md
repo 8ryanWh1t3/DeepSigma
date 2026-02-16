@@ -1,4 +1,11 @@
 ---
+title: "Demo Walkthrough — End-to-End Decision Episode"
+version: "1.0.0"
+status: "Canonical"
+last_updated: "2026-02-16"
+---
+
+---
 title: "End-to-End Demo Walkthrough"
 version: "1.0.0"
 status: "Canonical"
