@@ -204,7 +204,7 @@ def main():
                 except Exception as exc:
                     print(f"\u26a0\ufe0f  {key} DLR validation skipped: {exc}")
     else:
-        print(f"\u26a0\ufe0f  Canonical demo file not found - skipped")
+        print("\u26a0\ufe0f  Canonical demo file not found - skipped")
 
     print("\nAll example artifacts validated.")
 
