@@ -41,6 +41,10 @@ jobs:
         run: |
           python llm_data_model/05_validation/validate_examples.py
 
+      - name: Run Money Demo contract test
+        run: |
+          python -m pytest tests/test_money_demo.py -v --tb=short
+
   lint:
     runs-on: ubuntu-latest
     steps:
