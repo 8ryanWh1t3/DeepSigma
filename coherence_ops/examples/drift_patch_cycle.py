@@ -30,7 +30,7 @@ import json
 import sys
 from dataclasses import asdict
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, List
 
 # ---------------------------------------------------------------------------
 # Ensure the repo root is on sys.path so `coherence_ops` is importable
