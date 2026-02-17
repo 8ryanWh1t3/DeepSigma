@@ -27,7 +27,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          python -m pytest tests/test_degrade_ladder.py tests/test_policy_loader.py tests/test_coherence_dlr.py tests/test_coherence_rs.py tests/test_coherence_ds.py tests/test_coherence_mg.py tests/test_coherence_bridge.py -v --tb=short
+                    python -m pytest tests/test_degrade_ladder.py tests/test_policy_loader.py tests/test_coherence_dlr.py tests/test_coherence_rs.py tests/test_coherence_ds.py tests/test_coherence_mg.py tests/test_coherence_bridge.py tests/test_prime.py tests/test_schema_claim.py tests/test_api.py -v --tb=short
 
       - name: Run integration tests
         run: |
