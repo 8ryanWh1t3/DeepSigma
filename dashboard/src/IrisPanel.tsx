@@ -60,9 +60,9 @@ function ConfidenceBar({ value }: { value: number }) {
                                     className="h-full rounded-full transition-all duration-500"
                                     style={{ width: `${pct}%`, backgroundColor: color }}
                                   />
-                </div>div>
-                <span className="text-sm font-mono" style={{ color }}>{pct}%</span>span>
-          </div>div>
+                </div>
+                <span className="text-sm font-mono" style={{ color }}>{pct}%</span>
+          </div>
         );
 }
 
@@ -73,7 +73,7 @@ function ProvenanceChain({ chain }: { chain: IRISProvenanceLink[] }) {
                 <h4 className="text-sm font-semibold text-slate-300 flex items-center gap-2">
                         <Link2 size={14} className="text-slate-500" />
                         Provenance Chain ({chain.length} link{chain.length !== 1 ? 's' : ''})
-                </h4>h4>
+                </h4>
                 <div className="relative ml-3 border-l-2 border-slate-700 pl-4 space-y-3">
                   {chain.map((link, i) => {
                       const artStyle = ARTIFACT_COLORS[link.artifact] || 'text-slate-400 bg-slate-800 border-slate-600';
@@ -84,36 +84,36 @@ function ProvenanceChain({ chain }: { chain: IRISProvenanceLink[] }) {
                                                   <div className="flex items-start gap-2 flex-wrap">
                                                                   <span className={`px-1.5 py-0.5 rounded text-xs font-mono border ${artStyle}`}>
                                                                     {link.artifact}
-                                                                  </span>span>
-                                                                  <span className="text-xs text-slate-500 font-mono">{link.ref_id}</span>span>
-                                                                  <span className="text-xs px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">{link.role}</span>span>
-                                                  </div>div>
+                                                                  </span>
+                                                                  <span className="text-xs text-slate-500 font-mono">{link.ref_id}</span>
+                                                                  <span className="text-xs px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">{link.role}</span>
+                                                  </div>
                                       {link.detail && (
-                                                      <p className="text-xs text-slate-500 mt-0.5 ml-1">{link.detail}</p>p>
+                                                      <p className="text-xs text-slate-500 mt-0.5 ml-1">{link.detail}</p>
                                                   )}
-                                    </div>div>
+                                    </div>
                                   );
           })}
-                </div>div>
-          </div>div>
+                </div>
+          </div>
         );
 }
 
 function DataSection({ title, children }: { title: string; children: React.ReactNode }) {
     return (
           <div className="bg-slate-800/50 rounded-lg border border-slate-700 p-4">
-                <h4 className="text-sm font-semibold text-slate-300 mb-3">{title}</h4>h4>
+                <h4 className="text-sm font-semibold text-slate-300 mb-3">{title}</h4>
             {children}
-          </div>div>
+          </div>
         );
 }
 
 function KeyValueRow({ label, value, mono }: { label: string; value: string | number; mono?: boolean }) {
     return (
           <div className="flex justify-between items-center py-1 border-b border-slate-700/50 last:border-0">
-                <span className="text-xs text-slate-500">{label}</span>span>
-                <span className={`text-sm text-slate-200 ${mono ? 'font-mono' : ''}`}>{value}</span>span>
-          </div>div>
+                <span className="text-xs text-slate-500">{label}</span>
+                <span className={`text-sm text-slate-200 ${mono ? 'font-mono' : ''}`}>{value}</span>
+          </div>
         );
 }
 
@@ -131,7 +131,7 @@ function WhyDetail({ data }: { data: Record<string, any> }) {
                               <KeyValueRow label="Label" value={mgProv.node.label || '—'} />
                               <KeyValueRow label="Evidence Refs" value={(mgProv.evidence_refs || []).length} mono />
                               <KeyValueRow label="Actions" value={(mgProv.actions || []).length} mono />
-                    </DataSection>DataSection>
+                    </DataSection>
                 )}
             {dlrEntry.dlr_id && (
                     <DataSection title="Decision Lineage Record">
@@ -140,16 +140,16 @@ function WhyDetail({ data }: { data: Record<string, any> }) {
                               <KeyValueRow label="Outcome" value={dlrEntry.outcome_code || '—'} />
                               <KeyValueRow label="Policy Stamp" value={dlrEntry.policy_stamp ? 'Present' : 'Missing'} />
                               <KeyValueRow label="Degrade Step" value={dlrEntry.degrade_step || 'none'} />
-                    </DataSection>DataSection>
+                    </DataSection>
                 )}
             {data.mg_drift && data.mg_drift.length > 0 && (
                     <DataSection title={`Linked Drift Events (${data.mg_drift.length})`}>
                       {data.mg_drift.slice(0, 5).map((d: any, i: number) => (
                                   <KeyValueRow key={i} label={d.type || `Drift ${i + 1}`} value={d.severity || 'unknown'} />
                                 ))}
-                    </DataSection>DataSection>
+                    </DataSection>
                 )}
-          </div>div>
+          </div>
         );
 }
 
@@ -162,13 +162,13 @@ function WhatChangedDetail({ data }: { data: Record<string, any> }) {
                         <KeyValueRow label="Degraded Episodes" value={(data.degraded_episodes || []).length} mono />
                         <KeyValueRow label="Missing Policy" value={(data.policy_missing || []).length} mono />
                   {data.patch_count != null && <KeyValueRow label="Patches" value={data.patch_count} mono />}
-                </DataSection>DataSection>
+                </DataSection>
             {Object.keys(dist).length > 0 && (
                     <DataSection title="Outcome Distribution">
                       {Object.entries(dist).map(([code, count]) => (
                                   <KeyValueRow key={code} label={code} value={count as number} mono />
                                 ))}
-                    </DataSection>DataSection>
+                    </DataSection>
                 )}
             {data.drift_summary && (
                     <DataSection title="Drift Summary">
@@ -176,9 +176,9 @@ function WhatChangedDetail({ data }: { data: Record<string, any> }) {
                       {Object.entries(data.drift_summary.by_severity || {}).map(([sev, n]) => (
                                   <KeyValueRow key={sev} label={sev} value={n as number} mono />
                                 ))}
-                    </DataSection>DataSection>
+                    </DataSection>
                 )}
-          </div>div>
+          </div>
         );
 }
 
@@ -193,22 +193,22 @@ function WhatDriftedDetail({ data }: { data: Record<string, any> }) {
                   {data.resolution_ratio != null && (
                       <KeyValueRow label="Resolution Ratio" value={`${(data.resolution_ratio * 100).toFixed(1)}%`} />
                     )}
-                </DataSection>DataSection>
+                </DataSection>
             {(data.top_buckets || []).length > 0 && (
                     <DataSection title={`Top Drift Fingerprints (${data.top_buckets.length})`}>
                       {data.top_buckets.slice(0, 5).map((b: any, i: number) => (
                                   <KeyValueRow key={i} label={b.fingerprint || `Bucket ${i + 1}`} value={`${b.count || 0} signal(s)`} />
                                 ))}
-                    </DataSection>DataSection>
+                    </DataSection>
                 )}
             {(data.top_recurring || []).length > 0 && (
                     <DataSection title="Top Recurring Patterns">
                       {data.top_recurring.slice(0, 5).map((pat: string, i: number) => (
-                                  <div key={i} className="text-xs text-slate-400 py-0.5 font-mono">{pat}</div>div>
+                                  <div key={i} className="text-xs text-slate-400 py-0.5 font-mono">{pat}</div>
                                 ))}
-                    </DataSection>DataSection>
+                    </DataSection>
                 )}
-          </div>div>
+          </div>
         );
 }
 
@@ -222,30 +222,30 @@ function RecallDetail({ data }: { data: Record<string, any> }) {
                               <KeyValueRow label="Node Label" value={prov.node.label || '—'} />
                               <KeyValueRow label="Evidence Refs" value={(prov.evidence_refs || []).length} mono />
                               <KeyValueRow label="Actions" value={(prov.actions || []).length} mono />
-                    </DataSection>DataSection>
+                    </DataSection>
                 )}
             {(data.drift_events || []).length > 0 && (
                     <DataSection title={`Drift Events (${data.drift_events.length})`}>
                       {data.drift_events.slice(0, 5).map((d: any, i: number) => (
                                   <KeyValueRow key={i} label={d.type || `Event ${i + 1}`} value={d.severity || 'unknown'} />
                                 ))}
-                    </DataSection>DataSection>
+                    </DataSection>
                 )}
             {(data.patches || []).length > 0 && (
                     <DataSection title={`Patches (${data.patches.length})`}>
                       {data.patches.slice(0, 5).map((p: any, i: number) => (
                                   <KeyValueRow key={i} label={p.patch_id || `Patch ${i + 1}`} value={p.status || 'applied'} />
                                 ))}
-                    </DataSection>DataSection>
+                    </DataSection>
                 )}
             {dlrEntry.dlr_id && (
                     <DataSection title="Decision Lineage Record">
                               <KeyValueRow label="DLR ID" value={dlrEntry.dlr_id} mono />
                               <KeyValueRow label="Decision Type" value={dlrEntry.decision_type || '—'} />
                               <KeyValueRow label="Outcome" value={dlrEntry.outcome_code || '—'} />
-                    </DataSection>DataSection>
+                    </DataSection>
                 )}
-          </div>div>
+          </div>
         );
 }
 
@@ -256,12 +256,12 @@ function StatusDetail({ data }: { data: Record<string, any> }) {
                 <DataSection title="Coherence Score">
                         <KeyValueRow label="Overall Score" value={`${data.overall_score || 0}/100`} mono />
                         <KeyValueRow label="Grade" value={data.grade || '—'} />
-                </DataSection>DataSection>
+                </DataSection>
             {dims.length > 0 && (
                     <DataSection title="Dimensions">
                       {dims.map((d: any, i: number) => (
                                   <div key={i} className="flex items-center justify-between py-1.5 border-b border-slate-700/50 last:border-0">
-                                                <span className="text-xs text-slate-400">{d.name}</span>span>
+                                                <span className="text-xs text-slate-400">{d.name}</span>
                                                 <div className="flex items-center gap-3">
                                                                 <div className="w-20 h-1.5 bg-slate-700 rounded-full overflow-hidden">
                                                                                   <div
@@ -271,27 +271,27 @@ function StatusDetail({ data }: { data: Record<string, any> }) {
                                                                                                                                 background: d.score >= 70 ? '#10b981' : d.score >= 40 ? '#f59e0b' : '#ef4444',
                                                                                                           }}
                                                                                                       />
-                                                                </div>div>
-                                                                <span className="text-xs font-mono text-slate-300 w-12 text-right">{d.score.toFixed(1)}</span>span>
-                                                </div>div>
-                                  </div>div>
+                                                                </div>
+                                                                <span className="text-xs font-mono text-slate-300 w-12 text-right">{d.score.toFixed(1)}</span>
+                                                </div>
+                                  </div>
                                 ))}
-                    </DataSection>DataSection>
+                    </DataSection>
                 )}
             {data.mg_stats && (
                     <DataSection title="Memory Graph Stats">
                               <KeyValueRow label="Total Nodes" value={data.mg_stats.total_nodes || 0} mono />
                               <KeyValueRow label="Total Edges" value={data.mg_stats.total_edges || 0} mono />
-                    </DataSection>DataSection>
+                    </DataSection>
                 )}
             {data.drift_headline && (
                     <DataSection title="Drift Headline">
                               <KeyValueRow label="Total" value={data.drift_headline.total || 0} mono />
                               <KeyValueRow label="Red" value={data.drift_headline.red || 0} mono />
                               <KeyValueRow label="Recurring" value={data.drift_headline.recurring || 0} mono />
-                    </DataSection>DataSection>
+                    </DataSection>
                 )}
-          </div>div>
+          </div>
         );
 }
 
@@ -320,41 +320,41 @@ function IRISResponseView({ response }: { response: IRISResponse }) {
                                   <div className="flex items-center gap-3">
                                     {sts.icon}
                                               <div>
-                                                            <div className={`text-sm font-semibold ${sts.text}`}>{response.status}</div>div>
-                                                            <div className="text-xs text-slate-500 font-mono">Query ID: {response.query_id}</div>div>
-                                              </div>div>
-                                  </div>div>
+                                                            <div className={`text-sm font-semibold ${sts.text}`}>{response.status}</div>
+                                                            <div className="text-xs text-slate-500 font-mono">Query ID: {response.query_id}</div>
+                                              </div>
+                                  </div>
                                   <div className="flex items-center gap-4 text-xs text-slate-500">
-                                              <span className="flex items-center gap-1"><Clock size={12} />{response.elapsed_ms.toFixed(0)} ms</span>span>
-                                              <span>{meta.label} query</span>span>
-                                              <span>{new Date(response.resolved_at).toLocaleTimeString()}</span>span>
-                                  </div>div>
-                        </div>div>
-                </div>div>
+                                              <span className="flex items-center gap-1"><Clock size={12} />{response.elapsed_ms.toFixed(0)} ms</span>
+                                              <span>{meta.label} query</span>
+                                              <span>{new Date(response.resolved_at).toLocaleTimeString()}</span>
+                                  </div>
+                        </div>
+                </div>
           
             {/* Confidence */}
                 <div className="bg-slate-900 rounded-lg border border-slate-800 p-4">
-                        <div className="text-xs text-slate-500 mb-1.5">Confidence</div>div>
+                        <div className="text-xs text-slate-500 mb-1.5">Confidence</div>
                         <ConfidenceBar value={response.confidence} />
-                </div>div>
+                </div>
           
             {/* Summary */}
                 <div className="bg-slate-900 rounded-lg border border-slate-800 p-4">
-                        <div className="text-xs text-slate-500 mb-1.5">Summary</div>div>
-                        <p className="text-sm text-slate-200 leading-relaxed">{response.summary}</p>p>
-                </div>div>
+                        <div className="text-xs text-slate-500 mb-1.5">Summary</div>
+                        <p className="text-sm text-slate-200 leading-relaxed">{response.summary}</p>
+                </div>
           
             {/* Warnings */}
             {response.warnings.length > 0 && (
                     <div className="bg-yellow-900/20 rounded-lg border border-yellow-800 p-4">
-                              <div className="text-xs text-yellow-400 font-semibold mb-2">Warnings</div>div>
+                              <div className="text-xs text-yellow-400 font-semibold mb-2">Warnings</div>
                       {response.warnings.map((w, i) => (
                                   <div key={i} className="text-xs text-yellow-300 flex items-start gap-2 py-0.5">
                                                 <AlertCircle size={12} className="mt-0.5 shrink-0" />
                                     {w}
-                                  </div>div>
+                                  </div>
                                 ))}
-                    </div>div>
+                    </div>
                 )}
           
             {/* Data detail */}
@@ -366,12 +366,12 @@ function IRISResponseView({ response }: { response: IRISResponse }) {
             {response.provenance_chain.length > 0 && (
                     <div className="bg-slate-900 rounded-lg border border-slate-800 p-4">
                               <ProvenanceChain chain={response.provenance_chain} />
-                    </div>div>
+                    </div>
                 )}
           
             {/* Raw JSON toggle */}
                 <RawJsonToggle response={response} />
-          </div>div>
+          </div>
         );
 }
 
@@ -384,15 +384,15 @@ function RawJsonToggle({ response }: { response: IRISResponse }) {
                           onClick={() => setOpen(o => !o)}
                           className="w-full flex items-center justify-between px-4 py-3 text-xs text-slate-500 hover:text-slate-300 transition-colors"
                         >
-                        <span>Raw JSON Response</span>span>
+                        <span>Raw JSON Response</span>
                         <ChevronRight size={14} className={`transform transition-transform ${open ? 'rotate-90' : ''}`} />
-                </button>button>
+                </button>
             {open && (
                     <pre className="px-4 pb-4 text-xs text-slate-400 font-mono overflow-x-auto max-h-80 overflow-y-auto whitespace-pre-wrap">
                       {json}
-                    </pre>pre>
+                    </pre>
                 )}
-          </div>div>
+          </div>
         );
 }
 
@@ -415,7 +415,7 @@ function QueryHistory({ entries, selected, onSelect }: { entries: HistoryEntry[]
           return (
                   <div className="text-xs text-slate-600 text-center py-8">
                           No queries yet. Ask IRIS a question above.
-                  </div>div>
+                  </div>
                 );
     }
     return (
@@ -434,16 +434,16 @@ function QueryHistory({ entries, selected, onSelect }: { entries: HistoryEntry[]
                                               }`}
                                             >
                                             <div className="flex items-center gap-2 mb-1">
-                                                          <span className={`text-${meta.color}-400`}>{meta.icon}</span>span>
-                                                          <span className="text-xs font-semibold text-slate-300">{meta.label}</span>span>
-                                                          <span className={`ml-auto text-xs ${STATUS_STYLE[entry.status].text}`}>{entry.status}</span>span>
-                                            </div>div>
-                                            <div className="text-xs text-slate-500 truncate">{entry.text || `${meta.hint}`}</div>div>
-                                            <div className="text-xs text-slate-600 mt-1">{entry.timestamp}</div>div>
-                                </button>button>
+                                                          <span className={`text-${meta.color}-400`}>{meta.icon}</span>
+                                                          <span className="text-xs font-semibold text-slate-300">{meta.label}</span>
+                                                          <span className={`ml-auto text-xs ${STATUS_STYLE[entry.status].text}`}>{entry.status}</span>
+                                            </div>
+                                            <div className="text-xs text-slate-500 truncate">{entry.text || `${meta.hint}`}</div>
+                                            <div className="text-xs text-slate-600 mt-1">{entry.timestamp}</div>
+                                </button>
                               );
           })}
-          </div>div>
+          </div>
         );
 }
 
@@ -507,12 +507,12 @@ export function IrisPanel() {
                         <div className="flex items-center gap-3 mb-5">
                                   <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-600/20 text-blue-400">
                                               <Eye size={18} />
-                                  </div>div>
+                                  </div>
                                   <div>
-                                              <h3 className="text-lg font-semibold">IRIS Query Panel</h3>h3>
-                                              <p className="text-xs text-slate-500">Interface for Resolution, Insight, and Status</p>p>
-                                  </div>div>
-                        </div>div>
+                                              <h3 className="text-lg font-semibold">IRIS Query Panel</h3>
+                                              <p className="text-xs text-slate-500">Interface for Resolution, Insight, and Status</p>
+                                  </div>
+                        </div>
                 
                   {/* Query type selector */}
                         <div className="flex flex-wrap gap-2 mb-4">
@@ -531,10 +531,10 @@ export function IrisPanel() {
                                                         >
                                           {meta.icon}
                                           {meta.label}
-                                        </button>button>
+                                        </button>
                                       );
           })}
-                        </div>div>
+                        </div>
                 
                   {/* Input form */}
                         <form onSubmit={handleSubmit} className="space-y-3">
@@ -548,7 +548,7 @@ export function IrisPanel() {
                                                               onChange={e => setQueryText(e.target.value)}
                                                               className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-10 pr-4 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
                                                             />
-                                  </div>div>
+                                  </div>
                         
                           {/* Episode ID field (conditional) */}
                           {needsEpisodeId && (
@@ -561,7 +561,7 @@ export function IrisPanel() {
                                                         onChange={e => setEpisodeId(e.target.value)}
                                                         className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-10 pr-4 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
                                                       />
-                        </div>div>
+                        </div>
                                   )}
                         
                           {/* Submit */}
@@ -581,17 +581,17 @@ export function IrisPanel() {
                                                                               Query IRIS
                                                               </>>
                                                             )}
-                                  </button>button>
-                        </form>form>
-                </div>div>
+                                  </button>
+                        </form>
+                </div>
           
             {/* Results grid: history sidebar + response */}
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                   {/* History sidebar */}
                         <div className="lg:col-span-1 bg-slate-900 rounded-lg border border-slate-800 p-4">
-                                  <h4 className="text-sm font-semibold text-slate-300 mb-3">Query History</h4>h4>
+                                  <h4 className="text-sm font-semibold text-slate-300 mb-3">Query History</h4>
                                   <QueryHistory entries={history} selected={selectedHistoryId} onSelect={handleHistorySelect} />
-                        </div>div>
+                        </div>
                 
                   {/* Response area */}
                         <div className="lg:col-span-3">
@@ -600,15 +600,15 @@ export function IrisPanel() {
                       ) : (
                         <div className="bg-slate-900 rounded-lg border border-slate-800 p-12 text-center">
                                       <Eye size={48} className="mx-auto text-slate-700 mb-4" />
-                                      <p className="text-slate-500 text-sm">Submit a query to see IRIS results</p>p>
+                                      <p className="text-slate-500 text-sm">Submit a query to see IRIS results</p>
                                       <p className="text-slate-600 text-xs mt-2">
                                                       IRIS resolves operator questions against MG, DLR, DS, and RS artifacts
                                                       with full provenance chains and decision lineage.
-                                      </p>p>
-                        </div>div>
+                                      </p>
+                        </div>
                                   )}
-                        </div>div>
-                </div>div>
-          </div>div>
+                        </div>
+                </div>
+          </div>
         );
 }</></></div>
