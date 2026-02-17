@@ -24,8 +24,20 @@ except ImportError:
 
 DATA_DIR = Path(os.environ.get("DATA_DIR", "/app/data"))
 
+# ── Exhaust Inbox router (optional) ──────────────────────────
+try:
+    from dashboard.server.exhaust_api import router as exhaust_router
+    _HAS_EXHAUST = True
+except ImportError:
+    _HAS_EXHAUST = False
+    logger.info("Exhaust Inbox router not loaded (import failed)")
+
 if HAS_FASTAPI:
     app = FastAPI(title="DeepSigma Dashboard API", version="0.1.0")
+
+    # Mount Exhaust Inbox API router
+    if _HAS_EXHAUST:
+        app.include_router(exhaust_router, prefix="/api/exhaust", tags=["exhaust"])
 else:
     app = None
     logger.warning("FastAPI not installed; dashboard API unavailable")
