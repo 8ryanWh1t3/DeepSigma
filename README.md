@@ -8,7 +8,7 @@
 
 **Truth · Reasoning · Memory**
 
-[🚀 Start Here](START_HERE.md) · [🔁 Hero Demo](HERO_DEMO.md) · [🏢 Boardroom Brief](category/boardroom_brief.md) · [📜 Specs](canonical/) · [🗺️ Navigation](NAV.md)
+[🚀 Start Here](START_HERE.md) · [🔁 Hero Demo](HERO_DEMO.md) · [🏢 Boardroom Brief](category/boardroom_brief.md) · [📜 Specs](canonical/) · [🗺️ Navigation](NAV.md) · [🔬 RAL](ABOUT.md)
 
 </div>
 
@@ -116,6 +116,7 @@ DeepSigma/
 
 | Resource | Path |
 |----------|------|
+| Reality Await Layer (RAL) | [ABOUT.md](ABOUT.md) |
 | Front door | [START_HERE.md](START_HERE.md) |
 | Hero demo | [HERO_DEMO.md](HERO_DEMO.md) |
 | Boardroom brief | [category/boardroom_brief.md](category/boardroom_brief.md) |
