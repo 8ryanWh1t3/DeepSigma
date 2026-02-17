@@ -6,7 +6,7 @@ WORKDIR /build/dashboard
 
 # Install dependencies first (better layer caching)
 COPY dashboard/package.json dashboard/package-lock.json* ./
-RUN npm ci --ignore-scripts 2>/dev/null || npm install
+RUN if [ -f package-lock.json ]; then npm ci --ignore-scripts; else npm install; fi
 
 # Copy source and build
 COPY dashboard/index.html dashboard/tsconfig.json dashboard/tsconfig.node.json ./
@@ -42,6 +42,9 @@ COPY --from=frontend-build /build/dashboard/dist /app/dashboard/dist
 
 # Copy Python source for the API and DeepSigma package
 COPY dashboard/server/ /app/dashboard/server/
+
+# Ensure dashboard is a Python package (uvicorn needs dashboard.server.api)
+RUN touch /app/dashboard/__init__.py /app/dashboard/server/__init__.py
 COPY pyproject.toml setup.cfg* /app/
 COPY engine/ /app/engine/
 COPY coherence_ops/ /app/coherence_ops/
@@ -51,7 +54,7 @@ COPY specs/ /app/specs/
 COPY adapters/ /app/adapters/
 
 # Install DeepSigma package so coherence_ops is importable
-RUN pip install --no-cache-dir -e /app 2>/dev/null || true
+RUN pip install --no-cache-dir -e /app
 
 # ── nginx: serve static assets + reverse-proxy /api ─────────
 COPY <<'NGINX' /etc/nginx/sites-available/default
@@ -97,7 +100,7 @@ stderr_logfile=/dev/stderr
 stderr_logfile_maxbytes=0
 
 [program:api]
-command=uvicorn dashboard.server.api:app --host 0.0.0.0 --port 8000 --workers 2
+command=uvicorn dashboard.server.api:app --host 0.0.0.0 --port 8000 --workers 1
 directory=/app
 autostart=true
 autorestart=true
