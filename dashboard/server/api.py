@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -21,7 +22,7 @@ try:
 except ImportError:
     HAS_FASTAPI = False
 
-DATA_DIR = Path("data")
+DATA_DIR = Path(os.environ.get("DATA_DIR", "/app/data"))
 
 if HAS_FASTAPI:
     app = FastAPI(title="DeepSigma Dashboard API", version="0.1.0")
@@ -141,7 +142,7 @@ if HAS_FASTAPI:
     # CoherenceOps endpoints
     # ---------------------------------------------------------------
 
-    LLM_DATA_DIR = Path("llm_data_model/03_examples")
+    LLM_DATA_DIR = Path(os.environ.get("LLM_DATA_DIR", "/app/llm_data_model/03_examples"))
 
     def _get_records() -> List[Dict[str, Any]]:
         """Load LLM Data Model canonical records."""
