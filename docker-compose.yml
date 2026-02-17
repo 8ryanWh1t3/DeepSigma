@@ -1,0 +1,31 @@
+# ── docker-compose.yml ───────────────────────────────────────
+# Quick-start the Σ OVERWATCH Dashboard locally.
+#
+#   docker compose up --build
+#   open http://localhost:3000
+#
+# Mount a local data/ directory to feed real episode/drift JSON
+# files to the API, or leave it empty to use mock data.
+# ─────────────────────────────────────────────────────────────
+
+services:
+  overwatch:
+      build:
+            context: .
+                  dockerfile: Dockerfile
+                      image: ghcr.io/8ryanwh1t3/deepsigma-dashboard:local
+                          container_name: overwatch-dashboard
+                              ports:
+                                    - "3000:3000"
+                                        volumes:
+                                              # Mount local data directory for episode/drift JSON files
+                                                    - ./data:/app/data:ro
+                                                        environment:
+                                                              - PYTHONPATH=/app
+                                                                  restart: unless-stopped
+                                                                      healthcheck:
+                                                                            test: ["CMD", "curl", "-f", "http://localhost:3000/healthz"]
+                                                                                  interval: 30s
+                                                                                        timeout: 5s
+                                                                                              retries: 3
+                                                                                                    start_period: 10s
