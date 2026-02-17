@@ -1,0 +1,57 @@
+# ── .dockerignore ────────────────────────────────────────────
+# Keep the Docker build context lean and fast.
+
+# Version control
+.git
+.gitignore
+
+# Node artifacts (rebuilt in stage 1)
+dashboard/node_modules
+dashboard/dist
+dashboard/.vite
+
+# Python artifacts
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+.eggs
+dist/
+build/
+*.whl
+
+# IDE / editor
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# CI / docs (not needed at runtime)
+.github
+docs
+mermaid
+wiki
+roadmap
+release
+CHANGELOG.md
+CONTRIBUTING.md
+GLOSSARY.md
+HERO_DEMO.md
+NAV.md
+SECURITY.md
+START_HERE.md
+LICENSE
+
+# Test artifacts
+tests
+.pytest_cache
+.coverage
+htmlcov
+
+# Examples (optional — uncomment to include demo data)
+# examples
