@@ -298,7 +298,7 @@ function resolveWhy(query: IRISQueryInput, queryId: string): IRISResponse {
   };
 }
 
-function resolveWhatChanged(_query: IRISQueryInput, queryId: string): IRISResponse {
+function resolveWhatChanged(query: IRISQueryInput, queryId: string): IRISResponse {
     const totalEntries = 20 + Math.floor(Math.random() * 80);
     const provenance: IRISProvenanceLink[] = [];
     const parts: string[] = [];
@@ -356,7 +356,7 @@ function resolveWhatChanged(_query: IRISQueryInput, queryId: string): IRISRespon
   };
 }
 
-function resolveWhatDrifted(_query: IRISQueryInput, queryId: string): IRISResponse {
+function resolveWhatDrifted(query: IRISQueryInput, queryId: string): IRISResponse {
     const totalSignals = 8 + Math.floor(Math.random() * 40);
     const provenance: IRISProvenanceLink[] = [];
     const parts: string[] = [];
@@ -476,7 +476,7 @@ function resolveRecall(query: IRISQueryInput, queryId: string): IRISResponse {
   };
 }
 
-function resolveStatus(_query: IRISQueryInput, queryId: string): IRISResponse {
+function resolveStatus(query: IRISQueryInput, queryId: string): IRISResponse {
     const provenance: IRISProvenanceLink[] = [];
     const parts: string[] = [];
 
@@ -530,6 +530,54 @@ function resolveStatus(_query: IRISQueryInput, queryId: string): IRISResponse {
         elapsed_ms: 100 + Math.random() * 500,
         warnings: overallScore < 60 ? [`System coherence below threshold (${overallScore}/100) — review recommended`] : [],
   };
+}
+
+// ---------------------------------------------------------------------------
+// Real-data API fetch helpers (http://localhost:8000)
+// Falls back to mock data when the API server is not running.
+// ---------------------------------------------------------------------------
+
+const API_BASE = 'http://localhost:8000';
+
+async function apiFetch<T>(path: string): Promise<T | null> {
+    try {
+        const res = await fetch(`${API_BASE}${path}`, { signal: AbortSignal.timeout(2000) });
+        if (!res.ok) return null;
+        return (await res.json()) as T;
+    } catch {
+        return null;
+    }
+}
+
+/** Fetch real episodes from the API; returns null if the server is offline. */
+export async function fetchRealEpisodes(): Promise<DecisionEpisode[] | null> {
+    return apiFetch<DecisionEpisode[]>('/api/episodes');
+}
+
+/** Fetch real drift events from the API; returns null if the server is offline. */
+export async function fetchRealDrifts(): Promise<DriftEvent[] | null> {
+    return apiFetch<DriftEvent[]>('/api/drifts');
+}
+
+/** Fetch real agent metrics from the API; returns null if the server is offline. */
+export async function fetchRealAgents(): Promise<AgentMetrics[] | null> {
+    return apiFetch<AgentMetrics[]>('/api/agents');
+}
+
+/** Resolve an IRIS query via the real API; falls back to mock resolver. */
+export async function fetchRealIRIS(query: IRISQueryInput): Promise<IRISResponse | null> {
+    try {
+        const res = await fetch(`${API_BASE}/api/iris`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(query),
+            signal: AbortSignal.timeout(5000),
+        });
+        if (!res.ok) return null;
+        return (await res.json()) as IRISResponse;
+    } catch {
+        return null;
+    }
 }
 
 /**
