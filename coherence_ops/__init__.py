@@ -26,7 +26,7 @@ ResolutionStatus   — OK | PARTIAL | NOT_FOUND | ERROR
 """
 from __future__ import annotations
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 from coherence_ops.manifest import CoherenceManifest
 from coherence_ops.dlr import (
@@ -50,8 +50,18 @@ from coherence_ops.iris import (
     IRISConfig,
     ResolutionStatus,
 )
-
-__all__ = [
+from coherence_ops.prime import (
+    PRIMEGate,
+    PRIMEConfig,
+    PRIMEContext,
+    PRIMEVerdict,
+    TruthInvariant,
+    ReasoningInvariant,
+    MemoryInvariant,
+    Verdict,
+    ConfidenceBand,
+)
+    __all__ = [
         "CoherenceManifest",
         "DLRBuilder",
         "ClaimNativeDLRBuilder",
@@ -70,6 +80,15 @@ __all__ = [
         "IRISQuery",
         "IRISResponse",
         "QueryType",
+            "PRIMEGate",
+            "PRIMEConfig",
+            "PRIMEContext",
+            "PRIMEVerdict",
+            "TruthInvariant",
+            "ReasoningInvariant",
+            "MemoryInvariant",
+            "Verdict",
+            "ConfidenceBand",
         "IRISConfig",
         "ResolutionStatus",
 ]
