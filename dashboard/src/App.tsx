@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
-    BarChart, Bar, LineChart, Line, AreaChart, Area, XAxis, YAxis,
+    BarChart, Bar, AreaChart, Area, XAxis, YAxis,
     CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell,
     RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis
 } from 'recharts';

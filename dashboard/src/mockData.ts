@@ -298,7 +298,7 @@ function resolveWhy(query: IRISQueryInput, queryId: string): IRISResponse {
   };
 }
 
-function resolveWhatChanged(query: IRISQueryInput, queryId: string): IRISResponse {
+function resolveWhatChanged(_query: IRISQueryInput, queryId: string): IRISResponse {
     const totalEntries = 20 + Math.floor(Math.random() * 80);
     const provenance: IRISProvenanceLink[] = [];
     const parts: string[] = [];
@@ -356,7 +356,7 @@ function resolveWhatChanged(query: IRISQueryInput, queryId: string): IRISRespons
   };
 }
 
-function resolveWhatDrifted(query: IRISQueryInput, queryId: string): IRISResponse {
+function resolveWhatDrifted(_query: IRISQueryInput, queryId: string): IRISResponse {
     const totalSignals = 8 + Math.floor(Math.random() * 40);
     const provenance: IRISProvenanceLink[] = [];
     const parts: string[] = [];
@@ -476,7 +476,7 @@ function resolveRecall(query: IRISQueryInput, queryId: string): IRISResponse {
   };
 }
 
-function resolveStatus(query: IRISQueryInput, queryId: string): IRISResponse {
+function resolveStatus(_query: IRISQueryInput, queryId: string): IRISResponse {
     const provenance: IRISProvenanceLink[] = [];
     const parts: string[] = [];
 
