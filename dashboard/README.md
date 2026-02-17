@@ -96,6 +96,34 @@ npm run build
 
 Output in `dist/` — deploy to any static host.
 
+## Docker
+
+Run the full dashboard + API as a container — no Node.js or Python required on the host.
+
+### Pull from GHCR
+
+```sh
+docker pull ghcr.io/8ryanwh1t3/deepsigma-dashboard:main
+docker run -p 3000:3000 ghcr.io/8ryanwh1t3/deepsigma-dashboard:main
+```
+
+### Build locally
+
+```sh
+docker compose up --build
+```
+
+### With real data
+
+Mount a directory of episode/drift JSON files:
+
+```sh
+docker run -p 3000:3000 -v ./data:/app/data:ro ghcr.io/8ryanwh1t3/deepsigma-dashboard:main
+```
+
+Open [http://localhost:3000](http://localhost:3000) — the dashboard serves on port 3000.
+The API is available at `/api/` (e.g. `/api/episodes`, `/api/drift`, `/api/health`).
+
 ## Data
 
 Mock data generators produce realistic:
