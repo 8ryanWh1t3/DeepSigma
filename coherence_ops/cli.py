@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from dataclasses import asdict
 import sys
 from pathlib import Path
 from typing import Any, Dict, List
@@ -155,7 +156,7 @@ def cmd_score(args: argparse.Namespace) -> None:
     report = scorer.score()
 
     if getattr(args, "json", False):
-        print(json.dumps(report.to_dict(), indent=2))
+        print(json.dumps(asdict(report), indent=2))
         return
 
     print(f"Coherence Score: {report.overall_score}/100  Grade: {report.grade}")
@@ -193,11 +194,8 @@ def cmd_iris_query(args: argparse.Namespace) -> None:
     dlr, rs, ds, mg = _build_pipeline(episodes, drift_events)
 
     engine = IRISEngine(
-        dlr_builder=dlr,
-        rs=rs,
-        ds=ds,
-        mg=mg,
-        config=IRISConfig(),
+              config=IRISConfig(),
+              memory_graph=mg,
     )
 
     qtype = _IRIS_QUERY_TYPE_MAP.get(args.type.upper())
@@ -214,13 +212,11 @@ def cmd_iris_query(args: argparse.Namespace) -> None:
         query_type=qtype,
         episode_id=args.target or "",
         text=args.text or "",
-        limit=args.limit,
-    )
 
     response = engine.resolve(query)
 
     if getattr(args, "json", False):
-        print(response.to_json(indent=2))
+        print(json.dumps(response.to_dict(), indent=2))
         return
 
     print(response.summary)
