@@ -88,6 +88,22 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
+### Lock-file for deterministic builds
+
+The repo ships without `package-lock.json`. Both the Dockerfile and CI
+handle this gracefully (`npm install` fallback), but for fully
+deterministic dependency resolution you should commit the lock-file:
+
+```sh
+cd dashboard
+npm install          # generates package-lock.json
+git add package-lock.json
+git commit -m "chore(dashboard): add package-lock.json for deterministic builds"
+```
+
+Once committed, the Docker build will automatically prefer `npm ci` for
+faster, reproducible installs.
+
 ## Build
 
 ```sh
