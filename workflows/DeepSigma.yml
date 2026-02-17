@@ -1,1 +1,19 @@
 # DeepSigma workflow configuration
+# ===================================
+#
+# CI pipeline:        .github/workflows/ci.yml
+# Package registry:   https://pypi.org/project/deepsigma/
+#
+# Jobs:
+#   test     — matrix (3.10, 3.11, 3.12), unit + integration + schema validation
+#   lint     — ruff (E, F, W rules)
+#   publish  — PyPI via trusted publishing (on v* tags, after test + lint pass)
+#
+# Release workflow:
+#   1. Bump version in pyproject.toml
+#   2. git tag v<version> && git push --tags
+#   3. CI runs test → lint → publish automatically
+#
+# Required GitHub setup:
+#   - Repository environment "pypi" (Settings → Environments)
+#   - PyPI trusted publisher configured for this repo
