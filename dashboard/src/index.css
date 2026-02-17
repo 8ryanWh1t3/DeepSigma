@@ -6,32 +6,49 @@
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;
     font-weight: 400;
-    color-scheme: dark;
 }
 
+/* Light mode defaults */
 body {
     margin: 0;
     min-width: 320px;
     min-height: 100vh;
+    background-color: #f8fafc;
+    color: #0f172a;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Dark mode overrides */
+.dark body,
+html.dark body {
     background-color: #020617;
     color: #f1f5f9;
+    color-scheme: dark;
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+/* Scrollbar styling — dark */
+.dark ::-webkit-scrollbar { width: 8px; height: 8px; }
+.dark ::-webkit-scrollbar-track { background: #0f172a; }
+.dark ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+/* Scrollbar styling — light */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #f1f5f9; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* Toast slide-in animation */
+@keyframes slide-in {
+    from { transform: translateX(100%); opacity: 0; }
+    to   { transform: translateX(0);    opacity: 1; }
+}
+.animate-slide-in {
+    animation: slide-in 0.3s ease-out;
 }
 
-::-webkit-scrollbar-track {
-    background: #0f172a;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #334155;
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #475569;
+/* Select styling for dark mode */
+.dark select option {
+    background-color: #1e293b;
+    color: #f1f5f9;
 }
