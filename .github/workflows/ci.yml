@@ -64,10 +64,35 @@ jobs:
         run: |
           ruff check . --select E,F,W --ignore E501
 
+
+  dashboard-build:
+    name: Dashboard TypeScript Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dashboard
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then npm ci --ignore-scripts; else npm install; fi
+      - name: Type-check and build
+        run: npm run build
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dashboard-dist
+          path: dashboard/dist/
+          retention-days: 5
+
   publish:
     name: Publish to PyPI
     runs-on: ubuntu-latest
-    needs: [test, lint]
+    needs: [test, lint, dashboard-build]
     if: startsWith(github.ref, 'refs/tags/v')
     environment: pypi
     permissions:
