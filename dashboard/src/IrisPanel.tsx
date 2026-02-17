@@ -574,12 +574,12 @@ export function IrisPanel() {
                                                               <>
                                                                               <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                                                                               Resolving…
-                                                              </>>
+                                                              </>
                                                             ) : (
                                                               <>
                                                                               <Search size={16} />
                                                                               Query IRIS
-                                                              </>>
+                                                              </>
                                                             )}
                                   </button>
                         </form>
@@ -611,4 +611,4 @@ export function IrisPanel() {
                 </div>
           </div>
         );
-}</></></div>
+}
