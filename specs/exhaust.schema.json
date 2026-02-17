@@ -1,0 +1,376 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deepsigma.dev/schemas/exhaust/v1",
+  "title": "DeepSigma Exhaust Inbox Schema",
+  "description": "JSON Schema for the Exhaust Inbox system: events, episodes, refined episodes, and drift signals.",
+  "definitions": {
+    "EpisodeEvent": {
+      "type": "object",
+      "required": [
+        "event_id",
+        "event_type",
+        "timestamp",
+        "payload"
+      ],
+      "properties": {
+        "event_id": {
+          "type": "string",
+          "description": "Deterministic SHA-256 hash (24 chars)"
+        },
+        "episode_id": {
+          "type": "string",
+          "description": "Assigned during assembly"
+        },
+        "session_id": {
+          "type": "string"
+        },
+        "event_type": {
+          "type": "string",
+          "enum": [
+            "prompt",
+            "response",
+            "tool_call",
+            "tool_result",
+            "model",
+            "metric",
+            "error"
+          ]
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "user_hash": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "project": {
+          "type": "string"
+        },
+        "team": {
+          "type": "string"
+        },
+        "payload": {
+          "type": "string",
+          "maxLength": 4000
+        },
+        "meta": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "DriftSignal": {
+      "type": "object",
+      "required": [
+        "type",
+        "severity",
+        "fingerprint"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "contradiction",
+            "missing_policy",
+            "low_coverage",
+            "stale_reference"
+          ]
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "green",
+            "yellow",
+            "red"
+          ]
+        },
+        "fingerprint": {
+          "type": "string",
+          "description": "Stable hash for dedup"
+        },
+        "description": {
+          "type": "string"
+        },
+        "recommended_patch": {
+          "type": "string"
+        }
+      }
+    },
+    "DecisionEpisode": {
+      "type": "object",
+      "required": [
+        "episode_id",
+        "started_at",
+        "events"
+      ],
+      "properties": {
+        "episode_id": {
+          "type": "string"
+        },
+        "session_id": {
+          "type": "string"
+        },
+        "user_hash": {
+          "type": "string"
+        },
+        "project": {
+          "type": "string"
+        },
+        "team": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ended_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EpisodeEvent"
+          }
+        },
+        "coherence_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "grade": {
+          "type": "string",
+          "enum": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ]
+        },
+        "drift_signals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DriftSignal"
+          }
+        },
+        "refined_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "committed": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "TruthItem": {
+      "type": "object",
+      "required": [
+        "id",
+        "claim",
+        "confidence"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "claim": {
+          "type": "string"
+        },
+        "evidence": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "support_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "provenance": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "accepted",
+            "rejected"
+          ],
+          "default": "pending"
+        }
+      }
+    },
+    "ReasoningItem": {
+      "type": "object",
+      "required": [
+        "id",
+        "decision",
+        "confidence"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "decision": {
+          "type": "string"
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "alternatives": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rationale": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "provenance": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "accepted",
+            "rejected"
+          ],
+          "default": "pending"
+        }
+      }
+    },
+    "MemoryItem": {
+      "type": "object",
+      "required": [
+        "id",
+        "entity",
+        "confidence"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "entity": {
+          "type": "string"
+        },
+        "entity_type": {
+          "type": "string"
+        },
+        "relations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "context_pointer": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "provenance": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "accepted",
+            "rejected"
+          ],
+          "default": "pending"
+        }
+      }
+    },
+    "RefinedEpisode": {
+      "type": "object",
+      "required": [
+        "episode_id",
+        "truth",
+        "reasoning",
+        "memory",
+        "coherence_score"
+      ],
+      "properties": {
+        "episode_id": {
+          "type": "string"
+        },
+        "truth": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TruthItem"
+          }
+        },
+        "reasoning": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ReasoningItem"
+          }
+        },
+        "memory": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MemoryItem"
+          }
+        },
+        "drift_signals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DriftSignal"
+          }
+        },
+        "coherence_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "grade": {
+          "type": "string",
+          "enum": [
+            "A",
+            "B",
+            "C",
+            "D"
+          ]
+        },
+        "refined_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "committed": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    }
+  }
+}
