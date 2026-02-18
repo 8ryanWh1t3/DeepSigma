@@ -5,6 +5,46 @@ All notable changes to Σ OVERWATCH / DeepSigma will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] — 2026-02-18 — "Trust at Scale"
+
+### Added — Connector Contract v1.0
+
+- **ConnectorV1 Protocol** (`connectors/contract.py`): `@runtime_checkable` interface with `source_name`, `list_records()`, `get_record()`, `to_envelopes()`
+- **RecordEnvelope** dataclass: Canonical wrapper with provenance, SHA-256 hashes, ACL tags, and raw payload
+- **JSON Schema** (`specs/connector_envelope.schema.json`): Draft-07 schema for envelope validation
+- **Normative spec** (`specs/connector_contract_v1.md`): Interface, pagination, retry/backoff, rate limiting, error model, auth handling
+- **Connector compliance**: All 4 connectors (SharePoint, Dataverse, AskSage, Snowflake) implement `source_name` + `to_envelopes()`
+- **Bridge function** `canonical_to_envelope()`: Converts existing canonical records to RecordEnvelope without breaking changes
+- **30 contract tests** (`tests/test_connector_contract_v1.py`)
+
+### Added — Connector Fixture Library
+
+- **Deterministic fixtures** (`fixtures/connectors/`): `baseline_raw.json` + `delta_raw.json` for all 4 connectors (SharePoint, Dataverse, Snowflake, AskSage)
+- **Golden envelopes** (`expected_envelopes.jsonl`): Pre-computed reference output for golden-file comparison
+- **Fixture generator** (`tools/generate_connector_fixtures.py`): Reads raw fixtures, runs connector transforms, writes golden JSONL
+- **24 fixture tests** (`tests/test_connector_fixtures.py`): Per-connector golden match, hash stability, cross-connector validation
+- **Fixture docs** (`docs/fixtures.md`): Philosophy, structure, regeneration guide
+
+### Added — Trust Scorecard
+
+- **Metrics spec** (`specs/trust_scorecard_v1.md`): 14 metrics + 4 SLO thresholds (IRIS latency, steps passed, schema clean, score positive)
+- **Scorecard generator** (`tools/trust_scorecard.py`): Reads Golden Path output, emits `trust_scorecard.json` with metrics + SLO checks
+- **Dashboard panel** (`dashboard/src/TrustScorecardPanel.tsx`): Score cards, SLO badges, timing/quality metrics
+- **API endpoint** (`dashboard/api_server.py`): `GET /api/trust_scorecard`
+- **CI integration** (`.github/workflows/ci.yml`): Connector contract tests + scorecard generation steps
+- **18 scorecard tests** (`tests/test_trust_scorecard.py`)
+
+### Changed
+
+- Dashboard App.tsx: Added Trust Scorecard tab (key 6), 7 views total
+- NAV.md: Added Fixture Library and Trust & Metrics sections
+- README.md: Added Trust Scorecard quickstart section
+- pyproject.toml: Added `connectors*` to package discovery
+
+### Stats
+
+- 679 tests passing, 72 new tests, 27 new files, 9 modified
+
 ## [0.4.0] — 2026-02-18 — "Control Surface"
 
 ### Added — Tier 1: Persistence & Wiring
