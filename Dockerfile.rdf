@@ -1,0 +1,74 @@
+# syntax=docker/dockerfile:1
+# ── Σ OVERWATCH RDF/SPARQL endpoint ──────────────────────────
+# Apache Jena Fuseki pre-loaded with the DeepSigma ontology.
+# Exposes a SPARQL 1.1 endpoint at http://localhost:3030/deepsigma
+#
+# Usage:
+#   docker run -p 3030:3030 ghcr.io/8ryanwh1t3/deepsigma-rdf
+#
+# SPARQL query endpoint: http://localhost:3030/deepsigma/sparql
+# SPARQL update:         http://localhost:3030/deepsigma/update
+# Graph store:           http://localhost:3030/deepsigma/data
+# Fuseki admin UI:       http://localhost:3030
+#
+# Example query:
+#   curl -X POST http://localhost:3030/deepsigma/sparql \
+#     -H "Content-Type: application/sparql-query" \
+#     -H "Accept: application/json" \
+#     -d "SELECT * WHERE { ?s ?p ?o } LIMIT 10"
+# ─────────────────────────────────────────────────────────────
+FROM stain/jena-fuseki:5.0.0
+
+LABEL org.opencontainers.image.source="https://github.com/8ryanWh1t3/DeepSigma"
+LABEL org.opencontainers.image.description="Σ OVERWATCH RDF — Jena Fuseki SPARQL endpoint with DeepSigma ontology"
+LABEL org.opencontainers.image.licenses="MIT"
+
+# Copy all ontology TTL files
+COPY rdf/coherence-ops-ontology.ttl /staging/
+COPY rdf/namespaces.ttl             /staging/
+COPY rdf/ontology/claim_primitive.ttl       /staging/
+COPY rdf/ontology/coherence_ops_core.ttl   /staging/
+COPY rdf/ontology/coherence_ops_extended.ttl /staging/
+
+# Copy sample data and SHACL shapes
+COPY rdf/sample_data/ /staging/sample_data/
+COPY rdf/shapes/      /staging/shapes/
+
+# Create Fuseki dataset config
+COPY <<'FUSEKI_CONF' /fuseki/configuration/deepsigma.ttl
+@prefix :      <#> .
+@prefix fuseki: <http://jena.apache.org/fuseki#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix tdb2:  <http://jena.apache.org/2016/tdb#> .
+@prefix ja:    <http://jena.hpl.hp.com/2005/11/Assembler#> .
+
+:service_deepsigma  a fuseki:Service ;
+    fuseki:name          "deepsigma" ;
+    fuseki:endpoint      [ fuseki:operation fuseki:query ;    fuseki:name "sparql" ] ;
+    fuseki:endpoint      [ fuseki:operation fuseki:update ;   fuseki:name "update" ] ;
+    fuseki:endpoint      [ fuseki:operation fuseki:gsp-rw ;   fuseki:name "data" ] ;
+    fuseki:dataset       :dataset_deepsigma .
+
+:dataset_deepsigma  a  tdb2:DatasetTDB2 ;
+    tdb2:location "/fuseki/databases/deepsigma" .
+FUSEKI_CONF
+
+# Load ontology TTL files into the dataset at build time
+USER root
+RUN mkdir -p /fuseki/databases/deepsigma && \
+    /jena/bin/tdb2.tdbloader \
+        --loc /fuseki/databases/deepsigma \
+        /staging/namespaces.ttl \
+        /staging/coherence-ops-ontology.ttl \
+        /staging/claim_primitive.ttl \
+        /staging/coherence_ops_core.ttl \
+        /staging/coherence_ops_extended.ttl && \
+    chown -R 9008:9008 /fuseki/databases/deepsigma
+
+USER 9008
+
+EXPOSE 3030
+
+# Fuseki reads datasets from /fuseki/configuration/
+ENV FUSEKI_DATASET_1=deepsigma
