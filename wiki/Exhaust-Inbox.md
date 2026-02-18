@@ -18,7 +18,7 @@ Every AI interaction produces exhaust — prompts, responses, tool calls, metric
         v
   ┌─────────────────┐
   │  Refine          │  POST /api/exhaust/episodes/{id}/refine
-  │  → 3 Buckets     │
+  │  → 3 Buckets     │  (rule-based or LLM-backed)
   │  → Drift Signals │
   │  → Coherence     │
   └─────────────────┘
@@ -46,11 +46,31 @@ Each item has a **confidence score** (0–1) that determines its gating tier:
 | 0.65 – 0.84 | `review_required` | Human review needed (amber) |
 | < 0.65 | `hold` | Held for investigation (red) |
 
+## LLM Extraction
+
+By default the refiner uses **rule-based extraction** (keyword and pattern matching). Enable **LLM-backed extraction** using `claude-haiku-4-5-20251001` for higher-quality buckets:
+
+```bash
+pip install -e ".[exhaust-llm]"
+export ANTHROPIC_API_KEY="sk-ant-..."
+export EXHAUST_USE_LLM="1"
+```
+
+When enabled, the `LLMExtractor` in `engine/exhaust_llm_extractor.py` builds a transcript of episode events (truncated to 6 000 chars), calls the Anthropic Messages API with a JSON-only system prompt, and parses the structured response into TRUTH / REASONING / MEMORY items. All confidence values are clamped to `[0.0, 1.0]`.
+
+**Fallback behaviour:** if the API call fails or returns unparseable output, the rule-based extractor runs transparently — no episode is lost and no error is surfaced.
+
+**Grade expectation:** LLM extraction typically produces **B** or **A** grades for well-structured episodes; rule-based typically yields **C** or **D**.
+
+Set `EXHAUST_USE_LLM=0` at any time to revert to rule-based without redeploying.
+
+See also: [`engine/exhaust_llm_extractor.py`](../engine/exhaust_llm_extractor.py) and the [LLM extraction cookbook](../cookbook/exhaust/llm_extraction/).
+
 ## Ingestion Wedges
 
 ### A) LangChain Real-Time
 
-The `ExhaustCallbackHandler` extends the DeepSigma callback handler to emit `EpisodeEvent` payloads during chain execution. Events are buffered and flushed to the ingestion endpoint.
+The `ExhaustCallbackHandler` extends the DeepSigma callback handler to emit `EpisodeEvent` payloads during chain execution. Events are buffered and flushed to the ingestion endpoint. Each LLM call also emits a `metric` event carrying `latency_ms` and the `model` name.
 
 ```python
 from adapters.langchain_exhaust import ExhaustCallbackHandler
@@ -81,7 +101,7 @@ python -m adapters.anthropic_exhaust \
 
 See: [`adapters/anthropic_exhaust.py`](../adapters/anthropic_exhaust.py)
 
-### E) Azure / OpenAI Batch
+### C) Azure / OpenAI Batch
 
 The batch adapter reads JSONL log exports from OpenAI or Azure OpenAI, normalises them to `EpisodeEvent` format, groups by `user_hash + conversation_id + time_window` (30 min default), and POSTs to the ingestion endpoint.
 
@@ -110,7 +130,7 @@ The refiner performs MVP drift detection on each episode:
 | `contradiction` | Claim contradicts existing canon |
 | `missing_policy` | Required policy flag not present |
 | `low_coverage` | Insufficient claim coverage for the episode |
-| `stale_reference` | References outdated or expired data |
+| `stale_reference` | Memory item references an episode ID no longer in the memory graph |
 
 Each signal has a **severity** (Green / Yellow / Red) and a **fingerprint** (stable hash for dedup) with an optional `recommended_patch`.
 
@@ -118,13 +138,13 @@ Each signal has a **severity** (Green / Yellow / Red) and a **fingerprint** (sta
 
 Episodes receive a coherence score (0–100) computed from weighted dimensions:
 
-| Dimension | Description |
-|-----------|-------------|
-| `claim_coverage` | How well claims cover the episode content |
-| `evidence_quality` | Strength and specificity of evidence |
-| `reasoning_completeness` | Whether decisions have rationale and alternatives |
-| `memory_linkage` | Entity/relation extraction quality |
-| `policy_adherence` | Compliance with active policy packs |
+| Dimension | Weight | Description |
+|-----------|--------|-------------|
+| `claim_coverage` | 25% | How well claims cover the episode content |
+| `evidence_quality` | 25% | Strength and specificity of evidence |
+| `reasoning_completeness` | 20% | Whether decisions have rationale and alternatives |
+| `memory_linkage` | 15% | Entity/relation extraction quality |
+| `policy_adherence` | 15% | Compliance with active policy packs |
 
 **Grade mapping:** A ≥ 85, B ≥ 75, C ≥ 65, D < 65
 
@@ -154,16 +174,16 @@ The Exhaust Inbox renders as a **three-lane layout** at `#/inbox`:
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `POST` | `/api/exhaust/events` | Ingest raw events |
-| `POST` | `/api/exhaust/episodes/assemble` | Group events into episodes |
-| `GET` | `/api/exhaust/episodes` | List episodes (filterable) |
+| `GET` | `/api/exhaust/health` | Health check — returns event/episode/refined counts |
+| `POST` | `/api/exhaust/events` | Ingest a raw `EpisodeEvent` |
+| `POST` | `/api/exhaust/episodes/assemble` | Group buffered events into episodes |
+| `GET` | `/api/exhaust/episodes` | List all assembled episodes |
 | `GET` | `/api/exhaust/episodes/{id}` | Episode detail |
-| `POST` | `/api/exhaust/episodes/{id}/refine` | Extract buckets + drift + coherence |
-| `POST` | `/api/exhaust/episodes/{id}/commit` | Commit refined episode |
-| `POST` | `/api/exhaust/episodes/{id}/item` | Accept/reject/edit single item |
-| `GET` | `/api/exhaust/drift` | List drift signals |
-| `GET` | `/api/exhaust/health` | Health check |
-| `GET` | `/api/exhaust/schema` | JSON Schema export |
+| `POST` | `/api/exhaust/episodes/{id}/refine` | Extract buckets + drift + coherence score |
+| `POST` | `/api/exhaust/episodes/{id}/commit` | Commit refined episode to Memory Graph |
+| `PATCH` | `/api/exhaust/episodes/{id}/items/{item_id}` | Accept / reject / edit a single bucket item |
+| `GET` | `/api/exhaust/mg` | Read the Memory Graph |
+| `GET` | `/api/exhaust/drift` | List all drift signals |
 
 ## Storage (MVP)
 
@@ -187,6 +207,17 @@ python tools/exhaust_cli.py refine --episode <id>
 python tools/exhaust_cli.py commit --episode <id>
 python tools/exhaust_cli.py health
 ```
+
+## Diagrams
+
+Four Mermaid diagrams cover the full Exhaust Inbox architecture:
+
+| Diagram | Contents |
+|---------|----------|
+| [`mermaid/29-exhaust-inbox-pipeline.md`](../mermaid/29-exhaust-inbox-pipeline.md) | Full pipeline (graph TB), bucket extraction detail (flowchart), episode state machine (stateDiagram) |
+| [`mermaid/29-exhaust-connector-map.md`](../mermaid/29-exhaust-connector-map.md) | Adapter ecosystem (graph LR), Source enum mapping, LangChain metric enrichment |
+| [`mermaid/29-exhaust-api-surface.md`](../mermaid/29-exhaust-api-surface.md) | All 10 endpoints (graph TD), refine→commit sequence diagram, status codes |
+| [`mermaid/29-llm-extraction-flow.md`](../mermaid/29-llm-extraction-flow.md) | LLMExtractor internals (flowchart), API call sequence, confidence clamping, system prompt |
 
 ## Related Pages
 
