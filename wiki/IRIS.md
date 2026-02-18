@@ -59,127 +59,127 @@ Runs CoherenceScorer across all four artifacts. Returns overall score (0–100),
 Every response includes:
 
 - **query_id** — deterministic hash: `iris-{sha256[:12]}`
-- - **query_type** — WHY | WHAT_CHANGED | WHAT_DRIFTED | RECALL | STATUS
-  - - **status** — RESOLVED | PARTIAL | NOT_FOUND | ERROR
-    - - **summary** — human-readable explanation
-      - - **data** — query-type-specific structured data
-        - - **provenance_chain** — ordered list of `ProvenanceLink` objects
-          - - **confidence** — 0.0–1.0 (additive per artifact, capped at 1.0)
-            - - **resolved_at** — ISO-8601 timestamp
-              - - **elapsed_ms** — wall-clock time
-                - - **warnings** — performance or data quality alerts
-                 
-                  - ### Provenance Chain
-                 
-                  - Each link in the chain identifies:
-                 
-                  - - **artifact** — DLR, MG, DS, RS, or PRIME
-                    - - **ref_id** — specific record identifier
-                      - - **role** — `source` (primary), `evidence` (supporting), or `context` (enriching)
-                        - - **detail** — human-readable description
-                         
-                          - ### Resolution Status
-                         
-                          - | Status | Condition |
-                          - |--------|-----------|
-                          - | RESOLVED | confidence >= 0.5 |
-                          - | PARTIAL | 0 < confidence < 0.5 |
-                          - | NOT_FOUND | required data missing |
-                          - | ERROR | exception during resolution |
-                         
-                          - ---
+- **query_type** — WHY | WHAT_CHANGED | WHAT_DRIFTED | RECALL | STATUS
+- **status** — RESOLVED | PARTIAL | NOT_FOUND | ERROR
+- **summary** — human-readable explanation
+- **data** — query-type-specific structured data
+- **provenance_chain** — ordered list of `ProvenanceLink` objects
+- **confidence** — 0.0–1.0 (additive per artifact, capped at 1.0)
+- **resolved_at** — ISO-8601 timestamp
+- **elapsed_ms** — wall-clock time
+- **warnings** — performance or data quality alerts
 
-                          ## Interfaces
+### Provenance Chain
 
-                          ### Python
+Each link in the chain identifies:
 
-                          ```python
-                          from coherence_ops.iris import IRISEngine, IRISQuery, QueryType
+- **artifact** — DLR, MG, DS, RS, or PRIME
+- **ref_id** — specific record identifier
+- **role** — `source` (primary), `evidence` (supporting), or `context` (enriching)
+- **detail** — human-readable description
 
-                          engine = IRISEngine(dlr_builder=dlr, rs=rs, ds=ds, mg=mg)
-                          response = engine.resolve(IRISQuery(query_type=QueryType.WHY, episode_id="ep-001"))
-                          ```
+### Resolution Status
 
-                          ### CLI
+| Status | Condition |
+|--------|-----------|
+| RESOLVED | confidence >= 0.5 |
+| PARTIAL | 0 < confidence < 0.5 |
+| NOT_FOUND | required data missing |
+| ERROR | exception during resolution |
 
-                          ```bash
-                          coherence iris query --type WHY --target ep-001
-                          coherence iris query --type STATUS
-                          coherence iris query --type WHAT_DRIFTED --json
-                          ```
+---
 
-                          ### Dashboard
+## Interfaces
 
-                          View 4 (keyboard shortcut `4`) in the Σ OVERWATCH dashboard. Natural language input with query type selector, structured response with provenance chain visualization.
+### Python
 
-                          ### JSON Schema
+```python
+from coherence_ops.iris import IRISEngine, IRISQuery, QueryType
 
-                          `specs/iris_query.schema.json` — JSON Schema draft 2020-12, `$id: https://deepsigma.dev/schemas/iris_query.schema.json`.
+engine = IRISEngine(dlr_builder=dlr, rs=rs, ds=ds, mg=mg)
+response = engine.resolve(IRISQuery(query_type=QueryType.WHY, episode_id="ep-001"))
+```
 
-                          ---
+### CLI
 
-                          ## Usage Patterns
+```bash
+coherence iris query --type WHY --target ep-001
+coherence iris query --type STATUS
+coherence iris query --type WHAT_DRIFTED --json
+```
 
-                          | Pattern | Query Type | When |
-                          |---------|-----------|------|
-                          | Post-incident review | WHY | After an unexpected outcome — trace provenance + policy context |
-                          | Drift triage | WHAT_DRIFTED | Routine monitoring — severity breakdown + resolution ratio |
-                          | Health check | STATUS | Pre-deployment — coherence score + dimension breakdown |
-                          | Institutional memory | RECALL | Onboarding / knowledge transfer — full graph context for an episode |
-                          | Change audit | WHAT_CHANGED | Pre-policy-update — baseline outcome distribution + patch count |
+### Dashboard
 
-                          ---
+View 4 (keyboard shortcut `4`) in the Σ OVERWATCH dashboard. Natural language input with query type selector, structured response with provenance chain visualization.
 
-                          ## Configuration
+### JSON Schema
 
-                          | Parameter | Default | Description |
-                          |-----------|---------|-------------|
-                          | `response_time_target_ms` | 60,000 | Performance warning threshold |
-                          | `max_provenance_depth` | 50 | Max provenance links per response |
-                          | `default_time_window_seconds` | 3,600 | Time window for WHAT_CHANGED |
-                          | `default_limit` | 20 | Result count limit |
-                          | `include_raw_artifacts` | false | Include raw data in response |
+`specs/iris_query.schema.json` — JSON Schema draft 2020-12, `$id: https://deepsigma.dev/schemas/iris_query.schema.json`.
 
-                          ---
+---
 
-                          ## Design Principles
+## Usage Patterns
 
-                          - **Read-only** — queries but never writes. Mutation flows through PRIME.
-                          - - **Provenance-first** — no answer without lineage. Every response traces back to artifact records.
-                            - - **Sub-60-second** — matches MG's institutional memory promise.
-                              - - **Structured output** — machine-parseable (JSON) and human-readable.
-                                - - **Graceful degradation** — returns PARTIAL/NOT_FOUND instead of failing when artifacts are unavailable.
-                                 
-                                  - ---
+| Pattern | Query Type | When |
+|---------|-----------|------|
+| Post-incident review | WHY | After an unexpected outcome — trace provenance + policy context |
+| Drift triage | WHAT_DRIFTED | Routine monitoring — severity breakdown + resolution ratio |
+| Health check | STATUS | Pre-deployment — coherence score + dimension breakdown |
+| Institutional memory | RECALL | Onboarding / knowledge transfer — full graph context for an episode |
+| Change audit | WHAT_CHANGED | Pre-policy-update — baseline outcome distribution + patch count |
 
-                                  ## Files
+---
 
-                                  | File | Description |
-                                  |------|-------------|
-                                  | `coherence_ops/iris.py` | Engine implementation |
-                                  | `specs/iris_query.schema.json` | JSON Schema contract |
-                                  | `coherence_ops/cli.py` | CLI `coherence iris query` |
-                                  | `dashboard/src/IrisPanel.tsx` | Dashboard panel component |
-                                  | `dashboard/src/mockData.ts` | Mock resolver for dev mode |
+## Configuration
 
-                                  ---
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `response_time_target_ms` | 60,000 | Performance warning threshold |
+| `max_provenance_depth` | 50 | Max provenance links per response |
+| `default_time_window_seconds` | 3,600 | Time window for WHAT_CHANGED |
+| `default_limit` | 20 | Result count limit |
+| `include_raw_artifacts` | false | Include raw data in response |
 
-                                  ## Glossary Terms
+---
 
-                                  See [Glossary](Glossary) and [GLOSSARY.md](../GLOSSARY.md):
+## Design Principles
 
-                                  - **IRIS** — operator-facing interface layer; query resolution with sub-60s targets
-                                  - - **PRIME** — governance threshold gate; LLM output → decision-grade action
-                                    - - **DLR** — Decision Lineage Record; truth constitution for a decision class
-                                      - - **RS** — Reasoning Summary; outcome aggregation and learning
-                                        - - **DS** — Drift Scan; structured drift signals by type/severity/fingerprint
-                                          - - **MG** — Memory Graph; provenance + recall graph
-                                            - - **Claim–Evidence–Source** — the truth chain enforced by PRIME, reconstructed by IRIS
-                                              - - **Coherence Score** — 0–100 composite from all four artifacts
-                                                - - **Seal** — immutable, tamper-evident record
-                                                 
-                                                  - See also: [Language Map](../docs/01-language-map.md) for LinkedIn-to-Code mappings (IRIS = Phase 2).
-                                                 
-                                                  - ---
+- **Read-only** — queries but never writes. Mutation flows through PRIME.
+- **Provenance-first** — no answer without lineage. Every response traces back to artifact records.
+- **Sub-60-second** — matches MG's institutional memory promise.
+- **Structured output** — machine-parseable (JSON) and human-readable.
+- **Graceful degradation** — returns PARTIAL/NOT_FOUND instead of failing when artifacts are unavailable.
 
-                                                  Full documentation: `docs/18-iris.md`
+---
+
+## Files
+
+| File | Description |
+|------|-------------|
+| `coherence_ops/iris.py` | Engine implementation |
+| `specs/iris_query.schema.json` | JSON Schema contract |
+| `coherence_ops/cli.py` | CLI `coherence iris query` |
+| `dashboard/src/IrisPanel.tsx` | Dashboard panel component |
+| `dashboard/src/mockData.ts` | Mock resolver for dev mode |
+
+---
+
+## Glossary Terms
+
+See [Glossary](Glossary) and [GLOSSARY.md](../GLOSSARY.md):
+
+- **IRIS** — operator-facing interface layer; query resolution with sub-60s targets
+- **PRIME** — governance threshold gate; LLM output → decision-grade action
+- **DLR** — Decision Lineage Record; truth constitution for a decision class
+- **RS** — Reasoning Summary; outcome aggregation and learning
+- **DS** — Drift Scan; structured drift signals by type/severity/fingerprint
+- **MG** — Memory Graph; provenance + recall graph
+- **Claim–Evidence–Source** — the truth chain enforced by PRIME, reconstructed by IRIS
+- **Coherence Score** — 0–100 composite from all four artifacts
+- **Seal** — immutable, tamper-evident record
+
+See also: [Language Map](../docs/01-language-map.md) for LinkedIn-to-Code mappings (IRIS = Phase 2).
+
+---
+
+Full documentation: `docs/18-iris.md`

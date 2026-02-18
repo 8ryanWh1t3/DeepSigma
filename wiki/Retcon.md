@@ -106,17 +106,17 @@
 > Retcon preserves full provenance. After a retcon:
 >
 > 1. The original claim remains in the graph (it is never deleted)
-> 2. 2. The new claim has `graph.supersedes` pointing to the original
->    3. 3. The retcon record links both, with full audit trail
->       4. 4. Any claim with `graph.dependsOn` referencing the original is flagged for re-evaluation
->          5. 5. IRIS queries that walk the graph see the supersession chain
->            
->             6. This means you can always answer: "What did we believe then? What do we believe now? Why did it change?"
->            
->             7. ## Related Pages
->            
->             8. - [Unified Atomic Claims](Unified-Atomic-Claims) — the Claim Primitive that Retcon corrects
+> 2. The new claim has `graph.supersedes` pointing to the original
+> 3. The retcon record links both, with full audit trail
+> 4. Any claim with `graph.dependsOn` referencing the original is flagged for re-evaluation
+> 5. IRIS queries that walk the graph see the supersession chain
+>
+> This means you can always answer: "What did we believe then? What do we believe now? Why did it change?"
+>
+> ## Related Pages
+>
+> - [Unified Atomic Claims](Unified-Atomic-Claims) — the Claim Primitive that Retcon corrects
 > - [Canon](Canon) — blessed claim memory that may need retcon
-> - - [Sealing & Episodes](Sealing-and-Episodes) — immutability model
->   - - [Drift to Patch](Drift-to-Patch) — the drift lifecycle (patches vs retcons)
->     - - [Schemas](Schemas) — all JSON Schema specs
+> - [Sealing & Episodes](Sealing-and-Episodes) — immutability model
+> - [Drift to Patch](Drift-to-Patch) — the drift lifecycle (patches vs retcons)
+> - [Schemas](Schemas) — all JSON Schema specs

@@ -78,7 +78,7 @@
 > ## Related Pages
 >
 > - [Unified Atomic Claims](Unified-Atomic-Claims) — the Claim Primitive that Canon promotes
-> - - [Retcon](Retcon) — retroactive correction of canon entries
->   - - [Sealing & Episodes](Sealing-and-Episodes) — immutability model
->     - - [Schemas](Schemas) — all JSON Schema specs
->       - - [IRIS](IRIS) — query resolution engine
+> - [Retcon](Retcon) — retroactive correction of canon entries
+> - [Sealing & Episodes](Sealing-and-Episodes) — immutability model
+> - [Schemas](Schemas) — all JSON Schema specs
+> - [IRIS](IRIS) — query resolution engine
