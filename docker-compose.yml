@@ -127,4 +127,4 @@ services:
       - golden-path
     # Run the fixture Golden Path:
     #   docker compose --profile golden-path run --rm golden-path
-    command: ["deepsigma", "golden-path", "sharepoint", "--fixture", "/app/demos/golden_path/fixtures/sharepoint_small", "--out", "/app/out", "--clean"]
+    command: ["deepsigma", "golden-path", "sharepoint", "--fixture", "/app/demos/golden_path/fixtures/sharepoint_small", "--output", "/app/out", "--clean"]

@@ -23,7 +23,7 @@ def _run_golden_path(args: argparse.Namespace) -> int:
     from demos.golden_path.config import GoldenPathConfig
     from demos.golden_path.pipeline import GoldenPathPipeline
 
-    out_dir = Path(args.out)
+    out_dir = Path(args.output)
 
     # --clean: wipe output directory before running
     if args.clean and out_dir.exists():
@@ -103,7 +103,7 @@ def main(argv: list[str] | None = None) -> int:
         help="Data source connector",
     )
     gp.add_argument("--fixture", default=None, help="Path to fixture directory (offline mode)")
-    gp.add_argument("--out", default="./golden_path_output", help="Output directory")
+    gp.add_argument("--output", "--out", default="./golden_path_output", help="Output directory")
     gp.add_argument("--clean", action="store_true", help="Wipe output directory before running")
     gp.add_argument("--verbose", action="store_true", help="Print extra diagnostic output")
     gp.add_argument("--json", action="store_true", help="Output JSON result instead of table")
