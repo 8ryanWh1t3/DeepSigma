@@ -28,10 +28,8 @@
           "type": "string",
           "enum": [
             "prompt",
-            "response",
-            "tool_call",
-            "tool_result",
-            "model",
+            "completion",
+            "tool",
             "metric",
             "error"
           ]
@@ -75,7 +73,7 @@
           "enum": [
             "contradiction",
             "missing_policy",
-            "low_coverage",
+            "low_claim_coverage",
             "stale_reference"
           ]
         },
@@ -206,7 +204,8 @@
           "enum": [
             "pending",
             "accepted",
-            "rejected"
+            "rejected",
+            "edited"
           ],
           "default": "pending"
         }
@@ -254,7 +253,8 @@
           "enum": [
             "pending",
             "accepted",
-            "rejected"
+            "rejected",
+            "edited"
           ],
           "default": "pending"
         }
@@ -305,7 +305,8 @@
           "enum": [
             "pending",
             "accepted",
-            "rejected"
+            "rejected",
+            "edited"
           ],
           "default": "pending"
         }
