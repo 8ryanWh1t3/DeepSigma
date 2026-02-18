@@ -51,7 +51,7 @@ export default function EpisodeCard({ episode, selected, onClick }: Props) {
   const maxDrift =
     driftCount > 0
       ? e.drift_signals!.reduce(
-          (worst: string, d: DriftSignal) =>
+          (worst: "green" | "yellow" | "red"", d: DriftSignal) =>
             d.severity === "red"
               ? "red"
               : d.severity === "yellow" && worst !== "red"

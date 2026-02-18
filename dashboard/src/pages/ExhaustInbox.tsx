@@ -40,8 +40,8 @@ export default function ExhaustInbox() {
         });
         // optimistic update
         if (refined) {
-          const updateBucket = (items: Record<string, unknown>[]) =>
-            items.map((it: Record<string, unknown>) =>
+          const updateBucket = (items: any[]) =>
+            items.map((it: any) =>
               (it.id as string) === itemId
                 ? { ...it, status: action === "edit" ? "pending" : action + "ed" }
                 : it,
@@ -50,15 +50,15 @@ export default function ExhaustInbox() {
             ...refined,
             truth:
               bucket === "truth"
-                ? (updateBucket(refined.truth as Record<string, unknown>[]) as unknown as typeof refined.truth)
+                ? (updateBucket(refined.truth as any[]) as typeof refined.truth)
                 : refined.truth,
             reasoning:
               bucket === "reasoning"
-                ? (updateBucket(refined.reasoning as Record<string, unknown>[]) as unknown as typeof refined.reasoning)
+                ? (updateBucket(refined.reasoning as any[]) as typeof refined.reasoning)
                 : refined.reasoning,
             memory:
               bucket === "memory"
-                ? (updateBucket(refined.memory as Record<string, unknown>[]) as unknown as typeof refined.memory)
+                ? (updateBucket(refined.memory as any[]) as typeof refined.memory)
                 : refined.memory,
           });
         }
@@ -72,7 +72,7 @@ export default function ExhaustInbox() {
   const handleAcceptAll = useCallback(async () => {
     if (!selectedId || !refined) return;
     // Accept every pending item across all buckets
-    const pending = (items: Record<string, unknown>[]) =>
+    const pending = (items: any[]) =>
       (items as Array<Record<string, unknown>>).filter(
         (it) => (it.status as string) !== "accepted",
       );
@@ -94,16 +94,16 @@ export default function ExhaustInbox() {
     }
     // reload – crude but effective for MVP
     if (refined) {
-      const markAll = (items: Record<string, unknown>[]) =>
+      const markAll = (items: any[]) =>
         (items as Array<Record<string, unknown>>).map((it) => ({
           ...it,
           status: "accepted",
         }));
       setRefined({
         ...refined,
-        truth: markAll(refined.truth as Record<string, unknown>[]) as unknown as typeof refined.truth,
-        reasoning: markAll(refined.reasoning as Record<string, unknown>[]) as unknown as typeof refined.reasoning,
-        memory: markAll(refined.memory as Record<string, unknown>[]) as unknown as typeof refined.memory,
+        truth: markAll(refined.truth as any[]) as typeof refined.truth,
+        reasoning: markAll(refined.reasoning as any[]) as typeof refined.reasoning,
+        memory: markAll(refined.memory as any[]) as typeof refined.memory,
       });
     }
   }, [selectedId, refined]);
