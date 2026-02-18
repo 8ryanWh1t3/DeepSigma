@@ -40,7 +40,7 @@ COPY <<'FUSEKI_CONF' /fuseki/configuration/deepsigma.ttl
 @prefix fuseki: <http://jena.apache.org/fuseki#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix tdb2:  <http://jena.apache.org/2016/tdb#> .
+@prefix tdb:   <http://jena.hpl.hp.com/2008/tdb#> .
 @prefix ja:    <http://jena.hpl.hp.com/2005/11/Assembler#> .
 
 :service_deepsigma  a fuseki:Service ;
@@ -50,15 +50,14 @@ COPY <<'FUSEKI_CONF' /fuseki/configuration/deepsigma.ttl
     fuseki:endpoint      [ fuseki:operation fuseki:gsp-rw ;   fuseki:name "data" ] ;
     fuseki:dataset       :dataset_deepsigma .
 
-:dataset_deepsigma  a  tdb2:DatasetTDB2 ;
-    tdb2:location "/fuseki/databases/deepsigma" .
+:dataset_deepsigma  a  tdb:DatasetTDB ;
+    tdb:location "/fuseki/databases/deepsigma" .
 FUSEKI_CONF
 
 # Load ontology TTL files into the dataset at build time
 USER root
 RUN mkdir -p /fuseki/databases/deepsigma && \
-    /jena/bin/tdb2.tdbloader \
-        --loc /fuseki/databases/deepsigma \
+    /jena-fuseki/tdbloader --loc /fuseki/databases/deepsigma \
         /staging/namespaces.ttl \
         /staging/coherence-ops-ontology.ttl \
         /staging/claim_primitive.ttl \
