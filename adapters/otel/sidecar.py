@@ -16,17 +16,17 @@ from __future__ import annotations
 import json
 import logging
 import os
+import sys
 import time
 from pathlib import Path
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
-logger = logging.getLogger(__name__)
-
 # Ensure the app root is importable
-import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from adapters.otel.exporter import OtelExporter  # noqa: E402
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+logger = logging.getLogger(__name__)
 
 DATA_ROOT = Path(os.environ.get("SIDECAR_DATA_DIR", "/app/data"))
 EPISODES_DIR = DATA_ROOT / "episodes"
