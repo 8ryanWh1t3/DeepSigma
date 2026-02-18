@@ -109,6 +109,9 @@ class ExhaustCallbackHandler(BaseCallbackHandler):
         self._flush_interval = flush_interval
         self._buffer: List[Dict[str, Any]] = []
         self._last_flush = time.monotonic()
+        # Per-run tracking for latency and model name
+        self._run_start: Dict[str, float] = {}
+        self._run_model: Dict[str, str] = {}
 
     # -- internal ----------------------------------------------------------
 
@@ -175,6 +178,12 @@ class ExhaustCallbackHandler(BaseCallbackHandler):
         parent_run_id: Optional[UUID] = None,
         **kwargs: Any,
     ) -> None:
+        # Record start time and model name for latency metric in on_llm_end
+        self._run_start[str(run_id)] = time.monotonic()
+        self._run_model[str(run_id)] = (
+            serialized.get("kwargs", {}).get("model_name")
+            or serialized.get("name", "")
+        )
         self._emit(
             self._base("prompt", run_id, parent_run_id, prompts, **kwargs)
         )
@@ -195,6 +204,25 @@ class ExhaustCallbackHandler(BaseCallbackHandler):
         self._emit(
             self._base("response", run_id, parent_run_id, text, **kwargs)
         )
+        # Emit latency + model metric
+        latency_ms = int(
+            (time.monotonic() - self._run_start.pop(str(run_id), time.monotonic())) * 1000
+        )
+        model = self._run_model.pop(str(run_id), "")
+        session_id = str(parent_run_id or run_id)
+        self._emit({
+            "event_id": _make_event_id(str(run_id), "metric", _utcnow()),
+            "episode_id": "",
+            "session_id": session_id,
+            "event_type": "metric",
+            "timestamp": _utcnow(),
+            "user_hash": _hash_user(kwargs.get("user_id")),
+            "source": self._source,
+            "project": self._project,
+            "team": self._team,
+            "payload": {"latency_ms": latency_ms, "model": model},
+            "meta": {},
+        })
 
     def on_tool_start(
         self,
