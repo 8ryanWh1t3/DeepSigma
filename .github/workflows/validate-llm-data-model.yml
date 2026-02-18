@@ -1,0 +1,71 @@
+name: Validate — LLM Data Model
+
+# Validates all JSON examples in llm_data_model/03_examples/ against the
+# canonical record schema whenever the data model is changed.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'llm_data_model/**'
+      - '.github/workflows/validate-llm-data-model.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'llm_data_model/**'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install jsonschema referencing
+
+      - name: Run LLM Data Model validation
+        run: python llm_data_model/05_validation/validate_examples.py
+
+      - name: Validate JSON schema files are well-formed
+        run: |
+          python -c "
+          import json, sys
+          from pathlib import Path
+          schemas = list(Path('llm_data_model/02_schema/jsonschema').glob('*.json'))
+          schemas += list(Path('llm_data_model/02_schema').glob('*.json'))
+          errors = []
+          for s in schemas:
+              try:
+                  json.loads(s.read_text())
+              except json.JSONDecodeError as e:
+                  errors.append(f'{s}: {e}')
+          if errors:
+              print('Schema JSON errors:', *errors, sep='\n  ')
+              sys.exit(1)
+          print(f'All {len(schemas)} schema file(s) are valid JSON')
+          "
+
+      - name: Validate example JSON files are well-formed
+        run: |
+          python -c "
+          import json, sys
+          from pathlib import Path
+          examples = list(Path('llm_data_model/03_examples').glob('*.json'))
+          errors = []
+          for ex in examples:
+              try:
+                  json.loads(ex.read_text())
+              except json.JSONDecodeError as e:
+                  errors.append(f'{ex.name}: {e}')
+          if errors:
+              print('Example JSON errors:', *errors, sep='\n  ')
+              sys.exit(1)
+          print(f'All {len(examples)} example file(s) are valid JSON')
+          "
