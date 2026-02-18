@@ -74,3 +74,21 @@ services:
     #   docker compose --profile cli run coherence audit /data/
     #   docker compose --profile cli run coherence iris query /data/ --type STATUS
     command: ["--help"]
+
+  tools:
+    build:
+      context: .
+      dockerfile: Dockerfile.tools
+    image: ghcr.io/8ryanwh1t3/deepsigma-tools:local
+    container_name: overwatch-tools
+    volumes:
+      - ./data:/data
+      - ./policy_packs:/app/policy_packs:ro
+    environment:
+      - PYTHONPATH=/app
+    profiles:
+      - cli
+    # Override command at runtime:
+    #   docker compose --profile cli run tools overwatch --decisionType X --policy /app/policy_packs/packs/demo_policy_pack_v1.json --out /data
+    #   docker compose --profile cli run tools overwatch-validate
+    #   docker compose --profile cli run tools overwatch-replay --episode /data/ep_001.json
