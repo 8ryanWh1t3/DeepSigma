@@ -194,8 +194,11 @@ def cmd_iris_query(args: argparse.Namespace) -> None:
     dlr, rs, ds, mg = _build_pipeline(episodes, drift_events)
 
     engine = IRISEngine(
-              config=IRISConfig(),
-              memory_graph=mg,
+        config=IRISConfig(),
+        memory_graph=mg,
+        dlr_entries=dlr.entries,
+        rs=rs,
+        ds=ds,
     )
 
     qtype = _IRIS_QUERY_TYPE_MAP.get(args.type.upper())
@@ -212,6 +215,7 @@ def cmd_iris_query(args: argparse.Namespace) -> None:
         query_type=qtype,
         episode_id=args.target or "",
         text=args.text or "",
+    )
 
     response = engine.resolve(query)
 
