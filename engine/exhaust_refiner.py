@@ -364,12 +364,37 @@ def score_coherence(
 def refine_episode(
     episode: DecisionEpisode,
     policy_pack: Optional[Dict[str, Any]] = None,
+    use_llm: bool = False,
 ) -> RefinedEpisode:
-    """Full refinement pipeline: extract -> dedup -> drift -> score."""
+    """Full refinement pipeline: extract -> dedup -> drift -> score.
 
-    truth = extract_truth(episode)
-    reasoning = extract_reasoning(episode)
-    memory = extract_memory(episode)
+    Args:
+        episode:     Assembled DecisionEpisode to refine.
+        policy_pack: Optional policy constraints for scoring.
+        use_llm:     When True and ANTHROPIC_API_KEY is set, use the
+                     LLM-based extractor in place of rule-based extraction.
+                     Falls back to rule-based on any failure.
+    """
+    if use_llm and os.environ.get("ANTHROPIC_API_KEY"):
+        try:
+            from engine.exhaust_llm_extractor import LLMExtractor
+            buckets = LLMExtractor().extract(episode)
+            truth = buckets.get("truth") or []
+            reasoning = buckets.get("reasoning") or []
+            # Always merge in the episode memory node from rule-based
+            llm_memory = buckets.get("memory") or []
+            rule_memory = extract_memory(episode)
+            # Deduplicate: rule_memory episode node + LLM entities
+            ep_nodes = [m for m in rule_memory if m.artifact_type == "episode"]
+            memory = ep_nodes + [m for m in llm_memory if m.artifact_type != "episode"]
+        except Exception:  # noqa: BLE001
+            use_llm = False  # fall through to rule-based
+
+    if not use_llm:
+        truth = extract_truth(episode)
+        reasoning = extract_reasoning(episode)
+        memory = extract_memory(episode)
+
     drift = detect_drift(episode, truth, memory)
     score, grade, breakdown = score_coherence(
         truth, reasoning, memory, drift, policy_pack
