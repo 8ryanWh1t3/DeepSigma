@@ -130,6 +130,23 @@ DeepSigma/
 
 ---
 
+## Operations
+
+| Resource | Purpose |
+|----------|---------|
+| [OPS_RUNBOOK.md](OPS_RUNBOOK.md) | Run Money Demo, tests, diagnostics, incident playbooks |
+| [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Top 20 issues — symptom → cause → fix → verify |
+| [CONFIG_REFERENCE.md](CONFIG_REFERENCE.md) | All CLI args, policy pack schema, environment variables |
+| [STABILITY.md](STABILITY.md) | What's stable, what's not, versioning policy, v1.0 criteria |
+| [TEST_STRATEGY.md](TEST_STRATEGY.md) | Test tiers, SLOs, how to run locally, coverage |
+
+**Run with coverage:**
+```bash
+pytest --cov=coherence_ops --cov-report=term-missing
+```
+
+---
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). All contributions must maintain consistency with Truth · Reasoning · Memory and the four canonical artifacts (DLR / RS / DS / MG).
