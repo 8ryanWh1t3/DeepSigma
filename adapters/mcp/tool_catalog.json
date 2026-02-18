@@ -1,6 +1,6 @@
 {
   "name": "sigma-overwatch-mcp",
-  "version": "0.1.0-scaffold",
+  "version": "0.2.0",
   "tools": [
     {
       "name": "overwatch.submit_task",
@@ -207,6 +207,49 @@
         "properties": {
           "ok": {
             "type": "boolean"
+          }
+        }
+      }
+    },
+    {
+      "name": "iris.query",
+      "description": "Query the IRIS operator resolution engine. Supports WHY, WHAT_CHANGED, WHAT_DRIFTED, RECALL, and STATUS query types. Returns structured response with provenance chain and confidence score.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["query_type"],
+        "properties": {
+          "query_type": {
+            "type": "string",
+            "enum": ["WHY", "WHAT_CHANGED", "WHAT_DRIFTED", "RECALL", "STATUS"]
+          },
+          "episode_id": {
+            "type": "string",
+            "description": "Required for WHY and RECALL queries"
+          },
+          "text": {
+            "type": "string",
+            "description": "Free-text query context"
+          },
+          "claim_id": {
+            "type": "string",
+            "description": "Target claim ID for WHY queries"
+          },
+          "decision_type": {
+            "type": "string",
+            "description": "Filter by decision type"
+          }
+        }
+      }
+    },
+    {
+      "name": "iris.reload",
+      "description": "Reload the coherence pipeline from disk. Call after new episodes or drift data have been written to /app/data.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "data_path": {
+            "type": "string",
+            "description": "Override data directory (default: /app/data)"
           }
         }
       }

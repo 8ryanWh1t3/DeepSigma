@@ -11,8 +11,10 @@ from __future__ import annotations
 import json
 import logging
 import os
+import time
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +40,13 @@ if HAS_FASTAPI:
     # Mount Exhaust Inbox API router
     if _HAS_EXHAUST:
         app.include_router(exhaust_router, prefix="/api/exhaust", tags=["exhaust"])
+
+    # Mount Drift Detection router
+    try:
+        from dashboard.server.drift_api import router as drift_router
+        app.include_router(drift_router, prefix="/api", tags=["drift"])
+    except ImportError:
+        logger.info("Drift API router not loaded (import failed)")
 else:
     app = None
     logger.warning("FastAPI not installed; dashboard API unavailable")
@@ -249,3 +258,104 @@ if HAS_FASTAPI:
     def health():
         """Simple health check."""
         return {"status": "ok", "dataDir": str(DATA_DIR), "dataExists": DATA_DIR.exists()}
+
+    # ---------------------------------------------------------------
+    # Pipeline singleton for IRIS / MG queries
+    # ---------------------------------------------------------------
+
+    _pipeline_cache: Optional[Tuple] = None
+    _pipeline_cache_time: float = 0.0
+    _PIPELINE_TTL: float = 60.0
+
+    def _get_pipeline():
+        """Lazy-init coherence pipeline with TTL-based refresh."""
+        nonlocal_vars = globals()
+        now = time.monotonic()
+        cache = nonlocal_vars.get("_pipeline_cache")
+        cache_time = nonlocal_vars.get("_pipeline_cache_time", 0.0)
+        if cache is not None and (now - cache_time) < _PIPELINE_TTL:
+            return cache
+        try:
+            from coherence_ops.cli import _build_pipeline
+            episodes = _get_episodes()
+            drift_events = _get_drift_events()
+            pipeline = _build_pipeline(episodes, drift_events)
+            nonlocal_vars["_pipeline_cache"] = pipeline
+            nonlocal_vars["_pipeline_cache_time"] = now
+            return pipeline
+        except Exception:
+            return None
+
+    @app.post("/api/iris")
+    def iris_query(body: dict):
+        """Resolve an IRIS operator query against the coherence pipeline."""
+        pipeline = _get_pipeline()
+        if pipeline is None:
+            return {"status": "ERROR", "summary": "Pipeline not available", "confidence": 0}
+        try:
+            from coherence_ops.iris import IRISConfig, IRISEngine, IRISQuery
+            dlr, rs, ds, mg = pipeline
+            engine = IRISEngine(
+                config=IRISConfig(),
+                memory_graph=mg,
+                dlr_entries=dlr.entries,
+                rs=rs,
+                ds=ds,
+            )
+            query = IRISQuery(
+                query_type=body.get("query_type", "STATUS"),
+                text=body.get("text", ""),
+                episode_id=body.get("episode_id", ""),
+            )
+            response = engine.resolve(query)
+            result = response.to_dict()
+            result["provenance_chain"] = result.pop("provenance", [])
+            result["resolved_at"] = datetime.now(timezone.utc).isoformat()
+            return result
+        except Exception as exc:
+            return {"status": "ERROR", "summary": str(exc), "confidence": 0}
+
+    @app.get("/api/drifts")
+    def list_drifts_plural(
+        drift_type: Optional[str] = Query(None),
+        severity: Optional[str] = Query(None),
+    ):
+        """Drift events (plural endpoint matching frontend expectations)."""
+        events = _get_drift_events()
+        if drift_type:
+            events = [e for e in events if e.get("type") == drift_type or e.get("driftType") == drift_type]
+        if severity:
+            events = [e for e in events if e.get("severity") == severity]
+        return events
+
+    @app.get("/api/agents")
+    def list_agents():
+        """Compute per-agent metrics from loaded episodes."""
+        episodes = _get_episodes()
+        agents: Dict[str, List[Dict[str, Any]]] = {}
+        for ep in episodes:
+            agent = ep.get("agentName", ep.get("decisionType", "unknown"))
+            agents.setdefault(agent, []).append(ep)
+        result = []
+        for name, eps in agents.items():
+            total = len(eps)
+            success = sum(1 for e in eps if e.get("outcome", {}).get("code") == "success")
+            avg_latency = sum(
+                e.get("telemetry", {}).get("endToEndMs", 0) for e in eps
+            ) / max(total, 1)
+            result.append({
+                "agentName": name,
+                "successRate": round(success / max(total, 1) * 100, 1),
+                "avgLatency": round(avg_latency, 0),
+                "episodeCount": total,
+            })
+        return result
+
+    @app.get("/api/memory-graph/stats")
+    def memory_graph_stats():
+        """Return MG node/edge statistics from the coherence pipeline."""
+        pipeline = _get_pipeline()
+        if pipeline is None:
+            return {"total_nodes": 0, "total_edges": 0, "nodes_by_kind": {}, "edges_by_kind": {}}
+        _, _, _, mg = pipeline
+        return mg.query("stats")

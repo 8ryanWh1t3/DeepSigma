@@ -81,9 +81,14 @@ class MemoryGraph:
         results = mg.query("claim", claim_id="CLAIM-2026-0001")
     """
 
-    def __init__(self) -> None:
+    def __init__(self, backend: Any = None) -> None:
         self._nodes: Dict[str, GraphNode] = {}
         self._edges: List[GraphEdge] = []
+        self._backend = backend
+        if self._backend is not None:
+            loaded_nodes, loaded_edges = self._backend.load()
+            self._nodes.update(loaded_nodes)
+            self._edges.extend(loaded_edges)
 
     @property
     def node_count(self) -> int:
@@ -461,7 +466,11 @@ class MemoryGraph:
     def _add_node(self, node: GraphNode) -> None:
         """Insert or update a node."""
         self._nodes[node.node_id] = node
+        if self._backend is not None:
+            self._backend.save_node(node)
 
     def _add_edge(self, edge: GraphEdge) -> None:
         """Append an edge (duplicates allowed)."""
         self._edges.append(edge)
+        if self._backend is not None:
+            self._backend.save_edge(edge)

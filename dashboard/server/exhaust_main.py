@@ -24,6 +24,12 @@ try:
 
     app.include_router(exhaust_router, prefix="/api/exhaust")
 
+    try:
+        from dashboard.server.drift_api import router as drift_router
+        app.include_router(drift_router, prefix="/api")
+    except ImportError:
+        pass
+
     @app.get("/healthz", tags=["health"])
     def health() -> dict:
         return {"status": "ok", "service": "exhaust"}

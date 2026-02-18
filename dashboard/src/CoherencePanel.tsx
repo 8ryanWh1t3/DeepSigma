@@ -2,7 +2,7 @@
  * CoherenceOps Panel — DLR/RS/DS/MG pipeline health dashboard.
  * Keyboard shortcut: 5
  */
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 interface PillarStatus {
   name: string;
@@ -40,9 +40,43 @@ const statusColor = (s: string) =>
   s === "active" ? "#22c55e" : s === "degraded" ? "#eab308" : "#ef4444";
 
 export const CoherencePanel: React.FC<CoherencePanelProps> = ({
-  pillars = defaultPillars,
-  knowledgeGraph = defaultGraph,
+  pillars: propPillars,
+  knowledgeGraph: propGraph,
 }) => {
+  const [pillars, setPillars] = useState<PillarStatus[]>(propPillars ?? defaultPillars);
+  const [knowledgeGraph, setKnowledgeGraph] = useState(propGraph ?? defaultGraph);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [statusRes, mgRes] = await Promise.all([
+          fetch('/api/coherence/status').then(r => r.ok ? r.json() : null),
+          fetch('/api/memory-graph/stats').then(r => r.ok ? r.json() : null),
+        ]);
+        if (statusRes?.pillars) {
+          const p = statusRes.pillars;
+          setPillars([
+            { name: "DLR", status: p.dlr?.status ?? "active", label: "Decision Log Records", count: p.dlr?.episode_count ?? 0, lastRun: "live" },
+            { name: "RS", status: p.rs?.status ?? "active", label: "Reflection Sessions", count: 0, lastRun: p.rs?.last_session ?? "n/a" },
+            { name: "DS", status: p.ds?.status ?? "active", label: "Drift Signals", count: p.ds?.drift_count ?? 0, lastRun: "live" },
+            { name: "MG", status: p.mg?.status ?? "active", label: "Memory Graph", count: p.mg?.node_count ?? 0, lastRun: "live" },
+          ]);
+        }
+        if (mgRes?.total_nodes !== undefined) {
+          setKnowledgeGraph({
+            nodeCount: mgRes.total_nodes,
+            edgeCount: mgRes.total_edges,
+            nodesByKind: mgRes.nodes_by_kind ?? {},
+            edgesByKind: mgRes.edges_by_kind ?? {},
+          });
+        }
+      } catch { /* silent fallback to defaults */ }
+    };
+    load();
+    const id = setInterval(load, 10000);
+    return () => clearInterval(id);
+  }, []);
+
   return (
     <div style={{ padding: "1.5rem" }}>
       <h2 style={{ fontSize: "1.25rem", fontWeight: 600, marginBottom: "1rem" }}>

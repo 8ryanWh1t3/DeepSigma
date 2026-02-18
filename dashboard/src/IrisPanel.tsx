@@ -465,16 +465,33 @@ export function IrisPanel() {
     const handleSubmit = useCallback(async (e?: React.FormEvent) => {
           if (e) e.preventDefault();
           setIsLoading(true);
-      
-          // Simulate network delay (mirrors real IRIS sub-60s target)
-          await new Promise(r => setTimeout(r, 300 + Math.random() * 700));
-      
-          const response = resolveIRISQuery({
-                  query_type: queryType,
-                  text: queryText,
-                  episode_id: episodeId,
-                  limit: 20,
-          });
+
+          // Try real API first, fall back to mock
+          let response: IRISResponse;
+          try {
+              const res = await fetch('/api/iris', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                      query_type: queryType,
+                      text: queryText,
+                      episode_id: episodeId,
+                      limit: 20,
+                  }),
+              });
+              if (res.ok) {
+                  const data = await res.json();
+                  if (data.status !== 'ERROR') {
+                      response = data as IRISResponse;
+                  } else {
+                      response = resolveIRISQuery({ query_type: queryType, text: queryText, episode_id: episodeId, limit: 20 });
+                  }
+              } else {
+                  response = resolveIRISQuery({ query_type: queryType, text: queryText, episode_id: episodeId, limit: 20 });
+              }
+          } catch {
+              response = resolveIRISQuery({ query_type: queryType, text: queryText, episode_id: episodeId, limit: 20 });
+          }
       
           const entry: HistoryEntry = {
                   id: response.query_id,
