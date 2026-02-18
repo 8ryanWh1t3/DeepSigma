@@ -2,7 +2,7 @@
 title: "Navigation Index"
 version: "1.0.0"
 status: "Living Document"
-last_updated: "2026-02-16"
+last_updated: "2026-02-18"
 ---
 
 # 🗺️ Navigation Index
@@ -71,6 +71,9 @@ last_updated: "2026-02-16"
 
 | Resource | Purpose |
 |----------|---------|
+| [`demos/golden_path/`](demos/golden_path/) | **Golden Path** — 7-step end-to-end decision governance demo |
+| [`demos/golden_path/README.md`](demos/golden_path/README.md) | Golden Path quickstart + options reference |
+| [`tools/golden_path_cli.py`](tools/golden_path_cli.py) | `deepsigma golden-path` CLI entrypoint |
 | [`examples/episodes/`](examples/episodes/) | 4 sealed DecisionEpisodes (success, drift, fallback, blocked) |
 | [`examples/drift/`](examples/drift/) | 3 drift events (bypass, freshness, time) |
 | [`examples/dte-packs/`](examples/dte-packs/) | Decision Timing Envelope examples |

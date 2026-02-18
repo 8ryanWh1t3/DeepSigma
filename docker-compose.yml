@@ -112,3 +112,19 @@ services:
     #   docker compose --profile cli run tools overwatch --decisionType X --policy /app/policy_packs/packs/demo_policy_pack_v1.json --out /data
     #   docker compose --profile cli run tools overwatch-validate
     #   docker compose --profile cli run tools overwatch-replay --episode /data/ep_001.json
+
+  golden-path:
+    build:
+      context: .
+      dockerfile: Dockerfile.tools
+    image: ghcr.io/8ryanwh1t3/deepsigma-tools:local
+    container_name: overwatch-golden-path
+    volumes:
+      - ./out:/app/out
+    environment:
+      - PYTHONPATH=/app
+    profiles:
+      - golden-path
+    # Run the fixture Golden Path:
+    #   docker compose --profile golden-path run --rm golden-path
+    command: ["deepsigma", "golden-path", "sharepoint", "--fixture", "/app/demos/golden_path/fixtures/sharepoint_small", "--out", "/app/out", "--clean"]

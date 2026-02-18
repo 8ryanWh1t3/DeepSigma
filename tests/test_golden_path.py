@@ -99,6 +99,15 @@ class TestGoldenPathFullPipeline:
         assert "steps_completed" in d
         assert "iris_queries" in d
 
+    def test_matches_expected_summary(self, tmp_path):
+        result = self._run(str(tmp_path))
+        expected = json.loads(
+            Path(FIXTURE_DIR, "expected_summary.json").read_text()
+        )
+        actual = result.to_dict()
+        for key, val in expected.items():
+            assert actual[key] == val, f"Mismatch on {key}: {actual[key]} != {val}"
+
 
 # ── RecordToEpisodeAssembler Tests ───────────────────────────────────
 

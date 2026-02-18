@@ -8,6 +8,7 @@
 #   overwatch           — run a supervised decision episode
 #   overwatch-validate  — validate JSON examples against schemas
 #   overwatch-replay    — replay a sealed episode through degrade ladder
+#   deepsigma           — top-level CLI (golden-path, etc.)
 #
 # Usage examples:
 #   docker run --rm -v ./data:/data \
@@ -22,6 +23,12 @@
 #   docker run --rm \
 #     ghcr.io/8ryanwh1t3/deepsigma-tools \
 #     overwatch-validate
+#
+#   docker run --rm \
+#     ghcr.io/8ryanwh1t3/deepsigma-tools \
+#     deepsigma golden-path sharepoint \
+#       --fixture /app/demos/golden_path/fixtures/sharepoint_small \
+#       --out /app/out --clean
 # ─────────────────────────────────────────────────────────────
 FROM python:3.12-slim
 
@@ -43,6 +50,7 @@ COPY verifiers/ /app/verifiers/
 COPY tools/ /app/tools/
 COPY specs/ /app/specs/
 COPY adapters/ /app/adapters/
+COPY demos/ /app/demos/
 COPY examples/ /app/examples/
 COPY llm_data_model/ /app/llm_data_model/
 COPY policy_packs/ /app/policy_packs/
@@ -55,4 +63,4 @@ RUN mkdir -p /data
 ENV PYTHONPATH=/app
 
 # Default: show available commands
-CMD ["sh", "-c", "echo 'Available: overwatch | overwatch-validate | overwatch-replay' && echo 'Run with: docker run --rm -v ./data:/data ghcr.io/8ryanwh1t3/deepsigma-tools <command> [args]'"]
+CMD ["sh", "-c", "echo 'Available: overwatch | overwatch-validate | overwatch-replay | deepsigma' && echo 'Run with: docker run --rm -v ./data:/data ghcr.io/8ryanwh1t3/deepsigma-tools <command> [args]'"]

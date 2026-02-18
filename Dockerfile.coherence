@@ -12,6 +12,7 @@
 #   coherence score <path> [--json]
 #   coherence mg export <path> [--format json]
 #   coherence iris query <path> --type STATUS|WHY|...
+#   coherence golden-path sharepoint --fixture /app/demos/golden_path/fixtures/sharepoint_small
 # ─────────────────────────────────────────────────────────────
 FROM python:3.12-slim
 
@@ -33,6 +34,7 @@ COPY verifiers/ /app/verifiers/
 COPY tools/ /app/tools/
 COPY specs/ /app/specs/
 COPY adapters/ /app/adapters/
+COPY demos/ /app/demos/
 
 RUN pip install --no-cache-dir -e /app
 

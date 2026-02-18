@@ -76,6 +76,30 @@ python -m coherence_ops.examples.drift_patch_cycle
 
 ---
 
+## Golden Path (v0.5.1)
+
+One command. One outcome. No ambiguity. Proves the full 7-step loop end-to-end:
+Connect → Normalize → Extract → Seal → Drift → Patch → Recall.
+
+```bash
+# Local (fixture mode — no credentials)
+deepsigma golden-path sharepoint \
+  --fixture demos/golden_path/fixtures/sharepoint_small --clean
+
+# Or via the coherence CLI
+coherence golden-path sharepoint \
+  --fixture demos/golden_path/fixtures/sharepoint_small
+
+# Docker
+docker compose --profile golden-path run --rm golden-path
+```
+
+Output: `golden_path_output/` with per-step JSON artifacts and `summary.json`.
+
+👉 Details: [demos/golden_path/README.md](demos/golden_path/README.md)
+
+---
+
 ## Repo Structure
 
 ```
@@ -94,6 +118,7 @@ DeepSigma/
 ├── engine/               # Compression, degrade ladder, supervisor
 ├── dashboard/            # React dashboard + mock API
 ├── adapters/             # MCP, OpenClaw, SharePoint, Power Platform, AskSage, Snowflake, LangChain
+├── demos/                # Golden Path end-to-end demo + fixtures
 └── release/              # Release readiness checklist
 ```
 
@@ -112,6 +137,7 @@ DeepSigma/
 | `coherence reconcile <path> [--auto-fix] [--json]` | Reconcile cross-artifact inconsistencies |
 | `coherence schema validate <file> --schema <name>` | Validate JSON against named schema |
 | `coherence dte check <path> --dte <spec>` | Check episodes against DTE constraints |
+| `deepsigma golden-path <source> [--fixture <path>]` | 7-step end-to-end Golden Path |
 
 ---
 
