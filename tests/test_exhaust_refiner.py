@@ -9,8 +9,6 @@ import json
 from pathlib import Path
 import sys
 
-import pytest
-
 # Make repo root importable
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -19,7 +17,6 @@ from dashboard.server.models_exhaust import (
     DriftSeverity,
     DriftType,
     EpisodeEvent,
-    EventType,
     Source,
 )
 from engine.exhaust_refiner import (
