@@ -1,31 +1,76 @@
 # ── docker-compose.yml ───────────────────────────────────────
-# Quick-start the Σ OVERWATCH Dashboard locally.
+# Full Σ OVERWATCH local stack.
 #
-#   docker compose up --build
-#   open http://localhost:3000
+#   docker compose up --build              # dashboard + exhaust
+#   docker compose up overwatch            # dashboard only
+#   docker compose up exhaust              # exhaust service only
+#   docker compose --profile cli run \
+#     coherence score /data/episodes.json  # one-shot CLI
 #
 # Mount a local data/ directory to feed real episode/drift JSON
-# files to the API, or leave it empty to use mock data.
+# files to the services, or leave it empty to use mock data.
 # ─────────────────────────────────────────────────────────────
 
 services:
   overwatch:
-      build:
-            context: .
-                  dockerfile: Dockerfile
-                      image: ghcr.io/8ryanwh1t3/deepsigma-dashboard:local
-                          container_name: overwatch-dashboard
-                              ports:
-                                    - "3000:3000"
-                                        volumes:
-                                              # Mount local data directory for episode/drift JSON files
-                                                    - ./data:/app/data:ro
-                                                        environment:
-                                                              - PYTHONPATH=/app
-                                                                  restart: unless-stopped
-                                                                      healthcheck:
-                                                                            test: ["CMD", "curl", "-f", "http://localhost:3000/healthz"]
-                                                                                  interval: 30s
-                                                                                        timeout: 5s
-                                                                                              retries: 3
-                                                                                                    start_period: 10s
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ghcr.io/8ryanwh1t3/deepsigma-dashboard:local
+    container_name: overwatch-dashboard
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data:ro
+    environment:
+      - PYTHONPATH=/app
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  exhaust:
+    build:
+      context: .
+      dockerfile: Dockerfile.exhaust
+    image: ghcr.io/8ryanwh1t3/deepsigma-exhaust:local
+    container_name: overwatch-exhaust
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - PYTHONPATH=/app
+      - EXHAUST_USE_LLM=0
+      # Uncomment and set to enable LLM-backed extraction:
+      # - ANTHROPIC_API_KEY=sk-ant-...
+      # - EXHAUST_USE_LLM=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8001/healthz')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  coherence:
+    build:
+      context: .
+      dockerfile: Dockerfile.coherence
+    image: ghcr.io/8ryanwh1t3/deepsigma-coherence:local
+    container_name: overwatch-coherence
+    volumes:
+      - ./data:/data
+    environment:
+      - PYTHONPATH=/app
+    profiles:
+      - cli
+    # Override command at runtime:
+    #   docker compose --profile cli run coherence score /data/episodes.json --json
+    #   docker compose --profile cli run coherence audit /data/
+    #   docker compose --profile cli run coherence iris query /data/ --type STATUS
+    command: ["--help"]
