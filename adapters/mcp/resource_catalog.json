@@ -1,0 +1,28 @@
+{
+  "resourceTypes": [
+    {
+      "uriTemplate": "episode://{episode_id}",
+      "name": "Decision Episode",
+      "description": "A sealed decision episode with actions, outcome, and telemetry.",
+      "mimeType": "application/json"
+    },
+    {
+      "uriTemplate": "drift://{drift_id}",
+      "name": "Drift Event",
+      "description": "A drift signal detected during episode processing.",
+      "mimeType": "application/json"
+    },
+    {
+      "uriTemplate": "schema://{schema_name}",
+      "name": "JSON Schema",
+      "description": "A canonical JSON schema (episode, dlr, dte, claim, drift, etc.).",
+      "mimeType": "application/json"
+    },
+    {
+      "uriTemplate": "stats://coherence",
+      "name": "Coherence Stats",
+      "description": "Current coherence pipeline statistics including scores and memory graph counts.",
+      "mimeType": "application/json"
+    }
+  ]
+}

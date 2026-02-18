@@ -1,0 +1,25 @@
+{
+  "prompts": [
+    {
+      "name": "assemble_context",
+      "description": "Build operator context for a decision type, including DTE constraints, policy rules, and recent episodes.",
+      "arguments": [
+        {"name": "decision_type", "description": "The decision type to assemble context for.", "required": true}
+      ]
+    },
+    {
+      "name": "trace_decision",
+      "description": "Trace the full decision chain for a sealed episode: actions taken, verification results, degrade path, and drift signals.",
+      "arguments": [
+        {"name": "episode_id", "description": "The episode ID to trace.", "required": true}
+      ]
+    },
+    {
+      "name": "check_contradictions",
+      "description": "Identify drift contradictions for an episode by comparing its truth claims against the memory graph canon.",
+      "arguments": [
+        {"name": "episode_id", "description": "The episode ID to check for contradictions.", "required": true}
+      ]
+    }
+  ]
+}

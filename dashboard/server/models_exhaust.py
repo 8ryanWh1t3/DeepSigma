@@ -133,6 +133,7 @@ class TruthItem(BaseModel):
     confidence: float = Field(0.5, ge=0.0, le=1.0)
     truth_type: str = "empirical"
     entity: str = ""
+    entity_type: str = ""
     property_name: str = ""
     value: str = ""
     unit: str = ""

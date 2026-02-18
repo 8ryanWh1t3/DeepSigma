@@ -44,6 +44,54 @@ def _stable_hash(*parts: str) -> str:
     return hashlib.sha256(raw.encode()).hexdigest()[:16]
 
 
+# ── Entity Type Inference ────────────────────────────────────────
+
+_ENTITY_TYPE_MAP = {
+    "cpu": "infrastructure", "memory": "infrastructure", "disk": "infrastructure",
+    "network": "infrastructure", "node": "infrastructure", "pod": "infrastructure",
+    "latency": "performance", "p95": "performance", "p99": "performance",
+    "throughput": "performance", "qps": "performance", "rps": "performance",
+    "error": "reliability", "failure": "reliability", "timeout": "reliability",
+    "uptime": "reliability", "availability": "reliability",
+    "user": "business", "revenue": "business", "conversion": "business",
+    "order": "business", "customer": "business",
+    "token": "cost", "cost": "cost", "usage": "cost", "spend": "cost",
+}
+
+
+def _infer_entity_type(name: str) -> str:
+    """Infer entity type from metric/entity name using keyword matching."""
+    lower = name.lower()
+    for keyword, etype in _ENTITY_TYPE_MAP.items():
+        if keyword in lower:
+            return etype
+    return ""
+
+
+# ── Confidence Calibration ───────────────────────────────────────
+
+_BOOST_WORDS = {"observed", "measured", "confirmed", "verified", "actual", "recorded"}
+_HEDGE_WORDS = {"possibly", "might", "uncertain", "maybe", "approximately", "estimated", "roughly"}
+
+
+def _calibrate_confidence(base: float, text: str) -> float:
+    """Adjust confidence based on certainty/hedging language in text."""
+    lower = text.lower()
+    boost = any(w in lower for w in _BOOST_WORDS)
+    hedge = any(w in lower for w in _HEDGE_WORDS)
+    if boost and not hedge:
+        return min(base + 0.1, 1.0)
+    if hedge and not boost:
+        return max(base - 0.1, 0.1)
+    return base
+
+
+# ── Assumption / Alternative Patterns ────────────────────────────
+
+_ASSUMPTION_PATTERNS = ["assuming ", "given that ", "if we assume", "under the assumption"]
+_ALTERNATIVE_PATTERNS = ["alternatively", "or we could", "another option", "we could also", "instead of"]
+
+
 # ── Truth Extraction ─────────────────────────────────────────────
 
 def extract_truth(episode: DecisionEpisode) -> List[TruthItem]:
@@ -76,6 +124,7 @@ def extract_truth(episode: DecisionEpisode) -> List[TruthItem]:
                     confidence=0.9,
                     truth_type="empirical",
                     entity=_slug(name),
+                    entity_type=_infer_entity_type(name),
                     property_name=name,
                     value=value,
                     unit=unit,
@@ -95,10 +144,11 @@ def extract_truth(episode: DecisionEpisode) -> List[TruthItem]:
                     ["is ", "are ", "was ", "has ", "equals", "total", "count", "average"]):
                     slug_key = _slug(line[:80])
                     if slug_key not in seen_claims:
+                        conf = _calibrate_confidence(0.6, line)
                         item = TruthItem(
                             claim=line[:200],
                             evidence=f"completion from {event.source.value}",
-                            confidence=0.6,
+                            confidence=conf,
                             truth_type="derived",
                             provenance=[event.event_id],
                         )
@@ -111,8 +161,13 @@ def extract_truth(episode: DecisionEpisode) -> List[TruthItem]:
 # ── Reasoning Extraction ─────────────────────────────────────────
 
 def extract_reasoning(episode: DecisionEpisode) -> List[ReasoningItem]:
-    """Extract decisions, assumptions, and rationale from episode events."""
+    """Extract decisions, assumptions, alternatives, and rationale from episode events."""
     seen: Dict[str, ReasoningItem] = {}
+    # Collect assumptions and alternatives from all text for attachment
+    all_assumptions: List[str] = []
+    all_alternatives: List[str] = []
+    # Track last completion text for tool rationale enrichment
+    last_completion_text = ""
 
     for event in episode.events:
         payload = event.payload
@@ -121,11 +176,20 @@ def extract_reasoning(episode: DecisionEpisode) -> List[ReasoningItem]:
             text = payload.get("text", payload.get("content", ""))
             if not text:
                 continue
+            last_completion_text = text
 
             # Detect reasoning patterns
             for line in text.split("\n"):
                 line = line.strip()
                 lower = line.lower()
+
+                # Extract assumptions
+                if any(p in lower for p in _ASSUMPTION_PATTERNS) and len(line) > 15:
+                    all_assumptions.append(line[:200])
+
+                # Extract alternatives
+                if any(p in lower for p in _ALTERNATIVE_PATTERNS) and len(line) > 15:
+                    all_alternatives.append(line[:200])
 
                 decision = ""
                 if any(p in lower for p in ["i recommend", "we should", "the best", "i chose", "decision:"]):
@@ -136,10 +200,11 @@ def extract_reasoning(episode: DecisionEpisode) -> List[ReasoningItem]:
                 if decision:
                     slug_key = _slug(decision[:80])
                     if slug_key not in seen:
+                        conf = _calibrate_confidence(0.55, line)
                         item = ReasoningItem(
                             decision=decision,
                             rationale="",
-                            confidence=0.55,
+                            confidence=conf,
                             provenance=[event.event_id],
                         )
                         seen[slug_key] = item
@@ -150,15 +215,30 @@ def extract_reasoning(episode: DecisionEpisode) -> List[ReasoningItem]:
             decision = f"Used tool: {tool_name}"
             slug_key = _slug(decision)
             if slug_key not in seen:
+                # Enrich rationale from preceding completion context
+                rationale = f"Tool invocation with input: {tool_input}"
+                if last_completion_text:
+                    # Extract the last line of the preceding completion as context
+                    context_lines = [ln.strip() for ln in last_completion_text.split("\n") if ln.strip()]
+                    if context_lines:
+                        rationale = f"{context_lines[-1][:150]} → {rationale}"
                 item = ReasoningItem(
                     decision=decision,
-                    rationale=f"Tool invocation with input: {tool_input}",
+                    rationale=rationale,
                     confidence=0.75,
                     provenance=[event.event_id],
                 )
                 seen[slug_key] = item
 
-    return list(seen.values())
+    # Attach assumptions and alternatives to reasoning items
+    items = list(seen.values())
+    for item in items:
+        if all_assumptions and not item.assumptions:
+            item.assumptions = all_assumptions[:]
+        if all_alternatives and not item.alternatives:
+            item.alternatives = all_alternatives[:]
+
+    return items
 
 
 # ── Memory Extraction ────────────────────────────────────────────

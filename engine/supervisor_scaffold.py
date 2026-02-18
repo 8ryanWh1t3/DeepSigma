@@ -13,6 +13,7 @@ from typing import Any, Dict
 
 from engine.policy_loader import load_policy_pack, get_rules
 from engine.degrade_ladder import DegradeSignal, choose_degrade_step
+from engine.dte_enforcer import DTEEnforcer
 
 def apply_policy_and_degrade(decision_type: str, policy_pack_path: str, signals: DegradeSignal):
     pack = load_policy_pack(policy_pack_path)
@@ -26,11 +27,31 @@ def apply_policy_and_degrade(decision_type: str, policy_pack_path: str, signals:
         "policyPackHash": pack.get("policyPackHash"),
     }
 
+    # Run DTE enforcement if DTE defaults are present in the rules
+    dte_violations = []
+    dte_defaults = rules.get("dteDefaults")
+    if dte_defaults:
+        dte_spec = {
+            "deadlineMs": dte_defaults.get("decisionWindowMs", 0),
+            "freshness": {
+                "defaultTtlMs": dte_defaults.get("ttlMs", 0),
+            },
+        }
+        enforcer = DTEEnforcer(dte_spec)
+        dte_violations = enforcer.enforce(
+            elapsed_ms=signals.elapsed_ms,
+            feature_ages={"default": signals.max_feature_age_ms} if signals.max_feature_age_ms else None,
+        )
+
     degrade = {
         "step": step,
         "rationale": rationale,
         "signals": asdict(signals),
         "ladder": ladder,
+        "dte_violations": [
+            {"gate": v.gate, "field": v.field, "severity": v.severity, "message": v.message}
+            for v in dte_violations
+        ],
     }
     return policy_ref, degrade
 

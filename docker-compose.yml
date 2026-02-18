@@ -75,6 +75,26 @@ services:
     #   docker compose --profile cli run coherence iris query /data/ --type STATUS
     command: ["--help"]
 
+  otel-sidecar:
+    build:
+      context: .
+      dockerfile: Dockerfile.otel
+      args:
+        INSTALL_OTLP: grpc
+    image: ghcr.io/8ryanwh1t3/deepsigma-otel:local
+    container_name: overwatch-otel-sidecar
+    volumes:
+      - ./data:/app/data
+    environment:
+      - PYTHONPATH=/app
+      - OTEL_SERVICE_NAME=sigma-overwatch
+      # Set to your OTLP collector (e.g. http://otel-collector:4317):
+      - OTEL_EXPORTER_OTLP_ENDPOINT=
+      - SIDECAR_POLL_INTERVAL=5
+    profiles:
+      - otel
+    restart: unless-stopped
+
   tools:
     build:
       context: .
