@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────
 // BucketItem.tsx – Single item inside a bucket (truth / reasoning / memory)
 // ─────────────────────────────────────────────────────────────
-import React from "react";
+
 import ConfidenceBadge from "./ConfidenceBadge";
 import AcceptRejectBar from "./AcceptRejectBar";
 

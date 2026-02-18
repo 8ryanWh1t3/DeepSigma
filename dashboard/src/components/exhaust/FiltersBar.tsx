@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────
 // FiltersBar.tsx – Filter controls for the episode stream
 // ─────────────────────────────────────────────────────────────
-import React from "react";
+
 import type { FilterState } from "../../types/exhaust";
 
 interface Props {

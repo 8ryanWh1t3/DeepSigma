@@ -112,7 +112,6 @@ def extract_truth(episode: DecisionEpisode) -> List[TruthItem]:
 
 def extract_reasoning(episode: DecisionEpisode) -> List[ReasoningItem]:
     """Extract decisions, assumptions, and rationale from episode events."""
-    items: List[ReasoningItem] = []
     seen: Dict[str, ReasoningItem] = {}
 
     for event in episode.events:
@@ -166,7 +165,6 @@ def extract_reasoning(episode: DecisionEpisode) -> List[ReasoningItem]:
 
 def extract_memory(episode: DecisionEpisode) -> List[MemoryItem]:
     """Extract entities, relations, and artifacts from episode events."""
-    items: List[MemoryItem] = []
     seen: Dict[str, MemoryItem] = {}
 
     for event in episode.events:
@@ -188,7 +186,7 @@ def extract_memory(episode: DecisionEpisode) -> List[MemoryItem]:
                     )
 
         if event.event_type.value in ("prompt", "completion"):
-            text = payload.get("text", payload.get("content", ""))
+            _text = payload.get("text", payload.get("content", ""))
             model = payload.get("model", "")
             if model:
                 key = _slug(f"model_{model}")

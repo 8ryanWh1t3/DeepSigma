@@ -44,6 +44,9 @@ export interface DecisionEpisode {
   coherence_score: number | null;
   grade: Grade | null;
   refined: boolean;
+  drift_signals?: DriftSignal[];
+  refined_at?: string;
+  committed?: boolean;
 }
 
 // ── Bucket Items ───────────────────────────────────────────────

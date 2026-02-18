@@ -169,7 +169,7 @@ def cmd_commit(args: argparse.Namespace) -> None:
     if result.get("committed"):
         print(f"Committed episode {args.episode[:12]}… ✓")
     else:
-        print(f"Commit response:")
+        print("Commit response:")
         _print_json(result)
 
 

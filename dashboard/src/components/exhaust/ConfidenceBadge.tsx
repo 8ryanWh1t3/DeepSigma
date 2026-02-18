@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────
 // ConfidenceBadge.tsx – Confidence score pill with color coding
 // ─────────────────────────────────────────────────────────────
-import React from "react";
+
 
 interface Props {
   score: number;       // 0–1 float

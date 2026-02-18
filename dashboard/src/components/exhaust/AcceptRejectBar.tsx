@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────
 // AcceptRejectBar.tsx – Action bar for accept / reject / edit / escalate
 // ─────────────────────────────────────────────────────────────
-import React from "react";
+
 
 interface Props {
   onAccept: () => void;

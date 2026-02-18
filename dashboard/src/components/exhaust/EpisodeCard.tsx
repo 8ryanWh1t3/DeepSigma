@@ -1,8 +1,8 @@
 // ─────────────────────────────────────────────────────────────
 // EpisodeCard.tsx – Compact card for the left-lane episode stream
 // ─────────────────────────────────────────────────────────────
-import React from "react";
-import type { DecisionEpisode } from "../../types/exhaust";
+
+import type { DecisionEpisode, DriftSignal } from "../../types/exhaust";
 import ConfidenceBadge from "./ConfidenceBadge";
 import DriftBadge from "./DriftBadge";
 import SourceBadge from "./SourceBadge";
@@ -51,7 +51,7 @@ export default function EpisodeCard({ episode, selected, onClick }: Props) {
   const maxDrift =
     driftCount > 0
       ? e.drift_signals!.reduce(
-          (worst, d) =>
+          (worst: string, d: DriftSignal) =>
             d.severity === "red"
               ? "red"
               : d.severity === "yellow" && worst !== "red"

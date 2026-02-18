@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────
 // ExhaustInbox.tsx – Main page: three-lane layout for Exhaust Inbox
 // ─────────────────────────────────────────────────────────────
-import React, { useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import type { RefinedEpisode } from "../types/exhaust";
 import { commitEpisode, itemAction } from "../lib/api";
 import EpisodeStream from "../components/exhaust/EpisodeStream";
@@ -40,7 +40,7 @@ export default function ExhaustInbox() {
         });
         // optimistic update
         if (refined) {
-          const updateBucket = (items: unknown[]) =>
+          const updateBucket = (items: Record<string, unknown>[]) =>
             items.map((it: Record<string, unknown>) =>
               (it.id as string) === itemId
                 ? { ...it, status: action === "edit" ? "pending" : action + "ed" }
@@ -50,15 +50,15 @@ export default function ExhaustInbox() {
             ...refined,
             truth:
               bucket === "truth"
-                ? (updateBucket(refined.truth as unknown[]) as typeof refined.truth)
+                ? (updateBucket(refined.truth as Record<string, unknown>[]) as unknown as typeof refined.truth)
                 : refined.truth,
             reasoning:
               bucket === "reasoning"
-                ? (updateBucket(refined.reasoning as unknown[]) as typeof refined.reasoning)
+                ? (updateBucket(refined.reasoning as Record<string, unknown>[]) as unknown as typeof refined.reasoning)
                 : refined.reasoning,
             memory:
               bucket === "memory"
-                ? (updateBucket(refined.memory as unknown[]) as typeof refined.memory)
+                ? (updateBucket(refined.memory as Record<string, unknown>[]) as unknown as typeof refined.memory)
                 : refined.memory,
           });
         }
@@ -72,7 +72,7 @@ export default function ExhaustInbox() {
   const handleAcceptAll = useCallback(async () => {
     if (!selectedId || !refined) return;
     // Accept every pending item across all buckets
-    const pending = (items: unknown[]) =>
+    const pending = (items: Record<string, unknown>[]) =>
       (items as Array<Record<string, unknown>>).filter(
         (it) => (it.status as string) !== "accepted",
       );
@@ -94,16 +94,16 @@ export default function ExhaustInbox() {
     }
     // reload – crude but effective for MVP
     if (refined) {
-      const markAll = (items: unknown[]) =>
+      const markAll = (items: Record<string, unknown>[]) =>
         (items as Array<Record<string, unknown>>).map((it) => ({
           ...it,
           status: "accepted",
         }));
       setRefined({
         ...refined,
-        truth: markAll(refined.truth as unknown[]) as typeof refined.truth,
-        reasoning: markAll(refined.reasoning as unknown[]) as typeof refined.reasoning,
-        memory: markAll(refined.memory as unknown[]) as typeof refined.memory,
+        truth: markAll(refined.truth as Record<string, unknown>[]) as unknown as typeof refined.truth,
+        reasoning: markAll(refined.reasoning as Record<string, unknown>[]) as unknown as typeof refined.reasoning,
+        memory: markAll(refined.memory as Record<string, unknown>[]) as unknown as typeof refined.memory,
       });
     }
   }, [selectedId, refined]);

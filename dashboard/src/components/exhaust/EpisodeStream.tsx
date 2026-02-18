@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────
 // EpisodeStream.tsx – Left lane: scrollable list of episode cards
 // ─────────────────────────────────────────────────────────────
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import type { DecisionEpisode, FilterState } from "../../types/exhaust";
 import { listEpisodes } from "../../lib/api";
 import EpisodeCard from "./EpisodeCard";

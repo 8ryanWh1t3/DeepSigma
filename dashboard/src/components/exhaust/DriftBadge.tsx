@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────
 // DriftBadge.tsx – Drift severity indicator (Green / Yellow / Red)
 // ─────────────────────────────────────────────────────────────
-import React from "react";
+
 
 type Severity = "green" | "yellow" | "red";
 

@@ -19,18 +19,15 @@ logger = logging.getLogger(__name__)
 
 try:
     from fastapi import APIRouter, HTTPException, Query
-    from fastapi.responses import JSONResponse
     HAS_FASTAPI = True
 except ImportError:
     HAS_FASTAPI = False
 
 if HAS_FASTAPI:
     from .models_exhaust import (
-        CoherenceBreakdown,
         DecisionEpisode,
         DriftSignal,
         EpisodeEvent,
-        EpisodeListParams,
         HealthResponse,
         ItemAction,
         RefinedEpisode,

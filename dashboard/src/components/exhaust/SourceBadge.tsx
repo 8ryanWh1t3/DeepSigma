@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────
 // SourceBadge.tsx – Shows the ingestion source of an episode
 // ─────────────────────────────────────────────────────────────
-import React from "react";
+
 
 interface Props {
   source: string; // e.g. "langchain", "azure_openai", "cli_import"

@@ -1,11 +1,12 @@
 // ─────────────────────────────────────────────────────────────
 // EpisodeDetail.tsx – Center lane: timeline view of an episode
 // ─────────────────────────────────────────────────────────────
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import type {
   EpisodeDetail as EpisodeDetailType,
   EpisodeEvent,
   RefinedEpisode,
+  DriftSignal,
 } from "../../types/exhaust";
 import { getEpisode, refineEpisode } from "../../lib/api";
 import ConfidenceBadge from "./ConfidenceBadge";
@@ -124,9 +125,9 @@ export default function EpisodeDetail({ episodeId, onRefined }: Props) {
           {driftCount > 0 && (
             <DriftBadge
               severity={
-                ep.drift_signals!.some((d) => d.severity === "red")
+                ep.drift_signals!.some((d: DriftSignal) => d.severity === "red")
                   ? "red"
-                  : ep.drift_signals!.some((d) => d.severity === "yellow")
+                  : ep.drift_signals!.some((d: DriftSignal) => d.severity === "yellow")
                     ? "yellow"
                     : "green"
               }

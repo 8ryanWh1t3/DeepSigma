@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────
 // BucketPanel.tsx – Right lane: tabbed view of TRUTH / REASONING / MEMORY
 // ─────────────────────────────────────────────────────────────
-import React, { useState } from "react";
+import { useState } from "react";
 import type { RefinedEpisode } from "../../types/exhaust";
 import BucketItem from "./BucketItem";
 import AcceptRejectBar from "./AcceptRejectBar";
