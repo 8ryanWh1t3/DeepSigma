@@ -5,6 +5,45 @@ All notable changes to Σ OVERWATCH / DeepSigma will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] — 2026-02-18 — "Control Surface"
+
+### Added — Tier 1: Persistence & Wiring
+
+- **Memory Graph SQLite backend** (`coherence_ops/mg.py`): Optional `SQLiteBackend` for persistent MG storage across sessions
+- **Automated drift detector** (`coherence_ops/ds.py`): `detect_signals()` generates drift events from sealed episodes by comparing telemetry against DTE thresholds
+- **IRIS MCP tools** (`adapters/mcp/mcp_server_scaffold.py`): `iris.query` and `iris.reload` tools with lazy pipeline loading
+- **Dashboard API server** (`dashboard/api_server.py`): FastAPI endpoints for episodes, drifts, agents, coherence, and IRIS queries
+
+### Added — Tier 2: Enforcement & Observability
+
+- **OpenTelemetry instrumentation** (`coherence_ops/otel.py`): Spans for IRIS queries, coherence scoring, MG operations; counters and histograms for query timing, episode throughput, drift severity
+- **DTE Enforcer** (`engine/dte_enforcer.py`): Active constraint validation for Decision Timing Envelopes — deadline, stage budgets, feature TTL freshness, and limits
+- **MCP resources & prompts**: `resources/list`, `resources/read`, `prompts/list`, `prompts/get` for operator workflows
+- **Exhaust refiner hardening** (`coherence_ops/exhaust_refiner.py`): Entity typing for truth claims, confidence calibration with source-type weighting
+
+### Added — Tier 3: Ecosystem & Dashboard
+
+- **Dashboard SSE** (`dashboard/api_server.py`): `GET /api/sse` streaming endpoint multiplexing episodes, drifts, agents, and MG events; `GET /api/mg` Memory Graph JSON export
+- **Zustand store** (`dashboard/src/store.ts`): Centralized state management replacing scattered `useState`
+- **SSE hook** (`dashboard/src/hooks/useSSE.ts`): EventSource with auto-reconnect, HTTP polling fallback, mock data fallback
+- **MG Graph view** (`dashboard/src/components/MGGraphView.tsx`): SVG-based Memory Graph visualization with node coloring by kind, click-to-inspect
+- **LangGraph adapter** (`adapters/langgraph_exhaust.py`): Async `LangGraphExhaustTracker` for `astream_events()` with DTE constraint checking
+- **Shared exhaust helpers** (`adapters/_exhaust_helpers.py`): Extracted common helpers for LangChain/LangGraph adapter reuse
+- **Runtime schema validation** (`engine/schema_validator.py`): Lazy-compiled Draft 2020-12 validators with `$ref` resolution via `referencing.Registry`
+- **Test infrastructure** (`tests/conftest.py`, `tests/test_benchmarks.py`, `tests/test_load.py`): Shared fixtures, performance benchmarks, 100-episode load test
+
+### Changed
+
+- Dashboard App.tsx rewired from `useState`/polling to Zustand + SSE; added MG Graph tab (key 5)
+- LangChain adapter imports from shared `_exhaust_helpers` module (public API unchanged)
+- Policy loader gained `validate_schema` parameter for opt-in JSON Schema validation
+- CI now runs coverage gating and load test step
+- MCP server version bumped to 0.4.0
+
+### Stats
+
+- 424 tests passing (up from 389), 17 new files, 9 modified
+
 ## [0.3.1] — 2026-02-17
 
 ### Fixed
@@ -115,5 +154,6 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
                                                                                   - - **Repo Governance**: SECURITY.md, CODEOWNERS, Dependabot, issue/PR templates, CONTRIBUTING.md
                                                                                     - - **Testing**: unit tests (degrade ladder, policy loader) + integration test (full coherence pipeline end-to-end: episode → seal → score → drift → audit → reconcile → patch → re-score)
                                                                                      
-                                                                                      - [0.2.0]: https://github.com/8ryanWh1t3/DeepSigma/compare/v0.1.0...HEAD
-                                                                                      - [0.1.0]: https://github.com/8ryanWh1t3/DeepSigma/releases/tag/v0.1.0
+                                                                                      [0.4.0]: https://github.com/8ryanWh1t3/DeepSigma/compare/v0.1.0...v0.4.0
+[0.2.0]: https://github.com/8ryanWh1t3/DeepSigma/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/8ryanWh1t3/DeepSigma/releases/tag/v0.1.0

@@ -46,7 +46,7 @@ class TestInitialize:
             resp = mcp.rpc_result(_id, {
                 "protocolVersion": "2024-11-05",
                 "capabilities": {"tools": {}},
-                "serverInfo": {"name": "sigma-overwatch-mcp", "version": "0.2.0"},
+                "serverInfo": {"name": "sigma-overwatch-mcp", "version": "0.4.0"},
             })
 
         assert resp["result"]["protocolVersion"] == "2024-11-05"

@@ -346,7 +346,7 @@ def main() -> None:
                         "resources": {},
                         "prompts": {},
                     },
-                    "serverInfo": {"name": "sigma-overwatch-mcp", "version": "0.3.0"},
+                    "serverInfo": {"name": "sigma-overwatch-mcp", "version": "0.4.0"},
                 })
             elif method == "tools/list":
                 resp = handle_tools_list(_id)
