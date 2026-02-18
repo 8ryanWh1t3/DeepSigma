@@ -60,7 +60,9 @@ last_updated: "2026-02-18"
 
 | Resource | Purpose |
 |----------|---------|
-| [`specs/`](specs/) | 11 JSON schemas (DLR, drift, episode, DTE, claim, canon, retcon, IRIS, PRIME) |
+| [`specs/`](specs/) | 12 JSON schemas (DLR, drift, episode, DTE, claim, canon, retcon, IRIS, PRIME, connector envelope) |
+| [`specs/connector_contract_v1.md`](specs/connector_contract_v1.md) | Connector Contract v1.0 — standard interface + canonical envelope |
+| [`connectors/`](connectors/) | Connector Contract module — `ConnectorV1` protocol + `RecordEnvelope` |
 | [`llm_data_model/`](llm_data_model/) | LLM-optimized canonical data model (10 sub-directories) |
 | [`rdf/`](rdf/) | RDF/SHACL ontology files |
 | [`primitives/`](primitives/) | Core primitive implementations |

@@ -141,7 +141,9 @@ DeepSigma/
 
 ---
 
-## Connectors (v0.5.0)
+## Connectors (v0.6.0)
+
+All connectors conform to the [Connector Contract v1.0](specs/connector_contract_v1.md) — a standard interface with a canonical Record Envelope for provenance, hashing, and access control.
 
 | Connector | Transport | MCP Tools | Docs |
 |-----------|-----------|-----------|------|

@@ -31,7 +31,11 @@ class SnowflakeWarehouseConnector:
     - ``SNOWFLAKE_DATABASE``
     - ``SNOWFLAKE_SCHEMA`` (default: ``PUBLIC``)
     - ``SNOWFLAKE_WAREHOUSE``
+
+    Implements ConnectorV1 contract (v0.6.0+).
     """
+
+    source_name = "snowflake"
 
     def __init__(self, auth: Optional[SnowflakeAuth] = None) -> None:
         self._auth = auth or SnowflakeAuth()
@@ -57,6 +61,12 @@ class SnowflakeWarehouseConnector:
         sql = f"DESCRIBE TABLE {self._database}.{self._schema}.{table}"
         result = self._execute_statement(sql)
         return self._parse_result(result)
+
+    def to_envelopes(self, records: List[Dict[str, Any]]) -> list:
+        """Wrap canonical records in RecordEnvelope instances (ConnectorV1)."""
+        from connectors.contract import canonical_to_envelope
+        instance = self._auth.account if self._auth else "unknown"
+        return [canonical_to_envelope(r, source_instance=instance) for r in records]
 
     def to_canonical(self, rows: List[Dict[str, Any]], table_name: str) -> List[Dict[str, Any]]:
         """Transform SQL rows to canonical records."""

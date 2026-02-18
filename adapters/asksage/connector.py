@@ -29,7 +29,11 @@ class AskSageConnector:
     - ``ASKSAGE_EMAIL``
     - ``ASKSAGE_API_KEY``
     - ``ASKSAGE_BASE_URL`` (default: ``https://api.asksage.ai``)
+
+    Implements ConnectorV1 contract (v0.6.0+).
     """
+
+    source_name = "asksage"
 
     def __init__(
         self,
@@ -123,6 +127,13 @@ class AskSageConnector:
         payload = {"content": content, "dataset": dataset}
         body = json.dumps(payload).encode()
         return self._post("/server/train", body)
+
+    # ── Envelope contract ──────────────────────────────────────────
+
+    def to_envelopes(self, records: List[Dict[str, Any]]) -> list:
+        """Wrap canonical records in RecordEnvelope instances (ConnectorV1)."""
+        from connectors.contract import canonical_to_envelope
+        return [canonical_to_envelope(r, source_instance=self._base_url) for r in records]
 
     # ── HTTP helpers ─────────────────────────────────────────────
 

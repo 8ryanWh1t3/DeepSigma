@@ -1,0 +1,109 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://deepsigma.dev/schemas/connector_envelope/v1.0",
+  "title": "Connector Record Envelope v1.0",
+  "description": "Standardized envelope wrapping raw source data with provenance, hashes, and metadata. All connectors must produce records conforming to this schema.",
+  "type": "object",
+  "required": [
+    "envelope_version",
+    "source",
+    "source_instance",
+    "collected_at",
+    "record_id",
+    "record_type",
+    "provenance",
+    "hashes",
+    "raw"
+  ],
+  "properties": {
+    "envelope_version": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Schema version. Must be '1.0' for this version of the contract."
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Canonical source identifier (e.g. 'sharepoint', 'snowflake', 'dataverse', 'asksage')."
+    },
+    "source_instance": {
+      "type": "string",
+      "description": "Instance identifier (e.g. site URL, account name, environment URL). May be empty for singleton sources."
+    },
+    "collected_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 UTC timestamp when the record was collected/fetched."
+    },
+    "record_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for the record within the source."
+    },
+    "record_type": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Canonical record type (e.g. 'Document', 'Event', 'Entity', 'Claim', 'Metric')."
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["uri"],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Source URI (e.g. 'sharepoint://site/list/item', 'snowflake://account/db.schema.table/pk')."
+        },
+        "etag": {
+          "type": "string",
+          "description": "ETag or version identifier from the source system."
+        },
+        "last_modified": {
+          "type": "string",
+          "description": "Last modification timestamp from the source."
+        },
+        "author": {
+          "type": "string",
+          "description": "Author or last modifier identifier."
+        }
+      },
+      "additionalProperties": false
+    },
+    "hashes": {
+      "type": "object",
+      "required": ["raw_sha256"],
+      "properties": {
+        "raw_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA-256 hex digest of the raw field content."
+        },
+        "normalized_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA-256 hex digest of the normalized/canonical form."
+        }
+      },
+      "additionalProperties": false
+    },
+    "acl_tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Access control tags for RBAC filtering."
+    },
+    "raw": {
+      "description": "The raw source data. May be a JSON object or a string.",
+      "oneOf": [
+        { "type": "object" },
+        { "type": "string" }
+      ]
+    },
+    "metadata": {
+      "type": "object",
+      "default": {},
+      "description": "Arbitrary connector-specific metadata (confidence, TTL, labels, etc.)."
+    }
+  },
+  "additionalProperties": false
+}

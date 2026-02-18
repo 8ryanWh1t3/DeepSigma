@@ -63,7 +63,11 @@ class DataverseConnector:
     - ``DV_CLIENT_ID``
     - ``DV_CLIENT_SECRET``
     - ``DV_TENANT_ID``
+
+    Implements ConnectorV1 contract (v0.6.0+).
     """
+
+    source_name = "dataverse"
 
     def __init__(
         self,
@@ -106,6 +110,14 @@ class DataverseConnector:
         data = self._dv_get(url)
         rows = data.get("value", [])
         return [self._to_canonical(row, table_name) for row in rows]
+
+    # ── Envelope contract ──────────────────────────────────────────
+
+    def to_envelopes(self, records: List[Dict[str, Any]]) -> list:
+        """Wrap canonical records in RecordEnvelope instances (ConnectorV1)."""
+        from connectors.contract import canonical_to_envelope
+        env_name = self._env_url.split("//")[-1].split(".")[0] if self._env_url else "unknown"
+        return [canonical_to_envelope(r, source_instance=env_name) for r in records]
 
     # ── Field mapping ────────────────────────────────────────────
 
