@@ -55,6 +55,16 @@ jobs:
           python -m demos.golden_path --source sharepoint --fixture demos/golden_path/fixtures/sharepoint_small --output golden_path_ci_out --json
           python -m pytest tests/test_golden_path.py -v --tb=short
 
+      - name: Connector contract + fixture tests
+        run: |
+          python -m pytest tests/test_connector_contract_v1.py tests/test_connector_fixtures.py -v --tb=short
+
+      - name: Generate Trust Scorecard
+        run: |
+          python -m tools.trust_scorecard --input golden_path_ci_out --output trust_scorecard.json
+          cat trust_scorecard.json
+          python -m pytest tests/test_trust_scorecard.py -v --tb=short
+
   lint:
     runs-on: ubuntu-latest
     steps:

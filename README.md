@@ -100,6 +100,25 @@ Output: `golden_path_output/` with per-step JSON artifacts and `summary.json`.
 
 ---
 
+## Trust Scorecard (v0.6.0)
+
+Measurable SLOs from every Golden Path run. Generated automatically in CI.
+
+```bash
+python -m tools.trust_scorecard \
+  --input golden_path_ci_out --output trust_scorecard.json
+
+# With coverage
+python -m tools.trust_scorecard \
+  --input golden_path_ci_out --output trust_scorecard.json --coverage 85.3
+```
+
+Output: `trust_scorecard.json` with metrics, SLO checks, and timing data.
+
+👉 Spec: [specs/trust_scorecard_v1.md](specs/trust_scorecard_v1.md) · Dashboard: **Trust Scorecard** tab
+
+---
+
 ## Repo Structure
 
 ```
