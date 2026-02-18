@@ -1,0 +1,35 @@
+# Minimal OpenClaw Policy Pack
+# Compatible with adapters/openclaw/adapter.py (OpenClawSupervisor)
+#
+# Usage:
+#   import yaml
+#   from adapters.openclaw.adapter import OpenClawSupervisor
+#   policy = yaml.safe_load(open("cookbook/openclaw/supervised_run/policy_pack_min.yaml"))
+#   supervisor = OpenClawSupervisor(policy_pack=policy)
+
+version: "1.0"
+policyPackId: "pp-min-001"
+name: "Minimal Policy Pack (Cookbook Example)"
+description: "One contract demonstrating pre/post condition verification for LoanApproval decisions."
+
+contracts:
+  LoanApproval:
+    contractId: "contract-loan-min"
+    description: "Pre/post verification for loan approval decisions"
+    preconditions:
+      - field: "applicant_verified"
+        equals: true
+        message: "Applicant must be verified before loan approval"
+    postconditions:
+      - field: "decision"
+        equals: "approved"
+        message: "Action must explicitly return decision=approved"
+
+  TradeExecution:
+    contractId: "contract-trade-min"
+    description: "Market open check for trade execution"
+    preconditions:
+      - field: "market_open"
+        equals: true
+        message: "Trades may only be executed while market is open"
+    postconditions: []

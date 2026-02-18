@@ -109,6 +109,19 @@ last_updated: "2026-02-16"
 
 ---
 
+## 🍳 Cookbook (Runnables)
+
+Runnable, verifiable integration examples with expected output and failure modes.
+
+| Resource | Purpose |
+|----------|---------|
+| [`cookbook/README.md`](cookbook/README.md) | Quick chooser, prerequisites, verification concept |
+| [`cookbook/mcp/hello_deepsigma/`](cookbook/mcp/hello_deepsigma/) | MCP loopback — full 7-message session, run_loopback.py |
+| [`cookbook/openclaw/supervised_run/`](cookbook/openclaw/supervised_run/) | Contract enforcement — PASS, BLOCKED, POSTCONDITION FAILED scenarios |
+| [`cookbook/otel/trace_drift_patch/`](cookbook/otel/trace_drift_patch/) | OTel span export for episodes and drift events |
+
+---
+
 ## 📖 Extended Documentation
 
 | File | Topic |
