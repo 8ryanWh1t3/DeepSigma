@@ -27,7 +27,7 @@ except ImportError:
 
 pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
 
-import dashboard.server.exhaust_api as api_module
+import dashboard.server.exhaust_api as api_module  # noqa: E402
 
 
 # ── Fixtures ──────────────────────────────────────────────────────
