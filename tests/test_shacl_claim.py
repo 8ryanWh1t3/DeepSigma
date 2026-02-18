@@ -4,6 +4,11 @@ Validate claim_primitive_instance.ttl against claim_primitive.shacl.ttl."""
 import os
 import unittest
 
+import pytest
+
+rdflib = pytest.importorskip("rdflib", reason="rdflib not installed — install with: pip install deepsigma[rdf]")
+pyshacl = pytest.importorskip("pyshacl", reason="pyshacl not installed — install with: pip install deepsigma[rdf]")
+
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -12,8 +17,6 @@ class TestClaimSHACL(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        rdflib = __import__("rdflib")
-        pyshacl = __import__("pyshacl")
         cls.rdflib = rdflib
         cls.pyshacl = pyshacl
 

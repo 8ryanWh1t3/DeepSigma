@@ -28,6 +28,9 @@
 - **Integrations**
   - [MCP](MCP)
   - [LangChain](LangChain)
+  - [LangChain Governance](LangChain-Governance)
+  - [AskSage](AskSage)
+  - [Snowflake](Snowflake)
   - [Palantir Foundry](Palantir-Foundry)
   - [Power Platform](Power-Platform)
   - [OpenTelemetry](OpenTelemetry)

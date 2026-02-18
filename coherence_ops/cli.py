@@ -226,6 +226,123 @@ def cmd_iris_query(args: argparse.Namespace) -> None:
     print(response.summary)
 
 
+def cmd_reconcile(args: argparse.Namespace) -> None:
+    episodes = _load_episodes(args.path)
+    drift_events = _load_drift(args.path)
+    dlr, _rs, ds, mg = _build_pipeline(episodes, drift_events)
+
+    from coherence_ops.reconciler import Reconciler
+    reconciler = Reconciler(dlr_builder=dlr, ds=ds, mg=mg)
+    result = reconciler.reconcile()
+
+    if getattr(args, "auto_fix", False):
+        applied = reconciler.apply_auto_fixes()
+        result = reconciler.reconcile()  # re-run after fixes
+
+    if getattr(args, "json", False):
+        print(json.dumps(asdict(result), indent=2, default=str))
+        return
+
+    print(f"Reconciliation | {len(result.proposals)} proposal(s)")
+    print(f"  Auto-fixable: {result.auto_fixable_count}")
+    print(f"  Manual:       {result.manual_count}")
+    for p in result.proposals:
+        fix = " [auto-fixable]" if p.auto_fixable else ""
+        print(f"  - [{p.kind.value}] {p.description}{fix}")
+    print()
+
+
+def cmd_schema_validate(args: argparse.Namespace) -> None:
+    p = Path(args.file)
+    if not p.exists():
+        print(f"Error: {args.file} not found", file=sys.stderr)
+        sys.exit(1)
+
+    data = json.loads(p.read_text())
+    items = data if isinstance(data, list) else [data]
+
+    from engine.schema_validator import validate
+    all_valid = True
+    results = []
+    for i, item in enumerate(items):
+        result = validate(item, args.schema)
+        results.append({"index": i, "valid": result.valid, "errors": [
+            {"path": e.path, "message": e.message} for e in result.errors
+        ]})
+        if not result.valid:
+            all_valid = False
+
+    if getattr(args, "json", False):
+        print(json.dumps({"valid": all_valid, "results": results}, indent=2))
+    else:
+        status = "PASS" if all_valid else "FAIL"
+        print(f"Schema Validation: {status} ({args.schema})")
+        for r in results:
+            if not r["valid"]:
+                for e in r["errors"]:
+                    print(f"  [{r['index']}] {e['path']}: {e['message']}")
+
+    sys.exit(0 if all_valid else 1)
+
+
+def cmd_dte_check(args: argparse.Namespace) -> None:
+    episodes = _load_episodes(args.path)
+
+    dte_path = Path(args.dte)
+    if not dte_path.exists():
+        print(f"Error: DTE spec not found: {args.dte}", file=sys.stderr)
+        sys.exit(1)
+
+    dte_spec = json.loads(dte_path.read_text())
+
+    from engine.dte_enforcer import DTEEnforcer
+    enforcer = DTEEnforcer(dte_spec)
+
+    results = []
+    for ep in episodes:
+        ep_id = ep.get("episodeId", "unknown")
+        telem = ep.get("telemetry", {})
+        elapsed = telem.get("endToEndMs", 0)
+        stage_elapsed = telem.get("stageMs", {})
+        counts = {
+            "hops": telem.get("hopCount", 0),
+            "tool_calls": telem.get("toolCallCount", 0),
+        }
+        violations = enforcer.enforce(
+            elapsed_ms=elapsed,
+            stage_elapsed=stage_elapsed,
+            counts=counts,
+        )
+        if violations:
+            results.append({
+                "episodeId": ep_id,
+                "violations": [
+                    {
+                        "gate": v.gate,
+                        "field": v.field,
+                        "limit": v.limit_value,
+                        "actual": v.actual_value,
+                        "severity": v.severity,
+                        "message": v.message,
+                    }
+                    for v in violations
+                ],
+            })
+
+    if getattr(args, "json", False):
+        print(json.dumps({"total_episodes": len(episodes), "violations": results}, indent=2))
+    else:
+        if results:
+            print(f"DTE Check: {len(results)}/{len(episodes)} episode(s) with violations")
+            for r in results:
+                for v in r["violations"]:
+                    print(f"  [{r['episodeId']}] {v['message']}")
+        else:
+            print(f"DTE Check: CLEAN — {len(episodes)} episode(s) within envelope")
+
+    sys.exit(1 if results else 0)
+
+
 def cmd_demo(args: argparse.Namespace) -> None:  # noqa: ARG001
     parser = argparse.ArgumentParser(
         prog="coherence demo",
@@ -306,6 +423,34 @@ def main() -> None:
     )
     p_iris_query.set_defaults(func=cmd_iris_query)
 
+    # ── reconcile ─────────────────────────────────────────────────
+    p_reconcile = subparsers.add_parser("reconcile", help="Detect cross-artifact inconsistencies")
+    p_reconcile.add_argument("path", help="Path to episodes file or directory")
+    p_reconcile.add_argument("--auto-fix", action="store_true", help="Apply auto-fixable repairs")
+    p_reconcile.add_argument("--json", action="store_true", help="Output JSON")
+    p_reconcile.set_defaults(func=cmd_reconcile)
+
+    # ── schema validate ──────────────────────────────────────────
+    p_schema = subparsers.add_parser("schema", help="Schema operations")
+    schema_sub = p_schema.add_subparsers(dest="schema_command", required=True)
+
+    p_schema_validate = schema_sub.add_parser("validate", help="Validate JSON against a schema")
+    p_schema_validate.add_argument("file", help="Path to JSON file to validate")
+    p_schema_validate.add_argument("--schema", required=True, help="Schema name (e.g., episode, drift, dte)")
+    p_schema_validate.add_argument("--json", action="store_true", help="Output JSON")
+    p_schema_validate.set_defaults(func=cmd_schema_validate)
+
+    # ── dte check ────────────────────────────────────────────────
+    p_dte = subparsers.add_parser("dte", help="DTE operations")
+    dte_sub = p_dte.add_subparsers(dest="dte_command", required=True)
+
+    p_dte_check = dte_sub.add_parser("check", help="Check episodes against DTE constraints")
+    p_dte_check.add_argument("path", help="Path to episodes file or directory")
+    p_dte_check.add_argument("--dte", required=True, help="Path to DTE spec JSON")
+    p_dte_check.add_argument("--json", action="store_true", help="Output JSON")
+    p_dte_check.set_defaults(func=cmd_dte_check)
+
+    # ── demo ─────────────────────────────────────────────────────
     p_demo = subparsers.add_parser(
         "demo",
         help="Demo: coherence score",

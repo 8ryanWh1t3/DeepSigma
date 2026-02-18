@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "deepsigma"
-version = "0.4.0"
+version = "0.5.0"
 description = "Σ OVERWATCH — Reality Await Layer (RAL) control plane for agentic AI"
 readme = "README.md"
 license = {text = "MIT"}
@@ -47,6 +47,16 @@ dev = [
 ]
 langgraph = [
     "langgraph>=0.2.0",
+]
+azure = [
+    "msal>=1.25.0",
+]
+snowflake = [
+    "cryptography>=42.0",
+]
+rdf = [
+    "rdflib>=7.0",
+    "pyshacl>=0.25",
 ]
 
 [project.urls]

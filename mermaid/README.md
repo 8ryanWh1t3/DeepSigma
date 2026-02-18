@@ -36,6 +36,12 @@ GitHub renders Mermaid diagrams natively in `.md` files.
 | 26 | Named Graph Sealing | State Diagram | Draft → sealed → drifted → patched immutability lifecycle |
 | 27 | Claim Primitive | Graph + Mindmap + Flowchart + State | AtomicClaim structure, graph topology, truth types, status light derivation, seal lifecycle |
 | 28 | DLR Claim-Native | Flowchart + Graph + ER + Graph | Decision flow, rationale graph, before/after comparison, entity relationships, composability hub |
+| 30 | SharePoint Connector Flow | Flowchart | Graph API → field mapping → canonical record → ingest with delta sync and webhooks |
+| 31 | Power Platform Connector Flow | Flowchart | Dataverse Web API → field mapping → canonical record + Power Automate trigger + reverse sync |
+| 32 | LangChain Governance Flow | Sequence | Chain execution with GovernanceCallbackHandler DTE checks and violation decision tree |
+| 33 | AskSage Connector Flow | Flowchart | AskSage API (query/train/datasets) → exhaust adapter → canonical records with auth token flow |
+| 34 | Snowflake Connector Flow | Flowchart | Dual-mode Cortex AI + warehouse SQL → exhaust events → canonical records with shared auth |
+| 35 | Connector Ecosystem | Graph | All v0.5.0 connectors with MCP tool counts, transport, and governance layer |
 
 ## Diagram Types Used
 

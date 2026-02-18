@@ -10,7 +10,7 @@ import {
 } from '../mockData';
 
 const SSE_URL = '/api/sse';
-const API_BASE = 'http://localhost:8000';
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000';
 
 /**
  * Custom hook that establishes an SSE connection for real-time dashboard updates.

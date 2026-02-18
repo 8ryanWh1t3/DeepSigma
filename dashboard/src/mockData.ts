@@ -537,7 +537,7 @@ function resolveStatus(_query: IRISQueryInput, queryId: string): IRISResponse {
 // Falls back to mock data when the API server is not running.
 // ---------------------------------------------------------------------------
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000';
 
 async function apiFetch<T>(path: string): Promise<T | null> {
     try {

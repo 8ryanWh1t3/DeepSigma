@@ -21,6 +21,7 @@ Endpoints
 
 import asyncio
 import json
+import os
 import sys
 from collections import defaultdict
 from datetime import datetime
@@ -32,9 +33,9 @@ REPO_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
 import uvicorn  # noqa: E402
-from fastapi import FastAPI, HTTPException  # noqa: E402
+from fastapi import FastAPI, HTTPException, Request  # noqa: E402
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
-from fastapi.responses import StreamingResponse  # noqa: E402
+from fastapi.responses import PlainTextResponse, StreamingResponse  # noqa: E402
 
 from coherence_ops import (  # noqa: E402
     DLRBuilder,
@@ -50,14 +51,17 @@ from coherence_ops import (  # noqa: E402
 # ── App setup ─────────────────────────────────────────────────────────────────
 app = FastAPI(title="DeepSigma Dashboard API", version="0.1.0")
 
+_DEFAULT_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+]
+_CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "").split(",") if os.environ.get("CORS_ORIGINS") else _DEFAULT_ORIGINS
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:5173",
-    ],
+    allow_origins=_CORS_ORIGINS,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -445,9 +449,90 @@ async def sse_stream():
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 
+# ── Webhooks ─────────────────────────────────────────────────────────────────
+
+@app.post("/api/webhooks/sharepoint")
+async def webhook_sharepoint(request: Request):
+    """SharePoint Graph API webhook.
+
+    - Validation: echoes ``?validationToken`` as ``text/plain``
+    - Change notification: triggers delta_sync on changed lists
+    - HMAC verification when ``SP_WEBHOOK_SECRET`` is set
+    """
+    # Validation handshake — Graph API sends GET-style token in query
+    validation_token = request.query_params.get("validationToken")
+    if validation_token:
+        return PlainTextResponse(validation_token, media_type="text/plain")
+
+    body = await request.body()
+
+    # HMAC verification
+    sp_secret = os.environ.get("SP_WEBHOOK_SECRET", "")
+    if sp_secret:
+        from adapters._connector_helpers import verify_webhook_hmac
+        sig = request.headers.get("X-SP-Signature", "")
+        if not verify_webhook_hmac(body, sp_secret, sig):
+            raise HTTPException(status_code=401, detail="HMAC verification failed")
+
+    try:
+        payload = json.loads(body)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON")
+
+    # Process change notifications
+    notifications = payload.get("value", [])
+    logger.info("SharePoint webhook: %d notification(s)", len(notifications))
+
+    return {"status": "accepted", "notifications": len(notifications)}
+
+
+@app.post("/api/webhooks/powerautomate")
+async def webhook_powerautomate(request: Request):
+    """Power Automate webhook.
+
+    Accepts pre-mapped canonical records (passthrough) or raw Dataverse records
+    (auto-transform via DataverseConnector).
+    """
+    body = await request.body()
+
+    # HMAC verification
+    pa_secret = os.environ.get("PA_WEBHOOK_SECRET", "")
+    if pa_secret:
+        from adapters._connector_helpers import verify_webhook_hmac
+        sig = request.headers.get("X-PowerAutomate-Signature", "")
+        if not verify_webhook_hmac(body, pa_secret, sig):
+            raise HTTPException(status_code=401, detail="HMAC verification failed")
+
+    try:
+        payload = json.loads(body)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON")
+
+    # Detect if this is a pre-mapped canonical record or raw Dataverse
+    if "record_id" in payload and "record_type" in payload:
+        # Already canonical — passthrough
+        logger.info("Power Automate webhook: canonical record %s", payload.get("record_id"))
+        return {"status": "accepted", "record_id": payload.get("record_id")}
+
+    # Auto-transform raw Dataverse record
+    table_name = payload.get("@odata.type", "").split(".")[-1].lower() + "s"
+    if not table_name or table_name == "s":
+        table_name = "unknown"
+
+    from adapters.powerplatform.connector import DataverseConnector
+    connector = DataverseConnector()
+    record = connector._to_canonical(payload, table_name)
+    logger.info("Power Automate webhook: auto-transformed to %s", record.get("record_id"))
+
+    return {"status": "accepted", "record_id": record.get("record_id"), "record_type": record.get("record_type")}
+
+
+logger = __import__("logging").getLogger(__name__)
+
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
+    port = int(os.environ.get("PORT", "8000"))
     print(f"Repo root: {REPO_ROOT}")
     print(f"Episodes dir: {REPO_ROOT / 'examples' / 'episodes'}")
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=port)

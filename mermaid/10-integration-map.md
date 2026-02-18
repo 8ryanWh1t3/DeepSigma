@@ -28,6 +28,8 @@ graph TB
     subgraph DataPlatforms["Data Platforms"]
         FOUNDRY[Palantir Foundry<br/>Ontology Objects]
         POWER[Power Platform<br/>Dataverse + Power Automate]
+        SAGE[AskSage<br/>REST API · 4 MCP tools]
+        SNOW[Snowflake<br/>Cortex AI + Warehouse SQL<br/>5 MCP tools]
     end
 
     subgraph Governance["Governance"]
@@ -45,6 +47,8 @@ graph TB
 
     SUP -->|read/write| FOUNDRY
     SUP -->|read/write| POWER
+    SUP -->|query/train| SAGE
+    SUP -->|complete/query| SNOW
 
     SEAL -->|sealed episodes| COHOPS
 

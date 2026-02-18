@@ -253,6 +253,163 @@
           }
         }
       }
+    },
+    {
+      "name": "sharepoint.list",
+      "description": "List items from a SharePoint list and return canonical records.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["list_id"],
+        "properties": {
+          "list_id": {"type": "string", "description": "SharePoint list ID"}
+        }
+      }
+    },
+    {
+      "name": "sharepoint.get",
+      "description": "Get a single SharePoint list item as a canonical record.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["list_id", "item_id"],
+        "properties": {
+          "list_id": {"type": "string"},
+          "item_id": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "sharepoint.sync",
+      "description": "Incremental delta sync of a SharePoint list. Returns created/updated counts and records.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["list_id"],
+        "properties": {
+          "list_id": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "dataverse.list",
+      "description": "List records from a Dataverse table and return canonical records.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["table_name"],
+        "properties": {
+          "table_name": {"type": "string", "description": "Dataverse table name (e.g. accounts, incidents)"}
+        }
+      }
+    },
+    {
+      "name": "dataverse.get",
+      "description": "Get a single Dataverse record by table and record ID.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["table_name", "record_id"],
+        "properties": {
+          "table_name": {"type": "string"},
+          "record_id": {"type": "string", "description": "Dataverse GUID"}
+        }
+      }
+    },
+    {
+      "name": "dataverse.query",
+      "description": "Query a Dataverse table with OData $filter expression.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["table_name", "filter"],
+        "properties": {
+          "table_name": {"type": "string"},
+          "filter": {"type": "string", "description": "OData $filter expression (e.g. $filter=statecode eq 0)"}
+        }
+      }
+    },
+    {
+      "name": "asksage.query",
+      "description": "Query AskSage AI with a prompt. Returns response text, model used, and token count.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["prompt"],
+        "properties": {
+          "prompt": {"type": "string"},
+          "model": {"type": "string", "description": "Model override (optional)"},
+          "dataset": {"type": "string", "description": "Dataset to query against (optional)"},
+          "persona": {"type": "string", "description": "Persona to use (optional)"}
+        }
+      }
+    },
+    {
+      "name": "asksage.models",
+      "description": "List available AskSage models.",
+      "inputSchema": {"type": "object", "properties": {}}
+    },
+    {
+      "name": "asksage.datasets",
+      "description": "List available AskSage datasets.",
+      "inputSchema": {"type": "object", "properties": {}}
+    },
+    {
+      "name": "asksage.history",
+      "description": "Get AskSage query history (user logs).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {"type": "integer", "description": "Max entries to return (default: 20)"}
+        }
+      }
+    },
+    {
+      "name": "cortex.complete",
+      "description": "Run a Snowflake Cortex AI completion. Returns assembled response text and token usage.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["model", "messages"],
+        "properties": {
+          "model": {"type": "string", "description": "Cortex model name"},
+          "messages": {"type": "array", "items": {"type": "object"}, "description": "Chat messages"},
+          "max_tokens": {"type": "integer"},
+          "temperature": {"type": "number"}
+        }
+      }
+    },
+    {
+      "name": "cortex.embed",
+      "description": "Generate embeddings via Snowflake Cortex AI.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["model", "texts"],
+        "properties": {
+          "model": {"type": "string"},
+          "texts": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    {
+      "name": "snowflake.query",
+      "description": "Execute a SQL query against Snowflake warehouse.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["sql"],
+        "properties": {
+          "sql": {"type": "string", "description": "SQL statement"}
+        }
+      }
+    },
+    {
+      "name": "snowflake.tables",
+      "description": "List tables in the configured Snowflake database/schema.",
+      "inputSchema": {"type": "object", "properties": {}}
+    },
+    {
+      "name": "snowflake.sync",
+      "description": "Sync a Snowflake table to canonical records.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["table_name"],
+        "properties": {
+          "table_name": {"type": "string"},
+          "since": {"type": "string", "description": "ISO-8601 timestamp for incremental sync (optional)"}
+        }
+      }
     }
   ]
 }

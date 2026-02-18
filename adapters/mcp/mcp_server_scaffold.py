@@ -164,6 +164,107 @@ def handle_tools_call(_id: Any, params: Dict[str, Any]) -> Dict[str, Any]:
             "mg_node_count": pipeline["mg"].node_count,
         })
 
+    # ── SharePoint tools ──────────────────────────────────────
+    if name == "sharepoint.list":
+        from adapters.sharepoint.connector import SharePointConnector
+        connector = SharePointConnector()
+        records = connector.list_items(arguments.get("list_id", ""))
+        return rpc_result(_id, {"records": records, "count": len(records)})
+
+    if name == "sharepoint.get":
+        from adapters.sharepoint.connector import SharePointConnector
+        connector = SharePointConnector()
+        record = connector.get_item(arguments.get("list_id", ""), arguments.get("item_id", ""))
+        return rpc_result(_id, {"record": record})
+
+    if name == "sharepoint.sync":
+        from adapters.sharepoint.connector import SharePointConnector
+        connector = SharePointConnector()
+        result = connector.delta_sync(arguments.get("list_id", ""))
+        return rpc_result(_id, result)
+
+    # ── Dataverse tools ────────────────────────────────────────
+    if name == "dataverse.list":
+        from adapters.powerplatform.connector import DataverseConnector
+        connector = DataverseConnector()
+        records = connector.list_records(arguments.get("table_name", ""))
+        return rpc_result(_id, {"records": records, "count": len(records)})
+
+    if name == "dataverse.get":
+        from adapters.powerplatform.connector import DataverseConnector
+        connector = DataverseConnector()
+        record = connector.get_record(arguments.get("table_name", ""), arguments.get("record_id", ""))
+        return rpc_result(_id, {"record": record})
+
+    if name == "dataverse.query":
+        from adapters.powerplatform.connector import DataverseConnector
+        connector = DataverseConnector()
+        records = connector.query(arguments.get("table_name", ""), arguments.get("filter", ""))
+        return rpc_result(_id, {"records": records, "count": len(records)})
+
+    # ── AskSage tools ──────────────────────────────────────────
+    if name == "asksage.query":
+        from adapters.asksage.connector import AskSageConnector
+        connector = AskSageConnector()
+        result = connector.query(
+            prompt=arguments.get("prompt", ""),
+            model=arguments.get("model"),
+            dataset=arguments.get("dataset"),
+            persona=arguments.get("persona"),
+        )
+        return rpc_result(_id, result)
+
+    if name == "asksage.models":
+        from adapters.asksage.connector import AskSageConnector
+        connector = AskSageConnector()
+        return rpc_result(_id, {"models": connector.get_models()})
+
+    if name == "asksage.datasets":
+        from adapters.asksage.connector import AskSageConnector
+        connector = AskSageConnector()
+        return rpc_result(_id, {"datasets": connector.get_datasets()})
+
+    if name == "asksage.history":
+        from adapters.asksage.connector import AskSageConnector
+        connector = AskSageConnector()
+        return rpc_result(_id, {"logs": connector.get_user_logs(limit=arguments.get("limit", 20))})
+
+    # ── Snowflake Cortex tools ─────────────────────────────────
+    if name == "cortex.complete":
+        from adapters.snowflake.cortex import CortexConnector
+        connector = CortexConnector()
+        result = connector.complete_sync(
+            model=arguments.get("model", ""),
+            messages=arguments.get("messages", []),
+            max_tokens=arguments.get("max_tokens"),
+            temperature=arguments.get("temperature"),
+        )
+        return rpc_result(_id, result)
+
+    if name == "cortex.embed":
+        from adapters.snowflake.cortex import CortexConnector
+        connector = CortexConnector()
+        result = connector.embed(model=arguments.get("model", ""), texts=arguments.get("texts", []))
+        return rpc_result(_id, result)
+
+    # ── Snowflake warehouse tools ──────────────────────────────
+    if name == "snowflake.query":
+        from adapters.snowflake.warehouse import SnowflakeWarehouseConnector
+        connector = SnowflakeWarehouseConnector()
+        rows = connector.query(arguments.get("sql", ""))
+        return rpc_result(_id, {"rows": rows, "count": len(rows)})
+
+    if name == "snowflake.tables":
+        from adapters.snowflake.warehouse import SnowflakeWarehouseConnector
+        connector = SnowflakeWarehouseConnector()
+        return rpc_result(_id, {"tables": connector.list_tables()})
+
+    if name == "snowflake.sync":
+        from adapters.snowflake.warehouse import SnowflakeWarehouseConnector
+        connector = SnowflakeWarehouseConnector()
+        result = connector.sync_table(arguments.get("table_name", ""), since=arguments.get("since"))
+        return rpc_result(_id, result)
+
     return rpc_error(_id, -32601, f"Unknown tool: {name}")
 
 # ── Resources ───────────────────────────────────────────────────

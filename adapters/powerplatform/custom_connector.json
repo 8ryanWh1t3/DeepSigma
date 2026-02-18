@@ -1,0 +1,120 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "DeepSigma OVERWATCH",
+    "description": "Sigma OVERWATCH — Institutional Decision Infrastructure connector for Power Platform.",
+    "version": "0.5.0"
+  },
+  "host": "localhost:8000",
+  "basePath": "/api",
+  "schemes": ["https"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "securityDefinitions": {
+    "api_key": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "X-API-Key"
+    }
+  },
+  "security": [{"api_key": []}],
+  "paths": {
+    "/v1/records": {
+      "post": {
+        "operationId": "IngestRecord",
+        "summary": "Ingest a canonical record",
+        "description": "Submit a single canonical record to the DeepSigma store.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "record_id": {"type": "string"},
+                "record_type": {"type": "string", "enum": ["Entity", "Claim", "Metric", "Event", "Document"]},
+                "created_at": {"type": "string", "format": "date-time"},
+                "observed_at": {"type": "string", "format": "date-time"},
+                "content": {"type": "object"},
+                "confidence": {"type": "object", "properties": {"score": {"type": "number"}}},
+                "ttl": {"type": "integer"},
+                "labels": {"type": "object", "properties": {"tags": {"type": "array", "items": {"type": "string"}}}}
+              },
+              "required": ["record_id", "record_type", "content"]
+            }
+          }
+        ],
+        "responses": {
+          "201": {"description": "Record ingested", "schema": {"type": "object", "properties": {"record_id": {"type": "string"}, "status": {"type": "string"}}}},
+          "400": {"description": "Validation error"}
+        }
+      }
+    },
+    "/iris": {
+      "post": {
+        "operationId": "QueryIRIS",
+        "summary": "Query IRIS engine",
+        "description": "Submit an IRIS query for resolution, insight, or status.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "query_type": {"type": "string", "enum": ["WHY", "WHAT_CHANGED", "WHAT_DRIFTED", "RECALL", "STATUS"]},
+                "text": {"type": "string"},
+                "episode_id": {"type": "string"}
+              },
+              "required": ["query_type"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {"description": "IRIS response", "schema": {"type": "object"}},
+          "404": {"description": "No episodes found"}
+        }
+      }
+    },
+    "/coherence": {
+      "get": {
+        "operationId": "CheckCoherence",
+        "summary": "Get coherence score",
+        "description": "Run the full coherence scoring pipeline and return the scored report.",
+        "parameters": [],
+        "responses": {
+          "200": {"description": "Coherence report", "schema": {"type": "object"}},
+          "404": {"description": "No episodes found"}
+        }
+      }
+    },
+    "/webhooks/powerautomate": {
+      "post": {
+        "operationId": "EmitDrift",
+        "summary": "Emit drift event via webhook",
+        "description": "Submit a drift event or canonical record from Power Automate.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "record_id": {"type": "string"},
+                "record_type": {"type": "string"},
+                "content": {"type": "object"}
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {"description": "Accepted"},
+          "401": {"description": "HMAC verification failed"}
+        }
+      }
+    }
+  }
+}

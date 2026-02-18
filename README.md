@@ -90,10 +90,10 @@ DeepSigma/
 ├── examples/             # Episodes, drift events, demo data
 ├── llm_data_model/       # LLM-optimized canonical data model
 ├── docs/                 # Extended docs (vision, IRIS, policy packs)
-├── mermaid/              # 28+ architecture & flow diagrams
+├── mermaid/              # 35+ architecture & flow diagrams
 ├── engine/               # Compression, degrade ladder, supervisor
 ├── dashboard/            # React dashboard + mock API
-├── adapters/             # MCP, OpenClaw, OpenTelemetry
+├── adapters/             # MCP, OpenClaw, SharePoint, Power Platform, AskSage, Snowflake, LangChain
 └── release/              # Release readiness checklist
 ```
 
@@ -109,6 +109,22 @@ DeepSigma/
 | `python -m coherence_ops iris query --type WHY --target <id>` | Why was this decided? |
 | `python -m coherence_ops iris query --type WHAT_DRIFTED --json` | What assumptions decayed? |
 | `python -m coherence_ops demo <path>` | Score + IRIS in one command |
+| `coherence reconcile <path> [--auto-fix] [--json]` | Reconcile cross-artifact inconsistencies |
+| `coherence schema validate <file> --schema <name>` | Validate JSON against named schema |
+| `coherence dte check <path> --dte <spec>` | Check episodes against DTE constraints |
+
+---
+
+## Connectors (v0.5.0)
+
+| Connector | Transport | MCP Tools | Docs |
+|-----------|-----------|-----------|------|
+| SharePoint | Graph API | `sharepoint.list` / `get` / `sync` | [docs/26](docs/26-sharepoint-connector.md) |
+| Power Platform | Dataverse Web API | `dataverse.list` / `get` / `query` | [docs/27](docs/27-power-platform-connector.md) |
+| AskSage | REST API | `asksage.query` / `models` / `datasets` / `history` | [docs/28](docs/28-asksage-connector.md) |
+| Snowflake | Cortex + SQL API | `cortex.complete` / `embed` / `snowflake.query` / `tables` / `sync` | [docs/29](docs/29-snowflake-connector.md) |
+| LangChain | Callback | Governance + Exhaust handlers | [docs/23](docs/23-langgraph-adapter.md) |
+| OpenClaw | HTTP | Dashboard API client | [adapters/openclaw/](adapters/openclaw/) |
 
 ---
 
