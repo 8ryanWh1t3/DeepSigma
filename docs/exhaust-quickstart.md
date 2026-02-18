@@ -128,6 +128,37 @@ python -m adapters.azure_openai_exhaust \
 | ≥ 65 | C |
 | < 65 | D |
 
+## LLM Extraction (optional)
+
+By default the refiner uses fast rule-based extraction. For higher-quality
+TRUTH/REASONING/MEMORY output, enable Anthropic-backed extraction:
+
+```bash
+pip install -e ".[exhaust-llm]"
+export ANTHROPIC_API_KEY="sk-ant-..."
+export EXHAUST_USE_LLM="1"
+```
+
+When `EXHAUST_USE_LLM=1`, each `/refine` call sends the episode transcript
+to `claude-haiku-4-5-20251001` and parses structured JSON back into buckets.
+If the API is unavailable or the key is missing, the rule-based extractor
+runs automatically as a fallback — no episode is lost.
+
+To verify LLM extraction is active:
+
+```bash
+curl -s http://localhost:8000/api/exhaust/episodes/<id>/refine | jq '.grade'
+# LLM extraction typically yields higher coherence scores (B/A vs C/D)
+```
+
+The model is configurable in code:
+
+```python
+from engine.exhaust_llm_extractor import LLMExtractor
+extractor = LLMExtractor(model="claude-sonnet-4-5-20250929")
+buckets = extractor.extract(episode)
+```
+
 ## Storage (MVP)
 
 All data is file-based under `/app/data`:

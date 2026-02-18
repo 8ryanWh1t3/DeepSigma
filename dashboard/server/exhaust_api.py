@@ -244,7 +244,8 @@ if HAS_FASTAPI:
         # Import refiner (lazy to avoid circular deps)
         try:
             from engine.exhaust_refiner import refine_episode as do_refine
-            refined = do_refine(episode)
+            use_llm = os.environ.get("EXHAUST_USE_LLM", "0") == "1"
+            refined = do_refine(episode, use_llm=use_llm)
         except ImportError:
             # Fallback: minimal stub refinement
             refined = RefinedEpisode(
