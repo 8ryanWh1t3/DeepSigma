@@ -140,7 +140,7 @@ export EXHAUST_USE_LLM="1"
 ```
 
 When `EXHAUST_USE_LLM=1`, each `/refine` call sends the episode transcript
-to `claude-haiku-4-5-20251001` and parses structured JSON back into buckets.
+to `example/default` and parses structured JSON back into buckets.
 If the API is unavailable or the key is missing, the rule-based extractor
 runs automatically as a fallback — no episode is lost.
 
