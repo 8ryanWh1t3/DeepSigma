@@ -1,14 +1,17 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
     BarChart, Bar, AreaChart, Area, XAxis, YAxis,
     CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell,
     RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis
 } from 'recharts';
 import { AlertCircle, TrendingUp, Zap, Clock, Activity, Search, Download } from 'lucide-react';
-import { generateMockEpisodes, generateMockDrifts, generateAgentMetrics, fetchRealEpisodes, fetchRealDrifts, fetchRealAgents, DecisionEpisode, DriftEvent, AgentMetrics } from './mockData';
+import { DecisionEpisode, DriftEvent, AgentMetrics } from './mockData';
 import { IrisPanel } from './IrisPanel';
+import { useOverwatchStore } from './store';
+import { useSSE } from './hooks/useSSE';
+import { MGGraphView } from './components/MGGraphView';
 
-type ViewType = 'overview' | 'episodes' | 'drift' | 'iris' | 'export';
+type ViewType = 'overview' | 'episodes' | 'drift' | 'iris' | 'graph' | 'export';
 type SortField = 'agent' | 'status' | 'deadline' | 'duration' | 'freshness' | 'outcome';
 type SortDir = 'asc' | 'desc';
 
@@ -223,51 +226,26 @@ function ExportView({ episodes, drifts, metrics }: { episodes: DecisionEpisode[]
 }
 
 export function App() {
-    const [episodes, setEpisodes] = useState<DecisionEpisode[]>([]);
-    const [drifts, setDrifts] = useState<DriftEvent[]>([]);
-    const [metrics, setMetrics] = useState<AgentMetrics[]>([]);
+    const episodes = useOverwatchStore((s) => s.episodes);
+    const drifts = useOverwatchStore((s) => s.drifts);
+    const metrics = useOverwatchStore((s) => s.agents);
+    const connection = useOverwatchStore((s) => s.connection);
     const [selectedView, setSelectedView] = useState<ViewType>('overview');
     const [autoRefresh, setAutoRefresh] = useState(true);
-    const [lastUpdate, setLastUpdate] = useState('');
-    const [dataSource, setDataSource] = useState<'api' | 'mock'>('mock');
-
-    const loadData = useCallback(async () => {
-          // Try the real API first; fall back to mock data if offline
-          const [realEps, realDrifts, realAgents] = await Promise.all([
-                  fetchRealEpisodes(), fetchRealDrifts(), fetchRealAgents(),
-          ]);
-          if (realEps && realEps.length > 0) {
-                  setEpisodes(realEps);
-                  setDrifts(realDrifts ?? generateMockDrifts(20));
-                  setMetrics(realAgents ?? generateAgentMetrics());
-                  setDataSource('api');
-          } else {
-                  setEpisodes(generateMockEpisodes(100));
-                  setDrifts(generateMockDrifts(100));
-                  setMetrics(generateAgentMetrics());
-                  setDataSource('mock');
-          }
-          setLastUpdate(new Date().toLocaleTimeString());
-    }, []);
-  
-    useEffect(() => {
-          loadData();
-          if (autoRefresh) {
-                  const id=setInterval(loadData,5000);
-                  return ()=>clearInterval(id);
-          }
-    }, [autoRefresh, loadData]);
+    const { refresh } = useSSE(autoRefresh);
+    const lastUpdate = connection.lastEvent;
+    const dataSource = connection.dataSource;
   
     useEffect(() => {
           const handler = (e: KeyboardEvent) => {
                   if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return;
-                  const views: ViewType[] = ['overview','episodes','drift','iris','export'];
-                  if (e.key>='1'&&e.key<='5') setSelectedView(views[parseInt(e.key)-1]);
-                  if (e.key==='r') loadData();
+                  const views: ViewType[] = ['overview','episodes','drift','iris','graph','export'];
+                  if (e.key>='1'&&e.key<='6') setSelectedView(views[parseInt(e.key)-1]);
+                  if (e.key==='r') refresh();
           };
           window.addEventListener('keydown', handler);
           return () => window.removeEventListener('keydown', handler);
-    }, [loadData]);
+    }, [refresh]);
   
     const successRate = episodes.length>0 ? ((episodes.filter(e=>e.status==='success').length/episodes.length)*100).toFixed(1) : '0';
     const avgLatency = episodes.length>0 ? (episodes.reduce((s,e)=>s+e.actualDuration,0)/episodes.length).toFixed(0) : '0';
@@ -318,19 +296,19 @@ export function App() {
                                                             <input type="checkbox" checked={autoRefresh} onChange={e=>setAutoRefresh(e.target.checked)} className="rounded accent-blue-500" />
                                                             Auto-Refresh (5s)
                                               </label>
-                                              <button onClick={loadData} className="text-xs text-slate-400 hover:text-blue-400 transition-colors">{'\u21BB'} Refresh</button>
+                                              <button onClick={refresh} className="text-xs text-slate-400 hover:text-blue-400 transition-colors">{'\u21BB'} Refresh</button>
                                               <div className="text-xs text-slate-500">Updated: {lastUpdate}</div>
-                                              <div className={`text-xs px-1.5 py-0.5 rounded font-mono ${dataSource === 'api' ? 'bg-green-900 text-green-300' : 'bg-slate-800 text-slate-500'}`}>{dataSource === 'api' ? '● live' : '○ mock'}</div>
+                                              <div className={`text-xs px-1.5 py-0.5 rounded font-mono ${dataSource === 'sse' ? 'bg-green-900 text-green-300' : dataSource === 'api' ? 'bg-blue-900 text-blue-300' : 'bg-slate-800 text-slate-500'}`}>{dataSource === 'sse' ? '● sse' : dataSource === 'api' ? '● api' : '○ mock'}</div>
                                   </div>
                         </div>
                 </header>
           
                 <nav className="border-b border-slate-800 bg-slate-900">
                         <div className="max-w-7xl mx-auto px-4 flex gap-1">
-                          {(['overview','episodes','drift','iris','export'] as const).map((view,i) => (
+                          {(['overview','episodes','drift','iris','graph','export'] as const).map((view,i) => (
                         <button key={view} onClick={()=>setSelectedView(view)}
                                         className={`px-4 py-3 text-sm font-medium transition-colors border-b-2 ${selectedView===view?'border-blue-500 text-blue-400':'border-transparent text-slate-400 hover:text-slate-300'}`}>
-                                      <span className="text-xs text-slate-600 mr-1">{i+1}</span>{view === 'iris' ? 'IRIS' : view.charAt(0).toUpperCase()+view.slice(1)}
+                                      <span className="text-xs text-slate-600 mr-1">{i+1}</span>{view === 'iris' ? 'IRIS' : view === 'graph' ? 'MG Graph' : view.charAt(0).toUpperCase()+view.slice(1)}
                         </button>
                       ))}
                         </div>
@@ -424,11 +402,12 @@ export function App() {
                   {selectedView==='episodes' && <EpisodesView episodes={episodes}/>}
                   {selectedView==='drift' && <DriftView drifts={drifts}/>}
                   {selectedView==='iris' && <IrisPanel />}
+                  {selectedView==='graph' && <MGGraphView />}
                   {selectedView==='export' && <ExportView episodes={episodes} drifts={drifts} metrics={metrics}/>}
                 </main>
           
                 <div className="fixed bottom-4 right-4 text-xs text-slate-600 bg-slate-900/80 px-3 py-1.5 rounded border border-slate-800">
-                        Press 1-5 to switch views {'\u00B7'} R to refresh
+                        Press 1-6 to switch views {'\u00B7'} R to refresh
                 </div>
           </div>
         );

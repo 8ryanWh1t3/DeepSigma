@@ -19,6 +19,7 @@ Endpoints
     POST /api/iris        — IRIS query (body: {query_type, text, episode_id})
 """
 
+import asyncio
 import json
 import sys
 from collections import defaultdict
@@ -33,6 +34,7 @@ sys.path.insert(0, str(REPO_ROOT))
 import uvicorn  # noqa: E402
 from fastapi import FastAPI, HTTPException  # noqa: E402
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
+from fastapi.responses import StreamingResponse  # noqa: E402
 
 from coherence_ops import (  # noqa: E402
     DLRBuilder,
@@ -399,6 +401,48 @@ def query_iris(body: Dict[str, Any]):
     )
     response = engine.resolve(query)
     return response.to_dict()
+
+
+@app.get("/api/mg")
+def get_mg():
+    """Return Memory Graph nodes + edges as JSON."""
+    episodes = _load_episodes()
+    drifts = _load_drifts()
+    if not episodes:
+        return {"nodes": [], "edges": []}
+    _, _, _, mg = _build_pipeline(episodes, drifts)
+    return json.loads(mg.to_json())
+
+
+@app.get("/api/sse")
+async def sse_stream():
+    """SSE stream: multiplexes episodes, drifts, agents, mg events."""
+    async def event_generator():
+        last_hash = ""
+        while True:
+            try:
+                episodes = _load_episodes()
+                drifts = _load_drifts()
+                current_hash = f"{len(episodes)}:{len(drifts)}"
+                if current_hash != last_hash:
+                    drift_lookup: Dict[str, List] = defaultdict(list)
+                    for dr in drifts:
+                        drift_lookup[dr.get("episodeId", "")].append(dr)
+                    ep_data = [_episode_to_dashboard(ep, drift_lookup) for ep in episodes]
+                    drift_data = [_drift_to_dashboard(dr) for dr in drifts]
+                    agent_data = _build_agent_metrics(episodes, drifts)
+                    yield f"event: episodes\ndata: {json.dumps(ep_data)}\n\n"
+                    yield f"event: drifts\ndata: {json.dumps(drift_data)}\n\n"
+                    yield f"event: agents\ndata: {json.dumps(agent_data)}\n\n"
+                    if episodes:
+                        _, _, _, mg = _build_pipeline(episodes, drifts)
+                        yield f"event: mg\ndata: {mg.to_json()}\n\n"
+                    last_hash = current_hash
+                yield ": keepalive\n\n"
+            except Exception:
+                yield ": error\n\n"
+            await asyncio.sleep(2)
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 
 # ── Entry point ───────────────────────────────────────────────────────────────

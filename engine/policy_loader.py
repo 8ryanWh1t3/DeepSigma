@@ -28,6 +28,7 @@ def _compute_hash(pack: Dict[str, Any]) -> str:
 def load_policy_pack(
     path: str,
     verify_hash: bool | None = None,
+    validate_schema: bool = False,
 ) -> Dict[str, Any]:
     """Load a policy pack JSON file and optionally verify its integrity hash.
 
@@ -36,6 +37,7 @@ def load_policy_pack(
         verify_hash: If True, verify the policyPackHash field against computed hash.
             If None (default), checks DEEPSIGMA_NO_VERIFY_HASH env var.
             Set to False to skip verification entirely.
+        validate_schema: If True, validate the pack against the policy_pack JSON schema.
 
     Returns:
         Parsed policy pack dict.
@@ -47,6 +49,15 @@ def load_policy_pack(
     """
     p = Path(path)
     pack = json.loads(p.read_text(encoding="utf-8"))
+
+    # Optional schema validation
+    if validate_schema:
+        from engine.schema_validator import validate as _validate_schema
+
+        result = _validate_schema(pack, "policy_pack")
+        if not result.valid:
+            for err in result.errors:
+                logger.warning("Policy pack schema: %s at %s", err.message, err.path)
 
     # Determine whether to verify
     if verify_hash is None:

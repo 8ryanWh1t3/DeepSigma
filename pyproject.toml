@@ -42,7 +42,11 @@ exhaust-llm = [
 dev = [
     "pytest",
     "pytest-cov",
+    "pytest-benchmark",
     "ruff",
+]
+langgraph = [
+    "langgraph>=0.2.0",
 ]
 
 [project.urls]
@@ -72,3 +76,6 @@ exclude = ["coherence_ops/cli.py"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "benchmark: performance benchmark tests (deselect with '-m \"not benchmark\"')",
+]
