@@ -16,3 +16,9 @@ Expose these tools:
 - `adapters/mcp/mcp_server_scaffold.py`
 - `adapters/mcp/tool_catalog.json`
 - `examples/mcp/mcp_client_messages.jsonl`
+
+## Runnable Cookbook
+
+For a step-by-step runnable example with expected output, verification, and failure modes:
+
+→ [cookbook/mcp/hello_deepsigma/README.md](../../cookbook/mcp/hello_deepsigma/README.md)

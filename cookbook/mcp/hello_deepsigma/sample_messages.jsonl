@@ -1,0 +1,7 @@
+{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}
+{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"overwatch.submit_task","arguments":{"decisionType":"LoanApproval","context":{"applicant_id":"cust-001","amount_requested":50000}}}}
+{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"overwatch.tool_execute","arguments":{"session_id":"__SESSION_ID__","tool":"credit_check","input":{"applicant_id":"cust-001","bureau":"equifax"}}}}
+{"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"overwatch.action_dispatch","arguments":{"session_id":"__SESSION_ID__","action":{"type":"approve_loan","amount":50000},"idempotencyKey":"idem-001"}}}
+{"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"overwatch.verify_run","arguments":{"session_id":"__SESSION_ID__","method":"schema_check","target":"loan_approval"}}}
+{"jsonrpc":"2.0","id":6,"method":"tools/call","params":{"name":"overwatch.episode_seal","arguments":{"session_id":"__SESSION_ID__","episode":{"episodeId":"ep-mcp-001","decisionType":"LoanApproval","actor":{"id":"mcp-agent-01"},"outcome":{"code":"success","reason":"all checks passed"}}}}}
+{"jsonrpc":"2.0","id":7,"method":"tools/call","params":{"name":"overwatch.drift_emit","arguments":{"driftId":"drift-mcp-001","episodeId":"ep-mcp-001","driftType":"outcome","severity":"green","detectedAt":"2026-01-01T00:00:00Z","delta":0.0,"threshold":0.1}}}
