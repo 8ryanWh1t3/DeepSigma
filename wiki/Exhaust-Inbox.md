@@ -65,6 +65,22 @@ chain.invoke(input, config={"callbacks": [handler]})
 
 See: [`adapters/langchain_exhaust.py`](../adapters/langchain_exhaust.py)
 
+### B) Anthropic Direct
+
+The Anthropic batch adapter reads JSONL exports of Anthropic Messages API
+responses, normalises them to `EpisodeEvent` format (prompt / completion /
+tool / metric), groups by `session_id + time_window` (30 min default), and
+POSTs to the ingestion endpoint.
+
+```bash
+python -m adapters.anthropic_exhaust \
+    --file /path/to/anthropic_logs.jsonl \
+    --project my-project \
+    --dry-run          # preview without POSTing
+```
+
+See: [`adapters/anthropic_exhaust.py`](../adapters/anthropic_exhaust.py)
+
 ### E) Azure / OpenAI Batch
 
 The batch adapter reads JSONL log exports from OpenAI or Azure OpenAI, normalises them to `EpisodeEvent` format, groups by `user_hash + conversation_id + time_window` (30 min default), and POSTs to the ingestion endpoint.

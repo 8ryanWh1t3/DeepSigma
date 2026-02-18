@@ -31,6 +31,7 @@ class Source(str, Enum):
     langchain = "langchain"
     openai = "openai"
     azure = "azure"
+    anthropic = "anthropic"
     manual = "manual"
 
 

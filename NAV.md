@@ -119,6 +119,9 @@ Runnable, verifiable integration examples with expected output and failure modes
 | [`cookbook/mcp/hello_deepsigma/`](cookbook/mcp/hello_deepsigma/) | MCP loopback — full 7-message session, run_loopback.py |
 | [`cookbook/openclaw/supervised_run/`](cookbook/openclaw/supervised_run/) | Contract enforcement — PASS, BLOCKED, POSTCONDITION FAILED scenarios |
 | [`cookbook/otel/trace_drift_patch/`](cookbook/otel/trace_drift_patch/) | OTel span export for episodes and drift events |
+| [`cookbook/exhaust/README.md`](cookbook/exhaust/README.md) | Exhaust Inbox quick chooser — LangChain / Azure / Anthropic / manual |
+| [`cookbook/exhaust/basic_ingest/`](cookbook/exhaust/basic_ingest/) | Full ingest → assemble → refine → commit cycle (no API key) |
+| [`cookbook/exhaust/llm_extraction/`](cookbook/exhaust/llm_extraction/) | LLM-backed extraction demo (requires ANTHROPIC_API_KEY) |
 
 ---
 
