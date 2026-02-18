@@ -142,6 +142,18 @@ last_updated: "2026-02-16"
 
 ---
 
+## 🔧 Ops Pack
+
+| Resource | Purpose |
+|----------|---------|
+| [`OPS_RUNBOOK.md`](OPS_RUNBOOK.md) | Run Money Demo, tests, diagnostics, incident playbooks (WHY retrieval SLO) |
+| [`TROUBLESHOOTING.md`](TROUBLESHOOTING.md) | Top 20 issues — symptom → cause → fix → verify |
+| [`CONFIG_REFERENCE.md`](CONFIG_REFERENCE.md) | CLI args, policy pack schema, environment variables |
+| [`STABILITY.md`](STABILITY.md) | Stable interfaces, versioning policy, v1.0 criteria |
+| [`TEST_STRATEGY.md`](TEST_STRATEGY.md) | Test tiers, SLOs, coverage, CI enforcement |
+
+---
+
 ## ✅ Quality & Release
 
 | Resource | Purpose |
