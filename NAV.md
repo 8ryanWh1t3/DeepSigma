@@ -93,6 +93,16 @@ last_updated: "2026-02-18"
 | Resource | Purpose |
 |----------|---------|
 | [`dashboard/`](dashboard/) | React dashboard UI + mock data + server API |
+| [`dashboard/src/TrustScorecardPanel.tsx`](dashboard/src/TrustScorecardPanel.tsx) | Trust Scorecard dashboard panel |
+
+---
+
+## 📏 Trust & Metrics
+
+| Resource | Purpose |
+|----------|---------|
+| [`specs/trust_scorecard_v1.md`](specs/trust_scorecard_v1.md) | Trust Scorecard v1.0 — metrics spec + SLO thresholds |
+| [`tools/trust_scorecard.py`](tools/trust_scorecard.py) | Trust Scorecard generator (reads Golden Path output) |
 
 ---
 

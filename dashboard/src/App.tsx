@@ -10,8 +10,9 @@ import { IrisPanel } from './IrisPanel';
 import { useOverwatchStore } from './store';
 import { useSSE } from './hooks/useSSE';
 import { MGGraphView } from './components/MGGraphView';
+import { TrustScorecardPanel } from './TrustScorecardPanel';
 
-type ViewType = 'overview' | 'episodes' | 'drift' | 'iris' | 'graph' | 'export';
+type ViewType = 'overview' | 'episodes' | 'drift' | 'iris' | 'graph' | 'trust' | 'export';
 type SortField = 'agent' | 'status' | 'deadline' | 'duration' | 'freshness' | 'outcome';
 type SortDir = 'asc' | 'desc';
 
@@ -239,8 +240,8 @@ export function App() {
     useEffect(() => {
           const handler = (e: KeyboardEvent) => {
                   if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return;
-                  const views: ViewType[] = ['overview','episodes','drift','iris','graph','export'];
-                  if (e.key>='1'&&e.key<='6') setSelectedView(views[parseInt(e.key)-1]);
+                  const views: ViewType[] = ['overview','episodes','drift','iris','graph','trust','export'];
+                  if (e.key>='1'&&e.key<='7') setSelectedView(views[parseInt(e.key)-1]);
                   if (e.key==='r') refresh();
           };
           window.addEventListener('keydown', handler);
@@ -305,10 +306,10 @@ export function App() {
           
                 <nav className="border-b border-slate-800 bg-slate-900">
                         <div className="max-w-7xl mx-auto px-4 flex gap-1">
-                          {(['overview','episodes','drift','iris','graph','export'] as const).map((view,i) => (
+                          {(['overview','episodes','drift','iris','graph','trust','export'] as const).map((view,i) => (
                         <button key={view} onClick={()=>setSelectedView(view)}
                                         className={`px-4 py-3 text-sm font-medium transition-colors border-b-2 ${selectedView===view?'border-blue-500 text-blue-400':'border-transparent text-slate-400 hover:text-slate-300'}`}>
-                                      <span className="text-xs text-slate-600 mr-1">{i+1}</span>{view === 'iris' ? 'IRIS' : view === 'graph' ? 'MG Graph' : view.charAt(0).toUpperCase()+view.slice(1)}
+                                      <span className="text-xs text-slate-600 mr-1">{i+1}</span>{view === 'iris' ? 'IRIS' : view === 'graph' ? 'MG Graph' : view === 'trust' ? 'Trust Scorecard' : view.charAt(0).toUpperCase()+view.slice(1)}
                         </button>
                       ))}
                         </div>
@@ -403,11 +404,12 @@ export function App() {
                   {selectedView==='drift' && <DriftView drifts={drifts}/>}
                   {selectedView==='iris' && <IrisPanel />}
                   {selectedView==='graph' && <MGGraphView />}
+                  {selectedView==='trust' && <TrustScorecardPanel />}
                   {selectedView==='export' && <ExportView episodes={episodes} drifts={drifts} metrics={metrics}/>}
                 </main>
           
                 <div className="fixed bottom-4 right-4 text-xs text-slate-600 bg-slate-900/80 px-3 py-1.5 rounded border border-slate-800">
-                        Press 1-6 to switch views {'\u00B7'} R to refresh
+                        Press 1-7 to switch views {'\u00B7'} R to refresh
                 </div>
           </div>
         );

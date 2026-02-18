@@ -407,6 +407,15 @@ def query_iris(body: Dict[str, Any]):
     return response.to_dict()
 
 
+@app.get("/api/trust_scorecard")
+def get_trust_scorecard():
+    """Return the Trust Scorecard if available."""
+    scorecard_path = REPO_ROOT / "trust_scorecard.json"
+    if not scorecard_path.exists():
+        raise HTTPException(status_code=404, detail="Trust Scorecard not found. Run: python -m tools.trust_scorecard --input <golden_path_output>")
+    return json.loads(scorecard_path.read_text())
+
+
 @app.get("/api/mg")
 def get_mg():
     """Return Memory Graph nodes + edges as JSON."""
