@@ -410,6 +410,23 @@
           "since": {"type": "string", "description": "ISO-8601 timestamp for incremental sync (optional)"}
         }
       }
+    },
+    {
+      "name": "golden_path.run",
+      "description": "Run the 7-step Golden Path end-to-end decision governance loop. Connects to a data source, normalizes records, extracts claims, seals an episode, detects drift, patches, and runs IRIS recall.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["source"],
+        "properties": {
+          "source": {"type": "string", "enum": ["sharepoint", "snowflake", "dataverse", "asksage"]},
+          "fixture": {"type": "string", "description": "Path to fixture directory for offline mode"},
+          "episode_id": {"type": "string", "description": "Custom episode ID (default: gp-demo)"},
+          "list_id": {"type": "string", "description": "SharePoint list ID"},
+          "table_name": {"type": "string", "description": "Dataverse table name"},
+          "sql": {"type": "string", "description": "Snowflake SQL query"},
+          "prompt": {"type": "string", "description": "AskSage prompt"}
+        }
+      }
     }
   ]
 }

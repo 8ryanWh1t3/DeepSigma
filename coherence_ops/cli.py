@@ -343,6 +343,40 @@ def cmd_dte_check(args: argparse.Namespace) -> None:
     sys.exit(1 if results else 0)
 
 
+def cmd_golden_path(args: argparse.Namespace) -> None:
+    """Run the 7-step Golden Path decision governance loop."""
+    from demos.golden_path.config import GoldenPathConfig
+    from demos.golden_path.pipeline import GoldenPathPipeline
+
+    config = GoldenPathConfig(
+        source=args.source,
+        fixture_path=args.fixture,
+        episode_id=getattr(args, "episode_id", "gp-demo"),
+        decision_type=getattr(args, "decision_type", "ingest"),
+        output_dir=getattr(args, "output", "./golden_path_output"),
+        supervised=getattr(args, "supervised", False),
+        list_id=getattr(args, "list_id", ""),
+        table_name=getattr(args, "table", ""),
+        sql=getattr(args, "sql", ""),
+        prompt=getattr(args, "prompt", ""),
+    )
+
+    pipeline = GoldenPathPipeline(config)
+    result = pipeline.run()
+
+    if getattr(args, "json", False):
+        print(json.dumps(result.to_dict(), indent=2))
+    else:
+        print(f"\nGolden Path complete: {len(result.steps_completed)}/7 steps")
+        print(f"  Records: {result.canonical_records}  Claims: {result.claims_extracted}")
+        print(f"  Baseline: {result.baseline_score:.1f} ({result.baseline_grade})")
+        print(f"  Drift: {result.drift_events} events  Patch: {result.patch_applied}")
+        print(f"  Patched:  {result.patched_score:.1f} ({result.patched_grade})")
+        print(f"  IRIS: {result.iris_queries}")
+        print(f"  Output:   {result.output_dir}")
+        print(f"  Elapsed:  {result.elapsed_ms:.0f}ms")
+
+
 def cmd_demo(args: argparse.Namespace) -> None:  # noqa: ARG001
     parser = argparse.ArgumentParser(
         prog="coherence demo",
@@ -449,6 +483,28 @@ def main() -> None:
     p_dte_check.add_argument("--dte", required=True, help="Path to DTE spec JSON")
     p_dte_check.add_argument("--json", action="store_true", help="Output JSON")
     p_dte_check.set_defaults(func=cmd_dte_check)
+
+    # ── golden-path ────────────────────────────────────────────────
+    p_gp = subparsers.add_parser(
+        "golden-path",
+        help="Run the 7-step Golden Path decision governance loop",
+    )
+    p_gp.add_argument(
+        "source",
+        choices=["sharepoint", "snowflake", "dataverse", "asksage"],
+        help="Data source connector",
+    )
+    p_gp.add_argument("--fixture", default=None, help="Path to fixture directory")
+    p_gp.add_argument("--episode-id", default="gp-demo", help="Episode ID")
+    p_gp.add_argument("--decision-type", default="ingest", help="Decision type")
+    p_gp.add_argument("--output", default="./golden_path_output", help="Output directory")
+    p_gp.add_argument("--supervised", action="store_true", help="Pause before patch")
+    p_gp.add_argument("--list-id", default="", help="SharePoint list ID")
+    p_gp.add_argument("--table", default="", help="Dataverse table name")
+    p_gp.add_argument("--sql", default="", help="Snowflake SQL query")
+    p_gp.add_argument("--prompt", default="", help="AskSage prompt")
+    p_gp.add_argument("--json", action="store_true", help="Output JSON result")
+    p_gp.set_defaults(func=cmd_golden_path)
 
     # ── demo ─────────────────────────────────────────────────────
     p_demo = subparsers.add_parser(

@@ -265,6 +265,21 @@ def handle_tools_call(_id: Any, params: Dict[str, Any]) -> Dict[str, Any]:
         result = connector.sync_table(arguments.get("table_name", ""), since=arguments.get("since"))
         return rpc_result(_id, result)
 
+    if name == "golden_path.run":
+        from demos.golden_path.config import GoldenPathConfig
+        from demos.golden_path.pipeline import GoldenPathPipeline
+        config = GoldenPathConfig(
+            source=arguments.get("source", "sharepoint"),
+            fixture_path=arguments.get("fixture"),
+            episode_id=arguments.get("episode_id", "gp-demo"),
+            list_id=arguments.get("list_id", ""),
+            table_name=arguments.get("table_name", ""),
+            sql=arguments.get("sql", ""),
+            prompt=arguments.get("prompt", ""),
+        )
+        result = GoldenPathPipeline(config).run()
+        return rpc_result(_id, result.to_dict())
+
     return rpc_error(_id, -32601, f"Unknown tool: {name}")
 
 # ── Resources ───────────────────────────────────────────────────
