@@ -1,0 +1,82 @@
+[
+  {
+    "id": "1",
+    "createdDateTime": "2026-01-10T09:00:00Z",
+    "lastModifiedDateTime": "2026-02-15T14:30:00Z",
+    "createdBy": {"user": {"email": "jane.doe@contoso.com"}},
+    "fields": {
+      "id": "1",
+      "Title": "Data Retention Policy v3.1",
+      "ContentType": {"Name": "Document"},
+      "Body": "<p>All customer PII must be purged after 24 months. Exceptions require VP-level approval.</p>",
+      "Created": "2026-01-10T09:00:00Z",
+      "Modified": "2026-02-15T14:30:00Z",
+      "Author": "jane.doe@contoso.com",
+      "FileLeafRef": "DataRetentionPolicy_v3.1.docx"
+    }
+  },
+  {
+    "id": "2",
+    "createdDateTime": "2026-01-12T11:00:00Z",
+    "lastModifiedDateTime": "2026-02-14T09:15:00Z",
+    "createdBy": {"user": {"email": "bob.smith@contoso.com"}},
+    "fields": {
+      "id": "2",
+      "Title": "Vendor Risk Assessment Framework",
+      "ContentType": {"Name": "Document"},
+      "Body": "<p>All third-party vendors handling sensitive data must complete annual SOC2 review.</p>",
+      "Created": "2026-01-12T11:00:00Z",
+      "Modified": "2026-02-14T09:15:00Z",
+      "Author": "bob.smith@contoso.com",
+      "FileLeafRef": "VendorRiskFramework_2026.docx"
+    }
+  },
+  {
+    "id": "3",
+    "createdDateTime": "2026-02-10T16:00:00Z",
+    "lastModifiedDateTime": "2026-02-10T16:45:00Z",
+    "createdBy": {"user": {"email": "alice.chen@contoso.com"}},
+    "fields": {
+      "id": "3",
+      "Title": "Q1 Compliance Review Complete",
+      "ContentType": {"Name": "Event"},
+      "Body": "<p>Reviewed 142 data handling procedures. 3 flagged for remediation.</p>",
+      "Created": "2026-02-10T16:00:00Z",
+      "Modified": "2026-02-10T16:45:00Z",
+      "Author": "alice.chen@contoso.com",
+      "FileLeafRef": ""
+    }
+  },
+  {
+    "id": "4",
+    "createdDateTime": "2026-02-12T10:00:00Z",
+    "lastModifiedDateTime": "2026-02-12T11:30:00Z",
+    "createdBy": {"user": {"email": "dave.wilson@contoso.com"}},
+    "fields": {
+      "id": "4",
+      "Title": "Vendor SOC2 Audit — Acme Corp",
+      "ContentType": {"Name": "Task"},
+      "Body": "<p>SOC2 Type II audit received for Acme Corp. No material findings.</p>",
+      "Created": "2026-02-12T10:00:00Z",
+      "Modified": "2026-02-12T11:30:00Z",
+      "Author": "dave.wilson@contoso.com",
+      "FileLeafRef": ""
+    }
+  },
+  {
+    "id": "5",
+    "createdDateTime": "2025-11-01T08:00:00Z",
+    "lastModifiedDateTime": "2026-02-01T12:00:00Z",
+    "createdBy": {"user": {"email": "admin@contoso.com"}},
+    "fields": {
+      "id": "5",
+      "Title": "Acme Corp — Primary Contact",
+      "ContentType": {"Name": "Item"},
+      "Body": "<p>Primary contact: Sarah Johnson, VP Security.</p>",
+      "Created": "2025-11-01T08:00:00Z",
+      "Modified": "2026-02-01T12:00:00Z",
+      "Author": "admin@contoso.com",
+      "FileLeafRef": ""
+    }
+  }
+]

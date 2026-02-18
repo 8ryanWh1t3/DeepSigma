@@ -1,0 +1,92 @@
+[
+  {
+    "record_id": "sage-001",
+    "record_type": "Claim",
+    "created_at": "2026-02-10T09:00:00Z",
+    "observed_at": "2026-02-10T09:00:00Z",
+    "source": {
+      "system": "asksage",
+      "actor": {"id": "analyst@contoso.com", "type": "human"}
+    },
+    "provenance": [{"type": "source", "ref": "asksage://query/q-001"}],
+    "confidence": {"score": 0.80},
+    "ttl": 86400000,
+    "content": {
+      "title": "NIST CSF alignment assessment",
+      "body": "Current posture aligns with 78% of NIST CSF controls. Key gaps in PR.AC (access control) and DE.CM (continuous monitoring)."
+    },
+    "labels": {"tags": ["nist", "csf", "assessment"]}
+  },
+  {
+    "record_id": "sage-002",
+    "record_type": "Claim",
+    "created_at": "2026-02-11T14:00:00Z",
+    "observed_at": "2026-02-11T14:00:00Z",
+    "source": {
+      "system": "asksage",
+      "actor": {"id": "analyst@contoso.com", "type": "human"}
+    },
+    "provenance": [{"type": "source", "ref": "asksage://query/q-002"}],
+    "confidence": {"score": 0.75},
+    "ttl": 86400000,
+    "content": {
+      "title": "FedRAMP readiness check",
+      "body": "Organization meets 65% of FedRAMP Moderate baseline. Primary gaps: AU (audit), IA (identification/auth), SC (system comms)."
+    },
+    "labels": {"tags": ["fedramp", "compliance", "readiness"]}
+  },
+  {
+    "record_id": "sage-003",
+    "record_type": "Claim",
+    "created_at": "2026-02-12T10:00:00Z",
+    "observed_at": "2026-02-12T10:00:00Z",
+    "source": {
+      "system": "asksage",
+      "actor": {"id": "ciso@contoso.com", "type": "human"}
+    },
+    "provenance": [{"type": "source", "ref": "asksage://query/q-003"}],
+    "confidence": {"score": 0.85},
+    "ttl": 86400000,
+    "content": {
+      "title": "Vendor risk tier classification",
+      "body": "Acme Corp: Tier 1 (critical). Vendor X: Tier 2 (significant). All others: Tier 3."
+    },
+    "labels": {"tags": ["vendor", "risk", "classification"]}
+  },
+  {
+    "record_id": "sage-004",
+    "record_type": "Document",
+    "created_at": "2026-02-13T11:00:00Z",
+    "observed_at": "2026-02-13T11:00:00Z",
+    "source": {
+      "system": "asksage",
+      "actor": {"id": "analyst@contoso.com", "type": "human"}
+    },
+    "provenance": [{"type": "source", "ref": "asksage://query/q-004"}],
+    "confidence": {"score": 0.70},
+    "ttl": 86400000,
+    "content": {
+      "title": "Zero-trust architecture summary",
+      "body": "Summary of DoD zero-trust reference architecture. Key pillars: identity, device, network, application, data."
+    },
+    "labels": {"tags": ["zero-trust", "architecture", "dod"]}
+  },
+  {
+    "record_id": "sage-005",
+    "record_type": "Claim",
+    "created_at": "2026-02-14T08:00:00Z",
+    "observed_at": "2026-02-14T08:00:00Z",
+    "source": {
+      "system": "asksage",
+      "actor": {"id": "ciso@contoso.com", "type": "human"}
+    },
+    "provenance": [{"type": "source", "ref": "asksage://query/q-005"}],
+    "confidence": {"score": 0.90},
+    "ttl": 86400000,
+    "content": {
+      "title": "Incident response SLA compliance",
+      "body": "Current MTTR: 4.2 hours (target: 4 hours). 95th percentile: 8 hours (target: 8 hours). SLA met."
+    },
+    "labels": {"tags": ["incident-response", "sla", "metrics"]}
+  }
+]

@@ -73,6 +73,9 @@ last_updated: "2026-02-18"
 
 | Resource | Purpose |
 |----------|---------|
+| [`fixtures/connectors/`](fixtures/connectors/) | **Fixture Library** — offline deterministic fixtures for all connectors |
+| [`docs/fixtures.md`](docs/fixtures.md) | Fixture philosophy, structure, regeneration |
+| [`tools/generate_connector_fixtures.py`](tools/generate_connector_fixtures.py) | Fixture envelope generator tool |
 | [`demos/golden_path/`](demos/golden_path/) | **Golden Path** — 7-step end-to-end decision governance demo |
 | [`demos/golden_path/README.md`](demos/golden_path/README.md) | Golden Path quickstart + options reference |
 | [`tools/golden_path_cli.py`](tools/golden_path_cli.py) | `deepsigma golden-path` CLI entrypoint |

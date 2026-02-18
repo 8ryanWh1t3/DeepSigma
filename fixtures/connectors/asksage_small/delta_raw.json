@@ -1,0 +1,92 @@
+[
+  {
+    "record_id": "sage-001",
+    "record_type": "Claim",
+    "created_at": "2026-02-10T09:00:00Z",
+    "observed_at": "2026-02-18T09:00:00Z",
+    "source": {
+      "system": "asksage",
+      "actor": {"id": "analyst@contoso.com", "type": "human"}
+    },
+    "provenance": [{"type": "source", "ref": "asksage://query/q-001-v2"}],
+    "confidence": {"score": 0.85},
+    "ttl": 86400000,
+    "content": {
+      "title": "NIST CSF alignment assessment (updated)",
+      "body": "Current posture aligns with 82% of NIST CSF controls after PR.AC remediation. Remaining gap: DE.CM."
+    },
+    "labels": {"tags": ["nist", "csf", "assessment", "updated"]}
+  },
+  {
+    "record_id": "sage-002",
+    "record_type": "Claim",
+    "created_at": "2026-02-11T14:00:00Z",
+    "observed_at": "2026-02-11T14:00:00Z",
+    "source": {
+      "system": "asksage",
+      "actor": {"id": "analyst@contoso.com", "type": "human"}
+    },
+    "provenance": [{"type": "source", "ref": "asksage://query/q-002"}],
+    "confidence": {"score": 0.75},
+    "ttl": 86400000,
+    "content": {
+      "title": "FedRAMP readiness check",
+      "body": "Organization meets 65% of FedRAMP Moderate baseline. Primary gaps: AU (audit), IA (identification/auth), SC (system comms)."
+    },
+    "labels": {"tags": ["fedramp", "compliance", "readiness"]}
+  },
+  {
+    "record_id": "sage-003",
+    "record_type": "Claim",
+    "created_at": "2026-02-12T10:00:00Z",
+    "observed_at": "2026-02-12T10:00:00Z",
+    "source": {
+      "system": "asksage",
+      "actor": {"id": "ciso@contoso.com", "type": "human"}
+    },
+    "provenance": [{"type": "source", "ref": "asksage://query/q-003"}],
+    "confidence": {"score": 0.50},
+    "ttl": 86400000,
+    "content": {
+      "title": "Vendor risk tier classification",
+      "body": "Acme Corp: Tier 1 (critical) — ACQUIRED. Risk tier under review. Vendor X: Tier 1 (elevated). All others: Tier 3."
+    },
+    "labels": {"tags": ["vendor", "risk", "classification", "review"]}
+  },
+  {
+    "record_id": "sage-005",
+    "record_type": "Claim",
+    "created_at": "2026-02-14T08:00:00Z",
+    "observed_at": "2026-02-14T08:00:00Z",
+    "source": {
+      "system": "asksage",
+      "actor": {"id": "ciso@contoso.com", "type": "human"}
+    },
+    "provenance": [{"type": "source", "ref": "asksage://query/q-005"}],
+    "confidence": {"score": 0.90},
+    "ttl": 86400000,
+    "content": {
+      "title": "Incident response SLA compliance",
+      "body": "Current MTTR: 4.2 hours (target: 4 hours). 95th percentile: 8 hours (target: 8 hours). SLA met."
+    },
+    "labels": {"tags": ["incident-response", "sla", "metrics"]}
+  },
+  {
+    "record_id": "sage-006",
+    "record_type": "Claim",
+    "created_at": "2026-02-18T10:00:00Z",
+    "observed_at": "2026-02-18T10:00:00Z",
+    "source": {
+      "system": "asksage",
+      "actor": {"id": "analyst@contoso.com", "type": "human"}
+    },
+    "provenance": [{"type": "source", "ref": "asksage://query/q-006"}],
+    "confidence": {"score": 0.70},
+    "ttl": 86400000,
+    "content": {
+      "title": "Supply chain risk assessment",
+      "body": "3 critical dependencies identified with single-vendor risk. Recommend diversification for cloud storage and auth providers."
+    },
+    "labels": {"tags": ["supply-chain", "risk", "diversification"]}
+  }
+]
