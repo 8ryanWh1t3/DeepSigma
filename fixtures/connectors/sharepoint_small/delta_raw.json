@@ -1,0 +1,66 @@
+[
+  {
+    "id": "1",
+    "createdDateTime": "2026-01-10T09:00:00Z",
+    "lastModifiedDateTime": "2026-02-18T10:00:00Z",
+    "createdBy": {"user": {"email": "jane.doe@contoso.com"}},
+    "fields": {
+      "id": "1",
+      "Title": "Data Retention Policy v3.2",
+      "ContentType": {"Name": "Document"},
+      "Body": "<p>All customer PII must be purged after 18 months (changed from 24). Exceptions require C-level approval.</p>",
+      "Created": "2026-01-10T09:00:00Z",
+      "Modified": "2026-02-18T10:00:00Z",
+      "Author": "jane.doe@contoso.com",
+      "FileLeafRef": "DataRetentionPolicy_v3.2.docx"
+    }
+  },
+  {
+    "id": "2",
+    "createdDateTime": "2026-01-12T11:00:00Z",
+    "lastModifiedDateTime": "2026-02-14T09:15:00Z",
+    "createdBy": {"user": {"email": "bob.smith@contoso.com"}},
+    "fields": {
+      "id": "2",
+      "Title": "Vendor Risk Assessment Framework",
+      "ContentType": {"Name": "Document"},
+      "Body": "<p>All third-party vendors handling sensitive data must complete annual SOC2 review.</p>",
+      "Created": "2026-01-12T11:00:00Z",
+      "Modified": "2026-02-14T09:15:00Z",
+      "Author": "bob.smith@contoso.com",
+      "FileLeafRef": "VendorRiskFramework_2026.docx"
+    }
+  },
+  {
+    "id": "4",
+    "createdDateTime": "2026-02-12T10:00:00Z",
+    "lastModifiedDateTime": "2026-02-12T11:30:00Z",
+    "createdBy": {"user": {"email": "dave.wilson@contoso.com"}},
+    "fields": {
+      "id": "4",
+      "Title": "Vendor SOC2 Audit — Acme Corp",
+      "ContentType": {"Name": "Task"},
+      "Body": "<p>SOC2 Type II audit received for Acme Corp. No material findings.</p>",
+      "Created": "2026-02-12T10:00:00Z",
+      "Modified": "2026-02-12T11:30:00Z",
+      "Author": "dave.wilson@contoso.com",
+      "FileLeafRef": ""
+    }
+  },
+  {
+    "id": "6",
+    "createdDateTime": "2026-02-17T14:00:00Z",
+    "lastModifiedDateTime": "2026-02-17T15:30:00Z",
+    "createdBy": {"user": {"email": "alice.chen@contoso.com"}},
+    "fields": {
+      "id": "6",
+      "Title": "Emergency Data Breach Response — Vendor X",
+      "ContentType": {"Name": "Event"},
+      "Body": "<p>Vendor X reported potential data exposure. Incident response team activated.</p>",
+      "Created": "2026-02-17T14:00:00Z",
+      "Modified": "2026-02-17T15:30:00Z",
+      "Author": "alice.chen@contoso.com",
+      "FileLeafRef": ""
+    }
+  }
+]
