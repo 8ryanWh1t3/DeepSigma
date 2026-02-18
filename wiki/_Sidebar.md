@@ -23,6 +23,8 @@
   - [DLR Schema](Unified-Atomic-Claims)
   - [Canon Schema](Canon)
   - [Retcon Schema](Retcon)
+- **Exhaust Inbox**
+  - [Exhaust Inbox](Exhaust-Inbox)
 - **Integrations**
   - [MCP](MCP)
   - [LangChain](LangChain)
