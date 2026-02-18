@@ -44,7 +44,11 @@ class SharePointConnector:
     - ``SP_CLIENT_ID``
     - ``SP_CLIENT_SECRET``
     - ``SP_SITE_ID``
+
+    Implements ConnectorV1 contract (v0.6.0+).
     """
+
+    source_name = "sharepoint"
 
     def __init__(
         self,
@@ -127,6 +131,14 @@ class SharePointConnector:
             "expirationDateTime": expiry,
         }
         return self._graph_post(f"{GRAPH_BASE}/subscriptions", body)
+
+    # ── Envelope contract ──────────────────────────────────────────
+
+    def to_envelopes(self, records: List[Dict[str, Any]]) -> list:
+        """Wrap canonical records in RecordEnvelope instances (ConnectorV1)."""
+        from connectors.contract import canonical_to_envelope
+        instance = f"{self._site_id}" if self._site_id else "unknown"
+        return [canonical_to_envelope(r, source_instance=instance) for r in records]
 
     # ── Field mapping ────────────────────────────────────────────
 
