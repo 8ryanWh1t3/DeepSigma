@@ -1,0 +1,73 @@
+name: Docker — Exhaust Inbox
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+    paths:
+      - 'dashboard/server/exhaust_api.py'
+      - 'dashboard/server/exhaust_main.py'
+      - 'dashboard/server/models_exhaust.py'
+      - 'engine/exhaust_refiner.py'
+      - 'engine/exhaust_llm_extractor.py'
+      - 'coherence_ops/**'
+      - 'engine/**'
+      - 'specs/**'
+      - 'adapters/**'
+      - 'pyproject.toml'
+      - 'Dockerfile.exhaust'
+      - '.github/workflows/docker-exhaust.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'Dockerfile.exhaust'
+      - 'dashboard/server/exhaust_main.py'
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/deepsigma-exhaust
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile.exhaust
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
