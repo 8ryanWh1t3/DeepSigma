@@ -44,6 +44,7 @@ class DriftType(str, Enum):
     contradiction = "contradiction"
     missing_policy = "missing_policy"
     low_claim_coverage = "low_claim_coverage"
+    stale_reference = "stale_reference"
 
 
 class ItemStatus(str, Enum):

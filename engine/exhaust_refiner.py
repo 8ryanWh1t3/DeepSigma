@@ -227,10 +227,10 @@ def detect_drift(
 ) -> List[DriftSignal]:
     """Detect drift by comparing extracted claims against local canon.
 
-    MVP checks:
+    Checks:
     1. Same entity+property with different value -> contradiction
-    2. Missing policy flags
-    3. Low claim coverage
+    2. Low claim coverage (no truth from multi-event episode)
+    3. Stale reference (memory item references an episode not in canon)
     """
     signals: List[DriftSignal] = []
 
@@ -254,6 +254,14 @@ def detect_drift(
             key = f"{_slug(c.get('entity', ''))}:{_slug(c.get('property_name', ''))}"
             if key and key != ":":
                 canon_map[key] = c.get("value", "")
+
+    # Build known episode IDs from canon
+    known_episode_ids: set = {
+        c.get("entity", "")
+        for c in canon
+        if c.get("artifact_type") == "episode" or c.get("node_type") == "memory"
+        and c.get("artifact_type") == "episode"
+    }
 
     # Check contradictions
     for item in truth:
@@ -287,6 +295,30 @@ def detect_drift(
             episode_id=episode.episode_id,
         ))
 
+    # Check stale references: memory items whose context references an unknown episode
+    if known_episode_ids:
+        for item in memory:
+            if item.artifact_type == "episode":
+                continue  # episode nodes are self-referential
+            context = item.context or ""
+            if context.startswith("In episode "):
+                ref_ep_id = context.removeprefix("In episode ").strip()
+                if ref_ep_id and ref_ep_id not in known_episode_ids:
+                    signals.append(DriftSignal(
+                        drift_type=DriftType.stale_reference,
+                        severity=DriftSeverity.yellow,
+                        description=(
+                            f"Memory item '{item.entity}' references episode "
+                            f"'{ref_ep_id}' not found in memory graph"
+                        ),
+                        entity=item.entity,
+                        episode_id=episode.episode_id,
+                        recommended_patch={
+                            "action": "verify_episode_reference",
+                            "referenced_episode": ref_ep_id,
+                        },
+                    ))
+
     return signals
 
 
@@ -306,9 +338,9 @@ def score_coherence(
     high_conf_claims = sum(1 for t in truth if t.confidence >= 0.7)
     claim_coverage = min(high_conf_claims / max(total_claims, 1), 1.0)
 
-    # Evidence quality: avg confidence of truth items
+    # Evidence quality: avg confidence of truth items (0.0 when no truth)
     evidence_quality = (
-        sum(t.confidence for t in truth) / max(len(truth), 1)
+        sum(t.confidence for t in truth) / len(truth) if truth else 0.0
     )
 
     # Reasoning completeness: have decisions + rationale
