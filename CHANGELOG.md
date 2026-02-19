@@ -5,6 +5,28 @@ All notable changes to Σ OVERWATCH / DeepSigma will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.2] — 2026-02-19 — "Creative Director Suite"
+
+### Added — Creative Director Suite (Excel-First Governance)
+
+- **Dataset** (`datasets/creative_director_suite/`): 8 CSVs (25 rows each) — creative production sample data (Sanrio-themed campaigns)
+- **Workbook generator** (`tools/generate_cds_workbook.py`): Produces governed Excel workbook with BOOT sheet + 7 named tables + 25 sample rows each
+- **Template workbook** (`templates/creative_director_suite/Creative_Director_Suite_CoherenceOps_v2.xlsx`): Ready-to-use .xlsx for SharePoint deployment
+- **Workbook Boot Protocol** (`docs/excel-first/WORKBOOK_BOOT_PROTOCOL.md`): BOOT!A1 specification — LLM initialization via structured system prompt in cell A1
+- **Table Schemas** (`docs/excel-first/TABLE_SCHEMAS.md`): 7 governance table schemas (tblTimeline, tblDeliverables, tblDLR, tblClaims, tblAssumptions, tblPatchLog, tblCanonGuardrails)
+- **Multi-Dimensional Prompting for Teams** (`docs/excel-first/multi-dim-prompting-for-teams/README.md`): 6-lens prompt model (PRIME/EXEC/OPS/AI-TECH/HUMAN/ICON) with SharePoint-first architecture
+
+### Changed
+
+- `pyproject.toml`: Version 0.6.1 → 0.6.2, added `[excel]` optional dependency group (openpyxl)
+- `coherence_ops/__init__.py`: `__version__` 0.5.0 → 0.6.2
+- `README.md`: Added Creative Director Suite section with quickstart
+- `NAV.md`: Added Excel-First Governance section
+
+### Stats
+
+- 17 new files, 5 modified, 200 CSV rows, 7 named tables, 1 generated workbook
+
 ## [0.6.1] — 2026-02-19 — "Interop Gateway"
 
 ### Added — Interoperability Stack

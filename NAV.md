@@ -132,6 +132,19 @@ last_updated: "2026-02-18"
 
 ---
 
+## 📊 Excel-First Governance (v0.6.2)
+
+| Resource | Purpose |
+|----------|---------|
+| [`docs/excel-first/multi-dim-prompting-for-teams/README.md`](docs/excel-first/multi-dim-prompting-for-teams/README.md) | Multi-Dimensional Prompting for Teams — SharePoint-first guide |
+| [`docs/excel-first/WORKBOOK_BOOT_PROTOCOL.md`](docs/excel-first/WORKBOOK_BOOT_PROTOCOL.md) | How BOOT!A1 initializes LLM workbook context |
+| [`docs/excel-first/TABLE_SCHEMAS.md`](docs/excel-first/TABLE_SCHEMAS.md) | 7 governance table schemas with column definitions |
+| [`datasets/creative_director_suite/`](datasets/creative_director_suite/) | 8 CSVs — creative production sample data (25 rows each) |
+| [`templates/creative_director_suite/`](templates/creative_director_suite/) | Generated Excel workbook template |
+| [`tools/generate_cds_workbook.py`](tools/generate_cds_workbook.py) | Workbook generation script |
+
+---
+
 ## 🔌 Integrations & Adapters
 
 | Resource | Purpose |

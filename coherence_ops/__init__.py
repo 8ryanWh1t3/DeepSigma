@@ -26,7 +26,7 @@ ResolutionStatus   — OK | PARTIAL | NOT_FOUND | ERROR
 """
 from __future__ import annotations
 
-__version__ = "0.5.0"
+__version__ = "0.6.2"
 
 from coherence_ops.manifest import CoherenceManifest
 from coherence_ops.dlr import (

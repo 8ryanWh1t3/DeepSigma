@@ -119,6 +119,32 @@ Output: `trust_scorecard.json` with metrics, SLO checks, and timing data.
 
 ---
 
+## Creative Director Suite (v0.6.2)
+
+Excel-first Coherence Ops — govern creative decisions in a shared workbook that any team can edit in SharePoint. No code required.
+
+```bash
+# Generate the governed workbook
+pip install -e ".[excel]"
+python tools/generate_cds_workbook.py
+
+# Explore the sample dataset
+ls datasets/creative_director_suite/samples/
+```
+
+The workbook includes a `BOOT` sheet (LLM system prompt), 7 named governance tables (tblTimeline, tblDeliverables, tblDLR, tblClaims, tblAssumptions, tblPatchLog, tblCanonGuardrails), and a Coherence Index dashboard.
+
+**Quickstart:**
+1. Download the template workbook from `templates/creative_director_suite/`
+2. Fill `BOOT!A1` (or use the pre-filled template)
+3. Attach workbook to your LLM app (ChatGPT, Claude, Copilot)
+4. Respond to: **"What Would You Like To Do Today?"**
+5. Paste write-back rows into Excel tables
+
+> Docs: [Excel-First Guide](docs/excel-first/multi-dim-prompting-for-teams/README.md) · [Boot Protocol](docs/excel-first/WORKBOOK_BOOT_PROTOCOL.md) · [Table Schemas](docs/excel-first/TABLE_SCHEMAS.md) · [Dataset](datasets/creative_director_suite/README.md)
+
+---
+
 ## Repo Structure
 
 ```
@@ -132,7 +158,9 @@ DeepSigma/
 ├── specs/                # JSON schemas (11 schemas)
 ├── examples/             # Episodes, drift events, demo data
 ├── llm_data_model/       # LLM-optimized canonical data model
-├── docs/                 # Extended docs (vision, IRIS, policy packs)
+├── datasets/             # Creative Director Suite sample data (8 CSVs)
+├── docs/                 # Extended docs (vision, IRIS, policy packs, Excel-first)
+├── templates/            # Excel workbook templates
 ├── mermaid/              # 35+ architecture & flow diagrams
 ├── engine/               # Compression, degrade ladder, supervisor
 ├── dashboard/            # React dashboard + mock API
