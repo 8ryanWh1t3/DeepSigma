@@ -24,7 +24,7 @@ jobs:
       - name: Install package
         run: |
           python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+          pip install -e ".[dev,excel]"
 
       - name: Run unit tests with coverage
         run: |
@@ -64,6 +64,16 @@ jobs:
           python -m tools.trust_scorecard --input golden_path_ci_out --output trust_scorecard.json
           cat trust_scorecard.json
           python -m pytest tests/test_trust_scorecard.py -v --tb=short
+
+      - name: Validate BOOT contract
+        run: |
+          python tools/validate_workbook_boot.py templates/creative_director_suite/Creative_Director_Suite_CoherenceOps_v2.xlsx
+          python -m pytest tests/test_workbook_boot_validator.py -v --tb=short
+
+      - name: Excel-first Money Demo
+        run: |
+          python -m demos.excel_first --out excel_first_demo_out
+          python -m pytest tests/test_excel_first_money_demo.py -v --tb=short
 
   lint:
     runs-on: ubuntu-latest
