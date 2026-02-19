@@ -1,0 +1,128 @@
+{
+  "episode_id": "ep-gs-003",
+  "title": "ALL",
+  "domain_primary": "PLT",
+  "domains_affected": ["PLT", "OPS", "CRE", "MON", "DAT"],
+  "severity": "red",
+  "category": "shared_infrastructure_cascade",
+  "studios_involved": {
+    "origin": "shared-infrastructure",
+    "detection": "automated",
+    "impact": ["tokyo", "montreal", "bucharest", "singapore"]
+  },
+  "detected_at": "2026-02-20T08:00:00Z",
+  "resolved_at": "2026-02-20T16:00:00Z",
+  "resolution_hours": 8,
+  "claims_affected": [
+    {
+      "claim_id": "Claim-PLT-001",
+      "tier": 0,
+      "status_before": "DEGRADED",
+      "status_after": "UNKNOWN",
+      "credibility_sub_index_before": 72,
+      "credibility_sub_index_after": 30
+    },
+    {
+      "claim_id": "Claim-PLT-002",
+      "tier": 0,
+      "status_before": "OK",
+      "status_after": "UNKNOWN",
+      "credibility_sub_index_before": 84,
+      "credibility_sub_index_after": 28
+    },
+    {
+      "claim_id": "Claim-OPS-001",
+      "tier": 0,
+      "status_before": "OK",
+      "status_after": "DEGRADED",
+      "credibility_sub_index_before": 80,
+      "credibility_sub_index_after": 61
+    },
+    {
+      "claim_id": "Claim-CRE-001",
+      "tier": 0,
+      "status_before": "DEGRADED",
+      "status_after": "DEGRADED",
+      "credibility_sub_index_before": 68,
+      "credibility_sub_index_after": 52
+    },
+    {
+      "claim_id": "Claim-MON-003",
+      "tier": 1,
+      "status_before": "OK",
+      "status_after": "DEGRADED",
+      "credibility_sub_index_before": 78,
+      "credibility_sub_index_after": 55
+    },
+    {
+      "claim_id": "Claim-DAT-003",
+      "tier": 1,
+      "status_before": "OK",
+      "status_after": "DEGRADED",
+      "credibility_sub_index_before": 82,
+      "credibility_sub_index_after": 60
+    }
+  ],
+  "evidence_affected": 50,
+  "dlr": {
+    "decision": "Rollback CI/CD dependency to last known good; restore S003 and S023; add shared-infrastructure to change review board",
+    "decided_by": "Infrastructure on-call + publisher governance escalation",
+    "authority_level": "publisher",
+    "evidence_considered": 8,
+    "alternatives_rejected": [
+      {
+        "option": "Forward-fix the dependency incompatibility",
+        "rejection_reason": "Root cause analysis incomplete; forward-fix timeline unknown; 50 evidence nodes stale and growing"
+      }
+    ]
+  },
+  "rs": {
+    "primary_reasoning": "Rollback is fastest path to evidence freshness restoration across 5 domains; forward-fix can proceed as non-emergency once rollback stabilizes",
+    "weights": {
+      "evidence_freshness_restoration": 0.50,
+      "blast_radius_containment": 0.30,
+      "root_cause_resolution": 0.15,
+      "process_improvement": 0.05
+    },
+    "counter_claims": [
+      "DevOps team argued rollback might revert other recent changes (accepted risk — silent coupling discovered in Scenario 4)"
+    ]
+  },
+  "ds": {
+    "drift_signals": ["DS-GS-003"],
+    "categories": ["shared_infrastructure_cascade"],
+    "cross_domain": true,
+    "cross_studio": true,
+    "cascade_detected": true,
+    "time_to_detection_hours": 0.2,
+    "cascade": {
+      "trigger": "CI/CD dependency binary incompatibility",
+      "propagation_timeline": [
+        {"source": "S003", "delta_minutes": 0, "domains": ["PLT", "OPS", "CRE"], "evidence_lost": 28},
+        {"source": "S023", "delta_minutes": 30, "domains": ["OPS", "MON", "DAT"], "evidence_lost": 22}
+      ],
+      "total_evidence_affected": 50,
+      "peak_index_impact": -30
+    }
+  },
+  "mg": {
+    "new_edges": [
+      "shared-infrastructure dependency change → cross-studio change review board approval",
+      "K8s cluster change → canary deployment requirement",
+      "S003 + S023 co-location documented as single-point-of-failure"
+    ],
+    "governance_changes": 3
+  },
+  "seal": {
+    "hash": "sha256:e7f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1",
+    "sealed_at": "2026-02-20T16:15:00Z",
+    "sealed_by": "coherence_steward",
+    "integrity": "verified"
+  },
+  "credibility_index": {
+    "before": 71,
+    "during": 41,
+    "after": 69,
+    "delta_peak": -30
+  }
+}

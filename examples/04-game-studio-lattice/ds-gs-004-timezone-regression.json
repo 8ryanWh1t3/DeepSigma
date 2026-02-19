@@ -1,0 +1,56 @@
+{
+  "ds_id": "DS-GS-004",
+  "episode_id": "ep-gs-004",
+  "category": "post_patch_regression",
+  "severity": "yellow",
+  "detected_at": "2026-02-20T14:00:00Z",
+  "domains_affected": ["OPS", "CRE"],
+  "affected_claims": ["Claim-OPS-002", "Claim-CRE-003"],
+  "affected_evidence_count": 14,
+  "title": "VANGUARD",
+  "studios_involved": {
+    "origin": "singapore",
+    "detection": "singapore",
+    "impact": ["tokyo"],
+    "blocked_by_timezone": true
+  },
+  "source_ids": ["Source-S013", "Source-S002"],
+  "correlation_groups": ["studio-singapore", "studio-tokyo"],
+  "runtime_types": ["verify", "outcome"],
+  "cross_domain": true,
+  "cross_studio": true,
+  "regression_context": {
+    "caused_by_episode": "ep-gs-003",
+    "caused_by_action": "CI/CD dependency rollback silently reverted localization config",
+    "silent_coupling": "Localization config was packaged with CI/CD dependency — not independently versioned",
+    "symptoms": [
+      "Japanese players matched to EU servers (180ms+ latency)",
+      "EU players seeing Japanese-language UI elements in ranked matches"
+    ],
+    "player_sessions_affected": 40000,
+    "duration_hours": 6
+  },
+  "timezone_amplification": {
+    "detecting_studio": "singapore",
+    "detecting_studio_timezone": "UTC+8",
+    "detecting_local_time": "22:00 SGT",
+    "owning_studio": "tokyo",
+    "owning_studio_timezone": "UTC+9",
+    "owning_studio_status": "after_hours",
+    "owning_studio_next_business_hour": "09:00 JST (00:00 UTC)",
+    "gap_without_lattice": {
+      "hours": 10,
+      "description": "P1 ticket sits in Tokyo queue until morning; ~40k additional affected sessions"
+    },
+    "gap_with_lattice": {
+      "hours": 2,
+      "description": "Sync Plane detects missing response from Tokyo within expected window; escalation triggers on-call rotation"
+    },
+    "escalation_trigger": "OPS-domain Sync Plane response window breach (4h threshold)"
+  },
+  "credibility_index_impact": {
+    "before": 69,
+    "after": 63,
+    "delta": -6
+  }
+}

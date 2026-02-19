@@ -1,0 +1,111 @@
+{
+  "episode_id": "ep-gs-002",
+  "title": "VANGUARD",
+  "domain_primary": "MON",
+  "domains_affected": ["MON", "REG", "CRE"],
+  "severity": "red",
+  "category": "monetization_contradiction",
+  "studios_involved": {
+    "origin": "singapore",
+    "detection": "bucharest",
+    "impact": ["montreal"]
+  },
+  "detected_at": "2026-02-19T13:00:00Z",
+  "resolved_at": "2026-02-20T13:00:00Z",
+  "resolution_hours": 24,
+  "claims_affected": [
+    {
+      "claim_id": "Claim-MON-001",
+      "tier": 0,
+      "status_before": "OK",
+      "status_after": "DEGRADED",
+      "credibility_sub_index_before": 82,
+      "credibility_sub_index_after": 48
+    },
+    {
+      "claim_id": "Claim-REG-002",
+      "tier": 0,
+      "status_before": "OK",
+      "status_after": "FAILED",
+      "credibility_sub_index_before": 86,
+      "credibility_sub_index_after": 38
+    },
+    {
+      "claim_id": "Claim-CRE-002",
+      "tier": 0,
+      "status_before": "OK",
+      "status_after": "DEGRADED",
+      "credibility_sub_index_before": 89,
+      "credibility_sub_index_after": 61
+    }
+  ],
+  "evidence_affected": 22,
+  "dlr": {
+    "decision": "Sequenced three-patch resolution: (1) disable Cache in restricted regions, (2) remove stat variations, (3) publish player communication",
+    "decided_by": "Cross-studio governance council",
+    "authority_level": "publisher",
+    "evidence_considered": 14,
+    "alternatives_rejected": [
+      {
+        "option": "Keep Cache globally with probability disclosure only",
+        "rejection_reason": "Does not resolve Belgium/Netherlands prohibition — regulatory risk unacceptable"
+      },
+      {
+        "option": "Remove Cache entirely from all regions",
+        "rejection_reason": "Creates different CRE drift — promotional content promised to players not delivered; overreaction damages credibility"
+      }
+    ]
+  },
+  "rs": {
+    "primary_reasoning": "Three-way contradiction loop requires sequenced resolution: regulatory urgency first (Belgium exposure window), then commercial fix (stat variations), then narrative repair (player communication)",
+    "weights": {
+      "regulatory_urgency": 0.45,
+      "player_trust": 0.30,
+      "revenue_impact": 0.15,
+      "timeline_pressure": 0.10
+    },
+    "counter_claims": [
+      "Revenue team argued Cache should be retained in unrestricted regions (accepted — region-lock approach)",
+      "PR team argued immediate full removal would signal panic to players (accepted — sequenced approach preferred)",
+      "Singapore live-ops argued the stat variations were negligible (rejected — 'no competitive content behind random purchases' is a binary commitment)"
+    ],
+    "cascade_analysis": {
+      "type": "three-way contradiction loop",
+      "loop": [
+        "MON-001 ('monetization matches commitments') contradicts CRE-002 ('franchise narrative integrity') via Player-First Promise blog",
+        "CRE-002 depends on REG-002 ('regional monetization restrictions') because the blog implicitly promises legal compliance",
+        "REG-002 feeds back to MON-001 because regional restrictions define what 'valid monetization' means"
+      ],
+      "resolution_order": ["REG-002", "MON-001", "CRE-002"]
+    }
+  },
+  "ds": {
+    "drift_signals": ["DS-GS-002a", "DS-GS-002b", "DS-GS-002c"],
+    "categories": ["policy_breach", "narrative_integrity", "regional_violation"],
+    "cross_domain": true,
+    "cross_studio": true,
+    "cascade_detected": true,
+    "time_to_detection_hours": 4
+  },
+  "mg": {
+    "new_edges": [
+      "Singapore monetization approval → Bucharest compliance pre-check (mandatory)",
+      "Singapore monetization approval → Montréal PR consistency review (mandatory)",
+      "Public commitment registry → monetization feature approval gate"
+    ],
+    "governance_changes": 3,
+    "templates_updated": ["monetization_approval_v2", "regional_compliance_checklist_v3"]
+  },
+  "seal": {
+    "hash": "sha256:c4f8a2d7e1b9f3c6a8d2e4f7b1c5d9a3e7f2b6c0d4e8f1a5b9c3d7e0f4a8b2c6",
+    "sealed_at": "2026-02-20T13:15:00Z",
+    "sealed_by": "coherence_steward",
+    "integrity": "verified"
+  },
+  "credibility_index": {
+    "before": 76,
+    "during": 52,
+    "after": 71,
+    "delta_peak": -24
+  }
+}

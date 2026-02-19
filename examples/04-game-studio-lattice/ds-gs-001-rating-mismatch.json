@@ -1,0 +1,40 @@
+{
+  "ds_id": "DS-GS-001",
+  "episode_id": "ep-gs-001",
+  "category": "content_rating_mismatch",
+  "severity": "red",
+  "detected_at": "2026-02-19T07:30:00Z",
+  "domains_affected": ["CRE", "REG", "PLT"],
+  "affected_claims": ["Claim-CRE-001", "Claim-REG-001", "Claim-PLT-001"],
+  "affected_evidence_count": 18,
+  "title": "RONIN",
+  "sku_affected": ["RONIN-PS5-EU", "RONIN-XBOX-EU", "RONIN-PC-EU", "RONIN-SWITCH-GLOBAL"],
+  "studios_involved": {
+    "origin": "tokyo",
+    "detection": "bucharest",
+    "impact": ["montreal"]
+  },
+  "source_id": "Source-S009",
+  "correlation_group": "studio-bucharest",
+  "runtime_types": ["verify", "outcome"],
+  "cross_domain": true,
+  "cross_studio": true,
+  "rating_impact": {
+    "current_rating": "PEGI-16",
+    "detected_rating": "PEGI-18",
+    "boards_affected": ["PEGI", "CERO"],
+    "content_trigger": "Dismemberment VFX in 'The Iron Garden' DLC",
+    "retail_commitments_at_risk": true,
+    "pre_order_count_affected": "EU retail pre-orders at PEGI 16 classification"
+  },
+  "credibility_index_impact": {
+    "before": 83,
+    "after": 64,
+    "delta": -19
+  },
+  "timezone_context": {
+    "origin_local_time": "14:00 JST",
+    "detection_local_time": "09:30 EET",
+    "hours_to_detection": 2.5
+  }
+}

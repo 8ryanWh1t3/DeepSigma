@@ -1,0 +1,72 @@
+{
+  "ds_id": "DS-GS-003",
+  "episode_id": "ep-gs-003",
+  "category": "shared_infrastructure_cascade",
+  "severity": "red",
+  "detected_at": "2026-02-20T08:00:00Z",
+  "domains_affected": ["PLT", "OPS", "CRE", "MON", "DAT"],
+  "affected_claims": [
+    "Claim-PLT-001", "Claim-PLT-002",
+    "Claim-OPS-001",
+    "Claim-CRE-001",
+    "Claim-MON-003",
+    "Claim-DAT-003"
+  ],
+  "affected_evidence_count": 50,
+  "title": "ALL",
+  "studios_involved": {
+    "origin": "shared-infrastructure",
+    "detection": "automated",
+    "impact": ["tokyo", "montreal", "bucharest", "singapore"]
+  },
+  "source_ids": ["Source-S003", "Source-S023"],
+  "correlation_group": "shared-infrastructure",
+  "runtime_types": ["verify", "time"],
+  "cross_domain": true,
+  "cross_studio": true,
+  "cascade": {
+    "trigger": "CI/CD dependency update introduced binary incompatibility",
+    "trigger_time": "2026-02-20T08:00:00Z",
+    "propagation": [
+      {
+        "source": "Source-S003",
+        "name": "Cross-Studio Build Pipeline",
+        "failure_time": "2026-02-20T08:00:00Z",
+        "delta_minutes": 0,
+        "domains_affected": ["PLT", "OPS", "CRE"],
+        "evidence_lost": 28,
+        "immediate_effects": [
+          "All three title nightly builds failed simultaneously",
+          "PLT-001 quorum drops below K threshold",
+          "PLT-002 (build verification) goes UNKNOWN"
+        ]
+      },
+      {
+        "source": "Source-S023",
+        "name": "Player Telemetry Pipeline",
+        "failure_time": "2026-02-20T08:30:00Z",
+        "delta_minutes": 30,
+        "domains_affected": ["OPS", "MON", "DAT"],
+        "evidence_lost": 22,
+        "immediate_effects": [
+          "Monetization analytics lose real-time visibility",
+          "Player data flow monitoring gaps emerge",
+          "OPS-001 confidence drops to 0.61"
+        ],
+        "co_failure_reason": "Shares Kubernetes cluster k8s-global-prod-01 with Source-S003"
+      }
+    ],
+    "total_evidence_affected": 50,
+    "domains_affected_count": 5,
+    "correlation_group_proven": "shared-infrastructure — S003 and S023 co-located on same K8s cluster",
+    "redundancy_illusion": "Studios believed their domains were independent; correlation group analysis proved they were not"
+  },
+  "credibility_index_impact": {
+    "before": 71,
+    "after": 41,
+    "delta": -30,
+    "lowest_point": 41,
+    "band_at_lowest": "Compromised",
+    "recommendation_at_lowest": "Halt all dependent decisions until restoration completes"
+  }
+}

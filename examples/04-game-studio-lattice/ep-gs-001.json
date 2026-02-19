@@ -1,0 +1,100 @@
+{
+  "episode_id": "ep-gs-001",
+  "title": "RONIN",
+  "domain_primary": "CRE",
+  "domains_affected": ["CRE", "REG", "PLT"],
+  "severity": "red",
+  "category": "content_rating_mismatch",
+  "studios_involved": {
+    "origin": "tokyo",
+    "detection": "bucharest",
+    "impact": ["montreal"]
+  },
+  "detected_at": "2026-02-19T07:30:00Z",
+  "resolved_at": "2026-02-19T18:00:00Z",
+  "resolution_hours": 10.5,
+  "claims_affected": [
+    {
+      "claim_id": "Claim-CRE-001",
+      "tier": 0,
+      "status_before": "OK",
+      "status_after": "DEGRADED",
+      "credibility_sub_index_before": 91,
+      "credibility_sub_index_after": 62
+    },
+    {
+      "claim_id": "Claim-REG-001",
+      "tier": 0,
+      "status_before": "OK",
+      "status_after": "FAILED",
+      "credibility_sub_index_before": 88,
+      "credibility_sub_index_after": 45
+    },
+    {
+      "claim_id": "Claim-PLT-001",
+      "tier": 0,
+      "status_before": "OK",
+      "status_after": "DEGRADED",
+      "credibility_sub_index_before": 85,
+      "credibility_sub_index_after": 68
+    }
+  ],
+  "evidence_affected": 18,
+  "dlr": {
+    "decision": "Accept Option C — ship DLC without dismemberment system, add post-launch after re-rating",
+    "decided_by": "Publisher governance council (Tokyo creative director + Bucharest QA lead + Montréal retail liaison)",
+    "authority_level": "publisher",
+    "evidence_considered": 12,
+    "alternatives_rejected": [
+      {
+        "option": "A",
+        "description": "Modify VFX to stay within PEGI 16 envelope",
+        "rejection_reason": "2-week creative rework delays DLC past retail commitment window"
+      },
+      {
+        "option": "B",
+        "description": "Accept PEGI 18, re-rate, notify retail partners",
+        "rejection_reason": "Unknown re-rating timeline; retail pre-orders at PEGI 16 pricing already confirmed"
+      }
+    ]
+  },
+  "rs": {
+    "primary_reasoning": "Decoupling DLC ship date from re-rating timeline preserves retail commitments while allowing creative intent to be realized post-launch",
+    "weights": {
+      "retail_commitment_integrity": 0.35,
+      "creative_vision_preservation": 0.25,
+      "regulatory_compliance": 0.25,
+      "timeline_impact": 0.15
+    },
+    "counter_claims": [
+      "Tokyo art director argued dismemberment is core to DLC identity (acknowledged — deferred, not cancelled)",
+      "Montréal retail team confirmed PEGI 16 pre-orders cannot be reclassified post-purchase (confirmed risk)"
+    ]
+  },
+  "ds": {
+    "drift_signals": ["DS-GS-001"],
+    "categories": ["content_rating_mismatch"],
+    "cross_domain": true,
+    "cross_studio": true,
+    "time_to_detection_hours": 2.5
+  },
+  "mg": {
+    "new_edges": [
+      "Tokyo art approval → Bucharest rating pre-check (mandatory before creative sign-off on mature content)",
+      "Content descriptor change → automatic REG-001 re-evaluation trigger"
+    ],
+    "governance_changes": 2
+  },
+  "seal": {
+    "hash": "sha256:a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2",
+    "sealed_at": "2026-02-19T18:15:00Z",
+    "sealed_by": "coherence_steward",
+    "integrity": "verified"
+  },
+  "credibility_index": {
+    "before": 83,
+    "during": 64,
+    "after": 76,
+    "delta_peak": -19
+  }
+}

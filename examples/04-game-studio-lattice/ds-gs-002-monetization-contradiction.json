@@ -1,0 +1,56 @@
+{
+  "ds_id": "DS-GS-002",
+  "episode_id": "ep-gs-002",
+  "category": "monetization_contradiction",
+  "severity": "red",
+  "detected_at": "2026-02-19T13:00:00Z",
+  "domains_affected": ["MON", "REG", "CRE"],
+  "affected_claims": ["Claim-MON-001", "Claim-REG-002", "Claim-CRE-002"],
+  "affected_evidence_count": 22,
+  "title": "VANGUARD",
+  "studios_involved": {
+    "origin": "singapore",
+    "detection": "bucharest",
+    "impact": ["montreal"]
+  },
+  "source_ids": ["Source-S013", "Source-S014", "Source-S009"],
+  "correlation_groups": ["studio-singapore", "studio-bucharest"],
+  "runtime_types": ["verify", "outcome", "bypass"],
+  "cross_domain": true,
+  "cross_studio": true,
+  "sub_signals": [
+    {
+      "ds_id": "DS-GS-002a",
+      "category": "regional_violation",
+      "detail": "Founder's Cache constitutes paid random reward — prohibited in Belgium/Netherlands",
+      "region": "BE/NL",
+      "authority": "Belgian Gaming Commission / Kansspelautoriteit",
+      "regulatory_exposure_hours": 4
+    },
+    {
+      "ds_id": "DS-GS-002b",
+      "category": "regional_violation",
+      "detail": "Cache probabilities not disclosed on purchase screen — Japan Consumer Affairs Agency requirement",
+      "region": "JP",
+      "authority": "Consumer Affairs Agency (景品表示法)"
+    },
+    {
+      "ds_id": "DS-GS-002c",
+      "category": "narrative_integrity",
+      "detail": "Founder's Cache weapon skins with stat variations contradict 'Player-First Promise' blog commitment",
+      "public_commitment": "We will never gate competitive content behind randomized purchases",
+      "commitment_date": "2026-01-28",
+      "commitment_studio": "montreal"
+    }
+  ],
+  "cascade_analysis": {
+    "type": "three-way_contradiction_loop",
+    "loop_description": "MON-001 ↔ CRE-002 ↔ REG-002 — no single patch resolves all three",
+    "resolution_requires": "sequenced_patching"
+  },
+  "credibility_index_impact": {
+    "before": 76,
+    "after": 52,
+    "delta": -24
+  }
+}

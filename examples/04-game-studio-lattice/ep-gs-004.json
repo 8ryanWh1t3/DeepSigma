@@ -1,0 +1,103 @@
+{
+  "episode_id": "ep-gs-004",
+  "title": "VANGUARD",
+  "domain_primary": "OPS",
+  "domains_affected": ["OPS", "CRE"],
+  "severity": "yellow",
+  "category": "post_patch_regression",
+  "studios_involved": {
+    "origin": "singapore",
+    "detection": "singapore",
+    "impact": ["tokyo"],
+    "blocked_by_timezone": true
+  },
+  "detected_at": "2026-02-20T14:00:00Z",
+  "resolved_at": "2026-02-20T20:00:00Z",
+  "resolution_hours": 6,
+  "claims_affected": [
+    {
+      "claim_id": "Claim-OPS-002",
+      "tier": 1,
+      "status_before": "OK",
+      "status_after": "DEGRADED",
+      "credibility_sub_index_before": 78,
+      "credibility_sub_index_after": 58
+    },
+    {
+      "claim_id": "Claim-CRE-003",
+      "tier": 1,
+      "status_before": "OK",
+      "status_after": "DEGRADED",
+      "credibility_sub_index_before": 85,
+      "credibility_sub_index_after": 67
+    }
+  ],
+  "evidence_affected": 14,
+  "player_impact": {
+    "affected_sessions": 40000,
+    "duration_hours": 6,
+    "regions_affected": ["JP", "EU"],
+    "symptoms": [
+      "Japanese players matched to EU servers (180ms+ latency)",
+      "EU players seeing Japanese-language UI elements in ranked matches"
+    ]
+  },
+  "dlr": {
+    "decision": "Singapore applies region-lock workaround immediately; Tokyo on-call deploys localization config fix",
+    "decided_by": "Singapore live-ops lead + Tokyo on-call engineer",
+    "authority_level": "studio",
+    "evidence_considered": 6,
+    "alternatives_rejected": [
+      {
+        "option": "Wait for Tokyo business hours",
+        "rejection_reason": "10-hour additional player impact unacceptable; ~40k sessions/hour affected"
+      }
+    ]
+  },
+  "rs": {
+    "primary_reasoning": "Immediate workaround from Singapore + targeted fix from Tokyo on-call is faster than waiting for business hours; workaround limits blast radius while root fix is deployed",
+    "weights": {
+      "player_experience": 0.50,
+      "fix_confidence": 0.25,
+      "operational_complexity": 0.15,
+      "timezone_urgency": 0.10
+    },
+    "counter_claims": []
+  },
+  "ds": {
+    "drift_signals": ["DS-GS-004"],
+    "categories": ["post_patch_regression", "timezone_amplification"],
+    "cross_domain": true,
+    "cross_studio": true,
+    "time_to_detection_hours": 0,
+    "timezone_context": {
+      "detecting_studio": "singapore",
+      "owning_studio": "tokyo",
+      "detecting_studio_local_time": "22:00 SGT",
+      "owning_studio_status": "after_hours",
+      "gap_without_lattice_hours": 10,
+      "gap_with_lattice_hours": 2,
+      "escalation_method": "sync_plane_response_window_breach"
+    }
+  },
+  "mg": {
+    "new_edges": [
+      "CI/CD dependency change → localization config validation (mandatory)",
+      "Overnight timezone gap → 24/7 on-call rotation proposal"
+    ],
+    "governance_changes": 2,
+    "root_cause_link": "ep-gs-003 restoration rollback silently reverted localization config"
+  },
+  "seal": {
+    "hash": "sha256:f8a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1",
+    "sealed_at": "2026-02-20T20:15:00Z",
+    "sealed_by": "coherence_steward",
+    "integrity": "verified"
+  },
+  "credibility_index": {
+    "before": 69,
+    "during": 63,
+    "after": 72,
+    "delta_peak": -6
+  }
+}
