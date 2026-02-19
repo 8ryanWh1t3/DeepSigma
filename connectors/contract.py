@@ -40,7 +40,7 @@ _ENVELOPE_SCHEMA: Optional[Dict[str, Any]] = None
 def _load_schema() -> Dict[str, Any]:
     global _ENVELOPE_SCHEMA
     if _ENVELOPE_SCHEMA is None:
-        _ENVELOPE_SCHEMA = json.loads(_ENVELOPE_SCHEMA_PATH.read_text())
+        _ENVELOPE_SCHEMA = json.loads(_ENVELOPE_SCHEMA_PATH.read_text(encoding="utf-8"))
     return _ENVELOPE_SCHEMA
 
 

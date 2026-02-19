@@ -19,7 +19,7 @@ def _load_expected(connector_name: str) -> list[dict]:
     """Load expected_envelopes.jsonl for a connector."""
     path = FIXTURE_BASE / connector_name / "expected_envelopes.jsonl"
     assert path.exists(), f"Missing: {path}"
-    return [json.loads(line) for line in path.read_text().strip().splitlines()]
+    return [json.loads(line) for line in path.read_text(encoding="utf-8").strip().splitlines()]
 
 
 # ── SharePoint Fixtures ──────────────────────────────────────────────────────
@@ -33,7 +33,7 @@ class TestSharePointFixtures:
         from adapters.sharepoint.connector import SharePointConnector
         from connectors.contract import canonical_to_envelope
 
-        raw = json.loads((FIXTURE_BASE / self.CONNECTOR / "baseline_raw.json").read_text())
+        raw = json.loads((FIXTURE_BASE / self.CONNECTOR / "baseline_raw.json").read_text(encoding="utf-8"))
         with mock_patch.object(SharePointConnector, "__init__", lambda self, **kw: None):
             c = SharePointConnector.__new__(SharePointConnector)
             c._site_id = "fixture-site"
@@ -94,7 +94,7 @@ class TestDataverseFixtures:
         from adapters.powerplatform.connector import DataverseConnector
         from connectors.contract import canonical_to_envelope
 
-        raw = json.loads((FIXTURE_BASE / self.CONNECTOR / "baseline_raw.json").read_text())
+        raw = json.loads((FIXTURE_BASE / self.CONNECTOR / "baseline_raw.json").read_text(encoding="utf-8"))
         with mock_patch.object(DataverseConnector, "__init__", lambda self, **kw: None):
             c = DataverseConnector.__new__(DataverseConnector)
             c._env_url = "https://fixture.crm.dynamics.com"
@@ -153,7 +153,7 @@ class TestSnowflakeFixtures:
         from adapters.snowflake.warehouse import SnowflakeWarehouseConnector
         from connectors.contract import canonical_to_envelope
 
-        raw = json.loads((FIXTURE_BASE / self.CONNECTOR / "baseline_raw.json").read_text())
+        raw = json.loads((FIXTURE_BASE / self.CONNECTOR / "baseline_raw.json").read_text(encoding="utf-8"))
         with mock_patch.object(SnowflakeWarehouseConnector, "__init__", lambda self, **kw: None):
             c = SnowflakeWarehouseConnector.__new__(SnowflakeWarehouseConnector)
             c._auth = MagicMock()
@@ -209,7 +209,7 @@ class TestAskSageFixtures:
     def _produce(self):
         from connectors.contract import canonical_to_envelope
 
-        raw = json.loads((FIXTURE_BASE / self.CONNECTOR / "baseline_raw.json").read_text())
+        raw = json.loads((FIXTURE_BASE / self.CONNECTOR / "baseline_raw.json").read_text(encoding="utf-8"))
         envs = []
         for rec in raw:
             env = canonical_to_envelope(rec, source_instance="https://api.asksage.ai")
