@@ -34,7 +34,7 @@ def main(argv: list[str] | None = None) -> int:
     print("  Excel-first Money Demo — COMPLETE")
     print("=" * 60)
     print(f"  Output:         {result['output_dir']}")
-    print(f"  Workbook:       workbook.xlsx")
+    print("  Workbook:       workbook.xlsx")
     print(f"  BOOT valid:     {result['boot_valid']}")
     print(f"  Drift detected: {result['drift_detected']}")
     print(f"  Patch proposed: {result['patch_proposed']}")
