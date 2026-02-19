@@ -9,10 +9,17 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12"]
+        os: [ubuntu-latest]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        include:
+          - os: windows-latest
+            python-version: "3.12"
+          - os: windows-latest
+            python-version: "3.13"
 
     steps:
       - uses: actions/checkout@v4
@@ -39,10 +46,12 @@ jobs:
           python -m pytest tests/test_load.py -v --tb=short
 
       - name: Validate examples against schemas
+        if: runner.os == 'Linux'
         run: |
           python tools/validate_examples.py
 
       - name: Validate LLM Data Model examples
+        if: runner.os == 'Linux'
         run: |
           python llm_data_model/05_validation/validate_examples.py
 
@@ -51,6 +60,7 @@ jobs:
           python -m pytest tests/test_money_demo.py -v --tb=short
 
       - name: Golden Path fixture gate
+        if: runner.os == 'Linux'
         run: |
           python -m demos.golden_path --source sharepoint --fixture demos/golden_path/fixtures/sharepoint_small --output golden_path_ci_out --json
           python -m pytest tests/test_golden_path.py -v --tb=short
@@ -60,22 +70,26 @@ jobs:
           python -m pytest tests/test_connector_contract_v1.py tests/test_connector_fixtures.py -v --tb=short
 
       - name: Generate Trust Scorecard
+        if: runner.os == 'Linux'
         run: |
           python -m tools.trust_scorecard --input golden_path_ci_out --output trust_scorecard.json
           cat trust_scorecard.json
           python -m pytest tests/test_trust_scorecard.py -v --tb=short
 
       - name: Validate BOOT contract
+        if: runner.os == 'Linux'
         run: |
           python tools/validate_workbook_boot.py templates/creative_director_suite/Creative_Director_Suite_CoherenceOps_v2.xlsx
           python -m pytest tests/test_workbook_boot_validator.py -v --tb=short
 
       - name: Excel-first Money Demo
+        if: runner.os == 'Linux'
         run: |
           python -m demos.excel_first --out excel_first_demo_out
           python -m pytest tests/test_excel_first_money_demo.py -v --tb=short
 
       - name: MDPT Prompt Index gate
+        if: runner.os == 'Linux'
         run: |
           python mdpt/tools/generate_prompt_index.py --csv tests/fixtures/promptcapabilities_export.csv --out mdpt_index_ci_out
           python -m pytest tests/test_mdpt_index_generator.py -v --tb=short
