@@ -5,6 +5,28 @@ All notable changes to Σ OVERWATCH / DeepSigma will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] — 2026-02-19 — "Real Credibility Engine Runtime"
+
+### Added
+
+- **Credibility Engine Runtime** (`credibility_engine/`): Real stateful engine module with live claim management, drift event processing, Credibility Index recalculation, and canonical artifact generation
+- **JSONL Persistence** (`credibility_engine/store.py`): Append-only JSONL storage for claims, drift events, snapshots, correlation clusters, and sync regions under `data/credibility/`
+- **API Endpoints** (`credibility_engine/api.py`): 6 FastAPI routes — `/api/credibility/snapshot`, `/claims/tier0`, `/drift/24h`, `/correlation`, `/sync`, `/packet`
+- **Dashboard API Mode**: `DATA_MODE = "API"` toggle in `app.js` — dashboard can fetch from runtime API instead of static JSON files
+- **Simulation-as-Driver**: `runner.py --mode engine` pushes simulation state into the runtime engine for persistence and API serving
+
+### Changed
+
+- `dashboard/api_server.py`: Integrated `credibility_engine.api` router
+- `pyproject.toml`: Version 0.6.4 → 0.7.0, added `credibility_engine*` to package discovery
+- `coherence_ops/__init__.py`: `__version__` 0.6.4 → 0.7.0
+
+### Stats
+
+- 8 new files, 7 modified, abstract institutional modeling preserved
+
+---
+
 ## [0.6.4] — 2026-02-19 — "MDPT Beta Kit + Credibility Engine"
 
 ### Added

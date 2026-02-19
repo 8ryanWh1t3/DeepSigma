@@ -3,6 +3,21 @@
 (function () {
   'use strict';
 
+  /* ── Data Mode: "API" fetches from /api/credibility/*, "MOCK" uses local JSON ── */
+  var DATA_MODE = "MOCK";
+
+  var API_BASE = "/api/credibility";
+
+  var API_MAP = {
+    credibility_snapshot: API_BASE + "/snapshot",
+    claims_tier0: API_BASE + "/claims/tier0",
+    drift_events_24h: API_BASE + "/drift/24h",
+    correlation_map: API_BASE + "/correlation",
+    ttl_timeline: null,
+    sync_integrity: API_BASE + "/sync",
+    credibility_packet_example: API_BASE + "/packet"
+  };
+
   const DATA = {};
 
   const FILES = [
@@ -16,12 +31,22 @@
   ];
 
   async function loadAll() {
-    const results = await Promise.all(
-      FILES.map(f =>
-        fetch(f + '.json')
-          .then(r => { if (!r.ok) throw new Error(f); return r.json(); })
-      )
-    );
+    var results;
+    if (DATA_MODE === "API") {
+      results = await Promise.all(
+        FILES.map(function (f) {
+          var url = API_MAP[f];
+          if (!url) return fetch(f + '.json').then(function (r) { if (!r.ok) throw new Error(f); return r.json(); });
+          return fetch(url).then(function (r) { if (!r.ok) throw new Error(f); return r.json(); });
+        })
+      );
+    } else {
+      results = await Promise.all(
+        FILES.map(function (f) {
+          return fetch(f + '.json').then(function (r) { if (!r.ok) throw new Error(f); return r.json(); });
+        })
+      );
+    }
     FILES.forEach((f, i) => { DATA[f] = results[i]; });
     render();
   }

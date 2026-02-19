@@ -47,6 +47,7 @@ from coherence_ops import (  # noqa: E402
     ReflectionSession,
     CoherenceScorer,
 )
+from credibility_engine.api import router as credibility_router  # noqa: E402
 
 # ── App setup ─────────────────────────────────────────────────────────────────
 app = FastAPI(title="DeepSigma Dashboard API", version="0.1.0")
@@ -65,6 +66,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# -- Credibility Engine routes -------------------------------------------------
+app.include_router(credibility_router)
 
 # ── Data paths ────────────────────────────────────────────────────────────────
 _EP_DIRS = [
