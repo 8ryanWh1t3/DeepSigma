@@ -3,19 +3,32 @@
 (function () {
   'use strict';
 
-  /* ── Data Mode: "API" fetches from /api/credibility/*, "MOCK" uses local JSON ── */
+  /* ── Data Mode: "API" fetches from /api/*, "MOCK" uses local JSON ── */
   var DATA_MODE = "MOCK";
 
-  var API_BASE = "/api/credibility";
+  /* ── Tenant + Role state ── */
+  var currentTenant = "tenant-alpha";
+  var currentRole = "exec";
 
-  var API_MAP = {
-    credibility_snapshot: API_BASE + "/snapshot",
-    claims_tier0: API_BASE + "/claims/tier0",
-    drift_events_24h: API_BASE + "/drift/24h",
-    correlation_map: API_BASE + "/correlation",
-    ttl_timeline: null,
-    sync_integrity: API_BASE + "/sync",
-    credibility_packet_example: API_BASE + "/packet"
+  function apiBase() {
+    return "/api/" + currentTenant + "/credibility";
+  }
+
+  function apiHeaders() {
+    return {
+      "X-Role": currentRole,
+      "X-User": "demo"
+    };
+  }
+
+  var API_MAP_FN = {
+    credibility_snapshot: function () { return apiBase() + "/snapshot"; },
+    claims_tier0: function () { return apiBase() + "/claims/tier0"; },
+    drift_events_24h: function () { return apiBase() + "/drift/24h"; },
+    correlation_map: function () { return apiBase() + "/correlation"; },
+    ttl_timeline: function () { return null; },
+    sync_integrity: function () { return apiBase() + "/sync"; },
+    credibility_packet_example: function () { return apiBase() + "/snapshot"; }
   };
 
   const DATA = {};
@@ -30,14 +43,53 @@
     'credibility_packet_example'
   ];
 
+  /* ── Tenant/Role initialization ── */
+
+  function initControls() {
+    if (DATA_MODE !== "API") return;
+
+    var controlsEl = document.getElementById('header-controls');
+    controlsEl.style.display = 'flex';
+
+    var tenantSelect = document.getElementById('tenant-select');
+    var roleSelect = document.getElementById('role-select');
+
+    // Fetch tenant list
+    fetch("/api/tenants")
+      .then(function (r) { return r.json(); })
+      .then(function (tenants) {
+        tenantSelect.innerHTML = tenants.map(function (t) {
+          var sel = t.tenant_id === currentTenant ? ' selected' : '';
+          return '<option value="' + t.tenant_id + '"' + sel + '>' +
+            t.display_name + ' (' + t.tenant_id + ')</option>';
+        }).join('');
+      })
+      .catch(function () {
+        tenantSelect.innerHTML = '<option value="tenant-alpha">tenant-alpha</option>';
+      });
+
+    tenantSelect.addEventListener('change', function () {
+      currentTenant = this.value;
+      loadAll();
+    });
+
+    roleSelect.value = currentRole;
+    roleSelect.addEventListener('change', function () {
+      currentRole = this.value;
+    });
+  }
+
+  /* ── Data loading ── */
+
   async function loadAll() {
     var results;
     if (DATA_MODE === "API") {
       results = await Promise.all(
         FILES.map(function (f) {
-          var url = API_MAP[f];
+          var urlFn = API_MAP_FN[f];
+          var url = urlFn ? urlFn() : null;
           if (!url) return fetch(f + '.json').then(function (r) { if (!r.ok) throw new Error(f); return r.json(); });
-          return fetch(url).then(function (r) { if (!r.ok) throw new Error(f); return r.json(); });
+          return fetch(url, { headers: apiHeaders() }).then(function (r) { if (!r.ok) throw new Error(f); return r.json(); });
         })
       );
     } else {
@@ -68,6 +120,8 @@
 
   function renderHeader() {
     const snap = DATA.credibility_snapshot;
+    document.getElementById('current-tenant').textContent =
+      snap.tenant_id || currentTenant;
     document.getElementById('last-updated').textContent =
       new Date(snap.last_updated).toLocaleString();
     document.getElementById('total-nodes').textContent =
@@ -362,59 +416,127 @@
   /* ── Credibility Packet ── */
 
   function bindPacketButton() {
-    document.getElementById('btn-generate-packet').addEventListener('click', function () {
-      var preview = document.getElementById('packet-preview');
-      var pkt = DATA.credibility_packet_example;
+    var genBtn = document.getElementById('btn-generate-packet');
+    var sealBtn = document.getElementById('btn-seal-packet');
+    var preview = document.getElementById('packet-preview');
+    var statusEl = document.getElementById('packet-status');
 
-      var text = '=== CREDIBILITY PACKET ===\n' +
-        'ID: ' + pkt.packet_id + '\n' +
-        'Generated: ' + pkt.generated_at + '\n' +
-        'Sealed: ' + (pkt.seal.sealed ? 'YES' : 'NO') + '\n' +
-        'Hash: ' + pkt.seal.seal_hash + '\n\n' +
+    // Generate
+    genBtn.onclick = function () {
+      statusEl.style.display = 'none';
+      if (DATA_MODE === "API") {
+        fetch(apiBase() + "/packet/generate", {
+          method: "POST",
+          headers: apiHeaders()
+        })
+          .then(function (r) { return r.json(); })
+          .then(function (pkt) {
+            DATA.credibility_packet_example = pkt;
+            renderPacketPreview(pkt, preview);
+            statusEl.textContent = 'Packet generated (unsealed).';
+            statusEl.className = 'packet-status info';
+            statusEl.style.display = 'block';
+          })
+          .catch(function (err) {
+            statusEl.textContent = 'Generate failed: ' + err.message;
+            statusEl.className = 'packet-status error';
+            statusEl.style.display = 'block';
+          });
+      } else {
+        renderPacketPreview(DATA.credibility_packet_example, preview);
+      }
+    };
 
-        '--- CREDIBILITY INDEX ---\n' +
-        'Score: ' + pkt.credibility_index.score + ' / 100\n' +
-        'Band: ' + pkt.credibility_index.band + '\n\n' +
+    // Seal
+    sealBtn.onclick = function () {
+      statusEl.style.display = 'none';
+      if (DATA_MODE !== "API") {
+        statusEl.textContent = 'Seal requires API mode.';
+        statusEl.className = 'packet-status error';
+        statusEl.style.display = 'block';
+        return;
+      }
+      fetch(apiBase() + "/packet/seal", {
+        method: "POST",
+        headers: apiHeaders()
+      })
+        .then(function (r) {
+          if (r.status === 403) {
+            return r.json().then(function (body) {
+              throw new Error(body.detail || 'Seal requires role: coherence_steward.');
+            });
+          }
+          if (!r.ok) throw new Error('Seal failed (' + r.status + ')');
+          return r.json();
+        })
+        .then(function (pkt) {
+          DATA.credibility_packet_example = pkt;
+          renderPacketPreview(pkt, preview);
+          statusEl.textContent = 'Packet sealed by ' + currentRole + '.';
+          statusEl.className = 'packet-status success';
+          statusEl.style.display = 'block';
+        })
+        .catch(function (err) {
+          statusEl.textContent = err.message;
+          statusEl.className = 'packet-status error';
+          statusEl.style.display = 'block';
+        });
+    };
+  }
 
-        '--- DLR SUMMARY ---\n' +
-        'ID: ' + pkt.dlr_summary.dlr_id + '\n' +
-        'Title: ' + pkt.dlr_summary.title + '\n' +
-        'Decided by: ' + pkt.dlr_summary.decided_by + '\n' +
-        'Key Findings:\n' +
-        pkt.dlr_summary.key_findings.map(function (f) { return '  - ' + f; }).join('\n') + '\n\n' +
+  function renderPacketPreview(pkt, preview) {
+    var sealStatus = (pkt.seal && pkt.seal.sealed) ? 'YES' : 'NO';
+    var sealHash = (pkt.seal && pkt.seal.seal_hash) ? pkt.seal.seal_hash : '—';
 
-        '--- RS SUMMARY ---\n' +
-        'ID: ' + pkt.rs_summary.rs_id + '\n' +
-        'Assessment: ' + pkt.rs_summary.reasoning.overall_assessment + '\n' +
-        'Primary Risk: ' + pkt.rs_summary.reasoning.primary_risk + '\n' +
-        'Recommendation: ' + pkt.rs_summary.reasoning.recommendation + '\n\n' +
+    var text = '=== CREDIBILITY PACKET ===\n' +
+      'Tenant: ' + (pkt.tenant_id || '—') + '\n' +
+      'ID: ' + pkt.packet_id + '\n' +
+      'Generated: ' + pkt.generated_at + '\n' +
+      'Sealed: ' + sealStatus + '\n' +
+      'Hash: ' + sealHash + '\n\n' +
 
-        '--- DS SUMMARY ---\n' +
-        'ID: ' + pkt.ds_summary.ds_id + '\n' +
-        'Active Signals: ' + pkt.ds_summary.active_signals + '\n' +
-        'Critical: ' + pkt.ds_summary.critical_signal.category +
-        ' (' + pkt.ds_summary.critical_signal.source + ')\n' +
-        'Claims Affected: ' + pkt.ds_summary.critical_signal.claims_affected + '\n\n' +
+      '--- CREDIBILITY INDEX ---\n' +
+      'Score: ' + pkt.credibility_index.score + ' / 100\n' +
+      'Band: ' + pkt.credibility_index.band + '\n\n' +
 
-        '--- MG SUMMARY ---\n' +
-        'ID: ' + pkt.mg_summary.mg_id + '\n' +
-        'Changes (24h): ' +
-        pkt.mg_summary.changes_last_24h.nodes_added + ' nodes added, ' +
-        pkt.mg_summary.changes_last_24h.patches_applied + ' patches, ' +
-        pkt.mg_summary.changes_last_24h.seals_created + ' seals\n\n' +
+      '--- DLR SUMMARY ---\n' +
+      'ID: ' + pkt.dlr_summary.dlr_id + '\n' +
+      'Title: ' + pkt.dlr_summary.title + '\n' +
+      'Decided by: ' + pkt.dlr_summary.decided_by + '\n' +
+      'Key Findings:\n' +
+      pkt.dlr_summary.key_findings.map(function (f) { return '  - ' + f; }).join('\n') + '\n\n' +
 
-        '--- SEAL ---\n' +
-        'Hash: ' + pkt.seal.seal_hash + '\n' +
-        'Sealed at: ' + pkt.seal.sealed_at + '\n' +
-        'Role: ' + pkt.seal.role + '\n' +
-        'Chain length: ' + pkt.seal.hash_chain_length + '\n\n' +
+      '--- RS SUMMARY ---\n' +
+      'ID: ' + pkt.rs_summary.rs_id + '\n' +
+      'Assessment: ' + pkt.rs_summary.reasoning.overall_assessment + '\n' +
+      'Primary Risk: ' + pkt.rs_summary.reasoning.primary_risk + '\n' +
+      'Recommendation: ' + pkt.rs_summary.reasoning.recommendation + '\n\n' +
 
-        '--- GUARDRAILS ---\n' +
-        pkt.guardrails.description;
+      '--- DS SUMMARY ---\n' +
+      'ID: ' + pkt.ds_summary.ds_id + '\n' +
+      'Active Signals: ' + pkt.ds_summary.active_signals + '\n' +
+      'Critical: ' + pkt.ds_summary.critical_signal.category +
+      ' (' + pkt.ds_summary.critical_signal.source + ')\n' +
+      'Claims Affected: ' + pkt.ds_summary.critical_signal.claims_affected + '\n\n' +
 
-      preview.textContent = text;
-      preview.style.display = 'block';
-    });
+      '--- MG SUMMARY ---\n' +
+      'ID: ' + pkt.mg_summary.mg_id + '\n' +
+      'Changes (24h): ' +
+      pkt.mg_summary.changes_last_24h.nodes_added + ' nodes added, ' +
+      pkt.mg_summary.changes_last_24h.patches_applied + ' patches, ' +
+      pkt.mg_summary.changes_last_24h.seals_created + ' seals\n\n' +
+
+      '--- SEAL ---\n' +
+      'Sealed: ' + sealStatus + '\n' +
+      'Hash: ' + sealHash + '\n' +
+      (pkt.seal && pkt.seal.sealed_at ? 'Sealed at: ' + pkt.seal.sealed_at + '\n' : '') +
+      (pkt.seal && pkt.seal.role ? 'Role: ' + pkt.seal.role + '\n' : '') +
+      (pkt.seal && pkt.seal.hash_chain_length ? 'Chain length: ' + pkt.seal.hash_chain_length + '\n' : '') +
+      '\n--- GUARDRAILS ---\n' +
+      pkt.guardrails.description;
+
+    preview.textContent = text;
+    preview.style.display = 'block';
   }
 
   /* ── Helpers ── */
@@ -447,6 +569,7 @@
   }
 
   /* ── Boot ── */
+  initControls();
   loadAll();
 
   /* ── Auto-refresh for simulation mode ── */

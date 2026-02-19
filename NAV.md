@@ -169,7 +169,7 @@ last_updated: "2026-02-18"
 
 ---
 
-## 🏗 Credibility Engine (v0.6.4)
+## 🏗 Credibility Engine (v0.8.0)
 
 | Resource | Purpose |
 |----------|---------|
@@ -179,13 +179,16 @@ last_updated: "2026-02-18"
 | [`docs/credibility-engine/sync_plane.md`](docs/credibility-engine/sync_plane.md) | Sync Plane — beacons, watermarks, replay detection |
 | [`docs/credibility-engine/drift_patch_seal_loop.md`](docs/credibility-engine/drift_patch_seal_loop.md) | 5 institutional drift categories + Drift-Patch-Seal loop |
 | [`docs/credibility-engine/deployment_patterns.md`](docs/credibility-engine/deployment_patterns.md) | MVP → Production deployment + economic modeling |
+| [`docs/credibility-engine/TENANCY_SPEC.md`](docs/credibility-engine/TENANCY_SPEC.md) | Multi-tenant specification — tenant entity, RBAC, record schemas |
+| [`docs/credibility-engine/API_V0_8.md`](docs/credibility-engine/API_V0_8.md) | API Reference v0.8.0 — tenant-scoped endpoints, auth headers |
 | [`examples/01-mini-lattice/`](examples/01-mini-lattice/) | Mini Lattice — 12 nodes, mechanics |
 | [`examples/02-enterprise-lattice/`](examples/02-enterprise-lattice/) | Enterprise Lattice — ~500 nodes, complexity |
 | [`examples/03-credibility-engine-scale/`](examples/03-credibility-engine-scale/) | Credibility Engine at Scale — 30k–40k nodes, survivability |
 | [`mermaid/38-lattice-architecture.md`](mermaid/38-lattice-architecture.md) | Lattice architecture diagram |
 | [`mermaid/39-drift-loop.md`](mermaid/39-drift-loop.md) | Institutional drift loop diagram |
 | [`sim/credibility-engine/`](sim/credibility-engine/) | Stage 2 Simulation — tick-based engine driving live dashboard |
-| [`credibility_engine/`](credibility_engine/) | Stage 3 Runtime — real engine with JSONL persistence + API endpoints |
+| [`credibility_engine/`](credibility_engine/) | Stage 3 Runtime — multi-tenant engine with JSONL persistence + API |
+| [`tenancy/`](tenancy/) | Tenancy module — tenant registry, paths, header-based RBAC |
 
 ---
 

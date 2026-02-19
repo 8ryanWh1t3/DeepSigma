@@ -23,6 +23,7 @@ from credibility_engine.models import (
     make_default_clusters,
     make_default_sync_regions,
 )
+from credibility_engine.constants import DEFAULT_TENANT_ID
 from credibility_engine.store import CredibilityStore
 
 
@@ -35,10 +36,17 @@ class CredibilityEngine:
 
     Maintains live state and persists to JSONL.
     Can be driven by the simulator or by direct API calls.
+    Tenant-aware: each instance is scoped to a single tenant via its store.
     """
 
-    def __init__(self, store: CredibilityStore | None = None) -> None:
-        self.store = store or CredibilityStore()
+    def __init__(
+        self,
+        store: CredibilityStore | None = None,
+        tenant_id: str | None = None,
+    ) -> None:
+        tid = tenant_id or DEFAULT_TENANT_ID
+        self.store = store or CredibilityStore(tenant_id=tid)
+        self.tenant_id = self.store.tenant_id
 
         # Live state
         self.claims: list[Claim] = []
@@ -250,6 +258,7 @@ class CredibilityEngine:
         auto_rate = round(auto_resolved / max(len(self.drift_events), 1), 2)
 
         return {
+            "tenant_id": self.tenant_id,
             "index_score": self.credibility_index,
             "index_band": self.index_band,
             "index_band_color": self._band_color(),
@@ -277,6 +286,7 @@ class CredibilityEngine:
     def snapshot_claims(self) -> dict[str, Any]:
         """Produce claims_tier0.json compatible with dashboard."""
         return {
+            "tenant_id": self.tenant_id,
             "tier": 0,
             "total_count": 200,
             "claims": [
@@ -325,6 +335,7 @@ class CredibilityEngine:
                 pending += 1
 
         return {
+            "tenant_id": self.tenant_id,
             "window": "24h",
             "window_start": _now_iso(),
             "window_end": _now_iso(),
@@ -342,6 +353,7 @@ class CredibilityEngine:
     def snapshot_correlation(self) -> dict[str, Any]:
         """Produce correlation_map.json compatible with dashboard."""
         return {
+            "tenant_id": self.tenant_id,
             "clusters": [
                 {
                     "cluster_id": c.id,
@@ -378,6 +390,7 @@ class CredibilityEngine:
             fed_status = "CRITICAL"
 
         return {
+            "tenant_id": self.tenant_id,
             "regions": [
                 {
                     "region": r.id,
