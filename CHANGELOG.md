@@ -5,6 +5,27 @@ All notable changes to Σ OVERWATCH / DeepSigma will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.1] — 2026-02-19 — "Interop Gateway"
+
+### Added — Interoperability Stack
+
+- **Interop Stack overview** (`docs/interop/README.md`): Unified architecture for AG-UI + A2A + MCP + Agora — one-stack view, layer-by-layer breakdown, Coherence Ops artifact mapping
+- **Gateway Spec v0.1** (`docs/interop/COHERENCE_INTEROP_GATEWAY_SPEC_v0.1.md`): Protocol adapters, Agora-style negotiation engine, sealed contract lifecycle, runtime with retry/circuit breaker, observability (OTel trace propagation), drift sensor + patch loop, security controls, SLOs
+- **ProtocolContract JSON Schema** (`schemas/interop/protocol_contract.schema.json`): Draft-07 schema with sealing, versioning, provenance, participants, message types, intents, error codes, constraints, signing + optional deprecation/migration/rollback/telemetry
+- **Example contract** (`templates/interop/ProtocolContract.example.json`): Realistic AgentBooking ↔ AgentTravel interaction with 4 message types, 2 intents, 5 error codes
+- **Drift triggers playbook** (`docs/interop/DRIFT_TRIGGERS.md`): 10 trigger types (schema, semantic, capability, policy, performance, freshness) with detection signals, severity, response actions, emitted artifacts
+- **MVP plan** (`docs/interop/MVP_PLAN.md`): 14-day implementation plan with daily milestones, demo checkpoints, test coverage targets
+- **Mermaid diagrams**: Interop request flow sequence (`mermaid/30-interop-request-flow.md`) + Agora negotiation flowchart (`mermaid/31-agora-negotiation-flow.md`)
+
+### Fixed
+
+- `TrustScorecardPanel.tsx`: Removed unused `React` import (TS6133)
+- `expected_summary.json`: Updated golden-file drift count 5 → 6 to match pipeline output
+
+### Stats
+
+- 679 tests passing, 9 new files, 2 fixed, NAV.md updated
+
 ## [0.6.0] — 2026-02-18 — "Trust at Scale"
 
 ### Added — Connector Contract v1.0
