@@ -1,0 +1,43 @@
+{
+  "patch_id": "Patch-HC-004",
+  "title": "Clinical Ops: Close equipment/stockout gap impacting care delivery",
+  "trigger_drift_signal": "ds-hc-004-equipment-gap",
+  "severity": "YELLOW",
+  "domains": ["CLN", "OPS"],
+  "tier0_claims_impacted": ["CLN-002"],
+  "decision_options": [
+    {
+      "option": "A",
+      "name": "Temporary substitution + reorder automation",
+      "tradeoff": "Clinical workflow adjustment",
+      "success_metric": "Stockouts eliminated; care pathway continuity preserved"
+    },
+    {
+      "option": "B",
+      "name": "Expedite procurement + adjust par levels",
+      "tradeoff": "Cost increase",
+      "success_metric": "Par levels updated; lead time stabilized"
+    }
+  ],
+  "selected_option": "A",
+  "patch_sequence": [
+    {
+      "step": 1,
+      "action": "Enable approved substitutes and update clinical guidance",
+      "owner": "clinical-lead",
+      "verification": "Guidance published; staff acknowledgment",
+      "rollback": "Remove substitute guidance"
+    },
+    {
+      "step": 2,
+      "action": "Implement reorder trigger thresholds (par levels) and alerts",
+      "owner": "supply-chain",
+      "verification": "Alert fires before stockout; dashboards confirm",
+      "rollback": "Disable triggers"
+    }
+  ],
+  "closure_conditions": [
+    "Zero stockouts for 14 days",
+    "OPS confidence >= 0.80"
+  ]
+}
