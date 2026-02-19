@@ -65,6 +65,22 @@ Same primitives. Same artifacts. Same loop. Different scale.
 
 ---
 
+## Why Scale Changes Everything
+
+At 12 nodes, a human can trace every dependency. At 500, hidden correlations emerge. At 40,000, manual governance is impossible.
+
+| Principle | Why It Matters at Scale |
+|-----------|------------------------|
+| **Truth decays** | Evidence has a shelf life. Without TTL discipline, stale assertions masquerade as current truth. |
+| **Silence is signal** | A lattice that stops producing drift signals is not healthy — it is blind. Watch for instability, not absence. |
+| **Independence must be enforced** | Sources that appear independent may share infrastructure. Correlation groups make hidden dependencies visible. |
+| **Drift is normal** | 100–400 drift events per day is steady state at production scale. Drift is maintenance fuel, not crisis. |
+| **Seal authority matters** | No single region should control institutional truth. Authority distribution (no region >40%) prevents capture. |
+
+At every scale, the same question: **can the institution trust its own assertions right now?** The Credibility Index answers it with a number. The Drift→Patch→Seal loop keeps that number honest.
+
+---
+
 ## Try It (5 Minutes)
 
 ```bash
