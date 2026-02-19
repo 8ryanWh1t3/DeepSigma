@@ -35,9 +35,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[dev,excel]" pydantic
 
-      - name: Run unit tests with coverage
+      - name: Run unit tests with coverage (Linux)
+        if: runner.os == 'Linux'
         run: |
           python -m pytest tests/ -v --tb=short --cov=coherence_ops --cov=engine --cov-report=term-missing --ignore=tests/test_integration.py --ignore=tests/test_load.py --ignore=tests/test_benchmarks.py --ignore=tests/test_golden_path.py --ignore=tests/test_trust_scorecard.py
+
+      - name: Run unit tests with coverage (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          python -m pytest tests/ -v --tb=short --cov=coherence_ops --cov=engine --cov-report=term-missing --ignore=tests/test_integration.py --ignore=tests/test_load.py --ignore=tests/test_benchmarks.py --ignore=tests/test_golden_path.py --ignore=tests/test_trust_scorecard.py --ignore=tests/test_iris.py --ignore=tests/test_langchain_governance.py
 
   integration-tests:
     name: Integration & Demo Tests
