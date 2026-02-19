@@ -1,0 +1,204 @@
+{
+  "contract_id": "c9a1f2e3-4b56-7890-abcd-ef1234567890",
+  "version": "1.0.0",
+  "hash": "sha256:a3f8b2c1d4e5f67890abcdef1234567890abcdef1234567890abcdef12345678",
+  "sealed_at": "2026-02-19T14:30:00Z",
+  "expiry": "2026-03-21T14:30:00Z",
+  "supersedes": null,
+  "provenance": [
+    {
+      "ref": "neg-session-7a8b9c0d",
+      "type": "negotiation",
+      "timestamp": "2026-02-19T14:29:45Z",
+      "detail": "Agora negotiation, 2 rounds, model=claude-sonnet-4-6"
+    },
+    {
+      "ref": "operator-jane@acme.com",
+      "type": "human_approval",
+      "timestamp": "2026-02-19T14:29:58Z",
+      "detail": "Approved after reviewing field mappings"
+    }
+  ],
+  "participants": [
+    {
+      "id": "agent://acme.com/booking-agent/v2",
+      "role": "initiator",
+      "protocol": "a2a/1.0",
+      "capabilities": ["book_travel", "cancel_booking", "modify_booking"]
+    },
+    {
+      "id": "agent://travelcorp.io/travel-fulfillment/v1",
+      "role": "responder",
+      "protocol": "rest/openapi3",
+      "capabilities": ["search_flights", "reserve_seat", "issue_ticket", "cancel_ticket"]
+    }
+  ],
+  "message_types": [
+    {
+      "name": "BookingRequest",
+      "direction": "initiator_to_responder",
+      "schema": {
+        "type": "object",
+        "required": ["trip_id", "traveler", "origin", "destination", "departure_date"],
+        "properties": {
+          "trip_id": { "type": "string", "format": "uuid" },
+          "traveler": {
+            "type": "object",
+            "required": ["name", "email"],
+            "properties": {
+              "name": { "type": "string" },
+              "email": { "type": "string", "format": "email" },
+              "loyalty_id": { "type": "string" }
+            }
+          },
+          "origin": { "type": "string", "pattern": "^[A-Z]{3}$" },
+          "destination": { "type": "string", "pattern": "^[A-Z]{3}$" },
+          "departure_date": { "type": "string", "format": "date" },
+          "return_date": { "type": "string", "format": "date" },
+          "class": { "type": "string", "enum": ["economy", "business", "first"] },
+          "max_budget_usd": { "type": "number", "minimum": 0 }
+        }
+      },
+      "required_fields": ["trip_id", "traveler", "origin", "destination", "departure_date"]
+    },
+    {
+      "name": "BookingConfirmation",
+      "direction": "responder_to_initiator",
+      "schema": {
+        "type": "object",
+        "required": ["trip_id", "confirmation_code", "status", "flights"],
+        "properties": {
+          "trip_id": { "type": "string", "format": "uuid" },
+          "confirmation_code": { "type": "string" },
+          "status": { "type": "string", "enum": ["confirmed", "waitlisted", "rejected"] },
+          "flights": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "flight_number": { "type": "string" },
+                "departure": { "type": "string", "format": "date-time" },
+                "arrival": { "type": "string", "format": "date-time" },
+                "seat": { "type": "string" }
+              }
+            }
+          },
+          "total_cost_usd": { "type": "number" },
+          "cancellation_policy": { "type": "string" }
+        }
+      },
+      "required_fields": ["trip_id", "confirmation_code", "status", "flights"]
+    },
+    {
+      "name": "CancellationRequest",
+      "direction": "initiator_to_responder",
+      "schema": {
+        "type": "object",
+        "required": ["trip_id", "confirmation_code", "reason"],
+        "properties": {
+          "trip_id": { "type": "string", "format": "uuid" },
+          "confirmation_code": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      },
+      "required_fields": ["trip_id", "confirmation_code", "reason"]
+    },
+    {
+      "name": "CancellationConfirmation",
+      "direction": "responder_to_initiator",
+      "schema": {
+        "type": "object",
+        "required": ["trip_id", "status", "refund_usd"],
+        "properties": {
+          "trip_id": { "type": "string", "format": "uuid" },
+          "status": { "type": "string", "enum": ["cancelled", "partial_cancel", "denied"] },
+          "refund_usd": { "type": "number", "minimum": 0 },
+          "penalty_usd": { "type": "number", "minimum": 0 }
+        }
+      },
+      "required_fields": ["trip_id", "status", "refund_usd"]
+    }
+  ],
+  "intents": [
+    {
+      "name": "book_travel",
+      "description": "Book a flight itinerary for a traveler.",
+      "triggers": ["BookingRequest"],
+      "outcomes": ["BookingConfirmation"]
+    },
+    {
+      "name": "cancel_booking",
+      "description": "Cancel a previously confirmed booking.",
+      "triggers": ["CancellationRequest"],
+      "outcomes": ["CancellationConfirmation"]
+    }
+  ],
+  "error_codes": [
+    {
+      "code": "E001_NO_AVAILABILITY",
+      "meaning": "No flights available for the requested route and dates.",
+      "retryable": true,
+      "suggested_action": "Retry with flexible dates or alternate airports."
+    },
+    {
+      "code": "E002_INVALID_DATES",
+      "meaning": "Departure date is in the past or return date precedes departure.",
+      "retryable": false,
+      "suggested_action": "Correct dates and resubmit."
+    },
+    {
+      "code": "E003_BUDGET_EXCEEDED",
+      "meaning": "All available options exceed the max_budget_usd constraint.",
+      "retryable": true,
+      "suggested_action": "Increase budget or relax class/date constraints."
+    },
+    {
+      "code": "E004_CANCEL_WINDOW_CLOSED",
+      "meaning": "Cancellation window has passed per the booking's cancellation policy.",
+      "retryable": false,
+      "suggested_action": "Contact support for exceptions."
+    },
+    {
+      "code": "E500_INTERNAL",
+      "meaning": "Unexpected error on the responder side.",
+      "retryable": true,
+      "suggested_action": "Retry with exponential backoff."
+    }
+  ],
+  "constraints": {
+    "rate_limit": {
+      "requests_per_minute": 60,
+      "burst": 10
+    },
+    "max_payload_bytes": 65536,
+    "timeout_ms": 5000,
+    "idempotency_required": true,
+    "tool_scopes": [
+      "read:flights",
+      "write:bookings",
+      "write:cancellations"
+    ]
+  },
+  "signing": {
+    "algorithm": "sha256",
+    "public_key": null,
+    "signature": null
+  },
+  "deprecation": {
+    "deprecated": false,
+    "deprecated_at": null,
+    "sunset_at": null,
+    "migration_ref": null
+  },
+  "migration": null,
+  "rollback": {
+    "rollback_to": null,
+    "auto_rollback": true,
+    "failure_threshold": 5
+  },
+  "telemetry": {
+    "trace_propagation": "w3c",
+    "metrics_endpoint": null,
+    "log_level": "info"
+  }
+}
