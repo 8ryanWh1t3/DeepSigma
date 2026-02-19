@@ -1,0 +1,28 @@
+flowchart TB
+  S003[(S003 Cross-Studio Build Pipeline)]
+  S023[(S023 Player Telemetry Pipeline)]
+
+  subgraph SharedInfra["Correlation Group: shared-infrastructure (CRITICAL)"]
+    S003
+    S023
+  end
+
+  CRE[CRE Evidence Nodes]
+  PLT[PLT Evidence Nodes]
+  OPS[OPS Evidence Nodes]
+  MON[MON Evidence Nodes]
+  DAT[DAT Evidence Nodes]
+
+  S003 --> CRE
+  S003 --> PLT
+  S003 --> OPS
+
+  S023 --> OPS
+  S023 --> MON
+  S023 --> DAT
+
+  RISK["50 Evidence Nodes impacted\n(18% of all evidence)\nCascades across 4 domains"]
+  SharedInfra --> RISK
+
+  style SharedInfra fill:#111,stroke:#f33,stroke-width:3px
+  style RISK fill:#111,stroke:#f33,stroke-width:3px

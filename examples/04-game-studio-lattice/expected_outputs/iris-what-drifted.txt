@@ -1,0 +1,40 @@
+IRIS WHAT_DRIFTED — Game Studio Lattice
+========================================
+
+Query:   WHAT_DRIFTED
+Status:  RESOLVED
+Confidence: 0.91
+
+Active Drift Signals: 4
+
+  1. DS-GS-001 — Rating Mismatch (RED)
+     Domains: CRE, REG, PLT
+     Claims:  CRE-001, REG-001, PLT-001 (all Tier 0)
+     Impact:  18 evidence nodes, cross-domain, cross-studio
+     Patch:   Patch-GS-001 (Option C selected)
+
+  2. DS-GS-002 — Monetization Contradiction (RED)
+     Domains: MON, REG, CRE
+     Claims:  MON-001, REG-002 (Tier 0), CRE-002 (Tier 0)
+     Impact:  22 evidence nodes, 3-way cascade loop
+     Patch:   Patch-GS-002 (regional enforcement + disclosures)
+
+  3. DS-GS-003 — Infrastructure Cascade (RED)
+     Domains: OPS, PLT, DAT, MON
+     Claims:  across 4 domains (8 claims affected)
+     Impact:  50 evidence nodes (shared-infrastructure group)
+     Patch:   Patch-GS-003 (add independent beacons + quorum hardening)
+
+  4. DS-GS-004 — Timezone Regression (YELLOW)
+     Domains: OPS, PLT
+     Claims:  OPS-001, PLT-001 (PLT Tier 0)
+     Impact:  12 evidence nodes, overnight drift window
+     Patch:   Patch-GS-004 (handoff checklists + regression gate)
+
+Concentration Risk:
+  shared-infrastructure correlation group: S003 + S023 feed 50 nodes across
+  4 domains. Single failure cascades 18% of all evidence.
+
+Thin-Margin Claims:
+  PLT-001c (Nintendo Lotcheck): 2 evidence sources, zero quorum margin
+  REG-002d (KR age-gate): 1 evidence source, zero quorum margin

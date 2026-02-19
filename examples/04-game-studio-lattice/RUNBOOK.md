@@ -1,6 +1,6 @@
 ---
 title: "Game Studio Lattice — Runbook"
-version: 1.0.0
+version: 1.1.0
 status: Example
 last_updated: 2026-02-19
 ---
@@ -8,7 +8,7 @@ last_updated: 2026-02-19
 # Game Studio Lattice Runbook
 
 Operational procedures for running the game studio lattice example. Covers scoring,
-drift detection, scenario replay, and IRIS queries.
+drift detection, scenario replay, IRIS queries, validation, and workbook generation.
 
 ---
 
@@ -16,7 +16,8 @@ drift detection, scenario replay, and IRIS queries.
 
 ```bash
 git clone https://github.com/8ryanWh1t3/DeepSigma.git && cd DeepSigma
-pip install -r requirements.txt
+pip install -e .
+pip install openpyxl   # for workbook generation
 ```
 
 ---
@@ -33,8 +34,8 @@ python -m coherence_ops score ./examples/04-game-studio-lattice/episodes/ --json
 python -m coherence_ops score ./examples/04-game-studio-lattice/episodes/ep-gs-001.json --json
 
 # Get letter grade
-python -m coherence_ops score ./examples/04-game-studio-lattice/episodes/ 
-# Expected: ~83 → B (baseline) or lower if drift episodes loaded
+python -m coherence_ops score ./examples/04-game-studio-lattice/episodes/
+# Expected: ~83 -> B (baseline) or lower if drift episodes loaded
 ```
 
 ### Expected Baseline Output
@@ -50,15 +51,21 @@ Evidence: 282
 
 ---
 
-## 2. Run Drift Detection
+## 2. Run Drift -> Patch Cycle
 
 ```bash
-# Detect drift across all episodes
-python -m coherence_ops.examples.drift_patch_cycle
+# Full game-studio example (loads episodes, drift signals, patches)
+python -m coherence_ops.examples.drift_patch_cycle --example game-studio
 
-# Expected output progression:
-# BASELINE 83.00 (B) → DRIFT 64.00 (D) → PATCH 76.00 (C)
+# Default money demo (for comparison)
+python -m coherence_ops.examples.drift_patch_cycle
 ```
+
+Expected output for game-studio:
+- 4 episodes loaded
+- 4 drift signals detected (3 RED, 1 YELLOW)
+- 4 patch plans with closure conditions
+- Score progression: 83 -> 41 (worst) -> recovery
 
 ---
 
@@ -70,7 +77,7 @@ python -m coherence_ops.examples.drift_patch_cycle
 python -m coherence_ops iris query --type WHY --target ep-gs-001
 ```
 
-Expected: Returns the DLR showing Tokyo creative approval → Bucharest QA flag → 
+Expected: Returns the DLR showing Tokyo creative approval -> Bucharest QA flag ->
 three-domain contradiction across CRE-001, REG-001, PLT-001.
 
 ### What drifted in the monetization domain?
@@ -79,17 +86,13 @@ three-domain contradiction across CRE-001, REG-001, PLT-001.
 python -m coherence_ops iris query --type WHAT_DRIFTED --json
 ```
 
-Expected: Returns DS-GS-002 (Founder's Cache contradiction) with the three-way
-cascade loop across MON-001, REG-002, CRE-002.
+Expected: Returns DS-GS-001..004 with the four scenario drift signals, plus
+`shared-infrastructure` correlation group flagged as concentration risk.
 
-### What assumptions decayed?
+### Full IRIS query pack
 
-```bash
-python -m coherence_ops iris query --type WHAT_DRIFTED --json
-```
-
-Expected: Shows the `shared-infrastructure` correlation group as the highest-decay
-assumption — Source-S003 and S023 proved less independent than assumed.
+See [iris_queries.md](iris_queries.md) for the complete set of queries with expected outputs.
+Expected output stubs are in `expected_outputs/`.
 
 ---
 
@@ -102,7 +105,7 @@ To walk through the four scenarios sequentially:
 python -m coherence_ops score \
   ./examples/04-game-studio-lattice/episodes/ep-gs-001.json --json
 
-# Scenario 2: Monetization contradiction  
+# Scenario 2: Monetization contradiction
 python -m coherence_ops score \
   ./examples/04-game-studio-lattice/episodes/ep-gs-002.json --json
 
@@ -144,31 +147,83 @@ game-studio-specific extensions.
 
 ---
 
-## 6. Verification Checklist
+## 6. Patch Artifacts
+
+View the patch plans:
+
+```bash
+ls ./examples/04-game-studio-lattice/patches/
+
+# patch-gs-001-rating-envelope.json
+# patch-gs-002-founders-cache.json
+# patch-gs-003-shared-infra.json
+# patch-gs-004-timezone-regression.json
+```
+
+Each patch includes decision options, selected option, step-by-step sequence with
+owners and rollback plans, and closure conditions.
+
+---
+
+## 7. Validate Example JSON
+
+```bash
+python ./examples/04-game-studio-lattice/tools/validate_example_json.py
+```
+
+Checks all episodes, drift signals, and patches for required keys. Exits non-zero
+on failure. Uses only stdlib.
+
+---
+
+## 8. Generate GameOps Workbook
+
+```bash
+python ./examples/04-game-studio-lattice/tools/generate_gamestudio_workbook.py \
+  --out ./examples/04-game-studio-lattice/GameOps_Workbook.xlsx
+```
+
+Generates an Excel workbook with 8 tabs:
+- BalanceChanges, EconomyTuning, FeatureCuts, Assumptions
+- DriftSignals, PatchPlans, CanonRules
+- PROMPTS (LLM interaction surface with system prompt)
+
+Each tab has 25 synthetic rows cross-referenced to ep-gs-XXX, DS-GS-XXX, Patch-GS-XXX.
+Requires `openpyxl`.
+
+---
+
+## 9. Verification Checklist
 
 After running the example, verify:
 
 | Check | Expected |
 |---|---|
-| All 4 episodes parse without error | ✅ |
-| Baseline score ~83 (B) | ✅ |
-| Drift detection identifies all 4 scenarios | ✅ |
-| IRIS WHY query returns cross-domain reasoning | ✅ |
-| IRIS WHAT_DRIFTED surfaces infrastructure correlation | ✅ |
-| Decision episodes are sealed with valid hashes | ✅ |
-| Memory Graph shows 4 new governance edges after Scenario 2 | ✅ |
+| All 4 episodes parse without error | Valid JSON |
+| All 4 drift signals parse without error | Valid JSON |
+| All 4 patches parse without error | Valid JSON |
+| Baseline score ~83 (B) | ~83 / B |
+| Drift detection identifies all 4 scenarios | 4 signals |
+| IRIS WHY query returns cross-domain reasoning | Resolved |
+| IRIS WHAT_DRIFTED surfaces infrastructure correlation | 4 signals |
+| Patch plans have closure conditions | 4 plans |
+| Validator returns all-pass | 12 files |
+| Workbook generates with 8 tabs | .xlsx created |
 
 ---
 
-## 7. Key Files
+## 10. Key Files
 
 | File | Purpose |
 |---|---|
 | [README.md](README.md) | Lattice structure, node inventory, credibility walkthrough |
 | [SCENARIO_PLAN.md](SCENARIO_PLAN.md) | Four drift scenarios with detection, response, seal |
 | [SCHEMAS.md](SCHEMAS.md) | JSON schemas with game-studio extensions |
-| `episodes/ep-gs-001.json` | Rating break episode |
-| `episodes/ep-gs-002.json` | Monetization contradiction episode |
-| `episodes/ep-gs-003.json` | Infrastructure cascade episode |
-| `episodes/ep-gs-004.json` | Timezone regression episode |
-| `drift_signals/` | Drift signal JSON files for each scenario |
+| [iris_queries.md](iris_queries.md) | IRIS query pack with expected outputs |
+| `episodes/` | 4 decision episode JSON files |
+| `drift_signals/` | 4 drift signal JSON files |
+| `patches/` | 4 patch plan JSON files |
+| `diagrams/` | 3 Mermaid diagrams (contradiction loop, blast radius, drift-to-patch) |
+| `expected_outputs/` | Expected output stubs for deterministic demos |
+| `tools/validate_example_json.py` | JSON validation harness |
+| `tools/generate_gamestudio_workbook.py` | Excel workbook generator |

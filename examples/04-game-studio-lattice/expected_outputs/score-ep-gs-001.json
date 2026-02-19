@@ -1,0 +1,37 @@
+{
+  "overall_score": 64.0,
+  "grade": "D",
+  "dimensions": [
+    {
+      "name": "policy_adherence",
+      "weight": 0.25,
+      "score": 85.0,
+      "note": "DLR present with governance council decision"
+    },
+    {
+      "name": "outcome_health",
+      "weight": 0.30,
+      "score": 55.0,
+      "note": "Partial outcome — DLC feature deferred, not resolved"
+    },
+    {
+      "name": "drift_control",
+      "weight": 0.25,
+      "score": 40.0,
+      "note": "1 red signal (rating mismatch), 3 Tier 0 claims impacted"
+    },
+    {
+      "name": "memory_completeness",
+      "weight": 0.20,
+      "score": 82.0,
+      "note": "Episode in graph with drift edges; patch pending"
+    }
+  ],
+  "metadata": {
+    "episode": "ep-gs-001",
+    "event": "RONIN DLC rating envelope breach",
+    "credibility_index_before": 83,
+    "credibility_index_during": 64,
+    "credibility_index_after": 76
+  }
+}

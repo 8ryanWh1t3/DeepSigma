@@ -1,0 +1,36 @@
+{
+  "patch_id": "Patch-GS-003",
+  "title": "Shared Infrastructure: Reduce correlation-group concentration risk",
+  "trigger_drift_signal": "ds-gs-003-infrastructure-cascade",
+  "severity": "RED",
+  "domains": ["OPS", "PLT", "DAT", "MON"],
+  "correlation_group": "shared-infrastructure",
+  "risk_statement": "S003+S023 feed 50 evidence nodes across 4 domains; single failure cascades lattice integrity.",
+  "patch_sequence": [
+    {
+      "step": 1,
+      "action": "Add independent beacon source for build verification per studio",
+      "owner": "tokyo",
+      "verification": "Per-studio CI evidence nodes exist",
+      "rollback": "Disable beacon ingestion"
+    },
+    {
+      "step": 2,
+      "action": "Add secondary telemetry pipeline snapshot (read-only) for drift confirmation",
+      "owner": "montreal",
+      "verification": "Parallel metrics match within tolerance",
+      "rollback": "Drop snapshot pipeline"
+    },
+    {
+      "step": 3,
+      "action": "Update quorum rules to require >=2 correlation groups for Tier0 where possible",
+      "owner": "bucharest",
+      "verification": "Quorum config updated; scoring reflects margin gain",
+      "rollback": "Restore previous quorum config"
+    }
+  ],
+  "closure_conditions": [
+    "shared-infrastructure risk reduced below 40 nodes",
+    "Tier0 quorum margin improved for PLT/REG thin claims"
+  ]
+}

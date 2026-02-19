@@ -1,0 +1,17 @@
+flowchart LR
+  CRE[CRE: Creative Direction] -->|assets + approvals| REG[REG: Regional Compliance]
+  REG -->|ratings + restrictions| MON[MON: Monetization Policy]
+  MON -->|public commitments + mechanics| CRE
+
+  PLT[PLT: Platform Certification] -->|TRC/XR/Lotcheck gates| OPS[OPS: Live Service Ops]
+  OPS -->|patches + events| PLT
+
+  DAT[DAT: Player Data Sovereignty] -->|jurisdiction rules| OPS
+  OPS -->|telemetry + configs| DAT
+
+  style CRE fill:#111,stroke:#0ff,stroke-width:2px
+  style REG fill:#111,stroke:#f0f,stroke-width:2px
+  style MON fill:#111,stroke:#ff0,stroke-width:2px
+  style PLT fill:#111,stroke:#0f0,stroke-width:2px
+  style OPS fill:#111,stroke:#f80,stroke-width:2px
+  style DAT fill:#111,stroke:#08f,stroke-width:2px
