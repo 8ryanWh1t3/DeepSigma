@@ -3,6 +3,9 @@
 Append-only JSONL storage for claims, drift events, snapshots,
 correlation clusters, and sync regions.
 
+Supports multi-tenant isolation via tenant_id-scoped data directories.
+Backward compatible: omitting tenant_id uses DEFAULT_TENANT_ID.
+
 Abstract institutional credibility architecture.
 No real-world system modeled.
 """
@@ -11,17 +14,27 @@ from __future__ import annotations
 
 import json
 import threading
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from credibility_engine.constants import DEFAULT_TENANT_ID
 
-_DEFAULT_DATA_DIR = Path(__file__).parent.parent / "data" / "credibility"
+_BASE_DATA_DIR = Path(__file__).parent.parent / "data" / "credibility"
 
 _write_lock = threading.Lock()
 
 
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
 class CredibilityStore:
-    """JSONL file-backed persistence for credibility engine state."""
+    """JSONL file-backed persistence for credibility engine state.
+
+    Tenant-aware: each tenant gets an isolated data directory under
+    data/credibility/{tenant_id}/.
+    """
 
     CLAIMS_FILE = "claims.jsonl"
     DRIFT_FILE = "drift.jsonl"
@@ -30,18 +43,34 @@ class CredibilityStore:
     SYNC_FILE = "sync.jsonl"
     PACKET_FILE = "packet_latest.json"
 
-    def __init__(self, data_dir: str | Path | None = None) -> None:
-        self.data_dir = Path(data_dir) if data_dir else _DEFAULT_DATA_DIR
+    def __init__(
+        self,
+        data_dir: str | Path | None = None,
+        tenant_id: str | None = None,
+    ) -> None:
+        if data_dir is not None:
+            # Explicit data_dir takes precedence (backward compat / testing)
+            self.data_dir = Path(data_dir)
+        else:
+            tid = tenant_id or DEFAULT_TENANT_ID
+            self.data_dir = _BASE_DATA_DIR / tid
+        self.tenant_id = tenant_id or DEFAULT_TENANT_ID
         self.data_dir.mkdir(parents=True, exist_ok=True)
 
     # -- Core operations -------------------------------------------------------
 
     def append_record(self, filename: str, record: dict[str, Any]) -> None:
-        """Append a single JSON record as a line to a JSONL file."""
+        """Append a single JSON record as a line to a JSONL file.
+
+        Injects tenant_id and timestamp if not already present.
+        """
+        enriched = dict(record)
+        enriched.setdefault("tenant_id", self.tenant_id)
+        enriched.setdefault("timestamp", _now_iso())
         filepath = self.data_dir / filename
         with _write_lock:
             with open(filepath, "a", encoding="utf-8") as f:
-                f.write(json.dumps(record, default=str) + "\n")
+                f.write(json.dumps(enriched, default=str) + "\n")
 
     def load_latest(self, filename: str) -> dict[str, Any] | None:
         """Load the last record from a JSONL file."""
@@ -55,7 +84,9 @@ class CredibilityStore:
                 if stripped:
                     last_line = stripped
         if last_line:
-            return json.loads(last_line)
+            record = json.loads(last_line)
+            record.setdefault("tenant_id", self.tenant_id)
+            return record
         return None
 
     def load_last_n(self, filename: str, n: int = 10) -> list[dict[str, Any]]:
@@ -69,7 +100,10 @@ class CredibilityStore:
                 stripped = line.strip()
                 if stripped:
                     lines.append(stripped)
-        return [json.loads(line) for line in lines[-n:]]
+        records = [json.loads(line) for line in lines[-n:]]
+        for r in records:
+            r.setdefault("tenant_id", self.tenant_id)
+        return records
 
     def load_all(self, filename: str) -> list[dict[str, Any]]:
         """Load all records from a JSONL file."""
@@ -81,15 +115,19 @@ class CredibilityStore:
             for line in f:
                 stripped = line.strip()
                 if stripped:
-                    records.append(json.loads(stripped))
+                    record = json.loads(stripped)
+                    record.setdefault("tenant_id", self.tenant_id)
+                    records.append(record)
         return records
 
     def write_json(self, filename: str, data: dict[str, Any]) -> None:
         """Write a single JSON file (non-JSONL, for packets)."""
+        enriched = dict(data)
+        enriched.setdefault("tenant_id", self.tenant_id)
         filepath = self.data_dir / filename
         with _write_lock:
             with open(filepath, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=2, default=str)
+                json.dump(enriched, f, indent=2, default=str)
                 f.write("\n")
 
     def load_json(self, filename: str) -> dict[str, Any] | None:
@@ -98,9 +136,39 @@ class CredibilityStore:
         if not filepath.exists():
             return None
         with open(filepath, encoding="utf-8") as f:
-            return json.load(f)
+            record = json.load(f)
+        if isinstance(record, dict):
+            record.setdefault("tenant_id", self.tenant_id)
+        return record
+
+    def write_batch(self, filename: str, records: list[dict[str, Any]]) -> None:
+        """Overwrite a JSONL file with a complete batch of records.
+
+        Use for current-state data (claims, clusters, sync) where the full
+        set is written at once. Injects tenant_id and timestamp if missing.
+        """
+        filepath = self.data_dir / filename
+        with _write_lock:
+            with open(filepath, "w", encoding="utf-8") as f:
+                for record in records:
+                    enriched = dict(record)
+                    enriched.setdefault("tenant_id", self.tenant_id)
+                    enriched.setdefault("timestamp", _now_iso())
+                    f.write(json.dumps(enriched, default=str) + "\n")
 
     # -- Convenience methods ---------------------------------------------------
+
+    def save_claims(self, claim_dicts: list[dict[str, Any]]) -> None:
+        """Overwrite claims file with full current state."""
+        self.write_batch(self.CLAIMS_FILE, claim_dicts)
+
+    def save_clusters(self, cluster_dicts: list[dict[str, Any]]) -> None:
+        """Overwrite correlation file with full current state."""
+        self.write_batch(self.CORRELATION_FILE, cluster_dicts)
+
+    def save_sync(self, sync_dicts: list[dict[str, Any]]) -> None:
+        """Overwrite sync file with full current state."""
+        self.write_batch(self.SYNC_FILE, sync_dicts)
 
     def append_claim(self, claim_dict: dict[str, Any]) -> None:
         self.append_record(self.CLAIMS_FILE, claim_dict)
@@ -124,24 +192,16 @@ class CredibilityStore:
         return self.load_latest(self.SNAPSHOTS_FILE)
 
     def latest_claims(self) -> list[dict[str, Any]]:
-        """Load all current claim records (last batch written)."""
-        records = self.load_all(self.CLAIMS_FILE)
-        if not records:
-            return []
-        # Claims are written in batches — find the latest batch
-        # by grouping records that share the same write timestamp
-        # Simple approach: return the last N records where N = 5 (Tier 0)
-        return records[-5:] if len(records) >= 5 else records
+        """Load all current claim records."""
+        return self.load_all(self.CLAIMS_FILE)
 
     def latest_clusters(self) -> list[dict[str, Any]]:
-        """Load latest correlation cluster batch."""
-        records = self.load_all(self.CORRELATION_FILE)
-        return records[-6:] if len(records) >= 6 else records
+        """Load all current correlation clusters."""
+        return self.load_all(self.CORRELATION_FILE)
 
     def latest_sync(self) -> list[dict[str, Any]]:
-        """Load latest sync region batch."""
-        records = self.load_all(self.SYNC_FILE)
-        return records[-3:] if len(records) >= 3 else records
+        """Load all current sync regions."""
+        return self.load_all(self.SYNC_FILE)
 
     def drift_last_24h(self, n: int = 500) -> list[dict[str, Any]]:
         """Load recent drift events."""

@@ -1,0 +1,70 @@
+{
+  "tenant_id": "tenant-charlie",
+  "packet_id": "CP-SEED-tenant-charlie",
+  "generated_at": "2026-02-19T19:10:51.921162Z",
+  "generated_by": "seed-script",
+  "credibility_index": {
+    "score": 68,
+    "band": "Elevated",
+    "components": {}
+  },
+  "dlr_summary": {
+    "dlr_id": "DLR-SEED",
+    "title": "Seed packet",
+    "decided_by": "seed",
+    "key_findings": [
+      "1 UNKNOWN, 1 DEGRADED",
+      "CG-002 CRITICAL (0.93)"
+    ]
+  },
+  "rs_summary": {
+    "rs_id": "RS-SEED",
+    "reasoning": {
+      "overall_assessment": "Structural degradation",
+      "primary_risk": "CG-002 CRITICAL at 0.93",
+      "secondary_risk": "CLM-T0-002 UNKNOWN",
+      "recommendation": "Immediate remediation"
+    }
+  },
+  "ds_summary": {
+    "ds_id": "DS-SEED",
+    "active_signals": 10,
+    "by_severity": {
+      "low": 0,
+      "medium": 3,
+      "high": 3,
+      "critical": 4
+    },
+    "critical_signal": {
+      "category": "timing_entropy",
+      "source": "DRF-C-001",
+      "claims_affected": 5,
+      "regions": [
+        "Central"
+      ],
+      "description": "timing_entropy drift event (critical)"
+    }
+  },
+  "mg_summary": {
+    "mg_id": "MG-SEED",
+    "changes_last_24h": {
+      "nodes_added": 0,
+      "edges_added": 0,
+      "patches_applied": 0,
+      "seals_created": 0
+    }
+  },
+  "seal": {
+    "sealed": false,
+    "seal_hash": null,
+    "sealed_at": null,
+    "sealed_by": null,
+    "role": null,
+    "hash_chain_length": 157
+  },
+  "guardrails": {
+    "abstract_model": true,
+    "domain_specific": false,
+    "description": "Seed packet. Abstract institutional architecture."
+  }
+}

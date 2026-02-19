@@ -5,6 +5,39 @@ All notable changes to Σ OVERWATCH / DeepSigma will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] — 2026-02-19 — "Multi-Tenant Credibility Engine MVP"
+
+### Added
+
+- **Tenancy Module** (`tenancy/`): Tenant registry, path management, header-based RBAC
+- **Tenant Boundary**: `tenant_id` propagation across claims, drift, snapshots, packets, seals
+- **Tenant-Scoped Persistence**: Isolated data directories under `data/credibility/{tenant_id}/`
+- **Tenant-Scoped API Routes**: Canonical `/api/{tenant_id}/credibility/*` endpoints
+- **Backward-Compatible Alias Routes**: `/api/credibility/*` still serves default tenant
+- **RBAC**: Header-based role enforcement (`X-Role`, `X-User`) — seal requires `coherence_steward`
+- **Packet Generate/Seal Split**: Separate POST endpoints for generating (any role) and sealing (coherence_steward only)
+- **Dashboard Tenant + Role Selectors**: Dropdown controls in API mode for tenant switching and role selection
+- **Seed Data**: 3 demo tenants (alpha/bravo/charlie) with distinct credibility profiles
+- **Tenant Registry**: `data/tenants.json` with 3 sample tenants auto-created on first use
+- **Tenancy Spec** (`docs/credibility-engine/TENANCY_SPEC.md`): Tenant entity, roles, permission matrix, record schemas
+- **API Reference** (`docs/credibility-engine/API_V0_8.md`): Complete v0.8.0 endpoint documentation
+
+### Changed
+
+- `pyproject.toml`: Version 0.7.0 → 0.8.0, added `tenancy*` to package discovery
+- `credibility_engine/store.py`: Tenant-aware persistence with `tenant_id` parameter
+- `credibility_engine/engine.py`: Tenant-scoped engine instances
+- `credibility_engine/packet.py`: Generate/seal separation, tenant_id in packets
+- `credibility_engine/api.py`: Per-tenant engine cache, tenant-scoped + alias routes
+- `dashboard/credibility-engine-demo/`: Tenant and role selector UI in API mode
+
+### Stats
+
+- 10 new files, 10 modified, abstract institutional modeling preserved
+- 3 demo tenants with isolated credibility profiles
+
+---
+
 ## [0.7.0] — 2026-02-19 — "Real Credibility Engine Runtime"
 
 ### Added

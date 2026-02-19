@@ -21,7 +21,11 @@ def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
-def generate_credibility_packet(engine: CredibilityEngine) -> dict[str, Any]:
+def generate_credibility_packet(
+    engine: CredibilityEngine,
+    role: str = "Coherence Steward",
+    user: str = "credibility-engine-runtime",
+) -> dict[str, Any]:
     """Generate a complete credibility packet from current engine state.
 
     Returns the packet dict and persists it to the store.
@@ -52,24 +56,21 @@ def generate_credibility_packet(engine: CredibilityEngine) -> dict[str, Any]:
         },
     }
 
-    # Seal
-    seal_input = f"{packet_id}:{ts}:{engine.credibility_index}"
-    seal_hash = hashlib.sha256(seal_input.encode()).hexdigest()[:40]
-    engine.seal_chain_length += 1
-
+    # Seal — generated packets are unsealed; use seal_credibility_packet() to seal
     seal = {
-        "sealed": True,
-        "seal_hash": f"sha256:{seal_hash}",
-        "sealed_at": ts,
-        "sealed_by": "credibility-engine-runtime",
-        "role": "Coherence Steward",
+        "sealed": False,
+        "seal_hash": None,
+        "sealed_at": None,
+        "sealed_by": None,
+        "role": None,
         "hash_chain_length": engine.seal_chain_length,
     }
 
     packet = {
+        "tenant_id": engine.tenant_id,
         "packet_id": packet_id,
         "generated_at": ts,
-        "generated_by": "credibility-engine-runtime",
+        "generated_by": user,
         "credibility_index": {
             "score": engine.credibility_index,
             "band": engine.index_band,
@@ -94,6 +95,42 @@ def generate_credibility_packet(engine: CredibilityEngine) -> dict[str, Any]:
     # Persist
     engine.store.save_packet(packet)
 
+    return packet
+
+
+def seal_credibility_packet(
+    engine: CredibilityEngine,
+    packet: dict[str, Any] | None = None,
+    role: str = "Coherence Steward",
+    user: str = "credibility-engine-runtime",
+) -> dict[str, Any]:
+    """Seal an existing packet (or the latest) with a SHA-256 hash.
+
+    Sealing requires the coherence_steward role (enforced at API layer).
+    Returns the sealed packet and persists it.
+    """
+    if packet is None:
+        packet = engine.store.latest_packet()
+    if packet is None:
+        # No packet to seal — generate one first
+        packet = generate_credibility_packet(engine, role=role, user=user)
+
+    ts = _now_iso()
+    seal_input = f"{packet['packet_id']}:{ts}:{engine.credibility_index}"
+    seal_hash = hashlib.sha256(seal_input.encode()).hexdigest()[:40]
+    engine.seal_chain_length += 1
+    engine.seals_created += 1
+
+    packet["seal"] = {
+        "sealed": True,
+        "seal_hash": f"sha256:{seal_hash}",
+        "sealed_at": ts,
+        "sealed_by": user,
+        "role": role,
+        "hash_chain_length": engine.seal_chain_length,
+    }
+
+    engine.store.save_packet(packet)
     return packet
 
 

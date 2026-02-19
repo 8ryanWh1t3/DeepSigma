@@ -107,7 +107,7 @@ Four scenarios model progressive institutional entropy: Day0 (stable), Day1 (ent
 
 ---
 
-## Stage 3 — Real Credibility Engine Runtime
+## Stage 3 — Multi-Tenant Credibility Engine (v0.8.0)
 
 Run the API server to serve live credibility state:
 
@@ -115,18 +115,29 @@ Run the API server to serve live credibility state:
 uvicorn dashboard.api_server:app --reload
 ```
 
-Engine persists live state under `data/credibility/`. Dashboard can run in API mode by setting `DATA_MODE = "API"` in `app.js`.
+Engine persists live state under `data/credibility/{tenant_id}/`. Dashboard supports tenant + role selection in API mode (`DATA_MODE = "API"` in `app.js`).
+
+**Tenant-scoped API routes:** `/api/{tenant_id}/credibility/*`
 
 | Endpoint | Description |
 |----------|-------------|
-| `GET /api/credibility/snapshot` | Credibility Index, band, components, trend |
-| `GET /api/credibility/claims/tier0` | Tier 0 claims with quorum and TTL |
-| `GET /api/credibility/drift/24h` | Drift events by severity, category, region |
-| `GET /api/credibility/correlation` | Correlation cluster map |
-| `GET /api/credibility/sync` | Sync plane integrity |
-| `GET /api/credibility/packet` | Sealed credibility packet (DLR/RS/DS/MG) |
+| `GET /api/tenants` | List all registered tenants |
+| `GET /api/{tenant_id}/credibility/snapshot` | Credibility Index, band, components, trend |
+| `GET /api/{tenant_id}/credibility/claims/tier0` | Tier 0 claims with quorum and TTL |
+| `GET /api/{tenant_id}/credibility/drift/24h` | Drift events by severity, category, region |
+| `GET /api/{tenant_id}/credibility/correlation` | Correlation cluster map |
+| `GET /api/{tenant_id}/credibility/sync` | Sync plane integrity |
+| `POST /api/{tenant_id}/credibility/packet/generate` | Generate credibility packet (any role) |
+| `POST /api/{tenant_id}/credibility/packet/seal` | Seal packet (requires `coherence_steward`) |
 
-> [Runtime Engine docs](credibility_engine/) · [API integration](dashboard/api_server.py)
+Alias routes at `/api/credibility/*` remain for backward compatibility (serve default tenant).
+
+**Quick start:**
+1. `uvicorn dashboard.api_server:app --reload`
+2. Open dashboard, select tenant + role
+3. Generate + seal packet
+
+> [Runtime Engine docs](credibility_engine/) · [API Reference](docs/credibility-engine/API_V0_8.md) · [Tenancy Spec](docs/credibility-engine/TENANCY_SPEC.md)
 
 ---
 
