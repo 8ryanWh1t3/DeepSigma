@@ -1,0 +1,51 @@
+{
+  "patch_id": "Patch-HC-003",
+  "title": "Revenue Cycle: Resolve billing/coding drift and prevent claim denials",
+  "trigger_drift_signal": "ds-hc-003-billing-drift",
+  "severity": "RED",
+  "domains": ["FIN", "OPS", "REG"],
+  "tier0_claims_impacted": ["FIN-002", "REG-003"],
+  "decision_options": [
+    {
+      "option": "A",
+      "name": "Hotfix coding rules + backfill claims",
+      "tradeoff": "Short-term ops load; immediate recovery",
+      "success_metric": "Denial rate returns to baseline; backlog cleared"
+    },
+    {
+      "option": "B",
+      "name": "Freeze impacted billing pathways pending audit",
+      "tradeoff": "Revenue impact; lower risk exposure",
+      "success_metric": "Zero new denials in impacted codes"
+    }
+  ],
+  "selected_option": "A",
+  "patch_sequence": [
+    {
+      "step": 1,
+      "action": "Identify top denial codes + root cause (mapping/config regression)",
+      "owner": "revenue-cycle",
+      "verification": "Denial cohort report + diff confirmed",
+      "rollback": "Restore previous mapping"
+    },
+    {
+      "step": 2,
+      "action": "Deploy corrected coding/config rules with staged rollout",
+      "owner": "ops",
+      "verification": "Test claims pass; staged deployment logs",
+      "rollback": "Rollback to prior config"
+    },
+    {
+      "step": 3,
+      "action": "Backfill/resubmit affected claims and document audit trail",
+      "owner": "revenue-cycle",
+      "verification": "Backlog count trends to zero; audit packet generated",
+      "rollback": "Stop resubmission batch"
+    }
+  ],
+  "closure_conditions": [
+    "Denial rate <= baseline + tolerance",
+    "FIN confidence >= 0.85",
+    "No open RED drift for FIN/REG"
+  ]
+}
