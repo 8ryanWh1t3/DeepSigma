@@ -42,14 +42,14 @@ class TestDoctor:
     def test_doctor_runs(self, capsys):
         from deepsigma.cli.main import main
 
-        rc = main(["doctor"])
+        main(["doctor"])
         out = capsys.readouterr().out
         assert "PASS" in out or "FAIL" in out
 
     def test_doctor_json(self, capsys):
         from deepsigma.cli.main import main
 
-        rc = main(["doctor", "--json"])
+        main(["doctor", "--json"])
         out = capsys.readouterr().out
         data = json.loads(out)
         assert "passed" in data
