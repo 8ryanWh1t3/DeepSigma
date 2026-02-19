@@ -64,6 +64,8 @@ Same primitives. Same artifacts. Same loop. Different scale.
 > Examples: [Mini Lattice](examples/01-mini-lattice/) · [Enterprise Lattice](examples/02-enterprise-lattice/) · [Credibility Engine Scale](examples/03-credibility-engine-scale/) · [Full docs](docs/credibility-engine/)
 >
 > Demo: [Credibility Engine Cockpit](dashboard/credibility-engine-demo/) — static dashboard, 7 panels, 30 seconds to institutional state
+>
+> Stage 2: [Simulated Engine](sim/credibility-engine/) — live simulation driver, 4 scenarios (Day0–Day3), 2-second ticks
 
 ---
 
@@ -80,6 +82,26 @@ At 12 nodes, a human can trace every dependency. At 500, hidden correlations eme
 | **Seal authority matters** | No single region should control institutional truth. Authority distribution (no region >40%) prevents capture. |
 
 At every scale, the same question: **can the institution trust its own assertions right now?** The Credibility Index answers it with a number. The Drift→Patch→Seal loop keeps that number honest.
+
+---
+
+## Stage 2 — Simulated Credibility Engine
+
+Run the simulation driver to power the dashboard with live synthetic data:
+
+```bash
+# Terminal 1: Start simulation (Day0 = stable baseline)
+python sim/credibility-engine/runner.py --scenario day0
+
+# Terminal 2: Serve dashboard
+python -m http.server 8000
+```
+
+Visit: [http://localhost:8000/dashboard/credibility-engine-demo/](http://localhost:8000/dashboard/credibility-engine-demo/)
+
+Four scenarios model progressive institutional entropy: Day0 (stable), Day1 (entropy emerges), Day2 (coordinated darkness), Day3 (external mismatch + recovery). The dashboard updates every 2 seconds.
+
+> [Simulation docs](sim/credibility-engine/) · [Dashboard](dashboard/credibility-engine-demo/)
 
 ---
 

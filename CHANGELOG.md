@@ -50,9 +50,17 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Demo Dashboard** (`dashboard/credibility-engine-demo/`): Static 7-panel cockpit surface — Credibility Index, Tier 0 claims, drift activity, correlation risk, TTL timeline, Sync Plane integrity, credibility packet generator. Vanilla HTML/CSS/JS, no frameworks. Mock JSON calibrated to 36,000-node production lattice
 - `README.md`: Added demo link to Progressive Escalation section
 
+### Added — Stage 2 Simulated Credibility Engine
+
+- **Simulation Harness** (`sim/credibility-engine/`): Tick-based engine (2-second intervals, 15 sim-min/tick) that overwrites dashboard JSON atomically. Models: claims, correlation clusters, sync regions, drift fingerprints
+- **4 Scenarios**: Day0 (stable baseline, CI 94–97), Day1 (entropy, CI 85–90), Day2 (coordinated darkness, CI 65–75), Day3 (external mismatch + recovery, CI 45–60)
+- **Credibility Packet Generator**: Live DLR/RS/DS/MG summaries with narrative reasoning and sealed hash chain
+- **Dashboard auto-refresh**: 2-second polling added to `app.js` for live simulation visualization
+- **Hot-swap scenarios**: Drop `scenario.json` in dashboard directory to switch scenarios at runtime
+
 ### Stats (Credibility Engine addition)
 
-- 11 new files + 11 demo files, 4 modified, 0 new tests (documentation-only), 2 new Mermaid diagrams
+- 11 new files + 11 demo files + 6 simulation files, 4 modified, 0 new tests (documentation-only), 2 new Mermaid diagrams
 
 ## [0.6.3] — 2026-02-19 — "Excel-first Hardening"
 
