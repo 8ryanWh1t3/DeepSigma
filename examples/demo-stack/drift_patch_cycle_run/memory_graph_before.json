@@ -1,0 +1,145 @@
+{
+  "nodes": [
+    {
+      "node_id": "ep-demo-001",
+      "kind": "episode",
+      "label": "deploy",
+      "timestamp": "2026-02-12T10:00:00Z",
+      "properties": {
+        "outcome": "success",
+        "degrade_step": "none",
+        "seal_hash": "sha256:seal001aaa"
+      }
+    },
+    {
+      "node_id": "idem-deploy-001",
+      "kind": "action",
+      "label": "deploy_model",
+      "timestamp": null,
+      "properties": {
+        "blast_radius": "medium",
+        "targets": [
+          "model-svc/v2.4"
+        ]
+      }
+    },
+    {
+      "node_id": "evidence:evidence:deploy-checklist-001",
+      "kind": "evidence",
+      "label": "evidence:deploy-checklist-001",
+      "timestamp": null,
+      "properties": {}
+    },
+    {
+      "node_id": "ep-demo-002",
+      "kind": "episode",
+      "label": "scale",
+      "timestamp": "2026-02-12T10:15:00Z",
+      "properties": {
+        "outcome": "success",
+        "degrade_step": "none",
+        "seal_hash": "sha256:seal002bbb"
+      }
+    },
+    {
+      "node_id": "idem-scale-002",
+      "kind": "action",
+      "label": "scale_replicas",
+      "timestamp": null,
+      "properties": {
+        "blast_radius": "low",
+        "targets": [
+          "inference-svc"
+        ]
+      }
+    },
+    {
+      "node_id": "evidence:evidence:load-metrics-002",
+      "kind": "evidence",
+      "label": "evidence:load-metrics-002",
+      "timestamp": null,
+      "properties": {}
+    },
+    {
+      "node_id": "ep-demo-003",
+      "kind": "episode",
+      "label": "rollback",
+      "timestamp": "2026-02-12T10:30:00Z",
+      "properties": {
+        "outcome": "partial",
+        "degrade_step": "safe_subset",
+        "seal_hash": "sha256:seal003ccc"
+      }
+    },
+    {
+      "node_id": "idem-rollback-003",
+      "kind": "action",
+      "label": "rollback_model",
+      "timestamp": null,
+      "properties": {
+        "blast_radius": "high",
+        "targets": [
+          "model-svc/v2.4"
+        ]
+      }
+    },
+    {
+      "node_id": "evidence:evidence:incident-003",
+      "kind": "evidence",
+      "label": "evidence:incident-003",
+      "timestamp": null,
+      "properties": {}
+    }
+  ],
+  "edges": [
+    {
+      "source_id": "ep-demo-001",
+      "target_id": "idem-deploy-001",
+      "kind": "produced",
+      "label": "",
+      "properties": {}
+    },
+    {
+      "source_id": "evidence:evidence:deploy-checklist-001",
+      "target_id": "ep-demo-001",
+      "kind": "evidence_of",
+      "label": "",
+      "properties": {}
+    },
+    {
+      "source_id": "ep-demo-002",
+      "target_id": "idem-scale-002",
+      "kind": "produced",
+      "label": "",
+      "properties": {}
+    },
+    {
+      "source_id": "evidence:evidence:load-metrics-002",
+      "target_id": "ep-demo-002",
+      "kind": "evidence_of",
+      "label": "",
+      "properties": {}
+    },
+    {
+      "source_id": "ep-demo-003",
+      "target_id": "idem-rollback-003",
+      "kind": "produced",
+      "label": "",
+      "properties": {}
+    },
+    {
+      "source_id": "evidence:evidence:incident-003",
+      "target_id": "ep-demo-003",
+      "kind": "evidence_of",
+      "label": "",
+      "properties": {}
+    },
+    {
+      "source_id": "evidence:evidence:deploy-checklist-001",
+      "target_id": "ep-demo-003",
+      "kind": "evidence_of",
+      "label": "",
+      "properties": {}
+    }
+  ]
+}
