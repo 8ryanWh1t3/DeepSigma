@@ -185,6 +185,21 @@ and naming conventions port directly into the DeepSigma runtime.
 
 ---
 
+## Power App Pack (v0.6.3)
+
+Implementation-ready specs for deploying MDPT on SharePoint + Power Platform:
+
+| Resource | What It Provides |
+|----------|-----------------|
+| [PromptCapabilities Build Sheet](SHAREPOINT_LIST_BUILD_SHEET_PromptCapabilities.md) | SharePoint list schema for the 18 prompt capabilities |
+| [PromptRuns Build Sheet](SHAREPOINT_LIST_BUILD_SHEET_PromptRuns.md) | Execution log list with calculated governance metrics |
+| [DriftPatches Build Sheet](SHAREPOINT_LIST_BUILD_SHEET_DriftPatches.md) | Drift signal + patch lifecycle tracking list |
+| [Power Automate Flows](POWER_AUTOMATE_FLOWS.md) | 4 flow recipes: drift alert, patch approval, weekly digest, workbook refresh |
+| [Power Apps Screen Map](POWER_APPS_SCREEN_MAP.md) | 5-screen canvas app layout with data bindings |
+| [MDPT Governance](GOVERNANCE.md) | Permission model, audit trail, compliance, escalation path |
+
+---
+
 ## See Also
 
 - [Workbook Boot Protocol](../WORKBOOK_BOOT_PROTOCOL.md) — how BOOT!A1 works

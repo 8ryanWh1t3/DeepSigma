@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "deepsigma"
-version = "0.6.2"
+version = "0.6.3"
 description = "Σ OVERWATCH — Reality Await Layer (RAL) control plane for agentic AI"
 readme = "README.md"
 license = {text = "MIT"}
@@ -73,6 +73,7 @@ overwatch = "tools.run_supervised:main"
 overwatch-validate = "tools.validate_examples:main"
 coherence = "coherence_ops.cli:main"
 deepsigma = "tools.golden_path_cli:main"
+excel-demo = "demos.excel_first.__main__:main"
 
 [tool.setuptools.packages.find]
 include = [

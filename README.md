@@ -145,6 +145,23 @@ The workbook includes a `BOOT` sheet (LLM system prompt), 7 named governance tab
 
 ---
 
+## Excel-first Money Demo (v0.6.3)
+
+One command. Deterministic Drift→Patch proof — no LLM, no network.
+
+```bash
+python -m demos.excel_first --out out/excel_money_demo
+
+# Or via console entry point
+excel-demo --out out/excel_money_demo
+```
+
+Output: `workbook.xlsx`, `run_record.json`, `drift_signal.json`, `patch_stub.json`, `coherence_delta.txt`
+
+> Docs: [Money Demo](docs/excel-first/MONEY_DEMO.md) · [BOOT Validator](tools/validate_workbook_boot.py) · [MDPT Power App Pack](docs/excel-first/multi-dim-prompting-for-teams/POWER_AUTOMATE_FLOWS.md)
+
+---
+
 ## Repo Structure
 
 ```
