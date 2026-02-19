@@ -425,16 +425,13 @@ class CredibilityEngine:
     # -- Internal helpers ------------------------------------------------------
 
     def _persist_claims(self) -> None:
-        for c in self.claims:
-            self.store.append_claim(c.to_dict())
+        self.store.save_claims([c.to_dict() for c in self.claims])
 
     def _persist_clusters(self) -> None:
-        for c in self.clusters:
-            self.store.append_correlation(c.to_dict())
+        self.store.save_clusters([c.to_dict() for c in self.clusters])
 
     def _persist_sync(self) -> None:
-        for r in self.sync_regions:
-            self.store.append_sync(r.to_dict())
+        self.store.save_sync([r.to_dict() for r in self.sync_regions])
 
     def _build_summary(self) -> str:
         unknown = sum(1 for c in self.claims if c.state == "UNKNOWN")

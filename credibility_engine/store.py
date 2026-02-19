@@ -141,7 +141,34 @@ class CredibilityStore:
             record.setdefault("tenant_id", self.tenant_id)
         return record
 
+    def write_batch(self, filename: str, records: list[dict[str, Any]]) -> None:
+        """Overwrite a JSONL file with a complete batch of records.
+
+        Use for current-state data (claims, clusters, sync) where the full
+        set is written at once. Injects tenant_id and timestamp if missing.
+        """
+        filepath = self.data_dir / filename
+        with _write_lock:
+            with open(filepath, "w", encoding="utf-8") as f:
+                for record in records:
+                    enriched = dict(record)
+                    enriched.setdefault("tenant_id", self.tenant_id)
+                    enriched.setdefault("timestamp", _now_iso())
+                    f.write(json.dumps(enriched, default=str) + "\n")
+
     # -- Convenience methods ---------------------------------------------------
+
+    def save_claims(self, claim_dicts: list[dict[str, Any]]) -> None:
+        """Overwrite claims file with full current state."""
+        self.write_batch(self.CLAIMS_FILE, claim_dicts)
+
+    def save_clusters(self, cluster_dicts: list[dict[str, Any]]) -> None:
+        """Overwrite correlation file with full current state."""
+        self.write_batch(self.CORRELATION_FILE, cluster_dicts)
+
+    def save_sync(self, sync_dicts: list[dict[str, Any]]) -> None:
+        """Overwrite sync file with full current state."""
+        self.write_batch(self.SYNC_FILE, sync_dicts)
 
     def append_claim(self, claim_dict: dict[str, Any]) -> None:
         self.append_record(self.CLAIMS_FILE, claim_dict)
@@ -165,21 +192,16 @@ class CredibilityStore:
         return self.load_latest(self.SNAPSHOTS_FILE)
 
     def latest_claims(self) -> list[dict[str, Any]]:
-        """Load all current claim records (last batch written)."""
-        records = self.load_all(self.CLAIMS_FILE)
-        if not records:
-            return []
-        return records[-5:] if len(records) >= 5 else records
+        """Load all current claim records."""
+        return self.load_all(self.CLAIMS_FILE)
 
     def latest_clusters(self) -> list[dict[str, Any]]:
-        """Load latest correlation cluster batch."""
-        records = self.load_all(self.CORRELATION_FILE)
-        return records[-6:] if len(records) >= 6 else records
+        """Load all current correlation clusters."""
+        return self.load_all(self.CORRELATION_FILE)
 
     def latest_sync(self) -> list[dict[str, Any]]:
-        """Load latest sync region batch."""
-        records = self.load_all(self.SYNC_FILE)
-        return records[-3:] if len(records) >= 3 else records
+        """Load all current sync regions."""
+        return self.load_all(self.SYNC_FILE)
 
     def drift_last_24h(self, n: int = 500) -> list[dict[str, Any]]:
         """Load recent drift events."""
