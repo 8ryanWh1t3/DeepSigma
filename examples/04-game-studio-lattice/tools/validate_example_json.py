@@ -26,7 +26,7 @@ EPISODE_REQUIRED = {
 DRIFT_REQUIRED = {
     "id_fields": ["ds_id", "drift_id", "driftId", "signal_id"],
     "required": ["severity", "domains_affected", "affected_claims"],
-    "recommended": ["category", "detected_at", "correlation_group"],
+    "recommended": ["category", "detected_at", ["correlation_group", "correlation_groups"]],
 }
 
 PATCH_REQUIRED = {
@@ -85,7 +85,11 @@ def validate_files(
 
         # Check recommended fields (warn only)
         for key in spec.get("recommended", []):
-            if key not in data:
+            if isinstance(key, list):
+                # Accept any of the listed alternatives
+                if not any(k in data for k in key):
+                    warnings.append(f"missing recommended key: {' or '.join(key)}")
+            elif key not in data:
                 warnings.append(f"missing recommended key: {key}")
 
         if issues:
