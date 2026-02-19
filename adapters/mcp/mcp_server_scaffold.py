@@ -27,9 +27,36 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from adapters.mcp.resilience import CircuitBreaker, CircuitOpen, retry, is_transient  # noqa: E402
+
 CATALOG = json.loads((ROOT / "adapters" / "mcp" / "tool_catalog.json").read_text(encoding="utf-8"))
 RESOURCE_CATALOG = json.loads((ROOT / "adapters" / "mcp" / "resource_catalog.json").read_text(encoding="utf-8"))
 PROMPT_CATALOG = json.loads((ROOT / "adapters" / "mcp" / "prompt_catalog.json").read_text(encoding="utf-8"))
+
+# ── Per-connector circuit breakers ───────────────────────────────
+BREAKERS: Dict[str, CircuitBreaker] = {
+    "sharepoint": CircuitBreaker(name="sharepoint", threshold=5, cooldown=60.0),
+    "dataverse": CircuitBreaker(name="dataverse", threshold=5, cooldown=60.0),
+    "asksage": CircuitBreaker(name="asksage", threshold=5, cooldown=60.0),
+    "cortex": CircuitBreaker(name="cortex", threshold=5, cooldown=60.0),
+    "snowflake": CircuitBreaker(name="snowflake", threshold=5, cooldown=60.0),
+    "golden_path": CircuitBreaker(name="golden_path", threshold=5, cooldown=60.0),
+}
+
+
+def _connector_call(breaker_name: str, fn: Any, *args: Any, **kwargs: Any) -> Any:
+    """Execute *fn* with retry + circuit-breaker protection."""
+    breaker = BREAKERS.get(breaker_name)
+
+    @retry(max_attempts=3, base_delay=0.5, transient=is_transient)
+    def _guarded() -> Any:
+        if breaker is not None:
+            with breaker():
+                return fn(*args, **kwargs)
+        return fn(*args, **kwargs)
+
+    return _guarded()
+
 
 # Lazy-loaded IRIS pipeline (built on first iris.query or iris.reload)
 _iris_pipeline: Optional[Dict[str, Any]] = None
@@ -168,45 +195,46 @@ def handle_tools_call(_id: Any, params: Dict[str, Any]) -> Dict[str, Any]:
     if name == "sharepoint.list":
         from adapters.sharepoint.connector import SharePointConnector
         connector = SharePointConnector()
-        records = connector.list_items(arguments.get("list_id", ""))
+        records = _connector_call("sharepoint", connector.list_items, arguments.get("list_id", ""))
         return rpc_result(_id, {"records": records, "count": len(records)})
 
     if name == "sharepoint.get":
         from adapters.sharepoint.connector import SharePointConnector
         connector = SharePointConnector()
-        record = connector.get_item(arguments.get("list_id", ""), arguments.get("item_id", ""))
+        record = _connector_call("sharepoint", connector.get_item, arguments.get("list_id", ""), arguments.get("item_id", ""))
         return rpc_result(_id, {"record": record})
 
     if name == "sharepoint.sync":
         from adapters.sharepoint.connector import SharePointConnector
         connector = SharePointConnector()
-        result = connector.delta_sync(arguments.get("list_id", ""))
+        result = _connector_call("sharepoint", connector.delta_sync, arguments.get("list_id", ""))
         return rpc_result(_id, result)
 
     # ── Dataverse tools ────────────────────────────────────────
     if name == "dataverse.list":
         from adapters.powerplatform.connector import DataverseConnector
         connector = DataverseConnector()
-        records = connector.list_records(arguments.get("table_name", ""))
+        records = _connector_call("dataverse", connector.list_records, arguments.get("table_name", ""))
         return rpc_result(_id, {"records": records, "count": len(records)})
 
     if name == "dataverse.get":
         from adapters.powerplatform.connector import DataverseConnector
         connector = DataverseConnector()
-        record = connector.get_record(arguments.get("table_name", ""), arguments.get("record_id", ""))
+        record = _connector_call("dataverse", connector.get_record, arguments.get("table_name", ""), arguments.get("record_id", ""))
         return rpc_result(_id, {"record": record})
 
     if name == "dataverse.query":
         from adapters.powerplatform.connector import DataverseConnector
         connector = DataverseConnector()
-        records = connector.query(arguments.get("table_name", ""), arguments.get("filter", ""))
+        records = _connector_call("dataverse", connector.query, arguments.get("table_name", ""), arguments.get("filter", ""))
         return rpc_result(_id, {"records": records, "count": len(records)})
 
     # ── AskSage tools ──────────────────────────────────────────
     if name == "asksage.query":
         from adapters.asksage.connector import AskSageConnector
         connector = AskSageConnector()
-        result = connector.query(
+        result = _connector_call(
+            "asksage", connector.query,
             prompt=arguments.get("prompt", ""),
             model=arguments.get("model"),
             dataset=arguments.get("dataset"),
@@ -217,23 +245,24 @@ def handle_tools_call(_id: Any, params: Dict[str, Any]) -> Dict[str, Any]:
     if name == "asksage.models":
         from adapters.asksage.connector import AskSageConnector
         connector = AskSageConnector()
-        return rpc_result(_id, {"models": connector.get_models()})
+        return rpc_result(_id, {"models": _connector_call("asksage", connector.get_models)})
 
     if name == "asksage.datasets":
         from adapters.asksage.connector import AskSageConnector
         connector = AskSageConnector()
-        return rpc_result(_id, {"datasets": connector.get_datasets()})
+        return rpc_result(_id, {"datasets": _connector_call("asksage", connector.get_datasets)})
 
     if name == "asksage.history":
         from adapters.asksage.connector import AskSageConnector
         connector = AskSageConnector()
-        return rpc_result(_id, {"logs": connector.get_user_logs(limit=arguments.get("limit", 20))})
+        return rpc_result(_id, {"logs": _connector_call("asksage", connector.get_user_logs, limit=arguments.get("limit", 20))})
 
     # ── Snowflake Cortex tools ─────────────────────────────────
     if name == "cortex.complete":
         from adapters.snowflake.cortex import CortexConnector
         connector = CortexConnector()
-        result = connector.complete_sync(
+        result = _connector_call(
+            "cortex", connector.complete_sync,
             model=arguments.get("model", ""),
             messages=arguments.get("messages", []),
             max_tokens=arguments.get("max_tokens"),
@@ -244,25 +273,25 @@ def handle_tools_call(_id: Any, params: Dict[str, Any]) -> Dict[str, Any]:
     if name == "cortex.embed":
         from adapters.snowflake.cortex import CortexConnector
         connector = CortexConnector()
-        result = connector.embed(model=arguments.get("model", ""), texts=arguments.get("texts", []))
+        result = _connector_call("cortex", connector.embed, model=arguments.get("model", ""), texts=arguments.get("texts", []))
         return rpc_result(_id, result)
 
     # ── Snowflake warehouse tools ──────────────────────────────
     if name == "snowflake.query":
         from adapters.snowflake.warehouse import SnowflakeWarehouseConnector
         connector = SnowflakeWarehouseConnector()
-        rows = connector.query(arguments.get("sql", ""))
+        rows = _connector_call("snowflake", connector.query, arguments.get("sql", ""))
         return rpc_result(_id, {"rows": rows, "count": len(rows)})
 
     if name == "snowflake.tables":
         from adapters.snowflake.warehouse import SnowflakeWarehouseConnector
         connector = SnowflakeWarehouseConnector()
-        return rpc_result(_id, {"tables": connector.list_tables()})
+        return rpc_result(_id, {"tables": _connector_call("snowflake", connector.list_tables)})
 
     if name == "snowflake.sync":
         from adapters.snowflake.warehouse import SnowflakeWarehouseConnector
         connector = SnowflakeWarehouseConnector()
-        result = connector.sync_table(arguments.get("table_name", ""), since=arguments.get("since"))
+        result = _connector_call("snowflake", connector.sync_table, arguments.get("table_name", ""), since=arguments.get("since"))
         return rpc_result(_id, result)
 
     if name == "golden_path.run":
@@ -277,7 +306,7 @@ def handle_tools_call(_id: Any, params: Dict[str, Any]) -> Dict[str, Any]:
             sql=arguments.get("sql", ""),
             prompt=arguments.get("prompt", ""),
         )
-        result = GoldenPathPipeline(config).run()
+        result = _connector_call("golden_path", GoldenPathPipeline(config).run)
         return rpc_result(_id, result.to_dict())
 
     return rpc_error(_id, -32601, f"Unknown tool: {name}")
@@ -449,6 +478,7 @@ def main() -> None:
         line = line.strip()
         if not line:
             continue
+        _id = None
         try:
             req = json.loads(line)
             _id = req.get("id")
@@ -478,8 +508,10 @@ def main() -> None:
                 resp = handle_prompts_get(_id, params)
             else:
                 resp = rpc_error(_id, -32601, f"Unknown method: {method}")
+        except CircuitOpen as co:
+            resp = rpc_error(_id, -32003, f"Service unavailable: {co}")
         except Exception as e:
-            resp = rpc_error(None, -32001, f"Server error: {e}")
+            resp = rpc_error(_id, -32001, f"Server error: {e}")
         sys.stdout.write(json.dumps(resp) + "\n")
         sys.stdout.flush()
 
