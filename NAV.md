@@ -150,6 +150,22 @@ last_updated: "2026-02-18"
 
 ---
 
+## 🧩 MDPT Beta Kit (v0.6.4)
+
+| Resource | Purpose |
+|----------|---------|
+| [`mdpt/README.md`](mdpt/README.md) | MDPT package overview and lifecycle diagram |
+| [`mdpt/tools/generate_prompt_index.py`](mdpt/tools/generate_prompt_index.py) | Generate Prompt Index from CSV export |
+| [`mdpt/templates/prompt_index_schema.json`](mdpt/templates/prompt_index_schema.json) | JSON Schema for Prompt Index |
+| [`mdpt/powerapps/STARTER_KIT.md`](mdpt/powerapps/STARTER_KIT.md) | Power App builder guide — 8 screens in under 1 hour |
+| [`mdpt/powerapps/POWERAPPS_SCREEN_MAP.md`](mdpt/powerapps/POWERAPPS_SCREEN_MAP.md) | Compact screen reference with data bindings |
+| [`mdpt/powerapps/powerfx/`](mdpt/powerapps/powerfx/) | 6 PowerFx snippet files |
+| [`deepsigma/cli/`](deepsigma/cli/) | Unified Product CLI — 5 commands |
+| [`docs/CLI.md`](docs/CLI.md) | CLI reference documentation |
+| [`mermaid/37-mdpt-beta-kit.md`](mermaid/37-mdpt-beta-kit.md) | MDPT lifecycle Mermaid diagram |
+
+---
+
 ## 🔌 Integrations & Adapters
 
 | Resource | Purpose |

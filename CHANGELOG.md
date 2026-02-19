@@ -5,6 +5,30 @@ All notable changes to Σ OVERWATCH / DeepSigma will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.4] — 2026-02-19 — "MDPT Beta Kit"
+
+### Added
+
+- **MDPT Index Generator** (`mdpt/tools/generate_prompt_index.py`): Reads PromptCapabilities CSV export, filters Approved rows, validates required fields, normalizes values, sorts deterministically, emits `prompt_index.json` + `prompt_index_summary.md` with Totals, Expiring Soon, Top Drift, Top Used sections
+- **MDPT Prompt Index Schema** (`mdpt/templates/prompt_index_schema.json`): Draft-07 JSON Schema for the generated prompt index — nested capability model with links and telemetry
+- **Product CLI** (`deepsigma/cli/`): Unified `deepsigma` entrypoint with 5 subcommands: `doctor`, `demo excel`, `validate boot`, `mdpt index`, `golden-path`
+- **Power App Starter Kit** (`mdpt/powerapps/`): 8-screen builder guide + screen map + 6 PowerFx snippet files for canvas app construction in under 1 hour
+- **Mermaid diagram** (`mermaid/37-mdpt-beta-kit.md`): MDPT Beta Kit lifecycle — Index → Catalog → Use → Log → Drift → Patch
+- **Test fixtures**: `tests/fixtures/promptcapabilities_export.csv` — 8-row CSV fixture (6 Approved, 2 non-Approved) for MDPT Index Generator tests
+- **CI gates**: MDPT Index generator validation + Product CLI smoke test
+
+### Changed
+
+- `pyproject.toml`: Version 0.6.3 → 0.6.4, `deepsigma` console script now points to `deepsigma.cli.main:main`, added `mdpt*` and `deepsigma*` to package discovery
+- `coherence_ops/__init__.py`: `__version__` 0.6.3 → 0.6.4
+- `.github/workflows/ci.yml`: Added MDPT Index generator + Product CLI smoke test gates
+- `NAV.md`: Added MDPT Beta Kit section
+- `README.md`: Added MDPT Beta Kit section with Product CLI and canonical Mermaid diagram
+
+### Stats
+
+- 27 new files, 6 modified, 29 new tests, 2 new CI gates
+
 ## [0.6.3] — 2026-02-19 — "Excel-first Hardening"
 
 ### Added

@@ -162,6 +162,60 @@ Output: `workbook.xlsx`, `run_record.json`, `drift_signal.json`, `patch_stub.jso
 
 ---
 
+## MDPT Beta Kit (v0.6.4)
+
+Registry index, product CLI, and Power App starter kit for governed prompt operations.
+
+```mermaid
+flowchart TB
+    subgraph SharePoint["SharePoint Lists"]
+        PC[PromptCapabilities<br/>Master Registry]
+        PR[PromptRuns<br/>Execution Log]
+        DP[DriftPatches<br/>Patch Queue]
+    end
+
+    subgraph Generator["MDPT Index Generator"]
+        CSV[CSV Export] --> GEN[generate_prompt_index.py]
+        GEN --> IDX[prompt_index.json]
+        GEN --> SUM[prompt_index_summary.md]
+    end
+
+    subgraph Lifecycle["Prompt Lifecycle"]
+        direction LR
+        INDEX[1. Index] --> CATALOG[2. Catalog]
+        CATALOG --> USE[3. Use]
+        USE --> LOG[4. Log]
+        LOG --> DRIFT[5. Drift]
+        DRIFT --> PATCH[6. Patch]
+        PATCH -.->|refresh| INDEX
+    end
+
+    PC -->|export| CSV
+    INDEX -.-> PC
+    USE -.-> PR
+    DRIFT -.-> DP
+    PATCH -.-> DP
+
+    style SharePoint fill:#0078d4,stroke:#0078d4,color:#fff
+    style Generator fill:#16213e,stroke:#0f3460,color:#fff
+    style Lifecycle fill:#0f3460,stroke:#0f3460,color:#fff
+```
+
+```bash
+# Generate MDPT Prompt Index from SharePoint export
+deepsigma mdpt index --csv prompt_export.csv --out out/mdpt
+
+# Product CLI
+deepsigma doctor                                    # Environment health check
+deepsigma demo excel --out out/excel_money_demo     # Excel-first Money Demo
+deepsigma validate boot <file.xlsx>                 # BOOT contract validation
+deepsigma golden-path sharepoint --fixture ...      # 7-step Golden Path
+```
+
+> Docs: [CLI Reference](docs/CLI.md) · [MDPT](mdpt/README.md) · [Power App Starter Kit](mdpt/powerapps/STARTER_KIT.md)
+
+---
+
 ## Repo Structure
 
 ```
@@ -172,13 +226,15 @@ DeepSigma/
 ├── category/             # Economic tension, boardroom brief, risk model
 ├── canonical/            # Normative specs: DLR, RS, DS, MG, Prime Constitution
 ├── coherence_ops/        # Python library + CLI + examples
+├── deepsigma/cli/        # Unified product CLI (doctor, demo, validate, mdpt, golden-path)
+├── mdpt/                 # MDPT tools, templates, Power App starter kit
 ├── specs/                # JSON schemas (11 schemas)
 ├── examples/             # Episodes, drift events, demo data
 ├── llm_data_model/       # LLM-optimized canonical data model
 ├── datasets/             # Creative Director Suite sample data (8 CSVs)
 ├── docs/                 # Extended docs (vision, IRIS, policy packs, Excel-first)
 ├── templates/            # Excel workbook templates
-├── mermaid/              # 35+ architecture & flow diagrams
+├── mermaid/              # 37+ architecture & flow diagrams
 ├── engine/               # Compression, degrade ladder, supervisor
 ├── dashboard/            # React dashboard + mock API
 ├── adapters/             # MCP, OpenClaw, SharePoint, Power Platform, AskSage, Snowflake, LangChain
@@ -201,6 +257,10 @@ DeepSigma/
 | `coherence reconcile <path> [--auto-fix] [--json]` | Reconcile cross-artifact inconsistencies |
 | `coherence schema validate <file> --schema <name>` | Validate JSON against named schema |
 | `coherence dte check <path> --dte <spec>` | Check episodes against DTE constraints |
+| `deepsigma doctor` | Environment health check |
+| `deepsigma demo excel [--out DIR]` | Excel-first Money Demo |
+| `deepsigma validate boot <file.xlsx>` | BOOT contract validation |
+| `deepsigma mdpt index --csv <file>` | Generate MDPT Prompt Index |
 | `deepsigma golden-path <source> [--fixture <path>]` | 7-step end-to-end Golden Path |
 
 ---

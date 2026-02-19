@@ -68,6 +68,7 @@ def _generate_workbook(path: Path) -> None:
     """Generate workbook using the CDS generator."""
     import openpyxl
     from openpyxl.styles import Alignment, Font
+    from openpyxl.worksheet.table import Table, TableStyleInfo  # noqa: F401
 
     # Import generator functions from the existing tool
     import sys
