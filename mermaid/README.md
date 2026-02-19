@@ -42,6 +42,7 @@ GitHub renders Mermaid diagrams natively in `.md` files.
 | 33 | AskSage Connector Flow | Flowchart | AskSage API (query/train/datasets) → exhaust adapter → canonical records with auth token flow |
 | 34 | Snowflake Connector Flow | Flowchart | Dual-mode Cortex AI + warehouse SQL → exhaust events → canonical records with shared auth |
 | 35 | Connector Ecosystem | Graph | All v0.5.0 connectors with MCP tool counts, transport, and governance layer |
+| 36 | Excel-First Governance | Flowchart + Sequence | Creative Director Suite architecture — BOOT protocol, named tables, LLM writeback, 6-lens model |
 
 ## Diagram Types Used
 

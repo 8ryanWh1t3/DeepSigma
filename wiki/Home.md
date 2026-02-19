@@ -50,6 +50,15 @@ The runtime enforces four contracts on every decision before it is sealed.
 
 ---
 
+## Excel-First Governance (v0.6.2)
+
+| Page | What it covers |
+|------|---------------|
+| [Creative Director Suite](Creative-Director-Suite) | Dataset, workbook template, generator, quickstart |
+| [Excel-First Governance](Excel-First-Governance) | BOOT protocol, 7 table schemas, 6-lens prompting, writeback contract |
+
+---
+
 ## Exhaust Inbox
 
 Captures AI interaction exhaust (prompts, completions, tool calls, metrics) and routes it into the governance pipeline automatically.

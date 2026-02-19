@@ -38,6 +38,9 @@
   - [Operations](Operations)
   - [SLOs & Metrics](SLOs-and-Metrics)
   - [Replay & Testing](Replay-and-Testing)
+- **Excel-First**
+  - [Creative Director Suite](Creative-Director-Suite)
+  - [Excel-First Governance](Excel-First-Governance)
 - **Governance**
   - [Coherence Ops Mapping](Coherence-Ops-Mapping)
   - [IRIS](IRIS)
