@@ -1,0 +1,57 @@
+{
+  "patch_id": "Patch-GS-001",
+  "title": "RONIN DLC: Restore PEGI16/CERO-D rating envelope",
+  "trigger_drift_signal": "ds-gs-001-rating-mismatch",
+  "severity": "RED",
+  "domains": ["CRE", "REG", "PLT"],
+  "tier0_claims_impacted": ["CRE-001", "REG-001", "PLT-001"],
+  "decision_options": [
+    {
+      "option": "A",
+      "name": "Modify VFX to remain PEGI16",
+      "tradeoff": "Creative cost; ~2 weeks rework",
+      "success_metric": "Classifier score <= PEGI16 threshold; rating submission unchanged"
+    },
+    {
+      "option": "B",
+      "name": "Accept PEGI18 and re-rate",
+      "tradeoff": "Commercial cost; retail + store comms; timeline unknown",
+      "success_metric": "Board decision updated; retailer comms complete"
+    },
+    {
+      "option": "C",
+      "name": "Ship DLC without dismemberment; patch later",
+      "tradeoff": "Creative compromise; feature delayed",
+      "success_metric": "DLC ships on time; re-rating path reopened post-launch"
+    }
+  ],
+  "selected_option": "C",
+  "patch_sequence": [
+    {
+      "step": 1,
+      "action": "Disable dismemberment VFX in DLC build branch",
+      "owner": "tokyo",
+      "verification": "Build diff + QA classifier pass",
+      "rollback": "Re-enable feature flag"
+    },
+    {
+      "step": 2,
+      "action": "Update marketing claims + retailer notes",
+      "owner": "montreal",
+      "verification": "Comms signed; store assets consistent",
+      "rollback": "Revert copy to previous"
+    },
+    {
+      "step": 3,
+      "action": "Re-scope re-rating plan for future patch",
+      "owner": "bucharest",
+      "verification": "Submission packet drafted",
+      "rollback": "Defer to next season window"
+    }
+  ],
+  "closure_conditions": [
+    "REG-001 confidence >= 0.85",
+    "PLT-001 unchanged cert gates",
+    "No open RED drift for CRE/REG/PLT"
+  ]
+}

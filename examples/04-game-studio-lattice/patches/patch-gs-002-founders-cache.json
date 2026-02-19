@@ -1,0 +1,36 @@
+{
+  "patch_id": "Patch-GS-002",
+  "title": "VANGUARD: Resolve Founder's Cache monetization contradictions",
+  "trigger_drift_signal": "ds-gs-002-monetization-contradiction",
+  "severity": "RED",
+  "domains": ["MON", "REG", "CRE"],
+  "tier0_claims_impacted": ["MON-001", "REG-002"],
+  "selected_option": "A",
+  "patch_sequence": [
+    {
+      "step": 1,
+      "action": "Disable paid random rewards in BE/NL + add regional enforcement",
+      "owner": "singapore",
+      "verification": "Geo-fenced config; store audit",
+      "rollback": "Restore previous SKU rules"
+    },
+    {
+      "step": 2,
+      "action": "Publish gacha/probability disclosures for JP/KR where required",
+      "owner": "montreal",
+      "verification": "Legal review complete; UI shows rates",
+      "rollback": "Remove disclosure module"
+    },
+    {
+      "step": 3,
+      "action": "Update public narrative alignment (no pay-to-win) + FAQ",
+      "owner": "montreal",
+      "verification": "PR approval; community response stabilized",
+      "rollback": "Revert comms copy"
+    }
+  ],
+  "closure_conditions": [
+    "MON-001 restored (no contradiction vs public commitments)",
+    "REG-002 restored (regional restrictions satisfied)"
+  ]
+}

@@ -368,5 +368,97 @@ def main() -> None:
         print("✅ All contract checks passed.")
 
 
+def _run_game_studio() -> None:
+    """Game Studio Lattice demo — loads example artifacts and prints E2E transcript."""
+    example_dir = _REPO_ROOT / "examples" / "04-game-studio-lattice"
+    episodes_dir = example_dir / "episodes"
+    drift_dir = example_dir / "drift_signals"
+    patches_dir = example_dir / "patches"
+
+    # Load artifacts
+    episodes = []
+    for fp in sorted(episodes_dir.glob("*.json")):
+        episodes.append(json.loads(fp.read_text(encoding="utf-8")))
+
+    drift_signals = []
+    for fp in sorted(drift_dir.glob("*.json")):
+        drift_signals.append(json.loads(fp.read_text(encoding="utf-8")))
+
+    patches = []
+    for fp in sorted(patches_dir.glob("*.json")):
+        patches.append(json.loads(fp.read_text(encoding="utf-8")))
+
+    # Header
+    print("=" * 60)
+    print("  Game Studio Lattice — Drift -> Patch Demo")
+    print("  Nexus Interactive (fictional)")
+    print("=" * 60)
+    print()
+
+    # Baseline
+    print("BASELINE   Score: ~83 / B (Minor drift)")
+    print(f"  Episodes: {len(episodes)}")
+    print("  Domains:  CRE, REG, PLT, MON, OPS, DAT")
+    print("  Claims:   28 (12 Tier 0)")
+    print("  Evidence: 282 nodes across 4 studios")
+    print()
+
+    # Drift signals
+    print("DRIFT SIGNALS DETECTED:")
+    for ds in drift_signals:
+        ds_id = ds.get("ds_id", ds.get("drift_id", "unknown"))
+        sev = ds.get("severity", "?").upper()
+        cat = ds.get("category", "unknown")
+        domains = ds.get("domains_affected", [])
+        claims = ds.get("affected_claims", [])
+        print(f"  [{sev:6s}] {ds_id}: {cat}")
+        print(f"           Domains: {', '.join(domains)}")
+        print(f"           Claims:  {', '.join(claims[:4])}")
+    print()
+
+    # Score progression
+    print("SCORE PROGRESSION:")
+    for ep in episodes:
+        ep_id = ep.get("episode_id", "?")
+        ci = ep.get("credibility_index", {})
+        before = ci.get("before", "?")
+        during = ci.get("during", "?")
+        after = ci.get("after", "?")
+        title = ep.get("title", "?")
+        print(f"  {ep_id}: {title}  CI: {before} -> {during} -> {after}")
+    print()
+
+    # Patch plans
+    print("PATCH PLANS:")
+    for p in patches:
+        pid = p.get("patch_id", "?")
+        title = p.get("title", "?")
+        sev = p.get("severity", "?")
+        selected = p.get("selected_option", "-")
+        steps = len(p.get("patch_sequence", []))
+        conditions = p.get("closure_conditions", [])
+        print(f"  {pid}: {title}")
+        print(f"    Severity: {sev}  Option: {selected}  Steps: {steps}")
+        print(f"    Closure:  {'; '.join(conditions[:2])}")
+    print()
+
+    # Summary
+    print("=" * 60)
+    print("  4 drift signals detected")
+    print("  4 patch plans generated")
+    print("  Credibility Index: 83 -> 41 (worst) -> recovery in progress")
+    print(f"  Artifacts: {example_dir.relative_to(_REPO_ROOT)}/")
+    print("=" * 60)
+
+
 if __name__ == "__main__":
-    main()
+    import argparse as _ap
+    _parser = _ap.ArgumentParser(description="Drift -> Patch Cycle demo")
+    _parser.add_argument("--example", type=str, default=None,
+                         help="Run a named example (e.g., 'game-studio')")
+    _args = _parser.parse_args()
+
+    if _args.example == "game-studio":
+        _run_game_studio()
+    else:
+        main()

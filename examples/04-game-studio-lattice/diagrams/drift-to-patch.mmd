@@ -1,0 +1,14 @@
+sequenceDiagram
+  participant E as Evidence
+  participant C as Claims
+  participant D as DriftSignal
+  participant I as IRIS
+  participant P as PatchPlan
+  participant M as MemoryGraph
+
+  E->>C: Update evidence w/ TTL + confidence
+  C->>D: Detect contradiction / decay
+  D->>I: WHY / WHAT_DRIFTED query surface
+  I->>P: Generate Patch sequence (options + DRI)
+  P->>M: Write new edges (decision->drift->patch)
+  M-->>I: Next query returns institutional memory

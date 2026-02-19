@@ -1,0 +1,27 @@
+{
+  "patch_id": "Patch-GS-004",
+  "title": "Timezone Regression: Close overnight drift windows",
+  "trigger_drift_signal": "ds-gs-004-timezone-regression",
+  "severity": "YELLOW",
+  "domains": ["OPS", "PLT"],
+  "patch_sequence": [
+    {
+      "step": 1,
+      "action": "Add handoff checklist + beacon ping at end-of-day for Montreal and start-of-day for Tokyo",
+      "owner": "montreal",
+      "verification": "Beacon events recorded; gaps < 2h",
+      "rollback": "Remove checklist gating"
+    },
+    {
+      "step": 2,
+      "action": "Add automated regression gate for region-specific compliance patches",
+      "owner": "bucharest",
+      "verification": "CI gate blocks known cert regressions",
+      "rollback": "Disable gate"
+    }
+  ],
+  "closure_conditions": [
+    "No recurring timezone-window regressions for 14 days",
+    "PLT cert pipeline stable across handoffs"
+  ]
+}

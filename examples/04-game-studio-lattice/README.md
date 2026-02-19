@@ -33,6 +33,45 @@ or platform holder is represented.
 
 ---
 
+## 60-Second Quickstart
+
+```bash
+# from repo root
+
+# 1) Score baseline (expected ~83 / B)
+python -m coherence_ops score ./examples/04-game-studio-lattice/episodes/ --json
+
+# 2) Ask WHY (Episode 1: rating envelope breach)
+python -m coherence_ops iris query --type WHY --target ep-gs-001
+
+# 3) Show drift inventory (expected: 4 scenario drift signals)
+python -m coherence_ops iris query --type WHAT_DRIFTED --json
+
+# 4) Run the full Drift->Patch demo (creates/prints patch plan)
+python -m coherence_ops.examples.drift_patch_cycle --example game-studio
+
+# 5) Validate example JSON is "production-shaped"
+python ./examples/04-game-studio-lattice/tools/validate_example_json.py
+
+# 6) Generate the Excel-first GameOps workbook
+python ./examples/04-game-studio-lattice/tools/generate_gamestudio_workbook.py \
+  --out ./examples/04-game-studio-lattice/GameOps_Workbook.xlsx
+```
+
+---
+
+## Diagrams
+
+Visual comprehension layer for the lattice structure and drift dynamics.
+
+| Diagram | File | What It Shows |
+|---|---|---|
+| Contradiction Loop | [contradiction-loop.mmd](diagrams/contradiction-loop.mmd) | CRE -> REG -> MON -> CRE dependency cycle across all 6 domains |
+| Shared Infra Blast Radius | [shared-infra-blast-radius.mmd](diagrams/shared-infra-blast-radius.mmd) | S003 + S023 cascade risk — 50 nodes, 4 domains, 18% of evidence |
+| Drift to Patch | [drift-to-patch.mmd](diagrams/drift-to-patch.mmd) | Evidence -> Claims -> DriftSignal -> IRIS -> PatchPlan -> MemoryGraph sequence |
+
+---
+
 ## The Publisher
 
 | Attribute | Value |
@@ -302,20 +341,29 @@ across all regions where that platform operates.
 
 ## Try It
 
+See [60-Second Quickstart](#60-second-quickstart) above, or the full [Runbook](RUNBOOK.md) for step-by-step procedures.
+
 ```bash
-# Score coherence on the game studio episodes
+# Score all episodes
 python -m coherence_ops score ./examples/04-game-studio-lattice/episodes/ --json
 
-# Run IRIS query — why was the VANGUARD cert blocked?
-python -m coherence_ops iris query --type WHY --target ep-gs-003
+# IRIS: why was the rating envelope breached?
+python -m coherence_ops iris query --type WHY --target ep-gs-001
 
-# What drifted in the monetization domain?
+# IRIS: what drifted?
 python -m coherence_ops iris query --type WHAT_DRIFTED --json
 
-# Full pipeline
-python -m coherence_ops.examples.e2e_seal_to_report
+# Full Drift->Patch cycle
+python -m coherence_ops.examples.drift_patch_cycle --example game-studio
+
+# Validate all example JSON
+python ./examples/04-game-studio-lattice/tools/validate_example_json.py
+
+# Generate GameOps Excel workbook
+python ./examples/04-game-studio-lattice/tools/generate_gamestudio_workbook.py \
+  --out ./examples/04-game-studio-lattice/GameOps_Workbook.xlsx
 ```
 
 ---
 
-→ [Scenario Plan](SCENARIO_PLAN.md) · [Schemas](SCHEMAS.md) · [Runbook](RUNBOOK.md)
+→ [Scenario Plan](SCENARIO_PLAN.md) · [Schemas](SCHEMAS.md) · [Runbook](RUNBOOK.md) · [IRIS Queries](iris_queries.md) · [Diagrams](diagrams/)
