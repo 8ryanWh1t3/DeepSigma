@@ -75,6 +75,16 @@ jobs:
           python -m demos.excel_first --out excel_first_demo_out
           python -m pytest tests/test_excel_first_money_demo.py -v --tb=short
 
+      - name: MDPT Prompt Index gate
+        run: |
+          python mdpt/tools/generate_prompt_index.py --csv tests/fixtures/promptcapabilities_export.csv --out mdpt_index_ci_out
+          python -m pytest tests/test_mdpt_index_generator.py -v --tb=short
+
+      - name: Product CLI smoke test
+        run: |
+          python -m deepsigma.cli.main doctor --json
+          python -m pytest tests/test_cli_smoke.py -v --tb=short
+
   lint:
     runs-on: ubuntu-latest
     steps:

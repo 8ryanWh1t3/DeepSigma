@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://deepsigma.dev/schemas/mdpt/prompt_index/v0.1",
+  "title": "MDPT Prompt Index",
+  "description": "Machine-readable index of MDPT prompt capabilities, generated from a PromptCapabilities SharePoint list export.",
+  "type": "object",
+  "required": ["generated_at", "source", "counts", "capabilities"],
+  "properties": {
+    "generated_at": {
+      "type": "string",
+      "description": "ISO 8601 timestamp of generation."
+    },
+    "source": {
+      "type": "object",
+      "required": ["type", "filename"],
+      "properties": {
+        "type": { "type": "string" },
+        "filename": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "counts": {
+      "type": "object",
+      "required": ["total"],
+      "properties": {
+        "total": { "type": "integer", "minimum": 0 },
+        "by_risk_lane": {
+          "type": "object",
+          "additionalProperties": { "type": "integer" }
+        },
+        "by_use_case": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["use_case", "count"],
+            "properties": {
+              "use_case": { "type": "string" },
+              "count": { "type": "integer" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "capabilities": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Capability" }
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "Capability": {
+      "type": "object",
+      "required": [
+        "capability_id",
+        "title",
+        "risk_lane",
+        "ttl_hours",
+        "status",
+        "latest_version",
+        "links"
+      ],
+      "properties": {
+        "capability_id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "owner_dri": { "type": "string" },
+        "approver": { "type": "string" },
+        "team": { "type": "string" },
+        "use_case": { "type": "string" },
+        "audience": { "type": "string" },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "risk_lane": {
+          "type": "string",
+          "enum": ["GREEN", "YELLOW", "RED"]
+        },
+        "ttl_hours": { "type": "number" },
+        "review_cadence_days": { "type": ["integer", "null"] },
+        "status": { "type": "string" },
+        "latest_version": { "type": "string" },
+        "latest_approved_date": { "type": ["string", "null"] },
+        "links": {
+          "type": "object",
+          "required": ["prompt_matrix"],
+          "properties": {
+            "prompt_matrix": { "type": "string" },
+            "examples": { "type": "string" },
+            "manifest": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "telemetry": {
+          "type": "object",
+          "properties": {
+            "last_eval_score": { "type": ["number", "null"] },
+            "run_count": { "type": ["integer", "null"] },
+            "drift_count": { "type": ["integer", "null"] },
+            "patch_count": { "type": ["integer", "null"] },
+            "last_drift_date": { "type": ["string", "null"] }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
