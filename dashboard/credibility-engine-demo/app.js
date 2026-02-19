@@ -127,6 +127,12 @@
     document.getElementById('total-nodes').textContent =
       snap.total_nodes.toLocaleString();
     document.getElementById('total-regions').textContent = snap.regions;
+    // Policy hash (v0.9.0)
+    var policyEl = document.getElementById('policy-hash');
+    if (policyEl && snap.policy_hash) {
+      policyEl.textContent = snap.policy_hash.substring(0, 12) + '…';
+      policyEl.title = snap.policy_hash;
+    }
   }
 
   /* ── Credibility Index ── */
@@ -487,6 +493,9 @@
   function renderPacketPreview(pkt, preview) {
     var sealStatus = (pkt.seal && pkt.seal.sealed) ? 'YES' : 'NO';
     var sealHash = (pkt.seal && pkt.seal.seal_hash) ? pkt.seal.seal_hash : '—';
+    var prevSealHash = (pkt.seal && pkt.seal.prev_seal_hash) ? pkt.seal.prev_seal_hash : '—';
+    var policyHash = (pkt.seal && pkt.seal.policy_hash) || pkt.policy_hash || '—';
+    var snapshotHash = (pkt.seal && pkt.seal.snapshot_hash) ? pkt.seal.snapshot_hash : '—';
 
     var text = '=== CREDIBILITY PACKET ===\n' +
       'Tenant: ' + (pkt.tenant_id || '—') + '\n' +
@@ -529,6 +538,9 @@
       '--- SEAL ---\n' +
       'Sealed: ' + sealStatus + '\n' +
       'Hash: ' + sealHash + '\n' +
+      'Prev Seal: ' + prevSealHash + '\n' +
+      'Policy Hash: ' + policyHash + '\n' +
+      'Snapshot Hash: ' + snapshotHash + '\n' +
       (pkt.seal && pkt.seal.sealed_at ? 'Sealed at: ' + pkt.seal.sealed_at + '\n' : '') +
       (pkt.seal && pkt.seal.role ? 'Role: ' + pkt.seal.role + '\n' : '') +
       (pkt.seal && pkt.seal.hash_chain_length ? 'Chain length: ' + pkt.seal.hash_chain_length + '\n' : '') +

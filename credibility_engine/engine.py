@@ -25,6 +25,9 @@ from credibility_engine.models import (
 )
 from credibility_engine.constants import DEFAULT_TENANT_ID
 from credibility_engine.store import CredibilityStore
+from governance.audit import audit_action
+from governance.drift_registry import update_drift_registry
+from tenancy.policies import evaluate_policy, get_policy_hash, load_policy
 
 
 def _now_iso() -> str:
@@ -64,6 +67,9 @@ class CredibilityEngine:
 
         # Latest index
         self._index_cache: dict[str, Any] | None = None
+
+        # Latest policy evaluation (used by packet generator)
+        self._last_policy_eval: dict[str, Any] | None = None
 
     # -- Initialization --------------------------------------------------------
 
@@ -221,9 +227,30 @@ class CredibilityEngine:
     # -- Snapshot generation ---------------------------------------------------
 
     def generate_snapshot(self) -> Snapshot:
-        """Generate and persist a point-in-time snapshot."""
+        """Generate and persist a point-in-time snapshot.
+
+        Evaluates tenant policy and persists policy metadata with the snapshot.
+        Updates drift registry for recurrence tracking.
+        """
         if self._index_cache is None:
             self.recalculate_index()
+
+        # Evaluate policy against current state
+        state = {
+            "claims": [c.to_dict() for c in self.claims],
+            "clusters": [c.to_dict() for c in self.clusters],
+            "sync_regions": [r.to_dict() for r in self.sync_regions],
+            "drift_events": [e.to_dict() for e in self.drift_events],
+        }
+        policy_eval = evaluate_policy(self.tenant_id, state)
+        self._last_policy_eval = policy_eval
+
+        # Update drift registry for recurrence tracking
+        if self.drift_events:
+            update_drift_registry(
+                self.tenant_id,
+                [e.to_dict() for e in self.drift_events],
+            )
 
         snapshot = Snapshot(
             timestamp=_now_iso(),
@@ -232,7 +259,30 @@ class CredibilityEngine:
             summary=self._build_summary(),
             components=self._index_cache["components"],
         )
-        self.store.append_snapshot(snapshot.to_dict())
+
+        # Enrich snapshot dict with governance metadata
+        snap_dict = snapshot.to_dict()
+        snap_dict["policy_hash"] = policy_eval.get("policy_hash")
+        snap_dict["policy_violations"] = policy_eval.get("violations", [])
+        snap_dict["policy_violation_count"] = policy_eval.get("violation_count", 0)
+
+        self.store.append_snapshot(snap_dict)
+
+        # Audit
+        audit_action(
+            tenant_id=self.tenant_id,
+            actor_user="credibility-engine-runtime",
+            actor_role="system",
+            action="SNAPSHOT_WRITE",
+            target_type="SNAPSHOT",
+            target_id=f"SNAP-{snap_dict['timestamp']}",
+            outcome="SUCCESS",
+            metadata={
+                "score": self._index_cache["score"],
+                "band": self._index_cache["band"],
+                "policy_hash": policy_eval.get("policy_hash"),
+            },
+        )
         return snapshot
 
     def persist_state(self) -> None:
@@ -257,6 +307,10 @@ class CredibilityEngine:
         active_signals = sum(1 for e in self.drift_events if not e.auto_resolved)
         auto_rate = round(auto_resolved / max(len(self.drift_events), 1), 2)
 
+        # Policy hash for governance display
+        policy = load_policy(self.tenant_id)
+        policy_hash = get_policy_hash(policy)
+
         return {
             "tenant_id": self.tenant_id,
             "index_score": self.credibility_index,
@@ -269,6 +323,7 @@ class CredibilityEngine:
             "regions": 3,
             "active_drift_signals": active_signals,
             "auto_patch_rate": auto_rate,
+            "policy_hash": policy_hash,
             "bands": [
                 {"range": "90\u2013100", "label": "Stable", "action": "Monitor"},
                 {"range": "75\u201389", "label": "Minor Drift",

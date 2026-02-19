@@ -7,6 +7,7 @@ No real-world system modeled.
 """
 
 from tenancy.paths import ensure_tenant_dirs, tenant_file, tenant_root
+from tenancy.policies import evaluate_policy, load_policy, save_policy
 from tenancy.rbac import get_role, require_role
 from tenancy.tenants import (
     assert_tenant_exists,
@@ -25,4 +26,7 @@ __all__ = [
     "tenant_file",
     "get_role",
     "require_role",
+    "load_policy",
+    "save_policy",
+    "evaluate_policy",
 ]

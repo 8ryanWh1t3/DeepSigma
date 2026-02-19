@@ -3,6 +3,9 @@
 Produces sealed credibility packets containing DLR, RS, DS, MG summaries.
 Persists the latest packet to data/credibility/packet_latest.json.
 
+v0.9.0: Seal chaining — each seal links to the previous seal for that tenant
+via prev_seal_hash, policy_hash, and snapshot_hash fields.
+
 Abstract institutional credibility architecture.
 No real-world system modeled.
 """
@@ -10,15 +13,36 @@ No real-world system modeled.
 from __future__ import annotations
 
 import hashlib
+import json
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any
+
+from governance.audit import audit_action
+from tenancy.policies import get_policy_hash, load_policy
 
 if TYPE_CHECKING:
     from credibility_engine.engine import CredibilityEngine
 
+SEAL_CHAIN_FILE = "seal_chain.jsonl"
+
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _canonical_json(data: dict[str, Any]) -> str:
+    """Produce a canonical JSON string for hashing."""
+    return json.dumps(data, sort_keys=True, default=str)
+
+
+def _load_last_seal(engine: "CredibilityEngine") -> dict[str, Any] | None:
+    """Load the last seal chain entry for the tenant."""
+    return engine.store.load_latest(SEAL_CHAIN_FILE)
+
+
+def _append_seal_chain(engine: "CredibilityEngine", entry: dict[str, Any]) -> None:
+    """Append a seal chain record."""
+    engine.store.append_record(SEAL_CHAIN_FILE, entry)
 
 
 def generate_credibility_packet(
@@ -56,6 +80,10 @@ def generate_credibility_packet(
         },
     }
 
+    # Policy hash
+    policy = load_policy(engine.tenant_id)
+    policy_hash = get_policy_hash(policy)
+
     # Seal — generated packets are unsealed; use seal_credibility_packet() to seal
     seal = {
         "sealed": False,
@@ -64,7 +92,13 @@ def generate_credibility_packet(
         "sealed_by": None,
         "role": None,
         "hash_chain_length": engine.seal_chain_length,
+        "prev_seal_hash": None,
+        "policy_hash": policy_hash,
+        "snapshot_hash": None,
     }
+
+    # Policy evaluation summary (if available)
+    policy_eval = getattr(engine, "_last_policy_eval", None)
 
     packet = {
         "tenant_id": engine.tenant_id,
@@ -80,6 +114,11 @@ def generate_credibility_packet(
         "rs_summary": rs,
         "ds_summary": ds,
         "mg_summary": mg,
+        "policy_hash": policy_hash,
+        "policy_evaluation": {
+            "violation_count": policy_eval.get("violation_count", 0) if policy_eval else 0,
+            "violations": policy_eval.get("violations", []) if policy_eval else [],
+        },
         "seal": seal,
         "guardrails": {
             "abstract_model": True,
@@ -95,6 +134,18 @@ def generate_credibility_packet(
     # Persist
     engine.store.save_packet(packet)
 
+    # Audit
+    audit_action(
+        tenant_id=engine.tenant_id,
+        actor_user=user,
+        actor_role=role,
+        action="PACKET_GENERATE",
+        target_type="PACKET",
+        target_id=packet_id,
+        outcome="SUCCESS",
+        metadata={"score": engine.credibility_index, "band": engine.index_band},
+    )
+
     return packet
 
 
@@ -104,7 +155,12 @@ def seal_credibility_packet(
     role: str = "Coherence Steward",
     user: str = "credibility-engine-runtime",
 ) -> dict[str, Any]:
-    """Seal an existing packet (or the latest) with a SHA-256 hash.
+    """Seal an existing packet (or the latest) with a chained SHA-256 hash.
+
+    Chained sealing includes:
+    - prev_seal_hash: hash of the last seal for this tenant (or "GENESIS")
+    - policy_hash: hash of the current policy
+    - snapshot_hash: hash of the latest snapshot
 
     Sealing requires the coherence_steward role (enforced at API layer).
     Returns the sealed packet and persists it.
@@ -116,21 +172,80 @@ def seal_credibility_packet(
         packet = generate_credibility_packet(engine, role=role, user=user)
 
     ts = _now_iso()
-    seal_input = f"{packet['packet_id']}:{ts}:{engine.credibility_index}"
-    seal_hash = hashlib.sha256(seal_input.encode()).hexdigest()[:40]
+    packet_id = packet["packet_id"]
+
+    # Load chain context
+    last_seal = _load_last_seal(engine)
+    prev_seal_hash = (
+        last_seal.get("seal_hash", "GENESIS") if last_seal else "GENESIS"
+    )
+
+    # Policy hash
+    policy = load_policy(engine.tenant_id)
+    policy_hash = get_policy_hash(policy)
+
+    # Snapshot hash
+    latest_snapshot = engine.store.latest_snapshot()
+    snapshot_hash = (
+        hashlib.sha256(_canonical_json(latest_snapshot).encode()).hexdigest()[:40]
+        if latest_snapshot
+        else "NO_SNAPSHOT"
+    )
+
+    # Compute chained seal hash
+    # Exclude seal fields from packet for canonical input
+    packet_for_hash = {
+        k: v for k, v in packet.items() if k != "seal"
+    }
+    canonical_packet = _canonical_json(packet_for_hash)
+    seal_input = f"{prev_seal_hash}|{policy_hash}|{snapshot_hash}|{canonical_packet}"
+    seal_hash = f"sha256:{hashlib.sha256(seal_input.encode()).hexdigest()[:40]}"
+
     engine.seal_chain_length += 1
     engine.seals_created += 1
 
     packet["seal"] = {
         "sealed": True,
-        "seal_hash": f"sha256:{seal_hash}",
+        "seal_hash": seal_hash,
         "sealed_at": ts,
         "sealed_by": user,
         "role": role,
         "hash_chain_length": engine.seal_chain_length,
+        "prev_seal_hash": prev_seal_hash,
+        "policy_hash": policy_hash,
+        "snapshot_hash": snapshot_hash,
     }
 
     engine.store.save_packet(packet)
+
+    # Append seal chain record
+    chain_entry = {
+        "tenant_id": engine.tenant_id,
+        "packet_id": packet_id,
+        "sealed_at": ts,
+        "seal_hash": seal_hash,
+        "prev_seal_hash": prev_seal_hash,
+        "policy_hash": policy_hash,
+        "snapshot_hash": snapshot_hash,
+    }
+    _append_seal_chain(engine, chain_entry)
+
+    # Audit
+    audit_action(
+        tenant_id=engine.tenant_id,
+        actor_user=user,
+        actor_role=role,
+        action="PACKET_SEAL",
+        target_type="PACKET",
+        target_id=packet_id,
+        outcome="SUCCESS",
+        metadata={
+            "seal_hash": seal_hash,
+            "prev_seal_hash": prev_seal_hash,
+            "chain_length": engine.seal_chain_length,
+        },
+    )
+
     return packet
 
 

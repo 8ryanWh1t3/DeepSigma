@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "deepsigma"
-version = "0.8.0"
+version = "0.9.0"
 description = "Σ OVERWATCH — Reality Await Layer (RAL) control plane for agentic AI"
 readme = "README.md"
 license = {text = "MIT"}
@@ -88,6 +88,7 @@ include = [
     "deepsigma*",
     "credibility_engine*",
     "tenancy*",
+    "governance*",
 ]
 
 [tool.ruff]

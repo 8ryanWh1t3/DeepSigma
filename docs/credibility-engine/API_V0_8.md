@@ -125,6 +125,37 @@ All responses include `tenant_id` at the top level for tenant identification.
 
 ---
 
+## v0.9.0 Additions
+
+v0.9.0 adds governance endpoints. Existing v0.8.0 endpoints are unchanged.
+
+### GET /api/{tenant_id}/policy
+
+Returns the current policy for the tenant.
+
+### POST /api/{tenant_id}/policy
+
+Updates the tenant policy. **Requires role:** `truth_owner` or `coherence_steward`.
+
+Body: JSON with any subset of policy keys (`ttl_policy`, `quorum_policy`, `correlation_policy`, `silence_policy`, `slo_policy`, `quota_policy`).
+
+### GET /api/{tenant_id}/audit/recent?limit=50
+
+Returns the most recent audit events for the tenant (read-only, max 200).
+
+### Seal Chaining
+
+`POST /api/{tenant_id}/credibility/packet/seal` now produces chained seals:
+- `prev_seal_hash`: hash of the last seal for this tenant (or `"GENESIS"`)
+- `policy_hash`: hash of current policy content
+- `snapshot_hash`: hash of the latest snapshot
+
+### Quota Enforcement
+
+Packet generation and sealing are subject to per-tenant quota limits defined in the policy. Exceeding the quota returns HTTP 429.
+
+---
+
 ## Guardrails
 
 - Abstract institutional credibility architecture only
