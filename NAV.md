@@ -110,10 +110,25 @@ last_updated: "2026-02-18"
 
 | Resource | Purpose |
 |----------|---------|
-| [`mermaid/`](mermaid/) | 28+ Mermaid diagrams (architecture, runtime, drift, schemas, pipelines) |
+| [`mermaid/`](mermaid/) | 30+ Mermaid diagrams (architecture, runtime, drift, schemas, pipelines, interop) |
 | Key: [`01-system-architecture.md`](mermaid/01-system-architecture.md) | System architecture overview |
 | Key: [`05-drift-to-patch.md`](mermaid/05-drift-to-patch.md) | Drift lifecycle flowchart |
 | Key: [`06-coherence-ops-pipeline.md`](mermaid/06-coherence-ops-pipeline.md) | Coherence Ops pipeline |
+| Key: [`30-interop-request-flow.md`](mermaid/30-interop-request-flow.md) | Interop request flow (AG-UI → A2A → MCP) |
+| Key: [`31-agora-negotiation-flow.md`](mermaid/31-agora-negotiation-flow.md) | Agora negotiation → contract → runtime |
+
+---
+
+## 🌐 Interoperability
+
+| Resource | Purpose |
+|----------|---------|
+| [`docs/interop/README.md`](docs/interop/README.md) | Interop Stack overview — AG-UI + A2A + MCP + Agora |
+| [`docs/interop/COHERENCE_INTEROP_GATEWAY_SPEC_v0.1.md`](docs/interop/COHERENCE_INTEROP_GATEWAY_SPEC_v0.1.md) | Coherence Ops Interop Gateway spec v0.1 |
+| [`docs/interop/DRIFT_TRIGGERS.md`](docs/interop/DRIFT_TRIGGERS.md) | Interop drift detection signals and response playbook |
+| [`docs/interop/MVP_PLAN.md`](docs/interop/MVP_PLAN.md) | 2-week implementation plan with daily milestones |
+| [`schemas/interop/protocol_contract.schema.json`](schemas/interop/protocol_contract.schema.json) | ProtocolContract JSON Schema |
+| [`templates/interop/ProtocolContract.example.json`](templates/interop/ProtocolContract.example.json) | Example: AgentBooking ↔ AgentTravel contract |
 
 ---
 

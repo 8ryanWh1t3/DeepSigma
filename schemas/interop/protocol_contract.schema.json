@@ -1,0 +1,337 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://deepsigma.dev/schemas/interop/protocol_contract/v0.1",
+  "title": "ProtocolContract",
+  "description": "A sealed, versioned agreement between two parties defining message types, field schemas, intents, error codes, and constraints for interoperable communication.",
+  "type": "object",
+  "required": [
+    "contract_id",
+    "version",
+    "hash",
+    "expiry",
+    "provenance",
+    "participants",
+    "message_types",
+    "intents",
+    "error_codes",
+    "constraints",
+    "signing"
+  ],
+  "properties": {
+    "contract_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique identifier for this contract."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of this contract (e.g., '1.0.0')."
+    },
+    "hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 hash of the canonical JSON representation, prefixed with 'sha256:'."
+    },
+    "sealed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when this contract was sealed."
+    },
+    "expiry": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when this contract must be revalidated (assumption half-life)."
+    },
+    "supersedes": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "contract_id of the previous version this contract replaces, or null if first version."
+    },
+    "provenance": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["ref", "type"],
+        "properties": {
+          "ref": {
+            "type": "string",
+            "description": "Reference identifier (e.g., negotiation session ID, human approver ID)."
+          },
+          "type": {
+            "type": "string",
+            "enum": ["negotiation", "manual", "migration", "human_approval"],
+            "description": "How this provenance entry was generated."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "detail": {
+            "type": "string",
+            "description": "Additional context (e.g., LLM model used, negotiation round count)."
+          }
+        }
+      },
+      "description": "Provenance chain: how this contract came to exist."
+    },
+    "participants": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["id", "role", "protocol"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Verifiable identifier for the participant (URI, DID, or fingerprint)."
+          },
+          "role": {
+            "type": "string",
+            "enum": ["initiator", "responder"],
+            "description": "Role in the interaction."
+          },
+          "protocol": {
+            "type": "string",
+            "description": "Native protocol of this participant (e.g., 'mcp/1.0', 'a2a/1.0', 'rest/openapi3', 'custom')."
+          },
+          "capabilities": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Declared capabilities of this participant."
+          }
+        }
+      },
+      "description": "The two parties bound by this contract."
+    },
+    "message_types": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "direction", "schema"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Message type identifier (e.g., 'BookingRequest', 'BookingConfirmation')."
+          },
+          "direction": {
+            "type": "string",
+            "enum": ["initiator_to_responder", "responder_to_initiator", "bidirectional"],
+            "description": "Who sends this message type."
+          },
+          "schema": {
+            "type": "object",
+            "description": "JSON Schema defining the message payload."
+          },
+          "required_fields": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Fields that must be present in every instance of this message."
+          }
+        }
+      },
+      "description": "All message types exchanged under this contract."
+    },
+    "intents": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "description"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Intent identifier (e.g., 'book_travel', 'cancel_booking')."
+          },
+          "description": {
+            "type": "string",
+            "description": "What this intent accomplishes."
+          },
+          "triggers": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Message types that can initiate this intent."
+          },
+          "outcomes": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Possible outcome message types."
+          }
+        }
+      },
+      "description": "Named intents this contract supports."
+    },
+    "error_codes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["code", "meaning", "retryable"],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Error code identifier (e.g., 'E001', 'INVALID_DATES')."
+          },
+          "meaning": {
+            "type": "string",
+            "description": "Human-readable explanation."
+          },
+          "retryable": {
+            "type": "boolean",
+            "description": "Whether the caller should retry after receiving this error."
+          },
+          "suggested_action": {
+            "type": "string",
+            "description": "Recommended recovery action."
+          }
+        }
+      },
+      "description": "Error codes and their semantics."
+    },
+    "constraints": {
+      "type": "object",
+      "required": ["rate_limit", "max_payload_bytes", "timeout_ms"],
+      "properties": {
+        "rate_limit": {
+          "type": "object",
+          "required": ["requests_per_minute"],
+          "properties": {
+            "requests_per_minute": { "type": "integer", "minimum": 1 },
+            "burst": { "type": "integer", "minimum": 1 }
+          },
+          "description": "Rate limiting parameters."
+        },
+        "max_payload_bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum payload size in bytes."
+        },
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 100,
+          "description": "Per-call timeout in milliseconds."
+        },
+        "idempotency_required": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether calls must be idempotent."
+        },
+        "tool_scopes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Allowed tool scopes (least privilege). E.g., ['read:bookings', 'write:bookings']."
+        }
+      },
+      "description": "Operational constraints for this contract."
+    },
+    "signing": {
+      "type": "object",
+      "required": ["algorithm"],
+      "properties": {
+        "algorithm": {
+          "type": "string",
+          "enum": ["sha256", "ed25519", "none"],
+          "description": "Signing algorithm used for contract integrity."
+        },
+        "public_key": {
+          "type": "string",
+          "description": "Public key of the signer (base64-encoded), if applicable."
+        },
+        "signature": {
+          "type": "string",
+          "description": "Signature over the contract body, if applicable."
+        }
+      },
+      "description": "Contract signing metadata."
+    },
+    "deprecation": {
+      "type": "object",
+      "properties": {
+        "deprecated": {
+          "type": "boolean",
+          "default": false
+        },
+        "deprecated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sunset_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When this contract will stop being honored."
+        },
+        "migration_ref": {
+          "type": "string",
+          "format": "uuid",
+          "description": "contract_id of the replacement contract."
+        }
+      },
+      "description": "Deprecation and sunset metadata."
+    },
+    "migration": {
+      "type": "object",
+      "properties": {
+        "from_version": { "type": "string" },
+        "to_version": { "type": "string" },
+        "field_mappings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "old_field": { "type": "string" },
+              "new_field": { "type": "string" },
+              "transform": { "type": "string", "description": "Transformation description (e.g., 'rename', 'split', 'merge')." }
+            }
+          }
+        }
+      },
+      "description": "Migration instructions from a previous contract version."
+    },
+    "rollback": {
+      "type": "object",
+      "properties": {
+        "rollback_to": {
+          "type": "string",
+          "format": "uuid",
+          "description": "contract_id to roll back to if this version fails."
+        },
+        "auto_rollback": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to automatically roll back on repeated failures."
+        },
+        "failure_threshold": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of consecutive failures before auto-rollback triggers."
+        }
+      },
+      "description": "Rollback configuration."
+    },
+    "telemetry": {
+      "type": "object",
+      "properties": {
+        "trace_propagation": {
+          "type": "string",
+          "enum": ["w3c", "b3", "none"],
+          "default": "w3c",
+          "description": "Trace context propagation format."
+        },
+        "metrics_endpoint": {
+          "type": "string",
+          "format": "uri",
+          "description": "Optional endpoint for pushing contract-level metrics."
+        },
+        "log_level": {
+          "type": "string",
+          "enum": ["debug", "info", "warn", "error"],
+          "default": "info"
+        }
+      },
+      "description": "Observability configuration for this contract."
+    }
+  },
+  "additionalProperties": false
+}
