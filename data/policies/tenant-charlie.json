@@ -1,0 +1,40 @@
+{
+  "tenant_id": "tenant-charlie",
+  "updated_at": "2026-02-19T20:00:00Z",
+  "ttl_policy": {
+    "tier0_seconds": 900,
+    "tier1_seconds": 3600,
+    "tier2_seconds": 21600
+  },
+  "quorum_policy": {
+    "tier0": {
+      "k_required": 3,
+      "n_total": 5,
+      "min_correlation_groups": 2,
+      "out_of_band_required": true
+    },
+    "tier1": {
+      "k_required": 2,
+      "n_total": 4,
+      "min_correlation_groups": 2,
+      "out_of_band_required": false
+    }
+  },
+  "correlation_policy": {
+    "review_threshold": 0.65,
+    "invalid_threshold": 0.85
+  },
+  "silence_policy": {
+    "healthy_pct": 0.1,
+    "elevated_pct": 0.5,
+    "degraded_pct": 1.5
+  },
+  "slo_policy": {
+    "why_retrieval_target_seconds": 60,
+    "packet_generate_target_ms": 500
+  },
+  "quota_policy": {
+    "packets_per_hour": 120,
+    "exports_per_day": 500
+  }
+}

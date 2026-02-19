@@ -5,6 +5,36 @@ All notable changes to Σ OVERWATCH / DeepSigma will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] — 2026-02-19 — "Governance Hardening"
+
+### Added
+
+- **Per-Tenant Policy Engine** (`tenancy/policies.py`): Tenant-scoped policy files with TTL, quorum, correlation, silence, SLO, and quota thresholds. Policy evaluation produces violation lists and SHA-256 policy hashes
+- **Seal Chaining** (`credibility_engine/packet.py`): Tamper-evident continuity — each seal links to the previous seal via `prev_seal_hash`, includes `policy_hash` and `snapshot_hash`. Seal chain persisted to `seal_chain.jsonl`
+- **Immutable Audit Trail** (`governance/audit.py`): Append-only audit log for critical actions (PACKET_GENERATE, PACKET_SEAL, SNAPSHOT_WRITE, POLICY_UPDATE). Denied attempts are always audited
+- **Drift Recurrence Weighting** (`governance/drift_registry.py`): Fingerprint registry tracks 24h/7d recurrence counts. Severity multipliers: >10 = 1.5x, >25 = 2.0x, >50 = 3.0x
+- **Quotas + SLO Telemetry** (`governance/telemetry.py`): Per-tenant rate limits on packet generation/sealing. Exceeding quota returns HTTP 429 + audit event. Tracks `packet_generate_latency_ms` and `packet_seal_latency_ms`
+- **Policy API Endpoints**: `GET /api/{tenant_id}/policy`, `POST /api/{tenant_id}/policy` (requires `truth_owner` or `coherence_steward`)
+- **Audit API Endpoint**: `GET /api/{tenant_id}/audit/recent?limit=50` (read-only)
+- **Seeded Policy Files**: 3 demo tenant policies with distinct configurations (Bravo: stricter quorum; Charlie: lower correlation threshold)
+- **Governance Spec** (`docs/credibility-engine/GOVERNANCE_V0_9.md`): Policy engine, seal chaining, audit trail, drift recurrence, telemetry documentation
+
+### Changed
+
+- `pyproject.toml`: Version 0.8.0 → 0.9.0, added `governance*` to package discovery
+- `credibility_engine/engine.py`: Policy evaluation in snapshot generation, drift registry updates, audit events
+- `credibility_engine/packet.py`: Chained sealing with policy_hash + snapshot_hash, audit events on generate/seal
+- `credibility_engine/api.py`: Policy/audit endpoints, quota enforcement, denied-attempt auditing
+- `tenancy/__init__.py`: Export policy functions
+- `dashboard/credibility-engine-demo/`: Policy hash + seal chain metadata display in packet preview
+- `docs/credibility-engine/API_V0_8.md`: Added v0.9.0 endpoints note
+
+### Stats
+
+- 9 new files, 9 modified, v0.8.0 API compatibility preserved, abstract institutional modeling preserved
+
+---
+
 ## [0.8.0] — 2026-02-19 — "Multi-Tenant Credibility Engine MVP"
 
 ### Added
