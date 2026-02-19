@@ -1,0 +1,75 @@
+{
+  "clusters": [
+    {
+      "cluster_id": "CG-001",
+      "label": "Internal Sensors (East)",
+      "sources": ["S-001", "S-004", "S-008"],
+      "coefficient": 0.62,
+      "status": "OK",
+      "claims_affected": 15,
+      "domains": ["E1", "E2"],
+      "regions": ["East"],
+      "risk_level": "low"
+    },
+    {
+      "cluster_id": "CG-002",
+      "label": "Shared Infrastructure (East + Central)",
+      "sources": ["S-003", "S-007", "S-012"],
+      "coefficient": 0.78,
+      "status": "REVIEW",
+      "claims_affected": 28,
+      "domains": ["E2", "C1", "C2"],
+      "regions": ["East", "Central"],
+      "risk_level": "medium"
+    },
+    {
+      "cluster_id": "CG-003",
+      "label": "Cross-Region API Feed",
+      "sources": ["S-CR-017", "S-CR-022"],
+      "coefficient": 0.91,
+      "status": "CRITICAL",
+      "claims_affected": 18,
+      "domains": ["E3", "C2", "W1"],
+      "regions": ["East", "Central", "West"],
+      "risk_level": "high"
+    },
+    {
+      "cluster_id": "CG-004",
+      "label": "Compliance Feeds (West)",
+      "sources": ["S-006", "S-010"],
+      "coefficient": 0.34,
+      "status": "OK",
+      "claims_affected": 10,
+      "domains": ["W2"],
+      "regions": ["West"],
+      "risk_level": "low"
+    },
+    {
+      "cluster_id": "CG-005",
+      "label": "Central Primary (Central)",
+      "sources": ["S-011", "S-013", "S-014", "S-019"],
+      "coefficient": 0.55,
+      "status": "OK",
+      "claims_affected": 22,
+      "domains": ["C1", "C3", "C4"],
+      "regions": ["Central"],
+      "risk_level": "low"
+    },
+    {
+      "cluster_id": "CG-006",
+      "label": "Reference Data (All Regions)",
+      "sources": ["S-015", "S-016"],
+      "coefficient": 0.41,
+      "status": "OK",
+      "claims_affected": 8,
+      "domains": ["E1", "C1", "W1"],
+      "regions": ["East", "Central", "West"],
+      "risk_level": "low"
+    }
+  ],
+  "thresholds": {
+    "ok_max": 0.7,
+    "review_max": 0.9,
+    "critical_min": 0.9
+  }
+}

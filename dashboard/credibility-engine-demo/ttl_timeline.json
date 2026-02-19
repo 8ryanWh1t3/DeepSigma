@@ -1,0 +1,49 @@
+{
+  "window": "next_4h",
+  "total_evidence_nodes": 9500,
+  "expiring_within_window": 342,
+  "clustering_warning": true,
+  "clustering_description": "68 Tier 1 evidence nodes expire within a 15-minute window at T+1h45m",
+  "upcoming_expirations": [
+    {
+      "bucket": "0–30min",
+      "count": 45,
+      "by_tier": { "0": 2, "1": 18, "2": 20, "3": 5 },
+      "by_region": { "East": 14, "Central": 19, "West": 12 }
+    },
+    {
+      "bucket": "30–60min",
+      "count": 72,
+      "by_tier": { "0": 5, "1": 28, "2": 30, "3": 9 },
+      "by_region": { "East": 22, "Central": 30, "West": 20 }
+    },
+    {
+      "bucket": "1–2h",
+      "count": 118,
+      "by_tier": { "0": 8, "1": 52, "2": 42, "3": 16 },
+      "by_region": { "East": 38, "Central": 48, "West": 32 }
+    },
+    {
+      "bucket": "2–4h",
+      "count": 107,
+      "by_tier": { "0": 3, "1": 34, "2": 48, "3": 22 },
+      "by_region": { "East": 35, "Central": 42, "West": 30 }
+    }
+  ],
+  "tier_0_expirations": [
+    {
+      "evidence_id": "EV-E1-0042",
+      "claim_id": "CLM-T0-002",
+      "ttl_remaining_minutes": 35,
+      "source": "S-003",
+      "region": "Central"
+    },
+    {
+      "evidence_id": "EV-W2-0118",
+      "claim_id": "CLM-T0-003",
+      "ttl_remaining_minutes": 0,
+      "source": "S-W2-007",
+      "region": "West"
+    }
+  ]
+}

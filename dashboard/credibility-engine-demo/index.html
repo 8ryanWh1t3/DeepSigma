@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Credibility Engine — Demo Cockpit</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>&Sigma; OVERWATCH <span class="header-separator">/</span> Credibility Engine</h1>
+      <p class="header-subtitle">Institutional Decision Infrastructure — Demo Cockpit</p>
+    </div>
+    <div class="header-meta" id="header-meta">
+      <span class="meta-label">Last Updated:</span>
+      <span class="meta-value" id="last-updated">—</span>
+      <span class="meta-label">Nodes:</span>
+      <span class="meta-value" id="total-nodes">—</span>
+      <span class="meta-label">Regions:</span>
+      <span class="meta-value" id="total-regions">—</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- Panel 1: Credibility Index -->
+    <section class="panel panel-hero" id="panel-index">
+      <div class="panel-header">
+        <h2>Credibility Index</h2>
+        <span class="badge" id="index-band">—</span>
+      </div>
+      <div class="index-display">
+        <div class="index-score" id="index-score">—</div>
+        <div class="index-max">/ 100</div>
+      </div>
+      <div class="index-trend" id="index-trend"></div>
+      <div class="index-components" id="index-components"></div>
+      <div class="index-bands" id="index-bands"></div>
+    </section>
+
+    <!-- Panel 2: Tier 0 Claims -->
+    <section class="panel panel-wide" id="panel-claims">
+      <div class="panel-header">
+        <h2>Tier 0 Claims</h2>
+        <span class="badge badge-neutral" id="claims-count">—</span>
+      </div>
+      <div class="claims-table" id="claims-table"></div>
+    </section>
+
+    <!-- Panel 3: Drift Activity -->
+    <section class="panel" id="panel-drift">
+      <div class="panel-header">
+        <h2>Drift Activity (24h)</h2>
+        <span class="badge badge-neutral" id="drift-total">—</span>
+      </div>
+      <div class="drift-severity" id="drift-severity"></div>
+      <div class="drift-categories" id="drift-categories"></div>
+      <div class="drift-fingerprints" id="drift-fingerprints"></div>
+    </section>
+
+    <!-- Panel 4: Correlation Risk -->
+    <section class="panel" id="panel-correlation">
+      <div class="panel-header">
+        <h2>Correlation Risk</h2>
+      </div>
+      <div class="correlation-clusters" id="correlation-clusters"></div>
+    </section>
+
+    <!-- Panel 5: TTL Timeline -->
+    <section class="panel" id="panel-ttl">
+      <div class="panel-header">
+        <h2>TTL Expiration Timeline</h2>
+        <span class="badge badge-neutral" id="ttl-expiring">—</span>
+      </div>
+      <div class="ttl-alert" id="ttl-alert"></div>
+      <div class="ttl-buckets" id="ttl-buckets"></div>
+      <div class="ttl-tier0" id="ttl-tier0"></div>
+    </section>
+
+    <!-- Panel 6: Sync Plane Integrity -->
+    <section class="panel" id="panel-sync">
+      <div class="panel-header">
+        <h2>Sync Plane Integrity</h2>
+      </div>
+      <div class="sync-regions" id="sync-regions"></div>
+      <div class="sync-federation" id="sync-federation"></div>
+    </section>
+
+    <!-- Panel 7: Credibility Packet -->
+    <section class="panel panel-wide" id="panel-packet">
+      <div class="panel-header">
+        <h2>Credibility Packet</h2>
+      </div>
+      <p class="packet-description">Generate a sealed assessment packet containing DLR, RS, DS, and MG summaries for the current institutional state.</p>
+      <button class="btn-packet" id="btn-generate-packet">Generate Credibility Packet</button>
+      <div class="packet-preview" id="packet-preview" style="display:none;"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&Sigma; OVERWATCH &mdash; Abstract demo. Non-domain institutional credibility architecture. No real-world system modeled.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

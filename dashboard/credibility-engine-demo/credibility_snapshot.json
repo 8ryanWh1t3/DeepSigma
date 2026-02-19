@@ -1,0 +1,28 @@
+{
+  "index_score": 92,
+  "index_band": "Minor Drift",
+  "index_band_color": "yellow",
+  "trend_points": [96, 95, 94, 93, 92],
+  "trend_labels": ["T-4h", "T-3h", "T-2h", "T-1h", "Now"],
+  "last_updated": "2026-02-19T18:45:00Z",
+  "total_nodes": 36000,
+  "regions": 3,
+  "active_drift_signals": 7,
+  "auto_patch_rate": 0.92,
+  "bands": [
+    { "range": "95–100", "label": "Stable", "action": "Monitor" },
+    { "range": "85–94", "label": "Minor Drift", "action": "Review flagged claims" },
+    { "range": "70–84", "label": "Elevated Risk", "action": "Patch required" },
+    { "range": "50–69", "label": "Structural Degradation", "action": "Immediate remediation" },
+    { "range": "<50", "label": "Compromised", "action": "Halt dependent decisions" }
+  ],
+  "components": {
+    "tier_weighted_integrity": 42,
+    "drift_penalty": -4,
+    "correlation_risk": -6,
+    "quorum_margin": -2,
+    "ttl_expiration": -3,
+    "confirmation_bonus": 3,
+    "base": 60
+  }
+}

@@ -45,9 +45,14 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `NAV.md`: Added Credibility Engine section with 11 resource links, updated Diagrams count
 - `mermaid/README.md`: Added diagrams 37–39 to catalogue
 
+### Added — Credibility Engine Demo Cockpit
+
+- **Demo Dashboard** (`dashboard/credibility-engine-demo/`): Static 7-panel cockpit surface — Credibility Index, Tier 0 claims, drift activity, correlation risk, TTL timeline, Sync Plane integrity, credibility packet generator. Vanilla HTML/CSS/JS, no frameworks. Mock JSON calibrated to 36,000-node production lattice
+- `README.md`: Added demo link to Progressive Escalation section
+
 ### Stats (Credibility Engine addition)
 
-- 11 new files, 4 modified, 0 new tests (documentation-only), 2 new Mermaid diagrams
+- 11 new files + 11 demo files, 4 modified, 0 new tests (documentation-only), 2 new Mermaid diagrams
 
 ## [0.6.3] — 2026-02-19 — "Excel-first Hardening"
 

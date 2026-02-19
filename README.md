@@ -62,6 +62,8 @@ Coherence Ops scales from a single decision loop to institutional credibility in
 Same primitives. Same artifacts. Same loop. Different scale.
 
 > Examples: [Mini Lattice](examples/01-mini-lattice/) · [Enterprise Lattice](examples/02-enterprise-lattice/) · [Credibility Engine Scale](examples/03-credibility-engine-scale/) · [Full docs](docs/credibility-engine/)
+>
+> Demo: [Credibility Engine Cockpit](dashboard/credibility-engine-demo/) — static dashboard, 7 panels, 30 seconds to institutional state
 
 ---
 
