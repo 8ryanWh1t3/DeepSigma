@@ -423,4 +423,9 @@
 
   /* ── Boot ── */
   loadAll();
+
+  /* ── Auto-refresh for simulation mode ── */
+  setInterval(function () {
+    loadAll().catch(function () { /* ignore refresh errors */ });
+  }, 2000);
 })();

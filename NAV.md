@@ -94,6 +94,7 @@ last_updated: "2026-02-18"
 |----------|---------|
 | [`dashboard/`](dashboard/) | React dashboard UI + mock data + server API |
 | [`dashboard/src/TrustScorecardPanel.tsx`](dashboard/src/TrustScorecardPanel.tsx) | Trust Scorecard dashboard panel |
+| [`dashboard/credibility-engine-demo/`](dashboard/credibility-engine-demo/) | Credibility Engine Demo Cockpit — 7-panel static/live dashboard |
 
 ---
 
@@ -183,6 +184,7 @@ last_updated: "2026-02-18"
 | [`examples/03-credibility-engine-scale/`](examples/03-credibility-engine-scale/) | Credibility Engine at Scale — 30k–40k nodes, survivability |
 | [`mermaid/38-lattice-architecture.md`](mermaid/38-lattice-architecture.md) | Lattice architecture diagram |
 | [`mermaid/39-drift-loop.md`](mermaid/39-drift-loop.md) | Institutional drift loop diagram |
+| [`sim/credibility-engine/`](sim/credibility-engine/) | Stage 2 Simulation — tick-based engine driving live dashboard |
 
 ---
 
