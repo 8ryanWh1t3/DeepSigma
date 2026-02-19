@@ -13,7 +13,6 @@ All outputs are deterministic. No LLM calls. No network.
 
 from __future__ import annotations
 
-import datetime
 import json
 from pathlib import Path
 
@@ -69,7 +68,6 @@ def _generate_workbook(path: Path) -> None:
     """Generate workbook using the CDS generator."""
     import openpyxl
     from openpyxl.styles import Alignment, Font
-    from openpyxl.worksheet.table import Table, TableStyleInfo
 
     # Import generator functions from the existing tool
     import sys
