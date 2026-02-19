@@ -185,6 +185,7 @@ last_updated: "2026-02-18"
 | [`mermaid/38-lattice-architecture.md`](mermaid/38-lattice-architecture.md) | Lattice architecture diagram |
 | [`mermaid/39-drift-loop.md`](mermaid/39-drift-loop.md) | Institutional drift loop diagram |
 | [`sim/credibility-engine/`](sim/credibility-engine/) | Stage 2 Simulation — tick-based engine driving live dashboard |
+| [`credibility_engine/`](credibility_engine/) | Stage 3 Runtime — real engine with JSONL persistence + API endpoints |
 
 ---
 

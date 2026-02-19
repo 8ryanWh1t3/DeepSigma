@@ -115,6 +115,42 @@ def print_status(engine: CredibilityEngine, tick: int) -> None:
     )
 
 
+def _sync_to_runtime(sim_engine, runtime_engine) -> None:
+    """Push simulation state into the runtime credibility engine."""
+    from credibility_engine.packet import generate_credibility_packet
+
+    # Sync claims
+    for sim_claim in sim_engine.claims:
+        runtime_engine.update_claim_state(
+            sim_claim.claim_id,
+            state=sim_claim.status,
+            confidence=sim_claim.confidence,
+            margin=sim_claim.margin,
+            ttl_remaining=sim_claim.ttl_remaining_minutes,
+        )
+
+    # Sync correlations
+    for sim_cluster in sim_engine.clusters:
+        runtime_engine.update_correlation(
+            sim_cluster.cluster_id,
+            coefficient=sim_cluster.coefficient,
+        )
+
+    # Sync sync regions
+    for sim_sr in sim_engine.sync_regions:
+        runtime_engine.update_sync(
+            sim_sr.region,
+            time_skew_ms=sim_sr.time_skew_ms,
+            watermark_lag_s=sim_sr.watermark_lag_s,
+            replay_flags=sim_sr.replay_flags_count,
+        )
+
+    # Recalculate and persist
+    runtime_engine.recalculate_index()
+    runtime_engine.generate_snapshot()
+    generate_credibility_packet(runtime_engine)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Credibility Engine Simulation Runner",
@@ -136,15 +172,37 @@ def main() -> None:
         default=DEFAULT_OUTPUT,
         help="Directory to write JSON snapshots",
     )
+    parser.add_argument(
+        "--mode",
+        choices=["json", "engine"],
+        default="json",
+        help="Output mode: 'json' writes files (default), 'engine' drives runtime engine",
+    )
     args = parser.parse_args()
 
     output_dir = os.path.abspath(args.output_dir)
-    if not os.path.isdir(output_dir):
+    if args.mode == "json" and not os.path.isdir(output_dir):
         print(f"Error: output directory does not exist: {output_dir}")
         sys.exit(1)
 
+    # Initialize runtime engine if in engine mode
+    runtime_engine = None
+    if args.mode == "engine":
+        try:
+            from credibility_engine.engine import CredibilityEngine as RuntimeEngine
+            from credibility_engine.store import CredibilityStore
+
+            store = CredibilityStore()
+            runtime_engine = RuntimeEngine(store=store)
+            runtime_engine.initialize_default_state()
+        except ImportError:
+            print("Error: credibility_engine module not found. Use --mode json instead.")
+            sys.exit(1)
+
     engine = CredibilityEngine(args.scenario)
     scenario_desc = engine.scenario["description"]
+
+    mode_label = "ENGINE (runtime)" if args.mode == "engine" else "JSON (file)"
 
     print()
     print("  ╔══════════════════════════════════════════════════════╗")
@@ -152,6 +210,7 @@ def main() -> None:
     print("  ╚══════════════════════════════════════════════════════╝")
     print()
     print(f"  Scenario:  {args.scenario} — {scenario_desc}")
+    print(f"  Mode:      {mode_label}")
     print(f"  Interval:  {args.interval}s per tick (15 min sim time)")
     print(f"  Output:    {output_dir}")
     print("  Dashboard: http://localhost:8000/dashboard/credibility-engine-demo/")
@@ -172,18 +231,22 @@ def main() -> None:
             # Advance simulation
             engine.tick()
 
-            # Generate all snapshots
-            snapshots = engine.all_snapshots()
-            packet = generate_packet(engine)
+            if args.mode == "engine" and runtime_engine is not None:
+                # Drive runtime engine with simulation state
+                _sync_to_runtime(engine, runtime_engine)
+            else:
+                # Generate all snapshots
+                snapshots = engine.all_snapshots()
+                packet = generate_packet(engine)
 
-            # Write all files atomically
-            for name, data in snapshots.items():
-                filepath = os.path.join(output_dir, f"{name}.json")
-                write_atomic(filepath, data)
-            write_atomic(
-                os.path.join(output_dir, "credibility_packet_example.json"),
-                packet,
-            )
+                # Write all files atomically
+                for name, data in snapshots.items():
+                    filepath = os.path.join(output_dir, f"{name}.json")
+                    write_atomic(filepath, data)
+                write_atomic(
+                    os.path.join(output_dir, "credibility_packet_example.json"),
+                    packet,
+                )
 
             # Print status
             print_status(engine, engine.tick_num)

@@ -66,6 +66,8 @@ Same primitives. Same artifacts. Same loop. Different scale.
 > Demo: [Credibility Engine Cockpit](dashboard/credibility-engine-demo/) — static dashboard, 7 panels, 30 seconds to institutional state
 >
 > Stage 2: [Simulated Engine](sim/credibility-engine/) — live simulation driver, 4 scenarios (Day0–Day3), 2-second ticks
+>
+> Stage 3: [Runtime Engine](credibility_engine/) — real engine with JSONL persistence + API endpoints
 
 ---
 
@@ -102,6 +104,29 @@ Visit: [http://localhost:8000/dashboard/credibility-engine-demo/](http://localho
 Four scenarios model progressive institutional entropy: Day0 (stable), Day1 (entropy emerges), Day2 (coordinated darkness), Day3 (external mismatch + recovery). The dashboard updates every 2 seconds.
 
 > [Simulation docs](sim/credibility-engine/) · [Dashboard](dashboard/credibility-engine-demo/)
+
+---
+
+## Stage 3 — Real Credibility Engine Runtime
+
+Run the API server to serve live credibility state:
+
+```bash
+uvicorn dashboard.api_server:app --reload
+```
+
+Engine persists live state under `data/credibility/`. Dashboard can run in API mode by setting `DATA_MODE = "API"` in `app.js`.
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /api/credibility/snapshot` | Credibility Index, band, components, trend |
+| `GET /api/credibility/claims/tier0` | Tier 0 claims with quorum and TTL |
+| `GET /api/credibility/drift/24h` | Drift events by severity, category, region |
+| `GET /api/credibility/correlation` | Correlation cluster map |
+| `GET /api/credibility/sync` | Sync plane integrity |
+| `GET /api/credibility/packet` | Sealed credibility packet (DLR/RS/DS/MG) |
+
+> [Runtime Engine docs](credibility_engine/) · [API integration](dashboard/api_server.py)
 
 ---
 
