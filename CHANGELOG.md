@@ -5,6 +5,33 @@ All notable changes to Σ OVERWATCH / DeepSigma will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] — 2026-02-19 — "Distributed Credibility Mesh"
+
+### Added
+
+- **Mesh Node Runtime** (`mesh/node_runtime.py`): Multi-node architecture with 4 roles — edge, validator, aggregator, seal-authority. Thread-based node processes with independent state and replication
+- **Signed Evidence Envelopes** (`mesh/envelopes.py`, `mesh/crypto.py`): Ed25519-compatible signing (HMAC-SHA256 demo fallback). Every envelope carries payload hash + signature for tamper evidence
+- **HTTP Replication** (`mesh/transport.py`): Push/pull transport for append-only log synchronization between nodes. FastAPI router under `/mesh/*` prefix
+- **Federated Quorum** (`mesh/federation.py`): Policy-driven quorum across regions + correlation groups. Claims cannot reach VERIFIED without multi-region, multi-group consensus. Partition → UNKNOWN (safe default)
+- **Mesh Scenarios** (`mesh/scenarios.py`): 4-phase scenario controller — healthy baseline, partition (region B offline), correlated failure (region C INVALID), recovery via patch
+- **Cross-Node Verification** (`mesh/verify.py`): Envelope signature verification, seal chain continuity checks, cross-node coverage reports
+- **Mesh CLI** (`mesh/cli.py`): `python -m mesh.cli init`, `run`, `scenario` commands for demo operation
+- **Mesh Summary Endpoint**: `GET /mesh/{tenant_id}/summary` — node statuses, last aggregate, last seal, verification health
+- **Append-Only Logstore** (`mesh/logstore.py`): Atomic JSONL writes with temp-file rename pattern. Deduplication by ID field
+
+### Changed
+
+- `pyproject.toml`: Version 0.9.0 → 1.0.0, added `mesh*` to package discovery
+- `credibility_engine/__init__.py`: Version bump
+- `dashboard/api_server.py`: Mesh router integration
+- `CHANGELOG.md`: v1.0.0 entry
+
+### Stats
+
+- 11 new files, 4 modified, v0.9.0 governance + credibility APIs preserved, abstract institutional modeling preserved
+
+---
+
 ## [0.9.0] — 2026-02-19 — "Governance Hardening"
 
 ### Added

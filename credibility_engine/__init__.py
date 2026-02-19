@@ -9,7 +9,7 @@ Abstract institutional credibility architecture.
 No real-world system modeled.
 """
 
-__version__ = "0.9.0"
+__version__ = "1.0.0"
 
 from credibility_engine.constants import DEFAULT_TENANT_ID
 from credibility_engine.engine import CredibilityEngine
