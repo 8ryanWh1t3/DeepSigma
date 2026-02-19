@@ -533,6 +533,98 @@ function resolveStatus(_query: IRISQueryInput, queryId: string): IRISResponse {
 }
 
 // ---------------------------------------------------------------------------
+// Trust Scorecard interfaces + mock generator
+// ---------------------------------------------------------------------------
+
+export interface TrustMetrics {
+    iris_why_latency_ms: number;
+    drift_detect_latency_ms: number;
+    patch_latency_ms: number;
+    connector_ingest_records_per_sec: number;
+    schema_validation_failures: number;
+    total_elapsed_ms: number;
+    steps_completed: number;
+    steps_total: number;
+    all_steps_passed: boolean;
+    drift_events_detected: number;
+    patch_applied: boolean;
+    iris_queries_resolved: number;
+    baseline_score: number;
+    baseline_grade: string;
+    patched_score: number;
+    patched_grade: string;
+    coverage_pct: number | null;
+}
+
+export interface SLOChecks {
+    iris_why_latency_ok: boolean;
+    all_steps_passed: boolean;
+    schema_clean: boolean;
+    score_positive: boolean;
+}
+
+export interface TrustScorecard {
+    scorecard_version: string;
+    timestamp: string;
+    source_dir: string;
+    metrics: TrustMetrics;
+    slo_checks: SLOChecks;
+}
+
+function gradeFor(score: number): string {
+    if (score >= 90) return 'A';
+    if (score >= 75) return 'B';
+    if (score >= 60) return 'C';
+    if (score >= 40) return 'D';
+    return 'F';
+}
+
+export function generateMockTrustScorecard(): TrustScorecard {
+    const baseline = 55 + Math.random() * 35;    // 55-90
+    const patched = baseline + 2 + Math.random() * 10;  // always higher
+    const stepsCompleted = 7;
+    const stepsTotal = 7;
+    const allPassed = Math.random() > 0.1;
+    const irisLatency = 800 + Math.random() * 4000;
+    const schemaFailures = Math.random() > 0.85 ? Math.floor(Math.random() * 3) : 0;
+
+    const metrics: TrustMetrics = {
+        iris_why_latency_ms: parseFloat(irisLatency.toFixed(1)),
+        drift_detect_latency_ms: parseFloat((20 + Math.random() * 200).toFixed(1)),
+        patch_latency_ms: parseFloat((5 + Math.random() * 80).toFixed(1)),
+        connector_ingest_records_per_sec: parseFloat((100 + Math.random() * 900).toFixed(1)),
+        schema_validation_failures: schemaFailures,
+        total_elapsed_ms: parseFloat((3000 + Math.random() * 12000).toFixed(1)),
+        steps_completed: allPassed ? stepsCompleted : stepsCompleted - 1,
+        steps_total: stepsTotal,
+        all_steps_passed: allPassed,
+        drift_events_detected: 1 + Math.floor(Math.random() * 4),
+        patch_applied: true,
+        iris_queries_resolved: 2 + Math.floor(Math.random() * 2),
+        baseline_score: parseFloat(baseline.toFixed(1)),
+        baseline_grade: gradeFor(baseline),
+        patched_score: parseFloat(Math.min(patched, 100).toFixed(1)),
+        patched_grade: gradeFor(Math.min(patched, 100)),
+        coverage_pct: Math.random() > 0.3 ? parseFloat((70 + Math.random() * 30).toFixed(1)) : null,
+    };
+
+    const slo: SLOChecks = {
+        iris_why_latency_ok: irisLatency <= 60000,
+        all_steps_passed: allPassed,
+        schema_clean: schemaFailures === 0,
+        score_positive: baseline > 0,
+    };
+
+    return {
+        scorecard_version: '1.0.0',
+        timestamp: new Date().toISOString(),
+        source_dir: 'golden_path_ci_out',
+        metrics,
+        slo_checks: slo,
+    };
+}
+
+// ---------------------------------------------------------------------------
 // Real-data API fetch helpers (http://localhost:8000)
 // Falls back to mock data when the API server is not running.
 // ---------------------------------------------------------------------------
@@ -562,6 +654,11 @@ export async function fetchRealDrifts(): Promise<DriftEvent[] | null> {
 /** Fetch real agent metrics from the API; returns null if the server is offline. */
 export async function fetchRealAgents(): Promise<AgentMetrics[] | null> {
     return apiFetch<AgentMetrics[]>('/api/agents');
+}
+
+/** Fetch real Trust Scorecard from the API; returns null if the server is offline. */
+export async function fetchRealTrustScorecard(): Promise<TrustScorecard | null> {
+    return apiFetch<TrustScorecard>('/api/trust_scorecard');
 }
 
 /** Resolve an IRIS query via the real API; falls back to mock resolver. */

@@ -4,7 +4,7 @@ import {
     CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell,
     RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis
 } from 'recharts';
-import { AlertCircle, TrendingUp, Zap, Clock, Activity, Search, Download } from 'lucide-react';
+import { AlertCircle, TrendingUp, Zap, Clock, Activity, Search, Download, Shield } from 'lucide-react';
 import { DecisionEpisode, DriftEvent, AgentMetrics } from './mockData';
 import { IrisPanel } from './IrisPanel';
 import { useOverwatchStore } from './store';
@@ -231,9 +231,14 @@ export function App() {
     const drifts = useOverwatchStore((s) => s.drifts);
     const metrics = useOverwatchStore((s) => s.agents);
     const connection = useOverwatchStore((s) => s.connection);
+    const trustScorecard = useOverwatchStore((s) => s.trustScorecard);
+    const fetchTrustScorecard = useOverwatchStore((s) => s.fetchTrustScorecard);
     const [selectedView, setSelectedView] = useState<ViewType>('overview');
     const [autoRefresh, setAutoRefresh] = useState(true);
     const { refresh } = useSSE(autoRefresh);
+
+    // Bootstrap Trust Scorecard on mount
+    useEffect(() => { fetchTrustScorecard(); }, [fetchTrustScorecard]);
     const lastUpdate = connection.lastEvent;
     const dataSource = connection.dataSource;
   
@@ -328,6 +333,23 @@ export function App() {
                                                                 <HealthGauge value={systemHealth} />
                                                 </div>
                                   </div>
+                                  {/* Trust Scorecard summary */}
+                                  {trustScorecard && (
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                      <KPICard icon={<Shield size={20}/>} label="Baseline Score" value={`${trustScorecard.metrics.baseline_score.toFixed(1)} (${trustScorecard.metrics.baseline_grade})`} trend="Pre-patch coherence" />
+                                      <KPICard icon={<Shield size={20}/>} label="Patched Score" value={`${trustScorecard.metrics.patched_score.toFixed(1)} (${trustScorecard.metrics.patched_grade})`} trend={`+${(trustScorecard.metrics.patched_score - trustScorecard.metrics.baseline_score).toFixed(1)} from baseline`} trendUp={true} />
+                                      <KPICard icon={<Zap size={20}/>} label="Pipeline Steps" value={`${trustScorecard.metrics.steps_completed}/${trustScorecard.metrics.steps_total}`} trend={trustScorecard.metrics.all_steps_passed ? 'All passed' : 'Degraded'} trendUp={trustScorecard.metrics.all_steps_passed} />
+                                      <div className="bg-slate-900 rounded-lg border border-slate-800 p-4 flex flex-col items-center justify-center hover:border-slate-700 transition-colors">
+                                        <div className="text-slate-400 text-xs mb-1">SLO Status</div>
+                                        {Object.values(trustScorecard.slo_checks).every(Boolean) ? (
+                                          <div className="text-lg font-bold text-green-400">ALL PASS</div>
+                                        ) : (
+                                          <div className="text-lg font-bold text-red-400">DEGRADED</div>
+                                        )}
+                                        <div className="text-xs text-slate-500 mt-1">{Object.values(trustScorecard.slo_checks).filter(Boolean).length}/{Object.values(trustScorecard.slo_checks).length} checks</div>
+                                      </div>
+                                    </div>
+                                  )}
                                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                                 <div className="bg-slate-900 rounded-lg border border-slate-800 p-6">
                                                                 <h3 className="text-lg font-semibold mb-4">Deadline vs Actual Duration</h3>
