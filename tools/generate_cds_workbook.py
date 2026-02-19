@@ -23,7 +23,7 @@ import datetime
 from pathlib import Path
 
 import openpyxl
-from openpyxl.styles import Alignment, Font, PatternFill
+from openpyxl.styles import Alignment, Font
 from openpyxl.worksheet.table import Table, TableStyleInfo
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -186,7 +186,7 @@ def generate_dlr_rows(n: int = 25) -> list[list]:
         rows.append([
             f"DEC-{i:03d}", f"INIT-{(i - 1) // 5 + 1:03d}", _date(i * 2),
             contexts[i % len(contexts)],
-            f"A: option_a; B: option_b; C: option_c",
+            "A: option_a; B: option_b; C: option_c",
             "B", f"Best balance of reach and brand safety for {CHARACTERS[i % len(CHARACTERS)]}",
             "A: too narrow; C: production risk",
             f"ASM-{i:03d};ASM-{(i % 25) + 1:03d}",
@@ -531,7 +531,7 @@ def main() -> None:
     wb.save(str(OUTPUT))
     print(f"Workbook saved to {OUTPUT}")
     print(f"  Sheets: {wb.sheetnames}")
-    print(f"  Named tables: ", end="")
+    print("  Named tables: ", end="")
     for ws in wb.worksheets:
         for t in ws.tables.values():
             print(f"{t.displayName} ", end="")
