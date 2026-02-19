@@ -17,6 +17,31 @@ import logging
 import os
 from typing import Any, Dict, Optional
 
+from adapters.otel.spans import (
+    ATTR_COHERENCE_GRADE,
+    ATTR_COHERENCE_SCORE,
+    ATTR_COHERENCE_DIMENSION_PREFIX,
+    ATTR_DEGRADE_STEP,
+    ATTR_DRIFT_EPISODE_ID,
+    ATTR_DRIFT_ID,
+    ATTR_DRIFT_SEVERITY,
+    ATTR_DRIFT_TYPE,
+    ATTR_EPISODE_DECISION_TYPE,
+    ATTR_EPISODE_DEGRADE_STEP,
+    ATTR_EPISODE_ID,
+    ATTR_PHASE_DURATION_MS,
+    ATTR_PHASE_NAME,
+    EVENT_DEGRADE_TRIGGERED,
+    METRIC_COHERENCE_SCORE,
+    METRIC_DRIFT_TOTAL,
+    METRIC_EPISODE_LATENCY_MS,
+    METRIC_EPISODES_TOTAL,
+    SPAN_COHERENCE_EVAL,
+    SPAN_DECISION_EPISODE,
+    SPAN_DRIFT_EVENT,
+    SPAN_PHASE_PREFIX,
+)
+
 logger = logging.getLogger(__name__)
 
 try:
@@ -118,22 +143,22 @@ class OtelExporter:
         self._meter = metrics.get_meter(self.service_name)
 
         self._episode_counter = self._meter.create_counter(
-            name="sigma.episodes.total",
+            name=METRIC_EPISODES_TOTAL,
             description="Total number of exported decision episodes",
             unit="1",
         )
         self._latency_histogram = self._meter.create_histogram(
-            name="sigma.episode.latency_ms",
+            name=METRIC_EPISODE_LATENCY_MS,
             description="End-to-end episode latency in milliseconds",
             unit="ms",
         )
         self._drift_counter = self._meter.create_counter(
-            name="sigma.drift.total",
+            name=METRIC_DRIFT_TOTAL,
             description="Total number of drift events",
             unit="1",
         )
         self._meter.create_observable_gauge(
-            name="sigma.coherence.score",
+            name=METRIC_COHERENCE_SCORE,
             description="Latest coherence score (0-100)",
             unit="1",
             callbacks=[self._observe_coherence],
@@ -150,29 +175,29 @@ class OtelExporter:
         if not self._tracer:
             return None
 
-        with self._tracer.start_as_current_span("decision_episode") as span:
+        with self._tracer.start_as_current_span(SPAN_DECISION_EPISODE) as span:
             episode_id = episode.get("episodeId", "")
             decision_type = episode.get("decisionType", "")
-            span.set_attribute("episode.id", episode_id)
-            span.set_attribute("episode.decision_type", decision_type)
+            span.set_attribute(ATTR_EPISODE_ID, episode_id)
+            span.set_attribute(ATTR_EPISODE_DECISION_TYPE, decision_type)
 
             telemetry = episode.get("telemetry", {})
             stage_ms = telemetry.get("stageMs", {})
 
             for phase in ("context", "plan", "act", "verify"):
-                with self._tracer.start_as_current_span(f"phase.{phase}") as child:
-                    child.set_attribute("phase.name", phase)
-                    child.set_attribute("phase.duration_ms", stage_ms.get(phase, 0))
+                with self._tracer.start_as_current_span(f"{SPAN_PHASE_PREFIX}.{phase}") as child:
+                    child.set_attribute(ATTR_PHASE_NAME, phase)
+                    child.set_attribute(ATTR_PHASE_DURATION_MS, stage_ms.get(phase, 0))
 
             degrade = episode.get("degrade", {})
             degrade_step = degrade.get("step", "none")
             if degrade_step and degrade_step != "none":
                 span.add_event(
-                    "degrade_triggered",
-                    attributes={"degrade.step": degrade_step},
+                    EVENT_DEGRADE_TRIGGERED,
+                    attributes={ATTR_DEGRADE_STEP: degrade_step},
                 )
 
-            span.set_attribute("episode.degrade_step", degrade_step)
+            span.set_attribute(ATTR_EPISODE_DEGRADE_STEP, degrade_step)
 
             outcome = episode.get("outcome", {})
             outcome_code = outcome.get("code", "unknown")
@@ -206,13 +231,13 @@ class OtelExporter:
         if not self._tracer:
             return
 
-        with self._tracer.start_as_current_span("drift_event") as span:
+        with self._tracer.start_as_current_span(SPAN_DRIFT_EVENT) as span:
             drift_type = drift.get("driftType", "")
             severity = drift.get("severity", "")
-            span.set_attribute("drift.id", drift.get("driftId", ""))
-            span.set_attribute("drift.type", drift_type)
-            span.set_attribute("drift.severity", severity)
-            span.set_attribute("drift.episode_id", drift.get("episodeId", ""))
+            span.set_attribute(ATTR_DRIFT_ID, drift.get("driftId", ""))
+            span.set_attribute(ATTR_DRIFT_TYPE, drift_type)
+            span.set_attribute(ATTR_DRIFT_SEVERITY, severity)
+            span.set_attribute(ATTR_DRIFT_EPISODE_ID, drift.get("episodeId", ""))
 
         if self._drift_counter:
             self._drift_counter.add(1, {
@@ -234,11 +259,11 @@ class OtelExporter:
             return
 
         # Also emit a span for the coherence evaluation event
-        with self._tracer.start_as_current_span("coherence_evaluation") as span:
-            span.set_attribute("coherence.score", self._coherence_score)
-            span.set_attribute("coherence.grade", report.get("grade", ""))
+        with self._tracer.start_as_current_span(SPAN_COHERENCE_EVAL) as span:
+            span.set_attribute(ATTR_COHERENCE_SCORE, self._coherence_score)
+            span.set_attribute(ATTR_COHERENCE_GRADE, report.get("grade", ""))
             for dim in report.get("dimensions", []):
                 span.set_attribute(
-                    f"coherence.{dim.get('name', 'unknown')}",
+                    f"{ATTR_COHERENCE_DIMENSION_PREFIX}.{dim.get('name', 'unknown')}",
                     dim.get("score", 0.0),
                 )
