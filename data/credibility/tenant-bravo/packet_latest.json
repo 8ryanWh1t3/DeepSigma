@@ -1,10 +1,10 @@
 {
   "tenant_id": "tenant-bravo",
   "packet_id": "CP-SEED-tenant-bravo",
-  "generated_at": "2026-02-19T18:42:38.584002Z",
+  "generated_at": "2026-02-19T19:02:20.540638Z",
   "generated_by": "seed-script",
   "credibility_index": {
-    "score": 87,
+    "score": 86,
     "band": "Minor Drift",
     "components": {}
   },
@@ -20,28 +20,28 @@
     "rs_id": "RS-SEED",
     "reasoning": {
       "overall_assessment": "Elevated stress",
-      "primary_risk": "CG-002 REVIEW",
+      "primary_risk": "CG-002 REVIEW (0.82)",
       "secondary_risk": "CLM-T0-002 DEGRADED",
       "recommendation": "Review flagged claims"
     }
   },
   "ds_summary": {
     "ds_id": "DS-SEED",
-    "active_signals": 3,
+    "active_signals": 10,
     "by_severity": {
-      "low": 0,
+      "low": 3,
       "medium": 2,
-      "high": 1,
-      "critical": 0
+      "high": 3,
+      "critical": 2
     },
     "critical_signal": {
-      "category": "correlation_drift",
-      "source": "DRF-B-002",
+      "category": "timing_entropy",
+      "source": "DRF-B-001",
       "claims_affected": 5,
       "regions": [
         "East"
       ],
-      "description": "correlation_drift drift event (high)"
+      "description": "timing_entropy drift event (critical)"
     }
   },
   "mg_summary": {

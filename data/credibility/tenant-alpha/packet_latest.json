@@ -1,41 +1,30 @@
 {
   "tenant_id": "tenant-alpha",
-  "packet_id": "CP-2026-02-19-1845",
-  "generated_at": "2026-02-19T18:45:56.039605Z",
-  "generated_by": "credibility-engine-runtime",
+  "packet_id": "CP-SEED-tenant-alpha",
+  "generated_at": "2026-02-19T19:01:28.425172Z",
+  "generated_by": "seed-script",
   "credibility_index": {
-    "score": 99,
+    "score": 95,
     "band": "Stable",
-    "components": {
-      "base": 100,
-      "drift_penalty": 0,
-      "correlation_penalty": 0,
-      "quorum_penalty": -1,
-      "ttl_penalty": 0,
-      "sync_penalty": 0
-    }
+    "components": {}
   },
   "dlr_summary": {
-    "dlr_id": "DLR-CP-2026-02-19-1845",
-    "title": "Credibility Packet \u2014 Institutional State Assessment",
-    "decided_by": "credibility-engine (runtime)",
-    "decision_type": "assessment",
-    "key_findings": [
-      "Credibility Index at 99 (Stable) \u2014 within healthy production band",
-      "2 drift events accumulated \u2014 100% auto-resolved"
-    ]
+    "dlr_id": "DLR-SEED",
+    "title": "Seed packet",
+    "decided_by": "seed",
+    "key_findings": []
   },
   "rs_summary": {
-    "rs_id": "RS-CP-2026-02-19-1845",
+    "rs_id": "RS-SEED",
     "reasoning": {
-      "overall_assessment": "Lattice is operationally healthy with Credibility Index at 99 (Stable). Localized drift signals are within expected bounds.",
-      "primary_risk": "No immediate correlation risk.",
-      "secondary_risk": "No claim-level risks identified.",
-      "recommendation": "Continue monitoring. Review flagged drift fingerprints on next rotation."
+      "overall_assessment": "Stable",
+      "primary_risk": "None",
+      "secondary_risk": "None",
+      "recommendation": "Monitor"
     }
   },
   "ds_summary": {
-    "ds_id": "DS-CP-2026-02-19-1845",
+    "ds_id": "DS-SEED",
     "active_signals": 0,
     "by_severity": {
       "low": 0,
@@ -52,27 +41,25 @@
     }
   },
   "mg_summary": {
-    "mg_id": "MG-CP-2026-02-19-1845",
+    "mg_id": "MG-SEED",
     "changes_last_24h": {
       "nodes_added": 0,
       "edges_added": 0,
-      "nodes_modified": 0,
-      "drift_signals_created": 2,
       "patches_applied": 0,
       "seals_created": 0
     }
   },
   "seal": {
-    "sealed": true,
-    "seal_hash": "sha256:b0470eab45a78161d81d580361e688f845cf80b6",
-    "sealed_at": "2026-02-19T18:45:56.040006Z",
-    "sealed_by": "demo",
-    "role": "Coherence Steward",
-    "hash_chain_length": 158
+    "sealed": false,
+    "seal_hash": null,
+    "sealed_at": null,
+    "sealed_by": null,
+    "role": null,
+    "hash_chain_length": 157
   },
   "guardrails": {
     "abstract_model": true,
     "domain_specific": false,
-    "description": "Runtime-generated credibility packet. Abstract institutional architecture. No real-world system modeled."
+    "description": "Seed packet. Abstract institutional architecture."
   }
 }
