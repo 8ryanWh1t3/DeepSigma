@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import type { DecisionEpisode, DriftEvent, AgentMetrics } from './mockData';
+import type { DecisionEpisode, DriftEvent, AgentMetrics, TrustScorecard } from './mockData';
+import { fetchRealTrustScorecard, generateMockTrustScorecard } from './mockData';
 
 export interface MGNode {
   node_id: string;
@@ -34,6 +35,9 @@ interface OverwatchStore {
   coherence: Record<string, unknown> | null;
   mgNodes: MGNode[];
   mgEdges: MGEdge[];
+  trustScorecard: TrustScorecard | null;
+  trustScorecardLoading: boolean;
+  trustScorecardError: string | null;
 
   // Connection state
   connection: ConnectionState;
@@ -45,6 +49,8 @@ interface OverwatchStore {
   setCoherence: (report: Record<string, unknown>) => void;
   setMGGraph: (nodes: MGNode[], edges: MGEdge[]) => void;
   setConnection: (state: Partial<ConnectionState>) => void;
+  setTrustScorecard: (sc: TrustScorecard | null) => void;
+  fetchTrustScorecard: () => Promise<void>;
 }
 
 export const useOverwatchStore = create<OverwatchStore>((set) => ({
@@ -54,6 +60,9 @@ export const useOverwatchStore = create<OverwatchStore>((set) => ({
   coherence: null,
   mgNodes: [],
   mgEdges: [],
+  trustScorecard: null,
+  trustScorecardLoading: false,
+  trustScorecardError: null,
   connection: { status: 'disconnected', lastEvent: '', dataSource: 'mock' },
 
   setEpisodes: (episodes) => set({ episodes }),
@@ -65,4 +74,14 @@ export const useOverwatchStore = create<OverwatchStore>((set) => ({
     set((prev) => ({
       connection: { ...prev.connection, ...state },
     })),
+  setTrustScorecard: (trustScorecard) => set({ trustScorecard, trustScorecardError: null }),
+  fetchTrustScorecard: async () => {
+    set({ trustScorecardLoading: true, trustScorecardError: null });
+    const real = await fetchRealTrustScorecard();
+    if (real) {
+      set({ trustScorecard: real, trustScorecardLoading: false });
+    } else {
+      set({ trustScorecard: generateMockTrustScorecard(), trustScorecardLoading: false });
+    }
+  },
 }));

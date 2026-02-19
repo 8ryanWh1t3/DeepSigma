@@ -1,39 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
+import { useOverwatchStore } from './store';
+import type { TrustScorecard } from './mockData';
 
-interface TrustMetrics {
-  iris_why_latency_ms: number;
-  drift_detect_latency_ms: number;
-  patch_latency_ms: number;
-  connector_ingest_records_per_sec: number;
-  schema_validation_failures: number;
-  total_elapsed_ms: number;
-  steps_completed: number;
-  steps_total: number;
-  all_steps_passed: boolean;
-  drift_events_detected: number;
-  patch_applied: boolean;
-  iris_queries_resolved: number;
-  baseline_score: number;
-  baseline_grade: string;
-  patched_score: number;
-  patched_grade: string;
-  coverage_pct: number | null;
-}
-
-interface SLOChecks {
-  iris_why_latency_ok: boolean;
-  all_steps_passed: boolean;
-  schema_clean: boolean;
-  score_positive: boolean;
-}
-
-interface TrustScorecard {
-  scorecard_version: string;
-  timestamp: string;
-  source_dir: string;
-  metrics: TrustMetrics;
-  slo_checks: SLOChecks;
-}
+const REFRESH_INTERVAL_MS = 30_000; // 30 seconds
 
 function SLOBadge({ ok, label }: { ok: boolean; label: string }) {
   return (
@@ -57,41 +26,32 @@ function MetricRow({ label, value, unit }: { label: string; value: string | numb
 }
 
 export function TrustScorecardPanel() {
-  const [scorecard, setScorecard] = useState<TrustScorecard | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const scorecard = useOverwatchStore((s) => s.trustScorecard);
+  const loading = useOverwatchStore((s) => s.trustScorecardLoading);
+  const fetchScorecard = useOverwatchStore((s) => s.fetchTrustScorecard);
+  const dataSource = useOverwatchStore((s) => s.connection.dataSource);
 
+  const refresh = useCallback(() => { fetchScorecard(); }, [fetchScorecard]);
+
+  // Fetch on mount + periodic refresh
   useEffect(() => {
-    const fetchScorecard = async () => {
-      try {
-        const resp = await fetch('/api/trust_scorecard');
-        if (!resp.ok) {
-          setError('Trust Scorecard not available — run the Golden Path pipeline first.');
-          setLoading(false);
-          return;
-        }
-        const data = await resp.json();
-        setScorecard(data);
-      } catch {
-        setError('Trust Scorecard not available — API server may be offline.');
-      }
-      setLoading(false);
-    };
     fetchScorecard();
-  }, []);
+    const timer = setInterval(fetchScorecard, REFRESH_INTERVAL_MS);
+    return () => clearInterval(timer);
+  }, [fetchScorecard]);
 
-  if (loading) {
+  if (loading && !scorecard) {
     return (
       <div className="p-6 text-center text-slate-400">Loading Trust Scorecard...</div>
     );
   }
 
-  if (error || !scorecard) {
+  if (!scorecard) {
     return (
       <div className="p-6">
         <div className="bg-slate-900 rounded-lg border border-slate-700 p-6 text-center">
           <h3 className="text-lg font-semibold text-slate-300 mb-2">Trust Scorecard</h3>
-          <p className="text-slate-500">{error || 'No scorecard data available.'}</p>
+          <p className="text-slate-500">No scorecard data available.</p>
           <p className="text-slate-600 text-sm mt-2">
             Generate with: <code className="bg-slate-800 px-2 py-0.5 rounded">python -m tools.trust_scorecard --input golden_path_ci_out</code>
           </p>
@@ -100,6 +60,15 @@ export function TrustScorecardPanel() {
     );
   }
 
+  return <ScorecardContent scorecard={scorecard} dataSource={dataSource} onRefresh={refresh} loading={loading} />;
+}
+
+function ScorecardContent({ scorecard, dataSource, onRefresh, loading }: {
+  scorecard: TrustScorecard;
+  dataSource: string;
+  onRefresh: () => void;
+  loading: boolean;
+}) {
   const m = scorecard.metrics;
   const slo = scorecard.slo_checks;
   const allSLOsPass = Object.values(slo).every(Boolean);
@@ -110,12 +79,24 @@ export function TrustScorecardPanel() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold text-slate-100">Trust Scorecard</h2>
-          <p className="text-slate-500 text-sm">v{scorecard.scorecard_version} — {new Date(scorecard.timestamp).toLocaleString()}</p>
+          <p className="text-slate-500 text-sm">
+            v{scorecard.scorecard_version} — {new Date(scorecard.timestamp).toLocaleString()}
+            {dataSource === 'mock' && <span className="ml-2 text-slate-600">(mock data)</span>}
+          </p>
         </div>
-        <div className={`px-3 py-1.5 rounded-lg text-sm font-semibold ${
-          allSLOsPass ? 'bg-green-900/50 text-green-400 border border-green-700' : 'bg-red-900/50 text-red-400 border border-red-700'
-        }`}>
-          {allSLOsPass ? 'ALL SLOs PASS' : 'SLO DEGRADED'}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onRefresh}
+            disabled={loading}
+            className="text-xs text-slate-400 hover:text-blue-400 transition-colors disabled:opacity-50"
+          >
+            {loading ? '↻ Refreshing...' : '↻ Refresh'}
+          </button>
+          <div className={`px-3 py-1.5 rounded-lg text-sm font-semibold ${
+            allSLOsPass ? 'bg-green-900/50 text-green-400 border border-green-700' : 'bg-red-900/50 text-red-400 border border-red-700'
+          }`}>
+            {allSLOsPass ? 'ALL SLOs PASS' : 'SLO DEGRADED'}
+          </div>
         </div>
       </div>
 
