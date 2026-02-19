@@ -5,7 +5,7 @@ All notable changes to Σ OVERWATCH / DeepSigma will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.6.4] — 2026-02-19 — "MDPT Beta Kit"
+## [0.6.4] — 2026-02-19 — "MDPT Beta Kit + Credibility Engine"
 
 ### Added
 
@@ -28,6 +28,26 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Stats
 
 - 27 new files, 6 modified, 29 new tests, 2 new CI gates
+
+### Added — Credibility Engine & Scaled Truth Infrastructure
+
+- **Credibility Index** (`docs/credibility-engine/credibility_index.md`): Composite 0–100 score from 6 components (tier-weighted claim integrity, drift penalty, correlation risk, quorum margin compression, TTL expiration, independent confirmation bonus). 5 interpretation bands (Stable → Compromised). Operational thresholds and fail-first indicators for 30k–40k node lattices
+- **Core System Design** (`docs/credibility-engine/core_system_design.md`): Evidence node model (11 required fields), append-only event model (6 event types), TTL discipline (Tier 0–3), K-of-N quorum with correlation groups and Tier 0 out-of-band requirement
+- **Sync Plane** (`docs/credibility-engine/sync_plane.md`): Event time vs ingest time, monotonic source sequence enforcement, independent time beacons, watermark logic, replay/backfill detection. Minimum: 3 regions, 3–5 sync nodes/region, 2 out-of-domain authorities, no region >40% authority
+- **Drift-Patch-Seal loop** (`docs/credibility-engine/drift_patch_seal_loop.md`): 5 institutional drift categories (timing entropy, correlation drift, confidence volatility, TTL compression, external mismatch) mapping to 8 runtime drift types. Per-category: DS artifact → root cause → patch → MG diff → sealed episode
+- **Deployment patterns** (`docs/credibility-engine/deployment_patterns.md`): MVP (6–8 engineers, $1.5M–$3M/year, Kafka/NATS + Neo4j/TerminusDB) + Production (30k–40k nodes, 3+ regions, hot/warm/cold, $6M–$10M/year) + economic modeling (~$170–$280/node/year)
+- **Progressive lattice examples**: 01-mini-lattice (12 nodes, mechanics), 02-enterprise-lattice (~500 nodes, complexity), 03-credibility-engine-scale (30k–40k nodes, survivability) — abstract, non-domain
+- **Mermaid diagrams**: 38-lattice-architecture (Claim → SubClaim → Evidence → Source + SyncPlane + Credibility Index), 39-drift-loop (institutional Drift → RootCause → Patch → MGUpdate → Seal → Index)
+
+### Changed — Credibility Engine
+
+- `README.md`: Added Progressive Escalation section and Credibility Engine section with category definition
+- `NAV.md`: Added Credibility Engine section with 11 resource links, updated Diagrams count
+- `mermaid/README.md`: Added diagrams 37–39 to catalogue
+
+### Stats (Credibility Engine addition)
+
+- 11 new files, 4 modified, 0 new tests (documentation-only), 2 new Mermaid diagrams
 
 ## [0.6.3] — 2026-02-19 — "Excel-first Hardening"
 
