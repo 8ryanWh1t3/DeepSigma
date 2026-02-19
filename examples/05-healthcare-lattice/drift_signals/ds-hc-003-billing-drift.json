@@ -1,0 +1,33 @@
+{
+  "ds_id": "DS-HC-003",
+  "episode_id": "ep-hc-003",
+  "category": "billing_classification_drift",
+  "severity": "red",
+  "detected_at": "2026-02-21T14:00:00Z",
+  "domains_affected": ["FIN", "REG", "CLN"],
+  "affected_claims": ["Claim-FIN-002", "Claim-REG-003", "Claim-CLN-004"],
+  "affected_evidence_count": 18,
+  "title": "Billing Code Drift: Observation-to-Inpatient Upcoding",
+  "facilities_involved": {
+    "origin": "meridian-general",
+    "detection": "meridian-general",
+    "impact": []
+  },
+  "source_id": "S-REV-001",
+  "correlation_group": "revenue-cycle",
+  "runtime_types": ["verify", "outcome"],
+  "cross_domain": true,
+  "cross_facility": false,
+  "billing_impact": {
+    "template_age_weeks": 3,
+    "revenue_anomaly_percent": 34,
+    "estimated_exposure_usd": 2100000,
+    "affected_diagnosis_codes": "Cardiac observation-vs-inpatient classification",
+    "cms_rule_update_lag_weeks": 6
+  },
+  "credibility_index_impact": {
+    "before": 70,
+    "after": 48,
+    "delta": -22
+  }
+}

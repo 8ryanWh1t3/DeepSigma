@@ -1,0 +1,85 @@
+{
+  "episode_id": "ep-hc-004",
+  "title": "Equipment Maintenance Lapse: Shift Handoff Gap",
+  "domain_primary": "OPS",
+  "domains_affected": ["OPS", "CLN"],
+  "severity": "yellow",
+  "category": "equipment_verification_gap",
+  "facilities_involved": {
+    "origin": "meridian-general",
+    "detection": "meridian-general",
+    "impact": []
+  },
+  "detected_at": "2026-02-22T03:00:00Z",
+  "resolved_at": "2026-02-22T10:00:00Z",
+  "resolution_hours": 7,
+  "claims_affected": [
+    {
+      "claim_id": "Claim-OPS-003",
+      "tier": 1,
+      "status_before": "OK",
+      "status_after": "DEGRADED",
+      "credibility_sub_index_before": 75,
+      "credibility_sub_index_after": 58
+    },
+    {
+      "claim_id": "Claim-CLN-005",
+      "tier": 0,
+      "status_before": "OK",
+      "status_after": "DEGRADED",
+      "credibility_sub_index_before": 78,
+      "credibility_sub_index_after": 62
+    }
+  ],
+  "evidence_affected": 8,
+  "dlr": {
+    "decision": "Pull 3 monitors from service; emergency calibration; add two-step verification to S-BIO-001",
+    "decided_by": "Director of Biomedical Engineering + CICU Nurse Manager",
+    "authority_level": "facility",
+    "evidence_considered": 6,
+    "alternatives_rejected": [
+      {
+        "option": "A",
+        "description": "Keep monitors in service pending morning calibration",
+        "rejection_reason": "One monitor already produced false-negative suppression; unacceptable clinical risk"
+      }
+    ]
+  },
+  "rs": {
+    "primary_reasoning": "Immediate removal eliminates clinical risk; two-step verification prevents recurrence at process level",
+    "weights": {
+      "patient_safety": 0.50,
+      "operational_continuity": 0.30,
+      "regulatory_compliance": 0.15,
+      "financial_impact": 0.05
+    },
+    "counter_claims": [
+      "Night charge nurse noted monitor shortage during census surge — addressed with portable monitors from step-down unit"
+    ]
+  },
+  "ds": {
+    "drift_signals": ["DS-HC-004"],
+    "categories": ["equipment_verification_gap"],
+    "cross_domain": true,
+    "cross_facility": false,
+    "time_to_detection_hours": 11
+  },
+  "mg": {
+    "new_edges": [
+      "Equipment maintenance complete → independent verification required before return-to-service status"
+    ],
+    "governance_changes": 1
+  },
+  "seal": {
+    "hash": "sha256:e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6",
+    "sealed_at": "2026-02-22T10:15:00Z",
+    "sealed_by": "coherence_steward",
+    "integrity": "verified"
+  },
+  "credibility_index": {
+    "before": 62,
+    "during": 56,
+    "after": 65,
+    "delta_peak": -6
+  }
+}

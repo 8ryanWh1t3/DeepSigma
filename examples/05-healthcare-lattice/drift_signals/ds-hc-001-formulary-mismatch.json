@@ -1,0 +1,33 @@
+{
+  "ds_id": "DS-HC-001",
+  "episode_id": "ep-hc-001",
+  "category": "formulary_mismatch",
+  "severity": "red",
+  "detected_at": "2026-02-20T18:00:00Z",
+  "domains_affected": ["CLN", "REG", "FIN"],
+  "affected_claims": ["Claim-CLN-001", "Claim-CLN-002", "Claim-REG-001"],
+  "affected_evidence_count": 14,
+  "title": "Cross-Facility Formulary Mismatch",
+  "facilities_involved": {
+    "origin": "meridian-general",
+    "detection": "meridian-general",
+    "impact": ["meridian-community"]
+  },
+  "source_id": "S-RX-001",
+  "correlation_group": "pharmacy-system",
+  "runtime_types": ["freshness", "verify"],
+  "cross_domain": true,
+  "cross_facility": true,
+  "clinical_impact": {
+    "agent_old": "Prior anticoagulant (non-formulary post-update)",
+    "agent_new": "Coagulase-X (new formulary standard)",
+    "interaction_risk": "Bridge protocol conflict at transfer",
+    "facilities_out_of_sync": ["meridian-community"],
+    "sync_lag_hours": 8
+  },
+  "credibility_index_impact": {
+    "before": 87,
+    "after": 68,
+    "delta": -19
+  }
+}

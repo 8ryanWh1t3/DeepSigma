@@ -1,0 +1,33 @@
+{
+  "ds_id": "DS-HC-004",
+  "episode_id": "ep-hc-004",
+  "category": "equipment_verification_gap",
+  "severity": "yellow",
+  "detected_at": "2026-02-22T03:00:00Z",
+  "domains_affected": ["OPS", "CLN"],
+  "affected_claims": ["Claim-OPS-003", "Claim-CLN-005"],
+  "affected_evidence_count": 8,
+  "title": "Equipment Verification Gap: Shift Handoff Failure",
+  "facilities_involved": {
+    "origin": "meridian-general",
+    "detection": "meridian-general",
+    "impact": []
+  },
+  "source_id": "S-BIO-001",
+  "correlation_group": "biomed-maintenance",
+  "runtime_types": ["verify"],
+  "cross_domain": true,
+  "cross_facility": false,
+  "equipment_impact": {
+    "monitors_affected": 3,
+    "monitors_total_maintained": 12,
+    "verification_step_missed": "Final calibration by second technician",
+    "false_alarm_suppression": true,
+    "delayed_recognition_minutes": 40
+  },
+  "credibility_index_impact": {
+    "before": 62,
+    "after": 56,
+    "delta": -6
+  }
+}

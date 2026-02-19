@@ -1,0 +1,15 @@
+%%{init: {'theme': 'base'}}%%
+flowchart LR
+    PT[P&T Committee<br/>Formulary Approval] -->|update| GEN[General Pharmacy<br/>S-RX-001]
+    PT -->|sync lag| COM[Community Pharmacy<br/>S-RX-001]
+    GEN -->|new agent| TRANSFER[Patient Transfer]
+    COM -->|old agent| TRANSFER
+    TRANSFER -->|conflict| CDS[Clinical Decision<br/>Support Flag]
+    CDS -->|drift signal| DS[DS-HC-001<br/>RED]
+
+    style PT fill:#4a90d9,color:#fff
+    style GEN fill:#5cb85c,color:#fff
+    style COM fill:#d9534f,color:#fff
+    style TRANSFER fill:#f0ad4e,color:#fff
+    style CDS fill:#d9534f,color:#fff
+    style DS fill:#d9534f,color:#fff

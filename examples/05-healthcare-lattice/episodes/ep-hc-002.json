@@ -1,0 +1,103 @@
+{
+  "episode_id": "ep-hc-002",
+  "title": "Staffing Ratio Breach: Cross-Facility Workforce Cascade",
+  "domain_primary": "OPS",
+  "domains_affected": ["OPS", "REG", "CLN", "FIN"],
+  "severity": "red",
+  "category": "staffing_ratio_breach",
+  "facilities_involved": {
+    "origin": "meridian-general",
+    "detection": "meridian-general",
+    "impact": ["meridian-community"]
+  },
+  "detected_at": "2026-02-21T02:00:00Z",
+  "resolved_at": "2026-02-21T18:00:00Z",
+  "resolution_hours": 16,
+  "claims_affected": [
+    {
+      "claim_id": "Claim-OPS-001",
+      "tier": 0,
+      "status_before": "OK",
+      "status_after": "FAILED",
+      "credibility_sub_index_before": 85,
+      "credibility_sub_index_after": 42
+    },
+    {
+      "claim_id": "Claim-REG-002",
+      "tier": 0,
+      "status_before": "OK",
+      "status_after": "DEGRADED",
+      "credibility_sub_index_before": 86,
+      "credibility_sub_index_after": 58
+    },
+    {
+      "claim_id": "Claim-CLN-003",
+      "tier": 1,
+      "status_before": "OK",
+      "status_after": "DEGRADED",
+      "credibility_sub_index_before": 82,
+      "credibility_sub_index_after": 64
+    },
+    {
+      "claim_id": "Claim-FIN-001",
+      "tier": 1,
+      "status_before": "OK",
+      "status_after": "DEGRADED",
+      "credibility_sub_index_before": 80,
+      "credibility_sub_index_after": 62
+    }
+  ],
+  "evidence_affected": 22,
+  "dlr": {
+    "decision": "Activate agency staffing for General; restore Community L&D contracts; implement cross-facility allocation model",
+    "decided_by": "Chief Nursing Officer + VP Operations + General Counsel",
+    "authority_level": "system",
+    "evidence_considered": 14,
+    "alternatives_rejected": [
+      {
+        "option": "A",
+        "description": "Divert Community patients to General to consolidate staffing",
+        "rejection_reason": "Community L&D patients cannot be safely transferred mid-labor; creates new clinical risk"
+      }
+    ]
+  },
+  "rs": {
+    "primary_reasoning": "Parallel staffing restoration preserves both facilities; cross-facility model prevents recurrence",
+    "weights": {
+      "patient_safety": 0.40,
+      "regulatory_compliance": 0.30,
+      "operational_continuity": 0.20,
+      "financial_impact": 0.10
+    },
+    "counter_claims": [
+      "CFO raised agency cost concern ($180K/week) — accepted as necessary for compliance",
+      "General CNO argued Community should absorb more surge — rejected due to L&D minimum staffing"
+    ]
+  },
+  "ds": {
+    "drift_signals": ["DS-HC-002"],
+    "categories": ["staffing_ratio_breach"],
+    "cross_domain": true,
+    "cross_facility": true,
+    "time_to_detection_hours": 0.5
+  },
+  "mg": {
+    "new_edges": [
+      "Staffing reallocation → system-level approval when any facility within 10% of minimum",
+      "Census surge trigger → automatic travel nurse pool freeze at all facilities"
+    ],
+    "governance_changes": 2
+  },
+  "seal": {
+    "hash": "sha256:c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4",
+    "sealed_at": "2026-02-21T18:30:00Z",
+    "sealed_by": "coherence_steward",
+    "integrity": "verified"
+  },
+  "credibility_index": {
+    "before": 79,
+    "during": 55,
+    "after": 70,
+    "delta_peak": -24
+  }
+}

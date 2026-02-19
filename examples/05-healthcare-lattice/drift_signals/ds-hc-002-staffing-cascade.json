@@ -1,0 +1,33 @@
+{
+  "ds_id": "DS-HC-002",
+  "episode_id": "ep-hc-002",
+  "category": "staffing_ratio_breach",
+  "severity": "red",
+  "detected_at": "2026-02-21T02:00:00Z",
+  "domains_affected": ["OPS", "REG", "CLN", "FIN"],
+  "affected_claims": ["Claim-OPS-001", "Claim-REG-002", "Claim-CLN-003", "Claim-FIN-001"],
+  "affected_evidence_count": 22,
+  "title": "Staffing Ratio Breach: Cross-Facility Workforce Cascade",
+  "facilities_involved": {
+    "origin": "meridian-general",
+    "detection": "meridian-general",
+    "impact": ["meridian-community"]
+  },
+  "source_id": "S-HR-001",
+  "correlation_group": "workforce-shared-pool",
+  "runtime_types": ["freshness", "outcome"],
+  "cross_domain": true,
+  "cross_facility": true,
+  "staffing_impact": {
+    "general_medsurg_ratio": "1:7",
+    "general_medsurg_mandate": "1:5",
+    "community_ld_status": "below minimum",
+    "census_surge_percent": 22,
+    "travel_nurse_contracts_diverted": 8
+  },
+  "credibility_index_impact": {
+    "before": 79,
+    "after": 55,
+    "delta": -24
+  }
+}

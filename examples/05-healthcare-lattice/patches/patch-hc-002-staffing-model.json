@@ -1,0 +1,52 @@
+{
+  "patch_id": "Patch-HC-002",
+  "title": "Cross-Facility Staffing Allocation Model",
+  "trigger_drift_signal": "ds-hc-002-staffing-cascade",
+  "severity": "RED",
+  "domains": ["OPS", "REG", "CLN", "FIN"],
+  "tier0_claims_impacted": ["OPS-001", "REG-002"],
+  "decision_options": [
+    {
+      "option": "A",
+      "name": "Cross-facility allocation model with minimum reserve",
+      "tradeoff": "Requires system-level staffing governance; limits facility autonomy",
+      "success_metric": "No facility below 90% of staffing minimum during reallocation"
+    },
+    {
+      "option": "B",
+      "name": "Facility-level staffing independence (no shared pool)",
+      "tradeoff": "Higher baseline cost; each facility maintains full independent coverage",
+      "success_metric": "Zero cross-facility staffing dependencies"
+    }
+  ],
+  "selected_option": "A",
+  "patch_sequence": [
+    {
+      "step": 1,
+      "action": "Activate agency staffing for General night shift; restore Community L&D contracts",
+      "owner": "chief-nursing-officer",
+      "verification": "General med-surg ratio restored to 1:5; Community L&D above minimum",
+      "rollback": "Maintain agency contracts until permanent staff restored"
+    },
+    {
+      "step": 2,
+      "action": "Submit corrective action plan to state regulatory body within 24 hours",
+      "owner": "chief-compliance-officer",
+      "verification": "State acknowledgment of corrective action plan received",
+      "rollback": "Escalate to legal counsel if state requires additional action"
+    },
+    {
+      "step": 3,
+      "action": "Implement cross-facility staffing allocation model with 10% reserve floor",
+      "owner": "vp-operations",
+      "verification": "Allocation model active in S-HR-001; alerts on reserve breach",
+      "rollback": "Revert to facility-level independent staffing"
+    }
+  ],
+  "closure_conditions": [
+    "OPS-001 confidence >= 0.80",
+    "REG-002 confidence >= 0.80",
+    "State regulatory corrective action plan accepted",
+    "No staffing ratio breach in subsequent 30 days"
+  ]
+}
