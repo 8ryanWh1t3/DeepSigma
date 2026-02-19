@@ -33,7 +33,7 @@ jobs:
       - name: Install package
         run: |
           python -m pip install --upgrade pip
-          pip install -e ".[dev,excel]"
+          pip install -e ".[dev,excel]" pydantic
 
       - name: Run unit tests with coverage
         run: |
