@@ -1,0 +1,32 @@
+%% Mini Lattice — 12 nodes
+%% Claim → SubClaim → Evidence → Source + Sync Plane
+
+graph TD
+    subgraph Lattice["Claim Lattice (12 nodes)"]
+        CA[Claim-A<br/>Tier 0] --> SA1[SubClaim-A1<br/>Tier 1]
+        CA --> SA2[SubClaim-A2<br/>Tier 1]
+        CA --> SA3[SubClaim-A3<br/>Tier 2]
+
+        SA1 --> E1[Evidence-E1<br/>TTL: 4h, conf: 0.92]
+        SA1 --> E2[Evidence-E2<br/>TTL: 8h, conf: 0.88]
+        SA2 --> E3[Evidence-E3<br/>TTL: 4h, conf: 0.95]
+        SA3 --> E4[Evidence-E4<br/>TTL: 1h, conf: 0.90]
+        SA3 --> E5[Evidence-E5<br/>TTL: 1h, conf: 0.85]
+
+        E1 --> S1[Source-S1<br/>Tier 1, internal-sensors]
+        E3 --> S1
+        E2 --> S2[Source-S2<br/>Tier 2, external-feeds]
+        E4 --> S2
+        E5 --> S2
+    end
+
+    subgraph Sync["Sync Plane"]
+        B1[Beacon-B1<br/>Tier 0] -.->|validates| E1
+        B1 -.->|validates| E2
+        B1 -.->|validates| E3
+        B1 -.->|validates| E4
+        B1 -.->|validates| E5
+    end
+
+    style Lattice fill:#0f3460,stroke:#0f3460,color:#fff
+    style Sync fill:#16213e,stroke:#0f3460,color:#fff
