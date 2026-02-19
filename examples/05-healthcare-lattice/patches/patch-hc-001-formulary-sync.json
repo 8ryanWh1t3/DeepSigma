@@ -1,0 +1,57 @@
+{
+  "patch_id": "Patch-HC-001",
+  "title": "Cross-Facility Formulary Synchronization",
+  "trigger_drift_signal": "ds-hc-001-formulary-mismatch",
+  "severity": "RED",
+  "domains": ["CLN", "REG", "FIN"],
+  "tier0_claims_impacted": ["CLN-001", "CLN-002", "REG-001"],
+  "decision_options": [
+    {
+      "option": "A",
+      "name": "Emergency formulary push to Community",
+      "tradeoff": "4-hour implementation; requires pharmacy downtime at Community",
+      "success_metric": "All facilities on same formulary version; no dispensing conflicts"
+    },
+    {
+      "option": "B",
+      "name": "Revert General to old formulary",
+      "tradeoff": "Disrupts 450-bed facility; patients already on new agent need transition",
+      "success_metric": "Uniform formulary across system; but reversal introduces new clinical risk"
+    },
+    {
+      "option": "C",
+      "name": "Manual bridge protocol for transfer patients + systemic sync",
+      "tradeoff": "Labor-intensive short-term; preserves both facilities' current operations",
+      "success_metric": "Zero formulary conflicts at transfer; sync verified within 24h"
+    }
+  ],
+  "selected_option": "C",
+  "patch_sequence": [
+    {
+      "step": 1,
+      "action": "Deploy manual bridge protocol for all inter-facility transfers",
+      "owner": "chief-pharmacy-officer",
+      "verification": "Transfer checklist includes formulary reconciliation; pharmacy sign-off",
+      "rollback": "Revert to pre-transfer medication hold protocol"
+    },
+    {
+      "step": 2,
+      "action": "Emergency formulary push to Community pharmacy system",
+      "owner": "pharmacy-informatics",
+      "verification": "S-RX-001 version match confirmed at all facilities; test dispensing verified",
+      "rollback": "Restore Community formulary from backup"
+    },
+    {
+      "step": 3,
+      "action": "Add real-time formulary sync verification to EHR interface engine",
+      "owner": "health-it",
+      "verification": "Sync heartbeat active; alert on version mismatch > 1 hour",
+      "rollback": "Disable sync check; revert to manual verification schedule"
+    }
+  ],
+  "closure_conditions": [
+    "CLN-001 confidence >= 0.85",
+    "All facilities on identical formulary version",
+    "No open medication safety events linked to formulary mismatch"
+  ]
+}

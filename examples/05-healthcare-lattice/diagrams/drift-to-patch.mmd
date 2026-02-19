@@ -1,0 +1,16 @@
+%%{init: {'theme': 'base'}}%%
+sequenceDiagram
+    participant SRC as Evidence Source
+    participant CLM as Claims
+    participant DS as Drift Signal
+    participant DRI as Decision Authority
+    participant PATCH as Patch Plan
+    participant MG as Memory Graph
+
+    SRC->>CLM: Evidence contradicts standing claim
+    CLM->>DS: Claim status flips (OK → DEGRADED/FAILED)
+    DS->>DRI: Severity + domains + claims escalated
+    DRI->>PATCH: Decision: selected option + sequence
+    PATCH->>MG: Governance edges added
+    MG->>CLM: Claim confidence restored
+    Note over SRC,MG: DecisionEpisode sealed

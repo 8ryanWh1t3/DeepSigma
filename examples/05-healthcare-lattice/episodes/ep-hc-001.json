@@ -1,0 +1,95 @@
+{
+  "episode_id": "ep-hc-001",
+  "title": "Formulary Conflict: Cross-Facility Medication Safety",
+  "domain_primary": "CLN",
+  "domains_affected": ["CLN", "REG", "FIN"],
+  "severity": "red",
+  "category": "formulary_mismatch",
+  "facilities_involved": {
+    "origin": "meridian-general",
+    "detection": "meridian-general",
+    "impact": ["meridian-community"]
+  },
+  "detected_at": "2026-02-20T18:00:00Z",
+  "resolved_at": "2026-02-21T04:00:00Z",
+  "resolution_hours": 10,
+  "claims_affected": [
+    {
+      "claim_id": "Claim-CLN-001",
+      "tier": 0,
+      "status_before": "OK",
+      "status_after": "FAILED",
+      "credibility_sub_index_before": 92,
+      "credibility_sub_index_after": 55
+    },
+    {
+      "claim_id": "Claim-CLN-002",
+      "tier": 0,
+      "status_before": "OK",
+      "status_after": "DEGRADED",
+      "credibility_sub_index_before": 90,
+      "credibility_sub_index_after": 65
+    },
+    {
+      "claim_id": "Claim-REG-001",
+      "tier": 0,
+      "status_before": "OK",
+      "status_after": "DEGRADED",
+      "credibility_sub_index_before": 88,
+      "credibility_sub_index_after": 70
+    }
+  ],
+  "evidence_affected": 14,
+  "dlr": {
+    "decision": "Implement manual bridge protocol for transfer patients (immediate) + emergency formulary push to Community (systemic fix)",
+    "decided_by": "Chief Medical Officer + Chief Pharmacy Officer",
+    "authority_level": "system",
+    "evidence_considered": 9,
+    "alternatives_rejected": [
+      {
+        "option": "B",
+        "description": "Revert General to old formulary until sync verified",
+        "rejection_reason": "Disrupts new protocol for 450-bed facility; reversal risk higher than bridge protocol"
+      }
+    ]
+  },
+  "rs": {
+    "primary_reasoning": "Immediate patient safety via bridge protocol preserves both facilities' operations while systemic fix deploys",
+    "weights": {
+      "patient_safety": 0.45,
+      "regulatory_compliance": 0.25,
+      "operational_continuity": 0.20,
+      "financial_impact": 0.10
+    },
+    "counter_claims": [
+      "Pharmacy argued full formulary revert is safer (rejected — General patients already on new agent)",
+      "Community CMO confirmed bridge protocol is clinically equivalent for transfer window"
+    ]
+  },
+  "ds": {
+    "drift_signals": ["DS-HC-001"],
+    "categories": ["formulary_mismatch"],
+    "cross_domain": true,
+    "cross_facility": true,
+    "time_to_detection_hours": 8
+  },
+  "mg": {
+    "new_edges": [
+      "Formulary change approval → mandatory cross-facility sync verification gate",
+      "Patient transfer → automatic formulary consistency check at receiving facility"
+    ],
+    "governance_changes": 2
+  },
+  "seal": {
+    "hash": "sha256:b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3",
+    "sealed_at": "2026-02-21T04:15:00Z",
+    "sealed_by": "coherence_steward",
+    "integrity": "verified"
+  },
+  "credibility_index": {
+    "before": 87,
+    "during": 68,
+    "after": 79,
+    "delta_peak": -19
+  }
+}

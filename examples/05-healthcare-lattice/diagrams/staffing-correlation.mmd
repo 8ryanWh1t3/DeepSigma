@@ -1,0 +1,25 @@
+%%{init: {'theme': 'base'}}%%
+flowchart TD
+    SURGE[Census Surge<br/>+22% at General] -->|diverts| POOL[Shared Travel<br/>Nurse Pool]
+    POOL -->|depletes| GEN_STAFF[General Night Shift<br/>1:7 ratio ❌]
+    POOL -->|starves| COM_STAFF[Community L&D<br/>Below minimum ❌]
+
+    GEN_STAFF -->|breach| OPS[OPS-001<br/>FAILED]
+    GEN_STAFF -->|breach| REG[REG-002<br/>DEGRADED]
+    COM_STAFF -->|cascade| CLN[CLN-003<br/>DEGRADED]
+    COM_STAFF -->|cost| FIN[FIN-001<br/>DEGRADED]
+
+    subgraph "Correlation Group: workforce-shared-pool"
+        POOL
+        GEN_STAFF
+        COM_STAFF
+    end
+
+    style SURGE fill:#d9534f,color:#fff
+    style POOL fill:#f0ad4e,color:#fff
+    style GEN_STAFF fill:#d9534f,color:#fff
+    style COM_STAFF fill:#d9534f,color:#fff
+    style OPS fill:#d9534f,color:#fff
+    style REG fill:#f0ad4e,color:#fff
+    style CLN fill:#f0ad4e,color:#fff
+    style FIN fill:#f0ad4e,color:#fff

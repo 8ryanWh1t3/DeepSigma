@@ -1,0 +1,95 @@
+{
+  "episode_id": "ep-hc-003",
+  "title": "Billing Code Drift: False Claims Exposure",
+  "domain_primary": "FIN",
+  "domains_affected": ["FIN", "REG", "CLN"],
+  "severity": "red",
+  "category": "billing_classification_drift",
+  "facilities_involved": {
+    "origin": "meridian-general",
+    "detection": "meridian-general",
+    "impact": []
+  },
+  "detected_at": "2026-02-21T14:00:00Z",
+  "resolved_at": "2026-02-22T20:00:00Z",
+  "resolution_hours": 30,
+  "claims_affected": [
+    {
+      "claim_id": "Claim-FIN-002",
+      "tier": 0,
+      "status_before": "OK",
+      "status_after": "FAILED",
+      "credibility_sub_index_before": 78,
+      "credibility_sub_index_after": 35
+    },
+    {
+      "claim_id": "Claim-REG-003",
+      "tier": 0,
+      "status_before": "OK",
+      "status_after": "FAILED",
+      "credibility_sub_index_before": 82,
+      "credibility_sub_index_after": 40
+    },
+    {
+      "claim_id": "Claim-CLN-004",
+      "tier": 1,
+      "status_before": "OK",
+      "status_after": "DEGRADED",
+      "credibility_sub_index_before": 80,
+      "credibility_sub_index_after": 60
+    }
+  ],
+  "evidence_affected": 18,
+  "dlr": {
+    "decision": "Suspend affected template; manual review queue; self-disclosure to CMS/OIG with corrective action plan",
+    "decided_by": "Chief Financial Officer + Chief Compliance Officer + General Counsel",
+    "authority_level": "system",
+    "evidence_considered": 11,
+    "alternatives_rejected": [
+      {
+        "option": "A",
+        "description": "Correct template only, defer disclosure pending internal audit",
+        "rejection_reason": "False Claims Act liability increases with delay; proactive disclosure reduces penalty exposure"
+      }
+    ]
+  },
+  "rs": {
+    "primary_reasoning": "Proactive self-disclosure with corrective action demonstrates good faith; template correction prevents further accumulation",
+    "weights": {
+      "regulatory_compliance": 0.40,
+      "financial_exposure": 0.30,
+      "clinical_documentation": 0.20,
+      "operational_impact": 0.10
+    },
+    "counter_claims": [
+      "Revenue cycle director argued upcoding was template error not intent — accepted, but disclosure still required",
+      "Legal counsel confirmed self-disclosure to OIG is the defensible path"
+    ]
+  },
+  "ds": {
+    "drift_signals": ["DS-HC-003"],
+    "categories": ["billing_classification_drift"],
+    "cross_domain": true,
+    "cross_facility": false,
+    "time_to_detection_hours": 504
+  },
+  "mg": {
+    "new_edges": [
+      "Coding template change → automated CMS rule validation gate",
+      "Revenue anomaly > 20% variance → automatic compliance review trigger"
+    ],
+    "governance_changes": 2
+  },
+  "seal": {
+    "hash": "sha256:d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5",
+    "sealed_at": "2026-02-22T20:30:00Z",
+    "sealed_by": "coherence_steward",
+    "integrity": "verified"
+  },
+  "credibility_index": {
+    "before": 70,
+    "during": 48,
+    "after": 62,
+    "delta_peak": -22
+  }
+}
