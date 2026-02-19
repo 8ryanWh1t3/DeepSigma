@@ -1,0 +1,70 @@
+{
+  "window": "24h",
+  "window_start": "2026-02-18T18:45:00Z",
+  "window_end": "2026-02-19T18:45:00Z",
+  "total_count": 183,
+  "by_severity": {
+    "low": 120,
+    "medium": 48,
+    "high": 14,
+    "critical": 1
+  },
+  "by_category": {
+    "timing_entropy": 62,
+    "correlation_drift": 28,
+    "confidence_volatility": 41,
+    "ttl_compression": 38,
+    "external_mismatch": 14
+  },
+  "by_region": {
+    "East": 58,
+    "Central": 74,
+    "West": 51
+  },
+  "auto_resolved": 168,
+  "pending_review": 12,
+  "escalated": 3,
+  "top_fingerprints": [
+    {
+      "fingerprint": "TTL-BATCH-EXPIRE-T1",
+      "description": "Tier 1 evidence batch TTL expiration",
+      "recurrence_count": 34,
+      "tier_impact": 1,
+      "severity": "low",
+      "auto_resolved": true
+    },
+    {
+      "fingerprint": "CONF-VOLATILITY-C2",
+      "description": "Confidence oscillation in Central Domain C2",
+      "recurrence_count": 18,
+      "tier_impact": 0,
+      "severity": "high",
+      "auto_resolved": false
+    },
+    {
+      "fingerprint": "CORR-DRIFT-S003",
+      "description": "Cross-region correlation drift from Source-S003",
+      "recurrence_count": 12,
+      "tier_impact": 0,
+      "severity": "high",
+      "auto_resolved": false
+    },
+    {
+      "fingerprint": "TIMING-LAG-WEST",
+      "description": "Ingestion lag variance in West region feeds",
+      "recurrence_count": 28,
+      "tier_impact": 2,
+      "severity": "low",
+      "auto_resolved": true
+    },
+    {
+      "fingerprint": "SYNC-BEACON-SKEW",
+      "description": "Beacon-W2 time skew exceeding 200ms",
+      "recurrence_count": 8,
+      "tier_impact": 1,
+      "severity": "medium",
+      "auto_resolved": false
+    }
+  ],
+  "hourly_distribution": [4, 3, 2, 3, 5, 6, 8, 12, 14, 11, 9, 8, 7, 6, 8, 10, 12, 9, 8, 11, 10, 7, 6, 4]
+}

@@ -1,0 +1,74 @@
+{
+  "packet_id": "CP-2026-02-19-1845",
+  "generated_at": "2026-02-19T18:45:00Z",
+  "generated_by": "credibility-engine-demo",
+  "credibility_index": {
+    "score": 92,
+    "band": "Minor Drift",
+    "components": {
+      "tier_weighted_integrity": 42,
+      "drift_penalty": -4,
+      "correlation_risk": -6,
+      "quorum_margin": -2,
+      "ttl_expiration": -3,
+      "confirmation_bonus": 3
+    }
+  },
+  "dlr_summary": {
+    "dlr_id": "DLR-CP-001",
+    "title": "Credibility Packet — Institutional State Assessment",
+    "decided_by": "credibility-engine (automated)",
+    "decision_type": "assessment",
+    "key_findings": [
+      "Credibility Index at 92 (Minor Drift) — within healthy production band",
+      "1 Tier 0 claim (CLM-T0-003) in UNKNOWN state — quorum broken, Source-W2-007 offline",
+      "Cross-region correlation risk from CG-003 (coefficient 0.91) flagged CRITICAL",
+      "183 drift events in 24h — 92% auto-resolved, 3 escalated"
+    ]
+  },
+  "rs_summary": {
+    "rs_id": "RS-CP-001",
+    "reasoning": {
+      "overall_assessment": "Lattice is operationally healthy with localized risk in West Domain W2 and elevated cross-region correlation from CG-003",
+      "primary_risk": "CG-003 cross-region API feed (coefficient 0.91) affects 18 claims across 3 regions — structural redundancy illusion",
+      "secondary_risk": "CLM-T0-003 UNKNOWN status — quorum restoration requires Source-W2-007 recovery or backup activation",
+      "recommendation": "Prioritize CG-003 correlation mitigation (add independent backup sources). Monitor CLM-T0-003 for Source-W2-007 recovery within 4h SLA"
+    }
+  },
+  "ds_summary": {
+    "ds_id": "DS-CP-001",
+    "active_signals": 7,
+    "by_severity": { "low": 3, "medium": 2, "high": 1, "critical": 1 },
+    "critical_signal": {
+      "category": "correlation_drift",
+      "source": "CG-003 (S-CR-017, S-CR-022)",
+      "claims_affected": 18,
+      "regions": ["East", "Central", "West"],
+      "description": "Cross-region correlation coefficient exceeded 0.9 threshold"
+    }
+  },
+  "mg_summary": {
+    "mg_id": "MG-CP-001",
+    "changes_last_24h": {
+      "nodes_added": 183,
+      "edges_added": 412,
+      "nodes_modified": 89,
+      "drift_signals_created": 183,
+      "patches_applied": 168,
+      "seals_created": 156
+    }
+  },
+  "seal": {
+    "sealed": true,
+    "seal_hash": "sha256:e7f3a1b9c2d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8",
+    "sealed_at": "2026-02-19T18:45:01Z",
+    "sealed_by": "credibility-engine-demo",
+    "role": "institutional-assessor",
+    "hash_chain_length": 157
+  },
+  "guardrails": {
+    "abstract_model": true,
+    "domain_specific": false,
+    "description": "Demo-only credibility packet. Abstract institutional architecture. No real-world system modeled."
+  }
+}

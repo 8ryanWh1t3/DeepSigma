@@ -1,0 +1,57 @@
+{
+  "regions": [
+    {
+      "region": "East",
+      "sync_nodes": 5,
+      "sync_nodes_healthy": 5,
+      "beacons": 2,
+      "beacons_healthy": 2,
+      "time_skew_ms": 12,
+      "watermark_lag_s": 0.8,
+      "watermark_advancing": true,
+      "replay_flags_count": 0,
+      "last_watermark": "2026-02-19T18:44:30Z",
+      "status": "OK"
+    },
+    {
+      "region": "Central",
+      "sync_nodes": 5,
+      "sync_nodes_healthy": 4,
+      "beacons": 2,
+      "beacons_healthy": 2,
+      "time_skew_ms": 45,
+      "watermark_lag_s": 2.3,
+      "watermark_advancing": true,
+      "replay_flags_count": 1,
+      "last_watermark": "2026-02-19T18:44:12Z",
+      "status": "WARN",
+      "warning_detail": "Sync node C-SN-03 intermittent — 1 replay flag in last hour"
+    },
+    {
+      "region": "West",
+      "sync_nodes": 4,
+      "sync_nodes_healthy": 4,
+      "beacons": 2,
+      "beacons_healthy": 2,
+      "time_skew_ms": 8,
+      "watermark_lag_s": 0.5,
+      "watermark_advancing": true,
+      "replay_flags_count": 0,
+      "last_watermark": "2026-02-19T18:44:45Z",
+      "status": "OK"
+    }
+  ],
+  "federation": {
+    "cross_region_skew_ms": 28,
+    "max_acceptable_skew_ms": 200,
+    "status": "OK"
+  },
+  "thresholds": {
+    "time_skew_warn_ms": 100,
+    "time_skew_critical_ms": 500,
+    "watermark_lag_warn_s": 5,
+    "watermark_lag_critical_s": 30,
+    "replay_warn_count": 1,
+    "replay_critical_count": 5
+  }
+}
