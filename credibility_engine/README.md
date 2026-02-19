@@ -1,13 +1,13 @@
 ---
 title: "Credibility Engine — Runtime Module"
-version: "0.7.0"
-status: "Stage 3"
+version: "0.8.0"
+status: "Stage 3 — Multi-Tenant"
 last_updated: "2026-02-19"
 ---
 
-# Credibility Engine — Stage 3 Runtime
+# Credibility Engine — Stage 3 Multi-Tenant Runtime
 
-A real runtime Credibility Engine with JSONL persistence and API endpoints, replacing the simulation-only Stage 2 architecture.
+A real runtime Credibility Engine with multi-tenant isolation, JSONL persistence, header-based RBAC, and tenant-scoped API endpoints.
 
 ---
 

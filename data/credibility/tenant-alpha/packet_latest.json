@@ -1,0 +1,78 @@
+{
+  "tenant_id": "tenant-alpha",
+  "packet_id": "CP-2026-02-19-1845",
+  "generated_at": "2026-02-19T18:45:56.039605Z",
+  "generated_by": "credibility-engine-runtime",
+  "credibility_index": {
+    "score": 99,
+    "band": "Stable",
+    "components": {
+      "base": 100,
+      "drift_penalty": 0,
+      "correlation_penalty": 0,
+      "quorum_penalty": -1,
+      "ttl_penalty": 0,
+      "sync_penalty": 0
+    }
+  },
+  "dlr_summary": {
+    "dlr_id": "DLR-CP-2026-02-19-1845",
+    "title": "Credibility Packet \u2014 Institutional State Assessment",
+    "decided_by": "credibility-engine (runtime)",
+    "decision_type": "assessment",
+    "key_findings": [
+      "Credibility Index at 99 (Stable) \u2014 within healthy production band",
+      "2 drift events accumulated \u2014 100% auto-resolved"
+    ]
+  },
+  "rs_summary": {
+    "rs_id": "RS-CP-2026-02-19-1845",
+    "reasoning": {
+      "overall_assessment": "Lattice is operationally healthy with Credibility Index at 99 (Stable). Localized drift signals are within expected bounds.",
+      "primary_risk": "No immediate correlation risk.",
+      "secondary_risk": "No claim-level risks identified.",
+      "recommendation": "Continue monitoring. Review flagged drift fingerprints on next rotation."
+    }
+  },
+  "ds_summary": {
+    "ds_id": "DS-CP-2026-02-19-1845",
+    "active_signals": 0,
+    "by_severity": {
+      "low": 0,
+      "medium": 0,
+      "high": 0,
+      "critical": 0
+    },
+    "critical_signal": {
+      "category": "none",
+      "source": "none",
+      "claims_affected": 0,
+      "regions": [],
+      "description": "No active drift signals"
+    }
+  },
+  "mg_summary": {
+    "mg_id": "MG-CP-2026-02-19-1845",
+    "changes_last_24h": {
+      "nodes_added": 0,
+      "edges_added": 0,
+      "nodes_modified": 0,
+      "drift_signals_created": 2,
+      "patches_applied": 0,
+      "seals_created": 0
+    }
+  },
+  "seal": {
+    "sealed": true,
+    "seal_hash": "sha256:b0470eab45a78161d81d580361e688f845cf80b6",
+    "sealed_at": "2026-02-19T18:45:56.040006Z",
+    "sealed_by": "demo",
+    "role": "Coherence Steward",
+    "hash_chain_length": 158
+  },
+  "guardrails": {
+    "abstract_model": true,
+    "domain_specific": false,
+    "description": "Runtime-generated credibility packet. Abstract institutional architecture. No real-world system modeled."
+  }
+}

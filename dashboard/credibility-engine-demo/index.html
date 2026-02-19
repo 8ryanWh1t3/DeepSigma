@@ -12,7 +12,22 @@
       <h1>&Sigma; OVERWATCH <span class="header-separator">/</span> Credibility Engine</h1>
       <p class="header-subtitle">Institutional Decision Infrastructure — Demo Cockpit</p>
     </div>
+    <div class="header-controls" id="header-controls" style="display:none;">
+      <label class="control-label">Tenant:
+        <select id="tenant-select" class="control-select"></select>
+      </label>
+      <label class="control-label">Role:
+        <select id="role-select" class="control-select">
+          <option value="exec">exec</option>
+          <option value="truth_owner">truth_owner</option>
+          <option value="dri">dri</option>
+          <option value="coherence_steward">coherence_steward</option>
+        </select>
+      </label>
+    </div>
     <div class="header-meta" id="header-meta">
+      <span class="meta-label">Tenant:</span>
+      <span class="meta-value" id="current-tenant">—</span>
       <span class="meta-label">Last Updated:</span>
       <span class="meta-value" id="last-updated">—</span>
       <span class="meta-label">Nodes:</span>
@@ -92,7 +107,11 @@
         <h2>Credibility Packet</h2>
       </div>
       <p class="packet-description">Generate a sealed assessment packet containing DLR, RS, DS, and MG summaries for the current institutional state.</p>
-      <button class="btn-packet" id="btn-generate-packet">Generate Credibility Packet</button>
+      <div class="packet-actions">
+        <button class="btn-packet" id="btn-generate-packet">Generate Packet</button>
+        <button class="btn-packet btn-seal" id="btn-seal-packet">Seal Packet</button>
+      </div>
+      <div class="packet-status" id="packet-status" style="display:none;"></div>
       <div class="packet-preview" id="packet-preview" style="display:none;"></div>
     </section>
   </main>
