@@ -43,6 +43,9 @@ GitHub renders Mermaid diagrams natively in `.md` files.
 | 34 | Snowflake Connector Flow | Flowchart | Dual-mode Cortex AI + warehouse SQL → exhaust events → canonical records with shared auth |
 | 35 | Connector Ecosystem | Graph | All v0.5.0 connectors with MCP tool counts, transport, and governance layer |
 | 36 | Excel-First Governance | Flowchart + Sequence | Creative Director Suite architecture — BOOT protocol, named tables, LLM writeback, 6-lens model |
+| 37 | MDPT Beta Kit | Flowchart | MDPT prompt lifecycle — Index → Catalog → Use → Log → Drift → Patch |
+| 38 | Lattice Architecture | Graph | Credibility Engine claim lattice with Sync Plane and Credibility Index |
+| 39 | Institutional Drift Loop | Flowchart | Drift → RootCause → Patch → MGUpdate → Seal → Index at institutional scale |
 
 ## Diagram Types Used
 

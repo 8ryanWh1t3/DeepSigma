@@ -110,12 +110,14 @@ last_updated: "2026-02-18"
 
 | Resource | Purpose |
 |----------|---------|
-| [`mermaid/`](mermaid/) | 30+ Mermaid diagrams (architecture, runtime, drift, schemas, pipelines, interop) |
+| [`mermaid/`](mermaid/) | 39+ Mermaid diagrams (architecture, runtime, drift, schemas, pipelines, interop, credibility) |
 | Key: [`01-system-architecture.md`](mermaid/01-system-architecture.md) | System architecture overview |
 | Key: [`05-drift-to-patch.md`](mermaid/05-drift-to-patch.md) | Drift lifecycle flowchart |
 | Key: [`06-coherence-ops-pipeline.md`](mermaid/06-coherence-ops-pipeline.md) | Coherence Ops pipeline |
 | Key: [`30-interop-request-flow.md`](mermaid/30-interop-request-flow.md) | Interop request flow (AG-UI → A2A → MCP) |
 | Key: [`31-agora-negotiation-flow.md`](mermaid/31-agora-negotiation-flow.md) | Agora negotiation → contract → runtime |
+| Key: [`38-lattice-architecture.md`](mermaid/38-lattice-architecture.md) | Credibility Engine lattice architecture |
+| Key: [`39-drift-loop.md`](mermaid/39-drift-loop.md) | Institutional drift loop |
 
 ---
 
@@ -163,6 +165,24 @@ last_updated: "2026-02-18"
 | [`deepsigma/cli/`](deepsigma/cli/) | Unified Product CLI — 5 commands |
 | [`docs/CLI.md`](docs/CLI.md) | CLI reference documentation |
 | [`mermaid/37-mdpt-beta-kit.md`](mermaid/37-mdpt-beta-kit.md) | MDPT lifecycle Mermaid diagram |
+
+---
+
+## 🏗 Credibility Engine (v0.6.4)
+
+| Resource | Purpose |
+|----------|---------|
+| [`docs/credibility-engine/README.md`](docs/credibility-engine/README.md) | Credibility Engine overview and document index |
+| [`docs/credibility-engine/credibility_index.md`](docs/credibility-engine/credibility_index.md) | Credibility Index — 6 components, 5 bands, operational thresholds |
+| [`docs/credibility-engine/core_system_design.md`](docs/credibility-engine/core_system_design.md) | Evidence node model, events, TTL discipline, K-of-N quorum |
+| [`docs/credibility-engine/sync_plane.md`](docs/credibility-engine/sync_plane.md) | Sync Plane — beacons, watermarks, replay detection |
+| [`docs/credibility-engine/drift_patch_seal_loop.md`](docs/credibility-engine/drift_patch_seal_loop.md) | 5 institutional drift categories + Drift-Patch-Seal loop |
+| [`docs/credibility-engine/deployment_patterns.md`](docs/credibility-engine/deployment_patterns.md) | MVP → Production deployment + economic modeling |
+| [`examples/01-mini-lattice/`](examples/01-mini-lattice/) | Mini Lattice — 12 nodes, mechanics |
+| [`examples/02-enterprise-lattice/`](examples/02-enterprise-lattice/) | Enterprise Lattice — ~500 nodes, complexity |
+| [`examples/03-credibility-engine-scale/`](examples/03-credibility-engine-scale/) | Credibility Engine at Scale — 30k–40k nodes, survivability |
+| [`mermaid/38-lattice-architecture.md`](mermaid/38-lattice-architecture.md) | Lattice architecture diagram |
+| [`mermaid/39-drift-loop.md`](mermaid/39-drift-loop.md) | Institutional drift loop diagram |
 
 ---
 

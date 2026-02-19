@@ -49,6 +49,22 @@ This is the **Drift → Patch loop** — continuous self-correction.
 
 ---
 
+## Progressive Escalation
+
+Coherence Ops scales from a single decision loop to institutional credibility infrastructure:
+
+| Level | Scale | What It Proves |
+|-------|-------|---------------|
+| **Mini Lattice** | 12 nodes | Mechanics: one claim, three evidence streams, TTL, drift, patch, seal |
+| **Enterprise Lattice** | ~500 nodes | Complexity: K-of-N quorum, correlation groups, regional validators, sync nodes |
+| **Credibility Engine** | 30,000–40,000 nodes | Survivability: multi-region, automated drift, continuous sealing, hot/warm/cold |
+
+Same primitives. Same artifacts. Same loop. Different scale.
+
+> Examples: [Mini Lattice](examples/01-mini-lattice/) · [Enterprise Lattice](examples/02-enterprise-lattice/) · [Credibility Engine Scale](examples/03-credibility-engine-scale/) · [Full docs](docs/credibility-engine/)
+
+---
+
 ## Try It (5 Minutes)
 
 ```bash
@@ -216,6 +232,50 @@ deepsigma golden-path sharepoint --fixture ...      # 7-step Golden Path
 
 ---
 
+## Credibility Engine (v0.6.4)
+
+Institutional-scale claim lattice with formal credibility scoring, evidence synchronization, and automated drift governance.
+
+**Credibility Index** — composite 0–100 score from 6 components:
+
+| Component | What It Measures |
+|-----------|-----------------|
+| Tier-weighted claim integrity | Higher-tier claims weigh more |
+| Drift penalty | Active drift signals reduce score |
+| Correlation risk penalty | Shared source dependencies penalized |
+| Quorum margin compression | Thin redundancy penalized |
+| TTL expiration penalty | Stale evidence penalized |
+| Independent confirmation bonus | 3+ independent sources rewarded |
+
+| Score | Band | Action |
+|-------|------|--------|
+| 95–100 | Stable | Monitor |
+| 85–94 | Minor drift | Review |
+| 70–84 | Elevated risk | Patch required |
+| 50–69 | Structural degradation | Immediate remediation |
+| <50 | Compromised | Halt dependent decisions |
+
+**Institutional Drift Categories** — 5 scale-level patterns composing from 8 runtime drift types: timing entropy, correlation drift, confidence volatility, TTL compression, external mismatch.
+
+**Sync Plane** — evidence timing infrastructure. Sync nodes are evidence about evidence. Event time vs. ingest time, monotonic sequences, independent beacons, watermark logic.
+
+**Category Definition:**
+Coherence Ops is not monitoring, observability, or compliance. It is the operating layer that prevents institutions from lying to themselves over time.
+
+**Deployment:**
+- MVP: 6–8 engineers, $1.5M–$3M/year
+- Production: 30k–40k nodes, 3+ regions, $6M–$10M/year (~$170–$280/node/year)
+
+> Docs: [Credibility Engine](docs/credibility-engine/) · [Credibility Index](docs/credibility-engine/credibility_index.md) · [Sync Plane](docs/credibility-engine/sync_plane.md) · [Deployment Patterns](docs/credibility-engine/deployment_patterns.md)
+>
+> Diagrams: [Lattice Architecture](mermaid/38-lattice-architecture.md) · [Drift Loop](mermaid/39-drift-loop.md)
+>
+> Examples: [Mini Lattice](examples/01-mini-lattice/) · [Enterprise Lattice](examples/02-enterprise-lattice/) · [Scale](examples/03-credibility-engine-scale/)
+
+**Guardrails:** Abstract model for institutional credibility infrastructure. Not domain-specific. Not modeling real-world weapons. Pure decision infrastructure.
+
+---
+
 ## Repo Structure
 
 ```
@@ -234,7 +294,8 @@ DeepSigma/
 ├── datasets/             # Creative Director Suite sample data (8 CSVs)
 ├── docs/                 # Extended docs (vision, IRIS, policy packs, Excel-first)
 ├── templates/            # Excel workbook templates
-├── mermaid/              # 37+ architecture & flow diagrams
+├── docs/credibility-engine/ # Credibility Index, Sync Plane, deployment patterns
+├── mermaid/              # 39+ architecture & flow diagrams
 ├── engine/               # Compression, degrade ladder, supervisor
 ├── dashboard/            # React dashboard + mock API
 ├── adapters/             # MCP, OpenClaw, SharePoint, Power Platform, AskSage, Snowflake, LangChain
