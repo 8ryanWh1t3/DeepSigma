@@ -5,6 +5,29 @@ All notable changes to Σ OVERWATCH / DeepSigma will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.3] — 2026-02-19 — "Excel-first Hardening"
+
+### Added
+
+- **BOOT contract validator** (`tools/validate_workbook_boot.py`): CI gate enforcing BOOT!A1 metadata keys (version, ttl_hours_default, risk_lane_default, schema_ref, owner) + named table presence
+- **Excel-first Money Demo** (`demos/excel_first/`): One-command deterministic Drift→Patch artifact loop — generates workbook, validates BOOT, detects drift, proposes patch, computes coherence delta
+- **MDPT SharePoint build sheets**: List schemas for PromptCapabilities, PromptRuns, DriftPatches with column definitions, views, and relationship diagrams
+- **MDPT Power Automate flows**: 4 flow recipes — drift alert, patch approval, weekly digest, workbook refresh validator
+- **MDPT Power Apps screen map**: 5-screen canvas app layout (Home, Prompt Gallery, Run Detail, Drift Board, Patch Queue)
+- **MDPT governance guide**: Permission model, audit trail, compliance considerations, escalation path
+- **Test fixtures**: 4 `.xlsx` fixture workbooks for BOOT contract validation tests
+
+### Changed
+
+- `tools/generate_cds_workbook.py`: BOOT_TEXT now includes required metadata block with `BOOT!` prefix
+- `.github/workflows/ci.yml`: Install `[excel]` extra, added BOOT contract validation + Excel-first Money Demo CI gates
+- `pyproject.toml`: Version 0.6.2 → 0.6.3, added `excel-demo` console script
+- `coherence_ops/__init__.py`: `__version__` 0.6.2 → 0.6.3
+
+### Stats
+
+- 20 new files, 10 modified, 27 new tests, 2 new CI gates
+
 ## [0.6.2] — 2026-02-19 — "Creative Director Suite"
 
 ### Added — Creative Director Suite (Excel-First Governance)

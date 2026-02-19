@@ -132,16 +132,21 @@ last_updated: "2026-02-18"
 
 ---
 
-## 📊 Excel-First Governance (v0.6.2)
+## 📊 Excel-First Governance (v0.6.2+)
 
 | Resource | Purpose |
 |----------|---------|
 | [`docs/excel-first/multi-dim-prompting-for-teams/README.md`](docs/excel-first/multi-dim-prompting-for-teams/README.md) | Multi-Dimensional Prompting for Teams — SharePoint-first guide |
 | [`docs/excel-first/WORKBOOK_BOOT_PROTOCOL.md`](docs/excel-first/WORKBOOK_BOOT_PROTOCOL.md) | How BOOT!A1 initializes LLM workbook context |
 | [`docs/excel-first/TABLE_SCHEMAS.md`](docs/excel-first/TABLE_SCHEMAS.md) | 7 governance table schemas with column definitions |
+| [`docs/excel-first/MONEY_DEMO.md`](docs/excel-first/MONEY_DEMO.md) | Excel-first Money Demo — deterministic Drift→Patch proof |
 | [`datasets/creative_director_suite/`](datasets/creative_director_suite/) | 8 CSVs — creative production sample data (25 rows each) |
 | [`templates/creative_director_suite/`](templates/creative_director_suite/) | Generated Excel workbook template |
 | [`tools/generate_cds_workbook.py`](tools/generate_cds_workbook.py) | Workbook generation script |
+| [`tools/validate_workbook_boot.py`](tools/validate_workbook_boot.py) | BOOT contract validator (CI gate) |
+| [`docs/excel-first/multi-dim-prompting-for-teams/POWER_AUTOMATE_FLOWS.md`](docs/excel-first/multi-dim-prompting-for-teams/POWER_AUTOMATE_FLOWS.md) | MDPT Power Automate flow recipes |
+| [`docs/excel-first/multi-dim-prompting-for-teams/POWER_APPS_SCREEN_MAP.md`](docs/excel-first/multi-dim-prompting-for-teams/POWER_APPS_SCREEN_MAP.md) | MDPT Power Apps 5-screen layout |
+| [`docs/excel-first/multi-dim-prompting-for-teams/GOVERNANCE.md`](docs/excel-first/multi-dim-prompting-for-teams/GOVERNANCE.md) | MDPT governance model — permissions, audit, compliance |
 
 ---
 

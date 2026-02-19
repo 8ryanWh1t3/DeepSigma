@@ -126,6 +126,25 @@ The BOOT sheet references these named tables. See [TABLE_SCHEMAS.md](TABLE_SCHEM
 
 ---
 
+## Validation Gate
+
+The BOOT contract is enforced in CI. To validate a workbook locally:
+
+```bash
+python tools/validate_workbook_boot.py templates/creative_director_suite/Creative_Director_Suite_CoherenceOps_v2.xlsx
+```
+
+Rules checked:
+
+1. Sheet "BOOT" exists
+2. Cell A1 begins with `BOOT!` prefix
+3. Required metadata keys present: `version:`, `ttl_hours_default:`, `risk_lane_default:`, `schema_ref:`, `owner:`
+4. 7 named governance tables present (pass `--boot-only` for minimal validation)
+
+Exit code 0 = pass, 1 = fail with readable errors.
+
+---
+
 ## See Also
 
 - [Table Schemas](TABLE_SCHEMAS.md) — full column definitions for all 7 tables
