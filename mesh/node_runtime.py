@@ -34,11 +34,9 @@ from mesh.transport import (
     ENVELOPES_LOG,
     SEAL_CHAIN_MIRROR_LOG,
     VALIDATIONS_LOG,
+    LocalTransport,
     ensure_node_dirs,
     log_replication,
-    pull_records,
-    push_records,
-    set_node_status,
 )
 
 
@@ -55,7 +53,14 @@ class NodeRole(str, Enum):
 
 @dataclass
 class MeshNode:
-    """A mesh node with a specific role."""
+    """A mesh node with a specific role.
+
+    Parameters
+    ----------
+    transport : Transport, optional
+        Pluggable transport for inter-node communication.
+        Defaults to LocalTransport (filesystem-based, in-process).
+    """
 
     node_id: str
     tenant_id: str
@@ -66,19 +71,23 @@ class MeshNode:
     private_key: str = ""
     running: bool = False
     _cycle_count: int = 0
+    transport: Any = None
 
     # Scenario overrides
     offline: bool = False
     force_correlation: float | None = None
 
     def __post_init__(self):
+        if self.transport is None:
+            self.transport = LocalTransport()
         if not self.public_key or not self.private_key:
             self.public_key, self.private_key = generate_keypair()
         ensure_node_dirs(self.tenant_id, self.node_id)
         self._update_status("initialized")
 
     def _data_dir(self) -> Path:
-        return Path(__file__).parent.parent / "data" / "mesh" / self.tenant_id / self.node_id
+        from mesh.transport import _node_dir
+        return _node_dir(self.tenant_id, self.node_id)
 
     def _log_path(self, log_name: str) -> Path:
         return self._data_dir() / log_name
@@ -98,7 +107,7 @@ class MeshNode:
         }
         if extra:
             status.update(extra)
-        set_node_status(self.tenant_id, self.node_id, status)
+        self.transport.set_status(self.tenant_id, self.node_id, status)
 
     def tick(self) -> dict[str, Any]:
         """Execute one cycle of the node's role behavior.
@@ -180,7 +189,7 @@ class MeshNode:
 
             # Replicate to peers
             for peer_id in self.peers:
-                push_records(
+                self.transport.push(
                     self.tenant_id, peer_id, ENVELOPES_LOG, [env.to_dict()],
                 )
 
@@ -212,7 +221,7 @@ class MeshNode:
         rejected = 0
 
         for peer_id in self.peers:
-            envs = pull_records(
+            envs = self.transport.pull(
                 self.tenant_id, peer_id, ENVELOPES_LOG,
             )
 
@@ -274,7 +283,7 @@ class MeshNode:
         # Replicate validations to peers
         all_vals = load_all(self._log_path(VALIDATIONS_LOG))
         for peer_id in self.peers:
-            push_records(
+            self.transport.push(
                 self.tenant_id, peer_id, VALIDATIONS_LOG, all_vals[-10:],
             )
             log_replication(
@@ -300,10 +309,10 @@ class MeshNode:
 
         for peer_id in self.peers:
             all_envs.extend(
-                pull_records(self.tenant_id, peer_id, ENVELOPES_LOG)
+                self.transport.pull(self.tenant_id, peer_id, ENVELOPES_LOG)
             )
             all_vals.extend(
-                pull_records(self.tenant_id, peer_id, VALIDATIONS_LOG)
+                self.transport.pull(self.tenant_id, peer_id, VALIDATIONS_LOG)
             )
 
         # Also include own logs
@@ -320,7 +329,7 @@ class MeshNode:
         policy_hash = get_policy_hash(policy)
 
         # Build sync regions from known peers
-        regions = _build_sync_regions(self.peers, self.tenant_id, all_envs)
+        regions = _build_sync_regions(self.peers, self.tenant_id, all_envs, self.transport)
 
         # Compute federated state
         fed_state = compute_federated_state(
@@ -357,7 +366,7 @@ class MeshNode:
 
         # Replicate aggregates to peers
         for peer_id in self.peers:
-            push_records(
+            self.transport.push(
                 self.tenant_id, peer_id, AGGREGATES_LOG, [agg.to_dict()],
             )
             log_replication(
@@ -385,7 +394,7 @@ class MeshNode:
         all_aggs: list[dict] = []
         for peer_id in self.peers:
             all_aggs.extend(
-                pull_records(self.tenant_id, peer_id, AGGREGATES_LOG)
+                self.transport.pull(self.tenant_id, peer_id, AGGREGATES_LOG)
             )
         all_aggs.extend(load_all(self._log_path(AGGREGATES_LOG)))
         all_aggs = dedupe_by_id(all_aggs, "aggregate_id")
@@ -432,7 +441,7 @@ class MeshNode:
 
         # Replicate seal to peers
         for peer_id in self.peers:
-            push_records(
+            self.transport.push(
                 self.tenant_id, peer_id, SEAL_CHAIN_MIRROR_LOG,
                 [seal_entry],
             )
@@ -472,6 +481,7 @@ def _build_sync_regions(
     peer_ids: list[str],
     tenant_id: str,
     envelopes: list[dict],
+    transport: Any = None,
 ) -> list[dict]:
     """Build sync region list from known peers and envelope activity."""
     regions: dict[str, dict] = {}
@@ -494,9 +504,16 @@ def _build_sync_regions(
             regions[rgn]["last_heartbeat"] = ts
 
     # Check peer statuses to detect offline regions
-    from mesh.transport import get_node_status
+    if transport is None:
+        from mesh.transport import get_node_status
+
+        def _get_status(tid, pid):
+            return get_node_status(tid, pid)
+    else:
+        _get_status = transport.get_status
+
     for pid in peer_ids:
-        status = get_node_status(tenant_id, pid)
+        status = _get_status(tenant_id, pid)
         if status and status.get("offline"):
             rgn = status.get("region_id", "unknown")
             if rgn in regions:

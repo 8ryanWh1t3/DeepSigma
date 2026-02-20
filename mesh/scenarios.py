@@ -27,12 +27,19 @@ def _now_iso() -> str:
 
 @dataclass
 class MeshScenario:
-    """Manages a set of mesh nodes through scenario phases."""
+    """Manages a set of mesh nodes through scenario phases.
+
+    Parameters
+    ----------
+    transport : Transport, optional
+        Transport instance to pass to all nodes. Defaults to LocalTransport.
+    """
 
     tenant_id: str
     nodes: list[MeshNode] = field(default_factory=list)
     phase: int = -1
     events: list[dict] = field(default_factory=list)
+    transport: Any = None
 
     def init_nodes(self) -> list[dict]:
         """Initialize standard 3-region mesh topology.
@@ -51,6 +58,8 @@ class MeshScenario:
         def peers_for(nid: str) -> list[str]:
             return [p for p in all_ids if p != nid]
 
+        t = self.transport  # None → MeshNode defaults to LocalTransport
+
         self.nodes = [
             # Region A
             MeshNode(
@@ -59,6 +68,7 @@ class MeshScenario:
                 region_id="region-A",
                 role=NodeRole.EDGE,
                 peers=peers_for("edge-A"),
+                transport=t,
             ),
             MeshNode(
                 node_id="aggregator-A",
@@ -66,6 +76,7 @@ class MeshScenario:
                 region_id="region-A",
                 role=NodeRole.AGGREGATOR,
                 peers=peers_for("aggregator-A"),
+                transport=t,
             ),
             MeshNode(
                 node_id="seal-A",
@@ -73,6 +84,7 @@ class MeshScenario:
                 region_id="region-A",
                 role=NodeRole.SEAL_AUTHORITY,
                 peers=peers_for("seal-A"),
+                transport=t,
             ),
             # Region B
             MeshNode(
@@ -81,6 +93,7 @@ class MeshScenario:
                 region_id="region-B",
                 role=NodeRole.VALIDATOR,
                 peers=peers_for("validator-B"),
+                transport=t,
             ),
             MeshNode(
                 node_id="edge-B",
@@ -88,6 +101,7 @@ class MeshScenario:
                 region_id="region-B",
                 role=NodeRole.EDGE,
                 peers=peers_for("edge-B"),
+                transport=t,
             ),
             # Region C
             MeshNode(
@@ -96,6 +110,7 @@ class MeshScenario:
                 region_id="region-C",
                 role=NodeRole.EDGE,
                 peers=peers_for("edge-C"),
+                transport=t,
             ),
             MeshNode(
                 node_id="validator-C",
@@ -103,6 +118,7 @@ class MeshScenario:
                 region_id="region-C",
                 role=NodeRole.VALIDATOR,
                 peers=peers_for("validator-C"),
+                transport=t,
             ),
         ]
 
