@@ -1,0 +1,107 @@
+[
+  {
+    "id": "run-001-agent",
+    "name": "agent",
+    "run_type": "chain",
+    "start_time": "2026-02-18T10:00:00.000Z",
+    "end_time": "2026-02-18T10:00:02.500Z",
+    "status": "success",
+    "inputs": {"messages": [{"role": "user", "content": "What is our Q1 revenue?"}]},
+    "outputs": {"messages": [{"role": "assistant", "content": "Let me look that up."}]},
+    "error": null,
+    "trace_id": "trace-abc-001",
+    "parent_run_id": null,
+    "extra": {
+      "metadata": {
+        "langgraph_step": 1,
+        "langgraph_node": "agent",
+        "langgraph_triggers": ["start:agent"],
+        "thread_id": "thread-001"
+      }
+    }
+  },
+  {
+    "id": "run-002-llm",
+    "name": "ChatAnthropic",
+    "run_type": "llm",
+    "start_time": "2026-02-18T10:00:00.100Z",
+    "end_time": "2026-02-18T10:00:01.800Z",
+    "status": "success",
+    "inputs": {"messages": [{"role": "user", "content": "What is our Q1 revenue?"}]},
+    "outputs": {"generations": [{"text": "Let me query the database for Q1 revenue."}]},
+    "error": null,
+    "trace_id": "trace-abc-001",
+    "parent_run_id": "run-001-agent",
+    "extra": {
+      "metadata": {
+        "langgraph_step": 1,
+        "langgraph_node": "agent",
+        "langgraph_triggers": []
+      },
+      "invocation_params": {"model_name": "claude-sonnet-4-20250514", "temperature": 0}
+    }
+  },
+  {
+    "id": "run-003-tool",
+    "name": "sql_query",
+    "run_type": "tool",
+    "start_time": "2026-02-18T10:00:02.600Z",
+    "end_time": "2026-02-18T10:00:03.200Z",
+    "status": "success",
+    "inputs": {"query": "SELECT SUM(revenue) FROM sales WHERE quarter='Q1'"},
+    "outputs": {"result": "$2.45M"},
+    "error": null,
+    "trace_id": "trace-abc-001",
+    "parent_run_id": null,
+    "extra": {
+      "metadata": {
+        "langgraph_step": 2,
+        "langgraph_node": "tool_executor",
+        "langgraph_triggers": ["agent"],
+        "thread_id": "thread-001"
+      }
+    }
+  },
+  {
+    "id": "run-004-retriever",
+    "name": "policy_search",
+    "run_type": "retriever",
+    "start_time": "2026-02-18T10:00:03.300Z",
+    "end_time": "2026-02-18T10:00:03.900Z",
+    "status": "success",
+    "inputs": {"query": "revenue reporting policy"},
+    "outputs": {"documents": [{"page_content": "Revenue must be reported quarterly per SOC2.", "metadata": {"source": "policy-db"}}]},
+    "error": null,
+    "trace_id": "trace-abc-001",
+    "parent_run_id": null,
+    "extra": {
+      "metadata": {
+        "langgraph_step": 2,
+        "langgraph_node": "tool_executor",
+        "langgraph_triggers": ["agent"],
+        "thread_id": "thread-001"
+      }
+    }
+  },
+  {
+    "id": "run-005-final",
+    "name": "agent",
+    "run_type": "chain",
+    "start_time": "2026-02-18T10:00:04.000Z",
+    "end_time": "2026-02-18T10:00:05.500Z",
+    "status": "success",
+    "inputs": {"messages": [{"role": "tool", "content": "$2.45M"}]},
+    "outputs": {"messages": [{"role": "assistant", "content": "Q1 revenue is $2.45M, reported per SOC2 policy."}]},
+    "error": null,
+    "trace_id": "trace-abc-001",
+    "parent_run_id": null,
+    "extra": {
+      "metadata": {
+        "langgraph_step": 3,
+        "langgraph_node": "agent",
+        "langgraph_triggers": ["tool_executor"],
+        "thread_id": "thread-001"
+      }
+    }
+  }
+]

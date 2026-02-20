@@ -1,0 +1,23 @@
+[
+  {
+    "id": "run-006-agent",
+    "name": "agent",
+    "run_type": "chain",
+    "start_time": "2026-02-18T11:00:00.000Z",
+    "end_time": "2026-02-18T11:00:01.200Z",
+    "status": "error",
+    "inputs": {"messages": [{"role": "user", "content": "Delete all records"}]},
+    "outputs": null,
+    "error": "PermissionDenied: destructive operations require elevated privileges",
+    "trace_id": "trace-abc-002",
+    "parent_run_id": null,
+    "extra": {
+      "metadata": {
+        "langgraph_step": 1,
+        "langgraph_node": "agent",
+        "langgraph_triggers": ["start:agent"],
+        "thread_id": "thread-002"
+      }
+    }
+  }
+]

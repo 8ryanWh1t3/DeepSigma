@@ -314,3 +314,7 @@ class TestSourceNameAttribute:
     def test_snowflake(self):
         from adapters.snowflake.warehouse import SnowflakeWarehouseConnector
         assert SnowflakeWarehouseConnector.source_name == "snowflake"
+
+    def test_langgraph(self):
+        from adapters.langgraph.connector import LangGraphConnector
+        assert LangGraphConnector.source_name == "langgraph"

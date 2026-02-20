@@ -247,11 +247,61 @@ class TestAskSageFixtures:
             assert env["source"] == "asksage"
 
 
+# ── LangGraph Fixtures ──────────────────────────────────────────────────────
+
+
+class TestLangGraphFixtures:
+    CONNECTOR = "langgraph_small"
+
+    def _produce(self):
+        from adapters.langgraph.connector import LangGraphConnector
+        from connectors.contract import canonical_to_envelope
+
+        raw = json.loads((FIXTURE_BASE / self.CONNECTOR / "baseline_raw.json").read_text(encoding="utf-8"))
+        c = LangGraphConnector(graph_id="fixture-graph", source_instance="fixture-instance")
+        records = c.to_canonical(raw)
+        envs = []
+        for rec in records:
+            env = canonical_to_envelope(rec, source_instance="fixture-instance")
+            env.collected_at = _COLLECTED_AT
+            envs.append(env.to_dict())
+        return envs
+
+    def test_count_matches(self):
+        expected = _load_expected(self.CONNECTOR)
+        produced = self._produce()
+        assert len(produced) == len(expected)
+
+    def test_envelopes_match_golden(self):
+        expected = _load_expected(self.CONNECTOR)
+        produced = self._produce()
+        for i, (exp, prod) in enumerate(zip(expected, produced)):
+            assert json.dumps(prod, sort_keys=True) == json.dumps(exp, sort_keys=True), \
+                f"Mismatch at index {i}"
+
+    def test_all_validate(self):
+        expected = _load_expected(self.CONNECTOR)
+        for i, env in enumerate(expected):
+            errors = validate_envelope(env)
+            assert errors == [], f"Validation errors at [{i}]: {errors}"
+
+    def test_hashes_stable(self):
+        expected = _load_expected(self.CONNECTOR)
+        produced = self._produce()
+        for exp, prod in zip(expected, produced):
+            assert exp["hashes"]["raw_sha256"] == prod["hashes"]["raw_sha256"]
+
+    def test_source_correct(self):
+        expected = _load_expected(self.CONNECTOR)
+        for env in expected:
+            assert env["source"] == "langgraph"
+
+
 # ── Cross-connector Tests ───────────────────────────────────────────────────
 
 
 class TestCrossConnector:
-    CONNECTORS = ["sharepoint_small", "dataverse_small", "snowflake_small", "asksage_small"]
+    CONNECTORS = ["sharepoint_small", "dataverse_small", "snowflake_small", "asksage_small", "langgraph_small"]
 
     def test_all_fixtures_exist(self):
         for name in self.CONNECTORS:
