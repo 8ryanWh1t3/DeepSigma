@@ -7,6 +7,7 @@ Commands:
     deepsigma validate boot <xlsx>            BOOT contract validation
     deepsigma mdpt index --csv <file>         Generate MDPT Prompt Index
     deepsigma golden-path <source> [opts]     7-step Golden Path loop
+    deepsigma compact --input <dir>           Compact JSONL evidence files
 """
 from __future__ import annotations
 
@@ -39,6 +40,7 @@ def main(argv: list[str] | None = None) -> int:
     subparsers = parser.add_subparsers(dest="command")
 
     from deepsigma.cli import (
+        compact,
         demo_excel,
         doctor,
         golden_path,
@@ -51,6 +53,7 @@ def main(argv: list[str] | None = None) -> int:
     validate_boot.register(subparsers)
     mdpt_index.register(subparsers)
     golden_path.register(subparsers)
+    compact.register(subparsers)
 
     args = parser.parse_args(argv)
 
