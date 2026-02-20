@@ -4,7 +4,6 @@ Run:  pytest tests/test_evidence_tiering.py -v
 """
 from __future__ import annotations
 
-import json
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -18,7 +17,6 @@ from credibility_engine.tiering import (
     EvidenceTier,
     EvidenceTierManager,
     TieringPolicy,
-    TieringSweepResult,
 )
 
 
