@@ -1,7 +1,10 @@
-"""Mesh Transport — HTTP push/pull replication and FastAPI router.
+"""Mesh Transport — pluggable transport layer for inter-node communication.
 
-Minimal FastAPI router under /mesh/* prefix for inter-node communication.
-Push/pull helpers for append-only log replication.
+Provides a Transport protocol with two implementations:
+- LocalTransport: filesystem-based push/pull (in-process, testing)
+- HTTPTransport: real HTTP calls via httpx (distributed deployment)
+
+Also includes the FastAPI mesh router for server-side endpoints.
 
 Abstract institutional credibility architecture.
 No real-world system modeled.
@@ -9,10 +12,15 @@ No real-world system modeled.
 
 from __future__ import annotations
 
+import json
+import logging
+import time
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol, runtime_checkable
 
 from mesh.logstore import append_jsonl, load_json, load_since, write_json
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Data paths
@@ -122,6 +130,289 @@ def log_replication(
 
 
 # ---------------------------------------------------------------------------
+# Transport Protocol
+# ---------------------------------------------------------------------------
+
+@runtime_checkable
+class Transport(Protocol):
+    """Abstract transport interface for inter-node communication.
+
+    Implementations:
+    - LocalTransport: filesystem-based (in-process, testing)
+    - HTTPTransport: real HTTP calls (distributed deployment)
+    """
+
+    def push(
+        self,
+        tenant_id: str,
+        target_node_id: str,
+        log_name: str,
+        records: list[dict],
+    ) -> int:
+        """Push records to a target node's log."""
+        ...
+
+    def pull(
+        self,
+        tenant_id: str,
+        source_node_id: str,
+        log_name: str,
+        since: str = "",
+    ) -> list[dict]:
+        """Pull records from a source node's log."""
+        ...
+
+    def get_status(self, tenant_id: str, node_id: str) -> dict | None:
+        """Read node status."""
+        ...
+
+    def set_status(self, tenant_id: str, node_id: str, status: dict) -> None:
+        """Write node status."""
+        ...
+
+    def health(self) -> dict[str, Any]:
+        """Return transport health info."""
+        ...
+
+
+# ---------------------------------------------------------------------------
+# LocalTransport — filesystem-based (backward compatible)
+# ---------------------------------------------------------------------------
+
+class LocalTransport:
+    """In-process transport using local filesystem JSONL files.
+
+    Wraps the existing push_records/pull_records module functions.
+    This is the default transport for single-process and testing scenarios.
+    """
+
+    def push(
+        self,
+        tenant_id: str,
+        target_node_id: str,
+        log_name: str,
+        records: list[dict],
+    ) -> int:
+        return push_records(tenant_id, target_node_id, log_name, records)
+
+    def pull(
+        self,
+        tenant_id: str,
+        source_node_id: str,
+        log_name: str,
+        since: str = "",
+    ) -> list[dict]:
+        return pull_records(tenant_id, source_node_id, log_name, since)
+
+    def get_status(self, tenant_id: str, node_id: str) -> dict | None:
+        return get_node_status(tenant_id, node_id)
+
+    def set_status(self, tenant_id: str, node_id: str, status: dict) -> None:
+        set_node_status(tenant_id, node_id, status)
+
+    def health(self) -> dict[str, Any]:
+        return {"status": "ok", "transport": "local"}
+
+
+# ---------------------------------------------------------------------------
+# HTTPTransport — real HTTP calls for distributed deployment
+# ---------------------------------------------------------------------------
+
+# Optional msgpack support
+_HAS_MSGPACK = False
+try:
+    import msgpack
+    _HAS_MSGPACK = True
+except ImportError:
+    pass
+
+
+def _encode_payload(data: Any, use_msgpack: bool = False) -> tuple[bytes, str]:
+    """Encode payload as JSON or MessagePack. Returns (bytes, content_type)."""
+    if use_msgpack and _HAS_MSGPACK:
+        return msgpack.packb(data, use_bin_type=True), "application/msgpack"
+    return json.dumps(data, default=str).encode("utf-8"), "application/json"
+
+
+def _decode_payload(raw: bytes, content_type: str) -> Any:
+    """Decode payload based on content type."""
+    if "msgpack" in content_type and _HAS_MSGPACK:
+        return msgpack.unpackb(raw, raw=False)
+    return json.loads(raw)
+
+
+_TRANSIENT_CODES = {502, 503, 504}
+_MAX_RETRIES = 3
+_BACKOFF_BASE = 0.5
+
+
+class HTTPTransport:
+    """HTTP-based transport for distributed mesh nodes.
+
+    Sends push/pull requests to remote node servers via httpx.
+    Supports JSON (default) and MessagePack (when available) serialization.
+
+    Parameters
+    ----------
+    peer_registry : dict[str, str]
+        Maps node_id → base_url (e.g. {"edge-A": "http://host1:8100"}).
+    timeout : float
+        HTTP request timeout in seconds.
+    verify_tls : bool
+        Whether to verify TLS certificates.
+    use_msgpack : bool
+        Prefer MessagePack when available.
+    """
+
+    def __init__(
+        self,
+        peer_registry: dict[str, str],
+        timeout: float = 5.0,
+        verify_tls: bool = True,
+        use_msgpack: bool = False,
+    ) -> None:
+        self._peers = dict(peer_registry)
+        self._timeout = timeout
+        self._verify_tls = verify_tls
+        self._use_msgpack = use_msgpack and _HAS_MSGPACK
+
+        try:
+            import httpx
+            self._client = httpx.Client(
+                timeout=timeout,
+                verify=verify_tls,
+            )
+        except ImportError:
+            raise ImportError(
+                "httpx is required for HTTPTransport. "
+                "Install with: pip install httpx"
+            )
+
+    def _base_url(self, node_id: str) -> str:
+        url = self._peers.get(node_id)
+        if url is None:
+            raise ValueError(f"Unknown peer node: {node_id}")
+        return url.rstrip("/")
+
+    def _request_with_retry(
+        self,
+        method: str,
+        url: str,
+        **kwargs: Any,
+    ) -> Any:
+        """Make HTTP request with retry on transient failures."""
+        import httpx
+
+        last_exc = None
+        for attempt in range(_MAX_RETRIES):
+            try:
+                resp = self._client.request(method, url, **kwargs)
+                if resp.status_code in _TRANSIENT_CODES:
+                    logger.warning(
+                        "Transient %d from %s (attempt %d/%d)",
+                        resp.status_code, url, attempt + 1, _MAX_RETRIES,
+                    )
+                    time.sleep(_BACKOFF_BASE * (2 ** attempt))
+                    continue
+                resp.raise_for_status()
+                ct = resp.headers.get("content-type", "application/json")
+                return _decode_payload(resp.content, ct)
+            except (httpx.ConnectError, httpx.TimeoutException) as exc:
+                last_exc = exc
+                logger.warning(
+                    "Connection error to %s (attempt %d/%d): %s",
+                    url, attempt + 1, _MAX_RETRIES, exc,
+                )
+                time.sleep(_BACKOFF_BASE * (2 ** attempt))
+
+        raise ConnectionError(
+            f"Failed after {_MAX_RETRIES} retries: {url}"
+        ) from last_exc
+
+    def push(
+        self,
+        tenant_id: str,
+        target_node_id: str,
+        log_name: str,
+        records: list[dict],
+    ) -> int:
+        base = self._base_url(target_node_id)
+        url = f"{base}/mesh/{tenant_id}/{target_node_id}/push"
+        key = log_name.replace(".jsonl", "")
+        payload = {key: records}
+        body, content_type = _encode_payload(payload, self._use_msgpack)
+        result = self._request_with_retry(
+            "POST", url,
+            content=body,
+            headers={"Content-Type": content_type},
+        )
+        return result.get("received", {}).get(key, 0)
+
+    def pull(
+        self,
+        tenant_id: str,
+        source_node_id: str,
+        log_name: str,
+        since: str = "",
+    ) -> list[dict]:
+        base = self._base_url(source_node_id)
+        url = f"{base}/mesh/{tenant_id}/{source_node_id}/pull"
+        params = {}
+        if since:
+            params["since"] = since
+        result = self._request_with_retry("GET", url, params=params)
+        key = log_name.replace(".jsonl", "")
+        return result.get("records", {}).get(key, [])
+
+    def get_status(self, tenant_id: str, node_id: str) -> dict | None:
+        try:
+            base = self._base_url(node_id)
+        except ValueError:
+            return None
+        url = f"{base}/mesh/{tenant_id}/{node_id}/status"
+        try:
+            return self._request_with_retry("GET", url)
+        except (ConnectionError, Exception):
+            return None
+
+    def set_status(self, tenant_id: str, node_id: str, status: dict) -> None:
+        # Status is node-local — always write to filesystem
+        set_node_status(tenant_id, node_id, status)
+
+    def health(self) -> dict[str, Any]:
+        """Ping all peers and return aggregate health."""
+        import httpx
+
+        peer_health: dict[str, str] = {}
+        for node_id, base_url in self._peers.items():
+            try:
+                resp = self._client.get(
+                    f"{base_url.rstrip('/')}/health",
+                    timeout=2.0,
+                )
+                if resp.status_code == 200:
+                    peer_health[node_id] = "ok"
+                else:
+                    peer_health[node_id] = f"error:{resp.status_code}"
+            except (httpx.ConnectError, httpx.TimeoutException):
+                peer_health[node_id] = "unreachable"
+
+        reachable = sum(1 for v in peer_health.values() if v == "ok")
+        return {
+            "status": "ok" if reachable == len(self._peers) else "degraded",
+            "transport": "http",
+            "peers_total": len(self._peers),
+            "peers_reachable": reachable,
+            "peer_health": peer_health,
+            "msgpack_enabled": self._use_msgpack,
+        }
+
+    def close(self) -> None:
+        """Close the HTTP client."""
+        self._client.close()
+
+
+# ---------------------------------------------------------------------------
 # FastAPI Router (for API server integration)
 # ---------------------------------------------------------------------------
 
@@ -130,18 +421,17 @@ def create_mesh_router():
 
     Returns an APIRouter with push/pull/status endpoints.
     """
-    from fastapi import APIRouter, Request
+    from fastapi import APIRouter, Body
 
     router = APIRouter(tags=["mesh"])
 
     @router.post("/mesh/{tenant_id}/{node_id}/push")
-    async def mesh_push(
+    def mesh_push(
         tenant_id: str,
         node_id: str,
-        request: Request,
+        body: dict = Body(),
     ) -> dict[str, Any]:
         """Receive pushed records from a peer node."""
-        body = await request.json()
         counts = {}
         for log_name in LOG_FILES:
             key = log_name.replace(".jsonl", "")
