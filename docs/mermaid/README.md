@@ -50,14 +50,14 @@ GitHub renders Mermaid diagrams natively in `.md` files.
 ## Diagram Types Used
 
 - `graph` — directed graphs (architecture, dependencies)
-- - `sequenceDiagram` — interaction flows between components
-  - - `erDiagram` — entity-relationship models
-    - - `flowchart` — decision logic and data flow
-      - - `stateDiagram` — state machines and lifecycles
-        - - `mindmap` — hierarchical concept maps
-          - - `pie` — proportional breakdowns
-            - - `gantt` — timeline and lifecycle stages
-             
-              - ## Viewing
-             
-              - Click any `.md` file on GitHub to see the rendered diagrams. Mermaid is supported natively — no extensions required.
+- `sequenceDiagram` — interaction flows between components
+- `erDiagram` — entity-relationship models
+- `flowchart` — decision logic and data flow
+- `stateDiagram` — state machines and lifecycles
+- `mindmap` — hierarchical concept maps
+- `pie` — proportional breakdowns
+- `gantt` — timeline and lifecycle stages
+
+## Viewing
+
+Click any `.md` file on GitHub to see the rendered diagrams. Mermaid is supported natively — no extensions required.
