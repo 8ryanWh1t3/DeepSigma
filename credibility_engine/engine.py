@@ -25,9 +25,6 @@ from credibility_engine.models import (
 )
 from credibility_engine.constants import DEFAULT_TENANT_ID
 from credibility_engine.store import CredibilityStore
-from governance.audit import audit_action
-from governance.drift_registry import update_drift_registry
-from tenancy.policies import evaluate_policy, get_policy_hash, load_policy
 
 
 def _now_iso() -> str:
@@ -246,6 +243,10 @@ class CredibilityEngine:
         if self._index_cache is None:
             self.recalculate_index()
 
+        from governance.audit import audit_action
+        from governance.drift_registry import update_drift_registry
+        from tenancy.policies import evaluate_policy
+
         # Evaluate policy against current state
         state = {
             "claims": [c.to_dict() for c in self.claims],
@@ -352,6 +353,8 @@ class CredibilityEngine:
         auto_rate = round(auto_resolved / max(len(self.drift_events), 1), 2)
 
         # Policy hash for governance display
+        from tenancy.policies import get_policy_hash, load_policy
+
         policy = load_policy(self.tenant_id)
         policy_hash = get_policy_hash(policy)
 
