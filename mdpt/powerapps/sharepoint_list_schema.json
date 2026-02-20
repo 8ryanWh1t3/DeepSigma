@@ -1,0 +1,83 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/sp/site-design-script-actions.schema.json",
+  "version": "1.0",
+  "description": "MDPT Power App SharePoint list schemas for PnP provisioning.",
+  "lists": [
+    {
+      "name": "PromptCapabilities",
+      "description": "Master registry of prompt capabilities.",
+      "templateType": 100,
+      "columns": [
+        {"name": "Capability_ID", "type": "Text", "required": true, "enforceUniqueValues": true, "description": "Unique ID (e.g. CAP-PRIME-INTEL-001)"},
+        {"name": "Lens", "type": "Choice", "required": true, "choices": ["PRIME", "EXEC", "OPS", "AI-TECH", "HUMAN", "ICON"]},
+        {"name": "Operation", "type": "Choice", "required": true, "choices": ["IntelOps", "ReOps", "FranOps"]},
+        {"name": "Prompt_Template", "type": "Note", "required": true, "description": "Prompt text template"},
+        {"name": "Description", "type": "Note", "required": false},
+        {"name": "Target_Tables", "type": "Note", "required": true, "description": "Comma-separated table names"},
+        {"name": "Output_Format", "type": "Choice", "required": true, "choices": ["Table", "Narrative", "Checklist", "Write-back Rows"]},
+        {"name": "Canon_Guardrail_Refs", "type": "Text", "required": false},
+        {"name": "Risk_Lane", "type": "Choice", "required": true, "choices": ["ADVISORY", "REVIEW", "GATE"]},
+        {"name": "Status", "type": "Choice", "required": true, "choices": ["Active", "Draft", "Deprecated"]},
+        {"name": "Owner", "type": "User", "required": false},
+        {"name": "Last_Updated", "type": "DateTime", "required": false},
+        {"name": "Version", "type": "Number", "required": true, "defaultValue": 1.0}
+      ],
+      "views": [
+        {"name": "All Capabilities", "default": true, "groupBy": "Lens", "sortBy": "Operation"},
+        {"name": "Active Only", "filter": "Status eq 'Active'", "sortBy": "Lens"},
+        {"name": "By Risk Lane", "groupBy": "Risk_Lane", "sortBy": "Status"}
+      ]
+    },
+    {
+      "name": "PromptRuns",
+      "description": "Execution log for prompt runs.",
+      "templateType": 100,
+      "columns": [
+        {"name": "Run_ID", "type": "Text", "required": true, "enforceUniqueValues": true},
+        {"name": "Capability_Ref", "type": "Lookup", "required": true, "lookupList": "PromptCapabilities", "lookupField": "Capability_ID"},
+        {"name": "User_Email", "type": "Text", "required": true},
+        {"name": "User_Name", "type": "Text", "required": true},
+        {"name": "Run_Timestamp", "type": "DateTime", "required": true},
+        {"name": "LLM_Platform", "type": "Choice", "required": true, "choices": ["ChatGPT", "Claude", "Copilot", "Other"]},
+        {"name": "Findings_Summary", "type": "Note", "required": true},
+        {"name": "Tables_Scanned", "type": "Note", "required": true},
+        {"name": "Rows_Analyzed", "type": "Number", "required": true},
+        {"name": "Actions_Proposed", "type": "Number", "required": false, "defaultValue": 0},
+        {"name": "Writeback_Rows", "type": "Number", "required": false, "defaultValue": 0},
+        {"name": "Canon_Violations", "type": "Number", "required": false, "defaultValue": 0},
+        {"name": "Drift_Detected", "type": "Boolean", "required": true, "defaultValue": false},
+        {"name": "Drift_Count", "type": "Number", "required": false, "defaultValue": 0},
+        {"name": "Eval_Score", "type": "Number", "required": false, "description": "0-100 quality score"}
+      ],
+      "views": [
+        {"name": "Recent Runs", "default": true, "sortBy": "Run_Timestamp", "sortOrder": "Descending"},
+        {"name": "Drift Detected", "filter": "Drift_Detected eq 1", "sortBy": "Run_Timestamp", "sortOrder": "Descending"}
+      ]
+    },
+    {
+      "name": "DriftPatches",
+      "description": "Drift signal and patch lifecycle queue.",
+      "templateType": 100,
+      "columns": [
+        {"name": "Patch_ID", "type": "Text", "required": true, "enforceUniqueValues": true},
+        {"name": "Run_Ref", "type": "Lookup", "required": true, "lookupList": "PromptRuns", "lookupField": "Run_ID"},
+        {"name": "Drift_Type", "type": "Choice", "required": true, "choices": ["freshness", "bypass", "verify", "outcome", "canon_conflict"]},
+        {"name": "Severity", "type": "Choice", "required": true, "choices": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]},
+        {"name": "Status", "type": "Choice", "required": true, "choices": ["Open", "In_Progress", "Approved", "Rejected", "Closed"]},
+        {"name": "Root_Cause", "type": "Note", "required": true},
+        {"name": "Proposed_Action", "type": "Note", "required": true},
+        {"name": "Affected_Tables", "type": "Text", "required": false},
+        {"name": "Assigned_To", "type": "User", "required": false},
+        {"name": "Resolution_Notes", "type": "Note", "required": false},
+        {"name": "Created_Date", "type": "DateTime", "required": true},
+        {"name": "Resolved_Date", "type": "DateTime", "required": false},
+        {"name": "SLA_Hours", "type": "Number", "required": false, "description": "Target resolution hours"}
+      ],
+      "views": [
+        {"name": "Open Patches", "default": true, "filter": "Status ne 'Closed' and Status ne 'Rejected'", "sortBy": "Severity"},
+        {"name": "All Patches", "sortBy": "Created_Date", "sortOrder": "Descending"},
+        {"name": "By Severity", "groupBy": "Severity", "sortBy": "Status"}
+      ]
+    }
+  ]
+}
