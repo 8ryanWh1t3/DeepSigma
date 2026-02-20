@@ -32,7 +32,7 @@ import jsonschema
 
 # ── Schema path ──────────────────────────────────────────────────────────────
 
-_SCHEMA_DIR = Path(__file__).resolve().parents[1] / "specs"
+_SCHEMA_DIR = Path(__file__).resolve().parents[2] / "specs"
 _ENVELOPE_SCHEMA_PATH = _SCHEMA_DIR / "connector_envelope.schema.json"
 _ENVELOPE_SCHEMA: Optional[Dict[str, Any]] = None
 

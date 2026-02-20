@@ -21,7 +21,7 @@ import time
 from pathlib import Path
 
 # Ensure the app root is importable
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from adapters.otel.exporter import OtelExporter  # noqa: E402
 

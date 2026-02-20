@@ -300,21 +300,21 @@ class TestToolCatalog:
     def test_catalog_has_29_tools(self):
         """Catalog contains 24 original + 5 coherence tools."""
         catalog = json.loads(
-            (ROOT / "adapters" / "mcp" / "tool_catalog.json").read_text()
+            (ROOT / "src" / "adapters" / "mcp" / "tool_catalog.json").read_text()
         )
         assert len(catalog["tools"]) == 29
 
     def test_catalog_version(self):
         """Catalog version is 1.0.0."""
         catalog = json.loads(
-            (ROOT / "adapters" / "mcp" / "tool_catalog.json").read_text()
+            (ROOT / "src" / "adapters" / "mcp" / "tool_catalog.json").read_text()
         )
         assert catalog["version"] == "1.0.0"
 
     def test_new_tools_have_schemas(self):
         """All 5 coherence tools have inputSchema."""
         catalog = json.loads(
-            (ROOT / "adapters" / "mcp" / "tool_catalog.json").read_text()
+            (ROOT / "src" / "adapters" / "mcp" / "tool_catalog.json").read_text()
         )
         coherence_tools = [t for t in catalog["tools"] if t["name"].startswith("coherence.")]
         assert len(coherence_tools) == 5

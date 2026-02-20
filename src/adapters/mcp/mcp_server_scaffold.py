@@ -30,15 +30,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from adapters.mcp.resilience import CircuitBreaker, CircuitOpen, retry, is_transient  # noqa: E402
 
-CATALOG = json.loads((ROOT / "adapters" / "mcp" / "tool_catalog.json").read_text(encoding="utf-8"))
-RESOURCE_CATALOG = json.loads((ROOT / "adapters" / "mcp" / "resource_catalog.json").read_text(encoding="utf-8"))
-PROMPT_CATALOG = json.loads((ROOT / "adapters" / "mcp" / "prompt_catalog.json").read_text(encoding="utf-8"))
+CATALOG = json.loads((ROOT / "src" / "adapters" / "mcp" / "tool_catalog.json").read_text(encoding="utf-8"))
+RESOURCE_CATALOG = json.loads((ROOT / "src" / "adapters" / "mcp" / "resource_catalog.json").read_text(encoding="utf-8"))
+PROMPT_CATALOG = json.loads((ROOT / "src" / "adapters" / "mcp" / "prompt_catalog.json").read_text(encoding="utf-8"))
 
 # ── Per-connector circuit breakers ───────────────────────────────
 BREAKERS: Dict[str, CircuitBreaker] = {

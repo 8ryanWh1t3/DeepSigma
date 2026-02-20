@@ -19,7 +19,7 @@ import sys
 from pathlib import Path
 
 # Make repo root importable
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 
 from dashboard.server.models_exhaust import DecisionEpisode, EpisodeEvent, Source
 from engine.exhaust_refiner import refine_episode

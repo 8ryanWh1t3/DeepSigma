@@ -44,8 +44,8 @@ from coherence_ops.scoring import CoherenceReport
 # ===================================================================
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-SAMPLE_EPISODES = REPO_ROOT / "coherence_ops" / "examples" / "sample_episodes.json"
-SAMPLE_DRIFT = REPO_ROOT / "coherence_ops" / "examples" / "sample_drift.json"
+SAMPLE_EPISODES = REPO_ROOT / "src" / "coherence_ops" / "examples" / "sample_episodes.json"
+SAMPLE_DRIFT = REPO_ROOT / "src" / "coherence_ops" / "examples" / "sample_drift.json"
 POLICY_PACK = REPO_ROOT / "docs" / "policy_packs" / "packs" / "demo_policy_pack_v1.json"
 
 

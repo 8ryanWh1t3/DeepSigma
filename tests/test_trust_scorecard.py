@@ -10,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from demos.golden_path.config import GoldenPathConfig
 from demos.golden_path.pipeline import GoldenPathPipeline
 
-FIXTURE_DIR = str(Path(__file__).parent.parent / "demos" / "golden_path" / "fixtures" / "sharepoint_small")
+FIXTURE_DIR = str(Path(__file__).parent.parent / "src" / "demos" / "golden_path" / "fixtures" / "sharepoint_small")
 
 
 def _run_golden_path(output_dir: str) -> dict:

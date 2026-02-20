@@ -19,8 +19,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
-SCAFFOLD = REPO_ROOT / "adapters" / "mcp" / "mcp_server_scaffold.py"
+REPO_ROOT = Path(__file__).resolve().parents[4]
+SCAFFOLD = REPO_ROOT / "src" / "adapters" / "mcp" / "mcp_server_scaffold.py"
 MESSAGES_FILE = Path(__file__).parent / "sample_messages.jsonl"
 
 

@@ -26,7 +26,7 @@ from typing import Any, Dict
 
 # Ensure the project root is on sys.path so engine.* imports work
 # without requiring PYTHONPATH=. to be set manually.
-_REPO_ROOT = str(Path(__file__).resolve().parents[1])
+_REPO_ROOT = str(Path(__file__).resolve().parents[2])
 if _REPO_ROOT not in sys.path:
     sys.path.insert(0, _REPO_ROOT)
 

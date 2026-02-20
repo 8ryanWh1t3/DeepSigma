@@ -83,21 +83,22 @@ All connectors conform to the [Connector Contract v1.0](specs/connector_contract
 
 ```
 DeepSigma/
-├── coherence_ops/       # Core Python library + CLI
-├── credibility_engine/  # Runtime engine with JSONL persistence
-├── deepsigma/cli/       # Unified product CLI
-├── services/            # SPARQL, RDF, semantic query layer
-├── adapters/            # MCP, SharePoint, Snowflake, LangGraph, OpenClaw, AskSage
-├── engine/              # Compression, degrade ladder, supervisor
-├── dashboard/           # React dashboard + API server
-├── demos/               # Golden Path, Excel-first Money Demo
-├── mdpt/                # MDPT tools + Power App starter kit
-├── templates/           # Excel workbook templates (CDS, Healthcare, FinServ)
-├── specs/               # JSON schemas
+├── src/                 # 12 Python packages (all source code)
+│   ├── coherence_ops/   #   Core library + CLI
+│   ├── engine/          #   Compression, degrade ladder, supervisor
+│   ├── adapters/        #   MCP, SharePoint, Snowflake, LangGraph, OpenClaw, AskSage
+│   ├── deepsigma/       #   Unified product CLI
+│   ├── demos/           #   Golden Path, Excel-first Money Demo
+│   └── ...              #   credibility_engine, services, mesh, governance, tenancy, verifiers, tools
+├── tests/               # 1050+ tests across unit, integration, benchmarks
 ├── docs/                # All documentation (canonical, mermaid, wiki, RDF, cookbook, etc.)
+├── dashboard/           # React dashboard + API server
+├── mdpt/                # MDPT tools + Power App starter kit
+├── specs/               # JSON schemas
 ├── examples/            # Mini Lattice, Enterprise, Scale, Healthcare, Game Studio
+├── templates/           # Excel workbook templates (CDS, Healthcare, FinServ)
 ├── fixtures/            # Test fixtures + datasets
-└── tests/               # 1050+ tests across unit, integration, benchmarks
+└── .github/             # CI/CD workflows
 ```
 
 ---

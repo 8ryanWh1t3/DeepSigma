@@ -46,12 +46,12 @@ COPY dashboard/server/ /app/dashboard/server/
 # Ensure dashboard is a Python package (uvicorn needs dashboard.server.api)
 RUN touch /app/dashboard/__init__.py /app/dashboard/server/__init__.py
 COPY pyproject.toml setup.cfg* /app/
-COPY engine/ /app/engine/
-COPY coherence_ops/ /app/coherence_ops/
-COPY verifiers/ /app/verifiers/
-COPY tools/ /app/tools/
+COPY src/engine/ /app/engine/
+COPY src/coherence_ops/ /app/coherence_ops/
+COPY src/verifiers/ /app/verifiers/
+COPY src/tools/ /app/tools/
 COPY specs/ /app/specs/
-COPY adapters/ /app/adapters/
+COPY src/adapters/ /app/adapters/
 
 # Install DeepSigma package so coherence_ops is importable
 RUN pip install --no-cache-dir -e /app

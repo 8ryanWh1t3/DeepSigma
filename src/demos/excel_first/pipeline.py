@@ -73,7 +73,7 @@ def _generate_workbook(path: Path) -> None:
     # Import generator functions from the existing tool
     import sys
     from pathlib import Path as P
-    repo_root = P(__file__).resolve().parent.parent.parent
+    repo_root = P(__file__).resolve().parents[3]
     if str(repo_root) not in sys.path:
         sys.path.insert(0, str(repo_root))
 
