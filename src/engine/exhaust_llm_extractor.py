@@ -101,7 +101,19 @@ class LLMExtractor:
         return f"Episode transcript:\n\n{transcript}\n\nExtract knowledge:"
 
     def _call_api(self, prompt: str) -> str:
-        """Call Anthropic Messages API and return raw response text."""
+        """Route to the configured LLM backend and return raw response text.
+
+        Backend is selected via ``DEEPSIGMA_LLM_BACKEND`` env var:
+          - ``anthropic`` (default) — Anthropic Messages API
+          - ``local`` — any OpenAI-compatible server (llama.cpp, Ollama, vLLM, etc.)
+        """
+        backend = os.environ.get("DEEPSIGMA_LLM_BACKEND", "anthropic").lower()
+        if backend == "local":
+            return self._call_local(prompt)
+        return self._call_anthropic(prompt)
+
+    def _call_anthropic(self, prompt: str) -> str:
+        """Call Anthropic Messages API."""
         try:
             import anthropic  # optional dep
         except ImportError as exc:
@@ -121,6 +133,20 @@ class LLMExtractor:
             messages=[{"role": "user", "content": prompt}],
         )
         return message.content[0].text
+
+    def _call_local(self, prompt: str) -> str:
+        """Call a local OpenAI-compatible server via LlamaCppConnector."""
+        from adapters.local_llm.connector import LlamaCppConnector
+
+        connector = LlamaCppConnector()
+        result = connector.chat(
+            messages=[
+                {"role": "system", "content": _SYSTEM_PROMPT},
+                {"role": "user", "content": prompt},
+            ],
+            max_tokens=self.max_tokens,
+        )
+        return result["text"]
 
     def _parse_response(self, text: str) -> Dict[str, List]:
         """Parse and validate the LLM JSON response into bucket objects."""

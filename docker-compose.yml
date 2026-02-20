@@ -48,6 +48,9 @@ services:
       # Uncomment and set to enable LLM-backed extraction:
       # - ANTHROPIC_API_KEY=sk-ant-...
       # - EXHAUST_USE_LLM=1
+      # Uncomment to use local LLM instead of Anthropic:
+      # - DEEPSIGMA_LLM_BACKEND=local
+      # - DEEPSIGMA_LOCAL_BASE_URL=http://host.docker.internal:8080
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c",

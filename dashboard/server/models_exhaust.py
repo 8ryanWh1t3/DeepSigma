@@ -31,6 +31,7 @@ class Source(str, Enum):
     openai = "openai"
     azure = "azure"
     anthropic = "anthropic"
+    local = "local"
     manual = "manual"
 
 

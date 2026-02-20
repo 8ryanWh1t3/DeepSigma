@@ -76,6 +76,7 @@ All connectors conform to the [Connector Contract v1.0](specs/connector_contract
 | Snowflake | Cortex + SQL API | [docs](docs/29-snowflake-connector.md) |
 | LangGraph | LangChain Callback | [docs](docs/23-langgraph-adapter.md) |
 | OpenClaw | WASM Sandbox | [docs](adapters/openclaw/) |
+| Local LLM | llama.cpp / OpenAI-compatible | [docs](docs/30-local-inference.md) |
 
 ---
 

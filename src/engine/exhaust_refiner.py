@@ -478,11 +478,19 @@ def refine_episode(
     Args:
         episode:     Assembled DecisionEpisode to refine.
         policy_pack: Optional policy constraints for scoring.
-        use_llm:     When True and ANTHROPIC_API_KEY is set, use the
-                     LLM-based extractor in place of rule-based extraction.
-                     Falls back to rule-based on any failure.
+        use_llm:     When True and a supported LLM backend is available,
+                     use the LLM-based extractor in place of rule-based
+                     extraction.  Falls back to rule-based on any failure.
+                     Backends: DEEPSIGMA_LLM_BACKEND=anthropic (default,
+                     requires ANTHROPIC_API_KEY) or =local (requires a
+                     running OpenAI-compatible server).
     """
-    if use_llm and os.environ.get("ANTHROPIC_API_KEY"):
+    _backend = os.environ.get("DEEPSIGMA_LLM_BACKEND", "anthropic").lower()
+    _llm_ok = (
+        (_backend == "anthropic" and os.environ.get("ANTHROPIC_API_KEY"))
+        or _backend == "local"
+    )
+    if use_llm and _llm_ok:
         try:
             from engine.exhaust_llm_extractor import LLMExtractor
             buckets = LLMExtractor().extract(episode)

@@ -46,6 +46,13 @@ RUN if [ "$INSTALL_LLM" = "1" ]; then \
     pip install --no-cache-dir "anthropic>=0.40.0"; \
     fi
 
+# Optional: install httpx for local LLM inference (llama.cpp, Ollama, vLLM, etc.)
+# Build with --build-arg INSTALL_LOCAL=1 to include it
+ARG INSTALL_LOCAL=0
+RUN if [ "$INSTALL_LOCAL" = "1" ]; then \
+    pip install --no-cache-dir "httpx>=0.25.0"; \
+    fi
+
 # Data directory for episode/drift storage (mount volume here)
 RUN mkdir -p /app/data
 
