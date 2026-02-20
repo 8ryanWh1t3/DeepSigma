@@ -13,7 +13,7 @@ import logging
 import os
 import threading
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterator, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +79,37 @@ def _read_jsonl(path: Path) -> List[Dict[str, Any]]:
     return results
 
 
+def _iter_jsonl(path: Path) -> Iterator[Dict[str, Any]]:
+    """Stream records from a JSONL file one at a time (bounded memory)."""
+    if not path.exists():
+        return
+    with open(path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                try:
+                    yield json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+
+
+def _count_jsonl(path: Path) -> int:
+    """Count valid JSON records in a JSONL file without loading them."""
+    if not path.exists():
+        return 0
+    count = 0
+    with open(path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                try:
+                    json.loads(line)
+                    count += 1
+                except json.JSONDecodeError:
+                    continue
+    return count
+
+
 def _write_json(path: Path, data: Dict[str, Any]) -> None:
     """Write a single JSON file with locking."""
     with _write_lock:
@@ -106,15 +137,11 @@ if HAS_FASTAPI:
     def exhaust_health():
         """Health check for the exhaust module."""
         _ensure_dirs()
-        events = _read_jsonl(EVENTS_FILE)
-        episodes = list(EPISODES_DIR.glob("*.json")) if EPISODES_DIR.exists() else []
-        refined = list(REFINED_DIR.glob("*.json")) if REFINED_DIR.exists() else []
-        drift = _read_jsonl(DRIFT_FILE)
         return HealthResponse(
-            events_count=len(events),
-            episodes_count=len(episodes),
-            refined_count=len(refined),
-            drift_count=len(drift),
+            events_count=_count_jsonl(EVENTS_FILE),
+            episodes_count=len(list(EPISODES_DIR.glob("*.json"))) if EPISODES_DIR.exists() else 0,
+            refined_count=len(list(REFINED_DIR.glob("*.json"))) if REFINED_DIR.exists() else 0,
+            drift_count=_count_jsonl(DRIFT_FILE),
         )
 
     @router.get("/schema")
@@ -211,9 +238,7 @@ if HAS_FASTAPI:
 
         # Check for drift if drift_only
         if drift_only:
-            drift_eids = set()
-            for d in _read_jsonl(DRIFT_FILE):
-                drift_eids.add(d.get("episode_id", ""))
+            drift_eids = {d.get("episode_id", "") for d in _iter_jsonl(DRIFT_FILE)}
             episodes = [e for e in episodes if e.get("episode_id") in drift_eids]
 
         total = len(episodes)
@@ -335,10 +360,14 @@ if HAS_FASTAPI:
         drift_type: Optional[str] = Query(None),
         limit: int = Query(100, ge=1, le=1000),
     ):
-        """List drift signals."""
-        signals = _read_jsonl(DRIFT_FILE)
-        if severity:
-            signals = [s for s in signals if s.get("severity") == severity]
-        if drift_type:
-            signals = [s for s in signals if s.get("drift_type") == drift_type]
-        return {"count": len(signals[:limit]), "drift_signals": signals[:limit]}
+        """List drift signals (streaming — bounded memory)."""
+        matched = []
+        for signal in _iter_jsonl(DRIFT_FILE):
+            if severity and signal.get("severity") != severity:
+                continue
+            if drift_type and signal.get("drift_type") != drift_type:
+                continue
+            matched.append(signal)
+            if len(matched) >= limit:
+                break
+        return {"count": len(matched), "drift_signals": matched}

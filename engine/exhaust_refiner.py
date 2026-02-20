@@ -312,34 +312,31 @@ def detect_drift(
     """
     signals: List[DriftSignal] = []
 
-    # Load existing memory graph as canon
-    canon: List[Dict[str, Any]] = []
+    # Stream canon from memory graph — build maps directly without intermediate list
+    canon_map: Dict[str, str] = {}
+    known_episode_ids: set = set()
     mg_path = canon_path or Path(os.environ.get("DATA_DIR", "/app/data")) / "mg" / "memory_graph.jsonl"
     if mg_path.exists():
         with open(mg_path, "r") as f:
             for line in f:
                 line = line.strip()
-                if line:
-                    try:
-                        canon.append(json.loads(line))
-                    except json.JSONDecodeError:
-                        continue
-
-    # Build canon lookup: entity+property -> value
-    canon_map: Dict[str, str] = {}
-    for c in canon:
-        if c.get("node_type") == "truth":
-            key = f"{_slug(c.get('entity', ''))}:{_slug(c.get('property_name', ''))}"
-            if key and key != ":":
-                canon_map[key] = c.get("value", "")
-
-    # Build known episode IDs from canon
-    known_episode_ids: set = {
-        c.get("entity", "")
-        for c in canon
-        if c.get("artifact_type") == "episode" or c.get("node_type") == "memory"
-        and c.get("artifact_type") == "episode"
-    }
+                if not line:
+                    continue
+                try:
+                    c = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if c.get("node_type") == "truth":
+                    key = f"{_slug(c.get('entity', ''))}:{_slug(c.get('property_name', ''))}"
+                    if key and key != ":":
+                        canon_map[key] = c.get("value", "")
+                if (
+                    c.get("artifact_type") == "episode"
+                    or (c.get("node_type") == "memory" and c.get("artifact_type") == "episode")
+                ):
+                    entity = c.get("entity", "")
+                    if entity:
+                        known_episode_ids.add(entity)
 
     # Check contradictions
     for item in truth:
