@@ -6,7 +6,6 @@ import json
 import sys
 import time
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 
@@ -18,7 +17,6 @@ from adapters.mcp.mcp_server_scaffold import (
     handle_initialize,
     handle_tools_call,
     handle_tools_list,
-    rpc_error,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
