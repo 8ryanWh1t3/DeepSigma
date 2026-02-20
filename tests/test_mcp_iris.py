@@ -16,7 +16,7 @@ class TestToolsList:
         resp = handle_tools_list(1)
         tools = resp["result"]["tools"]
         names = [t["name"] for t in tools]
-        assert len(tools) == 24
+        assert len(tools) == 29
         assert "iris.query" in names
         assert "iris.reload" in names
 

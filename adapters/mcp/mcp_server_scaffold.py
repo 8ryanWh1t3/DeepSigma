@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
-"""MCP Server Scaffold (dependency-free)
+"""MCP Server — Production JSON-RPC stdio server for MCP integration.
 
-Minimal JSON-RPC stdio server for MCP integration.
+Implements the Model Context Protocol v2024-11-05 with:
+- Full tool registry (29 tools including 5 coherence tools)
+- API key authentication (optional, via MCP_API_KEYS env var)
+- Per-client rate limiting (configurable via MCP_RATE_LIMIT env var)
+- Circuit breakers and retry logic for connector resilience
+- Streaming support for large result sets
 
 Supported JSON-RPC methods:
 - initialize
@@ -15,9 +20,11 @@ Run:
 
 from __future__ import annotations
 
+import dataclasses
 import json
 import os
 import sys
+import time
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -42,6 +49,46 @@ BREAKERS: Dict[str, CircuitBreaker] = {
     "snowflake": CircuitBreaker(name="snowflake", threshold=5, cooldown=60.0),
     "golden_path": CircuitBreaker(name="golden_path", threshold=5, cooldown=60.0),
 }
+
+
+# ── Authentication ──────────────────────────────────────────────
+_AUTH_KEYS_RAW = os.environ.get("MCP_API_KEYS", "")
+_AUTH_KEYS: set = {k.strip() for k in _AUTH_KEYS_RAW.split(",") if k.strip()} if _AUTH_KEYS_RAW else set()
+_AUTH_ENABLED = bool(_AUTH_KEYS)
+_AUTHED_SESSIONS: set = set()
+
+
+def _check_auth(session_id: str) -> bool:
+    """Return True if request is authorized (or auth is disabled)."""
+    if not _AUTH_ENABLED:
+        return True
+    return session_id in _AUTHED_SESSIONS
+
+
+# ── Rate Limiting ──────────────────────────────────────────────
+_RATE_LIMIT = int(os.environ.get("MCP_RATE_LIMIT", "60"))  # requests per minute
+
+
+class _RateLimiter:
+    """Per-session sliding window rate limiter."""
+
+    def __init__(self, max_per_minute: int = 60):
+        self._max = max_per_minute
+        self._windows: Dict[str, List[float]] = {}
+
+    def allow(self, session_id: str) -> bool:
+        now = time.monotonic()
+        window = self._windows.setdefault(session_id, [])
+        # Prune entries older than 60s
+        cutoff = now - 60.0
+        self._windows[session_id] = [t for t in window if t > cutoff]
+        if len(self._windows[session_id]) >= self._max:
+            return False
+        self._windows[session_id].append(now)
+        return True
+
+
+_rate_limiter = _RateLimiter(_RATE_LIMIT)
 
 
 def _connector_call(breaker_name: str, fn: Any, *args: Any, **kwargs: Any) -> Any:
@@ -309,6 +356,112 @@ def handle_tools_call(_id: Any, params: Dict[str, Any]) -> Dict[str, Any]:
         result = _connector_call("golden_path", GoldenPathPipeline(config).run)
         return rpc_result(_id, result.to_dict())
 
+    # ── Coherence tools ──────────────────────────────────────
+    if name == "coherence.query_credibility_index":
+        if _iris_pipeline is None:
+            _load_pipeline()
+        if _iris_pipeline is None:
+            return rpc_error(_id, -32000, "No data loaded. Call iris.reload first or set DATA_DIR.")
+        from coherence_ops.scoring import CoherenceScorer
+        scorer = CoherenceScorer(
+            dlr_builder=_iris_pipeline["dlr"],
+            rs=_iris_pipeline["rs"],
+            ds=_iris_pipeline["ds"],
+            mg=_iris_pipeline["mg"],
+        )
+        report = scorer.score()
+        return rpc_result(_id, {
+            "overall_score": report.overall_score,
+            "grade": report.grade,
+            "computed_at": report.computed_at,
+            "dimensions": [dataclasses.asdict(d) for d in report.dimensions],
+        })
+
+    if name == "coherence.list_drift_signals":
+        if _iris_pipeline is None:
+            _load_pipeline()
+        if _iris_pipeline is None:
+            return rpc_error(_id, -32000, "No data loaded. Call iris.reload first or set DATA_DIR.")
+        ds = _iris_pipeline["ds"]
+        summary = ds.summarise()
+        result_data = dataclasses.asdict(summary)
+        # Convert DriftBucket dataclasses to dicts
+        result_data["buckets"] = [dataclasses.asdict(b) for b in summary.buckets]
+        # Apply severity filter if provided
+        severity_filter = arguments.get("severity")
+        if severity_filter:
+            result_data["buckets"] = [
+                b for b in result_data["buckets"]
+                if b.get("worst_severity") == severity_filter
+            ]
+        # Apply limit
+        limit = arguments.get("limit", 100)
+        result_data["buckets"] = result_data["buckets"][:limit]
+        return rpc_result(_id, result_data)
+
+    if name == "coherence.get_episode":
+        episode_id = arguments.get("episode_id", "")
+        if not episode_id:
+            return rpc_error(_id, -32602, "Missing params.arguments.episode_id")
+        # Try MG provenance query first
+        if _iris_pipeline and _iris_pipeline.get("mg"):
+            provenance = _iris_pipeline["mg"].query("why", episode_id=episode_id)
+        else:
+            provenance = None
+        # Load episode file
+        data = _data_dir()
+        episode_data = None
+        for pattern in (f"{episode_id}.json", f"episodes/{episode_id}.json"):
+            candidate = data / pattern
+            if candidate.exists():
+                episode_data = json.loads(candidate.read_text(encoding="utf-8"))
+                break
+        if episode_data is None and (provenance is None or provenance.get("node") is None):
+            return rpc_error(_id, -32000, f"Episode not found: {episode_id}")
+        result_data = {"episode_id": episode_id}
+        if episode_data:
+            result_data["episode"] = episode_data
+        if provenance and provenance.get("node"):
+            result_data["provenance"] = provenance
+        return rpc_result(_id, result_data)
+
+    if name == "coherence.apply_patch":
+        patch = arguments.get("patch", {})
+        if not patch or not patch.get("patchId"):
+            return rpc_error(_id, -32602, "Missing params.arguments.patch with patchId")
+        if _iris_pipeline is None:
+            _load_pipeline()
+        if _iris_pipeline is None:
+            return rpc_error(_id, -32000, "No data loaded. Call iris.reload first or set DATA_DIR.")
+        mg = _iris_pipeline["mg"]
+        node_id = mg.add_patch(patch)
+        return rpc_result(_id, {
+            "applied": True,
+            "patch_id": patch["patchId"],
+            "node_id": node_id,
+        })
+
+    if name == "coherence.seal_decision":
+        episode = arguments.get("episode", {})
+        if not episode or not episode.get("episodeId"):
+            return rpc_error(_id, -32602, "Missing params.arguments.episode with episodeId")
+        if _iris_pipeline is None:
+            _load_pipeline()
+        if _iris_pipeline is None:
+            return rpc_error(_id, -32000, "No data loaded. Call iris.reload first or set DATA_DIR.")
+        from coherence_ops.dlr import DLRBuilder
+        dlr_builder = DLRBuilder()
+        entry = dlr_builder.from_episode(episode)
+        mg = _iris_pipeline["mg"]
+        mg.add_episode(episode)
+        return rpc_result(_id, {
+            "sealed": True,
+            "dlr_id": entry.dlr_id,
+            "episode_id": entry.episode_id,
+            "decision_type": entry.decision_type,
+            "outcome_code": entry.outcome_code,
+        })
+
     return rpc_error(_id, -32601, f"Unknown tool: {name}")
 
 # ── Resources ───────────────────────────────────────────────────
@@ -473,7 +626,30 @@ def handle_prompts_get(_id: Any, params: Dict[str, Any]) -> Dict[str, Any]:
 
 # ── Main Loop ───────────────────────────────────────────────────
 
+def handle_initialize(_id: Any, params: Dict[str, Any]) -> Dict[str, Any]:
+    """Handle MCP initialize with optional API key auth."""
+    session_id = "sess_" + uuid.uuid4().hex[:12]
+    # Auth: validate API key if auth is enabled
+    if _AUTH_ENABLED:
+        api_key = params.get("apiKey", "")
+        if api_key not in _AUTH_KEYS:
+            return rpc_error(_id, -32000, "Authentication failed: invalid API key")
+        _AUTHED_SESSIONS.add(session_id)
+
+    return rpc_result(_id, {
+        "protocolVersion": "2024-11-05",
+        "capabilities": {
+            "tools": {},
+            "resources": {},
+            "prompts": {},
+        },
+        "serverInfo": {"name": "sigma-overwatch-mcp", "version": "1.0.0"},
+        "sessionId": session_id,
+    })
+
+
 def main() -> None:
+    current_session: str = ""
     for line in sys.stdin:
         line = line.strip()
         if not line:
@@ -485,19 +661,20 @@ def main() -> None:
             method = req.get("method")
             params = req.get("params", {})
             if method == "initialize":
-                resp = rpc_result(_id, {
-                    "protocolVersion": "2024-11-05",
-                    "capabilities": {
-                        "tools": {},
-                        "resources": {},
-                        "prompts": {},
-                    },
-                    "serverInfo": {"name": "sigma-overwatch-mcp", "version": "0.4.0"},
-                })
+                resp = handle_initialize(_id, params)
+                if "result" in resp and "sessionId" in resp["result"]:
+                    current_session = resp["result"]["sessionId"]
             elif method == "tools/list":
                 resp = handle_tools_list(_id)
             elif method == "tools/call":
-                resp = handle_tools_call(_id, params)
+                # Auth check
+                if not _check_auth(current_session):
+                    resp = rpc_error(_id, -32000, "Authentication required: call initialize with valid apiKey")
+                # Rate limit check
+                elif not _rate_limiter.allow(current_session or "anonymous"):
+                    resp = rpc_error(_id, -32003, "Rate limit exceeded")
+                else:
+                    resp = handle_tools_call(_id, params)
             elif method == "resources/list":
                 resp = handle_resources_list(_id)
             elif method == "resources/read":
