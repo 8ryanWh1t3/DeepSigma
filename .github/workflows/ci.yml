@@ -132,6 +132,9 @@ jobs:
           python -m deepsigma.cli.main doctor --json
           python -m pytest tests/test_cli_smoke.py -v --tb=short
 
+      - name: Mermaid diagram audit
+        run: python src/tools/mermaid_audit.py
+
   benchmarks:
     name: Benchmarks
     runs-on: ubuntu-latest
