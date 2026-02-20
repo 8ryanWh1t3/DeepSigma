@@ -371,3 +371,55 @@ if HAS_FASTAPI:
             if len(matched) >= limit:
                 break
         return {"count": len(matched), "drift_signals": matched}
+
+    # ── Webhook management ────────────────────────────────────────
+
+    @router.post("/webhooks")
+    def register_webhook(body: dict):
+        """Register a new webhook endpoint."""
+        from engine.webhooks import WebhookConfig, WebhookManager
+        config = WebhookConfig(**body)
+        mgr = WebhookManager()
+        result = mgr.register(config)
+        data = result.model_dump()
+        data["secret"] = "***"
+        return {"status": "registered", "webhook": data}
+
+    @router.get("/webhooks")
+    def list_webhooks(tenant_id: str = Query("default")):
+        """List all registered webhooks for a tenant."""
+        from engine.webhooks import WebhookManager
+        mgr = WebhookManager()
+        webhooks = mgr.list_webhooks(tenant_id=tenant_id)
+        result = []
+        for w in webhooks:
+            d = w.model_dump()
+            d["secret"] = "***"
+            result.append(d)
+        return {"count": len(result), "webhooks": result}
+
+    @router.delete("/webhooks/{webhook_id}")
+    def delete_webhook(webhook_id: str):
+        """Delete a webhook registration."""
+        from engine.webhooks import WebhookManager
+        mgr = WebhookManager()
+        deleted = mgr.delete_webhook(webhook_id)
+        if not deleted:
+            raise HTTPException(404, f"Webhook {webhook_id} not found")
+        return {"status": "deleted", "webhook_id": webhook_id}
+
+    @router.post("/webhooks/{webhook_id}/test")
+    def test_webhook(webhook_id: str):
+        """Send a test event to a specific webhook."""
+        from engine.webhooks import WebhookEvent, WebhookEventType, WebhookManager
+        mgr = WebhookManager()
+        webhook = mgr.get_webhook(webhook_id)
+        if not webhook:
+            raise HTTPException(404, f"Webhook {webhook_id} not found")
+        test_event = WebhookEvent(
+            event_type=WebhookEventType.drift_detected,
+            tenant_id=webhook.tenant_id,
+            payload={"test": True, "message": "Test webhook delivery from DeepSigma"},
+        )
+        records = mgr.dispatch(test_event)
+        return {"status": "sent", "deliveries": [r.model_dump() for r in records]}
