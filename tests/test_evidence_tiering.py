@@ -267,6 +267,14 @@ class TestTierAwareQueries:
 
 # ── Engine Integration ───────────────────────────────────────────────────────
 
+_has_fastapi = True
+try:
+    import fastapi  # noqa: F401
+except ModuleNotFoundError:
+    _has_fastapi = False
+
+
+@pytest.mark.skipif(not _has_fastapi, reason="fastapi not installed")
 class TestEngineIntegration:
     def test_engine_with_tiering_uses_hot_warm(self, tmp_path):
         from credibility_engine.engine import CredibilityEngine
