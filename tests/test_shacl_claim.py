@@ -22,13 +22,13 @@ class TestClaimSHACL(unittest.TestCase):
 
         cls.data_graph = rdflib.Graph()
         cls.data_graph.parse(
-            os.path.join(_REPO_ROOT, "rdf/examples/claim_primitive_instance.ttl"),
+            os.path.join(_REPO_ROOT, "docs/rdf/examples/claim_primitive_instance.ttl"),
             format="turtle",
         )
 
         cls.shapes_graph = rdflib.Graph()
         cls.shapes_graph.parse(
-            os.path.join(_REPO_ROOT, "rdf/shapes/claim_primitive.shacl.ttl"),
+            os.path.join(_REPO_ROOT, "docs/rdf/shapes/claim_primitive.shacl.ttl"),
             format="turtle",
         )
 
@@ -111,11 +111,11 @@ class TestClaimSHACL(unittest.TestCase):
         """Both ontology and shapes files must parse without error."""
         g = self.rdflib.Graph()
         g.parse(
-            os.path.join(_REPO_ROOT, "rdf/ontology/coherence_ops_core.ttl"),
+            os.path.join(_REPO_ROOT, "docs/rdf/ontology/coherence_ops_core.ttl"),
             format="turtle",
         )
         g.parse(
-            os.path.join(_REPO_ROOT, "rdf/ontology/claim_primitive.ttl"),
+            os.path.join(_REPO_ROOT, "docs/rdf/ontology/claim_primitive.ttl"),
             format="turtle",
         )
         self.assertTrue(len(g) > 0)

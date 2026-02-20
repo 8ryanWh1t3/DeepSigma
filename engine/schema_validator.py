@@ -27,7 +27,7 @@ from referencing import Registry, Resource
 logger = logging.getLogger(__name__)
 
 SPECS_DIR = Path(__file__).resolve().parents[1] / "specs"
-POLICY_SCHEMA = Path(__file__).resolve().parents[1] / "policy_packs" / "policy_pack.schema.json"
+POLICY_SCHEMA = Path(__file__).resolve().parents[1] / "docs" / "policy_packs" / "policy_pack.schema.json"
 
 # Compiled validator cache: schema_name -> Draft202012Validator
 _VALIDATORS: Dict[str, Draft202012Validator] = {}

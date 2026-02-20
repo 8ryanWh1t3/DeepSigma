@@ -58,7 +58,7 @@ def build_registry() -> "Registry | None":
             resources.append((sch["$id"], resource))
 
     # Collect schemas from llm_data_model/02_schema/jsonschema/
-    schema_dir = ROOT / "llm_data_model" / "02_schema" / "jsonschema"
+    schema_dir = ROOT / "docs" / "llm_data_model" / "02_schema" / "jsonschema"
     if schema_dir.exists():
         for p in schema_dir.glob("*.json"):
             sch = load_schema(p)

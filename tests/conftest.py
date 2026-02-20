@@ -14,7 +14,7 @@ if str(REPO_ROOT) not in sys.path:
 
 SAMPLE_EPISODES_PATH = REPO_ROOT / "coherence_ops" / "examples" / "sample_episodes.json"
 SAMPLE_DRIFT_PATH = REPO_ROOT / "coherence_ops" / "examples" / "sample_drift.json"
-POLICY_PACK_PATH = REPO_ROOT / "policy_packs" / "packs" / "demo_policy_pack_v1.json"
+POLICY_PACK_PATH = REPO_ROOT / "docs" / "policy_packs" / "packs" / "demo_policy_pack_v1.json"
 
 
 @pytest.fixture

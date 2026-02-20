@@ -121,7 +121,7 @@ jobs:
 
       - name: Validate LLM Data Model examples
         run: |
-          python llm_data_model/05_validation/validate_examples.py
+          python docs/llm_data_model/05_validation/validate_examples.py
 
       - name: Connector contract + fixture tests
         run: |

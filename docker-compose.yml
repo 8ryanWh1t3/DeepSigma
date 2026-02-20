@@ -103,7 +103,7 @@ services:
     container_name: overwatch-tools
     volumes:
       - ./data:/data
-      - ./policy_packs:/app/policy_packs:ro
+      - ./docs/policy_packs:/app/policy_packs:ro
     environment:
       - PYTHONPATH=/app
     profiles:

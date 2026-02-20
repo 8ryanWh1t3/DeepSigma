@@ -72,6 +72,6 @@ if __name__ == "__main__":
         max_feature_age_ms=180,
         verifier_result="pass",
     )
-    policy_ref, degrade = apply_policy_and_degrade("AccountQuarantine", "policy_packs/packs/demo_policy_pack_v1.json", signals)
+    policy_ref, degrade = apply_policy_and_degrade("AccountQuarantine", "docs/policy_packs/packs/demo_policy_pack_v1.json", signals)
     episode = {"episodeId":"demo","decisionType":"AccountQuarantine"}
     print(json.dumps(stamp_episode(episode, policy_ref, degrade), indent=2))

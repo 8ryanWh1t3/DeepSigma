@@ -52,8 +52,8 @@ COPY specs/ /app/specs/
 COPY adapters/ /app/adapters/
 COPY demos/ /app/demos/
 COPY examples/ /app/examples/
-COPY llm_data_model/ /app/llm_data_model/
-COPY policy_packs/ /app/policy_packs/
+COPY docs/llm_data_model/ /app/llm_data_model/
+COPY docs/policy_packs/ /app/policy_packs/
 
 RUN pip install --no-cache-dir -e /app
 

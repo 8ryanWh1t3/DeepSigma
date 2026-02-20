@@ -1,18 +1,18 @@
 name: Validate — LLM Data Model
 
-# Validates all JSON examples in llm_data_model/03_examples/ against the
+# Validates all JSON examples in docs/llm_data_model/03_examples/ against the
 # canonical record schema whenever the data model is changed.
 
 on:
   push:
     branches: [main]
     paths:
-      - 'llm_data_model/**'
+      - 'docs/llm_data_model/**'
       - '.github/workflows/validate-llm-data-model.yml'
   pull_request:
     branches: [main]
     paths:
-      - 'llm_data_model/**'
+      - 'docs/llm_data_model/**'
   workflow_dispatch:
 
 jobs:
@@ -31,15 +31,15 @@ jobs:
         run: pip install jsonschema referencing
 
       - name: Run LLM Data Model validation
-        run: python llm_data_model/05_validation/validate_examples.py
+        run: python docs/llm_data_model/05_validation/validate_examples.py
 
       - name: Validate JSON schema files are well-formed
         run: |
           python -c "
           import json, sys
           from pathlib import Path
-          schemas = list(Path('llm_data_model/02_schema/jsonschema').glob('*.json'))
-          schemas += list(Path('llm_data_model/02_schema').glob('*.json'))
+          schemas = list(Path('docs/llm_data_model/02_schema/jsonschema').glob('*.json'))
+          schemas += list(Path('docs/llm_data_model/02_schema').glob('*.json'))
           errors = []
           for s in schemas:
               try:
@@ -57,7 +57,7 @@ jobs:
           python -c "
           import json, sys
           from pathlib import Path
-          examples = list(Path('llm_data_model/03_examples').glob('*.json'))
+          examples = list(Path('docs/llm_data_model/03_examples').glob('*.json'))
           errors = []
           for ex in examples:
               try:

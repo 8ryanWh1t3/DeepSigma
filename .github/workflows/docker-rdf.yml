@@ -5,14 +5,14 @@ on:
     branches: [main]
     tags: ['v*']
     paths:
-      - 'rdf/**'
+      - 'docs/rdf/**'
       - 'Dockerfile.rdf'
       - '.github/workflows/docker-rdf.yml'
   pull_request:
     branches: [main]
     paths:
       - 'Dockerfile.rdf'
-      - 'rdf/**'
+      - 'docs/rdf/**'
   workflow_dispatch:
 
 env:
