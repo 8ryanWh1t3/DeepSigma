@@ -1,6 +1,6 @@
 {
   "name": "sigma-overwatch-mcp",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "tools": [
     {
       "name": "overwatch.submit_task",
@@ -425,6 +425,130 @@
           "table_name": {"type": "string", "description": "Dataverse table name"},
           "sql": {"type": "string", "description": "Snowflake SQL query"},
           "prompt": {"type": "string", "description": "AskSage prompt"}
+        }
+      }
+    },
+    {
+      "name": "coherence.query_credibility_index",
+      "description": "Score the current coherence pipeline and return overall credibility index, grade, and dimensional breakdown.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "type": "object",
+        "required": ["overall_score", "grade"],
+        "properties": {
+          "overall_score": {"type": "number"},
+          "grade": {"type": "string", "enum": ["A", "B", "C", "D"]},
+          "computed_at": {"type": "string"},
+          "dimensions": {"type": "array", "items": {"type": "object"}}
+        }
+      }
+    },
+    {
+      "name": "coherence.list_drift_signals",
+      "description": "List drift signal buckets from the coherence pipeline with optional severity filter and limit.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "severity": {"type": "string", "enum": ["green", "yellow", "red"], "description": "Filter by worst severity"},
+          "limit": {"type": "integer", "description": "Max buckets to return (default: 100)"}
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "required": ["total_signals"],
+        "properties": {
+          "total_signals": {"type": "integer"},
+          "by_type": {"type": "object"},
+          "by_severity": {"type": "object"},
+          "buckets": {"type": "array", "items": {"type": "object"}}
+        }
+      }
+    },
+    {
+      "name": "coherence.get_episode",
+      "description": "Retrieve a decision episode by ID with optional Memory Graph provenance.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["episode_id"],
+        "properties": {
+          "episode_id": {"type": "string", "description": "Episode identifier"}
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "required": ["episode_id"],
+        "properties": {
+          "episode_id": {"type": "string"},
+          "episode": {"type": "object"},
+          "provenance": {"type": "object"}
+        }
+      }
+    },
+    {
+      "name": "coherence.apply_patch",
+      "description": "Apply a drift patch to the Memory Graph. Requires a patch object with patchId, driftId, and action.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["patch"],
+        "properties": {
+          "patch": {
+            "type": "object",
+            "required": ["patchId"],
+            "properties": {
+              "patchId": {"type": "string"},
+              "driftId": {"type": "string"},
+              "driftType": {"type": "string"},
+              "severity": {"type": "string"},
+              "action": {"type": "string"},
+              "description": {"type": "string"},
+              "field": {"type": "string"},
+              "suggestion": {"type": "string"}
+            }
+          }
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "required": ["applied", "patch_id", "node_id"],
+        "properties": {
+          "applied": {"type": "boolean"},
+          "patch_id": {"type": "string"},
+          "node_id": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "coherence.seal_decision",
+      "description": "Seal a decision episode, write a DLR entry, and add it to the Memory Graph.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["episode"],
+        "properties": {
+          "episode": {
+            "type": "object",
+            "required": ["episodeId"],
+            "description": "Full sealed episode object",
+            "properties": {
+              "episodeId": {"type": "string"},
+              "decisionType": {"type": "string"},
+              "outcome": {"type": "object"},
+              "events": {"type": "array"}
+            }
+          }
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "required": ["sealed", "dlr_id", "episode_id"],
+        "properties": {
+          "sealed": {"type": "boolean"},
+          "dlr_id": {"type": "string"},
+          "episode_id": {"type": "string"},
+          "decision_type": {"type": "string"},
+          "outcome_code": {"type": "string"}
         }
       }
     }
