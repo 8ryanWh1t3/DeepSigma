@@ -35,6 +35,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[dev,excel]" pydantic
 
+      - name: Install RDF extra (py3.12 Linux only)
+        if: matrix.python-version == '3.12' && runner.os == 'Linux'
+        run: pip install -e ".[rdf]"
+
       - name: Run unit tests with coverage (Linux)
         if: runner.os == 'Linux'
         run: |

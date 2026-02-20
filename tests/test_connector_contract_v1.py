@@ -318,3 +318,88 @@ class TestSourceNameAttribute:
     def test_langgraph(self):
         from adapters.langgraph.connector import LangGraphConnector
         assert LangGraphConnector.source_name == "langgraph"
+
+
+# ── ConnectorV1 method presence ───────────────────────
+
+
+class TestConnectorV1Methods:
+    """Every adapter must have list_records, get_record,
+    to_envelopes, and source_name."""
+
+    _ADAPTERS = [
+        "adapters.sharepoint.connector.SharePointConnector",
+        "adapters.powerplatform.connector.DataverseConnector",
+        "adapters.asksage.connector.AskSageConnector",
+        "adapters.snowflake.warehouse.SnowflakeWarehouseConnector",
+        "adapters.langgraph.connector.LangGraphConnector",
+    ]
+
+    def _load(self, fqn: str):
+        mod_path, cls_name = fqn.rsplit(".", 1)
+        import importlib
+        mod = importlib.import_module(mod_path)
+        return getattr(mod, cls_name)
+
+    def test_all_have_source_name(self):
+        for fqn in self._ADAPTERS:
+            cls = self._load(fqn)
+            assert hasattr(cls, "source_name"), (
+                f"{fqn} missing source_name"
+            )
+
+    def test_all_have_list_records(self):
+        for fqn in self._ADAPTERS:
+            cls = self._load(fqn)
+            assert hasattr(cls, "list_records"), (
+                f"{fqn} missing list_records"
+            )
+
+    def test_all_have_get_record(self):
+        for fqn in self._ADAPTERS:
+            cls = self._load(fqn)
+            assert hasattr(cls, "get_record"), (
+                f"{fqn} missing get_record"
+            )
+
+    def test_all_have_to_envelopes(self):
+        for fqn in self._ADAPTERS:
+            cls = self._load(fqn)
+            assert hasattr(cls, "to_envelopes"), (
+                f"{fqn} missing to_envelopes"
+            )
+
+    def test_query_based_raise_not_implemented(self):
+        """AskSage + LangGraph should raise."""
+        import pytest
+        from unittest.mock import patch
+        from adapters.asksage.connector import (
+            AskSageConnector,
+        )
+        from adapters.langgraph.connector import (
+            LangGraphConnector,
+        )
+
+        with patch.object(
+            AskSageConnector, "__init__",
+            lambda self, **kw: None,
+        ):
+            c = AskSageConnector.__new__(
+                AskSageConnector,
+            )
+        with pytest.raises(NotImplementedError):
+            c.list_records()
+        with pytest.raises(NotImplementedError):
+            c.get_record("x")
+
+        with patch.object(
+            LangGraphConnector, "__init__",
+            lambda self, **kw: None,
+        ):
+            lg = LangGraphConnector.__new__(
+                LangGraphConnector,
+            )
+        with pytest.raises(NotImplementedError):
+            lg.list_records()
+        with pytest.raises(NotImplementedError):
+            lg.get_record("x")

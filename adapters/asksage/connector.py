@@ -128,12 +128,46 @@ class AskSageConnector:
         body = json.dumps(payload).encode()
         return self._post("/server/train", body)
 
-    # ── Envelope contract ──────────────────────────────────────────
+    # ── ConnectorV1 contract ─────────────────────────────────────
 
-    def to_envelopes(self, records: List[Dict[str, Any]]) -> list:
-        """Wrap canonical records in RecordEnvelope instances (ConnectorV1)."""
-        from connectors.contract import canonical_to_envelope
-        return [canonical_to_envelope(r, source_instance=self._base_url) for r in records]
+    def list_records(
+        self, **kwargs: Any,
+    ) -> List[Dict[str, Any]]:
+        """Not supported — AskSage is query-based.
+
+        Use ``query()`` or ``get_user_logs()`` instead.
+        """
+        raise NotImplementedError(
+            "AskSage is query-based; "
+            "use query() or get_user_logs()"
+        )
+
+    def get_record(
+        self,
+        record_id: str,
+        **kwargs: Any,
+    ) -> Dict[str, Any]:
+        """Not supported — AskSage is query-based.
+
+        Use ``query()`` instead.
+        """
+        raise NotImplementedError(
+            "AskSage is query-based; use query()"
+        )
+
+    def to_envelopes(
+        self, records: List[Dict[str, Any]],
+    ) -> list:
+        """Wrap records in RecordEnvelope (ConnectorV1)."""
+        from connectors.contract import (
+            canonical_to_envelope,
+        )
+        return [
+            canonical_to_envelope(
+                r, source_instance=self._base_url,
+            )
+            for r in records
+        ]
 
     # ── HTTP helpers ─────────────────────────────────────────────
 
