@@ -1,7 +1,5 @@
 """Tests for StorageBackend implementations (SQLite + JSONL)."""
 
-import os
-
 import pytest
 
 from coherence_ops.storage import (
@@ -233,7 +231,7 @@ class TestCreateBackend:
 class TestSchemaCreation:
     def test_sqlite_creates_tables(self, tmp_path):
         import sqlite3
-        b = SQLiteStorageBackend(tmp_path / "schema.db")
+        SQLiteStorageBackend(tmp_path / "schema.db")
         conn = sqlite3.connect(str(tmp_path / "schema.db"))
         tables = [r[0] for r in conn.execute(
             "SELECT name FROM sqlite_master WHERE type='table'"
