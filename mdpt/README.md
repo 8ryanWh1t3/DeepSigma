@@ -49,6 +49,18 @@ flowchart TB
 
 ---
 
+## Documentation Map
+
+| Concern | Canonical Location |
+|---------|--------------------|
+| 6-lens governance framework | [`docs/excel-first/multi-dim-prompting-for-teams/`](../docs/excel-first/multi-dim-prompting-for-teams/README.md) |
+| SharePoint list build sheets | [`docs/excel-first/multi-dim-prompting-for-teams/`](../docs/excel-first/multi-dim-prompting-for-teams/) |
+| Power App deployment & tooling | [`mdpt/`](.) (this directory) |
+| Power Apps screen map (8-screen) | [`mdpt/powerapps/POWERAPPS_SCREEN_MAP.md`](powerapps/POWERAPPS_SCREEN_MAP.md) |
+| Power Automate flows | [`docs/excel-first/.../POWER_AUTOMATE_FLOWS.md`](../docs/excel-first/multi-dim-prompting-for-teams/POWER_AUTOMATE_FLOWS.md) |
+
+---
+
 ## Index Generator
 
 Convert a PromptCapabilities SharePoint list export (CSV) into a validated, deterministic index:

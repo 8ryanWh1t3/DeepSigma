@@ -61,8 +61,12 @@ snowflake = [
     "cryptography>=42.0",
 ]
 rdf = [
-    "rdflib>=7.0",
+    "rdflib>=7.0,<8",
+    "pyparsing>=3.1",
     "pyshacl>=0.25",
+]
+openclaw = [
+    "wasmtime>=23.0",
 ]
 excel = [
     "openpyxl>=3.1.0",
@@ -99,6 +103,7 @@ include = [
     "tenancy*",
     "governance*",
     "mesh*",
+    "services*",
 ]
 
 [tool.ruff]

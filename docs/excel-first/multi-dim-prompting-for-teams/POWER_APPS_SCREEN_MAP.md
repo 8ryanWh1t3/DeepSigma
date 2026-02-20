@@ -2,15 +2,19 @@
 title: "Power Apps Screen Map"
 version: "0.6.3"
 date: "2026-02-19"
+superseded_by: "mdpt/powerapps/POWERAPPS_SCREEN_MAP.md"
 ---
 
-# Power Apps Screen Map
+# Power Apps Screen Map (Superseded)
 
-> 5-screen canvas app for managing MDPT prompt runs, drift signals, and patches.
+> **This document is superseded.** The canonical 8-screen Power Apps
+> Screen Map is at
+> [`mdpt/powerapps/POWERAPPS_SCREEN_MAP.md`](../../../mdpt/powerapps/POWERAPPS_SCREEN_MAP.md)
+> (v0.6.4+). This file is retained for reference only.
 
 ---
 
-## App Overview
+## App Overview (Original 5-Screen Layout)
 
 The MDPT Power App provides a mobile-friendly interface for teams to browse prompt capabilities, review run results, monitor drift, and manage patches — all backed by the three SharePoint lists.
 

@@ -7,6 +7,9 @@ date: "2026-02-19"
 # MDPT Power Apps Screen Map
 
 > 8-screen canvas app for governed prompt operations.
+>
+> **Governance framework:** [docs/excel-first/multi-dim-prompting-for-teams/](../../docs/excel-first/multi-dim-prompting-for-teams/README.md)
+> | **Deployment guide:** [mdpt/docs/power_app_deployment.md](../docs/power_app_deployment.md)
 
 ---
 

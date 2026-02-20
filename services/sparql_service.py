@@ -47,12 +47,14 @@ try:
     _HAS_RDFLIB = True
 except ImportError:  # pragma: no cover
     _HAS_RDFLIB = False
+    Namespace = None  # type: ignore[assignment,misc]
 
 logger = logging.getLogger(__name__)
 
 # ── Namespace ──────────────────────────────────────────
 
-DS = Namespace("https://deepsigma.ai/ns/coherence#")
+DS_URI = "https://deepsigma.ai/ns/coherence#"
+DS = Namespace(DS_URI) if _HAS_RDFLIB else None  # type: ignore[arg-type]
 
 # ── Standard SPARQL queries ────────────────────────────
 

@@ -424,6 +424,7 @@ class TestScorecardIntegration:
 # ── Performance tests ──────────────────────────────────
 
 
+@pytest.mark.benchmark
 class TestPerformance:
     def test_10k_node_query_under_1s(self):
         """SPARQL queries < 1s for 10k-node lattice."""
