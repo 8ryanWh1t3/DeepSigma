@@ -42,6 +42,8 @@ class EvidenceEnvelope:
     payload_hash: str = ""
     signature: str = ""
     public_key: str = ""
+    event_time: str = ""  # source-reported observation time
+    sequence_number: int = 0  # monotonic per-source sequence
 
     def compute_payload_hash(self) -> str:
         raw = canonical_bytes(self.payload)
@@ -217,6 +219,8 @@ def create_envelope(
     private_key: str,
     public_key: str,
     signal_type: str = "evidence",
+    event_time: str = "",
+    sequence_number: int = 0,
 ) -> EvidenceEnvelope:
     """Factory: create and sign an evidence envelope."""
     env = EvidenceEnvelope(
@@ -226,6 +230,8 @@ def create_envelope(
         correlation_group=correlation_group,
         signal_type=signal_type,
         payload=payload,
+        event_time=event_time,
+        sequence_number=sequence_number,
     )
     env.sign_envelope(private_key, public_key)
     return env
