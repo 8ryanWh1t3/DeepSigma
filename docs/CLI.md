@@ -78,10 +78,10 @@ Run the 7-step Golden Path decision governance loop (Connect → Normalize → E
 
 ```bash
 deepsigma golden-path sharepoint \
-  --fixture demos/golden_path/fixtures/sharepoint_small --clean
+  --fixture src/demos/golden_path/fixtures/sharepoint_small --clean
 
 deepsigma golden-path sharepoint \
-  --fixture demos/golden_path/fixtures/sharepoint_small --json
+  --fixture src/demos/golden_path/fixtures/sharepoint_small --json
 ```
 
 ---

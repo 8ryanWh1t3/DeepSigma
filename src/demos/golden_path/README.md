@@ -23,14 +23,14 @@ No credentials required:
 ```bash
 python -m demos.golden_path \
   --source sharepoint \
-  --fixture demos/golden_path/fixtures/sharepoint_small
+  --fixture src/demos/golden_path/fixtures/sharepoint_small
 ```
 
 Or via the CLI:
 
 ```bash
 coherence golden-path sharepoint \
-  --fixture demos/golden_path/fixtures/sharepoint_small
+  --fixture src/demos/golden_path/fixtures/sharepoint_small
 ```
 
 ## Live Mode

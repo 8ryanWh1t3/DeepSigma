@@ -45,7 +45,7 @@ python -m coherence_ops.examples.drift_patch_cycle
 
 # Full 7-step Golden Path (no credentials needed)
 deepsigma golden-path sharepoint \
-  --fixture demos/golden_path/fixtures/sharepoint_small --clean
+  --fixture src/demos/golden_path/fixtures/sharepoint_small --clean
 ```
 
 ---

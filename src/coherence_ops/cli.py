@@ -236,7 +236,7 @@ def cmd_reconcile(args: argparse.Namespace) -> None:
     result = reconciler.reconcile()
 
     if getattr(args, "auto_fix", False):
-        applied = reconciler.apply_auto_fixes()
+        reconciler.apply_auto_fixes()
         result = reconciler.reconcile()  # re-run after fixes
 
     if getattr(args, "json", False):

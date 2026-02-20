@@ -2,9 +2,9 @@
 """Golden Path CLI — first-class entrypoint.
 
 Usage:
-    deepsigma golden-path sharepoint --fixture demos/golden_path/fixtures/sharepoint_small
-    deepsigma golden-path sharepoint --fixture demos/golden_path/fixtures/sharepoint_small --json
-    deepsigma golden-path sharepoint --fixture demos/golden_path/fixtures/sharepoint_small --clean --verbose
+    deepsigma golden-path sharepoint --fixture src/demos/golden_path/fixtures/sharepoint_small
+    deepsigma golden-path sharepoint --fixture src/demos/golden_path/fixtures/sharepoint_small --json
+    deepsigma golden-path sharepoint --fixture src/demos/golden_path/fixtures/sharepoint_small --clean --verbose
 """
 from __future__ import annotations
 

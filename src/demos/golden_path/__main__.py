@@ -4,7 +4,7 @@
 Usage:
     # Fixture mode (no credentials needed)
     python -m demos.golden_path --source sharepoint \\
-        --fixture demos/golden_path/fixtures/sharepoint_small
+        --fixture src/demos/golden_path/fixtures/sharepoint_small
 
     # Live mode (requires env vars)
     python -m demos.golden_path --source sharepoint --list-id Documents
