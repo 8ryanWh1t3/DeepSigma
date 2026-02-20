@@ -182,7 +182,7 @@ class SnowflakeWarehouseConnector:
         self, records: List[Dict[str, Any]],
     ) -> list:
         """Wrap canonical records in RecordEnvelopes."""
-        from connectors.contract import canonical_to_envelope
+        from adapters.contract import canonical_to_envelope
         inst = (
             self._auth.account if self._auth
             else "unknown"

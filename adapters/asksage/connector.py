@@ -159,7 +159,7 @@ class AskSageConnector:
         self, records: List[Dict[str, Any]],
     ) -> list:
         """Wrap records in RecordEnvelope (ConnectorV1)."""
-        from connectors.contract import (
+        from adapters.contract import (
             canonical_to_envelope,
         )
         return [

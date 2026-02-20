@@ -23,7 +23,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from connectors.contract import canonical_to_envelope, validate_envelope  # noqa: E402
+from adapters.contract import canonical_to_envelope, validate_envelope  # noqa: E402
 
 FIXTURE_BASE = _REPO_ROOT / "fixtures" / "connectors"
 

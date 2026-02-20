@@ -3,7 +3,7 @@ Tests for compression_engine and primitives.compression.
 """
 import pytest
 
-from primitives.compression import calculate_entropy, compress_claims
+from engine.compression import calculate_entropy, compress_claims
 from engine.compression_engine import apply_compression
 
 

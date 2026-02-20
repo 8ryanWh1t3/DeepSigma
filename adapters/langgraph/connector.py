@@ -88,7 +88,7 @@ class LangGraphConnector:
 
     def to_envelopes(self, records: List[Dict[str, Any]]) -> list:
         """Wrap canonical records in RecordEnvelope instances."""
-        from connectors.contract import canonical_to_envelope
+        from adapters.contract import canonical_to_envelope
 
         return [
             canonical_to_envelope(r, source_instance=self._source_instance)

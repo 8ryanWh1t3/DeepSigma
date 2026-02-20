@@ -1,4 +1,4 @@
-from primitives.compression import compress_claims
+from engine.compression import compress_claims
 
 
 def apply_compression(episode: dict) -> dict:

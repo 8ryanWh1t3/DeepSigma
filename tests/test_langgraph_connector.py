@@ -13,7 +13,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from adapters.langgraph.connector import LangGraphConnector
-from connectors.contract import RecordEnvelope, validate_envelope
+from adapters.contract import RecordEnvelope, validate_envelope
 
 FIXTURE_DIR = Path(__file__).resolve().parents[1] / "fixtures" / "connectors" / "langgraph_small"
 

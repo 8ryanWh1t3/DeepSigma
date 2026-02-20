@@ -5,7 +5,7 @@ dataclass used to wrap raw source data with provenance, hashes, and metadata.
 
 Usage::
 
-    from connectors.contract import ConnectorV1, RecordEnvelope, validate_envelope
+    from adapters.contract import ConnectorV1, RecordEnvelope, validate_envelope
 
     # Validate an envelope dict against the schema
     errors = validate_envelope(envelope_dict)

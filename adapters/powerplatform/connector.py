@@ -115,7 +115,7 @@ class DataverseConnector:
 
     def to_envelopes(self, records: List[Dict[str, Any]]) -> list:
         """Wrap canonical records in RecordEnvelope instances (ConnectorV1)."""
-        from connectors.contract import canonical_to_envelope
+        from adapters.contract import canonical_to_envelope
         env_name = self._env_url.split("//")[-1].split(".")[0] if self._env_url else "unknown"
         return [canonical_to_envelope(r, source_instance=env_name) for r in records]
 
