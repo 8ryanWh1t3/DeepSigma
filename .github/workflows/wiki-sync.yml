@@ -21,7 +21,7 @@ jobs:
 
       - name: Sync docs/wiki/ files
         run: |
-          cp docs/wiki/*.md /tmp/docs/wiki/
+          cp docs/wiki/*.md /tmp/wiki/
 
       - name: Commit and push
         run: |
