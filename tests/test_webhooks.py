@@ -4,7 +4,6 @@ Run:  pytest tests/test_webhooks.py -v
 """
 from __future__ import annotations
 
-import json
 import sys
 import urllib.error
 from pathlib import Path
@@ -15,9 +14,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from engine.webhooks import (
-    DeliveryRecord,
     DeliveryStatus,
-    PayloadFormat,
     WebhookConfig,
     WebhookEvent,
     WebhookEventType,
