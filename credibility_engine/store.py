@@ -209,3 +209,68 @@ class CredibilityStore:
 
     def latest_packet(self) -> dict[str, Any] | None:
         return self.load_json(self.PACKET_FILE)
+
+    # -- Tier file access (warm/cold) -----------------------------------------
+
+    def _tier_path(self, filename: str, tier: str) -> Path:
+        """Build path for a tiered file (e.g. claims-warm.jsonl)."""
+        stem = filename.replace(".jsonl", "")
+        return self.data_dir / f"{stem}-{tier}.jsonl"
+
+    def load_warm(self, filename: str) -> list[dict[str, Any]]:
+        """Load all records from the warm-tier file."""
+        path = self._tier_path(filename, "warm")
+        if not path.exists():
+            return []
+        records = []
+        with open(path, encoding="utf-8") as f:
+            for line in f:
+                stripped = line.strip()
+                if stripped:
+                    record = json.loads(stripped)
+                    record.setdefault("tenant_id", self.tenant_id)
+                    records.append(record)
+        return records
+
+    def load_cold(self, filename: str) -> list[dict[str, Any]]:
+        """Load all records from the cold-tier file."""
+        path = self._tier_path(filename, "cold")
+        if not path.exists():
+            return []
+        records = []
+        with open(path, encoding="utf-8") as f:
+            for line in f:
+                stripped = line.strip()
+                if stripped:
+                    record = json.loads(stripped)
+                    record.setdefault("tenant_id", self.tenant_id)
+                    records.append(record)
+        return records
+
+    def write_warm(self, filename: str, records: list[dict[str, Any]]) -> None:
+        """Write records to the warm-tier file."""
+        path = self._tier_path(filename, "warm")
+        if not records:
+            if path.exists():
+                path.unlink()
+            return
+        with _write_lock:
+            with open(path, "w", encoding="utf-8") as f:
+                for record in records:
+                    enriched = dict(record)
+                    enriched.setdefault("tenant_id", self.tenant_id)
+                    f.write(json.dumps(enriched, default=str) + "\n")
+
+    def write_cold(self, filename: str, records: list[dict[str, Any]]) -> None:
+        """Write records to the cold-tier file."""
+        path = self._tier_path(filename, "cold")
+        if not records:
+            if path.exists():
+                path.unlink()
+            return
+        with _write_lock:
+            with open(path, "w", encoding="utf-8") as f:
+                for record in records:
+                    enriched = dict(record)
+                    enriched.setdefault("tenant_id", self.tenant_id)
+                    f.write(json.dumps(enriched, default=str) + "\n")

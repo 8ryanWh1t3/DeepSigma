@@ -68,6 +68,9 @@ class CredibilityEngine:
         # Latest index
         self._index_cache: dict[str, Any] | None = None
 
+        # Evidence tiering (opt-in)
+        self._tier_manager: Any = None
+
         # Latest policy evaluation (used by packet generator)
         self._last_policy_eval: dict[str, Any] | None = None
 
@@ -185,10 +188,18 @@ class CredibilityEngine:
     # -- Index recalculation ---------------------------------------------------
 
     def recalculate_index(self) -> dict[str, Any]:
-        """Recalculate the Credibility Index from current state."""
-        claim_dicts = [c.to_dict() for c in self.claims]
+        """Recalculate the Credibility Index from current state.
+
+        When tiering is enabled, uses hot+warm claims and drift events
+        for scoring instead of the full in-memory state.
+        """
+        if self._tier_manager is not None:
+            claim_dicts = self._tier_manager.get_scoring_claims()
+            drift_dicts = self._tier_manager.get_scoring_drift(500)
+        else:
+            claim_dicts = [c.to_dict() for c in self.claims]
+            drift_dicts = [e.to_dict() for e in self.drift_events[-500:]]
         cluster_dicts = [c.to_dict() for c in self.clusters]
-        drift_dicts = [e.to_dict() for e in self.drift_events[-500:]]
         sync_dicts = [r.to_dict() for r in self.sync_regions]
 
         result = calculate_index_detailed(
@@ -291,6 +302,39 @@ class CredibilityEngine:
         self._persist_clusters()
         self._persist_sync()
 
+    # -- Evidence tiering ------------------------------------------------------
+
+    def enable_tiering(self, policy: Any = None) -> None:
+        """Enable hot/warm/cold evidence tiering.
+
+        Parameters
+        ----------
+        policy : TieringPolicy, optional
+            Custom tiering thresholds. Uses defaults if omitted.
+        """
+        from credibility_engine.tiering import EvidenceTierManager, TieringPolicy
+
+        if policy is None:
+            policy = TieringPolicy()
+        self._tier_manager = EvidenceTierManager(self.store, policy)
+
+    def run_tier_sweep(self) -> dict[str, Any]:
+        """Run a demotion sweep, moving aged evidence to warm/cold tiers.
+
+        Returns the sweep result summary. Raises RuntimeError if tiering
+        is not enabled.
+        """
+        if self._tier_manager is None:
+            raise RuntimeError("Tiering is not enabled. Call enable_tiering() first.")
+        result = self._tier_manager.sweep()
+        self._index_cache = None
+        return result.to_dict()
+
+    @property
+    def tier_manager(self) -> Any:
+        """Access the tier manager, or None if tiering is not enabled."""
+        return self._tier_manager
+
     # -- Dashboard-compatible snapshots ----------------------------------------
 
     def snapshot_credibility(self) -> dict[str, Any]:
@@ -336,6 +380,7 @@ class CredibilityEngine:
                  "action": "Halt dependent decisions"},
             ],
             "components": self.index_components,
+            "tiering": self._tier_manager.tier_summary() if self._tier_manager else None,
         }
 
     def snapshot_claims(self) -> dict[str, Any]:

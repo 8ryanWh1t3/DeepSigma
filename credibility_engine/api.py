@@ -309,3 +309,23 @@ def get_packet() -> dict[str, Any]:
     engine = _get_engine(DEFAULT_TENANT_ID)
     engine.recalculate_index()
     return generate_credibility_packet(engine)
+
+
+# -- Evidence tiering ---------------------------------------------------------
+
+@router.get("/api/{tenant_id}/credibility/tiers")
+def tenant_tier_summary(tenant_id: str) -> dict[str, Any]:
+    """Return evidence tier summary for the given tenant."""
+    engine = _get_engine(tenant_id)
+    if engine.tier_manager is None:
+        engine.enable_tiering()
+    return engine.tier_manager.tier_summary()
+
+
+@router.post("/api/{tenant_id}/credibility/tiers/sweep")
+def tenant_tier_sweep(tenant_id: str) -> dict[str, Any]:
+    """Trigger a tier demotion sweep for the given tenant."""
+    engine = _get_engine(tenant_id)
+    if engine.tier_manager is None:
+        engine.enable_tiering()
+    return engine.run_tier_sweep()
