@@ -11,12 +11,12 @@ on:
       - 'Dockerfile.exhaust'
       - 'docker-compose.yml'
       - '.github/workflows/docker-publish.yml'
-      - 'coherence_ops/**'
-      - 'engine/**'
-      - 'verifiers/**'
-      - 'tools/**'
+      - 'src/coherence_ops/**'
+      - 'src/engine/**'
+      - 'src/verifiers/**'
+      - 'src/tools/**'
       - 'specs/**'
-      - 'adapters/**'
+      - 'src/adapters/**'
       - 'pyproject.toml'
   pull_request:
     branches: [main]

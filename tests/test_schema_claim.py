@@ -19,7 +19,7 @@ class TestClaimSchema(unittest.TestCase):
         jsonschema = __import__("jsonschema")
         cls.jsonschema = jsonschema
         cls.schema = _load_json("specs/claim.schema.json")
-        cls.example = _load_json("llm_data_model/03_examples/claim_primitive_example.json")
+        cls.example = _load_json("docs/llm_data_model/03_examples/claim_primitive_example.json")
 
     def test_example_validates(self):
         """The worked example must validate against the schema."""

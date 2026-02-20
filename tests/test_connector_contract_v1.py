@@ -7,7 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from connectors.contract import (
+from adapters.contract import (
     RecordEnvelope,
     canonical_to_envelope,
     compute_hash,
@@ -15,7 +15,7 @@ from connectors.contract import (
     validate_envelope,
 )
 
-FIXTURE_DIR = Path(__file__).parent.parent / "demos" / "golden_path" / "fixtures" / "sharepoint_small"
+FIXTURE_DIR = Path(__file__).parent.parent / "src" / "demos" / "golden_path" / "fixtures" / "sharepoint_small"
 
 
 # ── RecordEnvelope Tests ─────────────────────────────────────────────────────

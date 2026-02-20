@@ -20,7 +20,7 @@ from adapters.otel.spans import (
     SPAN_PHASE_NAMES,
 )
 
-EXPORTER_PATH = Path(__file__).resolve().parents[1] / "adapters" / "otel" / "exporter.py"
+EXPORTER_PATH = Path(__file__).resolve().parents[1] / "src" / "adapters" / "otel" / "exporter.py"
 
 
 def _parse_exporter() -> ast.Module:

@@ -188,7 +188,7 @@ Connectors should:
 ## Validation
 
 ```python
-from connectors.contract import validate_envelope
+from adapters.contract import validate_envelope
 
 errors = validate_envelope(envelope_dict)
 if errors:

@@ -44,16 +44,16 @@ RUN pip install --no-cache-dir \
 WORKDIR /app
 
 COPY pyproject.toml /app/
-COPY engine/ /app/engine/
-COPY coherence_ops/ /app/coherence_ops/
-COPY verifiers/ /app/verifiers/
-COPY tools/ /app/tools/
+COPY src/engine/ /app/engine/
+COPY src/coherence_ops/ /app/coherence_ops/
+COPY src/verifiers/ /app/verifiers/
+COPY src/tools/ /app/tools/
 COPY specs/ /app/specs/
-COPY adapters/ /app/adapters/
-COPY demos/ /app/demos/
+COPY src/adapters/ /app/adapters/
+COPY src/demos/ /app/demos/
 COPY examples/ /app/examples/
-COPY llm_data_model/ /app/llm_data_model/
-COPY policy_packs/ /app/policy_packs/
+COPY docs/llm_data_model/ /app/llm_data_model/
+COPY docs/policy_packs/ /app/policy_packs/
 
 RUN pip install --no-cache-dir -e /app
 

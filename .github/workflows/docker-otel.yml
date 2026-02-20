@@ -5,9 +5,9 @@ on:
     branches: [main]
     tags: ['v*']
     paths:
-      - 'adapters/otel/**'
-      - 'engine/**'
-      - 'coherence_ops/**'
+      - 'src/adapters/otel/**'
+      - 'src/engine/**'
+      - 'src/coherence_ops/**'
       - 'pyproject.toml'
       - 'Dockerfile.otel'
       - '.github/workflows/docker-otel.yml'
@@ -15,7 +15,7 @@ on:
     branches: [main]
     paths:
       - 'Dockerfile.otel'
-      - 'adapters/otel/**'
+      - 'src/adapters/otel/**'
   workflow_dispatch:
 
 env:

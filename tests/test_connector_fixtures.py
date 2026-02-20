@@ -7,7 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from connectors.contract import validate_envelope
+from adapters.contract import validate_envelope
 
 FIXTURE_BASE = Path(__file__).parent.parent / "fixtures" / "connectors"
 
@@ -31,7 +31,7 @@ class TestSharePointFixtures:
     def _produce(self):
         from unittest.mock import MagicMock, patch as mock_patch
         from adapters.sharepoint.connector import SharePointConnector
-        from connectors.contract import canonical_to_envelope
+        from adapters.contract import canonical_to_envelope
 
         raw = json.loads((FIXTURE_BASE / self.CONNECTOR / "baseline_raw.json").read_text(encoding="utf-8"))
         with mock_patch.object(SharePointConnector, "__init__", lambda self, **kw: None):
@@ -92,7 +92,7 @@ class TestDataverseFixtures:
     def _produce(self):
         from unittest.mock import MagicMock, patch as mock_patch
         from adapters.powerplatform.connector import DataverseConnector
-        from connectors.contract import canonical_to_envelope
+        from adapters.contract import canonical_to_envelope
 
         raw = json.loads((FIXTURE_BASE / self.CONNECTOR / "baseline_raw.json").read_text(encoding="utf-8"))
         with mock_patch.object(DataverseConnector, "__init__", lambda self, **kw: None):
@@ -151,7 +151,7 @@ class TestSnowflakeFixtures:
     def _produce(self):
         from unittest.mock import MagicMock, patch as mock_patch
         from adapters.snowflake.warehouse import SnowflakeWarehouseConnector
-        from connectors.contract import canonical_to_envelope
+        from adapters.contract import canonical_to_envelope
 
         raw = json.loads((FIXTURE_BASE / self.CONNECTOR / "baseline_raw.json").read_text(encoding="utf-8"))
         with mock_patch.object(SnowflakeWarehouseConnector, "__init__", lambda self, **kw: None):
@@ -207,7 +207,7 @@ class TestAskSageFixtures:
     CONNECTOR = "asksage_small"
 
     def _produce(self):
-        from connectors.contract import canonical_to_envelope
+        from adapters.contract import canonical_to_envelope
 
         raw = json.loads((FIXTURE_BASE / self.CONNECTOR / "baseline_raw.json").read_text(encoding="utf-8"))
         envs = []
@@ -255,7 +255,7 @@ class TestLangGraphFixtures:
 
     def _produce(self):
         from adapters.langgraph.connector import LangGraphConnector
-        from connectors.contract import canonical_to_envelope
+        from adapters.contract import canonical_to_envelope
 
         raw = json.loads((FIXTURE_BASE / self.CONNECTOR / "baseline_raw.json").read_text(encoding="utf-8"))
         c = LangGraphConnector(graph_id="fixture-graph", source_instance="fixture-instance")

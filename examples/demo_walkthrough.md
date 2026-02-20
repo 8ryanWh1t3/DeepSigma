@@ -81,10 +81,10 @@ After sealing, Drift Detector emits:
         | File | Purpose |
         |------|---------|
         | examples/sample_decision_episode_001.json | Full JSON for both episodes |
-        | canonical/prime_constitution.md | Governance document |
-        | canonical/dlr_spec.md | DLR data model |
-        | canonical/ds_spec.md | Drift Signal spec |
-        | canonical/mg_spec.md | Memory Graph spec |
-        | runtime/encode_episode.md | How to encode |
-        | runtime/drift_patch_workflow.md | How drift triggers patch |
-        | runtime/sealing_protocol.md | How sealing works |
+        | docs/canonical/prime_constitution.md | Governance document |
+        | docs/canonical/dlr_spec.md | DLR data model |
+        | docs/canonical/ds_spec.md | Drift Signal spec |
+        | docs/canonical/mg_spec.md | Memory Graph spec |
+        | docs/runtime/encode_episode.md | How to encode |
+        | docs/runtime/drift_patch_workflow.md | How drift triggers patch |
+        | docs/runtime/sealing_protocol.md | How sealing works |

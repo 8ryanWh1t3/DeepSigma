@@ -5,12 +5,12 @@ on:
     branches: [main]
     tags: ['v*']
     paths:
-      - 'coherence_ops/**'
-      - 'engine/**'
-      - 'verifiers/**'
-      - 'tools/**'
+      - 'src/coherence_ops/**'
+      - 'src/engine/**'
+      - 'src/verifiers/**'
+      - 'src/tools/**'
       - 'specs/**'
-      - 'adapters/**'
+      - 'src/adapters/**'
       - 'pyproject.toml'
       - 'Dockerfile.coherence'
       - '.github/workflows/docker-coherence.yml'

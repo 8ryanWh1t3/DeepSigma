@@ -5,9 +5,9 @@ on:
     branches: [main]
     tags: ['v*']
     paths:
-      - 'adapters/mcp/**'
-      - 'engine/**'
-      - 'coherence_ops/**'
+      - 'src/adapters/mcp/**'
+      - 'src/engine/**'
+      - 'src/coherence_ops/**'
       - 'specs/**'
       - 'pyproject.toml'
       - 'Dockerfile.mcp'

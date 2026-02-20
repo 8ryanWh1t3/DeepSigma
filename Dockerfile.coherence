@@ -28,13 +28,13 @@ RUN pip install --no-cache-dir \
 WORKDIR /app
 
 COPY pyproject.toml /app/
-COPY coherence_ops/ /app/coherence_ops/
-COPY engine/ /app/engine/
-COPY verifiers/ /app/verifiers/
-COPY tools/ /app/tools/
+COPY src/coherence_ops/ /app/coherence_ops/
+COPY src/engine/ /app/engine/
+COPY src/verifiers/ /app/verifiers/
+COPY src/tools/ /app/tools/
 COPY specs/ /app/specs/
-COPY adapters/ /app/adapters/
-COPY demos/ /app/demos/
+COPY src/adapters/ /app/adapters/
+COPY src/demos/ /app/demos/
 
 RUN pip install --no-cache-dir -e /app
 

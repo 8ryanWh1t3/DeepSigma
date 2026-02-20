@@ -7,14 +7,17 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+SRC_ROOT = REPO_ROOT / "src"
 
 # Ensure imports resolve
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
+if str(SRC_ROOT) not in sys.path:
+    sys.path.insert(0, str(SRC_ROOT))
 
-SAMPLE_EPISODES_PATH = REPO_ROOT / "coherence_ops" / "examples" / "sample_episodes.json"
-SAMPLE_DRIFT_PATH = REPO_ROOT / "coherence_ops" / "examples" / "sample_drift.json"
-POLICY_PACK_PATH = REPO_ROOT / "policy_packs" / "packs" / "demo_policy_pack_v1.json"
+SAMPLE_EPISODES_PATH = SRC_ROOT / "coherence_ops" / "examples" / "sample_episodes.json"
+SAMPLE_DRIFT_PATH = SRC_ROOT / "coherence_ops" / "examples" / "sample_drift.json"
+POLICY_PACK_PATH = REPO_ROOT / "docs" / "policy_packs" / "packs" / "demo_policy_pack_v1.json"
 
 
 @pytest.fixture

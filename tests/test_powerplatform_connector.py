@@ -198,7 +198,7 @@ class TestDataverseConnector:
 
 class TestCustomConnectorJSON:
     def test_valid_json(self):
-        path = Path(__file__).parent.parent / "adapters" / "powerplatform" / "custom_connector.json"
+        path = Path(__file__).parent.parent / "src" / "adapters" / "powerplatform" / "custom_connector.json"
         data = json.loads(path.read_text())
         assert data["swagger"] == "2.0"
         assert "IngestRecord" in str(data)

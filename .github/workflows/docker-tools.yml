@@ -5,13 +5,13 @@ on:
     branches: [main]
     tags: ['v*']
     paths:
-      - 'tools/**'
-      - 'engine/**'
-      - 'coherence_ops/**'
-      - 'verifiers/**'
+      - 'src/tools/**'
+      - 'src/engine/**'
+      - 'src/coherence_ops/**'
+      - 'src/verifiers/**'
       - 'specs/**'
-      - 'adapters/**'
-      - 'policy_packs/**'
+      - 'src/adapters/**'
+      - 'docs/policy_packs/**'
       - 'pyproject.toml'
       - 'Dockerfile.tools'
       - '.github/workflows/docker-tools.yml'

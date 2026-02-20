@@ -234,14 +234,14 @@ Artifacts are written to [`examples/demo-stack/drift_patch_cycle_run/`](examples
 
 | Goal | Resource |
 |------|----------|
-| Canonical specs | [/canonical/](canonical/) — DLR, RS, DS, MG specifications |
-| Category claim | [/category/declaration.md](category/declaration.md) |
+| Canonical specs | [/docs/canonical/](docs/canonical/) — DLR, RS, DS, MG specifications |
+| Category claim | [/docs/category/declaration.md](docs/category/declaration.md) |
 | IRIS deep-dive | [docs/18-iris.md](docs/18-iris.md) |
 | JSON schemas | [/specs/](specs/) |
-| Mermaid diagrams | [/mermaid/](mermaid/) |
-| LLM-optimized data model | [/llm_data_model/](llm_data_model/) |
+| Mermaid diagrams | [/docs/mermaid/](docs/mermaid/) |
+| LLM-optimized data model | [/docs/llm_data_model/](docs/llm_data_model/) |
 | Full docs index | [docs/99-docs-map.md](docs/99-docs-map.md) |
-| Release checklist | [release/CHECKLIST_v1.md](release/CHECKLIST_v1.md) |
+| Release checklist | [docs/release/CHECKLIST_v1.md](docs/release/CHECKLIST_v1.md) |
 
 ---
 

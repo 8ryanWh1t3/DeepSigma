@@ -71,7 +71,7 @@ jobs:
 
       - name: Golden Path fixture gate
         run: |
-          python -m demos.golden_path --source sharepoint --fixture demos/golden_path/fixtures/sharepoint_small --output golden_path_ci_out --json
+          python -m demos.golden_path --source sharepoint --fixture src/demos/golden_path/fixtures/sharepoint_small --output golden_path_ci_out --json
           python -m pytest tests/test_golden_path.py -v --tb=short
 
       - name: Generate Trust Scorecard
@@ -91,7 +91,7 @@ jobs:
 
       - name: Validate BOOT contract
         run: |
-          python tools/validate_workbook_boot.py templates/creative_director_suite/Creative_Director_Suite_CoherenceOps_v2.xlsx
+          python src/tools/validate_workbook_boot.py templates/creative_director_suite/Creative_Director_Suite_CoherenceOps_v2.xlsx
           python -m pytest tests/test_workbook_boot_validator.py -v --tb=short
 
       - name: MDPT Prompt Index gate
@@ -117,11 +117,11 @@ jobs:
 
       - name: Validate examples against schemas
         run: |
-          python tools/validate_examples.py
+          python src/tools/validate_examples.py
 
       - name: Validate LLM Data Model examples
         run: |
-          python llm_data_model/05_validation/validate_examples.py
+          python docs/llm_data_model/05_validation/validate_examples.py
 
       - name: Connector contract + fixture tests
         run: |

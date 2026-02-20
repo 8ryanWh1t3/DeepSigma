@@ -107,7 +107,7 @@ records = connector.to_canonical(trace_data)
 envelopes = connector.to_envelopes(records)
 
 # Validate
-from connectors.contract import validate_envelope
+from adapters.contract import validate_envelope
 for env in envelopes:
     errors = validate_envelope(env.to_dict())
     assert not errors

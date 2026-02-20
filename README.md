@@ -45,7 +45,7 @@ python -m coherence_ops.examples.drift_patch_cycle
 
 # Full 7-step Golden Path (no credentials needed)
 deepsigma golden-path sharepoint \
-  --fixture demos/golden_path/fixtures/sharepoint_small --clean
+  --fixture src/demos/golden_path/fixtures/sharepoint_small --clean
 ```
 
 ---
@@ -83,22 +83,22 @@ All connectors conform to the [Connector Contract v1.0](specs/connector_contract
 
 ```
 DeepSigma/
-├── coherence_ops/       # Core Python library + CLI
-├── credibility_engine/  # Runtime engine with JSONL persistence
-├── deepsigma/cli/       # Unified product CLI
-├── services/            # SPARQL, RDF, semantic query layer
-├── adapters/            # MCP, SharePoint, Snowflake, LangGraph, OpenClaw, AskSage
-├── engine/              # Compression, degrade ladder, supervisor
+├── src/                 # 12 Python packages (all source code)
+│   ├── coherence_ops/   #   Core library + CLI
+│   ├── engine/          #   Compression, degrade ladder, supervisor
+│   ├── adapters/        #   MCP, SharePoint, Snowflake, LangGraph, OpenClaw, AskSage
+│   ├── deepsigma/       #   Unified product CLI
+│   ├── demos/           #   Golden Path, Excel-first Money Demo
+│   └── ...              #   credibility_engine, services, mesh, governance, tenancy, verifiers, tools
+├── tests/               # 1050+ tests across unit, integration, benchmarks
+├── docs/                # All documentation (canonical, mermaid, wiki, RDF, cookbook, etc.)
 ├── dashboard/           # React dashboard + API server
-├── demos/               # Golden Path, Excel-first Money Demo
 ├── mdpt/                # MDPT tools + Power App starter kit
-├── templates/           # Excel workbook templates (CDS, Healthcare, FinServ)
-├── specs/               # JSON schemas (11 schemas)
-├── canonical/           # Normative specs: DLR, RS, DS, MG
-├── docs/                # Extended documentation
+├── specs/               # JSON schemas
 ├── examples/            # Mini Lattice, Enterprise, Scale, Healthcare, Game Studio
-├── mesh/                # Distributed mesh transport + sync plane
-└── tests/               # 1050+ tests across unit, integration, benchmarks
+├── templates/           # Excel workbook templates (CDS, Healthcare, FinServ)
+├── fixtures/            # Test fixtures + datasets
+└── .github/             # CI/CD workflows
 ```
 
 ---
@@ -109,9 +109,9 @@ DeepSigma/
 |---|---|
 | [START_HERE.md](START_HERE.md) | Front door |
 | [HERO_DEMO.md](HERO_DEMO.md) | 5-minute hands-on walkthrough |
-| [NAV.md](NAV.md) | Full navigation index |
-| [ABOUT.md](ABOUT.md) | Reality Await Layer (RAL) |
-| [OPS_RUNBOOK.md](OPS_RUNBOOK.md) | Operations + incident playbooks |
+| [NAV.md](docs/NAV.md) | Full navigation index |
+| [ABOUT.md](docs/ABOUT.md) | Reality Await Layer (RAL) |
+| [OPS_RUNBOOK.md](docs/OPS_RUNBOOK.md) | Operations + incident playbooks |
 | [STABILITY.md](STABILITY.md) | Versioning policy + stability guarantees |
 | [docs/99-docs-map.md](docs/99-docs-map.md) | Complete docs map |
 

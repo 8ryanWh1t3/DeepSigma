@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'wiki/**'
+      - 'docs/wiki/**'
 
 jobs:
   sync:
@@ -19,9 +19,9 @@ jobs:
         run: |
           git clone "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git" /tmp/wiki
 
-      - name: Sync wiki/ files
+      - name: Sync docs/wiki/ files
         run: |
-          cp wiki/*.md /tmp/wiki/
+          cp docs/wiki/*.md /tmp/docs/wiki/
 
       - name: Commit and push
         run: |
