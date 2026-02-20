@@ -17,9 +17,6 @@ import json
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any
 
-from governance.audit import audit_action
-from tenancy.policies import get_policy_hash, load_policy
-
 if TYPE_CHECKING:
     from credibility_engine.engine import CredibilityEngine
 
@@ -50,6 +47,9 @@ def generate_credibility_packet(
     role: str = "Coherence Steward",
     user: str = "credibility-engine-runtime",
 ) -> dict[str, Any]:
+    from governance.audit import audit_action  # noqa: F811
+    from tenancy.policies import get_policy_hash, load_policy  # noqa: F811
+
     """Generate a complete credibility packet from current engine state.
 
     Returns the packet dict and persists it to the store.
@@ -165,6 +165,9 @@ def seal_credibility_packet(
     Sealing requires the coherence_steward role (enforced at API layer).
     Returns the sealed packet and persists it.
     """
+    from governance.audit import audit_action  # noqa: F811
+    from tenancy.policies import get_policy_hash, load_policy  # noqa: F811
+
     if packet is None:
         packet = engine.store.latest_packet()
     if packet is None:
