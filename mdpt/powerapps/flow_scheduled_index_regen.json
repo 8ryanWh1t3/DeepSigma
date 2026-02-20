@@ -1,0 +1,99 @@
+{
+  "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "name": "MDPT Scheduled Index Regeneration",
+    "description": "Weekly regeneration of the MDPT prompt index from PromptCapabilities SharePoint list. Exports CSV, runs the index generator, and posts results to Teams.",
+    "version": "1.0",
+    "category": "MDPT Governance"
+  },
+  "parameters": {
+    "$connections": {"defaultValue": {}, "type": "Object"},
+    "SharePointSiteUrl": {"defaultValue": "", "type": "String"},
+    "PromptCapabilitiesListId": {"defaultValue": "", "type": "String"},
+    "TeamsChannelId": {"defaultValue": "", "type": "String"},
+    "TeamsTeamId": {"defaultValue": "", "type": "String"},
+    "IndexStorageFolder": {"defaultValue": "/sites/mdpt/Shared Documents/prompt-index", "type": "String"}
+  },
+  "triggers": {
+    "Recurrence": {
+      "type": "Recurrence",
+      "recurrence": {
+        "frequency": "Week",
+        "interval": 1,
+        "schedule": {
+          "weekDays": ["Monday"],
+          "hours": ["6"],
+          "minutes": [0]
+        },
+        "timeZone": "UTC"
+      }
+    }
+  },
+  "actions": {
+    "Get_PromptCapabilities": {
+      "type": "ApiConnection",
+      "runAfter": {},
+      "inputs": {
+        "host": {"connection": {"name": "@parameters('$connections')['sharepointonline']['connectionId']"}},
+        "method": "get",
+        "path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('SharePointSiteUrl')))}/tables/@{encodeURIComponent(encodeURIComponent(parameters('PromptCapabilitiesListId')))}/items",
+        "queries": {
+          "$filter": "Status ne 'Deprecated'",
+          "$top": 500
+        }
+      }
+    },
+    "Build_CSV_Content": {
+      "type": "Compose",
+      "runAfter": {"Get_PromptCapabilities": ["Succeeded"]},
+      "inputs": "@{concat('CapabilityID,Title,Status,RiskLane,TTL_Hours,LatestVersion,LatestApprovedDate,LatestPromptMatrixLink,ExamplesLink,ManifestLink', decodeUriComponent('%0A'), join(body('Get_PromptCapabilities')?['value'], decodeUriComponent('%0A')))}"
+    },
+    "Create_CSV_File": {
+      "type": "ApiConnection",
+      "runAfter": {"Build_CSV_Content": ["Succeeded"]},
+      "inputs": {
+        "host": {"connection": {"name": "@parameters('$connections')['sharepointonline']['connectionId']"}},
+        "method": "post",
+        "path": "/datasets/@{encodeURIComponent(encodeURIComponent(parameters('SharePointSiteUrl')))}/files",
+        "body": "@outputs('Build_CSV_Content')",
+        "queries": {
+          "folderPath": "@parameters('IndexStorageFolder')",
+          "name": "prompt_capabilities_export_@{utcNow('yyyy-MM-dd')}.csv",
+          "queryParametersSingleEncoded": true
+        }
+      }
+    },
+    "Compute_Index_Stats": {
+      "type": "Compose",
+      "runAfter": {"Get_PromptCapabilities": ["Succeeded"]},
+      "inputs": {
+        "total": "@length(body('Get_PromptCapabilities')?['value'])",
+        "active": "@length(filter(body('Get_PromptCapabilities')?['value'], item()?['Status'], 'Active'))",
+        "advisory": "@length(filter(body('Get_PromptCapabilities')?['value'], item()?['Risk_Lane'], 'ADVISORY'))",
+        "review": "@length(filter(body('Get_PromptCapabilities')?['value'], item()?['Risk_Lane'], 'REVIEW'))",
+        "gate": "@length(filter(body('Get_PromptCapabilities')?['value'], item()?['Risk_Lane'], 'GATE'))",
+        "generated_at": "@utcNow()"
+      }
+    },
+    "Post_Teams_Summary": {
+      "type": "ApiConnection",
+      "runAfter": {
+        "Create_CSV_File": ["Succeeded"],
+        "Compute_Index_Stats": ["Succeeded"]
+      },
+      "inputs": {
+        "host": {"connection": {"name": "@parameters('$connections')['teams']['connectionId']"}},
+        "method": "post",
+        "path": "/v1.0/teams/@{parameters('TeamsTeamId')}/channels/@{parameters('TeamsChannelId')}/messages",
+        "body": {
+          "body": {
+            "contentType": "html",
+            "content": "<h3>MDPT Prompt Index Regenerated</h3><p><b>Date:</b> @{outputs('Compute_Index_Stats')['generated_at']}</p><ul><li>Total capabilities: @{outputs('Compute_Index_Stats')['total']}</li><li>Active: @{outputs('Compute_Index_Stats')['active']}</li><li>Risk lanes — Advisory: @{outputs('Compute_Index_Stats')['advisory']}, Review: @{outputs('Compute_Index_Stats')['review']}, Gate: @{outputs('Compute_Index_Stats')['gate']}</li></ul><p>CSV exported to: @{parameters('IndexStorageFolder')}</p>"
+          }
+        }
+      }
+    }
+  },
+  "outputs": {}
+}
