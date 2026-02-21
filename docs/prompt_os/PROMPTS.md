@@ -10,7 +10,7 @@ Three canonical prompts are versioned in the repo as reusable assets.
 |---|------|----------|-------------|
 | 01 | [`prompts/canonical/01_unified_executive_analysis.md`](../../prompts/canonical/01_unified_executive_analysis.md) | Decision | Structured decision output — analyzing options, preparing executive briefs, evaluating trade-offs |
 | 02 | [`prompts/canonical/02_reality_assessment.md`](../../prompts/canonical/02_reality_assessment.md) | Perception | Perception correction — grounding situations in observable reality, checking for narrative drift and emotional bias |
-| 03 | [`prompts/canonical/03_multi_dim_prompting_for_teams_a1.md`](../../prompts/canonical/03_multi_dim_prompting_for_teams_a1.md) | Governance | Workbook control — triage LLM session against Prompt OS v2 workbook, surface risks, recommend actions |
+| 03 | [`prompts/prompt_os/START_SESSION_A1.md`](../../prompts/prompt_os/START_SESSION_A1.md) | Governance | Workbook control — triage LLM session against Prompt OS v2 workbook, surface risks, recommend actions |
 
 ---
 
@@ -32,7 +32,9 @@ Use this prompt when you suspect narrative drift, emotional bias, or need to sep
 
 This is the primary workbook control prompt. Paste it into cell A1 of a START_SESSION sheet, or use it as the LLM system prompt when running a triage session. It reads all workbook tabs, identifies risks across decisions/assumptions/claims/patches, and outputs structured recommendations.
 
-**Maps to:** `prompts/prompt_os/START_SESSION_A1.md` — the 03 prompt is the core engine that START_SESSION wraps with output formatting.
+**Canonical file:** [`prompts/prompt_os/START_SESSION_A1.md`](../../prompts/prompt_os/START_SESSION_A1.md) — single source of truth. The file at `prompts/canonical/03_*` is a compatibility pointer.
+
+> **Note:** Canonical prompts (01, 02) are reusable analytical primitives. The workbook A1 prompt is operational control — it references specific table names and output formatting for the Prompt OS workbook.
 
 ---
 
