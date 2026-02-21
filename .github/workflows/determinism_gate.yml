@@ -82,3 +82,8 @@ jobs:
         run: |
           sealed=$(ls "$RUNNER_TEMP"/sealed2/RUN-*.json | grep -v manifest | head -1)
           python src/tools/reconstruct/replay_sealed_run.py --sealed "$sealed"
+
+      - name: Determinism audit (sealed run 1)
+        run: |
+          sealed=$(ls "$RUNNER_TEMP"/sealed1/RUN-*.json | grep -v manifest | head -1)
+          python src/tools/reconstruct/determinism_audit.py --sealed "$sealed" --strict
