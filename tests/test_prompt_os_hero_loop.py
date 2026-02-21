@@ -1,9 +1,7 @@
 """Tests for the Prompt OS Drift → Patch hero loop."""
 from __future__ import annotations
 
-import csv
 import json
-import os
 import shutil
 import tempfile
 import unittest

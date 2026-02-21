@@ -15,9 +15,8 @@ import argparse
 import csv
 import hashlib
 import json
-import os
-import string
 import random
+import string
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -268,14 +267,14 @@ def main() -> int:
     print("  Drift → Patch Hero Loop")
     print("=" * 50)
     if severity != "GREEN" and trigger_row:
-        print(f"  Drift detected:  YES")
+        print("  Drift detected:  YES")
         print(f"  Decision ID:     {trigger_row['DecisionID']}")
         print(f"  Decision:        {trigger_row.get('Title', '?')}")
         print(f"  Severity:        {severity}")
         print(f"  Patch ID:        {patch_id}")
     else:
-        print(f"  Drift detected:  NO")
-        print(f"  Severity:        GREEN")
+        print("  Drift detected:  NO")
+        print("  Severity:        GREEN")
     print(f"  Run ID:          {run_id}")
     print(f"  Sealed file:     {out_path}")
     print(f"  Telemetry:       {telemetry_path}")
