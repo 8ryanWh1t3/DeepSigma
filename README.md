@@ -2,6 +2,7 @@
 [![PyPI](https://img.shields.io/pypi/v/deepsigma)](https://pypi.org/project/deepsigma/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
+[![Release](https://img.shields.io/github/v/release/8ryanWh1t3/DeepSigma)](https://github.com/8ryanWh1t3/DeepSigma/releases/latest)
 
 <div align="center">
 
@@ -60,6 +61,7 @@ deepsigma golden-path sharepoint \
 | **Trust Scorecard** | Measurable SLOs from every Golden Path run | [Spec](schemas/core/trust_scorecard_v1.md) |
 | **Excel-first BOOT** | Govern decisions in a shared workbook — no code required | [BOOT Protocol](docs/excel-first/WORKBOOK_BOOT_PROTOCOL.md) |
 | **MDPT** | Multi-Dimensional Prompt Toolkit for governed prompt ops | [MDPT Docs](src/mdpt/README.md) |
+| **Court-Grade Admissibility** | Seal-and-prove pipeline: Merkle commitments, transparency log, multi-sig witness, hardware key hooks | [Admissibility Levels](docs/reconstruct/ADMISSIBILITY_LEVELS.md) |
 | **MCP Server** | Model Context Protocol server with auth + rate limiting | [MCP Adapter](adapters/mcp/) |
 | **RDF/SPARQL** | Semantic lattice queries via in-process SPARQL 1.1 | [SPARQL Service](services/sparql_service.py) |
 | **Dashboard** | React dashboard with Trust Scorecard + Zustand store | [Dashboard](dashboard/) |
@@ -92,7 +94,7 @@ DeepSigma/
 │   ├── demos/           #   Golden Path, Excel-first Money Demo
 │   ├── mdpt/            #   MDPT tools + Power App starter kit
 │   └── ...              #   credibility_engine, services, mesh, governance, tenancy, verifiers, tools
-├── tests/               # 1050+ tests, fixtures, datasets
+├── tests/               # 1250+ tests, fixtures, datasets
 ├── docs/                # Documentation + examples (canonical, mermaid, lattices, etc.)
 ├── dashboard/           # React dashboard + API server
 ├── schemas/             # JSON schemas (core engine + Prompt OS)
