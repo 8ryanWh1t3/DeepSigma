@@ -10,12 +10,12 @@ on:
       - 'src/coherence_ops/**'
       - 'specs/**'
       - 'pyproject.toml'
-      - 'Dockerfile.mcp'
+      - 'docker/Dockerfile.mcp'
       - '.github/workflows/docker-mcp.yml'
   pull_request:
     branches: [main]
     paths:
-      - 'Dockerfile.mcp'
+      - 'docker/Dockerfile.mcp'
   workflow_dispatch:
 
 env:
@@ -59,7 +59,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile.mcp
+          file: ./docker/Dockerfile.mcp
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

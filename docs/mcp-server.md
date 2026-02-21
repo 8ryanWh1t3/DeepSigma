@@ -98,7 +98,7 @@ Per-client sliding window rate limiter protects against runaway loops.
 ### Build
 
 ```bash
-docker build -f Dockerfile.mcp -t deepsigma-mcp .
+docker build -f docker/Dockerfile.mcp -t deepsigma-mcp .
 ```
 
 ### Run
