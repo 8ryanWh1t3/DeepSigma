@@ -1,19 +1,28 @@
 #!/usr/bin/env python3
 """Replay Sealed Run — adversarial reconstruction without live access.
 
-Validates a sealed run JSON against the sealed_run_v1 schema (structurally)
-and prints a deterministic reconstruction report.
+Validates a sealed run JSON structurally, recomputes the deterministic
+commit hash from the embedded hash_scope, and verifies admissibility.
+
+Exit codes:
+  0  REPLAY PASS (admissible)
+  1  INADMISSIBLE (structural or logical failure)
+  2  Schema failure (missing required keys)
+  3  Hash mismatch (commit_hash or content hash)
+  4  Missing referenced file (strict mode only)
 
 Usage:
-    python src/tools/reconstruct/replay_sealed_run.py --sealed artifacts/sealed_runs/RUN-001_20260221T120000Z.json
+    python src/tools/reconstruct/replay_sealed_run.py --sealed artifacts/sealed_runs/RUN-abc12345_20260221T000000Z.json
+    python src/tools/reconstruct/replay_sealed_run.py --sealed <path> --strict-files true
 """
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sys
 from pathlib import Path
+
+from canonical_json import canonical_dumps, sha256_text
 
 
 REQUIRED_TOP_KEYS = [
@@ -25,6 +34,12 @@ REQUIRED_TOP_KEYS = [
     "artifacts_emitted",
     "replay_instructions",
     "hash",
+]
+
+# Keys added by deterministic sealing (v1.1+)
+DETERMINISTIC_TOP_KEYS = [
+    "hash_scope",
+    "commit_hash",
 ]
 
 REQUIRED_ENVELOPE_KEYS = [
@@ -50,13 +65,24 @@ REQUIRED_PROVENANCE_KEYS = ["created_at", "run_id", "deterministic_inputs_hash"]
 REQUIRED_DECISION_KEYS = ["decision_id", "title", "status", "confidence_pct", "priority_score"]
 REQUIRED_REPLAY_KEYS = ["method", "command", "required_files"]
 
+# Hash scope keys
+REQUIRED_HASH_SCOPE_KEYS = [
+    "scope_version", "inputs", "prompts", "policies", "schemas", "parameters", "exclusions",
+]
+
 
 class ReplayResult:
     def __init__(self) -> None:
         self.checks: list[tuple[str, bool, str]] = []
+        self._exit_code: int = 0
 
     def check(self, name: str, passed: bool, detail: str = "") -> None:
         self.checks.append((name, passed, detail))
+
+    def set_exit_code(self, code: int) -> None:
+        """Set exit code if it would be worse than current."""
+        if code > self._exit_code:
+            self._exit_code = code
 
     @property
     def passed(self) -> bool:
@@ -66,36 +92,125 @@ class ReplayResult:
     def failed_count(self) -> int:
         return sum(1 for _, ok, _ in self.checks if not ok)
 
+    @property
+    def exit_code(self) -> int:
+        if self.passed:
+            return 0
+        return self._exit_code if self._exit_code > 0 else 1
+
 
 def verify_keys(obj: dict, required: list[str], prefix: str, result: ReplayResult) -> bool:
     """Check that all required keys are present."""
     missing = [k for k in required if k not in obj]
     if missing:
         result.check(f"{prefix}.keys", False, f"Missing: {missing}")
+        result.set_exit_code(2)
         return False
     result.check(f"{prefix}.keys", True, f"All {len(required)} keys present")
     return True
 
 
-def verify_hash(sealed: dict, result: ReplayResult) -> None:
-    """Verify the content hash."""
+def verify_content_hash(sealed: dict, result: ReplayResult) -> None:
+    """Verify the content hash using canonical serialization."""
     recorded = sealed.get("hash", "")
     if not recorded:
         result.check("hash.present", False, "No hash field")
+        result.set_exit_code(3)
         return
 
     copy = dict(sealed)
     copy["hash"] = ""
-    canonical = json.dumps(copy, sort_keys=True)
-    computed = "sha256:" + hashlib.sha256(canonical.encode()).hexdigest()
+    computed = sha256_text(canonical_dumps(copy))
 
     if computed == recorded:
         result.check("hash.integrity", True, f"Hash verified: {recorded[:30]}...")
     else:
         result.check("hash.integrity", False, f"Expected {computed[:30]}... got {recorded[:30]}...")
+        result.set_exit_code(3)
 
 
-def replay(sealed_path: Path) -> ReplayResult:
+def verify_commit_hash(sealed: dict, result: ReplayResult) -> None:
+    """Recompute the commit hash from the embedded hash_scope."""
+    hash_scope = sealed.get("hash_scope")
+    if hash_scope is None:
+        result.check("commit_hash.scope_present", False, "No hash_scope in sealed run (pre-v1.1)")
+        return
+
+    recorded = sealed.get("commit_hash", "")
+    if not recorded:
+        result.check("commit_hash.present", False, "No commit_hash field")
+        result.set_exit_code(3)
+        return
+
+    computed = sha256_text(canonical_dumps(hash_scope))
+
+    if computed == recorded:
+        result.check("commit_hash.integrity", True, f"Commit hash verified: {recorded[:30]}...")
+    else:
+        result.check("commit_hash.integrity", False,
+                      f"Expected {computed[:30]}... got {recorded[:30]}...")
+        result.set_exit_code(3)
+
+    # Verify commit hash matches provenance.deterministic_inputs_hash
+    envelope = sealed.get("authority_envelope", {})
+    provenance = envelope.get("provenance", {})
+    prov_hash = provenance.get("deterministic_inputs_hash", "")
+    if prov_hash and prov_hash == recorded:
+        result.check("commit_hash.provenance_match", True, "Matches provenance hash")
+    elif prov_hash:
+        result.check("commit_hash.provenance_match", False,
+                      f"Provenance hash {prov_hash[:30]}... != commit_hash {recorded[:30]}...")
+        result.set_exit_code(3)
+
+
+def verify_exclusions(sealed: dict, result: ReplayResult) -> None:
+    """Verify exclusion rules: observed_at should not be in hash scope."""
+    hash_scope = sealed.get("hash_scope")
+    if hash_scope is None:
+        return
+
+    exclusions = hash_scope.get("exclusions", [])
+    result.check(
+        "exclusions.defined",
+        len(exclusions) > 0,
+        f"{len(exclusions)} exclusions declared",
+    )
+
+    if "observed_at" in exclusions:
+        result.check("exclusions.observed_at", True, "observed_at correctly excluded")
+    else:
+        result.check("exclusions.observed_at", False, "observed_at not in exclusion list")
+
+
+def verify_hash_scope(sealed: dict, result: ReplayResult) -> None:
+    """Verify hash scope structure."""
+    hash_scope = sealed.get("hash_scope")
+    if hash_scope is None:
+        return
+
+    verify_keys(hash_scope, REQUIRED_HASH_SCOPE_KEYS, "hash_scope", result)
+
+    params = hash_scope.get("parameters", {})
+    result.check(
+        "hash_scope.deterministic",
+        "deterministic" in params,
+        f"deterministic={params.get('deterministic')}",
+    )
+
+
+def verify_strict_files(sealed: dict, result: ReplayResult) -> None:
+    """In strict mode, verify all referenced input files exist on disk."""
+    inputs = sealed.get("inputs_snapshot", {})
+    for fi in inputs.get("files", []):
+        path = Path(fi.get("path", ""))
+        if path.exists():
+            result.check(f"strict.file[{fi['path']}]", True, "File exists")
+        else:
+            result.check(f"strict.file[{fi['path']}]", False, "File NOT found")
+            result.set_exit_code(4)
+
+
+def replay(sealed_path: Path, verify_hash: bool = True, strict_files: bool = False) -> ReplayResult:
     """Run the full replay validation."""
     result = ReplayResult()
 
@@ -109,6 +224,7 @@ def replay(sealed_path: Path) -> ReplayResult:
         sealed = json.loads(sealed_path.read_text())
     except json.JSONDecodeError as e:
         result.check("file.json", False, str(e))
+        result.set_exit_code(2)
         return result
     result.check("file.json", True, "Valid JSON")
 
@@ -119,6 +235,14 @@ def replay(sealed_path: Path) -> ReplayResult:
     # Schema version
     sv = sealed.get("schema_version")
     result.check("schema_version", sv == "1.0", f"version={sv}")
+
+    # Deterministic keys (optional for v1.0 compatibility)
+    has_deterministic = all(k in sealed for k in DETERMINISTIC_TOP_KEYS)
+    result.check(
+        "deterministic.keys",
+        has_deterministic,
+        "hash_scope + commit_hash present" if has_deterministic else "Pre-v1.1 sealed run (no deterministic keys)",
+    )
 
     # Authority envelope
     envelope = sealed.get("authority_envelope", {})
@@ -234,8 +358,19 @@ def replay(sealed_path: Path) -> ReplayResult:
     replay_inst = sealed.get("replay_instructions", {})
     verify_keys(replay_inst, REQUIRED_REPLAY_KEYS, "replay", result)
 
-    # Hash integrity (last check)
-    verify_hash(sealed, result)
+    # Hash scope verification (v1.1+)
+    if has_deterministic:
+        verify_hash_scope(sealed, result)
+        verify_commit_hash(sealed, result)
+        verify_exclusions(sealed, result)
+
+    # Strict file checks
+    if strict_files:
+        verify_strict_files(sealed, result)
+
+    # Content hash integrity (last check)
+    if verify_hash:
+        verify_content_hash(sealed, result)
 
     return result
 
@@ -248,9 +383,21 @@ def main() -> int:
         "--sealed", type=Path, required=True,
         help="Path to sealed run JSON",
     )
+    parser.add_argument(
+        "--verify-hash", default="true", choices=["true", "false"],
+        help="Verify content hash (default: true)",
+    )
+    parser.add_argument(
+        "--strict-files", default="false", choices=["true", "false"],
+        help="Verify referenced files exist on disk (default: false)",
+    )
     args = parser.parse_args()
 
-    result = replay(args.sealed)
+    result = replay(
+        args.sealed,
+        verify_hash=(args.verify_hash == "true"),
+        strict_files=(args.strict_files == "true"),
+    )
 
     # Print report
     print("=" * 60)
@@ -265,15 +412,15 @@ def main() -> int:
     print("-" * 60)
     total = len(result.checks)
     passed = sum(1 for _, ok, _ in result.checks if ok)
-    failed = result.failed_count
 
     if result.passed:
-        print(f"  RESULT: ADMISSIBLE  ({passed}/{total} checks passed)")
+        print(f"  RESULT: REPLAY PASS  ({passed}/{total} checks passed)")
     else:
+        failed = result.failed_count
         print(f"  RESULT: INADMISSIBLE  ({failed}/{total} checks failed)")
     print("=" * 60)
 
-    return 0 if result.passed else 1
+    return result.exit_code
 
 
 if __name__ == "__main__":
