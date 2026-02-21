@@ -78,9 +78,9 @@ That's the entire onramp.
 | Executive brief | [category/boardroom_brief.md](docs/category/boardroom_brief.md) |
 | Risk model | [category/risk_model.md](docs/category/risk_model.md) |
 | Normative specs (DLR, RS, DS, MG) | [/canonical/](docs/canonical/) |
-| JSON schemas | [/specs/](specs/) |
+| JSON schemas | [/schemas/core/](schemas/core/) |
 | Python library + CLI | [/coherence_ops/](coherence_ops/) |
-| End-to-end examples | [/examples/](examples/) |
+| End-to-end examples | [/docs/examples/](docs/examples/) |
 | LLM-optimized data model | [/docs/llm_data_model/](docs/llm_data_model/) |
 | Operational runbooks | [/docs/runtime/](docs/runtime/) |
 | Extended docs | [/docs/](docs/) |

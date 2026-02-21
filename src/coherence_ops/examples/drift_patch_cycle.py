@@ -13,7 +13,7 @@ Re-run behaviour:
     timestamps so output is byte-identical across runs.
 
 Artifacts produced in:
-    examples/demo-stack/drift_patch_cycle_run/
+    docs/examples/demo-stack/drift_patch_cycle_run/
         report_baseline.json
         report_drift.json
         report_after.json
@@ -54,7 +54,7 @@ from coherence_ops.scoring import CoherenceReport  # noqa: E402
 # ===================================================================
 # Constants (pinned for determinism)
 # ===================================================================
-OUTPUT_DIR = _REPO_ROOT / "examples" / "demo-stack" / "drift_patch_cycle_run"
+OUTPUT_DIR = _REPO_ROOT / "docs" / "examples" / "demo-stack" / "drift_patch_cycle_run"
 NOW = "2026-02-16T15:00:00Z"
 
 # Deterministic IDs
@@ -88,7 +88,7 @@ def _load_episodes() -> list:
     if primary.exists():
         return json.loads(primary.read_text(encoding="utf-8"))
 
-    fallback = _REPO_ROOT / "examples" / "sample_decision_episode_001.json"
+    fallback = _REPO_ROOT / "docs" / "examples" / "sample_decision_episode_001.json"
     if fallback.exists():
         raw = json.loads(fallback.read_text(encoding="utf-8"))
         # composite doc: extract episode dicts (skip _meta)
@@ -370,7 +370,7 @@ def main() -> None:
 
 def _run_game_studio() -> None:
     """Game Studio Lattice demo — loads example artifacts and prints E2E transcript."""
-    example_dir = _REPO_ROOT / "examples" / "04-game-studio-lattice"
+    example_dir = _REPO_ROOT / "docs" / "examples" / "04-game-studio-lattice"
     episodes_dir = example_dir / "episodes"
     drift_dir = example_dir / "drift_signals"
     patches_dir = example_dir / "patches"
@@ -453,7 +453,7 @@ def _run_game_studio() -> None:
 
 def _run_healthcare() -> None:
     """Healthcare Lattice demo — loads example artifacts and prints E2E transcript."""
-    example_dir = _REPO_ROOT / "examples" / "05-healthcare-lattice"
+    example_dir = _REPO_ROOT / "docs" / "examples" / "05-healthcare-lattice"
     episodes_dir = example_dir / "episodes"
     drift_dir = example_dir / "drift_signals"
     patches_dir = example_dir / "patches"

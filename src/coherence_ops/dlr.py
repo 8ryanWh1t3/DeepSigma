@@ -126,7 +126,7 @@ class DLRBuilder:
 # ======================================================================
 # Claim-Native DLR Builder (v1.0)
 # Produces DLRs that reference AtomicClaim IDs rather than raw text.
-# Conforms to specs/dlr.schema.json
+# Conforms to schemas/core/dlr.schema.json
 # ======================================================================
 
 

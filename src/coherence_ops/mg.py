@@ -227,7 +227,7 @@ class MemoryGraph:
         """Add an AtomicClaim as a node with full graph topology.
 
         Args:
-            claim: An AtomicClaim dict (conforming to specs/claim.schema.json).
+            claim: An AtomicClaim dict (conforming to schemas/core/claim.schema.json).
             episode_id: Optional episode to link via DECIDES_CLAIM edge.
 
         Returns:

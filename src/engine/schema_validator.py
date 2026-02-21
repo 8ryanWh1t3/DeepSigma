@@ -1,6 +1,6 @@
 """Runtime JSON Schema validation for ingest boundaries.
 
-Lazy-compiles schemas from specs/*.schema.json and validates payloads
+Lazy-compiles schemas from schemas/core/*.schema.json and validates payloads
 at episode ingestion, policy pack loading, drift acceptance, and MCP input.
 
 Usage:
@@ -26,13 +26,13 @@ from referencing import Registry, Resource
 
 logger = logging.getLogger(__name__)
 
-SPECS_DIR = Path(__file__).resolve().parents[2] / "specs"
+SPECS_DIR = Path(__file__).resolve().parents[2] / "schemas" / "core"
 POLICY_SCHEMA = Path(__file__).resolve().parents[2] / "docs" / "policy_packs" / "policy_pack.schema.json"
 
 # Compiled validator cache: schema_name -> Draft202012Validator
 _VALIDATORS: Dict[str, Draft202012Validator] = {}
 
-# External $ref URL prefix → local specs/ directory mapping
+# External $ref URL prefix → local schemas/core/ directory mapping
 _REF_PREFIX = "https://sigma-overwatch.dev/schemas/"
 
 
@@ -59,7 +59,7 @@ def _get_validator(schema_name: str) -> Optional[Draft202012Validator]:
     if schema_name in _VALIDATORS:
         return _VALIDATORS[schema_name]
 
-    # Check specs/ first, then policy_packs/ for policy_pack schema
+    # Check schemas/core/ first, then policy_packs/ for policy_pack schema
     if schema_name == "policy_pack":
         schema_file = POLICY_SCHEMA
     else:

@@ -11,7 +11,7 @@ Commands:
     health   – Check API health
 
 Usage:
-    python tools/exhaust_cli.py import --file specs/sample_episode_events.jsonl
+    python tools/exhaust_cli.py import --file schemas/core/sample_episode_events.jsonl
     python tools/exhaust_cli.py assemble
     python tools/exhaust_cli.py list
     python tools/exhaust_cli.py refine --episode <episode_id>

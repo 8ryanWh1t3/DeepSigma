@@ -18,7 +18,7 @@ class TestClaimSchema(unittest.TestCase):
     def setUpClass(cls):
         jsonschema = __import__("jsonschema")
         cls.jsonschema = jsonschema
-        cls.schema = _load_json("specs/claim.schema.json")
+        cls.schema = _load_json("schemas/core/claim.schema.json")
         cls.example = _load_json("docs/llm_data_model/03_examples/claim_primitive_example.json")
 
     def test_example_validates(self):
@@ -53,7 +53,7 @@ class TestDLRSchema(unittest.TestCase):
     def setUpClass(cls):
         jsonschema = __import__("jsonschema")
         cls.jsonschema = jsonschema
-        cls.schema = _load_json("specs/dlr.schema.json")
+        cls.schema = _load_json("schemas/core/dlr.schema.json")
 
     def test_schema_loads(self):
         """DLR schema must be valid JSON."""
@@ -71,7 +71,7 @@ class TestCanonSchema(unittest.TestCase):
     def setUpClass(cls):
         jsonschema = __import__("jsonschema")
         cls.jsonschema = jsonschema
-        cls.schema = _load_json("specs/canon.schema.json")
+        cls.schema = _load_json("schemas/core/canon.schema.json")
 
     def test_schema_loads(self):
         """Canon schema must be valid JSON."""
@@ -89,7 +89,7 @@ class TestRetconSchema(unittest.TestCase):
     def setUpClass(cls):
         jsonschema = __import__("jsonschema")
         cls.jsonschema = jsonschema
-        cls.schema = _load_json("specs/retcon.schema.json")
+        cls.schema = _load_json("schemas/core/retcon.schema.json")
 
     def test_schema_loads(self):
         """Retcon schema must be valid JSON."""

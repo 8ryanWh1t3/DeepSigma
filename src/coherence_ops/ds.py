@@ -19,7 +19,7 @@ from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
-# Canonical drift types from specs/drift.schema.json
+# Canonical drift types from schemas/core/drift.schema.json
 DRIFT_TYPES = frozenset([
     "time", "freshness", "fallback", "bypass",
     "verify", "outcome", "fanout", "contention",

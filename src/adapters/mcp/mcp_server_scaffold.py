@@ -491,7 +491,7 @@ def handle_resources_list(_id: Any) -> Dict[str, Any]:
         })
 
     # Schemas
-    specs_dir = ROOT / "specs"
+    specs_dir = ROOT / "schemas" / "core"
     if specs_dir.exists():
         for f in sorted(specs_dir.glob("*.schema.json")):
             schema_name = f.stem.replace(".schema", "")
@@ -541,7 +541,7 @@ def handle_resources_read(_id: Any, params: Dict[str, Any]) -> Dict[str, Any]:
 
     if uri.startswith("schema://"):
         schema_name = uri.removeprefix("schema://")
-        candidate = ROOT / "specs" / f"{schema_name}.schema.json"
+        candidate = ROOT / "schemas" / "core" / f"{schema_name}.schema.json"
         if candidate.exists():
             content = json.loads(candidate.read_text(encoding="utf-8"))
             return rpc_result(_id, {

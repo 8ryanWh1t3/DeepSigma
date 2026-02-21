@@ -58,7 +58,7 @@ def _make_episode(events: list[dict]) -> DecisionEpisode:
     )
 
 
-SAMPLE_EVENTS_PATH = Path(__file__).parents[1] / "specs" / "sample_episode_events.jsonl"
+SAMPLE_EVENTS_PATH = Path(__file__).parents[1] / "schemas" / "core" / "sample_episode_events.jsonl"
 
 
 def _load_sample_episode() -> DecisionEpisode:

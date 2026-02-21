@@ -167,7 +167,7 @@ The `demo` command prints:
 
          - `schemas/coherence_manifest.schema.json` — manifest structure
          - - `schemas/coherence_report.schema.json` — audit report structure
-           - - `../specs/iris_query.schema.json` — IRIS query/response contract
+           - - `../schemas/core/iris_query.schema.json` — IRIS query/response contract
             
              - ## Related Resources
             

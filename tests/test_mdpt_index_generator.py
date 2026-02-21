@@ -11,7 +11,7 @@ if str(REPO_ROOT) not in sys.path:
 
 FIXTURES = REPO_ROOT / "tests" / "fixtures"
 CSV_FIXTURE = FIXTURES / "promptcapabilities_export.csv"
-SCHEMA_PATH = REPO_ROOT / "mdpt" / "templates" / "prompt_index_schema.json"
+SCHEMA_PATH = REPO_ROOT / "src" / "mdpt" / "templates" / "prompt_index_schema.json"
 
 
 class TestCSVLoading:

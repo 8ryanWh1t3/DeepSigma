@@ -8,8 +8,8 @@ distributable archive.
 
 Usage::
 
-    python mdpt/tools/package_power_app.py
-    python mdpt/tools/package_power_app.py --out /tmp/
+    python src/mdpt/tools/package_power_app.py
+    python src/mdpt/tools/package_power_app.py --out /tmp/
 """
 from __future__ import annotations
 
@@ -19,63 +19,63 @@ import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parents[2]
-MDPT = REPO / "mdpt"
+REPO = Path(__file__).resolve().parents[3]
+MDPT = REPO / "src" / "mdpt"
 
 # Files to include in the package
 PACKAGE_FILES = [
     # Deployment guide
-    ("mdpt/docs/power_app_deployment.md", "docs/"),
+    ("src/mdpt/docs/power_app_deployment.md", "docs/"),
     # Power App artifacts
     (
-        "mdpt/powerapps/STARTER_KIT.md",
+        "src/mdpt/powerapps/STARTER_KIT.md",
         "powerapps/",
     ),
     (
-        "mdpt/powerapps/POWERAPPS_SCREEN_MAP.md",
+        "src/mdpt/powerapps/POWERAPPS_SCREEN_MAP.md",
         "powerapps/",
     ),
     (
-        "mdpt/powerapps/sharepoint_list_schema.json",
+        "src/mdpt/powerapps/sharepoint_list_schema.json",
         "powerapps/",
     ),
     (
-        "mdpt/powerapps/flow_scheduled_index_regen.json",
+        "src/mdpt/powerapps/flow_scheduled_index_regen.json",
         "powerapps/",
     ),
     # PowerFx snippets
     (
-        "mdpt/powerapps/powerfx/catalog_gallery.pfx",
+        "src/mdpt/powerapps/powerfx/catalog_gallery.pfx",
         "powerapps/powerfx/",
     ),
     (
-        "mdpt/powerapps/powerfx/filters_sort.pfx",
+        "src/mdpt/powerapps/powerfx/filters_sort.pfx",
         "powerapps/powerfx/",
     ),
     (
-        "mdpt/powerapps/powerfx/use_capability.pfx",
+        "src/mdpt/powerapps/powerfx/use_capability.pfx",
         "powerapps/powerfx/",
     ),
     (
-        "mdpt/powerapps/powerfx/submit_run.pfx",
+        "src/mdpt/powerapps/powerfx/submit_run.pfx",
         "powerapps/powerfx/",
     ),
     (
-        "mdpt/powerapps/powerfx/drift_report.pfx",
+        "src/mdpt/powerapps/powerfx/drift_report.pfx",
         "powerapps/powerfx/",
     ),
     (
-        "mdpt/powerapps/powerfx/approvals_queue.pfx",
+        "src/mdpt/powerapps/powerfx/approvals_queue.pfx",
         "powerapps/powerfx/",
     ),
     # Index generator
     (
-        "mdpt/tools/generate_prompt_index.py",
+        "src/mdpt/tools/generate_prompt_index.py",
         "tools/",
     ),
     # Schema
     (
-        "mdpt/templates/prompt_index_schema.json",
+        "src/mdpt/templates/prompt_index_schema.json",
         "templates/",
     ),
 ]

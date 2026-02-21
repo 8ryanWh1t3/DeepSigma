@@ -18,7 +18,7 @@ Every connector in DeepSigma has deterministic, offline fixture data that proves
 ## Structure
 
 ```
-fixtures/connectors/
+tests/fixtures/connectors/
 ├── sharepoint_small/
 │   ├── baseline_raw.json          # Raw Graph API list items (5 records)
 │   ├── delta_raw.json             # Changed items (for drift testing)
@@ -84,7 +84,7 @@ pytest tests/test_connector_contract_v1.py tests/test_connector_fixtures.py -v
 
 ## Adding a New Connector Fixture
 
-1. Create `fixtures/connectors/<name>_small/`
+1. Create `tests/fixtures/connectors/<name>_small/`
 2. Add `baseline_raw.json` with 3-5 representative records in the source's native format
 3. Add `delta_raw.json` with mutations (changed, added, removed records)
 4. Add a transformer function in `tools/generate_connector_fixtures.py`

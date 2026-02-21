@@ -57,16 +57,16 @@ deepsigma golden-path sharepoint \
 | **Coherence Ops CLI** | Score, audit, query, reconcile decision artifacts | [CLI Reference](docs/CLI.md) |
 | **Golden Path** | 7-step end-to-end proof loop | [Golden Path](demos/golden_path/README.md) |
 | **Credibility Engine** | Institutional-scale claim lattice with formal scoring | [Engine Docs](docs/credibility-engine/) |
-| **Trust Scorecard** | Measurable SLOs from every Golden Path run | [Spec](specs/trust_scorecard_v1.md) |
+| **Trust Scorecard** | Measurable SLOs from every Golden Path run | [Spec](schemas/core/trust_scorecard_v1.md) |
 | **Excel-first BOOT** | Govern decisions in a shared workbook — no code required | [BOOT Protocol](docs/excel-first/WORKBOOK_BOOT_PROTOCOL.md) |
-| **MDPT** | Multi-Dimensional Prompt Toolkit for governed prompt ops | [MDPT Docs](mdpt/README.md) |
+| **MDPT** | Multi-Dimensional Prompt Toolkit for governed prompt ops | [MDPT Docs](src/mdpt/README.md) |
 | **MCP Server** | Model Context Protocol server with auth + rate limiting | [MCP Adapter](adapters/mcp/) |
 | **RDF/SPARQL** | Semantic lattice queries via in-process SPARQL 1.1 | [SPARQL Service](services/sparql_service.py) |
 | **Dashboard** | React dashboard with Trust Scorecard + Zustand store | [Dashboard](dashboard/) |
 
 ## Connectors
 
-All connectors conform to the [Connector Contract v1.0](specs/connector_contract_v1.md).
+All connectors conform to the [Connector Contract v1.0](schemas/core/connector_contract_v1.md).
 
 | Connector | Transport | Docs |
 |---|---|---|
@@ -90,15 +90,16 @@ DeepSigma/
 │   ├── adapters/        #   MCP, SharePoint, Snowflake, LangGraph, OpenClaw, AskSage
 │   ├── deepsigma/       #   Unified product CLI
 │   ├── demos/           #   Golden Path, Excel-first Money Demo
+│   ├── mdpt/            #   MDPT tools + Power App starter kit
 │   └── ...              #   credibility_engine, services, mesh, governance, tenancy, verifiers, tools
-├── tests/               # 1050+ tests across unit, integration, benchmarks
-├── docs/                # All documentation (canonical, mermaid, wiki, RDF, cookbook, etc.)
+├── tests/               # 1050+ tests, fixtures, datasets
+├── docs/                # Documentation + examples (canonical, mermaid, lattices, etc.)
 ├── dashboard/           # React dashboard + API server
-├── mdpt/                # MDPT tools + Power App starter kit
-├── specs/               # JSON schemas
-├── examples/            # Mini Lattice, Enterprise, Scale, Healthcare, Game Studio
-├── templates/           # Excel workbook templates (CDS, Healthcare, FinServ)
-├── fixtures/            # Test fixtures + datasets
+├── schemas/             # JSON schemas (core engine + Prompt OS)
+├── artifacts/           # Workbooks, templates, sealed runs
+├── prompts/             # Canonical prompts + Prompt OS control prompts
+├── sample_data/         # Demo-ready CSV sample data
+├── scripts/             # Validation and export scripts
 └── .github/             # CI/CD workflows
 ```
 
