@@ -128,6 +128,10 @@ Structured cognition workbook for institutional decision-making — no code requ
 - **Scoring:** PriorityScore · CredibilityScore · PromptHealth · ExpiryRisk
 - **Loop:** Perception → Decision → Memory → Drift → Patch
 
+## Prompts
+
+- **Canonical Prompts v1:** [`prompts/canonical/`](prompts/canonical/) — Executive Analysis, Reality Assessment, Team Workbook A1
+
 ---
 
 ## Contributing
