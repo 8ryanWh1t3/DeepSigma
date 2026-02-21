@@ -1,4 +1,26 @@
 DecisionID,Title,Category,Owner,Status,Confidence_pct,BlastRadius_1to5,Reversibility_1to5,CostOfDelay,CompressionRisk,Evidence,CounterEvidence,Assumptions,DateLogged,ReviewDate,PriorityScore,Notes
-DEC-001,Migrate to cloud ERP,Technology,J. Rivera,Active,75,4,2,High,Medium,"Vendor benchmarks; 3 case studies",Legacy integration risk,Budget approved Q1,2026-01-10,2026-04-10,5.32,Phase 1 scoped
-DEC-002,Expand QA headcount,Operations,M. Chen,Active,60,2,4,Medium,Low,"Defect backlog +40%",Contractor option exists,Hiring freeze lifted,2026-01-15,2026-03-15,2.06,3 FTEs requested
-DEC-003,Sunset legacy API,Technology,A. Patel,Deferred,50,3,1,Low,High,"No active consumers in 90d","Internal tooling still references v1",Migration path exists,2026-02-01,2026-05-01,3.17,Blocked on v2 parity
+DEC-001,Migrate to cloud ERP,Technology,J. Rivera,Active,80,1,1,Low,Medium,Vendor benchmarks; 3 case studies,Legacy integration risk,Budget approved Q1,2026-01-01,2026-04-01,4.68,Row 1 note
+DEC-002,Expand QA headcount,Operations,M. Chen,Active,87,3,2,Medium,High,Defect backlog +40%,Contractor option exists,Hiring freeze lifted,2026-02-02,2026-05-02,6.52,Row 2 note
+DEC-003,Sunset legacy API,Finance,A. Patel,Active,54,2,1,High,Low,No active consumers in 90d,Internal tooling still references v1,Migration path exists,2026-01-03,2026-04-03,6.02,Row 3 note
+DEC-004,Adopt containerized CI/CD,Strategy,S. Kim,Active,83,5,1,Low,Medium,Pipeline failure rate reduced 60% in pilot,Team unfamiliar with containers,Docker expertise on team,2026-02-04,2026-05-04,8.3,Row 4 note
+DEC-005,Renegotiate vendor contract,People,L. Torres,Active,77,4,1,Medium,High,Contract renewal 30% over market,Switching costs may exceed savings,Contract allows early exit,2026-01-05,2026-04-05,8.11,Row 5 note
+DEC-006,Hire data engineering lead,Technology,R. Nakamura,Active,41,1,2,High,Low,Team velocity dropped 20% without lead,Internal promotion candidate exists,Headcount approved,2026-02-06,2026-05-06,4.3,Row 6 note
+DEC-007,Consolidate reporting tools,Operations,D. Williams,Active,54,5,5,Low,Medium,5 overlapping tools identified in audit,Some tools have unique features,Budget for consolidation,2026-01-07,2026-04-07,5.12,Row 7 note
+DEC-008,Launch customer feedback portal,Finance,K. Larsen,Active,41,5,2,Medium,High,NPS dropped 12 points in Q4,Low engagement on existing channels,Product team available,2026-02-08,2026-05-08,8.05,Row 8 note
+DEC-009,Upgrade network infrastructure,Strategy,J. Rivera,Active,85,5,4,High,Low,3 outages traced to aging switches,Current infra meets min SLA,Capital budget approved,2026-01-09,2026-04-09,6.66,Row 9 note
+DEC-010,Implement zero-trust auth,People,M. Chen,Active,54,4,5,Low,Medium,Audit flagged 14 access control gaps,ZTA rollout disrupts developer flow,Security team has bandwidth,2026-02-10,2026-05-10,4.22,Row 10 note
+DEC-011,Open satellite office,Technology,A. Patel,Active,57,1,2,Medium,High,Remote attrition up 15%,Office lease market softening,Lease terms favorable,2026-01-11,2026-04-11,4.54,Row 11 note
+DEC-012,Standardize code review process,Operations,S. Kim,Active,84,4,3,High,Low,PR cycle time 3x industry average,Current process has tribal knowledge,Team buy-in present,2026-02-12,2026-05-12,6.5,Row 12 note
+DEC-013,Adopt event-driven architecture,Finance,L. Torres,Active,57,2,2,Low,Medium,Event mesh pilot cut latency 40%,Migration complexity is high,Kafka cluster available,2026-01-13,2026-04-13,4.69,Row 13 note
+DEC-014,Migrate data warehouse,Strategy,R. Nakamura,Active,88,3,1,Medium,High,Query times exceed SLA 22% of weeks,Current warehouse handles peak load,Cloud credits sufficient,2026-02-14,2026-05-14,7.28,Row 14 note
+DEC-015,Establish innovation lab,People,D. Williams,Active,45,4,1,High,Low,Competitor launched lab program,ROI unclear for 12 months,Executive sponsor confirmed,2026-01-15,2026-04-15,7.77,Row 15 note
+DEC-016,Reduce meeting overhead,Technology,K. Larsen,Deferred,62,3,5,Low,Medium,Avg 18h/week in meetings per IC,Some meetings are cross-functional,Calendar audit complete,2026-02-16,2026-05-16,3.37,Row 16 note
+DEC-017,Automate compliance checks,Operations,J. Rivera,Deferred,56,1,4,Medium,High,Manual compliance takes 80h/quarter,Tool maturity concerns,Compliance framework stable,2026-01-17,2026-04-17,3.04,Row 17 note
+DEC-018,Deploy edge caching layer,Finance,M. Chen,Deferred,74,1,4,High,Low,P99 latency above 500ms for 3 months,CDN contract still active,CDN vendor supports config,2026-02-18,2026-05-18,2.99,Row 18 note
+DEC-019,Restructure support tiers,Strategy,A. Patel,Deferred,45,5,3,Low,Medium,Ticket resolution time up 25%,Existing tiers have historical context,Support staff retainable,2026-01-19,2026-04-19,6.57,Row 19 note
+DEC-020,Build self-service analytics,People,S. Kim,Deferred,93,5,3,Medium,High,BI team backlog exceeds 6 months,Embedded analysts prefer current tools,Data access policies set,2026-02-20,2026-05-20,7.61,Row 20 note
+DEC-021,Introduce pair programming,Technology,L. Torres,Closed,76,2,1,High,Low,Knowledge silos identified in retro,Developer resistance noted,Schedule allows pairing,2026-01-21,2026-04-21,6.16,Row 21 note
+DEC-022,Outsource QA regression suite,Operations,R. Nakamura,Closed,42,2,3,Low,Medium,Regression suite takes 4h manual effort,Vendor lock-in risk,Vendor SLA acceptable,2026-02-22,2026-05-22,3.85,Row 22 note
+DEC-023,Unify identity provider,Finance,D. Williams,Closed,45,2,1,Medium,High,SSO fragmented across 3 providers,Migration may break legacy apps,IdP supports all apps,2026-01-23,2026-04-23,6.12,Row 23 note
+DEC-024,Create cross-team SLAs,Strategy,K. Larsen,Superseded,64,3,4,High,Low,Cross-team escalations up 35%,Informal agreements work for some teams,Teams agree on metrics,2026-02-24,2026-05-24,4.73,Row 24 note
+DEC-025,Adopt trunk-based development,People,J. Rivera,Superseded,80,3,2,Low,Medium,Long-lived branches cause 40% of conflicts,Requires CI overhaul,CI tooling supports it,2026-01-25,2026-04-25,5.73,Row 25 note
