@@ -20,7 +20,7 @@ last_updated: "2026-02-16"
 | Project vision & mission | [`docs/00-vision.md`](00-vision.md) | `category/declaration.md`, `README.md` |
 | Terminology & naming | [`docs/01-language-map.md`](01-language-map.md) | `GLOSSARY.md`, `ontology/triad.md` |
 | Core concepts (triad, loop) | [`docs/02-core-concepts.md`](02-core-concepts.md) | `ontology/triad.md`, `category/declaration.md`, `START_HERE.md` |
-| Quickstart (run commands) | [`HERO_DEMO.md`](../HERO_DEMO.md) | `docs/05-quickstart.md`, `coherence_ops/README.md` |
+| Quickstart (run commands) | [`HERO_DEMO.md`](HERO_DEMO.md) | `docs/05-quickstart.md`, `coherence_ops/README.md` |
 | DLR specification | [`canonical/dlr_spec.md`](../canonical/dlr_spec.md) | `docs/20-dlr-claim-native.md`, `llm_data_model/02_schema/` |
 | RS specification | [`canonical/rs_spec.md`](../canonical/rs_spec.md) | `llm_data_model/06_ontology/coherence_ops_alignment.md` |
 | DS specification | [`canonical/ds_spec.md`](../canonical/ds_spec.md) | `llm_data_model/06_ontology/coherence_ops_alignment.md` |
@@ -67,4 +67,4 @@ last_updated: "2026-02-16"
 3. **Operational guides** live in `/docs/`. They explain *how to use* the specs in context.
 4. **Theory & ontology** live in `/ontology/`. They explain *why* the model works this way.
 5. **LLM data model** lives in `/llm_data_model/`. It’s a parallel, LLM-optimized projection of the canonical model.
-6. **If in doubt**, start at [`NAV.md`](../NAV.md) or [`START_HERE.md`](../START_HERE.md).
+6. **If in doubt**, start at [`NAV.md`](NAV.md) or [`START_HERE.md`](START_HERE.md).

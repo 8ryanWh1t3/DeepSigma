@@ -234,14 +234,14 @@ Artifacts are written to [`examples/demo-stack/drift_patch_cycle_run/`](examples
 
 | Goal | Resource |
 |------|----------|
-| Canonical specs | [/docs/canonical/](docs/canonical/) — DLR, RS, DS, MG specifications |
-| Category claim | [/docs/category/declaration.md](docs/category/declaration.md) |
-| IRIS deep-dive | [docs/18-iris.md](docs/18-iris.md) |
-| JSON schemas | [/specs/](specs/) |
-| Mermaid diagrams | [/docs/mermaid/](docs/mermaid/) |
-| LLM-optimized data model | [/docs/llm_data_model/](docs/llm_data_model/) |
-| Full docs index | [docs/99-docs-map.md](docs/99-docs-map.md) |
-| Release checklist | [docs/release/CHECKLIST_v1.md](docs/release/CHECKLIST_v1.md) |
+| Canonical specs | [/docs/canonical/](canonical/) — DLR, RS, DS, MG specifications |
+| Category claim | [/docs/category/declaration.md](category/declaration.md) |
+| IRIS deep-dive | [18-iris.md](18-iris.md) |
+| JSON schemas | [/schemas/](../schemas/) |
+| Mermaid diagrams | [/docs/mermaid/](mermaid/) |
+| LLM-optimized data model | [/docs/llm_data_model/](llm_data_model/) |
+| Full docs index | [99-docs-map.md](99-docs-map.md) |
+| Release checklist | [release/CHECKLIST_v1.md](release/CHECKLIST_v1.md) |
 
 ---
 

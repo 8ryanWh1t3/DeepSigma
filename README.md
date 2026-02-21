@@ -109,12 +109,12 @@ DeepSigma/
 
 | | |
 |---|---|
-| [START_HERE.md](START_HERE.md) | Front door |
-| [HERO_DEMO.md](HERO_DEMO.md) | 5-minute hands-on walkthrough |
+| [START_HERE.md](docs/START_HERE.md) | Front door |
+| [HERO_DEMO.md](docs/HERO_DEMO.md) | 5-minute hands-on walkthrough |
 | [NAV.md](docs/NAV.md) | Full navigation index |
 | [ABOUT.md](docs/ABOUT.md) | Reality Await Layer (RAL) |
 | [OPS_RUNBOOK.md](docs/OPS_RUNBOOK.md) | Operations + incident playbooks |
-| [STABILITY.md](STABILITY.md) | Versioning policy + stability guarantees |
+| [STABILITY.md](docs/STABILITY.md) | Versioning policy + stability guarantees |
 | [docs/99-docs-map.md](docs/99-docs-map.md) | Complete docs map |
 
 ---

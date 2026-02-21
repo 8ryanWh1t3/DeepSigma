@@ -29,7 +29,7 @@ This is **institutional drift** — silent, compounding decay of decision qualit
 
 Coherence Ops exists so that question has an instant, auditable answer — regardless of who asks or when.
 
-→ [Full economic tension analysis](docs/category/economic_tension.md)
+→ [Full economic tension analysis](category/economic_tension.md)
 
 ---
 
@@ -64,7 +64,7 @@ DECIDE ──→ SEAL ──→ MONITOR ──→ DRIFT? ──→ PATCH ──�
 |------|--------|------|
 | 1 | Read this page (done) | 60 sec |
 | 2 | Run the [Hero Demo](HERO_DEMO.md) | 4 min |
-| 3 | Browse [canonical specs](docs/canonical/) | when ready |
+| 3 | Browse [canonical specs](canonical/) | when ready |
 
 That's the entire onramp.
 
@@ -74,18 +74,18 @@ That's the entire onramp.
 
 | You need… | Go to |
 |------------|-------|
-| Why this matters (economic) | [category/economic_tension.md](docs/category/economic_tension.md) |
-| Executive brief | [category/boardroom_brief.md](docs/category/boardroom_brief.md) |
-| Risk model | [category/risk_model.md](docs/category/risk_model.md) |
-| Normative specs (DLR, RS, DS, MG) | [/canonical/](docs/canonical/) |
-| JSON schemas | [/schemas/core/](schemas/core/) |
-| Python library + CLI | [/coherence_ops/](coherence_ops/) |
-| End-to-end examples | [/docs/examples/](docs/examples/) |
-| LLM-optimized data model | [/docs/llm_data_model/](docs/llm_data_model/) |
-| Operational runbooks | [/docs/runtime/](docs/runtime/) |
-| Extended docs | [/docs/](docs/) |
-| Full navigation | [NAV.md](docs/NAV.md) |
-| Docs de-duplication map | [docs/99-docs-map.md](docs/99-docs-map.md) |
+| Why this matters (economic) | [category/economic_tension.md](category/economic_tension.md) |
+| Executive brief | [category/boardroom_brief.md](category/boardroom_brief.md) |
+| Risk model | [category/risk_model.md](category/risk_model.md) |
+| Normative specs (DLR, RS, DS, MG) | [/canonical/](canonical/) |
+| JSON schemas | [/schemas/core/](../schemas/core/) |
+| Python library + CLI | [/coherence_ops/](../src/coherence_ops/) |
+| End-to-end examples | [/docs/examples/](examples/) |
+| LLM-optimized data model | [/docs/llm_data_model/](llm_data_model/) |
+| Operational runbooks | [/docs/runtime/](runtime/) |
+| Extended docs | [/docs/](./) |
+| Full navigation | [NAV.md](NAV.md) |
+| Docs de-duplication map | [99-docs-map.md](99-docs-map.md) |
 
 ---
 
@@ -94,12 +94,12 @@ That's the entire onramp.
 | File | What It Does |
 |------|-------------|
 | [HERO_DEMO.md](HERO_DEMO.md) | 5-min walkthrough: Decision → Seal → Drift → Patch → Memory |
-| [canonical/dlr_spec.md](docs/canonical/dlr_spec.md) | Decision Ledger Record spec |
-| [canonical/rs_spec.md](docs/canonical/rs_spec.md) | Reasoning Scaffold spec |
-| [canonical/ds_spec.md](docs/canonical/ds_spec.md) | Decision Scaffold spec |
-| [canonical/mg_spec.md](docs/canonical/mg_spec.md) | Memory Graph spec |
+| [canonical/dlr_spec.md](canonical/dlr_spec.md) | Decision Ledger Record spec |
+| [canonical/rs_spec.md](canonical/rs_spec.md) | Reasoning Scaffold spec |
+| [canonical/ds_spec.md](canonical/ds_spec.md) | Decision Scaffold spec |
+| [canonical/mg_spec.md](canonical/mg_spec.md) | Memory Graph spec |
 | [examples/sample_decision_episode_001.json](examples/sample_decision_episode_001.json) | Complete sealed episode (JSON) |
-| [coherence_ops/examples/e2e_seal_to_report.py](coherence_ops/examples/e2e_seal_to_report.py) | Full pipeline: episode → coherence report |
+| [coherence_ops/examples/e2e_seal_to_report.py](../src/coherence_ops/examples/e2e_seal_to_report.py) | Full pipeline: episode → coherence report |
 
 ---
 
@@ -115,7 +115,7 @@ That's the entire onramp.
 | **Patch** | Corrective DLR referencing the drifted original |
 | **IRIS** | Query engine: WHY / WHAT_CHANGED / WHAT_DRIFTED / RECALL / STATUS |
 
-Full glossary: [GLOSSARY.md](docs/GLOSSARY.md)
+Full glossary: [GLOSSARY.md](GLOSSARY.md)
 
 ---
 
