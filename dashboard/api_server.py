@@ -76,12 +76,12 @@ app.include_router(create_mesh_router())
 
 # ── Data paths ────────────────────────────────────────────────────────────────
 _EP_DIRS = [
-    REPO_ROOT / "examples" / "episodes",
+    REPO_ROOT / "docs" / "examples" / "episodes",
     REPO_ROOT / "coherence_ops" / "examples",
 ]
 _DRIFT_PATHS = [
     REPO_ROOT / "coherence_ops" / "examples" / "sample_drift.json",
-    REPO_ROOT / "examples" / "drift",
+    REPO_ROOT / "docs" / "examples" / "drift",
 ]
 
 

@@ -8,8 +8,8 @@ Requires:
     pip install jsonschema referencing
 
 Validates:
-    - examples/episodes/*.json   against schemas/core/episode.schema.json
-    - examples/drift/*.json      against schemas/core/drift.schema.json
+    - docs/examples/episodes/*.json   against schemas/core/episode.schema.json
+    - docs/examples/drift/*.json      against schemas/core/drift.schema.json
     - llm_data_model/03_examples/*.json against llm_data_model/02_schema/jsonschema/canonical_record.schema.json
 """
 from __future__ import annotations
@@ -95,12 +95,12 @@ def main():
 
     # --- Episode examples ---
     episode_schema = ROOT / "schemas" / "core" / "episode.schema.json"
-    for p in sorted((ROOT / "examples" / "episodes").glob("*.json")):
+    for p in sorted((ROOT / "docs" / "examples" / "episodes").glob("*.json")):
         validate(episode_schema, p, registry=registry)
 
     # --- Drift examples ---
     drift_schema = ROOT / "schemas" / "core" / "drift.schema.json"
-    for p in sorted((ROOT / "examples" / "drift").glob("*.json")):
+    for p in sorted((ROOT / "docs" / "examples" / "drift").glob("*.json")):
         validate(drift_schema, p, registry=registry)
 
     # --- LLM Data Model examples ---
@@ -122,7 +122,7 @@ def main():
         print("\n\u26a0\ufe0f LLM Data Model schema or examples not found \u2014 skipped")
 
     # ---- Canonical demo (sample_decision_episode_001.json) ----
-    canonical_demo = ROOT / "examples" / "sample_decision_episode_001.json"
+    canonical_demo = ROOT / "docs" / "examples" / "sample_decision_episode_001.json"
     if canonical_demo.exists():
         print()
         data = json.loads(canonical_demo.read_text(encoding="utf-8"))
