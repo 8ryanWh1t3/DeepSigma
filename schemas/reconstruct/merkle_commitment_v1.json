@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deepsigma.dev/schemas/reconstruct/merkle_commitment_v1.json",
+  "title": "Merkle Commitment v1",
+  "description": "Merkle commitment roots for selective disclosure of governance inputs.",
+  "type": "object",
+  "required": [
+    "inputs_root",
+    "prompts_root",
+    "schemas_root",
+    "policies_root",
+    "leaf_count",
+    "algorithm"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "inputs_root": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Merkle root over input CSV file hashes."
+    },
+    "prompts_root": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Merkle root over prompt file hashes."
+    },
+    "schemas_root": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Merkle root over schema file hashes."
+    },
+    "policies_root": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Merkle root over policy file hashes."
+    },
+    "leaf_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total number of leaves across all commitment trees."
+    },
+    "algorithm": {
+      "type": "string",
+      "const": "sha256-merkle",
+      "description": "Hash algorithm used for Merkle tree construction."
+    }
+  }
+}

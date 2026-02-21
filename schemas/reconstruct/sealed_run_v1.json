@@ -121,6 +121,19 @@
         }
       }
     },
+    "hash_scope": {
+      "type": "object",
+      "description": "Deterministic hash scope manifest (v1.1+). Defines what is included in the commit hash."
+    },
+    "commit_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 of canonical(hash_scope). Deterministic root hash (v1.1+)."
+    },
+    "inputs_commitments": {
+      "$ref": "merkle_commitment_v1.json",
+      "description": "Merkle commitment roots for selective disclosure (v1.3+)."
+    },
     "hash": {
       "type": "string",
       "description": "SHA-256 hash of the sealed run JSON (with hash field set to empty string)."
