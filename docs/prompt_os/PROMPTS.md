@@ -1,6 +1,6 @@
 # Prompt OS v2 — Canonical Prompts Reference
 
-Three canonical prompts are versioned in the repo as reusable assets.
+Canonical prompts are versioned in the repo as reusable assets.
 
 ---
 
@@ -8,9 +8,13 @@ Three canonical prompts are versioned in the repo as reusable assets.
 
 | # | File | Category | When to Use |
 |---|------|----------|-------------|
-| 01 | [`prompts/canonical/01_unified_executive_analysis.md`](../../prompts/canonical/01_unified_executive_analysis.md) | Decision | Structured decision output — analyzing options, preparing executive briefs, evaluating trade-offs |
-| 02 | [`prompts/canonical/02_reality_assessment.md`](../../prompts/canonical/02_reality_assessment.md) | Perception | Perception correction — grounding situations in observable reality, checking for narrative drift and emotional bias |
-| 03 | [`prompts/prompt_os/START_SESSION_A1.md`](../../prompts/prompt_os/START_SESSION_A1.md) | Governance | Workbook control — triage LLM session against Prompt OS v2 workbook, surface risks, recommend actions |
+| 01 | [`01_unified_executive_analysis.md`](../../prompts/canonical/01_unified_executive_analysis.md) | Decision | Structured decision output — analyzing options, executive briefs, trade-offs |
+| 01-json | [`01_unified_executive_analysis_json.md`](../../prompts/canonical/01_unified_executive_analysis_json.md) | Decision | JSON variant of 01 for automation pipelines |
+| 02 | [`02_reality_assessment.md`](../../prompts/canonical/02_reality_assessment.md) | Perception | Perception correction — grounding in observable reality, drift check |
+| 02-json | [`02_reality_assessment_json.md`](../../prompts/canonical/02_reality_assessment_json.md) | Perception | JSON variant of 02 for automation pipelines |
+| 03 | [`START_SESSION_A1.md`](../../prompts/prompt_os/START_SESSION_A1.md) | Governance | Workbook control — triage LLM session, surface risks, recommend actions |
+| 03-json | [`03_multi_dim_prompting_for_teams_a1_json.md`](../../prompts/canonical/03_multi_dim_prompting_for_teams_a1_json.md) | Governance | JSON variant of 03 for automation pipelines |
+| 04 | [`04_decision_compression.md`](../../prompts/canonical/04_decision_compression.md) | Decision | Detect and decompress rushed decisions — compression risk scoring |
 
 ---
 
@@ -34,16 +38,34 @@ This is the primary workbook control prompt. Paste it into cell A1 of a START_SE
 
 **Canonical file:** [`prompts/prompt_os/START_SESSION_A1.md`](../../prompts/prompt_os/START_SESSION_A1.md) — single source of truth. The file at `prompts/canonical/03_*` is a compatibility pointer.
 
-> **Note:** Canonical prompts (01, 02) are reusable analytical primitives. The workbook A1 prompt is operational control — it references specific table names and output formatting for the Prompt OS workbook.
+### 04 — Decision Compression
+
+Use this prompt when a decision is being rushed — under artificial urgency, without full reasoning, or with authority pressure overriding evidence. Scores compression risk (Low/Medium/High) and provides decompression steps including a 24–48 hour cooling period.
+
+**Maps to:** `DECISION_LOG` → `CompressionRisk` field. References 01 and 02 as decompression tools.
+
+### JSON Variants (01-json, 02-json, 03-json)
+
+JSON variants produce identical analysis but output structured JSON instead of text. Use these for:
+
+- Power Automate flows that need to parse LLM output
+- Schema validation pipelines
+- Sealed snapshot automation
+- Any pipeline that needs machine-readable output
+
+JSON output structures align with `schemas/prompt_os/prompt_os_schema_v2.json` where applicable.
+
+> **Note:** Canonical prompts (01, 02, 04) are reusable analytical primitives. The workbook A1 prompt (03) is operational control — it references specific table names and output formatting for the Prompt OS workbook.
 
 ---
 
 ## Relationship to Workbook
 
 ```
-02_reality_assessment → REALITY_ENGINE tab (perception input)
-01_executive_analysis → EXECUTIVE_ENGINE + DECISION_LOG tabs (decision output)
-03_team_workbook_a1  → All tabs (governance triage)
+02_reality_assessment    → REALITY_ENGINE tab (perception input)
+01_executive_analysis    → EXECUTIVE_ENGINE + DECISION_LOG tabs (decision output)
+04_decision_compression  → DECISION_LOG CompressionRisk field (pre-decision check)
+03_team_workbook_a1      → All tabs (governance triage)
 ```
 
-The three prompts map to the workbook's cognitive loop: **Perception → Decision → Memory**.
+The prompts map to the workbook's cognitive loop: **Perception → Decision → Memory**.
