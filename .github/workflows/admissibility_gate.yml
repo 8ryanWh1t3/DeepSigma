@@ -1,0 +1,85 @@
+name: Admissibility Gate
+
+permissions:
+  contents: read
+
+on:
+  push:
+    paths:
+      - 'src/tools/reconstruct/**'
+      - 'schemas/reconstruct/**'
+      - 'tests/test_transparency*'
+      - 'tests/test_multisig*'
+      - 'tests/test_merkle*'
+      - 'tests/test_seal_and_prove*'
+  pull_request:
+    paths:
+      - 'src/tools/reconstruct/**'
+      - 'schemas/reconstruct/**'
+      - 'tests/test_transparency*'
+      - 'tests/test_multisig*'
+      - 'tests/test_merkle*'
+      - 'tests/test_seal_and_prove*'
+
+jobs:
+  admissibility:
+    name: Court-Grade Admissibility
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run new test suites
+        run: |
+          python -m unittest tests.test_merkle_commitments -v
+          python -m unittest tests.test_transparency_log -v
+          python -m unittest tests.test_multisig -v
+          python -m unittest tests.test_seal_and_prove -v
+
+      - name: Run existing regression suites
+        run: |
+          python -m unittest tests.test_deterministic_seal -v
+          python -m unittest tests.test_reconstruct_replay -v
+          python -m unittest tests.test_signature_support -v
+
+      - name: Generate HMAC key
+        run: |
+          SIGN_KEY=$(python -c "import secrets,base64;print(base64.b64encode(secrets.token_bytes(32)).decode())")
+          echo "SIGN_KEY=$SIGN_KEY" >> "$GITHUB_ENV"
+
+      - name: Seal-and-prove pipeline
+        run: >
+          python src/tools/reconstruct/seal_and_prove.py
+          --decision-id DEC-001
+          --clock 2026-02-21T00:00:00Z
+          --sign-algo hmac
+          --sign-key-id ds-ci-2026-02
+          --sign-key "$SIGN_KEY"
+          --user ci
+          --out-dir "$RUNNER_TEMP/sealed"
+          --transparency-log "$RUNNER_TEMP/log.ndjson"
+          --pack-dir "$RUNNER_TEMP/pack"
+
+      - name: Verify transparency chain
+        run: >
+          python src/tools/reconstruct/transparency_log_append.py
+          --log-path "$RUNNER_TEMP/log.ndjson"
+          --verify-only
+
+      - name: Full replay with all flags
+        run: |
+          sealed=$(ls "$RUNNER_TEMP"/sealed/RUN-*.json | grep -v '\.sig\.' | grep -v manifest | head -1)
+          python src/tools/reconstruct/replay_sealed_run.py \
+            --sealed "$sealed" \
+            --verify-signature true \
+            --key "$SIGN_KEY" \
+            --verify-transparency true \
+            --transparency-log "$RUNNER_TEMP/log.ndjson"
+
+      - name: Determinism audit (strict)
+        run: |
+          sealed=$(ls "$RUNNER_TEMP"/sealed/RUN-*.json | grep -v '\.sig\.' | grep -v manifest | head -1)
+          python src/tools/reconstruct/determinism_audit.py --sealed "$sealed" --strict

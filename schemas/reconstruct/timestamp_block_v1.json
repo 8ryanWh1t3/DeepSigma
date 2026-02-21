@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deepsigma.dev/schemas/reconstruct/timestamp_block_v1.json",
+  "title": "Timestamp Block v1",
+  "description": "Trusted timestamp metadata for a governance artifact.",
+  "type": "object",
+  "required": [
+    "ts_version",
+    "method",
+    "timestamp",
+    "payload_commit_hash",
+    "payload_bytes_sha256"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "ts_version": {
+      "const": "1.0",
+      "description": "Timestamp block schema version."
+    },
+    "method": {
+      "type": "string",
+      "enum": ["transparency_log", "rfc3161", "public_chain_anchor"],
+      "description": "Timestamping method."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO8601 UTC timestamp."
+    },
+    "tsa_url": {
+      "type": ["string", "null"],
+      "description": "TSA URL for RFC 3161 (null for local methods)."
+    },
+    "tsa_response_b64": {
+      "type": ["string", "null"],
+      "description": "Base64 TSA response token (null for local methods)."
+    },
+    "log_entry_id": {
+      "type": ["string", "null"],
+      "description": "Transparency log entry ID."
+    },
+    "anchor_tx": {
+      "type": ["string", "null"],
+      "description": "Blockchain anchor transaction ID (null for non-chain methods)."
+    },
+    "payload_commit_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Commit hash of the artifact being timestamped."
+    },
+    "payload_bytes_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 of the canonical artifact bytes."
+    }
+  }
+}

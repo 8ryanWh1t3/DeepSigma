@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deepsigma.dev/schemas/reconstruct/multisig_block_v1.json",
+  "title": "Multi-Signature Block v1",
+  "description": "Multi-signature envelope requiring threshold agreement for governance actions.",
+  "type": "object",
+  "required": [
+    "multisig_version",
+    "artifact_hash",
+    "threshold",
+    "signatures"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "multisig_version": {
+      "const": "1.0",
+      "description": "Multi-signature schema version."
+    },
+    "artifact_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 of the canonical artifact bytes."
+    },
+    "threshold": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Minimum number of valid signatures required."
+    },
+    "signatures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["signer_id", "role", "algorithm", "signing_key_id", "signed_at", "signature"],
+        "additionalProperties": false,
+        "properties": {
+          "signer_id": {
+            "type": "string",
+            "description": "Identifier of the signer."
+          },
+          "role": {
+            "type": "string",
+            "enum": ["operator", "reviewer", "witness", "auditor"],
+            "description": "Role of the signer."
+          },
+          "algorithm": {
+            "type": "string",
+            "enum": ["hmac-sha256", "ed25519"],
+            "description": "Signing algorithm used."
+          },
+          "signing_key_id": {
+            "type": "string",
+            "description": "Key ID used to sign."
+          },
+          "signed_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when this signature was created."
+          },
+          "signature": {
+            "type": "string",
+            "description": "Base64-encoded cryptographic signature."
+          },
+          "public_key": {
+            "type": ["string", "null"],
+            "description": "Base64 public key (Ed25519 only)."
+          }
+        }
+      },
+      "description": "Array of individual signatures."
+    },
+    "witness_requirements": {
+      "type": ["array", "null"],
+      "items": { "type": "string" },
+      "description": "Required roles (e.g. ['operator', 'witness'])."
+    }
+  }
+}

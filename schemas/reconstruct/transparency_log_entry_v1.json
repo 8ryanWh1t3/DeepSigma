@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deepsigma.dev/schemas/reconstruct/transparency_log_entry_v1.json",
+  "title": "Transparency Log Entry v1",
+  "description": "A single append-only entry in the tamper-evident transparency log.",
+  "type": "object",
+  "required": [
+    "entry_version",
+    "entry_id",
+    "run_id",
+    "commit_hash",
+    "artifact_bytes_sha256",
+    "prev_entry_hash",
+    "entry_hash",
+    "observed_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "entry_version": {
+      "const": "1.0",
+      "description": "Entry schema version."
+    },
+    "entry_id": {
+      "type": "string",
+      "pattern": "^TLE-[a-f0-9]{8}$",
+      "description": "Deterministic entry ID."
+    },
+    "run_id": {
+      "type": "string",
+      "description": "Run ID of the sealed artifact."
+    },
+    "commit_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "Commit hash of the sealed artifact."
+    },
+    "artifact_bytes_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 of the sealed artifact canonical bytes."
+    },
+    "artifact_path": {
+      "type": ["string", "null"],
+      "description": "Path to the sealed artifact (informational)."
+    },
+    "signing_key_id": {
+      "type": ["string", "null"],
+      "description": "Signing key ID used to sign the artifact."
+    },
+    "witness_key_id": {
+      "type": ["string", "null"],
+      "description": "Witness key ID (if multi-sig)."
+    },
+    "prev_entry_hash": {
+      "type": ["string", "null"],
+      "description": "Hash of the previous log entry (null for first entry)."
+    },
+    "entry_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 of this entry (with entry_hash set to empty string during computation)."
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Wall-clock time when entry was appended."
+    }
+  }
+}

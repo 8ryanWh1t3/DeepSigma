@@ -107,6 +107,7 @@ python src/tools/reconstruct/replay_sealed_run.py \
 
 ## Related
 
+- [ADMISSIBILITY_PACK_V1.md](ADMISSIBILITY_PACK_V1.md) — **V1.3 pack** with transparency log, multi-sig, merkle commitments
 - [docs/reconstruct/KEY_MANAGEMENT.md](KEY_MANAGEMENT.md) — Key storage and rotation
 - [docs/reconstruct/DETERMINISM_DOCTRINE.md](DETERMINISM_DOCTRINE.md) — Hash scope and determinism rules
 - [docs/reconstruct/ADVERSARIAL_REPLAY_GUIDE.md](ADVERSARIAL_REPLAY_GUIDE.md) — Full replay procedure

@@ -28,7 +28,9 @@ import hashlib
 import hmac
 import json
 import os
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 from canonical_json import canonical_dumps, sha256_bytes
@@ -92,12 +94,49 @@ def sign_ed25519(payload_bytes: bytes, key_b64: str) -> tuple[str, str]:
         return sig_b64, pub_b64
 
 
+def sign_external(payload_bytes: bytes, cmd: str) -> str:
+    """Sign via external command. Writes payload hash to temp file, calls cmd, reads base64 sig.
+
+    The command receives the temp file path as its sole argument.
+    The temp file contains the hex-encoded SHA-256 of the payload bytes.
+    The command must print the base64-encoded signature to stdout (single line).
+    """
+    payload_hash = hashlib.sha256(payload_bytes).hexdigest()
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".hash", delete=False) as tf:
+        tf.write(payload_hash)
+        tf_path = tf.name
+    try:
+        proc = subprocess.run(
+            f"{cmd} {tf_path}",
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        if proc.returncode != 0:
+            print(f"ERROR: External signer exited {proc.returncode}", file=sys.stderr)
+            if proc.stderr:
+                print(f"  stderr: {proc.stderr.strip()}", file=sys.stderr)
+            sys.exit(1)
+        sig_b64 = proc.stdout.strip()
+        if not sig_b64:
+            print("ERROR: External signer produced no output on stdout", file=sys.stderr)
+            sys.exit(1)
+        return sig_b64
+    finally:
+        os.unlink(tf_path)
+
+
 # ── Builder ──────────────────────────────────────────────────────
 def build_signature_block(
     artifact_path: Path,
     algorithm: str,
     key_id: str,
-    key_b64: str,
+    key_b64: str | None = None,
+    signer_id: str | None = None,
+    role: str | None = None,
+    signer_type: str | None = None,
+    external_signer_cmd: str | None = None,
 ) -> dict:
     """Build a signature block for a sealed artifact."""
     raw_bytes = artifact_path.read_bytes()
@@ -123,7 +162,15 @@ def build_signature_block(
 
     # Sign the canonical bytes
     public_key = None
-    if algorithm == "hmac-sha256" or algorithm == "hmac":
+    if external_signer_cmd:
+        signature = sign_external(canonical_bytes, external_signer_cmd)
+        verification_instructions = (
+            "Signed by external command. Verify with the corresponding "
+            f"public key for key_id={key_id}."
+        )
+        if signer_type is None:
+            signer_type = "external"
+    elif algorithm == "hmac-sha256" or algorithm == "hmac":
         signature = sign_hmac(canonical_bytes, key_b64)
         verification_instructions = (
             "Verify with: python src/tools/reconstruct/verify_signature.py "
@@ -141,7 +188,7 @@ def build_signature_block(
     # Normalize algorithm name
     algo_name = "hmac-sha256" if algorithm in ("hmac", "hmac-sha256") else algorithm
 
-    return {
+    block = {
         "sig_version": "1.0",
         "algorithm": algo_name,
         "signing_key_id": key_id,
@@ -152,18 +199,30 @@ def build_signature_block(
         "signature": signature,
         "public_key": public_key,
         "verification_instructions": verification_instructions,
+        "signer_id": signer_id,
+        "role": role,
+        "signer_type": signer_type,
     }
+    return block
 
 
 def sign_artifact(
     artifact_path: Path,
     algorithm: str,
     key_id: str,
-    key_b64: str,
+    key_b64: str | None = None,
     out_path: Path | None = None,
+    signer_id: str | None = None,
+    role: str | None = None,
+    signer_type: str | None = None,
+    external_signer_cmd: str | None = None,
 ) -> Path:
     """Sign an artifact and write the .sig.json file. Returns sig path."""
-    sig_block = build_signature_block(artifact_path, algorithm, key_id, key_b64)
+    sig_block = build_signature_block(
+        artifact_path, algorithm, key_id, key_b64,
+        signer_id=signer_id, role=role, signer_type=signer_type,
+        external_signer_cmd=external_signer_cmd,
+    )
 
     if out_path is None:
         out_path = artifact_path.parent / (artifact_path.name + ".sig.json")
@@ -172,6 +231,83 @@ def sign_artifact(
         f.write(json.dumps(sig_block, indent=2, sort_keys=True))
 
     return out_path
+
+
+def append_signature(
+    artifact_path: Path,
+    algorithm: str,
+    key_id: str,
+    key_b64: str,
+    signer_id: str | None = None,
+    role: str | None = None,
+    sig_path: Path | None = None,
+) -> Path:
+    """Append a signature to an existing .sig.json, creating a multisig envelope.
+
+    If the existing file is a single sig block, wraps it in a multisig envelope first.
+    Returns the sig path.
+    """
+    if sig_path is None:
+        sig_path = artifact_path.parent / (artifact_path.name + ".sig.json")
+
+    # Build the new signature entry
+    new_block = build_signature_block(
+        artifact_path, algorithm, key_id, key_b64,
+        signer_id=signer_id, role=role,
+    )
+
+    # Convert to multisig signature entry format
+    new_sig_entry = {
+        "signer_id": signer_id or key_id,
+        "role": role or "operator",
+        "algorithm": new_block["algorithm"],
+        "signing_key_id": key_id,
+        "signed_at": new_block["signed_at"],
+        "signature": new_block["signature"],
+        "public_key": new_block.get("public_key"),
+    }
+
+    if sig_path.exists():
+        existing = json.loads(sig_path.read_text())
+
+        if "multisig_version" in existing:
+            # Already a multisig envelope — just append
+            existing["signatures"].append(new_sig_entry)
+            ms_block = existing
+        elif "sig_version" in existing:
+            # Single sig — wrap in multisig envelope
+            first_entry = {
+                "signer_id": existing.get("signer_id") or existing.get("signing_key_id", ""),
+                "role": existing.get("role") or "operator",
+                "algorithm": existing["algorithm"],
+                "signing_key_id": existing["signing_key_id"],
+                "signed_at": existing["signed_at"],
+                "signature": existing["signature"],
+                "public_key": existing.get("public_key"),
+            }
+            ms_block = {
+                "multisig_version": "1.0",
+                "artifact_hash": existing.get("payload_bytes_sha256", ""),
+                "threshold": 1,
+                "signatures": [first_entry, new_sig_entry],
+                "witness_requirements": None,
+            }
+        else:
+            raise ValueError(f"Unknown signature format in {sig_path}")
+    else:
+        # No existing sig — create multisig with just this one
+        ms_block = {
+            "multisig_version": "1.0",
+            "artifact_hash": new_block["payload_bytes_sha256"],
+            "threshold": 1,
+            "signatures": [new_sig_entry],
+            "witness_requirements": None,
+        }
+
+    with open(sig_path, "w") as f:
+        f.write(json.dumps(ms_block, indent=2, sort_keys=True))
+
+    return sig_path
 
 
 # ── Main ─────────────────────────────────────────────────────────
@@ -184,23 +320,47 @@ def main() -> int:
     parser.add_argument("--key", default=None,
                         help="Base64 key (or set DEEPSIGMA_SIGNING_KEY env)")
     parser.add_argument("--out", type=Path, default=None, help="Output .sig.json path")
+    parser.add_argument("--witness", default=None, help="Signer name/ID")
+    parser.add_argument("--role", default=None,
+                        choices=["operator", "reviewer", "witness", "auditor"],
+                        help="Signer role")
+    parser.add_argument("--append", action="store_true",
+                        help="Append to existing sig (creates multisig envelope)")
+    parser.add_argument("--external-signer-cmd", default=None,
+                        help="External signing command (receives hash file path as arg)")
     args = parser.parse_args()
 
-    # Resolve key
+    # Resolve key — not required when using external signer
     key_b64 = args.key or os.environ.get("DEEPSIGMA_SIGNING_KEY")
-    if not key_b64:
-        print("ERROR: Provide --key or set DEEPSIGMA_SIGNING_KEY env", file=sys.stderr)
+    if not key_b64 and not args.external_signer_cmd:
+        print("ERROR: Provide --key, set DEEPSIGMA_SIGNING_KEY env, or use --external-signer-cmd",
+              file=sys.stderr)
         return 1
 
     if not args.file.exists():
         print(f"ERROR: File not found: {args.file}", file=sys.stderr)
         return 1
 
-    sig_path = sign_artifact(args.file, args.algo, args.key_id, key_b64, args.out)
+    ext_cmd = args.external_signer_cmd
 
-    print(f"Signed: {args.file}")
+    if args.append:
+        sig_path = append_signature(
+            args.file, args.algo, args.key_id, key_b64,
+            signer_id=args.witness, role=args.role, sig_path=args.out,
+        )
+        print(f"Appended signature: {args.file}")
+    else:
+        sig_path = sign_artifact(
+            args.file, args.algo, args.key_id, key_b64, args.out,
+            signer_id=args.witness, role=args.role,
+            external_signer_cmd=ext_cmd,
+        )
+        print(f"Signed: {args.file}")
+
     print(f"  Algorithm:  {args.algo}")
     print(f"  Key ID:     {args.key_id}")
+    if args.witness:
+        print(f"  Signer:     {args.witness} ({args.role or 'operator'})")
     print(f"  Signature:  {sig_path}")
     return 0
 
