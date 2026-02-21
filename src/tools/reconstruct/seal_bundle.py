@@ -1,25 +1,29 @@
 #!/usr/bin/env python3
 """Seal Bundle Builder — creates an admissible, reconstructable sealed run.
 
-Reads decision data, prompts, schemas, and policy docs; hashes everything;
-builds a sealed_run_v1 JSON with embedded authority envelope.
+Reads decision data, prompts, schemas, and policy docs; hashes everything
+using canonical serialization; builds a sealed_run_v1 JSON with embedded
+authority envelope and deterministic commit hash.
+
+Deterministic mode (default):
+  --clock 2026-02-21T00:00:00Z --deterministic true
 
 Usage:
     python src/tools/reconstruct/seal_bundle.py --decision-id DEC-001
-    python src/tools/reconstruct/seal_bundle.py --decision-id DEC-001 --user Boss
-    python src/tools/reconstruct/seal_bundle.py --decision-id DEC-001 --out-dir /tmp/sealed
+    python src/tools/reconstruct/seal_bundle.py --decision-id DEC-001 --clock 2026-02-21T00:00:00Z
 """
 from __future__ import annotations
 
 import argparse
-import csv
 import hashlib
 import json
-import random
-import string
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
+
+from canonical_json import canonical_dumps, sha256_text
+from deterministic_ids import det_id
+from deterministic_io import list_files_deterministic, read_csv_deterministic
+from time_controls import format_utc, format_utc_compact, observed_now, parse_clock
 
 
 # ── Defaults ──────────────────────────────────────────────────────
@@ -48,41 +52,12 @@ ENFORCEMENT_GATES = [
 
 
 # ── Helpers ──────────────────────────────────────────────────────
-def _rand_alnum(n: int = 4) -> str:
-    return "".join(random.choices(string.ascii_uppercase + string.digits, k=n))
-
-
-def gen_run_id() -> str:
-    return f"RUN-{_rand_alnum(4)}"
-
-
 def sha256_file(path: Path) -> str:
     h = hashlib.sha256()
     with open(path, "rb") as f:
         for chunk in iter(lambda: f.read(8192), b""):
             h.update(chunk)
     return "sha256:" + h.hexdigest()
-
-
-def sha256_str(s: str) -> str:
-    return "sha256:" + hashlib.sha256(s.encode()).hexdigest()
-
-
-def read_csv(path: Path) -> list[dict]:
-    with open(path, newline="") as f:
-        return list(csv.DictReader(f))
-
-
-def hash_directory_files(directory: Path, glob_pattern: str = "**/*") -> dict[str, str]:
-    """Hash all files in a directory, returning {relative_path: hash}."""
-    result = {}
-    if not directory.exists():
-        return result
-    for p in sorted(directory.rglob("*")):
-        if p.is_file():
-            rel = str(p.relative_to(directory.parent.parent))
-            result[rel] = sha256_file(p)
-    return result
 
 
 def hash_prompt_files(prompts_dir: Path) -> dict[str, str]:
@@ -97,49 +72,139 @@ def hash_prompt_files(prompts_dir: Path) -> dict[str, str]:
     return result
 
 
+def hash_schema_files(schemas_dir: Path) -> dict[str, str]:
+    """Hash all schema files, returning {relative_path: hash}."""
+    result = {}
+    if not schemas_dir.exists():
+        return result
+    for p in sorted(schemas_dir.rglob("*.json")):
+        if p.is_file():
+            rel = str(p.relative_to(schemas_dir.parent))
+            result[rel] = sha256_file(p)
+    return result
+
+
+# ── Hash Scope Builder ───────────────────────────────────────────
+def build_hash_scope(
+    data_dir: Path,
+    prompts_dir: Path,
+    schemas_dir: Path,
+    policy_baseline: Path,
+    policy_version: str,
+    clock: str | None,
+    deterministic: bool,
+) -> dict:
+    """Build the deterministic hash scope manifest."""
+    # Input files (CSVs) — sorted lexicographically
+    input_entries = []
+    for csv_file in list_files_deterministic(data_dir, "*.csv"):
+        rel = str(csv_file.relative_to(data_dir.parent.parent.parent))
+        input_entries.append({
+            "path": rel,
+            "sha256": sha256_file(csv_file),
+            "type": "csv",
+        })
+
+    # Prompt files
+    prompt_hashes = hash_prompt_files(prompts_dir)
+    prompt_entries = [
+        {"path": p, "sha256": h} for p, h in sorted(prompt_hashes.items())
+    ]
+
+    # Policy
+    policy_entries = []
+    if policy_baseline.exists():
+        policy_entries.append({
+            "path": str(policy_baseline),
+            "sha256": sha256_file(policy_baseline),
+            "version": policy_version,
+        })
+
+    # Schema files
+    schema_hashes = hash_schema_files(schemas_dir)
+    schema_entries = [
+        {"path": p, "sha256": h} for p, h in sorted(schema_hashes.items())
+    ]
+
+    return {
+        "scope_version": "1.0",
+        "inputs": input_entries,
+        "prompts": prompt_entries,
+        "policies": policy_entries,
+        "schemas": schema_entries,
+        "parameters": {
+            "clock": clock,
+            "deterministic": deterministic,
+        },
+        "exclusions": [
+            "observed_at",
+            "artifacts_emitted",
+        ],
+    }
+
+
 # ── Builder ──────────────────────────────────────────────────────
 def build_sealed_run(
     decision_row: dict,
-    run_id: str,
     user: str,
     data_dir: Path,
     prompts_dir: Path,
     schemas_dir: Path,
     policy_baseline: Path,
     policy_version_file: Path,
-) -> dict:
-    now = datetime.now(timezone.utc)
-    now_iso = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+    clock: str | None = None,
+    deterministic: bool = True,
+) -> tuple[dict, str, str]:
+    """Build a deterministic sealed run.
+
+    Returns (sealed_dict, filename, run_id).
+    """
+    committed_at = parse_clock(clock)
+    committed_at_iso = format_utc(committed_at)
+
+    # Wall clock (excluded from hash scope)
+    obs = observed_now()
 
     # Read policy version
     policy_version = "GOV-UNKNOWN"
     if policy_version_file.exists():
         policy_version = policy_version_file.read_text().strip()
 
+    # Build hash scope
+    hash_scope = build_hash_scope(
+        data_dir=data_dir,
+        prompts_dir=prompts_dir,
+        schemas_dir=schemas_dir,
+        policy_baseline=policy_baseline,
+        policy_version=policy_version,
+        clock=clock,
+        deterministic=deterministic,
+    )
+
+    # Compute commit hash from canonical hash scope
+    commit_hash = sha256_text(canonical_dumps(hash_scope))
+
+    # Derive run ID deterministically
+    run_id = det_id("RUN", commit_hash, length=8)
+
     # Hash policy baseline
     policy_hash = ""
     if policy_baseline.exists():
         policy_hash = sha256_file(policy_baseline)
 
-    # Hash prompts
+    # Prompt hashes
     prompt_hashes = hash_prompt_files(prompts_dir)
 
-    # Hash input CSVs
+    # Input files
     input_files = []
-    for csv_file in sorted(data_dir.glob("*.csv")):
+    for csv_file in list_files_deterministic(data_dir, "*.csv"):
         rel = str(csv_file.relative_to(data_dir.parent.parent.parent))
         input_files.append({
             "path": rel,
             "sha256": sha256_file(csv_file),
         })
 
-    # Hash all deterministic inputs together
-    all_hashes = [policy_hash]
-    all_hashes.extend(prompt_hashes.values())
-    all_hashes.extend(f["sha256"] for f in input_files)
-    deterministic_hash = sha256_str("".join(sorted(all_hashes)))
-
-    # Scope: bind to the specific decision + related datasets
+    # Scope
     scope_decisions = [decision_row["DecisionID"]]
     scope_datasets = [f["path"] for f in input_files]
 
@@ -153,20 +218,20 @@ def build_sealed_run(
         "authority": {
             "type": "direct",
             "source": policy_version,
-            "effective_at": now_iso,
+            "effective_at": committed_at_iso,
             "expires_at": None,
         },
         "scope_bound": {
             "decisions": scope_decisions,
             "claims": [],
             "patches": [],
-            "prompts": list(prompt_hashes.keys()),
+            "prompts": sorted(prompt_hashes.keys()),
             "datasets": scope_datasets,
         },
         "policy_snapshot": {
             "policy_version": policy_version,
             "policy_hash": policy_hash,
-            "prompt_hashes": prompt_hashes,
+            "prompt_hashes": dict(sorted(prompt_hashes.items())),
             "schema_version": "1.0",
         },
         "refusal": {
@@ -183,9 +248,10 @@ def build_sealed_run(
             "enforcement_emitted": True,
         },
         "provenance": {
-            "created_at": now_iso,
+            "created_at": committed_at_iso,
+            "observed_at": obs,
             "run_id": run_id,
-            "deterministic_inputs_hash": deterministic_hash,
+            "deterministic_inputs_hash": commit_hash,
         },
     }
 
@@ -198,7 +264,7 @@ def build_sealed_run(
         "priority_score": float(decision_row.get("PriorityScore", 0)),
     }
 
-    # Outputs (placeholder — in a real run these come from LLM)
+    # Outputs (placeholder)
     outputs = {
         "top_risks": [],
         "top_actions": [],
@@ -206,11 +272,16 @@ def build_sealed_run(
     }
 
     # Replay instructions
-    ts = now.strftime("%Y%m%dT%H%M%SZ")
+    ts = format_utc_compact(committed_at)
     sealed_filename = f"{run_id}_{ts}.json"
+    replay_cmd = (
+        "python src/tools/reconstruct/replay_sealed_run.py"
+        f" --sealed artifacts/sealed_runs/{sealed_filename}"
+    )
+
     replay_instructions = {
         "method": "replay_sealed_run.py",
-        "command": f"python src/tools/reconstruct/replay_sealed_run.py --sealed artifacts/sealed_runs/{sealed_filename}",
+        "command": replay_cmd,
         "required_files": [f["path"] for f in input_files],
     }
 
@@ -222,14 +293,15 @@ def build_sealed_run(
         "outputs": outputs,
         "artifacts_emitted": [],
         "replay_instructions": replay_instructions,
+        "hash_scope": hash_scope,
+        "commit_hash": commit_hash,
         "hash": "",
     }
 
-    # Compute content hash
-    canonical = json.dumps(sealed, sort_keys=True)
-    sealed["hash"] = "sha256:" + hashlib.sha256(canonical.encode()).hexdigest()
+    # Compute content hash over canonical serialization
+    sealed["hash"] = sha256_text(canonical_dumps(sealed))
 
-    return sealed, sealed_filename
+    return sealed, sealed_filename, run_id
 
 
 # ── Main ─────────────────────────────────────────────────────────
@@ -238,7 +310,8 @@ def main() -> int:
         description="Seal Bundle Builder — create admissible sealed run"
     )
     parser.add_argument("--decision-id", required=True, help="DecisionID to seal")
-    parser.add_argument("--run-id", default=None, help="Run ID (auto-generated if omitted)")
+    parser.add_argument("--run-id", default=None,
+                        help="Run ID override (ignored in deterministic mode)")
     parser.add_argument("--user", default="Boss", help="Operator name")
     parser.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
@@ -246,9 +319,13 @@ def main() -> int:
     parser.add_argument("--schemas-dir", type=Path, default=DEFAULT_SCHEMAS_DIR)
     parser.add_argument("--policy-baseline", type=Path, default=DEFAULT_POLICY_BASELINE)
     parser.add_argument("--policy-version", type=Path, default=DEFAULT_POLICY_VERSION)
+    parser.add_argument("--clock", default=None,
+                        help="Fixed clock (ISO8601 UTC, e.g. 2026-02-21T00:00:00Z)")
+    parser.add_argument("--deterministic", default="true", choices=["true", "false"],
+                        help="Deterministic mode (default: true)")
     args = parser.parse_args()
 
-    run_id = args.run_id or gen_run_id()
+    deterministic = args.deterministic == "true"
     data_dir: Path = args.data_dir
 
     # Find decision
@@ -257,9 +334,9 @@ def main() -> int:
         print(f"ERROR: Decision log not found: {decision_path}", file=sys.stderr)
         return 1
 
-    decisions = read_csv(decision_path)
+    rows = read_csv_deterministic(decision_path)
     target = None
-    for row in decisions:
+    for row in rows:
         if row.get("DecisionID") == args.decision_id:
             target = row
             break
@@ -268,23 +345,24 @@ def main() -> int:
         print(f"ERROR: DecisionID '{args.decision_id}' not found", file=sys.stderr)
         return 1
 
-    sealed, filename = build_sealed_run(
+    sealed, filename, run_id = build_sealed_run(
         decision_row=target,
-        run_id=run_id,
         user=args.user,
         data_dir=data_dir,
         prompts_dir=args.prompts_dir,
         schemas_dir=args.schemas_dir,
         policy_baseline=args.policy_baseline,
         policy_version_file=args.policy_version,
+        clock=args.clock,
+        deterministic=deterministic,
     )
 
-    # Write sealed run
+    # Write sealed run (sorted JSON for readability)
     out_dir: Path = args.out_dir
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / filename
     with open(out_path, "w") as f:
-        json.dump(sealed, f, indent=2)
+        f.write(json.dumps(sealed, indent=2, sort_keys=True))
 
     # Write manifest
     manifest_path = out_dir / filename.replace(".json", ".manifest.json")
@@ -292,42 +370,58 @@ def main() -> int:
         "sealed_run": filename,
         "run_id": run_id,
         "decision_id": args.decision_id,
-        "created_at": sealed["authority_envelope"]["provenance"]["created_at"],
-        "hash": sealed["hash"],
-        "input_files": [fi["path"] for fi in sealed["inputs_snapshot"]["files"]],
+        "commit_hash": sealed["commit_hash"],
+        "hash_scope": sealed["hash_scope"],
+        "file_row_counts": {
+            e["path"]: _count_csv_rows(data_dir.parent.parent.parent / e["path"])
+            for e in sealed["hash_scope"]["inputs"]
+        },
         "policy_version": sealed["authority_envelope"]["policy_snapshot"]["policy_version"],
+        "schema_versions": {
+            e["path"]: "1.0" for e in sealed["hash_scope"]["schemas"]
+        },
     }
     with open(manifest_path, "w") as f:
-        json.dump(manifest, f, indent=2)
+        f.write(json.dumps(manifest, indent=2, sort_keys=True))
 
-    # Update artifacts_emitted with the actual output paths
+    # Update artifacts_emitted
     sealed["artifacts_emitted"] = [
         {"path": str(out_path), "sha256": sha256_file(out_path)},
         {"path": str(manifest_path), "sha256": sha256_file(manifest_path)},
     ]
-    # Rewrite with updated artifacts_emitted
+    # Recompute hash after updating artifacts_emitted
     sealed["hash"] = ""
-    canonical = json.dumps(sealed, sort_keys=True)
-    sealed["hash"] = "sha256:" + hashlib.sha256(canonical.encode()).hexdigest()
+    sealed["hash"] = sha256_text(canonical_dumps(sealed))
     with open(out_path, "w") as f:
-        json.dump(sealed, f, indent=2)
+        f.write(json.dumps(sealed, indent=2, sort_keys=True))
 
     # Summary
     print("=" * 55)
-    print("  Seal Bundle Builder")
+    print("  Seal Bundle Builder (Deterministic)")
     print("=" * 55)
     print(f"  Decision:        {target['DecisionID']} — {target.get('Title', '?')}")
     print(f"  Run ID:          {run_id}")
     print(f"  Operator:        {args.user}")
+    print(f"  Deterministic:   {deterministic}")
+    print(f"  Clock:           {args.clock or '(wall clock)'}")
     print(f"  Policy:          {sealed['authority_envelope']['policy_snapshot']['policy_version']}")
+    print(f"  Commit hash:     {sealed['commit_hash']}")
     print(f"  Refusal checked: {len(REFUSAL_CHECKS)} checks, none triggered")
     print(f"  Gates passed:    {len(ENFORCEMENT_GATES)}/{len(ENFORCEMENT_GATES)}")
     print(f"  Sealed file:     {out_path}")
     print(f"  Manifest:        {manifest_path}")
-    print(f"  Hash:            {sealed['hash']}")
+    print(f"  Content hash:    {sealed['hash']}")
     print("=" * 55)
 
     return 0
+
+
+def _count_csv_rows(path: Path) -> int:
+    """Count data rows in a CSV (excluding header)."""
+    if not path.exists():
+        return 0
+    with open(path) as f:
+        return max(0, sum(1 for _ in f) - 1)
 
 
 if __name__ == "__main__":

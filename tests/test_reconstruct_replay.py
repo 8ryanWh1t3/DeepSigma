@@ -15,6 +15,7 @@ sys.path.insert(0, str(REPO_ROOT / "src" / "tools" / "reconstruct"))
 import seal_bundle  # noqa: E402
 import replay_sealed_run as replay  # noqa: E402
 
+FIXED_CLOCK = "2026-02-21T00:00:00Z"
 
 # ── Sample data ──────────────────────────────────────────────────
 DECISION_HEADER = (
@@ -33,8 +34,8 @@ class ReconstructTestBase(unittest.TestCase):
 
     def setUp(self) -> None:
         self.tmpdir = tempfile.mkdtemp()
-        self.data_dir = Path(self.tmpdir) / "data"
-        self.data_dir.mkdir()
+        self.data_dir = Path(self.tmpdir) / "artifacts" / "sample_data" / "data"
+        self.data_dir.mkdir(parents=True)
         self.out_dir = Path(self.tmpdir) / "sealed"
         self.out_dir.mkdir()
         self.prompts_dir = Path(self.tmpdir) / "prompts"
@@ -63,12 +64,11 @@ class ReconstructTestBase(unittest.TestCase):
     def tearDown(self) -> None:
         shutil.rmtree(self.tmpdir, ignore_errors=True)
 
-    def _seal(self, decision_id: str = "DEC-TEST", run_id: str = "RUN-TEST") -> Path:
+    def _seal(self, decision_id: str = "DEC-TEST") -> Path:
         """Run seal_bundle and return path to sealed JSON."""
         sys.argv = [
             "seal_bundle.py",
             "--decision-id", decision_id,
-            "--run-id", run_id,
             "--user", "Tester",
             "--data-dir", str(self.data_dir),
             "--out-dir", str(self.out_dir),
@@ -76,18 +76,21 @@ class ReconstructTestBase(unittest.TestCase):
             "--schemas-dir", str(self.schemas_dir),
             "--policy-baseline", str(self.policy_baseline),
             "--policy-version", str(self.policy_version),
+            "--clock", FIXED_CLOCK,
+            "--deterministic", "true",
         ]
         rc = seal_bundle.main()
         self.assertEqual(rc, 0, "seal_bundle should succeed")
-        json_files = list(self.out_dir.glob("RUN-TEST_*.json"))
-        # Filter out manifest files
-        sealed_files = [f for f in json_files if ".manifest." not in f.name]
-        self.assertEqual(len(sealed_files), 1, "Expected one sealed JSON")
-        return sealed_files[0]
+        json_files = [
+            f for f in self.out_dir.glob("RUN-*.json")
+            if ".manifest." not in f.name
+        ]
+        self.assertEqual(len(json_files), 1, "Expected one sealed JSON")
+        return json_files[0]
 
 
 class TestSealAndReplay(ReconstructTestBase):
-    """Test the full seal → replay pipeline."""
+    """Test the full seal -> replay pipeline."""
 
     def test_seal_creates_valid_bundle(self) -> None:
         sealed_path = self._seal()
@@ -105,7 +108,10 @@ class TestSealAndReplay(ReconstructTestBase):
         self.assertIn("authority_envelope", sealed)
         self.assertIn("decision_state", sealed)
         self.assertIn("inputs_snapshot", sealed)
+        self.assertIn("hash_scope", sealed)
+        self.assertIn("commit_hash", sealed)
         self.assertTrue(sealed["hash"].startswith("sha256:"))
+        self.assertTrue(sealed["commit_hash"].startswith("sha256:"))
 
         # Check authority envelope
         env = sealed["authority_envelope"]
@@ -118,11 +124,19 @@ class TestSealAndReplay(ReconstructTestBase):
         self.assertFalse(env["refusal"]["refusal_triggered"])
         self.assertTrue(env["enforcement"]["enforcement_emitted"])
 
+        # Run ID should be deterministic (derived from hash)
+        run_id = env["provenance"]["run_id"]
+        self.assertTrue(run_id.startswith("RUN-"))
+        commit_hash = sealed["commit_hash"]
+        expected_prefix = "RUN-" + commit_hash.split(":")[1][:8]
+        self.assertEqual(run_id, expected_prefix)
+
     def test_replay_passes_on_valid_bundle(self) -> None:
         sealed_path = self._seal()
 
         result = replay.replay(sealed_path)
         self.assertTrue(result.passed, f"Replay should pass. Failures: {result.failed_count}")
+        self.assertEqual(result.exit_code, 0)
 
     def test_replay_fails_on_missing_authority(self) -> None:
         sealed_path = self._seal()
@@ -153,10 +167,10 @@ class TestSealAndReplay(ReconstructTestBase):
         sealed = json.loads(sealed_path.read_text())
         sealed["authority_envelope"]["scope_bound"]["decisions"] = []
         # Recompute hash so only scope check fails
+        from canonical_json import sha256_text
+        from canonical_json import canonical_dumps as cd
         sealed["hash"] = ""
-        import hashlib
-        canonical = json.dumps(sealed, sort_keys=True)
-        sealed["hash"] = "sha256:" + hashlib.sha256(canonical.encode()).hexdigest()
+        sealed["hash"] = sha256_text(cd(sealed))
         sealed_path.write_text(json.dumps(sealed))
 
         result = replay.replay(sealed_path)
@@ -178,6 +192,7 @@ class TestSealBundleErrors(ReconstructTestBase):
             "--schemas-dir", str(self.schemas_dir),
             "--policy-baseline", str(self.policy_baseline),
             "--policy-version", str(self.policy_version),
+            "--clock", FIXED_CLOCK,
         ]
         rc = seal_bundle.main()
         self.assertEqual(rc, 1)
@@ -192,6 +207,7 @@ class TestSealBundleErrors(ReconstructTestBase):
             "--schemas-dir", str(self.schemas_dir),
             "--policy-baseline", str(self.policy_baseline),
             "--policy-version", str(self.policy_version),
+            "--clock", FIXED_CLOCK,
         ]
         rc = seal_bundle.main()
         self.assertEqual(rc, 1)

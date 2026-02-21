@@ -1,0 +1,84 @@
+name: Determinism Gate
+
+permissions:
+  contents: read
+
+on:
+  push:
+    paths:
+      - 'src/tools/reconstruct/**'
+      - 'schemas/reconstruct/**'
+      - 'tests/test_deterministic_seal.py'
+      - 'tests/test_reconstruct_replay.py'
+      - 'tests/golden/**'
+  pull_request:
+    paths:
+      - 'src/tools/reconstruct/**'
+      - 'schemas/reconstruct/**'
+      - 'tests/test_deterministic_seal.py'
+      - 'tests/test_reconstruct_replay.py'
+      - 'tests/golden/**'
+
+jobs:
+  determinism:
+    name: Determinism Verification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run unit tests
+        run: |
+          python -m unittest tests.test_reconstruct_replay -v
+          python -m unittest tests.test_deterministic_seal -v
+
+      - name: Seal run 1 (fixed clock)
+        run: >
+          python src/tools/reconstruct/seal_bundle.py
+          --decision-id DEC-001
+          --clock 2026-02-21T00:00:00Z
+          --deterministic true
+          --user ci
+          --out-dir "$RUNNER_TEMP/sealed1"
+
+      - name: Seal run 2 (same fixed clock)
+        run: >
+          python src/tools/reconstruct/seal_bundle.py
+          --decision-id DEC-001
+          --clock 2026-02-21T00:00:00Z
+          --deterministic true
+          --user ci
+          --out-dir "$RUNNER_TEMP/sealed2"
+
+      - name: Compare commit hashes (must be identical)
+        run: |
+          hash1=$(python -c "
+          import json, glob
+          f = [x for x in glob.glob('$RUNNER_TEMP/sealed1/RUN-*.json') if 'manifest' not in x][0]
+          print(json.load(open(f))['commit_hash'])
+          ")
+          hash2=$(python -c "
+          import json, glob
+          f = [x for x in glob.glob('$RUNNER_TEMP/sealed2/RUN-*.json') if 'manifest' not in x][0]
+          print(json.load(open(f))['commit_hash'])
+          ")
+          echo "Run 1 commit hash: $hash1"
+          echo "Run 2 commit hash: $hash2"
+          if [ "$hash1" != "$hash2" ]; then
+            echo "FAIL: Commit hashes differ!"
+            exit 1
+          fi
+          echo "PASS: Commit hashes are identical."
+
+      - name: Replay sealed run 1
+        run: |
+          sealed=$(ls "$RUNNER_TEMP"/sealed1/RUN-*.json | grep -v manifest | head -1)
+          python src/tools/reconstruct/replay_sealed_run.py --sealed "$sealed"
+
+      - name: Replay sealed run 2
+        run: |
+          sealed=$(ls "$RUNNER_TEMP"/sealed2/RUN-*.json | grep -v manifest | head -1)
+          python src/tools/reconstruct/replay_sealed_run.py --sealed "$sealed"

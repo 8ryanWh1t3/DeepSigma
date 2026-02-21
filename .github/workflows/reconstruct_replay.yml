@@ -28,18 +28,21 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Run seal bundle builder
+      - name: Run seal bundle builder (deterministic)
         run: >
           python src/tools/reconstruct/seal_bundle.py
           --decision-id DEC-001
-          --run-id RUN-CI
+          --clock 2026-02-21T00:00:00Z
+          --deterministic true
           --user ci
           --out-dir "$RUNNER_TEMP/sealed_runs"
 
       - name: Run replay on sealed output
         run: |
-          sealed=$(ls "$RUNNER_TEMP"/sealed_runs/RUN-CI_*.json | grep -v manifest | head -1)
+          sealed=$(ls "$RUNNER_TEMP"/sealed_runs/RUN-*.json | grep -v manifest | head -1)
           python src/tools/reconstruct/replay_sealed_run.py --sealed "$sealed"
 
       - name: Run unit tests
-        run: python -m unittest tests.test_reconstruct_replay -v
+        run: |
+          python -m unittest tests.test_reconstruct_replay -v
+          python -m unittest tests.test_deterministic_seal -v
