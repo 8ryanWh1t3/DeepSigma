@@ -1,0 +1,592 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/8ryanWh1t3/DeepSigma/schemas/prompt_os/prompt_os_schema_v2.json",
+  "title": "Coherence Prompt OS v2 Schema",
+  "description": "JSON Schema for all named tables in the Coherence Prompt OS v2 workbook.",
+  "type": "object",
+  "required": [
+    "DecisionLogTable",
+    "AtomicClaimsTable",
+    "PromptLibraryTable",
+    "AssumptionsTable",
+    "PatchLogTable",
+    "LLMOutputTable",
+    "DashboardTrendsTable"
+  ],
+  "properties": {
+    "DecisionLogTable": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "DecisionID",
+          "Title",
+          "Category",
+          "Owner",
+          "Status",
+          "Confidence_pct",
+          "BlastRadius_1to5",
+          "Reversibility_1to5",
+          "CostOfDelay",
+          "CompressionRisk",
+          "Evidence",
+          "DateLogged",
+          "ReviewDate"
+        ],
+        "properties": {
+          "DecisionID": {
+            "type": "string",
+            "pattern": "^DEC-\\d{3,}$"
+          },
+          "Title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "Category": {
+            "type": "string",
+            "enum": ["Technology", "Operations", "Finance", "Strategy", "People"]
+          },
+          "Owner": {
+            "type": "string",
+            "minLength": 1
+          },
+          "Status": {
+            "type": "string",
+            "enum": ["Active", "Deferred", "Closed", "Superseded"]
+          },
+          "Confidence_pct": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "BlastRadius_1to5": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "Reversibility_1to5": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "CostOfDelay": {
+            "type": "string",
+            "enum": ["Low", "Medium", "High"]
+          },
+          "CompressionRisk": {
+            "type": "string",
+            "enum": ["Low", "Medium", "High"]
+          },
+          "Evidence": {
+            "type": "string"
+          },
+          "CounterEvidence": {
+            "type": "string"
+          },
+          "Assumptions": {
+            "type": "string"
+          },
+          "DateLogged": {
+            "type": "string",
+            "format": "date"
+          },
+          "ReviewDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "PriorityScore": {
+            "type": "number"
+          },
+          "Notes": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "examples": [
+        {
+          "DecisionID": "DEC-001",
+          "Title": "Migrate to cloud ERP",
+          "Category": "Technology",
+          "Owner": "J. Rivera",
+          "Status": "Active",
+          "Confidence_pct": 75,
+          "BlastRadius_1to5": 4,
+          "Reversibility_1to5": 2,
+          "CostOfDelay": "High",
+          "CompressionRisk": "Medium",
+          "Evidence": "Vendor benchmarks; 3 case studies",
+          "CounterEvidence": "Legacy integration risk",
+          "Assumptions": "Budget approved Q1",
+          "DateLogged": "2026-01-10",
+          "ReviewDate": "2026-04-10",
+          "PriorityScore": 5.32,
+          "Notes": "Phase 1 scoped"
+        }
+      ]
+    },
+    "AtomicClaimsTable": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "ClaimID",
+          "Claim",
+          "Source",
+          "SourceType",
+          "Confidence_pct",
+          "EvidenceStrength_0to100",
+          "DateCaptured"
+        ],
+        "properties": {
+          "ClaimID": {
+            "type": "string",
+            "pattern": "^CLM-\\d{3,}$"
+          },
+          "Claim": {
+            "type": "string",
+            "minLength": 1
+          },
+          "Source": {
+            "type": "string"
+          },
+          "SourceType": {
+            "type": "string",
+            "enum": ["Internal", "External", "LLM", "Expert"]
+          },
+          "Confidence_pct": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "EvidenceStrength_0to100": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "CounterEvidence_0to100": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "DateCaptured": {
+            "type": "string",
+            "format": "date"
+          },
+          "StaleDays": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "CredibilityScore": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "LinkedDecisionID": {
+            "type": "string"
+          },
+          "Tags": {
+            "type": "string"
+          },
+          "Notes": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "examples": [
+        {
+          "ClaimID": "CLM-001",
+          "Claim": "Cloud ERP reduces operational cost by 20%",
+          "Source": "Gartner 2025 Report",
+          "SourceType": "External",
+          "Confidence_pct": 80,
+          "EvidenceStrength_0to100": 75,
+          "CounterEvidence_0to100": 20,
+          "DateCaptured": "2026-01-10",
+          "StaleDays": 42,
+          "CredibilityScore": 47.6,
+          "LinkedDecisionID": "DEC-001",
+          "Tags": "cost-reduction",
+          "Notes": "Validated by 2 case studies"
+        }
+      ]
+    },
+    "PromptLibraryTable": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "PromptID",
+          "PromptName",
+          "Category",
+          "Version",
+          "SuccessRate_pct",
+          "AvgRating_1to5",
+          "DriftFlag"
+        ],
+        "properties": {
+          "PromptID": {
+            "type": "string",
+            "pattern": "^PRM-\\d{3,}$"
+          },
+          "PromptName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "Category": {
+            "type": "string",
+            "enum": ["Decision", "Perception", "Governance", "Maintenance", "Analysis"]
+          },
+          "Version": {
+            "type": "string"
+          },
+          "SuccessRate_pct": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "AvgRating_1to5": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "DriftFlag": {
+            "type": "string",
+            "enum": ["None", "Minor", "Major"]
+          },
+          "UsageCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "LastUsed": {
+            "type": "string",
+            "format": "date"
+          },
+          "PromptHealth": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "Owner": {
+            "type": "string"
+          },
+          "Notes": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "examples": [
+        {
+          "PromptID": "PRM-001",
+          "PromptName": "Executive Analysis",
+          "Category": "Decision",
+          "Version": "1.2",
+          "SuccessRate_pct": 82,
+          "AvgRating_1to5": 4.2,
+          "DriftFlag": "None",
+          "UsageCount": 45,
+          "LastUsed": "2026-02-10",
+          "PromptHealth": 83,
+          "Owner": "J. Rivera",
+          "Notes": "Standard executive output"
+        }
+      ]
+    },
+    "AssumptionsTable": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "AssumptionID",
+          "Assumption",
+          "LinkedDecisionID",
+          "Confidence_pct",
+          "CreatedDate",
+          "HalfLife_days",
+          "DisconfirmSignal",
+          "Status"
+        ],
+        "properties": {
+          "AssumptionID": {
+            "type": "string",
+            "pattern": "^ASM-\\d{3,}$"
+          },
+          "Assumption": {
+            "type": "string",
+            "minLength": 1
+          },
+          "LinkedDecisionID": {
+            "type": "string"
+          },
+          "Confidence_pct": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "CreatedDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "HalfLife_days": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "ExpiryDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "ExpiryRisk": {
+            "type": "string",
+            "enum": ["RED", "YELLOW", "GREEN"]
+          },
+          "DisconfirmSignal": {
+            "type": "string"
+          },
+          "LastReviewed": {
+            "type": "string",
+            "format": "date"
+          },
+          "Status": {
+            "type": "string",
+            "enum": ["Active", "Expired", "Validated", "Invalidated"]
+          },
+          "Notes": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "examples": [
+        {
+          "AssumptionID": "ASM-001",
+          "Assumption": "Budget approved for Q1 cloud migration",
+          "LinkedDecisionID": "DEC-001",
+          "Confidence_pct": 80,
+          "CreatedDate": "2026-01-10",
+          "HalfLife_days": 90,
+          "ExpiryDate": "2026-04-10",
+          "ExpiryRisk": "GREEN",
+          "DisconfirmSignal": "CFO budget revision",
+          "LastReviewed": "2026-02-01",
+          "Status": "Active",
+          "Notes": "Re-verify March"
+        }
+      ]
+    },
+    "PatchLogTable": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "PatchID",
+          "TriggerType",
+          "TriggerID",
+          "Description",
+          "Severity_GYR",
+          "Status",
+          "Owner",
+          "DateCreated"
+        ],
+        "properties": {
+          "PatchID": {
+            "type": "string",
+            "pattern": "^PAT-\\d{3,}$"
+          },
+          "TriggerType": {
+            "type": "string",
+            "enum": ["Drift", "Expiry", "Manual", "LLM"]
+          },
+          "TriggerID": {
+            "type": "string"
+          },
+          "Description": {
+            "type": "string"
+          },
+          "Severity_GYR": {
+            "type": "string",
+            "enum": ["GREEN", "YELLOW", "RED"]
+          },
+          "Status": {
+            "type": "string",
+            "enum": ["Open", "In Progress", "Resolved", "Wont Fix"]
+          },
+          "Owner": {
+            "type": "string"
+          },
+          "DateCreated": {
+            "type": "string",
+            "format": "date"
+          },
+          "DateResolved": {
+            "type": "string",
+            "format": "date"
+          },
+          "Resolution": {
+            "type": "string"
+          },
+          "Notes": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "examples": [
+        {
+          "PatchID": "PAT-001",
+          "TriggerType": "Drift",
+          "TriggerID": "ASM-002",
+          "Description": "Hiring freeze may be re-imposed",
+          "Severity_GYR": "YELLOW",
+          "Status": "Open",
+          "Owner": "M. Chen",
+          "DateCreated": "2026-02-10",
+          "Notes": "Monitor HR announcements"
+        }
+      ]
+    },
+    "LLMOutputTable": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "RunID",
+          "SessionDate",
+          "Model",
+          "TopActions",
+          "TopRisks",
+          "SummaryConfidence_pct",
+          "NextReviewDate",
+          "Operator"
+        ],
+        "properties": {
+          "RunID": {
+            "type": "string",
+            "pattern": "^RUN-\\d{3,}$"
+          },
+          "SessionDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "Model": {
+            "type": "string"
+          },
+          "TopActions": {
+            "type": "string"
+          },
+          "TopRisks": {
+            "type": "string"
+          },
+          "SuggestedUpdates": {
+            "type": "string"
+          },
+          "SealHash": {
+            "type": "string"
+          },
+          "SummaryConfidence_pct": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "NextReviewDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "Operator": {
+            "type": "string"
+          },
+          "Notes": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "examples": [
+        {
+          "RunID": "RUN-001",
+          "SessionDate": "2026-02-15",
+          "Model": "gpt-4o",
+          "TopActions": "1) Validate ERP vendor SSO; 2) Re-check hiring freeze; 3) Test v2 parity",
+          "TopRisks": "1) Budget reversal; 2) Legacy API consumer discovered; 3) Assumption staleness",
+          "SuggestedUpdates": "Update CLM-003 confidence; Flag ASM-002 for re-review",
+          "SealHash": "sha256:a1b2c3d4e5f6...",
+          "SummaryConfidence_pct": 78,
+          "NextReviewDate": "2026-02-22",
+          "Operator": "J. Rivera",
+          "Notes": "Weekly triage run"
+        }
+      ]
+    },
+    "DashboardTrendsTable": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "WeekEnding",
+          "ActiveDecisions",
+          "AvgConfidence",
+          "LowCredClaims",
+          "ExpiredAssumptions",
+          "OpenPatches",
+          "REDPatches",
+          "AvgPromptHealth"
+        ],
+        "properties": {
+          "WeekEnding": {
+            "type": "string",
+            "format": "date"
+          },
+          "ActiveDecisions": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "AvgConfidence": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "LowCredClaims": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "ExpiredAssumptions": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "OpenPatches": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "REDPatches": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "AvgPromptHealth": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "Notes": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "examples": [
+        {
+          "WeekEnding": "2026-02-07",
+          "ActiveDecisions": 2,
+          "AvgConfidence": 68,
+          "LowCredClaims": 1,
+          "ExpiredAssumptions": 0,
+          "OpenPatches": 1,
+          "REDPatches": 0,
+          "AvgPromptHealth": 74,
+          "Notes": "Baseline week"
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}
