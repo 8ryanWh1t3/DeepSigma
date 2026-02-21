@@ -83,7 +83,7 @@ class TestSharePointListSchema:
 
     def test_schema_loads(self):
         path = (
-            REPO / "mdpt" / "powerapps"
+            REPO / "src" / "mdpt" / "powerapps"
             / "sharepoint_list_schema.json"
         )
         data = json.loads(
@@ -93,7 +93,7 @@ class TestSharePointListSchema:
 
     def test_three_lists(self):
         path = (
-            REPO / "mdpt" / "powerapps"
+            REPO / "src" / "mdpt" / "powerapps"
             / "sharepoint_list_schema.json"
         )
         data = json.loads(
@@ -110,7 +110,7 @@ class TestSharePointListSchema:
 
     def test_capabilities_has_columns(self):
         path = (
-            REPO / "mdpt" / "powerapps"
+            REPO / "src" / "mdpt" / "powerapps"
             / "sharepoint_list_schema.json"
         )
         data = json.loads(
@@ -130,7 +130,7 @@ class TestSharePointListSchema:
 
     def test_drift_patches_has_severity(self):
         path = (
-            REPO / "mdpt" / "powerapps"
+            REPO / "src" / "mdpt" / "powerapps"
             / "sharepoint_list_schema.json"
         )
         data = json.loads(
@@ -153,7 +153,7 @@ class TestFlowTemplate:
 
     def test_flow_loads(self):
         path = (
-            REPO / "mdpt" / "powerapps"
+            REPO / "src" / "mdpt" / "powerapps"
             / "flow_scheduled_index_regen.json"
         )
         data = json.loads(
@@ -164,7 +164,7 @@ class TestFlowTemplate:
 
     def test_flow_has_recurrence_trigger(self):
         path = (
-            REPO / "mdpt" / "powerapps"
+            REPO / "src" / "mdpt" / "powerapps"
             / "flow_scheduled_index_regen.json"
         )
         data = json.loads(
@@ -177,7 +177,7 @@ class TestFlowTemplate:
 
     def test_flow_has_teams_action(self):
         path = (
-            REPO / "mdpt" / "powerapps"
+            REPO / "src" / "mdpt" / "powerapps"
             / "flow_scheduled_index_regen.json"
         )
         data = json.loads(
@@ -187,7 +187,7 @@ class TestFlowTemplate:
 
     def test_flow_metadata(self):
         path = (
-            REPO / "mdpt" / "powerapps"
+            REPO / "src" / "mdpt" / "powerapps"
             / "flow_scheduled_index_regen.json"
         )
         data = json.loads(
