@@ -270,6 +270,116 @@ def verify_commitments(sealed: dict, result: ReplayResult) -> None:
                       f"Policies root mismatch: {computed_policies[:30]}... != {expected_policies[:30]}...")
 
 
+def verify_authority_check(
+    sealed: dict,
+    authority_ledger: Path,
+    result: ReplayResult,
+) -> None:
+    """Verify the authority ledger binding in the sealed run.
+
+    Checks:
+    - authority_ledger_ref is present in sealed run
+    - Referenced entry exists in ledger with matching entry_hash
+    - Entry not revoked at committed_at time
+    - Scope covers decision(s) in sealed run
+    - effective_at <= committed_at (and not expired)
+    """
+    ref = sealed.get("authority_ledger_ref")
+    if ref is None:
+        result.check("authority.ref_present", False, "No authority_ledger_ref in sealed run")
+        return
+    result.check("authority.ref_present", True,
+                  f"entry_id={ref.get('authority_entry_id', '?')}")
+
+    if not authority_ledger.exists():
+        result.check("authority.ledger_exists", False, f"Not found: {authority_ledger}")
+        return
+    result.check("authority.ledger_exists", True, str(authority_ledger))
+
+    # Find the entry in the ledger
+    text = authority_ledger.read_text().strip()
+    if not text:
+        result.check("authority.entry_found", False, "Ledger is empty")
+        return
+
+    target_entry_id = ref.get("authority_entry_id", "")
+    found_entry = None
+    all_entries = []
+    for line in text.split("\n"):
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            entry = json.loads(line)
+            all_entries.append(entry)
+        except json.JSONDecodeError:
+            continue
+        if entry.get("entry_id") == target_entry_id:
+            found_entry = entry
+
+    if not found_entry:
+        result.check("authority.entry_found", False,
+                      f"Entry {target_entry_id} not in ledger")
+        return
+    result.check("authority.entry_found", True, f"Entry {target_entry_id} found")
+
+    # Verify entry_hash matches ref
+    recorded_hash = ref.get("authority_entry_hash", "")
+    actual_hash = found_entry.get("entry_hash", "")
+    if recorded_hash == actual_hash:
+        result.check("authority.entry_hash_match", True, "Entry hash matches ref")
+    else:
+        result.check("authority.entry_hash_match", False,
+                      f"Ref hash {recorded_hash[:30]}... != ledger {actual_hash[:30]}...")
+
+    # Check not revoked
+    authority_id = found_entry.get("authority_id", "")
+    committed_at = sealed.get("authority_envelope", {}).get("provenance", {}).get("created_at", "")
+    revoked = False
+    for e in all_entries:
+        if (e.get("grant_type") == "revocation"
+                and e.get("authority_id") == authority_id):
+            revoked_at = e.get("revoked_at", "")
+            if revoked_at and committed_at and revoked_at <= committed_at:
+                revoked = True
+                break
+    if revoked:
+        result.check("authority.not_revoked", False,
+                      f"Authority {authority_id} was revoked before commit")
+    else:
+        result.check("authority.not_revoked", True,
+                      f"Authority {authority_id} not revoked at commit time")
+
+    # Check effective_at <= committed_at
+    effective_at = found_entry.get("effective_at", "")
+    if effective_at and committed_at and effective_at <= committed_at:
+        result.check("authority.effective", True,
+                      f"effective_at={effective_at} <= committed_at={committed_at}")
+    elif effective_at and committed_at:
+        result.check("authority.effective", False,
+                      f"effective_at={effective_at} > committed_at={committed_at}")
+
+    # Check not expired
+    expires_at = found_entry.get("expires_at")
+    if expires_at and committed_at and expires_at <= committed_at:
+        result.check("authority.not_expired", False,
+                      f"Authority expired at {expires_at} before commit {committed_at}")
+    else:
+        result.check("authority.not_expired", True,
+                      "Authority not expired at commit time")
+
+    # Check scope covers decision
+    decision_id = sealed.get("decision_state", {}).get("decision_id", "")
+    scope = found_entry.get("scope_bound", {})
+    scope_decisions = scope.get("decisions", [])
+    if "*" in scope_decisions or decision_id in scope_decisions:
+        result.check("authority.scope_covers_decision", True,
+                      f"Scope covers {decision_id}")
+    else:
+        result.check("authority.scope_covers_decision", False,
+                      f"Scope {scope_decisions} does not cover {decision_id}")
+
+
 def verify_transparency_check(
     sealed: dict,
     transparency_log: Path,
@@ -395,7 +505,9 @@ def replay(sealed_path: Path, verify_hash: bool = True, strict_files: bool = Fal
            key_b64: str | None = None, public_key_b64: str | None = None,
            verify_transparency: bool = False,
            transparency_log: Path | None = None,
-           require_multisig: int | None = None) -> ReplayResult:
+           require_multisig: int | None = None,
+           verify_authority: bool = False,
+           authority_ledger: Path | None = None) -> ReplayResult:
     """Run the full replay validation."""
     result = ReplayResult()
 
@@ -570,6 +682,11 @@ def replay(sealed_path: Path, verify_hash: bool = True, strict_files: bool = Fal
         verify_multisig_requirement(sealed_path, require_multisig, key_b64,
                                     public_key_b64, result)
 
+    # Authority ledger verification (if requested)
+    if verify_authority:
+        ledger_path = authority_ledger or Path("artifacts/authority_ledger/ledger.ndjson")
+        verify_authority_check(sealed, ledger_path, result)
+
     # Content hash integrity (last check)
     if verify_hash:
         verify_content_hash(sealed, result)
@@ -609,6 +726,10 @@ def main() -> int:
                         help="Transparency log path (default: artifacts/transparency_log/log.ndjson)")
     parser.add_argument("--require-multisig", type=int, default=None,
                         help="Require N valid signatures (multi-sig threshold)")
+    parser.add_argument("--verify-authority", default="false", choices=["true", "false"],
+                        help="Verify authority ledger binding (default: false)")
+    parser.add_argument("--authority-ledger", type=Path, default=None,
+                        help="Authority ledger path (default: artifacts/authority_ledger/ledger.ndjson)")
     args = parser.parse_args()
 
     result = replay(
@@ -622,6 +743,8 @@ def main() -> int:
         verify_transparency=(args.verify_transparency == "true"),
         transparency_log=args.transparency_log,
         require_multisig=args.require_multisig,
+        verify_authority=(args.verify_authority == "true"),
+        authority_ledger=args.authority_ledger,
     )
 
     # Print report

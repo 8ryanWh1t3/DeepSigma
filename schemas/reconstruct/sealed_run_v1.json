@@ -134,6 +134,28 @@
       "$ref": "merkle_commitment_v1.json",
       "description": "Merkle commitment roots for selective disclosure (v1.3+)."
     },
+    "authority_ledger_ref": {
+      "type": ["object", "null"],
+      "description": "Reference to the authority ledger entry that authorized this sealed run (v2.0.3+).",
+      "properties": {
+        "authority_entry_id": {
+          "type": "string",
+          "description": "Entry ID in the authority ledger (AUTH-xxxxxxxx)."
+        },
+        "authority_entry_hash": {
+          "type": "string",
+          "description": "entry_hash of the authority ledger entry at time of sealing."
+        },
+        "authority_id": {
+          "type": "string",
+          "description": "Stable authority grant ID referenced."
+        },
+        "authority_ledger_path": {
+          "type": "string",
+          "description": "Path to the authority ledger NDJSON file."
+        }
+      }
+    },
     "hash": {
       "type": "string",
       "description": "SHA-256 hash of the sealed run JSON (with hash field set to empty string)."

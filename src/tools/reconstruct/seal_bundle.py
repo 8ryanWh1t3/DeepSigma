@@ -156,6 +156,8 @@ def build_sealed_run(
     policy_version_file: Path,
     clock: str | None = None,
     deterministic: bool = True,
+    authority_ledger_path: Path | None = None,
+    authority_entry_id: str | None = None,
 ) -> tuple[dict, str, str]:
     """Build a deterministic sealed run.
 
@@ -297,6 +299,19 @@ def build_sealed_run(
         policy_baseline=policy_baseline,
     )
 
+    # Authority ledger ref (optional, v2.0.3+)
+    authority_ledger_ref = None
+    if authority_ledger_path and authority_entry_id:
+        from authority_ledger_append import find_entry as find_ledger_entry
+        ledger_entry = find_ledger_entry(authority_ledger_path, authority_entry_id)
+        if ledger_entry:
+            authority_ledger_ref = {
+                "authority_entry_id": ledger_entry["entry_id"],
+                "authority_entry_hash": ledger_entry["entry_hash"],
+                "authority_id": ledger_entry["authority_id"],
+                "authority_ledger_path": str(authority_ledger_path),
+            }
+
     sealed = {
         "schema_version": "1.0",
         "authority_envelope": authority_envelope,
@@ -308,6 +323,7 @@ def build_sealed_run(
         "hash_scope": hash_scope,
         "commit_hash": commit_hash,
         "inputs_commitments": inputs_commitments,
+        "authority_ledger_ref": authority_ledger_ref,
         "hash": "",
     }
 
@@ -392,6 +408,10 @@ def main() -> int:
                         help="Signing key ID")
     parser.add_argument("--sign-key", default=None,
                         help="Base64 signing key (or set DEEPSIGMA_SIGNING_KEY env)")
+    parser.add_argument("--authority-ledger", type=Path, default=None,
+                        help="Path to authority ledger NDJSON")
+    parser.add_argument("--authority-entry-id", default=None,
+                        help="Authority ledger entry ID to bind")
     args = parser.parse_args()
 
     deterministic = args.deterministic == "true"
@@ -424,6 +444,8 @@ def main() -> int:
         policy_version_file=args.policy_version,
         clock=args.clock,
         deterministic=deterministic,
+        authority_ledger_path=args.authority_ledger,
+        authority_entry_id=args.authority_entry_id,
     )
 
     # Write sealed run + manifest

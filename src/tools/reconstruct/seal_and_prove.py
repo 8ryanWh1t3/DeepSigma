@@ -43,6 +43,7 @@ from pathlib import Path
 # Ensure reconstruct modules are importable
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+from authority_ledger_append import append_entry as append_authority_entry  # noqa: E402
 from determinism_audit import audit_sealed_run  # noqa: E402
 from deterministic_io import read_csv_deterministic  # noqa: E402
 from replay_sealed_run import replay  # noqa: E402
@@ -58,6 +59,7 @@ DEFAULT_SCHEMAS_DIR = Path("schemas")
 DEFAULT_POLICY_BASELINE = Path("docs/governance/POLICY_BASELINE.md")
 DEFAULT_POLICY_VERSION = Path("docs/governance/POLICY_VERSION.txt")
 DEFAULT_LOG_PATH = Path("artifacts/transparency_log/log.ndjson")
+DEFAULT_AUTHORITY_LEDGER = Path("artifacts/authority_ledger/ledger.ndjson")
 
 
 def seal_and_prove(
@@ -79,9 +81,13 @@ def seal_and_prove(
     no_audit: bool = False,
     no_replay_check: bool = False,
     external_signer_cmd: str | None = None,
+    authority_ledger: Path | None = None,
+    authority_entry_id: str | None = None,
+    auto_authority: bool = False,
 ) -> dict:
     """Run the full seal-and-prove pipeline. Returns summary dict."""
     errors: list[str] = []
+    authority_ledger_path = authority_ledger or DEFAULT_AUTHORITY_LEDGER
 
     # ── Step 1: Find decision ────────────────────────────────────
     decision_path = data_dir / "decision_log.csv"
@@ -97,6 +103,32 @@ def seal_and_prove(
     if not target:
         raise ValueError(f"DecisionID '{decision_id}' not found in {decision_path}")
 
+    # ── Step 1b: Auto-authority (optional) ─────────────────────────
+    if auto_authority and not authority_entry_id:
+        policy_version = "GOV-UNKNOWN"
+        if policy_version_file.exists():
+            policy_version = policy_version_file.read_text().strip()
+        policy_hash = ""
+        if policy_baseline.exists():
+            import hashlib as _hl
+            _h = _hl.sha256()
+            with open(policy_baseline, "rb") as _f:
+                for _chunk in iter(lambda: _f.read(8192), b""):
+                    _h.update(_chunk)
+            policy_hash = "sha256:" + _h.hexdigest()
+        auth_entry = append_authority_entry(
+            ledger_path=authority_ledger_path,
+            authority_id=f"AUTO-{decision_id}",
+            actor_id=user,
+            actor_role="Operator",
+            grant_type="direct",
+            scope_bound={"decisions": [decision_id], "claims": [], "patches": [], "prompts": [], "datasets": []},
+            policy_version=policy_version,
+            policy_hash=policy_hash,
+            effective_at=clock,
+        )
+        authority_entry_id = auth_entry["entry_id"]
+
     # ── Step 2: Build sealed run (includes merkle commitments) ───
     sealed, filename, run_id = build_sealed_run(
         decision_row=target,
@@ -108,6 +140,8 @@ def seal_and_prove(
         policy_version_file=policy_version_file,
         clock=clock,
         deterministic=True,
+        authority_ledger_path=authority_ledger_path if authority_entry_id else None,
+        authority_entry_id=authority_entry_id,
     )
 
     # ── Step 3: Write sealed + manifest ──────────────────────────
@@ -177,6 +211,8 @@ def seal_and_prove(
             verify_transparency=log_path is not None,
             transparency_log=log_path,
             require_multisig=len(witness_keys) + 1 if witness_keys else None,
+            verify_authority=authority_entry_id is not None,
+            authority_ledger=authority_ledger_path if authority_entry_id else None,
         )
         if not replay_result.passed:
             errors.append(f"Replay check: {replay_result.failed_count} failures")
@@ -193,6 +229,9 @@ def seal_and_prove(
         # Copy transparency log if it exists
         if log_path and log_path.exists():
             shutil.copy2(log_path, pack_dir / "transparency_log.ndjson")
+        # Copy authority ledger if it exists
+        if authority_entry_id and authority_ledger_path.exists():
+            shutil.copy2(authority_ledger_path, pack_dir / "authority_ledger.ndjson")
 
     summary = {
         "decision_id": decision_id,
@@ -203,6 +242,7 @@ def seal_and_prove(
         "manifest_path": str(manifest_path),
         "sig_paths": [str(p) for p in sig_paths],
         "transparency_entry": log_entry.get("entry_id") if log_entry else None,
+        "authority_entry_id": authority_entry_id,
         "audit_clean": audit_result.violations == 0 if audit_result else None,
         "replay_passed": replay_result.passed if replay_result else None,
         "pack_dir": str(pack_dir) if pack_dir else None,
@@ -242,6 +282,12 @@ def main() -> int:
                         help="Skip replay self-check")
     parser.add_argument("--external-signer-cmd", default=None,
                         help="External signing command")
+    parser.add_argument("--authority-ledger", type=Path, default=None,
+                        help="Authority ledger path (default: artifacts/authority_ledger/ledger.ndjson)")
+    parser.add_argument("--authority-entry-id", default=None,
+                        help="Authority entry ID to bind to sealed run")
+    parser.add_argument("--auto-authority", action="store_true",
+                        help="Auto-append an authority entry before sealing")
     args = parser.parse_args()
 
     # Resolve signing key
@@ -276,6 +322,9 @@ def main() -> int:
             no_audit=args.no_audit,
             no_replay_check=args.no_replay_check,
             external_signer_cmd=args.external_signer_cmd,
+            authority_ledger=args.authority_ledger,
+            authority_entry_id=args.authority_entry_id,
+            auto_authority=args.auto_authority,
         )
     except (FileNotFoundError, ValueError) as e:
         print(f"ERROR: {e}", file=sys.stderr)
@@ -294,6 +343,8 @@ def main() -> int:
     print(f"  Signatures:        {len(summary['sig_paths'])} files")
     if summary["transparency_entry"]:
         print(f"  Log entry:         {summary['transparency_entry']}")
+    if summary.get("authority_entry_id"):
+        print(f"  Authority entry:   {summary['authority_entry_id']}")
     if summary["audit_clean"] is not None:
         icon = "PASS" if summary["audit_clean"] else "FAIL"
         print(f"  Determinism audit: [{icon}]")
