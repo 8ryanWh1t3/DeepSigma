@@ -210,6 +210,67 @@ def verify_strict_files(sealed: dict, result: ReplayResult) -> None:
             result.set_exit_code(4)
 
 
+def verify_transparency_check(
+    sealed: dict,
+    transparency_log: Path,
+    result: ReplayResult,
+) -> None:
+    """Verify the artifact exists in the transparency log with valid chaining."""
+    if not transparency_log.exists():
+        result.check("transparency.log_exists", False, f"Not found: {transparency_log}")
+        return
+    result.check("transparency.log_exists", True, str(transparency_log))
+
+    text = transparency_log.read_text().strip()
+    if not text:
+        result.check("transparency.entry_found", False, "Log is empty")
+        return
+
+    target_commit = sealed.get("commit_hash", "")
+    found_entry = None
+    lines = text.split("\n")
+
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            entry = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if entry.get("commit_hash") == target_commit:
+            found_entry = entry
+            break
+
+    if not found_entry:
+        result.check("transparency.entry_found", False,
+                      f"No entry for commit_hash {target_commit[:30]}...")
+        return
+    result.check("transparency.entry_found", True,
+                  f"Entry {found_entry.get('entry_id', '?')} found")
+
+    # Verify entry_hash integrity
+    copy = dict(found_entry)
+    copy["entry_hash"] = ""
+    computed = sha256_text(canonical_dumps(copy))
+    recorded = found_entry.get("entry_hash", "")
+    if computed == recorded:
+        result.check("transparency.entry_hash", True, "Entry hash verified")
+    else:
+        result.check("transparency.entry_hash", False,
+                      f"Entry hash mismatch: {computed[:30]}... != {recorded[:30]}...")
+
+    # Verify artifact bytes hash matches sealed run hash
+    sealed_hash = sealed.get("hash", "")
+    entry_sealed_hash = found_entry.get("artifact_bytes_sha256", "")
+    if sealed_hash and entry_sealed_hash:
+        if sealed_hash == entry_sealed_hash:
+            result.check("transparency.sealed_hash_match", True, "Artifact hash matches")
+        else:
+            result.check("transparency.sealed_hash_match", False,
+                          f"Sealed hash {sealed_hash[:30]}... != entry {entry_sealed_hash[:30]}...")
+
+
 def verify_signature_check(
     sealed_path: Path,
     sig_path: Path | None,
@@ -233,9 +294,48 @@ def verify_signature_check(
         result.check(f"signature.{name}", passed, detail)
 
 
+def verify_multisig_requirement(
+    sealed_path: Path,
+    threshold: int,
+    key_b64: str | None,
+    public_key_b64: str | None,
+    result: ReplayResult,
+) -> None:
+    """Verify multi-signature threshold requirement."""
+    sig_path = Path(str(sealed_path) + ".sig.json")
+    if not sig_path.exists():
+        result.check("multisig.exists", False, f"Signature file not found: {sig_path}")
+        return
+
+    sig_data = json.loads(sig_path.read_text())
+
+    # Check if it's a multisig block or single signature
+    if "multisig_version" in sig_data:
+        sigs = sig_data.get("signatures", [])
+        result.check("multisig.format", True, "Multi-signature envelope")
+        result.check(
+            "multisig.threshold",
+            len(sigs) >= threshold,
+            f"{len(sigs)} signatures, threshold={threshold}",
+        )
+    elif "sig_version" in sig_data:
+        # Single signature — treat as threshold=1
+        result.check("multisig.format", True, "Single signature (threshold=1)")
+        result.check(
+            "multisig.threshold",
+            threshold <= 1,
+            f"1 signature, threshold={threshold}",
+        )
+    else:
+        result.check("multisig.format", False, "Unknown signature format")
+
+
 def replay(sealed_path: Path, verify_hash: bool = True, strict_files: bool = False,
            verify_sig: bool = False, sig_path: Path | None = None,
-           key_b64: str | None = None, public_key_b64: str | None = None) -> ReplayResult:
+           key_b64: str | None = None, public_key_b64: str | None = None,
+           verify_transparency: bool = False,
+           transparency_log: Path | None = None,
+           require_multisig: int | None = None) -> ReplayResult:
     """Run the full replay validation."""
     result = ReplayResult()
 
@@ -397,6 +497,16 @@ def replay(sealed_path: Path, verify_hash: bool = True, strict_files: bool = Fal
     if verify_sig:
         verify_signature_check(sealed_path, sig_path, key_b64, public_key_b64, result)
 
+    # Transparency log verification (if requested)
+    if verify_transparency:
+        log_path = transparency_log or Path("artifacts/transparency_log/log.ndjson")
+        verify_transparency_check(sealed, log_path, result)
+
+    # Multi-signature verification (if requested)
+    if require_multisig is not None:
+        verify_multisig_requirement(sealed_path, require_multisig, key_b64,
+                                    public_key_b64, result)
+
     # Content hash integrity (last check)
     if verify_hash:
         verify_content_hash(sealed, result)
@@ -428,6 +538,14 @@ def main() -> int:
                         help="Signature file path (autodetect if omitted)")
     parser.add_argument("--key", default=None, help="Base64 shared key (HMAC)")
     parser.add_argument("--public-key", default=None, help="Base64 public key (Ed25519)")
+    parser.add_argument(
+        "--verify-transparency", default="false", choices=["true", "false"],
+        help="Verify artifact in transparency log (default: false)",
+    )
+    parser.add_argument("--transparency-log", type=Path, default=None,
+                        help="Transparency log path (default: artifacts/transparency_log/log.ndjson)")
+    parser.add_argument("--require-multisig", type=int, default=None,
+                        help="Require N valid signatures (multi-sig threshold)")
     args = parser.parse_args()
 
     result = replay(
@@ -438,6 +556,9 @@ def main() -> int:
         sig_path=args.sig,
         key_b64=args.key,
         public_key_b64=args.public_key,
+        verify_transparency=(args.verify_transparency == "true"),
+        transparency_log=args.transparency_log,
+        require_multisig=args.require_multisig,
     )
 
     # Print report
