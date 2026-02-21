@@ -17,12 +17,14 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import sys
 from pathlib import Path
 
 from canonical_json import canonical_dumps, sha256_text
 from deterministic_ids import det_id
 from deterministic_io import list_files_deterministic, read_csv_deterministic
+from sign_artifact import sign_artifact
 from time_controls import format_utc, format_utc_compact, observed_now, parse_clock
 
 
@@ -323,6 +325,14 @@ def main() -> int:
                         help="Fixed clock (ISO8601 UTC, e.g. 2026-02-21T00:00:00Z)")
     parser.add_argument("--deterministic", default="true", choices=["true", "false"],
                         help="Deterministic mode (default: true)")
+    parser.add_argument("--sign", default="false", choices=["true", "false"],
+                        help="Sign sealed artifacts (default: false)")
+    parser.add_argument("--sign-algo", default="hmac", choices=["ed25519", "hmac"],
+                        help="Signing algorithm (default: hmac)")
+    parser.add_argument("--sign-key-id", default="ds-dev-2026-01",
+                        help="Signing key ID")
+    parser.add_argument("--sign-key", default=None,
+                        help="Base64 signing key (or set DEEPSIGMA_SIGNING_KEY env)")
     args = parser.parse_args()
 
     deterministic = args.deterministic == "true"
@@ -395,6 +405,19 @@ def main() -> int:
     with open(out_path, "w") as f:
         f.write(json.dumps(sealed, indent=2, sort_keys=True))
 
+    # Signing (optional)
+    sig_paths = []
+    do_sign = args.sign == "true"
+    if do_sign:
+        sign_key = args.sign_key or os.environ.get("DEEPSIGMA_SIGNING_KEY")
+        if not sign_key:
+            print("ERROR: --sign requires --sign-key or DEEPSIGMA_SIGNING_KEY env",
+                  file=sys.stderr)
+            return 1
+        for artifact in [out_path, manifest_path]:
+            sp = sign_artifact(artifact, args.sign_algo, args.sign_key_id, sign_key)
+            sig_paths.append(sp)
+
     # Summary
     print("=" * 55)
     print("  Seal Bundle Builder (Deterministic)")
@@ -410,6 +433,10 @@ def main() -> int:
     print(f"  Gates passed:    {len(ENFORCEMENT_GATES)}/{len(ENFORCEMENT_GATES)}")
     print(f"  Sealed file:     {out_path}")
     print(f"  Manifest:        {manifest_path}")
+    if sig_paths:
+        print(f"  Signed:          {args.sign_algo} ({args.sign_key_id})")
+        for sp in sig_paths:
+            print(f"    Sig:           {sp}")
     print(f"  Content hash:    {sealed['hash']}")
     print("=" * 55)
 
