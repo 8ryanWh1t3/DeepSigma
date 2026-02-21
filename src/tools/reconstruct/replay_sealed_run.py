@@ -210,7 +210,32 @@ def verify_strict_files(sealed: dict, result: ReplayResult) -> None:
             result.set_exit_code(4)
 
 
-def replay(sealed_path: Path, verify_hash: bool = True, strict_files: bool = False) -> ReplayResult:
+def verify_signature_check(
+    sealed_path: Path,
+    sig_path: Path | None,
+    key_b64: str | None,
+    public_key_b64: str | None,
+    result: ReplayResult,
+) -> None:
+    """Verify the cryptographic signature if requested."""
+    from verify_signature import verify as verify_sig
+
+    # Auto-detect sig path
+    if sig_path is None:
+        sig_path = Path(str(sealed_path) + ".sig.json")
+
+    if not sig_path.exists():
+        result.check("signature.exists", False, f"Signature file not found: {sig_path}")
+        return
+
+    sig_result = verify_sig(sealed_path, sig_path, key_b64, public_key_b64)
+    for name, passed, detail in sig_result.checks:
+        result.check(f"signature.{name}", passed, detail)
+
+
+def replay(sealed_path: Path, verify_hash: bool = True, strict_files: bool = False,
+           verify_sig: bool = False, sig_path: Path | None = None,
+           key_b64: str | None = None, public_key_b64: str | None = None) -> ReplayResult:
     """Run the full replay validation."""
     result = ReplayResult()
 
@@ -368,6 +393,10 @@ def replay(sealed_path: Path, verify_hash: bool = True, strict_files: bool = Fal
     if strict_files:
         verify_strict_files(sealed, result)
 
+    # Signature verification (if requested)
+    if verify_sig:
+        verify_signature_check(sealed_path, sig_path, key_b64, public_key_b64, result)
+
     # Content hash integrity (last check)
     if verify_hash:
         verify_content_hash(sealed, result)
@@ -391,12 +420,24 @@ def main() -> int:
         "--strict-files", default="false", choices=["true", "false"],
         help="Verify referenced files exist on disk (default: false)",
     )
+    parser.add_argument(
+        "--verify-signature", default="false", choices=["true", "false"],
+        help="Verify cryptographic signature (default: false)",
+    )
+    parser.add_argument("--sig", type=Path, default=None,
+                        help="Signature file path (autodetect if omitted)")
+    parser.add_argument("--key", default=None, help="Base64 shared key (HMAC)")
+    parser.add_argument("--public-key", default=None, help="Base64 public key (Ed25519)")
     args = parser.parse_args()
 
     result = replay(
         args.sealed,
         verify_hash=(args.verify_hash == "true"),
         strict_files=(args.strict_files == "true"),
+        verify_sig=(args.verify_signature == "true"),
+        sig_path=args.sig,
+        key_b64=args.key,
+        public_key_b64=args.public_key,
     )
 
     # Print report

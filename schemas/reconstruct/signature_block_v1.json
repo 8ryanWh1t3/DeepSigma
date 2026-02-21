@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deepsigma.dev/schemas/reconstruct/signature_block_v1.json",
+  "title": "Signature Block v1",
+  "description": "Cryptographic signature for sealed governance artifacts. Binds a signature to the commit hash and canonical bytes of a sealed run or manifest.",
+  "type": "object",
+  "required": [
+    "sig_version",
+    "algorithm",
+    "signing_key_id",
+    "signed_at",
+    "payload_type",
+    "payload_commit_hash",
+    "payload_bytes_sha256",
+    "signature",
+    "verification_instructions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "sig_version": {
+      "const": "1.0",
+      "description": "Signature block schema version."
+    },
+    "algorithm": {
+      "type": "string",
+      "enum": ["ed25519", "hmac-sha256"],
+      "description": "Signing algorithm. ed25519 preferred for public-key verification; hmac-sha256 as stdlib fallback."
+    },
+    "signing_key_id": {
+      "type": "string",
+      "pattern": "^ds-[a-z]+-[0-9]{4}-[0-9]{2}$",
+      "description": "Key identifier (e.g. ds-dev-2026-01, ds-prod-2026-02). Never contains the key itself."
+    },
+    "signed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "UTC ISO8601 timestamp of when the signature was created."
+    },
+    "payload_type": {
+      "type": "string",
+      "enum": ["sealed_run", "manifest"],
+      "description": "What type of artifact was signed."
+    },
+    "payload_commit_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "The commit_hash from the signed artifact."
+    },
+    "payload_bytes_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 of the canonical JSON bytes of the signed artifact."
+    },
+    "signature": {
+      "type": "string",
+      "description": "Base64-encoded signature value."
+    },
+    "public_key": {
+      "type": ["string", "null"],
+      "description": "Optional: base64-encoded public key (ed25519) or PEM file path reference. Null for hmac."
+    },
+    "verification_instructions": {
+      "type": "string",
+      "description": "Human-readable instructions for verifying this signature."
+    }
+  }
+}
