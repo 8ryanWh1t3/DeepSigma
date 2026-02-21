@@ -51,6 +51,21 @@ deepsigma golden-path sharepoint \
 
 ---
 
+## Court-Grade Proof (60 seconds)
+
+```bash
+# Seal + sign + authority bind + transparency log + pack
+python src/tools/reconstruct/seal_and_prove.py \
+    --decision-id DEC-001 --clock 2026-02-21T00:00:00Z \
+    --sign-algo hmac --sign-key-id ds-dev --sign-key "$KEY" \
+    --auto-authority --pack-dir /tmp/pack
+
+# Verify everything in one command:
+python src/tools/reconstruct/verify_pack.py --pack /tmp/pack --key "$KEY"
+```
+
+---
+
 ## Key Capabilities
 
 | Capability | Description | Docs |
