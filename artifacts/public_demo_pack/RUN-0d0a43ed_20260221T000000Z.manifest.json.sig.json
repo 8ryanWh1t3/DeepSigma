@@ -1,0 +1,15 @@
+{
+  "algorithm": "hmac-sha256",
+  "payload_bytes_sha256": "sha256:a0e2e52e50bc69adc1f917a7faceae98117ade814de1f49fb7ab88551f646aef",
+  "payload_commit_hash": "sha256:0d0a43edadc41813250a9adcd25e2600075837f49fecddf037a3c767ce5edc4c",
+  "payload_type": "manifest",
+  "public_key": null,
+  "role": "operator",
+  "sig_version": "1.0",
+  "signature": "XERsiA98EjMvZwyIwiimKz8QB3ae9GriHSCM68ZeSd0=",
+  "signed_at": "2026-02-21T20:28:46Z",
+  "signer_id": "Demo-Operator",
+  "signer_type": "software",
+  "signing_key_id": "ds-demo-public-2026",
+  "verification_instructions": "Verify with: python src/tools/reconstruct/verify_signature.py --file /var/folders/56/9kqkf5t179zg5nh7mb0nrp5h0000gn/T/tmpngudnv8i/sealed/RUN-0d0a43ed_20260221T000000Z.manifest.json --sig /var/folders/56/9kqkf5t179zg5nh7mb0nrp5h0000gn/T/tmpngudnv8i/sealed/RUN-0d0a43ed_20260221T000000Z.manifest.json.sig.json --key <shared-key-b64>"
+}
