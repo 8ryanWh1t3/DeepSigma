@@ -113,4 +113,14 @@ See [POWER_AUTOMATE_MAPPINGS.md](POWER_AUTOMATE_MAPPINGS.md) for exact table-to-
 - [EXECUTIVE_BRIEF_1PAGER.md](EXECUTIVE_BRIEF_1PAGER.md) — One-page executive brief for adoption
 - [RUNBOOK_PILOT_2WEEK.md](RUNBOOK_PILOT_2WEEK.md) — 2-week pilot plan with checklists
 - [GOVERNANCE.md](GOVERNANCE.md) — Governance policy: ownership, cadence, seal policy, retention
+- [SEALED_RUN_EXPORT_SPEC.md](SEALED_RUN_EXPORT_SPEC.md) — Sealed run JSON export specification
+- [DATA_VALIDATION_MAP.md](DATA_VALIDATION_MAP.md) — Enum dropdown values for all tables
+- [TELEMETRY.md](TELEMETRY.md) — Prompt health and usage telemetry
 - [diagrams/prompt_os_flow.mmd](diagrams/prompt_os_flow.mmd) — Architecture diagram
+
+## Scripts & CI
+
+- `scripts/prompt_os/validate_prompt_os.py` — CSV ↔ Schema parity validator
+- `scripts/prompt_os/validate_prompt_os.sh` — Shell runner for the validator
+- `scripts/prompt_os/export_sealed_run.py` — Export sealed run JSON from LLM_OUTPUT CSV
+- `.github/workflows/prompt_os_validate.yml` — CI workflow: schema validation + drift guard
