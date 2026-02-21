@@ -138,6 +138,24 @@ See:
 
 ---
 
+## Determinism Controls
+
+Sealed runs produced by `seal_bundle.py` (v1.1+) use deterministic sealing:
+
+1. **Canonical JSON.** All hashes are computed over canonical serialization (sorted keys, compact separators, normalized floats/datetimes). See `src/tools/reconstruct/canonical_json.py`.
+
+2. **Deterministic IDs.** Run IDs (`RUN-<hash8>`) and event IDs (`EVT-<hash8>`) are derived from content hashes, not random number generation.
+
+3. **Fixed clock.** The `--clock` parameter binds the committed timestamp. Same inputs + same clock = same commit hash. Wall-clock `observed_at` is excluded from the hash scope.
+
+4. **Hash scope manifest.** The `hash_scope` object embedded in every sealed run declares exactly what is included in and excluded from the deterministic hash.
+
+5. **Byte-for-byte replay.** The replay tool recomputes the commit hash from the embedded `hash_scope` and verifies it matches.
+
+See: [docs/reconstruct/DETERMINISM_DOCTRINE.md](../reconstruct/DETERMINISM_DOCTRINE.md) — Full determinism doctrine
+
+---
+
 ## Related Docs
 
 - [GOVERNANCE.md](GOVERNANCE.md) — Seal policy and retention rules
