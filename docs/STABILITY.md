@@ -2,7 +2,7 @@
 
 **Version:** v1.0.0
 **Status:** Beta — core architecture stable, experimental modules clearly marked
-**See also:** [CONFIG_REFERENCE.md](CONFIG_REFERENCE.md) · [CHANGELOG.md](CHANGELOG.md)
+**See also:** [CONFIG_REFERENCE.md](CONFIG_REFERENCE.md) · [CHANGELOG.md](../CHANGELOG.md)
 
 ---
 
@@ -148,10 +148,10 @@ DeepSigma follows [Semantic Versioning](https://semver.org/):
 
 ### How Breaking Changes Are Communicated
 
-1. Entry in [CHANGELOG.md](CHANGELOG.md) under `BREAKING` heading
+1. Entry in [CHANGELOG.md](../CHANGELOG.md) under `BREAKING` heading
 2. Note in relevant canonical spec or doc
 3. Migration path described if feasible
 
 ---
 
-*See also: [CHANGELOG.md](CHANGELOG.md) · [CONFIG_REFERENCE.md](CONFIG_REFERENCE.md) · [roadmap/README.md](roadmap/README.md)*
+*See also: [CHANGELOG.md](../CHANGELOG.md) · [CONFIG_REFERENCE.md](CONFIG_REFERENCE.md) · [roadmap/README.md](roadmap/README.md)*
