@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from adapters.contract import validate_envelope
 
-FIXTURE_BASE = Path(__file__).parent.parent / "fixtures" / "connectors"
+FIXTURE_BASE = Path(__file__).parent / "fixtures" / "connectors"
 
 # Use the same fixed timestamp as the generator
 _COLLECTED_AT = "2026-02-18T12:00:00+00:00"
