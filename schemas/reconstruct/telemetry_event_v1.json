@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deepsigma.dev/schemas/reconstruct/telemetry_event_v1.json",
+  "title": "Telemetry Event v1 (Deterministic)",
+  "description": "A telemetry event with a deterministic ID derived from content, not RNG.",
+  "type": "object",
+  "required": [
+    "event_id",
+    "event_type",
+    "run_id",
+    "severity",
+    "observed_at",
+    "payload"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "pattern": "^EVT-[a-f0-9]{8,}$",
+      "description": "Deterministic event ID: EVT-<hash8> derived from (event_type + run_id + payload canonical)."
+    },
+    "event_type": {
+      "type": "string",
+      "enum": ["drift_flag", "seal_complete", "replay_pass", "replay_fail", "patch_applied"],
+      "description": "The type of telemetry event."
+    },
+    "run_id": {
+      "type": "string",
+      "description": "The sealed run ID this event belongs to."
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["GREEN", "YELLOW", "RED"],
+      "description": "Event severity classification."
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Wall-clock timestamp (excluded from event ID derivation)."
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Event-specific payload data included in the deterministic hash."
+    }
+  }
+}

@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deepsigma.dev/schemas/reconstruct/hash_scope_v1.json",
+  "title": "Hash Scope v1 (Deterministic)",
+  "description": "Defines exactly what is included in the deterministic commit hash and what is excluded.",
+  "type": "object",
+  "required": [
+    "scope_version",
+    "inputs",
+    "prompts",
+    "policies",
+    "schemas",
+    "parameters",
+    "exclusions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "scope_version": {
+      "const": "1.0",
+      "description": "Version of the hash scope schema."
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "sha256", "type"],
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Relative path to the input file."
+          },
+          "sha256": {
+            "type": "string",
+            "description": "SHA-256 hash of the file contents."
+          },
+          "type": {
+            "type": "string",
+            "enum": ["csv", "json", "text"],
+            "description": "File type classification."
+          }
+        }
+      },
+      "description": "Input files included in the hash scope (CSVs, JSONs)."
+    },
+    "prompts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "sha256"],
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Relative path to the prompt file."
+          },
+          "sha256": {
+            "type": "string",
+            "description": "SHA-256 hash of the prompt file contents."
+          }
+        }
+      },
+      "description": "Prompt files included in the hash scope."
+    },
+    "policies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "sha256", "version"],
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Relative path to the policy file."
+          },
+          "sha256": {
+            "type": "string",
+            "description": "SHA-256 hash of the policy file contents."
+          },
+          "version": {
+            "type": "string",
+            "description": "Policy version identifier (e.g. GOV-2.0.2)."
+          }
+        }
+      },
+      "description": "Policy files included in the hash scope."
+    },
+    "schemas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "sha256"],
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Relative path to the schema file."
+          },
+          "sha256": {
+            "type": "string",
+            "description": "SHA-256 hash of the schema file contents."
+          }
+        }
+      },
+      "description": "Schema files included in the hash scope."
+    },
+    "parameters": {
+      "type": "object",
+      "required": ["clock", "deterministic"],
+      "additionalProperties": true,
+      "properties": {
+        "clock": {
+          "type": ["string", "null"],
+          "description": "Fixed clock value used for deterministic builds (ISO8601 UTC)."
+        },
+        "deterministic": {
+          "type": "boolean",
+          "description": "Whether deterministic mode was enabled."
+        },
+        "rule_version": {
+          "type": "string",
+          "description": "Version of the drift/patch rules applied."
+        }
+      },
+      "description": "Parameters that affect the sealed output."
+    },
+    "exclusions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Fields explicitly excluded from the hash scope (e.g. observed_at, non-deterministic fields)."
+    }
+  }
+}
