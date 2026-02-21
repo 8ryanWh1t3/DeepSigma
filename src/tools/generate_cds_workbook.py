@@ -14,7 +14,7 @@ Usage:
     python tools/generate_cds_workbook.py
 
 Output:
-    templates/creative_director_suite/Creative_Director_Suite_CoherenceOps_v2.xlsx
+    artifacts/templates/creative_director_suite/Creative_Director_Suite_CoherenceOps_v2.xlsx
 """
 
 from __future__ import annotations
@@ -36,6 +36,7 @@ V1_PATH = (
 )
 OUTPUT = (
     REPO_ROOT
+    / "artifacts"
     / "templates"
     / "creative_director_suite"
     / "Creative_Director_Suite_CoherenceOps_v2.xlsx"

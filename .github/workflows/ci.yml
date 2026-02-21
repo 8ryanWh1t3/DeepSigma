@@ -91,7 +91,7 @@ jobs:
 
       - name: Validate BOOT contract
         run: |
-          python src/tools/validate_workbook_boot.py templates/creative_director_suite/Creative_Director_Suite_CoherenceOps_v2.xlsx
+          python src/tools/validate_workbook_boot.py artifacts/templates/creative_director_suite/Creative_Director_Suite_CoherenceOps_v2.xlsx
           python -m pytest tests/test_workbook_boot_validator.py -v --tb=short
 
       - name: MDPT Prompt Index gate
