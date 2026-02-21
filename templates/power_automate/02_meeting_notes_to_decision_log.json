@@ -1,0 +1,97 @@
+{
+  "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "name": "Meeting Notes → Decision Log",
+    "description": "Captures decisions from meeting notes and appends rows to DecisionLogTable in the Prompt OS workbook.",
+    "version": "1.0",
+    "source": "DeepSigma Prompt OS v2"
+  },
+  "triggers": {
+    "Manual_Trigger_or_Scheduled": {
+      "type": "Request",
+      "kind": "Button",
+      "inputs": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "meeting_subject": { "type": "string", "description": "Meeting title" },
+            "meeting_date": { "type": "string", "format": "date", "description": "Meeting date (YYYY-MM-DD)" },
+            "organizer": { "type": "string", "description": "Meeting organizer name" },
+            "decision_text": { "type": "string", "description": "Decision statement" },
+            "evidence": { "type": "string", "description": "Supporting context from meeting notes" },
+            "category": { "type": "string", "enum": ["Technology", "Operations", "Finance", "Strategy", "People"] }
+          },
+          "required": ["meeting_subject", "decision_text", "organizer"]
+        }
+      },
+      "description": "Manual trigger with input fields. Can also be wired to a OneNote or Teams channel trigger."
+    }
+  },
+  "actions": {
+    "Generate_DecisionID": {
+      "type": "Compose",
+      "inputs": "@concat('DEC-', string(add(1, outputs('Get_Last_DecisionID'))))",
+      "description": "Generate sequential DecisionID. Wire Get_Last_DecisionID to read the last row from DecisionLogTable.",
+      "runAfter": {}
+    },
+    "Compute_ReviewDate": {
+      "type": "Compose",
+      "inputs": "@addDays(triggerBody()?['meeting_date'], 30, 'yyyy-MM-dd')",
+      "description": "Default 30-day review cycle from meeting date.",
+      "runAfter": {}
+    },
+    "Append_To_DecisionLogTable": {
+      "type": "ApiConnection",
+      "inputs": {
+        "host": { "connection": { "name": "@parameters('$connections')['excelonlinebusiness']['connectionId']" } },
+        "method": "post",
+        "path": "/drives/{driveId}/files/{fileId}/tables/{tableId}/rows",
+        "body": {
+          "DecisionID": "@outputs('Generate_DecisionID')",
+          "Title": "@triggerBody()?['decision_text']",
+          "Category": "@coalesce(triggerBody()?['category'], 'Operations')",
+          "Owner": "@triggerBody()?['organizer']",
+          "Status": "Active",
+          "Confidence_pct": 50,
+          "BlastRadius_1to5": 3,
+          "Reversibility_1to5": 3,
+          "CostOfDelay": "Medium",
+          "CompressionRisk": "Low",
+          "Evidence": "@coalesce(triggerBody()?['evidence'], '')",
+          "CounterEvidence": "",
+          "Assumptions": "",
+          "DateLogged": "@triggerBody()?['meeting_date']",
+          "ReviewDate": "@outputs('Compute_ReviewDate')",
+          "Notes": "@concat('From meeting: ', triggerBody()?['meeting_subject'])"
+        }
+      },
+      "description": "Append row to DecisionLogTable. Replace driveId, fileId, and tableId. Defaults are medium — operator adjusts post-capture.",
+      "runAfter": {
+        "Generate_DecisionID": ["Succeeded"],
+        "Compute_ReviewDate": ["Succeeded"]
+      }
+    },
+    "Notify_Owner": {
+      "type": "ApiConnection",
+      "inputs": {
+        "host": { "connection": { "name": "@parameters('$connections')['office365']['connectionId']" } },
+        "method": "post",
+        "path": "/v2/Mail",
+        "body": {
+          "to": "@triggerBody()?['organizer']",
+          "subject": "Decision logged: @{triggerBody()?['decision_text']}",
+          "body": "A decision was captured from your meeting '@{triggerBody()?['meeting_subject']}'. Review date: @{outputs('Compute_ReviewDate')}. Please update blast radius, reversibility, and confidence in the workbook."
+        }
+      },
+      "description": "Email notification to decision owner. Replace with Teams message if preferred.",
+      "runAfter": { "Append_To_DecisionLogTable": ["Succeeded"] }
+    }
+  },
+  "parameters": {
+    "$connections": {
+      "type": "Object",
+      "description": "Connection references for Excel Online (Business) and Office 365. Configure these when importing the flow."
+    }
+  }
+}

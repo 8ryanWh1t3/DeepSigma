@@ -1,0 +1,162 @@
+{
+  "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "name": "Export Sealed Snapshot (PDF + JSON)",
+    "description": "Exports all Prompt OS workbook tables as a sealed JSON snapshot with SHA-256 hash, plus a PDF export for audit trail.",
+    "version": "1.0",
+    "source": "DeepSigma Prompt OS v2"
+  },
+  "triggers": {
+    "Manual_Trigger": {
+      "type": "Request",
+      "kind": "Button",
+      "inputs": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "operator": { "type": "string", "description": "Name of the person creating the snapshot" },
+            "run_id": { "type": "string", "description": "LLM_OUTPUT RunID to associate with this seal (optional)" }
+          },
+          "required": ["operator"]
+        }
+      },
+      "description": "Manual trigger. Can also be wired to run after an LLM triage session."
+    }
+  },
+  "actions": {
+    "Read_All_Tables": {
+      "type": "Scope",
+      "actions": {
+        "Read_DecisionLogTable": {
+          "type": "ApiConnection",
+          "inputs": {
+            "host": { "connection": { "name": "@parameters('$connections')['excelonlinebusiness']['connectionId']" } },
+            "method": "get",
+            "path": "/drives/{driveId}/files/{fileId}/tables/DecisionLogTable/rows"
+          }
+        },
+        "Read_AtomicClaimsTable": {
+          "type": "ApiConnection",
+          "inputs": {
+            "host": { "connection": { "name": "@parameters('$connections')['excelonlinebusiness']['connectionId']" } },
+            "method": "get",
+            "path": "/drives/{driveId}/files/{fileId}/tables/AtomicClaimsTable/rows"
+          }
+        },
+        "Read_AssumptionsTable": {
+          "type": "ApiConnection",
+          "inputs": {
+            "host": { "connection": { "name": "@parameters('$connections')['excelonlinebusiness']['connectionId']" } },
+            "method": "get",
+            "path": "/drives/{driveId}/files/{fileId}/tables/AssumptionsTable/rows"
+          }
+        },
+        "Read_PromptLibraryTable": {
+          "type": "ApiConnection",
+          "inputs": {
+            "host": { "connection": { "name": "@parameters('$connections')['excelonlinebusiness']['connectionId']" } },
+            "method": "get",
+            "path": "/drives/{driveId}/files/{fileId}/tables/PromptLibraryTable/rows"
+          }
+        },
+        "Read_PatchLogTable": {
+          "type": "ApiConnection",
+          "inputs": {
+            "host": { "connection": { "name": "@parameters('$connections')['excelonlinebusiness']['connectionId']" } },
+            "method": "get",
+            "path": "/drives/{driveId}/files/{fileId}/tables/PatchLogTable/rows"
+          }
+        },
+        "Read_LLMOutputTable": {
+          "type": "ApiConnection",
+          "inputs": {
+            "host": { "connection": { "name": "@parameters('$connections')['excelonlinebusiness']['connectionId']" } },
+            "method": "get",
+            "path": "/drives/{driveId}/files/{fileId}/tables/LLMOutputTable/rows"
+          }
+        },
+        "Read_DashboardTrendsTable": {
+          "type": "ApiConnection",
+          "inputs": {
+            "host": { "connection": { "name": "@parameters('$connections')['excelonlinebusiness']['connectionId']" } },
+            "method": "get",
+            "path": "/drives/{driveId}/files/{fileId}/tables/DashboardTrendsTable/rows"
+          }
+        }
+      },
+      "description": "Read all 7 named tables from the workbook in parallel.",
+      "runAfter": {}
+    },
+    "Build_Snapshot_JSON": {
+      "type": "Compose",
+      "inputs": {
+        "seal_version": "2.0",
+        "sealed_at": "@utcNow()",
+        "operator": "@triggerBody()?['operator']",
+        "tables": {
+          "DecisionLogTable": "@body('Read_DecisionLogTable')?['value']",
+          "AtomicClaimsTable": "@body('Read_AtomicClaimsTable')?['value']",
+          "AssumptionsTable": "@body('Read_AssumptionsTable')?['value']",
+          "PromptLibraryTable": "@body('Read_PromptLibraryTable')?['value']",
+          "PatchLogTable": "@body('Read_PatchLogTable')?['value']",
+          "LLMOutputTable": "@body('Read_LLMOutputTable')?['value']",
+          "DashboardTrendsTable": "@body('Read_DashboardTrendsTable')?['value']"
+        }
+      },
+      "description": "Assemble the sealed snapshot JSON object.",
+      "runAfter": { "Read_All_Tables": ["Succeeded"] }
+    },
+    "Compute_Seal_Hash": {
+      "type": "Compose",
+      "inputs": "@concat('sha256:', outputs('Build_Snapshot_JSON'))",
+      "description": "Compute hash. Note: Power Automate lacks native SHA-256 — use an Azure Function or HTTP action to a hashing API for production. This placeholder concatenates for template purposes.",
+      "runAfter": { "Build_Snapshot_JSON": ["Succeeded"] }
+    },
+    "Save_JSON_To_Archive": {
+      "type": "ApiConnection",
+      "inputs": {
+        "host": { "connection": { "name": "@parameters('$connections')['sharepointonline']['connectionId']" } },
+        "method": "post",
+        "path": "/datasets/{siteId}/files",
+        "body": "@outputs('Build_Snapshot_JSON')",
+        "queries": {
+          "folderPath": "/Prompt_OS_Archive",
+          "name": "@concat(utcNow('yyyy-MM-dd'), '_sealed_snapshot.json')"
+        }
+      },
+      "description": "Save sealed JSON to SharePoint archive folder. Replace siteId and folderPath.",
+      "runAfter": { "Compute_Seal_Hash": ["Succeeded"] }
+    },
+    "Export_Workbook_PDF": {
+      "type": "ApiConnection",
+      "inputs": {
+        "host": { "connection": { "name": "@parameters('$connections')['excelonlinebusiness']['connectionId']" } },
+        "method": "get",
+        "path": "/drives/{driveId}/files/{fileId}/content",
+        "queries": { "format": "pdf" }
+      },
+      "description": "Export workbook as PDF. Save to archive alongside JSON.",
+      "runAfter": { "Read_All_Tables": ["Succeeded"] }
+    },
+    "Send_Confirmation": {
+      "type": "ApiConnection",
+      "inputs": {
+        "host": { "connection": { "name": "@parameters('$connections')['teams']['connectionId']" } },
+        "method": "post",
+        "path": "/v1.0/teams/{teamId}/channels/{channelId}/messages",
+        "body": {
+          "content": "Sealed snapshot created by @{triggerBody()?['operator']}. Archive: @{utcNow('yyyy-MM-dd')}_sealed_snapshot.json"
+        }
+      },
+      "description": "Confirmation notification. Replace teamId and channelId.",
+      "runAfter": { "Save_JSON_To_Archive": ["Succeeded"] }
+    }
+  },
+  "parameters": {
+    "$connections": {
+      "type": "Object",
+      "description": "Connection references for Excel Online (Business), SharePoint Online, and Teams. Configure these when importing the flow."
+    }
+  }
+}

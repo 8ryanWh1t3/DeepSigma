@@ -1,0 +1,170 @@
+{
+  "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "name": "Weekly Scheduled Run → Expiry + Drift Flagging",
+    "description": "Runs weekly to flag expired assumptions and degraded prompts, creating PATCH_LOG entries and snapshotting dashboard trends.",
+    "version": "1.0",
+    "source": "DeepSigma Prompt OS v2"
+  },
+  "triggers": {
+    "Weekly_Schedule": {
+      "type": "Recurrence",
+      "recurrence": {
+        "frequency": "Week",
+        "interval": 1,
+        "schedule": {
+          "weekDays": ["Monday"],
+          "hours": [8],
+          "minutes": [0]
+        },
+        "timeZone": "UTC"
+      },
+      "description": "Every Monday at 08:00 UTC. Adjust schedule and timezone for your organization."
+    }
+  },
+  "actions": {
+    "Read_AssumptionsTable": {
+      "type": "ApiConnection",
+      "inputs": {
+        "host": { "connection": { "name": "@parameters('$connections')['excelonlinebusiness']['connectionId']" } },
+        "method": "get",
+        "path": "/drives/{driveId}/files/{fileId}/tables/AssumptionsTable/rows"
+      },
+      "description": "Read all rows from AssumptionsTable. Replace driveId and fileId.",
+      "runAfter": {}
+    },
+    "Filter_Expired_Assumptions": {
+      "type": "Query",
+      "inputs": {
+        "from": "@body('Read_AssumptionsTable')?['value']",
+        "where": "@and(equals(item()?['ExpiryRisk'], 'RED'), equals(item()?['Status'], 'Active'))"
+      },
+      "description": "Filter for active assumptions with RED ExpiryRisk.",
+      "runAfter": { "Read_AssumptionsTable": ["Succeeded"] }
+    },
+    "Read_PatchLogTable": {
+      "type": "ApiConnection",
+      "inputs": {
+        "host": { "connection": { "name": "@parameters('$connections')['excelonlinebusiness']['connectionId']" } },
+        "method": "get",
+        "path": "/drives/{driveId}/files/{fileId}/tables/PatchLogTable/rows"
+      },
+      "description": "Read existing patches to avoid duplicates.",
+      "runAfter": {}
+    },
+    "Create_Expiry_Patches": {
+      "type": "Foreach",
+      "foreach": "@body('Filter_Expired_Assumptions')",
+      "actions": {
+        "Check_Existing_Patch": {
+          "type": "Query",
+          "inputs": {
+            "from": "@body('Read_PatchLogTable')?['value']",
+            "where": "@and(equals(item()?['TriggerID'], items('Create_Expiry_Patches')?['AssumptionID']), not(equals(item()?['Status'], 'Resolved')))"
+          }
+        },
+        "Create_Patch_If_New": {
+          "type": "If",
+          "expression": { "@equals": ["@length(body('Check_Existing_Patch'))", 0] },
+          "actions": {
+            "Append_Expiry_Patch": {
+              "type": "ApiConnection",
+              "inputs": {
+                "host": { "connection": { "name": "@parameters('$connections')['excelonlinebusiness']['connectionId']" } },
+                "method": "post",
+                "path": "/drives/{driveId}/files/{fileId}/tables/PatchLogTable/rows",
+                "body": {
+                  "PatchID": "@concat('PAT-', string(ticks(utcNow())))",
+                  "TriggerType": "Expiry",
+                  "TriggerID": "@items('Create_Expiry_Patches')?['AssumptionID']",
+                  "Description": "@concat('Assumption expired: ', items('Create_Expiry_Patches')?['Assumption'])",
+                  "Severity_GYR": "YELLOW",
+                  "Status": "Open",
+                  "Owner": "",
+                  "DateCreated": "@utcNow('yyyy-MM-dd')",
+                  "Notes": "Auto-created by weekly expiry check"
+                }
+              }
+            }
+          }
+        }
+      },
+      "description": "For each expired assumption without an open patch, create a new PATCH_LOG entry.",
+      "runAfter": {
+        "Filter_Expired_Assumptions": ["Succeeded"],
+        "Read_PatchLogTable": ["Succeeded"]
+      }
+    },
+    "Read_PromptLibraryTable": {
+      "type": "ApiConnection",
+      "inputs": {
+        "host": { "connection": { "name": "@parameters('$connections')['excelonlinebusiness']['connectionId']" } },
+        "method": "get",
+        "path": "/drives/{driveId}/files/{fileId}/tables/PromptLibraryTable/rows"
+      },
+      "description": "Read all prompts to check for Major drift.",
+      "runAfter": {}
+    },
+    "Filter_Degraded_Prompts": {
+      "type": "Query",
+      "inputs": {
+        "from": "@body('Read_PromptLibraryTable')?['value']",
+        "where": "@and(equals(item()?['DriftFlag'], 'Major'), less(item()?['PromptHealth'], 60))"
+      },
+      "runAfter": { "Read_PromptLibraryTable": ["Succeeded"] }
+    },
+    "Create_Drift_Patches": {
+      "type": "Foreach",
+      "foreach": "@body('Filter_Degraded_Prompts')",
+      "actions": {
+        "Append_Drift_Patch": {
+          "type": "ApiConnection",
+          "inputs": {
+            "host": { "connection": { "name": "@parameters('$connections')['excelonlinebusiness']['connectionId']" } },
+            "method": "post",
+            "path": "/drives/{driveId}/files/{fileId}/tables/PatchLogTable/rows",
+            "body": {
+              "PatchID": "@concat('PAT-', string(ticks(utcNow())))",
+              "TriggerType": "Drift",
+              "TriggerID": "@items('Create_Drift_Patches')?['PromptID']",
+              "Description": "@concat('Prompt degraded (Major drift): ', items('Create_Drift_Patches')?['PromptName'])",
+              "Severity_GYR": "RED",
+              "Status": "Open",
+              "Owner": "",
+              "DateCreated": "@utcNow('yyyy-MM-dd')",
+              "Notes": "Auto-created by weekly drift check"
+            }
+          }
+        }
+      },
+      "description": "Create RED patches for prompts with Major drift and health < 60.",
+      "runAfter": {
+        "Filter_Degraded_Prompts": ["Succeeded"],
+        "Read_PatchLogTable": ["Succeeded"]
+      }
+    },
+    "Send_Summary_Notification": {
+      "type": "ApiConnection",
+      "inputs": {
+        "host": { "connection": { "name": "@parameters('$connections')['teams']['connectionId']" } },
+        "method": "post",
+        "path": "/v1.0/teams/{teamId}/channels/{channelId}/messages",
+        "body": {
+          "content": "Weekly Prompt OS check complete. Expired assumptions flagged: @{length(body('Filter_Expired_Assumptions'))}. Degraded prompts flagged: @{length(body('Filter_Degraded_Prompts'))}."
+        }
+      },
+      "description": "Summary notification to Teams. Replace teamId and channelId.",
+      "runAfter": {
+        "Create_Expiry_Patches": ["Succeeded"],
+        "Create_Drift_Patches": ["Succeeded"]
+      }
+    }
+  },
+  "parameters": {
+    "$connections": {
+      "type": "Object",
+      "description": "Connection references for Excel Online (Business) and Teams. Configure these when importing the flow."
+    }
+  }
+}

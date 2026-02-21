@@ -1,0 +1,90 @@
+{
+  "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "name": "Email/Teams Message → Atomic Claims",
+    "description": "Ingests email or Teams messages matching keyword filters and appends rows to AtomicClaimsTable in the Prompt OS workbook.",
+    "version": "1.0",
+    "source": "DeepSigma Prompt OS v2"
+  },
+  "triggers": {
+    "When_a_new_email_arrives": {
+      "type": "ApiConnectionWebhook",
+      "inputs": {
+        "host": { "connection": { "name": "@parameters('$connections')['office365']['connectionId']" } },
+        "path": "/mailfolders/inbox/messages",
+        "queries": {
+          "subjectFilter": "decision,claim,evidence,finding",
+          "importance": "Any"
+        }
+      },
+      "description": "Trigger on emails matching decision/claim/evidence keywords in subject. Replace keywords with your organization's terms."
+    }
+  },
+  "actions": {
+    "Generate_ClaimID": {
+      "type": "Compose",
+      "inputs": "@concat('CLM-', string(add(1, outputs('Get_Last_ClaimID'))))",
+      "description": "Generate sequential ClaimID. Wire Get_Last_ClaimID to read the last row from AtomicClaimsTable.",
+      "runAfter": {}
+    },
+    "Extract_Claim_Text": {
+      "type": "Compose",
+      "inputs": "@first(split(triggerBody()?['body'], '.'))",
+      "description": "Extract first sentence as claim text. Customize extraction logic for your message format.",
+      "runAfter": {}
+    },
+    "Classify_Source_Type": {
+      "type": "Compose",
+      "inputs": "@if(contains(triggerBody()?['from']?['emailAddress']?['address'], '@YOURDOMAIN.com'), 'Internal', 'External')",
+      "description": "Replace @YOURDOMAIN.com with your organization's email domain.",
+      "runAfter": {}
+    },
+    "Append_To_AtomicClaimsTable": {
+      "type": "ApiConnection",
+      "inputs": {
+        "host": { "connection": { "name": "@parameters('$connections')['excelonlinebusiness']['connectionId']" } },
+        "method": "post",
+        "path": "/drives/{driveId}/files/{fileId}/tables/{tableId}/rows",
+        "body": {
+          "ClaimID": "@outputs('Generate_ClaimID')",
+          "Claim": "@outputs('Extract_Claim_Text')",
+          "Source": "@triggerBody()?['from']?['emailAddress']?['name']",
+          "SourceType": "@outputs('Classify_Source_Type')",
+          "Confidence_pct": 50,
+          "EvidenceStrength_0to100": 50,
+          "CounterEvidence_0to100": "",
+          "DateCaptured": "@utcNow('yyyy-MM-dd')",
+          "LinkedDecisionID": "",
+          "Tags": "",
+          "Notes": "@triggerBody()?['webLink']"
+        }
+      },
+      "description": "Append row to AtomicClaimsTable. Replace driveId, fileId, and tableId with your workbook location. Confidence defaults to 50 — operator adjusts post-capture.",
+      "runAfter": {
+        "Generate_ClaimID": ["Succeeded"],
+        "Extract_Claim_Text": ["Succeeded"],
+        "Classify_Source_Type": ["Succeeded"]
+      }
+    },
+    "Send_Confirmation": {
+      "type": "ApiConnection",
+      "inputs": {
+        "host": { "connection": { "name": "@parameters('$connections')['teams']['connectionId']" } },
+        "method": "post",
+        "path": "/v1.0/teams/{teamId}/channels/{channelId}/messages",
+        "body": {
+          "content": "New claim captured: @{outputs('Extract_Claim_Text')} (Source: @{triggerBody()?['from']?['emailAddress']?['name']})"
+        }
+      },
+      "description": "Send confirmation to Teams channel. Replace teamId and channelId with your notification channel.",
+      "runAfter": { "Append_To_AtomicClaimsTable": ["Succeeded"] }
+    }
+  },
+  "parameters": {
+    "$connections": {
+      "type": "Object",
+      "description": "Connection references for Office 365, Excel Online (Business), and Teams. Configure these when importing the flow."
+    }
+  }
+}
