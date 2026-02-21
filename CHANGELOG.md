@@ -5,6 +5,30 @@ All notable changes to Σ OVERWATCH / DeepSigma will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] — 2026-02-21 — "Clean Foundations"
+
+### Changed
+
+- **Canonical 9-folder structure**: Repo root reduced from 30+ items to 9 tracked folders + standard config files
+- `specs/` → `schemas/core/`, `templates/` → `artifacts/templates/`, `examples/` → `docs/examples/`, `fixtures/` → `tests/fixtures/`, `mdpt/` → `src/mdpt/` (PR #176)
+- 6 variant Dockerfiles moved to `docker/` subdirectory (PR #177)
+- `HERO_DEMO.md`, `STABILITY.md`, `START_HERE.md` moved into `docs/` (PR #178)
+- `sample_data/` → `artifacts/sample_data/`, `scripts/` → `src/tools/prompt_os/` (PR #179)
+- ~50 internal links rebased; ~15 pre-existing broken links fixed as side-effect
+- `.dockerignore` updated: `!docs/examples/` allowlist, removed stale entries
+- 5 variant Dockerfiles fixed: `COPY specs/` → `COPY schemas/`, `COPY examples/` → `COPY docs/examples/`
+
+### Added
+
+- **Prompt OS A–E** (PR #175): Sample data CSVs, JSON schema, validation scripts, sealed run export, CI workflow with drift guards
+
+### Stats
+
+- 0 new features, 0 breaking changes — structural cleanup only
+- All 1050+ tests pass, all Docker images build, all CI green
+
+---
+
 ## [1.0.0] — 2026-02-19 — "Distributed Credibility Mesh"
 
 ### Added
