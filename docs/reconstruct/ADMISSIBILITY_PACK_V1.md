@@ -15,6 +15,7 @@ Complete verification bundle for third-party audit without live system access. E
 | `<run_id>_<ts>.json.sig.json` | Signature (single or multisig envelope) | L2 |
 | `<run_id>_<ts>.manifest.json.sig.json` | Manifest signature | L2 |
 | `transparency_log.ndjson` | Append-only transparency log excerpt | L3 |
+| `authority_ledger.ndjson` | Authority ledger excerpt (who held authority at commit) | L7 |
 | Public key or shared key procedure | For signature verification | L2 |
 
 ### Referenced Schemas
@@ -26,6 +27,7 @@ Complete verification bundle for third-party audit without live system access. E
 | `schemas/reconstruct/multisig_block_v1.json` | Multi-signature envelope |
 | `schemas/reconstruct/merkle_commitment_v1.json` | Merkle commitment roots |
 | `schemas/reconstruct/transparency_log_entry_v1.json` | Log entry format |
+| `schemas/reconstruct/authority_ledger_entry_v1.json` | Authority ledger entry format |
 
 ---
 
@@ -86,7 +88,18 @@ python src/tools/reconstruct/determinism_audit.py \
 
 Checks: hash_scope present, clock fixed, deterministic flag, exclusions, run_id deterministic, no UUIDs, committed_at matches clock, merkle commitments present, canonical JSON valid.
 
-### Step 6: Full Pipeline Verification (All-in-One)
+### Step 6: Verify Authority Ledger
+
+```bash
+python src/tools/reconstruct/replay_sealed_run.py \
+    --sealed <sealed_run>.json \
+    --verify-authority true \
+    --authority-ledger authority_ledger.ndjson
+```
+
+Checks: authority_ledger_ref present, entry exists with matching hash, not revoked at commit time, scope covers decision, effective_at <= committed_at, not expired.
+
+### Step 7: Full Pipeline Verification (All-in-One)
 
 ```bash
 python src/tools/reconstruct/replay_sealed_run.py \
@@ -95,7 +108,9 @@ python src/tools/reconstruct/replay_sealed_run.py \
     --key <key> \
     --verify-transparency true \
     --transparency-log transparency_log.ndjson \
-    --require-multisig 2
+    --require-multisig 2 \
+    --verify-authority true \
+    --authority-ledger authority_ledger.ndjson
 ```
 
 ---
@@ -111,6 +126,7 @@ python src/tools/reconstruct/replay_sealed_run.py \
 | L4 | Committed | Merkle-bound | + inputs_commitments |
 | L5 | Witnessed | Multi-party attestation | + multisig envelope |
 | L6 | Hardware-Backed | Key attestation | + signer_type: hardware |
+| L7 | Authority-Bound | Actor held valid, scoped authority | + authority_ledger.ndjson |
 
 See [ADMISSIBILITY_LEVELS.md](ADMISSIBILITY_LEVELS.md) for full definitions.
 
@@ -125,6 +141,7 @@ python src/tools/reconstruct/seal_and_prove.py \
     --sign-algo hmac \
     --sign-key-id ds-dev-2026-02 \
     --sign-key "$DEEPSIGMA_SIGNING_KEY" \
+    --auto-authority \
     --pack-dir /path/to/admissibility-pack
 ```
 

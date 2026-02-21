@@ -1,0 +1,238 @@
+{
+  "commit_hash": "sha256:0d0a43edadc41813250a9adcd25e2600075837f49fecddf037a3c767ce5edc4c",
+  "decision_id": "DEC-001",
+  "file_row_counts": {
+    "artifacts/sample_data/prompt_os_v2/assumptions.csv": 25,
+    "artifacts/sample_data/prompt_os_v2/atomic_claims.csv": 25,
+    "artifacts/sample_data/prompt_os_v2/dashboard_trends.csv": 12,
+    "artifacts/sample_data/prompt_os_v2/decision_log.csv": 25,
+    "artifacts/sample_data/prompt_os_v2/llm_output.csv": 25,
+    "artifacts/sample_data/prompt_os_v2/patch_log.csv": 25,
+    "artifacts/sample_data/prompt_os_v2/prompt_library.csv": 25
+  },
+  "hash_scope": {
+    "exclusions": [
+      "observed_at",
+      "artifacts_emitted"
+    ],
+    "inputs": [
+      {
+        "path": "artifacts/sample_data/prompt_os_v2/assumptions.csv",
+        "sha256": "sha256:40302e2513c73764f7e3378c09a799d64d2c0284da05bf826342b39851242041",
+        "type": "csv"
+      },
+      {
+        "path": "artifacts/sample_data/prompt_os_v2/atomic_claims.csv",
+        "sha256": "sha256:9a43cde3f556936765a0d7aa039ee8c8b92fe0032b0ab78a262f0c54559360ec",
+        "type": "csv"
+      },
+      {
+        "path": "artifacts/sample_data/prompt_os_v2/dashboard_trends.csv",
+        "sha256": "sha256:331bb5a2e271d584a5eb61e95dad4e8052cac966714e38c1f695dd9e1bc16756",
+        "type": "csv"
+      },
+      {
+        "path": "artifacts/sample_data/prompt_os_v2/decision_log.csv",
+        "sha256": "sha256:cab2c36bbd1fd16de88430f3cce1a40e1b46138c794804e46a484d269189c3d9",
+        "type": "csv"
+      },
+      {
+        "path": "artifacts/sample_data/prompt_os_v2/llm_output.csv",
+        "sha256": "sha256:c8c4750da9e12f0bb62db4b121cf18b091ad0dde57727690b96a6d4649a4de9f",
+        "type": "csv"
+      },
+      {
+        "path": "artifacts/sample_data/prompt_os_v2/patch_log.csv",
+        "sha256": "sha256:3a3b32195b3b53551f8892c3dfe5c8e02d201c83f38243a6c9c9422468214b60",
+        "type": "csv"
+      },
+      {
+        "path": "artifacts/sample_data/prompt_os_v2/prompt_library.csv",
+        "sha256": "sha256:f4ef784fc735ea98c1c95bc163ac7bd90799c2e520c5bc8209a145ca2ea961fd",
+        "type": "csv"
+      }
+    ],
+    "parameters": {
+      "clock": "2026-02-21T00:00:00Z",
+      "deterministic": true
+    },
+    "policies": [
+      {
+        "path": "docs/governance/POLICY_BASELINE.md",
+        "sha256": "sha256:74b373520f0a880085798a265165dbd43909602ce589d9d4ec11d87904204493",
+        "version": "GOV-2.0.2"
+      }
+    ],
+    "prompts": [
+      {
+        "path": "prompts/README.md",
+        "sha256": "sha256:8927a1a123d8185809ee9128b38463afaff10b5b913cd97faede9282c812f5ba"
+      },
+      {
+        "path": "prompts/canonical/01_unified_executive_analysis.md",
+        "sha256": "sha256:0d5416943d4cbc433b05a0756029e36c1076a1ae81fbdf907844304d739edc11"
+      },
+      {
+        "path": "prompts/canonical/01_unified_executive_analysis_json.md",
+        "sha256": "sha256:ceae5c0b5605743d969e181ddea2f7b081980eab16387f42c7340ad1d608fcbc"
+      },
+      {
+        "path": "prompts/canonical/02_reality_assessment.md",
+        "sha256": "sha256:cce624f8fb903719b88ea436fdd972b745f17d3f1048959b6e4e7bcbff62849d"
+      },
+      {
+        "path": "prompts/canonical/02_reality_assessment_json.md",
+        "sha256": "sha256:c47866cc8ca5b3da121a85ec510a294f39d1df30bad371738911ac6632ab4a24"
+      },
+      {
+        "path": "prompts/canonical/03_multi_dim_prompting_for_teams_a1.md",
+        "sha256": "sha256:cecc12608c355cd81a72a48d1f7950b4a6f35d35f25e46968fd23a621e9076a9"
+      },
+      {
+        "path": "prompts/canonical/03_multi_dim_prompting_for_teams_a1_json.md",
+        "sha256": "sha256:29e44a167b547be68db5b03bbf24e19b7fa97c3cfaf5648e3859728ae4bbdf4e"
+      },
+      {
+        "path": "prompts/canonical/04_decision_compression.md",
+        "sha256": "sha256:b1c06f439ec2b86149a9c396d687252c45cd1a2c21f2c5e0d36cba4b0621d4ba"
+      },
+      {
+        "path": "prompts/prompt_os/START_SESSION_A1.md",
+        "sha256": "sha256:8b1a1fcc0e2b1e70eb88132b59d76546968713563cc4dca44cde78b48ab9d829"
+      }
+    ],
+    "schemas": [
+      {
+        "path": "schemas/core/action_contract.schema.json",
+        "sha256": "sha256:968cf1c471f872dc1b0b170f1b5065fa1d8eafc64057344c2fb4d4a75dab7788"
+      },
+      {
+        "path": "schemas/core/canon.schema.json",
+        "sha256": "sha256:de3dfaf3d6643eba6e06e7b0ba8755a867436ce64a3567396a32babf310445ed"
+      },
+      {
+        "path": "schemas/core/claim.schema.json",
+        "sha256": "sha256:58f6fbb6520764cd268d0a092e407ea47b7f47a526b1b03bf9d0ade710ac9d6c"
+      },
+      {
+        "path": "schemas/core/connector_envelope.schema.json",
+        "sha256": "sha256:c43ebb90e7de7da61795dab87bdb78dabdcf5152e3c88d465b4c1711523bcdb1"
+      },
+      {
+        "path": "schemas/core/dlr.schema.json",
+        "sha256": "sha256:0ea927c9e6d71fde4c888815bb12a546b47764b59058c66e1165af0ed2cfdb8a"
+      },
+      {
+        "path": "schemas/core/drift.schema.json",
+        "sha256": "sha256:284eaf9e7a41f232e6c383faa3a9e156f0087a894ba5d6c8f97f033de0866d0e"
+      },
+      {
+        "path": "schemas/core/dte.schema.json",
+        "sha256": "sha256:a9287d90ab04f24fb3058ff28330aa996a88a2312e00305bbe022ca60dcb4f7a"
+      },
+      {
+        "path": "schemas/core/episode.schema.json",
+        "sha256": "sha256:8919fc57c41a864e3e0e91368cce5cb96da6b63ff2b83ae9493ac7e7b0fffe63"
+      },
+      {
+        "path": "schemas/core/exhaust.schema.json",
+        "sha256": "sha256:26c4ac67dce522820c0705fdd9145f7b1d0f08992589a5a215081f0238b06573"
+      },
+      {
+        "path": "schemas/core/iris_query.schema.json",
+        "sha256": "sha256:ee4fc8e456857415f09277297d9400483aab623695524afc3034de8fe7a01469"
+      },
+      {
+        "path": "schemas/core/prime_gate.schema.json",
+        "sha256": "sha256:717155da9410c436374c77689c04e7cf381eb02d7f97bc2679796fa7d5530b25"
+      },
+      {
+        "path": "schemas/core/retcon.schema.json",
+        "sha256": "sha256:ab7daaa0be55ff547f292cb91d29abd9ae001ec39819f0feada688e39cb4cee3"
+      },
+      {
+        "path": "schemas/prompt_os/prompt_os_schema_v2.json",
+        "sha256": "sha256:8a98f0bb6b7691d5021b14d5b5da742eea9bab8f0041ae4f38460f2c719fd93b"
+      },
+      {
+        "path": "schemas/reconstruct/authority_envelope_v1.json",
+        "sha256": "sha256:abaeed9be4691696c6af3b5d3512ac1c4a475de21b8d31b51c4dcf4bdc4829d7"
+      },
+      {
+        "path": "schemas/reconstruct/authority_ledger_entry_v1.json",
+        "sha256": "sha256:e7d1af1755d9b773a8f1409b37099bb1280fcb7599ba2da9a7517e51f5ddabe2"
+      },
+      {
+        "path": "schemas/reconstruct/authority_ledger_v1.json",
+        "sha256": "sha256:ab6466d66a4105ce448f32558274f4113049bb902f905b1b072e204a44fcebd6"
+      },
+      {
+        "path": "schemas/reconstruct/hash_scope_v1.json",
+        "sha256": "sha256:ec8ca3ee0d39554b2087bee24da2fa54dbbf35c48fbbdbd6416a5e89c80bea07"
+      },
+      {
+        "path": "schemas/reconstruct/merkle_commitment_v1.json",
+        "sha256": "sha256:a21dc61296de4b6f96c8bd09cb1bab5ef68a9aa4a0587fe9c2bd3706382900b8"
+      },
+      {
+        "path": "schemas/reconstruct/multisig_block_v1.json",
+        "sha256": "sha256:311664f314a2bebc4e16a7f012bf40c081be433ec2b5b5882de1475c7f487365"
+      },
+      {
+        "path": "schemas/reconstruct/refusal_codes_v1.json",
+        "sha256": "sha256:76b3df2be1541efe62ade86f5f5e021c10603e1eec9e886a99dcd83fc84dd743"
+      },
+      {
+        "path": "schemas/reconstruct/sealed_run_v1.json",
+        "sha256": "sha256:df6261a957e4b1c5f487c78b8c511e166862441ca36bd59f2a4219ffe9717380"
+      },
+      {
+        "path": "schemas/reconstruct/signature_block_v1.json",
+        "sha256": "sha256:591dfc28e209e5a8e15b369a5fb99b1c48f5f4850bbbbbbe9213338e4d4522f0"
+      },
+      {
+        "path": "schemas/reconstruct/telemetry_event_v1.json",
+        "sha256": "sha256:0342152483b435d9ae0919f82b1a3609bf23cf8b6c25977b961216476c5747df"
+      },
+      {
+        "path": "schemas/reconstruct/timestamp_block_v1.json",
+        "sha256": "sha256:d42e510f767221a459dec517766ac9bf86b2b06b415bcbb8a6db024048358d73"
+      },
+      {
+        "path": "schemas/reconstruct/transparency_log_entry_v1.json",
+        "sha256": "sha256:98fba6a305cab61d64eff5d7c69cbbb76d39761ac8d2ef9ab989f96de9bb98c1"
+      }
+    ],
+    "scope_version": "1.0"
+  },
+  "policy_version": "GOV-2.0.2",
+  "run_id": "RUN-0d0a43ed",
+  "schema_versions": {
+    "schemas/core/action_contract.schema.json": "1.0",
+    "schemas/core/canon.schema.json": "1.0",
+    "schemas/core/claim.schema.json": "1.0",
+    "schemas/core/connector_envelope.schema.json": "1.0",
+    "schemas/core/dlr.schema.json": "1.0",
+    "schemas/core/drift.schema.json": "1.0",
+    "schemas/core/dte.schema.json": "1.0",
+    "schemas/core/episode.schema.json": "1.0",
+    "schemas/core/exhaust.schema.json": "1.0",
+    "schemas/core/iris_query.schema.json": "1.0",
+    "schemas/core/prime_gate.schema.json": "1.0",
+    "schemas/core/retcon.schema.json": "1.0",
+    "schemas/prompt_os/prompt_os_schema_v2.json": "1.0",
+    "schemas/reconstruct/authority_envelope_v1.json": "1.0",
+    "schemas/reconstruct/authority_ledger_entry_v1.json": "1.0",
+    "schemas/reconstruct/authority_ledger_v1.json": "1.0",
+    "schemas/reconstruct/hash_scope_v1.json": "1.0",
+    "schemas/reconstruct/merkle_commitment_v1.json": "1.0",
+    "schemas/reconstruct/multisig_block_v1.json": "1.0",
+    "schemas/reconstruct/refusal_codes_v1.json": "1.0",
+    "schemas/reconstruct/sealed_run_v1.json": "1.0",
+    "schemas/reconstruct/signature_block_v1.json": "1.0",
+    "schemas/reconstruct/telemetry_event_v1.json": "1.0",
+    "schemas/reconstruct/timestamp_block_v1.json": "1.0",
+    "schemas/reconstruct/transparency_log_entry_v1.json": "1.0"
+  },
+  "sealed_run": "RUN-0d0a43ed_20260221T000000Z.json"
+}

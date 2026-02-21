@@ -12,6 +12,8 @@ on:
       - 'tests/test_multisig*'
       - 'tests/test_merkle*'
       - 'tests/test_seal_and_prove*'
+      - 'tests/test_authority_ledger*'
+      - 'tests/test_verify_pack*'
   pull_request:
     paths:
       - 'src/tools/reconstruct/**'
@@ -20,6 +22,8 @@ on:
       - 'tests/test_multisig*'
       - 'tests/test_merkle*'
       - 'tests/test_seal_and_prove*'
+      - 'tests/test_authority_ledger*'
+      - 'tests/test_verify_pack*'
 
 jobs:
   admissibility:
@@ -38,6 +42,8 @@ jobs:
           python -m unittest tests.test_transparency_log -v
           python -m unittest tests.test_multisig -v
           python -m unittest tests.test_seal_and_prove -v
+          python -m unittest tests.test_authority_ledger -v
+          python -m unittest tests.test_verify_pack -v
 
       - name: Run existing regression suites
         run: |
@@ -61,6 +67,8 @@ jobs:
           --user ci
           --out-dir "$RUNNER_TEMP/sealed"
           --transparency-log "$RUNNER_TEMP/log.ndjson"
+          --auto-authority
+          --authority-ledger "$RUNNER_TEMP/ledger.ndjson"
           --pack-dir "$RUNNER_TEMP/pack"
 
       - name: Verify transparency chain
@@ -83,3 +91,15 @@ jobs:
         run: |
           sealed=$(ls "$RUNNER_TEMP"/sealed/RUN-*.json | grep -v '\.sig\.' | grep -v manifest | head -1)
           python src/tools/reconstruct/determinism_audit.py --sealed "$sealed" --strict
+
+      - name: Authority ledger chain verification
+        run: >
+          python src/tools/reconstruct/authority_ledger_append.py
+          --ledger-path "$RUNNER_TEMP/ledger.ndjson"
+          --verify-only
+
+      - name: Verify pack (one-command)
+        run: >
+          python src/tools/reconstruct/verify_pack.py
+          --pack "$RUNNER_TEMP/pack"
+          --key "$SIGN_KEY"
