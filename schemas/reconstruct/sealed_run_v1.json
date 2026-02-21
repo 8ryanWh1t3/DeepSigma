@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deepsigma.dev/schemas/reconstruct/sealed_run_v1.json",
+  "title": "Sealed Run v1 (Reconstructable)",
+  "description": "Unified sealed run with embedded authority envelope, input references, and replay instructions.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "authority_envelope",
+    "decision_state",
+    "inputs_snapshot",
+    "outputs",
+    "artifacts_emitted",
+    "replay_instructions",
+    "hash"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "description": "Schema version for sealed_run_v1."
+    },
+    "authority_envelope": {
+      "$ref": "authority_envelope_v1.json",
+      "description": "The authority envelope binding actor, scope, policy, refusal, and enforcement."
+    },
+    "decision_state": {
+      "type": "object",
+      "required": ["decision_id", "title", "status", "confidence_pct", "priority_score"],
+      "additionalProperties": true,
+      "properties": {
+        "decision_id": {
+          "type": "string",
+          "description": "The DecisionID that was evaluated."
+        },
+        "title": {
+          "type": "string",
+          "description": "Decision title at time of sealing."
+        },
+        "status": {
+          "type": "string",
+          "description": "Decision status at time of sealing."
+        },
+        "confidence_pct": {
+          "type": "number",
+          "description": "Confidence percentage at time of sealing."
+        },
+        "priority_score": {
+          "type": "number",
+          "description": "Priority score at time of sealing."
+        }
+      }
+    },
+    "inputs_snapshot": {
+      "type": "object",
+      "required": ["files"],
+      "additionalProperties": false,
+      "properties": {
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["path", "sha256"],
+            "properties": {
+              "path": { "type": "string" },
+              "sha256": { "type": "string" }
+            }
+          },
+          "description": "References to input files (path + hash). No raw content embedded."
+        }
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "required": ["top_risks", "top_actions", "suggested_updates"],
+      "additionalProperties": false,
+      "properties": {
+        "top_risks": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "top_actions": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "suggested_updates": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "artifacts_emitted": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": { "type": "string" },
+          "sha256": { "type": "string" }
+        }
+      },
+      "description": "Paths and hashes of artifacts produced by this run."
+    },
+    "replay_instructions": {
+      "type": "object",
+      "required": ["method", "command", "required_files"],
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "type": "string",
+          "description": "Reconstruction method (e.g. 'replay_sealed_run.py')."
+        },
+        "command": {
+          "type": "string",
+          "description": "Exact command to replay this sealed run."
+        },
+        "required_files": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Files required for replay (all must be present in the bundle)."
+        }
+      }
+    },
+    "hash": {
+      "type": "string",
+      "description": "SHA-256 hash of the sealed run JSON (with hash field set to empty string)."
+    }
+  }
+}

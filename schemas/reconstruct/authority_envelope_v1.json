@@ -1,0 +1,205 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deepsigma.dev/schemas/reconstruct/authority_envelope_v1.json",
+  "title": "Authority Envelope v1",
+  "description": "Binds an actor's authority to a specific scope, policy snapshot, and refusal/enforcement state at decision time.",
+  "type": "object",
+  "required": [
+    "envelope_version",
+    "actor",
+    "authority",
+    "scope_bound",
+    "policy_snapshot",
+    "refusal",
+    "enforcement",
+    "provenance"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "envelope_version": {
+      "const": "1.0",
+      "description": "Schema version for the authority envelope."
+    },
+    "actor": {
+      "type": "object",
+      "required": ["id", "role"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier of the actor (person or system)."
+        },
+        "role": {
+          "type": "string",
+          "description": "Role at time of action (e.g. 'Operator', 'Reviewer', 'System')."
+        },
+        "org_unit": {
+          "type": "string",
+          "description": "Organizational unit (optional)."
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "required": ["type", "source", "effective_at", "expires_at"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["delegated", "direct", "system", "inherited"],
+          "description": "How authority was obtained."
+        },
+        "source": {
+          "type": "string",
+          "description": "Reference to the authority grant (policy doc, delegation chain, etc.)."
+        },
+        "effective_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When authority became effective (ISO 8601)."
+        },
+        "expires_at": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "When authority expires (ISO 8601). Null if no expiry."
+        }
+      }
+    },
+    "scope_bound": {
+      "type": "object",
+      "required": ["decisions", "claims", "patches", "prompts", "datasets"],
+      "additionalProperties": false,
+      "properties": {
+        "decisions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Decision IDs in scope."
+        },
+        "claims": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Claim IDs in scope."
+        },
+        "patches": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Patch IDs in scope."
+        },
+        "prompts": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Prompt IDs or filenames in scope."
+        },
+        "datasets": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Dataset filenames in scope."
+        }
+      }
+    },
+    "policy_snapshot": {
+      "type": "object",
+      "required": ["policy_version", "policy_hash", "prompt_hashes", "schema_version"],
+      "additionalProperties": false,
+      "properties": {
+        "policy_version": {
+          "type": "string",
+          "description": "Policy version string (e.g. 'GOV-2.0.2')."
+        },
+        "policy_hash": {
+          "type": "string",
+          "description": "SHA-256 hash of the policy baseline document."
+        },
+        "prompt_hashes": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Map of prompt filename → SHA-256 hash."
+        },
+        "schema_version": {
+          "type": "string",
+          "description": "Schema version used for validation."
+        }
+      }
+    },
+    "refusal": {
+      "type": "object",
+      "required": [
+        "refusal_available",
+        "refusal_triggered",
+        "refusal_reason_code",
+        "checks_performed"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "refusal_available": {
+          "type": "boolean",
+          "description": "Whether refusal was structurally possible."
+        },
+        "refusal_triggered": {
+          "type": "boolean",
+          "description": "Whether refusal was actually triggered."
+        },
+        "refusal_reason_code": {
+          "type": ["string", "null"],
+          "description": "Refusal code if triggered, null otherwise."
+        },
+        "checks_performed": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of refusal checks executed (even if all passed)."
+        }
+      }
+    },
+    "enforcement": {
+      "type": "object",
+      "required": ["gates_checked", "gate_outcomes", "enforcement_emitted"],
+      "additionalProperties": false,
+      "properties": {
+        "gates_checked": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Names of enforcement gates checked."
+        },
+        "gate_outcomes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["gate", "result"],
+            "properties": {
+              "gate": { "type": "string" },
+              "result": {
+                "type": "string",
+                "enum": ["pass", "fail", "skip"]
+              }
+            }
+          },
+          "description": "Outcome for each gate checked."
+        },
+        "enforcement_emitted": {
+          "type": "boolean",
+          "description": "Whether enforcement artifacts were emitted."
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["created_at", "run_id", "deterministic_inputs_hash"],
+      "additionalProperties": false,
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of envelope creation (ISO 8601)."
+        },
+        "run_id": {
+          "type": "string",
+          "description": "Run ID this envelope is bound to."
+        },
+        "deterministic_inputs_hash": {
+          "type": "string",
+          "description": "SHA-256 hash of all deterministic inputs used."
+        }
+      }
+    }
+  }
+}

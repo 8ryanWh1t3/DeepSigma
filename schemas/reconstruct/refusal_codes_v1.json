@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deepsigma.dev/schemas/reconstruct/refusal_codes_v1.json",
+  "title": "Refusal Codes v1",
+  "description": "Enumerated refusal reason codes for authority envelope refusal checks.",
+  "type": "object",
+  "required": ["version", "codes"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "codes": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "NO_AUTHORITY": {
+          "type": "object",
+          "properties": {
+            "description": { "const": "Actor does not hold authority for the requested scope." },
+            "severity": { "const": "BLOCK" }
+          }
+        },
+        "SCOPE_VIOLATION": {
+          "type": "object",
+          "properties": {
+            "description": { "const": "Action falls outside the actor's bound scope." },
+            "severity": { "const": "BLOCK" }
+          }
+        },
+        "POLICY_EXPIRED": {
+          "type": "object",
+          "properties": {
+            "description": { "const": "Governing policy version has expired or been superseded." },
+            "severity": { "const": "BLOCK" }
+          }
+        },
+        "INSUFFICIENT_EVIDENCE": {
+          "type": "object",
+          "properties": {
+            "description": { "const": "Decision lacks minimum required evidence threshold." },
+            "severity": { "const": "WARN" }
+          }
+        },
+        "UNSAFE_ACTION": {
+          "type": "object",
+          "properties": {
+            "description": { "const": "Action classified as unsafe under current policy." },
+            "severity": { "const": "BLOCK" }
+          }
+        },
+        "MISSING_PROVENANCE": {
+          "type": "object",
+          "properties": {
+            "description": { "const": "Required provenance fields are absent or incomplete." },
+            "severity": { "const": "BLOCK" }
+          }
+        }
+      }
+    }
+  }
+}
