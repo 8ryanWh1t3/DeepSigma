@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deepsigma.dev/schemas/reconstruct/authority_ledger_entry_v1.json",
+  "title": "Authority Ledger Entry v1",
+  "description": "A single append-only entry in the authority ledger, recording who held authority at a specific moment.",
+  "type": "object",
+  "required": [
+    "entry_version",
+    "entry_id",
+    "authority_id",
+    "actor_id",
+    "actor_role",
+    "grant_type",
+    "scope_bound",
+    "policy_version",
+    "policy_hash",
+    "effective_at",
+    "prev_entry_hash",
+    "entry_hash",
+    "observed_at"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "entry_version": {
+      "const": "1.0",
+      "description": "Authority ledger entry schema version."
+    },
+    "entry_id": {
+      "type": "string",
+      "pattern": "^AUTH-[a-f0-9]{8}$",
+      "description": "Deterministic entry ID."
+    },
+    "authority_id": {
+      "type": "string",
+      "description": "Stable identifier for this authority grant (e.g. GOV-2.1, OP-alice-2026)."
+    },
+    "actor_id": {
+      "type": "string",
+      "description": "Actor who holds or is granted this authority."
+    },
+    "actor_role": {
+      "type": "string",
+      "description": "Role of the actor (e.g. Operator, Reviewer, System)."
+    },
+    "grant_type": {
+      "type": "string",
+      "enum": ["direct", "delegated", "emergency", "revocation"],
+      "description": "How authority was obtained or revoked."
+    },
+    "scope_bound": {
+      "type": "object",
+      "required": ["decisions", "claims", "patches", "prompts", "datasets"],
+      "additionalProperties": false,
+      "properties": {
+        "decisions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Decision IDs in scope."
+        },
+        "claims": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Claim IDs in scope."
+        },
+        "patches": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Patch IDs in scope."
+        },
+        "prompts": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Prompt IDs or filenames in scope."
+        },
+        "datasets": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Dataset filenames in scope."
+        }
+      },
+      "description": "Boundary of authority — what this grant covers."
+    },
+    "policy_version": {
+      "type": "string",
+      "description": "Policy version in effect at time of grant."
+    },
+    "policy_hash": {
+      "type": "string",
+      "description": "SHA-256 hash of the policy baseline document."
+    },
+    "effective_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When authority became effective (ISO 8601)."
+    },
+    "expires_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "When authority expires (ISO 8601). Null if no expiry."
+    },
+    "revoked_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "When authority was revoked. Null if not revoked."
+    },
+    "revocation_reason": {
+      "type": ["string", "null"],
+      "description": "Reason for revocation. Null if not revoked."
+    },
+    "witness_required": {
+      "type": "boolean",
+      "description": "Whether a witness co-signature is required for this authority."
+    },
+    "witness_role": {
+      "type": ["string", "null"],
+      "description": "Required witness role (e.g. Reviewer, Auditor). Null if no witness required."
+    },
+    "signing_key_id": {
+      "type": ["string", "null"],
+      "description": "Key ID used to sign/assert this authority entry."
+    },
+    "signature_ref": {
+      "type": ["string", "null"],
+      "description": "Path to signature artifact for this entry."
+    },
+    "commit_hash_refs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Sealed run commit hashes that referenced this authority entry."
+    },
+    "notes": {
+      "type": "string",
+      "description": "Free-text notes about this authority grant."
+    },
+    "prev_entry_hash": {
+      "type": ["string", "null"],
+      "description": "Hash of the previous ledger entry (null for first entry)."
+    },
+    "entry_hash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 of this entry (with entry_hash set to empty string during computation)."
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Wall-clock time when entry was appended."
+    }
+  }
+}

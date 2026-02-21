@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deepsigma.dev/schemas/reconstruct/authority_ledger_v1.json",
+  "title": "Authority Ledger v1",
+  "description": "Metadata schema for the authority ledger format.",
+  "type": "object",
+  "required": [
+    "ledger_version",
+    "format",
+    "hash_chain_rules",
+    "verification_rules"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "ledger_version": {
+      "const": "1.0",
+      "description": "Authority ledger schema version."
+    },
+    "format": {
+      "const": "ndjson",
+      "description": "Storage format — one JSON entry per line."
+    },
+    "hash_chain_rules": {
+      "type": "string",
+      "description": "Each entry links to the previous via prev_entry_hash. entry_hash is computed with entry_hash set to empty string, then canonical JSON serialized and SHA-256 hashed."
+    },
+    "verification_rules": {
+      "type": "string",
+      "description": "Verify by recomputing each entry_hash and checking prev_entry_hash chain continuity. Revocations are appended as new entries with grant_type=revocation."
+    }
+  }
+}
