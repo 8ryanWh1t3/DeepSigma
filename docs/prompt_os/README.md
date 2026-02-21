@@ -112,5 +112,5 @@ See [POWER_AUTOMATE_MAPPINGS.md](POWER_AUTOMATE_MAPPINGS.md) for exact table-to-
 - [PROMPTS.md](PROMPTS.md) — Canonical prompts reference and workbook tab mapping
 - [EXECUTIVE_BRIEF_1PAGER.md](EXECUTIVE_BRIEF_1PAGER.md) — One-page executive brief for adoption
 - [RUNBOOK_PILOT_2WEEK.md](RUNBOOK_PILOT_2WEEK.md) — 2-week pilot plan with checklists
-- [GOVERNANCE_POLICY_CARD.md](GOVERNANCE_POLICY_CARD.md) — Minimal governance rules
+- [GOVERNANCE.md](GOVERNANCE.md) — Governance policy: ownership, cadence, seal policy, retention
 - [diagrams/prompt_os_flow.mmd](diagrams/prompt_os_flow.mmd) — Architecture diagram

@@ -1,6 +1,6 @@
-# Prompt OS v2 — Governance Policy Card
+# Prompt OS v2 — Governance Policy
 
-Minimal governance rules for operating the Prompt OS workbook.
+Governance rules for operating the Prompt OS workbook: ownership, review cadence, seal policy, and retention.
 
 ---
 
@@ -84,3 +84,56 @@ This rule ensures:
 | > 3 RED assumptions simultaneously | Schedule emergency review |
 | LLM triage confidence < 50% | Re-run with fresh data; consider manual review |
 | Workbook formula errors | Contact system owner; do not manually override |
+
+---
+
+## Seal Policy
+
+Sealed runs create an immutable record of a point-in-time system state.
+
+### When to Seal
+
+| Trigger | Required? | Notes |
+|---------|-----------|-------|
+| Weekly LLM triage session | **Required** | Every triage run must produce a sealed output in `LLM_OUTPUT` |
+| Before major decision (BlastRadius ≥ 4) | **Required** | Seal the system state before and after the decision |
+| Monthly full system review | **Required** | Sealed snapshot for compliance archive |
+| Ad-hoc governance audit | Recommended | Seal on request from leadership or compliance |
+| After resolving a RED patch | Recommended | Seal to record the corrected state |
+
+### Seal Contents
+
+A sealed run includes:
+- All named table data (JSON export)
+- SHA-256 hash of the combined JSON
+- Timestamp and operator identity
+- Summary confidence percentage
+- Next review date
+
+### Seal Integrity
+
+- Once a `SealHash` is written to `LLM_OUTPUT`, it is **immutable** — never overwrite
+- If a correction is needed, create a **new LLM_OUTPUT row** with an updated seal
+- Seal hashes should be verifiable: retain the source JSON alongside the hash
+
+---
+
+## Retention Policy
+
+| Artifact | Retention | Storage |
+|----------|-----------|---------|
+| Workbook (live) | Current + rolling | Shared drive (SharePoint / OneDrive) |
+| Sealed snapshots (JSON + PDF) | **12 months minimum** | Archive folder with read-only access |
+| LLM_OUTPUT rows | Indefinite (part of workbook) | Retained in workbook as permanent record |
+| DASHBOARD_TRENDS rows | Indefinite | Retained in workbook — do not prune |
+| Expired assumptions | Indefinite | Retained in workbook — mark `Expired`, do not delete |
+| Resolved patches | Indefinite | Retained in workbook — mark `Resolved`, do not delete |
+| Superseded decisions | Indefinite | Retained in workbook — mark `Superseded`, do not delete |
+
+### Retention Rules
+
+1. **Never delete rows** from any table — the workbook is an append-only ledger
+2. **Sealed snapshots** must be retained for at least 12 months for audit trail compliance
+3. **Monthly archive**: at each monthly review, export a sealed snapshot to the archive folder
+4. **Access control**: archive folder should be read-only for all users except the system owner
+5. **Naming convention**: sealed snapshots use `YYYY-MM-DD_sealed_snapshot.json` format
