@@ -187,7 +187,7 @@ def main() -> int:
 
     print("-" * 55)
     total = len(result.checks)
-    ok_count = sum(1 for _, l, _ in result.checks if l == "ok")
+    ok_count = sum(1 for _, lvl, _ in result.checks if lvl == "ok")
     print(f"  {ok_count}/{total} checks passed", end="")
     if result.warnings:
         print(f", {result.warnings} warnings", end="")

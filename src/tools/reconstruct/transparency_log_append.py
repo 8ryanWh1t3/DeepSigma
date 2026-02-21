@@ -145,7 +145,7 @@ def verify_chain(log_path: Path) -> list[tuple[int, bool, str]]:
                 results.append((line_num, True, "Chain head (prev=null)"))
         else:
             if recorded_prev == prev_hash:
-                results.append((line_num, True, f"Chain link valid"))
+                results.append((line_num, True, "Chain link valid"))
             else:
                 results.append((
                     line_num, False,

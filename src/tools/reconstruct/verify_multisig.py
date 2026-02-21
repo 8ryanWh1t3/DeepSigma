@@ -17,7 +17,7 @@ import json
 import sys
 from pathlib import Path
 
-from canonical_json import canonical_dumps, sha256_bytes
+from canonical_json import canonical_dumps
 from verify_signature import VerifyResult, verify_hmac, verify_ed25519
 
 

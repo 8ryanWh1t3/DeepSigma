@@ -120,7 +120,7 @@ class TestProducesPack(SealAndProveTestBase):
     def test_produces_pack(self) -> None:
         """pack_dir contains expected files after a full run."""
         pack_dir = Path(self.tmpdir) / "pack"
-        summary = self._run_pipeline(pack_dir=pack_dir)
+        self._run_pipeline(pack_dir=pack_dir)
 
         self.assertTrue(pack_dir.exists(), "Pack dir should be created")
 
