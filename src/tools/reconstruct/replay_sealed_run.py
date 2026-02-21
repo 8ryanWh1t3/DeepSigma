@@ -210,6 +210,62 @@ def verify_strict_files(sealed: dict, result: ReplayResult) -> None:
             result.set_exit_code(4)
 
 
+def verify_commitments(sealed: dict, result: ReplayResult) -> None:
+    """Verify merkle commitment roots against hash_scope leaf hashes.
+
+    Auto-detects: only runs if inputs_commitments is present.
+    Recomputes each merkle root from the hash_scope entries and compares
+    against the recorded roots.
+    """
+    commitments = sealed.get("inputs_commitments")
+    if commitments is None:
+        return  # Pre-v1.3 sealed run — skip silently
+
+    from merkle import merkle_root
+
+    hash_scope = sealed.get("hash_scope", {})
+
+    # Inputs root — leaves are the sha256 hashes from hash_scope.inputs
+    input_leaves = sorted(e["sha256"] for e in hash_scope.get("inputs", []))
+    expected_inputs = commitments.get("inputs_root", "")
+    computed_inputs = merkle_root(input_leaves)
+    if computed_inputs == expected_inputs:
+        result.check("commitments.inputs_root", True, "Inputs merkle root verified")
+    else:
+        result.check("commitments.inputs_root", False,
+                      f"Inputs root mismatch: {computed_inputs[:30]}... != {expected_inputs[:30]}...")
+
+    # Prompts root — leaves are the sha256 hashes from hash_scope.prompts
+    prompt_leaves = sorted(e["sha256"] for e in hash_scope.get("prompts", []))
+    expected_prompts = commitments.get("prompts_root", "")
+    computed_prompts = merkle_root(prompt_leaves)
+    if computed_prompts == expected_prompts:
+        result.check("commitments.prompts_root", True, "Prompts merkle root verified")
+    else:
+        result.check("commitments.prompts_root", False,
+                      f"Prompts root mismatch: {computed_prompts[:30]}... != {expected_prompts[:30]}...")
+
+    # Schemas root — leaves are the sha256 hashes from hash_scope.schemas
+    schema_leaves = sorted(e["sha256"] for e in hash_scope.get("schemas", []))
+    expected_schemas = commitments.get("schemas_root", "")
+    computed_schemas = merkle_root(schema_leaves)
+    if computed_schemas == expected_schemas:
+        result.check("commitments.schemas_root", True, "Schemas merkle root verified")
+    else:
+        result.check("commitments.schemas_root", False,
+                      f"Schemas root mismatch: {computed_schemas[:30]}... != {expected_schemas[:30]}...")
+
+    # Policies root — leaves are the sha256 hashes from hash_scope.policies
+    policy_leaves = sorted(e["sha256"] for e in hash_scope.get("policies", []))
+    expected_policies = commitments.get("policies_root", "")
+    computed_policies = merkle_root(policy_leaves)
+    if computed_policies == expected_policies:
+        result.check("commitments.policies_root", True, "Policies merkle root verified")
+    else:
+        result.check("commitments.policies_root", False,
+                      f"Policies root mismatch: {computed_policies[:30]}... != {expected_policies[:30]}...")
+
+
 def verify_transparency_check(
     sealed: dict,
     transparency_log: Path,
@@ -488,6 +544,9 @@ def replay(sealed_path: Path, verify_hash: bool = True, strict_files: bool = Fal
         verify_hash_scope(sealed, result)
         verify_commit_hash(sealed, result)
         verify_exclusions(sealed, result)
+
+    # Merkle commitment verification (auto-detect, v1.3+)
+    verify_commitments(sealed, result)
 
     # Strict file checks
     if strict_files:

@@ -287,6 +287,16 @@ def build_sealed_run(
         "required_files": [f["path"] for f in input_files],
     }
 
+    # Build merkle commitment roots (derived from same data as hash_scope)
+    # Lazy import to avoid circular dependency (build_commitments → seal_bundle)
+    from build_commitments import build_commitment
+    inputs_commitments = build_commitment(
+        data_dir=data_dir,
+        prompts_dir=prompts_dir,
+        schemas_dir=schemas_dir,
+        policy_baseline=policy_baseline,
+    )
+
     sealed = {
         "schema_version": "1.0",
         "authority_envelope": authority_envelope,
@@ -297,6 +307,7 @@ def build_sealed_run(
         "replay_instructions": replay_instructions,
         "hash_scope": hash_scope,
         "commit_hash": commit_hash,
+        "inputs_commitments": inputs_commitments,
         "hash": "",
     }
 
@@ -304,6 +315,54 @@ def build_sealed_run(
     sealed["hash"] = sha256_text(canonical_dumps(sealed))
 
     return sealed, sealed_filename, run_id
+
+
+def write_sealed_output(
+    sealed: dict,
+    filename: str,
+    out_dir: Path,
+    data_dir: Path,
+) -> tuple[Path, Path]:
+    """Write sealed run + manifest to disk. Returns (sealed_path, manifest_path)."""
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / filename
+
+    with open(out_path, "w") as f:
+        f.write(json.dumps(sealed, indent=2, sort_keys=True))
+
+    # Write manifest
+    run_id = sealed["authority_envelope"]["provenance"]["run_id"]
+    decision_id = sealed["decision_state"]["decision_id"]
+    manifest_path = out_dir / filename.replace(".json", ".manifest.json")
+    manifest = {
+        "sealed_run": filename,
+        "run_id": run_id,
+        "decision_id": decision_id,
+        "commit_hash": sealed["commit_hash"],
+        "hash_scope": sealed["hash_scope"],
+        "file_row_counts": {
+            e["path"]: _count_csv_rows(data_dir.parent.parent.parent / e["path"])
+            for e in sealed["hash_scope"]["inputs"]
+        },
+        "policy_version": sealed["authority_envelope"]["policy_snapshot"]["policy_version"],
+        "schema_versions": {
+            e["path"]: "1.0" for e in sealed["hash_scope"]["schemas"]
+        },
+    }
+    with open(manifest_path, "w") as f:
+        f.write(json.dumps(manifest, indent=2, sort_keys=True))
+
+    # Update artifacts_emitted and recompute hash
+    sealed["artifacts_emitted"] = [
+        {"path": str(out_path), "sha256": sha256_file(out_path)},
+        {"path": str(manifest_path), "sha256": sha256_file(manifest_path)},
+    ]
+    sealed["hash"] = ""
+    sealed["hash"] = sha256_text(canonical_dumps(sealed))
+    with open(out_path, "w") as f:
+        f.write(json.dumps(sealed, indent=2, sort_keys=True))
+
+    return out_path, manifest_path
 
 
 # ── Main ─────────────────────────────────────────────────────────
@@ -367,43 +426,10 @@ def main() -> int:
         deterministic=deterministic,
     )
 
-    # Write sealed run (sorted JSON for readability)
-    out_dir: Path = args.out_dir
-    out_dir.mkdir(parents=True, exist_ok=True)
-    out_path = out_dir / filename
-    with open(out_path, "w") as f:
-        f.write(json.dumps(sealed, indent=2, sort_keys=True))
-
-    # Write manifest
-    manifest_path = out_dir / filename.replace(".json", ".manifest.json")
-    manifest = {
-        "sealed_run": filename,
-        "run_id": run_id,
-        "decision_id": args.decision_id,
-        "commit_hash": sealed["commit_hash"],
-        "hash_scope": sealed["hash_scope"],
-        "file_row_counts": {
-            e["path"]: _count_csv_rows(data_dir.parent.parent.parent / e["path"])
-            for e in sealed["hash_scope"]["inputs"]
-        },
-        "policy_version": sealed["authority_envelope"]["policy_snapshot"]["policy_version"],
-        "schema_versions": {
-            e["path"]: "1.0" for e in sealed["hash_scope"]["schemas"]
-        },
-    }
-    with open(manifest_path, "w") as f:
-        f.write(json.dumps(manifest, indent=2, sort_keys=True))
-
-    # Update artifacts_emitted
-    sealed["artifacts_emitted"] = [
-        {"path": str(out_path), "sha256": sha256_file(out_path)},
-        {"path": str(manifest_path), "sha256": sha256_file(manifest_path)},
-    ]
-    # Recompute hash after updating artifacts_emitted
-    sealed["hash"] = ""
-    sealed["hash"] = sha256_text(canonical_dumps(sealed))
-    with open(out_path, "w") as f:
-        f.write(json.dumps(sealed, indent=2, sort_keys=True))
+    # Write sealed run + manifest
+    out_path, manifest_path = write_sealed_output(
+        sealed, filename, args.out_dir, data_dir,
+    )
 
     # Signing (optional)
     sig_paths = []
