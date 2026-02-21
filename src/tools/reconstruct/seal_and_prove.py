@@ -232,6 +232,16 @@ def seal_and_prove(
         # Copy authority ledger if it exists
         if authority_entry_id and authority_ledger_path.exists():
             shutil.copy2(authority_ledger_path, pack_dir / "authority_ledger.ndjson")
+        # Write verify instructions
+        verify_instructions = (
+            "# Verify This Pack\n\n"
+            "```bash\n"
+            f"python src/tools/reconstruct/verify_pack.py --pack {pack_dir}"
+        )
+        if sign_algo == "hmac":
+            verify_instructions += ' --key "$KEY"'
+        verify_instructions += "\n```\n"
+        (pack_dir / "VERIFY_INSTRUCTIONS.md").write_text(verify_instructions)
 
     summary = {
         "decision_id": decision_id,
