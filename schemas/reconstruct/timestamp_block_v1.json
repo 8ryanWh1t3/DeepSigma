@@ -43,6 +43,11 @@
       "type": ["string", "null"],
       "description": "Blockchain anchor transaction ID (null for non-chain methods)."
     },
+    "log_head_hash": {
+      "type": ["string", "null"],
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 of the full transparency log at time of timestamping (log head anchor)."
+    },
     "payload_commit_hash": {
       "type": "string",
       "pattern": "^sha256:[a-f0-9]{64}$",
