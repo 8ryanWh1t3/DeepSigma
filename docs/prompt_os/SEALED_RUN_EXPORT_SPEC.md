@@ -109,6 +109,35 @@ Future: workbook-based extraction via openpyxl (reads directly from `LLM_OUTPUT`
 
 ---
 
+## Reconstructability Requirements
+
+Sealed runs produced by `seal_bundle.py` (v1+) must satisfy these additional requirements beyond the base schema:
+
+1. **Authority envelope required.** Every sealed run must embed a complete `authority_envelope` binding actor, role, scope, policy snapshot, refusal state, and enforcement state.
+
+2. **Policy/prompt/schema hashes required.** The `policy_snapshot` must include:
+   - `policy_version` — read from `docs/governance/POLICY_VERSION.txt`
+   - `policy_hash` — SHA-256 of `docs/governance/POLICY_BASELINE.md`
+   - `prompt_hashes` — SHA-256 of each prompt file used
+   - `schema_version` — version of the governing schema
+
+3. **Refusal checks must be recorded.** The `refusal.checks_performed` array must list all checks evaluated, even if none triggered. An empty array is inadmissible.
+
+4. **Enforcement must emit admissible artifacts.** `enforcement.enforcement_emitted` must be `true` and all `gate_outcomes` must have `result: "pass"` for the run to be admissible.
+
+5. **Replay script must succeed without live system.** The sealed run must be reconstructable using only the exported bundle:
+   ```bash
+   python src/tools/reconstruct/replay_sealed_run.py --sealed <path>
+   ```
+   A non-zero exit code means the sealed run is **inadmissible**.
+
+See:
+- [schemas/reconstruct/sealed_run_v1.json](../../schemas/reconstruct/sealed_run_v1.json) — Full schema
+- [schemas/reconstruct/authority_envelope_v1.json](../../schemas/reconstruct/authority_envelope_v1.json) — Authority envelope schema
+- [docs/reconstruct/ADVERSARIAL_REPLAY_GUIDE.md](../reconstruct/ADVERSARIAL_REPLAY_GUIDE.md) — Third-party replay guide
+
+---
+
 ## Related Docs
 
 - [GOVERNANCE.md](GOVERNANCE.md) — Seal policy and retention rules
