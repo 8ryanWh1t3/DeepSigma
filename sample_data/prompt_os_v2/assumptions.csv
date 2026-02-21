@@ -1,5 +1,26 @@
 AssumptionID,Assumption,LinkedDecisionID,Confidence_pct,CreatedDate,HalfLife_days,ExpiryDate,ExpiryRisk,DisconfirmSignal,LastReviewed,Status,Notes
-ASM-001,Budget approved for Q1 cloud migration,DEC-001,80,2026-01-10,90,2026-04-10,GREEN,CFO budget revision,2026-02-01,Active,Re-verify March
-ASM-002,Hiring freeze lifted permanently,DEC-002,60,2026-01-15,60,2026-03-16,YELLOW,HR policy change announcement,2026-02-10,Active,Fragile
-ASM-003,Legacy API migration path is complete,DEC-003,50,2026-02-01,45,2026-03-18,YELLOW,v2 parity test failure,2026-02-15,Active,Needs validation
-ASM-004,Vendor SSO integration stable,DEC-001,90,2026-01-20,180,2026-07-19,GREEN,Auth failure rate > 1%,2026-02-12,Active,Low risk
+ASM-001,Budget approved for Q1 cloud migration,DEC-001,93,2026-01-01,180,2026-06-30,GREEN,CFO budget revision,2026-02-17,Active,Note 1
+ASM-002,Hiring freeze lifted permanently,DEC-002,78,2026-01-02,45,2026-02-16,RED,HR policy change,2026-02-05,Active,Note 2
+ASM-003,Legacy API migration path is complete,DEC-003,63,2026-01-03,45,2026-02-17,RED,v2 parity test failure,2026-02-18,Active,Note 3
+ASM-004,Docker expertise available on team,DEC-004,89,2026-01-04,120,2026-05-04,GREEN,Key engineer departure,2026-02-01,Active,Note 4
+ASM-005,Vendor allows early contract exit,DEC-005,78,2026-01-05,60,2026-03-06,YELLOW,Vendor policy update,2026-02-16,Active,Note 5
+ASM-006,Headcount approved for data eng,DEC-006,41,2026-01-06,30,2026-02-05,RED,Headcount freeze,2026-02-12,Active,Note 6
+ASM-007,Consolidation budget secured,DEC-007,93,2026-01-07,60,2026-03-08,YELLOW,Budget reallocation,2026-02-08,Active,Note 7
+ASM-008,Product team available for portal,DEC-008,43,2026-01-08,45,2026-02-22,YELLOW,Product roadmap shift,2026-02-19,Active,Note 8
+ASM-009,Capital budget approved for network,DEC-009,45,2026-01-09,30,2026-02-08,RED,CapEx audit,2026-02-16,Active,Note 9
+ASM-010,Security team has bandwidth for ZTA,DEC-010,92,2026-01-10,30,2026-02-09,RED,Security incident,2026-02-18,Active,Note 10
+ASM-011,Satellite office lease terms favorable,DEC-011,89,2026-01-11,45,2026-02-25,YELLOW,Market rate spike,2026-02-05,Active,Note 11
+ASM-012,Team accepts code review changes,DEC-012,82,2026-01-12,90,2026-04-12,GREEN,Developer pushback,2026-02-18,Active,Note 12
+ASM-013,Kafka cluster provisioned and stable,DEC-013,50,2026-01-13,60,2026-03-14,YELLOW,Cluster instability,2026-02-17,Active,Note 13
+ASM-014,Cloud credits cover warehouse migration,DEC-014,95,2026-01-14,120,2026-05-14,GREEN,Credit exhaustion notice,2026-02-14,Active,Note 14
+ASM-015,Executive sponsor confirmed for lab,DEC-015,53,2026-01-15,120,2026-05-15,GREEN,Sponsor role change,2026-02-07,Active,Note 15
+ASM-016,Calendar audit completed by managers,DEC-016,85,2026-02-16,60,2026-04-17,GREEN,Manager non-compliance,2026-02-13,Active,Note 16
+ASM-017,Compliance framework remains stable,DEC-017,82,2026-02-17,180,2026-08-16,GREEN,Regulatory update,2026-02-12,Active,Note 17
+ASM-018,CDN vendor supports new configuration,DEC-018,68,2026-02-18,120,2026-06-18,GREEN,CDN contract change,2026-02-15,Expired,Note 18
+ASM-019,Support staff retainable during restructure,DEC-019,47,2026-02-19,45,2026-04-05,GREEN,Staff turnover spike,2026-02-08,Expired,Note 19
+ASM-020,Data access policies finalized,DEC-020,44,2026-02-20,60,2026-04-21,GREEN,Legal review delay,2026-02-01,Expired,Note 20
+ASM-021,Schedule accommodates pair programming,DEC-021,77,2026-02-21,120,2026-06-21,GREEN,Team capacity drop,2026-02-08,Validated,Note 21
+ASM-022,QA vendor SLA is acceptable,DEC-022,77,2026-02-22,45,2026-04-08,GREEN,Vendor SLA breach,2026-02-01,Validated,Note 22
+ASM-023,Identity provider supports all apps,DEC-023,44,2026-02-23,180,2026-08-22,GREEN,App compatibility issue,2026-02-21,Validated,Note 23
+ASM-024,Teams agree on shared SLA metrics,DEC-024,43,2026-02-24,45,2026-04-10,GREEN,Metric disagreement,2026-02-03,Invalidated,Note 24
+ASM-025,CI tooling supports trunk-based flow,DEC-025,42,2026-02-25,60,2026-04-26,GREEN,Tool deprecation,2026-02-03,Invalidated,Note 25
