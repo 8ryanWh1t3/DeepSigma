@@ -62,6 +62,20 @@
     "verification_instructions": {
       "type": "string",
       "description": "Human-readable instructions for verifying this signature."
+    },
+    "signer_id": {
+      "type": ["string", "null"],
+      "description": "Optional: identifier of the signer (v1.3+)."
+    },
+    "role": {
+      "type": ["string", "null"],
+      "enum": ["operator", "reviewer", "witness", "auditor", null],
+      "description": "Optional: role of the signer (v1.3+)."
+    },
+    "signer_type": {
+      "type": ["string", "null"],
+      "enum": ["software", "hardware", "external", null],
+      "description": "Optional: key type — software, hardware (HSM/YubiKey), or external signer (v1.3+)."
     }
   }
 }

@@ -98,6 +98,9 @@ def build_signature_block(
     algorithm: str,
     key_id: str,
     key_b64: str,
+    signer_id: str | None = None,
+    role: str | None = None,
+    signer_type: str | None = None,
 ) -> dict:
     """Build a signature block for a sealed artifact."""
     raw_bytes = artifact_path.read_bytes()
@@ -141,7 +144,7 @@ def build_signature_block(
     # Normalize algorithm name
     algo_name = "hmac-sha256" if algorithm in ("hmac", "hmac-sha256") else algorithm
 
-    return {
+    block = {
         "sig_version": "1.0",
         "algorithm": algo_name,
         "signing_key_id": key_id,
@@ -152,7 +155,11 @@ def build_signature_block(
         "signature": signature,
         "public_key": public_key,
         "verification_instructions": verification_instructions,
+        "signer_id": signer_id,
+        "role": role,
+        "signer_type": signer_type,
     }
+    return block
 
 
 def sign_artifact(
@@ -161,9 +168,15 @@ def sign_artifact(
     key_id: str,
     key_b64: str,
     out_path: Path | None = None,
+    signer_id: str | None = None,
+    role: str | None = None,
+    signer_type: str | None = None,
 ) -> Path:
     """Sign an artifact and write the .sig.json file. Returns sig path."""
-    sig_block = build_signature_block(artifact_path, algorithm, key_id, key_b64)
+    sig_block = build_signature_block(
+        artifact_path, algorithm, key_id, key_b64,
+        signer_id=signer_id, role=role, signer_type=signer_type,
+    )
 
     if out_path is None:
         out_path = artifact_path.parent / (artifact_path.name + ".sig.json")
@@ -172,6 +185,83 @@ def sign_artifact(
         f.write(json.dumps(sig_block, indent=2, sort_keys=True))
 
     return out_path
+
+
+def append_signature(
+    artifact_path: Path,
+    algorithm: str,
+    key_id: str,
+    key_b64: str,
+    signer_id: str | None = None,
+    role: str | None = None,
+    sig_path: Path | None = None,
+) -> Path:
+    """Append a signature to an existing .sig.json, creating a multisig envelope.
+
+    If the existing file is a single sig block, wraps it in a multisig envelope first.
+    Returns the sig path.
+    """
+    if sig_path is None:
+        sig_path = artifact_path.parent / (artifact_path.name + ".sig.json")
+
+    # Build the new signature entry
+    new_block = build_signature_block(
+        artifact_path, algorithm, key_id, key_b64,
+        signer_id=signer_id, role=role,
+    )
+
+    # Convert to multisig signature entry format
+    new_sig_entry = {
+        "signer_id": signer_id or key_id,
+        "role": role or "operator",
+        "algorithm": new_block["algorithm"],
+        "signing_key_id": key_id,
+        "signed_at": new_block["signed_at"],
+        "signature": new_block["signature"],
+        "public_key": new_block.get("public_key"),
+    }
+
+    if sig_path.exists():
+        existing = json.loads(sig_path.read_text())
+
+        if "multisig_version" in existing:
+            # Already a multisig envelope — just append
+            existing["signatures"].append(new_sig_entry)
+            ms_block = existing
+        elif "sig_version" in existing:
+            # Single sig — wrap in multisig envelope
+            first_entry = {
+                "signer_id": existing.get("signer_id") or existing.get("signing_key_id", ""),
+                "role": existing.get("role") or "operator",
+                "algorithm": existing["algorithm"],
+                "signing_key_id": existing["signing_key_id"],
+                "signed_at": existing["signed_at"],
+                "signature": existing["signature"],
+                "public_key": existing.get("public_key"),
+            }
+            ms_block = {
+                "multisig_version": "1.0",
+                "artifact_hash": existing.get("payload_bytes_sha256", ""),
+                "threshold": 1,
+                "signatures": [first_entry, new_sig_entry],
+                "witness_requirements": None,
+            }
+        else:
+            raise ValueError(f"Unknown signature format in {sig_path}")
+    else:
+        # No existing sig — create multisig with just this one
+        ms_block = {
+            "multisig_version": "1.0",
+            "artifact_hash": new_block["payload_bytes_sha256"],
+            "threshold": 1,
+            "signatures": [new_sig_entry],
+            "witness_requirements": None,
+        }
+
+    with open(sig_path, "w") as f:
+        f.write(json.dumps(ms_block, indent=2, sort_keys=True))
+
+    return sig_path
 
 
 # ── Main ─────────────────────────────────────────────────────────
@@ -184,6 +274,12 @@ def main() -> int:
     parser.add_argument("--key", default=None,
                         help="Base64 key (or set DEEPSIGMA_SIGNING_KEY env)")
     parser.add_argument("--out", type=Path, default=None, help="Output .sig.json path")
+    parser.add_argument("--witness", default=None, help="Signer name/ID")
+    parser.add_argument("--role", default=None,
+                        choices=["operator", "reviewer", "witness", "auditor"],
+                        help="Signer role")
+    parser.add_argument("--append", action="store_true",
+                        help="Append to existing sig (creates multisig envelope)")
     args = parser.parse_args()
 
     # Resolve key
@@ -196,11 +292,23 @@ def main() -> int:
         print(f"ERROR: File not found: {args.file}", file=sys.stderr)
         return 1
 
-    sig_path = sign_artifact(args.file, args.algo, args.key_id, key_b64, args.out)
+    if args.append:
+        sig_path = append_signature(
+            args.file, args.algo, args.key_id, key_b64,
+            signer_id=args.witness, role=args.role, sig_path=args.out,
+        )
+        print(f"Appended signature: {args.file}")
+    else:
+        sig_path = sign_artifact(
+            args.file, args.algo, args.key_id, key_b64, args.out,
+            signer_id=args.witness, role=args.role,
+        )
+        print(f"Signed: {args.file}")
 
-    print(f"Signed: {args.file}")
     print(f"  Algorithm:  {args.algo}")
     print(f"  Key ID:     {args.key_id}")
+    if args.witness:
+        print(f"  Signer:     {args.witness} ({args.role or 'operator'})")
     print(f"  Signature:  {sig_path}")
     return 0
 
