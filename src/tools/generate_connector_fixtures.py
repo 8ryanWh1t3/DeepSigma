@@ -25,7 +25,7 @@ if str(_REPO_ROOT) not in sys.path:
 
 from adapters.contract import canonical_to_envelope, validate_envelope  # noqa: E402
 
-FIXTURE_BASE = _REPO_ROOT / "fixtures" / "connectors"
+FIXTURE_BASE = _REPO_ROOT / "tests" / "fixtures" / "connectors"
 
 # ── Connector-specific transformers ──────────────────────────────────────────
 
