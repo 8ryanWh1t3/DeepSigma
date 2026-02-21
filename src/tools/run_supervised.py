@@ -2,8 +2,8 @@
 """Run a supervised decision — schema-compliant output.
 
 Produces a sealed DecisionEpisode JSON that conforms to
-specs/episode.schema.json and optionally a DriftEvent JSON
-conforming to specs/drift.schema.json. Closes #1, #2.
+schemas/core/episode.schema.json and optionally a DriftEvent JSON
+conforming to schemas/core/drift.schema.json. Closes #1, #2.
 
 Usage:
     python tools/run_supervised.py \
@@ -127,7 +127,7 @@ def main():
     snapshot_id = "snap_" + uuid.uuid4().hex[:8]
     fallback_used = step not in ("none", None)
 
-    # Build schema-compliant episode (specs/episode.schema.json)
+    # Build schema-compliant episode (schemas/core/episode.schema.json)
     episode: Dict[str, Any] = {
         "episodeId": episode_id,
         "decisionType": args.decisionType,
@@ -204,7 +204,7 @@ def main():
     ep_path = out_dir / f"{episode_id}.json"
     ep_path.write_text(json.dumps(episode, indent=2), encoding="utf-8")
 
-    # --- Drift events (schema-compliant: specs/drift.schema.json) ---
+    # --- Drift events (schema-compliant: schemas/core/drift.schema.json) ---
     drift_type = None
     drift_severity = "yellow"
     drift_details: Dict[str, Any] = {}

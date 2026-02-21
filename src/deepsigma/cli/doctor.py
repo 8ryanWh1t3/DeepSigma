@@ -8,7 +8,7 @@ from pathlib import Path
 _REPO_ROOT = Path(__file__).resolve().parents[3]
 
 _TEMPLATE = (
-    _REPO_ROOT / "templates" / "creative_director_suite"
+    _REPO_ROOT / "artifacts" / "templates" / "creative_director_suite"
     / "Creative_Director_Suite_CoherenceOps_v2.xlsx"
 )
 
@@ -31,8 +31,8 @@ CHECKS: list[tuple[str, bool, object]] = [
     ("src/coherence_ops/ exists", False, lambda: (_REPO_ROOT / "src" / "coherence_ops").is_dir()),
     ("src/engine/ exists", False, lambda: (_REPO_ROOT / "src" / "engine").is_dir()),
     ("src/tools/ exists", False, lambda: (_REPO_ROOT / "src" / "tools").is_dir()),
-    ("specs/ exists", False, lambda: (_REPO_ROOT / "specs").is_dir()),
-    ("mdpt/ exists", False, lambda: (_REPO_ROOT / "mdpt").is_dir()),
+    ("schemas/core/ exists", False, lambda: (_REPO_ROOT / "schemas" / "core").is_dir()),
+    ("src/mdpt/ exists", False, lambda: (_REPO_ROOT / "src" / "mdpt").is_dir()),
     ("CDS template exists", False, lambda: _TEMPLATE.exists()),
     ("boot validator importable", False, lambda: _try_import("tools.validate_workbook_boot")),
 ]

@@ -8,8 +8,8 @@ Requires:
     pip install jsonschema referencing
 
 Validates:
-    - examples/episodes/*.json   against specs/episode.schema.json
-    - examples/drift/*.json      against specs/drift.schema.json
+    - examples/episodes/*.json   against schemas/core/episode.schema.json
+    - examples/drift/*.json      against schemas/core/drift.schema.json
     - llm_data_model/03_examples/*.json against llm_data_model/02_schema/jsonschema/canonical_record.schema.json
 """
 from __future__ import annotations
@@ -50,8 +50,8 @@ def build_registry() -> "Registry | None":
         return None
 
     resources = []
-    # Collect schemas from specs/
-    for p in (ROOT / "specs").glob("*.json"):
+    # Collect schemas from schemas/core/
+    for p in (ROOT / "schemas" / "core").glob("*.json"):
         sch = load_schema(p)
         if "$id" in sch:
             resource = referencing.Resource.from_contents(sch, default_specification=DRAFT202012)
@@ -94,20 +94,20 @@ def main():
     registry = build_registry()
 
     # --- Episode examples ---
-    episode_schema = ROOT / "specs" / "episode.schema.json"
+    episode_schema = ROOT / "schemas" / "core" / "episode.schema.json"
     for p in sorted((ROOT / "examples" / "episodes").glob("*.json")):
         validate(episode_schema, p, registry=registry)
 
     # --- Drift examples ---
-    drift_schema = ROOT / "specs" / "drift.schema.json"
+    drift_schema = ROOT / "schemas" / "core" / "drift.schema.json"
     for p in sorted((ROOT / "examples" / "drift").glob("*.json")):
         validate(drift_schema, p, registry=registry)
 
     # --- LLM Data Model examples ---
     # Schema overrides: files that use standalone schemas instead of canonical_record
     llm_schema_overrides = {
-        "claim_primitive_example.json": ROOT / "specs" / "claim.schema.json",
-        "dlr_claim_native_example.json": ROOT / "specs" / "dlr.schema.json",
+        "claim_primitive_example.json": ROOT / "schemas" / "core" / "claim.schema.json",
+        "dlr_claim_native_example.json": ROOT / "schemas" / "core" / "dlr.schema.json",
     }
 
     llm_default_schema = ROOT / "llm_data_model" / "02_schema" / "jsonschema" / "canonical_record.schema.json"
@@ -131,7 +131,7 @@ def main():
         print(f"\u2705 {canonical_demo.relative_to(ROOT)} parses as valid JSON")
 
         # Validate each episode section against episode schema
-        episode_schema = ROOT / "specs" / "episode.schema.json"
+        episode_schema = ROOT / "schemas" / "core" / "episode.schema.json"
         for key, value in data.items():
             if key.startswith("_"):
                 continue  # skip _meta
@@ -155,7 +155,7 @@ def main():
                 print(f"\u274c {canonical_demo.relative_to(ROOT)} references {ref} (schema NOT FOUND)")
 
         # Validate claim objects against claim schema
-        claim_schema = ROOT / "specs" / "claim.schema.json"
+        claim_schema = ROOT / "schemas" / "core" / "claim.schema.json"
         if claim_schema.exists():
             for key, episode in data.items():
                 if key.startswith("_") or not isinstance(episode, dict):
@@ -181,7 +181,7 @@ def main():
                         print(f"\u26a0\ufe0f  {key} claim validation skipped: {exc}")
 
         # Validate DLR-shaped sections against dlr.schema.json
-        dlr_schema = ROOT / "specs" / "dlr.schema.json"
+        dlr_schema = ROOT / "schemas" / "core" / "dlr.schema.json"
         if dlr_schema.exists():
             for key, episode in data.items():
                 if key.startswith("_") or not isinstance(episode, dict):
