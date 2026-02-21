@@ -15,12 +15,12 @@ on:
       - 'specs/**'
       - 'src/adapters/**'
       - 'pyproject.toml'
-      - 'Dockerfile.exhaust'
+      - 'docker/Dockerfile.exhaust'
       - '.github/workflows/docker-exhaust.yml'
   pull_request:
     branches: [main]
     paths:
-      - 'Dockerfile.exhaust'
+      - 'docker/Dockerfile.exhaust'
       - 'dashboard/server/exhaust_main.py'
   workflow_dispatch:
 
@@ -65,7 +65,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile.exhaust
+          file: ./docker/Dockerfile.exhaust
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

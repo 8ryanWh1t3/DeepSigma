@@ -9,12 +9,12 @@ on:
       - 'src/engine/**'
       - 'src/coherence_ops/**'
       - 'pyproject.toml'
-      - 'Dockerfile.otel'
+      - 'docker/Dockerfile.otel'
       - '.github/workflows/docker-otel.yml'
   pull_request:
     branches: [main]
     paths:
-      - 'Dockerfile.otel'
+      - 'docker/Dockerfile.otel'
       - 'src/adapters/otel/**'
   workflow_dispatch:
 
@@ -59,7 +59,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile.otel
+          file: ./docker/Dockerfile.otel
           build-args: INSTALL_OTLP=grpc
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
