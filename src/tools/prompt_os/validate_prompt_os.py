@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Prompt OS v2 — CSV ↔ Schema parity validator.
 
-Validates every CSV in sample_data/prompt_os_v2 against
+Validates every CSV in artifacts/sample_data/prompt_os_v2 against
 schemas/prompt_os/prompt_os_schema_v2.json.
 
 Checks:
@@ -15,9 +15,9 @@ Checks:
 Exit code: 0 = all pass, 1 = any failure.
 
 Usage:
-    python scripts/prompt_os/validate_prompt_os.py
-    python scripts/prompt_os/validate_prompt_os.py --csv-dir sample_data/prompt_os_v2
-    python scripts/prompt_os/validate_prompt_os.py --schema schemas/prompt_os/prompt_os_schema_v2.json
+    python src/tools/prompt_os/validate_prompt_os.py
+    python src/tools/prompt_os/validate_prompt_os.py --csv-dir artifacts/sample_data/prompt_os_v2
+    python src/tools/prompt_os/validate_prompt_os.py --schema schemas/prompt_os/prompt_os_schema_v2.json
 """
 from __future__ import annotations
 
@@ -156,7 +156,7 @@ def main() -> int:
     parser.add_argument(
         "--csv-dir",
         type=Path,
-        default=Path("sample_data/prompt_os_v2"),
+        default=Path("artifacts/sample_data/prompt_os_v2"),
     )
     parser.add_argument(
         "--schema",

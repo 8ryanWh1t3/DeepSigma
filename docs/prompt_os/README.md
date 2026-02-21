@@ -120,7 +120,7 @@ See [POWER_AUTOMATE_MAPPINGS.md](POWER_AUTOMATE_MAPPINGS.md) for exact table-to-
 
 ## Scripts & CI
 
-- `scripts/prompt_os/validate_prompt_os.py` — CSV ↔ Schema parity validator
-- `scripts/prompt_os/validate_prompt_os.sh` — Shell runner for the validator
-- `scripts/prompt_os/export_sealed_run.py` — Export sealed run JSON from LLM_OUTPUT CSV
+- `src/tools/prompt_os/validate_prompt_os.py` — CSV ↔ Schema parity validator
+- `src/tools/prompt_os/validate_prompt_os.sh` — Shell runner for the validator
+- `src/tools/prompt_os/export_sealed_run.py` — Export sealed run JSON from LLM_OUTPUT CSV
 - `.github/workflows/prompt_os_validate.yml` — CI workflow: schema validation + drift guard

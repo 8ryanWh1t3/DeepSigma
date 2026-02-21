@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Export a single sealed run from LLM_OUTPUT CSV to JSON.
 
-Reads sample_data/prompt_os_v2/llm_output.csv (by default) and exports
+Reads artifacts/sample_data/prompt_os_v2/llm_output.csv (by default) and exports
 the specified RunID as an immutable JSON snapshot.
 
 Usage:
-    python scripts/prompt_os/export_sealed_run.py --run-id RUN-001
-    python scripts/prompt_os/export_sealed_run.py --run-id RUN-001 --out artifacts/sealed_runs/custom.json
-    python scripts/prompt_os/export_sealed_run.py --run-id RUN-001 --csv sample_data/prompt_os_v2/llm_output.csv
+    python src/tools/prompt_os/export_sealed_run.py --run-id RUN-001
+    python src/tools/prompt_os/export_sealed_run.py --run-id RUN-001 --out artifacts/sealed_runs/custom.json
+    python src/tools/prompt_os/export_sealed_run.py --run-id RUN-001 --csv artifacts/sample_data/prompt_os_v2/llm_output.csv
 """
 from __future__ import annotations
 
@@ -94,7 +94,7 @@ def main() -> int:
     parser.add_argument(
         "--csv",
         type=Path,
-        default=Path("sample_data/prompt_os_v2/llm_output.csv"),
+        default=Path("artifacts/sample_data/prompt_os_v2/llm_output.csv"),
         help="Path to LLM output CSV",
     )
     parser.add_argument(
