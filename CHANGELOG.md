@@ -5,6 +5,36 @@ All notable changes to Σ OVERWATCH / DeepSigma will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.2] — 2026-02-21 — "Court-Grade Admissibility"
+
+### Added
+
+- **Court-grade admissibility pipeline** (PR #184): Six admissibility levels (L0 Audit Clean → L6 Hardware-Backed) composed via single `seal_and_prove.py` orchestrator
+- **Merkle commitment trees** (`merkle.py`, `build_commitments.py`): Four independent SHA-256 Merkle roots (inputs, prompts, schemas, policies) embedded in sealed runs
+- **Transparency log** (`transparency_log_append.py`): Append-only NDJSON with hash-chained entries for tamper-evident audit trail
+- **Multi-signature witness** (`verify_multisig.py`): Threshold-based multi-party attestation with role tracking (operator/reviewer/auditor)
+- **Hardware-backed key hooks** (`sign_artifact.py --external-signer-cmd`): External signer protocol for YubiKey/HSM/KMS delegation
+- **Determinism audit** (`determinism_audit.py`): 9-check verification tool ensuring sealed runs are fully reproducible
+- **Seal-and-prove orchestrator** (`seal_and_prove.py`): Single command producing verifiable, tamper-evident governance artifact bundles
+- **Admissibility gate CI** (`admissibility_gate.yml`): End-to-end pipeline test with transparency chain verification and replay
+- **Mermaid diagram 11** (`docs/mermaid/11-seal-and-prove.md`): 5 diagrams covering pipeline, transparency chain, Merkle tree, admissibility levels, multi-sig evolution
+- 4 new JSON schemas: `merkle_commitment_v1`, `multisig_block_v1`, `transparency_log_entry_v1`, `timestamp_block_v1`
+- 5 new docs: admissibility levels, trusted timestamping, hardware-backed keys, determinism profile, admissibility pack v1
+
+### Changed
+
+- `replay_sealed_run.py`: Added transparency log verification, multi-sig threshold enforcement, and Merkle commitment auto-verification
+- `sign_artifact.py`: Added `--append` multi-sig mode, `--external-signer-cmd`, `signer_id`/`role`/`signer_type` fields
+- `seal_bundle.py`: Embedded Merkle commitments in sealed runs, extracted `write_sealed_output()` helper
+- `determinism_gate.yml`: Added determinism audit step on sealed output
+
+### Stats
+
+- 28 new tests (1252 total), 22 new files, 7 modified
+- All CI gates green (24/24 checks)
+
+---
+
 ## [2.0.1] — 2026-02-21 — "Clean Foundations"
 
 ### Changed
