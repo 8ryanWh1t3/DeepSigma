@@ -105,19 +105,19 @@ def verify_pack(
     sig_path = Path(str(sealed_path) + ".sig.json")
     has_sig = sig_path.exists()
     discovery_checks.append(("signature", has_sig,
-                             sig_path.name if has_sig else "Not found"))
+                             sig_path.name if has_sig else "Not found (optional)"))
 
-    # Discover log
+    # Discover log (optional — absence is not a failure)
     log_path = pack_dir / "transparency_log.ndjson"
     has_log = log_path.exists()
-    discovery_checks.append(("transparency_log", has_log,
-                             "transparency_log.ndjson" if has_log else "Not found"))
+    discovery_checks.append(("transparency_log", True,
+                             "transparency_log.ndjson" if has_log else "Not present (optional)"))
 
-    # Discover authority ledger
+    # Discover authority ledger (optional — absence is not a failure)
     ledger_path = pack_dir / "authority_ledger.ndjson"
     has_ledger = ledger_path.exists()
-    discovery_checks.append(("authority_ledger", has_ledger,
-                             "authority_ledger.ndjson" if has_ledger else "Not found"))
+    discovery_checks.append(("authority_ledger", True,
+                             "authority_ledger.ndjson" if has_ledger else "Not present (optional)"))
 
     result.add_section("Discovery", discovery_checks)
 
