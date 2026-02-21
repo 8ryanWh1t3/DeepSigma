@@ -93,16 +93,16 @@ Examples:
 
 ## Export Tool
 
-**Script:** `scripts/prompt_os/export_sealed_run.py`
+**Script:** `src/tools/prompt_os/export_sealed_run.py`
 
 MVP behavior (CSV-based):
-- Reads `sample_data/prompt_os_v2/llm_output.csv`
+- Reads `artifacts/sample_data/prompt_os_v2/llm_output.csv`
 - Exports a single run by `--run-id`
 - Writes JSON to `artifacts/sealed_runs/`
 
 ```bash
-python scripts/prompt_os/export_sealed_run.py --run-id RUN-001
-python scripts/prompt_os/export_sealed_run.py --run-id RUN-001 --out artifacts/sealed_runs/RUN-001_custom.json
+python src/tools/prompt_os/export_sealed_run.py --run-id RUN-001
+python src/tools/prompt_os/export_sealed_run.py --run-id RUN-001 --out artifacts/sealed_runs/RUN-001_custom.json
 ```
 
 Future: workbook-based extraction via openpyxl (reads directly from `LLM_OUTPUT` tab).

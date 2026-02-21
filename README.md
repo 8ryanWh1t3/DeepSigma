@@ -96,10 +96,8 @@ DeepSigma/
 ├── docs/                # Documentation + examples (canonical, mermaid, lattices, etc.)
 ├── dashboard/           # React dashboard + API server
 ├── schemas/             # JSON schemas (core engine + Prompt OS)
-├── artifacts/           # Workbooks, templates, sealed runs
+├── artifacts/           # Workbooks, templates, sealed runs, sample data
 ├── prompts/             # Canonical prompts + Prompt OS control prompts
-├── sample_data/         # Demo-ready CSV sample data
-├── scripts/             # Validation and export scripts
 └── .github/             # CI/CD workflows
 ```
 

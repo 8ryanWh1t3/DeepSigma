@@ -3,7 +3,7 @@
 
 Usage:
     python -m tools.validate_prompt_os
-    python -m tools.validate_prompt_os --csv-dir sample_data/prompt_os_v2
+    python -m tools.validate_prompt_os --csv-dir artifacts/sample_data/prompt_os_v2
     python -m tools.validate_prompt_os --schema schemas/prompt_os/prompt_os_schema_v2.json
 """
 
@@ -144,8 +144,8 @@ def main() -> int:
     parser.add_argument(
         "--csv-dir",
         type=Path,
-        default=Path("sample_data/prompt_os_v2"),
-        help="Directory containing CSV files (default: sample_data/prompt_os_v2)",
+        default=Path("artifacts/sample_data/prompt_os_v2"),
+        help="Directory containing CSV files (default: artifacts/sample_data/prompt_os_v2)",
     )
     parser.add_argument(
         "--schema",
