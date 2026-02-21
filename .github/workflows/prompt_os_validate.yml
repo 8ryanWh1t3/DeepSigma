@@ -1,0 +1,67 @@
+name: Prompt OS Validate
+
+on:
+  push:
+    paths:
+      - 'sample_data/prompt_os_v2/**'
+      - 'schemas/prompt_os/**'
+      - 'scripts/prompt_os/**'
+      - 'docs/prompt_os/**'
+  pull_request:
+    paths:
+      - 'sample_data/prompt_os_v2/**'
+      - 'schemas/prompt_os/**'
+      - 'scripts/prompt_os/**'
+      - 'docs/prompt_os/**'
+
+jobs:
+  validate:
+    name: CSV ↔ Schema Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run schema validator
+        run: python scripts/prompt_os/validate_prompt_os.py
+
+  drift-guard:
+    name: Drift Guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check required files exist
+        run: |
+          status=0
+
+          required_files=(
+            "docs/prompt_os/TABS_AND_SCHEMA.md"
+            "docs/prompt_os/SCORING.md"
+            "docs/prompt_os/PROMPTS.md"
+            "schemas/prompt_os/prompt_os_schema_v2.json"
+            "scripts/prompt_os/validate_prompt_os.py"
+          )
+
+          for f in "${required_files[@]}"; do
+            if [ ! -f "$f" ]; then
+              echo "MISSING: $f"
+              status=1
+            else
+              echo "OK:      $f"
+            fi
+          done
+
+          # Check that at least one CSV exists in sample_data
+          csv_count=$(find sample_data/prompt_os_v2 -name '*.csv' 2>/dev/null | wc -l)
+          if [ "$csv_count" -eq 0 ]; then
+            echo "MISSING: sample_data/prompt_os_v2/*.csv (no CSV files found)"
+            status=1
+          else
+            echo "OK:      sample_data/prompt_os_v2/ ($csv_count CSV files)"
+          fi
+
+          exit $status
