@@ -118,6 +118,18 @@ DeepSigma/
 
 ---
 
+## Excel Prompt OS v2
+
+Structured cognition workbook for institutional decision-making — no code required.
+
+- **Workbook:** [`artifacts/excel/Coherence_Prompt_OS_v2.xlsx`](artifacts/excel/Coherence_Prompt_OS_v2.xlsx)
+- **Docs:** [`docs/prompt_os/README.md`](docs/prompt_os/README.md)
+- **Tables:** DecisionLog, AtomicClaims, Assumptions, PromptLibrary, PatchLog, LLMOutput, DashboardTrends
+- **Scoring:** PriorityScore · CredibilityScore · PromptHealth · ExpiryRisk
+- **Loop:** Perception → Decision → Memory → Drift → Patch
+
+---
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
