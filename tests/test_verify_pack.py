@@ -13,8 +13,8 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT / "src" / "tools" / "reconstruct"))
 
-from seal_and_prove import seal_and_prove
-from verify_pack import verify_pack
+from seal_and_prove import seal_and_prove  # noqa: E402
+from verify_pack import verify_pack  # noqa: E402
 
 FIXED_CLOCK = "2026-02-21T00:00:00Z"
 

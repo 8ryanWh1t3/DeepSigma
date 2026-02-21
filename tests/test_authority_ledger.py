@@ -11,14 +11,14 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT / "src" / "tools" / "reconstruct"))
 
-from authority_ledger_append import (
+from authority_ledger_append import (  # noqa: E402
     append_entry,
     find_active_for_actor,
     find_entry,
     revoke_entry,
     verify_chain,
 )
-from authority_ledger_verify import verify_ledger
+from authority_ledger_verify import verify_ledger  # noqa: E402
 
 FIXED_CLOCK = "2026-02-21T00:00:00Z"
 
