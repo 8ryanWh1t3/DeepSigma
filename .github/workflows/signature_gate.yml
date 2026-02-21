@@ -1,0 +1,81 @@
+name: Signature Gate
+
+permissions:
+  contents: read
+
+on:
+  push:
+    paths:
+      - 'src/tools/reconstruct/**'
+      - 'schemas/reconstruct/signature_block_v1.json'
+      - 'tests/test_signature_support.py'
+  pull_request:
+    paths:
+      - 'src/tools/reconstruct/**'
+      - 'schemas/reconstruct/signature_block_v1.json'
+      - 'tests/test_signature_support.py'
+
+jobs:
+  signature:
+    name: Sign + Verify Validation
+    runs-on: ubuntu-latest
+    env:
+      DEEPSIGMA_TEST_KEY: ${{ secrets.DEEPSIGMA_SIGNING_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Generate test HMAC key (if secret not set)
+        run: |
+          if [ -z "$DEEPSIGMA_TEST_KEY" ]; then
+            export DEEPSIGMA_TEST_KEY=$(python -c "import secrets,base64; print(base64.b64encode(secrets.token_bytes(32)).decode())")
+            echo "DEEPSIGMA_TEST_KEY=$DEEPSIGMA_TEST_KEY" >> $GITHUB_ENV
+          fi
+
+      - name: Seal with deterministic clock
+        run: >
+          python src/tools/reconstruct/seal_bundle.py
+          --decision-id DEC-001
+          --clock 2026-02-21T00:00:00Z
+          --deterministic true
+          --user ci
+          --out-dir "$RUNNER_TEMP/signed_runs"
+
+      - name: Sign sealed run (HMAC)
+        run: |
+          sealed=$(ls "$RUNNER_TEMP"/signed_runs/RUN-*.json | grep -v manifest | grep -v sig | head -1)
+          python src/tools/reconstruct/sign_artifact.py \
+            --file "$sealed" \
+            --algo hmac \
+            --key-id ds-ci-2026-01 \
+            --key "$DEEPSIGMA_TEST_KEY"
+
+      - name: Sign manifest (HMAC)
+        run: |
+          manifest=$(ls "$RUNNER_TEMP"/signed_runs/*.manifest.json | head -1)
+          python src/tools/reconstruct/sign_artifact.py \
+            --file "$manifest" \
+            --algo hmac \
+            --key-id ds-ci-2026-01 \
+            --key "$DEEPSIGMA_TEST_KEY"
+
+      - name: Verify sealed run signature
+        run: |
+          sealed=$(ls "$RUNNER_TEMP"/signed_runs/RUN-*.json | grep -v manifest | grep -v sig | head -1)
+          python src/tools/reconstruct/verify_signature.py \
+            --file "$sealed" \
+            --key "$DEEPSIGMA_TEST_KEY"
+
+      - name: Replay with signature verification
+        run: |
+          sealed=$(ls "$RUNNER_TEMP"/signed_runs/RUN-*.json | grep -v manifest | grep -v sig | head -1)
+          python src/tools/reconstruct/replay_sealed_run.py \
+            --sealed "$sealed" \
+            --verify-signature true \
+            --key "$DEEPSIGMA_TEST_KEY"
+
+      - name: Run unit tests
+        run: python -m unittest tests.test_signature_support -v
