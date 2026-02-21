@@ -46,7 +46,7 @@ jobs:
 
       - name: Sign sealed run (HMAC)
         run: |
-          sealed=$(ls "$RUNNER_TEMP"/signed_runs/RUN-*.json | grep -v manifest | grep -v sig | head -1)
+          sealed=$(ls "$RUNNER_TEMP"/signed_runs/RUN-*.json | grep -v '\.manifest\.' | grep -v '\.sig\.' | head -1)
           python src/tools/reconstruct/sign_artifact.py \
             --file "$sealed" \
             --algo hmac \
@@ -64,14 +64,14 @@ jobs:
 
       - name: Verify sealed run signature
         run: |
-          sealed=$(ls "$RUNNER_TEMP"/signed_runs/RUN-*.json | grep -v manifest | grep -v sig | head -1)
+          sealed=$(ls "$RUNNER_TEMP"/signed_runs/RUN-*.json | grep -v '\.manifest\.' | grep -v '\.sig\.' | head -1)
           python src/tools/reconstruct/verify_signature.py \
             --file "$sealed" \
             --key "$DEEPSIGMA_TEST_KEY"
 
       - name: Replay with signature verification
         run: |
-          sealed=$(ls "$RUNNER_TEMP"/signed_runs/RUN-*.json | grep -v manifest | grep -v sig | head -1)
+          sealed=$(ls "$RUNNER_TEMP"/signed_runs/RUN-*.json | grep -v '\.manifest\.' | grep -v '\.sig\.' | head -1)
           python src/tools/reconstruct/replay_sealed_run.py \
             --sealed "$sealed" \
             --verify-signature true \
