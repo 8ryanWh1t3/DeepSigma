@@ -1,0 +1,45 @@
+name: Reconstruct Replay
+
+permissions:
+  contents: read
+
+on:
+  push:
+    paths:
+      - 'schemas/reconstruct/**'
+      - 'src/tools/reconstruct/**'
+      - 'docs/governance/**'
+      - 'tests/test_reconstruct_*.py'
+  pull_request:
+    paths:
+      - 'schemas/reconstruct/**'
+      - 'src/tools/reconstruct/**'
+      - 'docs/governance/**'
+      - 'tests/test_reconstruct_*.py'
+
+jobs:
+  reconstruct:
+    name: Seal + Replay Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run seal bundle builder
+        run: >
+          python src/tools/reconstruct/seal_bundle.py
+          --decision-id DEC-001
+          --run-id RUN-CI
+          --user ci
+          --out-dir "$RUNNER_TEMP/sealed_runs"
+
+      - name: Run replay on sealed output
+        run: |
+          sealed=$(ls "$RUNNER_TEMP"/sealed_runs/RUN-CI_*.json | grep -v manifest | head -1)
+          python src/tools/reconstruct/replay_sealed_run.py --sealed "$sealed"
+
+      - name: Run unit tests
+        run: python -m unittest tests.test_reconstruct_replay -v
