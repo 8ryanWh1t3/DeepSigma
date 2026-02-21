@@ -104,6 +104,15 @@ See [POWER_AUTOMATE_MAPPINGS.md](POWER_AUTOMATE_MAPPINGS.md) for exact table-to-
 
 ---
 
+## Demos
+
+- [MONEY_DEMO_V2_10MIN.md](MONEY_DEMO_V2_10MIN.md) — 10-minute live demo with before/after delta framing
+- [SNOWFLAKE_DEMO.md](SNOWFLAKE_DEMO.md) — Snowflake enterprise ingress guide
+- `src/tools/prompt_os/drift_to_patch_demo.py` — One-command Drift → Patch hero loop
+- `src/tools/prompt_os/export_for_snowflake.py` — Snowflake-ready export bundle generator
+
+---
+
 ## Related Docs
 
 - [TABS_AND_SCHEMA.md](TABS_AND_SCHEMA.md) — Full column-level schema for every tab
@@ -123,4 +132,6 @@ See [POWER_AUTOMATE_MAPPINGS.md](POWER_AUTOMATE_MAPPINGS.md) for exact table-to-
 - `src/tools/prompt_os/validate_prompt_os.py` — CSV ↔ Schema parity validator
 - `src/tools/prompt_os/validate_prompt_os.sh` — Shell runner for the validator
 - `src/tools/prompt_os/export_sealed_run.py` — Export sealed run JSON from LLM_OUTPUT CSV
+- `src/tools/prompt_os/drift_to_patch_demo.py` — Drift → Patch hero loop
+- `src/tools/prompt_os/export_for_snowflake.py` — Snowflake export bundle generator
 - `.github/workflows/prompt_os_validate.yml` — CI workflow: schema validation + drift guard
