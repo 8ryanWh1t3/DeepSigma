@@ -44,7 +44,7 @@ COPY src/adapters/otel/ /app/adapters/otel/
 COPY src/adapters/__init__.py /app/adapters/__init__.py
 COPY src/engine/ /app/engine/
 COPY src/coherence_ops/ /app/coherence_ops/
-COPY specs/ /app/specs/
+COPY schemas/ /app/schemas/
 
 RUN pip install --no-cache-dir -e /app
 

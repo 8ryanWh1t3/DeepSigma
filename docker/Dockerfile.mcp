@@ -40,7 +40,7 @@ COPY src/engine/ /app/engine/
 COPY src/coherence_ops/ /app/coherence_ops/
 COPY src/verifiers/ /app/verifiers/
 COPY src/tools/ /app/tools/
-COPY specs/ /app/specs/
+COPY schemas/ /app/schemas/
 
 RUN pip install --no-cache-dir -e /app
 

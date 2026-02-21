@@ -48,10 +48,10 @@ COPY src/engine/ /app/engine/
 COPY src/coherence_ops/ /app/coherence_ops/
 COPY src/verifiers/ /app/verifiers/
 COPY src/tools/ /app/tools/
-COPY specs/ /app/specs/
+COPY schemas/ /app/schemas/
 COPY src/adapters/ /app/adapters/
 COPY src/demos/ /app/demos/
-COPY examples/ /app/examples/
+COPY docs/examples/ /app/examples/
 COPY docs/llm_data_model/ /app/llm_data_model/
 COPY docs/policy_packs/ /app/policy_packs/
 
