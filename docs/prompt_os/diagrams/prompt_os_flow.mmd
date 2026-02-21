@@ -1,0 +1,15 @@
+flowchart LR
+  A[REALITY_ENGINE<br/>Perception Check] --> B[EXECUTIVE_ENGINE<br/>Structured Decision]
+  B --> C[DECISION_LOG<br/>Decision Memory]
+  A --> D[ATOMIC_CLAIMS<br/>Truth Claims]
+  D --> E[ASSUMPTIONS<br/>Half-Life + Expiry]
+  C --> F[PATCH_LOG<br/>Drift → Patch]
+  E --> F
+  G[PROMPT_LIBRARY<br/>Prompt Assets + Health] --> F
+  H[LLM_OUTPUT<br/>Top Actions + Seal] --> C
+  H --> D
+  I[DASHBOARD_V2<br/>KPI + Top Risks] <-- C
+  I <-- D
+  I <-- E
+  I <-- F
+  J[DASHBOARD_TRENDS<br/>Weekly Snapshots] <-- I
