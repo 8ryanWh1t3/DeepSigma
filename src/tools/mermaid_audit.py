@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Mermaid diagram drift guardrail.
 
-Ensures docs/mermaid/ contains only the 4 canonical diagrams + README.
+Ensures docs/mermaid/ contains only the 5 canonical diagrams + README.
 Fails (exit 1) if new diagrams have been added outside the archive.
 
 Usage:
@@ -25,9 +25,10 @@ CANONICAL = {
     "05-drift-to-patch.md",
     "06-coherence-ops-pipeline.md",
     "10-integration-map.md",
+    "11-seal-and-prove.md",
 }
 
-MAX_CANONICAL = 4  # diagrams (excludes README)
+MAX_CANONICAL = 5  # diagrams (excludes README)
 
 MERMAID_BLOCK_RE = re.compile(r"^```mermaid", re.MULTILINE)
 
