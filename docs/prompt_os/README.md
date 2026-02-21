@@ -64,7 +64,21 @@ See [SCORING.md](SCORING.md) for full formula documentation.
 
 ---
 
-## Quick Start
+## Start Here (60 seconds)
+
+1. **Open** `artifacts/excel/Coherence_Prompt_OS_v2.xlsx`
+2. **Go to** the `DECISION_LOG` tab
+3. **Fill 5 fields** for your first decision: Title, Category, Owner, Evidence, BlastRadius
+4. **Confirm** PriorityScore computes automatically in the last column
+5. **Copy** the system prompt from [`prompts/prompt_os/START_SESSION_A1.md`](../../prompts/prompt_os/START_SESSION_A1.md)
+6. **Run** your LLM with the workbook data attached + the system prompt
+7. **Paste** the LLM output into the `LLM_OUTPUT` tab
+
+You now have a governed decision with an auditable LLM triage session.
+
+---
+
+## Quick Start (Full Workflow)
 
 1. Open `artifacts/excel/Coherence_Prompt_OS_v2.xlsx`
 2. Review the `DASHBOARD_V2` tab for current KPI summary
@@ -95,4 +109,8 @@ See [POWER_AUTOMATE_MAPPINGS.md](POWER_AUTOMATE_MAPPINGS.md) for exact table-to-
 - [TABS_AND_SCHEMA.md](TABS_AND_SCHEMA.md) — Full column-level schema for every tab
 - [SCORING.md](SCORING.md) — Formula documentation
 - [POWER_AUTOMATE_MAPPINGS.md](POWER_AUTOMATE_MAPPINGS.md) — Automation integration mappings
+- [PROMPTS.md](PROMPTS.md) — Canonical prompts reference and workbook tab mapping
+- [EXECUTIVE_BRIEF_1PAGER.md](EXECUTIVE_BRIEF_1PAGER.md) — One-page executive brief for adoption
+- [RUNBOOK_PILOT_2WEEK.md](RUNBOOK_PILOT_2WEEK.md) — 2-week pilot plan with checklists
+- [GOVERNANCE_POLICY_CARD.md](GOVERNANCE_POLICY_CARD.md) — Minimal governance rules
 - [diagrams/prompt_os_flow.mmd](diagrams/prompt_os_flow.mmd) — Architecture diagram
