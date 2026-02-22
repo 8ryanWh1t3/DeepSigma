@@ -8,8 +8,8 @@
 
 # Σ OVERWATCH
 
-**Current pilot release:** v2.0.2  
-See: `docs/release/RELEASE_NOTES_v2.0.2.md`
+**Current pilot release:** v2.0.3  
+See: `docs/release/RELEASE_NOTES_v2.0.3.md`
 
 **Institutional Decision Infrastructure**
 

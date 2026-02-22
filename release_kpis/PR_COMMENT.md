@@ -1,4 +1,4 @@
-## Repo Radar KPI — v2.0.2
+## Repo Radar KPI — v2.0.3
 
 ![badge](release_kpis/badge_latest.svg)
 
@@ -13,8 +13,8 @@
 - Operational Maturity: 7
 
 **Artifacts:**
-- PNG: `release_kpis/radar_v2.0.2.png`
-- SVG: `release_kpis/radar_v2.0.2.svg`
+- PNG: `release_kpis/radar_v2.0.3.png`
+- SVG: `release_kpis/radar_v2.0.3.svg`
 - Badge: `release_kpis/badge_latest.svg`
 
 **Interpretation (pilot):**
