@@ -10,6 +10,7 @@
 
 | Task | Command |
 |------|---------|
+| Run Money Demo (recommended) | `make demo` |
 | Run Money Demo (canonical) | `python -m coherence_ops.examples.drift_patch_cycle` |
 | Score episodes | `python -m coherence_ops score ./coherence_ops/examples/sample_episodes.json --json` |
 | Run full test suite | `pytest tests/ -v` |
@@ -29,6 +30,9 @@ The Money Demo is the canonical proof-of-life for the Drift → Patch loop.
 
 ```bash
 # From repo root with venv active:
+make demo
+
+# or canonical Python entrypoint:
 python -m coherence_ops.examples.drift_patch_cycle
 ```
 

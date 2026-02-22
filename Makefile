@@ -1,7 +1,10 @@
-.PHONY: ci pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review lock-update build docker release-check pilot-pack
+.PHONY: ci demo pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review lock-update build docker release-check pilot-pack
 
 ci:
 	python scripts/compute_ci.py
+
+demo:
+	bash run_money_demo.sh
 
 pilot-in-a-box:
 	python scripts/pilot_in_a_box.py
