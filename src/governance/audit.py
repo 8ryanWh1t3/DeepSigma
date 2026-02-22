@@ -11,6 +11,7 @@ No real-world system modeled.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -35,14 +36,19 @@ def _validated_tenant_id(tenant_id: str) -> str:
     return tenant_id
 
 
+def _tenant_slug(tenant_id: str) -> str:
+    tid = _validated_tenant_id(tenant_id)
+    return hashlib.sha256(tid.encode("utf-8")).hexdigest()[:16]
+
+
 def _audit_path(tenant_id: str) -> Path:
     """Return the audit log file path for a tenant."""
     base = _BASE_AUDIT_DIR.resolve()
-    d = (base / _validated_tenant_id(tenant_id)).resolve()  # lgtm [py/path-injection]
+    d = (base / _tenant_slug(tenant_id)).resolve()
     if os.path.commonpath([str(base), str(d)]) != str(base):
         raise ValueError("Invalid tenant_id path")
     d.mkdir(parents=True, exist_ok=True)
-    path = (d / "audit.jsonl").resolve()  # lgtm [py/path-injection]
+    path = (d / "audit.jsonl").resolve()
     if os.path.commonpath([str(d), str(path)]) != str(d):
         raise ValueError("Invalid audit file path")
     return path
@@ -56,7 +62,7 @@ def append_audit(tenant_id: str, event: dict[str, Any]) -> dict[str, Any]:
     enriched.setdefault("timestamp", _now_iso())
     filepath = _audit_path(tenant_id)
     with _audit_lock:
-        with open(filepath, "a", encoding="utf-8") as f:  # lgtm [py/path-injection]
+        with open(filepath, "a", encoding="utf-8") as f:
             f.write(json.dumps(enriched, default=str) + "\n")
     return enriched
 
@@ -90,10 +96,10 @@ def load_recent_audit(
 ) -> list[dict[str, Any]]:
     """Load the most recent audit events for a tenant."""
     filepath = _audit_path(tenant_id)
-    if not filepath.exists():  # lgtm [py/path-injection]
+    if not filepath.exists():
         return []
     lines: list[str] = []
-    with open(filepath, encoding="utf-8") as f:  # lgtm [py/path-injection]
+    with open(filepath, encoding="utf-8") as f:
         for line in f:
             stripped = line.strip()
             if stripped:

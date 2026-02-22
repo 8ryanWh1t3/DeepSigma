@@ -24,7 +24,7 @@ def _now_iso() -> str:
 
 
 def _normalize_path(path: str | Path) -> Path:
-    raw = Path(path).expanduser()  # lgtm [py/path-injection]
+    raw = Path(path).expanduser()
     if any(part == ".." for part in raw.parts):
         raise ValueError("Path traversal is not allowed")
     if raw.is_absolute():

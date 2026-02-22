@@ -33,6 +33,11 @@ def _validated_tenant_id(tenant_id: str) -> str:
     return tenant_id
 
 
+def _tenant_slug(tenant_id: str) -> str:
+    tid = _validated_tenant_id(tenant_id)
+    return hashlib.sha256(tid.encode("utf-8")).hexdigest()[:16]
+
+
 def default_policy(tenant_id: str) -> dict[str, Any]:
     """Return the default policy for a tenant."""
     tenant_id = _validated_tenant_id(tenant_id)
@@ -81,9 +86,8 @@ def default_policy(tenant_id: str) -> dict[str, Any]:
 def _policy_path(tenant_id: str) -> Path:
     """Return the policy file path for a tenant."""
     _BASE_POLICY_DIR.mkdir(parents=True, exist_ok=True)
-    safe_tenant_id = _validated_tenant_id(tenant_id)
     base = _BASE_POLICY_DIR.resolve()
-    path = (base / f"{safe_tenant_id}.json").resolve()  # lgtm [py/path-injection]
+    path = (base / f"{_tenant_slug(tenant_id)}.json").resolve()
     if os.path.commonpath([str(base), str(path)]) != str(base):
         raise ValueError("Invalid tenant_id path")
     if path.parent != base:
@@ -94,11 +98,11 @@ def _policy_path(tenant_id: str) -> Path:
 def load_policy(tenant_id: str) -> dict[str, Any]:
     """Load the policy for a tenant. Creates default if missing."""
     path = _policy_path(tenant_id)
-    if not path.exists():  # lgtm [py/path-injection]
+    if not path.exists():
         policy = default_policy(tenant_id)
         save_policy(tenant_id, policy)
         return policy
-    with open(path, encoding="utf-8") as f:  # lgtm [py/path-injection]
+    with open(path, encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -113,7 +117,7 @@ def save_policy(
     if actor:
         policy_dict["updated_by"] = actor
     path = _policy_path(tenant_id)
-    with open(path, "w", encoding="utf-8") as f:  # lgtm [py/path-injection]
+    with open(path, "w", encoding="utf-8") as f:
         json.dump(policy_dict, f, indent=2, default=str)
         f.write("\n")
     return policy_dict
