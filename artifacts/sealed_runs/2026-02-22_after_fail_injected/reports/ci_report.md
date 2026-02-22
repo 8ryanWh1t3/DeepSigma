@@ -1,17 +1,17 @@
 # Coherence Index Report
 
-- Timestamp (UTC): 2026-02-22T14:27:46.460097+00:00
+- Timestamp (UTC): 2026-02-22T14:27:46.356332+00:00
 - CI score: **100**
 
 ## Counts
 
 - Decisions: 1
-- Assumptions: 3
-- Expired assumptions: 2
+- Assumptions: 2
+- Expired assumptions: 1
 - Expired assumptions (unpatched): 0
-- Drift records: 2
+- Drift records: 1
 - Open drift records: 0
-- Patch records: 2
+- Patch records: 1
 
 ## Violations
 

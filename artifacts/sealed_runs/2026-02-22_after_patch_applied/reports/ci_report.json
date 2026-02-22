@@ -1,0 +1,32 @@
+{
+  "timestamp": "2026-02-22T14:27:46.401961+00:00",
+  "ci_score": 65,
+  "counts": {
+    "decisions": 1,
+    "assumptions": 3,
+    "expired_assumptions": 2,
+    "expired_assumptions_unpatched": 1,
+    "drift": 2,
+    "drift_open": 1,
+    "patches": 1
+  },
+  "violations": [
+    {
+      "category": "expired_assumption",
+      "file": "pilot/assumptions/A-2026-069.md",
+      "message": "A-2026-069 expired on 2026-02-21 and has no linked patch"
+    },
+    {
+      "category": "open_drift",
+      "file": "pilot/drift/DRIFT-2026-069.md",
+      "message": "DRIFT-2026-069 is open and still contributes to drift risk",
+      "issue_ref": "DRIFT-2026-069"
+    },
+    {
+      "category": "drift_without_patch",
+      "file": "pilot/drift/DRIFT-2026-069.md",
+      "message": "DRIFT-2026-069 has no linked patch",
+      "issue_ref": "DRIFT-2026-069"
+    }
+  ]
+}
