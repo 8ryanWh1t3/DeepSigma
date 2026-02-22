@@ -25,6 +25,7 @@ from authority_ledger_verify import verify_ledger  # noqa: E402
 from determinism_audit import audit_sealed_run  # noqa: E402
 from replay_sealed_run import replay  # noqa: E402
 from transparency_log_append import verify_chain  # noqa: E402
+from verify_signature import verify as verify_signature  # noqa: E402
 
 
 class VerifyPackResult:
@@ -134,6 +135,32 @@ def verify_pack(
         authority_ledger=ledger_path if has_ledger else None,
     )
     result.add_section("Replay + Integrity", replay_result.checks)
+
+    # ── 1b. Verify all detached signature files in pack ───────────
+    if key_b64 is not None or public_key_b64 is not None:
+        detached_sig_checks: list[tuple[str, bool, str]] = []
+        for sig_file in sorted(pack_dir.glob("*.sig.json")):
+            target_file = Path(str(sig_file)[: -len(".sig.json")])
+            if not target_file.exists():
+                detached_sig_checks.append(
+                    (f"signature.target_exists.{sig_file.name}", False, f"Missing target: {target_file.name}")
+                )
+                continue
+            sig_result = verify_signature(
+                artifact_path=target_file,
+                sig_path=sig_file,
+                key_b64=key_b64,
+                public_key_b64=public_key_b64,
+            )
+            detached_sig_checks.append(
+                (
+                    f"signature.verify.{sig_file.name}",
+                    sig_result.passed,
+                    "PASS" if sig_result.passed else "Signature mismatch or invalid signature block",
+                )
+            )
+        if detached_sig_checks:
+            result.add_section("Detached Signatures", detached_sig_checks)
 
     # ── 2. Transparency log chain ─────────────────────────────────
     if has_log:
