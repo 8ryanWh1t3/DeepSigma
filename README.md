@@ -49,13 +49,16 @@ When assumptions decay, **Drift** fires. When drift exceeds tolerance, a **Patch
 ```bash
 pip install deepsigma
 
+# One-command Money Demo (recommended first run)
+make demo
+
 # Health check
 deepsigma doctor
 
 # Score coherence (0–100, A–F)
 python -m coherence_ops score ./coherence_ops/examples/sample_episodes.json --json
 
-# Drift → Patch in 60 seconds
+# Drift → Patch canonical entrypoint
 python -m coherence_ops.examples.drift_patch_cycle
 
 # Full 7-step Golden Path (no credentials needed)
