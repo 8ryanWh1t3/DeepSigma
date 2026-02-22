@@ -1,0 +1,26 @@
+version: "1.0"
+scale:
+  min: 0
+  max: 10
+kpis:
+  - key: technical_completeness
+    label: "Technical Completeness"
+  - key: automation_depth
+    label: "Automation Depth"
+  - key: authority_modeling
+    label: "Authority Modeling"
+  - key: enterprise_readiness
+    label: "Enterprise Readiness"
+  - key: scalability
+    label: "Scalability"
+  - key: data_integration
+    label: "Data Integration"
+  - key: economic_measurability
+    label: "Economic Measurability"
+  - key: operational_maturity
+    label: "Operational Maturity"
+aliases:
+  technical_depth: technical_completeness
+  automation_coverage: automation_depth
+  authority_controls: authority_modeling
+  maturity: operational_maturity
