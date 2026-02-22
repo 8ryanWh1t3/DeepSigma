@@ -15,6 +15,11 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install KPI dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install matplotlib
+
       - name: Run KPI
         run: |
           make kpi
