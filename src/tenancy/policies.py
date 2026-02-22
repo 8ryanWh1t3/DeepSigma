@@ -28,6 +28,8 @@ def _now_iso() -> str:
 
 
 def _validated_tenant_id(tenant_id: str) -> str:
+    if os.path.basename(tenant_id) != tenant_id:
+        raise ValueError("Invalid tenant_id")
     if not _SAFE_ID_RE.fullmatch(tenant_id):
         raise ValueError("Invalid tenant_id")
     return tenant_id

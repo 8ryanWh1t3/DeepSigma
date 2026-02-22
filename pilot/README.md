@@ -14,4 +14,4 @@ This folder contains the canonical pilot dataset: Decisions (DLR), Assumptions, 
 - Contract: `docs/docs/pilot/PILOT_CONTRACT_ONEPAGER.md`
 
 ## Release Notes
-- `docs/docs/release/RELEASE_NOTES_v2.0.2.md`
+- `docs/docs/release/RELEASE_NOTES_v2.0.3.md`
