@@ -1,4 +1,4 @@
-.PHONY: ci pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-badge kpi-gate kpi-issues issue-label-gate issues-review pilot-pack
+.PHONY: ci pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review pilot-pack
 
 ci:
 	python scripts/compute_ci.py
@@ -17,6 +17,9 @@ kpi:
 
 kpi-render:
 	python scripts/render_radar.py --kpi release_kpis/kpi_$(shell cat release_kpis/VERSION.txt).json --outdir release_kpis
+
+kpi-composite:
+	python scripts/render_composite_radar.py
 
 kpi-badge:
 	python scripts/render_badge.py --kpi release_kpis/kpi_$(shell cat release_kpis/VERSION.txt).json --out release_kpis/badge_latest.svg
