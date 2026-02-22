@@ -8,6 +8,9 @@
 
 # Σ OVERWATCH
 
+**Current pilot release:** v2.0.2  
+See: `docs/release/RELEASE_NOTES_v2.0.2.md`
+
 **Institutional Decision Infrastructure**
 
 *Trust layer for agentic AI: verify before act, seal what happened, detect drift, ship patches.*
