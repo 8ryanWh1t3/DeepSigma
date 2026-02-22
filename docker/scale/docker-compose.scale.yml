@@ -1,0 +1,23 @@
+services:
+  api:
+    build:
+      context: ../..
+      dockerfile: docker/scale/Dockerfile.api
+    image: deepsigma-api-scale:local
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - ../../data:/app/data
+    expose:
+      - "8000"
+    restart: unless-stopped
+
+  proxy:
+    image: nginx:1.27-alpine
+    depends_on:
+      - api
+    ports:
+      - "18080:18080"
+    volumes:
+      - ./nginx.scale.conf:/etc/nginx/nginx.conf:ro
+    restart: unless-stopped
