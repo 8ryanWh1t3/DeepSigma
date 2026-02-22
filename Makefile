@@ -1,4 +1,4 @@
-.PHONY: ci pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review lock-update pilot-pack
+.PHONY: ci pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review lock-update build docker release-check pilot-pack
 
 ci:
 	python scripts/compute_ci.py
@@ -39,6 +39,17 @@ issues-review:
 
 lock-update:
 	bash scripts/update_locks.sh
+
+build:
+	python -m pip install --upgrade pip
+	pip install -c requirements/locks/release-build.txt build
+	python -m build
+
+docker:
+	docker build -t ghcr.io/8ryanwh1t3/deepsigma:local .
+
+release-check:
+	python scripts/release_check.py
 
 pilot-pack:
 	python scripts/pilot_pack.py
