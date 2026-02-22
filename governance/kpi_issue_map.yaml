@@ -1,0 +1,40 @@
+version: "1.0"
+severity:
+  P0: {sla_days: 3, debt: 1.2, credit: 1.2}
+  P1: {sla_days: 7, debt: 1.0, credit: 1.0}
+  P2: {sla_days: 21, debt: 0.6, credit: 0.6}
+  P3: {sla_days: 45, debt: 0.3, credit: 0.3}
+type_weight:
+  feature: 1.0
+  bug: 1.0
+  debt: 0.8
+  doc: 0.5
+kpis:
+  technical_completeness:
+    label: "kpi:technical_completeness"
+    max_uplift_per_release: 1.0
+  automation_depth:
+    label: "kpi:automation_depth"
+    max_uplift_per_release: 1.0
+  authority_modeling:
+    label: "kpi:authority_modeling"
+    max_uplift_per_release: 1.0
+  enterprise_readiness:
+    label: "kpi:enterprise_readiness"
+    max_uplift_per_release: 1.0
+  scalability:
+    label: "kpi:scalability"
+    max_uplift_per_release: 1.0
+  data_integration:
+    label: "kpi:data_integration"
+    max_uplift_per_release: 1.0
+  economic_measurability:
+    label: "kpi:economic_measurability"
+    max_uplift_per_release: 1.0
+  operational_maturity:
+    label: "kpi:operational_maturity"
+    max_uplift_per_release: 1.0
+scoring:
+  close_credit_points: 0.15
+  overdue_debt_points: 0.20
+  p0_open_cap: 6.0

@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MPLCONFIGDIR: .cache/matplotlib
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
 
@@ -27,6 +28,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install matplotlib
 
+      - name: Run KPI issue deltas
+        run: |
+          make kpi-issues
+
       - name: Run KPI
         run: |
           make kpi
@@ -39,6 +44,7 @@ jobs:
             release_kpis/PR_COMMENT.md
             release_kpis/KPI_GATE_REPORT.md
             release_kpis/history.json
+            release_kpis/issue_deltas.json
             release_kpis/badge_latest.svg
             release_kpis/radar_*.png
             release_kpis/radar_*.svg
