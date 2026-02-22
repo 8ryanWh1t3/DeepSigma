@@ -37,8 +37,13 @@ router = APIRouter(tags=["credibility"])
 
 StoreFactory = Callable[[str], CredibilityStore]
 
+
+def _default_store_factory(tenant_id: str) -> CredibilityStore:
+    return CredibilityStore(tenant_id=tenant_id)
+
+
 # Stateless runtime default: construct store/engine per request.
-_store_factory: StoreFactory = lambda tenant_id: CredibilityStore(tenant_id=tenant_id)
+_store_factory: StoreFactory = _default_store_factory
 
 
 def _get_engine(tenant_id: str) -> CredibilityEngine:
