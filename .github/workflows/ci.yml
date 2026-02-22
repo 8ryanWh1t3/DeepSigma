@@ -413,6 +413,106 @@ jobs:
             --certificate-identity-regexp "^https://github.com/${{ github.repository }}/.github/workflows/ci.yml@refs/tags/${{ github.ref_name }}$" \
             "${{ env.IMAGE_NAME }}@${{ needs.release-artifacts.outputs.image_digest }}"
 
+  release-proof:
+    name: Release proof regeneration (Golden Path)
+    runs-on: ubuntu-latest
+    needs: [release-artifacts, dashboard-build]
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install runtime dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -c requirements/locks/dev-excel-local.txt -e ".[dev,excel]"
+
+      - name: Run Golden Path and capture transcript
+        run: |
+          set -euo pipefail
+          mkdir -p proof
+          python -m demos.golden_path \
+            --source sharepoint \
+            --fixture src/demos/golden_path/fixtures/sharepoint_small \
+            --output proof/golden_path_out \
+            --json | tee proof/golden_path_transcript.txt
+
+      - name: Generate Trust Scorecard
+        run: |
+          python -m tools.trust_scorecard \
+            --input proof/golden_path_out \
+            --output proof/trust_scorecard.json \
+            | tee -a proof/golden_path_transcript.txt
+
+      - name: Gate release on Trust Scorecard SLOs
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          scorecard = json.loads(Path("proof/trust_scorecard.json").read_text())
+          checks = scorecard.get("slo_checks", {})
+          failed = [k for k, v in checks.items() if not v]
+          if failed:
+              raise SystemExit(f"Trust Scorecard SLO failure(s): {', '.join(failed)}")
+          print("Trust Scorecard gate PASS")
+          PY
+
+      - name: Download dashboard build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dashboard-dist
+          path: dashboard/dist
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Capture dashboard screenshot (headless)
+        run: |
+          set -euo pipefail
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          python -m http.server 4173 --directory dashboard/dist >/tmp/dashboard_server.log 2>&1 &
+          server_pid=$!
+          trap "kill ${server_pid}" EXIT
+          npx playwright screenshot --device="Desktop Chrome" \
+            http://127.0.0.1:4173 \
+            proof/dashboard_screenshot.png
+
+      - name: Build versioned proof bundle
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME}"
+          cp proof/trust_scorecard.json "proof/trust_scorecard_${version}.json"
+          cp proof/golden_path_transcript.txt "proof/golden_path_transcript_${version}.txt"
+          cp proof/dashboard_screenshot.png "proof/dashboard_screenshot_${version}.png"
+          cp proof/golden_path_out/summary.json "proof/golden_path_summary_${version}.json"
+          tar -czf "proof/golden_path_output_${version}.tar.gz" -C proof golden_path_out
+
+      - name: Upload proof bundle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-proof-${{ github.ref_name }}
+          path: proof/*
+
+      - name: Attach proof artifacts to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            proof/trust_scorecard_${{ github.ref_name }}.json
+            proof/golden_path_transcript_${{ github.ref_name }}.txt
+            proof/dashboard_screenshot_${{ github.ref_name }}.png
+            proof/golden_path_summary_${{ github.ref_name }}.json
+            proof/golden_path_output_${{ github.ref_name }}.tar.gz
+
   pypi-smoke:
     name: Smoke install from PyPI
     runs-on: ubuntu-latest
