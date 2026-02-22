@@ -1,4 +1,4 @@
-.PHONY: ci pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-badge kpi-gate
+.PHONY: ci pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-badge kpi-gate kpi-issues
 
 ci:
 	python scripts/compute_ci.py
@@ -23,3 +23,6 @@ kpi-badge:
 
 kpi-gate:
 	python scripts/kpi_gate.py
+
+kpi-issues:
+	python scripts/kpi_from_issues.py

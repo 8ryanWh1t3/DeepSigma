@@ -27,6 +27,24 @@ def main() -> int:
             continue
         values[key] = float(value)
 
+    issue_path = outdir / "issue_deltas.json"
+    if issue_path.exists():
+        issue = json.loads(issue_path.read_text(encoding="utf-8"))
+        for key, delta in issue.get("kpis", {}).items():
+            if key not in values:
+                continue
+            values[key] = (
+                float(values[key])
+                + float(delta.get("credit_delta", 0))
+                - float(delta.get("debt_delta", 0))
+            )
+            cap = delta.get("cap_if_open_p0")
+            if cap is not None:
+                values[key] = min(values[key], float(cap))
+
+    for key in list(values.keys()):
+        values[key] = max(0, min(10, float(values[key])))
+
     merged = {
         "version": version,
         "scale": manual.get("scale", {"min": 0, "max": 10}),
