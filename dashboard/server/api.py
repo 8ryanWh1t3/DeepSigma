@@ -313,7 +313,7 @@ if HAS_FASTAPI:
             result["resolved_at"] = datetime.now(timezone.utc).isoformat()
             return result
         except Exception:
-            logger.exception("IRIS query failed")
+            logger.error("IRIS query failed")
             return {"status": "ERROR", "summary": "IRIS query failed", "confidence": 0}
 
     @app.get("/api/drifts")
