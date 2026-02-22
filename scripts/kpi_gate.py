@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -47,6 +48,38 @@ def parse_spec(spec_path: Path) -> list[dict]:
     return kpis
 
 
+def parse_version_tuple(version: str) -> tuple[int, ...]:
+    match = re.match(r"^v(\d+)\.(\d+)\.(\d+)$", version.strip())
+    if not match:
+        return (0, 0, 0)
+    return tuple(int(part) for part in match.groups())
+
+
+def load_historical_versions(outdir: Path, current_version: str) -> list[dict]:
+    current_tuple = parse_version_tuple(current_version)
+    discovered: list[tuple[tuple[int, ...], str, dict]] = []
+    pattern = re.compile(r"^kpi_(v\d+\.\d+\.\d+)(?:_merged)?\.json$")
+
+    for path in sorted(outdir.glob("kpi_v*.json")):
+        match = pattern.match(path.name)
+        if not match:
+            continue
+        version = match.group(1)
+        version_tuple = parse_version_tuple(version)
+        if version_tuple >= current_tuple:
+            continue
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+            values = payload.get("values", {})
+            if isinstance(values, dict):
+                discovered.append((version_tuple, version, values))
+        except Exception:
+            continue
+
+    discovered.sort(key=lambda item: item[0])
+    return [{"version": version, "values": values} for _, version, values in discovered]
+
+
 def main() -> int:
     outdir = ROOT / "release_kpis"
     history_path = outdir / "history.json"
@@ -67,6 +100,15 @@ def main() -> int:
 
     history = load_history(history_path)
     entries = history.get("entries", [])
+
+    # Backfill prior release versions if history is missing older entries.
+    existing_versions = {entry.get("version") for entry in entries}
+    for entry in load_historical_versions(outdir, version):
+        if entry["version"] not in existing_versions:
+            entries.append(entry)
+            existing_versions.add(entry["version"])
+
+    entries.sort(key=lambda entry: parse_version_tuple(str(entry.get("version", "v0.0.0"))))
     previous = entries[-1] if entries else None
     previous_values = previous.get("values", {}) if previous else {}
 
