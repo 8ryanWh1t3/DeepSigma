@@ -23,6 +23,13 @@ Convert the current 33 open issues into a deterministic execution sequence that 
 - `M2: Pilot Pack + Publish` (demo + evidence + release posture)
 - `M3: Scale v2.1` (mesh/multi-region/k8s scale program)
 
+## Execution Ownership
+- Lane 1 DRI (`M1`): Release Engineering Owner
+- Lane 2 DRI (`M1`/`M2`): Pilot Evidence Owner
+- Lane 3 DRI (`M2`/`M3`): Platform Scalability Owner
+- Approval authority: Coherence Steward (final gate sign-off)
+- Daily checkpoint: update #186 with done/blockers/next and expected KPI effect
+
 ## Lane 1: Uncap the Radar (72h)
 Goal: remove cap on `automation_depth` by clearing P0 blockers.
 
@@ -38,6 +45,7 @@ Rules:
 - Keep #186 as canonical umbrella.
 - Convert sibling items into linked checklist/sub-issues under #186.
 - Do not create duplicate P0s for the same release control surface.
+- If a linked item is no longer a hard blocker, demote from `sev:P0` and move to `M2` or `M3`.
 
 Expected KPI effect:
 - `automation_depth`: uncap from 6.0 to baseline trajectory (7.0+ on next valid run if debt/overdue penalties are controlled).
@@ -110,6 +118,34 @@ Day 7:
   - publish integrity
   - baseline security controls
 - Move mesh-heavy forward-looking work to `sev:P2` under `M3` unless actively shipping this sprint.
+
+## Apply Now (Operational Steps)
+1. Create milestones in GitHub:
+   - `M1: Pilot Uncap`
+   - `M2: Pilot Pack + Publish`
+   - `M3: Scale v2.1`
+2. Assign milestone + severity to lane items:
+   - Lane 1 items -> `M1` (keep only true blockers at `sev:P0`)
+   - Lane 2 items -> `M1` or `M2` by proof dependency
+   - Lane 3 pilot-minimum -> `M2`; deferred mesh suite -> `M3` and `sev:P2`
+3. Normalize umbrella flow:
+   - keep #186 open as umbrella until all linked blockers are complete
+   - link #134/#137/#150/#151/#147 as checklist/sub-issues
+4. Run deterministic checkpoints after each day:
+   - `make issues-review`
+   - `make issue-label-gate`
+   - `make kpi`
+
+## Release Gate Checks
+- Day 3 gate (uncap target):
+  - no open `sev:P0` blockers except explicitly approved carry-over
+  - `issue-label-gate` passes
+  - expected: `automation_depth` no longer pinned by P0 cap
+- Day 7 gate (pilot readiness target):
+  - proof loop artifacts linked and accessible from README
+  - KPI composite shows at least two release points with valid deltas
+  - pilot evidence docs updated (`#199` complete or approved)
+  - `make kpi` and `make issues-review` outputs committed
 
 ## KPI Impact Expectations (by release)
 - Next release after P0 clear:
