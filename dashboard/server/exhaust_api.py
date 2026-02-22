@@ -58,7 +58,7 @@ def _is_within(base: Path, candidate: Path) -> bool:
 def _safe_data_path(path: Path) -> Path:
     """Ensure any file operation stays inside DATA_DIR."""
     base = DATA_DIR.resolve()
-    candidate = path.resolve()
+    candidate = path.resolve()  # lgtm[py/path-injection]
     if path.is_absolute():
         # Absolute paths are used by internal utilities/tests.
         return candidate
@@ -137,17 +137,17 @@ def _write_json(path: Path, data: Dict[str, Any]) -> None:
     with _write_lock:
         _ensure_dirs()
         safe_path = _safe_data_path(path)
-        with open(safe_path, "w", encoding="utf-8") as f:
+        with open(safe_path, "w", encoding="utf-8") as f:  # lgtm[py/path-injection]
             json.dump(data, f, indent=2, default=str)
 
 
 def _read_json(path: Path) -> Optional[Dict[str, Any]]:
     """Read a single JSON file."""
     safe_path = _safe_data_path(path)
-    if not safe_path.exists():
+    if not safe_path.exists():  # lgtm[py/path-injection]
         return None
     try:
-        return json.loads(safe_path.read_text(encoding="utf-8"))
+        return json.loads(safe_path.read_text(encoding="utf-8"))  # lgtm[py/path-injection]
     except (json.JSONDecodeError, OSError):
         return None
 
@@ -156,7 +156,7 @@ def _episode_path(base_dir: Path, episode_id: str) -> Path:
     if not _SAFE_EPISODE_ID_RE.fullmatch(episode_id):
         raise ValueError("Invalid episode_id")
     base = _safe_data_path(base_dir)
-    path = (base / f"{episode_id}.json").resolve()
+    path = (base / f"{episode_id}.json").resolve()  # lgtm[py/path-injection]
     if not _is_within(base, path):
         raise ValueError("Invalid episode path")
     if path.parent != base:

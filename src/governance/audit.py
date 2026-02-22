@@ -38,11 +38,11 @@ def _validated_tenant_id(tenant_id: str) -> str:
 def _audit_path(tenant_id: str) -> Path:
     """Return the audit log file path for a tenant."""
     base = _BASE_AUDIT_DIR.resolve()
-    d = (base / _validated_tenant_id(tenant_id)).resolve()
+    d = (base / _validated_tenant_id(tenant_id)).resolve()  # lgtm[py/path-injection]
     if os.path.commonpath([str(base), str(d)]) != str(base):
         raise ValueError("Invalid tenant_id path")
     d.mkdir(parents=True, exist_ok=True)
-    path = (d / "audit.jsonl").resolve()
+    path = (d / "audit.jsonl").resolve()  # lgtm[py/path-injection]
     if os.path.commonpath([str(d), str(path)]) != str(d):
         raise ValueError("Invalid audit file path")
     return path

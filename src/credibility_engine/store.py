@@ -77,7 +77,7 @@ class CredibilityStore:
         else:
             tid = _validate_tenant_id(tenant_id or DEFAULT_TENANT_ID)
             base = _BASE_DATA_DIR.resolve()
-            candidate = (base / tid).resolve()
+            candidate = (base / tid).resolve()  # lgtm[py/path-injection]
             if not _is_within(base, candidate):
                 raise ValueError("Invalid tenant_id path")
             self.data_dir = candidate

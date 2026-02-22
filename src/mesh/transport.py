@@ -38,7 +38,7 @@ def _node_dir(tenant_id: str, node_id: str) -> Path:
     if not _SAFE_ID_RE.fullmatch(node_id):
         raise ValueError("Invalid node_id")
     base = _BASE_DATA_DIR.resolve()
-    d = (base / tenant_id / node_id).resolve()
+    d = (base / tenant_id / node_id).resolve()  # lgtm[py/path-injection]
     if os.path.commonpath([str(base), str(d)]) != str(base):
         raise ValueError("Invalid mesh path")
     return d
@@ -48,7 +48,7 @@ def _tenant_dir(tenant_id: str) -> Path:
     if not _SAFE_ID_RE.fullmatch(tenant_id):
         raise ValueError("Invalid tenant_id")
     base = _BASE_DATA_DIR.resolve()
-    d = (base / tenant_id).resolve()
+    d = (base / tenant_id).resolve()  # lgtm[py/path-injection]
     if os.path.commonpath([str(base), str(d)]) != str(base):
         raise ValueError("Invalid tenant path")
     return d

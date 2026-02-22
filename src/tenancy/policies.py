@@ -83,7 +83,7 @@ def _policy_path(tenant_id: str) -> Path:
     _BASE_POLICY_DIR.mkdir(parents=True, exist_ok=True)
     safe_tenant_id = _validated_tenant_id(tenant_id)
     base = _BASE_POLICY_DIR.resolve()
-    path = (base / f"{safe_tenant_id}.json").resolve()
+    path = (base / f"{safe_tenant_id}.json").resolve()  # lgtm[py/path-injection]
     if os.path.commonpath([str(base), str(path)]) != str(base):
         raise ValueError("Invalid tenant_id path")
     if path.parent != base:
