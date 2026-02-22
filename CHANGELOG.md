@@ -33,6 +33,16 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - 28 new tests (1252 total), 22 new files, 7 modified
 - All CI gates green (24/24 checks)
 
+### Pilot Additions (GitHub-Native)
+
+- GitHub-native pilot substrate in `pilot/` with fictional decision, assumption, drift, and patch records
+- Canonical markdown templates in `schemas/` for DLR, assumptions, drift signals, and patches
+- Deterministic Coherence Index calculator: `scripts/compute_ci.py`
+- Pilot CI workflow: `.github/workflows/coherence_ci.yml` with fail/warn/pass gate thresholds
+- Issue forms for drift and decision intake
+- Patch pull request checklist template
+- Pilot operations docs: `docs/LABELS.md`, `docs/WORKFLOWS.md`, `docs/PILOT_SCORECARD.md`
+
 ---
 
 ## [2.0.1] — 2026-02-21 — "Clean Foundations"

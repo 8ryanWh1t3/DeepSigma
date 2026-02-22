@@ -1,0 +1,28 @@
+name: New Decision
+about: Create a new Coherence Ops decision record
+title: "[DECISION] "
+labels: ["COH-DECISION"]
+body:
+  - type: input
+    id: decision_title
+    attributes:
+      label: Decision title
+      placeholder: DLR-YYYY-NNN summary
+    validations:
+      required: true
+
+  - type: input
+    id: owner
+    attributes:
+      label: Owner
+      placeholder: Team or individual owner
+    validations:
+      required: true
+
+  - type: input
+    id: deadline
+    attributes:
+      label: Deadline
+      placeholder: YYYY-MM-DD
+    validations:
+      required: true

@@ -1,0 +1,52 @@
+name: Drift Signal
+about: File a Coherence Ops drift signal
+title: "[DRIFT] "
+labels: ["COH-DRIFT", "COH-NEEDS-OWNER", "COH-SEV2"]
+body:
+  - type: dropdown
+    id: drift_type
+    attributes:
+      label: Drift Type
+      options:
+        - Outcome drift
+        - Assumption drift
+        - Canon drift
+        - Template bloat
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: Use this value to set COH-SEV1/COH-SEV2/COH-SEV3 label.
+      options:
+        - SEV-1
+        - SEV-2
+        - SEV-3
+    validations:
+      required: true
+
+  - type: input
+    id: linked_decision
+    attributes:
+      label: Linked Decision File
+      placeholder: pilot/decisions/2026-001-demo-threat-model.md
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      placeholder: Paste factual evidence for drift.
+    validations:
+      required: true
+
+  - type: input
+    id: owner
+    attributes:
+      label: Owner
+      placeholder: Team or individual owner
+    validations:
+      required: true
