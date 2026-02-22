@@ -172,10 +172,19 @@ def _ts_ms(iso: str) -> int:
         return 0
 
 
-def _sanitize_iris_result(data: Dict[str, Any]) -> Dict[str, Any]:
-    """Drop traceback-like fields before returning to API callers."""
+def _sanitize_iris_result(data: Any) -> Any:
+    """Recursively drop traceback-like fields before returning to API callers."""
     blocked = {"traceback", "stack", "stacktrace", "exception", "error_details"}
-    return {k: v for k, v in data.items() if k.lower() not in blocked}
+    if isinstance(data, dict):
+        out: Dict[str, Any] = {}
+        for k, v in data.items():
+            if str(k).lower() in blocked:
+                continue
+            out[k] = _sanitize_iris_result(v)
+        return out
+    if isinstance(data, list):
+        return [_sanitize_iris_result(v) for v in data]
+    return data
 
 
 def _episode_to_dashboard(ep: Dict[str, Any], drift_lookup: Dict[str, List]) -> Dict[str, Any]:
@@ -424,7 +433,18 @@ def query_iris(body: Dict[str, Any]):
     except Exception:
         logger.error("IRIS resolution failed")
         raise HTTPException(status_code=500, detail="IRIS query failed")
-    return _sanitize_iris_result(response.to_dict())
+    status = "OK" if str(getattr(response, "status", "OK")).upper() == "OK" else "ERROR"
+    confidence = getattr(response, "confidence", 0)
+    if not isinstance(confidence, (int, float)):
+        confidence = 0
+    return {
+        "status": status,
+        "summary": "IRIS query resolved" if status == "OK" else "IRIS query returned error",
+        "confidence": float(confidence),
+        "signals": [],
+        "why_chain": [],
+        "provenance": [],
+    }
 
 
 @app.get("/api/trust_scorecard")

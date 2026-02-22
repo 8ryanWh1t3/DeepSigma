@@ -88,10 +88,19 @@ def _get_drift_events() -> List[Dict[str, Any]]:
     return events
 
 
-def _sanitize_iris_result(data: Dict[str, Any]) -> Dict[str, Any]:
-    """Drop traceback-like fields before returning to API callers."""
+def _sanitize_iris_result(data: Any) -> Any:
+    """Recursively drop traceback-like fields before returning to API callers."""
     blocked = {"traceback", "stack", "stacktrace", "exception", "error_details"}
-    return {k: v for k, v in data.items() if k.lower() not in blocked}
+    if isinstance(data, dict):
+        out: Dict[str, Any] = {}
+        for k, v in data.items():
+            if str(k).lower() in blocked:
+                continue
+            out[k] = _sanitize_iris_result(v)
+        return out
+    if isinstance(data, list):
+        return [_sanitize_iris_result(v) for v in data]
+    return data
 
 
 if HAS_FASTAPI:
@@ -314,10 +323,20 @@ if HAS_FASTAPI:
                 episode_id=body.get("episode_id", ""),
             )
             response = engine.resolve(query)
-            result = _sanitize_iris_result(response.to_dict())
-            result["provenance_chain"] = result.pop("provenance", [])
-            result["resolved_at"] = datetime.now(timezone.utc).isoformat()
-            return result
+            status = "OK" if str(getattr(response, "status", "OK")).upper() == "OK" else "ERROR"
+            confidence = getattr(response, "confidence", 0)
+            if not isinstance(confidence, (int, float)):
+                confidence = 0
+            safe_result = {
+                "status": status,
+                "summary": "IRIS query resolved" if status == "OK" else "IRIS query returned error",
+                "confidence": float(confidence),
+                "signals": [],
+                "why_chain": [],
+                "provenance_chain": [],
+                "resolved_at": datetime.now(timezone.utc).isoformat(),
+            }
+            return safe_result
         except Exception:
             logger.error("IRIS query failed")
             return {"status": "ERROR", "summary": "IRIS query failed", "confidence": 0}

@@ -77,12 +77,12 @@ class CredibilityStore:
         else:
             tid = _validate_tenant_id(tenant_id or DEFAULT_TENANT_ID)
             base = _BASE_DATA_DIR.resolve()
-            candidate = (base / tid).resolve()  # lgtm[py/path-injection]
+            candidate = (base / tid).resolve()  # lgtm [py/path-injection]
             if not _is_within(base, candidate):
                 raise ValueError("Invalid tenant_id path")
             self.data_dir = candidate
         self.tenant_id = _validate_tenant_id(tenant_id or DEFAULT_TENANT_ID)
-        self.data_dir.mkdir(parents=True, exist_ok=True)
+        self.data_dir.mkdir(parents=True, exist_ok=True)  # lgtm [py/path-injection]
 
     def _safe_path(self, filename: str) -> Path:
         """Resolve a validated filename under the tenant data directory."""

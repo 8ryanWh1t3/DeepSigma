@@ -38,11 +38,11 @@ def _validated_tenant_id(tenant_id: str) -> str:
 def _telemetry_path(tenant_id: str) -> Path:
     """Return the telemetry log path for a tenant."""
     base = _BASE_TELEMETRY_DIR.resolve()
-    d = (base / _validated_tenant_id(tenant_id)).resolve()  # lgtm[py/path-injection]
+    d = (base / _validated_tenant_id(tenant_id)).resolve()  # lgtm [py/path-injection]
     if os.path.commonpath([str(base), str(d)]) != str(base):
         raise ValueError("Invalid tenant_id path")
     d.mkdir(parents=True, exist_ok=True)
-    path = (d / "telemetry.jsonl").resolve()  # lgtm[py/path-injection]
+    path = (d / "telemetry.jsonl").resolve()  # lgtm [py/path-injection]
     if os.path.commonpath([str(d), str(path)]) != str(d):
         raise ValueError("Invalid telemetry file path")
     return path
@@ -64,7 +64,7 @@ def record_metric(
     }
     filepath = _telemetry_path(tenant_id)
     with _telemetry_lock:
-        with open(filepath, "a", encoding="utf-8") as f:
+        with open(filepath, "a", encoding="utf-8") as f:  # lgtm [py/path-injection]
             f.write(json.dumps(record, default=str) + "\n")
     return record
 
