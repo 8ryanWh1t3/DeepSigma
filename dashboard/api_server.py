@@ -416,7 +416,7 @@ def query_iris(body: Dict[str, Any]):
     try:
         response = engine.resolve(query)
     except Exception:
-        logger.exception("IRIS resolution failed")
+        logger.error("IRIS resolution failed")
         raise HTTPException(status_code=500, detail="IRIS query failed")
     return response.to_dict()
 
