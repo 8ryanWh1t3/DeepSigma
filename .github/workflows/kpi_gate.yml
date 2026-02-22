@@ -1,0 +1,35 @@
+name: Repo Radar KPI
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  kpi:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install KPI dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install matplotlib
+
+      - name: Run KPI
+        run: |
+          make kpi
+
+      - name: Upload KPI artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: repo-kpi
+          path: |
+            release_kpis/PR_COMMENT.md
+            release_kpis/badge_latest.svg
+            release_kpis/radar_*.png
+            release_kpis/radar_*.svg

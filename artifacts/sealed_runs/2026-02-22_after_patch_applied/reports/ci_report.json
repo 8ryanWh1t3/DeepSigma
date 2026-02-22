@@ -1,13 +1,13 @@
 {
-  "timestamp": "2026-02-22T14:40:01.264561+00:00",
-  "ci_score": 65,
+  "timestamp": "2026-02-22T15:09:54.477404+00:00",
+  "ci_score": 30,
   "counts": {
     "decisions": 1,
-    "assumptions": 4,
-    "expired_assumptions": 3,
-    "expired_assumptions_unpatched": 1,
-    "drift": 3,
-    "drift_open": 1,
+    "assumptions": 5,
+    "expired_assumptions": 4,
+    "expired_assumptions_unpatched": 2,
+    "drift": 4,
+    "drift_open": 2,
     "patches": 2
   },
   "violations": [
@@ -17,16 +17,33 @@
       "message": "A-2026-071 expired on 2026-02-21 and has no linked patch"
     },
     {
+      "category": "expired_assumption",
+      "file": "pilot/assumptions/A-2026-072.md",
+      "message": "A-2026-072 expired on 2026-02-21 and has no linked patch"
+    },
+    {
       "category": "open_drift",
       "file": "pilot/drift/DRIFT-2026-071.md",
       "message": "DRIFT-2026-071 is open and still contributes to drift risk",
       "issue_ref": "DRIFT-2026-071"
     },
     {
+      "category": "open_drift",
+      "file": "pilot/drift/DRIFT-2026-072.md",
+      "message": "DRIFT-2026-072 is open and still contributes to drift risk",
+      "issue_ref": "DRIFT-2026-072"
+    },
+    {
       "category": "drift_without_patch",
       "file": "pilot/drift/DRIFT-2026-071.md",
       "message": "DRIFT-2026-071 has no linked patch",
       "issue_ref": "DRIFT-2026-071"
+    },
+    {
+      "category": "drift_without_patch",
+      "file": "pilot/drift/DRIFT-2026-072.md",
+      "message": "DRIFT-2026-072 has no linked patch",
+      "issue_ref": "DRIFT-2026-072"
     }
   ]
 }

@@ -124,7 +124,7 @@ def main() -> int:
     pass_score = run_ci()
 
     print("")
-    print("=== PILOT IN A BOX RESULTS (Build 71) ===")
+    print("=== PILOT IN A BOX RESULTS (Build 72) ===")
     print(f"Baseline CI: {baseline}")
     print(f"After FAIL injection CI: {fail_score}")
     print(f"After PATCH remediation CI: {pass_score}")
