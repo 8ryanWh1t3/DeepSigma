@@ -17,6 +17,8 @@ import json
 import os
 import re
 import threading
+import warnings
+from base64 import b64decode, b64encode
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -75,6 +77,7 @@ class CredibilityStore:
         self,
         data_dir: str | Path | None = None,
         tenant_id: str | None = None,
+        encrypt_at_rest: bool = False,
     ) -> None:
         if data_dir is not None:
             # Explicit data_dir takes precedence (backward compat / testing)
@@ -89,6 +92,92 @@ class CredibilityStore:
             self.data_dir = candidate
         self.tenant_id = _validate_tenant_id(tenant_id or DEFAULT_TENANT_ID)
         self.data_dir.mkdir(parents=True, exist_ok=True)  # lgtm [py/path-injection]
+        self.encrypt_at_rest = encrypt_at_rest
+        self._master_key = os.environ.get("DEEPSIGMA_MASTER_KEY", "")
+        self._encryption_enabled = False
+        self._aesgcm: Any = None
+        if self.encrypt_at_rest:
+            self._initialize_encryption()
+
+    def _initialize_encryption(self) -> None:
+        if not self._master_key:
+            warnings.warn(
+                "encrypt_at_rest=True but DEEPSIGMA_MASTER_KEY is unset; "
+                "falling back to plaintext persistence",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+            return
+        try:
+            from cryptography.hazmat.primitives.ciphers.aead import AESGCM  # type: ignore
+        except ImportError:
+            warnings.warn(
+                "encrypt_at_rest=True but cryptography is not installed; "
+                "falling back to plaintext persistence",
+                RuntimeWarning,
+                stacklevel=2,
+            )
+            return
+        key = self._derive_tenant_key(self._master_key)
+        self._aesgcm = AESGCM(key)
+        self._encryption_enabled = True
+
+    def _derive_tenant_key(self, master_key: str) -> bytes:
+        salt = f"deepsigma:{self.tenant_id}".encode("utf-8")
+        return hashlib.pbkdf2_hmac(
+            "sha256",
+            master_key.encode("utf-8"),
+            salt,
+            200_000,
+            dklen=32,
+        )
+
+    def _is_encrypted_envelope(self, obj: Any) -> bool:
+        return (
+            isinstance(obj, dict)
+            and "encrypted_payload" in obj
+            and "nonce" in obj
+        )
+
+    def _encrypt_record(self, record: dict[str, Any]) -> dict[str, Any]:
+        if not self._encryption_enabled or self._aesgcm is None:
+            return record
+        plaintext = json.dumps(record, default=str, separators=(",", ":")).encode("utf-8")
+        nonce = os.urandom(12)
+        aad = self.tenant_id.encode("utf-8")
+        ciphertext = self._aesgcm.encrypt(nonce, plaintext, aad)
+        return {
+            "enc": "AES-256-GCM",
+            "enc_version": 1,
+            "tenant_id": self.tenant_id,
+            "nonce": b64encode(nonce).decode("utf-8"),
+            "encrypted_payload": b64encode(ciphertext).decode("utf-8"),
+        }
+
+    def _decrypt_record_with(
+        self,
+        envelope: dict[str, Any],
+        aesgcm: Any,
+    ) -> dict[str, Any]:
+        nonce = b64decode(envelope["nonce"])
+        ciphertext = b64decode(envelope["encrypted_payload"])
+        aad = self.tenant_id.encode("utf-8")
+        plaintext = aesgcm.decrypt(nonce, ciphertext, aad)
+        obj = json.loads(plaintext.decode("utf-8"))
+        if isinstance(obj, dict):
+            obj.setdefault("tenant_id", self.tenant_id)
+        return obj
+
+    def _decode_record(self, raw: dict[str, Any]) -> dict[str, Any]:
+        if not self._is_encrypted_envelope(raw):
+            raw.setdefault("tenant_id", self.tenant_id)
+            return raw
+        if not self._encryption_enabled or self._aesgcm is None:
+            raise RuntimeError(
+                "Encrypted record found but decryption is unavailable. "
+                "Set DEEPSIGMA_MASTER_KEY and enable encrypt_at_rest."
+            )
+        return self._decrypt_record_with(raw, self._aesgcm)
 
     def _safe_path(self, filename: str) -> Path:
         """Resolve a validated filename under the tenant data directory."""
@@ -112,9 +201,12 @@ class CredibilityStore:
         enriched.setdefault("tenant_id", self.tenant_id)
         enriched.setdefault("timestamp", _now_iso())
         filepath = self._safe_path(filename)
+        serialized = enriched
+        if filename != self.PACKET_FILE and self._encryption_enabled:
+            serialized = self._encrypt_record(enriched)
         with _write_lock:
             with open(filepath, "a", encoding="utf-8") as f:
-                f.write(json.dumps(enriched, default=str) + "\n")
+                f.write(json.dumps(serialized, default=str) + "\n")
 
     def load_latest(self, filename: str) -> dict[str, Any] | None:
         """Load the last record from a JSONL file."""
@@ -128,9 +220,7 @@ class CredibilityStore:
                 if stripped:
                     last_line = stripped
         if last_line:
-            record = json.loads(last_line)
-            record.setdefault("tenant_id", self.tenant_id)
-            return record
+            return self._decode_record(json.loads(last_line))
         return None
 
     def load_last_n(self, filename: str, n: int = 10) -> list[dict[str, Any]]:
@@ -144,9 +234,7 @@ class CredibilityStore:
                 stripped = line.strip()
                 if stripped:
                     lines.append(stripped)
-        records = [json.loads(line) for line in lines[-n:]]
-        for r in records:
-            r.setdefault("tenant_id", self.tenant_id)
+        records = [self._decode_record(json.loads(line)) for line in lines[-n:]]
         return records
 
     def load_all(self, filename: str) -> list[dict[str, Any]]:
@@ -159,19 +247,20 @@ class CredibilityStore:
             for line in f:
                 stripped = line.strip()
                 if stripped:
-                    record = json.loads(stripped)
-                    record.setdefault("tenant_id", self.tenant_id)
-                    records.append(record)
+                    records.append(self._decode_record(json.loads(stripped)))
         return records
 
     def write_json(self, filename: str, data: dict[str, Any]) -> None:
         """Write a single JSON file (non-JSONL, for packets)."""
         enriched = dict(data)
         enriched.setdefault("tenant_id", self.tenant_id)
+        serialized = enriched
+        if filename != self.PACKET_FILE and self._encryption_enabled:
+            serialized = self._encrypt_record(enriched)
         filepath = self._safe_path(filename)
         with _write_lock:
             with open(filepath, "w", encoding="utf-8") as f:
-                json.dump(enriched, f, indent=2, default=str)
+                json.dump(serialized, f, indent=2, default=str)
                 f.write("\n")
 
     def load_json(self, filename: str) -> dict[str, Any] | None:
@@ -182,7 +271,7 @@ class CredibilityStore:
         with open(filepath, encoding="utf-8") as f:
             record = json.load(f)
         if isinstance(record, dict):
-            record.setdefault("tenant_id", self.tenant_id)
+            record = self._decode_record(record)
         return record
 
     def write_batch(self, filename: str, records: list[dict[str, Any]]) -> None:
@@ -198,7 +287,10 @@ class CredibilityStore:
                     enriched = dict(record)
                     enriched.setdefault("tenant_id", self.tenant_id)
                     enriched.setdefault("timestamp", _now_iso())
-                    f.write(json.dumps(enriched, default=str) + "\n")
+                    serialized = enriched
+                    if filename != self.PACKET_FILE and self._encryption_enabled:
+                        serialized = self._encrypt_record(enriched)
+                    f.write(json.dumps(serialized, default=str) + "\n")
 
     # -- Convenience methods ---------------------------------------------------
 
@@ -274,9 +366,7 @@ class CredibilityStore:
             for line in f:
                 stripped = line.strip()
                 if stripped:
-                    record = json.loads(stripped)
-                    record.setdefault("tenant_id", self.tenant_id)
-                    records.append(record)
+                    records.append(self._decode_record(json.loads(stripped)))
         return records
 
     def load_cold(self, filename: str) -> list[dict[str, Any]]:
@@ -289,9 +379,7 @@ class CredibilityStore:
             for line in f:
                 stripped = line.strip()
                 if stripped:
-                    record = json.loads(stripped)
-                    record.setdefault("tenant_id", self.tenant_id)
-                    records.append(record)
+                    records.append(self._decode_record(json.loads(stripped)))
         return records
 
     def write_warm(self, filename: str, records: list[dict[str, Any]]) -> None:
@@ -306,7 +394,10 @@ class CredibilityStore:
                 for record in records:
                     enriched = dict(record)
                     enriched.setdefault("tenant_id", self.tenant_id)
-                    f.write(json.dumps(enriched, default=str) + "\n")
+                    serialized = enriched
+                    if self._encryption_enabled:
+                        serialized = self._encrypt_record(enriched)
+                    f.write(json.dumps(serialized, default=str) + "\n")
 
     def write_cold(self, filename: str, records: list[dict[str, Any]]) -> None:
         """Write records to the cold-tier file."""
@@ -320,4 +411,63 @@ class CredibilityStore:
                 for record in records:
                     enriched = dict(record)
                     enriched.setdefault("tenant_id", self.tenant_id)
-                    f.write(json.dumps(enriched, default=str) + "\n")
+                    serialized = enriched
+                    if self._encryption_enabled:
+                        serialized = self._encrypt_record(enriched)
+                    f.write(json.dumps(serialized, default=str) + "\n")
+
+    def rekey(self, previous_master_key: str) -> dict[str, int]:
+        """Re-encrypt tenant records with the current DEEPSIGMA_MASTER_KEY.
+
+        Sealed packet artifacts are intentionally left plaintext.
+        """
+        if not self.encrypt_at_rest:
+            raise RuntimeError("Rekey requires encrypt_at_rest=True")
+        if not self._master_key or not self._encryption_enabled:
+            raise RuntimeError(
+                "Rekey requires DEEPSIGMA_MASTER_KEY and cryptography support"
+            )
+        if not previous_master_key:
+            raise RuntimeError("previous_master_key is required")
+
+        try:
+            from cryptography.hazmat.primitives.ciphers.aead import AESGCM  # type: ignore
+        except ImportError as exc:
+            raise RuntimeError("cryptography is required for rekey") from exc
+
+        old_aes = AESGCM(self._derive_tenant_key(previous_master_key))
+        stats = {"files": 0, "records": 0}
+        for path in sorted(self.data_dir.glob("*")):
+            if path.is_dir():
+                continue
+            if path.name == self.PACKET_FILE:
+                continue
+            if path.suffix == ".jsonl":
+                lines = path.read_text(encoding="utf-8").splitlines()
+                rewritten: list[str] = []
+                for line in lines:
+                    stripped = line.strip()
+                    if not stripped:
+                        continue
+                    raw = json.loads(stripped)
+                    if self._is_encrypted_envelope(raw):
+                        record = self._decrypt_record_with(raw, old_aes)
+                    else:
+                        record = raw
+                        record.setdefault("tenant_id", self.tenant_id)
+                    rewritten.append(json.dumps(self._encrypt_record(record), default=str))
+                    stats["records"] += 1
+                with _write_lock:
+                    path.write_text("\n".join(rewritten) + ("\n" if rewritten else ""), encoding="utf-8")
+                stats["files"] += 1
+            elif path.suffix == ".json":
+                raw = json.loads(path.read_text(encoding="utf-8"))
+                if self._is_encrypted_envelope(raw):
+                    record = self._decrypt_record_with(raw, old_aes)
+                else:
+                    record = raw
+                with _write_lock:
+                    path.write_text(json.dumps(self._encrypt_record(record), indent=2) + "\n", encoding="utf-8")
+                stats["files"] += 1
+                stats["records"] += 1
+        return stats

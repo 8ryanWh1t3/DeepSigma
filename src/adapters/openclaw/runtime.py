@@ -63,6 +63,8 @@ class SandboxConfig:
         Whether to allow WASI filesystem access.
     allow_network : bool
         Whether to allow WASI network access.
+    encrypt_at_rest : bool
+        Whether evidence persistence should use at-rest encryption.
     """
 
     memory_limit_mb: int = DEFAULT_MEMORY_LIMIT_MB
@@ -75,6 +77,7 @@ class SandboxConfig:
     )
     allow_filesystem: bool = False
     allow_network: bool = False
+    encrypt_at_rest: bool = False
 
 
 class SandboxViolation(Exception):
