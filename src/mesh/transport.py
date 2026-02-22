@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import time
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
@@ -27,13 +28,34 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 _BASE_DATA_DIR = Path(__file__).parent.parent / "data" / "mesh"
+_SAFE_ID_RE = re.compile(r"^[A-Za-z0-9_.-]{1,64}$")
 
 
 def _node_dir(tenant_id: str, node_id: str) -> Path:
-    return _BASE_DATA_DIR / tenant_id / node_id
+    if not _SAFE_ID_RE.fullmatch(tenant_id):
+        raise ValueError("Invalid tenant_id")
+    if not _SAFE_ID_RE.fullmatch(node_id):
+        raise ValueError("Invalid node_id")
+    d = (_BASE_DATA_DIR / tenant_id / node_id).resolve()
+    base = _BASE_DATA_DIR.resolve()
+    if base not in d.parents:
+        raise ValueError("Invalid mesh path")
+    return d
+
+
+def _tenant_dir(tenant_id: str) -> Path:
+    if not _SAFE_ID_RE.fullmatch(tenant_id):
+        raise ValueError("Invalid tenant_id")
+    d = (_BASE_DATA_DIR / tenant_id).resolve()
+    base = _BASE_DATA_DIR.resolve()
+    if d != base and base not in d.parents:
+        raise ValueError("Invalid tenant path")
+    return d
 
 
 def _log_path(tenant_id: str, node_id: str, log_name: str) -> Path:
+    if log_name not in LOG_FILES and log_name != NODE_STATUS_FILE:
+        raise ValueError(f"Unsupported log file: {log_name}")
     return _node_dir(tenant_id, node_id) / log_name
 
 
@@ -472,7 +494,14 @@ def create_mesh_router():
         Aggregates node statuses, last aggregate, last seal,
         and basic verification health.
         """
-        tenant_dir = _BASE_DATA_DIR / tenant_id
+        try:
+            tenant_dir = _tenant_dir(tenant_id)
+        except ValueError:
+            return {
+                "tenant_id": tenant_id,
+                "status": "invalid_tenant_id",
+                "nodes": [],
+            }
         if not tenant_dir.exists():
             return {
                 "tenant_id": tenant_id,

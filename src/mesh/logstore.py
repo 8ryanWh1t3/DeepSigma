@@ -8,16 +8,28 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import tempfile
 import threading
 from datetime import datetime, timezone
 from pathlib import Path
 
 _write_lock = threading.Lock()
+_SAFE_PATH_RE = re.compile(r"^[A-Za-z0-9_./-]+$")
 
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _normalize_path(path: str | Path) -> Path:
+    raw = str(path)
+    if "\\" in raw:
+        raise ValueError("Backslashes are not allowed in logstore paths")
+    if not _SAFE_PATH_RE.fullmatch(raw):
+        raise ValueError("Invalid characters in logstore path")
+    candidate = Path(path).expanduser().resolve()
+    return candidate
 
 
 def append_jsonl(path: str | Path, record: dict) -> None:
@@ -25,7 +37,7 @@ def append_jsonl(path: str | Path, record: dict) -> None:
 
     Uses temp-file + rename for atomic write on append.
     """
-    path = Path(path)
+    path = _normalize_path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
 
     record.setdefault("timestamp", _now_iso())
@@ -56,7 +68,7 @@ def append_jsonl(path: str | Path, record: dict) -> None:
 
 def load_last_n(path: str | Path, n: int = 50) -> list[dict]:
     """Load the last N records from a JSONL file."""
-    path = Path(path)
+    path = _normalize_path(path)
     if not path.exists():
         return []
 
@@ -78,7 +90,7 @@ def load_last_n(path: str | Path, n: int = 50) -> list[dict]:
 
 def load_all(path: str | Path) -> list[dict]:
     """Load all records from a JSONL file."""
-    path = Path(path)
+    path = _normalize_path(path)
     if not path.exists():
         return []
 
@@ -115,7 +127,7 @@ def dedupe_by_id(records: list[dict], id_field: str) -> list[dict]:
 
 def write_json(path: str | Path, data: dict) -> None:
     """Atomically write a single JSON file."""
-    path = Path(path)
+    path = _normalize_path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
 
     with _write_lock:
@@ -137,7 +149,7 @@ def write_json(path: str | Path, data: dict) -> None:
 
 def load_json(path: str | Path) -> dict | None:
     """Load a single JSON file. Returns None if missing."""
-    path = Path(path)
+    path = _normalize_path(path)
     if not path.exists():
         return None
     with open(path, encoding="utf-8") as f:

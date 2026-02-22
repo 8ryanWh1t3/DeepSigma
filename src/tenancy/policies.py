@@ -13,19 +13,28 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 _BASE_POLICY_DIR = Path(__file__).parent.parent / "data" / "policies"
+_SAFE_ID_RE = re.compile(r"^[A-Za-z0-9_.-]{1,64}$")
 
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
+def _validated_tenant_id(tenant_id: str) -> str:
+    if not _SAFE_ID_RE.fullmatch(tenant_id):
+        raise ValueError("Invalid tenant_id")
+    return tenant_id
+
+
 def default_policy(tenant_id: str) -> dict[str, Any]:
     """Return the default policy for a tenant."""
+    tenant_id = _validated_tenant_id(tenant_id)
     return {
         "tenant_id": tenant_id,
         "updated_at": _now_iso(),
@@ -71,7 +80,12 @@ def default_policy(tenant_id: str) -> dict[str, Any]:
 def _policy_path(tenant_id: str) -> Path:
     """Return the policy file path for a tenant."""
     _BASE_POLICY_DIR.mkdir(parents=True, exist_ok=True)
-    return _BASE_POLICY_DIR / f"{tenant_id}.json"
+    safe_tenant_id = _validated_tenant_id(tenant_id)
+    path = (_BASE_POLICY_DIR / f"{safe_tenant_id}.json").resolve()
+    base = _BASE_POLICY_DIR.resolve()
+    if path.parent != base:
+        raise ValueError("Invalid tenant_id path")
+    return path
 
 
 def load_policy(tenant_id: str) -> dict[str, Any]:

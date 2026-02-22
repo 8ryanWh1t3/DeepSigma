@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 import threading
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional
@@ -47,6 +48,7 @@ DRIFT_FILE = DRIFT_DIR / "drift.jsonl"
 
 # Single-writer lock (safe with --workers 1)
 _write_lock = threading.Lock()
+_SAFE_EPISODE_ID_RE = re.compile(r"^[A-Za-z0-9_.-]{1,128}$")
 
 
 def _ensure_dirs() -> None:
@@ -126,6 +128,16 @@ def _read_json(path: Path) -> Optional[Dict[str, Any]]:
         return json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
         return None
+
+
+def _episode_path(base_dir: Path, episode_id: str) -> Path:
+    if not _SAFE_EPISODE_ID_RE.fullmatch(episode_id):
+        raise ValueError("Invalid episode_id")
+    path = (base_dir / f"{episode_id}.json").resolve()
+    base = base_dir.resolve()
+    if path.parent != base:
+        raise ValueError("Invalid episode path")
+    return path
 
 
 # ── Router ───────────────────────────────────────────────────────
@@ -249,10 +261,15 @@ if HAS_FASTAPI:
     @router.get("/episodes/{episode_id}")
     def get_episode_detail(episode_id: str):
         """Get full episode detail including refined data if available."""
-        ep = _read_json(EPISODES_DIR / f"{episode_id}.json")
+        try:
+            episode_path = _episode_path(EPISODES_DIR, episode_id)
+            refined_path = _episode_path(REFINED_DIR, episode_id)
+        except ValueError:
+            raise HTTPException(400, "Invalid episode_id")
+        ep = _read_json(episode_path)
         if not ep:
             raise HTTPException(404, f"Episode {episode_id} not found")
-        refined = _read_json(REFINED_DIR / f"{episode_id}.json")
+        refined = _read_json(refined_path)
         return {"episode": ep, "refined": refined}
 
     # ── Refinement ───────────────────────────────────────────────
@@ -260,7 +277,12 @@ if HAS_FASTAPI:
     @router.post("/episodes/{episode_id}/refine")
     def refine_episode(episode_id: str):
         """Run extraction/refinement on an episode."""
-        ep_data = _read_json(EPISODES_DIR / f"{episode_id}.json")
+        try:
+            episode_path = _episode_path(EPISODES_DIR, episode_id)
+            refined_path = _episode_path(REFINED_DIR, episode_id)
+        except ValueError:
+            raise HTTPException(400, "Invalid episode_id")
+        ep_data = _read_json(episode_path)
         if not ep_data:
             raise HTTPException(404, f"Episode {episode_id} not found")
 
@@ -279,13 +301,13 @@ if HAS_FASTAPI:
                 grade="D",
             )
 
-        _write_json(REFINED_DIR / f"{episode_id}.json", refined.model_dump())
+        _write_json(refined_path, refined.model_dump())
 
         # Update episode status
         ep_data["refined"] = True
         ep_data["coherence_score"] = refined.coherence_score
         ep_data["grade"] = refined.grade
-        _write_json(EPISODES_DIR / f"{episode_id}.json", ep_data)
+        _write_json(episode_path, ep_data)
 
         return {"status": "refined", "episode_id": episode_id, "coherence_score": refined.coherence_score, "grade": refined.grade}
 
@@ -294,7 +316,12 @@ if HAS_FASTAPI:
     @router.post("/episodes/{episode_id}/commit")
     def commit_episode(episode_id: str):
         """Accept and commit refined items to memory graph + seal episode."""
-        refined_data = _read_json(REFINED_DIR / f"{episode_id}.json")
+        try:
+            episode_path = _episode_path(EPISODES_DIR, episode_id)
+            refined_path = _episode_path(REFINED_DIR, episode_id)
+        except ValueError:
+            raise HTTPException(400, "Invalid episode_id")
+        refined_data = _read_json(refined_path)
         if not refined_data:
             raise HTTPException(404, f"Refined data for {episode_id} not found")
 
@@ -314,12 +341,12 @@ if HAS_FASTAPI:
 
         # Mark committed
         refined_data["committed"] = True
-        _write_json(REFINED_DIR / f"{episode_id}.json", refined_data)
+        _write_json(refined_path, refined_data)
 
-        ep_data = _read_json(EPISODES_DIR / f"{episode_id}.json")
+        ep_data = _read_json(episode_path)
         if ep_data:
             ep_data["status"] = "committed"
-            _write_json(EPISODES_DIR / f"{episode_id}.json", ep_data)
+            _write_json(episode_path, ep_data)
 
         return {"status": "committed", "episode_id": episode_id}
 
@@ -328,7 +355,11 @@ if HAS_FASTAPI:
     @router.post("/episodes/{episode_id}/item")
     def item_action(episode_id: str, action: ItemAction):
         """Accept/reject/edit a single refined item."""
-        refined_data = _read_json(REFINED_DIR / f"{episode_id}.json")
+        try:
+            refined_path = _episode_path(REFINED_DIR, episode_id)
+        except ValueError:
+            raise HTTPException(400, "Invalid episode_id")
+        refined_data = _read_json(refined_path)
         if not refined_data:
             raise HTTPException(404, f"Refined data for {episode_id} not found")
 
@@ -349,7 +380,7 @@ if HAS_FASTAPI:
         if not found:
             raise HTTPException(404, f"Item {action.item_id} not found in {action.bucket}")
 
-        _write_json(REFINED_DIR / f"{episode_id}.json", refined_data)
+        _write_json(refined_path, refined_data)
         return {"status": action.action, "item_id": action.item_id}
 
     # ── Drift listing ────────────────────────────────────────────
