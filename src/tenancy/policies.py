@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -81,8 +82,10 @@ def _policy_path(tenant_id: str) -> Path:
     """Return the policy file path for a tenant."""
     _BASE_POLICY_DIR.mkdir(parents=True, exist_ok=True)
     safe_tenant_id = _validated_tenant_id(tenant_id)
-    path = (_BASE_POLICY_DIR / f"{safe_tenant_id}.json").resolve()
     base = _BASE_POLICY_DIR.resolve()
+    path = (base / f"{safe_tenant_id}.json").resolve()
+    if os.path.commonpath([str(base), str(path)]) != str(base):
+        raise ValueError("Invalid tenant_id path")
     if path.parent != base:
         raise ValueError("Invalid tenant_id path")
     return path

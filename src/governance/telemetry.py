@@ -9,6 +9,7 @@ No real-world system modeled.
 from __future__ import annotations
 
 import json
+import os
 import re
 import threading
 import time
@@ -36,12 +37,15 @@ def _validated_tenant_id(tenant_id: str) -> str:
 
 def _telemetry_path(tenant_id: str) -> Path:
     """Return the telemetry log path for a tenant."""
-    d = (_BASE_TELEMETRY_DIR / _validated_tenant_id(tenant_id)).resolve()
     base = _BASE_TELEMETRY_DIR.resolve()
-    if d != base and base not in d.parents:
+    d = (base / _validated_tenant_id(tenant_id)).resolve()
+    if os.path.commonpath([str(base), str(d)]) != str(base):
         raise ValueError("Invalid tenant_id path")
     d.mkdir(parents=True, exist_ok=True)
-    return d / "telemetry.jsonl"
+    path = (d / "telemetry.jsonl").resolve()
+    if os.path.commonpath([str(d), str(path)]) != str(d):
+        raise ValueError("Invalid telemetry file path")
+    return path
 
 
 def record_metric(
