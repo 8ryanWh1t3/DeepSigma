@@ -8,6 +8,8 @@ from credibility_engine import api as credibility_api
 from credibility_engine.constants import DEFAULT_TENANT_ID
 from credibility_engine.store import CredibilityStore
 
+import pytest
+
 
 def _temp_store_factory(base: Path):
     def _factory(tenant_id: str) -> CredibilityStore:
@@ -17,6 +19,13 @@ def _temp_store_factory(base: Path):
         )
 
     return _factory
+
+
+@pytest.fixture(autouse=True)
+def _restore_store_factory():
+    previous = credibility_api._store_factory
+    yield
+    credibility_api.set_store_factory(previous)
 
 
 def test_get_engine_is_request_scoped(tmp_path):
