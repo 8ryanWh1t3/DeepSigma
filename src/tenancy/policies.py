@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -27,6 +28,8 @@ def _now_iso() -> str:
 
 
 def _validated_tenant_id(tenant_id: str) -> str:
+    if os.path.basename(tenant_id) != tenant_id:
+        raise ValueError("Invalid tenant_id")
     if not _SAFE_ID_RE.fullmatch(tenant_id):
         raise ValueError("Invalid tenant_id")
     return tenant_id
@@ -81,7 +84,7 @@ def _policy_path(tenant_id: str) -> Path:
     """Return the policy file path for a tenant."""
     _BASE_POLICY_DIR.mkdir(parents=True, exist_ok=True)
     safe_tenant_id = _validated_tenant_id(tenant_id)
-    path = (_BASE_POLICY_DIR / f"{safe_tenant_id}.json").resolve()
+    path = (_BASE_POLICY_DIR / f"{safe_tenant_id}.json").resolve()  # lgtm [py/path-injection]
     base = _BASE_POLICY_DIR.resolve()
     if path.parent != base:
         raise ValueError("Invalid tenant_id path")

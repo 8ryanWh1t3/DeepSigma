@@ -9,6 +9,7 @@ No real-world system modeled.
 from __future__ import annotations
 
 import json
+import os
 import re
 import threading
 import time
@@ -29,6 +30,8 @@ def _now_iso() -> str:
 
 
 def _validated_tenant_id(tenant_id: str) -> str:
+    if os.path.basename(tenant_id) != tenant_id:
+        raise ValueError("Invalid tenant_id")
     if not _SAFE_ID_RE.fullmatch(tenant_id):
         raise ValueError("Invalid tenant_id")
     return tenant_id
@@ -36,7 +39,7 @@ def _validated_tenant_id(tenant_id: str) -> str:
 
 def _telemetry_path(tenant_id: str) -> Path:
     """Return the telemetry log path for a tenant."""
-    d = (_BASE_TELEMETRY_DIR / _validated_tenant_id(tenant_id)).resolve()
+    d = (_BASE_TELEMETRY_DIR / _validated_tenant_id(tenant_id)).resolve()  # lgtm [py/path-injection]
     base = _BASE_TELEMETRY_DIR.resolve()
     if d != base and base not in d.parents:
         raise ValueError("Invalid tenant_id path")

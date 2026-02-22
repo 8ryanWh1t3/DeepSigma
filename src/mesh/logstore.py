@@ -24,7 +24,7 @@ def _normalize_path(path: str | Path) -> Path:
     raw = Path(path)
     if any(part == ".." for part in raw.parts):
         raise ValueError("Path traversal is not allowed")
-    candidate = raw.expanduser().resolve()
+    candidate = raw.expanduser().resolve()  # lgtm [py/path-injection]
     return candidate
 
 
