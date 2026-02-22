@@ -1,0 +1,89 @@
+name: Coherence Pilot CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 6 * * *"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  coherence-ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compute Coherence Index
+        run: python3 scripts/compute_ci.py
+
+      - name: Upload CI report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coherence-ci-report
+          path: |
+            pilot/reports/ci_report.md
+            pilot/reports/ci_report.json
+
+      - name: Enforce CI gate
+        id: gate
+        run: |
+          CI_SCORE=$(python3 - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path('pilot/reports/ci_report.json').read_text(encoding='utf-8'))
+          print(int(data.get('ci_score', 0)))
+          PY
+          )
+          echo "ci_score=${CI_SCORE}" >> "$GITHUB_OUTPUT"
+          if [ "$CI_SCORE" -lt 75 ]; then
+            echo "CI score ${CI_SCORE} < 75 (FAIL)"
+            exit 1
+          elif [ "$CI_SCORE" -lt 90 ]; then
+            echo "::warning::CI score ${CI_SCORE} is in WARN range (75-89)"
+          else
+            echo "CI score ${CI_SCORE} is PASS (>=90)"
+          fi
+
+      - name: Comment CI on PR
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'pilot/reports/ci_report.json';
+            if (!fs.existsSync(path)) {
+              core.info('No ci_report.json found; skipping comment.');
+              return;
+            }
+            const report = JSON.parse(fs.readFileSync(path, 'utf8'));
+            const violations = (report.violations || []).slice(0, 5)
+              .map(v => `- \`${v.file}\`: ${v.message}${v.issue_ref ? ` (${v.issue_ref})` : ''}`)
+              .join('\n') || '- None';
+            const body = [
+              '## Coherence Pilot CI',
+              '',
+              `- CI score: **${report.ci_score}**`,
+              `- Timestamp: ${report.timestamp}`,
+              '',
+              '### Top Violations',
+              violations
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });
