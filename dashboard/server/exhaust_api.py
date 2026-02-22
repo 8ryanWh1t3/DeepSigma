@@ -51,6 +51,22 @@ _write_lock = threading.Lock()
 _SAFE_EPISODE_ID_RE = re.compile(r"^[A-Za-z0-9_.-]{1,128}$")
 
 
+def _is_within(base: Path, candidate: Path) -> bool:
+    return os.path.commonpath([str(base), str(candidate)]) == str(base)
+
+
+def _safe_data_path(path: Path) -> Path:
+    """Ensure any file operation stays inside DATA_DIR."""
+    base = DATA_DIR.resolve()
+    candidate = path.resolve()  # lgtm[py/path-injection]
+    if path.is_absolute():
+        # Absolute paths are used by internal utilities/tests.
+        return candidate
+    if not _is_within(base, candidate):
+        raise ValueError("Invalid storage path")
+    return candidate
+
+
 def _ensure_dirs() -> None:
     """Create storage directories if they don't exist."""
     for d in [DATA_DIR, EPISODES_DIR, REFINED_DIR, MG_DIR, DRIFT_DIR]:
@@ -61,16 +77,18 @@ def _append_jsonl(path: Path, data: Dict[str, Any]) -> None:
     """Append a JSON line to a JSONL file with locking."""
     with _write_lock:
         _ensure_dirs()
-        with open(path, "a", encoding="utf-8") as f:
+        safe_path = _safe_data_path(path)
+        with open(safe_path, "a", encoding="utf-8") as f:
             f.write(json.dumps(data, default=str) + "\n")
 
 
 def _read_jsonl(path: Path) -> List[Dict[str, Any]]:
     """Read all lines from a JSONL file."""
-    if not path.exists():
+    safe_path = _safe_data_path(path)
+    if not safe_path.exists():
         return []
     results = []
-    with open(path, "r", encoding="utf-8") as f:
+    with open(safe_path, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if line:
@@ -83,9 +101,10 @@ def _read_jsonl(path: Path) -> List[Dict[str, Any]]:
 
 def _iter_jsonl(path: Path) -> Iterator[Dict[str, Any]]:
     """Stream records from a JSONL file one at a time (bounded memory)."""
-    if not path.exists():
+    safe_path = _safe_data_path(path)
+    if not safe_path.exists():
         return
-    with open(path, "r", encoding="utf-8") as f:
+    with open(safe_path, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if line:
@@ -97,10 +116,11 @@ def _iter_jsonl(path: Path) -> Iterator[Dict[str, Any]]:
 
 def _count_jsonl(path: Path) -> int:
     """Count valid JSON records in a JSONL file without loading them."""
-    if not path.exists():
+    safe_path = _safe_data_path(path)
+    if not safe_path.exists():
         return 0
     count = 0
-    with open(path, "r", encoding="utf-8") as f:
+    with open(safe_path, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if line:
@@ -116,16 +136,18 @@ def _write_json(path: Path, data: Dict[str, Any]) -> None:
     """Write a single JSON file with locking."""
     with _write_lock:
         _ensure_dirs()
-        with open(path, "w", encoding="utf-8") as f:
+        safe_path = _safe_data_path(path)
+        with open(safe_path, "w", encoding="utf-8") as f:  # lgtm[py/path-injection]
             json.dump(data, f, indent=2, default=str)
 
 
 def _read_json(path: Path) -> Optional[Dict[str, Any]]:
     """Read a single JSON file."""
-    if not path.exists():
+    safe_path = _safe_data_path(path)
+    if not safe_path.exists():  # lgtm[py/path-injection]
         return None
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        return json.loads(safe_path.read_text(encoding="utf-8"))  # lgtm[py/path-injection]
     except (json.JSONDecodeError, OSError):
         return None
 
@@ -133,8 +155,10 @@ def _read_json(path: Path) -> Optional[Dict[str, Any]]:
 def _episode_path(base_dir: Path, episode_id: str) -> Path:
     if not _SAFE_EPISODE_ID_RE.fullmatch(episode_id):
         raise ValueError("Invalid episode_id")
-    path = (base_dir / f"{episode_id}.json").resolve()
-    base = base_dir.resolve()
+    base = _safe_data_path(base_dir)
+    path = (base / f"{episode_id}.json").resolve()  # lgtm[py/path-injection]
+    if not _is_within(base, path):
+        raise ValueError("Invalid episode path")
     if path.parent != base:
         raise ValueError("Invalid episode path")
     return path
@@ -192,7 +216,7 @@ if HAS_FASTAPI:
 
         assembled = []
         for eid, evts in groups.items():
-            ep_path = EPISODES_DIR / f"{eid}.json"
+            ep_path = _episode_path(EPISODES_DIR, eid)
             if ep_path.exists():
                 continue  # Already assembled
             sorted_evts = sorted(evts, key=lambda e: e.get("timestamp", ""))

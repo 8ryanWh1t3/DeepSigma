@@ -13,6 +13,7 @@ No real-world system modeled.
 from __future__ import annotations
 
 import json
+import os
 import re
 import threading
 from datetime import datetime, timezone
@@ -46,6 +47,10 @@ def _validate_tenant_id(tenant_id: str) -> str:
     return tenant_id
 
 
+def _is_within(base: Path, candidate: Path) -> bool:
+    return os.path.commonpath([str(base), str(candidate)]) == str(base)
+
+
 class CredibilityStore:
     """JSONL file-backed persistence for credibility engine state.
 
@@ -71,9 +76,24 @@ class CredibilityStore:
             self.data_dir = candidate
         else:
             tid = _validate_tenant_id(tenant_id or DEFAULT_TENANT_ID)
-            self.data_dir = _BASE_DATA_DIR / tid
+            base = _BASE_DATA_DIR.resolve()
+            candidate = (base / tid).resolve()  # lgtm[py/path-injection]
+            if not _is_within(base, candidate):
+                raise ValueError("Invalid tenant_id path")
+            self.data_dir = candidate
         self.tenant_id = _validate_tenant_id(tenant_id or DEFAULT_TENANT_ID)
         self.data_dir.mkdir(parents=True, exist_ok=True)
+
+    def _safe_path(self, filename: str) -> Path:
+        """Resolve a validated filename under the tenant data directory."""
+        safe_name = _validate_filename(filename)
+        base = self.data_dir.resolve()
+        candidate = (base / safe_name).resolve()
+        if not _is_within(base, candidate):
+            raise ValueError("Invalid file path")
+        if candidate.parent != base:
+            raise ValueError("Invalid file path")
+        return candidate
 
     # -- Core operations -------------------------------------------------------
 
@@ -85,14 +105,14 @@ class CredibilityStore:
         enriched = dict(record)
         enriched.setdefault("tenant_id", self.tenant_id)
         enriched.setdefault("timestamp", _now_iso())
-        filepath = self.data_dir / _validate_filename(filename)
+        filepath = self._safe_path(filename)
         with _write_lock:
             with open(filepath, "a", encoding="utf-8") as f:
                 f.write(json.dumps(enriched, default=str) + "\n")
 
     def load_latest(self, filename: str) -> dict[str, Any] | None:
         """Load the last record from a JSONL file."""
-        filepath = self.data_dir / _validate_filename(filename)
+        filepath = self._safe_path(filename)
         if not filepath.exists():
             return None
         last_line = None
@@ -109,7 +129,7 @@ class CredibilityStore:
 
     def load_last_n(self, filename: str, n: int = 10) -> list[dict[str, Any]]:
         """Load the last N records from a JSONL file."""
-        filepath = self.data_dir / _validate_filename(filename)
+        filepath = self._safe_path(filename)
         if not filepath.exists():
             return []
         lines: list[str] = []
@@ -125,7 +145,7 @@ class CredibilityStore:
 
     def load_all(self, filename: str) -> list[dict[str, Any]]:
         """Load all records from a JSONL file."""
-        filepath = self.data_dir / _validate_filename(filename)
+        filepath = self._safe_path(filename)
         if not filepath.exists():
             return []
         records = []
@@ -142,7 +162,7 @@ class CredibilityStore:
         """Write a single JSON file (non-JSONL, for packets)."""
         enriched = dict(data)
         enriched.setdefault("tenant_id", self.tenant_id)
-        filepath = self.data_dir / _validate_filename(filename)
+        filepath = self._safe_path(filename)
         with _write_lock:
             with open(filepath, "w", encoding="utf-8") as f:
                 json.dump(enriched, f, indent=2, default=str)
@@ -150,7 +170,7 @@ class CredibilityStore:
 
     def load_json(self, filename: str) -> dict[str, Any] | None:
         """Load a single JSON file."""
-        filepath = self.data_dir / _validate_filename(filename)
+        filepath = self._safe_path(filename)
         if not filepath.exists():
             return None
         with open(filepath, encoding="utf-8") as f:
@@ -165,7 +185,7 @@ class CredibilityStore:
         Use for current-state data (claims, clusters, sync) where the full
         set is written at once. Injects tenant_id and timestamp if missing.
         """
-        filepath = self.data_dir / _validate_filename(filename)
+        filepath = self._safe_path(filename)
         with _write_lock:
             with open(filepath, "w", encoding="utf-8") as f:
                 for record in records:
@@ -232,9 +252,11 @@ class CredibilityStore:
 
     def _tier_path(self, filename: str, tier: str) -> Path:
         """Build path for a tiered file (e.g. claims-warm.jsonl)."""
+        if tier not in {"warm", "cold"}:
+            raise ValueError(f"Invalid tier: {tier}")
         safe_filename = _validate_filename(filename)
         stem = safe_filename.replace(".jsonl", "")
-        return self.data_dir / f"{stem}-{tier}.jsonl"
+        return self._safe_path(f"{stem}-{tier}.jsonl")
 
     def load_warm(self, filename: str) -> list[dict[str, Any]]:
         """Load all records from the warm-tier file."""

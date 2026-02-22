@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 import time
 from pathlib import Path
@@ -36,9 +37,9 @@ def _node_dir(tenant_id: str, node_id: str) -> Path:
         raise ValueError("Invalid tenant_id")
     if not _SAFE_ID_RE.fullmatch(node_id):
         raise ValueError("Invalid node_id")
-    d = (_BASE_DATA_DIR / tenant_id / node_id).resolve()
     base = _BASE_DATA_DIR.resolve()
-    if base not in d.parents:
+    d = (base / tenant_id / node_id).resolve()  # lgtm[py/path-injection]
+    if os.path.commonpath([str(base), str(d)]) != str(base):
         raise ValueError("Invalid mesh path")
     return d
 
@@ -46,9 +47,9 @@ def _node_dir(tenant_id: str, node_id: str) -> Path:
 def _tenant_dir(tenant_id: str) -> Path:
     if not _SAFE_ID_RE.fullmatch(tenant_id):
         raise ValueError("Invalid tenant_id")
-    d = (_BASE_DATA_DIR / tenant_id).resolve()
     base = _BASE_DATA_DIR.resolve()
-    if d != base and base not in d.parents:
+    d = (base / tenant_id).resolve()  # lgtm[py/path-injection]
+    if os.path.commonpath([str(base), str(d)]) != str(base):
         raise ValueError("Invalid tenant path")
     return d
 

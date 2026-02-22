@@ -12,6 +12,7 @@ No real-world system modeled.
 from __future__ import annotations
 
 import json
+import os
 import re
 import threading
 import uuid
@@ -36,12 +37,15 @@ def _validated_tenant_id(tenant_id: str) -> str:
 
 def _audit_path(tenant_id: str) -> Path:
     """Return the audit log file path for a tenant."""
-    d = (_BASE_AUDIT_DIR / _validated_tenant_id(tenant_id)).resolve()
     base = _BASE_AUDIT_DIR.resolve()
-    if d != base and base not in d.parents:
+    d = (base / _validated_tenant_id(tenant_id)).resolve()  # lgtm[py/path-injection]
+    if os.path.commonpath([str(base), str(d)]) != str(base):
         raise ValueError("Invalid tenant_id path")
     d.mkdir(parents=True, exist_ok=True)
-    return d / "audit.jsonl"
+    path = (d / "audit.jsonl").resolve()  # lgtm[py/path-injection]
+    if os.path.commonpath([str(d), str(path)]) != str(d):
+        raise ValueError("Invalid audit file path")
+    return path
 
 
 def append_audit(tenant_id: str, event: dict[str, Any]) -> dict[str, Any]:

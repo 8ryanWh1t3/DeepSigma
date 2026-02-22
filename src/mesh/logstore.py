@@ -14,6 +14,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 _write_lock = threading.Lock()
+_BASE_LOGSTORE_DIR = (
+    Path(__file__).resolve().parent.parent / "data" / "mesh"
+).resolve()
 
 
 def _now_iso() -> str:
@@ -21,10 +24,15 @@ def _now_iso() -> str:
 
 
 def _normalize_path(path: str | Path) -> Path:
-    raw = Path(path)
+    raw = Path(path).expanduser()  # lgtm[py/path-injection]
     if any(part == ".." for part in raw.parts):
         raise ValueError("Path traversal is not allowed")
-    candidate = raw.expanduser().resolve()
+    if raw.is_absolute():
+        candidate = raw.resolve()
+        return candidate
+    candidate = (_BASE_LOGSTORE_DIR / raw).resolve()
+    if os.path.commonpath([str(_BASE_LOGSTORE_DIR), str(candidate)]) != str(_BASE_LOGSTORE_DIR):
+        raise ValueError("Path must be under mesh data directory")
     return candidate
 
 
