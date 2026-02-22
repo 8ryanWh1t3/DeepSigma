@@ -24,7 +24,7 @@ jobs:
       - name: Install KPI dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install matplotlib
+          pip install -r requirements/locks/kpi.txt
 
       - name: Run KPI issue deltas
         run: |

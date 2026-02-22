@@ -1,4 +1,4 @@
-.PHONY: ci pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review pilot-pack
+.PHONY: ci pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review lock-update pilot-pack
 
 ci:
 	python scripts/compute_ci.py
@@ -36,6 +36,9 @@ issue-label-gate:
 issues-review:
 	bash scripts/issues_review.sh
 	python scripts/issue_label_gate.py
+
+lock-update:
+	bash scripts/update_locks.sh
 
 pilot-pack:
 	python scripts/pilot_pack.py
