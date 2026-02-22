@@ -13,7 +13,7 @@ No real-world system modeled.
 from __future__ import annotations
 
 import time
-from typing import Any
+from typing import Any, Callable
 
 from fastapi import APIRouter, HTTPException, Query, Request
 
@@ -35,32 +35,42 @@ from tenancy.tenants import assert_tenant_exists, list_tenants
 
 router = APIRouter(tags=["credibility"])
 
-# Engine cache — one engine per tenant, lazily initialized
-_engines: dict[str, CredibilityEngine] = {}
+StoreFactory = Callable[[str], CredibilityStore]
+
+
+def _default_store_factory(tenant_id: str) -> CredibilityStore:
+    return CredibilityStore(tenant_id=tenant_id)
+
+
+# Stateless runtime default: construct store/engine per request.
+_store_factory: StoreFactory = _default_store_factory
 
 
 def _get_engine(tenant_id: str) -> CredibilityEngine:
-    """Get or create an engine instance for the given tenant."""
-    if tenant_id not in _engines:
-        assert_tenant_exists(tenant_id)
-        store = CredibilityStore(tenant_id=tenant_id)
-        engine = CredibilityEngine(store=store, tenant_id=tenant_id)
-        if not engine.load_from_store():
-            engine.initialize_default_state()
-        _engines[tenant_id] = engine
-    return _engines[tenant_id]
+    """Build a request-scoped engine for the given tenant."""
+    assert_tenant_exists(tenant_id)
+    store = _store_factory(tenant_id)
+    engine = CredibilityEngine(store=store, tenant_id=tenant_id)
+    if not engine.load_from_store():
+        engine.initialize_default_state()
+    return engine
+
+
+def set_store_factory(factory: StoreFactory) -> None:
+    """Override store construction (used by tests/deploy wiring)."""
+    global _store_factory
+    _store_factory = factory
 
 
 def reset_engine(
     tenant_id: str | None = None,
     store: CredibilityStore | None = None,
 ) -> CredibilityEngine:
-    """Reset the engine for a tenant (for testing or re-initialization)."""
+    """Reset persisted state for a tenant (for testing or re-initialization)."""
     tid = tenant_id or DEFAULT_TENANT_ID
-    s = store or CredibilityStore(tenant_id=tid)
+    s = store or _store_factory(tid)
     engine = CredibilityEngine(store=s, tenant_id=tid)
     engine.initialize_default_state()
-    _engines[tid] = engine
     return engine
 
 
