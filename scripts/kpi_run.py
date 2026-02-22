@@ -12,17 +12,39 @@ def main() -> int:
     outdir.mkdir(parents=True, exist_ok=True)
 
     version = (outdir / "VERSION.txt").read_text(encoding="utf-8").strip()
-    kpi_json = outdir / f"kpi_{version}.json"
-    if not kpi_json.exists():
-        raise SystemExit(f"Missing {kpi_json}. Create it first.")
+    manual = outdir / f"kpi_{version}.json"
+    if not manual.exists():
+        raise SystemExit(f"Missing {manual}. Create it first.")
 
-    # Render radar
-    subprocess.check_call(["python", "scripts/render_radar.py", "--kpi", str(kpi_json), "--outdir", "release_kpis"])
+    # Merge telemetry into kpi_{version}_merged.json.
+    subprocess.check_call(["python", "scripts/kpi_merge.py"])
+    merged = outdir / f"kpi_{version}_merged.json"
 
-    # Render badge_latest.svg
-    subprocess.check_call(["python", "scripts/render_badge.py", "--kpi", str(kpi_json), "--out", "release_kpis/badge_latest.svg"])
+    # Render radar + badge from merged values.
+    subprocess.check_call(
+        [
+            "python",
+            "scripts/render_radar.py",
+            "--kpi",
+            str(merged),
+            "--outdir",
+            "release_kpis",
+        ]
+    )
+    subprocess.check_call(
+        [
+            "python",
+            "scripts/render_badge.py",
+            "--kpi",
+            str(merged),
+            "--out",
+            "release_kpis/badge_latest.svg",
+        ]
+    )
 
-    # PR comment (versioned, deterministic)
+    # Gate + history update.
+    subprocess.check_call(["python", "scripts/kpi_gate.py"])
+
     radar_png = f"release_kpis/radar_{version}.png"
     radar_svg = f"release_kpis/radar_{version}.svg"
     badge_svg = "release_kpis/badge_latest.svg"
@@ -31,24 +53,16 @@ def main() -> int:
 
 ![badge]({badge_svg})
 
-**KPI Vector (0–10):**
-- Technical Completeness: 9
-- Automation Depth: 7
-- Authority Modeling: 6
-- Enterprise Readiness: 4
-- Scalability: 4
-- Data Integration: 5
-- Economic Measurability: 3
-- Operational Maturity: 7
-
-**Artifacts:**
+**Radar:**
 - PNG: `{radar_png}`
 - SVG: `{radar_svg}`
-- Badge: `{badge_svg}`
 
-**Interpretation (pilot):**
-- Strong: Technical + Automation + Operational maturity
-- Needs investment: Enterprise readiness + Scalability + Economic measurability
+**KPI Gate:**
+- `release_kpis/KPI_GATE_REPORT.md`
+
+**Notes:**
+- Some KPIs are auto-derived from repo telemetry (tests, docs, workflows, pilot drills).
+- Manual KPIs remain for judgment-based areas (Authority, Scalability, Economic Measurability).
 """
     (outdir / "PR_COMMENT.md").write_text(comment, encoding="utf-8")
     print("Wrote: release_kpis/PR_COMMENT.md")
