@@ -12,6 +12,7 @@ No real-world system modeled.
 from __future__ import annotations
 
 import json
+import re
 import threading
 import uuid
 from datetime import datetime, timezone
@@ -20,15 +21,25 @@ from typing import Any
 
 _BASE_AUDIT_DIR = Path(__file__).parent.parent / "data" / "audit"
 _audit_lock = threading.Lock()
+_SAFE_ID_RE = re.compile(r"^[A-Za-z0-9_.-]{1,64}$")
 
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
+def _validated_tenant_id(tenant_id: str) -> str:
+    if not _SAFE_ID_RE.fullmatch(tenant_id):
+        raise ValueError("Invalid tenant_id")
+    return tenant_id
+
+
 def _audit_path(tenant_id: str) -> Path:
     """Return the audit log file path for a tenant."""
-    d = _BASE_AUDIT_DIR / tenant_id
+    d = (_BASE_AUDIT_DIR / _validated_tenant_id(tenant_id)).resolve()
+    base = _BASE_AUDIT_DIR.resolve()
+    if d != base and base not in d.parents:
+        raise ValueError("Invalid tenant_id path")
     d.mkdir(parents=True, exist_ok=True)
     return d / "audit.jsonl"
 

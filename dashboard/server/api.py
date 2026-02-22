@@ -312,8 +312,9 @@ if HAS_FASTAPI:
             result["provenance_chain"] = result.pop("provenance", [])
             result["resolved_at"] = datetime.now(timezone.utc).isoformat()
             return result
-        except Exception as exc:
-            return {"status": "ERROR", "summary": str(exc), "confidence": 0}
+        except Exception:
+            logger.exception("IRIS query failed")
+            return {"status": "ERROR", "summary": "IRIS query failed", "confidence": 0}
 
     @app.get("/api/drifts")
     def list_drifts_plural(

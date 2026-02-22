@@ -21,6 +21,7 @@ Endpoints
 
 import asyncio
 import json
+import logging
 import os
 import sys
 from collections import defaultdict
@@ -52,6 +53,7 @@ from mesh.transport import create_mesh_router  # noqa: E402
 
 # ── App setup ─────────────────────────────────────────────────────────────────
 app = FastAPI(title="DeepSigma Dashboard API", version="0.1.0")
+logger = logging.getLogger(__name__)
 
 _DEFAULT_ORIGINS = [
     "http://localhost:3000",
@@ -411,7 +413,11 @@ def query_iris(body: Dict[str, Any]):
         episode_id=body.get("episode_id", ""),
         decision_type=body.get("decision_type", ""),
     )
-    response = engine.resolve(query)
+    try:
+        response = engine.resolve(query)
+    except Exception:
+        logger.exception("IRIS resolution failed")
+        raise HTTPException(status_code=500, detail="IRIS query failed")
     return response.to_dict()
 
 

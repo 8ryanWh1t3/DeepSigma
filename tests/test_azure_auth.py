@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import time
+from urllib.parse import urlparse
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -53,8 +54,10 @@ class TestAzureADAuth:
         token = auth.get_token()
         assert token == "tok-abc-123"
         req = mock_urlopen.call_args[0][0]
-        assert "login.microsoftonline.com" in req.full_url
-        assert "test-tenant" in req.full_url
+        parsed = urlparse(req.full_url)
+        assert parsed.scheme == "https"
+        assert parsed.netloc == "login.microsoftonline.com"
+        assert "/test-tenant/" in parsed.path
         assert req.data is not None
 
     @patch("urllib.request.urlopen")
