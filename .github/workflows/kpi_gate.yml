@@ -1,4 +1,4 @@
-name: Repo Radar KPI
+name: Repo KPI Gate
 
 on:
   pull_request:
@@ -8,13 +8,14 @@ permissions:
   contents: read
 
 jobs:
-  kpi:
+  gate:
     runs-on: ubuntu-latest
+    env:
+      MPLCONFIGDIR: .cache/matplotlib
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
@@ -23,16 +24,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install matplotlib
 
-      - name: Run KPI
+      - name: Run KPI (includes gate)
         run: |
           make kpi
-
-      - name: Upload KPI artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: repo-kpi
-          path: |
-            release_kpis/PR_COMMENT.md
-            release_kpis/badge_latest.svg
-            release_kpis/radar_*.png
-            release_kpis/radar_*.svg

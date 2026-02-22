@@ -1,4 +1,4 @@
-.PHONY: ci pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-badge
+.PHONY: ci pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-badge kpi-gate
 
 ci:
 	python scripts/compute_ci.py
@@ -20,3 +20,6 @@ kpi-render:
 
 kpi-badge:
 	python scripts/render_badge.py --kpi release_kpis/kpi_$(shell cat release_kpis/VERSION.txt).json --out release_kpis/badge_latest.svg
+
+kpi-gate:
+	python scripts/kpi_gate.py

@@ -1,0 +1,63 @@
+name: Repo Radar KPI
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  kpi:
+    runs-on: ubuntu-latest
+    env:
+      MPLCONFIGDIR: .cache/matplotlib
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install KPI dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install matplotlib
+
+      - name: Run KPI
+        run: |
+          make kpi
+
+      - name: Upload KPI artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: repo-kpi
+          path: |
+            release_kpis/PR_COMMENT.md
+            release_kpis/KPI_GATE_REPORT.md
+            release_kpis/history.json
+            release_kpis/badge_latest.svg
+            release_kpis/radar_*.png
+            release_kpis/radar_*.svg
+            release_kpis/kpi_*merged.json
+
+      - name: Post PR comment (Repo KPI)
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('release_kpis/PR_COMMENT.md', 'utf8');
+            const { owner, repo } = context.repo;
+            const issue_number = context.payload.pull_request.number;
+            const marker = "## Repo Radar KPI —";
+            const comments = await github.rest.issues.listComments({ owner, repo, issue_number, per_page: 100 });
+            const existing = comments.data.find(c => c.body && c.body.startsWith(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number, body });
+            }
