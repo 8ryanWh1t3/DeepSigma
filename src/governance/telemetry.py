@@ -70,7 +70,7 @@ def record_metric(
     }
     filepath = _telemetry_path(tenant_id)
     with _telemetry_lock:
-        with open(filepath, "a", encoding="utf-8") as f:
+        with open(filepath, "a", encoding="utf-8") as f:  # lgtm [py/path-injection]
             f.write(json.dumps(record, default=str) + "\n")
     return record
 

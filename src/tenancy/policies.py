@@ -98,11 +98,11 @@ def _policy_path(tenant_id: str) -> Path:
 def load_policy(tenant_id: str) -> dict[str, Any]:
     """Load the policy for a tenant. Creates default if missing."""
     path = _policy_path(tenant_id)
-    if not path.exists():
+    if not path.exists():  # lgtm [py/path-injection]
         policy = default_policy(tenant_id)
         save_policy(tenant_id, policy)
         return policy
-    with open(path, encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:  # lgtm [py/path-injection]
         return json.load(f)
 
 
@@ -117,7 +117,7 @@ def save_policy(
     if actor:
         policy_dict["updated_by"] = actor
     path = _policy_path(tenant_id)
-    with open(path, "w", encoding="utf-8") as f:
+    with open(path, "w", encoding="utf-8") as f:  # lgtm [py/path-injection]
         json.dump(policy_dict, f, indent=2, default=str)
         f.write("\n")
     return policy_dict

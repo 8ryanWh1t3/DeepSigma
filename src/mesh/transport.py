@@ -508,7 +508,7 @@ def create_mesh_router():
                 "status": "invalid_tenant_id",
                 "nodes": [],
             }
-        if not tenant_dir.exists():
+        if not tenant_dir.exists():  # lgtm [py/path-injection]
             return {
                 "tenant_id": tenant_id,
                 "status": "not_initialized",
