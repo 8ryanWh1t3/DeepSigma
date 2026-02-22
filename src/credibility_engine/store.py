@@ -12,6 +12,7 @@ No real-world system modeled.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -47,6 +48,11 @@ def _validate_tenant_id(tenant_id: str) -> str:
     return tenant_id
 
 
+def _tenant_slug(tenant_id: str) -> str:
+    tid = _validate_tenant_id(tenant_id)
+    return hashlib.sha256(tid.encode("utf-8")).hexdigest()[:16]
+
+
 def _is_within(base: Path, candidate: Path) -> bool:
     return os.path.commonpath([str(base), str(candidate)]) == str(base)
 
@@ -75,9 +81,9 @@ class CredibilityStore:
             candidate = Path(data_dir).expanduser().resolve()
             self.data_dir = candidate
         else:
-            tid = _validate_tenant_id(tenant_id or DEFAULT_TENANT_ID)
+            tid = _tenant_slug(tenant_id or DEFAULT_TENANT_ID)
             base = _BASE_DATA_DIR.resolve()
-            candidate = (base / tid).resolve()  # lgtm [py/path-injection]
+            candidate = (base / tid).resolve()
             if not _is_within(base, candidate):
                 raise ValueError("Invalid tenant_id path")
             self.data_dir = candidate

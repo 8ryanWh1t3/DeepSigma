@@ -8,6 +8,7 @@ No real-world system modeled.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -35,14 +36,19 @@ def _validated_tenant_id(tenant_id: str) -> str:
     return tenant_id
 
 
+def _tenant_slug(tenant_id: str) -> str:
+    tid = _validated_tenant_id(tenant_id)
+    return hashlib.sha256(tid.encode("utf-8")).hexdigest()[:16]
+
+
 def _telemetry_path(tenant_id: str) -> Path:
     """Return the telemetry log path for a tenant."""
     base = _BASE_TELEMETRY_DIR.resolve()
-    d = (base / _validated_tenant_id(tenant_id)).resolve()  # lgtm [py/path-injection]
+    d = (base / _tenant_slug(tenant_id)).resolve()
     if os.path.commonpath([str(base), str(d)]) != str(base):
         raise ValueError("Invalid tenant_id path")
     d.mkdir(parents=True, exist_ok=True)
-    path = (d / "telemetry.jsonl").resolve()  # lgtm [py/path-injection]
+    path = (d / "telemetry.jsonl").resolve()
     if os.path.commonpath([str(d), str(path)]) != str(d):
         raise ValueError("Invalid telemetry file path")
     return path

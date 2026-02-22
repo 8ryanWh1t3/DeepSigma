@@ -8,6 +8,7 @@ Assumes uvicorn --workers 1 (single-writer).
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import os
@@ -58,7 +59,7 @@ def _is_within(base: Path, candidate: Path) -> bool:
 def _safe_data_path(path: Path) -> Path:
     """Ensure any file operation stays inside DATA_DIR."""
     base = DATA_DIR.resolve()
-    candidate = path.resolve()  # lgtm [py/path-injection]
+    candidate = path.resolve()
     if path.is_absolute():
         # Absolute paths are used by internal utilities/tests.
         return candidate
@@ -156,11 +157,26 @@ def _episode_path(base_dir: Path, episode_id: str) -> Path:
     if not _SAFE_EPISODE_ID_RE.fullmatch(episode_id):
         raise ValueError("Invalid episode_id")
     base = _safe_data_path(base_dir)
-    path = (base / f"{episode_id}.json").resolve()  # lgtm [py/path-injection]
+    # Avoid using externally supplied identifiers directly in file-system paths.
+    episode_key = hashlib.sha256(episode_id.encode("utf-8")).hexdigest()[:24]
+    path = (base / f"{episode_key}.json").resolve()
     if not _is_within(base, path):
         raise ValueError("Invalid episode path")
     if path.parent != base:
         raise ValueError("Invalid episode path")
+    return path
+
+
+def _resolve_episode_file(base_dir: Path, episode_id: str) -> Path:
+    """Resolve an episode file for reads, with fallback for legacy filenames."""
+    path = _episode_path(base_dir, episode_id)
+    if path.exists():
+        return path
+    base = _safe_data_path(base_dir)
+    for candidate in sorted(base.glob("*.json")):
+        data = _read_json(candidate)
+        if isinstance(data, dict) and data.get("episode_id") == episode_id:
+            return candidate
     return path
 
 
@@ -286,8 +302,8 @@ if HAS_FASTAPI:
     def get_episode_detail(episode_id: str):
         """Get full episode detail including refined data if available."""
         try:
-            episode_path = _episode_path(EPISODES_DIR, episode_id)
-            refined_path = _episode_path(REFINED_DIR, episode_id)
+            episode_path = _resolve_episode_file(EPISODES_DIR, episode_id)
+            refined_path = _resolve_episode_file(REFINED_DIR, episode_id)
         except ValueError:
             raise HTTPException(400, "Invalid episode_id")
         ep = _read_json(episode_path)
@@ -302,7 +318,7 @@ if HAS_FASTAPI:
     def refine_episode(episode_id: str):
         """Run extraction/refinement on an episode."""
         try:
-            episode_path = _episode_path(EPISODES_DIR, episode_id)
+            episode_path = _resolve_episode_file(EPISODES_DIR, episode_id)
             refined_path = _episode_path(REFINED_DIR, episode_id)
         except ValueError:
             raise HTTPException(400, "Invalid episode_id")
@@ -341,8 +357,8 @@ if HAS_FASTAPI:
     def commit_episode(episode_id: str):
         """Accept and commit refined items to memory graph + seal episode."""
         try:
-            episode_path = _episode_path(EPISODES_DIR, episode_id)
-            refined_path = _episode_path(REFINED_DIR, episode_id)
+            episode_path = _resolve_episode_file(EPISODES_DIR, episode_id)
+            refined_path = _resolve_episode_file(REFINED_DIR, episode_id)
         except ValueError:
             raise HTTPException(400, "Invalid episode_id")
         refined_data = _read_json(refined_path)
@@ -380,7 +396,7 @@ if HAS_FASTAPI:
     def item_action(episode_id: str, action: ItemAction):
         """Accept/reject/edit a single refined item."""
         try:
-            refined_path = _episode_path(REFINED_DIR, episode_id)
+            refined_path = _resolve_episode_file(REFINED_DIR, episode_id)
         except ValueError:
             raise HTTPException(400, "Invalid episode_id")
         refined_data = _read_json(refined_path)

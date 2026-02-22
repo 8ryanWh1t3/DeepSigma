@@ -12,6 +12,7 @@ No real-world system modeled.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import logging
 import os
@@ -32,13 +33,17 @@ _BASE_DATA_DIR = Path(__file__).parent.parent / "data" / "mesh"
 _SAFE_ID_RE = re.compile(r"^[A-Za-z0-9_.-]{1,64}$")
 
 
+def _safe_slug(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()[:16]
+
+
 def _node_dir(tenant_id: str, node_id: str) -> Path:
     if not _SAFE_ID_RE.fullmatch(tenant_id):
         raise ValueError("Invalid tenant_id")
     if not _SAFE_ID_RE.fullmatch(node_id):
         raise ValueError("Invalid node_id")
     base = _BASE_DATA_DIR.resolve()
-    d = (base / tenant_id / node_id).resolve()  # lgtm [py/path-injection]
+    d = (base / _safe_slug(tenant_id) / _safe_slug(node_id)).resolve()
     if os.path.commonpath([str(base), str(d)]) != str(base):
         raise ValueError("Invalid mesh path")
     return d
@@ -48,7 +53,7 @@ def _tenant_dir(tenant_id: str) -> Path:
     if not _SAFE_ID_RE.fullmatch(tenant_id):
         raise ValueError("Invalid tenant_id")
     base = _BASE_DATA_DIR.resolve()
-    d = (base / tenant_id).resolve()  # lgtm [py/path-injection]
+    d = (base / _safe_slug(tenant_id)).resolve()
     if os.path.commonpath([str(base), str(d)]) != str(base):
         raise ValueError("Invalid tenant path")
     return d

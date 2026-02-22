@@ -33,6 +33,11 @@ def _validated_tenant_id(tenant_id: str) -> str:
     return tenant_id
 
 
+def _tenant_slug(tenant_id: str) -> str:
+    tid = _validated_tenant_id(tenant_id)
+    return hashlib.sha256(tid.encode("utf-8")).hexdigest()[:16]
+
+
 def default_policy(tenant_id: str) -> dict[str, Any]:
     """Return the default policy for a tenant."""
     tenant_id = _validated_tenant_id(tenant_id)
@@ -81,9 +86,8 @@ def default_policy(tenant_id: str) -> dict[str, Any]:
 def _policy_path(tenant_id: str) -> Path:
     """Return the policy file path for a tenant."""
     _BASE_POLICY_DIR.mkdir(parents=True, exist_ok=True)
-    safe_tenant_id = _validated_tenant_id(tenant_id)
     base = _BASE_POLICY_DIR.resolve()
-    path = (base / f"{safe_tenant_id}.json").resolve()  # lgtm [py/path-injection]
+    path = (base / f"{_tenant_slug(tenant_id)}.json").resolve()
     if os.path.commonpath([str(base), str(path)]) != str(base):
         raise ValueError("Invalid tenant_id path")
     if path.parent != base:
