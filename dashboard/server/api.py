@@ -88,6 +88,12 @@ def _get_drift_events() -> List[Dict[str, Any]]:
     return events
 
 
+def _sanitize_iris_result(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Drop traceback-like fields before returning to API callers."""
+    blocked = {"traceback", "stack", "stacktrace", "exception", "error_details"}
+    return {k: v for k, v in data.items() if k.lower() not in blocked}
+
+
 if HAS_FASTAPI:
 
     @app.get("/api/episodes")
@@ -308,7 +314,7 @@ if HAS_FASTAPI:
                 episode_id=body.get("episode_id", ""),
             )
             response = engine.resolve(query)
-            result = response.to_dict()
+            result = _sanitize_iris_result(response.to_dict())
             result["provenance_chain"] = result.pop("provenance", [])
             result["resolved_at"] = datetime.now(timezone.utc).isoformat()
             return result
