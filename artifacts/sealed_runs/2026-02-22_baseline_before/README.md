@@ -67,3 +67,19 @@ Use `rg "2026-001|A-2026-001|DRIFT-2026-001|PATCH-2026-001" pilot/` to retrieve 
 - DRI model: `docs/pilot/DRI_MODEL.md`
 - Branch protection: `docs/pilot/BRANCH_PROTECTION.md`
 - Contract: `docs/pilot/PILOT_CONTRACT_ONEPAGER.md`
+
+## Pilot Drills
+
+- PASS→FAIL→PASS: `make pilot-in-a-box`
+- WHY-60s: `make why-60s`
+
+## Pilot Governance
+
+- Scope: `docs/docs/pilot/PILOT_SCOPE.md`
+- DRI model: `docs/docs/pilot/DRI_MODEL.md`
+- Branch protection: `docs/docs/pilot/BRANCH_PROTECTION.md`
+- Contract: `docs/docs/pilot/PILOT_CONTRACT_ONEPAGER.md`
+
+## Release Notes
+
+- `docs/docs/release/RELEASE_NOTES_v2.0.2.md`

@@ -5,26 +5,26 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-_ = ROOT / "pilot"
+PILOT = ROOT / "pilot"
 
-QUESTIONS = [
-    ("Find the most recent DLR ID", "pilot/decisions"),
-    ("Find any Assumption ID (A-*)", "pilot/assumptions"),
-    ("Find any Drift ID (DRIFT-*)", "pilot/drift"),
-    ("Find any Patch ID (PATCH-*)", "pilot/patches"),
+PROMPTS = [
+    ("Find the most recent Decision (DLR) file in pilot/decisions", PILOT / "decisions"),
+    ("Find any Assumption file A-* in pilot/assumptions", PILOT / "assumptions"),
+    ("Find any Drift file DRIFT-* in pilot/drift", PILOT / "drift"),
+    ("Find any Patch file PATCH-* in pilot/patches", PILOT / "patches"),
 ]
 
 
 def main() -> int:
-    print("WHY-60s Challenge — You have 60 seconds total.")
+    print("WHY-60s Challenge — total time limit: 60 seconds.")
     start = time.time()
 
-    for i, (question, rel) in enumerate(QUESTIONS, 1):
-        elapsed = time.time() - start
-        if elapsed > 60:
+    for i, (q, path) in enumerate(PROMPTS, 1):
+        if (time.time() - start) > 60:
             print("TIME — FAIL")
             return 2
-        print(f"[{i}/4] {question} (look in {rel})")
+        print(f"[{i}/4] {q}")
+        print(f"Folder: {path}")
         input("Press ENTER when you have the answer.")
 
     total = time.time() - start
