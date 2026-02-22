@@ -123,6 +123,7 @@ class TestSandboxConfig:
         assert cfg.timeout_s == 5.0
         assert cfg.allow_filesystem is False
         assert cfg.allow_network is False
+        assert cfg.encrypt_at_rest is False
 
     def test_custom_limits(self):
         cfg = SandboxConfig(
