@@ -172,6 +172,12 @@ def _ts_ms(iso: str) -> int:
         return 0
 
 
+def _sanitize_iris_result(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Drop traceback-like fields before returning to API callers."""
+    blocked = {"traceback", "stack", "stacktrace", "exception", "error_details"}
+    return {k: v for k, v in data.items() if k.lower() not in blocked}
+
+
 def _episode_to_dashboard(ep: Dict[str, Any], drift_lookup: Dict[str, List]) -> Dict[str, Any]:
     telem = ep.get("telemetry", {})
     outcome = ep.get("outcome", {})
@@ -418,7 +424,7 @@ def query_iris(body: Dict[str, Any]):
     except Exception:
         logger.error("IRIS resolution failed")
         raise HTTPException(status_code=500, detail="IRIS query failed")
-    return response.to_dict()
+    return _sanitize_iris_result(response.to_dict())
 
 
 @app.get("/api/trust_scorecard")
