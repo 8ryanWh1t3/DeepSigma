@@ -1,0 +1,41 @@
+name: "KPI Portfolio — Enterprise Readiness"
+description: "Work for pilot adoption: docs, branch protection, runbooks, packaging, minimal ops."
+title: "[KPI][Enterprise Readiness] "
+labels: ["kpi:enterprise_readiness"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Add one `sev:*` and one `type:*` label after creation.
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options: ["sev:P0", "sev:P1", "sev:P2", "sev:P3"]
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      options: ["type:feature", "type:bug", "type:debt", "type:doc"]
+    validations:
+      required: true
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+    validations:
+      required: true
+  - type: textarea
+    id: deliverables
+    attributes:
+      label: Deliverables
+    validations:
+      required: true
+  - type: textarea
+    id: proof
+    attributes:
+      label: Proof / Verification
+    validations:
+      required: true

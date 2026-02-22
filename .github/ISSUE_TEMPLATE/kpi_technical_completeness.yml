@@ -1,0 +1,51 @@
+name: "KPI Portfolio — Technical Completeness"
+description: "Work that increases completeness of core system surfaces (CLI, schema, tests, packaging, determinism)."
+title: "[KPI][Technical Completeness] "
+labels: ["kpi:technical_completeness"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Labeling rules**
+        - This issue already has the KPI label.
+        - You MUST add exactly one `sev:*` and one `type:*` label after creation.
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity (choose one)
+      options: ["sev:P0", "sev:P1", "sev:P2", "sev:P3"]
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type (choose one)
+      options: ["type:feature", "type:bug", "type:debt", "type:doc"]
+    validations:
+      required: true
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      description: "What changes, and why does it increase technical completeness?"
+      placeholder: "Example: Add schema validation for KPI files so malformed data cannot render."
+    validations:
+      required: true
+  - type: textarea
+    id: deliverables
+    attributes:
+      label: Deliverables (checklist)
+      placeholder: |
+        - [ ] Code change
+        - [ ] Tests updated/added
+        - [ ] Docs updated
+        - [ ] CI green
+    validations:
+      required: true
+  - type: textarea
+    id: proof
+    attributes:
+      label: Proof / Verification
+      placeholder: "Commands, logs, screenshots, or steps proving it's done."
+    validations:
+      required: true
