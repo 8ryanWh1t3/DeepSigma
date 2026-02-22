@@ -9,17 +9,17 @@
 # Σ OVERWATCH
 
 **Current pilot release:** v2.0.3  
-See: `docs/release/RELEASE_NOTES_v2.0.3.md`
+See: [docs/release/RELEASE_NOTES_v2.0.3.md](docs/release/RELEASE_NOTES_v2.0.3.md)
 
 ## Repo Radar KPI (latest)
-![Repo KPI Badge](release_kpis/badge_latest.svg)
+[![Repo KPI Badge](release_kpis/badge_latest.svg)](release_kpis/radar_composite_latest.png)
 
-- Latest radar: `release_kpis/radar_$(cat release_kpis/VERSION.txt).png`
-- Composite release radar: `release_kpis/radar_composite_latest.png`
-- Composite release delta table: `release_kpis/radar_composite_latest.md`
-- Gate report: `release_kpis/KPI_GATE_REPORT.md`
-- Issue label gate: `release_kpis/ISSUE_LABEL_GATE_REPORT.md`
-- KPI history: `release_kpis/history.json`
+- Current release radar: [release_kpis/radar_v2.0.3.png](release_kpis/radar_v2.0.3.png)
+- Composite release radar: [release_kpis/radar_composite_latest.png](release_kpis/radar_composite_latest.png)
+- Composite release delta table: [release_kpis/radar_composite_latest.md](release_kpis/radar_composite_latest.md)
+- Gate report: [release_kpis/KPI_GATE_REPORT.md](release_kpis/KPI_GATE_REPORT.md)
+- Issue label gate: [release_kpis/ISSUE_LABEL_GATE_REPORT.md](release_kpis/ISSUE_LABEL_GATE_REPORT.md)
+- KPI history: [release_kpis/history.json](release_kpis/history.json)
 
 **Institutional Decision Infrastructure**
 
