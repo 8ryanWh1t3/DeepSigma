@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MPLCONFIGDIR: .cache/matplotlib
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
 
