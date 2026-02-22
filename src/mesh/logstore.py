@@ -8,14 +8,12 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import tempfile
 import threading
 from datetime import datetime, timezone
 from pathlib import Path
 
 _write_lock = threading.Lock()
-_SAFE_PATH_RE = re.compile(r"^[A-Za-z0-9_./-]+$")
 
 
 def _now_iso() -> str:
@@ -23,12 +21,10 @@ def _now_iso() -> str:
 
 
 def _normalize_path(path: str | Path) -> Path:
-    raw = str(path)
-    if "\\" in raw:
-        raise ValueError("Backslashes are not allowed in logstore paths")
-    if not _SAFE_PATH_RE.fullmatch(raw):
-        raise ValueError("Invalid characters in logstore path")
-    candidate = Path(path).expanduser().resolve()
+    raw = Path(path)
+    if any(part == ".." for part in raw.parts):
+        raise ValueError("Path traversal is not allowed")
+    candidate = raw.expanduser().resolve()
     return candidate
 
 
