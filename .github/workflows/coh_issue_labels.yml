@@ -1,0 +1,53 @@
+name: Coherence Issue Labeler
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  apply-severity-label:
+    if: contains(github.event.issue.labels.*.name, 'COH-DRIFT')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync severity label from issue form
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const body = (issue.body || '').toUpperCase();
+
+            let target = null;
+            if (body.includes('SEV-1')) target = 'COH-SEV1';
+            else if (body.includes('SEV-2')) target = 'COH-SEV2';
+            else if (body.includes('SEV-3')) target = 'COH-SEV3';
+
+            if (!target) {
+              core.info('No SEV marker found in issue body; skipping.');
+              return;
+            }
+
+            const remove = ['COH-SEV1', 'COH-SEV2', 'COH-SEV3'].filter((l) => l !== target);
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue.number,
+              labels: [target]
+            });
+
+            for (const label of remove) {
+              try {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  name: label
+                });
+              } catch (error) {
+                // ignore missing labels
+              }
+            }
