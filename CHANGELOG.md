@@ -5,6 +5,20 @@ All notable changes to Σ OVERWATCH / DeepSigma will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.3] — 2026-02-22 — "Security Burndown Completion"
+
+### Changed
+
+- Path handling hardened across storage and mesh modules using deterministic slugged path keys for tenant and node-derived file segments
+- Exhaust API now preserves backward compatibility for legacy episode filenames via content-based episode ID resolution fallback
+- IRIS API response shaping tightened to fixed, sanitized payloads to eliminate stack-trace exposure surfaces
+- Release metadata and policy baseline advanced to `v2.0.3` / `GOV-2.0.3`
+
+### Security
+
+- Cleared open `py/stack-trace-exposure` findings from CodeQL
+- Reduced and then eliminated open CodeQL findings on `main` through the security burndown merge path
+
 ## [2.0.2] — 2026-02-21 — "Court-Grade Admissibility"
 
 ### Added
