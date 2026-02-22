@@ -35,23 +35,38 @@ def snapshot(tag: str) -> None:
 def main() -> int:
     ART.mkdir(parents=True, exist_ok=True)
 
+    # --- CLEANUP (ensures deterministic behavior across repeated runs) ---
+    seed_files = [
+        PILOT / "assumptions" / "A-2026-071.md",
+        PILOT / "assumptions" / "A-2026-072.md",
+        PILOT / "drift" / "DRIFT-2026-071.md",
+        PILOT / "drift" / "DRIFT-2026-072.md",
+        PILOT / "patches" / "PATCH-2026-071.md",
+        PILOT / "patches" / "PATCH-2026-072.md",
+    ]
+    for f in seed_files:
+        if f.exists():
+            f.unlink()
+
     snapshot("baseline_before")
     baseline = run_ci()
 
-    # --- FAIL injection (deterministic) ---
-    # Expired assumption (should trigger penalty in CI)
+    # --- FAIL injection (deterministic + guaranteed to drop CI) ---
     expired = (date.today() - timedelta(days=1)).isoformat()
-    a_id = "A-2026-071"
-    write(PILOT / "assumptions" / f"{a_id}.md", f"""# Assumption
+
+    assumptions = ["A-2026-071", "A-2026-072"]
+    drifts = ["DRIFT-2026-071", "DRIFT-2026-072"]
+
+    for a_id in assumptions:
+        write(PILOT / "assumptions" / f"{a_id}.md", f"""# Assumption
 
 - Assumption ID: {a_id}
 - Expiry date (YYYY-MM-DD): {expired}
 - Description: Deterministic failure seed assumption for PASS→FAIL→PASS drill.
 """)
 
-    # Open drift without patch (should trigger penalty in CI)
-    d_id = "DRIFT-2026-071"
-    write(PILOT / "drift" / f"{d_id}.md", f"""# Drift Signal
+    for d_id in drifts:
+        write(PILOT / "drift" / f"{d_id}.md", f"""# Drift Signal
 
 - Drift ID: {d_id}
 - Status: Open
@@ -63,25 +78,46 @@ def main() -> int:
     fail_score = run_ci()
 
     # --- PATCH remediation (restore PASS) ---
-    p_id = "PATCH-2026-071"
-    write(PILOT / "patches" / f"{p_id}.md", f"""# Patch
+    patches = ["PATCH-2026-071", "PATCH-2026-072"]
 
-- Patch ID: {p_id}
+    # Patch #1 closes DRIFT-071 and references both assumptions
+    write(PILOT / "patches" / f"{patches[0]}.md", f"""# Patch
+
+- Patch ID: {patches[0]}
 - Date: {date.today().isoformat()}
-- Linked Drift: {d_id}
-- Patched Assumptions: {a_id}
+- Linked Drift: {drifts[0]}
+- Patched Assumptions: {assumptions[0]}, {assumptions[1]}
 
 ## Change
-- Close drift and document remediation for the failure-seed assumption.
+- Close drift and document remediation for failure-seed assumptions.
 """)
 
-    # Close drift + reference patch
-    write(PILOT / "drift" / f"{d_id}.md", f"""# Drift Signal
+    write(PILOT / "drift" / f"{drifts[0]}.md", f"""# Drift Signal
 
-- Drift ID: {d_id}
+- Drift ID: {drifts[0]}
 - Status: Closed
 - Summary: Deterministic failure seed drift (patched).
-- Patch Reference: {p_id}
+- Patch Reference: {patches[0]}
+""")
+
+    # Patch #2 closes DRIFT-072 and references both assumptions
+    write(PILOT / "patches" / f"{patches[1]}.md", f"""# Patch
+
+- Patch ID: {patches[1]}
+- Date: {date.today().isoformat()}
+- Linked Drift: {drifts[1]}
+- Patched Assumptions: {assumptions[0]}, {assumptions[1]}
+
+## Change
+- Close drift and complete remediation for failure-seed assumptions.
+""")
+
+    write(PILOT / "drift" / f"{drifts[1]}.md", f"""# Drift Signal
+
+- Drift ID: {drifts[1]}
+- Status: Closed
+- Summary: Deterministic failure seed drift (patched).
+- Patch Reference: {patches[1]}
 """)
 
     snapshot("after_patch_applied")
@@ -94,8 +130,8 @@ def main() -> int:
     print(f"After PATCH remediation CI: {pass_score}")
     print("")
     print("Target behavior:")
-    print("- FAIL injection pushes CI below your failure threshold (ideally < 75).")
-    print("- PATCH remediation restores CI above pass threshold (ideally ≥ 90).")
+    print("- FAIL injection MUST push CI below the hard fail threshold (e.g., < 75).")
+    print("- PATCH remediation MUST restore CI above pass threshold (e.g., ≥ 90).")
     return 0
 
 
