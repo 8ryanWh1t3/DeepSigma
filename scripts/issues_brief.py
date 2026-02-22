@@ -23,7 +23,7 @@ KPI_KEYS = [
 
 
 def labels(issue: dict) -> list[str]:
-    return [l["name"] for l in issue.get("labels", [])]
+    return [label["name"] for label in issue.get("labels", [])]
 
 
 def age_days(created_at: str) -> int:
@@ -33,7 +33,7 @@ def age_days(created_at: str) -> int:
 
 
 def pick_one(prefix: str, labs: list[str]) -> str:
-    xs = [l for l in labs if l.startswith(prefix)]
+    xs = [label for label in labs if label.startswith(prefix)]
     return xs[0] if xs else ""
 
 
