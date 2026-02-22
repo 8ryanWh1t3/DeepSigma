@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b1220"/>
+      <stop offset="100%" stop-color="#141f35"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="720" fill="url(#bg)"/>
+  <rect x="40" y="40" width="1120" height="640" rx="14" fill="#0f172a" stroke="#334155"/>
+  <text x="80" y="94" fill="#e2e8f0" font-family="Menlo, Monaco, Consolas, monospace" font-size="28">Credibility Index Dashboard</text>
+  <text x="80" y="126" fill="#93c5fd" font-family="Menlo, Monaco, Consolas, monospace" font-size="16">Tenant: demo-sharepoint-small</text>
+
+  <rect x="80" y="160" width="320" height="180" rx="10" fill="#111827" stroke="#475569"/>
+  <text x="104" y="206" fill="#e2e8f0" font-family="Menlo, Monaco, Consolas, monospace" font-size="20">Credibility Index</text>
+  <text x="104" y="262" fill="#22c55e" font-family="Menlo, Monaco, Consolas, monospace" font-size="52" font-weight="bold">75.0 (B)</text>
+  <text x="104" y="300" fill="#94a3b8" font-family="Menlo, Monaco, Consolas, monospace" font-size="14">Updated: 2026-02-22T23:39Z</text>
+
+  <rect x="430" y="160" width="320" height="180" rx="10" fill="#111827" stroke="#475569"/>
+  <text x="454" y="206" fill="#e2e8f0" font-family="Menlo, Monaco, Consolas, monospace" font-size="20">Claim Status Lights</text>
+  <circle cx="470" cy="248" r="10" fill="#22c55e"/><text x="490" y="254" fill="#cbd5e1" font-family="Menlo, Monaco, Consolas, monospace" font-size="14">Green: 2</text>
+  <circle cx="470" cy="278" r="10" fill="#f59e0b"/><text x="490" y="284" fill="#cbd5e1" font-family="Menlo, Monaco, Consolas, monospace" font-size="14">Yellow: 1</text>
+  <circle cx="470" cy="308" r="10" fill="#ef4444"/><text x="490" y="314" fill="#cbd5e1" font-family="Menlo, Monaco, Consolas, monospace" font-size="14">Red: 0</text>
+
+  <rect x="780" y="160" width="340" height="180" rx="10" fill="#111827" stroke="#475569"/>
+  <text x="804" y="206" fill="#e2e8f0" font-family="Menlo, Monaco, Consolas, monospace" font-size="20">Trust Scorecard</text>
+  <text x="804" y="246" fill="#cbd5e1" font-family="Menlo, Monaco, Consolas, monospace" font-size="15">IRIS WHY latency: 1.4ms (&lt; 60000ms)</text>
+  <text x="804" y="276" fill="#cbd5e1" font-family="Menlo, Monaco, Consolas, monospace" font-size="15">Steps passed: 7/7</text>
+  <text x="804" y="306" fill="#22c55e" font-family="Menlo, Monaco, Consolas, monospace" font-size="18" font-weight="bold">SLOs: ALL PASS</text>
+
+  <rect x="80" y="380" width="1040" height="250" rx="10" fill="#111827" stroke="#475569"/>
+  <text x="104" y="422" fill="#e2e8f0" font-family="Menlo, Monaco, Consolas, monospace" font-size="20">Golden Path Evidence (Summary)</text>
+  <text x="104" y="460" fill="#cbd5e1" font-family="Menlo, Monaco, Consolas, monospace" font-size="15">CONNECT PASS · NORMALIZE PASS · EXTRACT PASS · SEAL PASS · DRIFT PASS · PATCH PASS · RECALL PASS</text>
+  <text x="104" y="490" fill="#cbd5e1" font-family="Menlo, Monaco, Consolas, monospace" font-size="15">IRIS: WHY=RESOLVED, WHAT_CHANGED=RESOLVED, STATUS=RESOLVED</text>
+  <text x="104" y="520" fill="#cbd5e1" font-family="Menlo, Monaco, Consolas, monospace" font-size="15">Drift events: 6 · Patch applied: true · Elapsed: 21ms</text>
+</svg>

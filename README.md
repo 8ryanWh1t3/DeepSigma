@@ -66,6 +66,49 @@ deepsigma golden-path sharepoint \
   --fixture src/demos/golden_path/fixtures/sharepoint_small --clean
 ```
 
+## Golden-Path Proof Artifacts
+
+![Credibility Index dashboard proof](docs/assets/dashboard_credibility_index.svg)
+![Drift detection and patch proof](docs/assets/dashboard_drift_patch.svg)
+
+```bash
+# Golden Path run (ingest -> drift -> patch -> recall)
+PYTHONPATH=src python -m tools.golden_path_cli golden-path sharepoint \
+  --fixture src/demos/golden_path/fixtures/sharepoint_small \
+  --output golden_path_output --clean
+
+# Trust Scorecard (includes WHY retrieval SLO check)
+PYTHONPATH=src python -m tools.trust_scorecard \
+  --input golden_path_output \
+  --output golden_path_output/trust_scorecard.json
+```
+
+```text
+============================================================
+  GOLDEN PATH
+============================================================
+  [1] CONNECT              PASS
+  [2] NORMALIZE            PASS
+  [3] EXTRACT              PASS
+  [4] SEAL                 PASS
+  [5] DRIFT                PASS
+  [6] PATCH                PASS
+  [7] RECALL               PASS
+...
+  IRIS:       WHY=RESOLVED, WHAT_CHANGED=RESOLVED, STATUS=RESOLVED
+  Drift:      6 events
+  Patch:      applied
+============================================================
+Trust Scorecard written to golden_path_output/trust_scorecard.json
+  SLOs:    ALL PASS
+```
+
+Trust Scorecard highlights from the same run:
+- `iris_why_latency_ms`: `1.4` (`<= 60000` target, retrieval <= 60s)
+- `patch_applied`: `true`
+- `drift_events_detected`: `6`
+- `all_steps_passed`: `true`
+
 ---
 
 ## Court-Grade Proof (60 seconds)

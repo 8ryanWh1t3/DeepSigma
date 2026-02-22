@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0a0f1a"/>
+      <stop offset="100%" stop-color="#142033"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="720" fill="url(#bg2)"/>
+  <rect x="40" y="40" width="1120" height="640" rx="14" fill="#0f172a" stroke="#334155"/>
+  <text x="80" y="94" fill="#e2e8f0" font-family="Menlo, Monaco, Consolas, monospace" font-size="28">Drift Detection and Patch View</text>
+  <text x="80" y="126" fill="#93c5fd" font-family="Menlo, Monaco, Consolas, monospace" font-size="16">Loop: drift-cycle-001 -&gt; patch-cycle-001</text>
+
+  <rect x="80" y="160" width="500" height="220" rx="10" fill="#111827" stroke="#475569"/>
+  <text x="104" y="206" fill="#e2e8f0" font-family="Menlo, Monaco, Consolas, monospace" font-size="20">Open Drift Signals</text>
+  <rect x="104" y="228" width="452" height="42" rx="8" fill="#450a0a" stroke="#7f1d1d"/>
+  <text x="122" y="255" fill="#fecaca" font-family="Menlo, Monaco, Consolas, monospace" font-size="14">DRIFT-2026-001 | Assumption expired | Severity: SEV-1</text>
+  <rect x="104" y="282" width="452" height="42" rx="8" fill="#1f2937" stroke="#374151"/>
+  <text x="122" y="309" fill="#cbd5e1" font-family="Menlo, Monaco, Consolas, monospace" font-size="14">Evidence: expiry_date &lt; today, owner assigned, patch required</text>
+  <text x="104" y="350" fill="#fca5a5" font-family="Menlo, Monaco, Consolas, monospace" font-size="14">State before remediation: CI impacted by open drift + expired assumption</text>
+
+  <rect x="620" y="160" width="500" height="220" rx="10" fill="#111827" stroke="#475569"/>
+  <text x="644" y="206" fill="#e2e8f0" font-family="Menlo, Monaco, Consolas, monospace" font-size="20">Applied Patch</text>
+  <rect x="644" y="228" width="452" height="42" rx="8" fill="#052e16" stroke="#14532d"/>
+  <text x="662" y="255" fill="#bbf7d0" font-family="Menlo, Monaco, Consolas, monospace" font-size="14">PATCH-2026-001 | Assumption refreshed | Drift closed</text>
+  <rect x="644" y="282" width="452" height="42" rx="8" fill="#1f2937" stroke="#374151"/>
+  <text x="662" y="309" fill="#cbd5e1" font-family="Menlo, Monaco, Consolas, monospace" font-size="14">Links: decision DLR + drift issue + patch record + updated seal</text>
+  <text x="644" y="350" fill="#86efac" font-family="Menlo, Monaco, Consolas, monospace" font-size="14">State after remediation: drift closed, CI recovers to compliant range</text>
+
+  <rect x="80" y="420" width="1040" height="210" rx="10" fill="#111827" stroke="#475569"/>
+  <text x="104" y="462" fill="#e2e8f0" font-family="Menlo, Monaco, Consolas, monospace" font-size="20">Drift -&gt; Patch Timeline</text>
+  <line x1="130" y1="520" x2="1070" y2="520" stroke="#334155" stroke-width="4"/>
+  <circle cx="220" cy="520" r="12" fill="#ef4444"/>
+  <text x="196" y="555" fill="#fecaca" font-family="Menlo, Monaco, Consolas, monospace" font-size="14">Drift detected</text>
+  <circle cx="600" cy="520" r="12" fill="#f59e0b"/>
+  <text x="555" y="555" fill="#fde68a" font-family="Menlo, Monaco, Consolas, monospace" font-size="14">Patch prepared</text>
+  <circle cx="950" cy="520" r="12" fill="#22c55e"/>
+  <text x="910" y="555" fill="#bbf7d0" font-family="Menlo, Monaco, Consolas, monospace" font-size="14">Recovery verified</text>
+</svg>
