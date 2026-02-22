@@ -6,7 +6,7 @@ on:
 
 permissions:
   contents: read
-  issues: write
+  issues: read
   pull-requests: write
 
 jobs:
@@ -30,6 +30,7 @@ jobs:
 
       - name: Run KPI issue deltas
         run: |
+          make issue-label-gate
           make kpi-issues
 
       - name: Run KPI
@@ -43,12 +44,16 @@ jobs:
           path: |
             release_kpis/PR_COMMENT.md
             release_kpis/KPI_GATE_REPORT.md
+            release_kpis/ISSUE_LABEL_GATE_REPORT.md
             release_kpis/history.json
             release_kpis/issue_deltas.json
             release_kpis/badge_latest.svg
+            release_kpis/kpi_trend.png
+            release_kpis/kpi_trend.svg
             release_kpis/radar_*.png
             release_kpis/radar_*.svg
             release_kpis/kpi_*merged.json
+            pilot_pack/**
 
       - name: Post PR comment (Repo KPI)
         if: github.event_name == 'pull_request'

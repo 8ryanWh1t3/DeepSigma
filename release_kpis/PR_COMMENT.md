@@ -6,9 +6,14 @@
 - PNG: `release_kpis/radar_v2.0.3.png`
 - SVG: `release_kpis/radar_v2.0.3.svg`
 
-**KPI Gate:**
-- `release_kpis/KPI_GATE_REPORT.md`
+    **Trend:**
+    - PNG: `release_kpis/kpi_trend.png`
+    - SVG: `release_kpis/kpi_trend.svg`
 
-**Notes:**
-- Some KPIs are auto-derived from repo telemetry (tests, docs, workflows, pilot drills).
+    **Gates:**
+    - `release_kpis/KPI_GATE_REPORT.md`
+    - `release_kpis/ISSUE_LABEL_GATE_REPORT.md`
+
+    **Notes:**
+    - Some KPIs are auto-derived from repo telemetry (tests, docs, workflows, pilot drills).
 - Manual KPIs remain for judgment-based areas (Authority, Scalability, Economic Measurability).
