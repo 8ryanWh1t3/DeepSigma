@@ -28,6 +28,7 @@ jobs:
 
       - name: Run KPI issue deltas
         run: |
+          make issue-label-gate
           make kpi-issues
 
       - name: Run KPI (includes gate)

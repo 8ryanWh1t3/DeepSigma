@@ -11,6 +11,14 @@
 **Current pilot release:** v2.0.3  
 See: `docs/release/RELEASE_NOTES_v2.0.3.md`
 
+## Repo Radar KPI (latest)
+![Repo KPI Badge](release_kpis/badge_latest.svg)
+
+- Latest radar: `release_kpis/radar_$(cat release_kpis/VERSION.txt).png`
+- Gate report: `release_kpis/KPI_GATE_REPORT.md`
+- Issue label gate: `release_kpis/ISSUE_LABEL_GATE_REPORT.md`
+- KPI history: `release_kpis/history.json`
+
 **Institutional Decision Infrastructure**
 
 *Trust layer for agentic AI: verify before act, seal what happened, detect drift, ship patches.*
