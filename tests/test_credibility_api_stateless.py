@@ -4,11 +4,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
+pytest.importorskip("fastapi")
+
 from credibility_engine import api as credibility_api
 from credibility_engine.constants import DEFAULT_TENANT_ID
 from credibility_engine.store import CredibilityStore
-
-import pytest
 
 
 def _temp_store_factory(base: Path):
