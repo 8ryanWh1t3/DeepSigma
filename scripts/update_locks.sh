@@ -16,5 +16,6 @@ pip-compile --strip-extras pyproject.toml --extra openclaw -o requirements/locks
 
 # KPI workflow toolchain.
 pip-compile --strip-extras requirements/locks/kpi.in -o requirements/locks/kpi.txt
+pip-compile --strip-extras requirements/locks/release-build.in -o requirements/locks/release-build.txt
 
 echo "Lockfiles updated under requirements/locks/."
