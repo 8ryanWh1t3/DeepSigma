@@ -323,14 +323,17 @@ if HAS_FASTAPI:
                 episode_id=body.get("episode_id", ""),
             )
             response = engine.resolve(query)
-            result = _sanitize_iris_result(response.to_dict())
+            status = "OK" if str(getattr(response, "status", "OK")).upper() == "OK" else "ERROR"
+            confidence = getattr(response, "confidence", 0)
+            if not isinstance(confidence, (int, float)):
+                confidence = 0
             safe_result = {
-                "status": result.get("status", "OK"),
-                "summary": result.get("summary", ""),
-                "confidence": result.get("confidence", 0),
-                "signals": result.get("signals", []),
-                "why_chain": result.get("why_chain", []),
-                "provenance_chain": result.get("provenance", []),
+                "status": status,
+                "summary": "IRIS query resolved" if status == "OK" else "IRIS query returned error",
+                "confidence": float(confidence),
+                "signals": [],
+                "why_chain": [],
+                "provenance_chain": [],
                 "resolved_at": datetime.now(timezone.utc).isoformat(),
             }
             return safe_result

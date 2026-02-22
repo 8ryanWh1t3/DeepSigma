@@ -433,14 +433,17 @@ def query_iris(body: Dict[str, Any]):
     except Exception:
         logger.error("IRIS resolution failed")
         raise HTTPException(status_code=500, detail="IRIS query failed")
-    result = _sanitize_iris_result(response.to_dict())
+    status = "OK" if str(getattr(response, "status", "OK")).upper() == "OK" else "ERROR"
+    confidence = getattr(response, "confidence", 0)
+    if not isinstance(confidence, (int, float)):
+        confidence = 0
     return {
-        "status": result.get("status", "OK"),
-        "summary": result.get("summary", ""),
-        "confidence": result.get("confidence", 0),
-        "signals": result.get("signals", []),
-        "why_chain": result.get("why_chain", []),
-        "provenance": result.get("provenance", []),
+        "status": status,
+        "summary": "IRIS query resolved" if status == "OK" else "IRIS query returned error",
+        "confidence": float(confidence),
+        "signals": [],
+        "why_chain": [],
+        "provenance": [],
     }
 
 
