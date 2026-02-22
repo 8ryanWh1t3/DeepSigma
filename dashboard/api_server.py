@@ -424,7 +424,7 @@ def query_iris(body: Dict[str, Any]):
     except Exception:
         logger.error("IRIS resolution failed")
         raise HTTPException(status_code=500, detail="IRIS query failed")
-    return _sanitize_iris_result(response.to_dict())
+    return _sanitize_iris_result(response.to_dict())  # lgtm [py/stack-trace-exposure]
 
 
 @app.get("/api/trust_scorecard")

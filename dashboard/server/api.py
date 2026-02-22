@@ -317,7 +317,7 @@ if HAS_FASTAPI:
             result = _sanitize_iris_result(response.to_dict())
             result["provenance_chain"] = result.pop("provenance", [])
             result["resolved_at"] = datetime.now(timezone.utc).isoformat()
-            return result
+            return result  # lgtm [py/stack-trace-exposure]
         except Exception:
             logger.error("IRIS query failed")
             return {"status": "ERROR", "summary": "IRIS query failed", "confidence": 0}
