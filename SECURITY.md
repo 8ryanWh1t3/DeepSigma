@@ -52,3 +52,35 @@ This repo enforces:
 - **Sealed DecisionEpisodes** — immutable after sealing
 - **Named graph immutability** — patch-rather-than-overwrite
 - **CODEOWNERS** review on all pull requests to protected paths
+
+## Release Signature Verification
+
+Tagged releases (`v*`) publish signed artifacts and SBOM evidence:
+
+- Python distributions (`.whl`, `.tar.gz`) are signed with **Sigstore keyless** and include `*.sigstore.json` bundles.
+- Container image `ghcr.io/8ryanwh1t3/deepsigma` is signed with **Cosign keyless**.
+- SBOMs are attached to release artifacts:
+  - `deepsigma-<tag>-source.sbom.cdx.json` (CycloneDX)
+  - `deepsigma-<tag>-image.sbom.spdx.json` (SPDX)
+
+### Verify Python release signatures
+
+```bash
+python -m pip install sigstore
+python -m sigstore verify github \
+  --bundle deepsigma-<version>-py3-none-any.whl.sigstore.json \
+  --repository 8ryanWh1t3/DeepSigma \
+  --trigger push \
+  --name CI \
+  --ref refs/tags/v<version> \
+  deepsigma-<version>-py3-none-any.whl
+```
+
+### Verify container signature
+
+```bash
+cosign verify \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+  --certificate-identity-regexp '^https://github.com/8ryanWh1t3/DeepSigma/.github/workflows/ci.yml@refs/tags/v<version>$' \
+  ghcr.io/8ryanwh1t3/deepsigma:v<version>
+```
