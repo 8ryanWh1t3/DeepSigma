@@ -15,19 +15,18 @@ from tenancy.tenants import (
     list_tenants,
 )
 
-try:
-    from tenancy.rbac import get_role, require_role
-except ModuleNotFoundError as exc:
-    if exc.name != "fastapi":
-        raise
+def get_role(*args, **kwargs):
+    """Lazy-load RBAC helpers to avoid importing FastAPI at module import time."""
+    from tenancy.rbac import get_role as _get_role
 
-    def _missing_fastapi(*_args, _exc=exc, **_kwargs):
-        raise ModuleNotFoundError(
-            "fastapi is required for tenancy.rbac imports"
-        ) from _exc
+    return _get_role(*args, **kwargs)
 
-    get_role = _missing_fastapi
-    require_role = _missing_fastapi
+
+def require_role(*args, **kwargs):
+    """Lazy-load RBAC helpers to avoid importing FastAPI at module import time."""
+    from tenancy.rbac import require_role as _require_role
+
+    return _require_role(*args, **kwargs)
 
 __all__ = [
     "ensure_registry",
