@@ -13,10 +13,10 @@ from typing import Any
 from credibility_engine.store import CredibilityStore
 from governance import audit as audit_mod
 from tenancy import policies as policy_mod
-from tenancy import tenants as tenant_mod
 from tenancy.rbac import VALID_ROLES
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
+TENANT_REGISTRY_PATH = Path(__file__).resolve().parents[2] / "data" / "tenants.json"
 REDACTED = "[REDACTED]"
 EMAIL_RE = re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b")
 
@@ -62,7 +62,7 @@ def run_export(args: argparse.Namespace) -> int:
         raise ValueError("--from must be <= --to")
 
     tenant_id = args.tenant
-    tenant = tenant_mod.assert_tenant_exists(tenant_id)
+    tenant = _load_tenant_or_raise(tenant_id)
 
     out_dir = Path(args.out).expanduser().resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -271,6 +271,26 @@ def _build_tenant_config(tenant_id: str, tenant: dict[str, Any]) -> dict[str, An
         },
         "retention": policy.get("retention_policy", {}),
     }
+
+
+def _load_tenant_or_raise(tenant_id: str) -> dict[str, Any]:
+    tenants = _load_tenant_registry()
+    for tenant in tenants:
+        if tenant.get("tenant_id") == tenant_id:
+            return tenant
+    raise ValueError(f"Tenant not found: {tenant_id}")
+
+
+def _load_tenant_registry() -> list[dict[str, Any]]:
+    if not TENANT_REGISTRY_PATH.exists():
+        return []
+    try:
+        data = json.loads(TENANT_REGISTRY_PATH.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return []
+    if isinstance(data, list):
+        return [row for row in data if isinstance(row, dict)]
+    return []
 
 
 def _discover_connectors() -> list[str]:

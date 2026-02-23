@@ -10,7 +10,6 @@ from deepsigma.cli.main import main
 from deepsigma.cli import compliance_export as compliance_mod
 from governance import audit as audit_mod
 from tenancy import policies as policy_mod
-from tenancy import tenants as tenant_mod
 
 
 def _iso(days_ago: int) -> str:
@@ -19,9 +18,10 @@ def _iso(days_ago: int) -> str:
 
 
 def _seed_tenant_registry(tmp_path) -> None:
-    tenant_mod._REGISTRY_PATH = tmp_path / "tenants.json"
-    tenant_mod._REGISTRY_PATH.parent.mkdir(parents=True, exist_ok=True)
-    tenant_mod._REGISTRY_PATH.write_text(
+    registry_path = tmp_path / "tenants.json"
+    compliance_mod.TENANT_REGISTRY_PATH = registry_path
+    registry_path.parent.mkdir(parents=True, exist_ok=True)
+    registry_path.write_text(
         json.dumps(
             [
                 {
