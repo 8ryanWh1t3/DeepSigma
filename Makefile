@@ -1,4 +1,4 @@
-.PHONY: ci demo pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review lock-update build docker release-check pilot-pack scale-benchmark openapi-docs openapi-check security-gate
+.PHONY: ci demo pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review lock-update build docker release-check pilot-pack scale-benchmark openapi-docs openapi-check security-gate security-demo
 
 ci:
 	python scripts/compute_ci.py
@@ -70,3 +70,6 @@ openapi-check:
 
 security-gate:
 	python scripts/crypto_misuse_scan.py
+
+security-demo:
+	python scripts/reencrypt_demo.py

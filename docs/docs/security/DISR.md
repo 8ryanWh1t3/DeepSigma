@@ -16,6 +16,7 @@ visible, reversible, and measurable under pilot conditions.
 
 - Key lifecycle policy: `docs/docs/security/KEY_LIFECYCLE.md`
 - Recovery runbook: `docs/docs/security/RECOVERY_RUNBOOK.md`
+- 10-minute demo: `docs/docs/security/DEMO_10_MIN.md`
 - Crypto envelope schema: `schemas/core/crypto_envelope.schema.json`
 - Keyring model: `src/deepsigma/security/keyring.py`
 

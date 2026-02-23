@@ -167,6 +167,7 @@ All connectors conform to the [Connector Contract v1.0](schemas/core/connector_c
 - [DISR Security Model](docs/docs/security/DISR.md) — Breakable -> Detectable -> Rotatable -> Recoverable posture for pilot security credibility.
 - [Key Lifecycle](docs/docs/security/KEY_LIFECYCLE.md) — key versioning, TTL, and rotation cadence.
 - [Recovery Runbook](docs/docs/security/RECOVERY_RUNBOOK.md) — compromise response and re-encryption recovery sequence.
+- [10-Minute Security Demo](docs/docs/security/DEMO_10_MIN.md) — reproducible DISR drill (`make security-gate` + `make security-demo`).
 
 ## Monitoring
 
