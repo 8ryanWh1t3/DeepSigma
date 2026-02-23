@@ -33,9 +33,11 @@ def main() -> int:
         outdir / "kpi_trend.svg",
         outdir / "SECURITY_GATE_REPORT.md",
         outdir / "SECURITY_GATE_REPORT.json",
+        outdir / "scalability_metrics.json",
         ROOT / "data" / "security" / "authority_ledger.json",
         ROOT / "artifacts" / "disr_demo" / "authority_ledger.json",
         ROOT / "artifacts" / "disr_demo" / "disr_demo_summary.json",
+        ROOT / "artifacts" / "benchmarks" / "reencrypt" / "benchmark_summary.json",
     ]
     for file_path in files:
         if file_path.exists():
@@ -64,6 +66,7 @@ def main() -> int:
         ROOT / "scripts" / "why_60s_challenge.py",
         ROOT / "scripts" / "compute_ci.py",
         ROOT / "scripts" / "reencrypt_demo.py",
+        ROOT / "scripts" / "reencrypt_benchmark.py",
     ]
     for drill in drills:
         if drill.exists():

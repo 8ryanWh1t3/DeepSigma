@@ -1,4 +1,4 @@
-.PHONY: ci demo pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review lock-update build docker release-check pilot-pack scale-benchmark openapi-docs openapi-check security-gate security-demo
+.PHONY: ci demo pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review lock-update build docker release-check pilot-pack scale-benchmark reencrypt-benchmark openapi-docs openapi-check security-gate security-demo
 
 ci:
 	python scripts/compute_ci.py
@@ -59,6 +59,9 @@ pilot-pack:
 
 scale-benchmark:
 	bash scripts/run_scale_stack.sh
+
+reencrypt-benchmark:
+	python scripts/reencrypt_benchmark.py
 
 openapi-docs:
 	python scripts/export_openapi.py

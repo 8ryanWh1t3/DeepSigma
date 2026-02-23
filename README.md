@@ -168,6 +168,7 @@ All connectors conform to the [Connector Contract v1.0](schemas/core/connector_c
 - [Key Lifecycle](docs/docs/security/KEY_LIFECYCLE.md) — key versioning, TTL, and rotation cadence.
 - [Recovery Runbook](docs/docs/security/RECOVERY_RUNBOOK.md) — compromise response and re-encryption recovery sequence.
 - [10-Minute Security Demo](docs/docs/security/DEMO_10_MIN.md) — reproducible DISR drill (`make security-gate` + `make security-demo`).
+- [DISR Re-encrypt Benchmark](docs/docs/security/DEMO_10_MIN.md) — pilot-scale telemetry (`make reencrypt-benchmark`) with output in `release_kpis/scalability_metrics.json`.
 
 ## Monitoring
 
