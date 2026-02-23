@@ -1,15 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "deepsigma.fullname" . }}
+  name: {{ include "deepsigma.componentName" (dict "component" "dashboard" "Chart" .Chart "Release" .Release "Values" .Values) }}
   labels:
     {{- include "deepsigma.labels" . | nindent 4 }}
+    app.kubernetes.io/component: dashboard
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .Values.dashboard.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
+    - port: {{ .Values.dashboard.service.port }}
       targetPort: http
       protocol: TCP
       name: http
   selector:
-    {{- include "deepsigma.selectorLabels" . | nindent 4 }}
+    {{- include "deepsigma.componentLabels" (dict "component" "dashboard" "Chart" .Chart "Release" .Release "Values" .Values) | nindent 4 }}

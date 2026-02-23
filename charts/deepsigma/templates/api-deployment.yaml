@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "deepsigma.componentName" (dict "component" "dashboard" "Chart" .Chart "Release" .Release "Values" .Values) }}
+  name: {{ include "deepsigma.componentName" (dict "component" "api" "Chart" .Chart "Release" .Release "Values" .Values) }}
   labels:
     {{- include "deepsigma.labels" . | nindent 4 }}
-    app.kubernetes.io/component: dashboard
+    app.kubernetes.io/component: api
 spec:
-  replicas: {{ .Values.dashboard.replicaCount }}
+  replicas: {{ .Values.api.replicaCount }}
   selector:
     matchLabels:
-      {{- include "deepsigma.componentLabels" (dict "component" "dashboard" "Chart" .Chart "Release" .Release "Values" .Values) | nindent 6 }}
+      {{- include "deepsigma.componentLabels" (dict "component" "api" "Chart" .Chart "Release" .Release "Values" .Values) | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "deepsigma.componentLabels" (dict "component" "dashboard" "Chart" .Chart "Release" .Release "Values" .Values) | nindent 8 }}
+        {{- include "deepsigma.componentLabels" (dict "component" "api" "Chart" .Chart "Release" .Release "Values" .Values) | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -28,22 +28,22 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        - name: dashboard
-          image: "{{ .Values.dashboard.image.repository }}:{{ .Values.dashboard.image.tag }}"
-          imagePullPolicy: {{ .Values.dashboard.image.pullPolicy }}
+        - name: api
+          image: "{{ .Values.api.image.repository }}:{{ .Values.api.image.tag }}"
+          imagePullPolicy: {{ .Values.api.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 3000
+              containerPort: 8000
               protocol: TCP
-          {{- with .Values.dashboard.env }}
+          {{- with .Values.api.env }}
           env:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           livenessProbe:
-            {{- toYaml .Values.dashboard.livenessProbe | nindent 12 }}
+            {{- toYaml .Values.api.livenessProbe | nindent 12 }}
           readinessProbe:
-            {{- toYaml .Values.dashboard.readinessProbe | nindent 12 }}
-          {{- with .Values.dashboard.resources }}
+            {{- toYaml .Values.api.readinessProbe | nindent 12 }}
+          {{- with .Values.api.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
