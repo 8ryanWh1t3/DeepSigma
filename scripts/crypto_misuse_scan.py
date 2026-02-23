@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import argparse
-from dataclasses import dataclass
 import json
 import os
 from pathlib import Path
@@ -21,12 +20,12 @@ from deepsigma.security.events import EVENT_NONCE_REUSE_DETECTED, append_securit
 ENVELOPE_REQUIRED_FIELDS = ["key_id", "key_version", "alg", "nonce", "aad"]
 
 
-@dataclass
 class Finding:
-    severity: str
-    category: str
-    message: str
-    location: str
+    def __init__(self, *, severity: str, category: str, message: str, location: str) -> None:
+        self.severity = severity
+        self.category = category
+        self.message = message
+        self.location = location
 
     def as_dict(self) -> dict[str, str]:
         return {
