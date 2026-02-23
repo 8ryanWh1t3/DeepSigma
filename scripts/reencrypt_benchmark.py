@@ -8,9 +8,14 @@ from datetime import datetime, timezone
 import hashlib
 import json
 from pathlib import Path
-import resource
 import sys
 import time
+import tracemalloc
+
+try:
+    import resource  # type: ignore[attr-defined]
+except ModuleNotFoundError:  # pragma: no cover - windows fallback path
+    resource = None  # type: ignore[assignment]
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -29,6 +34,26 @@ def _rss_bytes(ru_maxrss: int) -> int:
     if sys.platform == "darwin":
         return int(ru_maxrss)
     return int(ru_maxrss * 1024)
+
+
+def _start_mem_probe() -> tuple[int, int]:
+    """Start memory probe and return baseline metrics."""
+    if resource is not None:
+        ru = resource.getrusage(resource.RUSAGE_SELF)
+        return (_rss_bytes(ru.ru_maxrss), 0)
+    tracemalloc.start()
+    _, peak = tracemalloc.get_traced_memory()
+    return (0, int(peak))
+
+
+def _stop_mem_probe(baseline_rss: int, baseline_trace_peak: int) -> int:
+    """Stop memory probe and return best-effort peak bytes."""
+    if resource is not None:
+        ru = resource.getrusage(resource.RUSAGE_SELF)
+        return max(baseline_rss, _rss_bytes(ru.ru_maxrss))
+    _, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+    return max(1, baseline_trace_peak, int(peak))
 
 
 def _write_dataset(path: Path, records: int, reset: bool) -> tuple[int, int]:
@@ -107,7 +132,7 @@ def main() -> int:
     started_at = _utc_now_iso()
     wall_start = time.perf_counter()
     cpu_start = time.process_time()
-    ru_start = resource.getrusage(resource.RUSAGE_SELF)
+    rss_baseline, trace_baseline = _start_mem_probe()
 
     summary = run_reencrypt_job(
         tenant_id="tenant-alpha",
@@ -121,8 +146,7 @@ def main() -> int:
 
     wall_elapsed = max(time.perf_counter() - wall_start, 0.001)
     cpu_elapsed = max(time.process_time() - cpu_start, 0.0)
-    ru_end = resource.getrusage(resource.RUSAGE_SELF)
-    rss_peak_bytes = max(_rss_bytes(ru_start.ru_maxrss), _rss_bytes(ru_end.ru_maxrss))
+    rss_peak_bytes = _stop_mem_probe(rss_baseline, trace_baseline)
     ended_at = _utc_now_iso()
 
     records_per_second = records_targeted / wall_elapsed
