@@ -19,11 +19,13 @@ import re
 import threading
 import warnings
 from base64 import b64decode, b64encode
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
 from credibility_engine.constants import DEFAULT_TENANT_ID
+from deepsigma.security.keyring import KeyVersionRecord
+from deepsigma.security.providers import provider_from_policy
 
 _BASE_DATA_DIR = Path(__file__).parent.parent / "data" / "credibility"
 _SAFE_TENANT_RE = re.compile(r"^[A-Za-z0-9_.-]{1,64}$")
@@ -96,8 +98,11 @@ class CredibilityStore:
         self._master_key = os.environ.get("DEEPSIGMA_MASTER_KEY", "")
         self._encryption_enabled = False
         self._aesgcm: Any = None
+        self._crypto_provider: Any = None
         if self.encrypt_at_rest:
             self._initialize_encryption()
+            if self._encryption_enabled:
+                self._initialize_crypto_provider()
 
     def _initialize_encryption(self) -> None:
         if not self._master_key:
@@ -121,6 +126,28 @@ class CredibilityStore:
         key = self._derive_tenant_key(self._master_key)
         self._aesgcm = AESGCM(key)
         self._encryption_enabled = True
+
+    def _initialize_crypto_provider(self) -> None:
+        keystore_path = self.data_dir / "local_keystore.json"
+        provider_name = os.environ.get("DEEPSIGMA_CRYPTO_PROVIDER", "local-keystore")
+        self._crypto_provider = provider_from_policy(
+            {"security": {"crypto_provider": provider_name}},
+            default="local-keystore",
+            provider_overrides={
+                "local-keystore": {"path": keystore_path},
+                "local-keyring": {"path": keystore_path},
+            },
+        )
+
+    def _ensure_active_key_version(self, key_id: str = "credibility") -> KeyVersionRecord:
+        if self._crypto_provider is None:
+            raise RuntimeError("Crypto provider is not initialized")
+        current = self._crypto_provider.current_key_version(key_id)
+        if current is not None:
+            return current
+        ttl_days = int(os.environ.get("DEEPSIGMA_KEY_TTL_DAYS", "14"))
+        expires_at = (datetime.now(timezone.utc) + timedelta(days=ttl_days)).isoformat().replace("+00:00", "Z")
+        return self._crypto_provider.create_key_version(key_id=key_id, expires_at=expires_at)
 
     def _derive_tenant_key(self, master_key: str) -> bytes:
         salt = f"deepsigma:{self.tenant_id}".encode("utf-8")
@@ -146,7 +173,18 @@ class CredibilityStore:
         nonce = os.urandom(12)
         aad = self.tenant_id.encode("utf-8")
         ciphertext = self._aesgcm.encrypt(nonce, plaintext, aad)
+        key_record = self._ensure_active_key_version("credibility")
+        provider_name = getattr(self._crypto_provider, "name", "local-keystore")
+        created_at = _now_iso()
         return {
+            "envelope_version": "1.0",
+            "key_id": key_record.key_id,
+            "key_version": key_record.key_version,
+            "provider": provider_name,
+            "alg": "AES-256-GCM",
+            "aad": self.tenant_id,
+            "created_at": created_at,
+            "expires_at": key_record.expires_at,
             "enc": "AES-256-GCM",
             "enc_version": 1,
             "tenant_id": self.tenant_id,
@@ -161,7 +199,8 @@ class CredibilityStore:
     ) -> dict[str, Any]:
         nonce = b64decode(envelope["nonce"])
         ciphertext = b64decode(envelope["encrypted_payload"])
-        aad = self.tenant_id.encode("utf-8")
+        aad_text = str(envelope.get("aad", self.tenant_id))
+        aad = aad_text.encode("utf-8")
         plaintext = aesgcm.decrypt(nonce, ciphertext, aad)
         obj = json.loads(plaintext.decode("utf-8"))
         if isinstance(obj, dict):

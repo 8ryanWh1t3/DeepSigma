@@ -8,9 +8,12 @@
     "envelope_version",
     "key_id",
     "key_version",
+    "provider",
     "alg",
     "nonce",
-    "aad"
+    "aad",
+    "created_at",
+    "expires_at"
   ],
   "properties": {
     "envelope_version": {
@@ -33,6 +36,11 @@
       "enum": ["AES-256-GCM"],
       "description": "Encryption algorithm used for this payload."
     },
+    "provider": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Crypto provider used to source the key version."
+    },
     "nonce": {
       "type": "string",
       "minLength": 16,
@@ -42,6 +50,15 @@
       "type": "string",
       "minLength": 1,
       "description": "Associated authenticated data context string."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the crypto envelope was generated."
+    },
+    "expires_at": {
+      "type": ["string", "null"],
+      "description": "Key version expiry timestamp (RFC3339) or null."
     },
     "encrypted_payload": {
       "type": "string",

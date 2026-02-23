@@ -6,6 +6,7 @@ import os
 from typing import Any, Callable
 
 from .base import CryptoProvider
+from .local_keystore import LocalKeyStoreProvider
 from .local_keyring import LocalKeyringProvider
 
 ProviderFactory = Callable[..., CryptoProvider]
@@ -36,7 +37,7 @@ def create_provider(name: str, **kwargs: Any) -> CryptoProvider:
     return factory(**kwargs)
 
 
-def resolve_provider_name(policy: dict[str, Any] | None = None, *, default: str = "local-keyring") -> str:
+def resolve_provider_name(policy: dict[str, Any] | None = None, *, default: str = "local-keystore") -> str:
     """Resolve provider name from env first, then policy, then default."""
     env_name = os.getenv("DEEPSIGMA_CRYPTO_PROVIDER")
     if env_name:
@@ -61,7 +62,7 @@ def resolve_provider_name(policy: dict[str, Any] | None = None, *, default: str 
 def provider_from_policy(
     policy: dict[str, Any] | None = None,
     *,
-    default: str = "local-keyring",
+    default: str = "local-keystore",
     provider_overrides: dict[str, Any] | None = None,
 ) -> CryptoProvider:
     """Create provider selected by policy name, with optional per-provider kwargs."""
@@ -80,4 +81,5 @@ def _normalize_name(name: str) -> str:
     return normalized
 
 
+register_provider("local-keystore", LocalKeyStoreProvider)
 register_provider("local-keyring", LocalKeyringProvider)

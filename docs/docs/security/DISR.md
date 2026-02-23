@@ -23,5 +23,6 @@ visible, reversible, and measurable under pilot conditions.
 ## Pilot implementation notes
 
 - Key versions are modeled explicitly (`key_id`, `key_version`, `expires_at`, `status`).
-- Envelope metadata must include `key_id`, `key_version`, `alg`, `nonce`, and `aad`.
+- Default provider is `local-keystore` (file-backed) with deterministic storage at `local_keystore.json`.
+- Envelope v1 metadata includes `key_id`, `key_version`, `provider`, `alg`, `nonce`, `aad`, `created_at`, and `expires_at`.
 - Expiry and disable transitions are represented as status changes, not silent mutation.
