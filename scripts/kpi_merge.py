@@ -45,11 +45,50 @@ def main() -> int:
     for key in list(values.keys()):
         values[key] = max(0, min(10, float(values[key])))
 
+    # Apply artifact eligibility tiers so KPI claims are capped by evidence.
+    eligibility_path = ROOT / "governance" / "kpi_eligibility.json"
+    eligibility_rules = json.loads(eligibility_path.read_text(encoding="utf-8"))
+    tier_order = eligibility_rules.get(
+        "tier_order", ["unverified", "simulated", "real", "production"]
+    )
+    tier_meta = eligibility_rules.get("tiers", {})
+
+    kpi_eligibility: dict[str, dict] = {}
+    for key, raw_value in list(values.items()):
+        rule = eligibility_rules.get("kpis", {}).get(key, {})
+        achieved_tier = "unverified"
+        missing_by_tier: dict[str, list[str]] = {}
+
+        for tier in ("simulated", "real", "production"):
+            required = [str(path) for path in rule.get(tier, [])]
+            missing = [path for path in required if not (ROOT / path).exists()]
+            missing_by_tier[tier] = missing
+            if not missing:
+                achieved_tier = tier
+            else:
+                break
+
+        tier_cap = float(tier_meta.get(achieved_tier, {}).get("max_score", 3.0))
+        confidence = float(tier_meta.get(achieved_tier, {}).get("confidence", 0.30))
+        capped_value = min(float(raw_value), tier_cap)
+        values[key] = round(max(0.0, min(10.0, capped_value)), 2)
+        kpi_eligibility[key] = {
+            "tier": achieved_tier,
+            "tier_cap": tier_cap,
+            "confidence": round(confidence, 3),
+            "missing_by_tier": missing_by_tier,
+        }
+
     merged = {
         "version": version,
         "scale": manual.get("scale", {"min": 0, "max": 10}),
         "values": values,
         "telemetry": telemetry.get("_telemetry", {}),
+        "eligibility": {
+            "schema": eligibility_rules.get("schema", "kpi_eligibility_v1"),
+            "tier_order": tier_order,
+            "kpis": kpi_eligibility,
+        },
     }
 
     merged_path = outdir / f"kpi_{version}_merged.json"
