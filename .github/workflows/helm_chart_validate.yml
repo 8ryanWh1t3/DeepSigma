@@ -1,0 +1,53 @@
+name: Helm Chart Validation
+
+on:
+  pull_request:
+    paths:
+      - "charts/**"
+      - "docs/deployment/HELM.md"
+      - ".github/workflows/helm_chart_validate.yml"
+  push:
+    branches: [main]
+    paths:
+      - "charts/**"
+      - "docs/deployment/HELM.md"
+      - ".github/workflows/helm_chart_validate.yml"
+
+jobs:
+  chart-lint-template:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+      - name: Helm lint
+        run: helm lint charts/deepsigma
+      - name: Helm template
+        run: helm template deepsigma charts/deepsigma >/tmp/deepsigma-render.yaml
+
+  kind-install-test:
+    runs-on: ubuntu-latest
+    needs: chart-lint-template
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+      - name: Setup kind cluster
+        uses: helm/kind-action@v1
+        with:
+          cluster_name: deepsigma
+      - name: Install chart
+        run: |
+          helm upgrade --install deepsigma charts/deepsigma --namespace deepsigma --create-namespace
+          kubectl -n deepsigma rollout status deploy/deepsigma --timeout=180s
+      - name: Helm test smoke checks
+        run: helm test deepsigma -n deepsigma
+      - name: Diagnostics on failure
+        if: failure()
+        run: |
+          kubectl get pods -A -o wide
+          kubectl -n deepsigma get all
+          kubectl -n deepsigma describe deploy deepsigma || true
+          kubectl -n deepsigma logs deploy/deepsigma --all-containers=true --tail=200 || true
+          kubectl -n deepsigma get events --sort-by=.metadata.creationTimestamp | tail -n 100 || true
+          helm get all deepsigma -n deepsigma || true

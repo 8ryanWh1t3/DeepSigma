@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "deepsigma.fullname" . }}-smoke"
+  labels:
+    {{- include "deepsigma.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  restartPolicy: Never
+  containers:
+    - name: smoke
+      image: curlimages/curl:8.7.1
+      command: ['sh', '-c']
+      args:
+        - >-
+          set -euo pipefail;
+          curl -fsS "http://{{ include "deepsigma.fullname" . }}:{{ .Values.service.port }}/healthz";
+          curl -fsS "http://{{ include "deepsigma.fullname" . }}:{{ .Values.service.port }}/api/health";

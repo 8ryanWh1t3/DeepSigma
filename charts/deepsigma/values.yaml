@@ -1,0 +1,40 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/8ryanwh1t3/deepsigma-dashboard
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+service:
+  type: ClusterIP
+  port: 3000
+
+resources: {}
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+readinessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+
+env: []
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

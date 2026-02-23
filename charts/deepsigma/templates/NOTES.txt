@@ -1,0 +1,7 @@
+DeepSigma installed.
+
+Check service:
+  kubectl get svc {{ include "deepsigma.fullname" . }}
+
+Run smoke tests:
+  helm test {{ .Release.Name }}
