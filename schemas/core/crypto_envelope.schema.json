@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://deepsigma.dev/schemas/crypto_envelope/v1.0",
+  "title": "Crypto Envelope v1.0",
+  "description": "Canonical cryptographic envelope metadata for encrypted at-rest artifacts.",
+  "type": "object",
+  "required": [
+    "envelope_version",
+    "key_id",
+    "key_version",
+    "alg",
+    "nonce",
+    "aad"
+  ],
+  "properties": {
+    "envelope_version": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Schema version identifier."
+    },
+    "key_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Logical key identifier from the keyring."
+    },
+    "key_version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Monotonic key version from the keyring."
+    },
+    "alg": {
+      "type": "string",
+      "enum": ["AES-256-GCM"],
+      "description": "Encryption algorithm used for this payload."
+    },
+    "nonce": {
+      "type": "string",
+      "minLength": 16,
+      "description": "Nonce/IV encoded as base64."
+    },
+    "aad": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Associated authenticated data context string."
+    },
+    "encrypted_payload": {
+      "type": "string",
+      "description": "Ciphertext payload encoded as base64."
+    }
+  },
+  "additionalProperties": false
+}
