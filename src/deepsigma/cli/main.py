@@ -12,6 +12,8 @@ Commands:
     deepsigma golden-path <source> [opts]     7-step Golden Path loop
     deepsigma compact --input <dir>           Compact JSONL evidence files
     deepsigma rekey --tenant <id>             Rekey encrypted evidence at rest
+    deepsigma security rotate-keys ...        Rotate key versions with audit events
+    deepsigma security reencrypt ...          Re-encrypt with checkpoint/resume
     deepsigma compliance export --tenant ...  Export SOC 2 evidence package
 """
 from __future__ import annotations
@@ -52,6 +54,7 @@ def main(argv: list[str] | None = None) -> int:
         golden_path,
         init_project,
         mdpt_index,
+        security,
         retention,
         rekey,
         new_connector,
@@ -67,6 +70,7 @@ def main(argv: list[str] | None = None) -> int:
     golden_path.register(subparsers)
     compact.register(subparsers)
     rekey.register(subparsers)
+    security.register(subparsers)
     compliance_export.register(subparsers)
     new_connector.register(subparsers)
 

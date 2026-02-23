@@ -132,3 +132,63 @@ class TestInitProject:
         assert (project_dir / "data" / "sample_claims.json").exists()
         assert (project_dir / "scenarios" / "drift_scenario.md").exists()
         assert (project_dir / "queries" / "iris_queries.md").exists()
+
+
+class TestSecurityCLI:
+    def test_security_rotate_keys_json(self, tmp_path, capsys):
+        from deepsigma.cli.main import main
+
+        keyring_path = tmp_path / "keyring.json"
+        event_path = tmp_path / "events.jsonl"
+
+        rc = main(
+            [
+                "security",
+                "rotate-keys",
+                "--tenant",
+                "tenant-alpha",
+                "--key-id",
+                "credibility",
+                "--ttl-days",
+                "14",
+                "--keyring-path",
+                str(keyring_path),
+                "--event-log-path",
+                str(event_path),
+                "--json",
+            ]
+        )
+        assert rc == 0
+        payload = json.loads(capsys.readouterr().out)
+        assert payload["key_id"] == "credibility"
+        assert payload["key_version"] == 1
+        assert keyring_path.exists()
+        assert event_path.exists()
+
+    def test_security_reencrypt_dry_run_json(self, tmp_path, capsys):
+        from deepsigma.cli.main import main
+
+        data_dir = tmp_path / "cred"
+        data_dir.mkdir(parents=True, exist_ok=True)
+        (data_dir / "claims.jsonl").write_text('{"claim_id":"C-1"}\\n', encoding="utf-8")
+        checkpoint = tmp_path / "checkpoint.json"
+
+        rc = main(
+            [
+                "security",
+                "reencrypt",
+                "--tenant",
+                "tenant-alpha",
+                "--data-dir",
+                str(data_dir),
+                "--checkpoint",
+                str(checkpoint),
+                "--dry-run",
+                "--json",
+            ]
+        )
+        assert rc == 0
+        payload = json.loads(capsys.readouterr().out)
+        assert payload["status"] == "dry_run"
+        assert payload["records_targeted"] == 1
+        assert checkpoint.exists()
