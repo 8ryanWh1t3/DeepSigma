@@ -10,6 +10,9 @@ on:
       - "docs/scaling/STATELESS_API_SCALE_GUIDE.md"
       - "docs/examples/scale/**"
 
+permissions:
+  contents: read
+
 jobs:
   benchmark:
     runs-on: ubuntu-latest

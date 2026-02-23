@@ -399,7 +399,9 @@ def _persistence_probe() -> tuple[bool, str]:
         probe_path.unlink(missing_ok=True)
         return True, "ok"
     except Exception as exc:
-        return False, f"{type(exc).__name__}: {exc}"
+        # Avoid leaking internal exception data via public health endpoints.
+        logger.warning("Persistence probe failed: %s", type(exc).__name__)
+        return False, "unavailable"
 
 
 def _health_payload() -> dict[str, Any]:
