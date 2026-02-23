@@ -12,6 +12,13 @@ This demo proves the DISR loop in one pass:
 - Optional signing key in env:
   - `export DEEPSIGMA_AUTHORITY_SIGNING_KEY="demo-signing-key"`
 
+## Honesty flags (important)
+
+- `make security-demo` and default `make reencrypt-benchmark` are **dry-run/simulated** workflows.
+- These flows measure orchestration + IO behavior, not production-grade cryptographic throughput.
+- KPI uplift from these artifacts is capped unless metrics are marked `kpi_eligible=true` from real workload runs.
+- If `DEEPSIGMA_AUTHORITY_SIGNING_KEY` is unset, demo signing uses a placeholder default key.
+
 ## Commands
 
 ```bash
@@ -42,6 +49,12 @@ make reencrypt-benchmark
 - `artifacts/benchmarks/reencrypt/benchmark_summary.json`
 - `artifacts/benchmarks/reencrypt/claims.jsonl` (100k-record deterministic fixture by default)
 
+To run a real workload benchmark (not dry-run), use:
+
+```bash
+make reencrypt-benchmark ARGS="--real-workload"
+```
+
 ## What to verify
 
 - Rotation event exists with `event_type = KEY_ROTATED`.
@@ -57,6 +70,8 @@ make reencrypt-benchmark
 - `mttr_seconds`
 - `reencrypt_records_per_second`
 - `reencrypt_mb_per_minute`
+- `execution_mode`, `evidence_level`, `kpi_eligible`
+- `signing_key_source` and `signing_notice`
 
 `release_kpis/scalability_metrics.json` captures:
 
@@ -65,3 +80,4 @@ make reencrypt-benchmark
 - `rss_peak_bytes`
 - `throughput_records_per_second`
 - `throughput_mb_per_minute`
+- `execution_mode`, `evidence_level`, `kpi_eligible`

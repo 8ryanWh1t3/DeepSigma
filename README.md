@@ -170,6 +170,8 @@ All connectors conform to the [Connector Contract v1.0](schemas/core/connector_c
 - [10-Minute Security Demo](docs/docs/security/DEMO_10_MIN.md) — reproducible DISR drill (`make security-gate` + `make security-demo`).
 - [DISR Re-encrypt Benchmark](docs/docs/security/DEMO_10_MIN.md) — pilot-scale telemetry (`make reencrypt-benchmark`) with output in `release_kpis/scalability_metrics.json`.
 
+Note: default demo/benchmark commands run in dry-run mode and are marked as simulated evidence; KPI uplift is capped unless real workload mode is used.
+
 ## Monitoring
 
 - Prometheus metrics endpoint: `GET /metrics`
