@@ -25,6 +25,10 @@ def run_self_check() -> int:
     signature = hmac.new(key.encode("utf-8"), message.encode("utf-8"), hashlib.sha256).hexdigest()
     if not verify(message, signature, key):
         return fail("self-check signature did not verify")
+    if verify(message, signature, "wrong-key"):
+        return fail("signature verification should fail with wrong key")
+    if verify(message + "-tampered", signature, key):
+        return fail("signature verification should fail with tampered message")
 
     with tempfile.TemporaryDirectory() as tmp:
         msg_path = Path(tmp) / "message.txt"

@@ -17,11 +17,13 @@ REQUIRED_FILES = [
 
 REQUIRED_PROOFS = [
     "schemas/intent_packet.schema.json",
+    "schemas/core/decision_episode_chain.schema.json",
     "scripts/pre_exec_gate.py",
     "scripts/validate_intent_packet.py",
     "scripts/crypto_proof.py",
     "governance/decision_invariants.md",
     "scripts/validate_claim_evidence_authority.py",
+    "scripts/validate_decision_episode_chain.py",
     "scripts/verify_authority_signature.py",
     "scripts/idempotency_guard.py",
     "scripts/capture_run_snapshot.py",
@@ -34,6 +36,7 @@ PROOF_SCRIPTS = [
     "scripts/validate_intent_packet.py",
     "scripts/crypto_proof.py",
     "scripts/validate_claim_evidence_authority.py",
+    "scripts/validate_decision_episode_chain.py",
     "scripts/verify_authority_signature.py",
     "scripts/idempotency_guard.py",
     "scripts/capture_run_snapshot.py",
@@ -55,6 +58,14 @@ SCHEMA_REQUIRED_KEYS = {
     "ttl_expires_at",
     "author",
     "authority",
+}
+
+CHAIN_SCHEMA_REQUIRED_KEYS = {
+    "intent_hash",
+    "authority_hash",
+    "snapshot_hash",
+    "outputs_hash",
+    "chain_hash",
 }
 
 INVARIANT_SNIPPETS = [
@@ -103,6 +114,16 @@ def check_intent_schema(path: Path) -> None:
         raise ValueError("intent schema properties must be a non-empty object")
 
 
+def check_decision_chain_schema(path: Path) -> None:
+    schema = json.loads(path.read_text(encoding="utf-8"))
+    if schema.get("type") != "object":
+        raise ValueError("decision episode chain schema must define type=object")
+    required = set(schema.get("required", []))
+    missing = sorted(CHAIN_SCHEMA_REQUIRED_KEYS - required)
+    if missing:
+        raise ValueError(f"decision episode chain schema missing keys: {', '.join(missing)}")
+
+
 def check_invariants_doc(path: Path) -> None:
     text = path.read_text(encoding="utf-8")
     for token in INVARIANT_SNIPPETS:
@@ -149,6 +170,9 @@ def main() -> int:
 
     check_intent_schema(ROOT / "schemas/intent_packet.schema.json")
     pass_msg("intent schema semantic checks passed")
+
+    check_decision_chain_schema(ROOT / "schemas/core/decision_episode_chain.schema.json")
+    pass_msg("decision episode chain schema semantic checks passed")
 
     check_invariants_doc(ROOT / "governance/decision_invariants.md")
     pass_msg("decision invariants semantic checks passed")
