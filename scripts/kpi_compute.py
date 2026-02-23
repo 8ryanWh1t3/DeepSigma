@@ -34,6 +34,45 @@ def clamp(value: float, lo: float = 0, hi: float = 10) -> float:
     return max(lo, min(hi, value))
 
 
+def parse_security_metrics() -> dict | None:
+    path = ROOT / "release_kpis" / "security_metrics.json"
+    if not path.exists():
+        return None
+    try:
+        obj = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    if not isinstance(obj, dict):
+        return None
+    return obj
+
+
+def score_economic_measurability(metrics: dict) -> float:
+    score = 3.0  # metrics present and parseable
+    mttr = float(metrics.get("mttr_seconds", 0))
+    rps = float(metrics.get("reencrypt_records_per_second", 0))
+    mbm = float(metrics.get("reencrypt_mb_per_minute", 0))
+
+    if mttr <= 300:
+        score += 3
+    elif mttr <= 600:
+        score += 2
+    elif mttr <= 1200:
+        score += 1
+
+    if rps >= 1:
+        score += 2
+    elif rps >= 0.1:
+        score += 1
+
+    if mbm >= 0.01:
+        score += 2
+    elif mbm >= 0.001:
+        score += 1
+
+    return clamp(score)
+
+
 def score_enterprise_readiness() -> float:
     points = 0
     points += 1 if file_exists("docs/docs/pilot/BRANCH_PROTECTION.md") else 0
@@ -95,6 +134,7 @@ def score_operational_maturity() -> float:
 
 def main() -> int:
     docs_root = ROOT / "docs" / "docs"
+    metrics = parse_security_metrics()
     out = {
         "technical_completeness": round(score_technical_completeness(), 2),
         "automation_depth": round(score_automation_depth(), 2),
@@ -105,8 +145,11 @@ def main() -> int:
             "test_files": count_files("tests/test_*.py") + count_files("tests/**/test_*.py"),
             "workflows": count_files(".github/workflows/*.yml") + count_files(".github/workflows/*.yaml"),
             "docs_md": len(list(docs_root.glob("**/*.md"))) if docs_root.exists() else 0,
+            "security_metrics_present": metrics is not None,
         },
     }
+    if metrics is not None:
+        out["economic_measurability"] = round(score_economic_measurability(metrics), 2)
     print(json.dumps(out, indent=2))
     return 0
 
