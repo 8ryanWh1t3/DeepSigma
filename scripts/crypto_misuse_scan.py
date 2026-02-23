@@ -218,6 +218,43 @@ def _validate_crypto_policy(root: Path, findings: list[Finding]) -> dict[str, An
             )
         )
 
+    default_provider = str(policy.get("default_provider", ""))
+    allowed_providers = {str(item) for item in policy.get("allowed_providers", [])}
+    if default_provider and default_provider not in allowed_providers:
+        findings.append(
+            Finding(
+                severity="HIGH",
+                category="invalid_default_provider",
+                message=f"default_provider '{default_provider}' is not in allowed_providers",
+                location=str(policy_path),
+            )
+        )
+
+    env_provider = os.getenv("DEEPSIGMA_CRYPTO_PROVIDER")
+    if env_provider:
+        normalized = env_provider.strip().lower()
+        if normalized not in allowed_providers:
+            findings.append(
+                Finding(
+                    severity="HIGH",
+                    category="provider_policy_violation_env",
+                    message=f"DEEPSIGMA_CRYPTO_PROVIDER '{normalized}' is blocked by crypto policy",
+                    location="env:DEEPSIGMA_CRYPTO_PROVIDER",
+                )
+            )
+        elif default_provider and normalized != default_provider:
+            findings.append(
+                Finding(
+                    severity="MEDIUM",
+                    category="provider_drift",
+                    message=(
+                        f"Runtime provider override '{normalized}' differs from policy default "
+                        f"'{default_provider}'"
+                    ),
+                    location="env:DEEPSIGMA_CRYPTO_PROVIDER",
+                )
+            )
+
     return policy
 
 
