@@ -24,11 +24,13 @@
   labels: roadmap, v2.0.7, metrics, tec
 
 ## v2.1.0
-### EPICs (1)
+### EPICs (2)
 - #313 **EPIC: v2.1.0 DISR Architecture Expansion (Stark)**  
   labels: kpi:authority_modeling, sev:P1, type:feature, lane:epic, roadmap, stark, v2.1.0
+- #342 **EPIC: Close the 4 Gaps (Determinism + Intent + Audit-Neutral Logic + Pre-Exec Accountability)**  
+  labels: kpi:operational_maturity, sev:P1, type:feature, roadmap, v2.1.0, governance, epic, hardening
 
-### ISSUEs (6)
+### ISSUEs (20)
 - #324 **v2.1.0: DISR Provider Interface Abstraction**  
   labels: priority:P1, kpi:technical_completeness, sev:P1, type:feature, roadmap, v2.1.0, architecture
 - #325 **v2.1.0: Authority-Bound Action Contracts**  
@@ -39,22 +41,64 @@
   labels: priority:P1, kpi:operational_maturity, sev:P1, type:feature, roadmap, v2.1.0, security
 - #332 **LOCK: v2.1.0 Scope Freeze**  
   labels: v2.1.0, release, governance
+- #343 **GAP: Deterministic Replay Spec (What must be sealed to replay?)**  
+  labels: kpi:operational_maturity, sev:P1, type:doc, roadmap, v2.1.0, governance, hardening
+- #344 **GAP: Sealed Input State Snapshot (pre-run) + provenance bundle**  
+  labels: kpi:technical_completeness, sev:P1, type:feature, roadmap, v2.1.0, governance, hardening
+- #345 **GAP: Deterministic Environment Fingerprint (runtime + dependencies)**  
+  labels: kpi:technical_completeness, sev:P1, type:feature, roadmap, v2.1.0, governance, hardening
+- #346 **GAP: Replay Runner (one-command) to reproduce last run from sealed artifacts**  
+  labels: kpi:enterprise_readiness, sev:P1, type:feature, roadmap, v2.1.0, governance, hardening
+- #347 **GAP: Intent Packet schema (intent -> scope -> risk -> success criteria)**  
+  labels: kpi:authority_modeling, sev:P1, type:doc, roadmap, v2.1.0, governance, hardening
+- #348 **GAP: Intent Hash Binding (intent hash must match action contract before execution)**  
+  labels: kpi:authority_modeling, sev:P1, type:feature, roadmap, v2.1.0, governance, hardening
+- #349 **GAP: Intent Mutation Detection (diff + alert if intent changes after approval)**  
+  labels: kpi:operational_maturity, sev:P2, type:feature, roadmap, v2.1.0, governance, hardening
+- #350 **GAP: Decision Invariants Ledger (PRIME-like invariants for decisions)**  
+  labels: kpi:operational_maturity, sev:P1, type:doc, roadmap, v2.1.0, governance, hardening
+- #351 **GAP: Claim->Evidence->Authority binding model (machine-checkable)**  
+  labels: kpi:technical_completeness, sev:P1, type:feature, roadmap, v2.1.0, governance, hardening
+- #352 **GAP: Audit-Neutral Output Pack (context-free review bundle)**  
+  labels: kpi:enterprise_readiness, sev:P2, type:feature, roadmap, v2.1.0, governance, hardening
+- #353 **GAP: Pre-Execution Gate (block execution unless Intent + Authority + Policy satisfied)**  
+  labels: kpi:automation_depth, sev:P1, type:feature, roadmap, v2.1.0, governance, hardening
+- #354 **GAP: Authority Signature Verification (remove placeholder signing)**  
+  labels: kpi:authority_modeling, sev:P1, type:feature, roadmap, v2.1.0, governance, hardening
+- #355 **GAP: Replay/Nonce Protection Enforcement (prevent repeat execution without idempotency key)**  
+  labels: kpi:automation_depth, sev:P2, type:feature, roadmap, v2.1.0, governance, hardening
+- #356 **GAP: Decision Episode sealing (post-run binds outcome to intent+authority+inputs)**  
+  labels: kpi:operational_maturity, sev:P1, type:feature, roadmap, v2.1.0, governance, hardening
 - #358 **MILESTONE: v2.1.0 Decision Infrastructure Hardening**  
   labels: v2.1.0, hardening, milestone
 
 ## v2.1.1
-### EPICs (1)
+### EPICs (2)
+- #312 **EPIC: v2.0.8 Adoption + Enterprise Integration Wedge (Stark)**  
+  labels: kpi:enterprise_readiness, sev:P1, type:feature, lane:epic, roadmap, stark, v2.0.8, v2.1.0-pre, v2.1.1
 - #333 **EPIC: v2.1.1 Institutional Expansion**  
   labels: roadmap, epic, dormant, v2.1.1
 
-### ISSUEs (2)
+### ISSUEs (8)
+- #318 **v2.0.8: make try (10-Minute Pilot Mode)**  
+  labels: priority:P1, kpi:enterprise_readiness, sev:P1, type:feature, roadmap, v2.0.8, adoption, v2.1.1
+- #319 **v2.0.8: Decision Office Templates**  
+  labels: priority:P1, kpi:technical_completeness, sev:P1, type:feature, roadmap, v2.0.8, adoption, v2.1.1
+- #320 **v2.0.8: pilot_pack Folder**  
+  labels: priority:P1, kpi:enterprise_readiness, sev:P1, type:feature, roadmap, v2.0.8, adoption, v2.1.1
+- #321 **v2.1.0-pre: GitHub Issues → DLR Mapping**  
+  labels: priority:P1, kpi:data_integration, sev:P1, type:feature, roadmap, v2.1.0-pre, integration, v2.1.1
+- #322 **v2.1.0-pre: SharePoint / Teams Export Mode**  
+  labels: priority:P1, kpi:data_integration, sev:P1, type:feature, roadmap, v2.1.0-pre, integration, v2.1.1
+- #323 **v2.1.0-pre: Jira Import/Export Adapter**  
+  labels: priority:P2, kpi:data_integration, sev:P2, type:feature, roadmap, v2.1.0-pre, integration, v2.1.1
 - #334 **v2.1.1: Enterprise Connectors Suite**  
   labels: roadmap, integration, dormant, v2.1.1
 - #335 **v2.1.1: DISR Provider Abstraction Layer v2**  
   labels: roadmap, security, dormant, v2.1.1
 
 ## UNVERSIONED
-### EPICs (7)
+### EPICs (5)
 - #148 **Epic: Helm chart + Kubernetes manifests**  
   labels: infra, priority:P1, kpi:automation_depth, sev:P1, type:feature
 - #149 **Epic: Multi-region mesh over real networks**  
@@ -65,12 +109,8 @@
   labels: kpi:operational_maturity, sev:P1, type:feature, lane:epic
 - #280 **EPIC: v2.0.5 DISR Pilot Wedge (10-minute recoverability proof)**  
   labels: kpi:enterprise_readiness, sev:P2, type:feature, lane:epic
-- #312 **EPIC: v2.0.8 Adoption + Enterprise Integration Wedge (Stark)**  
-  labels: kpi:enterprise_readiness, sev:P1, type:feature, lane:epic, roadmap, stark, v2.0.8, v2.1.0-pre
-- #342 **EPIC: Close the 4 Gaps (Determinism + Intent + Audit-Neutral Logic + Pre-Exec Accountability)**  
-  labels: kpi:operational_maturity, sev:P1, type:feature, roadmap, governance, epic, hardening
 
-### ISSUEs (141)
+### ISSUEs (121)
 - #1 **run_supervised.py output does not conform to episode.schema.json**  
   labels: bug, schema
 - #2 **Drift events from run_supervised.py do not conform to drift.schema.json**  
@@ -313,43 +353,3 @@
   labels: kpi:automation_depth, sev:P1, type:feature, lane:automation-gate
 - #291 **DISR-210: Security Audit Pack export (sealed events + authority ledger + metrics + configs)**  
   labels: kpi:enterprise_readiness, sev:P1, type:feature, lane:audit-pack
-- #318 **v2.0.8: make try (10-Minute Pilot Mode)**  
-  labels: priority:P1, kpi:enterprise_readiness, sev:P1, type:feature, roadmap, v2.0.8, adoption
-- #319 **v2.0.8: Decision Office Templates**  
-  labels: priority:P1, kpi:technical_completeness, sev:P1, type:feature, roadmap, v2.0.8, adoption
-- #320 **v2.0.8: pilot_pack Folder**  
-  labels: priority:P1, kpi:enterprise_readiness, sev:P1, type:feature, roadmap, v2.0.8, adoption
-- #321 **v2.1.0-pre: GitHub Issues → DLR Mapping**  
-  labels: priority:P1, kpi:data_integration, sev:P1, type:feature, roadmap, v2.1.0-pre, integration
-- #322 **v2.1.0-pre: SharePoint / Teams Export Mode**  
-  labels: priority:P1, kpi:data_integration, sev:P1, type:feature, roadmap, v2.1.0-pre, integration
-- #323 **v2.1.0-pre: Jira Import/Export Adapter**  
-  labels: priority:P2, kpi:data_integration, sev:P2, type:feature, roadmap, v2.1.0-pre, integration
-- #343 **GAP: Deterministic Replay Spec (What must be sealed to replay?)**  
-  labels: kpi:operational_maturity, sev:P1, type:doc, roadmap, governance, hardening
-- #344 **GAP: Sealed Input State Snapshot (pre-run) + provenance bundle**  
-  labels: kpi:technical_completeness, sev:P1, type:feature, roadmap, governance, hardening
-- #345 **GAP: Deterministic Environment Fingerprint (runtime + dependencies)**  
-  labels: kpi:technical_completeness, sev:P1, type:feature, roadmap, governance, hardening
-- #346 **GAP: Replay Runner (one-command) to reproduce last run from sealed artifacts**  
-  labels: kpi:enterprise_readiness, sev:P1, type:feature, roadmap, governance, hardening
-- #347 **GAP: Intent Packet schema (intent -> scope -> risk -> success criteria)**  
-  labels: kpi:authority_modeling, sev:P1, type:doc, roadmap, governance, hardening
-- #348 **GAP: Intent Hash Binding (intent hash must match action contract before execution)**  
-  labels: kpi:authority_modeling, sev:P1, type:feature, roadmap, governance, hardening
-- #349 **GAP: Intent Mutation Detection (diff + alert if intent changes after approval)**  
-  labels: kpi:operational_maturity, sev:P2, type:feature, roadmap, governance, hardening
-- #350 **GAP: Decision Invariants Ledger (PRIME-like invariants for decisions)**  
-  labels: kpi:operational_maturity, sev:P1, type:doc, roadmap, governance, hardening
-- #351 **GAP: Claim->Evidence->Authority binding model (machine-checkable)**  
-  labels: kpi:technical_completeness, sev:P1, type:feature, roadmap, governance, hardening
-- #352 **GAP: Audit-Neutral Output Pack (context-free review bundle)**  
-  labels: kpi:enterprise_readiness, sev:P2, type:feature, roadmap, governance, hardening
-- #353 **GAP: Pre-Execution Gate (block execution unless Intent + Authority + Policy satisfied)**  
-  labels: kpi:automation_depth, sev:P1, type:feature, roadmap, governance, hardening
-- #354 **GAP: Authority Signature Verification (remove placeholder signing)**  
-  labels: kpi:authority_modeling, sev:P1, type:feature, roadmap, governance, hardening
-- #355 **GAP: Replay/Nonce Protection Enforcement (prevent repeat execution without idempotency key)**  
-  labels: kpi:automation_depth, sev:P2, type:feature, roadmap, governance, hardening
-- #356 **GAP: Decision Episode sealing (post-run binds outcome to intent+authority+inputs)**  
-  labels: kpi:operational_maturity, sev:P1, type:feature, roadmap, governance, hardening
