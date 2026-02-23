@@ -19,6 +19,17 @@ secret:
   enabled: false
   stringData: {}
 
+dataPersistence:
+  enabled: false
+  existingClaim: ""
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 10Gi
+  mountPaths:
+    - /app/src/data
+    - /app/data
+
 api:
   replicaCount: 1
   image:

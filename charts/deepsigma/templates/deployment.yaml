@@ -58,6 +58,19 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- if .Values.dataPersistence.enabled }}
+          volumeMounts:
+            {{- range .Values.dataPersistence.mountPaths }}
+            - name: deepsigma-data
+              mountPath: {{ . | quote }}
+            {{- end }}
+          {{- end }}
+      {{- if .Values.dataPersistence.enabled }}
+      volumes:
+        - name: deepsigma-data
+          persistentVolumeClaim:
+            claimName: {{ include "deepsigma.dataPvcName" . }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

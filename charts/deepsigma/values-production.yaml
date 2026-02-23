@@ -50,6 +50,10 @@ secret:
   stringData:
     DEEPSIGMA_MASTER_KEY: "replace-me"
 
+dataPersistence:
+  enabled: false
+  existingClaim: ""
+
 fuseki:
   enabled: true
 
