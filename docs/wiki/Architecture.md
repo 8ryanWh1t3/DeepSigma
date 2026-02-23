@@ -23,7 +23,7 @@ Transport options:
 - **MCP server** (recommended) or MCP gateway
 - Direct adapters (LangChain callbacks/tool wrappers)
 
-See also: [Runtime Flow](Runtime-Flow.md)
+See also: [Runtime Flow](Runtime-Flow)
 
 Mermaid diagrams:
 - [System Architecture](../mermaid/01-system-architecture.md)

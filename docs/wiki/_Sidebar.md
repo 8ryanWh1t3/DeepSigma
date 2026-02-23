@@ -1,5 +1,6 @@
 - **Start**
   - [Home](Home)
+  - [Wiki Index](Wiki-Index)
   - [Quickstart](Quickstart)
   - [FAQ](FAQ)
 - **Core**
@@ -38,6 +39,8 @@
   - [Operations](Operations)
   - [SLOs & Metrics](SLOs-and-Metrics)
   - [Release Notes v2.0.6](../release/RELEASE_NOTES_v2.0.6.md)
+  - [Repo Radar Composite](../../release_kpis/radar_composite_latest.png)
+  - [TEC Summary](../../release_kpis/TEC_SUMMARY.md)
   - [Replay & Testing](Replay-and-Testing)
 - **Excel-First**
   - [Creative Director Suite](Creative-Director-Suite)
