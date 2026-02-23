@@ -19,6 +19,8 @@ def test_reencrypt_benchmark_writes_scalability_metrics(tmp_path: Path):
     repo_root = Path(__file__).resolve().parents[1]
     out_dir = tmp_path / "bench"
     metrics_path = tmp_path / "scalability_metrics.json"
+    security_metrics_path = tmp_path / "security_metrics.json"
+    history_path = tmp_path / "benchmark_history.json"
     summary_path = tmp_path / "summary.json"
 
     cmd = [
@@ -34,6 +36,10 @@ def test_reencrypt_benchmark_writes_scalability_metrics(tmp_path: Path):
         str(metrics_path),
         "--summary-out",
         str(summary_path),
+        "--security-metrics-out",
+        str(security_metrics_path),
+        "--history-out",
+        str(history_path),
         "--reset-dataset",
     ]
     subprocess.check_call(cmd, cwd=repo_root)
@@ -46,6 +52,13 @@ def test_reencrypt_benchmark_writes_scalability_metrics(tmp_path: Path):
     assert metrics["execution_mode"] == "dry_run"
     assert metrics["evidence_level"] == "simulated"
     assert metrics["kpi_eligible"] is False
+    assert security_metrics_path.exists()
+    security_metrics = json.loads(security_metrics_path.read_text(encoding="utf-8"))
+    assert security_metrics["metric_family"] == "disr_security"
+    assert security_metrics["mttr_seconds"] > 0
+    assert history_path.exists()
+    history = json.loads(history_path.read_text(encoding="utf-8"))
+    assert len(history["entries"]) == 1
 
 
 def test_kpi_compute_supports_scalability_metrics(tmp_path: Path):
@@ -82,3 +95,32 @@ def test_kpi_compute_caps_simulated_scalability_metrics(tmp_path: Path):
     metrics = module.parse_scalability_metrics()
     assert metrics is not None
     assert module.score_scalability(metrics) <= 4.0
+
+
+def test_reencrypt_benchmark_appends_history(tmp_path: Path):
+    repo_root = Path(__file__).resolve().parents[1]
+    history_path = tmp_path / "benchmark_history.json"
+    cmd = [
+        "python",
+        str(repo_root / "scripts" / "reencrypt_benchmark.py"),
+        "--records",
+        "200",
+        "--dataset-dir",
+        str(tmp_path / "bench"),
+        "--checkpoint",
+        str(tmp_path / "checkpoint.json"),
+        "--metrics-out",
+        str(tmp_path / "scalability_metrics.json"),
+        "--summary-out",
+        str(tmp_path / "summary.json"),
+        "--security-metrics-out",
+        str(tmp_path / "security_metrics.json"),
+        "--history-out",
+        str(history_path),
+        "--reset-dataset",
+    ]
+    subprocess.check_call(cmd, cwd=repo_root)
+    subprocess.check_call(cmd, cwd=repo_root)
+    history = json.loads(history_path.read_text(encoding="utf-8"))
+    assert history["metric_family"] == "disr_benchmark_history"
+    assert len(history["entries"]) == 2

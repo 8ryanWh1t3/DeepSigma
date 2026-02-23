@@ -66,6 +66,7 @@ def build_security_audit_pack(root: Path, out_dir: Path, *, strict: bool = False
         "release_kpis/SECURITY_GATE_REPORT.json",
         "release_kpis/security_metrics.json",
         "release_kpis/scalability_metrics.json",
+        "release_kpis/benchmark_history.json",
         "governance/security_crypto_policy.json",
         "schemas/core/security_crypto_policy.schema.json",
         "schemas/core/crypto_envelope.schema.json",
