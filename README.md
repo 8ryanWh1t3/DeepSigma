@@ -158,6 +158,11 @@ All connectors conform to the [Connector Contract v1.0](schemas/core/connector_c
 | OpenClaw | WASM Sandbox | [docs](adapters/openclaw/) |
 | Local LLM | llama.cpp / OpenAI-compatible | [docs](docs/30-local-inference.md) |
 
+## Security And Data Handling
+
+- [Data Boundaries](docs/DATA_BOUNDARIES.md) — data at rest, storage locations, retention, redaction, tenancy isolation, connector flow, secrets policy, and network boundaries.
+- [Connector SDK](docs/CONNECTOR_SDK.md) — ConnectorV1 contract and safety expectations for custom adapters.
+
 ---
 
 ## Repo Structure

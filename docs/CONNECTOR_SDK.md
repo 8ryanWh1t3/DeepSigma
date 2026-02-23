@@ -34,7 +34,7 @@ Generated scaffold includes:
 2. `source_name` must be stable and non-empty.
 3. `to_envelopes` must produce envelopes passing `validate_envelope`.
 4. Connectors should be read-only by default and avoid writing upstream data.
-5. Redaction/data-boundary behavior should follow `docs/136.md` / policy docs.
+5. Redaction/data-boundary behavior should follow `docs/DATA_BOUNDARIES.md`.
 
 ## Protocol harness
 
