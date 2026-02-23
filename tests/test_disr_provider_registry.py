@@ -42,6 +42,9 @@ class _DummyProvider(CryptoProvider):
 def test_default_provider_is_registered() -> None:
     assert "local-keystore" in available_providers()
     assert "local-keyring" in available_providers()
+    assert "aws-kms" in available_providers()
+    assert "gcp-kms" in available_providers()
+    assert "azure-kv" in available_providers()
 
 
 def test_create_provider_unknown_raises() -> None:
@@ -110,3 +113,10 @@ def test_local_keystore_file_format_is_deterministic(tmp_path) -> None:
     assert '"provider": "local-keystore"' in payload
     assert '"schema_version": "1.0"' in payload
     assert payload.count('"key_version"') == 2
+
+
+@pytest.mark.parametrize("provider_name", ["aws-kms", "gcp-kms", "azure-kv"])
+def test_cloud_kms_stubs_fail_closed(provider_name: str) -> None:
+    provider = create_provider(provider_name)
+    with pytest.raises(NotImplementedError, match="stub"):
+        provider.create_key_version("credibility")

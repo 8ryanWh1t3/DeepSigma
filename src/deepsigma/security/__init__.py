@@ -11,6 +11,9 @@ from .providers import (
     resolve_provider_name,
 )
 from .providers.base import CryptoProvider
+from .providers.aws_kms import AWSKMSProvider
+from .providers.azure_kv import AzureKeyVaultProvider
+from .providers.gcp_kms import GCPKMSProvider
 from .providers.local_keystore import LocalKeyStoreProvider
 from .providers.local_keyring import LocalKeyringProvider
 
@@ -22,7 +25,10 @@ __all__ = [
     "available_providers",
     "append_security_event",
     "append_authority_rotation_entry",
+    "AWSKMSProvider",
+    "AzureKeyVaultProvider",
     "create_provider",
+    "GCPKMSProvider",
     "LocalKeyStoreProvider",
     "LocalKeyringProvider",
     "provider_from_policy",
