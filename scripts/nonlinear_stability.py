@@ -2,10 +2,9 @@
 from __future__ import annotations
 
 import json
-import math
 import re
 from pathlib import Path
-from statistics import mean, pstdev
+from statistics import mean
 
 ROOT = Path(__file__).resolve().parents[1]
 RK = ROOT / "release_kpis"
