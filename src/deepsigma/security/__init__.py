@@ -1,6 +1,6 @@
 """Security primitives for DISR (Disposable Rotors)."""
 
-from .authority_ledger import append_authority_rotation_entry
+from .authority_ledger import append_authority_rotation_entry, export_authority_ledger, load_authority_ledger
 from .action_contract import ActionContract, create_action_contract, validate_action_contract
 from .events import (
     EVENT_KEY_ROTATED,
@@ -55,6 +55,8 @@ __all__ = [
     "EVENT_REENCRYPT_DONE",
     "EVENT_PROVIDER_CHANGED",
     "append_authority_rotation_entry",
+    "load_authority_ledger",
+    "export_authority_ledger",
     "ActionContract",
     "create_action_contract",
     "validate_action_contract",

@@ -180,3 +180,44 @@ def append_authority_action_entry(
         },
     )
     return entry
+
+
+def load_authority_ledger(ledger_path: str | Path) -> list[dict[str, Any]]:
+    path = Path(ledger_path)
+    if not path.exists():
+        return []
+    raw = path.read_text(encoding="utf-8").strip()
+    if not raw:
+        return []
+    obj = json.loads(raw)
+    if not isinstance(obj, list):
+        raise ValueError("authority ledger file must be a JSON array")
+    return [item for item in obj if isinstance(item, dict)]
+
+
+def export_authority_ledger(
+    *,
+    ledger_path: str | Path,
+    out_path: str | Path,
+    export_format: str = "json",
+) -> Path:
+    entries = load_authority_ledger(ledger_path)
+    destination = Path(out_path)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+
+    normalized = export_format.strip().lower()
+    if normalized == "json":
+        payload = {
+            "schema_version": LEDGER_SCHEMA_VERSION,
+            "entry_count": len(entries),
+            "entries": entries,
+        }
+        destination.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+        return destination
+
+    if normalized == "ndjson":
+        lines = [json.dumps(entry, sort_keys=True) for entry in entries]
+        destination.write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
+        return destination
+
+    raise ValueError("export_format must be one of: json, ndjson")
