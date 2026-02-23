@@ -93,6 +93,11 @@ def main() -> int:
         help="Path to write benchmark summary JSON",
     )
     parser.add_argument("--reset-dataset", action="store_true", help="Regenerate dataset from scratch")
+    parser.add_argument(
+        "--real-workload",
+        action="store_true",
+        help="Run real re-encrypt workload (requires DEEPSIGMA_MASTER_KEY and DEEPSIGMA_PREVIOUS_MASTER_KEY)",
+    )
     args = parser.parse_args()
 
     dataset_dir = (ROOT / args.dataset_dir).resolve()
@@ -106,7 +111,7 @@ def main() -> int:
 
     summary = run_reencrypt_job(
         tenant_id="tenant-alpha",
-        dry_run=True,
+        dry_run=not args.real_workload,
         resume=False,
         data_dir=dataset_dir,
         checkpoint_path=(ROOT / args.checkpoint).resolve(),
@@ -127,6 +132,9 @@ def main() -> int:
     metrics = {
         "schema_version": "1.0",
         "metric_family": "disr_scalability",
+        "execution_mode": "real_workload" if args.real_workload else "dry_run",
+        "evidence_level": "real_workload" if args.real_workload else "simulated",
+        "kpi_eligible": bool(args.real_workload),
         "run_started_at": started_at,
         "run_completed_at": ended_at,
         "records_targeted": records_targeted,

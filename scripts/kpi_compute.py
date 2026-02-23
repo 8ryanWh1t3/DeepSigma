@@ -60,6 +60,10 @@ def parse_scalability_metrics() -> dict | None:
     return obj
 
 
+def is_kpi_eligible(metrics: dict) -> bool:
+    return bool(metrics.get("kpi_eligible")) and metrics.get("evidence_level") == "real_workload"
+
+
 def score_economic_measurability(metrics: dict) -> float:
     score = 3.0  # metrics present and parseable
     mttr = float(metrics.get("mttr_seconds", 0))
@@ -83,13 +87,18 @@ def score_economic_measurability(metrics: dict) -> float:
     elif mbm >= 0.001:
         score += 1
 
+    if not is_kpi_eligible(metrics):
+        return clamp(min(score, 4.0))
     return clamp(score)
 
 
 def score_scalability(metrics: dict) -> float:
     raw = metrics.get("scalability_score")
     if isinstance(raw, (int, float)):
-        return clamp(float(raw))
+        score = clamp(float(raw))
+        if not is_kpi_eligible(metrics):
+            return clamp(min(score, 4.0))
+        return score
     throughput = float(metrics.get("throughput_records_per_second", 0))
     mbm = float(metrics.get("throughput_mb_per_minute", 0))
     score = 2.0
@@ -105,6 +114,8 @@ def score_scalability(metrics: dict) -> float:
         score += 2
     elif mbm >= 10:
         score += 1
+    if not is_kpi_eligible(metrics):
+        return clamp(min(score, 4.0))
     return clamp(score)
 
 

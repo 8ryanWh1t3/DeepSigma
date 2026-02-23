@@ -61,7 +61,7 @@ scale-benchmark:
 	bash scripts/run_scale_stack.sh
 
 reencrypt-benchmark:
-	python scripts/reencrypt_benchmark.py
+	python scripts/reencrypt_benchmark.py $(ARGS)
 
 openapi-docs:
 	python scripts/export_openapi.py

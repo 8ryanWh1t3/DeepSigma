@@ -47,6 +47,7 @@ def main() -> int:
     bytes_targeted = claims_path.stat().st_size
 
     signing_key = os.getenv("DEEPSIGMA_AUTHORITY_SIGNING_KEY", "demo-signing-key")
+    signing_key_source = "env" if os.getenv("DEEPSIGMA_AUTHORITY_SIGNING_KEY") else "placeholder_default"
     compromise_started_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     t0 = time.perf_counter()
     rotation = rotate_keys(
@@ -81,6 +82,9 @@ def main() -> int:
     metrics = {
         "schema_version": "1.0",
         "metric_family": "disr_security",
+        "execution_mode": "dry_run",
+        "evidence_level": "simulated",
+        "kpi_eligible": False,
         "tenant_id": args.tenant,
         "compromise_started_at": compromise_started_at,
         "rotation_completed_at": rotation_completed_at,
@@ -90,6 +94,9 @@ def main() -> int:
         "bytes_targeted": bytes_targeted,
         "reencrypt_records_per_second": round(records_per_second, 3),
         "reencrypt_mb_per_minute": round(mb_per_minute, 6),
+        "signing_mode": "hmac",
+        "signing_key_source": signing_key_source,
+        "signing_notice": "Pilot signing key may be placeholder unless DEEPSIGMA_AUTHORITY_SIGNING_KEY is set.",
     }
     kpi_metrics_path = ROOT / "release_kpis" / "security_metrics.json"
     kpi_metrics_path.parent.mkdir(parents=True, exist_ok=True)
