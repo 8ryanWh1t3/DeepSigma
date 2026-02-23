@@ -79,6 +79,9 @@ def test_reencrypt_dry_run_then_resume_completed(tmp_path: Path):
         resume=False,
         data_dir=data_dir,
         checkpoint_path=checkpoint,
+        authority_dri="dri.approver",
+        authority_reason="dry-run validation",
+        authority_signing_key="test-signing-key",
     )
     assert first.status == "dry_run"
 
@@ -102,6 +105,9 @@ def test_reencrypt_dry_run_then_resume_completed(tmp_path: Path):
         resume=True,
         data_dir=data_dir,
         checkpoint_path=checkpoint,
+        authority_dri="dri.approver",
+        authority_reason="resume validation",
+        authority_signing_key="test-signing-key",
     )
     assert resumed.resumed is True
     assert resumed.status == "completed"

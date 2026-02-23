@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from credibility_engine.store import CredibilityStore
 from deepsigma.security.reencrypt import run_reencrypt_job
 from deepsigma.security.rotate_keys import rotate_keys
 
@@ -63,6 +64,9 @@ def test_reencrypt_dry_run_writes_checkpoint(tmp_path: Path):
         resume=False,
         data_dir=data_dir,
         checkpoint_path=checkpoint,
+        authority_dri="dri.approver",
+        authority_reason="planned drill",
+        authority_signing_key="test-signing-key",
     )
 
     assert summary.status == "dry_run"
@@ -93,6 +97,9 @@ def test_reencrypt_resume_completed_returns_without_changes(tmp_path: Path):
         resume=True,
         data_dir=tmp_path / "cred",
         checkpoint_path=checkpoint,
+        authority_dri="dri.approver",
+        authority_reason="resume run",
+        authority_signing_key="test-signing-key",
     )
 
     assert summary.resumed is True
@@ -132,3 +139,49 @@ def test_rotate_keys_requires_authority_context(tmp_path: Path):
             keyring_path=tmp_path / "keyring.json",
             event_log_path=tmp_path / "events.jsonl",
         )
+
+
+def test_reencrypt_requires_authority_context(tmp_path: Path):
+    data_dir = tmp_path / "cred"
+    data_dir.mkdir(parents=True, exist_ok=True)
+    (data_dir / "claims.jsonl").write_text('{"claim_id":"C-1"}\n', encoding="utf-8")
+
+    with pytest.raises(ValueError, match="authority_dri is required"):
+        run_reencrypt_job(
+            tenant_id="tenant-alpha",
+            dry_run=True,
+            resume=False,
+            data_dir=data_dir,
+            checkpoint_path=tmp_path / "checkpoint.json",
+            authority_dri=None,
+            authority_reason="planned drill",
+            authority_signing_key="test-signing-key",
+        )
+
+
+def test_reencrypt_completed_writes_authority_ledger(tmp_path: Path, monkeypatch):
+    data_dir = tmp_path / "cred"
+    data_dir.mkdir(parents=True, exist_ok=True)
+    (data_dir / "claims.jsonl").write_text('{"claim_id":"C-1"}\n', encoding="utf-8")
+
+    monkeypatch.setenv("DEEPSIGMA_MASTER_KEY", "old-master-key")
+    old_store = CredibilityStore(data_dir=data_dir, tenant_id="tenant-alpha", encrypt_at_rest=True)
+    old_store.append_claim({"claim_id": "C-2"})
+
+    monkeypatch.setenv("DEEPSIGMA_MASTER_KEY", "new-master-key")
+    monkeypatch.setenv("DEEPSIGMA_PREVIOUS_MASTER_KEY", "old-master-key")
+    summary = run_reencrypt_job(
+        tenant_id="tenant-alpha",
+        dry_run=False,
+        resume=False,
+        data_dir=data_dir,
+        checkpoint_path=tmp_path / "checkpoint.json",
+        authority_dri="dri.approver",
+        authority_reason="incident recovery",
+        authority_signing_key="test-signing-key",
+        authority_ledger_path=tmp_path / "authority_ledger.json",
+    )
+
+    assert summary.status == "completed"
+    ledger = json.loads((tmp_path / "authority_ledger.json").read_text(encoding="utf-8"))
+    assert ledger[-1]["entry_type"] == "AUTHORIZED_REENCRYPT"

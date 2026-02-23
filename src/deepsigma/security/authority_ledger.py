@@ -34,6 +34,28 @@ def append_authority_rotation_entry(
     authority_reason: str,
     signing_key: str,
 ) -> dict[str, Any]:
+    return append_authority_action_entry(
+        ledger_path=ledger_path,
+        authority_event=rotation_event,
+        authority_dri=authority_dri,
+        authority_role=authority_role,
+        authority_reason=authority_reason,
+        signing_key=signing_key,
+        action_type="AUTHORIZED_KEY_ROTATION",
+    )
+
+
+def append_authority_action_entry(
+    *,
+    ledger_path: str | Path,
+    authority_event: dict[str, Any],
+    authority_dri: str,
+    authority_role: str,
+    authority_reason: str,
+    signing_key: str,
+    action_type: str,
+    action_contract: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     path = Path(ledger_path)
     path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -46,24 +68,29 @@ def append_authority_rotation_entry(
                 entries = [item for item in obj if isinstance(item, dict)]
 
     prev_hash = entries[-1]["entry_hash"] if entries else None
+    payload = authority_event.get("payload", {})
     unsigned = {
-        "entry_type": "AUTHORIZED_KEY_ROTATION",
-        "event_id": rotation_event["event_id"],
-        "event_hash": rotation_event["event_hash"],
-        "tenant_id": rotation_event["tenant_id"],
-        "key_id": rotation_event["payload"]["key_id"],
-        "key_version": rotation_event["payload"]["key_version"],
+        "entry_type": action_type,
+        "event_id": authority_event["event_id"],
+        "event_hash": authority_event["event_hash"],
+        "tenant_id": authority_event["tenant_id"],
+        "key_id": payload.get("key_id"),
+        "key_version": payload.get("key_version"),
         "authority_dri": authority_dri,
         "authority_role": authority_role,
         "authority_reason": authority_reason,
-        "recorded_at": rotation_event["occurred_at"],
+        "recorded_at": authority_event["occurred_at"],
         "prev_entry_hash": prev_hash,
+        "action_contract_id": (action_contract or {}).get("action_id"),
+        "action_contract_dri": (action_contract or {}).get("dri"),
+        "action_contract_approver": (action_contract or {}).get("approver"),
     }
     signature = _event_signature(unsigned, signing_key)
     entry = dict(unsigned)
     entry["event_signature"] = signature
     entry["signature_alg"] = "HMAC-SHA256"
-    entry["entry_id"] = f"AUTHROT-{rotation_event['event_hash'][:12]}"
+    prefix = "AUTHROT" if action_type == "AUTHORIZED_KEY_ROTATION" else "AUTHACT"
+    entry["entry_id"] = f"{prefix}-{authority_event['event_hash'][:12]}"
     entry["entry_hash"] = _entry_hash({**entry, "entry_hash": ""})
 
     entries.append(entry)

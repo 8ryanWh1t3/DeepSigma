@@ -142,6 +142,10 @@ def main() -> int:
         checkpoint_path=(ROOT / args.checkpoint).resolve(),
         actor_user="benchmark-runner",
         actor_role="coherence_steward",
+        authority_dri="benchmark.dri",
+        authority_reason="benchmark authorization",
+        authority_signing_key="benchmark-signing-key",
+        authority_ledger_path=(dataset_dir / "authority_ledger.json").resolve(),
     )
 
     wall_elapsed = max(time.perf_counter() - wall_start, 0.001)

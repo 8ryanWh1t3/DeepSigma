@@ -18,6 +18,7 @@ visible, reversible, and measurable under pilot conditions.
 - Recovery runbook: `docs/docs/security/RECOVERY_RUNBOOK.md`
 - 10-minute demo: `docs/docs/security/DEMO_10_MIN.md`
 - Crypto envelope schema: `schemas/core/crypto_envelope.schema.json`
+- Authority action contract schema: `schemas/core/action_contract.schema.json`
 - Keyring model: `src/deepsigma/security/keyring.py`
 
 ## Pilot implementation notes
@@ -26,6 +27,7 @@ visible, reversible, and measurable under pilot conditions.
 - Default provider is `local-keystore` (file-backed) with deterministic storage at `local_keystore.json`.
 - Envelope v1 metadata includes `key_id`, `key_version`, `provider`, `alg`, `nonce`, `aad`, `created_at`, and `expires_at`.
 - Expiry and disable transitions are represented as status changes, not silent mutation.
+- Privileged rotate/reencrypt actions require a signed authority action contract.
 
 ## Optional cloud provider stubs
 
