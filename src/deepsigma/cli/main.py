@@ -2,6 +2,7 @@
 """DeepSigma unified CLI — product entrypoint.
 
 Commands:
+    deepsigma init <project-name>            Scaffold a 5-minute starter project
     deepsigma doctor                          Environment health check
     deepsigma demo excel [--out DIR]          Excel-first Money Demo
     deepsigma retention sweep --tenant <id>   TTL retention sweep + compaction
@@ -47,6 +48,7 @@ def main(argv: list[str] | None = None) -> int:
         demo_excel,
         doctor,
         golden_path,
+        init_project,
         mdpt_index,
         retention,
         rekey,
@@ -54,6 +56,7 @@ def main(argv: list[str] | None = None) -> int:
         validate_boot,
     )
 
+    init_project.register(subparsers)
     doctor.register(subparsers)
     demo_excel.register(subparsers)
     validate_boot.register(subparsers)

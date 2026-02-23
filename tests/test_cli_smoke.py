@@ -115,3 +115,20 @@ class TestNewConnector:
         assert (connector_dir / "mcp_tools.py").exists()
         assert (connector_dir / "README.md").exists()
         assert (tests_dir / "test_sample_api_connector.py").exists()
+
+
+class TestInitProject:
+    def test_init_project_scaffolds_quickstart_files(self, tmp_path):
+        from deepsigma.cli.main import main
+
+        rc = main(["init", "my-project", "--out-dir", str(tmp_path)])
+        assert rc == 0
+
+        project_dir = tmp_path / "my-project"
+        assert (project_dir / "README.md").exists()
+        assert (project_dir / "Makefile").exists()
+        assert (project_dir / "data" / "sample_episodes.json").exists()
+        assert (project_dir / "data" / "sample_drift.json").exists()
+        assert (project_dir / "data" / "sample_claims.json").exists()
+        assert (project_dir / "scenarios" / "drift_scenario.md").exists()
+        assert (project_dir / "queries" / "iris_queries.md").exists()
