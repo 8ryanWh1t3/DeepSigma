@@ -21,4 +21,5 @@
 
 **Notes:**
 - Some KPIs are auto-derived from repo telemetry (tests, docs, workflows, pilot drills).
-- Manual KPIs remain for judgment-based areas (Authority, Scalability, Economic Measurability).
+- Economic and Scalability are auto-derived from DISR metrics and capped by evidence eligibility (`kpi_eligible` / `evidence_level`).
+- Authority Modeling remains manual/judgment-based until authority telemetry scoring is wired.
