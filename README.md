@@ -87,6 +87,24 @@ When assumptions decay, **Drift** fires. When drift exceeds tolerance, a **Patch
 
 ---
 
+## Operating Modes: Core vs Enterprise
+
+DeepSigma currently supports two operating modes in the same repo:
+
+- **Core mode**: a compact, demo-first wedge for fast adoption and deterministic proof (`run_money_demo.sh`, core drift->patch loop).
+- **Enterprise mode**: the full platform surface (connectors, dashboards, Docker stacks, extended telemetry, broader governance and integration tooling).
+
+To keep mainline adoption friction low while preserving full capability, enterprise-heavy surfaces can be parked in:
+
+- [`_park_enterprise/README.md`](_park_enterprise/README.md)
+
+Use this boundary intentionally:
+
+- Start with Core for first proof and onboarding speed.
+- Expand into Enterprise modules when your deployment scope requires them.
+
+---
+
 ## Quick Start
 
 ```bash
