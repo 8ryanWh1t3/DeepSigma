@@ -8,8 +8,11 @@ from pathlib import Path
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+SRC_ROOT = REPO_ROOT / "src"
+if str(SRC_ROOT) not in sys.path:
+    sys.path.insert(0, str(SRC_ROOT))
 if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
+    sys.path.insert(1, str(REPO_ROOT))
 
 CSV_FIXTURE = REPO_ROOT / "tests" / "fixtures" / "promptcapabilities_export.csv"
 VALID_BOOT = REPO_ROOT / "tests" / "fixtures" / "valid_boot.xlsx"
@@ -85,3 +88,30 @@ class TestDemoExcel:
         rc = main(["demo", "excel", "--out", str(tmp_path)])
         assert rc == 0
         assert (tmp_path / "workbook.xlsx").exists()
+
+
+class TestNewConnector:
+    def test_new_connector_scaffolds_files(self, tmp_path):
+        from deepsigma.cli.main import main
+
+        out_dir = tmp_path / "adapters"
+        tests_dir = tmp_path / "tests"
+
+        rc = main(
+            [
+                "new-connector",
+                "sample-api",
+                "--out-dir",
+                str(out_dir),
+                "--tests-dir",
+                str(tests_dir),
+            ]
+        )
+        assert rc == 0
+
+        connector_dir = out_dir / "sample_api"
+        assert (connector_dir / "__init__.py").exists()
+        assert (connector_dir / "connector.py").exists()
+        assert (connector_dir / "mcp_tools.py").exists()
+        assert (connector_dir / "README.md").exists()
+        assert (tests_dir / "test_sample_api_connector.py").exists()
