@@ -41,6 +41,12 @@ api:
     httpGet:
       path: /api/ready
       port: http
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
 
 dashboard:
   replicaCount: 1

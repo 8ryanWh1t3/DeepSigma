@@ -15,6 +15,12 @@ api:
   envFrom:
     configMapRef: true
     secretRef: true
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 65
+    targetMemoryUtilizationPercentage: 75
 
 dashboard:
   replicaCount: 3
