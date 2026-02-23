@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import json
 from pathlib import Path
 import subprocess
 
@@ -46,10 +47,19 @@ def main() -> int:
     subprocess.check_call(["python", "scripts/kpi_gate.py"])
     subprocess.check_call(["python", "scripts/render_kpi_trend.py"])
     subprocess.check_call(["python", "scripts/render_composite_radar.py"])
+    subprocess.check_call(["make", "tec"])
 
     radar_png = f"release_kpis/radar_{version}.png"
     radar_svg = f"release_kpis/radar_{version}.svg"
     badge_svg = "release_kpis/badge_latest.svg"
+    tec_internal = outdir / "tec_internal.json"
+    tec_executive = outdir / "tec_executive.json"
+    tec_dod = outdir / "tec_dod.json"
+    if not (tec_internal.exists() and tec_executive.exists() and tec_dod.exists()):
+        raise SystemExit("Missing TEC artifacts. Expected tec_internal/executive/dod json files.")
+    tec_internal_data = json.loads(tec_internal.read_text(encoding="utf-8"))
+    tec_executive_data = json.loads(tec_executive.read_text(encoding="utf-8"))
+    tec_dod_data = json.loads(tec_dod.read_text(encoding="utf-8"))
 
     comment = f"""## Repo Radar KPI — {version}
 
@@ -71,6 +81,12 @@ def main() -> int:
 **Gates:**
 - `release_kpis/KPI_GATE_REPORT.md`
 - `release_kpis/ISSUE_LABEL_GATE_REPORT.md`
+
+**TEC (ROM):**
+- Internal: {tec_internal_data["base"]["hours"]} hrs | ${int(tec_internal_data["base"]["cost"]):,}
+- Executive: {tec_executive_data["base"]["hours"]} hrs | ${int(tec_executive_data["base"]["cost"]):,}
+- DoD: {tec_dod_data["base"]["hours"]} hrs | ${int(tec_dod_data["base"]["cost"]):,}
+- Full detail: `release_kpis/TEC_SUMMARY.md`
 
 **Notes:**
 - Some KPIs are auto-derived from repo telemetry (tests, docs, workflows, pilot drills).

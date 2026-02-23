@@ -1,4 +1,4 @@
-.PHONY: ci demo pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review lock-update build docker release-check pilot-pack scale-benchmark reencrypt-benchmark openapi-docs openapi-check security-gate security-demo security-audit-pack authority-ledger-export
+.PHONY: ci demo pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review tec lock-update build docker release-check pilot-pack scale-benchmark reencrypt-benchmark openapi-docs openapi-check security-gate security-demo security-audit-pack authority-ledger-export
 
 ci:
 	python scripts/compute_ci.py
@@ -39,6 +39,10 @@ issue-label-gate:
 issues-review:
 	bash scripts/issues_review.sh
 	python scripts/issue_label_gate.py
+
+tec:
+	bash scripts/export_repo_telemetry.sh
+	python scripts/tec_estimate.py
 
 lock-update:
 	bash scripts/update_locks.sh
