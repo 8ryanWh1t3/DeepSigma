@@ -1,9 +1,9 @@
-# Σ OVERWATCH / RAL — Wiki
+# DeepSigma Enterprise Wiki
 
-**Σ OVERWATCH (RAL — Reality Await Layer)** is a runtime control plane for agentic AI.
-It enforces deadlines, freshness, safe actions, and verification — then seals every decision into an immutable `DecisionEpisode` and feeds the Drift → Patch learning loop.
+**DeepSigma** is an execution-governance and coherence-operations platform for AI and human decision systems.
+It applies pre-execution authority gates, policy-bound execution contracts, and sealed decision evidence to ensure governance is enforceable before state changes, then routes outcomes into the Drift → Patch learning loop.
 
-> If you only read one thing: **RAL is "await for reality."**
+> If you only read one thing: **governance must constrain execution, not just describe it afterward.**
 
 ---
 
