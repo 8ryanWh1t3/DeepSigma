@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "IntentPacket",
+  "type": "object",
+  "required": ["intent_statement", "scope", "success_criteria", "ttl_expires_at", "author", "authority"],
+  "properties": {
+    "intent_statement": {"type": "string"},
+    "scope": {"type": "string"},
+    "success_criteria": {"type": "string"},
+    "risk_flags": {"type": "array", "items": {"type": "string"}},
+    "ttl_expires_at": {"type": "string"},
+    "author": {"type": "object"},
+    "authority": {"type": "object"},
+    "intent_hash": {"type": "string"}
+  }
+}

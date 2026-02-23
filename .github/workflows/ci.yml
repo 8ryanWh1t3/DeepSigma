@@ -121,6 +121,9 @@ jobs:
       - name: Enforce version sync (pyproject vs release_kpis/VERSION.txt)
         run: make version-sync-check
 
+      - name: Milestone Gate (v2.1.0 hardening)
+        run: make milestone-gate
+
       - name: Validate examples against schemas
         run: |
           python src/tools/validate_examples.py

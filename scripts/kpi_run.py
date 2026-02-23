@@ -8,6 +8,22 @@ import subprocess
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def format_layer_coverage() -> str:
+    mapping_path = ROOT / "release_kpis" / "layer_kpi_mapping.json"
+    if not mapping_path.exists():
+        return ""
+
+    mapping = json.loads(mapping_path.read_text(encoding="utf-8"))
+    lines = ["", "**Layer Coverage (Decision Infrastructure):**"]
+    for layer, kpis in mapping.items():
+        if isinstance(kpis, list):
+            kpi_str = ", ".join(kpis)
+        else:
+            kpi_str = str(kpis)
+        lines.append(f"- {layer}: {kpi_str}")
+    return "\n".join(lines)
+
+
 def main() -> int:
     outdir = ROOT / "release_kpis"
     outdir.mkdir(parents=True, exist_ok=True)
@@ -63,6 +79,7 @@ def main() -> int:
     tec_internal_data = json.loads(tec_internal.read_text(encoding="utf-8"))
     tec_executive_data = json.loads(tec_executive.read_text(encoding="utf-8"))
     tec_dod_data = json.loads(tec_dod.read_text(encoding="utf-8"))
+    layer_coverage = format_layer_coverage()
 
     comment = f"""## Repo Radar KPI — {version}
 
@@ -111,6 +128,7 @@ def main() -> int:
 - Some KPIs are auto-derived from repo telemetry (tests, docs, workflows, pilot drills).
 - Economic and Scalability are auto-derived from DISR metrics and capped by evidence eligibility (`kpi_eligible` / `evidence_level`).
 - Authority Modeling remains manual/judgment-based until authority telemetry scoring is wired.
+{layer_coverage}
 """
     (outdir / "PR_COMMENT.md").write_text(comment, encoding="utf-8")
     print("Wrote: release_kpis/PR_COMMENT.md")
