@@ -118,6 +118,28 @@ When the API server is running, mesh endpoints are available:
 | `/mesh/{tenant_id}/{node_id}/status` | GET | Node status |
 | `/mesh/{tenant_id}/summary` | GET | Tenant mesh summary |
 
+## Partition Detection and Recovery
+
+`HTTPTransport` now tracks peer health as a simple state machine:
+
+- `ONLINE` -> normal operation
+- `SUSPECT` -> transient connectivity failures detected
+- `OFFLINE` -> repeated failures beyond configured threshold
+
+Recovery is automatic: once a peer starts responding again and reaches the
+configured success threshold, it transitions back to `ONLINE`.
+
+State thresholds and transport retry behavior are configurable:
+
+- `max_retries`
+- `backoff_base`
+- `suspect_after_failures`
+- `offline_after_failures`
+- `recovery_successes`
+
+`health()` output includes `peer_states` and `partition_metrics` for
+partition/recovery visibility.
+
 ## Guardrails
 
 - Abstract institutional credibility model

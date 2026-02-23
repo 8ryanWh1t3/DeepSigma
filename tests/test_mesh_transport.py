@@ -249,6 +249,61 @@ class TestHTTPTransport:
             )
             MockClient.assert_called_once_with(timeout=5.0, verify=False)
 
+    def test_partition_state_transitions_and_recovery(self):
+        from mesh.transport import HTTPTransport
+
+        ok_resp = MagicMock()
+        ok_resp.status_code = 200
+        ok_resp.content = b'{"status":"ok","records":{"envelopes":[]}}'
+        ok_resp.headers = {"content-type": "application/json"}
+
+        with patch("httpx.Client") as MockClient:
+            MockClient.return_value.request.side_effect = [
+                httpx.ConnectError("boom-1"),
+                httpx.ConnectError("boom-2"),
+                ok_resp,
+            ]
+            t = HTTPTransport(
+                peer_registry={NODE_A: "http://host1:8100"},
+                max_retries=1,
+                backoff_base=0.0,
+                suspect_after_failures=1,
+                offline_after_failures=2,
+                recovery_successes=1,
+            )
+
+            with pytest.raises(ConnectionError):
+                t.pull(TENANT, NODE_A, ENVELOPES_LOG)
+            assert t.peer_states()[NODE_A] == "SUSPECT"
+
+            with pytest.raises(ConnectionError):
+                t.pull(TENANT, NODE_A, ENVELOPES_LOG)
+            assert t.peer_states()[NODE_A] == "OFFLINE"
+
+            records = t.pull(TENANT, NODE_A, ENVELOPES_LOG)
+            assert records == []
+            assert t.peer_states()[NODE_A] == "ONLINE"
+
+            events = t.partition_events()
+            assert any(e["event_type"] == "partition" for e in events)
+            assert any(e["event_type"] == "recovery" for e in events)
+
+    def test_health_includes_partition_metrics(self):
+        from mesh.transport import HTTPTransport
+
+        with patch("httpx.Client") as MockClient:
+            MockClient.return_value.get.side_effect = httpx.ConnectError("down")
+            t = HTTPTransport(
+                peer_registry={NODE_A: "http://host1:8100"},
+                max_retries=1,
+                backoff_base=0.0,
+                suspect_after_failures=1,
+                offline_after_failures=1,
+            )
+            health = t.health()
+            assert health["peer_states"][NODE_A] == "OFFLINE"
+            assert health["partition_metrics"]["offline_peers"] == 1
+
 
 # ── Serialization ───────────────────────────────────────────────────────────
 

@@ -18,6 +18,7 @@ import logging
 import os
 import re
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 
@@ -279,6 +280,14 @@ _TRANSIENT_CODES = {502, 503, 504}
 _MAX_RETRIES = 3
 _BACKOFF_BASE = 0.5
 
+PEER_ONLINE = "ONLINE"
+PEER_SUSPECT = "SUSPECT"
+PEER_OFFLINE = "OFFLINE"
+
+
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
 
 class HTTPTransport:
     """HTTP-based transport for distributed mesh nodes.
@@ -304,11 +313,40 @@ class HTTPTransport:
         timeout: float = 5.0,
         verify_tls: bool = True,
         use_msgpack: bool = False,
+        max_retries: int = _MAX_RETRIES,
+        backoff_base: float = _BACKOFF_BASE,
+        suspect_after_failures: int = 1,
+        offline_after_failures: int = 2,
+        recovery_successes: int = 1,
     ) -> None:
+        if max_retries < 1:
+            raise ValueError("max_retries must be >= 1")
+        if suspect_after_failures < 1:
+            raise ValueError("suspect_after_failures must be >= 1")
+        if offline_after_failures < suspect_after_failures:
+            raise ValueError("offline_after_failures must be >= suspect_after_failures")
+        if recovery_successes < 1:
+            raise ValueError("recovery_successes must be >= 1")
+
         self._peers = dict(peer_registry)
         self._timeout = timeout
         self._verify_tls = verify_tls
         self._use_msgpack = use_msgpack and _HAS_MSGPACK
+        self._max_retries = max_retries
+        self._backoff_base = backoff_base
+        self._suspect_after_failures = suspect_after_failures
+        self._offline_after_failures = offline_after_failures
+        self._recovery_successes = recovery_successes
+        self._peer_states: dict[str, dict[str, Any]] = {
+            node_id: {
+                "state": PEER_ONLINE,
+                "consecutive_failures": 0,
+                "consecutive_successes": 0,
+                "last_change": _now_iso(),
+            }
+            for node_id in self._peers
+        }
+        self._partition_events: list[dict[str, str]] = []
 
         try:
             import httpx
@@ -328,39 +366,153 @@ class HTTPTransport:
             raise ValueError(f"Unknown peer node: {node_id}")
         return url.rstrip("/")
 
+    def _ensure_runtime_state(self) -> None:
+        """Backfill runtime fields for test-constructed instances."""
+        if not hasattr(self, "_max_retries"):
+            self._max_retries = _MAX_RETRIES
+        if not hasattr(self, "_backoff_base"):
+            self._backoff_base = _BACKOFF_BASE
+        if not hasattr(self, "_suspect_after_failures"):
+            self._suspect_after_failures = 1
+        if not hasattr(self, "_offline_after_failures"):
+            self._offline_after_failures = 2
+        if not hasattr(self, "_recovery_successes"):
+            self._recovery_successes = 1
+        if not hasattr(self, "_peer_states"):
+            self._peer_states = {
+                node_id: {
+                    "state": PEER_ONLINE,
+                    "consecutive_failures": 0,
+                    "consecutive_successes": 0,
+                    "last_change": _now_iso(),
+                }
+                for node_id in getattr(self, "_peers", {})
+            }
+        if not hasattr(self, "_partition_events"):
+            self._partition_events = []
+
+    def _record_partition_event(
+        self,
+        peer_id: str,
+        event_type: str,
+        from_state: str,
+        to_state: str,
+        reason: str,
+    ) -> None:
+        event = {
+            "timestamp": _now_iso(),
+            "peer_id": peer_id,
+            "event_type": event_type,
+            "from_state": from_state,
+            "to_state": to_state,
+            "reason": reason,
+        }
+        self._partition_events.append(event)
+        if len(self._partition_events) > 200:
+            self._partition_events = self._partition_events[-200:]
+
+    def _set_peer_state(self, peer_id: str, new_state: str, reason: str) -> None:
+        state = self._peer_states.setdefault(
+            peer_id,
+            {
+                "state": PEER_ONLINE,
+                "consecutive_failures": 0,
+                "consecutive_successes": 0,
+                "last_change": _now_iso(),
+            },
+        )
+        prev = state["state"]
+        if prev == new_state:
+            return
+        state["state"] = new_state
+        state["last_change"] = _now_iso()
+        if new_state == PEER_ONLINE:
+            self._record_partition_event(peer_id, "recovery", prev, new_state, reason)
+        else:
+            self._record_partition_event(peer_id, "partition", prev, new_state, reason)
+
+    def _mark_peer_success(self, peer_id: str) -> None:
+        state = self._peer_states.setdefault(
+            peer_id,
+            {
+                "state": PEER_ONLINE,
+                "consecutive_failures": 0,
+                "consecutive_successes": 0,
+                "last_change": _now_iso(),
+            },
+        )
+        state["consecutive_failures"] = 0
+        state["consecutive_successes"] = int(state.get("consecutive_successes", 0)) + 1
+        if (
+            state["state"] != PEER_ONLINE
+            and state["consecutive_successes"] >= self._recovery_successes
+        ):
+            self._set_peer_state(peer_id, PEER_ONLINE, "request_succeeded")
+
+    def _mark_peer_failure(self, peer_id: str, reason: str) -> None:
+        state = self._peer_states.setdefault(
+            peer_id,
+            {
+                "state": PEER_ONLINE,
+                "consecutive_failures": 0,
+                "consecutive_successes": 0,
+                "last_change": _now_iso(),
+            },
+        )
+        state["consecutive_successes"] = 0
+        state["consecutive_failures"] = int(state.get("consecutive_failures", 0)) + 1
+        failures = state["consecutive_failures"]
+        if failures >= self._offline_after_failures:
+            self._set_peer_state(peer_id, PEER_OFFLINE, reason)
+        elif failures >= self._suspect_after_failures:
+            self._set_peer_state(peer_id, PEER_SUSPECT, reason)
+
     def _request_with_retry(
         self,
         method: str,
         url: str,
+        peer_id: str = "",
         **kwargs: Any,
     ) -> Any:
         """Make HTTP request with retry on transient failures."""
         import httpx
 
+        self._ensure_runtime_state()
         last_exc = None
-        for attempt in range(_MAX_RETRIES):
+        for attempt in range(self._max_retries):
             try:
                 resp = self._client.request(method, url, **kwargs)
                 if resp.status_code in _TRANSIENT_CODES:
                     logger.warning(
                         "Transient %d from %s (attempt %d/%d)",
-                        resp.status_code, url, attempt + 1, _MAX_RETRIES,
+                        resp.status_code, url, attempt + 1, self._max_retries,
                     )
-                    time.sleep(_BACKOFF_BASE * (2 ** attempt))
+                    if attempt < self._max_retries - 1:
+                        time.sleep(self._backoff_base * (2 ** attempt))
                     continue
                 resp.raise_for_status()
                 ct = resp.headers.get("content-type", "application/json")
-                return _decode_payload(resp.content, ct)
+                payload = _decode_payload(resp.content, ct)
+                if peer_id:
+                    self._mark_peer_success(peer_id)
+                return payload
             except (httpx.ConnectError, httpx.TimeoutException) as exc:
                 last_exc = exc
                 logger.warning(
                     "Connection error to %s (attempt %d/%d): %s",
-                    url, attempt + 1, _MAX_RETRIES, exc,
+                    url, attempt + 1, self._max_retries, exc,
                 )
-                time.sleep(_BACKOFF_BASE * (2 ** attempt))
+                if attempt < self._max_retries - 1:
+                    time.sleep(self._backoff_base * (2 ** attempt))
+            except httpx.HTTPError as exc:
+                last_exc = exc
+                break
 
+        if peer_id:
+            reason = last_exc.__class__.__name__ if last_exc else "request_failed"
+            self._mark_peer_failure(peer_id, reason)
         raise ConnectionError(
-            f"Failed after {_MAX_RETRIES} retries: {url}"
+            f"Failed after {self._max_retries} retries: {url}"
         ) from last_exc
 
     def push(
@@ -377,6 +529,7 @@ class HTTPTransport:
         body, content_type = _encode_payload(payload, self._use_msgpack)
         result = self._request_with_retry(
             "POST", url,
+            peer_id=target_node_id,
             content=body,
             headers={"Content-Type": content_type},
         )
@@ -394,7 +547,7 @@ class HTTPTransport:
         params = {}
         if since:
             params["since"] = since
-        result = self._request_with_retry("GET", url, params=params)
+        result = self._request_with_retry("GET", url, params=params, peer_id=source_node_id)
         key = log_name.replace(".jsonl", "")
         return result.get("records", {}).get(key, [])
 
@@ -405,7 +558,7 @@ class HTTPTransport:
             return None
         url = f"{base}/mesh/{tenant_id}/{node_id}/status"
         try:
-            return self._request_with_retry("GET", url)
+            return self._request_with_retry("GET", url, peer_id=node_id)
         except (ConnectionError, Exception):
             return None
 
@@ -417,6 +570,7 @@ class HTTPTransport:
         """Ping all peers and return aggregate health."""
         import httpx
 
+        self._ensure_runtime_state()
         peer_health: dict[str, str] = {}
         for node_id, base_url in self._peers.items():
             try:
@@ -426,20 +580,51 @@ class HTTPTransport:
                 )
                 if resp.status_code == 200:
                     peer_health[node_id] = "ok"
+                    self._mark_peer_success(node_id)
                 else:
                     peer_health[node_id] = f"error:{resp.status_code}"
+                    self._mark_peer_failure(node_id, f"http_{resp.status_code}")
             except (httpx.ConnectError, httpx.TimeoutException):
                 peer_health[node_id] = "unreachable"
+                self._mark_peer_failure(node_id, "health_unreachable")
 
         reachable = sum(1 for v in peer_health.values() if v == "ok")
+        state_map = {
+            node_id: self._peer_states.get(node_id, {}).get("state", PEER_ONLINE)
+            for node_id in self._peers
+        }
+        partition_events = sum(
+            1 for e in self._partition_events if e.get("event_type") == "partition"
+        )
+        recovery_events = sum(
+            1 for e in self._partition_events if e.get("event_type") == "recovery"
+        )
         return {
             "status": "ok" if reachable == len(self._peers) else "degraded",
             "transport": "http",
             "peers_total": len(self._peers),
             "peers_reachable": reachable,
             "peer_health": peer_health,
+            "peer_states": state_map,
+            "partition_metrics": {
+                "partition_events": partition_events,
+                "recovery_events": recovery_events,
+                "suspect_peers": sum(1 for s in state_map.values() if s == PEER_SUSPECT),
+                "offline_peers": sum(1 for s in state_map.values() if s == PEER_OFFLINE),
+            },
             "msgpack_enabled": self._use_msgpack,
         }
+
+    def peer_states(self) -> dict[str, str]:
+        """Return current peer state map (ONLINE/SUSPECT/OFFLINE)."""
+        return {
+            node_id: self._peer_states.get(node_id, {}).get("state", PEER_ONLINE)
+            for node_id in self._peers
+        }
+
+    def partition_events(self) -> list[dict[str, str]]:
+        """Return recent partition/recovery events."""
+        return list(self._partition_events)
 
     def close(self) -> None:
         """Close the HTTP client."""
