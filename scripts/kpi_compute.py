@@ -47,11 +47,7 @@ def parse_security_metrics() -> dict | None:
     return obj
 
 
-def score_economic_measurability() -> float:
-    metrics = parse_security_metrics()
-    if not metrics:
-        return 0.0
-
+def score_economic_measurability(metrics: dict) -> float:
     score = 3.0  # metrics present and parseable
     mttr = float(metrics.get("mttr_seconds", 0))
     rps = float(metrics.get("reencrypt_records_per_second", 0))
@@ -138,20 +134,22 @@ def score_operational_maturity() -> float:
 
 def main() -> int:
     docs_root = ROOT / "docs" / "docs"
+    metrics = parse_security_metrics()
     out = {
         "technical_completeness": round(score_technical_completeness(), 2),
         "automation_depth": round(score_automation_depth(), 2),
         "enterprise_readiness": round(score_enterprise_readiness(), 2),
         "data_integration": round(score_data_integration(), 2),
-        "economic_measurability": round(score_economic_measurability(), 2),
         "operational_maturity": round(score_operational_maturity(), 2),
         "_telemetry": {
             "test_files": count_files("tests/test_*.py") + count_files("tests/**/test_*.py"),
             "workflows": count_files(".github/workflows/*.yml") + count_files(".github/workflows/*.yaml"),
             "docs_md": len(list(docs_root.glob("**/*.md"))) if docs_root.exists() else 0,
-            "security_metrics_present": parse_security_metrics() is not None,
+            "security_metrics_present": metrics is not None,
         },
     }
+    if metrics is not None:
+        out["economic_measurability"] = round(score_economic_measurability(metrics), 2)
     print(json.dumps(out, indent=2))
     return 0
 

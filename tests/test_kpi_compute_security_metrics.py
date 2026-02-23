@@ -34,11 +34,13 @@ def test_score_economic_measurability_from_metrics(tmp_path: Path):
     module = _load_module(repo)
     module.ROOT = repo
 
-    score = module.score_economic_measurability()
+    metrics = module.parse_security_metrics()
+    assert metrics is not None
+    score = module.score_economic_measurability(metrics)
     assert score >= 8
 
 
-def test_score_economic_measurability_without_metrics(tmp_path: Path):
+def test_main_omits_economic_measurability_without_metrics(tmp_path: Path):
     repo = tmp_path / "repo"
     (repo / "scripts").mkdir(parents=True, exist_ok=True)
     source = Path(__file__).resolve().parents[1] / "scripts" / "kpi_compute.py"
@@ -47,4 +49,5 @@ def test_score_economic_measurability_without_metrics(tmp_path: Path):
     module = _load_module(repo)
     module.ROOT = repo
 
-    assert module.score_economic_measurability() == 0.0
+    payload = json.loads(__import__("subprocess").check_output(["python", str(repo / "scripts" / "kpi_compute.py")], text=True))
+    assert "economic_measurability" not in payload
