@@ -64,6 +64,8 @@ def test_reencrypt_dry_run_writes_checkpoint(tmp_path: Path):
         resume=False,
         data_dir=data_dir,
         checkpoint_path=checkpoint,
+        batch_size=25,
+        idempotency_key="ik-dry-001",
         authority_dri="dri.approver",
         authority_reason="planned drill",
         authority_signing_key="test-signing-key",
@@ -73,6 +75,8 @@ def test_reencrypt_dry_run_writes_checkpoint(tmp_path: Path):
     assert summary.records_targeted == 1
     cp = json.loads(checkpoint.read_text(encoding="utf-8"))
     assert cp["status"] == "dry_run"
+    assert cp["batch_size"] == 25
+    assert cp["idempotency_key"] == "ik-dry-001"
 
 
 def test_reencrypt_resume_completed_returns_without_changes(tmp_path: Path):
@@ -82,6 +86,7 @@ def test_reencrypt_resume_completed_returns_without_changes(tmp_path: Path):
             {
                 "tenant_id": "tenant-alpha",
                 "status": "completed",
+                "idempotency_key": "ik-001",
                 "files_targeted": 3,
                 "records_targeted": 9,
                 "files_rewritten": 3,
@@ -95,16 +100,64 @@ def test_reencrypt_resume_completed_returns_without_changes(tmp_path: Path):
         tenant_id="tenant-alpha",
         dry_run=False,
         resume=True,
-        data_dir=tmp_path / "cred",
-        checkpoint_path=checkpoint,
-        authority_dri="dri.approver",
-        authority_reason="resume run",
-        authority_signing_key="test-signing-key",
-    )
+            data_dir=tmp_path / "cred",
+            checkpoint_path=checkpoint,
+            idempotency_key="ik-001",
+            authority_dri="dri.approver",
+            authority_reason="resume run",
+            authority_signing_key="test-signing-key",
+        )
 
     assert summary.resumed is True
     assert summary.status == "completed"
     assert summary.records_reencrypted == 9
+
+
+def test_reencrypt_resume_rejects_mismatched_idempotency_key(tmp_path: Path):
+    checkpoint = tmp_path / "checkpoint.json"
+    checkpoint.write_text(
+        json.dumps(
+            {
+                "tenant_id": "tenant-alpha",
+                "status": "completed",
+                "idempotency_key": "ik-001",
+                "files_targeted": 1,
+                "records_targeted": 1,
+                "files_rewritten": 1,
+                "records_reencrypted": 1,
+            }
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="idempotency_key"):
+        run_reencrypt_job(
+            tenant_id="tenant-alpha",
+            dry_run=False,
+            resume=True,
+            data_dir=tmp_path / "cred",
+            checkpoint_path=checkpoint,
+            idempotency_key="ik-002",
+            authority_dri="dri.approver",
+            authority_reason="resume run",
+            authority_signing_key="test-signing-key",
+        )
+
+
+def test_reencrypt_rejects_invalid_batch_size(tmp_path: Path):
+    data_dir = tmp_path / "cred"
+    data_dir.mkdir(parents=True, exist_ok=True)
+    with pytest.raises(ValueError, match="batch_size must be > 0"):
+        run_reencrypt_job(
+            tenant_id="tenant-alpha",
+            dry_run=True,
+            resume=False,
+            data_dir=data_dir,
+            checkpoint_path=tmp_path / "checkpoint.json",
+            batch_size=0,
+            authority_dri="dri.approver",
+            authority_reason="policy",
+            authority_signing_key="test-signing-key",
+        )
 
 
 def test_rotate_keys_rejects_invalid_ttl(tmp_path: Path):

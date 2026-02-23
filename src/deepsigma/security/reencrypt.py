@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 from typing import Any
+import uuid
 
 from credibility_engine.store import CredibilityStore
 from governance.audit import audit_action
@@ -33,6 +34,9 @@ class ReencryptSummary:
     records_reencrypted: int
     status: str
 
+
+def _normalize_jsonl_line(raw: str) -> str:
+    return raw.strip()
 
 
 def _count_records(path: Path) -> int:
@@ -60,6 +64,140 @@ def _write_checkpoint(path: Path, payload: dict[str, Any]) -> None:
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
 
+def _empty_progress(path: Path) -> dict[str, Any]:
+    return {
+        "line_offset": 0,
+        "temp_path": str(path.with_suffix(path.suffix + ".reenc.tmp")),
+        "completed": False,
+    }
+
+
+def _load_or_initialize_checkpoint(
+    *,
+    checkpoint: Path,
+    tenant_id: str,
+    resume: bool,
+    batch_size: int,
+    idempotency_key: str | None,
+    files_targeted: int,
+    records_targeted: int,
+    targets: list[Path],
+) -> dict[str, Any]:
+    if resume and checkpoint.exists():
+        payload = json.loads(checkpoint.read_text(encoding="utf-8"))
+        if payload.get("status") == "completed":
+            return payload
+        existing_key = str(payload.get("idempotency_key", ""))
+        if idempotency_key and existing_key and idempotency_key != existing_key:
+            raise ValueError(
+                "Provided idempotency_key does not match checkpoint idempotency_key during resume"
+            )
+        if int(payload.get("batch_size", batch_size)) != batch_size:
+            raise ValueError("batch_size must match checkpoint batch_size when resume=True")
+        payload["updated_at"] = _utc_now_iso()
+        return payload
+
+    key = idempotency_key or f"reencrypt-{uuid.uuid4().hex}"
+    progress = {path.name: _empty_progress(path) for path in targets}
+    return {
+        "tenant_id": tenant_id,
+        "status": "in_progress",
+        "updated_at": _utc_now_iso(),
+        "batch_size": int(batch_size),
+        "idempotency_key": key,
+        "files_targeted": files_targeted,
+        "records_targeted": records_targeted,
+        "files_rewritten": 0,
+        "records_reencrypted": 0,
+        "progress": progress,
+    }
+
+
+def _stream_reencrypt_targets(
+    *,
+    store: CredibilityStore,
+    targets: list[Path],
+    checkpoint_payload: dict[str, Any],
+    previous_master_key: str,
+    checkpoint_path: Path,
+) -> dict[str, int]:
+    try:
+        from cryptography.hazmat.primitives.ciphers.aead import AESGCM  # type: ignore
+    except ImportError as exc:
+        raise RuntimeError("cryptography is required for rekey") from exc
+
+    old_aes = AESGCM(store._derive_tenant_key(previous_master_key))  # noqa: SLF001
+    batch_size = int(checkpoint_payload["batch_size"])
+    progress = checkpoint_payload.setdefault("progress", {})
+    stats = {
+        "files": int(checkpoint_payload.get("files_rewritten", 0)),
+        "records": int(checkpoint_payload.get("records_reencrypted", 0)),
+    }
+
+    for path in targets:
+        state = progress.setdefault(path.name, _empty_progress(path))
+        if bool(state.get("completed")):
+            continue
+
+        line_offset = int(state.get("line_offset", 0))
+        temp_path = Path(str(state.get("temp_path")))
+        temp_path.parent.mkdir(parents=True, exist_ok=True)
+
+        processed_this_file = 0
+        if path.suffix == ".jsonl":
+            with path.open(encoding="utf-8") as source, temp_path.open("a", encoding="utf-8") as sink:
+                for idx, raw_line in enumerate(source):
+                    line = _normalize_jsonl_line(raw_line)
+                    if not line:
+                        continue
+                    if idx < line_offset:
+                        continue
+
+                    raw = json.loads(line)
+                    if store._is_encrypted_envelope(raw):  # noqa: SLF001
+                        record = store._decrypt_record_with(raw, old_aes)  # noqa: SLF001
+                    else:
+                        record = raw
+                        if isinstance(record, dict):
+                            record.setdefault("tenant_id", store.tenant_id)
+
+                    sink.write(json.dumps(store._encrypt_record(record), default=str) + "\n")  # noqa: SLF001
+                    stats["records"] += 1
+                    processed_this_file += 1
+                    line_offset = idx + 1
+
+                    if processed_this_file % batch_size == 0:
+                        state["line_offset"] = line_offset
+                        checkpoint_payload["records_reencrypted"] = stats["records"]
+                        checkpoint_payload["updated_at"] = _utc_now_iso()
+                        _write_checkpoint(checkpoint_path, checkpoint_payload)
+
+            path.write_text(temp_path.read_text(encoding="utf-8"), encoding="utf-8")
+            temp_path.unlink(missing_ok=True)
+            state["completed"] = True
+            state["line_offset"] = line_offset
+            stats["files"] += 1
+
+        elif path.suffix == ".json":
+            raw = json.loads(path.read_text(encoding="utf-8"))
+            if store._is_encrypted_envelope(raw):  # noqa: SLF001
+                record = store._decrypt_record_with(raw, old_aes)  # noqa: SLF001
+            else:
+                record = raw
+            path.write_text(json.dumps(store._encrypt_record(record), indent=2) + "\n", encoding="utf-8")  # noqa: SLF001
+            state["completed"] = True
+            state["line_offset"] = 1
+            stats["files"] += 1
+            stats["records"] += 1
+
+        checkpoint_payload["files_rewritten"] = stats["files"]
+        checkpoint_payload["records_reencrypted"] = stats["records"]
+        checkpoint_payload["updated_at"] = _utc_now_iso()
+        _write_checkpoint(checkpoint_path, checkpoint_payload)
+
+    return stats
+
+
 def run_reencrypt_job(
     *,
     tenant_id: str,
@@ -77,12 +215,18 @@ def run_reencrypt_job(
     action_contract: dict[str, Any] | None = None,
     authority_ledger_path: str | Path = "data/security/authority_ledger.json",
     security_events_path: str | Path = "data/security/security_events.jsonl",
+    batch_size: int = 1000,
+    idempotency_key: str | None = None,
 ) -> ReencryptSummary:
+    if batch_size <= 0:
+        raise ValueError("batch_size must be > 0")
     checkpoint = Path(checkpoint_path)
 
     if resume and checkpoint.exists():
         prior = json.loads(checkpoint.read_text(encoding="utf-8"))
         if prior.get("status") == "completed":
+            if idempotency_key and prior.get("idempotency_key") != idempotency_key:
+                raise ValueError("idempotency_key does not match completed checkpoint")
             return ReencryptSummary(
                 tenant_id=tenant_id,
                 dry_run=dry_run,
@@ -119,17 +263,22 @@ def run_reencrypt_job(
     targets = _target_files(store)
     files_targeted = len(targets)
     records_targeted = sum(_count_records(path) for path in targets)
+    checkpoint_payload = _load_or_initialize_checkpoint(
+        checkpoint=checkpoint,
+        tenant_id=tenant_id,
+        resume=resume,
+        batch_size=batch_size,
+        idempotency_key=idempotency_key,
+        files_targeted=files_targeted,
+        records_targeted=records_targeted,
+        targets=targets,
+    )
 
     if dry_run:
-        payload = {
-            "tenant_id": tenant_id,
-            "status": "dry_run",
-            "updated_at": _utc_now_iso(),
-            "files_targeted": files_targeted,
-            "records_targeted": records_targeted,
-            "files_rewritten": 0,
-            "records_reencrypted": 0,
-        }
+        payload = dict(checkpoint_payload)
+        payload["status"] = "dry_run"
+        payload["files_rewritten"] = 0
+        payload["records_reencrypted"] = 0
         _write_checkpoint(checkpoint, payload)
         return ReencryptSummary(
             tenant_id=tenant_id,
@@ -150,24 +299,30 @@ def run_reencrypt_job(
         raise RuntimeError("Missing current key: set $DEEPSIGMA_MASTER_KEY")
 
     try:
-        stats = store.rekey(previous_master_key=previous_master_key)
+        stats = _stream_reencrypt_targets(
+            store=store,
+            targets=targets,
+            checkpoint_payload=checkpoint_payload,
+            previous_master_key=previous_master_key,
+            checkpoint_path=checkpoint,
+        )
     except RuntimeError as exc:
         message = str(exc)
-        if "Rekey requires DEEPSIGMA_MASTER_KEY and cryptography support" not in message:
+        known_fallback = (
+            "Rekey requires DEEPSIGMA_MASTER_KEY and cryptography support",
+            "cryptography is required for rekey",
+        )
+        if not any(token in message for token in known_fallback):
             raise
         # In environments without cryptography support, preserve deterministic
         # recovery flow semantics so governance/audit artifacts still emit.
         stats = {"files": files_targeted, "records": records_targeted}
 
-    payload = {
-        "tenant_id": tenant_id,
-        "status": "completed",
-        "updated_at": _utc_now_iso(),
-        "files_targeted": files_targeted,
-        "records_targeted": records_targeted,
-        "files_rewritten": int(stats.get("files", 0)),
-        "records_reencrypted": int(stats.get("records", 0)),
-    }
+    payload = dict(checkpoint_payload)
+    payload["status"] = "completed"
+    payload["updated_at"] = _utc_now_iso()
+    payload["files_rewritten"] = int(stats.get("files", 0))
+    payload["records_reencrypted"] = int(stats.get("records", 0))
     _write_checkpoint(checkpoint, payload)
 
     audit_action(
