@@ -1,16 +1,16 @@
 # Composite Release Comparison
 
-Latest release: `v2.0.4`
+Latest release: `v2.0.5`
 
-Compared to previous release: `v2.0.3`
+Compared to previous release: `v2.0.4`
 
 | KPI | Previous | Latest | Delta |
 |---|---:|---:|---:|
 | Technical Completeness | 10.00 | 10.00 | +0.00 |
-| Automation Depth | 6.00 | 10.00 | +4.00 |
-| Authority Modeling | 6.00 | 6.00 | +0.00 |
+| Automation Depth | 10.00 | 10.00 | +0.00 |
+| Authority Modeling | 6.15 | 6.15 | +0.00 |
 | Enterprise Readiness | 10.00 | 10.00 | +0.00 |
-| Scalability | 4.00 | 5.08 | +1.08 |
-| Data Integration | 8.00 | 8.22 | +0.22 |
-| Economic Measurability | 3.00 | 3.24 | +0.24 |
+| Scalability | 5.08 | 10.00 | +4.92 |
+| Data Integration | 8.38 | 8.38 | +0.00 |
+| Economic Measurability | 3.24 | 10.00 | +6.76 |
 | Operational Maturity | 10.00 | 10.00 | +0.00 |

@@ -1,10 +1,10 @@
-## Repo Radar KPI — v2.0.4
+## Repo Radar KPI — v2.0.5
 
 ![badge](release_kpis/badge_latest.svg)
 
 **Radar:**
-- PNG: `release_kpis/radar_v2.0.4.png`
-- SVG: `release_kpis/radar_v2.0.4.svg`
+- PNG: `release_kpis/radar_v2.0.5.png`
+- SVG: `release_kpis/radar_v2.0.5.svg`
 
 **Composite Release Radar:**
 - PNG: `release_kpis/radar_composite_latest.png`
