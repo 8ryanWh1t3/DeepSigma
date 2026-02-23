@@ -4,6 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![Release](https://img.shields.io/github/v/release/8ryanWh1t3/DeepSigma)](https://github.com/8ryanWh1t3/DeepSigma/releases/latest)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new/8ryanWh1t3/DeepSigma)
 
 <div align="center">
 
