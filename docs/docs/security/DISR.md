@@ -17,6 +17,7 @@ visible, reversible, and measurable under pilot conditions.
 - Key lifecycle policy: `docs/docs/security/KEY_LIFECYCLE.md`
 - Recovery runbook: `docs/docs/security/RECOVERY_RUNBOOK.md`
 - 10-minute demo: `docs/docs/security/DEMO_10_MIN.md`
+- Security audit export: `scripts/security_audit_pack.py` (`make security-audit-pack`)
 - Envelope migration plan: `docs/docs/security/ENVELOPE_VERSIONING.md`
 - Crypto envelope schema: `schemas/core/crypto_envelope.schema.json`
 - Crypto policy: `governance/security_crypto_policy.json`
