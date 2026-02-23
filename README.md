@@ -12,7 +12,6 @@ DeepSigma Core is the compressed adoption path focused on one wedge: Drift -> Pa
 
 - Deterministic Money Demo artifacts in `docs/examples/demo-stack/drift_patch_cycle_run/`
 - Contract test coverage for the demo (`tests/test_money_demo.py`)
-- Optional Excel-first demo test (`tests/test_excel_first_money_demo.py`)
 - Deterministic baseline proof report via:
 
 ```bash
@@ -34,10 +33,8 @@ make core-baseline
 
 - `run_money_demo.sh`
 - `src/coherence_ops/`
-- `src/demos/excel_first/`
 - `docs/examples/demo-stack/`
 - `tests/test_money_demo.py`
-- `tests/test_excel_first_money_demo.py`
 
 ## Enterprise Archive
 

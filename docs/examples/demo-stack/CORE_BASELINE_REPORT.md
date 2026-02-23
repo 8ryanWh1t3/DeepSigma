@@ -1,7 +1,7 @@
 # DeepSigma Core Baseline Report
 
 - Status: **PASS**
-- Generated (UTC): 2026-02-23T20:27:07.020914+00:00
+- Generated (UTC): 2026-02-23T20:34:53.160005+00:00
 - Python: 3.11.7
 - Platform: macOS-26.3-arm64-arm-64bit
 
@@ -15,6 +15,6 @@
 - `docs/examples/demo-stack/drift_patch_cycle_run/memory_graph_before.json`: `c14abbb14887e3800e38c339ebb4338e6411f2aabaf01689a4622c84311f8e37`
 - `docs/examples/demo-stack/drift_patch_cycle_run/memory_graph_diff.json`: `2beaf8d738efe49fcd6263197525105735b5b0d7ba4681e3e4c652a7536e6429`
 - `docs/examples/demo-stack/drift_patch_cycle_run/memory_graph_drift.json`: `1f3be0301a1736bb1fffb81290ba5b1b6ae98b3301bed86dfa631c994f900149`
-- `docs/examples/demo-stack/drift_patch_cycle_run/report_after.json`: `77f39a402564f9419f01b907a05799f7b7f738ed0339cdab21d98d5d73d83511`
-- `docs/examples/demo-stack/drift_patch_cycle_run/report_baseline.json`: `aedfca0667d56dc1c2f682c3f853af7ac2fea8076df4bccfd5dc8c5627638abe`
-- `docs/examples/demo-stack/drift_patch_cycle_run/report_drift.json`: `d1e8495690500aea8be684ff2f635a0aeb316a44bf16ba6fb253e33abac4c70d`
+- `docs/examples/demo-stack/drift_patch_cycle_run/report_after.json`: `1dfbbbc9fca329a413f5dc9aeef9e0932a1a2b9e7781d15ddf0317ec129c12b7`
+- `docs/examples/demo-stack/drift_patch_cycle_run/report_baseline.json`: `249ced23ec6b980ec3ca8fc5d6c432402562a028cf4c7ee2ca498ece3573d456`
+- `docs/examples/demo-stack/drift_patch_cycle_run/report_drift.json`: `5db9b13ede3c4c76925bb7073ba748884c5b0b39953e821429b9745b3c1e5b19`

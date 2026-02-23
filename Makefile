@@ -1,4 +1,4 @@
-.PHONY: demo core-demo core-baseline test-money test-excel
+.PHONY: demo core-demo core-baseline test-money
 
 demo:
 	bash run_money_demo.sh
@@ -11,6 +11,3 @@ core-baseline:
 
 test-money:
 	python -m pytest tests/test_money_demo.py -q
-
-test-excel:
-	python -m pytest tests/test_excel_first_money_demo.py -q
