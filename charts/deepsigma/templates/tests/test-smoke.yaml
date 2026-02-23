@@ -15,5 +15,5 @@ spec:
       args:
         - >-
           set -euo pipefail;
-          curl -fsS "http://{{ include "deepsigma.fullname" . }}:{{ .Values.service.port }}/healthz";
-          curl -fsS "http://{{ include "deepsigma.fullname" . }}:{{ .Values.service.port }}/api/health";
+          curl -fsS "http://{{ include "deepsigma.componentName" (dict "component" "dashboard" "Chart" .Chart "Release" .Release "Values" .Values) }}:{{ .Values.dashboard.service.port }}/healthz";
+          curl -fsS "http://{{ include "deepsigma.componentName" (dict "component" "api" "Chart" .Chart "Release" .Release "Values" .Values) }}:{{ .Values.api.service.port }}/api/health";

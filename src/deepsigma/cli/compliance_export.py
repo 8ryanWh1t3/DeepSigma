@@ -13,10 +13,10 @@ from typing import Any
 from credibility_engine.store import CredibilityStore
 from governance import audit as audit_mod
 from tenancy import policies as policy_mod
-from tenancy.rbac import VALID_ROLES
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 TENANT_REGISTRY_PATH = Path(__file__).resolve().parents[2] / "data" / "tenants.json"
+VALID_ROLES = ("truth_owner", "coherence_steward", "dri", "exec")
 REDACTED = "[REDACTED]"
 EMAIL_RE = re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b")
 

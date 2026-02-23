@@ -1,7 +1,13 @@
 DeepSigma installed.
 
-Check service:
-  kubectl get svc {{ include "deepsigma.fullname" . }}
+Check services:
+  kubectl get svc {{ include "deepsigma.componentName" (dict "component" "api" "Chart" .Chart "Release" .Release "Values" .Values) }}
+  kubectl get svc {{ include "deepsigma.componentName" (dict "component" "dashboard" "Chart" .Chart "Release" .Release "Values" .Values) }}
+
+{{- if .Values.ingress.enabled }}
+Ingress:
+  kubectl get ingress {{ include "deepsigma.fullname" . }}
+{{- end }}
 
 Run smoke tests:
   helm test {{ .Release.Name }}

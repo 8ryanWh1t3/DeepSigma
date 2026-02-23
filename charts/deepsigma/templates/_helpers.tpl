@@ -28,6 +28,15 @@ app.kubernetes.io/name: {{ include "deepsigma.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
+{{- define "deepsigma.componentLabels" -}}
+{{ include "deepsigma.selectorLabels" . }}
+app.kubernetes.io/component: {{ .component }}
+{{- end }}
+
+{{- define "deepsigma.componentName" -}}
+{{ include "deepsigma.fullname" . }}-{{ .component }}
+{{- end }}
+
 {{- define "deepsigma.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
 {{- default (include "deepsigma.fullname" .) .Values.serviceAccount.name }}
