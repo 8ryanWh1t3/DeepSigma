@@ -13,7 +13,7 @@ from governance.audit import audit_action
 
 from .action_contract import create_action_contract, validate_action_contract
 from .authority_ledger import append_authority_action_entry
-from .events import append_security_event
+from .events import EVENT_KEY_ROTATED, append_security_event
 from .keyring import Keyring, KeyVersionRecord
 
 
@@ -59,6 +59,7 @@ def rotate_keys(
     keyring_path: str | Path = "data/security/keyring.json",
     event_log_path: str | Path = "data/security/key_rotation_events.jsonl",
     authority_ledger_path: str | Path = "data/security/authority_ledger.json",
+    security_events_path: str | Path = "data/security/security_events.jsonl",
     now_fn: Callable[[], datetime] = _utc_now,
 ) -> RotationResult:
     if ttl_days <= 0:
@@ -109,7 +110,7 @@ def rotate_keys(
         handle.write(json.dumps(payload, sort_keys=True) + "\n")
 
     security_event = append_security_event(
-        event_type="AUTHORIZED_KEY_ROTATION",
+        event_type=EVENT_KEY_ROTATED,
         tenant_id=tenant_id,
         payload={
             "key_id": record.key_id,
@@ -122,6 +123,7 @@ def rotate_keys(
             "authority_reason": authority_reason,
             "action_contract_id": validated_contract.action_id,
         },
+        events_path=security_events_path,
         signer_id=authority_dri,
         signing_key=authority_signing_key,
     )

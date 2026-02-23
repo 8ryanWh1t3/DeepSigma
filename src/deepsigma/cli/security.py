@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 
+from deepsigma.security.events import EVENT_PROVIDER_CHANGED, append_security_event, query_security_events
 from deepsigma.security.reencrypt import reencrypt_summary_to_dict, run_reencrypt_job
 from deepsigma.security.rotate_keys import rotate_keys, rotation_result_to_dict
 
@@ -38,6 +39,11 @@ def register(subparsers: argparse._SubParsersAction) -> None:
         "--authority-ledger-path",
         default="data/security/authority_ledger.json",
         help="Path to append authority ledger entries",
+    )
+    rotate.add_argument(
+        "--security-events-path",
+        default="data/security/security_events.jsonl",
+        help="Path to append sealed security events",
     )
     rotate.add_argument("--keyring-path", default="data/security/keyring.json", help="Path to keyring JSON")
     rotate.add_argument(
@@ -79,12 +85,39 @@ def register(subparsers: argparse._SubParsersAction) -> None:
         help="Path to append authority ledger entries",
     )
     reenc.add_argument(
+        "--security-events-path",
+        default="data/security/security_events.jsonl",
+        help="Path to append sealed security events",
+    )
+    reenc.add_argument(
         "--action-contract-path",
         default=None,
         help="Optional JSON file with signed authority action contract",
     )
     reenc.add_argument("--json", action="store_true", help="Output JSON")
     reenc.set_defaults(func=run_reencrypt)
+
+    events = sp.add_parser("events", help="Query sealed security events")
+    events.add_argument("--events-path", default="data/security/security_events.jsonl", help="Path to security event log")
+    events.add_argument("--tenant", default=None, help="Optional tenant filter")
+    events.add_argument("--event-type", default=None, help="Optional event type filter")
+    events.add_argument("--limit", type=int, default=50, help="Max events to print")
+    events.add_argument("--json", action="store_true", help="Output JSON")
+    events.set_defaults(func=run_events)
+
+    provider_changed = sp.add_parser("provider-changed", help="Emit PROVIDER_CHANGED security event")
+    provider_changed.add_argument("--tenant", required=True, help="Tenant ID")
+    provider_changed.add_argument("--previous-provider", required=True, help="Previous provider name")
+    provider_changed.add_argument("--current-provider", required=True, help="Current provider name")
+    provider_changed.add_argument("--reason", default="manual_change", help="Reason for provider switch")
+    provider_changed.add_argument("--events-path", default="data/security/security_events.jsonl", help="Path to security event log")
+    provider_changed.add_argument(
+        "--authority-signing-key-env",
+        default="DEEPSIGMA_AUTHORITY_SIGNING_KEY",
+        help="Env var for optional HMAC signing key",
+    )
+    provider_changed.add_argument("--json", action="store_true", help="Output JSON")
+    provider_changed.set_defaults(func=run_provider_changed)
 
 
 def _load_action_contract(path: str | None) -> dict | None:
@@ -114,6 +147,7 @@ def run_rotate(args: argparse.Namespace) -> int:
         keyring_path=Path(args.keyring_path),
         event_log_path=Path(args.event_log_path),
         authority_ledger_path=Path(args.authority_ledger_path),
+        security_events_path=Path(args.security_events_path),
     )
     payload = rotation_result_to_dict(result)
     if args.json:
@@ -144,6 +178,7 @@ def run_reencrypt(args: argparse.Namespace) -> int:
         authority_signing_key=signing_key,
         action_contract=action_contract,
         authority_ledger_path=Path(args.authority_ledger_path),
+        security_events_path=Path(args.security_events_path),
     )
     payload = reencrypt_summary_to_dict(summary)
     if args.json:
@@ -153,4 +188,60 @@ def run_reencrypt(args: argparse.Namespace) -> int:
             f"Reencrypt status={payload['status']} tenant={payload['tenant_id']} "
             f"targeted={payload['records_targeted']} rewritten={payload['records_reencrypted']}"
         )
+    return 0
+
+
+def run_events(args: argparse.Namespace) -> int:
+    events = query_security_events(
+        events_path=Path(args.events_path),
+        event_type=args.event_type,
+        tenant_id=args.tenant,
+    )
+    rows = events[-args.limit :] if args.limit > 0 else events
+    payload = [
+        {
+            "event_id": event.event_id,
+            "event_type": event.event_type,
+            "tenant_id": event.tenant_id,
+            "occurred_at": event.occurred_at,
+            "event_hash": event.event_hash,
+            "prev_hash": event.prev_hash,
+        }
+        for event in rows
+    ]
+    if args.json:
+        print(json.dumps(payload, indent=2))
+    else:
+        print(f"events={len(payload)}")
+        for row in payload:
+            print(f"{row['occurred_at']} {row['event_type']} {row['event_id']} {row['tenant_id']}")
+    return 0
+
+
+def run_provider_changed(args: argparse.Namespace) -> int:
+    signing_key = os.getenv(args.authority_signing_key_env)
+    event = append_security_event(
+        event_type=EVENT_PROVIDER_CHANGED,
+        tenant_id=args.tenant,
+        payload={
+            "previous_provider": args.previous_provider,
+            "current_provider": args.current_provider,
+            "reason": args.reason,
+            "source": "security.cli",
+        },
+        events_path=Path(args.events_path),
+        signer_id="security-cli",
+        signing_key=signing_key,
+    )
+    payload = {
+        "event_id": event.event_id,
+        "event_type": event.event_type,
+        "tenant_id": event.tenant_id,
+        "occurred_at": event.occurred_at,
+        "event_hash": event.event_hash,
+    }
+    if args.json:
+        print(json.dumps(payload, indent=2))
+    else:
+        print(f"Provider change recorded event={event.event_id} hash={event.event_hash}")
     return 0

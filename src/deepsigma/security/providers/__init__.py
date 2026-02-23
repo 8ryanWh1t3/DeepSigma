@@ -67,6 +67,12 @@ def provider_from_policy(
     *,
     default: str = "local-keystore",
     provider_overrides: dict[str, Any] | None = None,
+    emit_change_event: bool = False,
+    previous_provider: str | None = None,
+    tenant_id: str = "tenant-alpha",
+    events_path: str = "data/security/security_events.jsonl",
+    signer_id: str | None = None,
+    signing_key: str | None = None,
 ) -> CryptoProvider:
     """Create provider selected by policy name, with optional per-provider kwargs."""
     name = resolve_provider_name(policy, default=default)
@@ -74,6 +80,23 @@ def provider_from_policy(
     kwargs = overrides.get(name, {})
     if not isinstance(kwargs, dict):
         raise ValueError(f"provider_overrides[{name}] must be a mapping")
+
+    if emit_change_event and previous_provider and _normalize_name(previous_provider) != name:
+        from ..events import EVENT_PROVIDER_CHANGED, append_security_event
+
+        append_security_event(
+            event_type=EVENT_PROVIDER_CHANGED,
+            tenant_id=tenant_id,
+            payload={
+                "previous_provider": _normalize_name(previous_provider),
+                "current_provider": name,
+                "source": "policy_resolution",
+            },
+            events_path=events_path,
+            signer_id=signer_id,
+            signing_key=signing_key,
+        )
+
     return create_provider(name, **kwargs)
 
 

@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://sigma-overwatch.dev/schemas/security_event.schema.json",
+  "title": "Security Event",
+  "type": "object",
+  "required": [
+    "event_id",
+    "event_type",
+    "tenant_id",
+    "occurred_at",
+    "payload",
+    "event_hash"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "KEY_ROTATED",
+        "NONCE_REUSE_DETECTED",
+        "REENCRYPT_DONE",
+        "PROVIDER_CHANGED",
+        "AUTHORIZED_KEY_ROTATION",
+        "REENCRYPT_COMPLETED"
+      ]
+    },
+    "tenant_id": {
+      "type": "string"
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "payload": {
+      "type": "object"
+    },
+    "prev_hash": {
+      "type": ["string", "null"]
+    },
+    "event_hash": {
+      "type": "string"
+    },
+    "signer_id": {
+      "type": ["string", "null"]
+    },
+    "signature": {
+      "type": ["string", "null"]
+    },
+    "signature_alg": {
+      "type": ["string", "null"]
+    }
+  },
+  "additionalProperties": false
+}

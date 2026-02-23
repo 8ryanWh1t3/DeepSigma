@@ -2,7 +2,15 @@
 
 from .authority_ledger import append_authority_rotation_entry
 from .action_contract import ActionContract, create_action_contract, validate_action_contract
-from .events import SecurityEvent, append_security_event
+from .events import (
+    EVENT_KEY_ROTATED,
+    EVENT_NONCE_REUSE_DETECTED,
+    EVENT_PROVIDER_CHANGED,
+    EVENT_REENCRYPT_DONE,
+    SecurityEvent,
+    append_security_event,
+    query_security_events,
+)
 from .keyring import Keyring, KeyVersionRecord
 from .providers import (
     available_providers,
@@ -25,6 +33,11 @@ __all__ = [
     "SecurityEvent",
     "available_providers",
     "append_security_event",
+    "query_security_events",
+    "EVENT_KEY_ROTATED",
+    "EVENT_NONCE_REUSE_DETECTED",
+    "EVENT_REENCRYPT_DONE",
+    "EVENT_PROVIDER_CHANGED",
     "append_authority_rotation_entry",
     "ActionContract",
     "create_action_contract",

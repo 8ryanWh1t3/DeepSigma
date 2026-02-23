@@ -14,7 +14,7 @@ from governance.audit import audit_action
 
 from .action_contract import create_action_contract, validate_action_contract
 from .authority_ledger import append_authority_action_entry
-from .events import append_security_event
+from .events import EVENT_REENCRYPT_DONE, append_security_event
 
 
 def _utc_now_iso() -> str:
@@ -76,6 +76,7 @@ def run_reencrypt_job(
     authority_signing_key: str | None = None,
     action_contract: dict[str, Any] | None = None,
     authority_ledger_path: str | Path = "data/security/authority_ledger.json",
+    security_events_path: str | Path = "data/security/security_events.jsonl",
 ) -> ReencryptSummary:
     checkpoint = Path(checkpoint_path)
 
@@ -187,7 +188,7 @@ def run_reencrypt_job(
     )
 
     security_event = append_security_event(
-        event_type="REENCRYPT_COMPLETED",
+        event_type=EVENT_REENCRYPT_DONE,
         tenant_id=tenant_id,
         payload={
             "files_rewritten": payload["files_rewritten"],
@@ -200,6 +201,7 @@ def run_reencrypt_job(
             "authority_reason": authority_reason,
             "action_contract_id": validated_contract.action_id,
         },
+        events_path=security_events_path,
         signer_id=authority_dri,
         signing_key=authority_signing_key,
     )

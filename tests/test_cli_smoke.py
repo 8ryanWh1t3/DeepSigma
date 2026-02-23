@@ -209,3 +209,44 @@ class TestSecurityCLI:
         assert payload["status"] == "dry_run"
         assert payload["records_targeted"] == 1
         assert checkpoint.exists()
+
+    def test_security_provider_changed_and_query(self, tmp_path, capsys, monkeypatch):
+        from deepsigma.cli.main import main
+
+        events_path = tmp_path / "security_events.jsonl"
+        monkeypatch.setenv("DEEPSIGMA_AUTHORITY_SIGNING_KEY", "test-signing-key")
+
+        rc = main(
+            [
+                "security",
+                "provider-changed",
+                "--tenant",
+                "tenant-alpha",
+                "--previous-provider",
+                "gcp-kms",
+                "--current-provider",
+                "local-keystore",
+                "--events-path",
+                str(events_path),
+                "--json",
+            ]
+        )
+        assert rc == 0
+        payload = json.loads(capsys.readouterr().out)
+        assert payload["event_type"] == "PROVIDER_CHANGED"
+
+        rc = main(
+            [
+                "security",
+                "events",
+                "--events-path",
+                str(events_path),
+                "--event-type",
+                "PROVIDER_CHANGED",
+                "--json",
+            ]
+        )
+        assert rc == 0
+        listed = json.loads(capsys.readouterr().out)
+        assert len(listed) == 1
+        assert listed[0]["event_type"] == "PROVIDER_CHANGED"

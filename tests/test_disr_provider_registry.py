@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
+import json
 
 import pytest
 
@@ -84,6 +85,25 @@ def test_provider_from_policy_uses_overrides(monkeypatch: pytest.MonkeyPatch, tm
     )
     record = provider.create_key_version("credibility")
     assert record.key_version == 1
+
+
+def test_provider_from_policy_emits_provider_changed_event(monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:
+    monkeypatch.delenv("DEEPSIGMA_CRYPTO_PROVIDER", raising=False)
+    events_path = tmp_path / "security_events.jsonl"
+    provider = provider_from_policy(
+        {"security": {"crypto_provider": "local-keystore"}},
+        provider_overrides={"local-keystore": {"path": tmp_path / "local_keystore.json", "now_fn": _now}},
+        emit_change_event=True,
+        previous_provider="gcp-kms",
+        tenant_id="tenant-alpha",
+        events_path=str(events_path),
+    )
+    assert provider.name == "local-keystore"
+    rows = [json.loads(line) for line in events_path.read_text(encoding="utf-8").splitlines()]
+    assert len(rows) == 1
+    assert rows[0]["event_type"] == "PROVIDER_CHANGED"
+    assert rows[0]["payload"]["previous_provider"] == "gcp-kms"
+    assert rows[0]["payload"]["current_provider"] == "local-keystore"
 
 
 def test_local_keyring_provider_lifecycle(tmp_path) -> None:
