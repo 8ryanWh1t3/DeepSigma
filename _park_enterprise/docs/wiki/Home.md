@@ -115,12 +115,46 @@ Captures AI interaction exhaust (prompts, completions, tool calls, metrics) and 
 
 | Asset | Link |
 |------|------|
-| Latest release notes | [v2.0.6](../release/RELEASE_NOTES_v2.0.6.md) |
-| KPI composite radar | [release_kpis/radar_composite_latest.png](../../release_kpis/radar_composite_latest.png) |
-| KPI delta table | [release_kpis/radar_composite_latest.md](../../release_kpis/radar_composite_latest.md) |
-| TEC summary (C-TEC v1.0) | [release_kpis/TEC_SUMMARY.md](../../release_kpis/TEC_SUMMARY.md) |
-| Mermaid canonical index | [docs/mermaid/README.md](../mermaid/README.md) |
-| Mermaid archive index | [docs/archive/mermaid/ARCHIVE_INDEX.md](../archive/mermaid/ARCHIVE_INDEX.md) |
+| Latest release notes | [v2.0.6](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/docs/release/RELEASE_NOTES_v2.0.6.md) |
+| KPI composite radar | [release_kpis/radar_composite_latest.png](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/release_kpis/radar_composite_latest.png) |
+| KPI delta table | [release_kpis/radar_composite_latest.md](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/release_kpis/radar_composite_latest.md) |
+| TEC summary (C-TEC v1.0) | [release_kpis/TEC_SUMMARY.md](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/release_kpis/TEC_SUMMARY.md) |
+| Mermaid canonical index | [docs/mermaid/README.md](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/docs/mermaid/README.md) |
+| Mermaid archive index | [docs/archive/mermaid/ARCHIVE_INDEX.md](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/docs/archive/mermaid/ARCHIVE_INDEX.md) |
+
+---
+## Repository Structure (`_park_enterprise`)
+
+```text
+_park_enterprise/
+├─ artifacts/          # Sealed runs, templates, verifier bundles, authority ledger
+├─ charts/             # Helm and deployment chart assets
+├─ core_output/        # Core demo/runtime output pipeline stages
+├─ dashboard/          # UI and dashboard services
+├─ docker/             # Container build and runtime definitions
+├─ docs/               # Enterprise documentation set
+│  ├─ wiki/            # GitHub wiki source pages
+│  ├─ mermaid/         # Canonical architecture/runtime diagrams
+│  ├─ archive/         # Historical/archived design materials
+│  ├─ release/         # Release notes and release documentation
+│  ├─ examples/        # Demo and reference examples
+│  └─ cookbook/        # Operational and integration recipes
+├─ governance/         # Governance specs and operating artifacts
+├─ ops/                # Monitoring/ops config (Grafana, Prometheus, etc.)
+├─ pilot/              # Pilot data: assumptions, decisions, drift, patches, reports
+├─ prompts/            # Prompt packs and prompt OS material
+├─ release_kpis/       # KPI exports and telemetry summaries
+├─ roadmap/            # Issue and milestone planning assets
+├─ schemas/            # JSON Schema catalog (core + prompt_os + reconstruct)
+├─ scripts/            # Tooling and automation scripts
+├─ specs/              # Legacy/compatibility specs
+├─ src/                # Enterprise Python packages and modules
+└─ tests/              # Enterprise test suites and fixtures
+```
+
+Source of truth:
+- Wiki source files: `_park_enterprise/docs/wiki/*.md`
+- Enterprise docs root: `_park_enterprise/docs/`
 
 ---
 

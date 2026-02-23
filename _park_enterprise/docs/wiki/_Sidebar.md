@@ -38,9 +38,9 @@
 - **Ops**
   - [Operations](Operations)
   - [SLOs & Metrics](SLOs-and-Metrics)
-  - [Release Notes v2.0.6](../release/RELEASE_NOTES_v2.0.6.md)
-  - [Repo Radar Composite](../../release_kpis/radar_composite_latest.png)
-  - [TEC Summary](../../release_kpis/TEC_SUMMARY.md)
+  - [Release Notes v2.0.6](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/docs/release/RELEASE_NOTES_v2.0.6.md)
+  - [Repo Radar Composite](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/release_kpis/radar_composite_latest.png)
+  - [TEC Summary](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/release_kpis/TEC_SUMMARY.md)
   - [Replay & Testing](Replay-and-Testing)
 - **Excel-First**
   - [Creative Director Suite](Creative-Director-Suite)

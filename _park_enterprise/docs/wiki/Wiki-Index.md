@@ -51,12 +51,12 @@ Canonical wiki structure for Sigma OVERWATCH / DeepSigma docs.
 
 ## Release + Evidence
 
-- [Release Notes v2.0.6](../release/RELEASE_NOTES_v2.0.6.md)
-- [Repo Radar Composite](../../release_kpis/radar_composite_latest.png)
-- [Repo Radar Delta](../../release_kpis/radar_composite_latest.md)
-- [TEC Summary](../../release_kpis/TEC_SUMMARY.md)
-- [Mermaid Canonical Index](../mermaid/README.md)
-- [Mermaid Archive Index](../archive/mermaid/ARCHIVE_INDEX.md)
+- [Release Notes v2.0.6](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/docs/release/RELEASE_NOTES_v2.0.6.md)
+- [Repo Radar Composite](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/release_kpis/radar_composite_latest.png)
+- [Repo Radar Delta](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/release_kpis/radar_composite_latest.md)
+- [TEC Summary](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/release_kpis/TEC_SUMMARY.md)
+- [Mermaid Canonical Index](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/docs/mermaid/README.md)
+- [Mermaid Archive Index](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/docs/archive/mermaid/ARCHIVE_INDEX.md)
 
 ## Domain Packs
 

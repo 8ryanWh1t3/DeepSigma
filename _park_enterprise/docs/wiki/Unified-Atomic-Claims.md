@@ -6,8 +6,8 @@
 >
 > A **Claim** is the indivisible unit of asserted truth. It is the atom from which every governance structure is composed. Before Claims existed as a first-class primitive, truth lived in scattered places — inside episode context blobs, provenance chains, evidence ref arrays, and freeform content objects. Claims unify all of this into a single, validated, decaying, graph-linked, sealable object.
 >
-> **Schema**: [`specs/claim.schema.json`](../specs/claim.schema.json)
-> **Docs**: [`docs/19-claim-primitive.md`](../docs/19-claim-primitive.md)
+> **Schema**: [`specs/claim.schema.json`](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/schemas/core/claim.schema.json)
+> **Docs**: [`docs/19-claim-primitive.md`](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/docs/19-claim-primitive.md)
 >
 > ## Anatomy of a Claim
 >
@@ -75,8 +75,8 @@
 >      
 >       4. Each `claimRef` carries a **decision-time snapshot**: the claim's confidence, statusLight, truthType, and freshness *at the moment the decision was made*. This means audit works even after claims expire or get superseded.
 >      
->       5. **Schema**: [`specs/dlr.schema.json`](../specs/dlr.schema.json)
->       6. **Docs**: [`docs/20-dlr-claim-native.md`](../docs/20-dlr-claim-native.md)
+>       5. **Schema**: [`specs/dlr.schema.json`](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/schemas/core/dlr.schema.json)
+>       6. **Docs**: [`docs/20-dlr-claim-native.md`](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/docs/20-dlr-claim-native.md)
 >      
 >       7. ## Composability
 >
@@ -94,7 +94,7 @@
 >
 > ## Diagrams
 >
-> See [`archive/mermaid/27-claim-primitive.md`](../archive/mermaid/27-claim-primitive.md) and [`archive/mermaid/28-dlr-claim-native.md`](../archive/mermaid/28-dlr-claim-native.md) for visual architecture.
+> See [`archive/mermaid/27-claim-primitive.md`](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/docs/archive/mermaid/27-claim-primitive.md) and [`archive/mermaid/28-dlr-claim-native.md`](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/docs/archive/mermaid/28-dlr-claim-native.md) for visual architecture.
 >
 > ## Related Pages
 >

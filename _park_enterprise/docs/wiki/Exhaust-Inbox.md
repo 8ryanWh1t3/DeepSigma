@@ -64,7 +64,7 @@ When enabled, the `LLMExtractor` in `engine/exhaust_llm_extractor.py` builds a t
 
 Set `EXHAUST_USE_LLM=0` at any time to revert to rule-based without redeploying.
 
-See also: [`engine/exhaust_llm_extractor.py`](../engine/exhaust_llm_extractor.py) and the [LLM extraction cookbook](../cookbook/exhaust/llm_extraction/).
+See also: [`engine/exhaust_llm_extractor.py`](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/src/engine/exhaust_llm_extractor.py) and the [LLM extraction cookbook](https://github.com/8ryanWh1t3/DeepSigma/tree/main/_park_enterprise/docs/cookbook/exhaust/llm_extraction/).
 
 ## Ingestion Wedges
 
@@ -83,7 +83,7 @@ handler = ExhaustCallbackHandler(
 chain.invoke(input, config={"callbacks": [handler]})
 ```
 
-See: [`adapters/langchain_exhaust.py`](../adapters/langchain_exhaust.py)
+See: [`adapters/langchain_exhaust.py`](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/src/adapters/langchain_exhaust.py)
 
 ### B) Anthropic Direct
 
@@ -99,7 +99,7 @@ python -m adapters.anthropic_exhaust \
     --dry-run          # preview without POSTing
 ```
 
-See: [`adapters/anthropic_exhaust.py`](../adapters/anthropic_exhaust.py)
+See: [`adapters/anthropic_exhaust.py`](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/src/adapters/anthropic_exhaust.py)
 
 ### C) Azure / OpenAI Batch
 
@@ -111,7 +111,7 @@ python -m adapters.azure_openai_exhaust \
     --project my-project
 ```
 
-See: [`adapters/azure_openai_exhaust.py`](../adapters/azure_openai_exhaust.py)
+See: [`adapters/azure_openai_exhaust.py`](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/src/adapters/azure_openai_exhaust.py)
 
 ## Episode Lifecycle
 
@@ -214,10 +214,10 @@ Four Mermaid diagrams cover the full Exhaust Inbox architecture:
 
 | Diagram | Contents |
 |---------|----------|
-| [`archive/mermaid/29-exhaust-inbox-pipeline.md`](../archive/mermaid/29-exhaust-inbox-pipeline.md) | Full pipeline (graph TB), bucket extraction detail (flowchart), episode state machine (stateDiagram) |
-| [`archive/mermaid/29-exhaust-connector-map.md`](../archive/mermaid/29-exhaust-connector-map.md) | Adapter ecosystem (graph LR), Source enum mapping, LangChain metric enrichment |
-| [`archive/mermaid/29-exhaust-api-surface.md`](../archive/mermaid/29-exhaust-api-surface.md) | All 10 endpoints (graph TD), refine→commit sequence diagram, status codes |
-| [`archive/mermaid/29-llm-extraction-flow.md`](../archive/mermaid/29-llm-extraction-flow.md) | LLMExtractor internals (flowchart), API call sequence, confidence clamping, system prompt |
+| [`archive/mermaid/29-exhaust-inbox-pipeline.md`](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/docs/archive/mermaid/29-exhaust-inbox-pipeline.md) | Full pipeline (graph TB), bucket extraction detail (flowchart), episode state machine (stateDiagram) |
+| [`archive/mermaid/29-exhaust-connector-map.md`](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/docs/archive/mermaid/29-exhaust-connector-map.md) | Adapter ecosystem (graph LR), Source enum mapping, LangChain metric enrichment |
+| [`archive/mermaid/29-exhaust-api-surface.md`](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/docs/archive/mermaid/29-exhaust-api-surface.md) | All 10 endpoints (graph TD), refine→commit sequence diagram, status codes |
+| [`archive/mermaid/29-llm-extraction-flow.md`](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/docs/archive/mermaid/29-llm-extraction-flow.md) | LLMExtractor internals (flowchart), API call sequence, confidence clamping, system prompt |
 
 ## Related Pages
 

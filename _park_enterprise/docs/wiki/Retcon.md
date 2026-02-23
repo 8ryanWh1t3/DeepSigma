@@ -8,7 +8,7 @@
 >
 > The key principle: **the original claim is never deleted or overwritten**. It remains in the graph with its full history intact. The Retcon creates a new claim, sets `graph.supersedes` to point at the original, and records the full rationale for the correction.
 >
-> **Schema**: [`specs/retcon.schema.json`](../specs/retcon.schema.json)
+> **Schema**: [`specs/retcon.schema.json`](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/schemas/core/retcon.schema.json)
 >
 > ## Retcon vs Patch
 >
