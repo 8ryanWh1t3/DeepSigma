@@ -1,0 +1,39 @@
+{
+  "schema": "kpi_bands_v1",
+  "version": "v2.0.6",
+  "bands": {
+    "technical_completeness": {
+      "low": 9.75,
+      "high": 10.0
+    },
+    "automation_depth": {
+      "low": 9.75,
+      "high": 10.0
+    },
+    "authority_modeling": {
+      "low": 5.9,
+      "high": 6.4
+    },
+    "enterprise_readiness": {
+      "low": 9.75,
+      "high": 10.0
+    },
+    "scalability": {
+      "low": 4.83,
+      "high": 5.33
+    },
+    "data_integration": {
+      "low": 8.13,
+      "high": 8.63
+    },
+    "economic_measurability": {
+      "low": 3.99,
+      "high": 4.49
+    },
+    "operational_maturity": {
+      "low": 9.75,
+      "high": 10.0
+    }
+  },
+  "formula": "half_width=(1-confidence)*2.5"
+}

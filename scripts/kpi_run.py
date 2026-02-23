@@ -42,6 +42,7 @@ def main() -> int:
             "release_kpis/badge_latest.svg",
         ]
     )
+    subprocess.check_call(["python", "scripts/kpi_confidence_bands.py"])
 
     # Gate + history update.
     subprocess.check_call(["python", "scripts/kpi_gate.py"])
@@ -94,6 +95,11 @@ def main() -> int:
 **Gates:**
 - `release_kpis/KPI_GATE_REPORT.md`
 - `release_kpis/ISSUE_LABEL_GATE_REPORT.md`
+
+**Eligibility + Confidence:**
+- Eligibility tiers: `governance/kpi_eligibility.json`
+- KPI confidence: `release_kpis/kpi_confidence.json`
+- KPI bands: `release_kpis/kpi_bands_{version}.json`
 
 **TEC (ROM):**
 - Internal: {tec_internal_data["base"]["hours"]} hrs | ${int(tec_internal_data["base"]["cost"]):,}

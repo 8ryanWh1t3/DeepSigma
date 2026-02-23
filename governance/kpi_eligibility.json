@@ -1,0 +1,52 @@
+{
+  "schema": "kpi_eligibility_v1",
+  "tiers": {
+    "unverified": {"max_score": 3.0, "confidence": 0.30},
+    "simulated": {"max_score": 6.0, "confidence": 0.45},
+    "real": {"max_score": 8.5, "confidence": 0.70},
+    "production": {"max_score": 10.0, "confidence": 0.90}
+  },
+  "tier_order": ["unverified", "simulated", "real", "production"],
+  "kpis": {
+    "technical_completeness": {
+      "simulated": ["scripts/compute_ci.py", "tests"],
+      "real": ["release_kpis/issues_all.json", "release_kpis/prs_merged.json"],
+      "production": [".github/workflows/ci.yml", "release_kpis/KPI_GATE_REPORT.md"]
+    },
+    "automation_depth": {
+      "simulated": [".github/workflows/kpi.yml", "scripts/kpi_run.py"],
+      "real": [".github/workflows/kpi_gate.yml", "release_kpis/ISSUE_LABEL_GATE_REPORT.md"],
+      "production": [".github/workflows/roadmap_guard.yml", "release_kpis/ROADMAP_SCOPE_GATE_REPORT.md"]
+    },
+    "authority_modeling": {
+      "simulated": ["scripts/export_authority_ledger.py"],
+      "real": ["artifacts/authority_ledger/ledger.ndjson", "docs/docs/security/KEY_LIFECYCLE.md"],
+      "production": ["release_kpis/security_metrics.json"]
+    },
+    "enterprise_readiness": {
+      "simulated": ["docs/QUICKSTART.md", "pilot/README.md"],
+      "real": ["docs/OPS_RUNBOOK.md", "docs/deployment/HELM.md"],
+      "production": ["release_kpis/radar_composite_latest.png", "release_kpis/PR_COMMENT.md"]
+    },
+    "scalability": {
+      "simulated": ["release_kpis/scalability_metrics.json"],
+      "real": ["scripts/reencrypt_benchmark.py", ".github/workflows/reencrypt_benchmark.yml"],
+      "production": ["docs/scaling/STATELESS_API_SCALE_GUIDE.md"]
+    },
+    "data_integration": {
+      "simulated": ["schemas/core/connector_contract_v1.md"],
+      "real": ["docs/26-sharepoint-connector.md", "docs/27-power-platform-connector.md"],
+      "production": ["docs/29-snowflake-connector.md", "docs/28-asksage-connector.md"]
+    },
+    "economic_measurability": {
+      "simulated": ["release_kpis/TEC_SUMMARY.md"],
+      "real": ["release_kpis/tec_internal.json", "release_kpis/tec_executive.json", "release_kpis/tec_dod.json"],
+      "production": ["release_kpis/nonlinear_stability_report.md"]
+    },
+    "operational_maturity": {
+      "simulated": ["scripts/pilot_in_a_box.py", "scripts/why_60s_challenge.py"],
+      "real": ["release_kpis/ISSUE_LABEL_GATE_REPORT.md", "release_kpis/ROADMAP_SCOPE_GATE_REPORT.md"],
+      "production": ["release_kpis/nonlinear_stability_report.md", "release_kpis/stability_v2.0.6.json"]
+    }
+  }
+}

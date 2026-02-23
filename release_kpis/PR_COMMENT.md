@@ -30,10 +30,15 @@
 - `release_kpis/KPI_GATE_REPORT.md`
 - `release_kpis/ISSUE_LABEL_GATE_REPORT.md`
 
+**Eligibility + Confidence:**
+- Eligibility tiers: `governance/kpi_eligibility.json`
+- KPI confidence: `release_kpis/kpi_confidence.json`
+- KPI bands: `release_kpis/kpi_bands_v2.0.6.json`
+
 **TEC (ROM):**
-- Internal: 2877.0 hrs | $431,550
-- Executive: 2877.0 hrs | $647,325
-- DoD: 2877.0 hrs | $791,175
+- Internal: 3071.3 hrs | $460,695
+- Executive: 3071.3 hrs | $691,042
+- DoD: 3071.3 hrs | $844,608
 - Full detail: `release_kpis/TEC_SUMMARY.md`
 
 **Notes:**
