@@ -1,7 +1,7 @@
 # TEC Summary (ROM)
 
 ## Counts
-- issues_total: **151**
+- issues_total: **166**
 - prs_merged: **182**
 - workflows: **29**
 - test_files: **99**
@@ -11,33 +11,33 @@
 - issues_with_pr_link_est: **89**
 
 ## Effort (Base hours breakdown)
-- issues_weighted: **1428.0**
-- issues_complexity_weighted: **1813.6**
+- issues_weighted: **1566.8**
+- issues_complexity_weighted: **1970.8**
 - pr_overhead: **273.0**
 - workflows: **145.0**
 - tests: **198.0**
 - docs: **484.5**
 - committee: **0.0**
-- total_base: **2528.5**
-- total_ctec: **2914.1**
+- total_base: **2667.2**
+- total_ctec: **3071.3**
 
 ## Complexity (C-TEC v1.0)
-- avg_index: **1.255**
+- avg_index: **1.244**
 - max_index: **1.95**
 - signals: PR diff size, changed files, cross-subsystem touch, issue duration, dependency refs
 
 ## Tiers (Low / Base / High)
 ### Internal @ $150/hr
-- Low:  2331.3 hrs | $349692.0
-- Base: 2914.1 hrs | $437115.0
-- High: 3934.0 hrs | $590105.0
+- Low:  2457.0 hrs | $368556.0
+- Base: 3071.3 hrs | $460695.0
+- High: 4146.3 hrs | $621938.0
 
 ### Executive @ $225/hr
-- Low:  2331.3 hrs | $524538.0
-- Base: 2914.1 hrs | $655672.0
-- High: 3934.0 hrs | $885158.0
+- Low:  2457.0 hrs | $552834.0
+- Base: 3071.3 hrs | $691042.0
+- High: 4146.3 hrs | $932907.0
 
 ### DoD Fully Burdened @ $275/hr
-- Low:  2331.3 hrs | $641102.0
-- Base: 2914.1 hrs | $801378.0
-- High: 3934.0 hrs | $1081860.0
+- Low:  2457.0 hrs | $675686.0
+- Base: 3071.3 hrs | $844608.0
+- High: 4146.3 hrs | $1140220.0
