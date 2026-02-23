@@ -4,10 +4,12 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
 import sys
+import time
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -41,8 +43,12 @@ def main() -> int:
         ),
         encoding="utf-8",
     )
+    records_targeted = sum(1 for line in claims_path.read_text(encoding="utf-8").splitlines() if line.strip())
+    bytes_targeted = claims_path.stat().st_size
 
     signing_key = os.getenv("DEEPSIGMA_AUTHORITY_SIGNING_KEY", "demo-signing-key")
+    compromise_started_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    t0 = time.perf_counter()
     rotation = rotate_keys(
         tenant_id=args.tenant,
         key_id=args.key_id,
@@ -57,6 +63,7 @@ def main() -> int:
         event_log_path=out_dir / "key_rotation_events.jsonl",
         authority_ledger_path=out_dir / "authority_ledger.json",
     )
+    rotation_completed_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     reencrypt = run_reencrypt_job(
         tenant_id=args.tenant,
         dry_run=True,
@@ -66,15 +73,38 @@ def main() -> int:
         actor_user="demo-operator",
         actor_role="coherence_steward",
     )
+    recovery_completed_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    elapsed_seconds = max(time.perf_counter() - t0, 0.001)
+    records_per_second = records_targeted / elapsed_seconds
+    mb_per_minute = (bytes_targeted / (1024 * 1024)) / (elapsed_seconds / 60.0)
+
+    metrics = {
+        "schema_version": "1.0",
+        "metric_family": "disr_security",
+        "tenant_id": args.tenant,
+        "compromise_started_at": compromise_started_at,
+        "rotation_completed_at": rotation_completed_at,
+        "recovery_completed_at": recovery_completed_at,
+        "mttr_seconds": round(elapsed_seconds, 3),
+        "records_targeted": records_targeted,
+        "bytes_targeted": bytes_targeted,
+        "reencrypt_records_per_second": round(records_per_second, 3),
+        "reencrypt_mb_per_minute": round(mb_per_minute, 6),
+    }
+    kpi_metrics_path = ROOT / "release_kpis" / "security_metrics.json"
+    kpi_metrics_path.parent.mkdir(parents=True, exist_ok=True)
+    kpi_metrics_path.write_text(json.dumps(metrics, indent=2) + "\n", encoding="utf-8")
 
     summary = {
         "rotation": rotation_result_to_dict(rotation),
         "reencrypt": reencrypt_summary_to_dict(reencrypt),
+        "metrics": metrics,
         "outputs": {
             "keyring": str(out_dir / "keyring.json"),
             "events": str(out_dir / "key_rotation_events.jsonl"),
             "authority_ledger": str(out_dir / "authority_ledger.json"),
             "checkpoint": str(out_dir / "reencrypt_checkpoint.json"),
+            "security_metrics": str(kpi_metrics_path),
         },
     }
     report_path = out_dir / "disr_demo_summary.json"

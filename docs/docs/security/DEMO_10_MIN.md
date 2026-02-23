@@ -33,6 +33,7 @@ make security-demo
 - `artifacts/disr_demo/authority_ledger.json`
 - `artifacts/disr_demo/reencrypt_checkpoint.json`
 - `artifacts/disr_demo/disr_demo_summary.json`
+- `release_kpis/security_metrics.json`
 
 ## What to verify
 
@@ -40,3 +41,12 @@ make security-demo
 - Security event stream includes signed `AUTHORIZED_KEY_ROTATION`.
 - Authority ledger contains an `AUTHORIZED_KEY_ROTATION` entry.
 - Re-encrypt result is `dry_run` with deterministic checkpoint output.
+- Metrics file contains numeric MTTR and throughput values.
+
+## Metrics (Economic Measurability)
+
+`release_kpis/security_metrics.json` captures:
+
+- `mttr_seconds`
+- `reencrypt_records_per_second`
+- `reencrypt_mb_per_minute`

@@ -34,6 +34,49 @@ def clamp(value: float, lo: float = 0, hi: float = 10) -> float:
     return max(lo, min(hi, value))
 
 
+def parse_security_metrics() -> dict | None:
+    path = ROOT / "release_kpis" / "security_metrics.json"
+    if not path.exists():
+        return None
+    try:
+        obj = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    if not isinstance(obj, dict):
+        return None
+    return obj
+
+
+def score_economic_measurability() -> float:
+    metrics = parse_security_metrics()
+    if not metrics:
+        return 0.0
+
+    score = 3.0  # metrics present and parseable
+    mttr = float(metrics.get("mttr_seconds", 0))
+    rps = float(metrics.get("reencrypt_records_per_second", 0))
+    mbm = float(metrics.get("reencrypt_mb_per_minute", 0))
+
+    if mttr <= 300:
+        score += 3
+    elif mttr <= 600:
+        score += 2
+    elif mttr <= 1200:
+        score += 1
+
+    if rps >= 1:
+        score += 2
+    elif rps >= 0.1:
+        score += 1
+
+    if mbm >= 0.01:
+        score += 2
+    elif mbm >= 0.001:
+        score += 1
+
+    return clamp(score)
+
+
 def score_enterprise_readiness() -> float:
     points = 0
     points += 1 if file_exists("docs/docs/pilot/BRANCH_PROTECTION.md") else 0
@@ -100,11 +143,13 @@ def main() -> int:
         "automation_depth": round(score_automation_depth(), 2),
         "enterprise_readiness": round(score_enterprise_readiness(), 2),
         "data_integration": round(score_data_integration(), 2),
+        "economic_measurability": round(score_economic_measurability(), 2),
         "operational_maturity": round(score_operational_maturity(), 2),
         "_telemetry": {
             "test_files": count_files("tests/test_*.py") + count_files("tests/**/test_*.py"),
             "workflows": count_files(".github/workflows/*.yml") + count_files(".github/workflows/*.yaml"),
             "docs_md": len(list(docs_root.glob("**/*.md"))) if docs_root.exists() else 0,
+            "security_metrics_present": parse_security_metrics() is not None,
         },
     }
     print(json.dumps(out, indent=2))
