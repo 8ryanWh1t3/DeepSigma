@@ -2,7 +2,7 @@
 
 A **DriftEvent** is a structured signal emitted whenever the runtime detects a variance between expected and observed behaviour. Drift events are typed, fingerprinted, and linked to the episode that triggered them. They feed the Drift → Patch loop and contribute to the `DS` (Drift Scan) artifact in Coherence Ops.
 
-**Schema file**: [`specs/drift.schema.json`](../specs/drift.schema.json)
+**Schema file**: [`specs/drift.schema.json`](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/schemas/core/drift.schema.json)
 
 ---
 

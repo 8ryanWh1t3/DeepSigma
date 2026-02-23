@@ -2,7 +2,7 @@
 
 The **Safe Action Contract** is the governance contract that an agent must satisfy before any action is dispatched. It encodes blast radius, idempotency, rollback, and authorization so that every tool call can be audited and reversed.
 
-**Schema file**: [`specs/action_contract.schema.json`](../specs/action_contract.schema.json)
+**Schema file**: [`specs/action_contract.schema.json`](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/schemas/core/action_contract.schema.json)
 
 ---
 

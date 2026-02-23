@@ -8,7 +8,7 @@
 >
 > Think of it this way: Claims are born during decisions. Most claims live and die within a single DLR. But some claims prove so reliable, so foundational, that they deserve to persist beyond the episode that created them. Canon is the ceremony that makes that happen.
 >
-> **Schema**: [`specs/canon.schema.json`](../specs/canon.schema.json)
+> **Schema**: [`specs/canon.schema.json`](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/schemas/core/canon.schema.json)
 >
 > ## When to Create a Canon Entry
 >

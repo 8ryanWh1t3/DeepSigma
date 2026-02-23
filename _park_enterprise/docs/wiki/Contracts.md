@@ -6,7 +6,7 @@ RAL governance is expressed through four contract types. Each contract is a stru
 
 ## DTE — Decision Timing Envelope
 
-**Schema:** [`specs/dte.schema.json`](../specs/dte.schema.json) · [Full reference →](DTE-Schema)
+**Schema:** [`specs/dte.schema.json`](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/schemas/core/dte.schema.json) · [Full reference →](DTE-Schema)
 
 The DTE is the master budget and constraint contract for a `decisionType`. It defines:
 
@@ -24,7 +24,7 @@ DTEs are loaded from a Policy Pack at decision start and stamped onto the sealed
 
 ## Safe Action Contract
 
-**Schema:** [`specs/action_contract.schema.json`](../specs/action_contract.schema.json) · [Full reference →](Action-Contract-Schema)
+**Schema:** [`specs/action_contract.schema.json`](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/schemas/core/action_contract.schema.json) · [Full reference →](Action-Contract-Schema)
 
 The Safe Action Contract is the per-dispatch governance contract that must be satisfied before any tool action is executed. It encodes:
 
@@ -55,7 +55,7 @@ See: [Verifiers](Verifiers) — implementation details and scaffold reference.
 
 ## DecisionEpisode
 
-**Schema:** [`specs/episode.schema.json`](../specs/episode.schema.json) · [Full reference →](Episode-Schema)
+**Schema:** [`specs/episode.schema.json`](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/schemas/core/episode.schema.json) · [Full reference →](Episode-Schema)
 
 The DecisionEpisode is not a pre-decision contract but the **sealed record** produced at the end of a decision cycle. It contains:
 

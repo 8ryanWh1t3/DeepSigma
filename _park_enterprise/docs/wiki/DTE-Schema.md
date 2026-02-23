@@ -2,7 +2,7 @@
 
 The **Decision Timing Envelope (DTE)** is the per-`decisionType` contract that governs time budgets, freshness requirements, blast radius limits, degrade ladder ordering, and verification requirements. DTEs are loaded at runtime — typically from a Policy Pack — and stamped onto every sealed episode.
 
-**Schema file**: [`specs/dte.schema.json`](../specs/dte.schema.json)
+**Schema file**: [`specs/dte.schema.json`](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/schemas/core/dte.schema.json)
 
 ---
 

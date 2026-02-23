@@ -166,7 +166,7 @@ View 4 (keyboard shortcut `4`) in the Σ OVERWATCH dashboard. Natural language i
 
 ## Glossary Terms
 
-See [Glossary](Glossary) and [GLOSSARY.md](../GLOSSARY.md):
+See [Glossary](Glossary) and [GLOSSARY.md](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/docs/GLOSSARY.md):
 
 - **IRIS** — operator-facing interface layer; query resolution with sub-60s targets
 - **PRIME** — governance threshold gate; LLM output → decision-grade action
@@ -178,7 +178,7 @@ See [Glossary](Glossary) and [GLOSSARY.md](../GLOSSARY.md):
 - **Coherence Score** — 0–100 composite from all four artifacts
 - **Seal** — immutable, tamper-evident record
 
-See also: [Language Map](../docs/01-language-map.md) for LinkedIn-to-Code mappings (IRIS = Phase 2).
+See also: [Language Map](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/docs/01-language-map.md) for LinkedIn-to-Code mappings (IRIS = Phase 2).
 
 ---
 

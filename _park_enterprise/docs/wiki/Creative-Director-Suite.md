@@ -122,7 +122,7 @@ See [Excel-First Governance](Excel-First-Governance) for the full BOOT!A1 spec, 
 | Boot Protocol spec | `docs/excel-first/WORKBOOK_BOOT_PROTOCOL.md` |
 | Table Schemas | `docs/excel-first/TABLE_SCHEMAS.md` |
 | 6-Lens Prompting | `docs/excel-first/multi-dim-prompting-for-teams/README.md` |
-| Release Notes | [RELEASE_NOTES_v0.6.2.md](../release/RELEASE_NOTES_v0.6.2.md) |
+| Release Notes | [RELEASE_NOTES_v0.6.2.md](https://github.com/8ryanWh1t3/DeepSigma/blob/main/_park_enterprise/docs/release/RELEASE_NOTES_v0.6.2.md) |
 
 ---
 
