@@ -12,6 +12,7 @@ from deepsigma.security.providers import (
     register_provider,
     resolve_provider_name,
 )
+from deepsigma.security.policy import CryptoPolicyError
 from deepsigma.security.providers.base import CryptoProvider
 
 
@@ -85,6 +86,12 @@ def test_provider_from_policy_uses_overrides(monkeypatch: pytest.MonkeyPatch, tm
     )
     record = provider.create_key_version("credibility")
     assert record.key_version == 1
+
+
+def test_provider_from_policy_rejects_disallowed_provider(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("DEEPSIGMA_CRYPTO_PROVIDER", "aws-kms")
+    with pytest.raises(CryptoPolicyError, match="blocked by crypto policy"):
+        provider_from_policy({"security": {"crypto_provider": "local-keystore"}})
 
 
 def test_provider_from_policy_emits_provider_changed_event(monkeypatch: pytest.MonkeyPatch, tmp_path) -> None:

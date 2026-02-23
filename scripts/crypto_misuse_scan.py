@@ -17,6 +17,7 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from deepsigma.security.events import EVENT_NONCE_REUSE_DETECTED, append_security_event  # noqa: E402
+from deepsigma.security.policy import load_crypto_policy  # noqa: E402
 ENVELOPE_REQUIRED_FIELDS = ["key_id", "key_version", "alg", "nonce", "aad"]
 
 
@@ -77,6 +78,7 @@ def _find_envelopes(node: Any, where: str) -> list[tuple[str, dict[str, Any]]]:
 
 def scan_repo(root: Path) -> list[Finding]:
     findings: list[Finding] = []
+    policy = _validate_crypto_policy(root, findings)
 
     schema_path = root / "schemas" / "core" / "crypto_envelope.schema.json"
     if not schema_path.exists():
@@ -115,7 +117,7 @@ def scan_repo(root: Path) -> list[Finding]:
     nonce_locations: dict[str, list[str]] = {}
     for path in root.rglob("*.json*"):
         rel = path.relative_to(root)
-        if any(part in {".git", "node_modules", "dist", "build", ".venv", "venv"} for part in rel.parts):
+        if any(part in {".git", "node_modules", "dist", "build", ".venv", "venv", "schemas"} for part in rel.parts):
             continue
         for where, obj in _iter_json_objects(path):
             for env_where, env in _find_envelopes(obj, where):
@@ -129,6 +131,8 @@ def scan_repo(root: Path) -> list[Finding]:
                             location=env_where,
                         )
                     )
+                if policy:
+                    _validate_envelope_against_policy(env, env_where, policy, findings)
                 nonce = str(env.get("nonce", ""))
                 if nonce:
                     nonce_locations.setdefault(nonce, []).append(env_where)
@@ -163,6 +167,101 @@ def scan_repo(root: Path) -> list[Finding]:
                     )
 
     return findings
+
+
+def _validate_crypto_policy(root: Path, findings: list[Finding]) -> dict[str, Any] | None:
+    policy_path = root / "governance" / "security_crypto_policy.json"
+    if not policy_path.exists():
+        findings.append(
+            Finding(
+                severity="HIGH",
+                category="missing_crypto_policy",
+                message="Missing runtime crypto policy at governance/security_crypto_policy.json",
+                location=str(policy_path),
+            )
+        )
+        return None
+
+    schema_path = root / "schemas" / "core" / "security_crypto_policy.schema.json"
+    if not schema_path.exists():
+        findings.append(
+            Finding(
+                severity="HIGH",
+                category="missing_crypto_policy_schema",
+                message="Missing crypto policy schema at schemas/core/security_crypto_policy.schema.json",
+                location=str(schema_path),
+            )
+        )
+
+    try:
+        policy = load_crypto_policy(policy_path)
+    except Exception as exc:
+        findings.append(
+            Finding(
+                severity="HIGH",
+                category="invalid_crypto_policy",
+                message=f"Invalid crypto policy: {exc}",
+                location=str(policy_path),
+            )
+        )
+        return None
+
+    min_ttl = int(policy["min_ttl_days"])
+    max_ttl = int(policy["max_ttl_days"])
+    if min_ttl > max_ttl:
+        findings.append(
+            Finding(
+                severity="HIGH",
+                category="invalid_ttl_bounds",
+                message=f"Crypto policy min_ttl_days ({min_ttl}) exceeds max_ttl_days ({max_ttl})",
+                location=str(policy_path),
+            )
+        )
+
+    return policy
+
+
+def _validate_envelope_against_policy(
+    envelope: dict[str, Any],
+    location: str,
+    policy: dict[str, Any],
+    findings: list[Finding],
+) -> None:
+    supported_versions = {str(item) for item in policy["envelope_versions_supported"]}
+    version = str(envelope.get("envelope_version", ""))
+    if version and version not in supported_versions:
+        findings.append(
+            Finding(
+                severity="HIGH",
+                category="unsupported_envelope_version",
+                message=f"Envelope version '{version}' not in crypto policy supported set",
+                location=location,
+            )
+        )
+
+    provider = str(envelope.get("provider", ""))
+    allowed_providers = {str(item) for item in policy["allowed_providers"]}
+    if provider and provider not in allowed_providers:
+        findings.append(
+            Finding(
+                severity="HIGH",
+                category="provider_policy_violation",
+                message=f"Envelope provider '{provider}' blocked by crypto policy",
+                location=location,
+            )
+        )
+
+    algorithm = str(envelope.get("alg", ""))
+    allowed_algs = {str(item) for item in policy["allowed_algorithms"]}
+    if algorithm and algorithm not in allowed_algs:
+        findings.append(
+            Finding(
+                severity="HIGH",
+                category="algorithm_policy_violation",
+                message=f"Envelope algorithm '{algorithm}' blocked by crypto policy",
+                location=location,
+            )
+        )
 
 
 def write_reports(findings: list[Finding], out_json: Path, out_md: Path) -> None:

@@ -124,6 +124,23 @@ def test_rotate_keys_rejects_invalid_ttl(tmp_path: Path):
         )
 
 
+def test_rotate_keys_rejects_ttl_above_policy_max(tmp_path: Path):
+    with pytest.raises(ValueError, match="violates crypto policy bounds"):
+        rotate_keys(
+            tenant_id="tenant-alpha",
+            key_id="credibility",
+            ttl_days=45,
+            actor_user="dri",
+            actor_role="coherence_steward",
+            authority_dri="dri.approver",
+            authority_role="dri_approver",
+            authority_reason="policy",
+            authority_signing_key="test-signing-key",
+            keyring_path=tmp_path / "keyring.json",
+            event_log_path=tmp_path / "events.jsonl",
+        )
+
+
 def test_rotate_keys_requires_authority_context(tmp_path: Path):
     with pytest.raises(ValueError, match="authority_dri is required"):
         rotate_keys(

@@ -17,7 +17,10 @@ visible, reversible, and measurable under pilot conditions.
 - Key lifecycle policy: `docs/docs/security/KEY_LIFECYCLE.md`
 - Recovery runbook: `docs/docs/security/RECOVERY_RUNBOOK.md`
 - 10-minute demo: `docs/docs/security/DEMO_10_MIN.md`
+- Envelope migration plan: `docs/docs/security/ENVELOPE_VERSIONING.md`
 - Crypto envelope schema: `schemas/core/crypto_envelope.schema.json`
+- Crypto policy: `governance/security_crypto_policy.json`
+- Crypto policy schema: `schemas/core/security_crypto_policy.schema.json`
 - Authority action contract schema: `schemas/core/action_contract.schema.json`
 - Keyring model: `src/deepsigma/security/keyring.py`
 
@@ -25,7 +28,8 @@ visible, reversible, and measurable under pilot conditions.
 
 - Key versions are modeled explicitly (`key_id`, `key_version`, `expires_at`, `status`).
 - Default provider is `local-keystore` (file-backed) with deterministic storage at `local_keystore.json`.
-- Envelope v1 metadata includes `key_id`, `key_version`, `provider`, `alg`, `nonce`, `aad`, `created_at`, and `expires_at`.
+- Envelope metadata is policy-driven via `envelope_version_current` and `envelope_versions_supported`.
+- Runtime enforces allowed providers/algorithms/TTL bounds from `governance/security_crypto_policy.json`.
 - Expiry and disable transitions are represented as status changes, not silent mutation.
 - Privileged rotate/reencrypt actions require a signed authority action contract.
 
