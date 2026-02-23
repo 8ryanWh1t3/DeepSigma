@@ -1,10 +1,10 @@
-## Repo Radar KPI — v2.0.5
+## Repo Radar KPI — v2.0.6
 
 ![badge](release_kpis/badge_latest.svg)
 
 **Radar:**
-- PNG: `release_kpis/radar_v2.0.5.png`
-- SVG: `release_kpis/radar_v2.0.5.svg`
+- PNG: `release_kpis/radar_v2.0.6.png`
+- SVG: `release_kpis/radar_v2.0.6.svg`
 
 **Composite Release Radar:**
 - PNG: `release_kpis/radar_composite_latest.png`
@@ -20,9 +20,9 @@
 - `release_kpis/ISSUE_LABEL_GATE_REPORT.md`
 
 **TEC (ROM):**
-- Internal: 2528.4 hrs | $379,260
-- Executive: 2528.4 hrs | $568,890
-- DoD: 2528.4 hrs | $695,310
+- Internal: 2538.9 hrs | $380,835
+- Executive: 2538.9 hrs | $571,252
+- DoD: 2538.9 hrs | $698,198
 - Full detail: `release_kpis/TEC_SUMMARY.md`
 
 **Notes:**

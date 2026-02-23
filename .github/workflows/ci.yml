@@ -118,6 +118,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -c requirements/locks/dev-excel-local.txt -e ".[dev,excel]"
 
+      - name: Enforce version sync (pyproject vs release_kpis/VERSION.txt)
+        run: make version-sync-check
+
       - name: Validate examples against schemas
         run: |
           python src/tools/validate_examples.py
