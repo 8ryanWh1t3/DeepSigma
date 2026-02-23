@@ -17,6 +17,7 @@ This demo proves the DISR loop in one pass:
 ```bash
 make security-gate
 make security-demo
+make reencrypt-benchmark
 ```
 
 ## Expected outputs
@@ -35,6 +36,12 @@ make security-demo
 - `artifacts/disr_demo/disr_demo_summary.json`
 - `release_kpis/security_metrics.json`
 
+`make reencrypt-benchmark` writes:
+
+- `release_kpis/scalability_metrics.json`
+- `artifacts/benchmarks/reencrypt/benchmark_summary.json`
+- `artifacts/benchmarks/reencrypt/claims.jsonl` (100k-record deterministic fixture by default)
+
 ## What to verify
 
 - Rotation event exists with `event_type = KEY_ROTATED`.
@@ -50,3 +57,11 @@ make security-demo
 - `mttr_seconds`
 - `reencrypt_records_per_second`
 - `reencrypt_mb_per_minute`
+
+`release_kpis/scalability_metrics.json` captures:
+
+- `wall_clock_seconds`
+- `cpu_seconds`
+- `rss_peak_bytes`
+- `throughput_records_per_second`
+- `throughput_mb_per_minute`
