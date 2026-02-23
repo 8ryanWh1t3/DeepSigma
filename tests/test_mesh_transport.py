@@ -15,6 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from mesh.transport import (
     ENVELOPES_LOG,
     LocalTransport,
+    NodeIdentity,
     Transport,
     _decode_payload,
     _encode_payload,
@@ -130,6 +131,10 @@ class TestLocalTransport:
 
 @pytest.mark.skipif(not _has_httpx, reason="httpx not installed")
 class TestHTTPTransport:
+    def test_node_identity_model_spiffe(self):
+        ident = NodeIdentity(node_id="edge-A", trust_domain="trust.local")
+        assert ident.spiffe_id == "spiffe://trust.local/node/edge-A"
+
     def test_push_sends_post(self):
         from mesh.transport import HTTPTransport
 
@@ -248,6 +253,75 @@ class TestHTTPTransport:
                 verify_tls=False,
             )
             MockClient.assert_called_once_with(timeout=5.0, verify=False)
+
+    def test_mtls_requires_https_and_trust_roots(self):
+        from mesh.transport import HTTPTransport
+
+        with patch("httpx.Client") as MockClient:
+            mock_resp = MagicMock()
+            mock_resp.status_code = 200
+            mock_resp.content = b'{"status":"ok","records":{"envelopes":[]}}'
+            mock_resp.headers = {"content-type": "application/json"}
+            MockClient.return_value.request.return_value = mock_resp
+            t = HTTPTransport(
+                peer_registry={NODE_A: "http://host1:8100"},
+                require_mtls=True,
+                trust_roots=["/etc/ssl/roots.pem"],
+                client_cert_path="/tmp/client.crt",
+                client_key_path="/tmp/client.key",
+            )
+            with pytest.raises(ConnectionError, match="not HTTPS"):
+                t.pull(TENANT, NODE_A, ENVELOPES_LOG)
+
+    def test_configurable_trust_roots_and_cert_rotation_path(self):
+        from mesh.transport import HTTPTransport
+
+        with patch("httpx.Client") as MockClient:
+            ok_resp = MagicMock()
+            ok_resp.status_code = 200
+            ok_resp.headers = {"content-type": "application/json"}
+            MockClient.return_value.get.return_value = ok_resp
+            t = HTTPTransport(
+                peer_registry={NODE_A: "https://host1:8100"},
+                require_mtls=True,
+                trust_roots=["/etc/ssl/rootA.pem"],
+                client_cert_path="/tmp/cert-v1.crt",
+                client_key_path="/tmp/key-v1.key",
+                cert_rotation_path="/etc/mesh/certs/current",
+            )
+            t.configure_trust_roots(["/etc/ssl/rootB.pem"])
+            t.rotate_client_certificate(
+                cert_path="/tmp/cert-v2.crt",
+                key_path="/tmp/key-v2.key",
+                cert_rotation_path="/etc/mesh/certs/next",
+            )
+            health = t.health()
+            assert health["identity"]["trust_roots"] == ["/etc/ssl/rootB.pem"]
+            assert health["identity"]["cert_rotation_path"] == "/etc/mesh/certs/next"
+
+    def test_rejects_untrusted_peer_fingerprint(self):
+        from mesh.transport import HTTPTransport
+
+        mock_resp = MagicMock()
+        mock_resp.status_code = 200
+        mock_resp.content = b'{"status":"ok","records":{"envelopes":[]}}'
+        mock_resp.headers = {
+            "content-type": "application/json",
+            "x-peer-cert-fingerprint": "deadbeef",
+        }
+
+        with patch("httpx.Client") as MockClient:
+            MockClient.return_value.request.return_value = mock_resp
+            t = HTTPTransport(peer_registry={NODE_A: "http://host1:8100"})
+            t.set_peer_identity(
+                NODE_A,
+                NodeIdentity(
+                    node_id=NODE_A,
+                    cert_fingerprint="cafebabe",
+                ),
+            )
+            with pytest.raises(ConnectionError, match="fingerprint mismatch"):
+                t.pull(TENANT, NODE_A, ENVELOPES_LOG)
 
     def test_partition_state_transitions_and_recovery(self):
         from mesh.transport import HTTPTransport

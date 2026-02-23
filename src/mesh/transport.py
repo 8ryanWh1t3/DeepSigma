@@ -18,6 +18,7 @@ import logging
 import os
 import re
 import time
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
@@ -285,6 +286,20 @@ PEER_SUSPECT = "SUSPECT"
 PEER_OFFLINE = "OFFLINE"
 
 
+@dataclass
+class NodeIdentity:
+    """Identity metadata for a mesh node."""
+
+    node_id: str
+    cert_fingerprint: str = ""
+    trust_domain: str = "mesh.local"
+    cert_serial: str = ""
+
+    @property
+    def spiffe_id(self) -> str:
+        return f"spiffe://{self.trust_domain}/node/{self.node_id}"
+
+
 def _now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -313,6 +328,14 @@ class HTTPTransport:
         timeout: float = 5.0,
         verify_tls: bool = True,
         use_msgpack: bool = False,
+        local_node_id: str = "unknown",
+        trust_domain: str = "mesh.local",
+        require_mtls: bool = False,
+        trust_roots: list[str] | None = None,
+        client_cert_path: str = "",
+        client_key_path: str = "",
+        cert_rotation_path: str = "",
+        peer_identities: dict[str, NodeIdentity] | None = None,
         max_retries: int = _MAX_RETRIES,
         backoff_base: float = _BACKOFF_BASE,
         suspect_after_failures: int = 1,
@@ -327,11 +350,27 @@ class HTTPTransport:
             raise ValueError("offline_after_failures must be >= suspect_after_failures")
         if recovery_successes < 1:
             raise ValueError("recovery_successes must be >= 1")
+        if require_mtls and not verify_tls:
+            raise ValueError("require_mtls=True requires verify_tls=True")
+        if require_mtls and (not client_cert_path or not client_key_path):
+            raise ValueError(
+                "require_mtls=True requires client_cert_path and client_key_path"
+            )
 
         self._peers = dict(peer_registry)
         self._timeout = timeout
         self._verify_tls = verify_tls
         self._use_msgpack = use_msgpack and _HAS_MSGPACK
+        self._require_mtls = require_mtls
+        self._trust_roots = list(trust_roots or [])
+        self._client_cert_path = client_cert_path
+        self._client_key_path = client_key_path
+        self._cert_rotation_path = cert_rotation_path
+        self._local_identity = NodeIdentity(
+            node_id=local_node_id,
+            trust_domain=trust_domain,
+        )
+        self._peer_identities = dict(peer_identities or {})
         self._max_retries = max_retries
         self._backoff_base = backoff_base
         self._suspect_after_failures = suspect_after_failures
@@ -350,9 +389,11 @@ class HTTPTransport:
 
         try:
             import httpx
+            client_kwargs: dict[str, Any] = {"timeout": timeout, "verify": verify_tls}
+            if self._require_mtls:
+                client_kwargs["cert"] = (self._client_cert_path, self._client_key_path)
             self._client = httpx.Client(
-                timeout=timeout,
-                verify=verify_tls,
+                **client_kwargs,
             )
         except ImportError:
             raise ImportError(
@@ -366,8 +407,58 @@ class HTTPTransport:
             raise ValueError(f"Unknown peer node: {node_id}")
         return url.rstrip("/")
 
+    def _enforce_peer_security(self, peer_id: str, url: str) -> None:
+        if not peer_id:
+            return
+        if self._require_mtls:
+            if not url.lower().startswith("https://"):
+                raise ConnectionError(
+                    f"mTLS required but peer URL is not HTTPS: {peer_id}"
+                )
+            if not self._trust_roots:
+                raise ConnectionError(
+                    "mTLS required but trust_roots is empty"
+                )
+        if peer_id in self._peer_identities and not self._peer_identities[peer_id].spiffe_id:
+            raise ConnectionError(f"Invalid peer identity for {peer_id}")
+
+    def _enforce_peer_identity(
+        self,
+        peer_id: str,
+        response_headers: dict[str, Any],
+    ) -> None:
+        if not peer_id:
+            return
+        peer_identity = self._peer_identities.get(peer_id)
+        if not peer_identity:
+            return
+        expected = peer_identity.cert_fingerprint.strip().lower()
+        if not expected:
+            return
+        observed = str(
+            response_headers.get("x-peer-cert-fingerprint", "")
+        ).strip().lower()
+        if observed != expected:
+            raise ConnectionError(
+                f"Untrusted peer fingerprint mismatch for {peer_id}"
+            )
+
     def _ensure_runtime_state(self) -> None:
         """Backfill runtime fields for test-constructed instances."""
+        if not hasattr(self, "_require_mtls"):
+            self._require_mtls = False
+        if not hasattr(self, "_trust_roots"):
+            self._trust_roots = []
+        if not hasattr(self, "_client_cert_path"):
+            self._client_cert_path = ""
+        if not hasattr(self, "_client_key_path"):
+            self._client_key_path = ""
+        if not hasattr(self, "_cert_rotation_path"):
+            self._cert_rotation_path = ""
+        if not hasattr(self, "_local_identity"):
+            self._local_identity = NodeIdentity(node_id="unknown")
+        if not hasattr(self, "_peer_identities"):
+            self._peer_identities = {}
         if not hasattr(self, "_max_retries"):
             self._max_retries = _MAX_RETRIES
         if not hasattr(self, "_backoff_base"):
@@ -478,6 +569,7 @@ class HTTPTransport:
         import httpx
 
         self._ensure_runtime_state()
+        self._enforce_peer_security(peer_id, url)
         last_exc = None
         for attempt in range(self._max_retries):
             try:
@@ -491,6 +583,7 @@ class HTTPTransport:
                         time.sleep(self._backoff_base * (2 ** attempt))
                     continue
                 resp.raise_for_status()
+                self._enforce_peer_identity(peer_id, resp.headers)
                 ct = resp.headers.get("content-type", "application/json")
                 payload = _decode_payload(resp.content, ct)
                 if peer_id:
@@ -612,6 +705,13 @@ class HTTPTransport:
                 "suspect_peers": sum(1 for s in state_map.values() if s == PEER_SUSPECT),
                 "offline_peers": sum(1 for s in state_map.values() if s == PEER_OFFLINE),
             },
+            "identity": {
+                "local_node_id": self._local_identity.node_id,
+                "spiffe_id": self._local_identity.spiffe_id,
+                "mtls_required": self._require_mtls,
+                "trust_roots": list(self._trust_roots),
+                "cert_rotation_path": self._cert_rotation_path,
+            },
             "msgpack_enabled": self._use_msgpack,
         }
 
@@ -625,6 +725,26 @@ class HTTPTransport:
     def partition_events(self) -> list[dict[str, str]]:
         """Return recent partition/recovery events."""
         return list(self._partition_events)
+
+    def set_peer_identity(self, peer_id: str, identity: NodeIdentity) -> None:
+        """Set or update expected identity metadata for a peer."""
+        self._peer_identities[peer_id] = identity
+
+    def configure_trust_roots(self, trust_roots: list[str]) -> None:
+        """Replace trust roots used for mTLS validation policy."""
+        self._trust_roots = list(trust_roots)
+
+    def rotate_client_certificate(
+        self,
+        cert_path: str,
+        key_path: str,
+        cert_rotation_path: str = "",
+    ) -> None:
+        """Update client certificate paths for rotation workflows."""
+        self._client_cert_path = cert_path
+        self._client_key_path = key_path
+        if cert_rotation_path:
+            self._cert_rotation_path = cert_rotation_path
 
     def close(self) -> None:
         """Close the HTTP client."""
