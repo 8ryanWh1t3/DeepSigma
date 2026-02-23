@@ -38,11 +38,15 @@ jobs:
               rel = p.as_posix()
               if rel.startswith(skip_prefixes):
                   continue
-              norm = p.name.lower().replace("-", "").replace("_", "").replace(".", "")
-              if norm in seen:
-                  collisions.append((seen[norm], rel))
+              # Detect only same-directory case-insensitive dupes; allow
+              # normal cross-directory names like README.md.
+              parent = p.parent.as_posix().lower()
+              norm = p.name.lower()
+              key = (parent, norm)
+              if key in seen:
+                  collisions.append((seen[key], rel))
               else:
-                  seen[norm] = rel
+                  seen[key] = rel
 
           if collisions:
               print("FAIL: duplicate-like filenames detected:")
