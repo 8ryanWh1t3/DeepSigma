@@ -1,0 +1,186 @@
+{
+  "meta": {
+    "catalog_name": "DeepSigma Feature Catalog",
+    "catalog_version": "v1",
+    "repo_release_line": "v2.x",
+    "source_of_truth": "release_kpis/feature_catalog.json"
+  },
+  "categories": [
+    {
+      "id": "DG_BOUNDARY",
+      "name": "Deterministic Governance Boundary",
+      "summary": "Governance enforced before execution: default deny, halt on ambiguity, proof-first artifacts.",
+      "features": [
+        {
+          "id": "PRE_EXEC_GATE",
+          "name": "Pre-Execution Gate",
+          "description": "Blocks execution unless intent+authority+policy requirements are satisfied.",
+          "artifacts": ["runs/intent_packet.json", "runs/authority_contract.json", "runs/input_snapshot.json"],
+          "enforcement": ["make milestone-gate", "CI: ci.yml", "CI: kpi_gate.yml"],
+          "kpi_axes": ["Automation_Depth", "Authority_Modeling", "Operational_Maturity"]
+        },
+        {
+          "id": "DEFAULT_DENY",
+          "name": "Default Deny",
+          "description": "If required conditions cannot be evaluated or are missing, execution is denied.",
+          "artifacts": ["governance/ambiguity_policy.md"],
+          "enforcement": ["scripts/pre_exec_gate.py"],
+          "kpi_axes": ["Authority_Modeling", "Operational_Maturity"]
+        },
+        {
+          "id": "HALT_ON_AMBIGUITY",
+          "name": "Halt on Ambiguity",
+          "description": "Conflicts/unknowns/insufficient provenance trigger a hard fail before routing.",
+          "artifacts": ["governance/ambiguity_policy.md"],
+          "enforcement": ["scripts/pre_exec_gate.py", "scripts/validate_v2_1_0_milestone.py"],
+          "kpi_axes": ["Authority_Modeling", "Operational_Maturity"]
+        }
+      ]
+    },
+    {
+      "id": "INTENT_GOV",
+      "name": "Intent Capture & Governance",
+      "summary": "Intent declared pre-action and bound to execution.",
+      "features": [
+        {
+          "id": "INTENT_PACKET_SCHEMA",
+          "name": "Intent Packet Schema",
+          "description": "Formal structure for intent, scope, success criteria, TTL, author, authority.",
+          "artifacts": ["schemas/intent_packet.schema.json", "runs/intent_packet.json"],
+          "enforcement": ["scripts/validate_intent_packet.py", "scripts/validate_v2_1_0_milestone.py"],
+          "kpi_axes": ["Authority_Modeling", "Technical_Completeness"]
+        },
+        {
+          "id": "INTENT_TTL",
+          "name": "Intent TTL Enforcement",
+          "description": "Intent expires; expired intent blocks execution.",
+          "artifacts": ["runs/intent_packet.json"],
+          "enforcement": ["scripts/validate_intent_packet.py"],
+          "kpi_axes": ["Operational_Maturity", "Authority_Modeling"]
+        },
+        {
+          "id": "INTENT_HASH_BINDING",
+          "name": "Intent Hash Binding",
+          "description": "Intent hash is bound into proof chain and audit pack.",
+          "artifacts": ["runs/proof_bundle.json"],
+          "enforcement": ["scripts/crypto_proof.py"],
+          "kpi_axes": ["Technical_Completeness", "Authority_Modeling"]
+        }
+      ]
+    },
+    {
+      "id": "AUDIT_NEUTRAL",
+      "name": "Audit-Neutral Decision Logic",
+      "summary": "Claim→Evidence→Authority and context-free audit export.",
+      "features": [
+        {
+          "id": "DECISION_INVARIANTS",
+          "name": "Decision Invariants Ledger",
+          "description": "Rules like claim→evidence required, no overwrite, authority precedence, TTL/half-life.",
+          "artifacts": ["governance/decision_invariants.md"],
+          "enforcement": ["scripts/validate_v2_1_0_milestone.py"],
+          "kpi_axes": ["Operational_Maturity", "Enterprise_Readiness"]
+        },
+        {
+          "id": "CEA_VALIDATOR",
+          "name": "Claim→Evidence→Authority Validator",
+          "description": "Machine-checkable binding of claims, evidence, and authority references.",
+          "artifacts": ["runs/decision_record.json"],
+          "enforcement": ["scripts/validate_claim_evidence_authority.py"],
+          "kpi_axes": ["Technical_Completeness", "Enterprise_Readiness"]
+        },
+        {
+          "id": "AUDIT_NEUTRAL_PACK",
+          "name": "Audit-Neutral Export Pack",
+          "description": "Exports sealed facts + hashes + authority + proof bundle without political narrative.",
+          "artifacts": ["packs/audit_neutral/*"],
+          "enforcement": ["scripts/export_audit_neutral_pack.py"],
+          "kpi_axes": ["Enterprise_Readiness", "Operational_Maturity"]
+        }
+      ]
+    },
+    {
+      "id": "PROOF_REPLAY",
+      "name": "Deterministic Replay & Proof Chain",
+      "summary": "Hash chain + optional signature verification + replay checks.",
+      "features": [
+        {
+          "id": "INPUT_SNAPSHOT",
+          "name": "Sealed Input Snapshot",
+          "description": "Inputs captured and hashed for deterministic evidence.",
+          "artifacts": ["runs/input_snapshot.json"],
+          "enforcement": ["scripts/capture_run_snapshot.py"],
+          "kpi_axes": ["Technical_Completeness", "Operational_Maturity"]
+        },
+        {
+          "id": "PROOF_BUNDLE",
+          "name": "Proof Bundle",
+          "description": "Hash chain across intent, snapshot, authority contract, outputs; optional signature verify.",
+          "artifacts": ["runs/proof_bundle.json"],
+          "enforcement": ["scripts/crypto_proof.py"],
+          "kpi_axes": ["Technical_Completeness", "Authority_Modeling"]
+        },
+        {
+          "id": "REPLAY_VALIDATION",
+          "name": "Replay Validation",
+          "description": "Validates proof chain presence and readiness for deterministic replay.",
+          "artifacts": ["runs/proof_bundle.json"],
+          "enforcement": ["scripts/replay_run.py"],
+          "kpi_axes": ["Operational_Maturity", "Enterprise_Readiness"]
+        }
+      ]
+    },
+    {
+      "id": "REPO_RADAR",
+      "name": "Repo Radar KPI System",
+      "summary": "8 KPI axes, radar render, badge_latest, PR comment, composite history.",
+      "features": [
+        {
+          "id": "KPI_RUN",
+          "name": "KPI Run Pipeline",
+          "description": "Computes KPI scores and emits render + PR artifacts.",
+          "artifacts": ["release_kpis/radar_*.png", "release_kpis/badge_latest*.svg", "release_kpis/PR_COMMENT*.md"],
+          "enforcement": ["CI: kpi.yml", "CI: kpi_gate.yml"],
+          "kpi_axes": ["All"]
+        },
+        {
+          "id": "LAYER_COVERAGE",
+          "name": "Layer Coverage Injection",
+          "description": "Appends Decision Infrastructure layer→KPI mapping into PR comment.",
+          "artifacts": ["release_kpis/PR_COMMENT*.md"],
+          "enforcement": ["scripts/kpi_run.py"],
+          "kpi_axes": ["Operational_Maturity", "Enterprise_Readiness"]
+        }
+      ]
+    },
+    {
+      "id": "ECON",
+      "name": "Economic Measurability (TEC / C-TEC)",
+      "summary": "Effort/cost modeling, sensitivity bands, complexity scaling.",
+      "features": [
+        {
+          "id": "TEC_MODEL",
+          "name": "TEC Baseline",
+          "description": "Time/Effort/Cost estimation outputs.",
+          "artifacts": ["release_kpis/TEC*.json", "release_kpis/TEC*.md"],
+          "enforcement": ["scripts/tec_run.py (if present)"],
+          "kpi_axes": ["Economic_Measurability"]
+        },
+        {
+          "id": "TEC_SENSITIVITY",
+          "name": "TEC Sensitivity Bands",
+          "description": "Best/expected/worst bounds + volatility metrics.",
+          "artifacts": ["release_kpis/TEC_SENSITIVITY*.json"],
+          "enforcement": ["scripts/tec_run.py (if present)"],
+          "kpi_axes": ["Economic_Measurability", "Operational_Maturity"]
+        }
+      ]
+    }
+  ],
+  "outer_edge_boundaries": [
+    "Not claiming full jurisdictional policy packs (EU AI Act article-by-article enforcement) yet",
+    "Not claiming full cryptographic attestation across all pipelines and connectors yet",
+    "Not claiming enterprise connectors (Jira/ServiceNow/SharePoint adapters) as complete (target v2.1.1)",
+    "Not claiming a full runtime control plane is governance (runtime is subordinate)"
+  ]
+}

@@ -126,3 +126,7 @@ stability:
 
 kpi-confidence:
 	python scripts/kpi_confidence_bands.py
+
+.PHONY: feature-catalog
+feature-catalog:
+	python scripts/render_feature_catalog.py

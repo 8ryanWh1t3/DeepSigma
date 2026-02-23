@@ -37,6 +37,9 @@ See: [docs/release/RELEASE_NOTES_v2.0.6.md](docs/release/RELEASE_NOTES_v2.0.6.md
 - Nonlinear stability report: [release_kpis/nonlinear_stability_report.md](release_kpis/nonlinear_stability_report.md)
 - SSI artifact (current release): [release_kpis/stability_v2.0.6.json](release_kpis/stability_v2.0.6.json)
 - Stability-adjusted forecast: [release_kpis/stability_adjusted_forecast.json](release_kpis/stability_adjusted_forecast.json)
+- Feature catalog (human): [docs/FEATURE_CATALOG.md](docs/FEATURE_CATALOG.md)
+- Feature catalog (machine): [release_kpis/feature_catalog.json](release_kpis/feature_catalog.json)
+- Feature catalog renderer: [scripts/render_feature_catalog.py](scripts/render_feature_catalog.py)
 
 ### Active Track (v2.1.0 — Security Hardening)
 - DISR hardening
