@@ -1,89 +1,83 @@
 #!/usr/bin/env python3
-from __future__ import annotations
+
+"""
+Creates an audit-neutral proof pack:
+- intent_packet.json
+- input_snapshot.json
+- authority_contract.json
+- outputs_manifest.json
+- proof_bundle.json
+- ambiguity_policy.md
+"""
 
 import argparse
-import hashlib
-import json
 import shutil
+import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
 
 def fail(msg: str) -> int:
     print(f"FAIL: {msg}")
-    return 1
+    return 2
 
 
-def sha256_file(path: Path) -> str:
-    h = hashlib.sha256()
-    with path.open("rb") as f:
-        while True:
-            chunk = f.read(8192)
-            if not chunk:
-                break
-            h.update(chunk)
-    return h.hexdigest()
+def export_pack(pack_dir: Path, files: list[Path]) -> None:
+    pack_dir.mkdir(parents=True, exist_ok=True)
+    for path in files:
+        if not path.exists():
+            raise FileNotFoundError(f"missing required pack file: {path}")
+        shutil.copy2(path, pack_dir / path.name)
 
 
-def build_decision_episode_chain(intent: Path, authority: Path, snapshot: Path, outputs: Path) -> dict[str, str]:
-    chain = {
-        "intent_hash": sha256_file(intent),
-        "authority_hash": sha256_file(authority),
-        "snapshot_hash": sha256_file(snapshot),
-        "outputs_hash": sha256_file(outputs),
-    }
-    material = (
-        chain["intent_hash"] + chain["authority_hash"] + chain["snapshot_hash"] + chain["outputs_hash"]
-    )
-    chain["chain_hash"] = hashlib.sha256(material.encode("utf-8")).hexdigest()
-    return chain
-
-
-def export_pack(inputs: list[Path], output_dir: Path) -> Path:
-    output_dir.mkdir(parents=True, exist_ok=True)
-    manifest: dict[str, str] = {}
-    for src in inputs:
-        if not src.exists():
-            raise FileNotFoundError(str(src))
-        dst = output_dir / src.name
-        shutil.copy2(src, dst)
-        manifest[dst.name] = sha256_file(dst)
-
-    manifest_path = output_dir / "MANIFEST.sha256.json"
-    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8")
-    return manifest_path
+def generate_proof() -> None:
+    result = subprocess.run([sys.executable, "scripts/crypto_proof.py"], capture_output=True, text=True)
+    if result.returncode != 0:
+        raise RuntimeError((result.stdout + "\n" + result.stderr).strip())
 
 
 def run_self_check() -> int:
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
-        src1 = root / "decision.json"
-        src2 = root / "authority.json"
-        src3 = root / "snapshot.json"
-        src4 = root / "outputs.json"
-        dst = root / "pack"
-        src1.write_text('{"d":1}', encoding="utf-8")
-        src2.write_text('{"a":1}', encoding="utf-8")
-        src3.write_text('{"s":1}', encoding="utf-8")
-        src4.write_text('{"o":1}', encoding="utf-8")
-        manifest = export_pack([src1, src2, src3, src4], dst)
+        runs = root / "runs"
+        gov = root / "governance"
+        pack = root / "packs" / "audit_neutral"
+        runs.mkdir(parents=True)
+        gov.mkdir(parents=True)
+        (runs / "intent_packet.json").write_text('{"intent":"ok"}', encoding="utf-8")
+        (runs / "input_snapshot.json").write_text('{"snapshot":"ok"}', encoding="utf-8")
+        (runs / "authority_contract.json").write_text('{"authority":"ok"}', encoding="utf-8")
+        (runs / "outputs_manifest.json").write_text('{"outputs":"ok"}', encoding="utf-8")
+        (runs / "proof_bundle.json").write_text('{"intent_hash":"x","input_snapshot_hash":"y","authority_contract_hash":"z","outputs_hash":"w"}', encoding="utf-8")
+        (gov / "ambiguity_policy.md").write_text("# policy", encoding="utf-8")
 
-        chain = build_decision_episode_chain(src1, src2, src3, src4)
-        chain_path = dst / "decision_episode_chain.json"
-        chain_path.write_text(json.dumps(chain, indent=2), encoding="utf-8")
-
-        data = json.loads(manifest.read_text(encoding="utf-8"))
-        if set(data.keys()) != {"decision.json", "authority.json", "snapshot.json", "outputs.json"}:
-            return fail("manifest keys mismatch")
-        chain_required = {"intent_hash", "authority_hash", "snapshot_hash", "outputs_hash", "chain_hash"}
-        if set(chain.keys()) != chain_required:
-            return fail("decision episode chain missing required fields")
-        if chain["chain_hash"] == "0" * 64:
-            return fail("chain_hash should not be zeroed")
+        export_pack(
+            pack,
+            [
+                runs / "intent_packet.json",
+                runs / "input_snapshot.json",
+                runs / "authority_contract.json",
+                runs / "outputs_manifest.json",
+                runs / "proof_bundle.json",
+                gov / "ambiguity_policy.md",
+            ],
+        )
+        copied = {p.name for p in pack.iterdir()}
+        expected = {
+            "intent_packet.json",
+            "input_snapshot.json",
+            "authority_contract.json",
+            "outputs_manifest.json",
+            "proof_bundle.json",
+            "ambiguity_policy.md",
+        }
+        if copied != expected:
+            return fail("audit-neutral pack self-check copy set mismatch")
 
         try:
-            export_pack([root / "missing.json"], dst)
-            return fail("missing input should fail pack export")
+            export_pack(pack, [runs / "missing.json"])
+            return fail("missing required file should fail pack export")
         except FileNotFoundError:
             pass
 
@@ -92,18 +86,8 @@ def run_self_check() -> int:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Export audit-neutral pack")
-    parser.add_argument(
-        "--inputs",
-        nargs="*",
-        default=["artifacts/decision_record.json", "artifacts/action_contract.json"],
-    )
-    parser.add_argument("--output-dir", default="artifacts/audit_neutral_pack")
-    parser.add_argument("--intent", default="artifacts/intent_packet.json")
-    parser.add_argument("--authority", default="artifacts/action_contract.json")
-    parser.add_argument("--snapshot", default="artifacts/run_snapshot.json")
-    parser.add_argument("--outputs", default="artifacts/outputs.json")
-    parser.add_argument("--no-emit-chain", action="store_true")
+    parser = argparse.ArgumentParser(description="Export audit-neutral proof pack")
+    parser.add_argument("--pack-dir", default="packs/audit_neutral")
     parser.add_argument("--self-check", action="store_true")
     args = parser.parse_args()
 
@@ -111,18 +95,20 @@ def main() -> int:
         return run_self_check()
 
     try:
-        inputs = [Path(x) for x in args.inputs]
-        manifest = export_pack(inputs, Path(args.output_dir))
-        if not args.no_emit_chain:
-            chain = build_decision_episode_chain(
-                Path(args.intent), Path(args.authority), Path(args.snapshot), Path(args.outputs)
-            )
-            chain_path = Path(args.output_dir) / "decision_episode_chain.json"
-            chain_path.write_text(json.dumps(chain, indent=2), encoding="utf-8")
+        generate_proof()
+        files = [
+            Path("runs/intent_packet.json"),
+            Path("runs/input_snapshot.json"),
+            Path("runs/authority_contract.json"),
+            Path("runs/outputs_manifest.json"),
+            Path("runs/proof_bundle.json"),
+            Path("governance/ambiguity_policy.md"),
+        ]
+        export_pack(Path(args.pack_dir), files)
     except Exception as exc:
         return fail(str(exc))
 
-    print(f"PASS: audit-neutral pack exported ({manifest})")
+    print(f"PASS: audit-neutral pack exported -> {args.pack_dir}/")
     return 0
 
 

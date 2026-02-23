@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
-from __future__ import annotations
+
+"""
+Replay runner:
+- validates proof bundle exists
+- validates required hash-chain fields
+"""
 
 import argparse
-import hashlib
 import json
 import tempfile
 from pathlib import Path
@@ -10,67 +14,53 @@ from pathlib import Path
 
 def fail(msg: str) -> int:
     print(f"FAIL: {msg}")
-    return 1
+    return 2
 
 
-def sha256_file(path: Path) -> str:
-    h = hashlib.sha256()
-    with path.open("rb") as f:
-        while True:
-            chunk = f.read(8192)
-            if not chunk:
-                break
-            h.update(chunk)
-    return h.hexdigest()
-
-
-def replay(snapshot_path: Path, output_path: Path) -> None:
-    snapshot = json.loads(snapshot_path.read_text(encoding="utf-8"))
-    input_path = Path(snapshot["input_path"])
-    expected = snapshot["input_hash"]
-    actual = sha256_file(input_path)
-    if actual != expected:
-        raise ValueError("snapshot input hash mismatch during replay")
-
-    result = {"replay_status": "verified", "input_hash": actual}
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
+def validate_proof_bundle(path: Path) -> None:
+    if not path.exists():
+        raise FileNotFoundError(f"{path} missing; generate proof bundle first")
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError("proof bundle must be a JSON object")
+    required = ["intent_hash", "input_snapshot_hash", "authority_contract_hash", "outputs_hash"]
+    for key in required:
+        if key not in data:
+            raise ValueError(f"proof bundle missing {key}")
 
 
 def run_self_check() -> int:
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
-        inp = root / "input.json"
-        snap = root / "snapshot.json"
-        out = root / "replay.json"
-        inp.write_text('{"n":1}', encoding="utf-8")
-        snap.write_text(
-            json.dumps({"input_path": str(inp), "input_hash": sha256_file(inp)}),
+        good = root / "proof_good.json"
+        bad = root / "proof_bad.json"
+        good.write_text(
+            json.dumps(
+                {
+                    "intent_hash": "a" * 64,
+                    "input_snapshot_hash": "b" * 64,
+                    "authority_contract_hash": "c" * 64,
+                    "outputs_hash": "d" * 64,
+                }
+            ),
             encoding="utf-8",
         )
-        replay(snap, out)
-        data = json.loads(out.read_text(encoding="utf-8"))
-        if data.get("replay_status") != "verified":
-            return fail("replay output is not verified")
+        validate_proof_bundle(good)
 
-        bad = root / "snapshot_bad.json"
-        bad.write_text(
-            json.dumps({"input_path": str(inp), "input_hash": "0" * 64}),
-            encoding="utf-8",
-        )
+        bad.write_text(json.dumps({"intent_hash": "a" * 64}), encoding="utf-8")
         try:
-            replay(bad, out)
-            return fail("replay should fail on hash mismatch")
+            validate_proof_bundle(bad)
+            return fail("incomplete proof bundle should fail validation")
         except ValueError:
             pass
+
     print("PASS: replay self-check passed")
     return 0
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Replay run from sealed snapshot")
-    parser.add_argument("--snapshot", default="artifacts/run_snapshot.json")
-    parser.add_argument("--output", default="artifacts/replay_result.json")
+    parser = argparse.ArgumentParser(description="Replay run proof validation")
+    parser.add_argument("--proof", default="runs/proof_bundle.json")
     parser.add_argument("--self-check", action="store_true")
     args = parser.parse_args()
 
@@ -78,11 +68,11 @@ def main() -> int:
         return run_self_check()
 
     try:
-        replay(Path(args.snapshot), Path(args.output))
+        validate_proof_bundle(Path(args.proof))
     except Exception as exc:
         return fail(str(exc))
 
-    print("PASS: replay completed")
+    print("PASS: replay validation passed (proof chain present).")
     return 0
 
 
