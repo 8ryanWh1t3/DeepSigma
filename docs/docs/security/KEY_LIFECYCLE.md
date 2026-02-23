@@ -39,3 +39,5 @@ Every key version record must include:
   - `authority_reason`
 - Rotations emit a signed `AUTHORIZED_KEY_ROTATION` security event.
 - Every approved rotation appends a chained entry to `data/security/authority_ledger.json`.
+- Each append also updates `data/security/authority_ledger.snapshot.json` with snapshot hash and provenance.
+- Authority precedence is enforced as `DRI > Approver > System`; system-tier actors cannot approve privileged actions.
