@@ -5,6 +5,18 @@ All notable changes to Σ OVERWATCH / DeepSigma will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.4] — 2026-02-23 — "Helm Validation Reliability + Release Coherence"
+
+### Changed
+
+- Helm chart validation workflow now waits on release-labeled deployments instead of a hardcoded deployment name.
+- kind install test now builds and loads a local API image for chart install validation, removing GHCR pull dependency during CI.
+- Release metadata and governance baseline advanced to `v2.0.4` / `GOV-2.0.4`.
+
+### CI
+
+- Resolved repeated `kind-install-test` install/rollout failures in `Helm Chart Validation` workflow.
+
 ## [2.0.3] — 2026-02-22 — "Security Burndown Completion"
 
 ### Changed

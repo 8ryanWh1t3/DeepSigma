@@ -1,6 +1,6 @@
-> NOTE (v2.0.3): This stability contract describes the stable core surfaces originally formalized at v1.0.0.
-> The repo's current pilot release is v2.0.3. The contract remains applicable to the stable surfaces;
-> see `docs/release/RELEASE_NOTES_v2.0.3.md` and root `CHANGELOG.md` for v2 changes.
+> NOTE (v2.0.4): This stability contract describes the stable core surfaces originally formalized at v1.0.0.
+> The repo's current pilot release is v2.0.4. The contract remains applicable to the stable surfaces;
+> see `docs/release/RELEASE_NOTES_v2.0.4.md` and root `CHANGELOG.md` for v2 changes.
 
 # Σ OVERWATCH — Stability Contract
 

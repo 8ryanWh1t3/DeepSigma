@@ -10,13 +10,13 @@
 
 # Σ OVERWATCH
 
-**Current pilot release:** v2.0.3  
-See: [docs/release/RELEASE_NOTES_v2.0.3.md](docs/release/RELEASE_NOTES_v2.0.3.md)
+**Current pilot release:** v2.0.4  
+See: [docs/release/RELEASE_NOTES_v2.0.4.md](docs/release/RELEASE_NOTES_v2.0.4.md)
 
 ## Repo Radar KPI (latest)
-[![Repo KPI Badge](https://github.com/8ryanWh1t3/DeepSigma/blob/main/release_kpis/badge_latest.svg?raw=1)](https://github.com/8ryanWh1t3/DeepSigma/blob/main/release_kpis/radar_v2.0.3.png?raw=1)
+[![Repo KPI Badge](https://github.com/8ryanWh1t3/DeepSigma/blob/main/release_kpis/badge_latest.svg?raw=1)](https://github.com/8ryanWh1t3/DeepSigma/blob/main/release_kpis/radar_v2.0.4.png?raw=1)
 
-- Current release radar: [release_kpis/radar_v2.0.3.png](https://github.com/8ryanWh1t3/DeepSigma/blob/main/release_kpis/radar_v2.0.3.png?raw=1)
+- Current release radar: [release_kpis/radar_v2.0.4.png](https://github.com/8ryanWh1t3/DeepSigma/blob/main/release_kpis/radar_v2.0.4.png?raw=1)
 - Composite release radar: [release_kpis/radar_composite_latest.png](https://github.com/8ryanWh1t3/DeepSigma/blob/main/release_kpis/radar_composite_latest.png?raw=1)
 - Composite release delta table: [release_kpis/radar_composite_latest.md](https://github.com/8ryanWh1t3/DeepSigma/blob/main/release_kpis/radar_composite_latest.md)
 - Gate report: [release_kpis/KPI_GATE_REPORT.md](https://github.com/8ryanWh1t3/DeepSigma/blob/main/release_kpis/KPI_GATE_REPORT.md)
