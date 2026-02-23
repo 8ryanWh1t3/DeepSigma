@@ -31,6 +31,9 @@ See: [docs/release/RELEASE_NOTES_v2.0.6.md](docs/release/RELEASE_NOTES_v2.0.6.md
 - Roadmap forecast: [release_kpis/roadmap_forecast.md](release_kpis/roadmap_forecast.md)
 - Roadmap timeline: [release_kpis/roadmap_timeline.svg](release_kpis/roadmap_timeline.svg)
 - Roadmap scope gate: [release_kpis/ROADMAP_SCOPE_GATE_REPORT.md](release_kpis/ROADMAP_SCOPE_GATE_REPORT.md)
+- Nonlinear stability report: [release_kpis/nonlinear_stability_report.md](release_kpis/nonlinear_stability_report.md)
+- SSI artifact (current release): [release_kpis/stability_v2.0.6.json](release_kpis/stability_v2.0.6.json)
+- Stability-adjusted forecast: [release_kpis/stability_adjusted_forecast.json](release_kpis/stability_adjusted_forecast.json)
 
 ### Active Track (v2.1.0 — Security Hardening)
 - DISR hardening

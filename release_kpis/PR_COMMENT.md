@@ -17,6 +17,11 @@
 - Timeline: `release_kpis/roadmap_timeline.svg`
 - Scope gate: `release_kpis/ROADMAP_SCOPE_GATE_REPORT.md`
 
+**Nonlinear Stability:**
+- SSI JSON: `release_kpis/stability_v2.0.6.json`
+- Simulation: `release_kpis/stability_simulation_v2.0.6.json`
+- Report: `release_kpis/nonlinear_stability_report.md`
+
 **Trend:**
 - PNG: `release_kpis/kpi_trend.png`
 - SVG: `release_kpis/kpi_trend.svg`
@@ -26,9 +31,9 @@
 - `release_kpis/ISSUE_LABEL_GATE_REPORT.md`
 
 **TEC (ROM):**
-- Internal: 2875.5 hrs | $431,325
-- Executive: 2875.5 hrs | $646,988
-- DoD: 2875.5 hrs | $790,762
+- Internal: 2877.0 hrs | $431,550
+- Executive: 2877.0 hrs | $647,325
+- DoD: 2877.0 hrs | $791,175
 - Full detail: `release_kpis/TEC_SUMMARY.md`
 
 **Notes:**

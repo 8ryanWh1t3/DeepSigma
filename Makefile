@@ -1,4 +1,4 @@
-.PHONY: ci demo pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review tec lock-update build docker release-check release-check-strict version-sync-check pilot-pack scale-benchmark reencrypt-benchmark openapi-docs openapi-check security-gate security-demo security-audit-pack authority-ledger-export roadmap-forecast roadmap-badge roadmap-timeline roadmap-gate roadmap-refresh
+.PHONY: ci demo pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review tec lock-update build docker release-check release-check-strict version-sync-check pilot-pack scale-benchmark reencrypt-benchmark openapi-docs openapi-check security-gate security-demo security-audit-pack authority-ledger-export roadmap-forecast roadmap-badge roadmap-timeline roadmap-gate roadmap-refresh stability
 
 ci:
 	python scripts/compute_ci.py
@@ -110,3 +110,6 @@ roadmap-refresh:
 	python scripts/render_roadmap_badge.py
 	python scripts/render_roadmap_timeline.py
 	python scripts/roadmap_scope_gate.py
+
+stability:
+	python scripts/nonlinear_stability.py

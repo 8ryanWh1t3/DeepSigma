@@ -1,0 +1,75 @@
+{
+  "schema": "stability_simulation_v1",
+  "version": "v2.0.6",
+  "scenarios": {
+    "mild": {
+      "description": "single-cycle turbulence with constrained spread",
+      "shock": {
+        "automation_depth": -0.6,
+        "scalability": -0.4,
+        "economic_measurability": -0.5,
+        "authority_modeling": -0.3
+      },
+      "projected_kpis": {
+        "technical_completeness": 10.0,
+        "automation_depth": 9.4,
+        "authority_modeling": 5.85,
+        "enterprise_readiness": 10.0,
+        "scalability": 4.68,
+        "data_integration": 8.38,
+        "economic_measurability": 3.74,
+        "operational_maturity": 10.0
+      },
+      "projected_ssi": 26.5,
+      "projected_drift_acceleration_index": 1.0,
+      "gate": "fail"
+    },
+    "moderate": {
+      "description": "broad system stress and governance lag",
+      "shock": {
+        "automation_depth": -1.2,
+        "scalability": -0.9,
+        "economic_measurability": -1.0,
+        "authority_modeling": -0.8,
+        "data_integration": -0.6
+      },
+      "projected_kpis": {
+        "technical_completeness": 10.0,
+        "automation_depth": 8.8,
+        "authority_modeling": 5.35,
+        "enterprise_readiness": 10.0,
+        "scalability": 4.18,
+        "data_integration": 7.78,
+        "economic_measurability": 3.24,
+        "operational_maturity": 10.0
+      },
+      "projected_ssi": 22.0,
+      "projected_drift_acceleration_index": 1.0,
+      "gate": "fail"
+    },
+    "severe": {
+      "description": "compound drift with authority + economic instability",
+      "shock": {
+        "automation_depth": -2.0,
+        "scalability": -1.8,
+        "economic_measurability": -1.7,
+        "authority_modeling": -1.4,
+        "data_integration": -1.1,
+        "operational_maturity": -0.8
+      },
+      "projected_kpis": {
+        "technical_completeness": 10.0,
+        "automation_depth": 8.0,
+        "authority_modeling": 4.75,
+        "enterprise_readiness": 10.0,
+        "scalability": 3.28,
+        "data_integration": 7.28,
+        "economic_measurability": 2.54,
+        "operational_maturity": 9.2
+      },
+      "projected_ssi": 16.33,
+      "projected_drift_acceleration_index": 1.0,
+      "gate": "fail"
+    }
+  }
+}
