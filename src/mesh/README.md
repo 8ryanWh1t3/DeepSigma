@@ -74,6 +74,16 @@ seal-A
 
 7 nodes, 3 regions. All nodes peer with each other for replication.
 
+## Peer Discovery
+
+Peer discovery supports:
+
+- static config (`StaticRegistry(peers=...)` or YAML file)
+- DNS SRV records (`StaticRegistry(dns_srv_records=[...])`)
+
+DNS SRV discovery resolves peers into node URLs and tags each entry with
+`discovered_via: dns-srv`.
+
 ## Verification
 
 ```bash
