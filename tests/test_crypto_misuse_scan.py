@@ -152,3 +152,69 @@ def test_scanner_flags_provider_policy_violation(tmp_path: Path):
     findings = module.scan_repo(repo)
     categories = {item.category for item in findings}
     assert "provider_policy_violation" in categories
+
+
+def test_scanner_flags_provider_drift_from_env(monkeypatch, tmp_path: Path):
+    repo = tmp_path / "repo"
+    (repo / "schemas" / "core").mkdir(parents=True, exist_ok=True)
+    (repo / "governance").mkdir(parents=True, exist_ok=True)
+    (repo / "data").mkdir(parents=True, exist_ok=True)
+
+    (repo / "schemas" / "core" / "crypto_envelope.schema.json").write_text(
+        json.dumps({"required": ["envelope_version", "key_id", "key_version", "alg", "nonce", "aad"]}),
+        encoding="utf-8",
+    )
+    (repo / "schemas" / "core" / "security_crypto_policy.schema.json").write_text("{}", encoding="utf-8")
+    (repo / "governance" / "security_crypto_policy.json").write_text(
+        json.dumps(
+            {
+                "policy_version": "1.0",
+                "default_provider": "local-keystore",
+                "allowed_providers": ["local-keystore", "local-keyring"],
+                "allowed_algorithms": ["AES-256-GCM"],
+                "min_ttl_days": 1,
+                "max_ttl_days": 30,
+                "envelope_version_current": "1.0",
+                "envelope_versions_supported": ["1.0"],
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("DEEPSIGMA_CRYPTO_PROVIDER", "local-keyring")
+    module = _load_scanner_module(Path(__file__).resolve().parents[1])
+    findings = module.scan_repo(repo)
+    categories = {item.category for item in findings}
+    assert "provider_drift" in categories
+
+
+def test_scanner_flags_blocked_provider_override(monkeypatch, tmp_path: Path):
+    repo = tmp_path / "repo"
+    (repo / "schemas" / "core").mkdir(parents=True, exist_ok=True)
+    (repo / "governance").mkdir(parents=True, exist_ok=True)
+    (repo / "data").mkdir(parents=True, exist_ok=True)
+
+    (repo / "schemas" / "core" / "crypto_envelope.schema.json").write_text(
+        json.dumps({"required": ["envelope_version", "key_id", "key_version", "alg", "nonce", "aad"]}),
+        encoding="utf-8",
+    )
+    (repo / "schemas" / "core" / "security_crypto_policy.schema.json").write_text("{}", encoding="utf-8")
+    (repo / "governance" / "security_crypto_policy.json").write_text(
+        json.dumps(
+            {
+                "policy_version": "1.0",
+                "default_provider": "local-keystore",
+                "allowed_providers": ["local-keystore"],
+                "allowed_algorithms": ["AES-256-GCM"],
+                "min_ttl_days": 1,
+                "max_ttl_days": 30,
+                "envelope_version_current": "1.0",
+                "envelope_versions_supported": ["1.0"],
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("DEEPSIGMA_CRYPTO_PROVIDER", "aws-kms")
+    module = _load_scanner_module(Path(__file__).resolve().parents[1])
+    findings = module.scan_repo(repo)
+    categories = {item.category for item in findings}
+    assert "provider_policy_violation_env" in categories
