@@ -55,9 +55,46 @@ def read_kpi_version() -> str:
     return raw[1:] if raw.startswith("v") else raw
 
 
+def verify_tag_is_main_head() -> tuple[bool, str]:
+    """Ensure the tagged commit is exactly the current origin/main HEAD."""
+    try:
+        subprocess.check_call(
+            ["git", "fetch", "origin", "main"],
+            cwd=ROOT,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        tag_commit = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"],
+            cwd=ROOT,
+            text=True,
+        ).strip()
+        main_commit = subprocess.check_output(
+            ["git", "rev-parse", "origin/main"],
+            cwd=ROOT,
+            text=True,
+        ).strip()
+    except subprocess.CalledProcessError as exc:
+        return False, f"Unable to resolve commit refs for strict main-head check: {exc}"
+
+    if tag_commit != main_commit:
+        return (
+            False,
+            "Tag commit is not origin/main HEAD: "
+            f"tag_commit={tag_commit} origin/main={main_commit}",
+        )
+
+    return True, main_commit
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate tag/version/changelog for release")
     parser.add_argument("--tag", help="Tag to validate (e.g. v2.0.3)")
+    parser.add_argument(
+        "--require-main-head",
+        action="store_true",
+        help="Require the tag to point to the current origin/main HEAD.",
+    )
     args = parser.parse_args()
 
     tag = detect_tag(args.tag)
@@ -94,6 +131,18 @@ def main() -> int:
         )
         failed = True
 
+    strict_main_head = args.require_main_head or os.environ.get(
+        "RELEASE_CHECK_REQUIRE_MAIN_HEAD"
+    ) == "1"
+    strict_main_head_ref = ""
+    if strict_main_head:
+        ok, result = verify_tag_is_main_head()
+        if not ok:
+            print(f"ERROR: {result}", file=sys.stderr)
+            failed = True
+        else:
+            strict_main_head_ref = result
+
     if failed:
         return 1
 
@@ -102,6 +151,8 @@ def main() -> int:
     print(f"- version: {project_version}")
     print(f"- kpi version: {kpi_version}")
     print(f"- changelog: {CHANGELOG}")
+    if strict_main_head:
+        print(f"- origin/main HEAD: {strict_main_head_ref}")
     return 0
 
 
