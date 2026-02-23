@@ -9,11 +9,15 @@ import json
 import os
 from pathlib import Path
 import re
+import sys
 from typing import Any
 
-from deepsigma.security.events import EVENT_NONCE_REUSE_DETECTED, append_security_event
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
+SRC = REPO_ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from deepsigma.security.events import EVENT_NONCE_REUSE_DETECTED, append_security_event
 ENVELOPE_REQUIRED_FIELDS = ["key_id", "key_version", "alg", "nonce", "aad"]
 
 
