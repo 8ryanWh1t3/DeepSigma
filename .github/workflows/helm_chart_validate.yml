@@ -39,9 +39,18 @@ jobs:
         uses: helm/kind-action@v1
         with:
           cluster_name: deepsigma
+      - name: Build and load local API image for kind
+        run: |
+          docker build -f docker/scale/Dockerfile.api -t deepsigma-api:ci .
+          kind load docker-image deepsigma-api:ci --name deepsigma
       - name: Install chart
         run: |
-          helm upgrade --install deepsigma charts/deepsigma --namespace deepsigma --create-namespace
+          helm upgrade --install deepsigma charts/deepsigma \
+            --namespace deepsigma \
+            --create-namespace \
+            --set api.image.repository=deepsigma-api \
+            --set api.image.tag=ci \
+            --set api.image.pullPolicy=IfNotPresent
           kubectl -n deepsigma wait \
             --for=condition=available \
             deployment \
