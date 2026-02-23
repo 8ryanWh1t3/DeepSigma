@@ -137,3 +137,27 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+# --- Feature Coverage (Catalog) ---
+def _append_feature_coverage_to_pr_comment(pr_comment_path: str = "release_kpis/PR_COMMENT.md") -> None:
+    import json
+    from pathlib import Path
+
+    cat_path = Path("release_kpis/feature_catalog.json")
+    if not cat_path.exists():
+        return
+
+    data = json.loads(cat_path.read_text(encoding="utf-8"))
+    lines = []
+    lines.append("")
+    lines.append("## 🧩 Feature Coverage (Catalog)")
+    for c in data.get("categories", []):
+        lines.append(f"- **{c.get('name','(unnamed)')}**: {len(c.get('features', []))} features")
+    p = Path(pr_comment_path)
+    if p.exists():
+        p.write_text(p.read_text(encoding="utf-8") + "\n" + "\n".join(lines) + "\n", encoding="utf-8")
+
+try:
+    _append_feature_coverage_to_pr_comment()
+except Exception:
+    pass
