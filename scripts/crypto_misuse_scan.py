@@ -17,7 +17,7 @@ SRC = REPO_ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from deepsigma.security.events import EVENT_NONCE_REUSE_DETECTED, append_security_event
+from deepsigma.security.events import EVENT_NONCE_REUSE_DETECTED, append_security_event  # noqa: E402
 ENVELOPE_REQUIRED_FIELDS = ["key_id", "key_version", "alg", "nonce", "aad"]
 
 
