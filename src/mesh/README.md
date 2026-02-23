@@ -157,6 +157,27 @@ controls for peer-to-peer replication links.
 Use `set_peer_identity`, `configure_trust_roots`, and
 `rotate_client_certificate` to manage trust and rotation configuration.
 
+## Anti-Entropy and Delta Sync
+
+Mesh anti-entropy now uses a deterministic protocol implemented in
+`mesh.anti_entropy`:
+
+- digest exchange (`digest`) to detect divergence quickly
+- cursor + known-id delta offers (`build_delta_offer`)
+- replay-safe apply (`apply_delta_replay_safe`) to skip duplicate IDs
+- reconciliation report (`reconcile_sets`) for correctness checks
+
+### Bandwidth Profile (reference)
+
+Using the built-in estimator (`estimate_bandwidth_profile`) with
+`avg_record_bytes=256`:
+
+| Full log records | Delta records | Full bytes | Delta bytes | Saved |
+|---:|---:|---:|---:|---:|
+| 1000 | 80 | 256000 | 20480 | 92.00% |
+
+This profile documents the target behavior for avoiding full-log replication.
+
 ## Guardrails
 
 - Abstract institutional credibility model
