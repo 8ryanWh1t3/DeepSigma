@@ -1,0 +1,15 @@
+name: Mesh WAN Integration
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  wan-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run 3-node WAN partition drill
+        run: |
+          bash scripts/mesh_wan_partition.sh

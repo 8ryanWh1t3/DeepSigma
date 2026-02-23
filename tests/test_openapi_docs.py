@@ -17,6 +17,7 @@ def test_openapi_json_served_and_contains_required_domains():
 
     assert "/api/credibility/snapshot" in paths
     assert "/mesh/{tenant_id}/summary" in paths
+    assert "/mesh/{tenant_id}/topology" in paths
     assert "/api/tenants" in paths
     assert "/api/{tenant_id}/policy" in paths
     assert "/api/{tenant_id}/audit/recent" in paths
