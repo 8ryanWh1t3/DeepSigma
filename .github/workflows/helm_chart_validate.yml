@@ -13,6 +13,9 @@ on:
       - "docs/deployment/HELM.md"
       - ".github/workflows/helm_chart_validate.yml"
 
+permissions:
+  contents: read
+
 jobs:
   chart-lint-template:
     runs-on: ubuntu-latest
