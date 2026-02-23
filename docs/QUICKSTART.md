@@ -49,3 +49,4 @@ cat out/iris_why.json
 1. Connector setup: `docs/CONNECTOR_SDK.md`
 2. OpenClaw policy modules: `adapters/openclaw/`
 3. Dashboard: `dashboard/` and `docs/24-dashboard-api.md`
+4. API reference: `docs/api/index.html`
