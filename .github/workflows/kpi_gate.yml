@@ -29,6 +29,7 @@ jobs:
 
       - name: Run KPI issue deltas
         run: |
+          make milestone-gate
           make issue-label-gate
           make kpi-issues
           make roadmap-gate
