@@ -24,6 +24,7 @@ import json
 import logging
 import os
 import sys
+import time
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
@@ -36,7 +37,7 @@ sys.path.insert(0, str(REPO_ROOT))
 import uvicorn  # noqa: E402
 from fastapi import FastAPI, HTTPException, Request  # noqa: E402
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
-from fastapi.responses import PlainTextResponse, StreamingResponse  # noqa: E402
+from fastapi.responses import JSONResponse, PlainTextResponse, StreamingResponse  # noqa: E402
 
 from coherence_ops import (  # noqa: E402
     DLRBuilder,
@@ -48,12 +49,19 @@ from coherence_ops import (  # noqa: E402
     ReflectionSession,
     CoherenceScorer,
 )
+from credibility_engine.constants import DEFAULT_TENANT_ID  # noqa: E402
+from credibility_engine.store import CredibilityStore  # noqa: E402
 from credibility_engine.api import router as credibility_router  # noqa: E402
 from mesh.transport import create_mesh_router  # noqa: E402
 
 # ── App setup ─────────────────────────────────────────────────────────────────
 app = FastAPI(title="DeepSigma Dashboard API", version="0.1.0")
 logger = logging.getLogger(__name__)
+_start_time = time.monotonic()
+_draining = False
+_inflight_requests = 0
+_DRAIN_TIMEOUT_S = float(os.environ.get("DEEPSIGMA_DRAIN_TIMEOUT_S", "5.0"))
+_DRAIN_POLL_S = float(os.environ.get("DEEPSIGMA_DRAIN_POLL_S", "0.05"))
 
 _DEFAULT_ORIGINS = [
     "http://localhost:3000",
@@ -69,6 +77,24 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def track_inflight_and_drain(request: Request, call_next):
+    """Track in-flight requests and reject new work while draining."""
+    global _inflight_requests
+
+    if _draining and request.url.path not in {"/api/health", "/api/live", "/api/ready"}:
+        return JSONResponse(
+            status_code=503,
+            content={"status": "draining", "detail": "Server is draining for shutdown"},
+        )
+
+    _inflight_requests += 1
+    try:
+        return await call_next(request)
+    finally:
+        _inflight_requests = max(0, _inflight_requests - 1)
 
 # -- Credibility Engine routes -------------------------------------------------
 app.include_router(credibility_router)
@@ -351,18 +377,65 @@ def _build_pipeline(episodes: List[Dict[str, Any]], drifts: List[Dict[str, Any]]
     return dlr, rs, ds, mg
 
 
-# ── Endpoints ─────────────────────────────────────────────────────────────────
+def _persistence_probe() -> tuple[bool, str]:
+    """Check whether credibility persistence is available."""
+    try:
+        store = CredibilityStore(tenant_id=DEFAULT_TENANT_ID)
+        # Ensure read path works and storage directory is writable.
+        store.load_all(CredibilityStore.CLAIMS_FILE)
+        probe_path = store.data_dir / ".healthcheck.tmp"
+        probe_path.write_text("ok", encoding="utf-8")
+        probe_path.unlink(missing_ok=True)
+        return True, "ok"
+    except Exception as exc:
+        return False, f"{type(exc).__name__}: {exc}"
 
-@app.get("/api/health")
-def health():
+
+def _health_payload() -> dict[str, Any]:
     episodes = _load_episodes()
     drifts = _load_drifts()
+    persistence_ok, persistence_detail = _persistence_probe()
+    ready = persistence_ok and not _draining
+    status = "ok" if ready else "degraded"
     return {
-        "status": "ok",
+        "status": status,
+        "ready": ready,
+        "draining": _draining,
+        "persistence_ok": persistence_ok,
+        "persistence_detail": persistence_detail,
+        "inflight_requests": _inflight_requests,
+        "uptime_s": round(time.monotonic() - _start_time, 1),
         "episode_count": len(episodes),
         "drift_count": len(drifts),
         "repo_root": str(REPO_ROOT),
     }
+
+
+# ── Endpoints ─────────────────────────────────────────────────────────────────
+
+@app.get("/api/health")
+def health():
+    return _health_payload()
+
+
+@app.get("/api/live")
+def liveness():
+    """Liveness endpoint: process is alive regardless of dependency readiness."""
+    return {
+        "status": "live",
+        "draining": _draining,
+        "inflight_requests": _inflight_requests,
+        "uptime_s": round(time.monotonic() - _start_time, 1),
+    }
+
+
+@app.get("/api/ready")
+def readiness():
+    """Readiness endpoint: 200 only when persistence is available and not draining."""
+    payload = _health_payload()
+    if payload["ready"]:
+        return payload
+    return JSONResponse(status_code=503, content=payload)
 
 
 @app.get("/api/episodes")
@@ -577,6 +650,27 @@ async def webhook_powerautomate(request: Request):
 
 
 logger = __import__("logging").getLogger(__name__)
+
+
+async def _drain_inflight_requests(timeout_s: float = _DRAIN_TIMEOUT_S) -> None:
+    """Wait for in-flight requests to complete, up to timeout."""
+    deadline = time.monotonic() + max(0.0, timeout_s)
+    while _inflight_requests > 0 and time.monotonic() < deadline:
+        await asyncio.sleep(_DRAIN_POLL_S)
+
+
+@app.on_event("shutdown")
+async def shutdown_drain() -> None:
+    """Graceful shutdown: stop accepting new work and drain in-flight requests."""
+    global _draining
+    _draining = True
+    logger.info(
+        "API entering drain mode (inflight=%s timeout=%.1fs)",
+        _inflight_requests,
+        _DRAIN_TIMEOUT_S,
+    )
+    await _drain_inflight_requests(_DRAIN_TIMEOUT_S)
+    logger.info("API shutdown drain complete (remaining inflight=%s)", _inflight_requests)
 
 # ── Entry point ───────────────────────────────────────────────────────────────
 

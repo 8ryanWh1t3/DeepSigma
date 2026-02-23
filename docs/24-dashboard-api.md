@@ -23,11 +23,40 @@ The server starts on `http://0.0.0.0:8000` by default. Set `PORT` to override.
 
 ### `GET /api/health`
 
-Liveness check with data counts.
+Aggregated health endpoint with readiness semantics.
 
 ```json
-{"status": "ok", "episode_count": 12, "drift_count": 5, "repo_root": "/path/to/DeepSigma"}
+{
+  "status": "ok",
+  "ready": true,
+  "draining": false,
+  "persistence_ok": true,
+  "persistence_detail": "ok",
+  "inflight_requests": 0,
+  "uptime_s": 12.1,
+  "episode_count": 12,
+  "drift_count": 5,
+  "repo_root": "/path/to/DeepSigma"
+}
 ```
+
+`status` is `degraded` when persistence is unavailable or the service is draining.
+
+### `GET /api/live`
+
+Liveness probe. Returns `200` whenever the process is alive.
+
+```json
+{"status":"live","draining":false,"inflight_requests":0,"uptime_s":12.1}
+```
+
+### `GET /api/ready`
+
+Readiness probe. Returns:
+- `200` when persistence is available and the server is not draining
+- `503` when persistence is unavailable or drain mode is active
+
+Use this endpoint for load balancer readiness checks.
 
 ### `GET /api/episodes`
 
@@ -136,6 +165,8 @@ export CORS_ORIGINS="https://dashboard.example.com,http://localhost:3000"
 | `CORS_ORIGINS` | localhost:3000,5173 | Comma-separated allowed origins |
 | `SP_WEBHOOK_SECRET` | *(unset)* | HMAC secret for SharePoint webhook |
 | `PA_WEBHOOK_SECRET` | *(unset)* | HMAC secret for Power Automate webhook |
+| `DEEPSIGMA_DRAIN_TIMEOUT_S` | `5.0` | Max seconds to wait for in-flight requests during shutdown |
+| `DEEPSIGMA_DRAIN_POLL_S` | `0.05` | Poll interval for in-flight drain loop |
 
 ---
 
