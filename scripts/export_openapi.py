@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 
@@ -48,9 +49,15 @@ def _enrich_openapi(spec: dict) -> dict:
 
 
 def main() -> int:
+    root = Path(__file__).resolve().parents[1]
+    src_root = root / "src"
+    if str(src_root) not in sys.path:
+        sys.path.insert(0, str(src_root))
+    if str(root) not in sys.path:
+        sys.path.insert(0, str(root))
+
     from dashboard.api_server import app
 
-    root = Path(__file__).resolve().parents[1]
     out_dir = root / "docs" / "api"
     out_dir.mkdir(parents=True, exist_ok=True)
 
