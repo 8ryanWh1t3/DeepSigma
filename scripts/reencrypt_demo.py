@@ -73,6 +73,10 @@ def main() -> int:
         checkpoint_path=out_dir / "reencrypt_checkpoint.json",
         actor_user="demo-operator",
         actor_role="coherence_steward",
+        authority_dri="demo.dri",
+        authority_reason="DISR 10-minute demo approval",
+        authority_signing_key=signing_key,
+        authority_ledger_path=out_dir / "authority_ledger.json",
     )
     recovery_completed_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     elapsed_seconds = max(time.perf_counter() - t0, 0.001)

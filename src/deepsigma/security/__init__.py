@@ -1,6 +1,7 @@
 """Security primitives for DISR (Disposable Rotors)."""
 
 from .authority_ledger import append_authority_rotation_entry
+from .action_contract import ActionContract, create_action_contract, validate_action_contract
 from .events import SecurityEvent, append_security_event
 from .keyring import Keyring, KeyVersionRecord
 from .providers import (
@@ -25,6 +26,9 @@ __all__ = [
     "available_providers",
     "append_security_event",
     "append_authority_rotation_entry",
+    "ActionContract",
+    "create_action_contract",
+    "validate_action_contract",
     "AWSKMSProvider",
     "AzureKeyVaultProvider",
     "create_provider",

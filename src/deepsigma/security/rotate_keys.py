@@ -11,7 +11,8 @@ from typing import Callable
 
 from governance.audit import audit_action
 
-from .authority_ledger import append_authority_rotation_entry
+from .action_contract import create_action_contract, validate_action_contract
+from .authority_ledger import append_authority_action_entry
 from .events import append_security_event
 from .keyring import Keyring, KeyVersionRecord
 
@@ -54,6 +55,7 @@ def rotate_keys(
     authority_role: str,
     authority_reason: str | None,
     authority_signing_key: str | None,
+    action_contract: dict | None = None,
     keyring_path: str | Path = "data/security/keyring.json",
     event_log_path: str | Path = "data/security/key_rotation_events.jsonl",
     authority_ledger_path: str | Path = "data/security/authority_ledger.json",
@@ -67,6 +69,20 @@ def rotate_keys(
         raise ValueError("authority_reason is required for rotation approval")
     if not authority_signing_key:
         raise ValueError("authority_signing_key is required to sign rotation approval")
+    if action_contract is None:
+        action_contract = create_action_contract(
+            action_type="ROTATE_KEYS",
+            requested_by=actor_user,
+            dri=authority_dri,
+            approver=authority_dri,
+            signing_key=authority_signing_key,
+        ).to_dict()
+    validated_contract = validate_action_contract(
+        action_contract,
+        expected_action_type="ROTATE_KEYS",
+        signing_key=authority_signing_key,
+        now=now_fn(),
+    )
 
     now = now_fn()
     expires_at = _to_iso(now + timedelta(days=ttl_days))
@@ -104,13 +120,14 @@ def rotate_keys(
             "authority_dri": authority_dri,
             "authority_role": authority_role,
             "authority_reason": authority_reason,
+            "action_contract_id": validated_contract.action_id,
         },
         signer_id=authority_dri,
         signing_key=authority_signing_key,
     )
-    authority_entry = append_authority_rotation_entry(
+    authority_entry = append_authority_action_entry(
         ledger_path=authority_ledger_path,
-        rotation_event={
+        authority_event={
             "event_id": security_event.event_id,
             "event_hash": security_event.event_hash,
             "tenant_id": tenant_id,
@@ -121,6 +138,8 @@ def rotate_keys(
         authority_role=authority_role,
         authority_reason=authority_reason,
         signing_key=authority_signing_key,
+        action_type="AUTHORIZED_KEY_ROTATION",
+        action_contract=validated_contract.to_dict(),
     )
 
     audit_action(
@@ -140,6 +159,7 @@ def rotate_keys(
             "authority_entry_id": authority_entry["entry_id"],
             "authority_reason": authority_reason,
             "approved_by": authority_dri,
+            "action_contract_id": validated_contract.action_id,
         },
     )
 

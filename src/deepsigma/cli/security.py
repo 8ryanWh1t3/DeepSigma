@@ -30,6 +30,11 @@ def register(subparsers: argparse._SubParsersAction) -> None:
         help="Env var name containing HMAC key for signed authority events",
     )
     rotate.add_argument(
+        "--action-contract-path",
+        default=None,
+        help="Optional JSON file with signed authority action contract",
+    )
+    rotate.add_argument(
         "--authority-ledger-path",
         default="data/security/authority_ledger.json",
         help="Path to append authority ledger entries",
@@ -60,12 +65,41 @@ def register(subparsers: argparse._SubParsersAction) -> None:
     )
     reenc.add_argument("--actor-user", default="system", help="Actor user for audit event")
     reenc.add_argument("--actor-role", default="coherence_steward", help="Actor role for audit event")
+    reenc.add_argument("--authority-dri", required=True, help="Approving DRI identity")
+    reenc.add_argument("--authority-role", default="dri_approver", help="Approving authority role")
+    reenc.add_argument("--authority-reason", required=True, help="Approval rationale")
+    reenc.add_argument(
+        "--authority-signing-key-env",
+        default="DEEPSIGMA_AUTHORITY_SIGNING_KEY",
+        help="Env var name containing HMAC key for signed authority events",
+    )
+    reenc.add_argument(
+        "--authority-ledger-path",
+        default="data/security/authority_ledger.json",
+        help="Path to append authority ledger entries",
+    )
+    reenc.add_argument(
+        "--action-contract-path",
+        default=None,
+        help="Optional JSON file with signed authority action contract",
+    )
     reenc.add_argument("--json", action="store_true", help="Output JSON")
     reenc.set_defaults(func=run_reencrypt)
 
 
+def _load_action_contract(path: str | None) -> dict | None:
+    if not path:
+        return None
+    raw = Path(path).read_text(encoding="utf-8")
+    payload = json.loads(raw)
+    if not isinstance(payload, dict):
+        raise ValueError("action contract file must contain a JSON object")
+    return payload
+
+
 def run_rotate(args: argparse.Namespace) -> int:
     signing_key = os.getenv(args.authority_signing_key_env)
+    action_contract = _load_action_contract(args.action_contract_path)
     result = rotate_keys(
         tenant_id=args.tenant,
         key_id=args.key_id,
@@ -76,6 +110,7 @@ def run_rotate(args: argparse.Namespace) -> int:
         authority_role=args.authority_role,
         authority_reason=args.authority_reason,
         authority_signing_key=signing_key,
+        action_contract=action_contract,
         keyring_path=Path(args.keyring_path),
         event_log_path=Path(args.event_log_path),
         authority_ledger_path=Path(args.authority_ledger_path),
@@ -92,6 +127,8 @@ def run_rotate(args: argparse.Namespace) -> int:
 
 
 def run_reencrypt(args: argparse.Namespace) -> int:
+    signing_key = os.getenv(args.authority_signing_key_env)
+    action_contract = _load_action_contract(args.action_contract_path)
     summary = run_reencrypt_job(
         tenant_id=args.tenant,
         dry_run=bool(args.dry_run),
@@ -101,6 +138,12 @@ def run_reencrypt(args: argparse.Namespace) -> int:
         previous_master_key_env=args.previous_master_key_env,
         actor_user=args.actor_user,
         actor_role=args.actor_role,
+        authority_dri=args.authority_dri,
+        authority_role=args.authority_role,
+        authority_reason=args.authority_reason,
+        authority_signing_key=signing_key,
+        action_contract=action_contract,
+        authority_ledger_path=Path(args.authority_ledger_path),
     )
     payload = reencrypt_summary_to_dict(summary)
     if args.json:

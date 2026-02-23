@@ -174,13 +174,15 @@ class TestSecurityCLI:
         assert event_path.exists()
         assert authority_ledger_path.exists()
 
-    def test_security_reencrypt_dry_run_json(self, tmp_path, capsys):
+    def test_security_reencrypt_dry_run_json(self, tmp_path, capsys, monkeypatch):
         from deepsigma.cli.main import main
 
         data_dir = tmp_path / "cred"
         data_dir.mkdir(parents=True, exist_ok=True)
         (data_dir / "claims.jsonl").write_text('{"claim_id":"C-1"}\\n', encoding="utf-8")
         checkpoint = tmp_path / "checkpoint.json"
+        authority_ledger_path = tmp_path / "authority_ledger.json"
+        monkeypatch.setenv("DEEPSIGMA_AUTHORITY_SIGNING_KEY", "test-signing-key")
 
         rc = main(
             [
@@ -193,6 +195,12 @@ class TestSecurityCLI:
                 "--checkpoint",
                 str(checkpoint),
                 "--dry-run",
+                "--authority-dri",
+                "dri.approver",
+                "--authority-reason",
+                "scheduled drill",
+                "--authority-ledger-path",
+                str(authority_ledger_path),
                 "--json",
             ]
         )
