@@ -4,6 +4,7 @@
 Commands:
     deepsigma doctor                          Environment health check
     deepsigma demo excel [--out DIR]          Excel-first Money Demo
+    deepsigma retention sweep --tenant <id>   TTL retention sweep + compaction
     deepsigma validate boot <xlsx>            BOOT contract validation
     deepsigma mdpt index --csv <file>         Generate MDPT Prompt Index
     deepsigma golden-path <source> [opts]     7-step Golden Path loop
@@ -46,6 +47,7 @@ def main(argv: list[str] | None = None) -> int:
         doctor,
         golden_path,
         mdpt_index,
+        retention,
         rekey,
         validate_boot,
     )
@@ -54,6 +56,7 @@ def main(argv: list[str] | None = None) -> int:
     demo_excel.register(subparsers)
     validate_boot.register(subparsers)
     mdpt_index.register(subparsers)
+    retention.register(subparsers)
     golden_path.register(subparsers)
     compact.register(subparsers)
     rekey.register(subparsers)

@@ -82,6 +82,12 @@ def default_policy(tenant_id: str) -> dict[str, Any]:
             "packets_per_hour": 120,
             "exports_per_day": 500,
         },
+        "retention_policy": {
+            "hot_retention_hours": 24,
+            "warm_retention_days": 30,
+            "cold_retention_days": 365,
+            "audit_retention_days": 2555,
+        },
     }
 
 

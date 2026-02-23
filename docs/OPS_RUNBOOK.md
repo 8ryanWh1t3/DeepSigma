@@ -12,6 +12,7 @@
 |------|---------|
 | Run Money Demo (recommended) | `make demo` |
 | Run Money Demo (canonical) | `python -m coherence_ops.examples.drift_patch_cycle` |
+| Run retention sweep | `deepsigma retention sweep --tenant tenant-alpha` |
 | Score episodes | `python -m coherence_ops score ./coherence_ops/examples/sample_episodes.json --json` |
 | Run full test suite | `pytest tests/ -v` |
 | Run with coverage | `pytest --cov=coherence_ops --cov-report=term-missing` |
