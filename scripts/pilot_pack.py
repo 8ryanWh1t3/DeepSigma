@@ -14,6 +14,7 @@ def main() -> int:
         shutil.rmtree(pack)
     pack.mkdir(parents=True, exist_ok=True)
 
+    subprocess.check_call(["make", "security-audit-pack"])
     subprocess.check_call(["make", "issue-label-gate"])
     subprocess.check_call(["make", "kpi-issues"])
     subprocess.check_call(["make", "kpi"])
@@ -74,6 +75,10 @@ def main() -> int:
         if drill.exists():
             shutil.copy2(drill, pack / drill.name)
 
+    audit_pack = ROOT / "security_audit_pack"
+    if audit_pack.exists():
+        shutil.copytree(audit_pack, pack / "security_audit_pack")
+
     (pack / "README.md").write_text(
         f"""# Pilot Pack - {version}
 
@@ -84,6 +89,7 @@ This folder is a shareable bundle for pilot evaluation.
 - KPI gate report + Issue label gate report
 - Pilot docs (scope, DRI, branch protection, contract)
 - Drill scripts (pilot_in_a_box, why_60s)
+- Security audit proof bundle (`security_audit_pack/`)
 
 ## Run locally
 ```bash
