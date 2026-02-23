@@ -94,6 +94,8 @@ def register(subparsers: argparse._SubParsersAction) -> None:
         default=None,
         help="Optional JSON file with signed authority action contract",
     )
+    reenc.add_argument("--batch-size", type=int, default=1000, help="Records per checkpointed batch")
+    reenc.add_argument("--idempotency-key", default=None, help="Stable idempotency key for resume safety")
     reenc.add_argument("--json", action="store_true", help="Output JSON")
     reenc.set_defaults(func=run_reencrypt)
 
@@ -179,6 +181,8 @@ def run_reencrypt(args: argparse.Namespace) -> int:
         action_contract=action_contract,
         authority_ledger_path=Path(args.authority_ledger_path),
         security_events_path=Path(args.security_events_path),
+        batch_size=args.batch_size,
+        idempotency_key=args.idempotency_key,
     )
     payload = reencrypt_summary_to_dict(summary)
     if args.json:

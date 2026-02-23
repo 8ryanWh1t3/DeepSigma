@@ -195,6 +195,10 @@ class TestSecurityCLI:
                 "--checkpoint",
                 str(checkpoint),
                 "--dry-run",
+                "--batch-size",
+                "50",
+                "--idempotency-key",
+                "ik-cli-001",
                 "--authority-dri",
                 "dri.approver",
                 "--authority-reason",
@@ -209,6 +213,9 @@ class TestSecurityCLI:
         assert payload["status"] == "dry_run"
         assert payload["records_targeted"] == 1
         assert checkpoint.exists()
+        cp = json.loads(checkpoint.read_text(encoding="utf-8"))
+        assert cp["batch_size"] == 50
+        assert cp["idempotency_key"] == "ik-cli-001"
 
     def test_security_provider_changed_and_query(self, tmp_path, capsys, monkeypatch):
         from deepsigma.cli.main import main
