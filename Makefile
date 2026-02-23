@@ -1,4 +1,4 @@
-.PHONY: ci demo run proof pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review tec lock-update build docker release-check release-check-strict version-sync-check milestone-gate pilot-pack scale-benchmark reencrypt-benchmark openapi-docs openapi-check security-gate security-demo security-audit-pack authority-ledger-export roadmap-forecast roadmap-badge roadmap-timeline roadmap-gate roadmap-refresh stability kpi-confidence
+.PHONY: ci demo run proof pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review tec lock-update build docker release-check release-check-strict version-sync-check milestone-gate pilot-pack scale-benchmark reencrypt-benchmark openapi-docs openapi-check security-gate security-demo security-audit-pack authority-ledger-export roadmap-forecast roadmap-badge roadmap-timeline roadmap-gate roadmap-refresh stability kpi-confidence sync-main branch-sync-check
 
 ci:
 	python scripts/compute_ci.py
@@ -130,3 +130,13 @@ kpi-confidence:
 .PHONY: feature-catalog
 feature-catalog:
 	python scripts/render_feature_catalog.py
+
+sync-main:
+	git checkout main
+	git fetch --prune origin
+	git reset --hard origin/main
+	git clean -fd
+	@echo "PASS: local main hard-synced to origin/main"
+
+branch-sync-check:
+	bash scripts/branch_sync_check.sh
