@@ -140,6 +140,23 @@ State thresholds and transport retry behavior are configurable:
 `health()` output includes `peer_states` and `partition_metrics` for
 partition/recovery visibility.
 
+## Peer Identity and mTLS
+
+`HTTPTransport` supports a node identity model (`NodeIdentity`) and mTLS policy
+controls for peer-to-peer replication links.
+
+- Identity uses a SPIFFE-style ID format:
+  `spiffe://{trust_domain}/node/{node_id}`
+- Optional peer certificate fingerprint checks can be configured per peer.
+- mTLS policy can enforce:
+  - HTTPS-only peer URLs
+  - configured trust roots
+  - client certificate and key paths
+  - certificate rotation path metadata
+
+Use `set_peer_identity`, `configure_trust_roots`, and
+`rotate_client_certificate` to manage trust and rotation configuration.
+
 ## Guardrails
 
 - Abstract institutional credibility model
