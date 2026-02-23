@@ -157,5 +157,5 @@ No single region can control institutional truth. Central holds 39% — the maxi
 
 ## Diagrams
 
-- [Lattice Architecture](../../mermaid/38-lattice-architecture.md) — Claim → SubClaim → Evidence → Source with Sync Plane and Credibility Index
-- [Institutional Drift Loop](../../mermaid/39-drift-loop.md) — Detection → Response → Repair cycle
+- [Lattice Architecture](../../archive/mermaid/38-lattice-architecture.md) — Claim → SubClaim → Evidence → Source with Sync Plane and Credibility Index
+- [Institutional Drift Loop](../../archive/mermaid/39-drift-loop.md) — Detection → Response → Repair cycle

@@ -62,8 +62,8 @@ This release introduces the formal models, operational thresholds, and deploymen
 
 | Diagram | What It Shows |
 |---------|--------------|
-| [38 — Lattice Architecture](../../mermaid/38-lattice-architecture.md) | Claim → SubClaim → Evidence → Source + Sync Plane + Credibility Index |
-| [39 — Institutional Drift Loop](../../mermaid/39-drift-loop.md) | Drift → RootCause → Patch → MGUpdate → Seal → Index |
+| [38 — Lattice Architecture](../archive/mermaid/38-lattice-architecture.md) | Claim → SubClaim → Evidence → Source + Sync Plane + Credibility Index (archived) |
+| [39 — Institutional Drift Loop](../archive/mermaid/39-drift-loop.md) | Drift → RootCause → Patch → MGUpdate → Seal → Index (archived) |
 
 ---
 

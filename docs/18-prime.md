@@ -181,7 +181,7 @@ The PRIME verdict is stored in the episode record for full traceability.
 | `coherence_ops/prime.py` | Core implementation |
 | `specs/prime_gate.schema.json` | JSON Schema for inputs/outputs |
 | `tests/test_prime.py` | Unit tests |
-| `mermaid/27-prime-threshold-gate.md` | Visual diagrams |
+| `archive/mermaid/27-prime-threshold-gate.md` | Visual diagrams (archived) |
 
 ## Related Concepts
 

@@ -111,14 +111,17 @@ last_updated: "2026-02-18"
 
 | Resource | Purpose |
 |----------|---------|
-| [`mermaid/`](mermaid/) | 39+ Mermaid diagrams (architecture, runtime, drift, schemas, pipelines, interop, credibility) |
+| [`mermaid/`](mermaid/) | 9 canonical Mermaid diagrams (actively maintained) |
 | Key: [`01-system-architecture.md`](mermaid/01-system-architecture.md) | System architecture overview |
 | Key: [`05-drift-to-patch.md`](mermaid/05-drift-to-patch.md) | Drift lifecycle flowchart |
 | Key: [`06-coherence-ops-pipeline.md`](mermaid/06-coherence-ops-pipeline.md) | Coherence Ops pipeline |
-| Key: [`30-interop-request-flow.md`](mermaid/30-interop-request-flow.md) | Interop request flow (AG-UI → A2A → MCP) |
-| Key: [`31-agora-negotiation-flow.md`](mermaid/31-agora-negotiation-flow.md) | Agora negotiation → contract → runtime |
-| Key: [`38-lattice-architecture.md`](mermaid/38-lattice-architecture.md) | Credibility Engine lattice architecture |
-| Key: [`39-drift-loop.md`](mermaid/39-drift-loop.md) | Institutional drift loop |
+| Key: [`10-integration-map.md`](mermaid/10-integration-map.md) | Integration and connector surfaces |
+| Key: [`11-seal-and-prove.md`](mermaid/11-seal-and-prove.md) | Admissibility and seal-proof flow |
+| Key: [`12-c-tec-pipeline.md`](mermaid/12-c-tec-pipeline.md) | C-TEC computation pipeline |
+| Key: [`13-release-preflight-flow.md`](mermaid/13-release-preflight-flow.md) | Release tag integrity before publish |
+| Key: [`14-kpi-confidence-bands-flow.md`](mermaid/14-kpi-confidence-bands-flow.md) | KPI score + uncertainty bands |
+| Key: [`15-disr-dual-mode-architecture.md`](mermaid/15-disr-dual-mode-architecture.md) | DISR local+KMS architecture |
+| Legacy index: [`archive/mermaid/ARCHIVE_INDEX.md`](archive/mermaid/ARCHIVE_INDEX.md) | Archived diagrams by topic |
 
 ---
 
@@ -165,7 +168,7 @@ last_updated: "2026-02-18"
 | [`mdpt/powerapps/powerfx/`](mdpt/powerapps/powerfx/) | 6 PowerFx snippet files |
 | [`deepsigma/cli/`](deepsigma/cli/) | Unified Product CLI — 5 commands |
 | [`docs/CLI.md`](docs/CLI.md) | CLI reference documentation |
-| [`mermaid/37-mdpt-beta-kit.md`](mermaid/37-mdpt-beta-kit.md) | MDPT lifecycle Mermaid diagram |
+| [`archive/mermaid/37-mdpt-beta-kit.md`](archive/mermaid/37-mdpt-beta-kit.md) | MDPT lifecycle Mermaid diagram (archived) |
 
 ---
 
@@ -184,8 +187,8 @@ last_updated: "2026-02-18"
 | [`examples/01-mini-lattice/`](examples/01-mini-lattice/) | Mini Lattice — 12 nodes, mechanics |
 | [`examples/02-enterprise-lattice/`](examples/02-enterprise-lattice/) | Enterprise Lattice — ~500 nodes, complexity |
 | [`examples/03-credibility-engine-scale/`](examples/03-credibility-engine-scale/) | Credibility Engine at Scale — 30k–40k nodes, survivability |
-| [`mermaid/38-lattice-architecture.md`](mermaid/38-lattice-architecture.md) | Lattice architecture diagram |
-| [`mermaid/39-drift-loop.md`](mermaid/39-drift-loop.md) | Institutional drift loop diagram |
+| [`archive/mermaid/38-lattice-architecture.md`](archive/mermaid/38-lattice-architecture.md) | Lattice architecture diagram (archived) |
+| [`archive/mermaid/39-drift-loop.md`](archive/mermaid/39-drift-loop.md) | Institutional drift loop diagram (archived) |
 | [`sim/credibility-engine/`](sim/credibility-engine/) | Stage 2 Simulation — tick-based engine driving live dashboard |
 | [`credibility_engine/`](credibility_engine/) | Stage 3 Runtime — multi-tenant engine with JSONL persistence + API |
 | [`tenancy/`](tenancy/) | Tenancy module — tenant registry, paths, header-based RBAC |

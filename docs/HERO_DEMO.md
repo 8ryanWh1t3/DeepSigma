@@ -238,7 +238,8 @@ Artifacts are written to [`examples/demo-stack/drift_patch_cycle_run/`](examples
 | Category claim | [/docs/category/declaration.md](category/declaration.md) |
 | IRIS deep-dive | [18-iris.md](18-iris.md) |
 | JSON schemas | [/schemas/](../schemas/) |
-| Mermaid diagrams | [/docs/mermaid/](mermaid/) |
+| Mermaid diagrams (canonical) | [`docs/mermaid/`](mermaid/) |
+| Mermaid archive (historical) | [`docs/archive/mermaid/`](archive/mermaid/) |
 | LLM-optimized data model | [/docs/llm_data_model/](llm_data_model/) |
 | Full docs index | [99-docs-map.md](99-docs-map.md) |
 | Release checklist | [release/CHECKLIST_v1.md](release/CHECKLIST_v1.md) |

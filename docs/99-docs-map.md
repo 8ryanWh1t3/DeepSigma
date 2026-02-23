@@ -39,9 +39,9 @@ last_updated: "2026-02-16"
 | DLR claim-native refactor | [`docs/20-dlr-claim-native.md`](20-dlr-claim-native.md) | `specs/dlr.schema.json` |
 | JSON schemas | [`specs/`](../specs/) | `coherence_ops/schemas/`, `llm_data_model/02_schema/` |
 | LLM data model | [`llm_data_model/README.md`](../llm_data_model/README.md) | `llm_data_model/06_ontology/coherence_ops_alignment.md` |
-| Mermaid diagrams | [`mermaid/README.md`](../mermaid/README.md) | Individual `mermaid/*.md` files |
+| Mermaid diagrams | [`mermaid/README.md`](../mermaid/README.md) | Canonical set in `docs/mermaid/`, historical set in `docs/archive/mermaid/` |
 | Drift-to-patch flow | [`runtime/drift_patch_workflow.md`](../runtime/drift_patch_workflow.md) | `ontology/drift_patch_model.md`, `mermaid/05-drift-to-patch.md` |
-| Sealing protocol | [`runtime/sealing_protocol.md`](../runtime/sealing_protocol.md) | `mermaid/14-seal-patch-lifecycle.md` |
+| Sealing protocol | [`runtime/sealing_protocol.md`](../runtime/sealing_protocol.md) | `mermaid/11-seal-and-prove.md` |
 | Category positioning | [`category/positioning.md`](../category/positioning.md) | `category/declaration.md` |
 
 ---

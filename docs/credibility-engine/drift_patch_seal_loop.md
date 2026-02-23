@@ -132,7 +132,7 @@ At production scale, manual-only drift management is itself a risk. The volume o
 
 This loop extends the existing lifecycle documented in:
 
-- [Drift to Patch diagram](../../mermaid/05-drift-to-patch.md) — runtime-level flowchart
+- [Drift to Patch diagram](../mermaid/05-drift-to-patch.md) — runtime-level flowchart
 - [Drift event schema](../../specs/drift.schema.json) — 8 runtime drift types
 - [Drift-Patch Model](../../ontology/drift_patch_model.md) — conceptual framework
 

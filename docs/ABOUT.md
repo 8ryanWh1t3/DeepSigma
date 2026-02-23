@@ -355,7 +355,7 @@ intent meets mutable reality.
 | `ontology/` | OWL ontology, SHACL shapes, SPARQL queries |
 | `policy_packs/` | Versioned enforcement bundles |
 | `docs/` | Extended documentation (20+ docs) |
-| `mermaid/` | 28+ architecture and flow diagrams |
+| `mermaid/` | 9 canonical diagrams (plus historical diagrams in `archive/mermaid/`) |
 
 ---
 

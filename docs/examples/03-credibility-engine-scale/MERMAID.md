@@ -158,5 +158,5 @@ sequenceDiagram
 
 ## Related Diagrams
 
-- [38 — Lattice Architecture](../../mermaid/38-lattice-architecture.md) — Claim → SubClaim → Evidence → Source with Sync Plane and Credibility Index
-- [39 — Institutional Drift Loop](../../mermaid/39-drift-loop.md) — Detection → Response → Repair at institutional scale
+- [38 — Lattice Architecture](../../archive/mermaid/38-lattice-architecture.md) — Claim → SubClaim → Evidence → Source with Sync Plane and Credibility Index
+- [39 — Institutional Drift Loop](../../archive/mermaid/39-drift-loop.md) — Detection → Response → Repair at institutional scale
