@@ -1,6 +1,6 @@
 # Governance Policy Baseline
 
-**Version:** GOV-2.0.4
+**Version:** GOV-2.0.5
 **Effective:** 2026-02-23
 
 ---

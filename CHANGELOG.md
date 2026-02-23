@@ -5,6 +5,26 @@ All notable changes to Σ OVERWATCH / DeepSigma will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.5] — 2026-02-23 — "DISR Completion + Measurable Scalability"
+
+### Added
+
+- Authority-modeled rotation approvals with signed `AUTHORIZED_KEY_ROTATION` events and chained authority ledger entries.
+- DISR 10-minute drill (`make security-demo`) and benchmark command (`make reencrypt-benchmark`).
+- Deterministic re-encrypt benchmark telemetry output:
+  - `release_kpis/scalability_metrics.json`
+  - `artifacts/benchmarks/reencrypt/benchmark_summary.json`
+- KPI telemetry parsing for economic/security and scalability metric artifacts.
+- New DISR unit coverage:
+  - keyring TTL/rotation/reencrypt pipeline tests
+  - KPI metric parser tests
+  - benchmark metrics tests
+
+### Changed
+
+- Release metadata and governance baseline advanced to `v2.0.5` / `GOV-2.0.5`.
+- Pilot pack wiring expanded to include DISR security and scalability evidence artifacts when present.
+
 ## [2.0.4] — 2026-02-23 — "Helm Validation Reliability + Release Coherence"
 
 ### Changed

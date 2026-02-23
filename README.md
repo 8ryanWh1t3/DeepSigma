@@ -10,13 +10,13 @@
 
 # Σ OVERWATCH
 
-**Current pilot release:** v2.0.4  
-See: [docs/release/RELEASE_NOTES_v2.0.4.md](docs/release/RELEASE_NOTES_v2.0.4.md)
+**Current pilot release:** v2.0.5  
+See: [docs/release/RELEASE_NOTES_v2.0.5.md](docs/release/RELEASE_NOTES_v2.0.5.md)
 
 ## Repo Radar KPI (latest)
 [![Repo KPI Badge](release_kpis/badge_latest.svg)](release_kpis/radar_composite_latest.png)
 
-- Current release radar: [release_kpis/radar_v2.0.4.png](release_kpis/radar_v2.0.4.png)
+- Current release radar: [release_kpis/radar_v2.0.5.png](release_kpis/radar_v2.0.5.png)
 - Composite release radar: [release_kpis/radar_composite_latest.png](release_kpis/radar_composite_latest.png)
 - Composite release delta table: [release_kpis/radar_composite_latest.md](release_kpis/radar_composite_latest.md)
 - Gate report: [release_kpis/KPI_GATE_REPORT.md](release_kpis/KPI_GATE_REPORT.md)
