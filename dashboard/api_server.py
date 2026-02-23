@@ -34,7 +34,6 @@ from typing import Any, Dict, List
 REPO_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
-import uvicorn  # noqa: E402
 from fastapi import FastAPI, HTTPException, Request  # noqa: E402
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 from fastapi.responses import JSONResponse, PlainTextResponse, StreamingResponse  # noqa: E402
@@ -675,6 +674,8 @@ async def shutdown_drain() -> None:
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
+    import uvicorn  # noqa: E402
+
     port = int(os.environ.get("PORT", "8000"))
     print(f"Repo root: {REPO_ROOT}")
     print(f"Episodes dir: {REPO_ROOT / 'examples' / 'episodes'}")

@@ -141,6 +141,7 @@ python src/tools/reconstruct/verify_pack.py --pack /tmp/pack --key "$KEY"
 | **MDPT** | Multi-Dimensional Prompt Toolkit for governed prompt ops | [MDPT Docs](src/mdpt/README.md) |
 | **Court-Grade Admissibility** | Seal-and-prove pipeline: Merkle commitments, transparency log, multi-sig witness, hardware key hooks | [Admissibility Levels](docs/reconstruct/ADMISSIBILITY_LEVELS.md) |
 | **MCP Server** | Model Context Protocol server with auth + rate limiting | [MCP Adapter](adapters/mcp/) |
+| **API Reference** | Auto-generated OpenAPI + static Redoc docs | [API Docs](docs/api/index.html) |
 | **RDF/SPARQL** | Semantic lattice queries via in-process SPARQL 1.1 | [SPARQL Service](services/sparql_service.py) |
 | **Dashboard** | React dashboard with Trust Scorecard + Zustand store | [Dashboard](dashboard/) |
 
