@@ -20,9 +20,9 @@
 - `release_kpis/ISSUE_LABEL_GATE_REPORT.md`
 
 **TEC (ROM):**
-- Internal: 2203.5 hrs | $330,525
-- Executive: 2203.5 hrs | $495,788
-- DoD: 2203.5 hrs | $605,962
+- Internal: 2528.4 hrs | $379,260
+- Executive: 2528.4 hrs | $568,890
+- DoD: 2528.4 hrs | $695,310
 - Full detail: `release_kpis/TEC_SUMMARY.md`
 
 **Notes:**

@@ -26,3 +26,25 @@ pr_overhead_hours: 1.5
 workflow_hours: 5
 test_file_hours: 2
 doc_file_hours: 1.5
+
+complexity:
+  # PR diff/churn to complexity score.
+  pr_loc_scale: 500
+  pr_loc_cap: 3.0
+  pr_files_scale: 10
+  pr_files_cap: 2.0
+  pr_score_weight: 0.15
+  pr_multiplier_cap: 1.0
+
+  # Cross-subsystem complexity.
+  subsystem_step: 0.15
+  subsystem_cap: 0.6
+
+  # Issue duration complexity.
+  duration_threshold_days: 14
+  duration_window_days: 30
+  duration_cap: 0.5
+
+  # Coordination/dependency complexity from issue references.
+  dependency_ref_step: 0.05
+  dependency_ref_cap: 0.4
