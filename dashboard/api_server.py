@@ -49,9 +49,11 @@ from coherence_ops import (  # noqa: E402
     CoherenceScorer,
 )
 from credibility_engine.constants import DEFAULT_TENANT_ID  # noqa: E402
+from credibility_engine.engine import CredibilityEngine  # noqa: E402
 from credibility_engine.store import CredibilityStore  # noqa: E402
 from credibility_engine.api import router as credibility_router  # noqa: E402
 from mesh.transport import create_mesh_router  # noqa: E402
+from services.prom_metrics import PROM_METRICS  # noqa: E402
 
 # ── App setup ─────────────────────────────────────────────────────────────────
 app = FastAPI(title="DeepSigma Dashboard API", version="0.1.0")
@@ -91,7 +93,17 @@ async def track_inflight_and_drain(request: Request, call_next):
 
     _inflight_requests += 1
     try:
-        return await call_next(request)
+        response = await call_next(request)
+        route = request.scope.get("route")
+        endpoint = getattr(route, "path", request.url.path) if route else request.url.path
+        PROM_METRICS.inc_counter(
+            "deepsigma_api_requests_total",
+            labels={
+                "endpoint": str(endpoint),
+                "status": str(response.status_code),
+            },
+        )
+        return response
     finally:
         _inflight_requests = max(0, _inflight_requests - 1)
 
@@ -410,6 +422,68 @@ def _health_payload() -> dict[str, Any]:
     }
 
 
+def _refresh_prom_metrics() -> None:
+    # Claims by state (VERIFIED/DEGRADED/UNKNOWN)
+    try:
+        store = CredibilityStore(tenant_id=DEFAULT_TENANT_ID)
+        engine = CredibilityEngine(store=store, tenant_id=DEFAULT_TENANT_ID)
+        if not engine.load_from_store():
+            engine.initialize_default_state()
+        cred = engine.snapshot_credibility()
+        PROM_METRICS.set_gauge(
+            "deepsigma_credibility_index",
+            float(cred.get("credibility_index", 0)),
+        )
+        snap = engine.snapshot_claims()
+        counts = {"VERIFIED": 0, "DEGRADED": 0, "UNKNOWN": 0}
+        for c in snap.get("claims", []):
+            st = str(c.get("state", "UNKNOWN")).upper()
+            if st not in counts:
+                st = "UNKNOWN"
+            counts[st] += 1
+        for state, total in counts.items():
+            PROM_METRICS.set_gauge("deepsigma_claims_total", total, {"state": state})
+    except Exception:
+        pass
+
+    # Drift events by severity (counter floor by observed corpus)
+    try:
+        counts = {"green": 0, "yellow": 0, "red": 0}
+        for d in _load_drifts():
+            sev = str(d.get("severity", "green")).lower()
+            if sev not in counts:
+                sev = "green"
+            counts[sev] += 1
+        for severity, total in counts.items():
+            PROM_METRICS.set_counter_floor(
+                "deepsigma_drift_events_total",
+                total,
+                {"severity": severity},
+            )
+    except Exception:
+        pass
+
+    # Evidence tiers (hot/warm/cold across tierable files)
+    try:
+        store = CredibilityStore(tenant_id=DEFAULT_TENANT_ID)
+        tierable_files = [
+            CredibilityStore.CLAIMS_FILE,
+            CredibilityStore.DRIFT_FILE,
+            CredibilityStore.SNAPSHOTS_FILE,
+            CredibilityStore.CORRELATION_FILE,
+            CredibilityStore.SYNC_FILE,
+        ]
+        totals = {"hot": 0, "warm": 0, "cold": 0}
+        for filename in tierable_files:
+            totals["hot"] += len(store.load_all(filename))
+            totals["warm"] += len(store.load_warm(filename))
+            totals["cold"] += len(store.load_cold(filename))
+        for tier, total in totals.items():
+            PROM_METRICS.set_gauge("deepsigma_evidence_tier_count", total, {"tier": tier})
+    except Exception:
+        pass
+
+
 # ── Endpoints ─────────────────────────────────────────────────────────────────
 
 @app.get("/api/health")
@@ -500,11 +574,17 @@ def query_iris(body: Dict[str, Any]):
         episode_id=body.get("episode_id", ""),
         decision_type=body.get("decision_type", ""),
     )
+    start = time.monotonic()
     try:
         response = engine.resolve(query)
     except Exception:
         logger.error("IRIS resolution failed")
         raise HTTPException(status_code=500, detail="IRIS query failed")
+    finally:
+        PROM_METRICS.observe_histogram(
+            "deepsigma_iris_query_duration_seconds",
+            time.monotonic() - start,
+        )
     status = "OK" if str(getattr(response, "status", "OK")).upper() == "OK" else "ERROR"
     confidence = getattr(response, "confidence", 0)
     if not isinstance(confidence, (int, float)):
@@ -517,6 +597,13 @@ def query_iris(body: Dict[str, Any]):
         "why_chain": [],
         "provenance": [],
     }
+
+
+@app.get("/metrics", response_class=PlainTextResponse)
+def metrics() -> str:
+    """Prometheus metrics endpoint."""
+    _refresh_prom_metrics()
+    return PROM_METRICS.render()
 
 
 @app.get("/api/trust_scorecard")

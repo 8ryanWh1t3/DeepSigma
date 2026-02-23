@@ -26,6 +26,7 @@ from credibility_engine.packet import (
 from credibility_engine.store import CredibilityStore
 from governance.audit import audit_action, load_recent_audit
 from governance.telemetry import check_quota, record_metric
+from services.prom_metrics import PROM_METRICS
 from tenancy.policies import (
     load_policy,
     save_policy,
@@ -205,6 +206,10 @@ def tenant_seal_packet(tenant_id: str, request: Request) -> dict[str, Any]:
     engine.recalculate_index()
     result = seal_credibility_packet(engine, role=role_header, user=user)
     elapsed_ms = round((time.monotonic() - start) * 1000, 1)
+    PROM_METRICS.observe_histogram(
+        "deepsigma_packet_seal_duration_seconds",
+        elapsed_ms / 1000.0,
+    )
 
     record_metric(tenant_id, "packet_seal_latency_ms", elapsed_ms, actor=user)
     return result
