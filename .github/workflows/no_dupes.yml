@@ -23,4 +23,32 @@ jobs:
           python-version: "3.12"
 
       - name: Check duplicate-like filenames
-        run: python3 scripts/check_no_dupe_files.py
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          root = Path(".")
+          skip_prefixes = (".git/", "_park_enterprise/")
+          seen = {}
+          collisions = []
+
+          for p in root.rglob("*"):
+              if not p.is_file():
+                  continue
+              rel = p.as_posix()
+              if rel.startswith(skip_prefixes):
+                  continue
+              norm = p.name.lower().replace("-", "").replace("_", "").replace(".", "")
+              if norm in seen:
+                  collisions.append((seen[norm], rel))
+              else:
+                  seen[norm] = rel
+
+          if collisions:
+              print("FAIL: duplicate-like filenames detected:")
+              for a, b in collisions:
+                  print(f" - {a} <-> {b}")
+              raise SystemExit(1)
+
+          print("PASS: no duplicate-like filenames")
+          PY
