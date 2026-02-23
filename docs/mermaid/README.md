@@ -1,6 +1,6 @@
 # Mermaid Diagrams (Canonical)
 
-Four diagrams define the visual language of Sigma OVERWATCH. Everything else is archived to reduce drift.
+Five diagrams define the visual language of Sigma OVERWATCH. Everything else is archived to reduce drift.
 
 ## Canonical Set
 
@@ -10,6 +10,7 @@ Four diagrams define the visual language of Sigma OVERWATCH. Everything else is 
 | 05 | [Drift to Patch](05-drift-to-patch.md) | Flowchart | 8 drift types → severity → fingerprint → 7 patch recommendations |
 | 06 | [Coherence Ops Pipeline](06-coherence-ops-pipeline.md) | Graph + Pie | DLR / RS / DS / MG data flow through audit, scoring, and reconciliation |
 | 10 | [Integration Map](10-integration-map.md) | Graph | Connectors, surfaces, and runtime integrations (MCP, LangChain, OTel, Foundry, Power Platform) |
+| 12 | [C-TEC Pipeline](12-c-tec-pipeline.md) | Flowchart | Time/Effort/Cost from deterministic telemetry with complexity weighting (Internal/Executive/DoD) |
 
 ## Archive
 

@@ -10,8 +10,8 @@
 
 # Σ OVERWATCH
 
-**Current pilot release:** v2.0.5  
-See: [docs/release/RELEASE_NOTES_v2.0.5.md](docs/release/RELEASE_NOTES_v2.0.5.md)
+**Current pilot release:** v2.0.6  
+See: [docs/release/RELEASE_NOTES_v2.0.6.md](docs/release/RELEASE_NOTES_v2.0.6.md)
 
 ## Repo Radar KPI (latest)
 [![Repo KPI Badge](release_kpis/badge_latest.svg)](release_kpis/radar_composite_latest.png)
@@ -22,6 +22,11 @@ See: [docs/release/RELEASE_NOTES_v2.0.5.md](docs/release/RELEASE_NOTES_v2.0.5.md
 - Gate report: [release_kpis/KPI_GATE_REPORT.md](release_kpis/KPI_GATE_REPORT.md)
 - Issue label gate: [release_kpis/ISSUE_LABEL_GATE_REPORT.md](release_kpis/ISSUE_LABEL_GATE_REPORT.md)
 - KPI history: [release_kpis/history.json](release_kpis/history.json)
+- TEC summary (C-TEC v1.0): [release_kpis/TEC_SUMMARY.md](release_kpis/TEC_SUMMARY.md)
+- TEC internal tier: [release_kpis/tec_internal.json](release_kpis/tec_internal.json)
+- TEC executive tier: [release_kpis/tec_executive.json](release_kpis/tec_executive.json)
+- TEC DoD tier: [release_kpis/tec_dod.json](release_kpis/tec_dod.json)
+- C-TEC mermaid flow: [docs/mermaid/12-c-tec-pipeline.md](docs/mermaid/12-c-tec-pipeline.md)
 
 **Institutional Decision Infrastructure**
 
