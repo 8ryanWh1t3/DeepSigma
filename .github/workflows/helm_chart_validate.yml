@@ -42,7 +42,11 @@ jobs:
       - name: Install chart
         run: |
           helm upgrade --install deepsigma charts/deepsigma --namespace deepsigma --create-namespace
-          kubectl -n deepsigma rollout status deploy/deepsigma --timeout=180s
+          kubectl -n deepsigma wait \
+            --for=condition=available \
+            deployment \
+            -l app.kubernetes.io/instance=deepsigma \
+            --timeout=180s
       - name: Helm test smoke checks
         run: helm test deepsigma -n deepsigma
       - name: Diagnostics on failure
