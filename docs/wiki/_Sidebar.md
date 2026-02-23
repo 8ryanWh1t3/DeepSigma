@@ -37,6 +37,7 @@
 - **Ops**
   - [Operations](Operations)
   - [SLOs & Metrics](SLOs-and-Metrics)
+  - [Release Notes v2.0.6](../release/RELEASE_NOTES_v2.0.6.md)
   - [Replay & Testing](Replay-and-Testing)
 - **Excel-First**
   - [Creative Director Suite](Creative-Director-Suite)

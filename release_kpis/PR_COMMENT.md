@@ -19,6 +19,12 @@
 - `release_kpis/KPI_GATE_REPORT.md`
 - `release_kpis/ISSUE_LABEL_GATE_REPORT.md`
 
+**TEC (ROM):**
+- Internal: 2528.4 hrs | $379,260
+- Executive: 2528.4 hrs | $568,890
+- DoD: 2528.4 hrs | $695,310
+- Full detail: `release_kpis/TEC_SUMMARY.md`
+
 **Notes:**
 - Some KPIs are auto-derived from repo telemetry (tests, docs, workflows, pilot drills).
 - Economic and Scalability are auto-derived from DISR metrics and capped by evidence eligibility (`kpi_eligible` / `evidence_level`).

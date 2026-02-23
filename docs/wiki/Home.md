@@ -110,6 +110,16 @@ Captures AI interaction exhaust (prompts, completions, tool calls, metrics) and 
 | [Replay & Testing](Replay-and-Testing) | Episode replay harness and test fixtures |
 | [Security](Security) | Threat model, seal integrity, authorization |
 
+## Latest Release + Telemetry
+
+| Asset | Link |
+|------|------|
+| Latest release notes | [v2.0.6](../release/RELEASE_NOTES_v2.0.6.md) |
+| KPI composite radar | [release_kpis/radar_composite_latest.png](../../release_kpis/radar_composite_latest.png) |
+| KPI delta table | [release_kpis/radar_composite_latest.md](../../release_kpis/radar_composite_latest.md) |
+| TEC summary (C-TEC v1.0) | [release_kpis/TEC_SUMMARY.md](../../release_kpis/TEC_SUMMARY.md) |
+| C-TEC mermaid flow | [docs/mermaid/12-c-tec-pipeline.md](../mermaid/12-c-tec-pipeline.md) |
+
 ---
 
 ## Reference

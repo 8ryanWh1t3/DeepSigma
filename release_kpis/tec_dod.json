@@ -1,0 +1,56 @@
+{
+  "tier": "dod",
+  "counts": {
+    "issues_total": 126,
+    "prs_merged": 174,
+    "workflows": 28,
+    "test_files": 99,
+    "doc_files": 315,
+    "security_issues_tagged": 0,
+    "committee_cycles_est": 0,
+    "issues_with_pr_link_est": 89
+  },
+  "hours": {
+    "issues_weighted": 1132.0,
+    "issues_complexity_weighted": 1456.9,
+    "pr_overhead": 261.0,
+    "workflows": 140.0,
+    "tests": 198.0,
+    "docs": 472.5,
+    "committee": 0.0,
+    "total_base": 2203.5,
+    "total_ctec": 2528.4
+  },
+  "complexity": {
+    "avg_index": 1.269,
+    "max_index": 1.95,
+    "config": {
+      "pr_loc_scale": 500,
+      "pr_loc_cap": 3.0,
+      "pr_files_scale": 10,
+      "pr_files_cap": 2.0,
+      "pr_score_weight": 0.15,
+      "pr_multiplier_cap": 1.0,
+      "subsystem_step": 0.15,
+      "subsystem_cap": 0.6,
+      "duration_threshold_days": 14,
+      "duration_window_days": 30,
+      "duration_cap": 0.5,
+      "dependency_ref_step": 0.05,
+      "dependency_ref_cap": 0.4
+    }
+  },
+  "rate_hourly": 275.0,
+  "low": {
+    "hours": 2022.7,
+    "cost": 556248.0
+  },
+  "base": {
+    "hours": 2528.4,
+    "cost": 695310.0
+  },
+  "high": {
+    "hours": 3413.3,
+    "cost": 938668.0
+  }
+}

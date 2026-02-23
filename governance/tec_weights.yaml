@@ -1,0 +1,50 @@
+rates:
+  internal_hourly: 150
+  exec_hourly: 225
+  dod_fully_burdened_hourly: 275
+
+uncertainty:
+  low: 0.8
+  base: 1.0
+  high: 1.35
+
+issue_hours:
+  type:feature: 8
+  type:bug: 3
+  type:debt: 5
+  type:doc: 1.5
+  security_default: 12
+  committee_cycle: 8
+
+severity_multiplier:
+  sev:P0: 2.0
+  sev:P1: 1.5
+  sev:P2: 1.0
+  sev:P3: 0.6
+
+pr_overhead_hours: 1.5
+workflow_hours: 5
+test_file_hours: 2
+doc_file_hours: 1.5
+
+complexity:
+  # PR diff/churn to complexity score.
+  pr_loc_scale: 500
+  pr_loc_cap: 3.0
+  pr_files_scale: 10
+  pr_files_cap: 2.0
+  pr_score_weight: 0.15
+  pr_multiplier_cap: 1.0
+
+  # Cross-subsystem complexity.
+  subsystem_step: 0.15
+  subsystem_cap: 0.6
+
+  # Issue duration complexity.
+  duration_threshold_days: 14
+  duration_window_days: 30
+  duration_cap: 0.5
+
+  # Coordination/dependency complexity from issue references.
+  dependency_ref_step: 0.05
+  dependency_ref_cap: 0.4
