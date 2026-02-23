@@ -28,3 +28,11 @@ If re-encryption validation fails:
 1. Halt processing.
 2. Restore from the latest verified checkpoint.
 3. Re-run with reduced batch size and diagnostics enabled.
+
+## Reproducible drill
+
+Use the demo drill to rehearse rotation plus re-encrypt dry-run:
+
+```bash
+make security-demo
+```

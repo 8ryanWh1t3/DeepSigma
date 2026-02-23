@@ -31,7 +31,11 @@ def main() -> int:
         outdir / "history.json",
         outdir / "kpi_trend.png",
         outdir / "kpi_trend.svg",
+        outdir / "SECURITY_GATE_REPORT.md",
+        outdir / "SECURITY_GATE_REPORT.json",
         ROOT / "data" / "security" / "authority_ledger.json",
+        ROOT / "artifacts" / "disr_demo" / "authority_ledger.json",
+        ROOT / "artifacts" / "disr_demo" / "disr_demo_summary.json",
     ]
     for file_path in files:
         if file_path.exists():
@@ -44,6 +48,10 @@ def main() -> int:
         ROOT / "docs" / "docs" / "pilot" / "PILOT_CONTRACT_ONEPAGER.md",
         ROOT / "docs" / "docs" / "release" / "RELEASE_NOTES_v2.0.3.md",
         ROOT / "docs" / "docs" / "governance" / "LABEL_POLICY.md",
+        ROOT / "docs" / "docs" / "security" / "DISR.md",
+        ROOT / "docs" / "docs" / "security" / "KEY_LIFECYCLE.md",
+        ROOT / "docs" / "docs" / "security" / "RECOVERY_RUNBOOK.md",
+        ROOT / "docs" / "docs" / "security" / "DEMO_10_MIN.md",
         ROOT / "governance" / "kpi_issue_map.yaml",
         ROOT / "governance" / "kpi_spec.yaml",
     ]
@@ -55,6 +63,7 @@ def main() -> int:
         ROOT / "scripts" / "pilot_in_a_box.py",
         ROOT / "scripts" / "why_60s_challenge.py",
         ROOT / "scripts" / "compute_ci.py",
+        ROOT / "scripts" / "reencrypt_demo.py",
     ]
     for drill in drills:
         if drill.exists():

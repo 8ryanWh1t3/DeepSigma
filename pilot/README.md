@@ -6,6 +6,7 @@ This folder contains the canonical pilot dataset: Decisions (DLR), Assumptions, 
 - PASS→FAIL→PASS: `make pilot-in-a-box`
 - WHY-60s: `make why-60s`
 - CI baseline: `make ci`
+- DISR security recovery drill: `make security-demo`
 
 ## Pilot Governance
 - Scope: `docs/docs/pilot/PILOT_SCOPE.md`
