@@ -12,6 +12,7 @@ Commands:
     deepsigma golden-path <source> [opts]     7-step Golden Path loop
     deepsigma compact --input <dir>           Compact JSONL evidence files
     deepsigma rekey --tenant <id>             Rekey encrypted evidence at rest
+    deepsigma compliance export --tenant ...  Export SOC 2 evidence package
 """
 from __future__ import annotations
 
@@ -44,6 +45,7 @@ def main(argv: list[str] | None = None) -> int:
     subparsers = parser.add_subparsers(dest="command")
 
     from deepsigma.cli import (
+        compliance_export,
         compact,
         demo_excel,
         doctor,
@@ -65,6 +67,7 @@ def main(argv: list[str] | None = None) -> int:
     golden_path.register(subparsers)
     compact.register(subparsers)
     rekey.register(subparsers)
+    compliance_export.register(subparsers)
     new_connector.register(subparsers)
 
     args = parser.parse_args(argv)
