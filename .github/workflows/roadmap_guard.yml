@@ -1,0 +1,38 @@
+name: Roadmap Scope Guard
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: read
+
+jobs:
+  roadmap-guard:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run roadmap refresh + scope gate
+        run: |
+          make roadmap-refresh
+
+      - name: Upload roadmap artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: roadmap-artifacts
+          path: |
+            roadmap/roadmap.json
+            release_kpis/roadmap_forecast.json
+            release_kpis/roadmap_forecast.md
+            release_kpis/roadmap_badge.svg
+            release_kpis/roadmap_timeline.svg
+            release_kpis/roadmap_timeline.md
+            release_kpis/ROADMAP_SCOPE_GATE_REPORT.md
