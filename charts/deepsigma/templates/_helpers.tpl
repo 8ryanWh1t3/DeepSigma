@@ -45,6 +45,14 @@ app.kubernetes.io/component: {{ .component }}
 {{ include "deepsigma.fullname" . }}-secret
 {{- end }}
 
+{{- define "deepsigma.dataPvcName" -}}
+{{- if .Values.dataPersistence.existingClaim }}
+{{ .Values.dataPersistence.existingClaim }}
+{{- else }}
+{{ include "deepsigma.fullname" . }}-data
+{{- end }}
+{{- end }}
+
 {{- define "deepsigma.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
 {{- default (include "deepsigma.fullname" .) .Values.serviceAccount.name }}

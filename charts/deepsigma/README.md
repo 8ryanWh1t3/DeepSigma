@@ -50,9 +50,19 @@ helm test deepsigma
 
 - `configMap.enabled`: creates `<release>-config` from `configMap.data`
 - `secret.enabled`: creates `<release>-secret` from `secret.stringData`
+- `dataPersistence.enabled`: creates/uses PVC for JSONL data directories (`/app/src/data`, `/app/data`)
 - `api.envFrom.*` / `dashboard.envFrom.*`: attach ConfigMap/Secret as env sources
 - `fuseki.enabled`: deploy optional Fuseki StatefulSet + service
 - `serviceMonitor.enabled`: emit Prometheus Operator `ServiceMonitor`
+
+### Persistence Notes
+
+- By default, chart-managed JSONL PVC is disabled.
+- To enable chart-managed PVC:
+  - set `dataPersistence.enabled=true` and optionally `dataPersistence.storageClassName`.
+- To use a pre-provisioned PVC:
+  - set `dataPersistence.enabled=true` and `dataPersistence.existingClaim=<claim-name>`.
+- For multi-replica API/dashboard, prefer shared RWX storage or external persistence backend.
 
 ### Ingress Compatibility
 
