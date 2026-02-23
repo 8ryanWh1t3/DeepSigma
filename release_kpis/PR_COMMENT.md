@@ -36,9 +36,9 @@
 - KPI bands: `release_kpis/kpi_bands_v2.0.6.json`
 
 **TEC (ROM):**
-- Internal: 3087.5 hrs | $463,125
-- Executive: 3087.5 hrs | $694,688
-- DoD: 3087.5 hrs | $849,062
+- Internal: 3092.0 hrs | $463,800
+- Executive: 3092.0 hrs | $695,700
+- DoD: 3092.0 hrs | $850,300
 - Full detail: `release_kpis/TEC_SUMMARY.md`
 
 **Notes:**

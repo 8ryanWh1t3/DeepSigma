@@ -2,7 +2,7 @@
 
 ## Counts
 - issues_total: **167**
-- prs_merged: **184**
+- prs_merged: **187**
 - workflows: **29**
 - test_files: **99**
 - doc_files: **325**
@@ -13,13 +13,13 @@
 ## Effort (Base hours breakdown)
 - issues_weighted: **1574.8**
 - issues_complexity_weighted: **1981.0**
-- pr_overhead: **276.0**
+- pr_overhead: **280.5**
 - workflows: **145.0**
 - tests: **198.0**
 - docs: **487.5**
 - committee: **0.0**
-- total_base: **2681.2**
-- total_ctec: **3087.5**
+- total_base: **2685.8**
+- total_ctec: **3092.0**
 
 ## Complexity (C-TEC v1.0)
 - avg_index: **1.244**
@@ -28,16 +28,16 @@
 
 ## Tiers (Low / Base / High)
 ### Internal @ $150/hr
-- Low:  2470.0 hrs | $370500.0
-- Base: 3087.5 hrs | $463125.0
-- High: 4168.1 hrs | $625219.0
+- Low:  2473.6 hrs | $371040.0
+- Base: 3092.0 hrs | $463800.0
+- High: 4174.2 hrs | $626130.0
 
 ### Executive @ $225/hr
-- Low:  2470.0 hrs | $555750.0
-- Base: 3087.5 hrs | $694688.0
-- High: 4168.1 hrs | $937828.0
+- Low:  2473.6 hrs | $556560.0
+- Base: 3092.0 hrs | $695700.0
+- High: 4174.2 hrs | $939195.0
 
 ### DoD Fully Burdened @ $275/hr
-- Low:  2470.0 hrs | $679250.0
-- Base: 3087.5 hrs | $849062.0
-- High: 4168.1 hrs | $1146234.0
+- Low:  2473.6 hrs | $680240.0
+- Base: 3092.0 hrs | $850300.0
+- High: 4174.2 hrs | $1147905.0

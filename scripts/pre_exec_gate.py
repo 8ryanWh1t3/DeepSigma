@@ -104,6 +104,33 @@ def run_self_check() -> int:
 
         validate(intent, auth, policy, snapshot)
 
+        bad_auth = root / "authority_bad.json"
+        bad_auth.write_text(
+            json.dumps(
+                {
+                    "action_type": "patch",
+                    "requested_by": "ops",
+                    "dri": "approver",
+                    "intent_hash": "mismatch",
+                    "signature": "sig",
+                }
+            ),
+            encoding="utf-8",
+        )
+        try:
+            validate(intent, bad_auth, policy, snapshot)
+            return fail("mismatched intent_hash should fail pre-exec gate")
+        except ValueError:
+            pass
+
+        bad_policy = root / "policy_bad.json"
+        bad_policy.write_text(json.dumps({"allowed_actions": ["seal"]}), encoding="utf-8")
+        try:
+            validate(intent, auth, bad_policy, snapshot)
+            return fail("disallowed action should fail pre-exec gate")
+        except ValueError:
+            pass
+
     print("PASS: pre-exec self-check passed")
     return 0
 

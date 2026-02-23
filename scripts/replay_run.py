@@ -52,6 +52,17 @@ def run_self_check() -> int:
         data = json.loads(out.read_text(encoding="utf-8"))
         if data.get("replay_status") != "verified":
             return fail("replay output is not verified")
+
+        bad = root / "snapshot_bad.json"
+        bad.write_text(
+            json.dumps({"input_path": str(inp), "input_hash": "0" * 64}),
+            encoding="utf-8",
+        )
+        try:
+            replay(bad, out)
+            return fail("replay should fail on hash mismatch")
+        except ValueError:
+            pass
     print("PASS: replay self-check passed")
     return 0
 
