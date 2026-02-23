@@ -12,6 +12,9 @@ api:
   env:
     - name: DEEPSIGMA_ENCRYPT_AT_REST
       value: "1"
+  envFrom:
+    configMapRef: true
+    secretRef: true
 
 dashboard:
   replicaCount: 3
@@ -24,6 +27,25 @@ dashboard:
     limits:
       cpu: 500m
       memory: 512Mi
+  envFrom:
+    configMapRef: true
+    secretRef: true
 
 ingress:
+  enabled: true
+
+configMap:
+  enabled: true
+  data:
+    DEEPSIGMA_LOG_LEVEL: info
+
+secret:
+  enabled: true
+  stringData:
+    DEEPSIGMA_MASTER_KEY: "replace-me"
+
+fuseki:
+  enabled: true
+
+serviceMonitor:
   enabled: true

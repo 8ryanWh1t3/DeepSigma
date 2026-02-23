@@ -1,0 +1,60 @@
+{{- if .Values.fuseki.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "deepsigma.componentName" (dict "component" "fuseki" "Chart" .Chart "Release" .Release "Values" .Values) }}
+  labels:
+    {{- include "deepsigma.labels" . | nindent 4 }}
+    app.kubernetes.io/component: fuseki
+spec:
+  serviceName: {{ include "deepsigma.componentName" (dict "component" "fuseki" "Chart" .Chart "Release" .Release "Values" .Values) }}
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "deepsigma.componentLabels" (dict "component" "fuseki" "Chart" .Chart "Release" .Release "Values" .Values) | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "deepsigma.componentLabels" (dict "component" "fuseki" "Chart" .Chart "Release" .Release "Values" .Values) | nindent 8 }}
+    spec:
+      containers:
+        - name: fuseki
+          image: "{{ .Values.fuseki.image.repository }}:{{ .Values.fuseki.image.tag }}"
+          imagePullPolicy: {{ .Values.fuseki.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 3030
+              protocol: TCP
+          env:
+            - name: FUSEKI_ADMIN_PASSWORD
+              value: {{ .Values.fuseki.adminPassword | quote }}
+          livenessProbe:
+            {{- toYaml .Values.fuseki.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.fuseki.readinessProbe | nindent 12 }}
+          {{- with .Values.fuseki.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.fuseki.persistence.enabled }}
+          volumeMounts:
+            - name: fuseki-data
+              mountPath: /fuseki
+          {{- end }}
+  {{- if .Values.fuseki.persistence.enabled }}
+  volumeClaimTemplates:
+    - metadata:
+        name: fuseki-data
+        labels:
+          {{- include "deepsigma.labels" . | nindent 10 }}
+          app.kubernetes.io/component: fuseki
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        {{- if .Values.fuseki.persistence.storageClassName }}
+        storageClassName: {{ .Values.fuseki.persistence.storageClassName | quote }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.fuseki.persistence.size | quote }}
+  {{- end }}
+{{- end }}

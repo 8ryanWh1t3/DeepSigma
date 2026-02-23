@@ -37,6 +37,14 @@ app.kubernetes.io/component: {{ .component }}
 {{ include "deepsigma.fullname" . }}-{{ .component }}
 {{- end }}
 
+{{- define "deepsigma.configMapName" -}}
+{{ include "deepsigma.fullname" . }}-config
+{{- end }}
+
+{{- define "deepsigma.secretName" -}}
+{{ include "deepsigma.fullname" . }}-secret
+{{- end }}
+
 {{- define "deepsigma.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
 {{- default (include "deepsigma.fullname" .) .Values.serviceAccount.name }}
