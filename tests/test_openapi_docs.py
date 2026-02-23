@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from fastapi.testclient import TestClient
+import pytest
 
-from dashboard.api_server import app
+TestClient = pytest.importorskip("fastapi.testclient").TestClient
+
+from dashboard.api_server import app  # noqa: E402
 
 
 def test_openapi_json_served_and_contains_required_domains():
