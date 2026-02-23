@@ -94,7 +94,7 @@
 >
 > ## Diagrams
 >
-> See [`mermaid/27-claim-primitive.md`](../mermaid/27-claim-primitive.md) and [`mermaid/28-dlr-claim-native.md`](../mermaid/28-dlr-claim-native.md) for visual architecture.
+> See [`archive/mermaid/27-claim-primitive.md`](../archive/mermaid/27-claim-primitive.md) and [`archive/mermaid/28-dlr-claim-native.md`](../archive/mermaid/28-dlr-claim-native.md) for visual architecture.
 >
 > ## Related Pages
 >

@@ -104,7 +104,7 @@ LinkedIn content primarily uses "Coherence Ops" and "Deep Sigma" language. This 
 
 **"I want to see the semantic layer"** → `rdf/README.md`
 
-**"I want to see the architecture visually"** → `mermaid/README.md` (28 diagrams)
+**"I want to see the architecture visually"** → `docs/mermaid/README.md` (9 canonical diagrams + archive index)
 
 **"I want to query the system"** → `docs/18-iris.md` for IRIS interface documentation
 
@@ -112,4 +112,4 @@ LinkedIn content primarily uses "Coherence Ops" and "Deep Sigma" language. This 
 
 ---
 
-*This map is updated as new features land. Last updated: 2026-02-15.*
+*This map is updated as new features land. Last updated: 2026-02-23.*

@@ -48,7 +48,7 @@ Region West (10,000 nodes)
 
 Cross-region beacon federation ensures global time consistency.
 
-See: [Lattice Architecture diagram](../../mermaid/38-lattice-architecture.md)
+See: [Lattice Architecture diagram](../../archive/mermaid/38-lattice-architecture.md)
 
 ---
 
@@ -146,7 +146,7 @@ Audit (continuous)
   └─ Queryable via IRIS: "What drifted? What was patched? What was the impact?"
 ```
 
-See: [Drift Loop diagram](../../mermaid/39-drift-loop.md)
+See: [Drift Loop diagram](../../archive/mermaid/39-drift-loop.md)
 
 ---
 

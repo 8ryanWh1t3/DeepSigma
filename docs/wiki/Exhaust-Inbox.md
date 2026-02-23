@@ -214,10 +214,10 @@ Four Mermaid diagrams cover the full Exhaust Inbox architecture:
 
 | Diagram | Contents |
 |---------|----------|
-| [`mermaid/29-exhaust-inbox-pipeline.md`](../mermaid/29-exhaust-inbox-pipeline.md) | Full pipeline (graph TB), bucket extraction detail (flowchart), episode state machine (stateDiagram) |
-| [`mermaid/29-exhaust-connector-map.md`](../mermaid/29-exhaust-connector-map.md) | Adapter ecosystem (graph LR), Source enum mapping, LangChain metric enrichment |
-| [`mermaid/29-exhaust-api-surface.md`](../mermaid/29-exhaust-api-surface.md) | All 10 endpoints (graph TD), refine→commit sequence diagram, status codes |
-| [`mermaid/29-llm-extraction-flow.md`](../mermaid/29-llm-extraction-flow.md) | LLMExtractor internals (flowchart), API call sequence, confidence clamping, system prompt |
+| [`archive/mermaid/29-exhaust-inbox-pipeline.md`](../archive/mermaid/29-exhaust-inbox-pipeline.md) | Full pipeline (graph TB), bucket extraction detail (flowchart), episode state machine (stateDiagram) |
+| [`archive/mermaid/29-exhaust-connector-map.md`](../archive/mermaid/29-exhaust-connector-map.md) | Adapter ecosystem (graph LR), Source enum mapping, LangChain metric enrichment |
+| [`archive/mermaid/29-exhaust-api-surface.md`](../archive/mermaid/29-exhaust-api-surface.md) | All 10 endpoints (graph TD), refine→commit sequence diagram, status codes |
+| [`archive/mermaid/29-llm-extraction-flow.md`](../archive/mermaid/29-llm-extraction-flow.md) | LLMExtractor internals (flowchart), API call sequence, confidence clamping, system prompt |
 
 ## Related Pages
 

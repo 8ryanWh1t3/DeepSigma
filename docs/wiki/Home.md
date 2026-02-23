@@ -118,7 +118,7 @@ Captures AI interaction exhaust (prompts, completions, tool calls, metrics) and 
 | KPI composite radar | [release_kpis/radar_composite_latest.png](../../release_kpis/radar_composite_latest.png) |
 | KPI delta table | [release_kpis/radar_composite_latest.md](../../release_kpis/radar_composite_latest.md) |
 | TEC summary (C-TEC v1.0) | [release_kpis/TEC_SUMMARY.md](../../release_kpis/TEC_SUMMARY.md) |
-| C-TEC mermaid flow | [docs/mermaid/12-c-tec-pipeline.md](../mermaid/12-c-tec-pipeline.md) |
+| C-TEC mermaid flow | [mermaid/12-c-tec-pipeline.md](../mermaid/12-c-tec-pipeline.md) |
 
 ---
 

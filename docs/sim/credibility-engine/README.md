@@ -142,4 +142,4 @@ Written to `dashboard/credibility-engine-demo/` each tick:
 - [Credibility Engine Docs](../../docs/credibility-engine/)
 - [Demo Cockpit](../../dashboard/credibility-engine-demo/)
 - [Credibility Index Specification](../../docs/credibility-engine/credibility_index.md)
-- [Lattice Architecture Diagram](../../mermaid/38-lattice-architecture.md)
+- [Lattice Architecture Diagram](../../archive/mermaid/38-lattice-architecture.md)

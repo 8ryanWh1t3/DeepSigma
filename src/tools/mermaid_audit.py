@@ -27,9 +27,12 @@ CANONICAL = {
     "10-integration-map.md",
     "11-seal-and-prove.md",
     "12-c-tec-pipeline.md",
+    "13-release-preflight-flow.md",
+    "14-kpi-confidence-bands-flow.md",
+    "15-disr-dual-mode-architecture.md",
 }
 
-MAX_CANONICAL = 6  # diagrams (excludes README)
+MAX_CANONICAL = 9  # diagrams (excludes README)
 
 MERMAID_BLOCK_RE = re.compile(r"^```mermaid", re.MULTILINE)
 

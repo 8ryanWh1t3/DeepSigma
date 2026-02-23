@@ -86,5 +86,5 @@ Every interop event maps to Σ OVERWATCH primitives:
 | [MVP Plan](MVP_PLAN.md) | 2-week implementation plan |
 | [ProtocolContract Schema](../../schemas/interop/protocol_contract.schema.json) | JSON Schema for sealed contracts |
 | [Example Contract](../../templates/interop/ProtocolContract.example.json) | Realistic AgentBooking ↔ AgentTravel example |
-| [Mermaid: Interop Flow](../../mermaid/30-interop-request-flow.md) | Sequence diagram |
-| [Mermaid: Agora Negotiation](../../mermaid/31-agora-negotiation-flow.md) | Negotiation flowchart |
+| [Mermaid: Interop Flow](../../archive/mermaid/30-interop-request-flow.md) | Sequence diagram (archived) |
+| [Mermaid: Agora Negotiation](../../archive/mermaid/31-agora-negotiation-flow.md) | Negotiation flowchart (archived) |
