@@ -1,24 +1,24 @@
 {
-  "computed_at": "2026-02-23T20:27:06.876732+00:00",
-  "overall_score": 90.0,
-  "grade": "A",
+  "computed_at": "2026-02-23T20:13:34.865207+00:00",
+  "overall_score": 75.0,
+  "grade": "B",
   "dimensions": [
     {
       "name": "policy_adherence",
-      "score": 100.0,
+      "score": 0.0,
       "weight": 0.25,
       "details": {
-        "stamped": 3,
-        "total": 3
+        "stamped": 0,
+        "total": 1
       }
     },
     {
       "name": "outcome_health",
-      "score": 66.67,
+      "score": 100.0,
       "weight": 0.3,
       "details": {
-        "success_rate": 0.6667,
-        "verification_pass_rate": 0.6667
+        "success_rate": 1.0,
+        "verification_pass_rate": 1.0
       }
     },
     {
@@ -34,15 +34,11 @@
       "score": 100,
       "weight": 0.2,
       "details": {
-        "episode_nodes": 3,
-        "expected_episodes": 3,
-        "total_nodes": 9
+        "episode_nodes": 1,
+        "expected_episodes": 1,
+        "total_nodes": 20
       }
     }
   ],
-  "metadata": {
-    "seal_status": "sealed",
-    "framework_version": "0.3.0",
-    "pipeline": "DLR \u2192 RS \u2192 DS \u2192 MG \u2192 Score"
-  }
+  "metadata": {}
 }

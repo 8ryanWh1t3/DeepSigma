@@ -1,0 +1,72 @@
+{
+  "generated_at_utc": "2026-02-23T20:13:34.924616+00:00",
+  "status": "PASS",
+  "python": "3.11.7",
+  "platform": "macOS-26.3-arm64-arm-64bit",
+  "commands": [
+    {
+      "cmd": [
+        "/opt/anaconda3/bin/python",
+        "-m",
+        "tools.golden_path_cli",
+        "golden-path",
+        "sharepoint",
+        "--fixture",
+        "src/demos/golden_path/fixtures/sharepoint_small",
+        "--output",
+        "core_output",
+        "--clean"
+      ],
+      "returncode": 0,
+      "stdout": "\n============================================================\n  GOLDEN PATH\n============================================================\n  [1] CONNECT              PASS\n  [2] NORMALIZE            PASS\n  [3] EXTRACT              PASS\n  [4] SEAL                 PASS\n  [5] DRIFT                PASS\n  [6] PATCH                PASS\n  [7] RECALL               PASS\n\n  Records:    5\n  Claims:     5\n  Baseline:   75.0 (B)\n  Drift:      6 events\n  Patch:      applied\n  Patched:    75.0 (B)\n  IRIS:       WHY=RESOLVED, WHAT_CHANGED=RESOLVED, STATUS=RESOLVED\n  Output:     core_output\n  Elapsed:    201ms\n============================================================\n",
+      "stderr": ""
+    },
+    {
+      "cmd": [
+        "/opt/anaconda3/bin/python",
+        "-m",
+        "tools.trust_scorecard",
+        "--input",
+        "core_output",
+        "--output",
+        "core_output/trust_scorecard.json"
+      ],
+      "returncode": 0,
+      "stdout": "Trust Scorecard written to core_output/trust_scorecard.json\n  Steps:   7/7\n  Score:   75.0 (B) \u2192 75.0 (B)\n  IRIS:    3/3 resolved\n  Drift:   6 events\n  Elapsed: 201ms\n  SLOs:    ALL PASS\n",
+      "stderr": ""
+    }
+  ],
+  "artifacts_sha256": {
+    "core_output/trust_scorecard.json": "691c86c9cc284ee94925ebd1c48e7fb92d5294b10663abc20280c2317c2aa476"
+  },
+  "trust_scorecard": {
+    "scorecard_version": "1.0",
+    "timestamp": "2026-02-23T20:13:34.918979+00:00",
+    "source_dir": "core_output",
+    "metrics": {
+      "iris_why_latency_ms": 13.4,
+      "drift_detect_latency_ms": 30.1,
+      "patch_latency_ms": 30.1,
+      "connector_ingest_records_per_sec": 249.0,
+      "schema_validation_failures": 0,
+      "total_elapsed_ms": 200.8,
+      "steps_completed": 7,
+      "steps_total": 7,
+      "all_steps_passed": true,
+      "drift_events_detected": 6,
+      "patch_applied": true,
+      "iris_queries_resolved": 3,
+      "baseline_score": 75.0,
+      "baseline_grade": "B",
+      "patched_score": 75.0,
+      "patched_grade": "B",
+      "coverage_pct": null
+    },
+    "slo_checks": {
+      "iris_why_latency_ok": true,
+      "all_steps_passed": true,
+      "schema_clean": true,
+      "score_positive": true
+    }
+  }
+}

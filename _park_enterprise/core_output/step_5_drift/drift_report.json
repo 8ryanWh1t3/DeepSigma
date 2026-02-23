@@ -1,0 +1,80 @@
+[
+  {
+    "driftId": "drift-gp-001",
+    "episodeId": "gp-demo",
+    "detectedAt": "2026-02-23T20:13:34.864Z",
+    "driftType": "new_evidence",
+    "kind": "new_evidence",
+    "severity": "yellow",
+    "fingerprint": {
+      "key": "new:e5f6a7b8-c9d"
+    },
+    "description": "New record appeared: e5f6a7b8-c9d",
+    "recommendedPatchType": "REPLAN"
+  },
+  {
+    "driftId": "drift-gp-002",
+    "episodeId": "gp-demo",
+    "detectedAt": "2026-02-23T20:13:34.864Z",
+    "driftType": "evidence_changed",
+    "kind": "evidence_changed",
+    "severity": "yellow",
+    "fingerprint": {
+      "key": "changed:5f3a7c28-1a2"
+    },
+    "description": "Record 5f3a7c28-1a2 content changed",
+    "recommendedPatchType": "RETCON"
+  },
+  {
+    "driftId": "drift-gp-003",
+    "episodeId": "gp-demo",
+    "detectedAt": "2026-02-23T20:13:34.864Z",
+    "driftType": "evidence_changed",
+    "kind": "evidence_changed",
+    "severity": "red",
+    "fingerprint": {
+      "key": "changed:b2c3d4e5-f6a"
+    },
+    "description": "Record b2c3d4e5-f6a content changed (confidence 0.75\u21920.40)",
+    "recommendedPatchType": "RETCON"
+  },
+  {
+    "driftId": "drift-gp-004",
+    "episodeId": "gp-demo",
+    "detectedAt": "2026-02-23T20:13:34.864Z",
+    "driftType": "evidence_removed",
+    "kind": "evidence_removed",
+    "severity": "red",
+    "fingerprint": {
+      "key": "removed:d4e5f6a7-b8c"
+    },
+    "description": "Record removed: d4e5f6a7-b8c",
+    "recommendedPatchType": "ROLLBACK"
+  },
+  {
+    "driftId": "drift-gp-005",
+    "episodeId": "gp-demo",
+    "detectedAt": "2026-02-23T20:13:34.864Z",
+    "driftType": "freshness",
+    "kind": "freshness",
+    "severity": "yellow",
+    "fingerprint": {
+      "key": "freshness:b2c3d4e5-f6a"
+    },
+    "description": "Record b2c3d4e5-f6a past TTL (1135714864ms > 604800000ms)",
+    "recommendedPatchType": "RETCON"
+  },
+  {
+    "driftId": "drift-gp-006",
+    "episodeId": "gp-demo",
+    "detectedAt": "2026-02-23T20:13:34.864Z",
+    "driftType": "freshness",
+    "kind": "freshness",
+    "severity": "yellow",
+    "fingerprint": {
+      "key": "freshness:c3d4e5f6-a7b"
+    },
+    "description": "Record c3d4e5f6-a7b past TTL (981814864ms > 604800000ms)",
+    "recommendedPatchType": "RETCON"
+  }
+]

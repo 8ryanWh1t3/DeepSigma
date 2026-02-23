@@ -5,14 +5,14 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "deepsigma"
 version = "2.0.6"
-description = "Σ OVERWATCH — Institutional Decision Infrastructure for coherence, credibility, and drift governance"
+description = "DeepSigma Core - Drift to Patch governed execution"
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
 authors = [
     {name = "Bryan David White", email = "8ryanWh1t3@gmail.com"},
 ]
-keywords = ["agentic-ai", "governance", "coherence-ops", "decision-episodes", "drift-patch"]
+keywords = ["governance", "coherence-ops", "drift-patch"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -22,7 +22,6 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
-    "Topic :: Software Development :: Libraries :: Application Frameworks",
 ]
 
 dependencies = [
@@ -32,94 +31,32 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-otel = [
-    "opentelemetry-api>=1.20.0",
-    "opentelemetry-sdk>=1.20.0",
-    "opentelemetry-exporter-otlp>=1.20.0",
-]
-exhaust-llm = [
-    "anthropic>=0.40.0",
-]
 dev = [
     "pytest",
     "pytest-cov",
-    "pytest-benchmark",
     "ruff",
-]
-langgraph = [
-    "langgraph>=0.2.0",
-]
-mesh = [
-    "httpx>=0.25.0",
-    "uvicorn>=0.24.0",
-    "msgpack>=1.0.0",
-]
-azure = [
-    "msal>=1.25.0",
-]
-snowflake = [
-    "cryptography>=42.0",
-]
-rdf = [
-    "rdflib>=7.0,<8",
-    "pyparsing>=3.1",
-    "pyshacl>=0.25",
-]
-openclaw = [
-    "wasmtime>=23.0",
 ]
 excel = [
     "openpyxl>=3.1.0",
-]
-postgresql = [
-    "psycopg[binary]>=3.1.0",
-]
-local = [
-    "httpx>=0.25.0",
-]
-encrypt = [
-    "cryptography>=42.0",
 ]
 
 [project.urls]
 Homepage = "https://github.com/8ryanWh1t3/DeepSigma"
 Repository = "https://github.com/8ryanWh1t3/DeepSigma"
-Wiki = "https://github.com/8ryanWh1t3/DeepSigma/wiki"
 Issues = "https://github.com/8ryanWh1t3/DeepSigma/issues"
 
 [project.scripts]
-overwatch = "tools.run_supervised:main"
-overwatch-validate = "tools.validate_examples:main"
 coherence = "coherence_ops.cli:main"
-deepsigma = "deepsigma.cli.main:main"
-excel-demo = "demos.excel_first.__main__:main"
 
 [tool.setuptools.packages.find]
-where = ["src", "."]
+where = ["src"]
 include = [
-    "engine*",
     "coherence_ops*",
-    "verifiers*",
-    "tools*",
-    "adapters*",
-    "demos*",
-    "mdpt*",
-    "deepsigma*",
-    "credibility_engine*",
-    "tenancy*",
-    "governance*",
-    "mesh*",
-    "services*",
-    "dashboard*",
 ]
 
 [tool.ruff]
-select = ["E","F","W"]
+select = ["E", "F", "W"]
 ignore = ["E501"]
-exclude = ["coherence_ops/cli.py"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-markers = [
-    "benchmark: performance benchmark tests (deselect with '-m \"not benchmark\"')",
-]

@@ -1,0 +1,69 @@
+{
+  "episodeId": "gp-demo",
+  "decisionType": "ingest",
+  "startedAt": "2025-11-01T08:00:00.000Z",
+  "endedAt": "2026-02-15T14:30:00.000Z",
+  "decisionWindowMs": 9181800000,
+  "actor": {
+    "type": "system",
+    "id": "golden-path",
+    "version": "0.5.1"
+  },
+  "dteRef": {
+    "decisionType": "ingest",
+    "version": "1.0"
+  },
+  "context": {
+    "snapshotId": "snap-gp-demo",
+    "capturedAt": "2025-11-01T08:00:00.000Z",
+    "ttlMs": 86400000,
+    "maxFeatureAgeMs": 3600000,
+    "ttlBreachesCount": 0,
+    "evidenceRefs": [
+      "sharepoint://contoso.sharepoint.com/sites/ops/lists/Policies/1",
+      "sharepoint://contoso.sharepoint.com/sites/ops/lists/Policies/2",
+      "sharepoint://contoso.sharepoint.com/sites/ops/lists/Tasks/3",
+      "sharepoint://contoso.sharepoint.com/sites/ops/lists/Tasks/4",
+      "sharepoint://contoso.sharepoint.com/sites/ops/lists/Contacts/5"
+    ]
+  },
+  "plan": {
+    "planner": "rules",
+    "summary": "Ingest 5 records from sharepoint"
+  },
+  "actions": [
+    {
+      "type": "ingest",
+      "blastRadiusTier": "low",
+      "idempotencyKey": "gp-gp-demo",
+      "rollbackPlan": "discard ingested records",
+      "authorization": {
+        "mode": "auto"
+      }
+    }
+  ],
+  "verification": {
+    "required": true,
+    "method": "schema_validation",
+    "result": "pass"
+  },
+  "outcome": {
+    "code": "success",
+    "reason": "5 canonical records normalized from sharepoint"
+  },
+  "telemetry": {
+    "endToEndMs": 9181800000,
+    "stageMs": {
+      "context": 2295450000,
+      "plan": 2295450000,
+      "act": 2295450000,
+      "verify": 2295450000
+    },
+    "hopCount": 1,
+    "fanout": 1
+  },
+  "seal": {
+    "sealedAt": "2026-02-23T20:13:34.667Z",
+    "sealHash": "f6285f412b733df2f29ebeb09e76d87098d0bb859cdf770144c95ad6974b91e3"
+  }
+}

@@ -1,0 +1,216 @@
+{
+  "query_id": "iris-3873f3a5b966",
+  "query_type": "WHY",
+  "status": "RESOLVED",
+  "summary": "Episode gp-demo: 5 claims, DLR outcome=success.",
+  "data": {
+    "mg_provenance": {
+      "episode_id": "gp-demo",
+      "node": {
+        "node_id": "gp-demo",
+        "kind": "episode",
+        "label": "ingest",
+        "timestamp": "2026-02-15T14:30:00.000Z",
+        "properties": {
+          "outcome": "success",
+          "degrade_step": null,
+          "seal_hash": "f6285f412b733df2f29ebeb09e76d87098d0bb859cdf770144c95ad6974b91e3"
+        }
+      },
+      "evidence_refs": [
+        "evidence:sharepoint://contoso.sharepoint.com/sites/ops/lists/Policies/1",
+        "evidence:sharepoint://contoso.sharepoint.com/sites/ops/lists/Policies/2",
+        "evidence:sharepoint://contoso.sharepoint.com/sites/ops/lists/Tasks/3",
+        "evidence:sharepoint://contoso.sharepoint.com/sites/ops/lists/Tasks/4",
+        "evidence:sharepoint://contoso.sharepoint.com/sites/ops/lists/Contacts/5"
+      ],
+      "actions": [
+        "gp-gp-demo"
+      ],
+      "claims": [
+        {
+          "node_id": "",
+          "kind": "claim",
+          "label": "",
+          "timestamp": null,
+          "properties": {
+            "truth_type": null,
+            "confidence": 0.9,
+            "status_light": null,
+            "owner": null,
+            "version": null,
+            "half_life_value": null,
+            "half_life_unit": null,
+            "classification": null,
+            "seal_hash": null
+          }
+        },
+        {
+          "node_id": "",
+          "kind": "claim",
+          "label": "",
+          "timestamp": null,
+          "properties": {
+            "truth_type": null,
+            "confidence": 0.9,
+            "status_light": null,
+            "owner": null,
+            "version": null,
+            "half_life_value": null,
+            "half_life_unit": null,
+            "classification": null,
+            "seal_hash": null
+          }
+        },
+        {
+          "node_id": "",
+          "kind": "claim",
+          "label": "",
+          "timestamp": null,
+          "properties": {
+            "truth_type": null,
+            "confidence": 0.9,
+            "status_light": null,
+            "owner": null,
+            "version": null,
+            "half_life_value": null,
+            "half_life_unit": null,
+            "classification": null,
+            "seal_hash": null
+          }
+        },
+        {
+          "node_id": "",
+          "kind": "claim",
+          "label": "",
+          "timestamp": null,
+          "properties": {
+            "truth_type": null,
+            "confidence": 0.9,
+            "status_light": null,
+            "owner": null,
+            "version": null,
+            "half_life_value": null,
+            "half_life_unit": null,
+            "classification": null,
+            "seal_hash": null
+          }
+        },
+        {
+          "node_id": "",
+          "kind": "claim",
+          "label": "",
+          "timestamp": null,
+          "properties": {
+            "truth_type": null,
+            "confidence": 0.9,
+            "status_light": null,
+            "owner": null,
+            "version": null,
+            "half_life_value": null,
+            "half_life_unit": null,
+            "classification": null,
+            "seal_hash": null
+          }
+        }
+      ]
+    },
+    "dlr_entry": {
+      "dlr_id": "dlr-212b14ea75b9",
+      "decision_type": "ingest",
+      "outcome_code": "success",
+      "degrade_step": null,
+      "policy_stamp": null
+    },
+    "rs_context": {
+      "episode_count": 1,
+      "outcome_distribution": {
+        "success": 1
+      },
+      "verification_pass_rate": 1.0
+    }
+  },
+  "provenance": [
+    {
+      "artifact": "MG",
+      "ref_id": "gp-demo",
+      "role": "source",
+      "detail": "Episode provenance node"
+    },
+    {
+      "artifact": "MG",
+      "ref_id": "evidence:sharepoint://contoso.sharepoint.com/sites/ops/lists/Policies/1",
+      "role": "evidence",
+      "detail": "Input evidence ref"
+    },
+    {
+      "artifact": "MG",
+      "ref_id": "evidence:sharepoint://contoso.sharepoint.com/sites/ops/lists/Policies/2",
+      "role": "evidence",
+      "detail": "Input evidence ref"
+    },
+    {
+      "artifact": "MG",
+      "ref_id": "evidence:sharepoint://contoso.sharepoint.com/sites/ops/lists/Tasks/3",
+      "role": "evidence",
+      "detail": "Input evidence ref"
+    },
+    {
+      "artifact": "MG",
+      "ref_id": "evidence:sharepoint://contoso.sharepoint.com/sites/ops/lists/Tasks/4",
+      "role": "evidence",
+      "detail": "Input evidence ref"
+    },
+    {
+      "artifact": "MG",
+      "ref_id": "evidence:sharepoint://contoso.sharepoint.com/sites/ops/lists/Contacts/5",
+      "role": "evidence",
+      "detail": "Input evidence ref"
+    },
+    {
+      "artifact": "MG",
+      "ref_id": "",
+      "role": "evidence",
+      "detail": "Deciding claim"
+    },
+    {
+      "artifact": "MG",
+      "ref_id": "",
+      "role": "evidence",
+      "detail": "Deciding claim"
+    },
+    {
+      "artifact": "MG",
+      "ref_id": "",
+      "role": "evidence",
+      "detail": "Deciding claim"
+    },
+    {
+      "artifact": "MG",
+      "ref_id": "",
+      "role": "evidence",
+      "detail": "Deciding claim"
+    },
+    {
+      "artifact": "MG",
+      "ref_id": "",
+      "role": "evidence",
+      "detail": "Deciding claim"
+    },
+    {
+      "artifact": "DLR",
+      "ref_id": "dlr-212b14ea75b9",
+      "role": "context",
+      "detail": "Policy context: ingest outcome=success"
+    },
+    {
+      "artifact": "RS",
+      "ref_id": "reflection-session",
+      "role": "context",
+      "detail": "Reflection: 1 episodes, pass_rate=1.00"
+    }
+  ],
+  "confidence": 1.0,
+  "warnings": [],
+  "elapsed_ms": 0.11804100358858705
+}

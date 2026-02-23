@@ -1,0 +1,27 @@
+[
+  {
+    "dlr_id": "dlr-212b14ea75b9",
+    "episode_id": "gp-demo",
+    "decision_type": "ingest",
+    "recorded_at": "2026-02-23T20:13:34.863093+00:00",
+    "dte_ref": {
+      "decisionType": "ingest",
+      "version": "1.0"
+    },
+    "action_contract": {
+      "blastRadiusTier": "low",
+      "idempotencyKey": "gp-gp-demo",
+      "rollbackPlan": "discard ingested records",
+      "authMode": "auto"
+    },
+    "verification": {
+      "required": true,
+      "method": "schema_validation",
+      "result": "pass"
+    },
+    "policy_stamp": null,
+    "outcome_code": "success",
+    "degrade_step": null,
+    "tags": []
+  }
+]
