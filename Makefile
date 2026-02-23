@@ -1,4 +1,4 @@
-.PHONY: ci demo pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review tec lock-update build docker release-check pilot-pack scale-benchmark reencrypt-benchmark openapi-docs openapi-check security-gate security-demo security-audit-pack authority-ledger-export
+.PHONY: ci demo pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review tec lock-update build docker release-check version-sync-check pilot-pack scale-benchmark reencrypt-benchmark openapi-docs openapi-check security-gate security-demo security-audit-pack authority-ledger-export
 
 ci:
 	python scripts/compute_ci.py
@@ -57,6 +57,9 @@ docker:
 
 release-check:
 	python scripts/release_check.py
+
+version-sync-check:
+	python scripts/check_release_version_sync.py
 
 pilot-pack:
 	python scripts/pilot_pack.py

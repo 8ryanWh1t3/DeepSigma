@@ -5,6 +5,31 @@ All notable changes to Σ OVERWATCH / DeepSigma will be documented in this file.
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.6] — 2026-02-23 — "TEC/C-TEC Normalization + Release Consistency Gate"
+
+### Added
+
+- Deterministic TEC outputs generated from repo telemetry:
+  - `release_kpis/TEC_SUMMARY.md`
+  - `release_kpis/tec_internal.json`
+  - `release_kpis/tec_executive.json`
+  - `release_kpis/tec_dod.json`
+- C-TEC v1.0 complexity weighting signals:
+  - PR diff size (`additions + deletions`)
+  - files changed per PR
+  - cross-subsystem touch (security/authority/kpi/ci)
+  - issue open→close duration
+  - issue dependency/reference count
+- Version consistency gate script: `scripts/check_release_version_sync.py`
+  - validates `pyproject.toml` version equals `release_kpis/VERSION.txt` (with `v` prefix normalization)
+
+### Changed
+
+- KPI pipeline now includes TEC generation so PR comments include ROM values.
+- README/wiki/mermaid updated for v2.0.6 surfaces and C-TEC visibility.
+- Mermaid guardrail updated to include canonical `docs/mermaid/12-c-tec-pipeline.md`.
+- Release metadata normalized to `2.0.6` / `v2.0.6` across package and KPI artifact version sources.
+
 ## [2.0.5] — 2026-02-23 — "DISR Completion + Measurable Scalability"
 
 ### Added
