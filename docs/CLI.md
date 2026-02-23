@@ -100,6 +100,36 @@ deepsigma golden-path sharepoint \
 
 ---
 
+### `deepsigma compliance export`
+
+Generate a tenant-scoped SOC 2 evidence package for a date range.
+
+```bash
+deepsigma compliance export \
+  --tenant tenant-alpha \
+  --from 2026-02-01 \
+  --to 2026-02-23 \
+  --out report/
+
+deepsigma compliance export \
+  --tenant tenant-alpha \
+  --from 2026-02-01 \
+  --to 2026-02-23 \
+  --out report/ \
+  --redact
+```
+
+Produces:
+- `audit_log.json` and `audit_log.csv` (date-filtered)
+- `sealed_packet_chain.json`
+- `policy_snapshots.json`
+- `trust_scorecard_history.json`
+- `tenant_configuration.json`
+- `data_flow_diagram.mmd`
+- `compliance_summary.md`
+
+---
+
 ## Version
 
 ```bash
