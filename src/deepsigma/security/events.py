@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 import hashlib
+import hmac
 import json
 from pathlib import Path
 from typing import Any
@@ -19,6 +20,9 @@ class SecurityEvent:
     payload: dict[str, Any]
     prev_hash: str | None
     event_hash: str
+    signer_id: str | None
+    signature: str | None
+    signature_alg: str | None
 
 
 
@@ -30,6 +34,11 @@ def _utc_now_iso() -> str:
 def _hash_payload(payload: dict[str, Any]) -> str:
     encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
+
+
+def _event_signature(payload: dict[str, Any], signing_key: str) -> str:
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hmac.new(signing_key.encode("utf-8"), encoded, hashlib.sha256).hexdigest()
 
 
 
@@ -54,6 +63,8 @@ def append_security_event(
     payload: dict[str, Any],
     events_path: str | Path = "data/security/security_events.jsonl",
     occurred_at: str | None = None,
+    signer_id: str | None = None,
+    signing_key: str | None = None,
 ) -> SecurityEvent:
     path = Path(events_path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -69,6 +80,7 @@ def append_security_event(
         "prev_hash": prev_hash,
     }
     event_hash = _hash_payload(base)
+    signature = _event_signature(base, signing_key) if signing_key else None
 
     event = SecurityEvent(
         event_id=f"SE-{event_hash[:12]}",
@@ -78,6 +90,9 @@ def append_security_event(
         payload=payload,
         prev_hash=prev_hash,
         event_hash=event_hash,
+        signer_id=signer_id,
+        signature=signature,
+        signature_alg="HMAC-SHA256" if signature else None,
     )
 
     with path.open("a", encoding="utf-8") as handle:

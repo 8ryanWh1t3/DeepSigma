@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 from deepsigma.security.reencrypt import reencrypt_summary_to_dict, run_reencrypt_job
@@ -20,6 +21,19 @@ def register(subparsers: argparse._SubParsersAction) -> None:
     rotate.add_argument("--ttl-days", type=int, default=14, help="Days before key expiry")
     rotate.add_argument("--actor-user", default="system", help="Actor user for audit event")
     rotate.add_argument("--actor-role", default="coherence_steward", help="Actor role for audit event")
+    rotate.add_argument("--authority-dri", required=True, help="Approving DRI identity")
+    rotate.add_argument("--authority-role", default="dri_approver", help="Approving authority role")
+    rotate.add_argument("--authority-reason", required=True, help="Approval rationale")
+    rotate.add_argument(
+        "--authority-signing-key-env",
+        default="DEEPSIGMA_AUTHORITY_SIGNING_KEY",
+        help="Env var name containing HMAC key for signed authority events",
+    )
+    rotate.add_argument(
+        "--authority-ledger-path",
+        default="data/security/authority_ledger.json",
+        help="Path to append authority ledger entries",
+    )
     rotate.add_argument("--keyring-path", default="data/security/keyring.json", help="Path to keyring JSON")
     rotate.add_argument(
         "--event-log-path",
@@ -51,14 +65,20 @@ def register(subparsers: argparse._SubParsersAction) -> None:
 
 
 def run_rotate(args: argparse.Namespace) -> int:
+    signing_key = os.getenv(args.authority_signing_key_env)
     result = rotate_keys(
         tenant_id=args.tenant,
         key_id=args.key_id,
         ttl_days=args.ttl_days,
         actor_user=args.actor_user,
         actor_role=args.actor_role,
+        authority_dri=args.authority_dri,
+        authority_role=args.authority_role,
+        authority_reason=args.authority_reason,
+        authority_signing_key=signing_key,
         keyring_path=Path(args.keyring_path),
         event_log_path=Path(args.event_log_path),
+        authority_ledger_path=Path(args.authority_ledger_path),
     )
     payload = rotation_result_to_dict(result)
     if args.json:

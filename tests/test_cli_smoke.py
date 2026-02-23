@@ -135,11 +135,13 @@ class TestInitProject:
 
 
 class TestSecurityCLI:
-    def test_security_rotate_keys_json(self, tmp_path, capsys):
+    def test_security_rotate_keys_json(self, tmp_path, capsys, monkeypatch):
         from deepsigma.cli.main import main
 
         keyring_path = tmp_path / "keyring.json"
         event_path = tmp_path / "events.jsonl"
+        authority_ledger_path = tmp_path / "authority_ledger.json"
+        monkeypatch.setenv("DEEPSIGMA_AUTHORITY_SIGNING_KEY", "test-signing-key")
 
         rc = main(
             [
@@ -155,6 +157,12 @@ class TestSecurityCLI:
                 str(keyring_path),
                 "--event-log-path",
                 str(event_path),
+                "--authority-dri",
+                "dri.approver",
+                "--authority-reason",
+                "scheduled policy rotation",
+                "--authority-ledger-path",
+                str(authority_ledger_path),
                 "--json",
             ]
         )
@@ -164,6 +172,7 @@ class TestSecurityCLI:
         assert payload["key_version"] == 1
         assert keyring_path.exists()
         assert event_path.exists()
+        assert authority_ledger_path.exists()
 
     def test_security_reencrypt_dry_run_json(self, tmp_path, capsys):
         from deepsigma.cli.main import main
