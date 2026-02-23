@@ -52,6 +52,16 @@ See: [docs/release/RELEASE_NOTES_v2.0.6.md](docs/release/RELEASE_NOTES_v2.0.6.md
 - Authority-bound contract enforcement expansion
 - Integration schema finalization
 
+## Positioning Shift
+- Not AI governance tooling
+- Not compliance software
+- **Decision Infrastructure**
+- **Institutional Accountability Engine**
+- Positioning manifesto: [docs/positioning/positioning_manifesto.md](docs/positioning/positioning_manifesto.md)
+- Executive briefing: [docs/positioning/executive_briefing_one_page.md](docs/positioning/executive_briefing_one_page.md)
+- Architecture model: [specs/decision_infrastructure_model.md](specs/decision_infrastructure_model.md)
+- Layer-to-KPI map: [release_kpis/layer_kpi_mapping.json](release_kpis/layer_kpi_mapping.json)
+
 **Institutional Decision Infrastructure**
 
 *Trust layer for agentic AI: verify before act, seal what happened, detect drift, ship patches.*
