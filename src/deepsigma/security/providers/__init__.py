@@ -5,7 +5,10 @@ from __future__ import annotations
 import os
 from typing import Any, Callable
 
+from .aws_kms import AWSKMSProvider
+from .azure_kv import AzureKeyVaultProvider
 from .base import CryptoProvider
+from .gcp_kms import GCPKMSProvider
 from .local_keystore import LocalKeyStoreProvider
 from .local_keyring import LocalKeyringProvider
 
@@ -83,3 +86,6 @@ def _normalize_name(name: str) -> str:
 
 register_provider("local-keystore", LocalKeyStoreProvider)
 register_provider("local-keyring", LocalKeyringProvider)
+register_provider("aws-kms", AWSKMSProvider)
+register_provider("gcp-kms", GCPKMSProvider)
+register_provider("azure-kv", AzureKeyVaultProvider)

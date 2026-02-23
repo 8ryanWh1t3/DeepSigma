@@ -26,3 +26,15 @@ visible, reversible, and measurable under pilot conditions.
 - Default provider is `local-keystore` (file-backed) with deterministic storage at `local_keystore.json`.
 - Envelope v1 metadata includes `key_id`, `key_version`, `provider`, `alg`, `nonce`, `aad`, `created_at`, and `expires_at`.
 - Expiry and disable transitions are represented as status changes, not silent mutation.
+
+## Optional cloud provider stubs
+
+Cloud KMS providers are registered as stubs only:
+
+- `aws-kms`
+- `gcp-kms`
+- `azure-kv`
+
+These stubs intentionally fail closed until you implement deployment-specific adapters.
+Do not commit credentials or cloud client configs in repo. Inject runtime auth through your
+deployment environment and replace stub internals in private integration layers.
