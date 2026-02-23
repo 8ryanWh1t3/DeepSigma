@@ -11,6 +11,7 @@ from typing import Callable
 
 from governance.audit import audit_action
 
+from .events import append_security_event
 from .keyring import Keyring, KeyVersionRecord
 
 
@@ -76,6 +77,18 @@ def rotate_keys(
     event_path.parent.mkdir(parents=True, exist_ok=True)
     with event_path.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(payload, sort_keys=True) + "\n")
+
+    append_security_event(
+        event_type="KEY_ROTATED",
+        tenant_id=tenant_id,
+        payload={
+            "key_id": record.key_id,
+            "key_version": record.key_version,
+            "expires_at": record.expires_at,
+            "actor_user": actor_user,
+            "actor_role": actor_role,
+        },
+    )
 
     audit_action(
         tenant_id=tenant_id,

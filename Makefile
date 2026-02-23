@@ -1,4 +1,4 @@
-.PHONY: ci demo pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review lock-update build docker release-check pilot-pack scale-benchmark openapi-docs openapi-check
+.PHONY: ci demo pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review lock-update build docker release-check pilot-pack scale-benchmark openapi-docs openapi-check security-gate
 
 ci:
 	python scripts/compute_ci.py
@@ -67,3 +67,6 @@ openapi-check:
 	python scripts/export_openapi.py
 	python scripts/check_openapi_spec.py
 	git diff --exit-code -- docs/api/openapi.json docs/api/index.html docs/api/README.md
+
+security-gate:
+	python scripts/crypto_misuse_scan.py

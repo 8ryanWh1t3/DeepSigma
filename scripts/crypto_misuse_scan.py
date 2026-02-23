@@ -1,0 +1,219 @@
+#!/usr/bin/env python3
+"""Detect common crypto misuse patterns and emit security gate reports."""
+
+import argparse
+from dataclasses import dataclass
+import json
+from pathlib import Path
+import re
+from typing import Any
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+ENVELOPE_REQUIRED_FIELDS = ["key_id", "key_version", "alg", "nonce", "aad"]
+
+
+@dataclass
+class Finding:
+    severity: str
+    category: str
+    message: str
+    location: str
+
+    def as_dict(self) -> dict[str, str]:
+        return {
+            "severity": self.severity,
+            "category": self.category,
+            "message": self.message,
+            "location": self.location,
+        }
+
+
+
+def _iter_json_objects(path: Path) -> list[tuple[str, dict[str, Any]]]:
+    out: list[tuple[str, dict[str, Any]]] = []
+    try:
+        if path.suffix == ".jsonl":
+            for idx, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+                if not line.strip():
+                    continue
+                try:
+                    obj = json.loads(line)
+                    if isinstance(obj, dict):
+                        out.append((f"{path}:{idx}", obj))
+                except json.JSONDecodeError:
+                    continue
+        elif path.suffix == ".json":
+            obj = json.loads(path.read_text(encoding="utf-8"))
+            if isinstance(obj, dict):
+                out.append((str(path), obj))
+            elif isinstance(obj, list):
+                for idx, item in enumerate(obj, start=1):
+                    if isinstance(item, dict):
+                        out.append((f"{path}#{idx}", item))
+    except Exception:
+        return []
+    return out
+
+
+
+def _find_envelopes(node: Any, where: str) -> list[tuple[str, dict[str, Any]]]:
+    found: list[tuple[str, dict[str, Any]]] = []
+    if isinstance(node, dict):
+        if "encrypted_payload" in node and "nonce" in node:
+            found.append((where, node))
+        for key, value in node.items():
+            found.extend(_find_envelopes(value, f"{where}.{key}"))
+    elif isinstance(node, list):
+        for idx, value in enumerate(node):
+            found.extend(_find_envelopes(value, f"{where}[{idx}]"))
+    return found
+
+
+
+def scan_repo(root: Path) -> list[Finding]:
+    findings: list[Finding] = []
+
+    schema_path = root / "schemas" / "core" / "crypto_envelope.schema.json"
+    if not schema_path.exists():
+        findings.append(
+            Finding(
+                severity="HIGH",
+                category="missing_schema",
+                message="Missing crypto envelope schema at schemas/core/crypto_envelope.schema.json",
+                location=str(schema_path),
+            )
+        )
+    else:
+        try:
+            schema = json.loads(schema_path.read_text(encoding="utf-8"))
+            required = set(schema.get("required", []))
+            missing = [field for field in ENVELOPE_REQUIRED_FIELDS if field not in required]
+            if missing:
+                findings.append(
+                    Finding(
+                        severity="HIGH",
+                        category="schema_missing_required",
+                        message=f"crypto envelope schema missing required fields: {', '.join(missing)}",
+                        location=str(schema_path),
+                    )
+                )
+        except Exception as exc:
+            findings.append(
+                Finding(
+                    severity="HIGH",
+                    category="schema_parse_error",
+                    message=f"Failed to parse crypto envelope schema: {type(exc).__name__}",
+                    location=str(schema_path),
+                )
+            )
+
+    nonce_locations: dict[str, list[str]] = {}
+
+    for path in root.rglob("*.json*"):
+        rel = path.relative_to(root)
+        if any(part in {".git", "node_modules", "dist", "build", ".venv", "venv"} for part in rel.parts):
+            continue
+        for where, obj in _iter_json_objects(path):
+            for env_where, env in _find_envelopes(obj, where):
+                missing = [field for field in ENVELOPE_REQUIRED_FIELDS if field not in env]
+                if missing:
+                    findings.append(
+                        Finding(
+                            severity="HIGH",
+                            category="missing_envelope_fields",
+                            message=f"Encrypted envelope missing fields: {', '.join(missing)}",
+                            location=env_where,
+                        )
+                    )
+                nonce = str(env.get("nonce", ""))
+                if nonce:
+                    nonce_locations.setdefault(nonce, []).append(env_where)
+
+    for nonce, locations in nonce_locations.items():
+        if len(locations) > 1:
+            findings.append(
+                Finding(
+                    severity="HIGH",
+                    category="nonce_reuse",
+                    message=f"Nonce reused across {len(locations)} envelopes: {nonce[:16]}...",
+                    location="; ".join(locations[:5]),
+                )
+            )
+
+    weak_random_pattern = re.compile(r"\brandom\.(random|randint|randrange|getrandbits|choice)\(")
+    for path in root.rglob("*.py"):
+        rel = path.relative_to(root)
+        if any(part in {".git", "node_modules", "dist", "build", ".venv", "venv", "__pycache__"} for part in rel.parts):
+            continue
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        for idx, line in enumerate(text.splitlines(), start=1):
+            if weak_random_pattern.search(line):
+                if any(token in str(rel).lower() for token in ["security", "crypto", "reencrypt", "rotate"]):
+                    findings.append(
+                        Finding(
+                            severity="MEDIUM",
+                            category="weak_randomness",
+                            message="Potential weak randomness primitive in security-sensitive module",
+                            location=f"{rel}:{idx}",
+                        )
+                    )
+
+    return findings
+
+
+
+def write_reports(findings: list[Finding], out_json: Path, out_md: Path) -> None:
+    out_json.parent.mkdir(parents=True, exist_ok=True)
+    out_json.write_text(
+        json.dumps({"findings": [f.as_dict() for f in findings]}, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    lines = ["# Security Gate Report", ""]
+    if not findings:
+        lines += ["## PASS", "", "- No crypto misuse findings detected.", ""]
+    else:
+        lines += ["## Findings", ""]
+        for finding in findings:
+            lines.append(f"- **{finding.severity}** `{finding.category}`: {finding.message}")
+            lines.append(f"  - Location: `{finding.location}`")
+        lines.append("")
+
+    out_md.write_text("\n".join(lines), encoding="utf-8")
+
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Scan repository for crypto misuse patterns")
+    parser.add_argument("--root", default=str(REPO_ROOT), help="Repository root")
+    parser.add_argument(
+        "--out-json",
+        default="release_kpis/SECURITY_GATE_REPORT.json",
+        help="JSON output path",
+    )
+    parser.add_argument(
+        "--out-md",
+        default="release_kpis/SECURITY_GATE_REPORT.md",
+        help="Markdown output path",
+    )
+    args = parser.parse_args()
+
+    root = Path(args.root).resolve()
+    findings = scan_repo(root)
+
+    out_json = (root / args.out_json).resolve()
+    out_md = (root / args.out_md).resolve()
+    write_reports(findings, out_json, out_md)
+
+    high = [f for f in findings if f.severity == "HIGH"]
+    print(f"Wrote: {out_json}")
+    print(f"Wrote: {out_md}")
+    if high:
+        print(f"Security gate failed with {len(high)} HIGH finding(s)")
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

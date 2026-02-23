@@ -12,6 +12,8 @@ from typing import Any
 from credibility_engine.store import CredibilityStore
 from governance.audit import audit_action
 
+from .events import append_security_event
+
 
 def _utc_now_iso() -> str:
     return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
@@ -143,6 +145,18 @@ def run_reencrypt_job(
             "files_rewritten": payload["files_rewritten"],
             "records_reencrypted": payload["records_reencrypted"],
             "checkpoint_path": str(checkpoint),
+        },
+    )
+
+    append_security_event(
+        event_type="REENCRYPT_COMPLETED",
+        tenant_id=tenant_id,
+        payload={
+            "files_rewritten": payload["files_rewritten"],
+            "records_reencrypted": payload["records_reencrypted"],
+            "checkpoint_path": str(checkpoint),
+            "actor_user": actor_user,
+            "actor_role": actor_role,
         },
     )
 
