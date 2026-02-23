@@ -1,0 +1,546 @@
+diff --git a/security_audit_pack/docs/docs/security/DISR.md b/security_audit_pack/docs/docs/security/DISR.md
+new file mode 100644
+index 0000000..5e23c38
+--- /dev/null
++++ b/security_audit_pack/docs/docs/security/DISR.md
+@@ -0,0 +1,47 @@
++# DISR Security Model
++
++DISR stands for **Breakable -> Detectable -> Rotatable -> Recoverable**.
++
++The intent is practical: assume keys can be compromised, then make compromise
++visible, reversible, and measurable under pilot conditions.
++
++## Core controls
++
++- **Breakable:** Keys are treated as disposable. No key is permanent.
++- **Detectable:** Misuse signals are machine-detectable and gateable in CI.
++- **Rotatable:** Rotation is a first-class operation, not an emergency-only script.
++- **Recoverable:** Re-encryption and rollback are rehearsed with deterministic drills.
++
++## Artifacts
++
++- Key lifecycle policy: `docs/docs/security/KEY_LIFECYCLE.md`
++- Recovery runbook: `docs/docs/security/RECOVERY_RUNBOOK.md`
++- 10-minute demo: `docs/docs/security/DEMO_10_MIN.md`
++- Security audit export: `scripts/security_audit_pack.py` (`make security-audit-pack`)
++- Envelope migration plan: `docs/docs/security/ENVELOPE_VERSIONING.md`
++- Crypto envelope schema: `schemas/core/crypto_envelope.schema.json`
++- Crypto policy: `governance/security_crypto_policy.json`
++- Crypto policy schema: `schemas/core/security_crypto_policy.schema.json`
++- Authority action contract schema: `schemas/core/action_contract.schema.json`
++- Keyring model: `src/deepsigma/security/keyring.py`
++
++## Pilot implementation notes
++
++- Key versions are modeled explicitly (`key_id`, `key_version`, `expires_at`, `status`).
++- Default provider is `local-keystore` (file-backed) with deterministic storage at `local_keystore.json`.
++- Envelope metadata is policy-driven via `envelope_version_current` and `envelope_versions_supported`.
++- Runtime enforces allowed providers/algorithms/TTL bounds from `governance/security_crypto_policy.json`.
++- Expiry and disable transitions are represented as status changes, not silent mutation.
++- Privileged rotate/reencrypt actions require a signed authority action contract.
++
++## Optional cloud provider stubs
++
++Cloud KMS providers are registered as stubs only:
++
++- `aws-kms`
++- `gcp-kms`
++- `azure-kv`
++
++These stubs intentionally fail closed until you implement deployment-specific adapters.
++Do not commit credentials or cloud client configs in repo. Inject runtime auth through your
++deployment environment and replace stub internals in private integration layers.
+diff --git a/security_audit_pack/docs/docs/security/ENVELOPE_VERSIONING.md b/security_audit_pack/docs/docs/security/ENVELOPE_VERSIONING.md
+new file mode 100644
+index 0000000..afb290c
+--- /dev/null
++++ b/security_audit_pack/docs/docs/security/ENVELOPE_VERSIONING.md
+@@ -0,0 +1,27 @@
++# Envelope Versioning Plan
++
++This document defines the migration path for cryptographic envelope schema versions.
++
++## Current state
++
++- `envelope_version_current`: `1.0`
++- `envelope_versions_supported`: `["1.0"]`
++- Source of truth: `governance/security_crypto_policy.json`
++
++## Migration strategy to v2
++
++- Strategy: **dual-read, single-write**
++- Writers must emit `envelope_version_current`.
++- Readers may accept any value in `envelope_versions_supported`.
++
++## v2 rollout sequence
++
++1. Add `2.0` to `envelope_versions_supported` while keeping current at `1.0`.
++2. Ship readers that can decode both `1.0` and `2.0`.
++3. Flip `envelope_version_current` to `2.0` for new writes.
++4. Retire `1.0` from supported versions after re-encryption and validation.
++
++## CI and runtime enforcement
++
++- `scripts/crypto_misuse_scan.py` fails on unsupported envelope versions.
++- Runtime write path rejects envelope metadata that violates provider/algorithm/version policy.
+diff --git a/security_audit_pack/docs/docs/security/KEY_LIFECYCLE.md b/security_audit_pack/docs/docs/security/KEY_LIFECYCLE.md
+new file mode 100644
+index 0000000..baad050
+--- /dev/null
++++ b/security_audit_pack/docs/docs/security/KEY_LIFECYCLE.md
+@@ -0,0 +1,43 @@
++# Key Lifecycle
++
++This document defines pilot-safe key lifecycle behavior for DISR.
++
++## States
++
++- `active`: usable for new encryption operations
++- `disabled`: administratively disabled; no new encryption
++- `expired`: TTL exceeded; no new encryption
++
++## Required fields
++
++Every key version record must include:
++
++- `key_id`
++- `key_version`
++- `created_at`
++- `expires_at` (nullable)
++- `status`
++
++## Rotation cadence (pilot)
++
++- Normal cadence: rotate every 14 days.
++- Emergency cadence: rotate immediately upon compromise signal.
++- Re-encryption follows rotation when historical data must remain decryptable.
++
++## Operational expectations
++
++- Rotation increments `key_version` monotonically per `key_id`.
++- New writes use the current active version.
++- Expired keys are not silently reused.
++
++## Approval chain (authority modeled)
++
++- Key rotation is blocked unless an explicit approving DRI identity is provided.
++- Approval context must include:
++  - `authority_dri`
++  - `authority_role`
++  - `authority_reason`
++- Rotations emit a signed `AUTHORIZED_KEY_ROTATION` security event.
++- Every approved rotation appends a chained entry to `data/security/authority_ledger.json`.
++- Each append also updates `data/security/authority_ledger.snapshot.json` with snapshot hash and provenance.
++- Authority precedence is enforced as `DRI > Approver > System`; system-tier actors cannot approve privileged actions.
+diff --git a/security_audit_pack/docs/docs/security/RECOVERY_RUNBOOK.md b/security_audit_pack/docs/docs/security/RECOVERY_RUNBOOK.md
+new file mode 100644
+index 0000000..7ed3ee0
+--- /dev/null
++++ b/security_audit_pack/docs/docs/security/RECOVERY_RUNBOOK.md
+@@ -0,0 +1,38 @@
++# Recovery Runbook (Pilot)
++
++This runbook describes recovery steps after key compromise in a DISR posture.
++
++## Objective
++
++Recover encrypted evidence integrity with auditable steps and bounded downtime.
++
++## Procedure
++
++1. Freeze writes for affected scope.
++2. Disable compromised key version.
++3. Create and activate a new key version.
++4. Re-encrypt evidence from old key -> new key (dry-run first).
++5. Validate readability and integrity.
++6. Resume writes.
++
++## Outputs
++
++- Rotation event with key lineage
++- Re-encryption summary (records processed, failures, retries)
++- Recovery timestamp and owner attribution
++
++## Rollback
++
++If re-encryption validation fails:
++
++1. Halt processing.
++2. Restore from the latest verified checkpoint.
++3. Re-run with reduced batch size and diagnostics enabled.
++
++## Reproducible drill
++
++Use the demo drill to rehearse rotation plus re-encrypt dry-run:
++
++```bash
++make security-demo
++```
+diff --git a/security_audit_pack/governance/security_crypto_policy.json b/security_audit_pack/governance/security_crypto_policy.json
+new file mode 100644
+index 0000000..5a3ae52
+--- /dev/null
++++ b/security_audit_pack/governance/security_crypto_policy.json
+@@ -0,0 +1,22 @@
++{
++  "policy_version": "1.0",
++  "default_provider": "local-keystore",
++  "allowed_providers": [
++    "local-keystore",
++    "local-keyring"
++  ],
++  "allowed_algorithms": [
++    "AES-256-GCM"
++  ],
++  "min_ttl_days": 1,
++  "max_ttl_days": 30,
++  "envelope_version_current": "1.0",
++  "envelope_versions_supported": [
++    "1.0"
++  ],
++  "migration": {
++    "next_version": "2.0",
++    "strategy": "dual-read single-write",
++    "notes": "Writers must emit envelope_version_current. Readers may accept envelope_versions_supported."
++  }
++}
+diff --git a/security_audit_pack/manifest.json b/security_audit_pack/manifest.json
+new file mode 100644
+index 0000000..6db608f
+--- /dev/null
++++ b/security_audit_pack/manifest.json
+@@ -0,0 +1,103 @@
++{
++  "schema_version": "1.0",
++  "artifact": "security_audit_pack",
++  "created_at": "2026-02-23T13:29:11.915249Z",
++  "root": "/Users/bryanwhite/Documents/DeepSigma-v0.3.0-issue291",
++  "counts": {
++    "included": 11,
++    "missing": 5
++  },
++  "files": [
++    {
++      "source": "data/security/security_events.jsonl",
++      "status": "missing"
++    },
++    {
++      "source": "data/security/authority_ledger.json",
++      "status": "missing"
++    },
++    {
++      "source": "artifacts/disr_demo/security_events.jsonl",
++      "status": "missing"
++    },
++    {
++      "source": "artifacts/disr_demo/authority_ledger.json",
++      "status": "missing"
++    },
++    {
++      "source": "artifacts/disr_demo/disr_demo_summary.json",
++      "status": "missing"
++    },
++    {
++      "source": "release_kpis/SECURITY_GATE_REPORT.md",
++      "status": "included",
++      "output": "release_kpis/SECURITY_GATE_REPORT.md",
++      "size_bytes": 71
++    },
++    {
++      "source": "release_kpis/SECURITY_GATE_REPORT.json",
++      "status": "included",
++      "output": "release_kpis/SECURITY_GATE_REPORT.json",
++      "size_bytes": 21
++    },
++    {
++      "source": "release_kpis/security_metrics.json",
++      "status": "included",
++      "output": "release_kpis/security_metrics.json",
++      "size_bytes": 696
++    },
++    {
++      "source": "release_kpis/scalability_metrics.json",
++      "status": "included",
++      "output": "release_kpis/scalability_metrics.json",
++      "size_bytes": 664
++    },
++    {
++      "source": "governance/security_crypto_policy.json",
++      "status": "included",
++      "output": "governance/security_crypto_policy.json",
++      "size_bytes": 519
++    },
++    {
++      "source": "schemas/core/security_crypto_policy.schema.json",
++      "status": "included",
++      "output": "schemas/core/security_crypto_policy.schema.json",
++      "size_bytes": 1499
++    },
++    {
++      "source": "schemas/core/crypto_envelope.schema.json",
++      "status": "included",
++      "output": "schemas/core/crypto_envelope.schema.json",
++      "size_bytes": 1832
++    },
++    {
++      "source": "docs/docs/security/DISR.md",
++      "status": "included",
++      "output": "docs/docs/security/DISR.md",
++      "size_bytes": 2246
++    },
++    {
++      "source": "docs/docs/security/KEY_LIFECYCLE.md",
++      "status": "included",
++      "output": "docs/docs/security/KEY_LIFECYCLE.md",
++      "size_bytes": 1386
++    },
++    {
++      "source": "docs/docs/security/RECOVERY_RUNBOOK.md",
++      "status": "included",
++      "output": "docs/docs/security/RECOVERY_RUNBOOK.md",
++      "size_bytes": 903
++    },
++    {
++      "source": "docs/docs/security/ENVELOPE_VERSIONING.md",
++      "status": "included",
++      "output": "docs/docs/security/ENVELOPE_VERSIONING.md",
++      "size_bytes": 949
++    }
++  ],
++  "versions": {
++    "generated_at": "2026-02-23T13:29:11.915249Z",
++    "git_commit": "ec0f94c73b12cdb173cf83cd06b80249a9d0ed94",
++    "release_version": "v2.0.5"
++  }
++}
+diff --git a/security_audit_pack/release_kpis/SECURITY_GATE_REPORT.json b/security_audit_pack/release_kpis/SECURITY_GATE_REPORT.json
+new file mode 100644
+index 0000000..2ef5648
+--- /dev/null
++++ b/security_audit_pack/release_kpis/SECURITY_GATE_REPORT.json
+@@ -0,0 +1,3 @@
++{
++  "findings": []
++}
+diff --git a/security_audit_pack/release_kpis/SECURITY_GATE_REPORT.md b/security_audit_pack/release_kpis/SECURITY_GATE_REPORT.md
+new file mode 100644
+index 0000000..bbd2739
+--- /dev/null
++++ b/security_audit_pack/release_kpis/SECURITY_GATE_REPORT.md
+@@ -0,0 +1,5 @@
++# Security Gate Report
++
++## PASS
++
++- No crypto misuse findings detected.
+diff --git a/security_audit_pack/release_kpis/scalability_metrics.json b/security_audit_pack/release_kpis/scalability_metrics.json
+new file mode 100644
+index 0000000..01debeb
+--- /dev/null
++++ b/security_audit_pack/release_kpis/scalability_metrics.json
+@@ -0,0 +1,19 @@
++{
++  "schema_version": "1.0",
++  "metric_family": "disr_scalability",
++  "execution_mode": "dry_run",
++  "evidence_level": "simulated",
++  "kpi_eligible": false,
++  "run_started_at": "2026-02-23T04:26:47.159990Z",
++  "run_completed_at": "2026-02-23T04:26:47.191298Z",
++  "records_targeted": 100000,
++  "bytes_targeted": 19100000,
++  "wall_clock_seconds": 0.031088,
++  "cpu_seconds": 0.030472,
++  "rss_peak_bytes": 84410368,
++  "throughput_records_per_second": 3216718.393,
++  "throughput_mb_per_minute": 35155.86165,
++  "scalability_score": 10.0,
++  "dataset_sha256": "91841054cc5b3c6b1be1e15f8b8881416cdb68e55f3095bcc9c50336a8c00bdd",
++  "deterministic_seed": "DISR-BENCH-2026"
++}
+diff --git a/security_audit_pack/release_kpis/security_metrics.json b/security_audit_pack/release_kpis/security_metrics.json
+new file mode 100644
+index 0000000..1ca935c
+--- /dev/null
++++ b/security_audit_pack/release_kpis/security_metrics.json
+@@ -0,0 +1,19 @@
++{
++  "schema_version": "1.0",
++  "metric_family": "disr_security",
++  "execution_mode": "dry_run",
++  "evidence_level": "simulated",
++  "kpi_eligible": false,
++  "tenant_id": "tenant-alpha",
++  "compromise_started_at": "2026-02-23T04:26:47.054745Z",
++  "rotation_completed_at": "2026-02-23T04:26:47.068482Z",
++  "recovery_completed_at": "2026-02-23T04:26:47.074710Z",
++  "mttr_seconds": 0.019,
++  "records_targeted": 1,
++  "bytes_targeted": 163,
++  "reencrypt_records_per_second": 53.818,
++  "reencrypt_mb_per_minute": 0.501953,
++  "signing_mode": "hmac",
++  "signing_key_source": "placeholder_default",
++  "signing_notice": "Pilot signing key may be placeholder unless DEEPSIGMA_AUTHORITY_SIGNING_KEY is set."
++}
+diff --git a/security_audit_pack/schemas/core/crypto_envelope.schema.json b/security_audit_pack/schemas/core/crypto_envelope.schema.json
+new file mode 100644
+index 0000000..26facdc
+--- /dev/null
++++ b/security_audit_pack/schemas/core/crypto_envelope.schema.json
+@@ -0,0 +1,69 @@
++{
++  "$schema": "http://json-schema.org/draft-07/schema#",
++  "$id": "https://deepsigma.dev/schemas/crypto_envelope/v1.0",
++  "title": "Crypto Envelope v1.0",
++  "description": "Canonical cryptographic envelope metadata for encrypted at-rest artifacts.",
++  "type": "object",
++  "required": [
++    "envelope_version",
++    "key_id",
++    "key_version",
++    "provider",
++    "alg",
++    "nonce",
++    "aad",
++    "created_at",
++    "expires_at"
++  ],
++  "properties": {
++    "envelope_version": {
++      "type": "string",
++      "const": "1.0",
++      "description": "Schema version identifier."
++    },
++    "key_id": {
++      "type": "string",
++      "minLength": 1,
++      "description": "Logical key identifier from the keyring."
++    },
++    "key_version": {
++      "type": "integer",
++      "minimum": 1,
++      "description": "Monotonic key version from the keyring."
++    },
++    "alg": {
++      "type": "string",
++      "enum": ["AES-256-GCM"],
++      "description": "Encryption algorithm used for this payload."
++    },
++    "provider": {
++      "type": "string",
++      "minLength": 1,
++      "description": "Crypto provider used to source the key version."
++    },
++    "nonce": {
++      "type": "string",
++      "minLength": 16,
++      "description": "Nonce/IV encoded as base64."
++    },
++    "aad": {
++      "type": "string",
++      "minLength": 1,
++      "description": "Associated authenticated data context string."
++    },
++    "created_at": {
++      "type": "string",
++      "format": "date-time",
++      "description": "Timestamp when the crypto envelope was generated."
++    },
++    "expires_at": {
++      "type": ["string", "null"],
++      "description": "Key version expiry timestamp (RFC3339) or null."
++    },
++    "encrypted_payload": {
++      "type": "string",
++      "description": "Ciphertext payload encoded as base64."
++    }
++  },
++  "additionalProperties": false
++}
+diff --git a/security_audit_pack/schemas/core/security_crypto_policy.schema.json b/security_audit_pack/schemas/core/security_crypto_policy.schema.json
+new file mode 100644
+index 0000000..0308b71
+--- /dev/null
++++ b/security_audit_pack/schemas/core/security_crypto_policy.schema.json
+@@ -0,0 +1,68 @@
++{
++  "$schema": "http://json-schema.org/draft-07/schema#",
++  "$id": "https://deepsigma.dev/schemas/security_crypto_policy/v1.0",
++  "title": "Security Crypto Policy",
++  "description": "Runtime policy constraints for provider/algorithm/TTL and envelope versions.",
++  "type": "object",
++  "required": [
++    "policy_version",
++    "default_provider",
++    "allowed_providers",
++    "allowed_algorithms",
++    "min_ttl_days",
++    "max_ttl_days",
++    "envelope_version_current",
++    "envelope_versions_supported"
++  ],
++  "properties": {
++    "policy_version": {
++      "type": "string",
++      "minLength": 1
++    },
++    "default_provider": {
++      "type": "string",
++      "minLength": 1
++    },
++    "allowed_providers": {
++      "type": "array",
++      "minItems": 1,
++      "items": {
++        "type": "string",
++        "minLength": 1
++      }
++    },
++    "allowed_algorithms": {
++      "type": "array",
++      "minItems": 1,
++      "items": {
++        "type": "string",
++        "minLength": 1
++      }
++    },
++    "min_ttl_days": {
++      "type": "integer",
++      "minimum": 1
++    },
++    "max_ttl_days": {
++      "type": "integer",
++      "minimum": 1
++    },
++    "envelope_version_current": {
++      "type": "string",
++      "minLength": 1
++    },
++    "envelope_versions_supported": {
++      "type": "array",
++      "minItems": 1,
++      "items": {
++        "type": "string",
++        "minLength": 1
++      }
++    },
++    "migration": {
++      "type": "object",
++      "additionalProperties": true
++    }
++  },
++  "additionalProperties": true
++}
+diff --git a/security_audit_pack/versions.json b/security_audit_pack/versions.json
+new file mode 100644
+index 0000000..8484a55
+--- /dev/null
++++ b/security_audit_pack/versions.json
+@@ -0,0 +1,5 @@
++{
++  "generated_at": "2026-02-23T13:29:11.915249Z",
++  "git_commit": "ec0f94c73b12cdb173cf83cd06b80249a9d0ed94",
++  "release_version": "v2.0.5"
++}

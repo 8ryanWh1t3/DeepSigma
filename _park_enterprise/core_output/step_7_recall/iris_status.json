@@ -1,0 +1,86 @@
+{
+  "query_id": "iris-27637df80804",
+  "query_type": "STATUS",
+  "status": "RESOLVED",
+  "summary": "Coherence: 75.0/100 (B). Drift signals: 0.",
+  "data": {
+    "overall_score": 75.0,
+    "grade": "B",
+    "dimensions": [
+      {
+        "name": "policy_adherence",
+        "score": 0.0,
+        "weight": 0.25,
+        "details": {
+          "stamped": 0,
+          "total": 1
+        }
+      },
+      {
+        "name": "outcome_health",
+        "score": 100.0,
+        "weight": 0.3,
+        "details": {
+          "success_rate": 1.0,
+          "verification_pass_rate": 1.0
+        }
+      },
+      {
+        "name": "drift_control",
+        "score": 100.0,
+        "weight": 0.25,
+        "details": {
+          "reason": "no drift signals"
+        }
+      },
+      {
+        "name": "memory_completeness",
+        "score": 100,
+        "weight": 0.2,
+        "details": {
+          "episode_nodes": 1,
+          "expected_episodes": 1,
+          "total_nodes": 20
+        }
+      }
+    ],
+    "computed_at": "2026-02-23T20:13:34.865902+00:00",
+    "mg_stats": {
+      "total_nodes": 20,
+      "total_edges": 28,
+      "nodes_by_kind": {
+        "episode": 1,
+        "action": 1,
+        "evidence": 5,
+        "claim": 1,
+        "drift": 6,
+        "patch": 6
+      },
+      "edges_by_kind": {
+        "produced": 1,
+        "evidence_of": 5,
+        "decides_claim": 5,
+        "claim_evidence": 5,
+        "triggered": 6,
+        "resolved_by": 6
+      }
+    }
+  },
+  "provenance": [
+    {
+      "artifact": "DLR",
+      "ref_id": "coherence-scorer",
+      "role": "source",
+      "detail": "CoherenceScorer: 75.0/100 (B)"
+    },
+    {
+      "artifact": "MG",
+      "ref_id": "mg-stats",
+      "role": "evidence",
+      "detail": "20 nodes, 28 edges"
+    }
+  ],
+  "confidence": 0.85,
+  "warnings": [],
+  "elapsed_ms": 0.07199996616691351
+}

@@ -1,0 +1,30 @@
+{
+  "scorecard_version": "1.0",
+  "timestamp": "2026-02-23T20:13:34.918979+00:00",
+  "source_dir": "core_output",
+  "metrics": {
+    "iris_why_latency_ms": 13.4,
+    "drift_detect_latency_ms": 30.1,
+    "patch_latency_ms": 30.1,
+    "connector_ingest_records_per_sec": 249.0,
+    "schema_validation_failures": 0,
+    "total_elapsed_ms": 200.8,
+    "steps_completed": 7,
+    "steps_total": 7,
+    "all_steps_passed": true,
+    "drift_events_detected": 6,
+    "patch_applied": true,
+    "iris_queries_resolved": 3,
+    "baseline_score": 75.0,
+    "baseline_grade": "B",
+    "patched_score": 75.0,
+    "patched_grade": "B",
+    "coverage_pct": null
+  },
+  "slo_checks": {
+    "iris_why_latency_ok": true,
+    "all_steps_passed": true,
+    "schema_clean": true,
+    "score_positive": true
+  }
+}

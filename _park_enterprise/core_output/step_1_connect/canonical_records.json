@@ -1,0 +1,178 @@
+[
+  {
+    "record_id": "5f3a7c28-1a2b-3c4d-5e6f-7a8b9c0d1e2f",
+    "record_type": "Document",
+    "created_at": "2026-01-10T09:00:00.000Z",
+    "observed_at": "2026-02-15T14:30:00.000Z",
+    "source": {
+      "system": "sharepoint",
+      "actor": {
+        "id": "jane.doe@contoso.com",
+        "type": "human"
+      }
+    },
+    "provenance": [
+      {
+        "type": "source",
+        "ref": "sharepoint://contoso.sharepoint.com/sites/ops/lists/Policies/1"
+      }
+    ],
+    "confidence": {
+      "score": 0.85
+    },
+    "ttl": 0,
+    "content": {
+      "title": "Data Retention Policy v3.1",
+      "body": "All customer PII must be purged after 24 months. Exceptions require VP-level approval and annual re-certification.",
+      "filename": "DataRetentionPolicy_v3.1.docx"
+    },
+    "labels": {
+      "tags": [
+        "policy",
+        "compliance",
+        "pii"
+      ]
+    }
+  },
+  {
+    "record_id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+    "record_type": "Document",
+    "created_at": "2026-01-12T11:00:00.000Z",
+    "observed_at": "2026-02-14T09:15:00.000Z",
+    "source": {
+      "system": "sharepoint",
+      "actor": {
+        "id": "bob.smith@contoso.com",
+        "type": "human"
+      }
+    },
+    "provenance": [
+      {
+        "type": "source",
+        "ref": "sharepoint://contoso.sharepoint.com/sites/ops/lists/Policies/2"
+      }
+    ],
+    "confidence": {
+      "score": 0.8
+    },
+    "ttl": 0,
+    "content": {
+      "title": "Vendor Risk Assessment Framework",
+      "body": "All third-party vendors handling sensitive data must complete annual SOC2 review. Critical vendors require quarterly check-ins.",
+      "filename": "VendorRiskFramework_2026.docx"
+    },
+    "labels": {
+      "tags": [
+        "vendor",
+        "risk",
+        "soc2"
+      ]
+    }
+  },
+  {
+    "record_id": "b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e",
+    "record_type": "Event",
+    "created_at": "2026-02-10T16:00:00.000Z",
+    "observed_at": "2026-02-10T16:45:00.000Z",
+    "source": {
+      "system": "sharepoint",
+      "actor": {
+        "id": "alice.chen@contoso.com",
+        "type": "human"
+      }
+    },
+    "provenance": [
+      {
+        "type": "source",
+        "ref": "sharepoint://contoso.sharepoint.com/sites/ops/lists/Tasks/3"
+      }
+    ],
+    "confidence": {
+      "score": 0.75
+    },
+    "ttl": 604800000,
+    "content": {
+      "title": "Q1 Compliance Review Complete",
+      "body": "Reviewed 142 data handling procedures. 3 flagged for remediation: HR-012, FIN-045, MKT-089.",
+      "filename": ""
+    },
+    "labels": {
+      "tags": [
+        "compliance",
+        "review",
+        "q1-2026"
+      ]
+    }
+  },
+  {
+    "record_id": "c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f",
+    "record_type": "Event",
+    "created_at": "2026-02-12T10:00:00.000Z",
+    "observed_at": "2026-02-12T11:30:00.000Z",
+    "source": {
+      "system": "sharepoint",
+      "actor": {
+        "id": "dave.wilson@contoso.com",
+        "type": "human"
+      }
+    },
+    "provenance": [
+      {
+        "type": "source",
+        "ref": "sharepoint://contoso.sharepoint.com/sites/ops/lists/Tasks/4"
+      }
+    ],
+    "confidence": {
+      "score": 0.7
+    },
+    "ttl": 604800000,
+    "content": {
+      "title": "Vendor SOC2 Audit \u2014 Acme Corp",
+      "body": "SOC2 Type II audit received for Acme Corp. No material findings. Next review scheduled Q3 2026.",
+      "filename": ""
+    },
+    "labels": {
+      "tags": [
+        "vendor",
+        "audit",
+        "soc2",
+        "acme"
+      ]
+    }
+  },
+  {
+    "record_id": "d4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a",
+    "record_type": "Entity",
+    "created_at": "2025-11-01T08:00:00.000Z",
+    "observed_at": "2026-02-01T12:00:00.000Z",
+    "source": {
+      "system": "sharepoint",
+      "actor": {
+        "id": "admin@contoso.com",
+        "type": "human"
+      }
+    },
+    "provenance": [
+      {
+        "type": "source",
+        "ref": "sharepoint://contoso.sharepoint.com/sites/ops/lists/Contacts/5"
+      }
+    ],
+    "confidence": {
+      "score": 0.9
+    },
+    "ttl": 0,
+    "content": {
+      "title": "Acme Corp \u2014 Primary Contact",
+      "body": "Primary contact: Sarah Johnson, VP Security. Email: sjohnson@acme.com. Phone: 555-0142.",
+      "filename": ""
+    },
+    "labels": {
+      "tags": [
+        "vendor",
+        "contact",
+        "acme"
+      ]
+    }
+  }
+]

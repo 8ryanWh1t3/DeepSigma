@@ -1,0 +1,61 @@
+diff --git a/release_kpis/scalability_metrics.json b/release_kpis/scalability_metrics.json
+index 01debeb..9a1fd9d 100644
+--- a/release_kpis/scalability_metrics.json
++++ b/release_kpis/scalability_metrics.json
+@@ -4,16 +4,16 @@
+   "execution_mode": "dry_run",
+   "evidence_level": "simulated",
+   "kpi_eligible": false,
+-  "run_started_at": "2026-02-23T04:26:47.159990Z",
+-  "run_completed_at": "2026-02-23T04:26:47.191298Z",
+-  "records_targeted": 100000,
+-  "bytes_targeted": 19100000,
+-  "wall_clock_seconds": 0.031088,
+-  "cpu_seconds": 0.030472,
+-  "rss_peak_bytes": 84410368,
+-  "throughput_records_per_second": 3216718.393,
+-  "throughput_mb_per_minute": 35155.86165,
++  "run_started_at": "2026-02-23T13:38:45.160399Z",
++  "run_completed_at": "2026-02-23T13:38:45.162910Z",
++  "records_targeted": 1000,
++  "bytes_targeted": 191000,
++  "wall_clock_seconds": 0.001355,
++  "cpu_seconds": 0.001101,
++  "rss_peak_bytes": 25198592,
++  "throughput_records_per_second": 737916.427,
++  "throughput_mb_per_minute": 8064.768079,
+   "scalability_score": 10.0,
+-  "dataset_sha256": "91841054cc5b3c6b1be1e15f8b8881416cdb68e55f3095bcc9c50336a8c00bdd",
++  "dataset_sha256": "96e1b18b27c76e49491b27ea93a31cb1c3fd76c9e0800763b60aa586cae08f87",
+   "deterministic_seed": "DISR-BENCH-2026"
+ }
+diff --git a/release_kpis/security_metrics.json b/release_kpis/security_metrics.json
+index 1ca935c..f279f2f 100644
+--- a/release_kpis/security_metrics.json
++++ b/release_kpis/security_metrics.json
+@@ -5,15 +5,15 @@
+   "evidence_level": "simulated",
+   "kpi_eligible": false,
+   "tenant_id": "tenant-alpha",
+-  "compromise_started_at": "2026-02-23T04:26:47.054745Z",
+-  "rotation_completed_at": "2026-02-23T04:26:47.068482Z",
+-  "recovery_completed_at": "2026-02-23T04:26:47.074710Z",
+-  "mttr_seconds": 0.019,
+-  "records_targeted": 1,
+-  "bytes_targeted": 163,
+-  "reencrypt_records_per_second": 53.818,
+-  "reencrypt_mb_per_minute": 0.501953,
++  "compromise_started_at": "2026-02-23T13:38:45.160399Z",
++  "rotation_completed_at": "2026-02-23T13:38:45.160399Z",
++  "recovery_completed_at": "2026-02-23T13:38:45.162910Z",
++  "mttr_seconds": 0.001355,
++  "records_targeted": 1000,
++  "bytes_targeted": 191000,
++  "reencrypt_records_per_second": 737916.427,
++  "reencrypt_mb_per_minute": 8064.768079,
+   "signing_mode": "hmac",
+-  "signing_key_source": "placeholder_default",
+-  "signing_notice": "Pilot signing key may be placeholder unless DEEPSIGMA_AUTHORITY_SIGNING_KEY is set."
++  "signing_key_source": "benchmark_signing_key",
++  "signing_notice": "Benchmark uses deterministic test signing key."
+ }

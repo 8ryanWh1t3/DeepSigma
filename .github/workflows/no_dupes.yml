@@ -23,4 +23,36 @@ jobs:
           python-version: "3.12"
 
       - name: Check duplicate-like filenames
-        run: python3 scripts/check_no_dupe_files.py
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          root = Path(".")
+          skip_prefixes = (".git/", "_park_enterprise/")
+          seen = {}
+          collisions = []
+
+          for p in root.rglob("*"):
+              if not p.is_file():
+                  continue
+              rel = p.as_posix()
+              if rel.startswith(skip_prefixes):
+                  continue
+              # Detect only same-directory case-insensitive dupes; allow
+              # normal cross-directory names like README.md.
+              parent = p.parent.as_posix().lower()
+              norm = p.name.lower()
+              key = (parent, norm)
+              if key in seen:
+                  collisions.append((seen[key], rel))
+              else:
+                  seen[key] = rel
+
+          if collisions:
+              print("FAIL: duplicate-like filenames detected:")
+              for a, b in collisions:
+                  print(f" - {a} <-> {b}")
+              raise SystemExit(1)
+
+          print("PASS: no duplicate-like filenames")
+          PY
