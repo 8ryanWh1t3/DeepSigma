@@ -164,6 +164,23 @@ All connectors conform to the [Connector Contract v1.0](schemas/core/connector_c
 - [Data Boundaries](docs/DATA_BOUNDARIES.md) — data at rest, storage locations, retention, redaction, tenancy isolation, connector flow, secrets policy, and network boundaries.
 - [Connector SDK](docs/CONNECTOR_SDK.md) — ConnectorV1 contract and safety expectations for custom adapters.
 
+## Monitoring
+
+- Prometheus metrics endpoint: `GET /metrics`
+- Grafana dashboard: `ops/grafana/deepsigma.json`
+- Local monitoring stack: `docker-compose.monitoring.yml`
+
+Start monitoring stack:
+
+```bash
+docker compose -f docker-compose.monitoring.yml up --build
+```
+
+Endpoints:
+- DeepSigma API: `http://localhost:8000`
+- Prometheus: `http://localhost:9090`
+- Grafana: `http://localhost:3001` (`admin` / `admin`)
+
 ---
 
 ## Repo Structure
