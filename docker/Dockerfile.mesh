@@ -1,0 +1,16 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir \
+    "fastapi>=0.104.0" \
+    "uvicorn[standard]>=0.24.0"
+
+COPY pyproject.toml /app/
+COPY src/mesh/ /app/mesh/
+
+RUN pip install --no-cache-dir -e /app
+
+ENV PYTHONPATH=/app
+
+ENTRYPOINT ["python", "-m", "mesh.server"]

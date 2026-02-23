@@ -117,6 +117,7 @@ When the API server is running, mesh endpoints are available:
 | `/mesh/{tenant_id}/{node_id}/pull` | GET | Pull records from a node |
 | `/mesh/{tenant_id}/{node_id}/status` | GET | Node status |
 | `/mesh/{tenant_id}/summary` | GET | Tenant mesh summary |
+| `/mesh/{tenant_id}/topology` | GET | Node state + replication lag visibility |
 
 ## Partition Detection and Recovery
 
@@ -177,6 +178,23 @@ Using the built-in estimator (`estimate_bandwidth_profile`) with
 | 1000 | 80 | 256000 | 20480 | 92.00% |
 
 This profile documents the target behavior for avoiding full-log replication.
+
+## WAN Integration Drill (3-Node + Induced Partition)
+
+Run the deterministic WAN drill:
+
+```bash
+bash scripts/mesh_wan_partition.sh
+```
+
+What it validates:
+- 3-node Docker mesh testbed boots and serves transport API
+- topology endpoint exposes node state + replication lag visibility
+- induced partition is applied (`mesh-c` stopped/unreachable)
+- recovery succeeds (`mesh-c` started/reachable)
+
+Operator runbook:
+- `docs/docs/pilot/MESH_WAN_TROUBLESHOOTING.md`
 
 ## Guardrails
 

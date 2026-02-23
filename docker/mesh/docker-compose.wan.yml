@@ -1,0 +1,40 @@
+services:
+  mesh-a:
+    build:
+      context: ../..
+      dockerfile: docker/Dockerfile.mesh
+    command: ["--tenant", "tenant-wan", "--node-id", "edge-A", "--host", "0.0.0.0", "--port", "8101"]
+    ports:
+      - "8111:8101"
+    networks: [meshnet]
+    volumes:
+      - mesh-data:/app/data
+
+  mesh-b:
+    build:
+      context: ../..
+      dockerfile: docker/Dockerfile.mesh
+    command: ["--tenant", "tenant-wan", "--node-id", "validator-B", "--host", "0.0.0.0", "--port", "8102"]
+    ports:
+      - "8112:8102"
+    networks: [meshnet]
+    volumes:
+      - mesh-data:/app/data
+
+  mesh-c:
+    build:
+      context: ../..
+      dockerfile: docker/Dockerfile.mesh
+    command: ["--tenant", "tenant-wan", "--node-id", "aggregator-C", "--host", "0.0.0.0", "--port", "8103"]
+    ports:
+      - "8113:8103"
+    networks: [meshnet]
+    volumes:
+      - mesh-data:/app/data
+
+networks:
+  meshnet:
+    driver: bridge
+
+volumes:
+  mesh-data:

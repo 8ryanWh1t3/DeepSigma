@@ -9,6 +9,7 @@ from pathlib import Path
 REQUIRED_PATHS = [
     "/api/credibility/snapshot",
     "/mesh/{tenant_id}/summary",
+    "/mesh/{tenant_id}/topology",
     "/api/tenants",
     "/api/{tenant_id}/policy",
     "/api/{tenant_id}/audit/recent",

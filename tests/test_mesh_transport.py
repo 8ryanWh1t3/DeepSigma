@@ -547,6 +547,36 @@ class TestMeshServer:
         resp = client.get(f"/mesh/{TENANT}/{NODE_A}/status")
         assert resp.status_code == 200
 
+    def test_topology_endpoint_includes_lag_and_state(self, mesh_data_dir):
+        from mesh.server import create_node_server
+        from fastapi.testclient import TestClient
+        from mesh.transport import log_replication
+
+        app_a = create_node_server(TENANT, NODE_A)
+        app_b = create_node_server(TENANT, NODE_B)
+        client_a = TestClient(app_a)
+        client_b = TestClient(app_b)
+
+        # ensure status exists for both nodes
+        client_a.get(f"/mesh/{TENANT}/{NODE_A}/status")
+        client_b.get(f"/mesh/{TENANT}/{NODE_B}/status")
+
+        # emit one replication event so lag can be calculated
+        log_replication(TENANT, NODE_A, "push", NODE_B, ENVELOPES_LOG, 1)
+
+        resp = client_a.get(f"/mesh/{TENANT}/topology")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["status"] == "active"
+        assert data["node_count"] >= 2
+        nodes = data["nodes"]
+        assert all("state" in n for n in nodes)
+        assert all("replication_lag_s" in n for n in nodes)
+        assert any(
+            n["replication_lag_s"] is None or n["replication_lag_s"] >= 0
+            for n in nodes
+        )
+
 
 # ── Discovery ──────────────────────────────────────────────────────────────
 

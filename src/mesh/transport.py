@@ -157,6 +157,7 @@ def log_replication(
     """Log a replication event."""
     path = _log_path(tenant_id, node_id, REPLICATION_LOG)
     append_jsonl(path, {
+        "timestamp": _now_iso(),
         "node_id": node_id,
         "direction": direction,
         "peer_id": peer_id,
@@ -302,6 +303,16 @@ class NodeIdentity:
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _iso_to_epoch(value: str) -> float | None:
+    if not value:
+        return None
+    try:
+        dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        return dt.timestamp()
+    except Exception:
+        return None
 
 
 class HTTPTransport:
@@ -835,25 +846,20 @@ def create_mesh_router():
         for node_dir in sorted(tenant_dir.iterdir()):
             if not node_dir.is_dir():
                 continue
-            nid = node_dir.name
-            status = get_node_status(tenant_id, nid)
+            status = load_json(node_dir / NODE_STATUS_FILE) or {}
             if status:
                 nodes.append(status)
 
             # Check aggregates
             from mesh.logstore import load_last_n as _load_n
-            aggs = _load_n(
-                _log_path(tenant_id, nid, AGGREGATES_LOG), 1,
-            )
+            aggs = _load_n(node_dir / AGGREGATES_LOG, 1)
             if aggs:
                 if last_aggregate is None or \
                    aggs[-1].get("timestamp", "") > last_aggregate.get("timestamp", ""):
                     last_aggregate = aggs[-1]
 
             # Check seal chain mirror
-            seals = _load_n(
-                _log_path(tenant_id, nid, SEAL_CHAIN_MIRROR_LOG), 1,
-            )
+            seals = _load_n(node_dir / SEAL_CHAIN_MIRROR_LOG, 1)
             if seals:
                 if last_seal is None or \
                    seals[-1].get("timestamp", "") > last_seal.get("timestamp", ""):
@@ -861,12 +867,8 @@ def create_mesh_router():
 
             # Count envelopes/validations
             from mesh.logstore import load_all as _load_all
-            total_envelopes += len(
-                _load_all(_log_path(tenant_id, nid, ENVELOPES_LOG))
-            )
-            total_validations += len(
-                _load_all(_log_path(tenant_id, nid, VALIDATIONS_LOG))
-            )
+            total_envelopes += len(_load_all(node_dir / ENVELOPES_LOG))
+            total_validations += len(_load_all(node_dir / VALIDATIONS_LOG))
 
         return {
             "tenant_id": tenant_id,
@@ -881,6 +883,64 @@ def create_mesh_router():
             ),
             "total_envelopes": total_envelopes,
             "total_validations": total_validations,
+        }
+
+    @router.get("/mesh/{tenant_id}/topology")
+    def mesh_topology(tenant_id: str) -> dict[str, Any]:
+        """Return node topology with state and replication lag visibility."""
+        try:
+            tenant_dir = _tenant_dir(tenant_id)
+        except ValueError:
+            return {
+                "tenant_id": tenant_id,
+                "status": "invalid_tenant_id",
+                "nodes": [],
+            }
+        if not tenant_dir.exists():  # lgtm [py/path-injection]
+            return {
+                "tenant_id": tenant_id,
+                "status": "not_initialized",
+                "nodes": [],
+            }
+
+        from mesh.logstore import load_last_n as _load_n
+
+        now_epoch = datetime.now(timezone.utc).timestamp()
+        nodes: list[dict[str, Any]] = []
+
+        for node_dir in sorted(tenant_dir.iterdir()):
+            if not node_dir.is_dir():
+                continue
+            status = load_json(node_dir / NODE_STATUS_FILE) or {}
+            node_id = str(status.get("node_id", node_dir.name))
+            replication_tail = _load_n(node_dir / REPLICATION_LOG, 1)
+
+            last_replication_at = ""
+            replication_lag_s: float | None = None
+            if replication_tail:
+                last_replication_at = str(replication_tail[-1].get("timestamp", ""))
+                ts_epoch = _iso_to_epoch(last_replication_at)
+                if ts_epoch is not None:
+                    replication_lag_s = max(0.0, round(now_epoch - ts_epoch, 3))
+
+            nodes.append(
+                {
+                    "node_id": node_id,
+                    "state": status.get("state", "unknown"),
+                    "offline": bool(status.get("offline", False)),
+                    "region_id": status.get("region_id", ""),
+                    "role": status.get("role", ""),
+                    "last_updated": status.get("last_updated", ""),
+                    "last_replication_at": last_replication_at,
+                    "replication_lag_s": replication_lag_s,
+                }
+            )
+
+        return {
+            "tenant_id": tenant_id,
+            "status": "active" if nodes else "empty",
+            "node_count": len(nodes),
+            "nodes": nodes,
         }
 
     return router
