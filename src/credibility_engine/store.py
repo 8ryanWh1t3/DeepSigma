@@ -25,6 +25,7 @@ from typing import Any
 
 from credibility_engine.constants import DEFAULT_TENANT_ID
 from deepsigma.security.keyring import KeyVersionRecord
+from deepsigma.security.policy import get_envelope_settings, validate_envelope_metadata
 from deepsigma.security.providers import provider_from_policy
 
 _BASE_DATA_DIR = Path(__file__).parent.parent / "data" / "credibility"
@@ -176,8 +177,9 @@ class CredibilityStore:
         key_record = self._ensure_active_key_version("credibility")
         provider_name = getattr(self._crypto_provider, "name", "local-keystore")
         created_at = _now_iso()
-        return {
-            "envelope_version": "1.0",
+        envelope_version, _ = get_envelope_settings()
+        envelope = {
+            "envelope_version": envelope_version,
             "key_id": key_record.key_id,
             "key_version": key_record.key_version,
             "provider": provider_name,
@@ -191,6 +193,8 @@ class CredibilityStore:
             "nonce": b64encode(nonce).decode("utf-8"),
             "encrypted_payload": b64encode(ciphertext).decode("utf-8"),
         }
+        validate_envelope_metadata(envelope)
+        return envelope
 
     def _decrypt_record_with(
         self,

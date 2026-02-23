@@ -11,6 +11,7 @@ from .base import CryptoProvider
 from .gcp_kms import GCPKMSProvider
 from .local_keystore import LocalKeyStoreProvider
 from .local_keyring import LocalKeyringProvider
+from ..policy import validate_provider_allowed
 
 ProviderFactory = Callable[..., CryptoProvider]
 
@@ -76,6 +77,7 @@ def provider_from_policy(
 ) -> CryptoProvider:
     """Create provider selected by policy name, with optional per-provider kwargs."""
     name = resolve_provider_name(policy, default=default)
+    validate_provider_allowed(name)
     overrides = provider_overrides or {}
     kwargs = overrides.get(name, {})
     if not isinstance(kwargs, dict):

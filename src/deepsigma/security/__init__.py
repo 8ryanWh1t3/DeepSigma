@@ -12,6 +12,15 @@ from .events import (
     query_security_events,
 )
 from .keyring import Keyring, KeyVersionRecord
+from .policy import (
+    CryptoPolicyError,
+    get_envelope_settings,
+    load_crypto_policy,
+    validate_algorithm_allowed,
+    validate_envelope_metadata,
+    validate_provider_allowed,
+    validate_rotation_ttl_days,
+)
 from .providers import (
     available_providers,
     create_provider,
@@ -34,6 +43,13 @@ __all__ = [
     "available_providers",
     "append_security_event",
     "query_security_events",
+    "load_crypto_policy",
+    "get_envelope_settings",
+    "validate_algorithm_allowed",
+    "validate_envelope_metadata",
+    "validate_provider_allowed",
+    "validate_rotation_ttl_days",
+    "CryptoPolicyError",
     "EVENT_KEY_ROTATED",
     "EVENT_NONCE_REUSE_DETECTED",
     "EVENT_REENCRYPT_DONE",

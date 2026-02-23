@@ -1,0 +1,22 @@
+{
+  "policy_version": "1.0",
+  "default_provider": "local-keystore",
+  "allowed_providers": [
+    "local-keystore",
+    "local-keyring"
+  ],
+  "allowed_algorithms": [
+    "AES-256-GCM"
+  ],
+  "min_ttl_days": 1,
+  "max_ttl_days": 30,
+  "envelope_version_current": "1.0",
+  "envelope_versions_supported": [
+    "1.0"
+  ],
+  "migration": {
+    "next_version": "2.0",
+    "strategy": "dual-read single-write",
+    "notes": "Writers must emit envelope_version_current. Readers may accept envelope_versions_supported."
+  }
+}

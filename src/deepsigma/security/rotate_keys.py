@@ -15,6 +15,7 @@ from .action_contract import create_action_contract, validate_action_contract
 from .authority_ledger import append_authority_action_entry
 from .events import EVENT_KEY_ROTATED, append_security_event
 from .keyring import Keyring, KeyVersionRecord
+from .policy import validate_rotation_ttl_days
 
 
 def _utc_now() -> datetime:
@@ -64,6 +65,7 @@ def rotate_keys(
 ) -> RotationResult:
     if ttl_days <= 0:
         raise ValueError("ttl_days must be > 0")
+    validate_rotation_ttl_days(ttl_days)
     if not authority_dri:
         raise ValueError("authority_dri is required for rotation approval")
     if not authority_reason:

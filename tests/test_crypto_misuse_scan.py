@@ -17,6 +17,7 @@ def _load_scanner_module(repo_root: Path):
 def test_scanner_detects_missing_envelope_fields(tmp_path: Path):
     repo = tmp_path / "repo"
     (repo / "schemas" / "core").mkdir(parents=True, exist_ok=True)
+    (repo / "governance").mkdir(parents=True, exist_ok=True)
     (repo / "data").mkdir(parents=True, exist_ok=True)
 
     schema = {
@@ -24,6 +25,22 @@ def test_scanner_detects_missing_envelope_fields(tmp_path: Path):
     }
     (repo / "schemas" / "core" / "crypto_envelope.schema.json").write_text(
         json.dumps(schema),
+        encoding="utf-8",
+    )
+    (repo / "schemas" / "core" / "security_crypto_policy.schema.json").write_text("{}", encoding="utf-8")
+    (repo / "governance" / "security_crypto_policy.json").write_text(
+        json.dumps(
+            {
+                "policy_version": "1.0",
+                "default_provider": "local-keystore",
+                "allowed_providers": ["local-keystore"],
+                "allowed_algorithms": ["AES-256-GCM"],
+                "min_ttl_days": 1,
+                "max_ttl_days": 30,
+                "envelope_version_current": "1.0",
+                "envelope_versions_supported": ["1.0"],
+            }
+        ),
         encoding="utf-8",
     )
 
@@ -44,6 +61,7 @@ def test_scanner_detects_missing_envelope_fields(tmp_path: Path):
 def test_scanner_passes_with_valid_envelope_and_schema(tmp_path: Path):
     repo = tmp_path / "repo"
     (repo / "schemas" / "core").mkdir(parents=True, exist_ok=True)
+    (repo / "governance").mkdir(parents=True, exist_ok=True)
     (repo / "data").mkdir(parents=True, exist_ok=True)
 
     schema = {
@@ -51,6 +69,22 @@ def test_scanner_passes_with_valid_envelope_and_schema(tmp_path: Path):
     }
     (repo / "schemas" / "core" / "crypto_envelope.schema.json").write_text(
         json.dumps(schema),
+        encoding="utf-8",
+    )
+    (repo / "schemas" / "core" / "security_crypto_policy.schema.json").write_text("{}", encoding="utf-8")
+    (repo / "governance" / "security_crypto_policy.json").write_text(
+        json.dumps(
+            {
+                "policy_version": "1.0",
+                "default_provider": "local-keystore",
+                "allowed_providers": ["local-keystore"],
+                "allowed_algorithms": ["AES-256-GCM"],
+                "min_ttl_days": 1,
+                "max_ttl_days": 30,
+                "envelope_version_current": "1.0",
+                "envelope_versions_supported": ["1.0"],
+            }
+        ),
         encoding="utf-8",
     )
 
@@ -70,3 +104,51 @@ def test_scanner_passes_with_valid_envelope_and_schema(tmp_path: Path):
 
     high = [item for item in findings if item.severity == "HIGH"]
     assert not high
+
+
+def test_scanner_flags_provider_policy_violation(tmp_path: Path):
+    repo = tmp_path / "repo"
+    (repo / "schemas" / "core").mkdir(parents=True, exist_ok=True)
+    (repo / "governance").mkdir(parents=True, exist_ok=True)
+    (repo / "data").mkdir(parents=True, exist_ok=True)
+
+    (repo / "schemas" / "core" / "crypto_envelope.schema.json").write_text(
+        json.dumps({"required": ["envelope_version", "key_id", "key_version", "alg", "nonce", "aad"]}),
+        encoding="utf-8",
+    )
+    (repo / "schemas" / "core" / "security_crypto_policy.schema.json").write_text("{}", encoding="utf-8")
+    (repo / "governance" / "security_crypto_policy.json").write_text(
+        json.dumps(
+            {
+                "policy_version": "1.0",
+                "default_provider": "local-keystore",
+                "allowed_providers": ["local-keystore"],
+                "allowed_algorithms": ["AES-256-GCM"],
+                "min_ttl_days": 1,
+                "max_ttl_days": 30,
+                "envelope_version_current": "1.0",
+                "envelope_versions_supported": ["1.0"],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (repo / "data" / "records.json").write_text(
+        json.dumps(
+            {
+                "encrypted_payload": "abc",
+                "nonce": "NONCE-1234567890",
+                "alg": "AES-256-GCM",
+                "key_id": "credibility",
+                "key_version": 1,
+                "aad": "tenant-alpha",
+                "provider": "aws-kms",
+                "envelope_version": "1.0",
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    module = _load_scanner_module(Path(__file__).resolve().parents[1])
+    findings = module.scan_repo(repo)
+    categories = {item.category for item in findings}
+    assert "provider_policy_violation" in categories
