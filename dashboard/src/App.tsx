@@ -18,6 +18,14 @@ type SortDir = 'asc' | 'desc';
 
 const ttStyle = { backgroundColor: '#1e293b', border: '1px solid #475569', color: '#f1f5f9' };
 
+interface MeshTopologyNode {
+    node_id: string;
+    state: string;
+    role: string;
+    region_id: string;
+    replication_lag_s: number | null;
+}
+
 function HealthGauge({ value }: { value: number }) {
     const color = value >= 90 ? '#10b981' : value >= 70 ? '#f59e0b' : '#ef4444';
     const label = value >= 90 ? 'Healthy' : value >= 70 ? 'Degraded' : 'Critical';
@@ -235,10 +243,27 @@ export function App() {
     const fetchTrustScorecard = useOverwatchStore((s) => s.fetchTrustScorecard);
     const [selectedView, setSelectedView] = useState<ViewType>('overview');
     const [autoRefresh, setAutoRefresh] = useState(true);
+    const [meshTopology, setMeshTopology] = useState<MeshTopologyNode[]>([]);
     const { refresh } = useSSE(autoRefresh);
 
     // Bootstrap Trust Scorecard on mount
     useEffect(() => { fetchTrustScorecard(); }, [fetchTrustScorecard]);
+    useEffect(() => {
+          let cancelled = false;
+          const loadTopology = async () => {
+                  try {
+                          const res = await fetch('/mesh/tenant-alpha/topology');
+                          if (!res.ok) return;
+                          const data = await res.json();
+                          if (!cancelled && Array.isArray(data?.nodes)) setMeshTopology(data.nodes);
+                  } catch {
+                          // ignore; dashboard can still operate without mesh API
+                  }
+          };
+          loadTopology();
+          const id = window.setInterval(loadTopology, autoRefresh ? 5000 : 15000);
+          return () => { cancelled = true; window.clearInterval(id); };
+    }, [autoRefresh]);
     const lastUpdate = connection.lastEvent;
     const dataSource = connection.dataSource;
   
@@ -418,6 +443,39 @@ export function App() {
                                                                                                       <Bar dataKey="value" fill="#a855f7" name="Count" radius={[0,4,4,0]}/>
                                                                                     </BarChart>
                                                                 </ResponsiveContainer>
+                                                </div>
+                                                <div className="bg-slate-900 rounded-lg border border-slate-800 p-6 lg:col-span-2">
+                                                                <h3 className="text-lg font-semibold mb-4">Mesh Topology and Replication Lag</h3>
+                                                                {meshTopology.length === 0 ? (
+                                                                  <div className="text-sm text-slate-500">Topology data unavailable (mesh API not initialized).</div>
+                                                                ) : (
+                                                                  <div className="overflow-x-auto">
+                                                                    <table className="w-full text-sm">
+                                                                      <thead className="border-b border-slate-700">
+                                                                        <tr>
+                                                                          <th className="text-left py-2 px-3 text-slate-300">Node</th>
+                                                                          <th className="text-left py-2 px-3 text-slate-300">State</th>
+                                                                          <th className="text-left py-2 px-3 text-slate-300">Role</th>
+                                                                          <th className="text-left py-2 px-3 text-slate-300">Region</th>
+                                                                          <th className="text-left py-2 px-3 text-slate-300">Replication Lag (s)</th>
+                                                                        </tr>
+                                                                      </thead>
+                                                                      <tbody>
+                                                                        {meshTopology.map((n) => (
+                                                                          <tr key={n.node_id} className="border-b border-slate-800">
+                                                                            <td className="py-2 px-3 font-mono text-xs text-slate-300">{n.node_id}</td>
+                                                                            <td className="py-2 px-3">{n.state || 'unknown'}</td>
+                                                                            <td className="py-2 px-3">{n.role || '-'}</td>
+                                                                            <td className="py-2 px-3">{n.region_id || '-'}</td>
+                                                                            <td className="py-2 px-3">
+                                                                              {n.replication_lag_s == null ? '-' : n.replication_lag_s.toFixed(3)}
+                                                                            </td>
+                                                                          </tr>
+                                                                        ))}
+                                                                      </tbody>
+                                                                    </table>
+                                                                  </div>
+                                                                )}
                                                 </div>
                                   </div>
                       </div>

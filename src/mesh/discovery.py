@@ -35,13 +35,25 @@ class StaticRegistry:
         self,
         peers: dict[str, dict[str, str]] | None = None,
         config_path: str | Path | None = None,
+        dns_srv_records: list[str] | None = None,
+        dns_scheme: str = "http",
+        dns_resolver: Any | None = None,
     ) -> None:
+        loaded: dict[str, Any] = {}
         if peers is not None:
-            self._peers = dict(peers)
+            loaded.update(dict(peers))
         elif config_path is not None:
-            self._peers = self._load_yaml(Path(config_path))
-        else:
-            self._peers = {}
+            loaded.update(self._load_yaml(Path(config_path)))
+
+        if dns_srv_records:
+            loaded.update(
+                self._load_dns_srv(
+                    records=dns_srv_records,
+                    scheme=dns_scheme,
+                    resolver=dns_resolver,
+                )
+            )
+        self._peers = loaded
 
     @staticmethod
     def _load_yaml(path: Path) -> dict[str, dict[str, str]]:
@@ -54,6 +66,42 @@ class StaticRegistry:
         if "peers" in data and isinstance(data["peers"], dict):
             return data["peers"]
         return data
+
+    @staticmethod
+    def _load_dns_srv(
+        records: list[str],
+        scheme: str = "http",
+        resolver: Any | None = None,
+    ) -> dict[str, dict[str, str]]:
+        """Load peers from DNS SRV records.
+
+        Requires ``dnspython`` unless a custom ``resolver`` is passed.
+        """
+        if resolver is None:
+            try:
+                import dns.resolver as _resolver  # type: ignore[import-not-found]
+            except ModuleNotFoundError:
+                return {}
+            resolver = _resolver
+
+        peers: dict[str, dict[str, str]] = {}
+        for srv_name in records:
+            try:
+                answers = resolver.resolve(srv_name, "SRV")
+            except Exception:
+                continue
+            for ans in answers:
+                host = str(getattr(ans, "target", "")).rstrip(".")
+                port = int(getattr(ans, "port", 0) or 0)
+                if not host or port <= 0:
+                    continue
+                node_id = host.split(".")[0]
+                peers[node_id] = {
+                    "url": f"{scheme}://{host}:{port}",
+                    "discovered_via": "dns-srv",
+                    "srv_record": srv_name,
+                }
+        return peers
 
     def get_peer_url(self, node_id: str) -> str | None:
         """Return the base URL for a peer node, or None if unknown."""

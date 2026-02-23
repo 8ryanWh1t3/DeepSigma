@@ -656,6 +656,28 @@ peers:
         assert len(reg) == 2
         assert reg.get_peer_url("edge-A") == "http://host1:8100"
 
+    def test_from_dns_srv_records(self):
+        class _Ans:
+            def __init__(self, target: str, port: int):
+                self.target = target
+                self.port = port
+
+        class _Resolver:
+            @staticmethod
+            def resolve(name: str, rrtype: str):
+                assert rrtype == "SRV"
+                if name == "_mesh._tcp.example.local":
+                    return [_Ans("edge-a.mesh.local.", 8101), _Ans("validator-b.mesh.local.", 8102)]
+                return []
+
+        reg = StaticRegistry(
+            dns_srv_records=["_mesh._tcp.example.local"],
+            dns_scheme="https",
+            dns_resolver=_Resolver,
+        )
+        assert reg.get_peer_url("edge-a") == "https://edge-a.mesh.local:8101"
+        assert reg.get_peer_url("validator-b") == "https://validator-b.mesh.local:8102"
+
 
 # ── Integration: HTTP Transport + Server ───────────────────────────────────
 
