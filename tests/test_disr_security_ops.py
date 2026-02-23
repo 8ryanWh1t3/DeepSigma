@@ -23,6 +23,7 @@ def temp_store_dir(tmp_path: Path) -> Path:
 def test_rotate_keys_emits_event_and_keyring(tmp_path: Path):
     keyring_path = tmp_path / "keyring.json"
     event_log_path = tmp_path / "events.jsonl"
+    authority_ledger_path = tmp_path / "authority_ledger.json"
 
     result = rotate_keys(
         tenant_id="tenant-alpha",
@@ -30,8 +31,13 @@ def test_rotate_keys_emits_event_and_keyring(tmp_path: Path):
         ttl_days=14,
         actor_user="dri",
         actor_role="coherence_steward",
+        authority_dri="dri.approver",
+        authority_role="dri_approver",
+        authority_reason="quarterly rotation cadence",
+        authority_signing_key="test-signing-key",
         keyring_path=keyring_path,
         event_log_path=event_log_path,
+        authority_ledger_path=authority_ledger_path,
     )
 
     assert result.key_version == 1
@@ -40,6 +46,9 @@ def test_rotate_keys_emits_event_and_keyring(tmp_path: Path):
     events = [json.loads(line) for line in event_log_path.read_text(encoding="utf-8").splitlines()]
     assert events[0]["event_type"] == "KEY_ROTATED"
     assert events[0]["event_hash"]
+    ledger = json.loads(authority_ledger_path.read_text(encoding="utf-8"))
+    assert ledger[0]["entry_type"] == "AUTHORIZED_KEY_ROTATION"
+    assert ledger[0]["authority_dri"] == "dri.approver"
 
 
 def test_reencrypt_dry_run_writes_checkpoint(tmp_path: Path):
@@ -99,6 +108,27 @@ def test_rotate_keys_rejects_invalid_ttl(tmp_path: Path):
             ttl_days=0,
             actor_user="dri",
             actor_role="coherence_steward",
+            authority_dri="dri.approver",
+            authority_role="dri_approver",
+            authority_reason="policy",
+            authority_signing_key="test-signing-key",
+            keyring_path=tmp_path / "keyring.json",
+            event_log_path=tmp_path / "events.jsonl",
+        )
+
+
+def test_rotate_keys_requires_authority_context(tmp_path: Path):
+    with pytest.raises(ValueError, match="authority_dri is required"):
+        rotate_keys(
+            tenant_id="tenant-alpha",
+            key_id="credibility",
+            ttl_days=14,
+            actor_user="dri",
+            actor_role="coherence_steward",
+            authority_dri=None,
+            authority_role="dri_approver",
+            authority_reason="policy",
+            authority_signing_key="test-signing-key",
             keyring_path=tmp_path / "keyring.json",
             event_log_path=tmp_path / "events.jsonl",
         )

@@ -29,3 +29,13 @@ Every key version record must include:
 - Rotation increments `key_version` monotonically per `key_id`.
 - New writes use the current active version.
 - Expired keys are not silently reused.
+
+## Approval chain (authority modeled)
+
+- Key rotation is blocked unless an explicit approving DRI identity is provided.
+- Approval context must include:
+  - `authority_dri`
+  - `authority_role`
+  - `authority_reason`
+- Rotations emit a signed `AUTHORIZED_KEY_ROTATION` security event.
+- Every approved rotation appends a chained entry to `data/security/authority_ledger.json`.

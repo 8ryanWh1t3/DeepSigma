@@ -31,6 +31,7 @@ def main() -> int:
         outdir / "history.json",
         outdir / "kpi_trend.png",
         outdir / "kpi_trend.svg",
+        ROOT / "data" / "security" / "authority_ledger.json",
     ]
     for file_path in files:
         if file_path.exists():
