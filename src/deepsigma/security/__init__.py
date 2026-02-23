@@ -11,6 +11,8 @@ from .providers import (
     resolve_provider_name,
 )
 from .providers.base import CryptoProvider
+from .providers.local_keystore import LocalKeyStoreProvider
+from .providers.local_keyring import LocalKeyringProvider
 
 __all__ = [
     "CryptoProvider",
@@ -21,6 +23,8 @@ __all__ = [
     "append_security_event",
     "append_authority_rotation_entry",
     "create_provider",
+    "LocalKeyStoreProvider",
+    "LocalKeyringProvider",
     "provider_from_policy",
     "register_provider",
     "resolve_provider_name",

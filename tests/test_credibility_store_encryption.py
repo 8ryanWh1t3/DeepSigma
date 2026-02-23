@@ -18,9 +18,18 @@ def test_encrypt_at_rest_jsonl_roundtrip(tmp_path, monkeypatch):
     )
     store.append_claim({"claim_id": "C-1", "score": 0.9})
 
-    raw = (tmp_path / "claims.jsonl").read_text(encoding="utf-8").strip()
-    assert "encrypted_payload" in raw
-    assert "claim_id" not in raw
+    raw_text = (tmp_path / "claims.jsonl").read_text(encoding="utf-8").strip()
+    assert "encrypted_payload" in raw_text
+    assert "claim_id" not in raw_text
+    raw = json.loads(raw_text)
+    assert raw["envelope_version"] == "1.0"
+    assert raw["provider"] in {"local-keystore", "local-keyring"}
+    assert raw["key_id"] == "credibility"
+    assert raw["key_version"] >= 1
+    assert raw["alg"] == "AES-256-GCM"
+    assert raw["aad"] == "alpha"
+    assert "created_at" in raw
+    assert "expires_at" in raw
 
     records = store.latest_claims()
     assert len(records) == 1
