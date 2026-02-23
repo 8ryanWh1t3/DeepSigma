@@ -1,10 +1,17 @@
-.PHONY: ci demo pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review tec lock-update build docker release-check release-check-strict version-sync-check milestone-gate pilot-pack scale-benchmark reencrypt-benchmark openapi-docs openapi-check security-gate security-demo security-audit-pack authority-ledger-export roadmap-forecast roadmap-badge roadmap-timeline roadmap-gate roadmap-refresh stability kpi-confidence
+.PHONY: ci demo run proof pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review tec lock-update build docker release-check release-check-strict version-sync-check milestone-gate pilot-pack scale-benchmark reencrypt-benchmark openapi-docs openapi-check security-gate security-demo security-audit-pack authority-ledger-export roadmap-forecast roadmap-badge roadmap-timeline roadmap-gate roadmap-refresh stability kpi-confidence
 
 ci:
 	python scripts/compute_ci.py
 
 demo:
 	bash run_money_demo.sh
+
+run:
+	python scripts/run.py
+
+proof:
+	python scripts/crypto_proof.py
+	python scripts/export_audit_neutral_pack.py
 
 pilot-in-a-box:
 	python scripts/pilot_in_a_box.py

@@ -11,11 +11,15 @@ ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_FILES = [
     "specs/decision_infrastructure_model.md",
     "release_kpis/layer_kpi_mapping.json",
+    "governance/ambiguity_policy.md",
+    "scripts/run.py",
 ]
 
 REQUIRED_PROOFS = [
     "schemas/intent_packet.schema.json",
     "scripts/pre_exec_gate.py",
+    "scripts/validate_intent_packet.py",
+    "scripts/crypto_proof.py",
     "governance/decision_invariants.md",
     "scripts/validate_claim_evidence_authority.py",
     "scripts/verify_authority_signature.py",
@@ -27,6 +31,8 @@ REQUIRED_PROOFS = [
 
 PROOF_SCRIPTS = [
     "scripts/pre_exec_gate.py",
+    "scripts/validate_intent_packet.py",
+    "scripts/crypto_proof.py",
     "scripts/validate_claim_evidence_authority.py",
     "scripts/verify_authority_signature.py",
     "scripts/idempotency_guard.py",
