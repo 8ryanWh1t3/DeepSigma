@@ -17,11 +17,6 @@ on:
       - 'pyproject.toml'
       - 'docker/Dockerfile.exhaust'
       - '.github/workflows/docker-exhaust.yml'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'docker/Dockerfile.exhaust'
-      - 'dashboard/server/exhaust_main.py'
   workflow_dispatch:
 
 env:

@@ -8,11 +8,6 @@ on:
       - 'docs/rdf/**'
       - 'docker/Dockerfile.rdf'
       - '.github/workflows/docker-rdf.yml'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'docker/Dockerfile.rdf'
-      - 'docs/rdf/**'
   workflow_dispatch:
 
 env:

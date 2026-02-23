@@ -11,14 +11,6 @@ on:
       - 'src/tools/prompt_os/**'
       - 'docs/prompt_os/**'
       - 'tests/test_prompt_os_*.py'
-  pull_request:
-    paths:
-      - 'artifacts/sample_data/prompt_os_v2/**'
-      - 'schemas/prompt_os/**'
-      - 'src/tools/prompt_os/**'
-      - 'docs/prompt_os/**'
-      - 'tests/test_prompt_os_*.py'
-
 jobs:
   validate:
     name: CSV ↔ Schema Validation

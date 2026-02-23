@@ -18,11 +18,6 @@ on:
       - 'specs/**'
       - 'src/adapters/**'
       - 'pyproject.toml'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'dashboard/**'
-      - 'Dockerfile'
   workflow_dispatch:
 
 env:

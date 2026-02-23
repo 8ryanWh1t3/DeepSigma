@@ -9,12 +9,6 @@ on:
       - 'src/tools/reconstruct/**'
       - 'schemas/reconstruct/signature_block_v1.json'
       - 'tests/test_signature_support.py'
-  pull_request:
-    paths:
-      - 'src/tools/reconstruct/**'
-      - 'schemas/reconstruct/signature_block_v1.json'
-      - 'tests/test_signature_support.py'
-
 jobs:
   signature:
     name: Sign + Verify Validation

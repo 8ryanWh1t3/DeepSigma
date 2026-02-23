@@ -11,11 +11,6 @@ on:
       - 'pyproject.toml'
       - 'docker/Dockerfile.otel'
       - '.github/workflows/docker-otel.yml'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'docker/Dockerfile.otel'
-      - 'src/adapters/otel/**'
   workflow_dispatch:
 
 env:

@@ -12,10 +12,6 @@ on:
       - 'pyproject.toml'
       - 'docker/Dockerfile.mcp'
       - '.github/workflows/docker-mcp.yml'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'docker/Dockerfile.mcp'
   workflow_dispatch:
 
 env:

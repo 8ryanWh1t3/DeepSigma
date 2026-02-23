@@ -15,10 +15,6 @@ on:
       - 'pyproject.toml'
       - 'docker/Dockerfile.tools'
       - '.github/workflows/docker-tools.yml'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'docker/Dockerfile.tools'
   workflow_dispatch:
 
 env:

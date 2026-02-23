@@ -14,10 +14,6 @@ on:
       - 'pyproject.toml'
       - 'docker/Dockerfile.coherence'
       - '.github/workflows/docker-coherence.yml'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'docker/Dockerfile.coherence'
   workflow_dispatch:
 
 env:
