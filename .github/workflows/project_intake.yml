@@ -1,0 +1,32 @@
+name: Project Intake (v2.1.0)
+
+on:
+  issues:
+    types:
+      - opened
+      - edited
+      - labeled
+      - unlabeled
+      - reopened
+      - milestoned
+      - demilestoned
+
+permissions:
+  contents: read
+  issues: write
+  repository-projects: write
+
+jobs:
+  intake:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.PROJECT_AUTOMATION_TOKEN != '' && secrets.PROJECT_AUTOMATION_TOKEN || secrets.GITHUB_TOKEN }}
+      TARGET_MILESTONE: v2.1.0 (DISR Architecture)
+      PROJECT_OWNER: 8ryanWh1t3
+      PROJECT_NUMBER: "2"
+      PROJECT_STATUS_DEFAULT: Todo
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sync issue to Stark board
+        run: python scripts/project_intake.py
