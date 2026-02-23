@@ -14,7 +14,6 @@ COPY src/ /app/src/
 COPY dashboard/ /app/dashboard/
 COPY schemas/ /app/schemas/
 COPY docs/examples/ /app/docs/examples/
-COPY coherence_ops/ /app/coherence_ops/
 
 RUN pip install --no-cache-dir -e /app
 
