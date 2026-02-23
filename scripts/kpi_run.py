@@ -47,6 +47,7 @@ def main() -> int:
     subprocess.check_call(["python", "scripts/kpi_gate.py"])
     subprocess.check_call(["python", "scripts/render_kpi_trend.py"])
     subprocess.check_call(["python", "scripts/render_composite_radar.py"])
+    subprocess.check_call(["make", "roadmap-refresh"])
     subprocess.check_call(["make", "tec"])
 
     radar_png = f"release_kpis/radar_{version}.png"
@@ -73,6 +74,12 @@ def main() -> int:
 - PNG: `release_kpis/radar_composite_latest.png`
 - SVG: `release_kpis/radar_composite_latest.svg`
 - Delta table: `release_kpis/radar_composite_latest.md`
+
+**Roadmap Forecast:**
+- Badge: `release_kpis/roadmap_badge.svg`
+- Forecast: `release_kpis/roadmap_forecast.md`
+- Timeline: `release_kpis/roadmap_timeline.svg`
+- Scope gate: `release_kpis/ROADMAP_SCOPE_GATE_REPORT.md`
 
 **Trend:**
 - PNG: `release_kpis/kpi_trend.png`

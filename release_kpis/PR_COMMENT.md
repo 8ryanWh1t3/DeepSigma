@@ -11,6 +11,12 @@
 - SVG: `release_kpis/radar_composite_latest.svg`
 - Delta table: `release_kpis/radar_composite_latest.md`
 
+**Roadmap Forecast:**
+- Badge: `release_kpis/roadmap_badge.svg`
+- Forecast: `release_kpis/roadmap_forecast.md`
+- Timeline: `release_kpis/roadmap_timeline.svg`
+- Scope gate: `release_kpis/ROADMAP_SCOPE_GATE_REPORT.md`
+
 **Trend:**
 - PNG: `release_kpis/kpi_trend.png`
 - SVG: `release_kpis/kpi_trend.svg`
@@ -20,9 +26,9 @@
 - `release_kpis/ISSUE_LABEL_GATE_REPORT.md`
 
 **TEC (ROM):**
-- Internal: 2538.9 hrs | $380,835
-- Executive: 2538.9 hrs | $571,252
-- DoD: 2538.9 hrs | $698,198
+- Internal: 2875.5 hrs | $431,325
+- Executive: 2875.5 hrs | $646,988
+- DoD: 2875.5 hrs | $790,762
 - Full detail: `release_kpis/TEC_SUMMARY.md`
 
 **Notes:**

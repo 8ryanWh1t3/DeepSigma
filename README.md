@@ -15,6 +15,7 @@ See: [docs/release/RELEASE_NOTES_v2.0.6.md](docs/release/RELEASE_NOTES_v2.0.6.md
 
 ## Repo Radar KPI (latest)
 [![Repo KPI Badge](release_kpis/badge_latest.svg)](release_kpis/radar_composite_latest.png)
+[![Roadmap Badge](release_kpis/roadmap_badge.svg)](release_kpis/roadmap_timeline.svg)
 
 - Current release radar: [release_kpis/radar_v2.0.6.png](release_kpis/radar_v2.0.6.png)
 - Composite release radar: [release_kpis/radar_composite_latest.png](release_kpis/radar_composite_latest.png)
@@ -27,6 +28,23 @@ See: [docs/release/RELEASE_NOTES_v2.0.6.md](docs/release/RELEASE_NOTES_v2.0.6.md
 - TEC executive tier: [release_kpis/tec_executive.json](release_kpis/tec_executive.json)
 - TEC DoD tier: [release_kpis/tec_dod.json](release_kpis/tec_dod.json)
 - C-TEC mermaid flow: [docs/mermaid/12-c-tec-pipeline.md](docs/mermaid/12-c-tec-pipeline.md)
+- Roadmap forecast: [release_kpis/roadmap_forecast.md](release_kpis/roadmap_forecast.md)
+- Roadmap timeline: [release_kpis/roadmap_timeline.svg](release_kpis/roadmap_timeline.svg)
+- Roadmap scope gate: [release_kpis/ROADMAP_SCOPE_GATE_REPORT.md](release_kpis/ROADMAP_SCOPE_GATE_REPORT.md)
+
+### Active Track (v2.1.0 — Security Hardening)
+- DISR hardening
+- Confidence bands
+- Eligibility tiers
+- Security determinism enforcement
+- KPI integrity gating
+- TEC/C-TEC formalization
+
+### Future Track (v2.1.1 — Institutional Expansion)
+- Enterprise Connectors
+- Multi-provider DISR abstraction
+- Authority-bound contract enforcement expansion
+- Integration schema finalization
 
 **Institutional Decision Infrastructure**
 
