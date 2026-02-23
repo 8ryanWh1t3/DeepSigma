@@ -5,6 +5,7 @@ Commands:
     deepsigma doctor                          Environment health check
     deepsigma demo excel [--out DIR]          Excel-first Money Demo
     deepsigma retention sweep --tenant <id>   TTL retention sweep + compaction
+    deepsigma new-connector <name>           Scaffold ConnectorV1 plugin
     deepsigma validate boot <xlsx>            BOOT contract validation
     deepsigma mdpt index --csv <file>         Generate MDPT Prompt Index
     deepsigma golden-path <source> [opts]     7-step Golden Path loop
@@ -49,6 +50,7 @@ def main(argv: list[str] | None = None) -> int:
         mdpt_index,
         retention,
         rekey,
+        new_connector,
         validate_boot,
     )
 
@@ -60,6 +62,7 @@ def main(argv: list[str] | None = None) -> int:
     golden_path.register(subparsers)
     compact.register(subparsers)
     rekey.register(subparsers)
+    new_connector.register(subparsers)
 
     args = parser.parse_args(argv)
 
