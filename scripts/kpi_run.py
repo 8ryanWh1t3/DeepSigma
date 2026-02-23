@@ -24,6 +24,25 @@ def format_layer_coverage() -> str:
     return "\n".join(lines)
 
 
+def append_feature_coverage_to_pr_comment(pr_comment_path: str = "release_kpis/PR_COMMENT.md") -> None:
+    cat_path = ROOT / "release_kpis" / "feature_catalog.json"
+    if not cat_path.exists():
+        return
+
+    data = json.loads(cat_path.read_text(encoding="utf-8"))
+    lines = []
+    lines.append("")
+    lines.append("## 🧩 Feature Coverage (Catalog)")
+    for category in data.get("categories", []):
+        lines.append(
+            f"- **{category.get('name', '(unnamed)')}**: {len(category.get('features', []))} features"
+        )
+
+    out_path = ROOT / pr_comment_path
+    if out_path.exists():
+        out_path.write_text(out_path.read_text(encoding="utf-8") + "\n" + "\n".join(lines) + "\n", encoding="utf-8")
+
+
 def main() -> int:
     outdir = ROOT / "release_kpis"
     outdir.mkdir(parents=True, exist_ok=True)
@@ -131,6 +150,7 @@ def main() -> int:
 {layer_coverage}
 """
     (outdir / "PR_COMMENT.md").write_text(comment, encoding="utf-8")
+    append_feature_coverage_to_pr_comment()
     print("Wrote: release_kpis/PR_COMMENT.md")
     return 0
 

@@ -36,9 +36,9 @@
 - KPI bands: `release_kpis/kpi_bands_v2.0.6.json`
 
 **TEC (ROM):**
-- Internal: 3092.0 hrs | $463,800
-- Executive: 3092.0 hrs | $695,700
-- DoD: 3092.0 hrs | $850,300
+- Internal: 3098.0 hrs | $464,700
+- Executive: 3098.0 hrs | $697,050
+- DoD: 3098.0 hrs | $851,950
 - Full detail: `release_kpis/TEC_SUMMARY.md`
 
 **Notes:**
@@ -51,3 +51,12 @@
 - Layer_1_AuditLogic: technical_completeness, enterprise_readiness
 - Layer_2_PreExecution: automation_depth, authority_modeling
 - Layer_3_RuntimeSafety: operational_maturity
+
+
+## 🧩 Feature Coverage (Catalog)
+- **Deterministic Governance Boundary**: 3 features
+- **Intent Capture & Governance**: 3 features
+- **Audit-Neutral Decision Logic**: 3 features
+- **Deterministic Replay & Proof Chain**: 3 features
+- **Repo Radar KPI System**: 2 features
+- **Economic Measurability (TEC / C-TEC)**: 2 features
