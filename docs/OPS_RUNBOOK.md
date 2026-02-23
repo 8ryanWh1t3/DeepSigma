@@ -16,6 +16,7 @@
 | Score episodes | `python -m coherence_ops score ./coherence_ops/examples/sample_episodes.json --json` |
 | Run full test suite | `pytest tests/ -v` |
 | Run with coverage | `pytest --cov=coherence_ops --cov-report=term-missing` |
+| Run stateless API scale benchmark (3 replicas, 100 concurrency) | `make scale-benchmark` |
 | Validate schemas | `python tools/validate_examples.py` |
 | Export Memory Graph | `python -m coherence_ops mg export ./coherence_ops/examples/sample_episodes.json --format=json` |
 | IRIS: Why this decision? | `python -m coherence_ops iris query --type WHY --target ep-001` |

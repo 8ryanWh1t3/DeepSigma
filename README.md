@@ -192,6 +192,7 @@ DeepSigma/
 | [NAV.md](docs/NAV.md) | Full navigation index |
 | [ABOUT.md](docs/ABOUT.md) | Reality Await Layer (RAL) |
 | [OPS_RUNBOOK.md](docs/OPS_RUNBOOK.md) | Operations + incident playbooks |
+| [STATELESS_API_SCALE_GUIDE.md](docs/scaling/STATELESS_API_SCALE_GUIDE.md) | 3-replica benchmark + sizing guidance |
 | [STABILITY.md](docs/STABILITY.md) | Versioning policy + stability guarantees |
 | [docs/99-docs-map.md](docs/99-docs-map.md) | Complete docs map |
 

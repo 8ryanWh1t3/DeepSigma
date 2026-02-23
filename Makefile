@@ -1,4 +1,4 @@
-.PHONY: ci demo pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review lock-update build docker release-check pilot-pack
+.PHONY: ci demo pilot-in-a-box why-60s no-dupes kpi kpi-render kpi-composite kpi-badge kpi-gate kpi-issues issue-label-gate issues-review lock-update build docker release-check pilot-pack scale-benchmark
 
 ci:
 	python scripts/compute_ci.py
@@ -56,3 +56,6 @@ release-check:
 
 pilot-pack:
 	python scripts/pilot_pack.py
+
+scale-benchmark:
+	bash scripts/run_scale_stack.sh
