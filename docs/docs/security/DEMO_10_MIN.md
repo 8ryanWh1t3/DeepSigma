@@ -58,6 +58,9 @@ make reencrypt-benchmark ARGS="--real-workload"
 ## What to verify
 
 - Rotation event exists with `event_type = KEY_ROTATED`.
+- Re-encrypt completion event exists with `event_type = REENCRYPT_DONE`.
+- Provider switches emit `event_type = PROVIDER_CHANGED`.
+- Nonce reuse detections emit `event_type = NONCE_REUSE_DETECTED`.
 - Security event stream includes signed `AUTHORIZED_KEY_ROTATION`.
 - Authority ledger contains an `AUTHORIZED_KEY_ROTATION` entry.
 - Re-encrypt result is `dry_run` with deterministic checkpoint output.

@@ -63,6 +63,7 @@ def main() -> int:
         keyring_path=out_dir / "keyring.json",
         event_log_path=out_dir / "key_rotation_events.jsonl",
         authority_ledger_path=out_dir / "authority_ledger.json",
+        security_events_path=out_dir / "security_events.jsonl",
     )
     rotation_completed_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     reencrypt = run_reencrypt_job(
@@ -77,6 +78,7 @@ def main() -> int:
         authority_reason="DISR 10-minute demo approval",
         authority_signing_key=signing_key,
         authority_ledger_path=out_dir / "authority_ledger.json",
+        security_events_path=out_dir / "security_events.jsonl",
     )
     recovery_completed_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     elapsed_seconds = max(time.perf_counter() - t0, 0.001)
@@ -114,6 +116,7 @@ def main() -> int:
             "keyring": str(out_dir / "keyring.json"),
             "events": str(out_dir / "key_rotation_events.jsonl"),
             "authority_ledger": str(out_dir / "authority_ledger.json"),
+            "security_events": str(out_dir / "security_events.jsonl"),
             "checkpoint": str(out_dir / "reencrypt_checkpoint.json"),
             "security_metrics": str(kpi_metrics_path),
         },

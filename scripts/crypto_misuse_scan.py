@@ -1,24 +1,31 @@
 #!/usr/bin/env python3
 """Detect common crypto misuse patterns and emit security gate reports."""
 
+from __future__ import annotations
+
 import argparse
-from dataclasses import dataclass
 import json
+import os
 from pathlib import Path
 import re
+import sys
 from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+SRC = REPO_ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
 
+from deepsigma.security.events import EVENT_NONCE_REUSE_DETECTED, append_security_event  # noqa: E402
 ENVELOPE_REQUIRED_FIELDS = ["key_id", "key_version", "alg", "nonce", "aad"]
 
 
-@dataclass
 class Finding:
-    severity: str
-    category: str
-    message: str
-    location: str
+    def __init__(self, *, severity: str, category: str, message: str, location: str) -> None:
+        self.severity = severity
+        self.category = category
+        self.message = message
+        self.location = location
 
     def as_dict(self) -> dict[str, str]:
         return {
@@ -27,7 +34,6 @@ class Finding:
             "message": self.message,
             "location": self.location,
         }
-
 
 
 def _iter_json_objects(path: Path) -> list[tuple[str, dict[str, Any]]]:
@@ -56,7 +62,6 @@ def _iter_json_objects(path: Path) -> list[tuple[str, dict[str, Any]]]:
     return out
 
 
-
 def _find_envelopes(node: Any, where: str) -> list[tuple[str, dict[str, Any]]]:
     found: list[tuple[str, dict[str, Any]]] = []
     if isinstance(node, dict):
@@ -68,7 +73,6 @@ def _find_envelopes(node: Any, where: str) -> list[tuple[str, dict[str, Any]]]:
         for idx, value in enumerate(node):
             found.extend(_find_envelopes(value, f"{where}[{idx}]"))
     return found
-
 
 
 def scan_repo(root: Path) -> list[Finding]:
@@ -109,7 +113,6 @@ def scan_repo(root: Path) -> list[Finding]:
             )
 
     nonce_locations: dict[str, list[str]] = {}
-
     for path in root.rglob("*.json*"):
         rel = path.relative_to(root)
         if any(part in {".git", "node_modules", "dist", "build", ".venv", "venv"} for part in rel.parts):
@@ -162,7 +165,6 @@ def scan_repo(root: Path) -> list[Finding]:
     return findings
 
 
-
 def write_reports(findings: list[Finding], out_json: Path, out_md: Path) -> None:
     out_json.parent.mkdir(parents=True, exist_ok=True)
     out_json.write_text(
@@ -179,23 +181,49 @@ def write_reports(findings: list[Finding], out_json: Path, out_md: Path) -> None
             lines.append(f"- **{finding.severity}** `{finding.category}`: {finding.message}")
             lines.append(f"  - Location: `{finding.location}`")
         lines.append("")
-
     out_md.write_text("\n".join(lines), encoding="utf-8")
 
+
+def emit_nonce_reuse_event(
+    *,
+    findings: list[Finding],
+    tenant_id: str,
+    events_path: Path,
+    signing_key: str | None,
+) -> None:
+    nonce_findings = [f for f in findings if f.category == "nonce_reuse"]
+    if not nonce_findings:
+        return
+    append_security_event(
+        event_type=EVENT_NONCE_REUSE_DETECTED,
+        tenant_id=tenant_id,
+        payload={
+            "finding_count": len(nonce_findings),
+            "locations": [f.location for f in nonce_findings[:10]],
+            "scan_scope": "repo",
+            "source": "crypto_misuse_scan",
+        },
+        events_path=events_path,
+        signer_id="security-gate",
+        signing_key=signing_key,
+    )
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Scan repository for crypto misuse patterns")
     parser.add_argument("--root", default=str(REPO_ROOT), help="Repository root")
+    parser.add_argument("--out-json", default="release_kpis/SECURITY_GATE_REPORT.json", help="JSON output path")
+    parser.add_argument("--out-md", default="release_kpis/SECURITY_GATE_REPORT.md", help="Markdown output path")
     parser.add_argument(
-        "--out-json",
-        default="release_kpis/SECURITY_GATE_REPORT.json",
-        help="JSON output path",
+        "--events-path",
+        default="data/security/security_events.jsonl",
+        help="Path to append NONCE_REUSE_DETECTED events",
     )
+    parser.add_argument("--tenant-id", default="tenant-alpha", help="Tenant id attached to emitted security events")
     parser.add_argument(
-        "--out-md",
-        default="release_kpis/SECURITY_GATE_REPORT.md",
-        help="Markdown output path",
+        "--signing-key-env",
+        default="DEEPSIGMA_AUTHORITY_SIGNING_KEY",
+        help="Env var containing optional HMAC signing key",
     )
     args = parser.parse_args()
 
@@ -205,6 +233,12 @@ def main() -> int:
     out_json = (root / args.out_json).resolve()
     out_md = (root / args.out_md).resolve()
     write_reports(findings, out_json, out_md)
+    emit_nonce_reuse_event(
+        findings=findings,
+        tenant_id=args.tenant_id,
+        events_path=(root / args.events_path).resolve(),
+        signing_key=os.environ.get(args.signing_key_env),
+    )
 
     high = [f for f in findings if f.severity == "HIGH"]
     print(f"Wrote: {out_json}")

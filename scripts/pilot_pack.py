@@ -34,8 +34,10 @@ def main() -> int:
         outdir / "SECURITY_GATE_REPORT.md",
         outdir / "SECURITY_GATE_REPORT.json",
         outdir / "scalability_metrics.json",
+        ROOT / "data" / "security" / "security_events.jsonl",
         ROOT / "data" / "security" / "authority_ledger.json",
         ROOT / "artifacts" / "disr_demo" / "authority_ledger.json",
+        ROOT / "artifacts" / "disr_demo" / "security_events.jsonl",
         ROOT / "artifacts" / "disr_demo" / "disr_demo_summary.json",
         ROOT / "artifacts" / "benchmarks" / "reencrypt" / "benchmark_summary.json",
     ]

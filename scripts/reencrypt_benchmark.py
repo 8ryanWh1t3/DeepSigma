@@ -146,6 +146,7 @@ def main() -> int:
         authority_reason="benchmark authorization",
         authority_signing_key="benchmark-signing-key",
         authority_ledger_path=(dataset_dir / "authority_ledger.json").resolve(),
+        security_events_path=(dataset_dir / "security_events.jsonl").resolve(),
     )
 
     wall_elapsed = max(time.perf_counter() - wall_start, 0.001)
