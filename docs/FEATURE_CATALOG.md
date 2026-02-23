@@ -4,7 +4,8 @@ Machine source of truth: `release_kpis/feature_catalog.json`
 
 ## Categories
 
-### Deterministic Governance Boundary  \nGovernance enforced before execution: default deny, halt on ambiguity, proof-first artifacts.
+### Deterministic Governance Boundary
+Governance enforced before execution: default deny, halt on ambiguity, proof-first artifacts.
 
 - **Pre-Execution Gate** (`PRE_EXEC_GATE`)
   - Blocks execution unless intent+authority+policy requirements are satisfied.
@@ -22,7 +23,8 @@ Machine source of truth: `release_kpis/feature_catalog.json`
   - Enforcement: scripts/pre_exec_gate.py, scripts/validate_v2_1_0_milestone.py
   - KPI axes: Authority_Modeling, Operational_Maturity
 
-### Intent Capture & Governance  \nIntent declared pre-action and bound to execution.
+### Intent Capture & Governance
+Intent declared pre-action and bound to execution.
 
 - **Intent Packet Schema** (`INTENT_PACKET_SCHEMA`)
   - Formal structure for intent, scope, success criteria, TTL, author, authority.
@@ -40,7 +42,8 @@ Machine source of truth: `release_kpis/feature_catalog.json`
   - Enforcement: scripts/crypto_proof.py
   - KPI axes: Technical_Completeness, Authority_Modeling
 
-### Audit-Neutral Decision Logic  \nClaim→Evidence→Authority and context-free audit export.
+### Audit-Neutral Decision Logic
+Claim→Evidence→Authority and context-free audit export.
 
 - **Decision Invariants Ledger** (`DECISION_INVARIANTS`)
   - Rules like claim→evidence required, no overwrite, authority precedence, TTL/half-life.
@@ -58,7 +61,8 @@ Machine source of truth: `release_kpis/feature_catalog.json`
   - Enforcement: scripts/export_audit_neutral_pack.py
   - KPI axes: Enterprise_Readiness, Operational_Maturity
 
-### Deterministic Replay & Proof Chain  \nHash chain + optional signature verification + replay checks.
+### Deterministic Replay & Proof Chain
+Hash chain + optional signature verification + replay checks.
 
 - **Sealed Input Snapshot** (`INPUT_SNAPSHOT`)
   - Inputs captured and hashed for deterministic evidence.
@@ -76,7 +80,8 @@ Machine source of truth: `release_kpis/feature_catalog.json`
   - Enforcement: scripts/replay_run.py
   - KPI axes: Operational_Maturity, Enterprise_Readiness
 
-### Repo Radar KPI System  \n8 KPI axes, radar render, badge_latest, PR comment, composite history.
+### Repo Radar KPI System
+8 KPI axes, radar render, badge_latest, PR comment, composite history.
 
 - **KPI Run Pipeline** (`KPI_RUN`)
   - Computes KPI scores and emits render + PR artifacts.
@@ -89,7 +94,8 @@ Machine source of truth: `release_kpis/feature_catalog.json`
   - Enforcement: scripts/kpi_run.py
   - KPI axes: Operational_Maturity, Enterprise_Readiness
 
-### Economic Measurability (TEC / C-TEC)  \nEffort/cost modeling, sensitivity bands, complexity scaling.
+### Economic Measurability (TEC / C-TEC)
+Effort/cost modeling, sensitivity bands, complexity scaling.
 
 - **TEC Baseline** (`TEC_MODEL`)
   - Time/Effort/Cost estimation outputs.

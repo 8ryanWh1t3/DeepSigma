@@ -17,7 +17,7 @@ def main():
     lines.append("")
 
     for c in data["categories"]:
-        lines.append(f"### {c['name']}  \\n{c['summary']}")
+        lines.append(f"### {c['name']}\n{c['summary']}")
         lines.append("")
         for f in c["features"]:
             lines.append(f"- **{f['name']}** (`{f['id']}`)")
