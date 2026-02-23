@@ -39,6 +39,17 @@ spec:
           env:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          {{- if or .Values.api.envFrom.configMapRef .Values.api.envFrom.secretRef }}
+          envFrom:
+            {{- if and .Values.api.envFrom.configMapRef .Values.configMap.enabled }}
+            - configMapRef:
+                name: {{ include "deepsigma.configMapName" . }}
+            {{- end }}
+            {{- if and .Values.api.envFrom.secretRef .Values.secret.enabled }}
+            - secretRef:
+                name: {{ include "deepsigma.secretName" . }}
+            {{- end }}
+          {{- end }}
           livenessProbe:
             {{- toYaml .Values.api.livenessProbe | nindent 12 }}
           readinessProbe:

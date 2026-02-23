@@ -1,0 +1,12 @@
+{{- if and .Values.configMap.enabled .Values.configMap.data }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "deepsigma.configMapName" . }}
+  labels:
+    {{- include "deepsigma.labels" . | nindent 4 }}
+data:
+  {{- range $k, $v := .Values.configMap.data }}
+  {{ $k }}: {{ $v | quote }}
+  {{- end }}
+{{- end }}

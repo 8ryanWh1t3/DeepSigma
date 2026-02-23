@@ -11,6 +11,14 @@ serviceAccount:
 podAnnotations: {}
 podLabels: {}
 
+configMap:
+  enabled: false
+  data: {}
+
+secret:
+  enabled: false
+  stringData: {}
+
 api:
   replicaCount: 1
   image:
@@ -22,6 +30,9 @@ api:
     port: 8000
   env: []
   resources: {}
+  envFrom:
+    configMapRef: false
+    secretRef: false
   livenessProbe:
     httpGet:
       path: /api/health
@@ -42,6 +53,9 @@ dashboard:
     port: 3000
   env: []
   resources: {}
+  envFrom:
+    configMapRef: false
+    secretRef: false
   livenessProbe:
     httpGet:
       path: /healthz
@@ -65,6 +79,39 @@ ingress:
           pathType: Prefix
           service: api
   tls: []
+
+fuseki:
+  enabled: false
+  image:
+    repository: stain/jena-fuseki
+    tag: "5.1.0"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 3030
+  persistence:
+    enabled: true
+    size: 5Gi
+    storageClassName: ""
+  resources: {}
+  adminPassword: "admin"
+  livenessProbe:
+    httpGet:
+      path: /$/ping
+      port: http
+  readinessProbe:
+    httpGet:
+      path: /$/ping
+      port: http
+
+serviceMonitor:
+  enabled: false
+  interval: 30s
+  scrapeTimeout: 10s
+  additionalLabels: {}
+  endpoint:
+    service: api
+    path: /metrics
 
 nodeSelector: {}
 tolerations: []

@@ -1,0 +1,18 @@
+{{- if .Values.fuseki.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "deepsigma.componentName" (dict "component" "fuseki" "Chart" .Chart "Release" .Release "Values" .Values) }}
+  labels:
+    {{- include "deepsigma.labels" . | nindent 4 }}
+    app.kubernetes.io/component: fuseki
+spec:
+  type: {{ .Values.fuseki.service.type }}
+  ports:
+    - port: {{ .Values.fuseki.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "deepsigma.componentLabels" (dict "component" "fuseki" "Chart" .Chart "Release" .Release "Values" .Values) | nindent 4 }}
+{{- end }}
