@@ -1,0 +1,34 @@
+name: DISR Reencrypt Benchmark
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 3 * * *"
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run benchmark suite
+        run: |
+          make security-demo
+          make reencrypt-benchmark ARGS="--records 20000 --reset-dataset"
+
+      - name: Upload benchmark artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: disr-benchmark
+          path: |
+            release_kpis/security_metrics.json
+            release_kpis/scalability_metrics.json
+            release_kpis/benchmark_history.json
+            artifacts/benchmarks/reencrypt/benchmark_summary.json
+            artifacts/benchmarks/reencrypt/security_events.jsonl
+            artifacts/benchmarks/reencrypt/authority_ledger.json

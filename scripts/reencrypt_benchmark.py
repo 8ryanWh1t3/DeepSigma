@@ -94,6 +94,29 @@ def _scalability_score(mttr_seconds: float, records_per_second: float, mb_per_mi
     return max(0.0, min(10.0, score))
 
 
+def _append_history(path: Path, entry: dict) -> None:
+    if path.exists():
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            payload = {}
+    else:
+        payload = {}
+    if not isinstance(payload, dict):
+        payload = {}
+    entries = payload.get("entries")
+    if not isinstance(entries, list):
+        entries = []
+    entries.append(entry)
+    out = {
+        "schema_version": "1.0",
+        "metric_family": "disr_benchmark_history",
+        "entries": entries,
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Benchmark DISR re-encrypt dry-run with telemetry")
     parser.add_argument("--records", type=int, default=100000, help="Number of records to benchmark")
@@ -116,6 +139,16 @@ def main() -> int:
         "--summary-out",
         default="artifacts/benchmarks/reencrypt/benchmark_summary.json",
         help="Path to write benchmark summary JSON",
+    )
+    parser.add_argument(
+        "--security-metrics-out",
+        default="release_kpis/security_metrics.json",
+        help="Path to write security metrics JSON",
+    )
+    parser.add_argument(
+        "--history-out",
+        default="release_kpis/benchmark_history.json",
+        help="Path to write append-only benchmark history",
     )
     parser.add_argument("--reset-dataset", action="store_true", help="Regenerate dataset from scratch")
     parser.add_argument(
@@ -182,8 +215,32 @@ def main() -> int:
     metrics_out.parent.mkdir(parents=True, exist_ok=True)
     metrics_out.write_text(json.dumps(metrics, indent=2) + "\n", encoding="utf-8")
 
+    security_metrics = {
+        "schema_version": "1.0",
+        "metric_family": "disr_security",
+        "execution_mode": "real_workload" if args.real_workload else "dry_run",
+        "evidence_level": "real_workload" if args.real_workload else "simulated",
+        "kpi_eligible": bool(args.real_workload),
+        "tenant_id": "tenant-alpha",
+        "compromise_started_at": started_at,
+        "rotation_completed_at": started_at,
+        "recovery_completed_at": ended_at,
+        "mttr_seconds": round(wall_elapsed, 6),
+        "records_targeted": records_targeted,
+        "bytes_targeted": bytes_targeted,
+        "reencrypt_records_per_second": round(records_per_second, 3),
+        "reencrypt_mb_per_minute": round(mb_per_minute, 6),
+        "signing_mode": "hmac",
+        "signing_key_source": "benchmark_signing_key",
+        "signing_notice": "Benchmark uses deterministic test signing key.",
+    }
+    security_metrics_out = (ROOT / args.security_metrics_out).resolve()
+    security_metrics_out.parent.mkdir(parents=True, exist_ok=True)
+    security_metrics_out.write_text(json.dumps(security_metrics, indent=2) + "\n", encoding="utf-8")
+
     output = {
         "metrics": metrics,
+        "security_metrics": security_metrics,
         "reencrypt_summary": reencrypt_summary_to_dict(summary),
         "dataset_path": str(claims_path),
     }
@@ -191,9 +248,29 @@ def main() -> int:
     summary_out.parent.mkdir(parents=True, exist_ok=True)
     summary_out.write_text(json.dumps(output, indent=2) + "\n", encoding="utf-8")
 
+    history_out = (ROOT / args.history_out).resolve()
+    _append_history(
+        history_out,
+        {
+            "run_started_at": started_at,
+            "run_completed_at": ended_at,
+            "execution_mode": metrics["execution_mode"],
+            "evidence_level": metrics["evidence_level"],
+            "records_targeted": records_targeted,
+            "wall_clock_seconds": metrics["wall_clock_seconds"],
+            "cpu_seconds": metrics["cpu_seconds"],
+            "rss_peak_bytes": metrics["rss_peak_bytes"],
+            "throughput_records_per_second": metrics["throughput_records_per_second"],
+            "throughput_mb_per_minute": metrics["throughput_mb_per_minute"],
+            "mttr_seconds": security_metrics["mttr_seconds"],
+        },
+    )
+
     print(json.dumps(output, indent=2))
     print(f"Wrote: {metrics_out}")
+    print(f"Wrote: {security_metrics_out}")
     print(f"Wrote: {summary_out}")
+    print(f"Wrote: {history_out}")
     return 0
 
 
