@@ -11,6 +11,7 @@ It enforces deadlines, freshness, safe actions, and verification — then seals 
 
 | Page | Purpose |
 |------|---------|
+| [Wiki Index](Wiki-Index) | Canonical wiki structure and navigation |
 | [Quickstart](Quickstart) | Get a supervised agent running in minutes |
 | [Concepts](Concepts) | The four problems RAL solves and the primitives that solve them |
 | [Architecture](Architecture) | System diagram and component map |
@@ -118,7 +119,8 @@ Captures AI interaction exhaust (prompts, completions, tool calls, metrics) and 
 | KPI composite radar | [release_kpis/radar_composite_latest.png](../../release_kpis/radar_composite_latest.png) |
 | KPI delta table | [release_kpis/radar_composite_latest.md](../../release_kpis/radar_composite_latest.md) |
 | TEC summary (C-TEC v1.0) | [release_kpis/TEC_SUMMARY.md](../../release_kpis/TEC_SUMMARY.md) |
-| C-TEC mermaid flow | [mermaid/12-c-tec-pipeline.md](../mermaid/12-c-tec-pipeline.md) |
+| Mermaid canonical index | [docs/mermaid/README.md](../mermaid/README.md) |
+| Mermaid archive index | [docs/archive/mermaid/ARCHIVE_INDEX.md](../archive/mermaid/ARCHIVE_INDEX.md) |
 
 ---
 
