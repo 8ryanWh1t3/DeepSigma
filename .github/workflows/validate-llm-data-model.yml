@@ -9,10 +9,6 @@ on:
     paths:
       - 'docs/llm_data_model/**'
       - '.github/workflows/validate-llm-data-model.yml'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'docs/llm_data_model/**'
   workflow_dispatch:
 
 permissions:

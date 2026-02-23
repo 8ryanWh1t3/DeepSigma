@@ -10,13 +10,6 @@ on:
       - 'src/tools/reconstruct/**'
       - 'docs/governance/**'
       - 'tests/test_reconstruct_*.py'
-  pull_request:
-    paths:
-      - 'schemas/reconstruct/**'
-      - 'src/tools/reconstruct/**'
-      - 'docs/governance/**'
-      - 'tests/test_reconstruct_*.py'
-
 jobs:
   reconstruct:
     name: Seal + Replay Validation

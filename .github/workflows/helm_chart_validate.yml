@@ -1,11 +1,6 @@
 name: Helm Chart Validation
 
 on:
-  pull_request:
-    paths:
-      - "charts/**"
-      - "docs/deployment/HELM.md"
-      - ".github/workflows/helm_chart_validate.yml"
   push:
     branches: [main]
     paths:
