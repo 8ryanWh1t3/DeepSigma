@@ -20,6 +20,20 @@ pip install -e ".[dev,excel]"
 
 ## Commands
 
+### `deepsigma init`
+
+Scaffold a starter project with sample claims, drift scenario, IRIS queries, and a Trust Scorecard path.
+
+```bash
+deepsigma init my-project
+cd my-project
+make demo
+```
+
+Produces a runnable starter workspace with `data/`, `queries/`, `scenarios/`, and `out/` artifacts.
+
+---
+
 ### `deepsigma doctor`
 
 Environment health check — verifies Python version, dependencies, repo structure, and key paths.

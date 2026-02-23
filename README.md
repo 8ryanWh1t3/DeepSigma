@@ -192,6 +192,7 @@ DeepSigma/
 
 | | |
 |---|---|
+| [QUICKSTART.md](docs/QUICKSTART.md) | 5-minute starter path (`deepsigma init` + `make demo`) |
 | [START_HERE.md](docs/START_HERE.md) | Front door |
 | [HERO_DEMO.md](docs/HERO_DEMO.md) | 5-minute hands-on walkthrough |
 | [NAV.md](docs/NAV.md) | Full navigation index |
