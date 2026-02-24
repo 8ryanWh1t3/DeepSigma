@@ -16,7 +16,7 @@ jobs:
     env:
       DEEPSIGMA_TEST_KEY: ${{ secrets.DEEPSIGMA_SIGNING_KEY }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: actions/setup-python@v6
         with:
