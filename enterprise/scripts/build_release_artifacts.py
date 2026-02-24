@@ -26,7 +26,9 @@ CORE_TOP = {
 
 def version() -> str:
     line = next(
-        l for l in (ROOT / "pyproject.toml").read_text(encoding="utf-8").splitlines() if l.startswith("version = ")
+        candidate
+        for candidate in (ROOT / "pyproject.toml").read_text(encoding="utf-8").splitlines()
+        if candidate.startswith("version = ")
     )
     return line.split("=", 1)[1].strip().strip('"')
 

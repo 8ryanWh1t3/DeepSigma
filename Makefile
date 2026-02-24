@@ -1,4 +1,7 @@
-.PHONY: demo core-demo enterprise-demo core-baseline test-money test-enterprise release-artifacts
+.PHONY: demo core-demo core-baseline test-core core-ci \
+	enterprise-demo test-enterprise enterprise-ci \
+	edition-guard secret-scan security-gate openapi-check version-sync-check \
+	test-money release-artifacts
 
 demo:
 	bash run_money_demo.sh
@@ -17,6 +20,33 @@ test-money:
 
 test-enterprise:
 	python -m pytest tests-enterprise/ -q
+
+test-core:
+	python -m pytest tests/ -q
+
+core-ci: edition-guard core-demo core-baseline test-core
+
+enterprise-ci: edition-guard enterprise-demo test-enterprise
+
+edition-guard:
+	@echo "==> Guard: CORE must not import ENTERPRISE"
+	@python enterprise/scripts/edition_guard.py
+
+secret-scan:
+	@echo "==> Secret scan (lightweight patterns)"
+	@python enterprise/scripts/secret_scan.py
+
+security-gate: secret-scan
+	@mkdir -p enterprise/release_kpis
+	@echo '{"status":"PASS"}' > enterprise/release_kpis/SECURITY_GATE_REPORT.json
+	@echo "PASS: security gate" > enterprise/release_kpis/SECURITY_GATE_REPORT.md
+
+openapi-check:
+	@test -f enterprise/docs/api/openapi.json
+	@echo "PASS: enterprise/docs/api/openapi.json present"
+
+version-sync-check:
+	@python enterprise/scripts/version_sync_check.py
 
 release-artifacts:
 	python enterprise/scripts/build_release_artifacts.py
