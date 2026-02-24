@@ -1,0 +1,76 @@
+{
+  "schema": "tec_ctec_v2",
+  "mode": "report_only",
+  "generated_at": "2026-02-24T13:17:46Z",
+  "inputs": {
+    "policy": "enterprise/governance/tec_ctec_policy.json",
+    "icr_latest_present": true,
+    "pcr_latest_present": true
+  },
+  "factors": {
+    "rcf": 1.0,
+    "icr_status": "GREEN",
+    "rl_open": 0,
+    "ccf": 0.7,
+    "cl14": 570,
+    "load_bucket": "extreme"
+  },
+  "core": {
+    "inventory": {
+      "files": 56,
+      "directories": 10,
+      "loc": 5886,
+      "packages": 4,
+      "configs": 12,
+      "tests": 1,
+      "run_surfaces": 4,
+      "artifacts": 21
+    },
+    "tec": 80.4,
+    "controls": {
+      "required": 6,
+      "passed": 6,
+      "kpi_coverage": 1.0,
+      "checks": {
+        "money_demo": true,
+        "baseline": true,
+        "core_tests": true,
+        "boundary_guard": true,
+        "secret_scan": true,
+        "docs_path_to_run": true
+      }
+    },
+    "control_coverage": 0.7,
+    "ctec": 56.28,
+    "r_tec": 80.4
+  },
+  "enterprise": {
+    "inventory": {
+      "files": 859,
+      "directories": 144,
+      "loc": 82169,
+      "packages": 32,
+      "configs": 117,
+      "tests": 1,
+      "run_surfaces": 112,
+      "artifacts": 197
+    },
+    "tec": 1204.4,
+    "controls": {
+      "required": 6,
+      "passed": 6,
+      "kpi_coverage": 1.0,
+      "checks": {
+        "enterprise_demo": true,
+        "enterprise_tests": true,
+        "deploy_sanity": true,
+        "connector_smokes": true,
+        "boundary_guard": true,
+        "secret_scan": true
+      }
+    },
+    "control_coverage": 0.7,
+    "ctec": 843.08,
+    "r_tec": 1204.4
+  }
+}

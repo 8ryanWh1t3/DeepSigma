@@ -1,0 +1,55 @@
+{
+  "schema": "tec_ctec_policy_v2",
+  "mode": "report_only",
+  "icr_rcf": {
+    "GREEN": 1.0,
+    "YELLOW": 0.85,
+    "RED": 0.6
+  },
+  "ccf_thresholds": {
+    "provisional": true,
+    "low_max": 25,
+    "medium_max": 60,
+    "high_max": 120
+  },
+  "ccf_map": {
+    "low": 1.0,
+    "medium": 0.9,
+    "high": 0.8,
+    "extreme": 0.7
+  },
+  "tec_formula": {
+    "F": 1.0,
+    "P": 3.0,
+    "C": 0.2,
+    "R": 2.0,
+    "T": 2.0
+  },
+  "edition_roots": {
+    "core": [
+      "src/core",
+      "src/coherence_ops",
+      "docs/examples/demo-stack",
+      "tests"
+    ],
+    "enterprise": [
+      "enterprise/src",
+      "enterprise/dashboard",
+      "enterprise/docs",
+      "enterprise/scripts",
+      "enterprise/release_kpis",
+      "tests-enterprise"
+    ]
+  },
+  "artifacts_roots": {
+    "core": [
+      "docs/examples/demo-stack/drift_patch_cycle_run",
+      "docs/examples/demo-stack"
+    ],
+    "enterprise": [
+      "enterprise/release_kpis",
+      "enterprise/artifacts",
+      "enterprise/schemas"
+    ]
+  }
+}
