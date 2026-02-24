@@ -1,4 +1,4 @@
-.PHONY: demo core-demo enterprise-demo core-baseline test-money test-enterprise
+.PHONY: demo core-demo enterprise-demo core-baseline test-money test-enterprise release-artifacts
 
 demo:
 	bash run_money_demo.sh
@@ -17,3 +17,6 @@ test-money:
 
 test-enterprise:
 	python -m pytest tests-enterprise/ -q
+
+release-artifacts:
+	python scripts/build_release_artifacts.py
