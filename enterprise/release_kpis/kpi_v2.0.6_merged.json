@@ -5,21 +5,28 @@
     "max": 10
   },
   "values": {
-    "technical_completeness": 10.0,
-    "automation_depth": 10.0,
+    "technical_completeness": 6.3,
+    "automation_depth": 3.0,
     "authority_modeling": 6.15,
-    "enterprise_readiness": 10.0,
+    "enterprise_readiness": 4.67,
     "scalability": 5.08,
     "data_integration": 8.38,
     "economic_measurability": 4.24,
-    "operational_maturity": 10.0
+    "operational_maturity": 7.91
   },
   "telemetry": {
-    "test_files": 198,
-    "workflows": 29,
+    "test_files": 200,
+    "workflows": 0,
     "docs_md": 19,
     "security_metrics_present": true,
-    "scalability_metrics_present": true
+    "scalability_metrics_present": true,
+    "insights_metrics_present": true,
+    "insights": {
+      "present": true,
+      "source": "release_kpis/insights_metrics.json",
+      "score": 7.84,
+      "signals": 0
+    }
   },
   "eligibility": {
     "schema": "kpi_eligibility_v1",
@@ -31,23 +38,25 @@
     ],
     "kpis": {
       "technical_completeness": {
-        "tier": "production",
-        "tier_cap": 10.0,
-        "confidence": 0.9,
+        "tier": "real",
+        "tier_cap": 8.5,
+        "confidence": 0.7,
         "missing_by_tier": {
           "simulated": [],
           "real": [],
-          "production": []
+          "production": [
+            ".github/workflows/ci.yml"
+          ]
         }
       },
       "automation_depth": {
-        "tier": "production",
-        "tier_cap": 10.0,
-        "confidence": 0.9,
+        "tier": "unverified",
+        "tier_cap": 3.0,
+        "confidence": 0.3,
         "missing_by_tier": {
-          "simulated": [],
-          "real": [],
-          "production": []
+          "simulated": [
+            ".github/workflows/kpi.yml"
+          ]
         }
       },
       "authority_modeling": {
@@ -71,13 +80,14 @@
         }
       },
       "scalability": {
-        "tier": "production",
-        "tier_cap": 10.0,
-        "confidence": 0.9,
+        "tier": "simulated",
+        "tier_cap": 6.0,
+        "confidence": 0.45,
         "missing_by_tier": {
           "simulated": [],
-          "real": [],
-          "production": []
+          "real": [
+            ".github/workflows/reencrypt_benchmark.yml"
+          ]
         }
       },
       "data_integration": {
