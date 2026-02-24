@@ -28,7 +28,7 @@ jobs:
           from pathlib import Path
 
           root = Path(".")
-          skip_prefixes = (".git/", "_park_enterprise/")
+          skip_prefixes = (".git/", "enterprise/")
           seen = {}
           collisions = []
 

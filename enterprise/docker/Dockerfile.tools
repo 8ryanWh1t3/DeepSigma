@@ -1,0 +1,66 @@
+# syntax=docker/dockerfile:1
+# ── Σ OVERWATCH Tools container ──────────────────────────────
+# Batch worker with all three supervisor CLI tools.
+# Run-and-exit pattern — no long-running process.
+#
+# Available commands:
+#
+#   overwatch           — run a supervised decision episode
+#   overwatch-validate  — validate JSON examples against schemas
+#   overwatch-replay    — replay a sealed episode through degrade ladder
+#   deepsigma           — top-level CLI (golden-path, etc.)
+#
+# Usage examples:
+#   docker run --rm -v ./data:/data \
+#     ghcr.io/8ryanwh1t3/deepsigma-tools \
+#     overwatch --decisionType AccountQuarantine \
+#       --policy /data/policy.json --out /data/out
+#
+#   docker run --rm -v ./data:/data \
+#     ghcr.io/8ryanwh1t3/deepsigma-tools \
+#     overwatch-replay --episode /data/ep_001.json
+#
+#   docker run --rm \
+#     ghcr.io/8ryanwh1t3/deepsigma-tools \
+#     overwatch-validate
+#
+#   docker run --rm \
+#     ghcr.io/8ryanwh1t3/deepsigma-tools \
+#     deepsigma golden-path sharepoint \
+#       --fixture /app/demos/golden_path/fixtures/sharepoint_small \
+#       --out /app/out --clean
+# ─────────────────────────────────────────────────────────────
+FROM python:3.12-slim
+
+LABEL org.opencontainers.image.source="https://github.com/8ryanWh1t3/DeepSigma"
+LABEL org.opencontainers.image.description="Σ OVERWATCH Tools — supervised run, replay, and validation CLIs"
+LABEL org.opencontainers.image.licenses="MIT"
+
+RUN pip install --no-cache-dir \
+    "jsonschema" \
+    "referencing>=0.35.0" \
+    "pyyaml>=6.0"
+
+WORKDIR /app
+
+COPY pyproject.toml /app/
+COPY src/engine/ /app/engine/
+COPY src/core/ /app/core/
+COPY src/verifiers/ /app/verifiers/
+COPY src/tools/ /app/tools/
+COPY schemas/ /app/schemas/
+COPY src/adapters/ /app/adapters/
+COPY src/demos/ /app/demos/
+COPY docs/examples/ /app/examples/
+COPY docs/llm_data_model/ /app/llm_data_model/
+COPY docs/policy_packs/ /app/policy_packs/
+
+RUN pip install --no-cache-dir -e /app
+
+# Data directory for episode I/O (mount volume here)
+RUN mkdir -p /data
+
+ENV PYTHONPATH=/app
+
+# Default: show available commands
+CMD ["sh", "-c", "echo 'Available: overwatch | overwatch-validate | overwatch-replay | deepsigma' && echo 'Run with: docker run --rm -v ./data:/data ghcr.io/8ryanwh1t3/deepsigma-tools <command> [args]'"]
