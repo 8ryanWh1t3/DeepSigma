@@ -1,9 +1,20 @@
 {
-  "schema": "tec_ctec_v2_tier",
-  "source": "enterprise/scripts/tec_ctec.py",
-  "tier": "dod",
-  "generated_at": "2026-02-24T13:28:14Z",
+  "schema": "tec_ctec_v2",
   "mode": "report_only",
+  "generated_at": "2026-02-24T13:28:14Z",
+  "inputs": {
+    "policy": "enterprise/governance/tec_ctec_policy.json",
+    "icr_latest_present": true,
+    "pcr_latest_present": true
+  },
+  "factors": {
+    "rcf": 1.0,
+    "icr_status": "GREEN",
+    "rl_open": 0,
+    "ccf": 0.7,
+    "cl14": 570,
+    "load_bucket": "extreme"
+  },
   "core": {
     "inventory": {
       "files": 56,
@@ -83,26 +94,5 @@
     "control_coverage": 0.7,
     "ctec": 1399.02,
     "r_tec": 1998.6
-  },
-  "factors": {
-    "rcf": 1.0,
-    "icr_status": "GREEN",
-    "rl_open": 0,
-    "ccf": 0.7,
-    "cl14": 570,
-    "load_bucket": "extreme"
-  },
-  "rate_hourly": 275.0,
-  "low": {
-    "hours": 1119.2,
-    "cost": 307784.0
-  },
-  "base": {
-    "hours": 1399.0,
-    "cost": 384730.0
-  },
-  "high": {
-    "hours": 1888.7,
-    "cost": 519386.0
   }
 }

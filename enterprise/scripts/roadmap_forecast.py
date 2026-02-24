@@ -2,11 +2,13 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 ROADMAP_PATH = ROOT / "roadmap" / "roadmap.json"
 OUTDIR = ROOT / "release_kpis"
+HEALTH_PATH = OUTDIR / "health" / "tec_ctec_latest.json"
 
 KPI_KEYS = [
     "technical_completeness",
@@ -77,9 +79,39 @@ def confidence_for_status(status: str) -> float:
     return 0.35
 
 
+def version_key(path: Path) -> tuple[int, int, int]:
+    match = re.search(r"kpi_v(\d+)\.(\d+)\.(\d+)_merged\.json$", path.name)
+    if not match:
+        return (0, 0, 0)
+    return tuple(int(match.group(i)) for i in range(1, 4))
+
+
+def latest_kpi_values() -> tuple[str, dict[str, float]]:
+    files = sorted(OUTDIR.glob("kpi_v*_merged.json"), key=version_key)
+    if not files:
+        return ("none", {key: 0.0 for key in KPI_KEYS})
+    latest = files[-1]
+    payload = json.loads(latest.read_text(encoding="utf-8"))
+    values = payload.get("values", {})
+    out = {key: float(values.get(key, 0.0)) for key in KPI_KEYS}
+    return (latest.name, out)
+
+
+def load_control_factor() -> tuple[str, float]:
+    if not HEALTH_PATH.exists():
+        return ("none", 1.0)
+    payload = json.loads(HEALTH_PATH.read_text(encoding="utf-8"))
+    total = payload.get("total", {})
+    control = float(total.get("control_coverage", 1.0))
+    return (str(HEALTH_PATH.relative_to(ROOT)), max(0.0, min(1.0, control)))
+
+
 def main() -> int:
     if not ROADMAP_PATH.exists():
         raise SystemExit(f"Missing roadmap file: {ROADMAP_PATH}")
+
+    kpi_source, baseline = latest_kpi_values()
+    control_source, control_factor = load_control_factor()
 
     roadmap = json.loads(ROADMAP_PATH.read_text(encoding="utf-8"))
     forecast: dict[str, dict] = {}
@@ -90,28 +122,59 @@ def main() -> int:
         for field in ("scope", "focus"):
             statements.extend(payload.get(field, []))
 
-        delta = score_statements(statements)
+        raw_delta = score_statements(statements)
         confidence = confidence_for_status(status)
+        expected_delta: dict[str, float] = {}
+        projected: dict[str, float] = {}
+        for key in KPI_KEYS:
+            expected_delta[key] = round(raw_delta[key] * control_factor, 2)
+            projected[key] = round(min(10.0, baseline[key] + expected_delta[key]), 2)
         forecast[version] = {
             "status": status,
-            "kpi_delta_expected": delta,
-            "confidence": confidence,
-            "notes": "Forecast is deterministic from roadmap statements; values are capped per release.",
+            "kpi_current": baseline,
+            "kpi_delta_raw": raw_delta,
+            "kpi_delta_expected": expected_delta,
+            "kpi_projected": projected,
+            "confidence": round(confidence * (0.8 + (0.2 * control_factor)), 2),
+            "notes": (
+                "Forecast is deterministic from roadmap statements and auto-scaled by current control coverage "
+                "(C-TEC total control factor)."
+            ),
         }
 
     OUTDIR.mkdir(parents=True, exist_ok=True)
     out_json = OUTDIR / "roadmap_forecast.json"
-    out_json.write_text(json.dumps({"schema": "roadmap_forecast_v1", "forecast": forecast}, indent=2), encoding="utf-8")
+    out_json.write_text(
+        json.dumps(
+            {
+                "schema": "roadmap_forecast_v2",
+                "inputs": {
+                    "kpi_source": kpi_source,
+                    "control_source": control_source,
+                    "control_factor": round(control_factor, 4),
+                },
+                "forecast": forecast,
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
 
     lines = ["# Roadmap KPI Forecast", ""]
+    lines.append(f"- KPI baseline source: `{kpi_source}`")
+    lines.append(f"- Control factor source: `{control_source}`")
+    lines.append(f"- Applied control factor: **{control_factor:.2f}**")
+    lines.append("")
     for version, payload in forecast.items():
         lines.append(f"## {version} ({payload['status']})")
         lines.append(f"- Confidence: **{payload['confidence']:.2f}**")
         lines.append("")
-        lines.append("| KPI | Expected Delta |")
-        lines.append("|---|---:|")
+        lines.append("| KPI | Current | Expected Delta | Projected |")
+        lines.append("|---|---:|---:|---:|")
         for key in KPI_KEYS:
-            lines.append(f"| {key} | {payload['kpi_delta_expected'][key]:.2f} |")
+            lines.append(
+                f"| {key} | {payload['kpi_current'][key]:.2f} | {payload['kpi_delta_expected'][key]:.2f} | {payload['kpi_projected'][key]:.2f} |"
+            )
         lines.append("")
     out_md = OUTDIR / "roadmap_forecast.md"
     out_md.write_text("\n".join(lines), encoding="utf-8")

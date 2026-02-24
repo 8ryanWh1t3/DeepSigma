@@ -1,0 +1,64 @@
+name: Health v2 (TEC/C-TEC)
+
+on:
+  workflow_dispatch:
+    inputs:
+      label_prs:
+        description: "Apply PCR labels to merged PRs in 14d window"
+        required: false
+        default: "false"
+  schedule:
+    - cron: "15 13 * * 1-5"
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: write
+
+jobs:
+  health-v2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev,enterprise]"
+
+      - name: ICR health snapshot (from GitHub)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python enterprise/scripts/icr_health_watcher.py --from-gh --snapshot
+
+      - name: PCR health snapshot (from GitHub)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LABEL_PRS: ${{ github.event.inputs.label_prs || 'false' }}
+        run: |
+          if [ "$LABEL_PRS" = "true" ]; then
+            python enterprise/scripts/pr_complexity_watcher.py --from-gh --snapshot --label-prs
+          else
+            python enterprise/scripts/pr_complexity_watcher.py --from-gh --snapshot
+          fi
+
+      - name: Compute TEC/C-TEC and summary
+        run: |
+          python enterprise/scripts/tec_ctec.py --snapshot
+          python enterprise/scripts/health_summary.py
+
+      - name: Upload health artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: health-v2-artifacts
+          path: |
+            enterprise/release_kpis/health/*.json
+            enterprise/release_kpis/health/*.md
+            enterprise/release_kpis/health/history/*.json

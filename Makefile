@@ -1,7 +1,10 @@
 .PHONY: demo core-demo core-baseline test-core core-ci \
 	enterprise-demo test-enterprise enterprise-ci \
 	edition-guard secret-scan security-gate openapi-check version-sync-check \
-	test-money release-artifacts pulse-insights
+	test-money release-artifacts pulse-insights \
+	icr-health pcr-health tec-ctec health-summary health-v2 \
+	icr-health-gh pcr-health-gh health-v2-gh tec \
+	roadmap-refresh roadmap-gate
 
 demo:
 	bash run_money_demo.sh
@@ -53,3 +56,35 @@ release-artifacts:
 
 pulse-insights:
 	python enterprise/scripts/pulse_insights.py
+
+icr-health:
+	python enterprise/scripts/icr_health_watcher.py --snapshot
+
+pcr-health:
+	python enterprise/scripts/pr_complexity_watcher.py --snapshot
+
+tec-ctec:
+	python enterprise/scripts/tec_ctec.py --snapshot
+
+tec: tec-ctec
+
+health-summary:
+	python enterprise/scripts/health_summary.py
+
+health-v2: icr-health pcr-health tec-ctec health-summary
+
+icr-health-gh:
+	python enterprise/scripts/icr_health_watcher.py --from-gh --snapshot
+
+pcr-health-gh:
+	python enterprise/scripts/pr_complexity_watcher.py --from-gh --snapshot
+
+health-v2-gh: icr-health-gh pcr-health-gh tec-ctec health-summary
+
+roadmap-refresh:
+	python enterprise/scripts/roadmap_forecast.py
+	python enterprise/scripts/render_roadmap_badge.py
+	python enterprise/scripts/render_roadmap_timeline.py
+
+roadmap-gate:
+	python enterprise/scripts/roadmap_scope_gate.py
