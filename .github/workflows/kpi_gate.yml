@@ -32,6 +32,7 @@ jobs:
           make issue-label-gate
           make kpi-issues
           make roadmap-gate
+          make pulse-insights
 
       - name: Run KPI (includes gate)
         run: |

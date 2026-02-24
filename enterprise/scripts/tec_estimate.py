@@ -224,9 +224,83 @@ def _write_json(path: Path, payload: dict) -> None:
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
 
+def _load_insights_metrics() -> dict | None:
+    path = OUT / "insights_metrics.json"
+    if not path.exists():
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    if isinstance(payload, dict):
+        return payload
+    return None
+
+
+def _insights_adjustment(hours: float, insights: dict | None) -> tuple[float, dict]:
+    cfg = WEIGHTS.get("insights", {})
+    enabled = bool(cfg.get("enabled", False))
+    details = {
+        "enabled": enabled,
+        "source": "release_kpis/insights_metrics.json",
+        "present": insights is not None,
+        "score": None,
+        "signal_count": 0,
+        "factor": 1.0,
+        "hours_delta": 0.0,
+    }
+    if not enabled or insights is None:
+        return hours, details
+
+    raw_score = insights.get("insights_score")
+    score = float(raw_score) if isinstance(raw_score, (int, float)) else float(cfg.get("neutral_score", 5.0))
+    score = max(0.0, min(10.0, score))
+    neutral = float(cfg.get("neutral_score", 5.0))
+    score_sensitivity = float(cfg.get("score_sensitivity", 0.02))
+    max_reduction = float(cfg.get("max_reduction", 0.12))
+    max_increase = float(cfg.get("max_increase", 0.18))
+    signal_step = float(cfg.get("signal_step", 0.015))
+    signal_cap = float(cfg.get("signal_cap", 0.12))
+
+    signals = insights.get("signals")
+    if isinstance(signals, list):
+        signal_count = len(signals)
+    elif isinstance(signals, dict):
+        signal_count = len(signals)
+    else:
+        raw_signal_count = insights.get("signal_count")
+        signal_count = int(raw_signal_count) if isinstance(raw_signal_count, int) else 0
+
+    # Better insight score reduces effort; lower score increases effort.
+    score_component = (neutral - score) * score_sensitivity
+    score_component = max(-max_reduction, min(max_increase, score_component))
+
+    # More active signals add complexity.
+    signal_component = min(signal_count * signal_step, signal_cap)
+
+    factor = max(1.0 - max_reduction, min(1.0 + max_increase + signal_cap, 1.0 + score_component + signal_component))
+    adjusted_hours = hours * factor
+
+    details.update(
+        {
+            "score": round(score, 3),
+            "signal_count": signal_count,
+            "factor": round(factor, 4),
+            "hours_delta": round(adjusted_hours - hours, 1),
+        }
+    )
+    return adjusted_hours, details
+
+
 def main() -> int:
     data = compute()
-    ctec_hours = float(data["hours"]["total_ctec"])
+    raw_ctec_hours = float(data["hours"]["total_ctec"])
+    insights = _load_insights_metrics()
+    ctec_hours, insights_details = _insights_adjustment(raw_ctec_hours, insights)
+    data["hours"]["total_ctec_unadjusted"] = round(raw_ctec_hours, 1)
+    data["hours"]["insights_adjustment_hours"] = round(ctec_hours - raw_ctec_hours, 1)
+    data["hours"]["total_ctec"] = round(ctec_hours, 1)
+    data["insights"] = insights_details
     uncertainty = WEIGHTS["uncertainty"]
 
     internal_rate = float(WEIGHTS["rates"]["internal_hourly"])
@@ -260,6 +334,13 @@ def main() -> int:
             f"- avg_index: **{data['complexity']['avg_index']}**",
             f"- max_index: **{data['complexity']['max_index']}**",
             "- signals: PR diff size, changed files, cross-subsystem touch, issue duration, dependency refs",
+            "",
+            "## Pulse Insights Adjustment",
+            f"- insights_present: **{data['insights']['present']}**",
+            f"- insights_score: **{data['insights']['score']}**",
+            f"- signal_count: **{data['insights']['signal_count']}**",
+            f"- adjustment_factor: **{data['insights']['factor']}x**",
+            f"- adjustment_hours: **{data['insights']['hours_delta']}**",
         ]
     )
 

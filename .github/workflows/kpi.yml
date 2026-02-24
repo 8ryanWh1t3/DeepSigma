@@ -34,6 +34,7 @@ jobs:
           make issue-label-gate
           make kpi-issues
           make roadmap-gate
+          make pulse-insights
 
       - name: Run KPI
         run: |
@@ -52,6 +53,7 @@ jobs:
             release_kpis/kpi_bands_*.json
             release_kpis/history.json
             release_kpis/issue_deltas.json
+            release_kpis/insights_metrics.json
             release_kpis/badge_latest.svg
             release_kpis/roadmap_badge.svg
             release_kpis/roadmap_forecast.json

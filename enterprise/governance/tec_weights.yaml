@@ -48,3 +48,15 @@ complexity:
   # Coordination/dependency complexity from issue references.
   dependency_ref_step: 0.05
   dependency_ref_cap: 0.4
+
+# Pulse insights adjustment for C-TEC.
+# Neutral score: 5.0
+# Lower scores increase effort; higher scores can reduce effort.
+insights:
+  enabled: true
+  neutral_score: 5.0
+  score_sensitivity: 0.02
+  max_reduction: 0.12
+  max_increase: 0.18
+  signal_step: 0.015
+  signal_cap: 0.12

@@ -5,5 +5,6 @@
 - KPI is driven by:
   - Manual baseline file: `release_kpis/kpi_<version>.json`
   - Telemetry overlay (optional): `scripts/kpi_compute.py`
+  - Insights telemetry (optional): `release_kpis/insights_metrics.json`
   - Issue deltas: `scripts/kpi_from_issues.py` -> `release_kpis/issue_deltas.json`
   - Gate + history: `scripts/kpi_gate.py` -> `release_kpis/history.json`

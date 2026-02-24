@@ -3,9 +3,9 @@
 ## Counts
 - issues_total: **167**
 - prs_merged: **190**
-- workflows: **29**
-- test_files: **99**
-- doc_files: **326**
+- workflows: **0**
+- test_files: **100**
+- doc_files: **323**
 - security_issues_tagged: **4**
 - committee_cycles_est: **0**
 - issues_with_pr_link_est: **90**
@@ -14,30 +14,39 @@
 - issues_weighted: **1574.8**
 - issues_complexity_weighted: **1981.0**
 - pr_overhead: **285.0**
-- workflows: **145.0**
-- tests: **198.0**
-- docs: **489.0**
+- workflows: **0.0**
+- tests: **200.0**
+- docs: **484.5**
 - committee: **0.0**
-- total_base: **2691.8**
-- total_ctec: **3098.0**
+- total_base: **2544.2**
+- total_ctec: **2782.9**
+- total_ctec_unadjusted: **2950.5**
+- insights_adjustment_hours: **-167.6**
 
 ## Complexity (C-TEC v1.0)
 - avg_index: **1.244**
 - max_index: **1.95**
 - signals: PR diff size, changed files, cross-subsystem touch, issue duration, dependency refs
 
+## Pulse Insights Adjustment
+- insights_present: **True**
+- insights_score: **7.84**
+- signal_count: **0**
+- adjustment_factor: **0.9432x**
+- adjustment_hours: **-167.6**
+
 ## Tiers (Low / Base / High)
 ### Internal @ $150/hr
-- Low:  2478.4 hrs | $371760.0
-- Base: 3098.0 hrs | $464700.0
-- High: 4182.3 hrs | $627345.0
+- Low:  2226.3 hrs | $333949.0
+- Base: 2782.9 hrs | $417437.0
+- High: 3756.9 hrs | $563540.0
 
 ### Executive @ $225/hr
-- Low:  2478.4 hrs | $557640.0
-- Base: 3098.0 hrs | $697050.0
-- High: 4182.3 hrs | $941018.0
+- Low:  2226.3 hrs | $500924.0
+- Base: 2782.9 hrs | $626155.0
+- High: 3756.9 hrs | $845309.0
 
 ### DoD Fully Burdened @ $275/hr
-- Low:  2478.4 hrs | $681560.0
-- Base: 3098.0 hrs | $851950.0
-- High: 4182.3 hrs | $1150132.0
+- Low:  2226.3 hrs | $612241.0
+- Base: 2782.9 hrs | $765301.0
+- High: 3756.9 hrs | $1033156.0

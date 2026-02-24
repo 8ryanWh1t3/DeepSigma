@@ -79,3 +79,44 @@ def test_main_omits_economic_measurability_without_metrics(tmp_path: Path):
 
     payload = json.loads(__import__("subprocess").check_output(["python", str(repo / "scripts" / "kpi_compute.py")], text=True))
     assert "economic_measurability" not in payload
+
+
+def test_parse_insights_metrics_and_summary(tmp_path: Path):
+    repo = tmp_path / "repo"
+    (repo / "scripts").mkdir(parents=True, exist_ok=True)
+    source = Path(__file__).resolve().parents[1] / "scripts" / "kpi_compute.py"
+    (repo / "scripts" / "kpi_compute.py").write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+    (repo / "release_kpis").mkdir(parents=True, exist_ok=True)
+    (repo / "release_kpis" / "insights_metrics.json").write_text(
+        json.dumps(
+            {
+                "insights_score": 8.7,
+                "signals": ["authority_gap", "decision_binding", "refusal_path"],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    module = _load_module(repo)
+    module.ROOT = repo
+
+    insights = module.parse_insights_metrics()
+    assert insights is not None
+    summary = module.summarize_insights(insights)
+    assert summary["present"] is True
+    assert summary["score"] == 8.7
+    assert summary["signals"] == 3
+
+
+def test_main_telemetry_marks_missing_insights(tmp_path: Path):
+    repo = tmp_path / "repo"
+    (repo / "scripts").mkdir(parents=True, exist_ok=True)
+    source = Path(__file__).resolve().parents[1] / "scripts" / "kpi_compute.py"
+    (repo / "scripts" / "kpi_compute.py").write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+
+    payload = json.loads(
+        __import__("subprocess").check_output(["python", str(repo / "scripts" / "kpi_compute.py")], text=True)
+    )
+    telemetry = payload.get("_telemetry", {})
+    assert telemetry["insights_metrics_present"] is False
+    assert telemetry["insights"]["present"] is False
