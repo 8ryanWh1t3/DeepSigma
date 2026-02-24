@@ -10,7 +10,10 @@ DeepSigma is institutional decision infrastructure: capture intent, run governed
 This repository ships as one product line with one version and two editions:
 
 - **CORE edition:** minimal, demo-first, deterministic (`pip install deepsigma`)
-- **ENTERPRISE edition:** extended adapters, dashboards, and ops surfaces (`pip install "deepsigma[enterprise]"`)
+- **ENTERPRISE edition:** extended adapters, dashboards, and ops surfaces (repo-native under `enterprise/`)
+
+Edition boundary ledger:
+- `EDITION_DIFF.md`
 
 ## Quick Start (Core)
 
@@ -52,6 +55,10 @@ Active Core surface at repo root:
 ### Enterprise Mode
 
 Use Enterprise mode when you need connectors, dashboards, extended security, broader telemetry, and integration-heavy workflows.
+
+Dependency note:
+- `pip install "deepsigma[enterprise]"` installs enterprise runtime extras used by telemetry/radar tooling.
+- Full enterprise code surfaces are repository-native under `enterprise/` and are run from source in this repo.
 
 Enterprise surfaces are first-class under:
 
