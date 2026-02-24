@@ -5,6 +5,7 @@ import json
 import math
 from pathlib import Path
 from typing import Dict, List, Tuple
+import textwrap
 
 import matplotlib
 
@@ -60,7 +61,7 @@ def render_overlay(labels: List[str], vectors: List[Tuple[str, List[float]]], ou
     angles = [2 * math.pi * idx / count for idx in range(count)]
     angles += angles[:1]
 
-    fig = plt.figure(figsize=(9, 7), dpi=140)
+    fig = plt.figure(figsize=(10, 8), dpi=140)
     ax = plt.subplot(111, polar=True)
 
     ax.set_theta_offset(math.pi / 2)
@@ -68,20 +69,34 @@ def render_overlay(labels: List[str], vectors: List[Tuple[str, List[float]]], ou
     ax.set_rlabel_position(90)
     ax.set_ylim(0, 10)
     ax.set_xticks(angles[:-1])
-    ax.set_xticklabels(labels, fontsize=9)
+    wrapped_labels = [textwrap.fill(label, width=14) for label in labels]
+    ax.set_xticklabels(wrapped_labels, fontsize=9)
     ax.set_yticks([2, 4, 6, 8, 10])
     ax.set_yticklabels(["2", "4", "6", "8", "10"], fontsize=8)
+    ax.grid(alpha=0.25, linestyle="--", linewidth=0.8)
 
-    palette = ["#1F77B4", "#2CA02C", "#D62728", "#FF7F0E", "#9467BD"]
+    palette = ["#1F77B4", "#2CA02C", "#D62728", "#FF7F0E", "#9467BD", "#8C564B"]
+    latest_idx = len(vectors) - 1
     for idx, (version, vector) in enumerate(vectors):
         values = vector + vector[:1]
         color = palette[idx % len(palette)]
-        alpha = 0.12 + (0.08 * idx)
-        ax.plot(angles, values, linewidth=2, color=color, label=version)
-        ax.fill(angles, values, color=color, alpha=min(alpha, 0.35))
+        if idx == latest_idx:
+            ax.plot(angles, values, linewidth=2.8, color=color, label=f"{version} (latest)")
+            ax.fill(angles, values, color=color, alpha=0.22)
+        else:
+            ax.plot(
+                angles,
+                values,
+                linewidth=1.6,
+                color=color,
+                linestyle=(0, (4, 2)),
+                alpha=0.85,
+                label=version,
+            )
 
-    ax.set_title("Repo KPI Composite Radar (Release Comparison)", y=1.15, fontsize=14, fontweight="bold")
-    ax.legend(loc="upper right", bbox_to_anchor=(1.28, 1.1), frameon=False, fontsize=8)
+    ax.set_title("Repo KPI Composite Radar (Release Comparison)", y=1.16, fontsize=14, fontweight="bold")
+    ax.legend(loc="upper right", bbox_to_anchor=(1.26, 1.12), frameon=False, fontsize=8)
+    fig.text(0.5, 0.03, "Latest release is filled; prior releases are dashed outlines.", ha="center", fontsize=8)
 
     out_png.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(out_png, bbox_inches="tight")

@@ -19,9 +19,9 @@
 - docs: **484.5**
 - committee: **0.0**
 - total_base: **2544.2**
-- total_ctec: **2782.9**
+- total_ctec: **2913.3**
 - total_ctec_unadjusted: **2950.5**
-- insights_adjustment_hours: **-167.6**
+- insights_adjustment_hours: **-37.2**
 
 ## Complexity (C-TEC v1.0)
 - avg_index: **1.244**
@@ -30,23 +30,23 @@
 
 ## Pulse Insights Adjustment
 - insights_present: **True**
-- insights_score: **7.84**
-- signal_count: **0**
-- adjustment_factor: **0.9432x**
-- adjustment_hours: **-167.6**
+- insights_score: **7.13**
+- signal_count: **2**
+- adjustment_factor: **0.9874x**
+- adjustment_hours: **-37.2**
 
 ## Tiers (Low / Base / High)
 ### Internal @ $150/hr
-- Low:  2226.3 hrs | $333949.0
-- Base: 2782.9 hrs | $417437.0
-- High: 3756.9 hrs | $563540.0
+- Low:  2330.7 hrs | $349599.0
+- Base: 2913.3 hrs | $436999.0
+- High: 3933.0 hrs | $589948.0
 
 ### Executive @ $225/hr
-- Low:  2226.3 hrs | $500924.0
-- Base: 2782.9 hrs | $626155.0
-- High: 3756.9 hrs | $845309.0
+- Low:  2330.7 hrs | $524398.0
+- Base: 2913.3 hrs | $655498.0
+- High: 3933.0 hrs | $884922.0
 
 ### DoD Fully Burdened @ $275/hr
-- Low:  2226.3 hrs | $612241.0
-- Base: 2782.9 hrs | $765301.0
-- High: 3756.9 hrs | $1033156.0
+- Low:  2330.7 hrs | $640931.0
+- Base: 2913.3 hrs | $801164.0
+- High: 3933.0 hrs | $1081571.0

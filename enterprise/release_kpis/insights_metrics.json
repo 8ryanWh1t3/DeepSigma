@@ -1,23 +1,40 @@
 {
   "schema": "pulse_insights_v1",
-  "generated_at": "2026-02-24T12:09:24Z",
+  "generated_at": "2026-02-24T12:33:36Z",
   "version": "v2.0.6",
   "source": "pulse",
-  "insights_score": 7.84,
-  "signal_count": 0,
-  "signals": [],
+  "insights_score": 7.13,
+  "signal_count": 2,
+  "signals": [
+    {
+      "id": "open_p0_caps",
+      "severity": "high",
+      "message": "One or more KPI tracks report open P0 caps.",
+      "value": {
+        "kpi_tracks": 2
+      }
+    },
+    {
+      "id": "kpi_mean_low",
+      "severity": "medium",
+      "message": "Merged KPI mean is below target threshold (6.0).",
+      "value": {
+        "kpi_average": 5.72
+      }
+    }
+  ],
   "inputs": {
     "issue_deltas_present": true,
     "kpi_merged_present": true,
     "history_present": true
   },
   "diagnostics": {
-    "closed_since_total": 42,
-    "open_total": 6,
-    "credit_delta_total": 5.3,
+    "closed_since_total": 61,
+    "open_total": 32,
+    "credit_delta_total": 7.84,
     "debt_delta_total": 0.0,
-    "open_p0_caps": 0,
-    "kpi_average": 7.98,
+    "open_p0_caps": 2,
+    "kpi_average": 5.72,
     "kpi_average_delta": 0.0
   }
 }
