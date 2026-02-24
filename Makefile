@@ -3,7 +3,8 @@
 	edition-guard secret-scan security-gate openapi-check version-sync-check \
 	test-money release-artifacts pulse-insights \
 	icr-health pcr-health tec-ctec health-summary health-v2 \
-	icr-health-gh pcr-health-gh health-v2-gh tec
+	icr-health-gh pcr-health-gh health-v2-gh tec \
+	roadmap-refresh roadmap-gate
 
 demo:
 	bash run_money_demo.sh
@@ -79,3 +80,11 @@ pcr-health-gh:
 	python enterprise/scripts/pr_complexity_watcher.py --from-gh --snapshot
 
 health-v2-gh: icr-health-gh pcr-health-gh tec-ctec health-summary
+
+roadmap-refresh:
+	python enterprise/scripts/roadmap_forecast.py
+	python enterprise/scripts/render_roadmap_badge.py
+	python enterprise/scripts/render_roadmap_timeline.py
+
+roadmap-gate:
+	python enterprise/scripts/roadmap_scope_gate.py
