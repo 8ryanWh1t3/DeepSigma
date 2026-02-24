@@ -11,6 +11,7 @@ from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ENT_ROOT = Path(__file__).resolve().parents[1]
+RK_ROOT = ENT_ROOT / "release_kpis"
 HEALTH_ROOT = ENT_ROOT / "release_kpis" / "health"
 HISTORY_ROOT = HEALTH_ROOT / "history"
 POLICY_PATH = ENT_ROOT / "governance" / "tec_ctec_policy.json"
@@ -357,15 +358,98 @@ def compute(snapshot: bool) -> dict[str, Any]:
     return payload
 
 
+def _build_tier(rate: float, base_hours: float, uncertainty: dict[str, float]) -> dict[str, Any]:
+    low_h = base_hours * float(uncertainty.get("low", 0.8))
+    base_h = base_hours * float(uncertainty.get("base", 1.0))
+    high_h = base_hours * float(uncertainty.get("high", 1.35))
+    return {
+        "rate_hourly": rate,
+        "low": {"hours": round(low_h, 1), "cost": round(rate * low_h, 0)},
+        "base": {"hours": round(base_h, 1), "cost": round(rate * base_h, 0)},
+        "high": {"hours": round(high_h, 1), "cost": round(rate * high_h, 0)},
+    }
+
+
+def write_release_kpi_outputs(payload: dict[str, Any]) -> None:
+    policy = json.loads(POLICY_PATH.read_text(encoding="utf-8"))
+    rates = policy.get("tec_rates", {})
+    uncertainty = policy.get("uncertainty", {"low": 0.8, "base": 1.0, "high": 1.35})
+    base_hours = float(payload["total"]["ctec"])
+
+    tier_data = {
+        "internal": _build_tier(float(rates.get("internal", 150.0)), base_hours, uncertainty),
+        "executive": _build_tier(float(rates.get("executive", 225.0)), base_hours, uncertainty),
+        "dod": _build_tier(float(rates.get("dod", 275.0)), base_hours, uncertainty),
+    }
+
+    for tier, data in tier_data.items():
+        out = {
+            "schema": "tec_ctec_v2_tier",
+            "source": "enterprise/scripts/tec_ctec.py",
+            "tier": tier,
+            "generated_at": payload["generated_at"],
+            "mode": payload["mode"],
+            "core": payload["core"],
+            "enterprise": payload["enterprise"],
+            "total": payload["total"],
+            "factors": payload["factors"],
+            **data,
+        }
+        (RK_ROOT / f"tec_{tier}.json").write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
+
+    md = [
+        "# TEC Summary (C-TEC v2)",
+        "",
+        "## Latest Factors",
+        f"- ICR: **{payload['factors']['icr_status']}** (RCF={payload['factors']['rcf']}, RL_open={payload['factors']['rl_open']})",
+        f"- PCR: **{payload['factors']['load_bucket']}** (CCF={payload['factors']['ccf']}, CL14={payload['factors']['cl14']})",
+        "",
+        "## Edition Metrics",
+        f"- CORE: TEC={payload['core']['tec']} | C-TEC={payload['core']['ctec']} | KPI={payload['core']['controls']['kpi_coverage']}",
+        f"- ENTERPRISE: TEC={payload['enterprise']['tec']} | C-TEC={payload['enterprise']['ctec']} | KPI={payload['enterprise']['controls']['kpi_coverage']}",
+        f"- TOTAL: TEC={payload['total']['tec']} | C-TEC={payload['total']['ctec']} | KPI={payload['total']['controls']['kpi_coverage']}",
+        "",
+        "## Tiers (from TOTAL C-TEC)",
+        "### Internal @ $150/hr",
+        f"- Low:  {tier_data['internal']['low']['hours']} hrs | ${int(tier_data['internal']['low']['cost'])}",
+        f"- Base: {tier_data['internal']['base']['hours']} hrs | ${int(tier_data['internal']['base']['cost'])}",
+        f"- High: {tier_data['internal']['high']['hours']} hrs | ${int(tier_data['internal']['high']['cost'])}",
+        "",
+        "### Executive @ $225/hr",
+        f"- Low:  {tier_data['executive']['low']['hours']} hrs | ${int(tier_data['executive']['low']['cost'])}",
+        f"- Base: {tier_data['executive']['base']['hours']} hrs | ${int(tier_data['executive']['base']['cost'])}",
+        f"- High: {tier_data['executive']['high']['hours']} hrs | ${int(tier_data['executive']['high']['cost'])}",
+        "",
+        "### DoD Fully Burdened @ $275/hr",
+        f"- Low:  {tier_data['dod']['low']['hours']} hrs | ${int(tier_data['dod']['low']['cost'])}",
+        f"- Base: {tier_data['dod']['base']['hours']} hrs | ${int(tier_data['dod']['base']['cost'])}",
+        f"- High: {tier_data['dod']['high']['hours']} hrs | ${int(tier_data['dod']['high']['cost'])}",
+        "",
+        "## Why This Is More Accurate",
+        "- Uses edition-scoped inventory plus full-repo `total` scope, so complexity is measured across actual shipped surfaces.",
+        "- Applies live governance factors (`RCF` from issue risk health, `CCF` from 14-day PR change load) instead of static effort-only multipliers.",
+        "- Computes C-TEC as control-adjusted complexity (`TEC x KPI_Coverage x RCF x CCF`), which reflects execution discipline, not just size.",
+        "- Produces deterministic daily snapshots (`ICR/PCR/TEC`) so trend direction is measurable and auditable over time.",
+        "",
+    ]
+    (RK_ROOT / "TEC_SUMMARY.md").write_text("\n".join(md), encoding="utf-8")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--snapshot", action="store_true", help="Write daily dated snapshot JSON.")
     args = parser.parse_args()
 
     payload = compute(snapshot=args.snapshot)
+    write_release_kpi_outputs(payload)
+
     print(f"Wrote: {HEALTH_ROOT / 'tec_ctec_latest.json'}")
     print(f"Wrote: {HEALTH_ROOT / 'tec_ctec_latest.md'}")
     print(f"Wrote: {HEALTH_ROOT / 'xray_health_block.md'}")
+    print(f"Wrote: {RK_ROOT / 'TEC_SUMMARY.md'}")
+    print(f"Wrote: {RK_ROOT / 'tec_internal.json'}")
+    print(f"Wrote: {RK_ROOT / 'tec_executive.json'}")
+    print(f"Wrote: {RK_ROOT / 'tec_dod.json'}")
     if args.snapshot:
         print("Wrote: daily TEC snapshot")
 

@@ -3,7 +3,7 @@
 	edition-guard secret-scan security-gate openapi-check version-sync-check \
 	test-money release-artifacts pulse-insights \
 	icr-health pcr-health tec-ctec health-summary health-v2 \
-	icr-health-gh pcr-health-gh health-v2-gh
+	icr-health-gh pcr-health-gh health-v2-gh tec
 
 demo:
 	bash run_money_demo.sh
@@ -64,6 +64,8 @@ pcr-health:
 
 tec-ctec:
 	python enterprise/scripts/tec_ctec.py --snapshot
+
+tec: tec-ctec
 
 health-summary:
 	python enterprise/scripts/health_summary.py

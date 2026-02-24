@@ -125,6 +125,12 @@ def build_summary() -> str:
             "- Rule: if C-TEC drops while TEC rises across snapshots, treat as unmanaged complexity drift.",
             "- Action: open drift event + patch plan, freeze net-new capability until control recovers.",
             "",
+            "## Accuracy Notes",
+            "",
+            "- `TOTAL` now measures full-repo scope, while `CORE` and `ENTERPRISE` stay edition-specific for boundary clarity.",
+            "- C-TEC is control-adjusted using current governance posture (`ICR -> RCF`) and current change pressure (`PCR/CL14 -> CCF`).",
+            "- Snapshot history provides time-series evidence, reducing one-off metric noise and making degradation/recovery explicit.",
+            "",
         ]
     )
     return "\n".join(lines)
