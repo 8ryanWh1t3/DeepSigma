@@ -74,6 +74,18 @@ make enterprise-demo
 make test-enterprise
 ```
 
+## Release Artifacts
+
+Build both edition artifacts from one version line:
+
+```bash
+make release-artifacts
+```
+
+Outputs in `dist/`:
+- `deepsigma-core-vX.Y.Z.zip`
+- `deepsigma-enterprise-vX.Y.Z.zip`
+
 ## Full Platform References
 
 For the full-platform docs and architecture map, use parked docs directly:
