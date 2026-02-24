@@ -77,8 +77,8 @@ jobs:
                       hits.append(str(p))
                       break
           if hits:
-              raise SystemExit(f\"Potential secret patterns found: {hits[:10]}\")
-          print(\"PASS: quick secret scan\")
+              raise SystemExit(f"Potential secret patterns found: {hits[:10]}")
+          print("PASS: quick secret scan")
           PY
 
       - name: Build core CI report
