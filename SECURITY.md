@@ -24,18 +24,16 @@ response within **5 business days** indicating next steps.
 
 The following are in scope for security reports:
 
-- **engine/** — supervisor scaffold, degrade ladder, policy loader
-- **coherence_ops/** — audit, scoring, reconciler, memory graph
-- **verifiers/** — read-after-write, invariant checks
-- **tools/** — run_supervised, validate_examples, drift_to_patch
-- **specs/** — JSON Schema definitions
-- **policy_packs/** — versioned enforcement bundles
+- **src/core/** — CORE audit, scoring, reconciler, memory graph
+- **enterprise/src/** — ENTERPRISE adapters, services, governance modules
+- **enterprise/schemas/** — JSON Schema definitions
+- **enterprise/policy_packs/** — versioned enforcement bundles
 
 The following are out of scope:
 
-- **mermaid/**, **wiki/**, **docs/** — documentation only (no executable code)
-- **rdf/** — ontology and SPARQL definitions (no executable code)
-- **dashboard/demo.html** — static demo file
+- **enterprise/docs/mermaid/**, **enterprise/docs/wiki/**, **docs/** — documentation only
+- **enterprise/docs/rdf/** — ontology and SPARQL definitions (no executable code)
+- **enterprise/dashboard/demo.html** — static demo file
 
 ## Disclosure Policy
 

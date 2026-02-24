@@ -35,6 +35,52 @@ jobs:
           bash run_money_demo.sh
           python -m pytest tests/test_money_demo.py -q
 
+      - name: Core package boundary check
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          roots = [
+              p.name
+              for p in Path("src").iterdir()
+              if p.is_dir() and not p.name.endswith(".egg-info")
+          ]
+          allowed = {"core", "coherence_ops"}
+          bad = sorted(set(roots) - allowed)
+          if bad:
+              raise SystemExit(f"Unexpected src packages for CORE gate: {bad}")
+          print("PASS: CORE package boundary")
+          PY
+
+      - name: Secret pattern scan (quick)
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          patterns = [
+              re.compile(r"AKIA[0-9A-Z]{16}"),
+              re.compile(r"ghp_[A-Za-z0-9]{36}"),
+              re.compile(r"-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----"),
+          ]
+          skip = {".git", ".venv", "enterprise", "node_modules"}
+          hits = []
+          for p in Path(".").rglob("*"):
+              if not p.is_file():
+                  continue
+              if any(part in skip for part in p.parts):
+                  continue
+              try:
+                  text = p.read_text(encoding="utf-8", errors="ignore")
+              except Exception:
+                  continue
+              for pat in patterns:
+                  if pat.search(text):
+                      hits.append(str(p))
+                      break
+          if hits:
+              raise SystemExit(f"Potential secret patterns found: {hits[:10]}")
+          print("PASS: quick secret scan")
+          PY
+
       - name: Build core CI report
         run: |
           mkdir -p docs/examples/demo-stack

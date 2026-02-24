@@ -50,7 +50,7 @@ def main() -> int:
     env["PYTHONPATH"] = str(ROOT / "src")
 
     steps = [
-        run([sys.executable, "-m", "coherence_ops.examples.drift_patch_cycle"], env),
+        run([sys.executable, "-m", "core.examples.drift_patch_cycle"], env),
         run([sys.executable, "-m", "pytest", "tests/test_money_demo.py", "-q"], env),
     ]
 

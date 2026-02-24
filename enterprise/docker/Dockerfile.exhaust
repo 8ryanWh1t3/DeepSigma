@@ -1,0 +1,70 @@
+# syntax=docker/dockerfile:1
+# ── Exhaust Inbox standalone service ─────────────────────────
+# FastAPI service for AI interaction exhaust ingestion.
+# Runs independently of the dashboard — no UI, no nginx.
+#
+#   docker run -p 8001:8001 \
+#     -e EXHAUST_USE_LLM=1 \
+#     -e ANTHROPIC_API_KEY=sk-ant-... \
+#     -v ./data:/app/data \
+#     ghcr.io/8ryanwh1t3/deepsigma-exhaust
+#
+# Build with LLM extraction support (opt-in):
+#   docker build -f Dockerfile.exhaust --build-arg INSTALL_LLM=1 .
+# ─────────────────────────────────────────────────────────────
+FROM python:3.12-slim
+
+LABEL org.opencontainers.image.source="https://github.com/8ryanWh1t3/DeepSigma"
+LABEL org.opencontainers.image.description="Σ OVERWATCH Exhaust Inbox — standalone ingestion service"
+LABEL org.opencontainers.image.licenses="MIT"
+
+RUN pip install --no-cache-dir \
+    "fastapi>=0.104.0" \
+    "uvicorn[standard]>=0.24.0" \
+    "jsonschema" \
+    "referencing>=0.35.0" \
+    "pyyaml>=6.0"
+
+WORKDIR /app
+
+COPY pyproject.toml /app/
+COPY dashboard/server/ /app/dashboard/server/
+RUN touch /app/dashboard/__init__.py /app/dashboard/server/__init__.py
+COPY src/engine/ /app/engine/
+COPY src/core/ /app/core/
+COPY src/verifiers/ /app/verifiers/
+COPY src/tools/ /app/tools/
+COPY schemas/ /app/schemas/
+COPY src/adapters/ /app/adapters/
+
+RUN pip install --no-cache-dir -e /app
+
+# Optional: install Anthropic client for LLM-backed extraction
+# Build with --build-arg INSTALL_LLM=1 to include it
+ARG INSTALL_LLM=0
+RUN if [ "$INSTALL_LLM" = "1" ]; then \
+    pip install --no-cache-dir "anthropic>=0.40.0"; \
+    fi
+
+# Optional: install httpx for local LLM inference (llama.cpp, Ollama, vLLM, etc.)
+# Build with --build-arg INSTALL_LOCAL=1 to include it
+ARG INSTALL_LOCAL=0
+RUN if [ "$INSTALL_LOCAL" = "1" ]; then \
+    pip install --no-cache-dir "httpx>=0.25.0"; \
+    fi
+
+# Data directory for episode/drift storage (mount volume here)
+RUN mkdir -p /app/data
+
+ENV PYTHONPATH=/app
+# Set EXHAUST_USE_LLM=1 at runtime to enable LLM extraction
+ENV EXHAUST_USE_LLM=0
+
+EXPOSE 8001
+
+# Use urllib (stdlib) — no curl needed in slim image
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8001/healthz')"
+
+CMD ["uvicorn", "dashboard.server.exhaust_main:app", \
+     "--host", "0.0.0.0", "--port", "8001", "--workers", "1"]
