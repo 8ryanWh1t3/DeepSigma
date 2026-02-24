@@ -1,7 +1,7 @@
 .PHONY: demo core-demo core-baseline test-core core-ci \
 	enterprise-demo test-enterprise enterprise-ci \
 	edition-guard secret-scan security-gate openapi-check version-sync-check \
-	test-money release-artifacts
+	test-money release-artifacts pulse-insights
 
 demo:
 	bash run_money_demo.sh
@@ -50,3 +50,6 @@ version-sync-check:
 
 release-artifacts:
 	python enterprise/scripts/build_release_artifacts.py
+
+pulse-insights:
+	python enterprise/scripts/pulse_insights.py

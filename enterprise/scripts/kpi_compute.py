@@ -60,6 +60,53 @@ def parse_scalability_metrics() -> dict | None:
     return obj
 
 
+def parse_insights_metrics() -> dict | None:
+    path = ROOT / "release_kpis" / "insights_metrics.json"
+    if not path.exists():
+        return None
+    try:
+        obj = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    if not isinstance(obj, dict):
+        return None
+    return obj
+
+
+def summarize_insights(metrics: dict | None) -> dict:
+    if not metrics:
+        return {
+            "present": False,
+            "source": "release_kpis/insights_metrics.json",
+            "score": None,
+            "signals": 0,
+        }
+
+    score = None
+    for key in ("insights_score", "score", "coverage_score"):
+        value = metrics.get(key)
+        if isinstance(value, (int, float)):
+            score = round(clamp(float(value)), 2)
+            break
+
+    signals = metrics.get("signals")
+    if isinstance(signals, list):
+        signal_count = len(signals)
+    elif isinstance(signals, dict):
+        signal_count = len(signals.keys())
+    elif isinstance(metrics.get("signal_count"), int):
+        signal_count = int(metrics["signal_count"])
+    else:
+        signal_count = 0
+
+    return {
+        "present": True,
+        "source": "release_kpis/insights_metrics.json",
+        "score": score,
+        "signals": signal_count,
+    }
+
+
 def is_kpi_eligible(metrics: dict) -> bool:
     return bool(metrics.get("kpi_eligible")) and metrics.get("evidence_level") == "real_workload"
 
@@ -182,6 +229,7 @@ def main() -> int:
     docs_root = ROOT / "docs" / "docs"
     metrics = parse_security_metrics()
     scalability_metrics = parse_scalability_metrics()
+    insights_metrics = parse_insights_metrics()
     out = {
         "technical_completeness": round(score_technical_completeness(), 2),
         "automation_depth": round(score_automation_depth(), 2),
@@ -194,6 +242,8 @@ def main() -> int:
             "docs_md": len(list(docs_root.glob("**/*.md"))) if docs_root.exists() else 0,
             "security_metrics_present": metrics is not None,
             "scalability_metrics_present": scalability_metrics is not None,
+            "insights_metrics_present": insights_metrics is not None,
+            "insights": summarize_insights(insights_metrics),
         },
     }
     if metrics is not None:

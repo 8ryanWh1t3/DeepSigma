@@ -55,6 +55,7 @@ def main() -> int:
     # Merge telemetry into kpi_{version}_merged.json.
     subprocess.check_call(["python", "scripts/kpi_merge.py"])
     merged = outdir / f"kpi_{version}_merged.json"
+    merged_data = json.loads(merged.read_text(encoding="utf-8"))
 
     # Render radar + badge from merged values.
     subprocess.check_call(
@@ -98,6 +99,27 @@ def main() -> int:
     tec_internal_data = json.loads(tec_internal.read_text(encoding="utf-8"))
     tec_executive_data = json.loads(tec_executive.read_text(encoding="utf-8"))
     tec_dod_data = json.loads(tec_dod.read_text(encoding="utf-8"))
+    telemetry = merged_data.get("telemetry", {})
+    insights = telemetry.get("insights", {})
+    insights_section = ""
+    if isinstance(insights, dict) and insights.get("present"):
+        score = insights.get("score")
+        score_text = "n/a" if score is None else f"{float(score):.2f}/10"
+        signal_count = int(insights.get("signals", 0))
+        source = str(insights.get("source", "release_kpis/insights_metrics.json"))
+        insights_section = (
+            "\n"
+            "**Insights Metrics:**\n"
+            f"- Score: {score_text}\n"
+            f"- Signals: {signal_count}\n"
+            f"- Source: `{source}`\n"
+        )
+    else:
+        insights_section = (
+            "\n"
+            "**Insights Metrics:**\n"
+            "- Not present (`release_kpis/insights_metrics.json` not found)\n"
+        )
     layer_coverage = format_layer_coverage()
 
     comment = f"""## Repo Radar KPI — {version}
@@ -147,6 +169,7 @@ def main() -> int:
 - Some KPIs are auto-derived from repo telemetry (tests, docs, workflows, pilot drills).
 - Economic and Scalability are auto-derived from DISR metrics and capped by evidence eligibility (`kpi_eligible` / `evidence_level`).
 - Authority Modeling remains manual/judgment-based until authority telemetry scoring is wired.
+{insights_section}
 {layer_coverage}
 """
     (outdir / "PR_COMMENT.md").write_text(comment, encoding="utf-8")
