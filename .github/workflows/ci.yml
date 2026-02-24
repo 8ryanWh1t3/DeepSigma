@@ -301,7 +301,7 @@ jobs:
           python -m sigstore sign --output-directory dist --overwrite dist/*.whl dist/*.tar.gz
 
       - name: Generate SLSA provenance attestations (dist)
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v3
         with:
           subject-path: "dist/*"
 
@@ -364,7 +364,7 @@ jobs:
             -o spdx-json=dist/deepsigma-${{ github.ref_name }}-image.sbom.spdx.json
 
       - name: Generate SLSA provenance attestation (container image)
-        uses: actions/attest-build-provenance@v2
+        uses: actions/attest-build-provenance@v3
         with:
           subject-name: ${{ env.IMAGE_NAME }}
           subject-digest: ${{ steps.build-image.outputs.digest }}
