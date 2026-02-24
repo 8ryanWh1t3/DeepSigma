@@ -1,0 +1,82 @@
+{
+  "_meta": {
+    "description": "Mock data for CoherenceOps and LLM Data Model dashboard panels",
+    "version": "1.0.0",
+    "generated": "2026-02-16T14:00:00Z",
+    "panels": ["core", "llm_data_model"]
+  },
+
+  "core": {
+    "pipeline_health": {
+      "overall_score": 72,
+      "grade": "C",
+      "last_updated": "2026-02-16T14:00:00Z",
+      "dimensions": {
+        "dlr_coverage": { "score": 95, "status": "healthy", "description": "Decision Ledger Records" },
+        "rs_completeness": { "score": 80, "status": "healthy", "description": "Reasoning Scaffolds" },
+        "ds_resolution": { "score": 45, "status": "degraded", "description": "Drift Signals" },
+        "mg_connectivity": { "score": 70, "status": "warning", "description": "Memory Graph" }
+      }
+    },
+    "drift_summary": {
+      "total_active": 5,
+      "by_severity": { "red": 2, "yellow": 2, "green": 1 },
+      "oldest_unresolved_hours": 72,
+      "mean_time_to_patch_hours": 4.2
+    },
+    "seal_rate": {
+      "last_24h": 47,
+      "last_7d": 312,
+      "last_30d": 1284,
+      "seal_integrity_pct": 99.8
+    },
+    "iris_queries": {
+      "last_24h": 23,
+      "top_types": [
+        { "type": "WHY", "count": 12 },
+        { "type": "WHAT_DRIFTED", "count": 6 },
+        { "type": "RECALL", "count": 3 },
+        { "type": "STATUS", "count": 2 }
+      ]
+    }
+  },
+
+  "llm_data_model": {
+    "record_counts": {
+      "Claim": { "total": 2847, "fresh": 2103, "stale": 744 },
+      "Episode": { "total": 1284, "fresh": 1198, "stale": 86 },
+      "Document": { "total": 456, "fresh": 389, "stale": 67 },
+      "Event": { "total": 3921, "fresh": 3654, "stale": 267 },
+      "Entity": { "total": 892, "fresh": 801, "stale": 91 },
+      "Metric": { "total": 5634, "fresh": 5412, "stale": 222 }
+    },
+    "knowledge_graph": {
+      "total_nodes": 15034,
+      "total_edges": 42891,
+      "avg_degree": 5.7,
+      "connected_components": 3,
+      "freshness_summary": {
+        "fresh_pct": 87.2,
+        "warning_pct": 8.1,
+        "stale_pct": 4.7
+      }
+    },
+    "ttl_compliance": {
+      "overall_pct": 91.3,
+      "by_type": {
+        "Claim": 73.8,
+        "Episode": 93.3,
+        "Document": 85.3,
+        "Event": 93.2,
+        "Entity": 89.8,
+        "Metric": 96.1
+      }
+    },
+    "canonical_coverage": {
+      "dlr_mapped_pct": 98.2,
+      "rs_mapped_pct": 94.1,
+      "ds_mapped_pct": 87.6,
+      "mg_mapped_pct": 91.4
+    }
+  }
+}

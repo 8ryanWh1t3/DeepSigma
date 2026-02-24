@@ -1,0 +1,53 @@
+# syntax=docker/dockerfile:1
+# ── Σ OVERWATCH MCP Server ───────────────────────────────────
+# JSON-RPC stdio server implementing the Model Context Protocol.
+# MCP clients launch this as a subprocess and pipe stdin/stdout.
+#
+# Claude Desktop config (~/.claude/claude_desktop_config.json):
+#   {
+#     "mcpServers": {
+#       "deepsigma": {
+#         "command": "docker",
+#         "args": ["run", "--rm", "-i",
+#                  "-v", "/path/to/data:/app/data",
+#                  "ghcr.io/8ryanwh1t3/deepsigma-mcp"]
+#       }
+#     }
+#   }
+#
+# Direct usage (pipe JSON-RPC over stdin):
+#   echo '{"jsonrpc":"2.0","method":"tools/list","id":1}' | \
+#     docker run --rm -i ghcr.io/8ryanwh1t3/deepsigma-mcp
+# ─────────────────────────────────────────────────────────────
+FROM python:3.12-slim
+
+LABEL org.opencontainers.image.source="https://github.com/8ryanWh1t3/DeepSigma"
+LABEL org.opencontainers.image.version="1.0.0"
+LABEL org.opencontainers.image.description="Σ OVERWATCH MCP Server — JSON-RPC stdio server for Model Context Protocol clients"
+LABEL org.opencontainers.image.licenses="MIT"
+
+RUN pip install --no-cache-dir \
+    "jsonschema" \
+    "referencing>=0.35.0" \
+    "pyyaml>=6.0"
+
+WORKDIR /app
+
+COPY pyproject.toml /app/
+COPY src/adapters/mcp/ /app/adapters/mcp/
+COPY src/adapters/__init__.py /app/adapters/__init__.py
+COPY src/engine/ /app/engine/
+COPY src/core/ /app/core/
+COPY src/verifiers/ /app/verifiers/
+COPY src/tools/ /app/tools/
+COPY schemas/ /app/schemas/
+
+RUN pip install --no-cache-dir -e /app
+
+# Episode/drift data accessible to MCP tools
+RUN mkdir -p /app/data
+
+ENV PYTHONPATH=/app
+
+# stdin/stdout for JSON-RPC — run with: docker run -i
+CMD ["python", "-u", "adapters/mcp/mcp_server_scaffold.py"]

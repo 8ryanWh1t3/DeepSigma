@@ -7,10 +7,10 @@
 
 DeepSigma is institutional decision infrastructure: capture intent, run governed execution, detect drift, and patch safely.
 
-This repository is intentionally structured with two modes:
+This repository ships as one product line with one version and two editions:
 
-- **Core mode (active at repo root):** minimal, demo-first, deterministic.
-- **Enterprise mode (parked):** full platform surface preserved under [`_park_enterprise/`](_park_enterprise/).
+- **CORE edition:** minimal, demo-first, deterministic (`pip install deepsigma`)
+- **ENTERPRISE edition:** extended adapters, dashboards, and ops surfaces (`pip install "deepsigma[enterprise]"`)
 
 ## Quick Start (Core)
 
@@ -45,7 +45,7 @@ Use Core mode when you need fast adoption and low cognitive load.
 Active Core surface at repo root:
 
 - `run_money_demo.sh`
-- `src/coherence_ops/`
+- `src/core/`
 - `docs/examples/demo-stack/`
 - `tests/test_money_demo.py`
 
@@ -53,29 +53,36 @@ Active Core surface at repo root:
 
 Use Enterprise mode when you need connectors, dashboards, extended security, broader telemetry, and integration-heavy workflows.
 
-Enterprise surfaces are preserved in:
+Enterprise surfaces are first-class under:
 
-- [`_park_enterprise/README.md`](_park_enterprise/README.md)
+- [`enterprise/README.md`](enterprise/README.md)
 
 Examples of parked modules:
 
-- `_park_enterprise/dashboard/`
-- `_park_enterprise/docker/`
-- `_park_enterprise/release_kpis/`
-- `_park_enterprise/schemas/`
-- `_park_enterprise/scripts/`
-- `_park_enterprise/src/` (non-core packages)
-- `_park_enterprise/docs/` (full enterprise docs)
+- `enterprise/dashboard/`
+- `enterprise/docker/`
+- `enterprise/release_kpis/`
+- `enterprise/schemas/`
+- `enterprise/scripts/`
+- `enterprise/src/` (non-core packages)
+- `enterprise/docs/` (full enterprise docs)
+
+Run the enterprise wedge:
+
+```bash
+make enterprise-demo
+make test-enterprise
+```
 
 ## Full Platform References
 
 For the full-platform docs and architecture map, use parked docs directly:
 
-- `_park_enterprise/docs/positioning/positioning_manifesto.md`
-- `_park_enterprise/docs/positioning/executive_briefing_one_page.md`
-- `_park_enterprise/docs/release/`
-- `_park_enterprise/docs/security/`
-- `_park_enterprise/docs/mermaid/`
+- `enterprise/docs/positioning/positioning_manifesto.md`
+- `enterprise/docs/positioning/executive_briefing_one_page.md`
+- `enterprise/docs/release/`
+- `enterprise/docs/security/`
+- `enterprise/docs/mermaid/`
 
 ## Repo Intent
 

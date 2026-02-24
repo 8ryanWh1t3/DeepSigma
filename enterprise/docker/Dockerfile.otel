@@ -1,0 +1,60 @@
+# syntax=docker/dockerfile:1
+# ── Σ OVERWATCH OTel Sidecar ─────────────────────────────────
+# Watches /app/data/{episodes,drift}/ for new JSON files and
+# exports them to an OTLP collector as OTel spans.
+#
+# Usage:
+#   docker run \
+#     -e OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317 \
+#     -v ./data:/app/data \
+#     ghcr.io/8ryanwh1t3/deepsigma-otel
+#
+# Build variants:
+#   default       — console exporter (no OTLP packages)
+#   --build-arg INSTALL_OTLP=grpc  — gRPC OTLP (port 4317)
+#   --build-arg INSTALL_OTLP=http  — HTTP OTLP (port 4318)
+#   --build-arg INSTALL_OTLP=both  — both transports
+# ─────────────────────────────────────────────────────────────
+FROM python:3.12-slim
+
+LABEL org.opencontainers.image.source="https://github.com/8ryanWh1t3/DeepSigma"
+LABEL org.opencontainers.image.description="Σ OVERWATCH OTel Sidecar — exports episodes and drift events to OTLP"
+LABEL org.opencontainers.image.licenses="MIT"
+
+RUN pip install --no-cache-dir \
+    "opentelemetry-api>=1.20.0" \
+    "opentelemetry-sdk>=1.20.0" \
+    "jsonschema" \
+    "referencing>=0.35.0" \
+    "pyyaml>=6.0"
+
+# Optional OTLP transport — install at build time via --build-arg INSTALL_OTLP=grpc|http|both
+ARG INSTALL_OTLP=none
+RUN if [ "$INSTALL_OTLP" = "grpc" ] || [ "$INSTALL_OTLP" = "both" ]; then \
+      pip install --no-cache-dir "opentelemetry-exporter-otlp-proto-grpc>=1.20.0"; \
+    fi && \
+    if [ "$INSTALL_OTLP" = "http" ] || [ "$INSTALL_OTLP" = "both" ]; then \
+      pip install --no-cache-dir "opentelemetry-exporter-otlp-proto-http>=1.20.0"; \
+    fi
+
+WORKDIR /app
+
+COPY pyproject.toml /app/
+COPY src/adapters/otel/ /app/adapters/otel/
+COPY src/adapters/__init__.py /app/adapters/__init__.py
+COPY src/engine/ /app/engine/
+COPY src/core/ /app/core/
+COPY schemas/ /app/schemas/
+
+RUN pip install --no-cache-dir -e /app
+
+# Watched directories (mount your data volume here)
+RUN mkdir -p /app/data/episodes /app/data/drift /app/data/exported
+
+ENV PYTHONPATH=/app
+# Set at runtime: -e OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+ENV OTEL_EXPORTER_OTLP_ENDPOINT=""
+ENV OTEL_SERVICE_NAME=sigma-overwatch
+ENV SIDECAR_POLL_INTERVAL=5
+
+CMD ["python", "-u", "adapters/otel/sidecar.py"]
