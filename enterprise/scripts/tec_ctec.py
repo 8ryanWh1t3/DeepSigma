@@ -220,9 +220,11 @@ def compute(snapshot: bool) -> dict[str, Any]:
 
     inv_core = build_inventory("core", policy)
     inv_ent = build_inventory("enterprise", policy)
+    inv_total = build_inventory("total", policy)
 
     tec_core = tec_score(inv_core, policy)
     tec_ent = tec_score(inv_ent, policy)
+    tec_total = tec_score(inv_total, policy)
 
     core_cov = control_coverage_core()
     ent_cov = control_coverage_enterprise()
@@ -235,6 +237,9 @@ def compute(snapshot: bool) -> dict[str, Any]:
 
     ctec_core = tec_core * control_core
     ctec_ent = tec_ent * control_ent
+    kpi_cov_total = round((core_cov["kpi_coverage"] + ent_cov["kpi_coverage"]) / 2.0, 4)
+    control_total = kpi_cov_total * rcf * ccf
+    ctec_total = tec_total * control_total
 
     payload: dict[str, Any] = {
         "schema": "tec_ctec_v2",
@@ -269,6 +274,19 @@ def compute(snapshot: bool) -> dict[str, Any]:
             "ctec": round(ctec_ent, 2),
             "r_tec": round(tec_ent + (2 * rl_open), 2),
         },
+        "total": {
+            "inventory": inv_total.__dict__,
+            "tec": round(tec_total, 2),
+            "controls": {
+                "required": core_cov["required"] + ent_cov["required"],
+                "passed": core_cov["passed"] + ent_cov["passed"],
+                "kpi_coverage": kpi_cov_total,
+                "checks_scope": "composite(core+enterprise)",
+            },
+            "control_coverage": round(control_total, 4),
+            "ctec": round(ctec_total, 2),
+            "r_tec": round(tec_total + (2 * rl_open), 2),
+        },
     }
 
     HEALTH_ROOT.mkdir(parents=True, exist_ok=True)
@@ -301,6 +319,13 @@ def compute(snapshot: bool) -> dict[str, Any]:
         f"- C-TEC: **{payload['enterprise']['ctec']}**",
         f"- R-TEC: **{payload['enterprise']['r_tec']}**",
         "",
+        "## TOTAL",
+        f"- TEC: **{payload['total']['tec']}**",
+        f"- KPI coverage: **{payload['total']['controls']['kpi_coverage']}**",
+        f"- Control coverage: **{payload['total']['control_coverage']}**",
+        f"- C-TEC: **{payload['total']['ctec']}**",
+        f"- R-TEC: **{payload['total']['r_tec']}**",
+        "",
     ]
     latest_md.write_text("\n".join(lines), encoding="utf-8")
 
@@ -314,6 +339,10 @@ def compute(snapshot: bool) -> dict[str, Any]:
         (
             f"ENT: TEC={payload['enterprise']['tec']} | KPI={payload['enterprise']['controls']['kpi_coverage']} "
             f"| ICR={icr_status} | CL14={cl14} | C-TEC={payload['enterprise']['ctec']}"
+        ),
+        (
+            f"TOTAL: TEC={payload['total']['tec']} | KPI={payload['total']['controls']['kpi_coverage']} "
+            f"| ICR={icr_status} | CL14={cl14} | C-TEC={payload['total']['ctec']}"
         ),
         "",
     ]

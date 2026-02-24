@@ -38,6 +38,7 @@ def _series(prefix: str) -> list[tuple[str, dict[str, Any]]]:
 def _pick_row(stamp: str, tec: dict[str, Any] | None, icr: dict[str, Any] | None, pcr: dict[str, Any] | None) -> str:
     core_ctec = "-"
     ent_ctec = "-"
+    total_ctec = "-"
     icr_status = "-"
     rl_open = "-"
     cl14 = "-"
@@ -45,13 +46,14 @@ def _pick_row(stamp: str, tec: dict[str, Any] | None, icr: dict[str, Any] | None
     if tec:
         core_ctec = str(tec.get("core", {}).get("ctec", "-"))
         ent_ctec = str(tec.get("enterprise", {}).get("ctec", "-"))
+        total_ctec = str(tec.get("total", {}).get("ctec", "-"))
     if icr:
         icr_status = str(icr.get("status", "-"))
         rl_open = str(icr.get("metrics", {}).get("rl_open", "-"))
     if pcr:
         cl14 = str(pcr.get("cl14", "-"))
 
-    return f"| {stamp} | {core_ctec} | {ent_ctec} | {icr_status} | {rl_open} | {cl14} |"
+    return f"| {stamp} | {core_ctec} | {ent_ctec} | {total_ctec} | {icr_status} | {rl_open} | {cl14} |"
 
 
 def build_summary() -> str:
@@ -80,6 +82,7 @@ def build_summary() -> str:
             [
                 f"- CORE: TEC={tec_latest.get('core', {}).get('tec', '-')} | C-TEC={tec_latest.get('core', {}).get('ctec', '-')} | KPI={tec_latest.get('core', {}).get('controls', {}).get('kpi_coverage', '-')}",
                 f"- ENTERPRISE: TEC={tec_latest.get('enterprise', {}).get('tec', '-')} | C-TEC={tec_latest.get('enterprise', {}).get('ctec', '-')} | KPI={tec_latest.get('enterprise', {}).get('controls', {}).get('kpi_coverage', '-')}",
+                f"- TOTAL: TEC={tec_latest.get('total', {}).get('tec', '-')} | C-TEC={tec_latest.get('total', {}).get('ctec', '-')} | KPI={tec_latest.get('total', {}).get('controls', {}).get('kpi_coverage', '-')}",
             ]
         )
     else:
@@ -99,10 +102,10 @@ def build_summary() -> str:
     else:
         lines.append("- PCR latest not present")
 
-    lines.extend(["", "## 7-Day Trend", "", "| Date | CORE C-TEC | ENT C-TEC | ICR | RL_open | CL14 |", "|---|---:|---:|---|---:|---:|"])
+    lines.extend(["", "## 7-Day Trend", "", "| Date | CORE C-TEC | ENT C-TEC | TOTAL C-TEC | ICR | RL_open | CL14 |", "|---|---:|---:|---:|---|---:|---:|"])
 
     if not stamps:
-        lines.append("| - | - | - | - | - | - |")
+        lines.append("| - | - | - | - | - | - | - |")
     else:
         for stamp in stamps:
             lines.append(
