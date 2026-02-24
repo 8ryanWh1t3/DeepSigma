@@ -401,7 +401,7 @@ jobs:
           pip install -c requirements/locks/release-build.txt sigstore
 
       - name: Download release evidence bundle
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: release-evidence-${{ github.ref_name }}
           path: dist
@@ -484,7 +484,7 @@ jobs:
           PY
 
       - name: Download dashboard build artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: dashboard-dist
           path: dashboard/dist
