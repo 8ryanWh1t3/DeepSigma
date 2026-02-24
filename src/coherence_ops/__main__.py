@@ -1,4 +1,5 @@
-"""Allow running coherence_ops as a module: python -m coherence_ops."""
-from coherence_ops.cli import main
+"""Compatibility entry point for `python -m coherence_ops`."""
+from core.cli import main
 
-main()
+if __name__ == "__main__":
+    raise SystemExit(main())

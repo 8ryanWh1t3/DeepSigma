@@ -6,7 +6,7 @@
 - Platform: macOS-26.3-arm64-arm-64bit
 
 ## Commands
-1. `/opt/anaconda3/bin/python -m coherence_ops.examples.drift_patch_cycle` -> rc=0
+1. `/opt/anaconda3/bin/python -m core.examples.drift_patch_cycle` -> rc=0
 2. `/opt/anaconda3/bin/python -m pytest tests/test_money_demo.py -q` -> rc=0
 
 ## Artifact Hashes

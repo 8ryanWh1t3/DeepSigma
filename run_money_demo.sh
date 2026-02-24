@@ -10,7 +10,7 @@ step() {
 }
 
 step "1/3" "Running Money Demo (Drift -> Patch cycle)"
-python -m coherence_ops.examples.drift_patch_cycle
+python -m core.examples.drift_patch_cycle
 
 step "2/3" "Verifying demo contract"
 python -m pytest tests/test_money_demo.py -q

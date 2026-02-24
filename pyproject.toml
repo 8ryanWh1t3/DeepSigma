@@ -39,6 +39,7 @@ dev = [
 excel = [
     "openpyxl>=3.1.0",
 ]
+enterprise = []
 
 [project.urls]
 Homepage = "https://github.com/8ryanWh1t3/DeepSigma"
@@ -46,11 +47,12 @@ Repository = "https://github.com/8ryanWh1t3/DeepSigma"
 Issues = "https://github.com/8ryanWh1t3/DeepSigma/issues"
 
 [project.scripts]
-coherence = "coherence_ops.cli:main"
+coherence = "core.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 include = [
+    "core*",
     "coherence_ops*",
 ]
 

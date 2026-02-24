@@ -10,13 +10,13 @@ last_updated: "2026-02-16"
 | Field | Value |
 |-------|-------|
 | Date | 2026-02-16 |
-| Script | `coherence_ops/examples/drift_patch_cycle.py` |
+| Script | `core/examples/drift_patch_cycle.py` |
 | Test | `tests/test_money_demo.py` |
 
 ## Command
 
 ```bash
-python -m coherence_ops.examples.drift_patch_cycle
+python -m core.examples.drift_patch_cycle
 ```
 
 ## Console Output (Deterministic)

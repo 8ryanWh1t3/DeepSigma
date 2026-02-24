@@ -19,10 +19,12 @@ import pytest
 # Ensure repo root is importable
 # ---------------------------------------------------------------------------
 _REPO_ROOT = Path(__file__).resolve().parents[1]
-if str(_REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(_REPO_ROOT))
+_SRC_ROOT = _REPO_ROOT / "src"
+for _p in (str(_REPO_ROOT), str(_SRC_ROOT)):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
 
-from coherence_ops.examples.drift_patch_cycle import (  # noqa: E402
+from core.examples.drift_patch_cycle import (  # noqa: E402
     OUTPUT_DIR,
     REQUIRED_ARTIFACTS,
     DRIFT_ID,

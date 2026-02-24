@@ -1,0 +1,1324 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "DeepSigma Dashboard API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/tenants": {
+      "get": {
+        "tags": [
+          "credibility"
+        ],
+        "summary": "Api List Tenants",
+        "description": "Return all registered tenants.",
+        "operationId": "api_list_tenants_api_tenants_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "type": "array",
+                  "title": "Response Api List Tenants Api Tenants Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/{tenant_id}/credibility/snapshot": {
+      "get": {
+        "tags": [
+          "credibility"
+        ],
+        "summary": "Tenant Snapshot",
+        "description": "Return current credibility snapshot for the given tenant.",
+        "operationId": "tenant_snapshot_api__tenant_id__credibility_snapshot_get",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Tenant Snapshot Api  Tenant Id  Credibility Snapshot Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/{tenant_id}/credibility/claims/tier0": {
+      "get": {
+        "tags": [
+          "credibility"
+        ],
+        "summary": "Tenant Claims Tier0",
+        "description": "Return current Tier 0 claim state for the given tenant.",
+        "operationId": "tenant_claims_tier0_api__tenant_id__credibility_claims_tier0_get",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Tenant Claims Tier0 Api  Tenant Id  Credibility Claims Tier0 Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/{tenant_id}/credibility/drift/24h": {
+      "get": {
+        "tags": [
+          "credibility"
+        ],
+        "summary": "Tenant Drift 24H",
+        "description": "Return drift events for the last 24 hours for the given tenant.",
+        "operationId": "tenant_drift_24h_api__tenant_id__credibility_drift_24h_get",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Tenant Drift 24H Api  Tenant Id  Credibility Drift 24H Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/{tenant_id}/credibility/correlation": {
+      "get": {
+        "tags": [
+          "credibility"
+        ],
+        "summary": "Tenant Correlation",
+        "description": "Return correlation cluster map for the given tenant.",
+        "operationId": "tenant_correlation_api__tenant_id__credibility_correlation_get",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Tenant Correlation Api  Tenant Id  Credibility Correlation Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/{tenant_id}/credibility/sync": {
+      "get": {
+        "tags": [
+          "credibility"
+        ],
+        "summary": "Tenant Sync",
+        "description": "Return sync plane integrity for the given tenant.",
+        "operationId": "tenant_sync_api__tenant_id__credibility_sync_get",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Tenant Sync Api  Tenant Id  Credibility Sync Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/{tenant_id}/credibility/packet/generate": {
+      "post": {
+        "tags": [
+          "credibility"
+        ],
+        "summary": "Tenant Generate Packet",
+        "description": "Generate a credibility packet for the given tenant.\n\nEnforces quota limits. Emits audit event.",
+        "operationId": "tenant_generate_packet_api__tenant_id__credibility_packet_generate_post",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Tenant Generate Packet Api  Tenant Id  Credibility Packet Generate Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/{tenant_id}/credibility/packet/seal": {
+      "post": {
+        "tags": [
+          "credibility"
+        ],
+        "summary": "Tenant Seal Packet",
+        "description": "Seal the latest credibility packet. Requires coherence_steward role.\n\nEnforces quota limits. Emits audit events including denied attempts.",
+        "operationId": "tenant_seal_packet_api__tenant_id__credibility_packet_seal_post",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Tenant Seal Packet Api  Tenant Id  Credibility Packet Seal Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/{tenant_id}/policy": {
+      "get": {
+        "tags": [
+          "credibility"
+        ],
+        "summary": "Tenant Get Policy",
+        "description": "Return the current policy for the given tenant.",
+        "operationId": "tenant_get_policy_api__tenant_id__policy_get",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Tenant Get Policy Api  Tenant Id  Policy Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "credibility"
+        ],
+        "summary": "Tenant Update Policy",
+        "description": "Update the policy for the given tenant.\n\nRequires truth_owner or coherence_steward role.\nEmits audit event for POLICY_UPDATE.",
+        "operationId": "tenant_update_policy_api__tenant_id__policy_post",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Tenant Update Policy Api  Tenant Id  Policy Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/{tenant_id}/audit/recent": {
+      "get": {
+        "tags": [
+          "credibility"
+        ],
+        "summary": "Tenant Audit Recent",
+        "description": "Return the most recent audit events for the given tenant.",
+        "operationId": "tenant_audit_recent_api__tenant_id__audit_recent_get",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Tenant Audit Recent Api  Tenant Id  Audit Recent Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/credibility/snapshot": {
+      "get": {
+        "tags": [
+          "credibility"
+        ],
+        "summary": "Get Snapshot",
+        "description": "Alias: credibility snapshot for default tenant.",
+        "operationId": "get_snapshot_api_credibility_snapshot_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Get Snapshot Api Credibility Snapshot Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/credibility/claims/tier0": {
+      "get": {
+        "tags": [
+          "credibility"
+        ],
+        "summary": "Get Claims Tier0",
+        "description": "Alias: Tier 0 claims for default tenant.",
+        "operationId": "get_claims_tier0_api_credibility_claims_tier0_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Get Claims Tier0 Api Credibility Claims Tier0 Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/credibility/drift/24h": {
+      "get": {
+        "tags": [
+          "credibility"
+        ],
+        "summary": "Get Drift 24H",
+        "description": "Alias: drift events for default tenant.",
+        "operationId": "get_drift_24h_api_credibility_drift_24h_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Get Drift 24H Api Credibility Drift 24H Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/credibility/correlation": {
+      "get": {
+        "tags": [
+          "credibility"
+        ],
+        "summary": "Get Correlation",
+        "description": "Alias: correlation clusters for default tenant.",
+        "operationId": "get_correlation_api_credibility_correlation_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Get Correlation Api Credibility Correlation Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/credibility/sync": {
+      "get": {
+        "tags": [
+          "credibility"
+        ],
+        "summary": "Get Sync",
+        "description": "Alias: sync plane integrity for default tenant.",
+        "operationId": "get_sync_api_credibility_sync_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Get Sync Api Credibility Sync Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/credibility/packet": {
+      "get": {
+        "tags": [
+          "credibility"
+        ],
+        "summary": "Get Packet",
+        "description": "Alias: generate packet for default tenant.",
+        "operationId": "get_packet_api_credibility_packet_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Get Packet Api Credibility Packet Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/{tenant_id}/credibility/tiers": {
+      "get": {
+        "tags": [
+          "credibility"
+        ],
+        "summary": "Tenant Tier Summary",
+        "description": "Return evidence tier summary for the given tenant.",
+        "operationId": "tenant_tier_summary_api__tenant_id__credibility_tiers_get",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Tenant Tier Summary Api  Tenant Id  Credibility Tiers Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/{tenant_id}/credibility/tiers/sweep": {
+      "post": {
+        "tags": [
+          "credibility"
+        ],
+        "summary": "Tenant Tier Sweep",
+        "description": "Trigger a tier demotion sweep for the given tenant.",
+        "operationId": "tenant_tier_sweep_api__tenant_id__credibility_tiers_sweep_post",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Tenant Tier Sweep Api  Tenant Id  Credibility Tiers Sweep Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mesh/{tenant_id}/{node_id}/push": {
+      "post": {
+        "tags": [
+          "mesh"
+        ],
+        "summary": "Mesh Push",
+        "description": "Receive pushed records from a peer node.",
+        "operationId": "mesh_push_mesh__tenant_id___node_id__push_post",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          },
+          {
+            "name": "node_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Node Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "title": "Body"
+              },
+              "example": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Mesh Push Mesh  Tenant Id   Node Id  Push Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mesh/{tenant_id}/{node_id}/pull": {
+      "get": {
+        "tags": [
+          "mesh"
+        ],
+        "summary": "Mesh Pull",
+        "description": "Pull records from this node's logs since a given time.",
+        "operationId": "mesh_pull_mesh__tenant_id___node_id__pull_get",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          },
+          {
+            "name": "node_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Node Id"
+            }
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Since"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Mesh Pull Mesh  Tenant Id   Node Id  Pull Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mesh/{tenant_id}/{node_id}/status": {
+      "get": {
+        "tags": [
+          "mesh"
+        ],
+        "summary": "Mesh Node Status",
+        "description": "Return node status.",
+        "operationId": "mesh_node_status_mesh__tenant_id___node_id__status_get",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          },
+          {
+            "name": "node_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Node Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Mesh Node Status Mesh  Tenant Id   Node Id  Status Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mesh/{tenant_id}/summary": {
+      "get": {
+        "tags": [
+          "mesh"
+        ],
+        "summary": "Mesh Summary",
+        "description": "Return mesh summary for a tenant.\n\nAggregates node statuses, last aggregate, last seal,\nand basic verification health.",
+        "operationId": "mesh_summary_mesh__tenant_id__summary_get",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Mesh Summary Mesh  Tenant Id  Summary Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mesh/{tenant_id}/topology": {
+      "get": {
+        "tags": [
+          "mesh"
+        ],
+        "summary": "Mesh Topology",
+        "description": "Return node topology with state and replication lag visibility.",
+        "operationId": "mesh_topology_mesh__tenant_id__topology_get",
+        "parameters": [
+          {
+            "name": "tenant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Tenant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Mesh Topology Mesh  Tenant Id  Topology Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "description": "Autogenerated reference for `GET /api/health`."
+      }
+    },
+    "/api/live": {
+      "get": {
+        "summary": "Liveness",
+        "description": "Liveness endpoint: process is alive regardless of dependency readiness.",
+        "operationId": "liveness_api_live_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ready": {
+      "get": {
+        "summary": "Readiness",
+        "description": "Readiness endpoint: 200 only when persistence is available and not draining.",
+        "operationId": "readiness_api_ready_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/episodes": {
+      "get": {
+        "summary": "Get Episodes",
+        "operationId": "get_episodes_api_episodes_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "description": "Autogenerated reference for `GET /api/episodes`."
+      }
+    },
+    "/api/drifts": {
+      "get": {
+        "summary": "Get Drifts",
+        "operationId": "get_drifts_api_drifts_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "description": "Autogenerated reference for `GET /api/drifts`."
+      }
+    },
+    "/api/agents": {
+      "get": {
+        "summary": "Get Agents",
+        "operationId": "get_agents_api_agents_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "description": "Autogenerated reference for `GET /api/agents`."
+      }
+    },
+    "/api/coherence": {
+      "get": {
+        "summary": "Get Coherence",
+        "description": "Run the full core pipeline and return the scored report.",
+        "operationId": "get_coherence_api_coherence_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/iris": {
+      "post": {
+        "summary": "Query Iris",
+        "description": "Run an IRIS query against the loaded episode corpus.\n\nBody (JSON):\n    query_type  : \"WHY\" | \"WHAT_CHANGED\" | \"WHAT_DRIFTED\" | \"RECALL\" | \"STATUS\"\n    text        : free-text question (optional)\n    episode_id  : target episode ID (optional)\n    decision_type: filter by decision type (optional)",
+        "operationId": "query_iris_api_iris_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "type": "object",
+                "title": "Body"
+              },
+              "example": {}
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/metrics": {
+      "get": {
+        "summary": "Metrics",
+        "description": "Prometheus metrics endpoint.",
+        "operationId": "metrics_metrics_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/trust_scorecard": {
+      "get": {
+        "summary": "Get Trust Scorecard",
+        "description": "Return the Trust Scorecard if available.",
+        "operationId": "get_trust_scorecard_api_trust_scorecard_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mg": {
+      "get": {
+        "summary": "Get Mg",
+        "description": "Return Memory Graph nodes + edges as JSON.",
+        "operationId": "get_mg_api_mg_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sse": {
+      "get": {
+        "summary": "Sse Stream",
+        "description": "SSE stream: multiplexes episodes, drifts, agents, mg events.",
+        "operationId": "sse_stream_api_sse_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/webhooks/sharepoint": {
+      "post": {
+        "summary": "Webhook Sharepoint",
+        "description": "SharePoint Graph API webhook.\n\n- Validation: echoes ``?validationToken`` as ``text/plain``\n- Change notification: triggers delta_sync on changed lists\n- HMAC verification when ``SP_WEBHOOK_SECRET`` is set",
+        "operationId": "webhook_sharepoint_api_webhooks_sharepoint_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/webhooks/powerautomate": {
+      "post": {
+        "summary": "Webhook Powerautomate",
+        "description": "Power Automate webhook.\n\nAccepts pre-mapped canonical records (passthrough) or raw Dataverse records\n(auto-transform via DataverseConnector).",
+        "operationId": "webhook_powerautomate_api_webhooks_powerautomate_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

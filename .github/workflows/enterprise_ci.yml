@@ -1,0 +1,45 @@
+name: Enterprise CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "enterprise/**"
+      - "tests-enterprise/**"
+      - "run_enterprise_demo.sh"
+      - ".github/workflows/enterprise_ci.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  enterprise-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev,enterprise]"
+
+      - name: Run enterprise demo
+        run: |
+          bash run_enterprise_demo.sh
+
+      - name: Run enterprise tests
+        run: |
+          python -m pytest tests-enterprise/ -q
+
+      - name: Docker and Helm sanity
+        run: |
+          test -d enterprise/docker
+          test -d enterprise/charts
+          echo "PASS: enterprise docker/chart surfaces present"
