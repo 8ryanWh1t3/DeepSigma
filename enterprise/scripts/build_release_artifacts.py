@@ -7,7 +7,7 @@ import subprocess
 from pathlib import Path
 import zipfile
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 DIST = ROOT / "dist"
 
 CORE_TOP = {
@@ -21,7 +21,6 @@ CORE_TOP = {
     "pyproject.toml",
     "requirements.txt",
     "run_money_demo.sh",
-    "run_enterprise_demo.sh",
 }
 
 
@@ -41,7 +40,7 @@ def is_core_file(path: str) -> bool:
     p = Path(path)
     if path in CORE_TOP:
         return True
-    if p.parts[0] in {"docs", "tests", "requirements", "src", "scripts"}:
+    if p.parts[0] in {"docs", "tests", "requirements", "src"}:
         if p.parts[0] == "src":
             # Core edition ships only core namespace + temporary shim.
             return len(p.parts) > 1 and p.parts[1] in {"core", "coherence_ops"}

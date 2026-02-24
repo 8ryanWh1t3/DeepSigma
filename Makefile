@@ -19,4 +19,4 @@ test-enterprise:
 	python -m pytest tests-enterprise/ -q
 
 release-artifacts:
-	python scripts/build_release_artifacts.py
+	python enterprise/scripts/build_release_artifacts.py
