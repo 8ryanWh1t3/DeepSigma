@@ -39,7 +39,11 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
-          roots = [p.name for p in Path("src").iterdir() if p.is_dir()]
+          roots = [
+              p.name
+              for p in Path("src").iterdir()
+              if p.is_dir() and not p.name.endswith(".egg-info")
+          ]
           allowed = {"core", "coherence_ops"}
           bad = sorted(set(roots) - allowed)
           if bad:
