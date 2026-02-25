@@ -406,13 +406,12 @@
   function nowIsoHost() { return new Date().toISOString(); }
   function todayHost() { return new Date().toISOString().slice(0, 10); }
   function escapeHtml(s) {
-    return String(s || '').replace(/[&<>"']/g, (m) => ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#39;'
-    }[m]));
+    return String(s || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
   async function loadJsZipHost() {
