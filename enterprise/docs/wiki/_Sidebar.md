@@ -48,6 +48,14 @@
 - **Excel-First**
   - [Creative Director Suite](Creative-Director-Suite)
   - [Excel-First Governance](Excel-First-Governance)
+- **EDGE + ABP**
+  - [EDGE Modules](EDGE-Modules)
+  - [ABP Specification](ABP-Specification)
+  - [ABP Builder](ABP-Builder)
+  - [ABP Verification](ABP-Verification)
+  - [Gate Enforcement](Gate-Enforcement)
+  - [Delegation Review](Delegation-Review)
+  - [Authority Ledger Binding](Authority-Ledger-Binding)
 - **Governance**
   - [Coherence Ops Mapping](Coherence-Ops-Mapping)
   - [IRIS](IRIS)

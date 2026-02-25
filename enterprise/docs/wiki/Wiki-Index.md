@@ -61,6 +61,16 @@ Canonical wiki structure for Sigma OVERWATCH / DeepSigma docs.
 - [Mermaid Canonical Index](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/docs/mermaid/README.md)
 - [Mermaid Archive Index](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/docs/archive/mermaid/ARCHIVE_INDEX.md)
 
+## EDGE + ABP
+
+- [EDGE Modules](EDGE-Modules)
+- [ABP Specification](ABP-Specification)
+- [ABP Builder](ABP-Builder)
+- [ABP Verification](ABP-Verification)
+- [Gate Enforcement](Gate-Enforcement)
+- [Delegation Review](Delegation-Review)
+- [Authority Ledger Binding](Authority-Ledger-Binding)
+
 ## Domain Packs
 
 - [Exhaust Inbox](Exhaust-Inbox)

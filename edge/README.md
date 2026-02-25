@@ -155,17 +155,17 @@ python -m pytest enterprise/tests/test_build_abp.py -v
 
 ## Wiki
 
-Deep-dive reference pages:
+Deep-dive reference pages (synced to [GitHub Wiki](https://github.com/8ryanWh1t3/DeepSigma/wiki)):
 
-| # | Page | Topic |
-|---|------|-------|
-| 01 | [EDGE Module Reference](wiki/01-edge-modules.md) | All 8 modules, Unified tabs, Coherence Dashboard, localStorage keys |
-| 02 | [ABP v1 Specification](wiki/02-abp-specification.md) | Full structure, deterministic ID/hash, canonical JSON, composition, sections reference |
-| 03 | [Delegation Review Triggers](wiki/03-delegation-review.md) | Governance loop, 4 DRT triggers, review policy, client-side evaluation |
-| 04 | [Gate Enforcement](wiki/04-gate-enforcement.md) | gate_abp.py, 10 checks, file-to-module map, CLI, JSON output |
-| 05 | [ABP Verification](wiki/05-abp-verification.md) | verify_abp.py 8 checks, verify_pack.py integration, evidence pack |
-| 06 | [ABP Builder](wiki/06-abp-builder.md) | build_abp(), compose_abps(), CLI, HTML embedding, re-stamping |
-| 07 | [Authority Ledger Binding](wiki/07-authority-ledger.md) | Ledger format, chaining, revocation, time-windowed authority |
+| Page | Topic |
+|------|-------|
+| [EDGE Modules](https://github.com/8ryanWh1t3/DeepSigma/wiki/EDGE-Modules) | All 8 modules, Unified tabs, Coherence Dashboard, localStorage keys |
+| [ABP Specification](https://github.com/8ryanWh1t3/DeepSigma/wiki/ABP-Specification) | Full structure, deterministic ID/hash, canonical JSON, composition, sections reference |
+| [Delegation Review](https://github.com/8ryanWh1t3/DeepSigma/wiki/Delegation-Review) | Governance loop, 4 DRT triggers, review policy, client-side evaluation |
+| [Gate Enforcement](https://github.com/8ryanWh1t3/DeepSigma/wiki/Gate-Enforcement) | gate_abp.py, 10 checks, file-to-module map, CLI, JSON output |
+| [ABP Verification](https://github.com/8ryanWh1t3/DeepSigma/wiki/ABP-Verification) | verify_abp.py 8 checks, verify_pack.py integration, evidence pack |
+| [ABP Builder](https://github.com/8ryanWh1t3/DeepSigma/wiki/ABP-Builder) | build_abp(), compose_abps(), CLI, HTML embedding, re-stamping |
+| [Authority Ledger Binding](https://github.com/8ryanWh1t3/DeepSigma/wiki/Authority-Ledger-Binding) | Ledger format, chaining, revocation, time-windowed authority |
 
 ### Related Canonical Mermaid Diagrams
 
