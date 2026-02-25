@@ -553,14 +553,18 @@
 
         .ci-value-box {
             position: absolute;
-            bottom: 0;
+            bottom: -2px;
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
         }
 
         .ci-value {
-            font-size: 36px;
+            font-size: 28px;
             font-weight: 800;
             color: var(--success);
             line-height: 1;
@@ -1328,12 +1332,13 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
             font-weight: 800;
-            font-size: 16px;
-            margin-left: 8px;
+            font-size: 13px;
+            margin-left: 4px;
+            vertical-align: middle;
         }
         .grade-badge.A { background: rgba(34,197,94,0.2); color: var(--success); }
         .grade-badge.B { background: rgba(59,130,246,0.2); color: var(--info); }
@@ -2944,6 +2949,9 @@
                         LIVE
                     </div>
                     <div class="timestamp" id="timestamp">--:--:--</div>
+                    <button class="btn btn-secondary" onclick="openIRIS()" title="IRIS Query (⌘K)" style="font-weight:700;letter-spacing:0.5px;">
+                        <span>🔮</span> IRIS
+                    </button>
                     <button class="btn btn-secondary btn-icon" onclick="openCommandPalette()" title="Commands (⌘K)">⌘</button>
                     <button class="btn btn-secondary btn-icon" onclick="toggleFullscreen()" title="Fullscreen (F11)">⛶</button>
                     <button class="btn btn-secondary" onclick="exportData()" title="Export">
@@ -4394,6 +4402,28 @@
                 });
             });
 
+            // Alert nav items (Red Signals, Half-Life Warnings)
+            document.querySelectorAll('.nav-item[data-filter]').forEach(item => {
+                item.addEventListener('click', function() {
+                    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                    this.classList.add('active');
+                    var filter = this.dataset.filter;
+                    switchTab('claims');
+                    if (filter === 'red') {
+                        document.getElementById('statusFilter').value = 'red';
+                        filterClaimsTable();
+                        showToast('info', 'Red Signals', 'Showing claims with red status light');
+                    } else if (filter === 'halflife') {
+                        // Filter to claims with <=14 days half-life remaining
+                        filteredClaims = data.claims.filter(function(c) {
+                            return halfLifeDaysRemaining(c) <= 14 && halfLifeDaysRemaining(c) !== Infinity;
+                        });
+                        renderClaimsTable(filteredClaims);
+                        showToast('info', 'Half-Life Warnings', 'Showing claims within 14 days of half-life expiry');
+                    }
+                });
+            });
+
             // Mobile nav items
             document.querySelectorAll('.mobile-nav-item[data-tab]').forEach(item => {
                 item.addEventListener('click', function() {
@@ -4720,6 +4750,14 @@
 
         function closeCommandPalette() {
             document.getElementById('cmdOverlay').classList.remove('active');
+        }
+
+        function openIRIS() {
+            document.getElementById('cmdOverlay').classList.add('active');
+            var input = document.getElementById('cmdInput');
+            input.value = 'status ';
+            input.focus();
+            renderCommandResults('status ');
         }
 
         function renderCommandResults(query) {
