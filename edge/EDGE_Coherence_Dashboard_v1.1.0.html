@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ATPS Coherence Dashboard</title>
+    <title>EDGE Coherence Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -2616,10 +2616,10 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="logo-container">
-                    <div class="logo">ATPS</div>
+                    <div class="logo">EDGE</div>
                     <div class="logo-text">
                         <h1>Coherence Ops</h1>
-                        <p>OPMG • HQDA</p>
+                        <p>Coherence Ops</p>
                     </div>
                 </div>
                 <button class="collapse-btn" onclick="toggleSidebar()" title="Toggle Sidebar">◀</button>
@@ -2951,7 +2951,7 @@
                         </div>
                         <div class="card">
                             <div class="card-header">
-                                <span class="card-title">Expiry Calendar - February 2025</span>
+                                <span class="card-title" id="calendarTitle">Expiry Calendar</span>
                             </div>
                             <div class="card-body">
                                 <div class="calendar-widget" id="calendar"></div>
@@ -3373,6 +3373,66 @@
             return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
         }
 
+        // Persistence
+        var STORAGE_KEY = 'ds_edge_coherence_v1';
+        var DRAFT_KEY = 'ds_edge_coherence_draft_v1';
+
+        function saveState() {
+            try {
+                var state = {
+                    claims: data.claims,
+                    theme: document.documentElement.classList.contains('light-theme') ? 'light' : 'dark',
+                    notifications: notificationsEnabled,
+                    version: '1.1.0'
+                };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (e) { /* quota exceeded — silently fail */ }
+        }
+
+        function loadState() {
+            try {
+                var raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return;
+                var state = JSON.parse(raw);
+                if (state.claims && Array.isArray(state.claims)) {
+                    data.claims = state.claims;
+                    data.metrics[0].value = data.claims.length;
+                }
+                if (state.theme === 'light') document.body.classList.add('light-theme');
+                if (typeof state.notifications === 'boolean') notificationsEnabled = state.notifications;
+            } catch (e) { /* corrupt data — use defaults */ }
+        }
+
+        function saveDraft() {
+            try {
+                var form = {};
+                ['newClaimType','newClaimId','newClaimStatement','newClaimRationale',
+                 'newClaimOwner','newClaimGoal','newClaimExpires','newClaimConfidence',
+                 'newClaimThread','newClaimAlignment','newClaimTask','newClaimWorkProduct','newClaimTags'].forEach(function(id) {
+                    var el = document.getElementById(id);
+                    if (el) form[id] = el.value;
+                });
+                localStorage.setItem(DRAFT_KEY, JSON.stringify(form));
+            } catch (e) {}
+        }
+
+        function loadDraft() {
+            try {
+                var raw = localStorage.getItem(DRAFT_KEY);
+                if (!raw) return false;
+                var form = JSON.parse(raw);
+                Object.keys(form).forEach(function(id) {
+                    var el = document.getElementById(id);
+                    if (el) el.value = form[id];
+                });
+                return true;
+            } catch (e) { return false; }
+        }
+
+        function clearDraft() {
+            try { localStorage.removeItem(DRAFT_KEY); } catch (e) {}
+        }
+
         // Data
         const data = {
             ci: 87.6,
@@ -3416,14 +3476,14 @@
             ],
             claims: [
                 // Physical Security - Goal 1
-                { id: 'DLR-2024-089', type: 'DLR', statement: 'Contractors with valid DBIDS do not require escort in Zone B during business hours', owner: 'CPT Rodriguez', status: 'challenged', goal: 'Goal 1', expires: '15 MAR 25', rationale: 'DBIDS verification provides sufficient identity assurance for Zone B access without physical escort.', confidence: 72, thread: 'Access Control', alignment: 'Authorizes', task: 'Contractor Entry Processing' },
+                { id: 'DLR-2024-089', type: 'DLR', statement: 'Contractors with valid DBIDS do not require escort in Zone B during business hours', owner: 'CPT Rodriguez', status: 'challenged', goal: 'Goal 1', expires: '15 MAR 25', rationale: 'DBIDS verification provides sufficient identity assurance for Zone B access without physical escort.', confidence: 72, thread: 'Access Control', alignment: 'Authorizes', task: 'Contractor Entry Processing', dependencies: ['ASM-2024-012', 'TRM-2024-034', 'AUT-2024-003'] },
                 { id: 'ASM-2024-012', type: 'ASM', statement: 'DBIDS verification completes within 24 hours for standard requests', owner: 'CPT Rodriguez', status: 'expiring', goal: 'Goal 1', expires: '15 FEB 25', rationale: 'Based on historical processing times from 2023-2024 data showing 94% completion within 24hrs.', confidence: 85, thread: 'Badge Operations', alignment: 'Assumes', task: 'Badge Issuance Timeline' },
                 { id: 'TRM-2024-034', type: 'TRM', statement: 'Zone B = Administrative areas accessible to credentialed personnel only', owner: 'CPT Rodriguez', status: 'active', goal: 'Goal 1', expires: '01 JUN 25', rationale: 'Army Regulation 190-13 defines access control zones for installation security.', confidence: 95, thread: 'Perimeter Security', alignment: 'Defines', task: 'Zone Classification' },
-                { id: 'DLR-2024-091', type: 'DLR', statement: 'Installation access badges issued within 72 hours of approval', owner: 'MAJ Thompson', status: 'active', goal: 'Goal 1', expires: '20 MAR 25', rationale: 'Badge production capacity supports this timeline based on current equipment.', confidence: 88, thread: 'Badge Operations', alignment: 'Enables', task: 'New Employee Onboarding' },
+                { id: 'DLR-2024-091', type: 'DLR', statement: 'Installation access badges issued within 72 hours of approval', owner: 'MAJ Thompson', status: 'active', goal: 'Goal 1', expires: '20 MAR 25', rationale: 'Badge production capacity supports this timeline based on current equipment.', confidence: 88, thread: 'Badge Operations', alignment: 'Enables', task: 'New Employee Onboarding', dependencies: ['ASM-2024-012', 'DEP-2024-018'] },
                 { id: 'ASM-2024-045', type: 'ASM', statement: 'Visitor badges valid for single day entry only', owner: 'SFC Williams', status: 'expiring', goal: 'Goal 1', expires: '03 FEB 25', rationale: 'Security requirement per installation policy memorandum 2024-03.', confidence: 90, thread: 'Visitor Management', alignment: 'Constrains', task: 'Visitor Processing' },
                 { id: 'TRM-2024-056', type: 'TRM', statement: 'Red Zone = Restricted areas requiring SECRET clearance minimum', owner: 'MAJ Thompson', status: 'active', goal: 'Goal 1', expires: '15 JUL 25', rationale: 'Defined per DoD 5200.08-R Physical Security Program.', confidence: 98, thread: 'Perimeter Security', alignment: 'Defines', task: 'Clearance Verification' },
                 { id: 'DLR-2024-078', type: 'DLR', statement: 'After-hours access requires supervisor pre-authorization and log entry', owner: 'CPT Rodriguez', status: 'challenged', goal: 'Goal 1', expires: '28 FEB 25', rationale: 'Balances operational need with security requirements per AR 190-13.', confidence: 65, thread: 'Access Control', alignment: 'Requires', task: 'After-Hours Entry' },
-                { id: 'DEP-2024-018', type: 'DEP', statement: 'Badge issuance timeline depends on DBIDS verification completion', owner: 'SFC Williams', status: 'active', goal: 'Goal 1', expires: '01 APR 25', rationale: 'Sequential process dependency - badges cannot issue before identity verification.', confidence: 92, thread: 'Badge Operations', alignment: 'Constrains', task: 'Badge Production Queue' },
+                { id: 'DEP-2024-018', type: 'DEP', statement: 'Badge issuance timeline depends on DBIDS verification completion', owner: 'SFC Williams', status: 'active', goal: 'Goal 1', expires: '01 APR 25', rationale: 'Sequential process dependency - badges cannot issue before identity verification.', confidence: 92, thread: 'Badge Operations', alignment: 'Constrains', task: 'Badge Production Queue', dependencies: ['ASM-2024-012'] },
                 { id: 'AUT-2024-003', type: 'AUT', statement: 'AR 190-13 governs all physical security access control decisions', owner: 'MAJ Thompson', status: 'active', goal: 'Goal 1', expires: '31 DEC 25', rationale: 'Primary regulatory authority for Army installation physical security.', confidence: 100, thread: 'Policy & Compliance', alignment: 'Authorizes', task: 'Policy Development' },
                 { id: 'ASM-2024-067', type: 'ASM', statement: 'Peak gate traffic occurs 0700-0830 and 1630-1730 daily', owner: 'SFC Williams', status: 'active', goal: 'Goal 1', expires: '30 APR 25', rationale: 'Based on 6-month traffic analysis from gate sensors.', confidence: 91, thread: 'Access Control', alignment: 'Assumes', task: 'Gate Staffing Schedule' },
                 
@@ -3442,7 +3502,7 @@
                 // Criminal Investigation - Goal 4
                 { id: 'DLR-2024-156', type: 'DLR', statement: 'Evidence chain of custody documented within 2 hours of collection', owner: 'CW3 Martinez', status: 'active', goal: 'Goal 4', expires: '15 APR 25', rationale: 'Ensures evidence integrity for prosecution viability.', confidence: 95, thread: 'Evidence Management', alignment: 'Requires', task: 'Evidence Intake' },
                 { id: 'ASM-2024-167', type: 'ASM', statement: 'Digital forensics backlog cleared within 30 days of submission', owner: 'CW3 Martinez', status: 'active', goal: 'Goal 4', expires: '01 JUL 25', rationale: 'Based on current staffing and caseload analysis.', confidence: 78, thread: 'Criminal Investigations', alignment: 'Assumes', task: 'Forensics Lab Scheduling' },
-                { id: 'DEP-2024-019', type: 'DEP', statement: 'Investigation timelines depend on digital forensics completion', owner: 'CW3 Martinez', status: 'expiring', goal: 'Goal 4', expires: '28 FEB 25', rationale: 'Many cases require device analysis before closure.', confidence: 84, thread: 'Criminal Investigations', alignment: 'Constrains', task: 'Case Closure Timeline' },
+                { id: 'DEP-2024-019', type: 'DEP', statement: 'Investigation timelines depend on digital forensics completion', owner: 'CW3 Martinez', status: 'expiring', goal: 'Goal 4', expires: '28 FEB 26', rationale: 'Many cases require device analysis before closure.', confidence: 84, thread: 'Criminal Investigations', alignment: 'Constrains', task: 'Case Closure Timeline', dependencies: ['ASM-2024-167'] },
                 
                 // Workforce Development - Goal 5  
                 { id: 'DLR-2024-178', type: 'DLR', statement: 'All new MPs complete 40-hour installation orientation within 30 days', owner: 'MSG Patterson', status: 'active', goal: 'Goal 5', expires: '01 JUN 25', rationale: 'Ensures operational readiness and local policy familiarity.', confidence: 91, thread: 'Training & Readiness', alignment: 'Requires', task: 'New MP Onboarding' },
@@ -3475,9 +3535,11 @@
 
         // Initialize
         function init() {
+            loadState();
+
             updateTimestamp();
             setInterval(updateTimestamp, 1000);
-            
+
             renderMetrics();
             renderActivity();
             renderBarChart();
@@ -3487,8 +3549,9 @@
             renderClaimsTable();
             renderTrendChart();
             renderCalendar();
+            populateBlastSelect();
             renderBlastRadius();
-            
+
             animateDashboard();
             setupEventListeners();
             setupDependencySearch();
@@ -3581,16 +3644,16 @@
 
         function renderClaimsTable() {
             document.getElementById('claimsTable').innerHTML = data.claims.map(c => `
-                <tr onclick="showClaimDetail('${c.id}')">
-                    <td><span class="claim-id">${c.id}</span></td>
-                    <td><span class="claim-type ${c.type}">${c.type}</span></td>
-                    <td>${c.statement.substring(0, 45)}...</td>
-                    <td>${c.owner}</td>
-                    <td><span class="claim-status ${c.status}">${c.status}</span></td>
-                    <td>${c.goal}</td>
-                    <td>${c.expires}</td>
+                <tr onclick="showClaimDetail('${escapeHtml(c.id)}')">
+                    <td><span class="claim-id">${escapeHtml(c.id)}</span></td>
+                    <td><span class="claim-type ${escapeHtml(c.type)}">${escapeHtml(c.type)}</span></td>
+                    <td>${escapeHtml(c.statement.substring(0, 45))}...</td>
+                    <td>${escapeHtml(c.owner)}</td>
+                    <td><span class="claim-status ${escapeHtml(c.status)}">${escapeHtml(c.status)}</span></td>
+                    <td>${escapeHtml(c.goal)}</td>
+                    <td>${escapeHtml(c.expires)}</td>
                     <td>
-                        <button class="btn btn-secondary btn-icon" onclick="event.stopPropagation(); handleAction('extend', '${c.id}')" title="Extend">📅</button>
+                        <button class="btn btn-secondary btn-icon" onclick="event.stopPropagation(); handleAction('extend', '${escapeHtml(c.id)}')" title="Extend">📅</button>
                     </td>
                 </tr>
             `).join('');
@@ -3614,84 +3677,198 @@
         }
 
         function renderCalendar() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const todayDate = now.getDate();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const startDay = new Date(year, month, 1).getDay();
+            const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+            // Update title
+            var titleEl = document.getElementById('calendarTitle');
+            if (titleEl) titleEl.textContent = 'Expiry Calendar - ' + monthNames[month] + ' ' + year;
+
+            // Build expiry days from claim data
+            var expiryDaysSet = {};
+            data.claims.forEach(function(c) {
+                if (!c.expires) return;
+                var parsed = parseClaimDate(c.expires);
+                if (parsed && parsed.getFullYear() === year && parsed.getMonth() === month) {
+                    var d = parsed.getDate();
+                    if (!expiryDaysSet[d]) expiryDaysSet[d] = [];
+                    expiryDaysSet[d].push(c.id);
+                }
+            });
+
             const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-            const today = 18;
-            const daysInMonth = 28;
-            
             let html = days.map(d => `<div class="calendar-header">${d}</div>`).join('');
-            
-            // Start on Saturday (6 empty cells, but Feb 2025 starts on Saturday which is index 6)
-            for (let i = 0; i < 6; i++) {
+
+            for (let i = 0; i < startDay; i++) {
                 html += `<div class="calendar-day muted"></div>`;
             }
-            
+
             for (let d = 1; d <= daysInMonth; d++) {
-                const isToday = d === today;
-                const hasExpiry = data.expiryDays.includes(d);
+                const isToday = d === todayDate;
+                const hasExpiry = !!expiryDaysSet[d];
                 html += `<div class="calendar-day ${isToday ? 'today' : ''} ${hasExpiry ? 'has-expiry' : ''}" onclick="showDayDetail(${d})">${d}</div>`;
             }
-            
+
             document.getElementById('calendar').innerHTML = html;
         }
 
-        function renderBlastRadius() {
-            const container = document.getElementById('blastContainer');
-            const nodeData = data.blastNodes['ASM-2024-012'];
-            
-            let svg = `<svg class="blast-svg" viewBox="0 0 500 280">`;
-            
-            // Lines from root to level1
-            nodeData.level1.forEach(n => {
-                svg += `<line class="blast-line" x1="${nodeData.root.x}" y1="${nodeData.root.y}" x2="${n.x}" y2="${n.y}"/>`;
+        function parseClaimDate(str) {
+            if (!str || str === 'TBD') return null;
+            // Handle formats like "15 MAR 25", "15 MAR 2025", or ISO dates
+            var months = {JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11};
+            var m = str.match(/(\d{1,2})\s+([A-Z]{3})\s+(\d{2,4})/);
+            if (m) {
+                var y = parseInt(m[3]);
+                if (y < 100) y += 2000;
+                return new Date(y, months[m[2]] || 0, parseInt(m[1]));
+            }
+            var d = new Date(str);
+            return isNaN(d.getTime()) ? null : d;
+        }
+
+        function buildDependencyGraph() {
+            // Build reverse adjacency: for each claim, who depends on it?
+            var dependents = {}; // claimId -> [claimIds that list it as a dependency]
+            data.claims.forEach(function(c) {
+                (c.dependencies || []).forEach(function(depId) {
+                    if (!dependents[depId]) dependents[depId] = [];
+                    dependents[depId].push(c.id);
+                });
             });
-            
-            // Lines from level1 to level2
-            svg += `<line class="blast-line" x1="${nodeData.level1[0].x}" y1="${nodeData.level1[0].y}" x2="${nodeData.level2[0].x}" y2="${nodeData.level2[0].y}"/>`;
-            svg += `<line class="blast-line" x1="${nodeData.level1[0].x}" y1="${nodeData.level1[0].y}" x2="${nodeData.level2[1].x}" y2="${nodeData.level2[1].y}"/>`;
-            svg += `<line class="blast-line" x1="${nodeData.level1[2].x}" y1="${nodeData.level1[2].y}" x2="${nodeData.level2[2].x}" y2="${nodeData.level2[2].y}"/>`;
-            svg += `<line class="blast-line" x1="${nodeData.level1[2].x}" y1="${nodeData.level1[2].y}" x2="${nodeData.level2[3].x}" y2="${nodeData.level2[3].y}"/>`;
-            
+            return dependents;
+        }
+
+        function populateBlastSelect() {
+            var select = document.getElementById('blastSelect');
+            if (!select) return;
+            var depGraph = buildDependencyGraph();
+
+            // Include claims that have dependents OR have dependencies
+            var candidates = data.claims.filter(function(c) {
+                return (depGraph[c.id] && depGraph[c.id].length > 0) || (c.dependencies && c.dependencies.length > 0);
+            });
+
+            // Fallback: if no dependency data, show all claims
+            if (candidates.length === 0) candidates = data.claims.slice(0, 10);
+
+            select.innerHTML = candidates.map(function(c) {
+                return '<option value="' + escapeHtml(c.id) + '">' + escapeHtml(c.id) + ' - ' + escapeHtml(c.statement.substring(0, 30)) + '</option>';
+            }).join('');
+
+            select.addEventListener('change', function() {
+                renderBlastRadius(this.value);
+            });
+        }
+
+        function renderBlastRadius(rootId) {
+            var container = document.getElementById('blastContainer');
+            if (!container) return;
+
+            if (!rootId) {
+                var select = document.getElementById('blastSelect');
+                rootId = select ? select.value : (data.claims[0] || {}).id;
+            }
+            if (!rootId) { container.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:40px;">No claims available</p>'; return; }
+
+            var depGraph = buildDependencyGraph();
+
+            // Level 1: claims that depend on rootId + claims rootId depends on
+            var rootClaim = data.claims.find(function(c) { return c.id === rootId; });
+            var level1Set = {};
+            // Dependents of root
+            (depGraph[rootId] || []).forEach(function(id) { level1Set[id] = true; });
+            // Dependencies of root
+            if (rootClaim && rootClaim.dependencies) {
+                rootClaim.dependencies.forEach(function(id) { level1Set[id] = true; });
+            }
+            var level1 = Object.keys(level1Set);
+
+            // Level 2: dependents/dependencies of level1 (excluding root and level1)
+            var level2Set = {};
+            level1.forEach(function(l1Id) {
+                (depGraph[l1Id] || []).forEach(function(id) {
+                    if (id !== rootId && !level1Set[id]) level2Set[id] = true;
+                });
+                var l1Claim = data.claims.find(function(c) { return c.id === l1Id; });
+                if (l1Claim && l1Claim.dependencies) {
+                    l1Claim.dependencies.forEach(function(id) {
+                        if (id !== rootId && !level1Set[id]) level2Set[id] = true;
+                    });
+                }
+            });
+            var level2 = Object.keys(level2Set);
+
+            // Layout
+            var cx = 250, cy = 140, r1 = 100, r2 = 130;
+            var rootNode = { id: rootId, x: cx, y: cy };
+
+            function circlePos(arr, radius, centerX, centerY) {
+                return arr.map(function(id, i) {
+                    var angle = (2 * Math.PI * i / arr.length) - Math.PI / 2;
+                    return { id: id, x: Math.round(centerX + radius * Math.cos(angle)), y: Math.round(centerY + radius * Math.sin(angle)) };
+                });
+            }
+
+            var l1Nodes = circlePos(level1, r1, cx, cy);
+            var l2Nodes = circlePos(level2, r2, cx, cy);
+
+            // SVG
+            var svg = '<svg class="blast-svg" viewBox="0 0 500 280">';
+
+            // Lines: root → level1
+            l1Nodes.forEach(function(n) {
+                svg += '<line class="blast-line" x1="' + rootNode.x + '" y1="' + rootNode.y + '" x2="' + n.x + '" y2="' + n.y + '"/>';
+            });
+
+            // Lines: level1 → level2 (connect each l2 to nearest l1)
+            l2Nodes.forEach(function(l2n) {
+                var nearest = l1Nodes[0];
+                var minDist = Infinity;
+                l1Nodes.forEach(function(l1n) {
+                    var d = Math.hypot(l1n.x - l2n.x, l1n.y - l2n.y);
+                    if (d < minDist) { minDist = d; nearest = l1n; }
+                });
+                svg += '<line class="blast-line" x1="' + nearest.x + '" y1="' + nearest.y + '" x2="' + l2n.x + '" y2="' + l2n.y + '"/>';
+            });
+
             // Level 2 nodes (blue)
-            nodeData.level2.forEach(n => {
-                svg += `
-                    <g class="blast-node" onclick="showClaimDetail('${n.id}')">
-                        <circle class="node-circle" cx="${n.x}" cy="${n.y}" r="22" fill="#3b82f6"/>
-                        <text class="node-text" x="${n.x}" y="${n.y}">${n.id}</text>
-                        <text class="node-label" x="${n.x}" y="${n.y + 35}">${n.label}</text>
-                    </g>
-                `;
+            l2Nodes.forEach(function(n) {
+                svg += '<g class="blast-node" onclick="showClaimDetail(\'' + escapeHtml(n.id) + '\')">' +
+                    '<circle class="node-circle" cx="' + n.x + '" cy="' + n.y + '" r="22" fill="#3b82f6"/>' +
+                    '<text class="node-text" x="' + n.x + '" y="' + n.y + '">' + escapeHtml(n.id.split('-')[0]) + '</text>' +
+                    '<text class="node-label" x="' + n.x + '" y="' + (n.y + 35) + '">' + escapeHtml(n.id) + '</text>' +
+                '</g>';
             });
-            
+
             // Level 1 nodes (yellow)
-            nodeData.level1.forEach(n => {
-                svg += `
-                    <g class="blast-node" onclick="showClaimDetail('${n.id}')">
-                        <circle class="node-circle" cx="${n.x}" cy="${n.y}" r="26" fill="#eab308"/>
-                        <text class="node-text" x="${n.x}" y="${n.y}">${n.id}</text>
-                        <text class="node-label" x="${n.x}" y="${n.y + 38}">${n.label}</text>
-                    </g>
-                `;
+            l1Nodes.forEach(function(n) {
+                svg += '<g class="blast-node" onclick="showClaimDetail(\'' + escapeHtml(n.id) + '\')">' +
+                    '<circle class="node-circle" cx="' + n.x + '" cy="' + n.y + '" r="26" fill="#eab308"/>' +
+                    '<text class="node-text" x="' + n.x + '" y="' + n.y + '">' + escapeHtml(n.id.split('-')[0]) + '</text>' +
+                    '<text class="node-label" x="' + n.x + '" y="' + (n.y + 38) + '">' + escapeHtml(n.id) + '</text>' +
+                '</g>';
             });
-            
+
             // Root node (red)
-            svg += `
-                <g class="blast-node" onclick="showClaimDetail('${nodeData.root.id}')">
-                    <circle class="node-circle" cx="${nodeData.root.x}" cy="${nodeData.root.y}" r="35" fill="#ef4444"/>
-                    <text class="node-text" x="${nodeData.root.x}" y="${nodeData.root.y - 6}">${nodeData.root.id.split('-')[0]}</text>
-                    <text class="node-text" x="${nodeData.root.x}" y="${nodeData.root.y + 8}" style="font-size:8px">${nodeData.root.id.split('-').slice(1).join('-')}</text>
-                </g>
-            `;
-            
-            svg += `</svg>`;
-            
-            svg += `
-                <div class="blast-legend">
-                    <div class="blast-legend-item"><div class="blast-legend-dot root"></div>Source (Expiring)</div>
-                    <div class="blast-legend-item"><div class="blast-legend-dot level1"></div>Direct (3)</div>
-                    <div class="blast-legend-item"><div class="blast-legend-dot level2"></div>Indirect (4)</div>
-                </div>
-            `;
-            
+            svg += '<g class="blast-node" onclick="showClaimDetail(\'' + escapeHtml(rootNode.id) + '\')">' +
+                '<circle class="node-circle" cx="' + rootNode.x + '" cy="' + rootNode.y + '" r="35" fill="#ef4444"/>' +
+                '<text class="node-text" x="' + rootNode.x + '" y="' + (rootNode.y - 6) + '">' + escapeHtml(rootId.split('-')[0]) + '</text>' +
+                '<text class="node-text" x="' + rootNode.x + '" y="' + (rootNode.y + 8) + '" style="font-size:8px">' + escapeHtml(rootId.split('-').slice(1).join('-')) + '</text>' +
+            '</g>';
+
+            svg += '</svg>';
+
+            svg += '<div class="blast-legend">' +
+                '<div class="blast-legend-item"><div class="blast-legend-dot root"></div>Source</div>' +
+                '<div class="blast-legend-item"><div class="blast-legend-dot level1"></div>Direct (' + level1.length + ')</div>' +
+                '<div class="blast-legend-item"><div class="blast-legend-dot level2"></div>Indirect (' + level2.length + ')</div>' +
+            '</div>';
+
             container.innerHTML = svg;
         }
 
@@ -3772,6 +3949,7 @@
                 this.classList.toggle('active');
                 document.body.classList.toggle('light-theme');
                 showToast('info', 'Theme Changed', document.body.classList.contains('light-theme') ? 'Light mode' : 'Dark mode');
+                saveState();
             });
 
             // Notifications toggle
@@ -3779,6 +3957,7 @@
                 this.classList.toggle('active');
                 notificationsEnabled = this.classList.contains('active');
                 showToast('info', 'Notifications', notificationsEnabled ? 'Enabled' : 'Disabled');
+                saveState();
             });
 
             // Tabs
@@ -3873,6 +4052,7 @@
             document.querySelectorAll('.header-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
             document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
             document.getElementById(tab + 'Content').classList.add('active');
+            if (tab === 'newclaim') loadDraft();
         }
 
         // Actions
@@ -3914,7 +4094,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'atps_claims_export.csv';
+            a.download = 'edge_claims_export.csv';
             a.click();
             
             showToast('success', 'Export Complete', 'Claims exported to CSV');
@@ -3928,6 +4108,7 @@
                 archive: `${id} archived`
             };
             showToast('success', 'Action Complete', actions[action] || 'Action completed');
+            if (id) saveState();
         }
 
         // Modals
@@ -3939,49 +4120,49 @@
                 <div class="claim-detail-grid">
                     <div class="detail-item">
                         <div class="detail-label">Type</div>
-                        <div class="detail-value"><span class="claim-type ${claim.type}">${claim.type}</span></div>
+                        <div class="detail-value"><span class="claim-type ${escapeHtml(claim.type)}">${escapeHtml(claim.type)}</span></div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Status</div>
-                        <div class="detail-value"><span class="claim-status ${claim.status}">${claim.status}</span></div>
+                        <div class="detail-value"><span class="claim-status ${escapeHtml(claim.status)}">${escapeHtml(claim.status)}</span></div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Expires</div>
-                        <div class="detail-value">${claim.expires}</div>
+                        <div class="detail-value">${escapeHtml(claim.expires)}</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Owner</div>
-                        <div class="detail-value">${claim.owner}</div>
+                        <div class="detail-value">${escapeHtml(claim.owner)}</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">PMG Goal</div>
-                        <div class="detail-value">${claim.goal}</div>
+                        <div class="detail-value">${escapeHtml(claim.goal)}</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Dependencies</div>
-                        <div class="detail-value">7 claims</div>
+                        <div class="detail-value">${(claim.dependencies || []).length || '—'} claims</div>
                     </div>
                 </div>
                 <div class="claim-statement">
                     <div class="claim-statement-label">Statement</div>
-                    <div class="claim-statement-text">${claim.statement}</div>
+                    <div class="claim-statement-text">${escapeHtml(claim.statement)}</div>
                 </div>
                 <div class="claim-statement" style="border-left-color: var(--info);">
                     <div class="claim-statement-label">Rationale</div>
-                    <div class="claim-statement-text">${claim.rationale || 'No rationale provided'}</div>
+                    <div class="claim-statement-text">${escapeHtml(claim.rationale || 'No rationale provided')}</div>
                 </div>
             `;
             document.getElementById('modalFooter').innerHTML = `
-                <button class="btn btn-secondary" onclick="handleAction('archive', '${claim.id}'); closeModal();">Archive</button>
-                <button class="btn btn-secondary" onclick="handleAction('challenge', '${claim.id}'); closeModal();">Challenge</button>
-                <button class="btn btn-primary" onclick="handleAction('extend', '${claim.id}'); closeModal();">Extend 30 Days</button>
+                <button class="btn btn-secondary" onclick="handleAction('archive', '${escapeHtml(claim.id)}'); closeModal();">Archive</button>
+                <button class="btn btn-secondary" onclick="handleAction('challenge', '${escapeHtml(claim.id)}'); closeModal();">Challenge</button>
+                <button class="btn btn-primary" onclick="handleAction('extend', '${escapeHtml(claim.id)}'); closeModal();">Extend 30 Days</button>
             `;
             document.getElementById('modalOverlay').classList.add('active');
         }
 
         function showMetricDetail(label) {
             document.getElementById('modalTitle').textContent = label;
-            document.getElementById('modalBody').innerHTML = `<p>Detailed breakdown for ${label} coming soon.</p>`;
+            document.getElementById('modalBody').innerHTML = `<p>Detailed breakdown for ${escapeHtml(label)} coming soon.</p>`;
             document.getElementById('modalFooter').innerHTML = `<button class="btn btn-primary" onclick="closeModal()">Close</button>`;
             document.getElementById('modalOverlay').classList.add('active');
         }
@@ -3993,15 +4174,15 @@
                 <div class="claim-detail-grid">
                     <div class="detail-item">
                         <div class="detail-label">Coverage</div>
-                        <div class="detail-value" style="color: var(--${goal.status});">${goal.pct}%</div>
+                        <div class="detail-value" style="color: var(--${escapeHtml(goal.status)});">${escapeHtml(goal.pct)}%</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Claims</div>
-                        <div class="detail-value">${goal.claims}</div>
+                        <div class="detail-value">${escapeHtml(goal.claims)}</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Status</div>
-                        <div class="detail-value">${goal.note}</div>
+                        <div class="detail-value">${escapeHtml(goal.note)}</div>
                     </div>
                 </div>
             `;
@@ -4011,7 +4192,7 @@
 
         function showAlertDetail(title) {
             document.getElementById('modalTitle').textContent = 'Alert: ' + title;
-            document.getElementById('modalBody').innerHTML = `<p>Alert details for "${title}"</p>`;
+            document.getElementById('modalBody').innerHTML = `<p>Alert details for "${escapeHtml(title)}"</p>`;
             document.getElementById('modalFooter').innerHTML = `
                 <button class="btn btn-secondary" onclick="closeModal()">Dismiss</button>
                 <button class="btn btn-primary" onclick="handleAction('review'); closeModal();">Take Action</button>
@@ -4020,12 +4201,22 @@
         }
 
         function showDayDetail(day) {
-            const hasExpiry = data.expiryDays.includes(day);
-            document.getElementById('modalTitle').textContent = `February ${day}, 2025`;
-            document.getElementById('modalBody').innerHTML = hasExpiry 
-                ? `<p>⚠️ Claims expiring on this day:</p><ul><li>ASM-2024-045</li></ul>`
-                : `<p>No claims expiring on this day.</p>`;
-            document.getElementById('modalFooter').innerHTML = `<button class="btn btn-primary" onclick="closeModal()">Close</button>`;
+            var now = new Date();
+            var year = now.getFullYear();
+            var month = now.getMonth();
+            var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+            // Find claims expiring on this day
+            var expiring = data.claims.filter(function(c) {
+                var parsed = parseClaimDate(c.expires);
+                return parsed && parsed.getFullYear() === year && parsed.getMonth() === month && parsed.getDate() === day;
+            });
+
+            document.getElementById('modalTitle').textContent = monthNames[month] + ' ' + day + ', ' + year;
+            document.getElementById('modalBody').innerHTML = expiring.length > 0
+                ? '<p>⚠️ Claims expiring on this day:</p><ul>' + expiring.map(function(c) { return '<li>' + escapeHtml(c.id) + ' — ' + escapeHtml(c.statement.substring(0, 40)) + '...</li>'; }).join('') + '</ul>'
+                : '<p>No claims expiring on this day.</p>';
+            document.getElementById('modalFooter').innerHTML = '<button class="btn btn-primary" onclick="closeModal()">Close</button>';
             document.getElementById('modalOverlay').classList.add('active');
         }
 
@@ -4129,10 +4320,10 @@
                 if (filteredClaims.length > 0) {
                     html += '<div class="cmd-group"><div class="cmd-group-label">Claims</div>';
                     filteredClaims.forEach(claim => {
-                        html += `<div class="cmd-item" onclick="showClaimDetail('${claim.id}'); closeCommandPalette();">
+                        html += `<div class="cmd-item" onclick="showClaimDetail('${escapeHtml(claim.id)}'); closeCommandPalette();">
                             <span class="cmd-item-icon">📋</span>
-                            <span class="cmd-item-text">${claim.id} - ${claim.statement.substring(0, 35)}...</span>
-                            <span class="claim-type ${claim.type}">${claim.type}</span>
+                            <span class="cmd-item-text">${escapeHtml(claim.id)} - ${escapeHtml(claim.statement.substring(0, 35))}...</span>
+                            <span class="claim-type ${escapeHtml(claim.type)}">${escapeHtml(claim.type)}</span>
                         </div>`;
                     });
                     html += '</div>';
@@ -4263,24 +4454,24 @@
                 <div class="compare-row">
                     <span class="compare-label">Status</span>
                     <span class="compare-value ${diff(claim.status, otherClaim.status)}">
-                        <span class="claim-status ${claim.status}">${claim.status}</span>
+                        <span class="claim-status ${escapeHtml(claim.status)}">${escapeHtml(claim.status)}</span>
                     </span>
                 </div>
                 <div class="compare-row">
                     <span class="compare-label">Owner</span>
-                    <span class="compare-value ${diff(claim.owner, otherClaim.owner)}">${claim.owner}</span>
+                    <span class="compare-value ${diff(claim.owner, otherClaim.owner)}">${escapeHtml(claim.owner)}</span>
                 </div>
                 <div class="compare-row">
                     <span class="compare-label">Goal</span>
-                    <span class="compare-value ${diff(claim.goal, otherClaim.goal)}">${claim.goal}</span>
+                    <span class="compare-value ${diff(claim.goal, otherClaim.goal)}">${escapeHtml(claim.goal)}</span>
                 </div>
                 <div class="compare-row">
                     <span class="compare-label">Expires</span>
-                    <span class="compare-value ${diff(claim.expires, otherClaim.expires)}">${claim.expires}</span>
+                    <span class="compare-value ${diff(claim.expires, otherClaim.expires)}">${escapeHtml(claim.expires)}</span>
                 </div>
                 <div style="margin-top: 16px; padding: 14px; background: var(--bg-secondary); border-radius: 8px; border-left: 3px solid var(--accent);">
                     <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">Statement</div>
-                    <div style="font-size: 13px; line-height: 1.5;">${claim.statement}</div>
+                    <div style="font-size: 13px; line-height: 1.5;">${escapeHtml(claim.statement)}</div>
                 </div>
             `;
         }
@@ -4352,18 +4543,18 @@
             
             document.getElementById('claimsTable').innerHTML = claims.map(function(c) {
                 var isSelected = bulkSelected.indexOf(c.id) >= 0;
-                return '<tr class="' + (isSelected ? 'selected' : '') + '" data-id="' + c.id + '">' +
-                    '<td class="th-checkbox"><input type="checkbox" class="row-checkbox" ' + (isSelected ? 'checked' : '') + ' onclick="toggleRowSelect(event, \'' + c.id + '\')"></td>' +
-                    '<td><span class="claim-id">' + c.id + '</span></td>' +
-                    '<td><span class="claim-type ' + c.type + '">' + c.type + '</span></td>' +
-                    '<td>' + c.statement.substring(0, 50) + '...</td>' +
-                    '<td>' + c.owner + '</td>' +
-                    '<td><span class="claim-status ' + c.status + '">' + c.status + '</span></td>' +
-                    '<td>' + c.goal.replace('Goal ', 'G') + '</td>' +
-                    '<td>' + c.expires + '</td>' +
+                return '<tr class="' + (isSelected ? 'selected' : '') + '" data-id="' + escapeHtml(c.id) + '">' +
+                    '<td class="th-checkbox"><input type="checkbox" class="row-checkbox" ' + (isSelected ? 'checked' : '') + ' onclick="toggleRowSelect(event, \'' + escapeHtml(c.id) + '\')"></td>' +
+                    '<td><span class="claim-id">' + escapeHtml(c.id) + '</span></td>' +
+                    '<td><span class="claim-type ' + escapeHtml(c.type) + '">' + escapeHtml(c.type) + '</span></td>' +
+                    '<td>' + escapeHtml(c.statement.substring(0, 50)) + '...</td>' +
+                    '<td>' + escapeHtml(c.owner) + '</td>' +
+                    '<td><span class="claim-status ' + escapeHtml(c.status) + '">' + escapeHtml(c.status) + '</span></td>' +
+                    '<td>' + escapeHtml(c.goal.replace('Goal ', 'G')) + '</td>' +
+                    '<td>' + escapeHtml(c.expires) + '</td>' +
                     '<td style="white-space:nowrap;">' +
-                        '<button class="btn btn-secondary btn-icon" onclick="event.stopPropagation(); showClaimDetail(\'' + c.id + '\')" title="View">👁️</button> ' +
-                        '<button class="btn btn-secondary btn-icon" onclick="event.stopPropagation(); editClaim(\'' + c.id + '\')" title="Edit">✏️</button>' +
+                        '<button class="btn btn-secondary btn-icon" onclick="event.stopPropagation(); showClaimDetail(\'' + escapeHtml(c.id) + '\')" title="View">👁️</button> ' +
+                        '<button class="btn btn-secondary btn-icon" onclick="event.stopPropagation(); editClaim(\'' + escapeHtml(c.id) + '\')" title="Edit">✏️</button>' +
                     '</td>' +
                 '</tr>';
             }).join('');
@@ -4520,7 +4711,7 @@
             var url = URL.createObjectURL(blob);
             var a = document.createElement('a');
             a.href = url;
-            a.download = 'atps_claims_selected_' + bulkSelected.length + '.csv';
+            a.download = 'edge_claims_selected_' + bulkSelected.length + '.csv';
             a.click();
             
             showToast('success', 'Export Complete', 'Exported ' + bulkSelected.length + ' claims');
@@ -4558,11 +4749,11 @@
                     '</div>' +
                     '<div class="edit-field form-full">' +
                         '<label class="edit-label">Statement</label>' +
-                        '<textarea class="edit-textarea" id="editStatement" rows="3">' + claim.statement + '</textarea>' +
+                        '<textarea class="edit-textarea" id="editStatement" rows="3">' + escapeHtml(claim.statement) + '</textarea>' +
                     '</div>' +
                     '<div class="edit-field form-full">' +
                         '<label class="edit-label">Rationale</label>' +
-                        '<textarea class="edit-textarea" id="editRationale" rows="3">' + (claim.rationale || '') + '</textarea>' +
+                        '<textarea class="edit-textarea" id="editRationale" rows="3">' + escapeHtml(claim.rationale || '') + '</textarea>' +
                     '</div>' +
                     '<div class="edit-field">' +
                         '<label class="edit-label">Owner</label>' +
@@ -4586,7 +4777,7 @@
                     '</div>' +
                     '<div class="edit-field">' +
                         '<label class="edit-label">Expires</label>' +
-                        '<input type="text" class="edit-input" id="editExpires" value="' + claim.expires + '">' +
+                        '<input type="text" class="edit-input" id="editExpires" value="' + escapeHtml(claim.expires) + '">' +
                     '</div>' +
                     '<div class="edit-field">' +
                         '<label class="edit-label">Confidence</label>' +
@@ -4623,6 +4814,7 @@
             closeModal();
             filterClaimsTable();
             showToast('success', 'Claim Updated', editingClaimId + ' has been updated');
+            saveState();
             doUndoableAction('Updated ' + editingClaimId);
             editingClaimId = null;
         }
@@ -4749,6 +4941,7 @@
 
         function saveClaimDraft() {
             var id = document.getElementById('newClaimId').value || 'DRAFT-' + Date.now();
+            saveDraft();
             showToast('info', 'Draft Saved', id + ' saved locally');
             doUndoableAction('Saved draft: ' + id);
         }
@@ -4776,6 +4969,10 @@
             var confidence = document.getElementById('newClaimConfidence').value;
             var workProduct = document.getElementById('newClaimWorkProduct').value;
 
+            // Tags
+            var tagsRaw = document.getElementById('newClaimTags') ? document.getElementById('newClaimTags').value : '';
+            var tags = tagsRaw.split(',').map(function(t) { return t.trim(); }).filter(Boolean);
+
             // Create new claim object with task alignment
             var newClaim = {
                 id: id,
@@ -4791,7 +4988,9 @@
                 thread: thread,
                 alignment: alignment,
                 task: task,
-                workProduct: workProduct || null
+                workProduct: workProduct || null,
+                tags: tags,
+                dependencies: selectedDependencies.slice()
             };
 
             // Add to data array
@@ -4802,7 +5001,9 @@
             data.metrics[0].value = data.claims.length;
 
             showToast('success', 'Claim Created', id + ' has been created');
-            
+            saveState();
+            clearDraft();
+
             // Reset form and switch to claims view
             resetNewClaimForm();
             switchTab('claims');
@@ -4830,9 +5031,9 @@
 
                 if (matches.length > 0) {
                     suggestions.innerHTML = matches.map(function(c) {
-                        return '<div class="dep-suggestion" onclick="addDependency(\'' + c.id + '\')">' +
-                            '<span>' + c.id + '</span>' +
-                            '<span class="claim-type ' + c.type + '">' + c.type + '</span>' +
+                        return '<div class="dep-suggestion" onclick="addDependency(\'' + escapeHtml(c.id) + '\')">' +
+                            '<span>' + escapeHtml(c.id) + '</span>' +
+                            '<span class="claim-type ' + escapeHtml(c.type) + '">' + escapeHtml(c.type) + '</span>' +
                         '</div>';
                     }).join('');
                     suggestions.classList.add('active');
