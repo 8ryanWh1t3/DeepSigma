@@ -3466,7 +3466,8 @@ ${mods.map(m => {
     // Hash
     html += '<div class="abp-hash">hash: ' + escapeHtml(abp.hash || 'n/a') + '</div>';
 
-    el.innerHTML = html;
+    el.textContent = '';
+    el.appendChild(document.createRange().createContextualFragment(html));
   }
 
   async function loadAbpFromFile() {
