@@ -906,18 +906,14 @@
         /* Blast Radius - Interactive SVG */
         .blast-container {
             position: relative;
-            height: 280px;
             background: var(--bg-secondary);
             border-radius: 8px;
-            overflow: hidden;
         }
 
         .blast-svg {
-            position: absolute;
-            top: 0;
-            left: 0;
+            display: block;
             width: 100%;
-            height: 100%;
+            height: auto;
         }
 
         .blast-line {
@@ -960,11 +956,10 @@
         }
 
         .blast-legend {
-            position: absolute;
-            bottom: 12px;
-            left: 12px;
             display: flex;
-            gap: 16px;
+            flex-wrap: wrap;
+            gap: 12px 16px;
+            padding: 10px 12px;
         }
 
         .blast-legend-item {
@@ -4196,7 +4191,7 @@
             var level2 = Object.keys(level2Set);
 
             // Layout
-            var cx = 250, cy = 140, r1 = 100, r2 = 140;
+            var cx = 250, cy = 180, r1 = 100, r2 = 150;
             var rootNode = { id: rootId, x: cx, y: cy };
 
             function circlePos(arr, radius, centerX, centerY) {
@@ -4217,7 +4212,7 @@
             var edgeClass = { dependsOn: 'blast-edge-depends', contradicts: 'blast-edge-contradicts', supersedes: 'blast-edge-supersedes', supports: 'blast-edge-supports', patches: 'blast-edge-patches' };
 
             // SVG
-            var svg = '<svg class="blast-svg" viewBox="0 0 500 280">';
+            var svg = '<svg class="blast-svg" viewBox="0 0 500 380">';
 
             // Draw edges with typed colors
             allEdges.forEach(function(e) {
