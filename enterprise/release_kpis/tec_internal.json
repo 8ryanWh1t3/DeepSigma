@@ -2,20 +2,20 @@
   "schema": "tec_ctec_v2_tier",
   "source": "enterprise/scripts/tec_ctec.py",
   "tier": "internal",
-  "generated_at": "2026-02-24T13:28:14Z",
+  "generated_at": "2026-02-25T20:02:52Z",
   "mode": "report_only",
   "core": {
     "inventory": {
-      "files": 56,
-      "directories": 10,
-      "loc": 5886,
-      "packages": 4,
-      "configs": 12,
-      "tests": 1,
-      "run_surfaces": 4,
-      "artifacts": 21
+      "files": 67,
+      "directories": 6,
+      "loc": 11168,
+      "packages": 3,
+      "configs": 28,
+      "tests": 9,
+      "run_surfaces": 3,
+      "artifacts": 20
     },
-    "tec": 80.4,
+    "tec": 105.6,
     "controls": {
       "required": 6,
       "passed": 6,
@@ -30,21 +30,21 @@
       }
     },
     "control_coverage": 0.7,
-    "ctec": 56.28,
-    "r_tec": 80.4
+    "ctec": 73.92,
+    "r_tec": 105.6
   },
   "enterprise": {
     "inventory": {
-      "files": 868,
-      "directories": 145,
-      "loc": 82620,
+      "files": 878,
+      "directories": 144,
+      "loc": 85334,
       "packages": 32,
       "configs": 119,
       "tests": 1,
-      "run_surfaces": 112,
-      "artifacts": 202
+      "run_surfaces": 114,
+      "artifacts": 188
     },
-    "tec": 1213.8,
+    "tec": 1227.8,
     "controls": {
       "required": 6,
       "passed": 6,
@@ -59,21 +59,21 @@
       }
     },
     "control_coverage": 0.7,
-    "ctec": 849.66,
-    "r_tec": 1213.8
+    "ctec": 859.46,
+    "r_tec": 1227.8
   },
   "total": {
     "inventory": {
-      "files": 1366,
-      "directories": 243,
-      "loc": 120950,
-      "packages": 36,
-      "configs": 283,
-      "tests": 102,
-      "run_surfaces": 132,
-      "artifacts": 210
+      "files": 1371,
+      "directories": 234,
+      "loc": 129203,
+      "packages": 35,
+      "configs": 288,
+      "tests": 111,
+      "run_surfaces": 135,
+      "artifacts": 196
     },
-    "tec": 1998.6,
+    "tec": 2025.6,
     "controls": {
       "required": 12,
       "passed": 12,
@@ -81,8 +81,8 @@
       "checks_scope": "composite(core+enterprise)"
     },
     "control_coverage": 0.7,
-    "ctec": 1399.02,
-    "r_tec": 1998.6
+    "ctec": 1417.92,
+    "r_tec": 2025.6
   },
   "factors": {
     "rcf": 1.0,
@@ -94,15 +94,15 @@
   },
   "rate_hourly": 150.0,
   "low": {
-    "hours": 1119.2,
-    "cost": 167882.0
+    "hours": 1134.3,
+    "cost": 170150.0
   },
   "base": {
-    "hours": 1399.0,
-    "cost": 209853.0
+    "hours": 1417.9,
+    "cost": 212688.0
   },
   "high": {
-    "hours": 1888.7,
-    "cost": 283302.0
+    "hours": 1914.2,
+    "cost": 287129.0
   }
 }

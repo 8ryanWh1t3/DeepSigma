@@ -1,5 +1,6 @@
 # KPI Gate Report - v2.0.6
 
 
-## FAILURES
-- Automation Depth below floor: 3.0 < 4.0
+## PASS
+- No floors violated
+- No regressions beyond max_drop

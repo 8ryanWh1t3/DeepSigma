@@ -1,10 +1,10 @@
 {
   "schema": "pulse_insights_v1",
-  "generated_at": "2026-02-24T12:33:36Z",
+  "generated_at": "2026-02-25T20:02:46Z",
   "version": "v2.0.6",
   "source": "pulse",
-  "insights_score": 7.13,
-  "signal_count": 2,
+  "insights_score": 6.16,
+  "signal_count": 3,
   "signals": [
     {
       "id": "open_p0_caps",
@@ -19,7 +19,15 @@
       "severity": "medium",
       "message": "Merged KPI mean is below target threshold (6.0).",
       "value": {
-        "kpi_average": 5.72
+        "kpi_average": 5.96
+      }
+    },
+    {
+      "id": "kpi_trend_down",
+      "severity": "medium",
+      "message": "KPI average trend is negative versus previous release.",
+      "value": {
+        "avg_delta": -2.022
       }
     }
   ],
@@ -29,12 +37,12 @@
     "history_present": true
   },
   "diagnostics": {
-    "closed_since_total": 61,
-    "open_total": 32,
-    "credit_delta_total": 7.84,
+    "closed_since_total": 75,
+    "open_total": 44,
+    "credit_delta_total": 9.65,
     "debt_delta_total": 0.0,
     "open_p0_caps": 2,
-    "kpi_average": 5.72,
-    "kpi_average_delta": 0.0
+    "kpi_average": 5.96,
+    "kpi_average_delta": -2.022
   }
 }

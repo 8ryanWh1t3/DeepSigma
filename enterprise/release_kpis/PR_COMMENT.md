@@ -36,15 +36,21 @@
 - KPI bands: `release_kpis/kpi_bands_v2.0.6.json`
 
 **TEC (ROM):**
-- Internal: 3098.0 hrs | $464,700
-- Executive: 3098.0 hrs | $697,050
-- DoD: 3098.0 hrs | $851,950
+- Internal: 1417.9 hrs | $212,688
+- Executive: 1417.9 hrs | $319,032
+- DoD: 1417.9 hrs | $389,928
 - Full detail: `release_kpis/TEC_SUMMARY.md`
 
 **Notes:**
 - Some KPIs are auto-derived from repo telemetry (tests, docs, workflows, pilot drills).
 - Economic and Scalability are auto-derived from DISR metrics and capped by evidence eligibility (`kpi_eligible` / `evidence_level`).
 - Authority Modeling remains manual/judgment-based until authority telemetry scoring is wired.
+
+**Insights Metrics:**
+- Score: 6.16/10
+- Signals: 3
+- Source: `release_kpis/insights_metrics.json`
+
 
 **Layer Coverage (Decision Infrastructure):**
 - Layer_0_Intent: authority_modeling, operational_maturity
