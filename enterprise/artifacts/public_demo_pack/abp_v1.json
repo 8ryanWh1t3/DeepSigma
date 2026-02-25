@@ -1,0 +1,159 @@
+{
+  "abp_version": "1.0",
+  "abp_id": "ABP-14dbac91",
+  "scope": {
+    "contract_id": "CTR-DEMO-001",
+    "program": "SEQUOIA",
+    "modules": [
+      "hiring",
+      "bid",
+      "compliance",
+      "boe"
+    ]
+  },
+  "authority_ref": {
+    "authority_entry_id": "AUTH-033059a5",
+    "authority_entry_hash": "sha256:521ae3f9e87b49dd954160ba859fe96205d15367c807bc96b8f6368e60d3d40c",
+    "authority_ledger_path": "enterprise/artifacts/public_demo_pack/authority_ledger.ndjson"
+  },
+  "objectives": {
+    "allowed": [
+      {
+        "id": "OBJ-001",
+        "description": "Evaluate bid/no-bid for opportunity DEC-001"
+      },
+      {
+        "id": "OBJ-002",
+        "description": "Assess staffing readiness for contract execution"
+      }
+    ],
+    "denied": [
+      {
+        "id": "OBJ-D01",
+        "description": "Modify sealed decisions",
+        "reason": "Sealed artifacts are immutable per governance policy"
+      }
+    ]
+  },
+  "tools": {
+    "allow": [
+      {
+        "name": "seal_bundle",
+        "scope": "DEC-001"
+      },
+      {
+        "name": "sign_artifact",
+        "scope": "DEC-001"
+      },
+      {
+        "name": "replay_sealed_run",
+        "scope": null
+      }
+    ],
+    "deny": [
+      {
+        "name": "authority_ledger_revoke",
+        "reason": "Only reviewers may revoke authority grants"
+      }
+    ]
+  },
+  "data": {
+    "permissions": [
+      {
+        "resource": "decision_log.csv",
+        "operations": [
+          "read"
+        ],
+        "roles": [
+          "Operator"
+        ],
+        "sensitivity": "internal"
+      },
+      {
+        "resource": "sealed_runs/*",
+        "operations": [
+          "read",
+          "write"
+        ],
+        "roles": [
+          "Operator"
+        ],
+        "sensitivity": "confidential"
+      }
+    ]
+  },
+  "approvals": {
+    "required": [
+      {
+        "action": "seal_decision",
+        "approver_role": "Reviewer",
+        "threshold": 1,
+        "timeout_ms": null
+      },
+      {
+        "action": "revoke_authority",
+        "approver_role": "Admin",
+        "threshold": 1,
+        "timeout_ms": 86400000
+      }
+    ]
+  },
+  "escalation": {
+    "paths": [
+      {
+        "trigger": "gate_fail",
+        "destination": "Reviewer",
+        "severity": "warn",
+        "auto": true
+      },
+      {
+        "trigger": "authority_expired",
+        "destination": "Admin",
+        "severity": "critical",
+        "auto": true
+      }
+    ]
+  },
+  "runtime": {
+    "validators": [
+      {
+        "name": "authority_envelope_complete",
+        "when": "pre_action",
+        "fail_action": "block",
+        "config": {}
+      },
+      {
+        "name": "policy_hash_matches",
+        "when": "pre_action",
+        "fail_action": "block",
+        "config": {}
+      },
+      {
+        "name": "drift_threshold",
+        "when": "periodic",
+        "fail_action": "escalate",
+        "config": {
+          "max_ds": 6
+        }
+      }
+    ]
+  },
+  "proof": {
+    "required": [
+      "seal",
+      "manifest",
+      "pack_hash",
+      "transparency_log",
+      "authority_ledger"
+    ]
+  },
+  "composition": {
+    "parent_abp_id": null,
+    "parent_abp_hash": null,
+    "children": []
+  },
+  "effective_at": "2026-02-21T00:00:00Z",
+  "expires_at": null,
+  "created_at": "2026-02-24T00:00:00Z",
+  "hash": "sha256:d1b8789663a8521006cd1b5cae10c1c3c835dec77d57e7b8cf77eb807c9aa4e8"
+}

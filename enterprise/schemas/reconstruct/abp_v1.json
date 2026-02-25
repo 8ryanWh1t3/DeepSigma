@@ -1,0 +1,321 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://deepsigma.dev/schemas/reconstruct/abp_v1.json",
+  "title": "Authority Boundary Primitive v1",
+  "description": "Stack-independent, pre-runtime declaration of what is allowed, denied, and required before any enforcement engine executes.",
+  "type": "object",
+  "required": [
+    "abp_version",
+    "abp_id",
+    "scope",
+    "authority_ref",
+    "objectives",
+    "tools",
+    "data",
+    "approvals",
+    "escalation",
+    "runtime",
+    "proof",
+    "composition",
+    "effective_at",
+    "expires_at",
+    "created_at",
+    "hash"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "abp_version": {
+      "const": "1.0",
+      "description": "ABP schema version."
+    },
+    "abp_id": {
+      "type": "string",
+      "pattern": "^ABP-[a-f0-9]{8}$",
+      "description": "Deterministic ABP ID: ABP- + first 8 hex chars of sha256(canonical(scope + authority_ref + created_at))."
+    },
+    "scope": {
+      "type": "object",
+      "required": ["contract_id", "program", "modules"],
+      "additionalProperties": false,
+      "properties": {
+        "contract_id": {
+          "type": ["string", "null"],
+          "description": "Contract identifier this ABP applies to."
+        },
+        "program": {
+          "type": ["string", "null"],
+          "description": "Program name (e.g. SEQUOIA)."
+        },
+        "modules": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Module names in scope (e.g. hiring, bid, compliance, boe)."
+        }
+      }
+    },
+    "authority_ref": {
+      "type": "object",
+      "required": ["authority_entry_id", "authority_entry_hash", "authority_ledger_path"],
+      "additionalProperties": false,
+      "properties": {
+        "authority_entry_id": {
+          "type": "string",
+          "pattern": "^AUTH-[a-f0-9]{8}$",
+          "description": "Entry ID from the authority ledger."
+        },
+        "authority_entry_hash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$",
+          "description": "Hash of the referenced authority ledger entry."
+        },
+        "authority_ledger_path": {
+          "type": ["string", "null"],
+          "description": "Relative path to the authority ledger file."
+        }
+      }
+    },
+    "objectives": {
+      "type": "object",
+      "required": ["allowed", "denied"],
+      "additionalProperties": false,
+      "properties": {
+        "allowed": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "description"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          },
+          "description": "Objectives the operator is permitted to pursue."
+        },
+        "denied": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "description", "reason"],
+            "additionalProperties": false,
+            "properties": {
+              "id": { "type": "string" },
+              "description": { "type": "string" },
+              "reason": { "type": "string" }
+            }
+          },
+          "description": "Objectives explicitly denied with reason."
+        }
+      }
+    },
+    "tools": {
+      "type": "object",
+      "required": ["allow", "deny"],
+      "additionalProperties": false,
+      "properties": {
+        "allow": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "scope"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string" },
+              "scope": { "type": ["string", "null"] }
+            }
+          },
+          "description": "Tools the operator may invoke, optionally scoped."
+        },
+        "deny": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "reason"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string" },
+              "reason": { "type": "string" }
+            }
+          },
+          "description": "Tools explicitly denied with reason."
+        }
+      }
+    },
+    "data": {
+      "type": "object",
+      "required": ["permissions"],
+      "additionalProperties": false,
+      "properties": {
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["resource", "operations", "roles", "sensitivity"],
+            "additionalProperties": false,
+            "properties": {
+              "resource": {
+                "type": "string",
+                "description": "Resource path or pattern."
+              },
+              "operations": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["read", "write", "delete"]
+                },
+                "description": "Permitted operations."
+              },
+              "roles": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Roles that hold this permission."
+              },
+              "sensitivity": {
+                "type": "string",
+                "enum": ["public", "internal", "confidential", "restricted"],
+                "description": "Data sensitivity tier."
+              }
+            }
+          }
+        }
+      }
+    },
+    "approvals": {
+      "type": "object",
+      "required": ["required"],
+      "additionalProperties": false,
+      "properties": {
+        "required": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["action", "approver_role", "threshold", "timeout_ms"],
+            "additionalProperties": false,
+            "properties": {
+              "action": { "type": "string" },
+              "approver_role": { "type": "string" },
+              "threshold": { "type": "integer", "minimum": 1 },
+              "timeout_ms": { "type": ["integer", "null"] }
+            }
+          }
+        }
+      }
+    },
+    "escalation": {
+      "type": "object",
+      "required": ["paths"],
+      "additionalProperties": false,
+      "properties": {
+        "paths": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["trigger", "destination", "severity", "auto"],
+            "additionalProperties": false,
+            "properties": {
+              "trigger": { "type": "string" },
+              "destination": { "type": "string" },
+              "severity": {
+                "type": "string",
+                "enum": ["info", "warn", "critical"]
+              },
+              "auto": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "required": ["validators"],
+      "additionalProperties": false,
+      "properties": {
+        "validators": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "when", "fail_action", "config"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string" },
+              "when": {
+                "type": "string",
+                "enum": ["pre_action", "post_action", "periodic"]
+              },
+              "fail_action": {
+                "type": "string",
+                "enum": ["block", "warn", "escalate", "degrade"]
+              },
+              "config": {
+                "type": "object",
+                "description": "Validator-specific configuration."
+              }
+            }
+          }
+        }
+      }
+    },
+    "proof": {
+      "type": "object",
+      "required": ["required"],
+      "additionalProperties": false,
+      "properties": {
+        "required": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["seal", "manifest", "pack_hash", "episode_log", "transparency_log", "authority_ledger"]
+          },
+          "description": "Proof artifacts the ABP expects enforcement engines to produce."
+        }
+      }
+    },
+    "composition": {
+      "type": "object",
+      "required": ["parent_abp_id", "parent_abp_hash", "children"],
+      "additionalProperties": false,
+      "properties": {
+        "parent_abp_id": {
+          "type": ["string", "null"],
+          "description": "Parent ABP ID if this is a child ABP."
+        },
+        "parent_abp_hash": {
+          "type": ["string", "null"],
+          "description": "Content hash of the parent ABP."
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["abp_id", "abp_hash"],
+            "additionalProperties": false,
+            "properties": {
+              "abp_id": { "type": "string" },
+              "abp_hash": { "type": "string" }
+            }
+          },
+          "description": "Child ABP references (for program-level composition)."
+        }
+      }
+    },
+    "effective_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this ABP becomes effective (ISO 8601)."
+    },
+    "expires_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "When this ABP expires (ISO 8601). Null if no expiry."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this ABP was created (ISO 8601)."
+    },
+    "hash": {
+      "type": "string",
+      "description": "Self-authenticating content hash: sha256(canonical(abp with hash=''))."
+    }
+  }
+}
