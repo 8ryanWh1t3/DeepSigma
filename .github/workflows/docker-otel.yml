@@ -9,7 +9,7 @@ on:
       - 'src/engine/**'
       - 'src/core/**'
       - 'pyproject.toml'
-      - 'docker/Dockerfile.otel'
+      - 'enterprise/docker/Dockerfile.otel'
       - '.github/workflows/docker-otel.yml'
   workflow_dispatch:
 
@@ -54,7 +54,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./docker/Dockerfile.otel
+          file: ./enterprise/docker/Dockerfile.otel
           build-args: INSTALL_OTLP=grpc
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}

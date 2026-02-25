@@ -6,7 +6,7 @@ on:
     tags: ['v*']
     paths:
       - 'docs/rdf/**'
-      - 'docker/Dockerfile.rdf'
+      - 'enterprise/docker/Dockerfile.rdf'
       - '.github/workflows/docker-rdf.yml'
   workflow_dispatch:
 
@@ -51,7 +51,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./docker/Dockerfile.rdf
+          file: ./enterprise/docker/Dockerfile.rdf
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

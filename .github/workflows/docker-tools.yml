@@ -13,7 +13,7 @@ on:
       - 'src/adapters/**'
       - 'docs/policy_packs/**'
       - 'pyproject.toml'
-      - 'docker/Dockerfile.tools'
+      - 'enterprise/docker/Dockerfile.tools'
       - '.github/workflows/docker-tools.yml'
   workflow_dispatch:
 
@@ -58,7 +58,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./docker/Dockerfile.tools
+          file: ./enterprise/docker/Dockerfile.tools
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

@@ -40,7 +40,6 @@ COPY src/engine/ /app/engine/
 COPY src/core/ /app/core/
 COPY src/verifiers/ /app/verifiers/
 COPY src/tools/ /app/tools/
-COPY schemas/ /app/schemas/
 
 RUN pip install --no-cache-dir -e /app
 

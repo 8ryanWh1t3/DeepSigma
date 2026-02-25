@@ -15,7 +15,7 @@ on:
       - 'specs/**'
       - 'src/adapters/**'
       - 'pyproject.toml'
-      - 'docker/Dockerfile.exhaust'
+      - 'enterprise/docker/Dockerfile.exhaust'
       - '.github/workflows/docker-exhaust.yml'
   workflow_dispatch:
 
@@ -60,7 +60,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./docker/Dockerfile.exhaust
+          file: ./enterprise/docker/Dockerfile.exhaust
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

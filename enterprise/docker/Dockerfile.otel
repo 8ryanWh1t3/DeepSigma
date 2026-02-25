@@ -44,7 +44,6 @@ COPY src/adapters/otel/ /app/adapters/otel/
 COPY src/adapters/__init__.py /app/adapters/__init__.py
 COPY src/engine/ /app/engine/
 COPY src/core/ /app/core/
-COPY schemas/ /app/schemas/
 
 RUN pip install --no-cache-dir -e /app
 

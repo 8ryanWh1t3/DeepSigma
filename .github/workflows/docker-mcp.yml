@@ -10,7 +10,7 @@ on:
       - 'src/core/**'
       - 'specs/**'
       - 'pyproject.toml'
-      - 'docker/Dockerfile.mcp'
+      - 'enterprise/docker/Dockerfile.mcp'
       - '.github/workflows/docker-mcp.yml'
   workflow_dispatch:
 
@@ -55,7 +55,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./docker/Dockerfile.mcp
+          file: ./enterprise/docker/Dockerfile.mcp
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
