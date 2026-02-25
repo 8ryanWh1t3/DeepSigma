@@ -14,6 +14,8 @@ from dataclasses import asdict, dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
+from .normalize import normalize_keys
+
 logger = logging.getLogger(__name__)
 
 
@@ -106,29 +108,30 @@ class MemoryGraph:
 
     def add_episode(self, episode: Dict[str, Any]) -> str:
         """Add a sealed episode as a node, plus action and evidence nodes."""
-        ep_id = episode.get("episodeId", "")
+        episode = normalize_keys(episode, style="snake")
+        ep_id = episode.get("episode_id", "")
         self._add_node(GraphNode(
             node_id=ep_id,
             kind=NodeKind.EPISODE,
-            label=episode.get("decisionType", ""),
-            timestamp=episode.get("sealedAt", episode.get("endedAt")),
+            label=episode.get("decision_type", ""),
+            timestamp=episode.get("sealed_at", episode.get("ended_at")),
             properties={
                 "outcome": episode.get("outcome", {}).get("code"),
                 "degrade_step": episode.get("degrade", {}).get("step"),
-                "seal_hash": episode.get("seal", {}).get("sealHash"),
+                "seal_hash": episode.get("seal", {}).get("seal_hash"),
             },
         ))
 
         # Action nodes
         for idx, action in enumerate(episode.get("actions", [])):
-            act_id = action.get("idempotencyKey", f"{ep_id}:action:{idx}")
+            act_id = action.get("idempotency_key", f"{ep_id}:action:{idx}")
             self._add_node(GraphNode(
                 node_id=act_id,
                 kind=NodeKind.ACTION,
                 label=action.get("type", ""),
                 properties={
-                    "blast_radius": action.get("blastRadiusTier"),
-                    "targets": action.get("targetRefs", []),
+                    "blast_radius": action.get("blast_radius_tier"),
+                    "targets": action.get("target_refs", []),
                 },
             ))
             self._add_edge(GraphEdge(
@@ -138,7 +141,7 @@ class MemoryGraph:
             ))
 
         # Evidence nodes
-        for ref in episode.get("context", {}).get("evidenceRefs", []):
+        for ref in episode.get("context", {}).get("evidence_refs", []):
             ev_id = f"evidence:{ref}"
             self._add_node(GraphNode(
                 node_id=ev_id,
@@ -159,18 +162,19 @@ class MemoryGraph:
 
     def add_drift(self, drift: Dict[str, Any]) -> str:
         """Add a drift event as a node and link to its episode."""
-        drift_id = drift.get("driftId", "")
-        episode_id = drift.get("episodeId", "")
+        drift = normalize_keys(drift, style="snake")
+        drift_id = drift.get("drift_id", "")
+        episode_id = drift.get("episode_id", "")
         fp = drift.get("fingerprint", {})
         self._add_node(GraphNode(
             node_id=drift_id,
             kind=NodeKind.DRIFT,
-            label=drift.get("driftType", ""),
-            timestamp=drift.get("detectedAt"),
+            label=drift.get("drift_type", ""),
+            timestamp=drift.get("detected_at"),
             properties={
                 "severity": drift.get("severity"),
                 "fingerprint_key": fp.get("key"),
-                "recommended_patch": drift.get("recommendedPatchType"),
+                "recommended_patch": drift.get("recommended_patch_type"),
             },
         ))
         if episode_id and episode_id in self._nodes:
@@ -195,19 +199,20 @@ class MemoryGraph:
 
         logger.debug(
             "Added drift node %s (type=%s)",
-            drift_id, drift.get("driftType"),
+            drift_id, drift.get("drift_type"),
         )
         return drift_id
 
     def add_patch(self, patch: Dict[str, Any]) -> str:
         """Add a patch record and link to the drift it resolves."""
-        patch_id = patch.get("patchId", "")
-        drift_id = patch.get("driftId", "")
+        patch = normalize_keys(patch, style="snake")
+        patch_id = patch.get("patch_id", "")
+        drift_id = patch.get("drift_id", "")
         self._add_node(GraphNode(
             node_id=patch_id,
             kind=NodeKind.PATCH,
-            label=patch.get("patchType", ""),
-            timestamp=patch.get("appliedAt"),
+            label=patch.get("patch_type", ""),
+            timestamp=patch.get("applied_at"),
             properties={
                 "description": patch.get("description"),
                 "changes": patch.get("changes", []),
@@ -233,21 +238,22 @@ class MemoryGraph:
         Returns:
             The claim_id of the added node.
         """
-        claim_id = claim.get("claimId", "")
+        claim = normalize_keys(claim, style="snake")
+        claim_id = claim.get("claim_id", "")
         self._add_node(GraphNode(
             node_id=claim_id,
             kind=NodeKind.CLAIM,
             label=claim.get("statement", ""),
-            timestamp=claim.get("timestampCreated"),
+            timestamp=claim.get("timestamp_created"),
             properties={
-                "truth_type": claim.get("truthType"),
+                "truth_type": claim.get("truth_type"),
                 "confidence": claim.get("confidence", {}).get("score"),
-                "status_light": claim.get("statusLight"),
+                "status_light": claim.get("status_light"),
                 "owner": claim.get("owner"),
                 "version": claim.get("version"),
-                "half_life_value": claim.get("halfLife", {}).get("value"),
-                "half_life_unit": claim.get("halfLife", {}).get("unit"),
-                "classification": claim.get("classificationTag"),
+                "half_life_value": claim.get("half_life", {}).get("value"),
+                "half_life_unit": claim.get("half_life", {}).get("unit"),
+                "classification": claim.get("classification_tag"),
                 "seal_hash": claim.get("seal", {}).get("hash"),
             },
         ))
@@ -262,7 +268,7 @@ class MemoryGraph:
 
         # Graph topology edges
         graph = claim.get("graph", {})
-        for dep in graph.get("dependsOn", []):
+        for dep in graph.get("depends_on", []):
             self._add_edge(GraphEdge(
                 source_id=claim_id,
                 target_id=dep,
@@ -309,7 +315,7 @@ class MemoryGraph:
 
         logger.debug(
             "Added claim node %s (type=%s, confidence=%s)",
-            claim_id, claim.get("truthType"),
+            claim_id, claim.get("truth_type"),
             claim.get("confidence", {}).get("score"),
         )
         return claim_id
