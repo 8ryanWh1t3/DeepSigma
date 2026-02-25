@@ -23,6 +23,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from authority_ledger_verify import verify_ledger  # noqa: E402
 from determinism_audit import audit_sealed_run  # noqa: E402
+from verify_abp import verify_abp  # noqa: E402
 from replay_sealed_run import replay  # noqa: E402
 from transparency_log_append import verify_chain  # noqa: E402
 from verify_signature import verify as verify_signature  # noqa: E402
@@ -61,7 +62,7 @@ def _find_sealed(pack_dir: Path) -> Path | None:
         if c.name.endswith(".sig.json") or c.name.endswith(".manifest.json"):
             continue
         if c.name in ("transparency_log.ndjson", "authority_ledger.ndjson",
-                       "LOG_HEAD.json", "VERIFY_INSTRUCTIONS.md"):
+                       "LOG_HEAD.json", "VERIFY_INSTRUCTIONS.md", "abp_v1.json"):
             continue
         try:
             data = json.loads(c.read_text())
@@ -120,6 +121,12 @@ def verify_pack(
     discovery_checks.append(("authority_ledger", True,
                              "authority_ledger.ndjson" if has_ledger else "Not present (optional)"))
 
+    # Discover ABP (optional — absence is not a failure)
+    abp_path = pack_dir / "abp_v1.json"
+    has_abp = abp_path.exists()
+    discovery_checks.append(("abp", True,
+                             "abp_v1.json" if has_abp else "Not present (optional)"))
+
     result.add_section("Discovery", discovery_checks)
 
     # ── 1. Replay sealed run ──────────────────────────────────────
@@ -176,7 +183,12 @@ def verify_pack(
         ledger_result = verify_ledger(ledger_path)
         result.add_section("Authority Ledger", ledger_result.checks)
 
-    # ── 4. Determinism audit ──────────────────────────────────────
+    # ── 4. Authority Boundary Primitive ──────────────────────────
+    if has_abp:
+        abp_result = verify_abp(abp_path, ledger_path if has_ledger else None)
+        result.add_section("Authority Boundary Primitive", abp_result.checks)
+
+    # ── 5. Determinism audit ──────────────────────────────────────
     audit_result = audit_sealed_run(sealed_path, strict=strict)
     audit_checks: list[tuple[str, bool, str]] = [
         ("determinism.violations", audit_result.violations == 0,

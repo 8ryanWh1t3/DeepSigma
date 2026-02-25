@@ -44,6 +44,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from authority_ledger_append import append_entry as append_authority_entry  # noqa: E402
+from build_abp import build_abp, write_abp, _resolve_authority_ref  # noqa: E402
 from determinism_audit import audit_sealed_run  # noqa: E402
 from deterministic_io import read_csv_deterministic  # noqa: E402
 from replay_sealed_run import replay  # noqa: E402
@@ -84,6 +85,9 @@ def seal_and_prove(
     authority_ledger: Path | None = None,
     authority_entry_id: str | None = None,
     auto_authority: bool = False,
+    abp_path: Path | None = None,
+    abp_config: Path | None = None,
+    auto_abp: bool = False,
 ) -> dict:
     """Run the full seal-and-prove pipeline. Returns summary dict."""
     errors: list[str] = []
@@ -128,6 +132,33 @@ def seal_and_prove(
             effective_at=clock,
         )
         authority_entry_id = auth_entry["entry_id"]
+
+    # ── Step 1c: Build or load ABP (optional) ───────────────────
+    abp_artifact_path: Path | None = None
+    if abp_path and abp_path.exists():
+        abp_artifact_path = abp_path
+    elif (auto_abp or abp_config) and authority_entry_id:
+        abp_cfg = {}
+        if abp_config and abp_config.exists():
+            abp_cfg = json.loads(abp_config.read_text())
+        try:
+            auth_ref = _resolve_authority_ref(authority_entry_id, authority_ledger_path)
+            abp_scope = abp_cfg.pop("scope", {
+                "contract_id": decision_id,
+                "program": None,
+                "modules": [],
+            })
+            abp_obj = build_abp(
+                scope=abp_scope,
+                authority_ref=auth_ref,
+                clock=clock,
+                **{k: v for k, v in abp_cfg.items()
+                   if k in ("objectives", "tools", "data", "approvals",
+                            "escalation", "runtime", "proof")},
+            )
+            abp_artifact_path = write_abp(abp_obj, out_dir)
+        except (ValueError, KeyError) as e:
+            errors.append(f"ABP build: {e}")
 
     # ── Step 2: Build sealed run (includes merkle commitments) ───
     sealed, filename, run_id = build_sealed_run(
@@ -232,6 +263,9 @@ def seal_and_prove(
         # Copy authority ledger if it exists
         if authority_entry_id and authority_ledger_path.exists():
             shutil.copy2(authority_ledger_path, pack_dir / "authority_ledger.ndjson")
+        # Copy ABP if it exists
+        if abp_artifact_path and abp_artifact_path.exists():
+            shutil.copy2(abp_artifact_path, pack_dir / "abp_v1.json")
         # Write verify instructions
         verify_instructions = (
             "# Verify This Pack\n\n"
@@ -253,6 +287,7 @@ def seal_and_prove(
         "sig_paths": [str(p) for p in sig_paths],
         "transparency_entry": log_entry.get("entry_id") if log_entry else None,
         "authority_entry_id": authority_entry_id,
+        "abp_path": str(abp_artifact_path) if abp_artifact_path else None,
         "audit_clean": audit_result.violations == 0 if audit_result else None,
         "replay_passed": replay_result.passed if replay_result else None,
         "pack_dir": str(pack_dir) if pack_dir else None,
@@ -298,6 +333,12 @@ def main() -> int:
                         help="Authority entry ID to bind to sealed run")
     parser.add_argument("--auto-authority", action="store_true",
                         help="Auto-append an authority entry before sealing")
+    parser.add_argument("--abp-path", type=Path, default=None,
+                        help="Path to pre-built ABP v1 JSON")
+    parser.add_argument("--abp-config", type=Path, default=None,
+                        help="Path to ABP config JSON for auto-build")
+    parser.add_argument("--auto-abp", action="store_true",
+                        help="Auto-build ABP from authority + defaults")
     args = parser.parse_args()
 
     # Resolve signing key
@@ -335,6 +376,9 @@ def main() -> int:
             authority_ledger=args.authority_ledger,
             authority_entry_id=args.authority_entry_id,
             auto_authority=args.auto_authority,
+            abp_path=args.abp_path,
+            abp_config=args.abp_config,
+            auto_abp=args.auto_abp,
         )
     except (FileNotFoundError, ValueError) as e:
         print(f"ERROR: {e}", file=sys.stderr)
@@ -355,6 +399,8 @@ def main() -> int:
         print(f"  Log entry:         {summary['transparency_entry']}")
     if summary.get("authority_entry_id"):
         print(f"  Authority entry:   {summary['authority_entry_id']}")
+    if summary.get("abp_path"):
+        print(f"  ABP:               {summary['abp_path']}")
     if summary["audit_clean"] is not None:
         icon = "PASS" if summary["audit_clean"] else "FAIL"
         print(f"  Determinism audit: [{icon}]")
