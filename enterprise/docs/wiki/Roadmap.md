@@ -1,37 +1,108 @@
 # Roadmap
 
-Current roadmap is organized into four execution tracks.
+## Recently Shipped
 
-## Track A — Credibility Hardening (v2.0.7)
+- **v2.0.6** — KPI confidence bands, C-TEC pipeline, DISR dual-mode crypto, release preflight flow
+- **ABP v1** — Authority Boundary Primitive: stack-independent, pre-runtime governance declaration (#419)
+- **TEC/C-TEC v2** — Health pipeline + roadmap auto-sync (#391)
 
-- KPI confidence bands (score + uncertainty)
-- KPI evidence-tier gating (simulated/real/production)
-- Stale artifact kill-switch in CI
-- Security posture proof-pack hardening
+## v2.0.7 — Stability & Credibility Hardening
 
-## Track B — Adoption Wedge (v2.0.8)
+Two workstreams: nonlinear stability metrics and credibility evidence.
 
-- `make try` 10-minute pilot mode
-- Decision Office scaffolding templates
-- Shareable pilot distribution pack
+### Nonlinear Stability Layer (#340 EPIC)
 
-## Track C — Enterprise Integration (v2.1.0-pre)
+- [#337](https://github.com/8ryanWh1t3/DeepSigma/issues/337) System Stability Index (SSI) metric
+- [#338](https://github.com/8ryanWh1t3/DeepSigma/issues/338) Drift Acceleration Detection Engine
+- [#339](https://github.com/8ryanWh1t3/DeepSigma/issues/339) TEC Sensitivity & Variance Modeling
 
-- GitHub Issues -> DLR mapping
-- SharePoint/Teams export mode
-- Jira import/export adapter
+### Credibility Evidence
 
-## Track D — DISR Architecture Expansion (v2.1.0)
+- [#315](https://github.com/8ryanWh1t3/DeepSigma/issues/315) KPI Eligibility Tiers (Simulated/Real/Production)
+- [#316](https://github.com/8ryanWh1t3/DeepSigma/issues/316) Stale Artifact Kill-Switch (P0)
+- [#317](https://github.com/8ryanWh1t3/DeepSigma/issues/317) Security Posture Proof Pack v2
 
-- Dual-mode crypto providers (local default + optional KMS)
-- Authority-bound action contracts
-- Streaming re-encrypt with checkpoint/resume
-- Signed telemetry event chain and exportable audit pack
+## v2.1.0 — Decision Infrastructure Hardening
+
+**Gate:** All 8 KPI axes >= 7.0 (#394)
+
+Two workstreams: KPI gap closure (6 epics, 18 child tasks) and DISR architecture.
+
+### KPI Gap Closure
+
+Each epic targets a single KPI axis below 7.0. Child tasks are the concrete deliverables.
+
+**Automation Depth** (#395)
+
+- [#401](https://github.com/8ryanWh1t3/DeepSigma/issues/401) Pre-Exec Gate Required in CI and Runtime Entry
+- [#402](https://github.com/8ryanWh1t3/DeepSigma/issues/402) Idempotency/Nonce Enforcement with Replay Block
+- [#403](https://github.com/8ryanWh1t3/DeepSigma/issues/403) Deterministic Replay Gate and Artifact Validation
+
+**Economic Measurability** (#396)
+
+- [#404](https://github.com/8ryanWh1t3/DeepSigma/issues/404) Decision Cost Ledger Schema + Emitter
+- [#405](https://github.com/8ryanWh1t3/DeepSigma/issues/405) Drift-to-Patch Value Delta Calculator
+- [#406](https://github.com/8ryanWh1t3/DeepSigma/issues/406) Economic KPI Ingestion Gate
+- [#392](https://github.com/8ryanWh1t3/DeepSigma/issues/392) Economic Evidence Ledger
+
+**Enterprise Readiness** (#397)
+
+- [#407](https://github.com/8ryanWh1t3/DeepSigma/issues/407) Enterprise Deploy Sanity Workflow (docker/helm/config)
+- [#408](https://github.com/8ryanWh1t3/DeepSigma/issues/408) Audit-Neutral Pack Completeness Validator
+- [#409](https://github.com/8ryanWh1t3/DeepSigma/issues/409) Enterprise Operator Runbook + Release Checklist Gate
+
+**Scalability** (#398)
+
+- [#410](https://github.com/8ryanWh1t3/DeepSigma/issues/410) Deterministic Scale Benchmark Harness
+- [#411](https://github.com/8ryanWh1t3/DeepSigma/issues/411) Scalability Regression Threshold Gate
+- [#412](https://github.com/8ryanWh1t3/DeepSigma/issues/412) Benchmark Trend Export into KPI Pipeline
+
+**Authority Modeling** (#399)
+
+- [#413](https://github.com/8ryanWh1t3/DeepSigma/issues/413) Production Signature Key Custody + Verification Path
+- [#414](https://github.com/8ryanWh1t3/DeepSigma/issues/414) Structural Refusal Authority Contract
+- [#415](https://github.com/8ryanWh1t3/DeepSigma/issues/415) Authority Evidence Chain Export
+
+**Technical Completeness** (#400)
+
+- [#416](https://github.com/8ryanWh1t3/DeepSigma/issues/416) Sealed Input Snapshot + Environment Fingerprint Contract
+- [#417](https://github.com/8ryanWh1t3/DeepSigma/issues/417) Intent/Decision/Evidence Schema Version Enforcement
+- [#418](https://github.com/8ryanWh1t3/DeepSigma/issues/418) Replay Reproducibility Tests in CI
+
+#### Standalone
+
+- [#393](https://github.com/8ryanWh1t3/DeepSigma/issues/393) Evidence Source Binding Schema (Data Integration)
+- [#349](https://github.com/8ryanWh1t3/DeepSigma/issues/349) Intent Mutation Detection (P2, Operational Maturity)
+
+### DISR Architecture
+
+- [#324](https://github.com/8ryanWh1t3/DeepSigma/issues/324) DISR Provider Interface Abstraction
+- [#325](https://github.com/8ryanWh1t3/DeepSigma/issues/325) Authority-Bound Action Contracts (P0)
+- [#326](https://github.com/8ryanWh1t3/DeepSigma/issues/326) Streaming Re-encrypt Engine with Checkpointing
+- [#327](https://github.com/8ryanWh1t3/DeepSigma/issues/327) Signed Telemetry Event Chain
+
+### Controls
+
+- [#332](https://github.com/8ryanWh1t3/DeepSigma/issues/332) LOCK: v2.1.0 Scope Freeze
+- [#358](https://github.com/8ryanWh1t3/DeepSigma/issues/358) MILESTONE: v2.1.0 Decision Infrastructure Hardening
+
+## v2.1.1 — Institutional Expansion (Dormant)
+
+Deferred until v2.1.0 gate passes. Includes adoption tooling, enterprise connectors, and DISR v2.
+
+- [#333](https://github.com/8ryanWh1t3/DeepSigma/issues/333) EPIC: v2.1.1 Institutional Expansion
+- [#334](https://github.com/8ryanWh1t3/DeepSigma/issues/334) Enterprise Connectors Suite (Jira, SharePoint, GitHub→DLR)
+- [#335](https://github.com/8ryanWh1t3/DeepSigma/issues/335) DISR Provider Abstraction Layer v2
+- [#318](https://github.com/8ryanWh1t3/DeepSigma/issues/318) `make try` 10-Minute Pilot Mode
+- [#319](https://github.com/8ryanWh1t3/DeepSigma/issues/319) Decision Office Templates
+- [#320](https://github.com/8ryanWh1t3/DeepSigma/issues/320) pilot_pack Folder
+- [#321](https://github.com/8ryanWh1t3/DeepSigma/issues/321) GitHub Issues → DLR Mapping
+- [#322](https://github.com/8ryanWh1t3/DeepSigma/issues/322) SharePoint / Teams Export Mode
+- [#323](https://github.com/8ryanWh1t3/DeepSigma/issues/323) Jira Import/Export Adapter
 
 ## Release Proof Requirements
 
 - Version parity across `pyproject.toml`, release notes, and KPI artifacts
 - Reproducible KPI pipeline output (`release_kpis/`)
 - Security gate and issue-label gate passing
-- Pilot evidence pack generated and linked
-
+- All 8 KPI axes >= 7.0 before v2.1.0 tag
