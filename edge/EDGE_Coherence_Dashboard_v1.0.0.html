@@ -3367,6 +3367,12 @@
     </nav>
 
     <script>
+        // Escape HTML to prevent XSS
+        function escapeHtml(s) {
+            if (s == null) return '';
+            return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+        }
+
         // Data
         const data = {
             ci: 87.6,
@@ -4041,8 +4047,8 @@
             toast.innerHTML = `
                 <span class="toast-icon">${icons[type]}</span>
                 <div class="toast-content">
-                    <div class="toast-title">${title}</div>
-                    <div class="toast-desc">${desc}</div>
+                    <div class="toast-title">${escapeHtml(title)}</div>
+                    <div class="toast-desc">${escapeHtml(desc)}</div>
                 </div>
                 <button class="toast-close" onclick="this.parentElement.remove()">×</button>
             `;
@@ -4677,29 +4683,29 @@
             const goalShort = goal ? goal.split(':')[0] : '—';
             const alignIcon = alignment ? alignment.split(' ')[0] : '—';
 
-            preview.innerHTML = 
+            preview.innerHTML =
                 '<div class="preview-claim">' +
                     '<div class="preview-claim-header">' +
-                        '<span class="preview-claim-id">' + (id || '[ID]') + '</span>' +
+                        '<span class="preview-claim-id">' + escapeHtml(id || '[ID]') + '</span>' +
                         '<div style="display:flex;gap:6px;">' +
-                            '<span class="claim-type ' + (type || '') + '">' + (type || '?') + '</span>' +
-                            '<span class="claim-status ' + statusValue + '">' + statusValue + '</span>' +
+                            '<span class="claim-type ' + escapeHtml(type || '') + '">' + escapeHtml(type || '?') + '</span>' +
+                            '<span class="claim-status ' + escapeHtml(statusValue) + '">' + escapeHtml(statusValue) + '</span>' +
                         '</div>' +
                     '</div>' +
                     '<div class="preview-claim-body">' +
-                        '<div class="preview-claim-statement">' + (statement || '<em style="color:var(--text-muted)">Enter statement...</em>') + '</div>' +
+                        '<div class="preview-claim-statement">' + (statement ? escapeHtml(statement) : '<em style="color:var(--text-muted)">Enter statement...</em>') + '</div>' +
                         // Task Alignment Row
-                        (task || thread ? 
+                        (task || thread ?
                         '<div class="preview-task-row">' +
-                            '<span class="preview-task-badge">' + alignIcon + ' ' + (alignment ? alignment.split(' - ')[0] : '?') + '</span>' +
-                            '<span class="preview-task-text">' + (task || 'Task TBD') + '</span>' +
-                            '<span class="preview-task-thread">' + (thread || '') + '</span>' +
+                            '<span class="preview-task-badge">' + escapeHtml(alignIcon) + ' ' + escapeHtml(alignment ? alignment.split(' - ')[0] : '?') + '</span>' +
+                            '<span class="preview-task-text">' + escapeHtml(task || 'Task TBD') + '</span>' +
+                            '<span class="preview-task-thread">' + escapeHtml(thread || '') + '</span>' +
                         '</div>' : '') +
                         '<div class="preview-claim-meta">' +
-                            '<div class="preview-meta-item"><span class="preview-meta-label">Owner</span><span class="preview-meta-value">' + ownerShort + '</span></div>' +
-                            '<div class="preview-meta-item"><span class="preview-meta-label">Goal</span><span class="preview-meta-value">' + goalShort + '</span></div>' +
-                            '<div class="preview-meta-item"><span class="preview-meta-label">Expires</span><span class="preview-meta-value">' + dateStr + '</span></div>' +
-                            '<div class="preview-meta-item"><span class="preview-meta-label">Confidence</span><span class="preview-meta-value" style="color:' + getConfidenceColor(confidence) + '">' + confidence + '%</span></div>' +
+                            '<div class="preview-meta-item"><span class="preview-meta-label">Owner</span><span class="preview-meta-value">' + escapeHtml(ownerShort) + '</span></div>' +
+                            '<div class="preview-meta-item"><span class="preview-meta-label">Goal</span><span class="preview-meta-value">' + escapeHtml(goalShort) + '</span></div>' +
+                            '<div class="preview-meta-item"><span class="preview-meta-label">Expires</span><span class="preview-meta-value">' + escapeHtml(dateStr) + '</span></div>' +
+                            '<div class="preview-meta-item"><span class="preview-meta-label">Confidence</span><span class="preview-meta-value" style="color:' + getConfidenceColor(confidence) + '">' + escapeHtml(confidence) + '%</span></div>' +
                         '</div>' +
                     '</div>' +
                 '</div>';

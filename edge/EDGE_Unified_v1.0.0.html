@@ -3398,9 +3398,9 @@ ${mods.map(m => {
         '<table class="abp-data-table"><thead><tr><th>Resource</th><th>Operations</th><th>Roles</th><th>Sensitivity</th></tr></thead><tbody>' +
         perms.map(p =>
           '<tr><td><code>' + escapeHtml(p.resource) + '</code></td>' +
-          '<td>' + (p.operations || []).join(', ') + '</td>' +
-          '<td>' + (p.roles || []).join(', ') + '</td>' +
-          '<td><span class="sensitivity ' + (p.sensitivity || '') + '">' + escapeHtml(p.sensitivity || 'n/a') + '</span></td></tr>'
+          '<td>' + (p.operations || []).map(o => escapeHtml(o)).join(', ') + '</td>' +
+          '<td>' + (p.roles || []).map(r => escapeHtml(r)).join(', ') + '</td>' +
+          '<td><span class="sensitivity ' + escapeHtml(p.sensitivity || '') + '">' + escapeHtml(p.sensitivity || 'n/a') + '</span></td></tr>'
         ).join('') +
         '</tbody></table>',
         false);
