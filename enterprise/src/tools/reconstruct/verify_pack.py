@@ -78,6 +78,7 @@ def verify_pack(
     key_b64: str | None = None,
     public_key_b64: str | None = None,
     strict: bool = False,
+    require_abp: bool = False,
 ) -> VerifyPackResult:
     """Verify all artifacts in a pack directory.
 
@@ -121,11 +122,15 @@ def verify_pack(
     discovery_checks.append(("authority_ledger", True,
                              "authority_ledger.ndjson" if has_ledger else "Not present (optional)"))
 
-    # Discover ABP (optional — absence is not a failure)
+    # Discover ABP
     abp_path = pack_dir / "abp_v1.json"
     has_abp = abp_path.exists()
-    discovery_checks.append(("abp", True,
-                             "abp_v1.json" if has_abp else "Not present (optional)"))
+    if require_abp:
+        discovery_checks.append(("abp", has_abp,
+                                 "abp_v1.json" if has_abp else "MISSING (required by --require-abp)"))
+    else:
+        discovery_checks.append(("abp", True,
+                                 "abp_v1.json" if has_abp else "Not present (recommended: use --require-abp to enforce)"))
 
     result.add_section("Discovery", discovery_checks)
 
@@ -213,6 +218,8 @@ def main() -> int:
                         help="Base64 Ed25519 public key")
     parser.add_argument("--strict", action="store_true",
                         help="Strict mode (determinism audit)")
+    parser.add_argument("--require-abp", action="store_true",
+                        help="Require ABP (abp_v1.json) in the pack — fail if missing")
     args = parser.parse_args()
 
     result = verify_pack(
@@ -220,6 +227,7 @@ def main() -> int:
         key_b64=args.key,
         public_key_b64=args.public_key,
         strict=args.strict,
+        require_abp=args.require_abp,
     )
 
     print("=" * 60)

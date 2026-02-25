@@ -2961,6 +2961,16 @@
                 justify-content: center;
             }
         }
+    
+        /* ABP Status Bar */
+        .abp-status{position:fixed;bottom:0;left:0;right:0;background:rgba(13,21,32,0.95);border-top:1px solid rgba(30,51,80,0.8);padding:6px 16px;font-size:11px;display:flex;align-items:center;gap:10px;z-index:9999;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+        .abp-status .abp-pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.5px}
+        .abp-status .abp-pill.pass{background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3)}
+        .abp-status .abp-pill.fail{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3)}
+        .abp-status .abp-id{color:#7df9ff;font-weight:700}
+        .abp-status .abp-scope{color:#8aa0b5}
+        .abp-status .abp-module{padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;text-transform:uppercase}
+        .abp-status .abp-module.in{background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.25)}
     </style>
 </head>
 <body>
@@ -6249,5 +6259,403 @@
         // Init
         document.addEventListener('DOMContentLoaded', init);
     </script>
+
+<!-- ABP Self-Verification -->
+<script type="application/json" id="ds-abp-v1">
+{
+  "abp_version": "1.0",
+  "abp_id": "ABP-bf0afe15",
+  "scope": {
+    "contract_id": "CTR-DEMO-001",
+    "program": "SEQUOIA",
+    "modules": [
+      "hiring",
+      "bid",
+      "compliance",
+      "boe",
+      "award_staffing",
+      "coherence",
+      "suite_readonly",
+      "unified"
+    ]
+  },
+  "authority_ref": {
+    "authority_entry_id": "AUTH-033059a5",
+    "authority_entry_hash": "sha256:521ae3f9e87b49dd954160ba859fe96205d15367c807bc96b8f6368e60d3d40c",
+    "authority_ledger_path": "enterprise/artifacts/public_demo_pack/authority_ledger.ndjson"
+  },
+  "objectives": {
+    "allowed": [
+      {
+        "id": "OBJ-001",
+        "description": "Evaluate bid/no-bid for opportunity DEC-001"
+      },
+      {
+        "id": "OBJ-002",
+        "description": "Assess staffing readiness for contract execution"
+      },
+      {
+        "id": "OBJ-003",
+        "description": "Map compliance requirements to deliverables"
+      },
+      {
+        "id": "OBJ-004",
+        "description": "Generate basis-of-estimate pricing models"
+      },
+      {
+        "id": "OBJ-005",
+        "description": "Estimate award staffing allocation and costs"
+      },
+      {
+        "id": "OBJ-006",
+        "description": "Monitor claim coherence and drift signals"
+      },
+      {
+        "id": "OBJ-007",
+        "description": "Present read-only unified decision surface"
+      },
+      {
+        "id": "OBJ-008",
+        "description": "Export verifiable evidence packs from any module"
+      }
+    ],
+    "denied": [
+      {
+        "id": "OBJ-D01",
+        "description": "Modify sealed decisions",
+        "reason": "Sealed artifacts are immutable per governance policy"
+      },
+      {
+        "id": "OBJ-D02",
+        "description": "Bypass ABP verification on export",
+        "reason": "All EDGE exports must carry verified ABP"
+      },
+      {
+        "id": "OBJ-D03",
+        "description": "Alter coherence scores without re-evaluation",
+        "reason": "Coherence values are derived from evidence chains"
+      }
+    ]
+  },
+  "tools": {
+    "allow": [
+      {
+        "name": "seal_bundle",
+        "scope": "DEC-001"
+      },
+      {
+        "name": "sign_artifact",
+        "scope": "DEC-001"
+      },
+      {
+        "name": "replay_sealed_run",
+        "scope": null
+      },
+      {
+        "name": "verify_pack",
+        "scope": null
+      },
+      {
+        "name": "verify_abp",
+        "scope": null
+      },
+      {
+        "name": "gate_abp",
+        "scope": null
+      },
+      {
+        "name": "export_evidence_pack",
+        "scope": "SEQUOIA"
+      }
+    ],
+    "deny": [
+      {
+        "name": "authority_ledger_revoke",
+        "reason": "Only reviewers may revoke authority grants"
+      },
+      {
+        "name": "transparency_log_delete",
+        "reason": "Append-only log cannot be truncated"
+      }
+    ]
+  },
+  "data": {
+    "permissions": [
+      {
+        "resource": "decision_log.csv",
+        "operations": [
+          "read"
+        ],
+        "roles": [
+          "Operator"
+        ],
+        "sensitivity": "internal"
+      },
+      {
+        "resource": "sealed_runs/*",
+        "operations": [
+          "read",
+          "write"
+        ],
+        "roles": [
+          "Operator"
+        ],
+        "sensitivity": "confidential"
+      },
+      {
+        "resource": "hiring_console/*",
+        "operations": [
+          "read",
+          "write"
+        ],
+        "roles": [
+          "Operator"
+        ],
+        "sensitivity": "confidential"
+      },
+      {
+        "resource": "bid_console/*",
+        "operations": [
+          "read",
+          "write"
+        ],
+        "roles": [
+          "Operator"
+        ],
+        "sensitivity": "confidential"
+      },
+      {
+        "resource": "compliance_matrix/*",
+        "operations": [
+          "read",
+          "write"
+        ],
+        "roles": [
+          "Operator"
+        ],
+        "sensitivity": "confidential"
+      },
+      {
+        "resource": "boe_pricing/*",
+        "operations": [
+          "read",
+          "write"
+        ],
+        "roles": [
+          "Operator"
+        ],
+        "sensitivity": "confidential"
+      },
+      {
+        "resource": "award_staffing/*",
+        "operations": [
+          "read",
+          "write"
+        ],
+        "roles": [
+          "Operator"
+        ],
+        "sensitivity": "internal"
+      },
+      {
+        "resource": "coherence_dashboard/*",
+        "operations": [
+          "read"
+        ],
+        "roles": [
+          "Operator",
+          "Reviewer"
+        ],
+        "sensitivity": "internal"
+      },
+      {
+        "resource": "evidence_packs/*",
+        "operations": [
+          "read"
+        ],
+        "roles": [
+          "Operator",
+          "Reviewer",
+          "Auditor"
+        ],
+        "sensitivity": "public"
+      }
+    ]
+  },
+  "approvals": {
+    "required": [
+      {
+        "action": "seal_decision",
+        "approver_role": "Reviewer",
+        "threshold": 1,
+        "timeout_ms": null
+      },
+      {
+        "action": "revoke_authority",
+        "approver_role": "Admin",
+        "threshold": 1,
+        "timeout_ms": 86400000
+      },
+      {
+        "action": "export_restricted_data",
+        "approver_role": "Reviewer",
+        "threshold": 1,
+        "timeout_ms": 3600000
+      }
+    ]
+  },
+  "escalation": {
+    "paths": [
+      {
+        "trigger": "gate_fail",
+        "destination": "Reviewer",
+        "severity": "warn",
+        "auto": true
+      },
+      {
+        "trigger": "authority_expired",
+        "destination": "Admin",
+        "severity": "critical",
+        "auto": true
+      },
+      {
+        "trigger": "abp_missing_on_export",
+        "destination": "Reviewer",
+        "severity": "critical",
+        "auto": true
+      },
+      {
+        "trigger": "coherence_drift_threshold",
+        "destination": "Reviewer",
+        "severity": "warn",
+        "auto": true
+      }
+    ]
+  },
+  "runtime": {
+    "validators": [
+      {
+        "name": "authority_envelope_complete",
+        "when": "pre_action",
+        "fail_action": "block",
+        "config": {}
+      },
+      {
+        "name": "policy_hash_matches",
+        "when": "pre_action",
+        "fail_action": "block",
+        "config": {}
+      },
+      {
+        "name": "abp_present_on_export",
+        "when": "pre_action",
+        "fail_action": "block",
+        "config": {}
+      },
+      {
+        "name": "abp_hash_valid",
+        "when": "pre_action",
+        "fail_action": "block",
+        "config": {}
+      },
+      {
+        "name": "drift_threshold",
+        "when": "periodic",
+        "fail_action": "escalate",
+        "config": {
+          "max_ds": 6
+        }
+      }
+    ]
+  },
+  "proof": {
+    "required": [
+      "authority_ledger",
+      "manifest",
+      "pack_hash",
+      "seal",
+      "transparency_log"
+    ]
+  },
+  "composition": {
+    "parent_abp_id": null,
+    "parent_abp_hash": null,
+    "children": []
+  },
+  "effective_at": "2026-02-25T00:00:00Z",
+  "expires_at": null,
+  "created_at": "2026-02-25T00:00:00Z",
+  "hash": "sha256:7b60bf989114006faf001ff55f0a0c77e951a41390a3639f84e99c3dd8ec9fe5"
+}
+</script>
+<div id="abpStatusBar" class="abp-status"></div>
+<script>
+(function abpSelfVerify() {
+  var ABP_MODULE = "coherence";
+  function abpCanonical(obj) {
+    if (obj === null || obj === undefined) return JSON.stringify(obj);
+    if (Array.isArray(obj)) return "[" + obj.map(abpCanonical).join(",") + "]";
+    if (typeof obj === "object") {
+      var keys = Object.keys(obj).sort();
+      return "{" + keys.map(function(k){return JSON.stringify(k)+":"+abpCanonical(obj[k])}).join(",") + "}";
+    }
+    if (typeof obj === "number" && Number.isFinite(obj) && obj === Math.floor(obj)) return String(Math.trunc(obj));
+    return JSON.stringify(obj);
+  }
+  function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+  async function abpSha256(str) {
+    var data = new TextEncoder().encode(str);
+    var digest = await crypto.subtle.digest("SHA-256", data);
+    return Array.from(new Uint8Array(digest)).map(function(b){return b.toString(16).padStart(2,"0")}).join("");
+  }
+  async function verify() {
+    var bar = document.getElementById("abpStatusBar");
+    if (!bar) return;
+    var el = document.getElementById("ds-abp-v1");
+    if (!el) { bar.innerHTML = '<span class="abp-pill fail">NO ABP</span>'; return; }
+    var abp;
+    try { abp = JSON.parse(el.textContent); } catch(e) {
+      bar.innerHTML = '<span class="abp-pill fail">ABP ERROR</span>';
+      return;
+    }
+    var checks = [];
+    // schema
+    var req = ["abp_version","abp_id","scope","authority_ref","objectives","tools","data","approvals","escalation","runtime","proof","composition","created_at","hash"];
+    var missing = req.filter(function(k){return !(k in abp)});
+    checks.push({n:"schema",p:!missing.length});
+    // hash
+    var copy = Object.assign({},abp); copy.hash = "";
+    var hex = await abpSha256(abpCanonical(copy));
+    var computedHash = "sha256:" + hex;
+    checks.push({n:"hash",p:computedHash===abp.hash});
+    // id
+    var seed = abpCanonical({scope:abp.scope,authority_ref:abp.authority_ref,created_at:abp.created_at});
+    var idHex = await abpSha256(seed);
+    checks.push({n:"id",p:("ABP-"+idHex.slice(0,8))===abp.abp_id});
+    // contradictions
+    var oA=new Set((abp.objectives?.allowed||[]).map(function(o){return o.id}));
+    var oD=new Set((abp.objectives?.denied||[]).map(function(o){return o.id}));
+    var tA=new Set((abp.tools?.allow||[]).map(function(t){return t.name}));
+    var tD=new Set((abp.tools?.deny||[]).map(function(t){return t.name}));
+    checks.push({n:"contradictions",p:![...oA].some(function(x){return oD.has(x)})&&![...tA].some(function(x){return tD.has(x)})});
+    // module scope
+    var modules = abp.scope?.modules||[];
+    checks.push({n:"module",p:modules.includes(ABP_MODULE)});
+    var allPass = checks.every(function(c){return c.p});
+    var html = '<span class="abp-pill '+(allPass?"pass":"fail")+'">'+(allPass?"ABP VERIFIED":"ABP FAILED")+"</span>";
+    html += '<span class="abp-id">'+esc(abp.abp_id)+"</span>";
+    html += '<span class="abp-scope">'+esc(abp.scope?.program||"")+"/"+esc(abp.scope?.contract_id||"")+"</span>";
+    html += '<span class="abp-module in">'+esc(ABP_MODULE)+"</span>";
+    if (!allPass) {
+      var fails = checks.filter(function(c){return !c.p}).map(function(c){return c.n});
+      html += '<span style="color:#ef4444;margin-left:8px">failed: '+esc(fails.join(", "))+"</span>";
+    }
+    bar.innerHTML = html;
+    try { localStorage.setItem("ds_abp_v1", JSON.stringify(abp)); } catch(_){}
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", verify);
+  else verify();
+})();
+</script>
 </body>
 </html>
