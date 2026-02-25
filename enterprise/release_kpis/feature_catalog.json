@@ -1,11 +1,107 @@
 {
   "meta": {
     "catalog_name": "DeepSigma Feature Catalog",
-    "catalog_version": "v1",
+    "catalog_version": "v2",
     "repo_release_line": "v2.x",
-    "source_of_truth": "release_kpis/feature_catalog.json"
+    "source_of_truth": "release_kpis/feature_catalog.json",
+    "last_updated": "2026-02-25"
   },
   "categories": [
+    {
+      "id": "CORE_ENGINE",
+      "name": "Core Decision Engine",
+      "summary": "4D coherence scoring, decision log, drift detection, memory graph, reflection, reconciliation, PRIME gate, DTE enforcement, and IRIS operator queries.",
+      "features": [
+        {
+          "id": "COHERENCE_SCORER",
+          "name": "4D Coherence Scorer",
+          "description": "Computes unified 0-100 coherence score across policy adherence, outcome health, drift control, and memory completeness.",
+          "artifacts": ["src/core/scoring.py"],
+          "enforcement": ["CI: coherence_ci.yml"],
+          "kpi_axes": ["Technical_Completeness", "Operational_Maturity"]
+        },
+        {
+          "id": "COHERENCE_GATE",
+          "name": "Coherence Gate",
+          "description": "Composable enforcement gate combining 4D scorer + PRIME gate to produce GREEN/YELLOW/RED signal.",
+          "artifacts": ["src/core/coherence_gate.py"],
+          "enforcement": ["CI: coherence_ci.yml"],
+          "kpi_axes": ["Technical_Completeness", "Authority_Modeling"]
+        },
+        {
+          "id": "DECISION_LOG",
+          "name": "Decision Log Record (DLR)",
+          "description": "Captures decision policy governance, action contracts used/blocked, verification requirements, and policy pack stamps.",
+          "artifacts": ["src/core/decision_log.py"],
+          "enforcement": ["CI: ci.yml"],
+          "kpi_axes": ["Technical_Completeness", "Authority_Modeling"]
+        },
+        {
+          "id": "DRIFT_SIGNAL",
+          "name": "Drift Signal Collector",
+          "description": "Ingests and organizes drift events by type, severity, fingerprint, and recurrence; feeds audit loop and scoring.",
+          "artifacts": ["src/core/drift_signal.py"],
+          "enforcement": ["CI: ci.yml"],
+          "kpi_axes": ["Technical_Completeness", "Operational_Maturity"]
+        },
+        {
+          "id": "MEMORY_GRAPH",
+          "name": "Memory Graph (MG)",
+          "description": "Provenance and recall graph storing episodes, actions, drift fingerprints, patches, and claims with sub-60s retrieval.",
+          "artifacts": ["src/core/memory_graph.py", "src/core/memory_graph_backends.py"],
+          "enforcement": ["CI: ci.yml"],
+          "kpi_axes": ["Technical_Completeness", "Data_Integration"]
+        },
+        {
+          "id": "REFLECTION",
+          "name": "Reflection Session (RS)",
+          "description": "Aggregates sealed episodes into learning summaries: outcome distribution, degradation frequency, verification pass rates.",
+          "artifacts": ["src/core/reflection.py"],
+          "enforcement": ["CI: ci.yml"],
+          "kpi_axes": ["Technical_Completeness", "Operational_Maturity"]
+        },
+        {
+          "id": "RECONCILER",
+          "name": "Cross-Artifact Reconciler",
+          "description": "Detects and proposes repairs for inconsistencies between DLR, drift signals, memory graph, and reflection summaries.",
+          "artifacts": ["src/core/reconciler.py"],
+          "enforcement": ["CI: ci.yml"],
+          "kpi_axes": ["Technical_Completeness", "Operational_Maturity"]
+        },
+        {
+          "id": "PRIME_GATE",
+          "name": "PRIME Threshold Gate",
+          "description": "Converts LLM probability gradients into APPROVE/DEFER/ESCALATE verdicts using Truth-Reasoning-Memory invariants.",
+          "artifacts": ["src/core/prime.py"],
+          "enforcement": ["CI: ci.yml"],
+          "kpi_axes": ["Authority_Modeling", "Technical_Completeness"]
+        },
+        {
+          "id": "DTE_ENFORCER",
+          "name": "Decision Timing Envelope (DTE)",
+          "description": "Validates hard timing constraints: deadline, stage budgets, feature TTL, hop/tool call limits.",
+          "artifacts": ["src/core/dte_enforcer.py"],
+          "enforcement": ["CI: ci.yml"],
+          "kpi_axes": ["Operational_Maturity", "Automation_Depth"]
+        },
+        {
+          "id": "IRIS",
+          "name": "IRIS Operator Query Engine",
+          "description": "Resolves WHY/WHAT_CHANGED/WHAT_DRIFTED/RECALL/STATUS queries by walking MG claim topology and DLR rationale graph in <60s.",
+          "artifacts": ["src/core/iris.py"],
+          "enforcement": ["CI: ci.yml"],
+          "kpi_axes": ["Operational_Maturity", "Enterprise_Readiness"]
+        },
+        {
+          "id": "COHERENCE_AUDIT",
+          "name": "Coherence Auditor",
+          "description": "Periodic cross-artifact consistency checks detecting orphan drift, missing episodes, policy stamp mismatches.",
+          "artifacts": ["src/core/audit.py"],
+          "enforcement": ["CI: ci.yml"],
+          "kpi_axes": ["Operational_Maturity", "Technical_Completeness"]
+        }
+      ]
+    },
     {
       "id": "DG_BOUNDARY",
       "name": "Deterministic Governance Boundary",
@@ -16,7 +112,7 @@
           "name": "Pre-Execution Gate",
           "description": "Blocks execution unless intent+authority+policy requirements are satisfied.",
           "artifacts": ["runs/intent_packet.json", "runs/authority_contract.json", "runs/input_snapshot.json"],
-          "enforcement": ["make milestone-gate", "CI: ci.yml", "CI: kpi_gate.yml"],
+          "enforcement": ["scripts/pre_exec_gate.py", "make milestone-gate", "CI: kpi_gate.yml"],
           "kpi_axes": ["Automation_Depth", "Authority_Modeling", "Operational_Maturity"]
         },
         {
@@ -71,19 +167,19 @@
     {
       "id": "AUDIT_NEUTRAL",
       "name": "Audit-Neutral Decision Logic",
-      "summary": "Claim→Evidence→Authority and context-free audit export.",
+      "summary": "Claim\u2192Evidence\u2192Authority binding and context-free audit export.",
       "features": [
         {
           "id": "DECISION_INVARIANTS",
           "name": "Decision Invariants Ledger",
-          "description": "Rules like claim→evidence required, no overwrite, authority precedence, TTL/half-life.",
+          "description": "Rules: claim\u2192evidence required, no overwrite, authority precedence, TTL/half-life.",
           "artifacts": ["governance/decision_invariants.md"],
           "enforcement": ["scripts/validate_v2_1_0_milestone.py"],
           "kpi_axes": ["Operational_Maturity", "Enterprise_Readiness"]
         },
         {
           "id": "CEA_VALIDATOR",
-          "name": "Claim→Evidence→Authority Validator",
+          "name": "Claim\u2192Evidence\u2192Authority Validator",
           "description": "Machine-checkable binding of claims, evidence, and authority references.",
           "artifacts": ["runs/decision_record.json"],
           "enforcement": ["scripts/validate_claim_evidence_authority.py"],
@@ -102,7 +198,7 @@
     {
       "id": "PROOF_REPLAY",
       "name": "Deterministic Replay & Proof Chain",
-      "summary": "Hash chain + optional signature verification + replay checks.",
+      "summary": "Hash chain, signature verification, Merkle commitments, authority ledger, and deterministic replay.",
       "features": [
         {
           "id": "INPUT_SNAPSHOT",
@@ -127,52 +223,380 @@
           "artifacts": ["runs/proof_bundle.json"],
           "enforcement": ["scripts/replay_run.py"],
           "kpi_axes": ["Operational_Maturity", "Enterprise_Readiness"]
+        },
+        {
+          "id": "AUTHORITY_LEDGER",
+          "name": "Authority Ledger",
+          "description": "Append-only ledger of authority actions (key rotations, approvals) with NDJSON persistence and integrity verification.",
+          "artifacts": ["artifacts/authority_ledger/ledger.ndjson"],
+          "enforcement": ["scripts/export_authority_ledger.py", "scripts/verify_authority_signature.py"],
+          "kpi_axes": ["Authority_Modeling", "Enterprise_Readiness"]
+        },
+        {
+          "id": "IDEMPOTENCY_GUARD",
+          "name": "Idempotency Guard",
+          "description": "Prevents duplicate execution of already-sealed runs by checking proof chain hashes.",
+          "artifacts": ["runs/proof_bundle.json"],
+          "enforcement": ["scripts/idempotency_guard.py"],
+          "kpi_axes": ["Operational_Maturity", "Technical_Completeness"]
+        }
+      ]
+    },
+    {
+      "id": "SECURITY",
+      "name": "Security & Key Management",
+      "summary": "Rotatable keyring, multi-cloud KMS, re-encryption at rest, authority ledger, crypto policy enforcement.",
+      "features": [
+        {
+          "id": "KEYRING",
+          "name": "Rotatable Keyring",
+          "description": "File-backed key management with version records, TTL/status lifecycle, and rotation history.",
+          "artifacts": ["src/deepsigma/security/keyring.py"],
+          "enforcement": ["CI: signature_gate.yml"],
+          "kpi_axes": ["Authority_Modeling", "Enterprise_Readiness"]
+        },
+        {
+          "id": "KMS_PROVIDERS",
+          "name": "Multi-Cloud KMS",
+          "description": "KMS provider abstraction supporting AWS KMS, Azure Key Vault, GCP KMS, and local keyring.",
+          "artifacts": ["src/deepsigma/security/providers/"],
+          "enforcement": ["CI: signature_gate.yml"],
+          "kpi_axes": ["Enterprise_Readiness", "Scalability"]
+        },
+        {
+          "id": "REENCRYPT",
+          "name": "Re-encryption at Rest",
+          "description": "Batch re-encryption of evidence with checkpoint/resume support and performance benchmarking.",
+          "artifacts": ["src/deepsigma/security/reencrypt.py", "scripts/reencrypt_benchmark.py"],
+          "enforcement": ["CI: reencrypt_benchmark.yml"],
+          "kpi_axes": ["Scalability", "Enterprise_Readiness"]
+        },
+        {
+          "id": "CRYPTO_POLICY",
+          "name": "Crypto Policy Enforcement",
+          "description": "Runtime crypto policy loading with ENV override support; blocks execution on policy violations.",
+          "artifacts": ["src/deepsigma/security/policy.py", "governance/crypto_policy.yaml"],
+          "enforcement": ["scripts/crypto_misuse_scan.py", "CI: signature_gate.yml"],
+          "kpi_axes": ["Authority_Modeling", "Technical_Completeness"]
+        }
+      ]
+    },
+    {
+      "id": "CONNECTORS",
+      "name": "Connector & Integration Framework",
+      "summary": "ConnectorV1 protocol, LLM framework adapters, enterprise SaaS connectors, MCP server, OpenTelemetry.",
+      "features": [
+        {
+          "id": "CONNECTOR_CONTRACT",
+          "name": "ConnectorV1 Protocol",
+          "description": "Standard interface + RecordEnvelope dataclass for all connectors; defines provenance, hashes, metadata wrapping.",
+          "artifacts": ["src/adapters/contract.py", "schemas/core/connector_contract_v1.md"],
+          "enforcement": ["tests-enterprise/"],
+          "kpi_axes": ["Data_Integration", "Technical_Completeness"]
+        },
+        {
+          "id": "LLM_ADAPTERS",
+          "name": "LLM Framework Adapters",
+          "description": "Exhaust + governance callbacks for LangChain, LangGraph, Anthropic, Azure OpenAI, and local LLM.",
+          "artifacts": ["src/adapters/langchain_exhaust.py", "src/adapters/langchain_governance.py", "src/adapters/anthropic_exhaust.py", "src/adapters/azure_openai_exhaust.py", "src/adapters/local_llm/"],
+          "enforcement": ["tests-enterprise/"],
+          "kpi_axes": ["Data_Integration", "Enterprise_Readiness"]
+        },
+        {
+          "id": "SAAS_CONNECTORS",
+          "name": "Enterprise SaaS Connectors",
+          "description": "SharePoint, Snowflake (Cortex AI + warehouse + exhaust), Power Platform, and AskSage connectors.",
+          "artifacts": ["src/adapters/sharepoint/", "src/adapters/snowflake/", "src/adapters/powerplatform/", "src/adapters/asksage/"],
+          "enforcement": ["tests-enterprise/"],
+          "kpi_axes": ["Data_Integration", "Scalability"]
+        },
+        {
+          "id": "MCP_SERVER",
+          "name": "Model Context Protocol Server",
+          "description": "MCP server scaffold exposing tools and prompts to AI agents with resilience and backoff handling.",
+          "artifacts": ["src/adapters/mcp/mcp_server_scaffold.py", "src/adapters/mcp/resilience.py"],
+          "enforcement": ["CI: docker-mcp.yml"],
+          "kpi_axes": ["Data_Integration", "Enterprise_Readiness"]
+        },
+        {
+          "id": "OTEL",
+          "name": "OpenTelemetry Integration",
+          "description": "OTEL exporter, sidecar injection, and span utilities for observability backends (Jaeger, Datadog).",
+          "artifacts": ["src/adapters/otel/otel_exporter.py", "src/adapters/otel/sidecar.py"],
+          "enforcement": ["CI: docker-otel.yml"],
+          "kpi_axes": ["Operational_Maturity", "Enterprise_Readiness"]
+        },
+        {
+          "id": "OPENCLAW",
+          "name": "OpenClaw Policy Adapter",
+          "description": "Institutional control flow adapter with OVERWATCH-compatible wrapper for policy-driven routing.",
+          "artifacts": ["src/adapters/openclaw/adapter.py", "src/adapters/openclaw/runtime.py"],
+          "enforcement": ["tests-enterprise/"],
+          "kpi_axes": ["Authority_Modeling", "Enterprise_Readiness"]
+        }
+      ]
+    },
+    {
+      "id": "CREDIBILITY",
+      "name": "Credibility Engine",
+      "summary": "Tenant-scoped credibility computation, tiering, packet sealing, and FastAPI endpoints.",
+      "features": [
+        {
+          "id": "CREDIBILITY_COMPUTE",
+          "name": "Credibility Computation",
+          "description": "Core credibility scoring engine with tier classification and packet sealing.",
+          "artifacts": ["src/credibility_engine/engine.py", "src/credibility_engine/tiering.py", "src/credibility_engine/packet.py"],
+          "enforcement": ["tests-enterprise/"],
+          "kpi_axes": ["Authority_Modeling", "Technical_Completeness"]
+        },
+        {
+          "id": "CREDIBILITY_API",
+          "name": "Credibility API",
+          "description": "FastAPI routes for tenant-scoped credibility, policy, and audit endpoints with quota enforcement.",
+          "artifacts": ["src/credibility_engine/api.py"],
+          "enforcement": ["tests-enterprise/"],
+          "kpi_axes": ["Enterprise_Readiness", "Scalability"]
+        }
+      ]
+    },
+    {
+      "id": "MESH",
+      "name": "Mesh Federation",
+      "summary": "Multi-region federated quorum, anti-entropy, sync plane, and WAN partition-safe consensus.",
+      "features": [
+        {
+          "id": "FEDERATION",
+          "name": "Federated Quorum",
+          "description": "Multi-region quorum + correlation computation; partitions yield UNKNOWN (safe default).",
+          "artifacts": ["src/mesh/federation.py", "src/mesh/sync_plane.py"],
+          "enforcement": ["tests-enterprise/"],
+          "kpi_axes": ["Scalability", "Operational_Maturity"]
+        },
+        {
+          "id": "ANTI_ENTROPY",
+          "name": "Anti-Entropy Protocol",
+          "description": "Consistency healing across mesh nodes with node discovery, log store, and transport abstraction.",
+          "artifacts": ["src/mesh/anti_entropy.py", "src/mesh/discovery.py", "src/mesh/logstore.py"],
+          "enforcement": ["tests-enterprise/"],
+          "kpi_axes": ["Scalability", "Technical_Completeness"]
+        }
+      ]
+    },
+    {
+      "id": "TENANCY",
+      "name": "Multi-Tenancy",
+      "summary": "Tenant registry, RBAC, isolated paths, per-tenant policy enforcement, and immutable audit trails.",
+      "features": [
+        {
+          "id": "TENANT_ISOLATION",
+          "name": "Tenant Isolation",
+          "description": "Tenant registry with isolated file paths, per-tenant RBAC, and policy enforcement.",
+          "artifacts": ["src/tenancy/tenants.py", "src/tenancy/rbac.py", "src/tenancy/paths.py"],
+          "enforcement": ["tests-enterprise/"],
+          "kpi_axes": ["Enterprise_Readiness", "Authority_Modeling"]
+        },
+        {
+          "id": "GOVERNANCE_AUDIT",
+          "name": "Immutable Audit Trail",
+          "description": "Append-only audit logs per tenant with governance telemetry and quota enforcement.",
+          "artifacts": ["src/governance/audit.py", "src/governance/telemetry.py"],
+          "enforcement": ["tests-enterprise/"],
+          "kpi_axes": ["Enterprise_Readiness", "Operational_Maturity"]
         }
       ]
     },
     {
       "id": "REPO_RADAR",
       "name": "Repo Radar KPI System",
-      "summary": "8 KPI axes, radar render, badge_latest, PR comment, composite history.",
+      "summary": "8 KPI axes, telemetry-driven scoring, eligibility tiers, confidence bands, radar/trend rendering, composite history, issue-driven deltas, and automated gate enforcement.",
       "features": [
         {
           "id": "KPI_RUN",
           "name": "KPI Run Pipeline",
-          "description": "Computes KPI scores and emits render + PR artifacts.",
-          "artifacts": ["release_kpis/radar_*.png", "release_kpis/badge_latest*.svg", "release_kpis/PR_COMMENT*.md"],
+          "description": "Full orchestration: compute, merge, render radar/badge/trend/composite, gate, stability, TEC, and PR comment.",
+          "artifacts": ["release_kpis/radar_*.png", "release_kpis/badge_latest.svg", "release_kpis/PR_COMMENT.md"],
           "enforcement": ["CI: kpi.yml", "CI: kpi_gate.yml"],
+          "kpi_axes": ["All"]
+        },
+        {
+          "id": "KPI_GATE",
+          "name": "KPI Gate Enforcement",
+          "description": "Floor validation and max-drop regression detection across all 8 KPI dimensions.",
+          "artifacts": ["release_kpis/KPI_GATE_REPORT.md", "governance/kpi_spec.yaml"],
+          "enforcement": ["scripts/kpi_gate.py", "CI: kpi_gate.yml"],
+          "kpi_axes": ["Automation_Depth", "Operational_Maturity"]
+        },
+        {
+          "id": "KPI_ELIGIBILITY",
+          "name": "Evidence Eligibility Tiers",
+          "description": "KPI values capped by evidence level: unverified (3.0), simulated (6.0), real (8.5), production (10.0).",
+          "artifacts": ["governance/kpi_eligibility.json", "release_kpis/kpi_confidence.json"],
+          "enforcement": ["scripts/kpi_merge.py"],
+          "kpi_axes": ["All"]
+        },
+        {
+          "id": "KPI_CONFIDENCE",
+          "name": "Confidence Bands",
+          "description": "Statistical confidence intervals around each KPI with low/high bounds per version.",
+          "artifacts": ["release_kpis/kpi_bands_*.json"],
+          "enforcement": ["scripts/kpi_confidence_bands.py"],
+          "kpi_axes": ["All"]
+        },
+        {
+          "id": "KPI_ISSUES",
+          "name": "Issue-Driven KPI Deltas",
+          "description": "Derives KPI credit/debt from GitHub issues with P0-P3 severity scoring and label-based mapping.",
+          "artifacts": ["release_kpis/issue_deltas.json", "governance/kpi_issue_map.yaml"],
+          "enforcement": ["scripts/kpi_from_issues.py", "scripts/issue_label_gate.py"],
+          "kpi_axes": ["Automation_Depth", "Operational_Maturity"]
+        },
+        {
+          "id": "COMPOSITE_RADAR",
+          "name": "Composite Radar + Trend",
+          "description": "Multi-version radar overlay and historical trend chart showing KPI trajectory.",
+          "artifacts": ["release_kpis/radar_composite_latest.png", "release_kpis/kpi_trend.png"],
+          "enforcement": ["scripts/render_composite_radar.py", "scripts/render_kpi_trend.py"],
           "kpi_axes": ["All"]
         },
         {
           "id": "LAYER_COVERAGE",
           "name": "Layer Coverage Injection",
-          "description": "Appends Decision Infrastructure layer→KPI mapping into PR comment.",
-          "artifacts": ["release_kpis/PR_COMMENT*.md"],
+          "description": "Appends Decision Infrastructure layer\u2192KPI mapping into PR comment.",
+          "artifacts": ["release_kpis/layer_kpi_mapping.json", "release_kpis/PR_COMMENT.md"],
           "enforcement": ["scripts/kpi_run.py"],
           "kpi_axes": ["Operational_Maturity", "Enterprise_Readiness"]
         }
       ]
     },
     {
-      "id": "ECON",
-      "name": "Economic Measurability (TEC / C-TEC)",
-      "summary": "Effort/cost modeling, sensitivity bands, complexity scaling.",
+      "id": "HEALTH",
+      "name": "Health & Stability Monitoring",
+      "summary": "ICR/PCR/TEC health watchers, nonlinear stability analysis, roadmap forecasting, and pulse insights.",
       "features": [
         {
-          "id": "TEC_MODEL",
-          "name": "TEC Baseline",
-          "description": "Time/Effort/Cost estimation outputs.",
-          "artifacts": ["release_kpis/TEC*.json", "release_kpis/TEC*.md"],
-          "enforcement": ["scripts/tec_run.py (if present)"],
+          "id": "ICR_HEALTH",
+          "name": "Infrastructure Coherence Ratio (ICR)",
+          "description": "Monitors infrastructure coherence metrics with snapshot history and GitHub-sourced data.",
+          "artifacts": ["release_kpis/health/icr_latest.json"],
+          "enforcement": ["scripts/icr_health_watcher.py", "make health-v2"],
+          "kpi_axes": ["Operational_Maturity", "Technical_Completeness"]
+        },
+        {
+          "id": "PCR_HEALTH",
+          "name": "PR Complexity Ratio (PCR)",
+          "description": "Tracks pull request complexity trends with snapshot history.",
+          "artifacts": ["release_kpis/health/pcr_latest.json"],
+          "enforcement": ["scripts/pr_complexity_watcher.py", "make health-v2"],
+          "kpi_axes": ["Operational_Maturity", "Automation_Depth"]
+        },
+        {
+          "id": "HEALTH_SUMMARY",
+          "name": "Health Summary + X-Ray",
+          "description": "Aggregates ICR/PCR/TEC health into unified summary with X-ray health block.",
+          "artifacts": ["release_kpis/health/HEALTH_SUMMARY.md", "release_kpis/health/xray_health_block.md"],
+          "enforcement": ["scripts/health_summary.py", "make health-v2"],
+          "kpi_axes": ["Operational_Maturity", "Enterprise_Readiness"]
+        },
+        {
+          "id": "STABILITY",
+          "name": "Nonlinear Stability Analysis",
+          "description": "SSI computation, Monte Carlo simulation, adjusted forecasting, and stability report generation.",
+          "artifacts": ["release_kpis/stability_*.json", "release_kpis/nonlinear_stability_report.md"],
+          "enforcement": ["scripts/nonlinear_stability.py", "make stability"],
+          "kpi_axes": ["Operational_Maturity", "Economic_Measurability"]
+        },
+        {
+          "id": "ROADMAP",
+          "name": "Roadmap Intelligence",
+          "description": "Roadmap forecasting, badge rendering, timeline visualization, and scope gate validation.",
+          "artifacts": ["release_kpis/roadmap_forecast.json", "release_kpis/roadmap_badge.svg", "release_kpis/roadmap_timeline.svg"],
+          "enforcement": ["scripts/roadmap_forecast.py", "scripts/roadmap_scope_gate.py", "CI: roadmap_guard.yml"],
+          "kpi_axes": ["Enterprise_Readiness", "Operational_Maturity"]
+        },
+        {
+          "id": "PULSE_INSIGHTS",
+          "name": "Pulse Insights",
+          "description": "Collects operational insight signals and scores for KPI telemetry enrichment.",
+          "artifacts": ["release_kpis/insights_metrics.json"],
+          "enforcement": ["scripts/pulse_insights.py", "make pulse-insights"],
+          "kpi_axes": ["Operational_Maturity", "Data_Integration"]
+        }
+      ]
+    },
+    {
+      "id": "ECON",
+      "name": "Economic Measurability (TEC / C-TEC)",
+      "summary": "Time/Effort/Cost modeling with complexity-adjusted variants, 3-tier audience outputs, and daily snapshots.",
+      "features": [
+        {
+          "id": "TEC_CTEC",
+          "name": "TEC / C-TEC Engine",
+          "description": "Complexity-adjusted effort/cost estimation producing internal, executive, and DoD audience variants.",
+          "artifacts": ["release_kpis/tec_internal.json", "release_kpis/tec_executive.json", "release_kpis/tec_dod.json", "release_kpis/TEC_SUMMARY.md"],
+          "enforcement": ["scripts/tec_ctec.py", "make tec"],
           "kpi_axes": ["Economic_Measurability"]
         },
         {
-          "id": "TEC_SENSITIVITY",
-          "name": "TEC Sensitivity Bands",
-          "description": "Best/expected/worst bounds + volatility metrics.",
-          "artifacts": ["release_kpis/TEC_SENSITIVITY*.json"],
-          "enforcement": ["scripts/tec_run.py (if present)"],
+          "id": "TEC_SNAPSHOTS",
+          "name": "TEC Health Snapshots",
+          "description": "Daily TEC snapshots with historical tracking for trend analysis.",
+          "artifacts": ["release_kpis/health/history/TEC_SNAPSHOT_*.json", "release_kpis/health/tec_ctec_latest.json"],
+          "enforcement": ["scripts/tec_ctec.py --snapshot"],
           "kpi_axes": ["Economic_Measurability", "Operational_Maturity"]
+        }
+      ]
+    },
+    {
+      "id": "PILOT",
+      "name": "Pilot & Operator Readiness",
+      "summary": "Pilot-in-a-box deployment, 60-second challenge, pilot pack generation, and project intake.",
+      "features": [
+        {
+          "id": "PILOT_IN_A_BOX",
+          "name": "Pilot-in-a-Box",
+          "description": "Self-contained pilot deployment script for rapid evaluation environments.",
+          "artifacts": ["scripts/pilot_in_a_box.py"],
+          "enforcement": ["tests-enterprise/"],
+          "kpi_axes": ["Operational_Maturity", "Enterprise_Readiness"]
+        },
+        {
+          "id": "WHY_60S",
+          "name": "Why 60s Challenge",
+          "description": "Validates that key operator queries resolve within 60-second target.",
+          "artifacts": ["scripts/why_60s_challenge.py"],
+          "enforcement": ["tests-enterprise/"],
+          "kpi_axes": ["Operational_Maturity"]
+        },
+        {
+          "id": "PILOT_PACK",
+          "name": "Pilot Pack Generator",
+          "description": "Generates deployment-ready pilot pack with configuration, docs, and evaluation criteria.",
+          "artifacts": ["pilot_pack/**"],
+          "enforcement": ["scripts/pilot_pack.py"],
+          "kpi_axes": ["Enterprise_Readiness", "Operational_Maturity"]
+        },
+        {
+          "id": "PROJECT_INTAKE",
+          "name": "Project Intake",
+          "description": "Structured intake workflow for new pilot projects with scoring and routing.",
+          "artifacts": ["scripts/project_intake.py"],
+          "enforcement": ["tests-enterprise/"],
+          "kpi_axes": ["Enterprise_Readiness"]
+        }
+      ]
+    },
+    {
+      "id": "DOCKER",
+      "name": "Container Infrastructure",
+      "summary": "Docker images for coherence, exhaust, MCP, tools, and OTEL workloads with CI validation.",
+      "features": [
+        {
+          "id": "DOCKER_IMAGES",
+          "name": "Docker Image Suite",
+          "description": "Containerized workloads: coherence engine, exhaust pipeline, MCP server, tools, and OTEL sidecar.",
+          "artifacts": ["docker/Dockerfile.coherence", "docker/Dockerfile.exhaust", "docker/Dockerfile.mcp", "docker/Dockerfile.tools"],
+          "enforcement": ["CI: docker-coherence.yml", "CI: docker-exhaust.yml", "CI: docker-mcp.yml", "CI: docker-tools.yml", "CI: docker-otel.yml"],
+          "kpi_axes": ["Enterprise_Readiness", "Scalability"]
         }
       ]
     }
@@ -180,7 +604,8 @@
   "outer_edge_boundaries": [
     "Not claiming full jurisdictional policy packs (EU AI Act article-by-article enforcement) yet",
     "Not claiming full cryptographic attestation across all pipelines and connectors yet",
-    "Not claiming enterprise connectors (Jira/ServiceNow/SharePoint adapters) as complete (target v2.1.1)",
-    "Not claiming a full runtime control plane is governance (runtime is subordinate)"
+    "Not claiming a full runtime control plane is governance (runtime is subordinate)",
+    "Mesh federation is functional but not yet tested at production-scale WAN partitions",
+    "Credibility engine API is tenant-scoped but not yet load-tested at multi-thousand-tenant scale"
   ]
 }
