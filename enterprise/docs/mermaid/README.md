@@ -1,6 +1,6 @@
 # Mermaid Diagrams (Canonical)
 
-Ten diagrams define the visual language of Sigma OVERWATCH. Everything else is archived to reduce drift.
+Eleven diagrams define the visual language of Sigma OVERWATCH. Everything else is archived to reduce drift.
 
 ## Canonical Set
 
@@ -16,6 +16,7 @@ Ten diagrams define the visual language of Sigma OVERWATCH. Everything else is a
 | 14 | [KPI Confidence Bands Flow](14-kpi-confidence-bands-flow.md) | Flowchart | KPI score + confidence/bands pipeline from evidence signals |
 | 15 | [DISR Dual-Mode Architecture](15-disr-dual-mode-architecture.md) | Graph | Local default crypto provider with optional KMS plug-ins and authority controls |
 | 16 | [Authority Boundary Primitive](16-authority-boundary-primitive.md) | Flowchart + Graph | Pre-runtime ABP lifecycle: declare → build → attach → verify + composition model |
+| 17 | [EDGE System](17-edge-system.md) | Flowchart + Graph | EDGE module map, gate enforcement flow, delegation review loop, Unified tab architecture |
 
 ## Archive
 
@@ -35,5 +36,6 @@ New diagrams require justification and must map to one of these canonical purpos
 7. **KPI telemetry** — scoring confidence and uncertainty bands
 8. **DISR security architecture** — provider model + authority contracts
 9. **Authority boundaries** — pre-runtime governance declarations and composition
+10. **EDGE surfaces** — exportable decision modules, gate enforcement, delegation review
 
 To add a diagram, update this index and ensure `tools/mermaid_audit.py` passes.
