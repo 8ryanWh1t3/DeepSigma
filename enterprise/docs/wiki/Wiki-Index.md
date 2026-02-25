@@ -46,6 +46,7 @@ Canonical wiki structure for Sigma OVERWATCH / DeepSigma docs.
 
 - [Operations](Operations)
 - [SLOs and Metrics](SLOs-and-Metrics)
+- [TEC and C-TEC](TEC-and-C-TEC)
 - [Replay and Testing](Replay-and-Testing)
 - [Security](Security)
 
