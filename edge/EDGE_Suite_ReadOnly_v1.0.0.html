@@ -1,0 +1,949 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Deep Sigma - SEQUOIA Unified Suite (Read-Only) v003</title>
+  <style>
+    :root { --bg:#0a0f16; --card:#111b29; --line:#22354d; --txt:#e7eef7; --muted:#8ea6bf; --accent:#7df9ff; --ok:#5dff93; --warn:#ffcc66; --bad:#ff6b6b; }
+    body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif}
+    header{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+    .brand b{display:block;letter-spacing:.4px}.brand small{color:var(--muted)}
+    .badge{border:1px solid rgba(125,249,255,.35);color:var(--accent);padding:4px 8px;border-radius:999px;font-size:12px}
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    button{background:#182235;color:var(--txt);border:1px solid #243449;border-radius:10px;padding:8px 10px;cursor:pointer}
+    button:hover{border-color:#2f4765}
+    button.primary{border-color:rgba(125,249,255,.45);box-shadow:0 0 0 1px rgba(125,249,255,.12) inset}
+    main{display:grid;grid-template-columns:340px 1fr;min-height:calc(100vh - 62px)}
+    aside{border-right:1px solid var(--line);padding:12px;overflow:auto;max-height:calc(100vh - 62px)}
+    .module{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:10px;cursor:pointer}
+    .module.active{border-color:rgba(125,249,255,.6);box-shadow:0 0 0 1px rgba(125,249,255,.15) inset}
+    .module b{display:block;font-size:13px;margin-bottom:5px}
+    .module .meta{font-size:12px;color:var(--muted)}
+    .path{margin-top:6px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px;color:#a9c3de;word-break:break-all}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .content{padding:12px;display:flex;flex-direction:column;gap:10px}
+    .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px}
+    .panel h3{margin:0 0 8px 0;font-size:14px}
+    .panel p{margin:0;color:var(--muted);font-size:12px}
+    .kpi{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+    .kpi .card,.lens .card{background:#0d1520;border:1px solid #22354d;border-radius:10px;padding:8px}
+    .kpi .v{font-size:18px;font-weight:700}
+    .kpi .l{font-size:11px;color:var(--muted)}
+    .lens{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .triple{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    th,td{padding:8px;border-bottom:1px solid #22354d;vertical-align:top}
+    th{text-align:left;color:#b9d3ea}
+    .status-ok{color:var(--ok)} .status-warn{color:var(--warn)} .status-bad{color:var(--bad)}
+    .frame-wrap{position:relative;height:54vh;min-height:360px;background:#0d1520;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+    iframe{width:100%;height:100%;border:0;pointer-events:none}
+    .overlay{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:flex-end;padding:10px;background:linear-gradient(to top, rgba(10,15,22,.35), rgba(10,15,22,0));pointer-events:none}
+    .overlay span{background:rgba(17,27,41,.82);border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-size:11px;color:#c0d5eb}
+    .pill{display:inline-block;padding:2px 7px;border-radius:999px;border:1px solid #2a3d57;font-size:11px;color:#bed6ef;margin-right:6px;margin-bottom:6px}
+    textarea, pre{width:100%;box-sizing:border-box;background:#0d1520;color:var(--txt);border:1px solid #243449;border-radius:10px;padding:10px;font-size:12px}
+    textarea{min-height:160px;resize:vertical}
+    .foot{font-size:11px;color:var(--muted)}
+    .alert{background:rgba(255,204,102,.08);border:1px solid rgba(255,204,102,.45);color:#ffd98e;border-radius:10px;padding:9px;font-size:12px}
+    @media (max-width: 1200px){ .kpi{grid-template-columns:repeat(3,1fr)} .lens{grid-template-columns:repeat(2,1fr)} .triple{grid-template-columns:1fr} .split{grid-template-columns:1fr} }
+    @media (max-width: 960px){ main{grid-template-columns:1fr} aside{border-right:0;border-bottom:1px solid var(--line);max-height:none} .frame-wrap{height:50vh;min-height:320px} }
+  </style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <b>Deep Sigma - SEQUOIA Unified Suite (Read-Only) v003</b>
+    <small>Control surface for Truth, Reasoning, Memory, Governance across 4 edge consoles</small>
+  </div>
+  <div class="row">
+    <button id="btnRefresh">Refresh</button>
+    <button id="btnExportRollup" class="primary">Export Rollup JSON</button>
+    <button id="btnPrintExec">Print Executive View</button>
+    <div class="badge">Read-Only Shell</div>
+  </div>
+</header>
+<main>
+  <aside>
+    <div id="moduleList"></div>
+    <div class="panel">
+      <h3>Storage Keys</h3>
+      <div id="keysList" class="path"></div>
+    </div>
+    <div class="panel">
+      <h3>Edge Transport Status</h3>
+      <div id="edgeStatus" class="muted">No edge data.</div>
+    </div>
+    <div class="panel">
+      <h3>Schema Compatibility</h3>
+      <div id="schemaStatus"></div>
+    </div>
+  </aside>
+  <section class="content">
+    <div class="panel">
+      <h3>Unified KPI Strip</h3>
+      <div id="kpiStrip" class="kpi"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Historical Trend (7/30)</h3>
+      <div id="trendStrip" class="triple"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Deep Sigma Lenses</h3>
+      <div id="lensStrip" class="lens"></div>
+    </div>
+
+    <div class="panel split">
+      <div>
+        <h3 id="moduleTitle">Module</h3>
+        <p id="moduleDesc">Description</p>
+        <div id="modulePath" class="path"></div>
+        <div class="row" style="margin-top:8px">
+          <button id="btnOpenModule">Open Module (New Tab)</button>
+          <button id="btnOpenModuleTab">Open Default Tab</button>
+        </div>
+      </div>
+      <div>
+        <h3>Governance Footprint</h3>
+        <div id="governanceFootprint"></div>
+      </div>
+    </div>
+
+    <div class="panel split">
+      <div>
+        <h3>Control Gates</h3>
+        <div id="gatePanel"></div>
+      </div>
+      <div>
+        <h3>Module Health Scoring</h3>
+        <div id="scorePanel"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Cross-Module Telemetry</h3>
+      <div id="telemetryTable"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Drift Signal Rollup (DS)</h3>
+      <div id="dsRollup" class="muted">No signals.</div>
+    </div>
+
+    <div class="panel alert">
+      Embedded viewer is intentionally inert (read-only). Use <b>Open Module (New Tab)</b> for live interaction, editing, export, and test mode execution.
+    </div>
+
+    <div class="panel split">
+      <div>
+        <h3>Suite Rollup JSON (deepsigma_suite_rollup_v1)</h3>
+        <textarea id="rollupPreview" class="mono" readonly></textarea>
+      </div>
+      <div>
+        <h3>Evidence Integrity Verifier</h3>
+        <p>Drop <span class="mono">ingest_manifest.json</span> and <span class="mono">hashes.json</span>, then verify <span class="mono">pack_hash</span>.</p>
+        <div class="row" style="margin:8px 0">
+          <input id="manifestFile" type="file" accept="application/json"/>
+          <input id="hashesFile" type="file" accept="application/json"/>
+          <button id="btnVerifyPack" class="primary">Verify</button>
+        </div>
+        <pre id="verifyResult" class="mono">No verification run yet.</pre>
+        <h3 style="margin-top:10px">ZIP Import (Bid/Compliance/BOE)</h3>
+        <p>Import from any of the 3 module ZIP packs and hydrate local storage for this suite.</p>
+        <div class="row" style="margin:8px 0">
+          <input id="zipImportFile" type="file" accept=".zip,application/zip"/>
+          <button id="btnImportZip" class="primary">Import ZIP</button>
+        </div>
+        <div id="zipSupportNote" class="muted"></div>
+        <pre id="importZipResult" class="mono">No ZIP import run yet.</pre>
+      </div>
+    </div>
+
+    <div class="frame-wrap">
+      <iframe id="viewer" title="Read-only viewer" sandbox="allow-scripts allow-same-origin"></iframe>
+      <div class="overlay"><span>Interaction disabled by wrapper (read-only mode)</span></div>
+    </div>
+    <div class="foot">Wrapper is read-only by design. It reads local artifacts and localStorage. It does not modify underlying module data.</div>
+  </section>
+</main>
+
+<script>
+const TREND_KEY = "ds_sequoia_suite_rollup_history_v1";
+const MODULES = [
+  {
+    id: "hiring",
+    name: "Hiring Console v019",
+    desc: "Authority gate + edge sync model for hiring episodes.",
+    file: "NGA_SEQUOIA_UI_v019.html",
+    defaultTab: "#dashboard",
+    dataKey: "ds_sequoia_hiring_console_v2_artifacts",
+    edgeCfgKey: "ds_sequoia_edge_cfg_v1",
+    edgeOutboxKey: "ds_sequoia_edge_outbox_v1",
+    schemas: ["deepsigma_ingest_manifest_v1","deepsigma_edge_sync_v1","MG_TalentGraph","DLR_OFFER"]
+  },
+  {
+    id: "bid",
+    name: "Bid/No-Bid Console v003",
+    desc: "Gate scoring, assumptions, risks, decision seal, and artifacts.",
+    file: "NGA_SEQUOIA_BidNoBid_UI_v003.html",
+    defaultTab: "#dashboard",
+    dataKey: "ds_bidnobid_console_v1",
+    edgeCfgKey: "ds_bidnobid_edge_cfg_v1",
+    edgeOutboxKey: "ds_bidnobid_edge_outbox_v1",
+    edgeAuditKey: "ds_bidnobid_edge_audit_v1",
+    schemas: ["deepsigma_ingest_manifest_v1","deepsigma_edge_sync_v1","MG_OpportunityGraph","DLR_BIDNOBID"]
+  },
+  {
+    id: "compliance",
+    name: "Compliance Matrix Console v001",
+    desc: "RFP requirements traceability, mapping, gaps, and DS checks.",
+    file: "NGA_SEQUOIA_ComplianceMatrix_UI_v001.html",
+    defaultTab: "#dashboard",
+    dataKey: "ds_compliance_matrix_v1",
+    schemas: ["deepsigma_compliance_matrix_v1","deepsigma_ingest_manifest_v1","DLR_REQUIREMENTS_BASELINE"]
+  },
+  {
+    id: "boe",
+    name: "BOE / Pricing Console v001",
+    desc: "Labor/rate BOE, risk bands, assumptions, and DLR-BOE exports.",
+    file: "NGA_SEQUOIA_BOE_Pricing_UI_v001.html",
+    defaultTab: "#dashboard",
+    dataKey: "ds_boe_pricing_v1",
+    schemas: ["deepsigma_boe_v1","deepsigma_ingest_manifest_v1","DLR_BOE_ASSUMPTIONS"]
+  }
+];
+
+const RATE_OUTLIER_THRESHOLD = 250;
+const HOURS_OUTLIER_THRESHOLD = 2000;
+const DS_GAP_AGE_DAYS = 5;
+let activeModuleId = MODULES[0].id;
+
+function esc(s){ return String(s || "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
+function n(x){ const v = Number(x); return Number.isFinite(v) ? v : 0; }
+function nowIso(){ return new Date().toISOString(); }
+function today(){ return new Date().toISOString().slice(0,10); }
+function daysOld(iso){ const t = new Date(iso || Date.now()).getTime(); if(!Number.isFinite(t)) return 0; return Math.max(0, Math.floor((Date.now()-t)/86400000)); }
+function pct(part, all){ if(!all) return 0; return Math.round((part/all)*1000)/10; }
+
+function readJson(key){
+  try{ const raw = localStorage.getItem(key); if(!raw) return null; return JSON.parse(raw); }
+  catch(_){ return null; }
+}
+function writeJson(key, val){
+  try{ localStorage.setItem(key, JSON.stringify(val)); }catch(_){ }
+}
+
+function summarizeHiring(db){
+  if(!db || typeof db !== "object") return {episodes:0, ds:0, sealed:0, truth:0, reasoning:0, memory:0, governance:0, detail:{}};
+  const roles = Array.isArray(db.roles) ? db.roles.length : 0;
+  const candidates = Array.isArray(db.candidates) ? db.candidates.length : 0;
+  const interviews = Array.isArray(db.interviews) ? db.interviews.length : 0;
+  const drift = Array.isArray(db.drift) ? db.drift : [];
+  const rs = Array.isArray(db.rs) ? db.rs.length : 0;
+  const offers = Array.isArray(db.candidates) ? db.candidates.filter(c=>c && (c.offer_date || c.status==="Offer" || c.status==="Accepted" || c.status==="Started")).length : 0;
+  return {
+    episodes: candidates,
+    ds: drift.length,
+    sealed: offers,
+    truth: roles + candidates,
+    reasoning: interviews + rs,
+    memory: drift.length + rs,
+    governance: offers,
+    detail: {roles,candidates,interviews,drift:drift.length,rs,offers}
+  };
+}
+function summarizeBid(db){
+  if(!db || typeof db !== "object") return {episodes:0, ds:0, sealed:0, truth:0, reasoning:0, memory:0, governance:0, detail:{}};
+  const opps = Array.isArray(db.opportunities) ? db.opportunities : [];
+  const assumptions = Array.isArray(db.assumptions) ? db.assumptions.length : 0;
+  const risks = Array.isArray(db.risks) ? db.risks.length : 0;
+  const drift = Array.isArray(db.drift) ? db.drift : [];
+  const rs = Array.isArray(db.rs) ? db.rs.length : 0;
+  const sealed = opps.filter(o=>o?.decision?.sealed).length;
+  return {
+    episodes: opps.length,
+    ds: drift.length,
+    sealed,
+    truth: opps.length,
+    reasoning: assumptions + risks,
+    memory: drift.length + rs,
+    governance: sealed,
+    detail: {opportunities:opps.length,assumptions,risks,drift:drift.length,rs,sealed}
+  };
+}
+function summarizeCompliance(db){
+  if(!db || typeof db !== "object") return {episodes:0, ds:0, sealed:0, truth:0, reasoning:0, memory:0, governance:0, detail:{}};
+  const reqs = Array.isArray(db.requirements) ? db.requirements : [];
+  const deliverables = Array.isArray(db.deliverables) ? db.deliverables.length : 0;
+  const gaps = Array.isArray(db.gaps) ? db.gaps : [];
+  const rs = Array.isArray(db.rs) ? db.rs.length : 0;
+  const mapped = reqs.filter(r=>String(r?.compliance_statement || "").trim().length>0).length;
+  const unassigned = reqs.filter(r=>!String(r?.owner || "").trim()).length;
+  const oldGaps = gaps.filter(g=>String(g?.status || "") !== "Resolved" && daysOld(g?.created) > DS_GAP_AGE_DAYS).length;
+  const dsAuto = [
+    unassigned>0 ? 1 : 0,
+    oldGaps>0 ? 1 : 0,
+    reqs.length && (mapped/reqs.length*100) < 90 ? 1 : 0,
+    reqs.filter(r=>!String(r?.compliance_statement || "").trim()).length>0 ? 1 : 0
+  ].reduce((a,b)=>a+b,0);
+  const sealed = db?.intake?.baseline_sealed ? 1 : 0;
+  return {
+    episodes: reqs.length,
+    ds: dsAuto,
+    sealed,
+    truth: reqs.length + deliverables,
+    reasoning: mapped,
+    memory: gaps.length + rs,
+    governance: sealed,
+    detail: {requirements:reqs.length,mapped,deliverables,gaps:gaps.length,ds_auto:dsAuto,baseline_sealed:!!sealed}
+  };
+}
+function summarizeBoe(db){
+  if(!db || typeof db !== "object") return {episodes:0, ds:0, sealed:0, truth:0, reasoning:0, memory:0, governance:0, detail:{}};
+  const labor = Array.isArray(db.labor) ? db.labor : [];
+  const assumptions = Array.isArray(db.assumptions) ? db.assumptions : [];
+  const missing = labor.filter(l=>!(n(l?.hours)>0) || !(n(l?.rate)>0)).length;
+  const rateOut = labor.filter(l=>n(l?.rate) > RATE_OUTLIER_THRESHOLD).length;
+  const hoursOut = labor.filter(l=>n(l?.hours) > HOURS_OUTLIER_THRESHOLD).length;
+  const cats = new Set(assumptions.map(a=>String(a?.category || "").toLowerCase()));
+  const missingDrivers = ["rates","escalation","productivity"].filter(c=>!cats.has(c)).length;
+  const ds = (missing>0?1:0)+(rateOut>0?1:0)+(hoursOut>0?1:0)+(missingDrivers>0?1:0);
+  const sealed = db?.approval?.sealed ? 1 : 0;
+  return {
+    episodes: labor.length,
+    ds,
+    sealed,
+    truth: labor.length,
+    reasoning: assumptions.length,
+    memory: assumptions.length,
+    governance: sealed,
+    detail: {labor_lines:labor.length,assumptions:assumptions.length,missing,rate_outliers:rateOut,hours_outliers:hoursOut,sealed:!!sealed}
+  };
+}
+
+function moduleSummary(mod){
+  const db = readJson(mod.dataKey);
+  if(mod.id === "hiring") return summarizeHiring(db);
+  if(mod.id === "bid") return summarizeBid(db);
+  if(mod.id === "compliance") return summarizeCompliance(db);
+  if(mod.id === "boe") return summarizeBoe(db);
+  return {episodes:0,ds:0,sealed:0,truth:0,reasoning:0,memory:0,governance:0,detail:{}};
+}
+
+function collectRollup(){
+  const byModule = MODULES.map(m => ({id:m.id, name:m.name, ...moduleSummary(m)}));
+  const totals = byModule.reduce((a,m)=>{
+    a.episodes += m.episodes; a.ds += m.ds; a.sealed += m.sealed;
+    a.truth += m.truth; a.reasoning += m.reasoning; a.memory += m.memory; a.governance += m.governance;
+    return a;
+  }, {episodes:0,ds:0,sealed:0,truth:0,reasoning:0,memory:0,governance:0});
+  const modulesWithData = byModule.filter(m=>m.episodes>0 || m.ds>0 || m.sealed>0).length;
+  return {byModule, totals, modulesWithData};
+}
+
+function governanceHealth(totals){
+  if(totals.ds === 0) return {label:"GREEN", cls:"status-ok"};
+  if(totals.ds <= 6) return {label:"YELLOW", cls:"status-warn"};
+  return {label:"RED", cls:"status-bad"};
+}
+
+function schemaCheck(mod){
+  const db = readJson(mod.dataKey);
+  if(!db) return {ok:false,msg:"no data"};
+  if(mod.id === "hiring"){
+    const ok = Array.isArray(db.roles) && Array.isArray(db.candidates) && Array.isArray(db.interviews) && Array.isArray(db.drift) && db.meta;
+    return {ok,msg:ok?"shape ok":"missing core arrays/meta"};
+  }
+  if(mod.id === "bid"){
+    const ok = Array.isArray(db.opportunities) && Array.isArray(db.assumptions) && Array.isArray(db.risks) && Array.isArray(db.drift) && db.meta;
+    return {ok,msg:ok?"shape ok":"missing core arrays/meta"};
+  }
+  if(mod.id === "compliance"){
+    const ok = db.intake && Array.isArray(db.requirements) && Array.isArray(db.deliverables) && Array.isArray(db.gaps) && db.meta;
+    return {ok,msg:ok?"shape ok":"missing intake/arrays/meta"};
+  }
+  if(mod.id === "boe"){
+    const ok = db.intake && Array.isArray(db.labor) && Array.isArray(db.assumptions) && db.risk_model && db.approval && db.meta;
+    return {ok,msg:ok?"shape ok":"missing intake/labor/assumptions/risk/approval/meta"};
+  }
+  return {ok:false,msg:"unknown module"};
+}
+
+function buildControlGates(rollup){
+  const byId = Object.fromEntries(rollup.byModule.map(m=>[m.id,m]));
+  const compliance = readJson("ds_compliance_matrix_v1");
+  const boe = readJson("ds_boe_pricing_v1");
+  const bidOutbox = readJson("ds_bidnobid_edge_outbox_v1") || [];
+  const hiringOutbox = readJson("ds_sequoia_edge_outbox_v1") || [];
+
+  const reqs = Array.isArray(compliance?.requirements) ? compliance.requirements : [];
+  const keyAssumptionCats = new Set((Array.isArray(boe?.assumptions) ? boe.assumptions : []).map(a=>String(a?.category || "").toLowerCase()));
+
+  const gates = [
+    {id:"GATE-001", name:"Unsealed episodes", pass: rollup.totals.sealed >= 1, value: `sealed=${rollup.totals.sealed}`},
+    {id:"GATE-002", name:"Missing key assumptions", pass: ["rates","escalation","productivity"].every(x=>keyAssumptionCats.has(x)), value:`present=${Array.from(keyAssumptionCats).join(",") || "none"}`},
+    {id:"GATE-003", name:"Edge outbox backlog <= 5", pass: (Array.isArray(bidOutbox)?bidOutbox.length:0) + (Array.isArray(hiringOutbox)?hiringOutbox.length:0) <= 5, value:`outbox=${(bidOutbox.length||0)+(hiringOutbox.length||0)}`},
+    {id:"GATE-004", name:"No high DS pressure", pass: rollup.totals.ds <= 6, value:`ds=${rollup.totals.ds}`},
+    {id:"GATE-005", name:"Compliance coverage >= 90%", pass: reqs.length ? pct(reqs.filter(r=>String(r?.compliance_statement || "").trim()).length, reqs.length) >= 90 : false, value:`reqs=${reqs.length}`},
+    {id:"GATE-006", name:"Bid decisions sealed", pass: (byId.bid?.sealed || 0) >= 1 || (byId.bid?.episodes || 0) === 0, value:`sealed=${byId.bid?.sealed || 0}`}
+  ];
+  return gates.map(g=>({...g,status:g.pass?"PASS":(g.id==="GATE-005" && g.value==="reqs=0" ? "WARN" : "FAIL")}));
+}
+
+function moduleHealthScore(mod, summary){
+  const schema = schemaCheck(mod).ok ? 1 : 0;
+  const data = summary.episodes > 0 ? 1 : 0;
+  const driftFactor = Math.max(0, 1 - Math.min(summary.ds, 10)/10);
+  const sealFactor = summary.episodes ? Math.min(1, summary.sealed / summary.episodes) : 0.5;
+  const memoryFactor = Math.min(1, summary.memory / 10);
+  const score = Math.round((0.20*schema + 0.20*data + 0.30*driftFactor + 0.20*sealFactor + 0.10*memoryFactor) * 100);
+  return score;
+}
+
+function rollupObject(){
+  const rollup = collectRollup();
+  const schemaRows = MODULES.map(m=>({module:m.id, ...schemaCheck(m)}));
+  const gates = buildControlGates(rollup);
+  const moduleScores = rollup.byModule.map(m=>{
+    const mod = MODULES.find(x=>x.id===m.id);
+    return {module:m.id, score:moduleHealthScore(mod,m)};
+  });
+  const composite = moduleScores.length ? Math.round(moduleScores.reduce((a,b)=>a+b.score,0)/moduleScores.length) : 0;
+
+  return {
+    schema: "deepsigma_suite_rollup_v1",
+    generated_at: nowIso(),
+    scope: "sequoia_edge_suite",
+    modules: rollup.byModule,
+    totals: rollup.totals,
+    modules_with_data: rollup.modulesWithData,
+    governance_health: governanceHealth(rollup.totals).label,
+    schema_compatibility: schemaRows,
+    control_gates: gates,
+    module_scores: moduleScores,
+    composite_score: composite,
+    storage_keys: MODULES.map(m=>({module:m.id,data_key:m.dataKey,edge_cfg_key:m.edgeCfgKey || null,edge_outbox_key:m.edgeOutboxKey || null,edge_audit_key:m.edgeAuditKey || null}))
+  };
+}
+
+function renderList(activeId){
+  const host = document.getElementById("moduleList");
+  host.innerHTML = MODULES.map(m => `
+    <div class="module ${m.id===activeId?"active":""}" data-id="${esc(m.id)}">
+      <b>${esc(m.name)}</b>
+      <div class="meta">${esc(m.desc)}</div>
+      <div class="path">${esc(m.file)}</div>
+      <div class="row" style="margin-top:6px">
+        <button data-action="open" data-id="${esc(m.id)}">Open</button>
+        <button data-action="open-tab" data-id="${esc(m.id)}">Open Tab</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderKeys(){
+  const rows = [];
+  MODULES.forEach(m=>{
+    rows.push(`<div><span class="pill">${esc(m.id)}</span><span class="mono">${esc(m.dataKey)}</span></div>`);
+    if(m.edgeCfgKey) rows.push(`<div class="mono">${esc(m.edgeCfgKey)}</div>`);
+    if(m.edgeOutboxKey) rows.push(`<div class="mono">${esc(m.edgeOutboxKey)}</div>`);
+    if(m.edgeAuditKey) rows.push(`<div class="mono">${esc(m.edgeAuditKey)}</div>`);
+  });
+  document.getElementById("keysList").innerHTML = rows.join("");
+}
+
+function renderEdgeStatus(){
+  const lines = [];
+  MODULES.forEach(m=>{
+    if(!m.edgeCfgKey && !m.edgeOutboxKey && !m.edgeAuditKey) return;
+    const cfg = m.edgeCfgKey ? readJson(m.edgeCfgKey) : null;
+    const outbox = m.edgeOutboxKey ? (readJson(m.edgeOutboxKey) || []) : [];
+    const audit = m.edgeAuditKey ? (readJson(m.edgeAuditKey) || {}) : null;
+    const endpoint = cfg?.endpoint ? "configured" : "not set";
+    const pending = Array.isArray(outbox) ? outbox.length : 0;
+    const receiptCount = Array.isArray(audit?.receipts) ? audit.receipts.length : 0;
+    lines.push(`<div><span class="pill">${esc(m.id)}</span> endpoint: ${esc(endpoint)} | outbox: ${pending} | receipts: ${receiptCount}</div>`);
+  });
+  document.getElementById("edgeStatus").innerHTML = lines.length ? lines.join("") : "No edge transport surfaces detected.";
+}
+
+function renderSchemaStatus(){
+  const rows = MODULES.map(m=>{
+    const s = schemaCheck(m);
+    const cls = s.ok ? "status-ok" : "status-warn";
+    return `<tr><td>${esc(m.name)}</td><td class="${cls}">${s.ok?"OK":"WARN"}</td><td>${esc(s.msg)}</td></tr>`;
+  }).join("");
+  document.getElementById("schemaStatus").innerHTML = `<table><thead><tr><th>Module</th><th>Status</th><th>Detail</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function renderKpis(rollup){
+  const health = governanceHealth(rollup.totals);
+  document.getElementById("kpiStrip").innerHTML = `
+    <div class="card"><div class="l">Total Episodes</div><div class="v">${rollup.totals.episodes}</div></div>
+    <div class="card"><div class="l">Total DS</div><div class="v">${rollup.totals.ds}</div></div>
+    <div class="card"><div class="l">Sealed Decisions/Baselines</div><div class="v">${rollup.totals.sealed}</div></div>
+    <div class="card"><div class="l">Modules with Data</div><div class="v">${rollup.modulesWithData}/4</div></div>
+    <div class="card"><div class="l">Truth Footprint</div><div class="v">${rollup.totals.truth}</div></div>
+    <div class="card"><div class="l">Governance Health</div><div class="v ${health.cls}">${health.label}</div></div>
+  `;
+}
+
+function renderLenses(rollup){
+  const t = rollup.totals;
+  document.getElementById("lensStrip").innerHTML = `
+    <div class="card"><div class="l">Truth Layer</div><div class="v">${t.truth}</div><div class="l">Roles/Reqs/Labor evidence points</div></div>
+    <div class="card"><div class="l">Reasoning Layer</div><div class="v">${t.reasoning}</div><div class="l">Assumptions, mappings, interview traces</div></div>
+    <div class="card"><div class="l">Memory Layer</div><div class="v">${t.memory}</div><div class="l">DS/RS history + gap memory</div></div>
+    <div class="card"><div class="l">Governance Layer</div><div class="v">${t.governance}</div><div class="l">Seals, approvals, baselines</div></div>
+  `;
+}
+
+function renderTelemetry(rollup){
+  const rows = rollup.byModule.map(m=>`<tr>
+    <td>${esc(m.name)}</td>
+    <td>${m.episodes}</td>
+    <td>${m.ds}</td>
+    <td>${m.sealed}</td>
+    <td>${esc(Object.entries(m.detail).map(([k,v])=>`${k}=${v}`).join(", "))}</td>
+  </tr>`).join("");
+  document.getElementById("telemetryTable").innerHTML = `<table><thead><tr><th>Module</th><th>Episodes</th><th>DS</th><th>Sealed</th><th>Detail</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function renderDsRollup(){
+  const lines = [];
+
+  const hiring = readJson("ds_sequoia_hiring_console_v2_artifacts");
+  (Array.isArray(hiring?.drift) ? hiring.drift.slice(-10).reverse() : []).forEach(d=>lines.push({module:"hiring", code:d.code || "DS-HIRE", msg:d.msg || "drift"}));
+
+  const bid = readJson("ds_bidnobid_console_v1");
+  (Array.isArray(bid?.drift) ? bid.drift.slice(-10).reverse() : []).forEach(d=>lines.push({module:"bid", code:d.code || "DS-BID", msg:d.msg || "drift"}));
+
+  const c = readJson("ds_compliance_matrix_v1");
+  if(c){
+    const reqs = Array.isArray(c.requirements) ? c.requirements : [];
+    const gaps = Array.isArray(c.gaps) ? c.gaps : [];
+    const unassigned = reqs.filter(r=>!String(r?.owner || "").trim()).length;
+    const unmapped = reqs.filter(r=>!String(r?.compliance_statement || "").trim()).length;
+    const oldGaps = gaps.filter(g=>String(g?.status || "") !== "Resolved" && daysOld(g?.created) > DS_GAP_AGE_DAYS).length;
+    if(unassigned>0) lines.push({module:"compliance", code:"DS-COMP-001", msg:`Unassigned requirements: ${unassigned}`});
+    if(oldGaps>0) lines.push({module:"compliance", code:"DS-COMP-002", msg:`Open gaps older than ${DS_GAP_AGE_DAYS}d: ${oldGaps}`});
+    if(unmapped>0) lines.push({module:"compliance", code:"DS-COMP-004", msg:`Requirements without compliance statement: ${unmapped}`});
+  }
+
+  const b = readJson("ds_boe_pricing_v1");
+  if(b){
+    const labor = Array.isArray(b.labor) ? b.labor : [];
+    const assumptions = Array.isArray(b.assumptions) ? b.assumptions : [];
+    const missing = labor.filter(l=>!(n(l?.hours)>0) || !(n(l?.rate)>0)).length;
+    const rateOut = labor.filter(l=>n(l?.rate) > RATE_OUTLIER_THRESHOLD).length;
+    const hoursOut = labor.filter(l=>n(l?.hours) > HOURS_OUTLIER_THRESHOLD).length;
+    const cats = new Set(assumptions.map(a=>String(a?.category || "").toLowerCase()));
+    const missingDrivers = ["rates","escalation","productivity"].filter(x=>!cats.has(x)).length;
+    if(missing>0) lines.push({module:"boe", code:"DS-BOE-001", msg:`Missing hours/rate lines: ${missing}`});
+    if(rateOut>0) lines.push({module:"boe", code:"DS-BOE-002", msg:`Rate outliers > $${RATE_OUTLIER_THRESHOLD}: ${rateOut}`});
+    if(hoursOut>0) lines.push({module:"boe", code:"DS-BOE-003", msg:`Hours outliers > ${HOURS_OUTLIER_THRESHOLD}: ${hoursOut}`});
+    if(missingDrivers>0) lines.push({module:"boe", code:"DS-BOE-004", msg:`Missing key driver assumptions: ${missingDrivers}`});
+  }
+
+  const host = document.getElementById("dsRollup");
+  if(!lines.length){ host.textContent = "No active DS signals detected."; return; }
+  host.innerHTML = lines.slice(0,40).map(x=>`<div><span class="pill">${esc(x.module)}</span><span class="pill">${esc(x.code)}</span>${esc(x.msg)}</div>`).join("");
+}
+
+function trendHistory(){
+  const list = readJson(TREND_KEY);
+  return Array.isArray(list) ? list : [];
+}
+function updateTrendSnapshot(rollup){
+  const arr = trendHistory();
+  const day = today();
+  const cur = {date:day, ds:rollup.totals.ds, sealed:rollup.totals.sealed, modules_with_data:rollup.modulesWithData};
+  const i = arr.findIndex(x=>x.date===day);
+  if(i>=0) arr[i]=cur; else arr.push(cur);
+  arr.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+  const trimmed = arr.slice(-120);
+  writeJson(TREND_KEY, trimmed);
+  return trimmed;
+}
+function metricDelta(arr, key, days){
+  if(!arr.length) return {latest:0, prior:0, delta:0};
+  const latest = arr[arr.length-1][key] || 0;
+  const target = new Date(Date.now() - days*86400000).toISOString().slice(0,10);
+  let prior = arr[0][key] || 0;
+  for(let i=arr.length-1;i>=0;i--){ if(arr[i].date <= target){ prior = arr[i][key] || 0; break; } }
+  return {latest, prior, delta: latest-prior};
+}
+function renderTrend(arr){
+  const d7ds = metricDelta(arr,"ds",7);
+  const d30ds = metricDelta(arr,"ds",30);
+  const d7sealed = metricDelta(arr,"sealed",7);
+  const d30mods = metricDelta(arr,"modules_with_data",30);
+  document.getElementById("trendStrip").innerHTML = `
+    <div class="card">
+      <div class="l">DS Trend</div>
+      <div class="v">7d: ${d7ds.delta >= 0 ? "+" : ""}${d7ds.delta} | 30d: ${d30ds.delta >= 0 ? "+" : ""}${d30ds.delta}</div>
+      <div class="l">latest=${d7ds.latest}</div>
+    </div>
+    <div class="card">
+      <div class="l">Sealed Trend</div>
+      <div class="v">7d: ${d7sealed.delta >= 0 ? "+" : ""}${d7sealed.delta}</div>
+      <div class="l">latest=${d7sealed.latest}</div>
+    </div>
+    <div class="card">
+      <div class="l">Coverage Trend (modules w/data)</div>
+      <div class="v">30d: ${d30mods.delta >= 0 ? "+" : ""}${d30mods.delta}</div>
+      <div class="l">latest=${d30mods.latest}/4</div>
+    </div>
+  `;
+}
+
+function renderGatesAndScores(rollup){
+  const gates = buildControlGates(rollup);
+  document.getElementById("gatePanel").innerHTML = `<table><thead><tr><th>Gate</th><th>Status</th><th>Value</th></tr></thead><tbody>${gates.map(g=>{
+    const cls = g.status==="PASS"?"status-ok":(g.status==="WARN"?"status-warn":"status-bad");
+    return `<tr><td>${esc(g.id)} ${esc(g.name)}</td><td class="${cls}">${esc(g.status)}</td><td>${esc(g.value)}</td></tr>`;
+  }).join("")}</tbody></table>`;
+
+  const scores = rollup.byModule.map(m=>{
+    const mod = MODULES.find(x=>x.id===m.id);
+    return {module:m.id, name:m.name, score:moduleHealthScore(mod,m)};
+  });
+  const composite = scores.length ? Math.round(scores.reduce((a,b)=>a+b.score,0)/scores.length) : 0;
+  document.getElementById("scorePanel").innerHTML = `<table><thead><tr><th>Module</th><th>Score</th></tr></thead><tbody>${scores.map(s=>`<tr><td>${esc(s.name)}</td><td>${s.score}</td></tr>`).join("")}<tr><td><b>Composite</b></td><td><b>${composite}</b></td></tr></tbody></table>`;
+}
+
+function renderRollupPreview(obj){
+  document.getElementById("rollupPreview").value = JSON.stringify(obj, null, 2);
+}
+
+function selectModule(id){
+  const mod = MODULES.find(m => m.id === id) || MODULES[0];
+  activeModuleId = mod.id;
+  renderList(mod.id);
+  document.getElementById("moduleTitle").textContent = mod.name;
+  document.getElementById("moduleDesc").textContent = mod.desc;
+  document.getElementById("modulePath").textContent = mod.file;
+  document.getElementById("viewer").src = mod.file;
+  document.getElementById("governanceFootprint").innerHTML = mod.schemas.map(s=>`<span class="pill">${esc(s)}</span>`).join("");
+  try { location.hash = "#" + mod.id; } catch(_) {}
+}
+
+function openModule(mod, withTab){
+  const href = withTab ? `${mod.file}${mod.defaultTab || ""}` : mod.file;
+  window.open(href, "_blank", "noopener");
+}
+
+async function sha256Hex(bytes){
+  const arr = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  const out = await crypto.subtle.digest("SHA-256", arr);
+  return Array.from(new Uint8Array(out)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+function utf8(s){ return new TextEncoder().encode(String(s || "")); }
+function utf8Decode(bytes){ return new TextDecoder().decode(bytes); }
+function u16le(buf, i){ return buf[i] | (buf[i+1] << 8); }
+function u32le(buf, i){ return (buf[i]) | (buf[i+1] << 8) | (buf[i+2] << 16) | (buf[i+3] << 24); }
+
+async function inflateRaw(bytes){
+  if(typeof DecompressionStream !== "function") throw new Error("DecompressionStream not available for deflate entries.");
+  const ds = new DecompressionStream("deflate-raw");
+  const blob = new Blob([bytes]);
+  const stream = blob.stream().pipeThrough(ds);
+  const ab = await new Response(stream).arrayBuffer();
+  return new Uint8Array(ab);
+}
+
+async function loadJsZip(){
+  if(window.JSZip) return window.JSZip;
+  await new Promise((resolve, reject)=>{
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
+    s.async = true;
+    s.onload = resolve;
+    s.onerror = ()=>reject(new Error("Failed to load JSZip CDN fallback."));
+    document.head.appendChild(s);
+  });
+  if(!window.JSZip) throw new Error("JSZip did not initialize.");
+  return window.JSZip;
+}
+
+async function unzipEntries(zipFile){
+  if(typeof DecompressionStream !== "function"){
+    const JSZip = await loadJsZip();
+    const zip = await JSZip.loadAsync(zipFile);
+    const out = [];
+    for(const name of Object.keys(zip.files)){
+      const f = zip.files[name];
+      if(f.dir) continue;
+      const data = new Uint8Array(await f.async("uint8array"));
+      out.push({name, data, text: utf8Decode(data)});
+    }
+    return out;
+  }
+  const buf = new Uint8Array(await zipFile.arrayBuffer());
+  const entries = [];
+  let i = 0;
+  while(i + 30 <= buf.length){
+    const sig = u32le(buf, i) >>> 0;
+    if(sig !== 0x04034b50) break;
+    const method = u16le(buf, i + 8);
+    const compSize = u32le(buf, i + 18) >>> 0;
+    const nameLen = u16le(buf, i + 26);
+    const extraLen = u16le(buf, i + 28);
+    const nameStart = i + 30;
+    const dataStart = nameStart + nameLen + extraLen;
+    const dataEnd = dataStart + compSize;
+    if(dataEnd > buf.length) throw new Error("ZIP parse failed: truncated entry.");
+    const name = utf8Decode(buf.slice(nameStart, nameStart + nameLen));
+    const compressed = buf.slice(dataStart, dataEnd);
+    let data;
+    if(method === 0){
+      data = compressed;
+    } else if(method === 8){
+      data = await inflateRaw(compressed);
+    } else {
+      throw new Error(`Unsupported ZIP method ${method} for entry ${name}`);
+    }
+    entries.push({name, data, text: utf8Decode(data)});
+    i = dataEnd;
+  }
+  return entries;
+}
+
+function findJson(entries, predicate){
+  const e = entries.find(x => predicate(String(x.name || "").toLowerCase()));
+  if(!e) return null;
+  try{ return JSON.parse(e.text); }catch(_){ return null; }
+}
+
+function importComplianceFromEntries(entries){
+  const matrix = findJson(entries, n => n.includes("/matrix/") && n.endsWith("_compliance_matrix.json"));
+  if(!matrix || matrix.schema !== "deepsigma_compliance_matrix_v1") return {imported:false, reason:"compliance matrix JSON not found"};
+  const db = {
+    intake: matrix.intake || {},
+    requirements: Array.isArray(matrix.requirements) ? matrix.requirements : [],
+    deliverables: Array.isArray(matrix.deliverables) ? matrix.deliverables : [],
+    gaps: Array.isArray(matrix.gaps) ? matrix.gaps : [],
+    ds_manual: [],
+    rs: [],
+    meta: {created: nowIso(), version: "1.0", imported_from: "zip"}
+  };
+  writeJson("ds_compliance_matrix_v1", db);
+  return {imported:true, module:"compliance", requirements:db.requirements.length, gaps:db.gaps.length};
+}
+
+function importBoeFromEntries(entries){
+  const boe = findJson(entries, n => n.includes("/boe/") && n.includes("boe_") && n.endsWith(".json"));
+  if(!boe || boe.schema !== "deepsigma_boe_v1") return {imported:false, reason:"boe JSON not found"};
+  const db = {
+    intake: boe.intake || {},
+    labor: Array.isArray(boe.labor) ? boe.labor : [],
+    assumptions: Array.isArray(boe.assumptions) ? boe.assumptions : [],
+    risk_model: boe.risk_model || {hours:{best:0.9,base:1,worst:1.15},rate:{best:0.98,base:1,worst:1.05},sensitivity:{escalation:true,surge:false,clearance:false}},
+    approval: boe.approval || {approvers:"", authority_note:"", decision_note:"", sealed:false, sealed_at:null},
+    meta: {created: nowIso(), version: "1.0", imported_from: "zip"}
+  };
+  writeJson("ds_boe_pricing_v1", db);
+  return {imported:true, module:"boe", labor_lines:db.labor.length, assumptions:db.assumptions.length};
+}
+
+function importBidFromEntries(entries){
+  const mg = findJson(entries, n => n.includes("/mg/") && n.includes("_mg_opportunitygraph_") && n.endsWith(".json"));
+  const assumptions = findJson(entries, n => n.includes("/assumptions/") && n.includes("_assumptions_") && n.endsWith(".json"));
+  const risks = findJson(entries, n => n.includes("/risks/") && n.includes("_risks_") && n.endsWith(".json"));
+  const manifest = findJson(entries, n => n.endsWith("/ingest_manifest.json"));
+  if(!mg || !Array.isArray(mg.nodes)) return {imported:false, reason:"bid mg JSON not found"};
+  const oppNode = mg.nodes.find(n => n && n.type === "opportunity") || {};
+  const decNode = mg.nodes.find(n => n && n.type === "decision") || null;
+  const oppId = manifest?.opportunity_id || oppNode.id || (Array.isArray(assumptions) && assumptions[0]?.opp_id) || `OPP-${today()}`;
+
+  const existing = readJson("ds_bidnobid_console_v1");
+  const db = (existing && typeof existing === "object") ? existing : {opportunities:[], assumptions:[], risks:[], drift:[], rs:[], meta:{created:nowIso(), version:"1.0"}};
+  db.opportunities = Array.isArray(db.opportunities) ? db.opportunities : [];
+  db.assumptions = Array.isArray(db.assumptions) ? db.assumptions : [];
+  db.risks = Array.isArray(db.risks) ? db.risks : [];
+  db.drift = Array.isArray(db.drift) ? db.drift : [];
+  db.rs = Array.isArray(db.rs) ? db.rs : [];
+
+  const opp = {
+    id: String(oppId),
+    customer: String(oppNode.customer || ""),
+    office: "",
+    vehicle: String(oppNode.vehicle || ""),
+    naics: "",
+    value_band: String(oppNode.value_band || ""),
+    pop: "",
+    dates: {rfi:"", rfp:"", q_due:"", due:"", award_est:""},
+    competitors: "",
+    security_needs: "",
+    score: {scores:{strategic_fit:0,customer_access:0,capability_fit:0,past_perf:0,capacity_staffing:0,differentiation:0,price_margin:0,risk_complexity:0}, total:0, recommendation:"Watch", updated:nowIso()},
+    decision: decNode ? {value:String(decNode.value || "Watch"), approver:"", authority:"", rationale:"Imported from ZIP", sealed:!!decNode.sealed, seal:decNode.sealed ? `${nowIso()}|zip-import` : null, updated:nowIso()} : null,
+    created: nowIso(),
+    updated: nowIso()
+  };
+  const oi = db.opportunities.findIndex(x => String(x?.id) === opp.id);
+  if(oi >= 0) db.opportunities[oi] = {...db.opportunities[oi], ...opp, updated: nowIso()};
+  else db.opportunities.push(opp);
+
+  if(Array.isArray(assumptions)){
+    assumptions.forEach(a=>{
+      const rec = {...a, opp_id: a?.opp_id || opp.id, id: a?.id || `ASM-${Math.random().toString(16).slice(2,8).toUpperCase()}`, created: a?.created || nowIso()};
+      if(!db.assumptions.find(x=>String(x?.id)===String(rec.id))) db.assumptions.push(rec);
+    });
+  }
+  if(Array.isArray(risks)){
+    risks.forEach(r=>{
+      const rec = {...r, opp_id: r?.opp_id || opp.id, id: r?.id || `RISK-${Math.random().toString(16).slice(2,8).toUpperCase()}`, created: r?.created || nowIso()};
+      if(!db.risks.find(x=>String(x?.id)===String(rec.id))) db.risks.push(rec);
+    });
+  }
+  db.meta = {...(db.meta || {}), version:"1.0", imported_from:"zip", updated: nowIso()};
+  writeJson("ds_bidnobid_console_v1", db);
+  return {imported:true, module:"bid", opportunities:db.opportunities.length, assumptions:db.assumptions.length, risks:db.risks.length};
+}
+
+async function importModuleZip(){
+  const zf = document.getElementById("zipImportFile").files?.[0];
+  if(!zf){ document.getElementById("importZipResult").textContent = "Select a ZIP file first."; return; }
+  try{
+    const entries = await unzipEntries(zf);
+    const results = [];
+    const compliance = importComplianceFromEntries(entries); if(compliance.imported) results.push(compliance);
+    const boe = importBoeFromEntries(entries); if(boe.imported) results.push(boe);
+    const bid = importBidFromEntries(entries); if(bid.imported) results.push(bid);
+    if(!results.length){
+      document.getElementById("importZipResult").textContent = JSON.stringify({
+        schema: "deepsigma_zip_import_v1",
+        generated_at: nowIso(),
+        file: zf.name,
+        imported: false,
+        message: "No compatible Bid/Compliance/BOE payload found in ZIP."
+      }, null, 2);
+      return;
+    }
+    document.getElementById("importZipResult").textContent = JSON.stringify({
+      schema: "deepsigma_zip_import_v1",
+      generated_at: nowIso(),
+      file: zf.name,
+      imported: true,
+      modules: results
+    }, null, 2);
+    refresh();
+  }catch(err){
+    document.getElementById("importZipResult").textContent = `ZIP import failed: ${err.message || err}`;
+  }
+}
+
+async function verifyEvidence(){
+  const mf = document.getElementById("manifestFile").files?.[0];
+  const hf = document.getElementById("hashesFile").files?.[0];
+  if(!mf || !hf){ document.getElementById("verifyResult").textContent = "Select manifest and hashes files first."; return; }
+  try{
+    const manifest = JSON.parse(await mf.text());
+    const hashesDoc = JSON.parse(await hf.text());
+    const hashes = hashesDoc?.hashes || {};
+    const pairs = Object.entries(hashes).sort((a,b)=>a[0].localeCompare(b[0])).map(([k,v])=>`${k} ${v}`).join("\n");
+    const computed = await sha256Hex(utf8(pairs));
+    const inManifest = manifest?.pack_hash || "";
+    const inHashes = hashesDoc?.pack_hash || "";
+    const ok = computed && inManifest && inHashes && computed === inManifest && computed === inHashes;
+    document.getElementById("verifyResult").textContent = JSON.stringify({
+      schema: "deepsigma_pack_verify_v1",
+      generated_at: nowIso(),
+      manifest_schema: manifest?.schema || null,
+      files_hashed: Object.keys(hashes).length,
+      computed_pack_hash: computed,
+      manifest_pack_hash: inManifest,
+      hashes_pack_hash: inHashes,
+      valid: !!ok
+    }, null, 2);
+  }catch(err){
+    document.getElementById("verifyResult").textContent = `Verification failed: ${err.message || err}`;
+  }
+}
+
+function exportRollup(){
+  const obj = rollupObject();
+  const blob = new Blob([JSON.stringify(obj, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `deepsigma_suite_rollup_${today()}.json`;
+  a.click();
+}
+
+function printExec(){
+  const obj = rollupObject();
+  const w = window.open("", "_blank", "noopener");
+  if(!w) return;
+  const html = `<!doctype html><html><head><meta charset="utf-8"/><title>Deep Sigma Executive Snapshot</title>
+    <style>body{font-family:system-ui;padding:20px;color:#0f1720}h1{margin:0 0 8px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #c7d1dc;padding:8px;font-size:12px}th{text-align:left;background:#eef4fa}pre{background:#f5f8fb;padding:10px;border:1px solid #d2dbe6}</style></head><body>
+    <h1>Deep Sigma Executive Snapshot</h1><div>Generated: ${esc(obj.generated_at)}</div>
+    <h2>Totals</h2><pre>${esc(JSON.stringify(obj.totals, null, 2))}</pre>
+    <h2>Control Gates</h2><table><thead><tr><th>Gate</th><th>Status</th><th>Value</th></tr></thead><tbody>${obj.control_gates.map(g=>`<tr><td>${esc(g.id)} ${esc(g.name)}</td><td>${esc(g.status)}</td><td>${esc(g.value)}</td></tr>`).join("")}</tbody></table>
+    <h2>Module Scores</h2><table><thead><tr><th>Module</th><th>Score</th></tr></thead><tbody>${obj.module_scores.map(s=>`<tr><td>${esc(s.module)}</td><td>${s.score}</td></tr>`).join("")}<tr><td><b>Composite</b></td><td><b>${obj.composite_score}</b></td></tr></tbody></table>
+    </body></html>`;
+  w.document.open(); w.document.write(html); w.document.close(); w.focus(); w.print();
+}
+
+function refresh(){
+  const rollup = collectRollup();
+  renderKeys();
+  renderEdgeStatus();
+  renderSchemaStatus();
+  renderKpis(rollup);
+  renderLenses(rollup);
+  renderTelemetry(rollup);
+  renderDsRollup();
+  renderGatesAndScores(rollup);
+
+  const hist = updateTrendSnapshot(rollup);
+  renderTrend(hist);
+
+  const obj = rollupObject();
+  renderRollupPreview(obj);
+  document.getElementById("zipSupportNote").textContent =
+    (typeof DecompressionStream === "function")
+      ? "ZIP engine: native DecompressionStream."
+      : "ZIP engine: JSZip CDN fallback will be loaded when needed.";
+}
+
+(function init(){
+  refresh();
+  renderList(MODULES[0].id);
+  document.getElementById("moduleList").addEventListener("click", (e) => {
+    const card = e.target.closest(".module");
+    const btn = e.target.closest("button");
+    if(btn){
+      const mod = MODULES.find(m=>m.id===btn.dataset.id);
+      if(!mod) return;
+      if(btn.dataset.action === "open") return openModule(mod, false);
+      if(btn.dataset.action === "open-tab") return openModule(mod, true);
+      return;
+    }
+    if(!card) return;
+    selectModule(card.dataset.id);
+  });
+  const hash = (location.hash || "").replace("#", "").trim();
+  selectModule(hash || MODULES[0].id);
+
+  document.getElementById("btnRefresh")?.addEventListener("click", refresh);
+  document.getElementById("btnExportRollup")?.addEventListener("click", exportRollup);
+  document.getElementById("btnPrintExec")?.addEventListener("click", printExec);
+  document.getElementById("btnVerifyPack")?.addEventListener("click", verifyEvidence);
+  document.getElementById("btnImportZip")?.addEventListener("click", importModuleZip);
+  document.getElementById("btnOpenModule")?.addEventListener("click", ()=>{
+    const mod = MODULES.find(m=>m.id===activeModuleId) || MODULES[0];
+    openModule(mod,false);
+  });
+  document.getElementById("btnOpenModuleTab")?.addEventListener("click", ()=>{
+    const mod = MODULES.find(m=>m.id===activeModuleId) || MODULES[0];
+    openModule(mod,true);
+  });
+
+  window.addEventListener("storage", refresh);
+  setInterval(refresh, 10000);
+})();
+</script>
+</body>
+</html>

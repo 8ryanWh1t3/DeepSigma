@@ -1,0 +1,771 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Deep Sigma - BOE / Pricing Console v001</title>
+  <style>
+    :root { --bg:#0b0f14; --card:#111824; --muted:#8aa0b5; --txt:#e7eef7; --accent:#7df9ff; --warn:#ffcc66; --bad:#ff6b6b; --ok:#5dff93; }
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:var(--bg);color:var(--txt)}
+    header{padding:16px 18px;border-bottom:1px solid #1b2a3a;display:flex;gap:12px;align-items:center;justify-content:space-between}
+    .brand{display:flex;flex-direction:column;gap:2px}.brand b{letter-spacing:.4px}.brand small{color:var(--muted)}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+    button{background:#182235;color:var(--txt);border:1px solid #243449;border-radius:10px;padding:10px 12px;cursor:pointer}
+    button:hover{border-color:#2f4765} button.primary{border-color:rgba(125,249,255,.45);box-shadow:0 0 0 1px rgba(125,249,255,.12) inset} button.danger{border-color:rgba(255,107,107,.45)}
+    main{display:grid;grid-template-columns:290px 1fr;min-height:calc(100vh - 66px)}
+    nav{border-right:1px solid #1b2a3a;padding:14px}
+    .tab{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--txt);margin-bottom:8px}
+    .tab.active{background:#101a28;border-color:#243449}
+    .wrap{padding:14px 16px;max-width:1400px}
+    .card{background:var(--card);border:1px solid #1b2a3a;border-radius:14px;padding:12px}
+    .card h3{margin:0 0 10px 0;font-size:14px;color:#cfe2f7;letter-spacing:.3px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .kpi{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+    label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
+    input,textarea,select{width:100%;box-sizing:border-box;background:#0d1520;color:var(--txt);border:1px solid #243449;border-radius:10px;padding:10px 10px;font-size:13px}
+    textarea{min-height:92px;resize:vertical}
+    .small{font-size:12px}.muted{color:var(--muted);font-size:12px}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace}
+    table{width:100%;border-collapse:collapse;font-size:13px} th,td{padding:9px;border-bottom:1px solid #1b2a3a;vertical-align:top} th{color:#b9d3ea;text-align:left}
+    .hidden{display:none}
+    .right{display:flex;gap:10px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
+    .pill{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid #243449;color:var(--muted);font-size:12px;margin-right:6px}
+    .ok{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+  </style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <b>Deep Sigma - BOE / Pricing Console v001</b>
+    <small>Offline edge node | DLR-BOE | DS pricing drift | Manifest + Hashes + Pack Hash</small>
+  </div>
+  <div class="row">
+    <button id="btnExport" class="primary">Export JSON</button>
+    <button id="btnImport">Import JSON</button>
+    <button id="btnReset" class="danger">Reset</button>
+  </div>
+</header>
+<main>
+  <nav>
+    <button class="tab active" data-tab="dashboard">Dashboard</button>
+    <button class="tab" data-tab="intake">Opportunity / RFP Intake</button>
+    <button class="tab" data-tab="labor">Labor Mix Builder</button>
+    <button class="tab" data-tab="assumptions">Assumptions (DLR-BOE)</button>
+    <button class="tab" data-tab="risk">Risk Bands + Sensitivities</button>
+    <button class="tab" data-tab="approval">Review / Approval (Seal)</button>
+    <button class="tab" data-tab="artifacts">Artifacts Export</button>
+    <button class="tab" data-tab="test">Test Mode</button>
+    <div style="margin-top:14px" class="muted">Data stored in <span class="mono">localStorage</span>.</div>
+  </nav>
+  <div class="wrap">
+    <section id="tab-dashboard">
+      <div class="kpi">
+        <div class="card"><div class="muted">Total Labor Hours</div><b id="kHours">0</b></div>
+        <div class="card"><div class="muted">Base Total Price</div><b id="kPrice">$0</b></div>
+        <div class="card"><div class="muted">Margin Band (manual)</div><b id="kMargin">-</b></div>
+        <div class="card"><div class="muted">Risk Score</div><b id="kRisk">0</b></div>
+        <div class="card"><div class="muted">Auto DS Alerts</div><b id="kDs">0</b></div>
+      </div>
+      <div class="kpi" style="margin-top:10px">
+        <div class="card"><div class="muted">BOE Completeness</div><b id="kComplete">0%</b></div>
+        <div class="card"><div class="muted">Assumptions</div><b id="kAssumptions">0</b></div>
+        <div class="card"><div class="muted">Rate Outliers</div><b id="kRateOut">0</b></div>
+        <div class="card"><div class="muted">Hours Outliers</div><b id="kHoursOut">0</b></div>
+        <div class="card"><div class="muted">Missing Hours/Rate</div><b id="kMissing">0</b></div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h3>Auto DS Alerts</h3>
+        <div id="dashDs" class="muted">No alerts.</div>
+      </div>
+    </section>
+
+    <section id="tab-intake" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <h3>Opportunity / Pricing Basis Intake</h3>
+          <label>Opportunity ID</label><input id="iOppId" placeholder="OPP-BOE-001"/>
+          <label>Opportunity Title</label><input id="iTitle" placeholder="Program / Pursuit name"/>
+          <label>Customer</label><input id="iCustomer" placeholder="Agency / Office"/>
+          <label>Contract Type</label><select id="iContract"><option>FFP</option><option>T&M</option><option>Cost+</option></select>
+          <label>Period of Performance</label><input id="iPop" placeholder="Base + 4 options"/>
+          <label>Locations</label><textarea id="iLocations" placeholder="Arlington, VA\nSan Diego, CA"></textarea>
+          <label>Escalation Policy</label><textarea id="iEscalation" placeholder="e.g., 3% annual"></textarea>
+          <label>Fringe Placeholder (%)</label><input id="iFringe" type="number" step="0.01"/>
+          <label>Overhead Placeholder (%)</label><input id="iOverhead" type="number" step="0.01"/>
+          <label>G&A Placeholder (%)</label><input id="iGa" type="number" step="0.01"/>
+          <label>Manual Margin Band</label><input id="iMarginBand" placeholder="Best 14% / Base 11% / Worst 8%"/>
+          <div class="right" style="margin-top:10px"><button id="btnIntakeSave" class="primary">Save Intake</button></div>
+          <div id="iHint" class="muted"></div>
+        </div>
+        <div class="card">
+          <h3>Intake Snapshot</h3>
+          <pre id="iPreview" class="mono" style="white-space:pre-wrap">No intake saved.</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-labor" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <h3>Labor Line Item</h3>
+          <label>Line ID (optional)</label><input id="lId" placeholder="LINE-001"/>
+          <label>Role / Labor Category</label><input id="lRole"/>
+          <label>Location</label><input id="lLocation"/>
+          <label>Clearance</label><input id="lClearance" placeholder="None / Secret / TS-SCI"/>
+          <label>Hours</label><input id="lHours" type="number" min="0" step="1"/>
+          <label>Rate ($/hr)</label><input id="lRate" type="number" min="0" step="0.01"/>
+          <label>Period</label><input id="lPeriod" placeholder="Base / Option1"/>
+          <label>Rate Type</label><select id="lRateType"><option>loaded</option><option>fully-burdened</option><option>raw</option></select>
+          <label>Notes</label><textarea id="lNotes"></textarea>
+          <div class="right" style="margin-top:10px">
+            <button id="btnLClear">Clear</button>
+            <button id="btnLSave" class="primary">Save Line</button>
+          </div>
+          <div id="lHint" class="muted"></div>
+        </div>
+        <div class="card">
+          <h3>Labor Mix</h3>
+          <div id="laborTable" class="muted">No labor lines yet.</div>
+          <h3 style="margin-top:12px">Aggregates</h3>
+          <pre id="laborAgg" class="mono" style="white-space:pre-wrap">{}</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-assumptions" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <h3>Add Assumption</h3>
+          <label>Assumption text</label><textarea id="aText"></textarea>
+          <label>Category</label><select id="aCat"><option>rates</option><option>hours</option><option>productivity</option><option>travel</option><option>subs</option><option>escalation</option></select>
+          <label>Confidence</label><select id="aConfidence"><option>Low</option><option>Med</option><option>High</option></select>
+          <label>Expiry date</label><input id="aExpiry" type="date"/>
+          <label>Disconfirmers</label><textarea id="aDis"></textarea>
+          <div class="right" style="margin-top:10px"><button id="btnASave" class="primary">Save Assumption</button></div>
+        </div>
+        <div class="card"><h3>Assumptions Register</h3><div id="assumptionTable" class="muted">No assumptions yet.</div></div>
+      </div>
+    </section>
+
+    <section id="tab-risk" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <h3>Risk Bands + Sensitivities</h3>
+          <label>Hours multipliers (best/base/worst)</label>
+          <div class="grid" style="grid-template-columns:1fr 1fr 1fr">
+            <input id="rbHoursBest" type="number" step="0.01" value="0.9"/>
+            <input id="rbHoursBase" type="number" step="0.01" value="1.0"/>
+            <input id="rbHoursWorst" type="number" step="0.01" value="1.15"/>
+          </div>
+          <label>Rate multipliers (best/base/worst)</label>
+          <div class="grid" style="grid-template-columns:1fr 1fr 1fr">
+            <input id="rbRateBest" type="number" step="0.01" value="0.98"/>
+            <input id="rbRateBase" type="number" step="0.01" value="1.0"/>
+            <input id="rbRateWorst" type="number" step="0.01" value="1.05"/>
+          </div>
+          <label>Sensitivity switches</label>
+          <select id="rbEscalation"><option value="true">Escalation ON</option><option value="false">Escalation OFF</option></select>
+          <select id="rbSurge"><option value="false">Surge Staffing OFF</option><option value="true">Surge Staffing ON</option></select>
+          <select id="rbClearance"><option value="false">Clearance Premium OFF</option><option value="true">Clearance Premium ON</option></select>
+          <div class="right" style="margin-top:10px"><button id="btnRiskSave" class="primary">Save Risk Model</button></div>
+        </div>
+        <div class="card">
+          <h3>Banded Totals</h3>
+          <pre id="riskPreview" class="mono" style="white-space:pre-wrap">No model yet.</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-approval" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <h3>Review / Approval</h3>
+          <label>Approver(s)</label><input id="apApprovers" placeholder="Name; Name"/>
+          <label>Authority note</label><textarea id="apAuthority"></textarea>
+          <label>Decision note</label><textarea id="apDecision"></textarea>
+          <label>Seal status</label><select id="apSeal"><option value="false">Open</option><option value="true">Sealed</option></select>
+          <div class="right" style="margin-top:10px"><button id="btnApprovalSave" class="primary">Save Approval</button></div>
+          <div id="apHint" class="muted"></div>
+        </div>
+        <div class="card">
+          <h3>DLR-BOE Preview</h3>
+          <pre id="approvalPreview" class="mono" style="white-space:pre-wrap">No approval record.</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-artifacts" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <h3>Artifacts Export</h3>
+          <label>Prefix</label><input id="packPrefix" value="SEQUOIA"/>
+          <label>Program</label><input id="orgProgram" value="NGA - SEQUOIA"/>
+          <label>Steward</label><input id="cohSteward" value="Pricing Steward"/>
+          <label>Safe Export</label><select id="safeExport"><option value="false">OFF</option><option value="true">ON</option></select>
+          <label>Safe Level</label><select id="safeExportLevel"><option value="lite">Lite (mask customer/title/notes)</option><option value="strict">Strict (strip narrative)</option></select>
+          <div class="right" style="margin-top:10px"><button id="btnZipPack" class="primary">Download BOE Pack ZIP</button></div>
+          <div class="muted small">Pack includes BOE JSON, DLR_BOE_ASSUMPTIONS.md, DS_PRICING_date.md, ingest_manifest.json, hashes.json, README.md.</div>
+        </div>
+        <div class="card">
+          <h3>Manifest Preview</h3>
+          <pre id="preview" class="mono" style="white-space:pre-wrap">No export yet.</pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-test" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <h3>Test Mode</h3>
+          <div class="right" style="justify-content:flex-start">
+            <button id="tmRunAll" class="primary">Generate Sample BOE</button>
+            <button id="tmDownloadZip">Export ZIP</button>
+            <button id="tmReset" class="danger">Reset Data</button>
+          </div>
+          <div class="muted small" style="margin-top:8px">Generates 20-60 labor lines, assumptions, outliers, and approval snapshot.</div>
+          <pre id="tmLog" class="mono" style="white-space:pre-wrap;min-height:160px"></pre>
+        </div>
+        <div class="card">
+          <h3>Expected DS Rules</h3>
+          <ul class="muted">
+            <li>DS-BOE-001: labor line missing hours or rate</li>
+            <li>DS-BOE-002: rate outlier &gt; $250/hr</li>
+            <li>DS-BOE-003: hours outlier &gt; 2,000 hrs/position/year</li>
+            <li>DS-BOE-004: missing assumptions for rates/escalation/productivity</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<input id="fileImport" type="file" accept="application/json" class="hidden"/>
+<script>
+const KEY = "ds_boe_pricing_v1";
+const RATE_OUTLIER_THRESHOLD = 250;
+const HOURS_OUTLIER_THRESHOLD = 2000;
+
+function storageAvailable(){ try{ const x="__ds_test__"; localStorage.setItem(x,x); localStorage.removeItem(x); return true; }catch(_){ return false; } }
+function getStoreItem(k){ if(storageAvailable()) return localStorage.getItem(k); window.__ds_memstore ||= {}; return window.__ds_memstore[k] || null; }
+function setStoreItem(k,v){ if(storageAvailable()) return localStorage.setItem(k,v); window.__ds_memstore ||= {}; window.__ds_memstore[k] = v; }
+function removeStoreItem(k){ if(storageAvailable()) return localStorage.removeItem(k); if(window.__ds_memstore) delete window.__ds_memstore[k]; }
+
+function nowIso(){ return new Date().toISOString(); }
+function today(){ return new Date().toISOString().slice(0,10); }
+function uid(prefix){ return `${prefix}-${Math.random().toString(16).slice(2,8).toUpperCase()}`; }
+function v(id){ return (document.getElementById(id)?.value || "").trim(); }
+function s(id,val){ const el=document.getElementById(id); if(el) el.value = val || ""; }
+function esc(x){ return String(x || "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
+function n(x){ const t = Number(x); return Number.isFinite(t) ? t : 0; }
+function money(x){ return `$${n(x).toLocaleString(undefined,{maximumFractionDigits:2,minimumFractionDigits:2})}`; }
+function safeFile(sv){ return (sv||"").replace(/[^a-z0-9_\-]+/gi,"_").replace(/_+/g,"_").replace(/^_+|_+$/g,""); }
+function strToUtf8Bytes(s){ return new TextEncoder().encode(s); }
+
+function emptyDb(){
+  return {
+    intake: {
+      opp_id:"", title:"", customer:"", contract_type:"FFP", pop:"", locations:"", escalation_policy:"", fringe_pct:0, overhead_pct:0, ga_pct:0, margin_band:""
+    },
+    labor: [],
+    assumptions: [],
+    risk_model: {
+      hours: {best:0.9, base:1.0, worst:1.15},
+      rate: {best:0.98, base:1.0, worst:1.05},
+      sensitivity: {escalation:true, surge:false, clearance:false}
+    },
+    approval: {approvers:"", authority_note:"", decision_note:"", sealed:false, sealed_at:null},
+    meta: {created:nowIso(), version:"1.0"}
+  };
+}
+function load(){
+  const raw = getStoreItem(KEY);
+  if(!raw){ const db = emptyDb(); setStoreItem(KEY, JSON.stringify(db)); return db; }
+  try{
+    const db = JSON.parse(raw);
+    db.intake ||= emptyDb().intake;
+    db.labor ||= [];
+    db.assumptions ||= [];
+    db.risk_model ||= emptyDb().risk_model;
+    db.approval ||= emptyDb().approval;
+    db.meta ||= {created:nowIso(), version:"1.0"};
+    return db;
+  }catch(_){ const db = emptyDb(); setStoreItem(KEY, JSON.stringify(db)); return db; }
+}
+function save(db){ setStoreItem(KEY, JSON.stringify(db)); refreshAll(); }
+
+function setTab(tab){
+  ["dashboard","intake","labor","assumptions","risk","approval","artifacts","test"].forEach(t=>{
+    const el=document.getElementById(`tab-${t}`); if(el) el.classList.toggle("hidden", t!==tab);
+  });
+  document.querySelectorAll(".tab").forEach(b=> b.classList.toggle("active", b.dataset.tab===tab));
+  try{ location.hash = "#" + tab; }catch(_){ }
+}
+
+function lineTotal(line){ return n(line.hours) * n(line.rate); }
+function aggregates(db){
+  const byPeriod = {}, byRole = {}, byLocation = {};
+  let hours = 0, price = 0;
+  db.labor.forEach(l=>{
+    const h=n(l.hours), r=n(l.rate), t=h*r;
+    hours += h; price += t;
+    byPeriod[l.period||"(unset)"] = (byPeriod[l.period||"(unset)"] || 0) + t;
+    byRole[l.role||"(unset)"] = (byRole[l.role||"(unset)"] || 0) + t;
+    byLocation[l.location||"(unset)"] = (byLocation[l.location||"(unset)"] || 0) + t;
+  });
+  return {hours, price, byPeriod, byRole, byLocation};
+}
+
+function computeRiskBandTotals(db){
+  const agg = aggregates(db);
+  const rm = db.risk_model;
+  const sensHours = rm.sensitivity.surge ? 1.08 : 1.0;
+  const sensRates = (rm.sensitivity.clearance ? 1.04 : 1.0) * (rm.sensitivity.escalation ? 1.03 : 1.0);
+  const mk = (hM,rM)=> agg.price * hM * rM * sensHours * sensRates;
+  return {
+    best: mk(n(rm.hours.best), n(rm.rate.best)),
+    base: mk(n(rm.hours.base), n(rm.rate.base)),
+    worst: mk(n(rm.hours.worst), n(rm.rate.worst)),
+    delta_best_vs_base: mk(n(rm.hours.best), n(rm.rate.best)) - mk(n(rm.hours.base), n(rm.rate.base)),
+    delta_worst_vs_base: mk(n(rm.hours.worst), n(rm.rate.worst)) - mk(n(rm.hours.base), n(rm.rate.base))
+  };
+}
+
+function computeAutoDs(db){
+  const alerts = [];
+  const missing = db.labor.filter(l=>!(n(l.hours)>0) || !(n(l.rate)>0));
+  if(missing.length){ alerts.push({code:"DS-BOE-001", msg:`Labor lines missing hours or rate: ${missing.length}`}); }
+
+  const rateOut = db.labor.filter(l=>n(l.rate) > RATE_OUTLIER_THRESHOLD);
+  if(rateOut.length){ alerts.push({code:"DS-BOE-002", msg:`Rate outliers above $${RATE_OUTLIER_THRESHOLD}/hr: ${rateOut.length}`}); }
+
+  const hoursOut = db.labor.filter(l=>n(l.hours) > HOURS_OUTLIER_THRESHOLD);
+  if(hoursOut.length){ alerts.push({code:"DS-BOE-003", msg:`Hours outliers above ${HOURS_OUTLIER_THRESHOLD}: ${hoursOut.length}`}); }
+
+  const cats = new Set(db.assumptions.map(a=>String(a.category||"").toLowerCase()));
+  const missingDrivers = ["rates","escalation","productivity"].filter(c=>!cats.has(c));
+  if(missingDrivers.length){ alerts.push({code:"DS-BOE-004", msg:`Missing assumptions for key drivers: ${missingDrivers.join(", ")}`}); }
+
+  return alerts.map(a=>({time:nowIso(), code:a.code, msg:a.msg, patch:"Review BOE model + add patch note"}));
+}
+
+function boeCompleteness(db){
+  const checks = [];
+  checks.push(!!db.intake.opp_id);
+  checks.push(!!db.intake.customer);
+  checks.push(!!db.intake.contract_type);
+  checks.push(db.labor.length > 0);
+  checks.push(db.labor.every(l=>n(l.hours)>0 && n(l.rate)>0 && !!l.role));
+  checks.push(db.assumptions.length > 0);
+  checks.push(!!db.approval.approvers);
+  const pass = checks.filter(Boolean).length;
+  return Math.round((pass/checks.length)*1000)/10;
+}
+
+function saveIntake(){
+  const db = load();
+  db.intake.opp_id = v("iOppId");
+  db.intake.title = v("iTitle");
+  db.intake.customer = v("iCustomer");
+  db.intake.contract_type = v("iContract") || "FFP";
+  db.intake.pop = v("iPop");
+  db.intake.locations = v("iLocations");
+  db.intake.escalation_policy = v("iEscalation");
+  db.intake.fringe_pct = n(v("iFringe"));
+  db.intake.overhead_pct = n(v("iOverhead"));
+  db.intake.ga_pct = n(v("iGa"));
+  db.intake.margin_band = v("iMarginBand");
+  save(db);
+  document.getElementById("iHint").textContent = "Intake saved.";
+}
+
+function saveLabor(){
+  const db = load();
+  const id = v("lId") || `LINE-${String(db.labor.length+1).padStart(3,"0")}`;
+  const row = {
+    id,
+    role: v("lRole"),
+    location: v("lLocation"),
+    clearance: v("lClearance"),
+    hours: n(v("lHours")),
+    rate: n(v("lRate")),
+    period: v("lPeriod") || "Base",
+    rate_type: v("lRateType") || "loaded",
+    notes: v("lNotes"),
+    created: db.labor.find(x=>x.id===id)?.created || nowIso(),
+    updated: nowIso()
+  };
+  const i = db.labor.findIndex(x=>x.id===id);
+  if(i>=0) db.labor[i]=row; else db.labor.push(row);
+  save(db);
+  document.getElementById("lHint").textContent = `Saved ${id}`;
+}
+function clearLabor(){ ["lId","lRole","lLocation","lClearance","lHours","lRate","lPeriod","lNotes"].forEach(x=>s(x,"")); s("lRateType","loaded"); }
+function editLabor(id){ const r = load().labor.find(x=>x.id===id); if(!r) return; s("lId",r.id); s("lRole",r.role); s("lLocation",r.location); s("lClearance",r.clearance); s("lHours",String(r.hours||"")); s("lRate",String(r.rate||"")); s("lPeriod",r.period); s("lRateType",r.rate_type); s("lNotes",r.notes); setTab("labor"); }
+function deleteLabor(id){ if(!confirm("Delete labor line?")) return; const db=load(); db.labor=db.labor.filter(x=>x.id!==id); save(db); }
+
+function saveAssumption(){
+  const db = load();
+  const rec = {
+    id: uid("ASM"),
+    text: v("aText"),
+    category: v("aCat") || "rates",
+    confidence: v("aConfidence") || "Med",
+    expiry: v("aExpiry"),
+    disconfirmers: v("aDis"),
+    created: nowIso()
+  };
+  if(!rec.text) return alert("Assumption text required.");
+  db.assumptions.push(rec);
+  save(db);
+  ["aText","aExpiry","aDis"].forEach(x=>s(x,"")); s("aCat","rates"); s("aConfidence","Med");
+}
+
+function saveRiskModel(){
+  const db = load();
+  db.risk_model.hours.best = n(v("rbHoursBest"));
+  db.risk_model.hours.base = n(v("rbHoursBase"));
+  db.risk_model.hours.worst = n(v("rbHoursWorst"));
+  db.risk_model.rate.best = n(v("rbRateBest"));
+  db.risk_model.rate.base = n(v("rbRateBase"));
+  db.risk_model.rate.worst = n(v("rbRateWorst"));
+  db.risk_model.sensitivity.escalation = v("rbEscalation") === "true";
+  db.risk_model.sensitivity.surge = v("rbSurge") === "true";
+  db.risk_model.sensitivity.clearance = v("rbClearance") === "true";
+  save(db);
+}
+
+function saveApproval(){
+  const db = load();
+  db.approval.approvers = v("apApprovers");
+  db.approval.authority_note = v("apAuthority");
+  db.approval.decision_note = v("apDecision");
+  const seal = v("apSeal") === "true";
+  db.approval.sealed = seal;
+  db.approval.sealed_at = seal ? nowIso() : null;
+  save(db);
+  document.getElementById("apHint").textContent = "Approval saved.";
+}
+
+function renderDashboard(){
+  const db=load();
+  const agg = aggregates(db);
+  const ds = computeAutoDs(db);
+  const missing = db.labor.filter(l=>!(n(l.hours)>0) || !(n(l.rate)>0)).length;
+  const rateOut = db.labor.filter(l=>n(l.rate) > RATE_OUTLIER_THRESHOLD).length;
+  const hoursOut = db.labor.filter(l=>n(l.hours) > HOURS_OUTLIER_THRESHOLD).length;
+  const riskScore = Math.min(100, (ds.length*20) + (rateOut*3) + (hoursOut*2));
+
+  document.getElementById("kHours").textContent = String(Math.round(agg.hours));
+  document.getElementById("kPrice").textContent = money(agg.price);
+  document.getElementById("kMargin").textContent = db.intake.margin_band || "-";
+  document.getElementById("kRisk").textContent = String(Math.round(riskScore));
+  document.getElementById("kDs").textContent = String(ds.length);
+  document.getElementById("kComplete").textContent = `${boeCompleteness(db)}%`;
+  document.getElementById("kAssumptions").textContent = String(db.assumptions.length);
+  document.getElementById("kRateOut").textContent = String(rateOut);
+  document.getElementById("kHoursOut").textContent = String(hoursOut);
+  document.getElementById("kMissing").textContent = String(missing);
+  document.getElementById("dashDs").innerHTML = ds.length ? ds.map(x=>`<div><span class="pill">${esc(x.code)}</span> ${esc(x.msg)}</div>`).join("") : "No DS alerts.";
+}
+
+function renderIntake(){
+  const db=load();
+  s("iOppId",db.intake.opp_id); s("iTitle",db.intake.title); s("iCustomer",db.intake.customer); s("iContract",db.intake.contract_type);
+  s("iPop",db.intake.pop); s("iLocations",db.intake.locations); s("iEscalation",db.intake.escalation_policy);
+  s("iFringe",String(db.intake.fringe_pct||"")); s("iOverhead",String(db.intake.overhead_pct||"")); s("iGa",String(db.intake.ga_pct||"")); s("iMarginBand",db.intake.margin_band);
+  document.getElementById("iPreview").textContent = JSON.stringify(db.intake, null, 2);
+}
+function renderLabor(){
+  const db=load();
+  const el=document.getElementById("laborTable");
+  if(!db.labor.length){ el.innerHTML = "<div class='muted'>No labor lines yet.</div>"; }
+  else {
+    el.innerHTML = `<table><thead><tr><th>ID</th><th>Role</th><th>Location</th><th>Clr</th><th>Hours</th><th>Rate</th><th>Period</th><th>Total</th><th></th></tr></thead><tbody>${db.labor.map(r=>`<tr>
+      <td class="mono">${esc(r.id)}</td><td>${esc(r.role)}</td><td>${esc(r.location)}</td><td>${esc(r.clearance)}</td><td>${n(r.hours).toLocaleString()}</td><td>${money(r.rate)}</td><td>${esc(r.period)}</td><td>${money(lineTotal(r))}</td>
+      <td><button data-action="edit" data-id="${esc(r.id)}">Edit</button> <button class="danger" data-action="del" data-id="${esc(r.id)}">Delete</button></td>
+    </tr>`).join("")}</tbody></table>`;
+  }
+  const agg = aggregates(db);
+  document.getElementById("laborAgg").textContent = JSON.stringify({
+    totals: {hours:agg.hours, price:agg.price},
+    by_period: agg.byPeriod,
+    by_role: agg.byRole,
+    by_location: agg.byLocation
+  }, null, 2);
+}
+function renderAssumptions(){
+  const db=load(); const el=document.getElementById("assumptionTable");
+  if(!db.assumptions.length){ el.innerHTML = "<div class='muted'>No assumptions yet.</div>"; return; }
+  el.innerHTML = `<table><thead><tr><th>ID</th><th>Category</th><th>Confidence</th><th>Expiry</th><th>Assumption</th></tr></thead><tbody>${db.assumptions.slice().reverse().map(a=>`<tr>
+    <td class="mono">${esc(a.id)}</td><td>${esc(a.category)}</td><td>${esc(a.confidence)}</td><td>${esc(a.expiry)}</td><td>${esc(a.text)}</td>
+  </tr>`).join("")}</tbody></table>`;
+}
+function renderRisk(){
+  const db=load();
+  s("rbHoursBest",String(db.risk_model.hours.best)); s("rbHoursBase",String(db.risk_model.hours.base)); s("rbHoursWorst",String(db.risk_model.hours.worst));
+  s("rbRateBest",String(db.risk_model.rate.best)); s("rbRateBase",String(db.risk_model.rate.base)); s("rbRateWorst",String(db.risk_model.rate.worst));
+  s("rbEscalation",String(!!db.risk_model.sensitivity.escalation)); s("rbSurge",String(!!db.risk_model.sensitivity.surge)); s("rbClearance",String(!!db.risk_model.sensitivity.clearance));
+  const bands = computeRiskBandTotals(db);
+  document.getElementById("riskPreview").textContent = JSON.stringify({
+    model: db.risk_model,
+    totals: bands,
+    base_price: aggregates(db).price,
+    delta_best_vs_base: bands.delta_best_vs_base,
+    delta_worst_vs_base: bands.delta_worst_vs_base
+  }, null, 2);
+}
+function renderApproval(){
+  const db=load();
+  s("apApprovers", db.approval.approvers); s("apAuthority", db.approval.authority_note); s("apDecision", db.approval.decision_note); s("apSeal", String(!!db.approval.sealed));
+  document.getElementById("approvalPreview").textContent = JSON.stringify(db.approval, null, 2);
+}
+
+function applySafeToBoe(db){
+  const safe = (document.getElementById("safeExport")?.value || "false") === "true";
+  const level = document.getElementById("safeExportLevel")?.value || "lite";
+  const out = JSON.parse(JSON.stringify(db));
+  if(!safe) return out;
+
+  if(level === "lite"){
+    out.intake.customer = out.intake.customer ? "(masked)" : "";
+    out.intake.title = out.intake.title ? "(masked)" : "";
+    out.labor = out.labor.map(l=>({ ...l, notes: l.notes ? "(masked)" : "" }));
+    out.approval.authority_note = out.approval.authority_note ? "(masked)" : "";
+    out.approval.decision_note = out.approval.decision_note ? "(masked)" : "";
+  }else if(level === "strict"){
+    out.intake.customer = out.intake.customer ? "(masked)" : "";
+    out.intake.title = out.intake.title ? "(masked)" : "";
+    out.intake.locations = "";
+    out.intake.escalation_policy = "";
+    out.labor = out.labor.map(l=>({
+      id: l.id, role: "(stripped)", location: "(stripped)", clearance: "(stripped)", hours: n(l.hours), rate: n(l.rate), period: l.period, rate_type: l.rate_type, notes: ""
+    }));
+    out.assumptions = out.assumptions.map(a=>({id:a.id, category:a.category, confidence:a.confidence, expiry:a.expiry, text:"", disconfirmers:""}));
+    out.approval.authority_note = "";
+    out.approval.decision_note = "";
+    out.approval.approvers = out.approval.approvers ? "(masked)" : "";
+  }
+  return out;
+}
+
+function dsMarkdown(ds){
+  return `# DS Pricing - ${today()}\n\n## Auto Alerts\n${ds.length ? ds.map(d=>`- **${d.code}** (${d.time}) - ${d.msg}`).join("\\n") : "- None"}\n`;
+}
+function dlrMarkdown(db, meta){
+  const agg = aggregates(db);
+  return `# DLR BOE Assumptions\n**Program:** ${meta.program}  \n**Generated:** ${meta.generated}  \n\n## Intake\n- Opp ID: ${db.intake.opp_id || "(unset)"}\n- Contract Type: ${db.intake.contract_type || "(unset)"}\n- POP: ${db.intake.pop || "(unset)"}\n\n## Totals\n- Labor Hours: ${Math.round(agg.hours)}\n- Base Price: ${money(agg.price)}\n\n## Approval\n- Approvers: ${db.approval.approvers || "(unset)"}\n- Sealed: ${db.approval.sealed ? "true" : "false"}\n- Sealed At: ${db.approval.sealed_at || "(none)"}\n\n## Assumption Count\n- ${db.assumptions.length}\n`;
+}
+
+function crc32(buf){ let c = 0 ^ (-1); for(let i=0;i<buf.length;i++) c = (c>>>8) ^ CRC_TABLE[(c ^ buf[i]) & 0xFF]; return (c ^ (-1)) >>> 0; }
+const CRC_TABLE = (()=>{ const t=new Uint32Array(256); for(let i=0;i<256;i++){ let c=i; for(let k=0;k<8;k++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1); t[i]=c>>>0; } return t; })();
+function u16(n){ return [n & 0xFF, (n>>>8)&0xFF]; }
+function u32(n){ return [n & 0xFF, (n>>>8)&0xFF, (n>>>16)&0xFF, (n>>>24)&0xFF]; }
+function buildZip(entries){
+  const fileParts=[]; const central=[]; let offset=0;
+  for(const e of entries){
+    const nameBytes=strToUtf8Bytes(e.name), data=e.bytes, crc=crc32(data), size=data.length;
+    const dt=e.mtime||new Date();
+    const dosTime=((dt.getHours()&0x1F)<<11)|((dt.getMinutes()&0x3F)<<5)|((Math.floor(dt.getSeconds()/2))&0x1F);
+    const dosDate=(((dt.getFullYear()-1980)&0x7F)<<9)|(((dt.getMonth()+1)&0x0F)<<5)|(dt.getDate()&0x1F);
+    const local=[...u32(0x04034b50),...u16(20),...u16(0),...u16(0),...u16(dosTime),...u16(dosDate),...u32(crc),...u32(size),...u32(size),...u16(nameBytes.length),...u16(0)];
+    fileParts.push(new Uint8Array(local), nameBytes, data);
+    const c=[...u32(0x02014b50),...u16(0x0314),...u16(20),...u16(0),...u16(0),...u16(dosTime),...u16(dosDate),...u32(crc),...u32(size),...u32(size),...u16(nameBytes.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(offset)];
+    central.push(new Uint8Array(c), nameBytes);
+    offset += local.length + nameBytes.length + size;
+  }
+  const centralStart=offset;
+  for(const p of central){ fileParts.push(p); offset += p.length; }
+  const centralSize=offset-centralStart;
+  const eocd=[...u32(0x06054b50),...u16(0),...u16(0),...u16(entries.length),...u16(entries.length),...u32(centralSize),...u32(centralStart),...u16(0)];
+  fileParts.push(new Uint8Array(eocd));
+  return new Blob(fileParts,{type:"application/zip"});
+}
+async function sha256Hex(bytes){ const out = await crypto.subtle.digest("SHA-256", bytes.buffer ? bytes.buffer : bytes); return Array.from(new Uint8Array(out)).map(b=>b.toString(16).padStart(2,"0")).join(""); }
+
+async function createZipPackPayload(){
+  const db = load();
+  const safe = (document.getElementById("safeExport")?.value || "false") === "true";
+  const level = document.getElementById("safeExportLevel")?.value || "lite";
+  const meta = {
+    prefix: v("packPrefix") || "SEQUOIA",
+    program: v("orgProgram") || "NGA - SEQUOIA",
+    steward: v("cohSteward") || "Pricing Steward",
+    generated: nowIso(),
+    date: today(),
+    safe_export: safe,
+    safe_export_level: level,
+    version: "1.0"
+  };
+  const root = `${safeFile(meta.prefix)}_BOEPack_${meta.date}`;
+  const entries = []; const ts = new Date();
+  const addJson = (path,obj)=>{ const bytes=strToUtf8Bytes(JSON.stringify(obj,null,2)); entries.push({name:`${root}/${path}`, bytes, mtime:ts}); return bytes; };
+  const addText = (path,text)=>{ const bytes=strToUtf8Bytes(text); entries.push({name:`${root}/${path}`, bytes, mtime:ts}); return bytes; };
+
+  const ds = computeAutoDs(db);
+  const safeBoe = applySafeToBoe(db);
+  const riskBands = computeRiskBandTotals(db);
+  addJson(`boe/BOE_${safeFile(db.intake.opp_id || "OPP")}.json`, {
+    schema: "deepsigma_boe_v1",
+    meta,
+    intake: safeBoe.intake,
+    labor: safeBoe.labor,
+    assumptions: safeBoe.assumptions,
+    risk_model: safeBoe.risk_model,
+    risk_bands: riskBands,
+    approval: safeBoe.approval
+  });
+  addText(`dlr/DLR_BOE_ASSUMPTIONS_${safeFile(db.intake.opp_id || "OPP")}.md`, dlrMarkdown(safeBoe, meta));
+  addText(`ds/DS_PRICING_${meta.date}.md`, dsMarkdown(ds));
+
+  const manifest = {
+    schema: "deepsigma_ingest_manifest_v1",
+    meta,
+    counts: {
+      labor_lines: db.labor.length,
+      assumptions: db.assumptions.length,
+      ds_auto: ds.length
+    },
+    hashes_file: "hashes.json"
+  };
+  const hashes = {};
+  for(const e of entries) hashes[e.name] = await sha256Hex(e.bytes);
+  const material = strToUtf8Bytes(Object.entries(hashes).sort((a,b)=>a[0].localeCompare(b[0])).map(([k,val])=>`${k} ${val}`).join("\n"));
+  const pack_hash = await sha256Hex(material);
+  manifest.pack_hash = pack_hash;
+
+  addJson("ingest_manifest.json", manifest);
+  addJson("hashes.json", {pack_hash, hashes});
+  addText("README.md", `# ${meta.prefix} BOE Pack\nProgram: ${meta.program}\nGenerated: ${meta.generated}\nSafe export: ${meta.safe_export} (${meta.safe_export_level})\n`);
+
+  return {root, manifest, zipBlob: buildZip(entries)};
+}
+
+async function downloadZipPack(){
+  const {root, manifest, zipBlob} = await createZipPackPayload();
+  document.getElementById("preview").textContent = JSON.stringify(manifest, null, 2);
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(zipBlob);
+  a.download = `${root}.zip`;
+  a.click();
+}
+
+function tmLog(msg){ const el=document.getElementById("tmLog"); if(!el) return; el.textContent += `[${nowIso()}] ${msg}\n`; el.scrollTop = el.scrollHeight; }
+function tmResetAll(){ if(!confirm("Reset ALL local data?")) return; removeStoreItem(KEY); load(); refreshAll(); document.getElementById("tmLog").textContent=""; tmLog("Reset complete."); }
+function tmRunAll(){
+  const db = load();
+  db.intake = {
+    opp_id: "OPP-TEST-BOE-001",
+    title: "Sample Mission Services Pursuit",
+    customer: "Sample Agency",
+    contract_type: "FFP",
+    pop: "Base + 4 Option Years",
+    locations: "Arlington, VA\nSan Antonio, TX",
+    escalation_policy: "3% annual",
+    fringe_pct: 31,
+    overhead_pct: 24,
+    ga_pct: 11,
+    margin_band: "Best 15% / Base 11% / Worst 8%"
+  };
+  db.labor = [];
+  const lineCount = 20 + Math.floor(Math.random()*41);
+  const roles = ["PM","Deputy PM","Systems Engineer","Cyber Analyst","Data Scientist","DevSecOps Engineer","Trainer","Field Service Rep"];
+  const locs = ["Arlington, VA","San Antonio, TX","Huntsville, AL","Remote"];
+  const periods = ["Base","Option1","Option2","Option3","Option4"];
+  for(let i=1;i<=lineCount;i++){
+    db.labor.push({
+      id: `LINE-${String(i).padStart(3,"0")}`,
+      role: roles[i%roles.length],
+      location: locs[i%locs.length],
+      clearance: i%3===0 ? "TS-SCI" : "Secret",
+      hours: 900 + ((i*47)%900),
+      rate: 120 + ((i*9)%95),
+      period: periods[i%periods.length],
+      rate_type: "loaded",
+      notes: i%5===0 ? "Shift overlap + transition support" : "",
+      created: nowIso(),
+      updated: nowIso()
+    });
+  }
+  if(db.labor[2]) db.labor[2].rate = 312;
+  if(db.labor[7]) db.labor[7].hours = 2350;
+  if(db.labor[10]) db.labor[10].rate = 0;
+
+  db.assumptions = [
+    {id:uid("ASM"), text:"Historical loaded rates anchored to FY25 awarded rates.", category:"rates", confidence:"Med", expiry:today(), disconfirmers:"Awarded labor category mapping changes", created:nowIso()},
+    {id:uid("ASM"), text:"Productivity uplift of 8% by month 4 from tooling standardization.", category:"productivity", confidence:"Low", expiry:today(), disconfirmers:"Onboarding delay >30 days", created:nowIso()}
+  ];
+  db.risk_model = {
+    hours: {best:0.9, base:1.0, worst:1.15},
+    rate: {best:0.98, base:1.0, worst:1.05},
+    sensitivity: {escalation:true, surge:true, clearance:true}
+  };
+  db.approval = {approvers:"Pricing Lead; Capture Exec", authority_note:"Pricing board authority under capture policy.", decision_note:"Proceed with base and high-confidence options.", sealed:true, sealed_at:nowIso()};
+  save(db);
+
+  const ds = computeAutoDs(db);
+  tmLog(`Generated sample BOE with ${lineCount} lines.`);
+  tmLog(`Injected outliers: rate>${RATE_OUTLIER_THRESHOLD}, hours>${HOURS_OUTLIER_THRESHOLD}, missing rate.`);
+  tmLog(`Auto DS count: ${ds.length}`);
+}
+
+function bindEvents(){
+  document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click", ()=>setTab(b.dataset.tab)));
+  document.getElementById("btnIntakeSave")?.addEventListener("click", saveIntake);
+  document.getElementById("btnLSave")?.addEventListener("click", saveLabor);
+  document.getElementById("btnLClear")?.addEventListener("click", clearLabor);
+  document.getElementById("laborTable")?.addEventListener("click", (e)=>{
+    const b=e.target.closest("button"); if(!b) return;
+    if(b.dataset.action==="edit") editLabor(b.dataset.id);
+    if(b.dataset.action==="del") deleteLabor(b.dataset.id);
+  });
+  document.getElementById("btnASave")?.addEventListener("click", saveAssumption);
+  document.getElementById("btnRiskSave")?.addEventListener("click", saveRiskModel);
+  document.getElementById("btnApprovalSave")?.addEventListener("click", saveApproval);
+  document.getElementById("btnZipPack")?.addEventListener("click", downloadZipPack);
+
+  document.getElementById("btnExport")?.addEventListener("click", ()=>{
+    const blob = new Blob([JSON.stringify(load(),null,2)], {type:"application/json"});
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `boe_pricing_console_${today()}.json`; a.click();
+  });
+  document.getElementById("btnImport")?.addEventListener("click", ()=>document.getElementById("fileImport")?.click());
+  document.getElementById("fileImport")?.addEventListener("change", (e)=>{
+    const file = e.target.files?.[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      try{
+        const db = JSON.parse(reader.result);
+        if(!db || typeof db !== "object" || Array.isArray(db)) throw new Error("Invalid root object");
+        setStoreItem(KEY, JSON.stringify(db));
+        refreshAll();
+        alert("Imported.");
+      }catch(err){ alert(`Invalid JSON: ${err.message || "Import failed"}`); }
+    };
+    reader.readAsText(file);
+  });
+  document.getElementById("btnReset")?.addEventListener("click", tmResetAll);
+
+  document.getElementById("tmRunAll")?.addEventListener("click", tmRunAll);
+  document.getElementById("tmDownloadZip")?.addEventListener("click", downloadZipPack);
+  document.getElementById("tmReset")?.addEventListener("click", tmResetAll);
+}
+
+function refreshAll(){
+  renderDashboard();
+  renderIntake();
+  renderLabor();
+  renderAssumptions();
+  renderRisk();
+  renderApproval();
+}
+
+(function init(){
+  load();
+  bindEvents();
+  refreshAll();
+  const h = (location.hash||"").replace("#","").trim();
+  const valid = ["dashboard","intake","labor","assumptions","risk","approval","artifacts","test"];
+  if(valid.includes(h)) setTab(h); else setTab("dashboard");
+})();
+</script>
+</body>
+</html>

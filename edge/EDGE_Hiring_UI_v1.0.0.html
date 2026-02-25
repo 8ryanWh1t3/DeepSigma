@@ -1,0 +1,2523 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Deep Sigma — SEQUOIA Hiring Console v019</title>
+  <style>
+    :root { --bg:#0b0f14; --card:#111824; --muted:#8aa0b5; --txt:#e7eef7; --accent:#7df9ff; --warn:#ffcc66; --bad:#ff6b6b; --ok:#5dff93; }
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:var(--bg);color:var(--txt);}
+    header{padding:16px 18px;border-bottom:1px solid #1b2a3a;display:flex;gap:12px;align-items:center;justify-content:space-between;}
+    .brand{display:flex;flex-direction:column;gap:2px}
+    .brand b{letter-spacing:.5px}
+    .brand small{color:var(--muted)}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+    button{background:#182235;color:var(--txt);border:1px solid #243449;border-radius:10px;padding:10px 12px;cursor:pointer}
+    button:hover{border-color:#2f4765}
+    button.primary{border-color:rgba(125,249,255,.45);box-shadow:0 0 0 1px rgba(125,249,255,.12) inset}
+    button.danger{border-color:rgba(255,107,107,.45)}
+    main{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 66px)}
+    nav{border-right:1px solid #1b2a3a;padding:14px}
+    .tab{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--txt);margin-bottom:8px}
+    .tab.active{background:#101a28;border-color:#243449}
+    .wrap{padding:14px 16px;max-width:1200px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .card{background:var(--card);border:1px solid #1b2a3a;border-radius:14px;padding:12px}
+    .card h3{margin:0 0 10px 0;font-size:14px;color:#cfe2f7;letter-spacing:.3px}
+    label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
+    input,textarea,select{
+      width:100%;box-sizing:border-box;background:#0d1520;color:var(--txt);
+      border:1px solid #243449;border-radius:10px;padding:10px 10px;font-size:13px;
+    }
+    textarea{min-height:90px;resize:vertical}
+    .muted{color:var(--muted);font-size:12px}
+    .pill{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid #243449;color:var(--muted);font-size:12px;margin-right:6px}
+    .kpi{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+    .kpi .card{padding:10px}
+    .kpi b{display:block;font-size:18px;margin-top:4px}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th,td{padding:10px;border-bottom:1px solid #1b2a3a;vertical-align:top}
+    th{color:#b9d3ea;text-align:left;font-weight:600}
+    .status{font-weight:600}
+    .s-ok{color:var(--ok)} .s-warn{color:var(--warn)} .s-bad{color:var(--bad)}
+    .flex{display:flex;gap:10px;flex-wrap:wrap}
+    .right{display:flex;gap:10px;justify-content:flex-end;align-items:center}
+    .small{font-size:12px}
+    .hidden{display:none}
+    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+    .split{display:grid;grid-template-columns:1.3fr .7fr;gap:12px}
+    .warnbox{border:1px solid rgba(255,204,102,.35);background:rgba(255,204,102,.06);border-radius:12px;padding:10px}
+  </style>
+</head>
+<body>
+<div id="hud" style="position:fixed;top:72px;right:12px;z-index:9999;background:rgba(125,249,255,.08);border:1px solid rgba(125,249,255,.25);padding:10px;border-radius:12px;font-size:12px;max-width:340px;display:none"></div>
+<div id="rsModal" style="display:none;position:fixed;inset:76px 12px 12px 12px;z-index:9998;background:rgba(11,15,20,.98);border:1px solid rgba(125,249,255,.25);border-radius:16px;overflow:auto;padding:12px"></div>
+<header>
+  <div class="brand">
+    <b>Deep Sigma — SEQUOIA Hiring Console</b>
+    <small>🧠 DLR · 🔍 RS · 🧾 DS · 🧬 MG · 🛑 Seal→Version→Patch (local-only) <span id="storeWarn" style="display:none;color:#ffcc66">— storage disabled; using memory only. Use Export JSON/ZIP.</span></small>
+  </div>
+  <div class="row">
+    <button id="btnExport" class="primary">Export JSON</button>
+    <button id="btnImport">Import JSON</button>
+    <button id="btnReset" class="danger">Reset</button>
+  </div>
+</header>
+
+<main>
+  <nav>
+    <button class="tab active" data-tab="dashboard">Dashboard</button>
+    <button class="tab" data-tab="roles">Roles (DLR-ROLE)</button>
+    <button class="tab" data-tab="candidates">Candidates (MG)</button>
+    <button class="tab" data-tab="interviews">Interviews & Scorecards</button>
+    <button class="tab" data-tab="board">Fulfillment Board</button>
+    <button class="tab" data-tab="drift">Drift Signals (DS)</button>
+    <button class="tab" data-tab="test">Test Mode</button>
+    <button class="tab" data-tab="rs">RS Sessions</button>
+    <button class="tab" data-tab="artifacts">Artifacts Generator</button>
+    <div style="margin-top:14px" class="muted">
+      Data stored in <span class="mono">localStorage</span>. Export for sharing.
+    </div>
+  </nav>
+
+  <div class="wrap">
+    <!-- DASHBOARD -->
+    <section id="tab-dashboard">
+      <div class="kpi">
+        <div class="card"><div class="muted">Open Roles</div><b id="kOpenRoles">0</b></div>
+        <div class="card"><div class="muted">Active Candidates</div><b id="kCandidates">0</b></div>
+        <div class="card"><div class="muted">In Interview</div><b id="kInInterview">0</b></div>
+        <div class="card"><div class="muted">Offers Out</div><b id="kOffers">0</b></div>
+        <div class="card"><div class="muted">Started</div><b id="kStarted">0</b></div>
+      </div>
+
+      <div class="kpi" style="margin-top:12px">
+        <div class="card"><div class="muted">Avg Time-to-Offer</div><b id="kTimeToOffer">—</b></div>
+        <div class="card"><div class="muted">Offer Acceptance</div><b id="kOfferAccept">—</b></div>
+        <div class="card"><div class="muted">Variance Breaches</div><b id="kVarBreaches">0</b></div>
+        <div class="card"><div class="muted">Stuck Candidates</div><b id="kStuck">0</b></div>
+        <div class="card"><div class="muted">Auto DS Alerts</div><b id="kAutoDs">0</b></div>
+      </div>
+
+      <div class="grid" style="margin-top:12px">
+        <div class="card">
+          <h3>Fast Actions</h3>
+          <div class="flex">
+            <button class="primary" id="btnSeed">Seed SEQUOIA roles</button>
+            <button id="btnNewRole">+ New Role</button>
+            <button id="btnNewCandidate">+ New Candidate</button>
+            <button id="btnNewInterview">+ New Interview</button>
+            <button id="btnGoArtifacts" class="primary">Generate Artifacts →</button>
+            <button id="btnGoRS">RS →</button>
+          </div>
+          <p class="muted" style="margin-top:10px">
+            Stark rule: 3-gate loop, same-day decision, offer within 24h of Gate 3.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Hiring SLOs</h3>
+          <ul class="muted">
+            <li>Time-to-Offer ≤ 7 days</li>
+            <li>Offer Acceptance ≥ 70%</li>
+            <li>Interviewer variance (RFS) ≤ 15 pts</li>
+            <li>“Why retrieval” ≤ 60 seconds (decision reconstructable)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h3>Latest Drift Alerts (DS)</h3>
+        <div id="driftList" class="muted">No drift yet.</div>
+      </div>
+    </section>
+
+    <!-- ROLES -->
+    <section id="tab-roles" class="hidden">
+      <div class="card">
+        <h3>Create / Edit Role (DLR-ROLE)</h3>
+        <div class="grid">
+          <div>
+            <label>Role ID (DLR-ROLE-###)</label>
+            <input id="roleId" placeholder="DLR-ROLE-001"/>
+          </div>
+          <div>
+            <label>Role Name</label>
+            <input id="roleName" placeholder="Program Manager (PM)"/>
+          </div>
+        </div>
+        <div class="grid">
+          <div>
+            <label>Wave</label>
+            <select id="roleWave">
+              <option>Wave 1 — Mobilize</option>
+              <option>Wave 2 — Factory</option>
+              <option>Wave 3 — Integration</option>
+            </select>
+          </div>
+          <div>
+            <label>Labor Category (mapping)</label>
+            <input id="roleLabor" placeholder="Program Manager / Project Manager / ISSO / ..."/>
+          </div>
+        </div>
+        <label>Mission (90 days)</label>
+        <textarea id="roleMission" placeholder="Stand up contract governance + delivery rhythm; meet SLOs..."></textarea>
+
+        <div class="grid">
+          <div>
+            <label>Must-Haves (max 5, one per line)</label>
+            <textarea id="roleMust" placeholder="1) ..."></textarea>
+          </div>
+          <div>
+            <label>Nice-to-Haves (one per line)</label>
+            <textarea id="roleNice" placeholder="..."></textarea>
+          </div>
+        </div>
+
+        <label>Gate 2 Simulation Prompt</label>
+        <textarea id="roleSim" placeholder="Week 1 mission scenario..."></textarea>
+
+        <div class="right" style="margin-top:10px">
+          <span class="muted small" id="roleSavedHint"></span>
+          <button id="btnSaveRole" class="primary">Save Role</button>
+          <button id="btnClearRole">Clear</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h3>Roles</h3>
+        <div id="rolesTable"></div>
+      </div>
+    </section>
+
+    <!-- CANDIDATES -->
+    <section id="tab-candidates" class="hidden">
+      <div class="card">
+        <h3>Create / Edit Candidate (MG Node)</h3>
+        <div class="grid">
+          <div>
+            <label>Candidate ID</label>
+            <input id="candId" placeholder="C-0001"/>
+          </div>
+          <div>
+            <label>Name (or redacted handle)</label>
+            <input id="candName" placeholder="Candidate A"/>
+          </div>
+        </div>
+        <div class="grid">
+          <div>
+            <label>Target Role</label>
+            <select id="candRole"></select>
+          </div>
+          <div>
+            <label>Status</label>
+            <select id="candStatus">
+              <option>Sourcing</option>
+              <option>Screened</option>
+              <option>Gate2</option>
+              <option>Gate3</option>
+              <option>Offer</option>
+              <option>Accepted</option>
+              <option>Cleared</option>
+              <option>Started</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid">
+          <div>
+            <label>Clearance</label>
+            <input id="candClearance" placeholder="TS/SCI (eligible) / Secret / None"/>
+          </div>
+          <div>
+            <label>Availability Date</label>
+            <input id="candAvail" placeholder="YYYY-MM-DD"/>
+          </div>
+        </div>
+        <div class="grid">
+          <div>
+            <label>Comp Range (candidate)</label>
+            <input id="candComp" placeholder="$..."/>
+          </div>
+          <div>
+            <label>Evidence Links (one per line)</label>
+            <textarea id="candEvidence" placeholder="GitHub / writing / work samples..."></textarea>
+          </div>
+        </div>
+        <label>Risk Flags (Red/Yellow)</label>
+        <textarea id="candRisks" placeholder="Red: ...&#10;Yellow: ..."></textarea>
+
+        <div class="right" style="margin-top:10px">
+          <span class="muted small" id="candSavedHint"></span>
+          <button id="btnSaveCandidate" class="primary">Save Candidate</button>
+          <button id="btnClearCandidate">Clear</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h3>Candidates</h3>
+        <div id="candsTable"></div>
+      </div>
+    </section>
+
+    <!-- INTERVIEWS -->
+    <section id="tab-interviews" class="hidden">
+      <div class="card">
+        <h3>Create Interview + Sealed Scorecard</h3>
+        <div class="grid">
+          <div>
+            <label>Interview ID</label>
+            <input id="intId" placeholder="I-0001"/>
+          </div>
+          <div>
+            <label>Candidate</label>
+            <select id="intCand"></select>
+          </div>
+        </div>
+        <div class="grid">
+          <div>
+            <label>Gate</label>
+            <select id="intGate">
+              <option>Gate 1 — Screen</option>
+              <option>Gate 2 — Simulation</option>
+              <option>Gate 3 — Execution & Trust</option>
+            </select>
+          </div>
+          <div>
+            <label>Interviewer</label>
+            <input id="intInterviewer" placeholder="Interviewer Name"/>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div>
+            <label>RFS (0–100)</label>
+            <input id="sRfs" type="number" min="0" max="100" placeholder="80"/>
+          </div>
+          <div>
+            <label>TPS (0–100)</label>
+            <input id="sTps" type="number" min="0" max="100" placeholder="70"/>
+          </div>
+        </div>
+        <div class="grid">
+          <div>
+            <label>UR (0.0–1.0)</label>
+            <input id="sUr" type="number" step="0.01" min="0" max="1" placeholder="0.65"/>
+          </div>
+          <div>
+            <label>Decision</label>
+            <select id="sDecision">
+              <option>Hire</option>
+              <option>Hold</option>
+              <option>No-Hire</option>
+            </select>
+          </div>
+        </div>
+
+        <label>Evidence (one per line)</label>
+        <textarea id="sEvidence"></textarea>
+        <label>Notes</label>
+        <textarea id="sNotes"></textarea>
+        <label>Flags (Red/Yellow)</label>
+        <textarea id="sFlags" placeholder="Red: ...&#10;Yellow: ..."></textarea>
+
+        <div class="right" style="margin-top:10px">
+          <span class="muted small" id="intSavedHint"></span>
+          <button id="btnSaveInterview" class="primary">Save Interview</button>
+          <button id="btnClearInterview">Clear</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h3>Interviews</h3>
+        <div id="intsTable"></div>
+      </div>
+    </section>
+
+    <!-- BOARD -->
+    <section id="tab-board" class="hidden">
+      <div class="card">
+        <h3>Fulfillment Board</h3>
+        <div id="boardTable"></div>
+        <p class="muted" style="margin-top:10px">
+          States: Sourcing → Screened → Gate2 → Gate3 → Offer → Accepted → Cleared → Started
+        </p>
+      </div>
+    </section>
+
+    <!-- DRIFT -->
+    <section id="tab-drift" class="hidden">
+      <div class="card">
+        <h3>Drift Signals (DS) — Hiring</h3>
+        <p class="muted">Auto-detects DS triggers from your interview data and records alerts.</p>
+        <div id="driftTable"></div>
+        <div class="right" style="margin-top:10px">
+          <button id="btnRunDrift" class="primary">Run Drift Scan</button>
+        </div>
+      </div>
+    
+    <!-- RS -->
+    <section id="tab-rs" class="hidden">
+      <div class="card" style="margin-bottom:12px">
+        <h3>RS Sessions</h3>
+        <div class="muted">Weekly Hiring Reflection — create, auto-fill snapshot, add patches, seal, export.</div>
+      </div>
+
+      <div class="card">
+        <h3>Create / Update RS</h3>
+
+        <div class="grid">
+          <div>
+            <label>RS ID</label>
+            <input id="rsId" placeholder="RS-0001"/>
+          </div>
+          <div>
+            <label>Week Of (YYYY-MM-DD)</label>
+            <input id="rsWeek" placeholder="YYYY-MM-DD"/>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div>
+            <label>Coherence Steward</label>
+            <input id="rsSteward" placeholder="(name)"/>
+          </div>
+          <div>
+            <label>Seal</label>
+            <select id="rsSealed">
+              <option value="false">Open (editable)</option>
+              <option value="true">Sealed (freeze)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div style="display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap">
+            <h3 style="margin:0">Auto Snapshot</h3>
+            <div class="flex">
+              <button id="btnCreateRSNow" class="primary">Create RS (this week)</button>
+              <button id="btnAutoFillRS" class="primary">Auto-Fill Snapshot</button>
+            </div>
+          </div>
+          <div id="rsSnapshot" class="muted" style="margin-top:10px">Create an RS to populate snapshot.</div>
+        </div>
+
+        <label>Decisions (one per line)</label>
+        <textarea id="rsDecisions" placeholder="- Decision 1&#10;- Decision 2"></textarea>
+
+        <div class="card" style="margin-top:12px">
+          <h3>Patches</h3>
+          <div class="muted small">Changes to the hiring system: rubric, gate design, sourcing lane, comp, capacity.</div>
+
+          <div class="grid" style="margin-top:10px">
+            <div>
+              <label>Patch Title</label>
+              <input id="patchTitle" placeholder="Tighten Gate 2 scoring anchors for PM"/>
+            </div>
+            <div>
+              <label>Owner</label>
+              <input id="patchOwner" placeholder="(name)"/>
+            </div>
+          </div>
+          <div class="grid">
+            <div>
+              <label>Due (YYYY-MM-DD)</label>
+              <input id="patchDue" placeholder="YYYY-MM-DD"/>
+            </div>
+            <div>
+              <label>Success Metric</label>
+              <input id="patchMetric" placeholder="Variance breaches → 0; Time-to-offer ≤ 7d"/>
+            </div>
+          </div>
+          <div class="right" style="margin-top:10px">
+            <button id="btnAddPatch">+ Add Patch</button>
+          </div>
+          <div id="patchesTable" style="margin-top:10px"></div>
+        </div>
+
+        <div class="right" style="margin-top:10px">
+          <span class="muted small" id="rsSavedHint"></span>
+          <button id="btnSaveRS" class="primary">Save RS</button>
+          <button id="btnExportRS">Export RS.md</button>
+          <button id="btnExportExec">Export Exec Brief.md</button>
+          <button id="btnClearRS" class="danger">Clear</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px">
+        <h3>RS Sessions List</h3>
+        <div id="rsTable" style="margin-top:10px"></div>
+      </div>
+    </section>
+
+</section>
+
+    
+    <!-- TEST MODE -->
+    <section id="tab-test" class="hidden">
+      <div class="card">
+        <h3>Test Mode</h3>
+        <div class="muted">Generate realistic sample data and automatically validate: ZIP export, manifest, hashing, safe export, SLO/Auto DS, and Offer artifacts.</div>
+
+        <div class="grid" style="margin-top:12px">
+          <div>
+            <label>Sample Candidates Count</label>
+            <input id="tmCount" type="number" min="1" max="200" value="10"/>
+          </div>
+          <div>
+            <label>Safe Export for Test Run</label>
+            <select id="tmSafe">
+              <option value="false">Off</option>
+              <option value="true">On (Lite)</option>
+              <option value="strict">On (Strict)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div>
+            <label>Simulate Aging (days)</label>
+            <input id="tmAgeDays" type="number" min="0" max="60" value="10"/>
+          </div>
+          <div>
+            <label>Notes</label>
+            <input id="tmNotes" placeholder="Test run notes (optional)"/>
+          </div>
+        </div>
+
+        <div class="flex" style="margin-top:10px">
+          <button id="tmSeedRoles" class="primary">Seed Roles</button>
+          <button id="tmGenData" class="primary">Generate Sample Data</button>
+          <button id="tmTriggerVariance">Trigger Variance Breach</button>
+          <button id="tmMakeOffer">Create Offer + Accepted</button>
+          <button id="tmSimAging">Simulate Aging</button>
+        </div>
+
+        <div class="flex" style="margin-top:10px">
+          <button id="tmRunAll" class="primary">RUN FULL TEST</button>
+          <button id="tmDownloadZip" class="primary">Download ZIP Pack</button>
+          <button id="tmReset" class="danger">Reset Data</button>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <h3>Test Log</h3>
+          <pre id="tmLog" class="mono" style="white-space:pre-wrap;margin:0"></pre>
+        </div>
+      </div>
+    </section>
+
+<!-- ARTIFACTS -->
+    <section id="tab-artifacts" class="hidden">
+      <div class="split">
+        <div class="card">
+          <h3>Artifacts Generator</h3>
+          <div class="warnbox muted">
+            This exports files to your machine. Nothing is sent anywhere.
+          </div>
+
+          <label>Pack Prefix</label>
+          <input id="packPrefix" placeholder="SEQUOIA" value="SEQUOIA"/>
+
+          <div class="grid" style="margin-top:10px">
+            <div>
+              <label>Safe Export (redact PII)</label>
+              <select id="safeExport">
+                <option value="false">Off</option>
+                <option value="true">On</option>
+              </select>
+            </div>
+            <div>
+              <label>Safe Export Level</label>
+              <select id="safeExportLevel">
+                <option value="lite">Lite (mask name/comp/clearance)</option>
+                <option value="strict">Strict (also strip evidence links)</option>
+              </select>
+            </div>
+          </div>
+
+          <label>Organization / Program</label>
+          <input id="orgProgram" placeholder="NGA — SEQUOIA"/>
+
+          <label>Coherence Steward</label>
+          <input id="cohSteward" placeholder="(name)"/>
+
+          <label>Approval / Authority Note</label>
+          <textarea id="authorityNote" placeholder="Who can approve hiring decisions, offers, role changes, and policy shifts..."></textarea>
+
+          <div class="card" style="margin-top:12px">
+            <h3>Edge Sync (DeepSigma Enterprise)</h3>
+            <div class="grid">
+              <div>
+                <label>Enterprise Intake Endpoint</label>
+                <input id="edgeEndpoint" placeholder="https://your-enterprise-host/api/edge/intake"/>
+              </div>
+              <div>
+                <label>Bearer Token</label>
+                <input id="edgeToken" type="password" placeholder="Optional token for Authorization header"/>
+              </div>
+            </div>
+            <div class="grid" style="margin-top:10px">
+              <div>
+                <label>Manifest Signing Key (HMAC)</label>
+                <input id="edgeSignKey" type="password" placeholder="Optional shared key for manifest signature"/>
+              </div>
+              <div>
+                <label>Outbox</label>
+                <div class="muted" id="edgeOutboxCount">Outbox: 0 pending</div>
+              </div>
+            </div>
+            <div class="flex" style="margin-top:10px">
+              <button class="primary" id="btnSyncPack">Sync ZIP Pack to Enterprise</button>
+              <button id="btnRetryOutbox">Retry Outbox</button>
+            </div>
+            <div id="edgeSyncStatus" class="muted small" style="margin-top:8px">Status: not synced</div>
+          </div>
+
+          <div class="flex" style="margin-top:10px">
+            <button class="primary" id="btnDLRRoles">Download DLR-ROLE MDs</button>
+            <button class="primary" id="btnMG">Download MG_TalentGraph.json</button>
+            <button class="primary" id="btnScorecards">Download SCORECARDS.json</button>
+	    <button class="primary" id="btnZipPack">Download ZIP Pack</button>
+          </div>
+
+          <div class="flex" style="margin-top:10px">
+            <button id="btnRSTemplate">Download RS_HIRING_WEEKLY.md</button>
+            <button id="btnDSTemplate">Download DS_HIRING.md</button>
+          </div>
+
+          <div class="card" style="margin-top:12px">
+            <h3>Offer Generator (per candidate)</h3>
+            <div id="offersList" class="muted">No candidates in Offer status.</div>
+          </div>
+
+          <p class="muted small" style="margin-top:10px">
+            Tip: Export JSON daily. Treat the export file as the “portable system of record” until you wire SharePoint/PowerApp.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>Preview</h3>
+          <div class="muted">Select an export action to preview the first generated artifact here.</div>
+          <pre id="preview" class="mono" style="white-space:pre-wrap;margin-top:10px;"></pre>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<input id="fileImport" type="file" accept="application/json" class="hidden"/>
+<script>
+const KEY = "ds_sequoia_hiring_console_v2_artifacts";
+const EDGE_CFG_KEY = "ds_sequoia_edge_cfg_v1";
+const EDGE_OUTBOX_KEY = "ds_sequoia_edge_outbox_v1";
+
+function storageAvailable(){
+  try{
+    const x="__ds_test__";
+    window.localStorage.setItem(x,x);
+    window.localStorage.removeItem(x);
+    return true;
+  } catch(e){
+    return false;
+  }
+}
+
+function getStoreItem(k){
+  if(storageAvailable()) return window.localStorage.getItem(k);
+  return (window.__ds_memstore && window.__ds_memstore[k]) ? window.__ds_memstore[k] : null;
+}
+function setStoreItem(k,v){
+  if(storageAvailable()) return window.localStorage.setItem(k,v);
+  window.__ds_memstore ||= {};
+  window.__ds_memstore[k]=v;
+}
+function removeStoreItem(k){
+  if(storageAvailable()) return window.localStorage.removeItem(k);
+  if(window.__ds_memstore) delete window.__ds_memstore[k];
+}
+
+function edgeCfgDefault(){
+  return { endpoint:"", token:"", sign_key:"" };
+}
+function loadEdgeCfg(){
+  const raw = getStoreItem(EDGE_CFG_KEY);
+  if(!raw) return edgeCfgDefault();
+  try{
+    const cfg = JSON.parse(raw);
+    return {
+      endpoint: cfg.endpoint || "",
+      token: cfg.token || "",
+      sign_key: cfg.sign_key || ""
+    };
+  }catch(_){
+    return edgeCfgDefault();
+  }
+}
+function saveEdgeCfg(){
+  const cfg = {
+    endpoint: v("edgeEndpoint"),
+    token: v("edgeToken"),
+    sign_key: v("edgeSignKey")
+  };
+  setStoreItem(EDGE_CFG_KEY, JSON.stringify(cfg));
+}
+function loadOutbox(){
+  const raw = getStoreItem(EDGE_OUTBOX_KEY);
+  if(!raw) return [];
+  try{
+    const x = JSON.parse(raw);
+    return Array.isArray(x) ? x : [];
+  }catch(_){
+    return [];
+  }
+}
+function saveOutbox(items){
+  setStoreItem(EDGE_OUTBOX_KEY, JSON.stringify(items));
+  updateOutboxBadge();
+}
+function updateOutboxBadge(){
+  const n = loadOutbox().length;
+  const el = document.getElementById("edgeOutboxCount");
+  if(el) el.textContent = `Outbox: ${n} pending`;
+}
+function syncStatus(msg, ok){
+  const el = document.getElementById("edgeSyncStatus");
+  if(!el) return;
+  el.textContent = `Status: ${msg}`;
+  el.style.color = ok===true ? "var(--ok)" : ok===false ? "var(--bad)" : "var(--muted)";
+}
+function stableStringify(value){
+  if(value===null || typeof value!=="object") return JSON.stringify(value);
+  if(Array.isArray(value)) return `[${value.map(stableStringify).join(",")}]`;
+  const keys = Object.keys(value).sort();
+  return `{${keys.map(k=>`${JSON.stringify(k)}:${stableStringify(value[k])}`).join(",")}}`;
+}
+function b64FromBytes(bytes){
+  let s = "";
+  const arr = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  for(let i=0;i<arr.length;i++) s += String.fromCharCode(arr[i]);
+  return btoa(s);
+}
+function b64FromArrayBuffer(buf){
+  return b64FromBytes(new Uint8Array(buf));
+}
+function bytesFromB64(b64){
+  const bin = atob(b64);
+  const out = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+async function signManifest(manifest, signKey){
+  if(!signKey) return null;
+  const key = await crypto.subtle.importKey(
+    "raw",
+    strToUtf8Bytes(signKey),
+    {name:"HMAC", hash:"SHA-256"},
+    false,
+    ["sign"]
+  );
+  const material = strToUtf8Bytes(stableStringify(manifest));
+  const sig = await crypto.subtle.sign("HMAC", key, material);
+  return b64FromArrayBuffer(sig);
+}
+
+async function createZipPackPayload(){
+  const db0 = load();
+  const meta = packMeta();
+  const root = `${safeFile(meta.prefix)}_HiringPack_${meta.date}`;
+  const entries = [];
+  const ts = new Date();
+
+  const addText = (path, text) => {
+    const bytes = strToUtf8Bytes(text);
+    entries.push({name: `${root}/${path}`, bytes, mtime: ts});
+    return bytes;
+  };
+  const addJson = (path, obj) => {
+    const text = JSON.stringify(obj, null, 2);
+    const bytes = strToUtf8Bytes(text);
+    entries.push({name: `${root}/${path}`, bytes, mtime: ts});
+    return bytes;
+  };
+
+  // Roles
+  if(db0.roles.length){
+    db0.roles.forEach(r=>{
+      addText(`roles_dlr_role/${safeFile(meta.prefix)}_${safeFile(r.id)}_${safeFile(r.name)}.md`, mdRole(r, meta));
+    });
+  } else addText("roles_dlr_role/_empty.txt", "No roles found.");
+
+  // MG + Scorecards
+  const mg = buildMG(meta);
+  addJson(`mg/${safeFile(meta.prefix)}_MG_TalentGraph_${meta.date}.json`, mg);
+
+  const sc = buildScorecards(meta);
+  addJson(`scorecards/${safeFile(meta.prefix)}_SCORECARDS_${meta.date}.json`, sc);
+
+  // RS template + DS snapshot
+  addText(`rs/${safeFile(meta.prefix)}_RS_HIRING_WEEKLY_${meta.date}.md`, buildRS(meta));
+  addText(`ds/${safeFile(meta.prefix)}_DS_HIRING_${meta.date}.md`, buildDS(meta));
+
+  // RS sessions
+  if(db0.rs && db0.rs.length){
+    db0.rs.forEach(s=>{
+      addText(`rs_sessions/${safeFile(meta.prefix)}_RS_${safeFile(s.id)}_${s.week_of}.md`, rsToMarkdown(s, meta));
+      addText(`rs_sessions/${safeFile(meta.prefix)}_EXEC_BRIEF_${safeFile(s.id)}_${s.week_of}.md`, rsExecBrief(s, meta));
+    });
+  } else addText("rs_sessions/_none.txt", "No RS sessions recorded.");
+
+  // Offers
+  const offers = db0.candidates.filter(c=>c.status==="Offer");
+  if(offers.length){
+    offers.forEach((c,idx)=>{
+      const cc = redactCandidate(c, idx);
+      const r = db0.roles.find(x=>x.id===c.role) || {id:c.role, name:"(role not found)"};
+      addText(`offers_dlr_offer/${safeFile(meta.prefix)}_DLR_OFFER_${safeFile(cc.id)}_${safeFile(cc.name)}_${meta.date}.md`, buildOfferMD(cc, r, meta));
+    });
+  } else addText("offers_dlr_offer/_none.txt", "No candidates in Offer status.");
+
+  // Manifest + hashes
+  const manifest = {
+    schema: "deepsigma_ingest_manifest_v1",
+    meta,
+    counts: {
+      roles: db0.roles.length,
+      candidates: db0.candidates.length,
+      interviews: db0.interviews.length,
+      drift: db0.drift.length,
+      rs_sessions: (db0.rs||[]).length,
+      offers: offers.length
+    },
+    hashes_file: "hashes.json"
+  };
+
+  const hashes = {};
+  for(const e of entries){
+    hashes[e.name] = await sha256Hex(e.bytes);
+  }
+  const pack_hash_material = strToUtf8Bytes(Object.entries(hashes).sort((a,b)=>a[0].localeCompare(b[0])).map(([k,v])=>`${k} ${v}`).join("\n"));
+  const pack_hash = await sha256Hex(pack_hash_material);
+  manifest.pack_hash = pack_hash;
+
+  addJson("ingest_manifest.json", manifest);
+  addJson("hashes.json", {pack_hash, hashes});
+
+  addText("README.md", `# ${meta.prefix} Hiring Pack (ZIP)\nProgram: ${meta.program}\nGenerated: ${meta.generated}\nSafe export: ${meta.safe_export} (${meta.safe_export_level})\n\nIncludes manifest + SHA-256 hashes.\n`);
+
+  const zipBlob = buildZip(entries);
+  return {root, manifest, hashes, zipBlob, meta};
+}
+
+async function downloadZipPack(){
+  const {root, manifest, zipBlob} = await createZipPackPayload();
+  previewText(JSON.stringify(manifest, null, 2));
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(zipBlob);
+  a.download = `${root}.zip`;
+  a.click();
+}
+
+async function postPackToEnterprise(pack, cfg){
+  const zipBytes = new Uint8Array(await pack.zipBlob.arrayBuffer());
+  const signature = await signManifest(pack.manifest, cfg.sign_key || "");
+  const payload = {
+    schema: "deepsigma_edge_sync_v1",
+    sent_at: nowIso(),
+    client: {app: "NGA_SEQUOIA_UI", version: "0.19"},
+    root: pack.root,
+    manifest: pack.manifest,
+    hashes: pack.hashes,
+    zip_b64: b64FromBytes(zipBytes),
+    signature: signature ? {alg: "HMAC-SHA256", value_b64: signature} : null
+  };
+  const headers = {"Content-Type":"application/json"};
+  if(cfg.token) headers["Authorization"] = `Bearer ${cfg.token}`;
+  if(signature) headers["X-DeepSigma-Signature"] = signature;
+  const res = await fetch(cfg.endpoint, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(payload)
+  });
+  if(!res.ok){
+    const txt = await res.text().catch(()=> "");
+    throw new Error(`HTTP ${res.status}${txt ? `: ${txt.slice(0,200)}` : ""}`);
+  }
+  return payload;
+}
+async function syncPackNow(){
+  saveEdgeCfg();
+  const cfg = loadEdgeCfg();
+  if(!cfg.endpoint) return alert("Set Enterprise Intake Endpoint first.");
+  syncStatus("syncing...", null);
+  try{
+    const pack = await createZipPackPayload();
+    await postPackToEnterprise(pack, cfg);
+    previewText(JSON.stringify(pack.manifest, null, 2));
+    syncStatus(`synced ${pack.root} at ${nowIso()}`, true);
+  }catch(err){
+    try{
+      const pack = await createZipPackPayload();
+      const zipBytes = new Uint8Array(await pack.zipBlob.arrayBuffer());
+      const signature = await signManifest(pack.manifest, cfg.sign_key || "");
+      const queue = loadOutbox();
+      queue.push({
+        queued_at: nowIso(),
+        endpoint: cfg.endpoint,
+        root: pack.root,
+        manifest: pack.manifest,
+        hashes: pack.hashes,
+        zip_b64: b64FromBytes(zipBytes),
+        signature: signature || null
+      });
+      saveOutbox(queue);
+    }catch(_){}
+    syncStatus(`queued to outbox (${err.message || "sync failed"})`, false);
+  }
+}
+async function retryOutbox(){
+  saveEdgeCfg();
+  const cfg = loadEdgeCfg();
+  let q = loadOutbox();
+  if(!q.length) return syncStatus("outbox empty", true);
+  if(!cfg.endpoint) return alert("Set Enterprise Intake Endpoint first.");
+  syncStatus(`retrying ${q.length} queued pack(s)...`, null);
+  const keep = [];
+  let okCount = 0;
+  for(const item of q){
+    try{
+      const payload = {
+        schema: "deepsigma_edge_sync_v1",
+        sent_at: nowIso(),
+        client: {app: "NGA_SEQUOIA_UI", version: "0.19"},
+        root: item.root,
+        manifest: item.manifest,
+        hashes: item.hashes,
+        zip_b64: item.zip_b64,
+        signature: item.signature ? {alg: "HMAC-SHA256", value_b64: item.signature} : null
+      };
+      const headers = {"Content-Type":"application/json"};
+      if(cfg.token) headers["Authorization"] = `Bearer ${cfg.token}`;
+      if(item.signature) headers["X-DeepSigma-Signature"] = item.signature;
+      const res = await fetch(item.endpoint || cfg.endpoint, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(payload)
+      });
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      okCount += 1;
+    }catch(_){
+      keep.push(item);
+    }
+  }
+  saveOutbox(keep);
+  syncStatus(`outbox sent=${okCount}, pending=${keep.length}`, keep.length===0);
+}
+
+function nowIso(){ return new Date().toISOString(); }
+function today(){ return new Date().toISOString().slice(0,10); }
+function uid(prefix){ return prefix + "-" + Math.random().toString(16).slice(2,8).toUpperCase(); }
+
+// ---------------- Single-file ZIP (store) ----------------
+function crc32(buf){
+  let c = 0 ^ (-1);
+  for(let i=0;i<buf.length;i++){
+    c = (c >>> 8) ^ CRC_TABLE[(c ^ buf[i]) & 0xFF];
+  }
+  return (c ^ (-1)) >>> 0;
+}
+const CRC_TABLE = (() => {
+  const t = new Uint32Array(256);
+  for (let i=0;i<256;i++){
+    let c=i;
+    for(let k=0;k<8;k++){
+      c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    }
+    t[i]=c>>>0;
+  }
+  return t;
+})();
+function u16(n){ return [n & 0xFF, (n>>>8) & 0xFF]; }
+function u32(n){ return [n & 0xFF, (n>>>8) & 0xFF, (n>>>16) & 0xFF, (n>>>24) & 0xFF]; }
+function strToUtf8Bytes(s){ return new TextEncoder().encode(s); }
+
+function buildZip(entries){
+  const fileParts = [];
+  const centralParts = [];
+  let offset = 0;
+
+  for(const e of entries){
+    const nameBytes = strToUtf8Bytes(e.name);
+    const data = e.bytes;
+    const crc = crc32(data);
+    const size = data.length;
+    const dt = e.mtime || new Date();
+    const dosTime = ((dt.getHours() & 0x1F) << 11) | ((dt.getMinutes() & 0x3F) << 5) | ((Math.floor(dt.getSeconds()/2)) & 0x1F);
+    const dosDate = (((dt.getFullYear()-1980) & 0x7F) << 9) | (((dt.getMonth()+1) & 0x0F) << 5) | (dt.getDate() & 0x1F);
+
+    const local = [
+      ...u32(0x04034b50), ...u16(20), ...u16(0), ...u16(0),
+      ...u16(dosTime), ...u16(dosDate),
+      ...u32(crc), ...u32(size), ...u32(size),
+      ...u16(nameBytes.length), ...u16(0),
+    ];
+    fileParts.push(new Uint8Array(local), nameBytes, data);
+
+    const central = [
+      ...u32(0x02014b50), ...u16(0x0314), ...u16(20),
+      ...u16(0), ...u16(0),
+      ...u16(dosTime), ...u16(dosDate),
+      ...u32(crc), ...u32(size), ...u32(size),
+      ...u16(nameBytes.length), ...u16(0), ...u16(0),
+      ...u16(0), ...u16(0), ...u32(0),
+      ...u32(offset),
+    ];
+    centralParts.push(new Uint8Array(central), nameBytes);
+    offset += local.length + nameBytes.length + size;
+  }
+
+  const centralStart = offset;
+  for(const part of centralParts){
+    fileParts.push(part);
+    offset += part.length;
+  }
+  const centralSize = offset - centralStart;
+
+  const eocd = [
+    ...u32(0x06054b50),
+    ...u16(0), ...u16(0),
+    ...u16(entries.length), ...u16(entries.length),
+    ...u32(centralSize), ...u32(centralStart),
+    ...u16(0)
+  ];
+  fileParts.push(new Uint8Array(eocd));
+  return new Blob(fileParts, {type:"application/zip"});
+}
+
+async function sha256Hex(bytes){
+  const buf = await crypto.subtle.digest("SHA-256", bytes.buffer ? bytes.buffer : bytes);
+  const arr = Array.from(new Uint8Array(buf));
+  return arr.map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+function safeFile(s){ return (s||"").replace(/[^a-z0-9_\-]+/gi,"_").replace(/_+/g,"_").replace(/^_+|_+$/g,""); }
+
+function load(){
+  const raw = getStoreItem(KEY);
+  if(!raw){
+    const init = { roles:[], candidates:[], interviews:[], drift:[], rs:[], meta:{created:nowIso(), version:"2.0"} };
+    setStoreItem(KEY, JSON.stringify(init));
+  }
+  const db = JSON.parse(getStoreItem(KEY));
+  // migrations / defaults
+  db.roles ||= [];
+  db.candidates ||= [];
+  db.interviews ||= [];
+  db.drift ||= [];
+  db.rs ||= [];
+  db.meta ||= {created: nowIso(), version:"2.0"};
+  // ensure candidate timestamps exist
+  db.candidates.forEach((c,idx)=>{
+    c = redactCandidate(c, idx); c.created ||= nowIso(); c.status_changed ||= c.created; });
+  return db;
+}
+function save(db){ setStoreItem(KEY, JSON.stringify(db)); refreshAll(); }
+
+function setTab(tab){
+  try{ location.hash = "#"+tab; }catch(_){ }
+  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
+
+  const tabs = ["dashboard","roles","candidates","interviews","board","drift","test","rs","artifacts"];
+  const hud = document.getElementById("hud");
+
+  tabs.forEach(t=>{
+    const el = document.getElementById("tab-"+t);
+    if(!el) return;
+    const shouldHide = (t!==tab);
+    el.classList.toggle("hidden", shouldHide);
+    // hard override for safety
+    if(shouldHide) el.style.display = "none";
+    else el.style.display = "block";
+  });
+
+  if(tab==="artifacts") refreshOffersList();
+  if(tab==="rs"){    // show RS modal overlay for reliability
+    const rm=document.getElementById("rsModal");
+    if(rm){ rm.style.display="block"; renderRSModal(); }
+  
+    try{ renderRSList(); }catch(_){}
+    try{ defaultRSFields(); }catch(_){}
+    // force visibility + min height so it can't collapse
+    const rs = document.getElementById("tab-rs");
+    if(rs){
+      rs.style.minHeight = "600px";
+      rs.style.border = "1px dashed rgba(125,249,255,.35)";
+      rs.style.background = "rgba(125,249,255,.03)";
+      rs.scrollIntoView({block:"start"});
+  }
+  }
+
+  // HUD refresh after paint
+  const show = (location.search||"").includes("hashdebug=1");
+  if(hud){
+    hud.style.display = show ? "block" : "none";
+    requestAnimationFrame(()=>{
+      const rows = [];
+      tabs.forEach(t=>{
+        const el = document.getElementById("tab-"+t);
+        if(!el){ rows.push(`• tab-${t}: MISSING`); return; }
+        const cs = getComputedStyle(el);
+        rows.push(`• tab-${t}: ${el.classList.contains("hidden") ? "hidden" : "shown"} | display=${cs.display} | vis=${cs.visibility} | height=${Math.round(el.getBoundingClientRect().height)}px`);
+      });
+      hud.innerHTML = `<b>Tab Debug HUD</b><div class="muted">Add <span class="mono">?hashdebug=1</span> to URL to keep this visible.</div><div style="margin-top:6px" class="mono">${rows.join("<br>")}</div>`;
+    });
+  }
+}
+window.setTab = setTab;
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click", ()=>setTab(b.dataset.tab)));
+
+function seedSequoia(){
+  const db = load();
+  if(db.roles.length) return alert("Roles already exist. Reset if you want a clean seed.");
+  const roles = [
+    {id:"DLR-ROLE-001", name:"Program Manager (PM)", wave:"Wave 1 — Mobilize", labor:"Program Manager",
+     mission:"Stand up contract governance + delivery rhythm; meet SLOs; maintain customer trust.",
+     must:["IDIQ/task order delivery discipline","Metrics cadence + risk burn-down","Stakeholder management","Staffing/vendor coordination","Evidence-based reporting"],
+     nice:["ATO familiarity","GEOINT context"],
+     sim:"Customer wants +30% throughput without quality loss in 72 hours. What do you do?"},
+    {id:"DLR-ROLE-002", name:"Delivery Lead / Scrum Master", wave:"Wave 1 — Mobilize", labor:"Project Manager / Scrum Master",
+     mission:"Sprint discipline, throughput stability, predictable change handling.",
+     must:["Backlog hygiene","Change control","Cycle time/WIP/throughput metrics","Cross-team coordination","Escalation discipline"],
+     nice:["Labeling ops exposure"],
+     sim:"Label policy change lands mid-sprint. Prevent rework spiral while keeping throughput."},
+    {id:"DLR-ROLE-003", name:"Security Lead (ISSO/ISSM)", wave:"Wave 1 — Mobilize", labor:"ISSO / ISSM",
+     mission:"Access control + compliance posture + audit readiness without delivery drag.",
+     must:["ISSO/ISSM experience","ATO mindset","Data handling + logging","Identity/access governance","Risk acceptance routing"],
+     nice:["Cloud security"],
+     sim:"You inherit labeling tool + data flow. Identify top 10 control failures in 30 minutes."},
+    {id:"DLR-ROLE-004", name:"Coherence Steward (Deep Sigma)", wave:"Wave 1 — Mobilize", labor:"Governance / Knowledge Mgmt Lead",
+     mission:"Make delivery mechanically reconstructable: decisions, changes, drift, patches, memory.",
+     must:["Evidence-first documentation","Versioning discipline","Blast radius thinking","Queryable knowledge structure","Calm enforcement"],
+     nice:["Ontologies/graphs"],
+     sim:"Reconstruct why label class X changed and which datasets/models were impacted — under 60 seconds."},
+    {id:"DLR-ROLE-005", name:"Data Ops Lead", wave:"Wave 2 — Factory", labor:"Operations Manager",
+     mission:"Run labeling floor: staffing, queues, throughput, escalation.",
+     must:["Production ops","Queueing/staffing","Metric-driven floor control","Escalation discipline","Training/SOP enforcement"],
+     nice:["Labeling tools"],
+     sim:"Design shift plan to hit 50 labels/day/person while protecting QA."},
+    {id:"DLR-ROLE-006", name:"QA Lead", wave:"Wave 2 — Factory", labor:"QA Manager",
+     mission:"Quality gates, IAA stability, adjudication workflow.",
+     must:["IAA + sampling","Adjudication","Feedback loops","Metrics ownership","Change impact evaluation"],
+     nice:["Data labeling QA"],
+     sim:"IAA is sliding. Set thresholds, sampling plan, adjudication, stop-ship triggers."},
+  ];
+  db.roles = roles;
+  save(db);
+  alert("Seeded SEQUOIA roles.");
+}
+
+function roleOptions(selectEl){
+  const db = load();
+  selectEl.innerHTML = db.roles.map(r=>`<option value="${r.id}">${r.id} — ${r.name}</option>`).join("") || `<option value="">(no roles yet)</option>`;
+}
+
+function refreshAll(){
+  refreshDashboard(); refreshRoles(); refreshCandidates(); refreshInterviews(); refreshBoard(); refreshDrift();
+  roleOptions(document.getElementById("candRole"));
+  const db = load();
+  document.getElementById("intCand").innerHTML = db.candidates.map(c=>`<option value="${c.id}">${c.id} — ${c.name}</option>`).join("") || `<option value="">(no candidates yet)</option>`;
+  refreshOffersList();
+  renderRSList();
+}
+
+
+function computeSLO(){
+  const db = load();
+  const offers = db.candidates.filter(c=>c.offer_date);
+  const accepted = db.candidates.filter(c=>c.accepted_date);
+  const offerAcceptance = offers.length ? Math.round((accepted.length / offers.length)*100) : null;
+
+  const tto = offers.filter(c=>c.created).map(c => (new Date(c.offer_date).getTime() - new Date(c.created).getTime())/(1000*60*60*24)).filter(x=>x>=0);
+  const avgTimeToOffer = tto.length ? Math.round((tto.reduce((a,b)=>a+b,0)/tto.length)*10)/10 : null;
+
+  const byCand = {};
+  db.interviews.forEach(i=>{ byCand[i.candidate] ||= []; byCand[i.candidate].push(Number(i.rfs)); });
+  let varianceBreaches = 0;
+  Object.values(byCand).forEach(scores=>{
+    if(scores.length>=2){
+      const mx=Math.max(...scores), mn=Math.min(...scores);
+      if(mx-mn>15) varianceBreaches += 1;
+    }
+  });
+
+  const now = Date.now();
+  const days = (iso)=> Math.max(0, Math.round((now - new Date(iso).getTime())/(1000*60*60*24)));
+  const thresh = {Sourcing:7, Screened:5, Gate2:3, Gate3:3, Offer:2, Accepted:5, Cleared:10, Started:9999};
+  let stuck = 0;
+  db.candidates.forEach(c=>{
+    const st=c.status||"Sourcing";
+    const age=days(c.status_changed||c.created||nowIso());
+    if(age > (thresh[st] ?? 7)) stuck += 1;
+  });
+
+  return {avgTimeToOffer, offerAcceptance, varianceBreaches, stuck};
+}
+
+function upsertAutoDS(code, msg, patch){
+  const db = load();
+  const d = today();
+  const exists = db.drift.some(x=>x.code===code && (x.time||"").startsWith(d));
+  if(exists) return false;
+  db.drift.push({time: nowIso(), code, msg, patch});
+  save(db);
+  return true;
+}
+
+function runAutoDS(){
+  const slo = computeSLO();
+  let created = 0;
+
+  if(slo.avgTimeToOffer != null && slo.avgTimeToOffer > 7){
+    if(upsertAutoDS("DS-HIRE-001", `Avg time-to-offer is ${slo.avgTimeToOffer} days (>7).`, "Patch loop capacity, tighten scheduling, pre-brief interviewers.")) created += 1;
+  }
+  if(slo.offerAcceptance != null && slo.offerAcceptance < 70){
+    if(upsertAutoDS("DS-HIRE-002", `Offer acceptance is ${slo.offerAcceptance}% (<70%).`, "Patch comp band, mission clarity, start-date friction.")) created += 1;
+  }
+  if(slo.varianceBreaches > 0){
+    if(upsertAutoDS("DS-HIRE-003", `Interviewer variance breaches present: ${slo.varianceBreaches}.`, "Calibrate rubric, add scoring anchors, require 2 Gate-2 scorers.")) created += 1;
+  }
+  if(slo.stuck > 0){
+    if(upsertAutoDS("DS-HIRE-004", `Stuck candidates detected: ${slo.stuck}.`, "Patch stage SLAs, force routing decisions, remove bottlenecks.")) created += 1;
+  }
+  return created;
+}
+
+function refreshDashboard(){
+  const db = load();
+  document.getElementById("kOpenRoles").textContent = db.roles.length;
+  document.getElementById("kCandidates").textContent = db.candidates.length;
+  document.getElementById("kInInterview").textContent = db.candidates.filter(c=>["Gate2","Gate3"].includes(c.status)).length;
+  document.getElementById("kOffers").textContent = db.candidates.filter(c=>c.status==="Offer").length;
+  document.getElementById("kStarted").textContent = db.candidates.filter(c=>c.status==="Started").length;
+
+  const slo = computeSLO();
+  const autoCreated = runAutoDS();
+  const kT = document.getElementById("kTimeToOffer"); if(kT) kT.textContent = (slo.avgTimeToOffer==null) ? "—" : `${slo.avgTimeToOffer}d`;
+  const kA = document.getElementById("kOfferAccept"); if(kA) kA.textContent = (slo.offerAcceptance==null) ? "—" : `${slo.offerAcceptance}%`;
+  const kV = document.getElementById("kVarBreaches"); if(kV) kV.textContent = `${slo.varianceBreaches}`;
+  const kS = document.getElementById("kStuck"); if(kS) kS.textContent = `${slo.stuck}`;
+  const kD = document.getElementById("kAutoDs"); if(kD) kD.textContent = `${autoCreated}`;
+
+  const d = db.drift.slice(-5).reverse();
+  const el = document.getElementById("driftList");
+  if(!d.length){ el.textContent = "No drift yet."; return; }
+  el.innerHTML = d.map(x=>`<div><span class="pill">${x.code}</span> ${x.msg} <span class="muted">(${x.time})</span></div>`).join("");
+}
+
+function refreshRoles(){
+  const db = load();
+  const el = document.getElementById("rolesTable");
+  if(!db.roles.length){ el.innerHTML = "<div class='muted'>No roles yet. Click “Seed SEQUOIA roles”.</div>"; return; }
+  el.innerHTML = `<table>
+    <thead><tr><th>ID</th><th>Role</th><th>Wave</th><th>Labor</th><th></th></tr></thead>
+    <tbody>${db.roles.map(r=>`
+      <tr>
+        <td class="mono">${r.id}</td>
+        <td>${r.name}</td>
+        <td>${r.wave}</td>
+        <td class="muted">${r.labor||""}</td>
+        <td><button data-action="role-edit" data-id="${r.id}">Edit</button> <button class="danger" data-action="role-delete" data-id="${r.id}">Delete</button></td>
+      </tr>`).join("")}
+    </tbody></table>`;
+}
+
+function refreshCandidates(){
+  const db = load();
+  const el = document.getElementById("candsTable");
+  if(!db.candidates.length){ el.innerHTML = "<div class='muted'>No candidates yet.</div>"; return; }
+  const roleName = (id)=> (db.roles.find(r=>r.id===id)?.name)||"(role?)";
+  el.innerHTML = `<table>
+    <thead><tr><th>ID</th><th>Name</th><th>Role</th><th>Status</th><th>Clearance</th><th></th></tr></thead>
+    <tbody>${db.candidates.map(c=>`
+      <tr>
+        <td class="mono">${c.id}</td>
+        <td>${c.name}</td>
+        <td class="muted">${c.role} — ${roleName(c.role)}</td>
+        <td class="status">${c.status}</td>
+        <td class="muted">${c.clearance||""}</td>
+        <td><button data-action="cand-edit" data-id="${c.id}">Edit</button> <button class="danger" data-action="cand-delete" data-id="${c.id}">Delete</button></td>
+      </tr>`).join("")}
+    </tbody></table>`;
+}
+
+function refreshInterviews(){
+  const db = load();
+  const el = document.getElementById("intsTable");
+  if(!db.interviews.length){ el.innerHTML = "<div class='muted'>No interviews yet.</div>"; return; }
+  const candName = (id)=> (db.candidates.find(c=>c.id===id)?.name)||"(candidate?)";
+  el.innerHTML = `<table>
+    <thead><tr><th>ID</th><th>Candidate</th><th>Gate</th><th>RFS/TPS/UR</th><th>Decision</th><th>Seal</th><th></th></tr></thead>
+    <tbody>${db.interviews.map(i=>`
+      <tr>
+        <td class="mono">${i.id}</td>
+        <td>${i.candidate} — ${candName(i.candidate)}</td>
+        <td class="muted">${i.gate}</td>
+        <td class="muted">${i.rfs}/${i.tps}/${i.ur}</td>
+        <td class="${i.decision==='Hire'?'s-ok':i.decision==='Hold'?'s-warn':'s-bad'}">${i.decision}</td>
+        <td class="muted mono">${i.seal}</td>
+        <td><button data-action="int-edit" data-id="${i.id}">Edit</button> <button class="danger" data-action="int-delete" data-id="${i.id}">Delete</button></td>
+      </tr>`).join("")}
+    </tbody></table>`;
+}
+
+function refreshBoard(){
+  const db = load();
+  const el = document.getElementById("boardTable");
+  const cols = ["Sourcing","Screened","Gate2","Gate3","Offer","Accepted","Cleared","Started"];
+  const buckets = Object.fromEntries(cols.map(c=>[c,[]]));
+  db.candidates.forEach((c,idx)=>{
+    c = redactCandidate(c, idx); (buckets[c.status] ||= []).push(c); });
+
+  el.innerHTML = `<div class="grid" style="grid-template-columns:repeat(4,1fr)">
+    ${cols.map(s=>`
+      <div class="card">
+        <h3>${s} <span class="muted">(${(buckets[s]||[]).length})</span></h3>
+        ${(buckets[s]||[]).map(c=>`
+          <div style="border:1px solid #1b2a3a;border-radius:12px;padding:10px;margin-bottom:8px">
+            <div><b>${c.name}</b> <span class="muted mono">${c.id}</span></div>
+            <div class="muted small">${c.role}</div>
+            <div class="right" style="margin-top:8px">
+              <button data-action="cand-move" data-id="${c.id}" data-dir="-1">←</button>
+              <button data-action="cand-move" data-id="${c.id}" data-dir="1">→</button>
+            </div>
+          </div>`).join("") || `<div class="muted">—</div>`}
+      </div>`).join("")}
+  </div>`;
+}
+
+function refreshDrift(){
+  const db = load();
+  const el = document.getElementById("driftTable");
+  if(!db.drift.length){ el.innerHTML = "<div class='muted'>No drift alerts recorded.</div>"; return; }
+  el.innerHTML = `<table>
+    <thead><tr><th>Time</th><th>Code</th><th>Message</th><th>Patch Hint</th></tr></thead>
+    <tbody>${db.drift.slice().reverse().map(d=>`
+      <tr>
+        <td class="muted mono">${d.time}</td>
+        <td class="mono">${d.code}</td>
+        <td>${d.msg}</td>
+        <td class="muted">${d.patch}</td>
+      </tr>`).join("")}
+    </tbody></table>`;
+}
+
+function runDriftScan(){
+  const db = load();
+  const alerts = [];
+
+  // DS-HIRE-003: high variance for same candidate across interviews (RFS range > 15)
+  const byCand = {};
+  db.interviews.forEach(i=>{
+    byCand[i.candidate] ||= [];
+    byCand[i.candidate].push(Number(i.rfs));
+  });
+  Object.entries(byCand).forEach(([cid, scores])=>{
+    if(scores.length >= 2){
+      const mx = Math.max(...scores), mn = Math.min(...scores);
+      if(mx - mn > 15){
+        alerts.push({code:"DS-HIRE-003", msg:`Interviewer variance for ${cid} is ${mx-mn} RFS points.`, patch:"Calibrate rubric; retrain interviewers; tighten Gate 2 scoring anchors."});
+      }
+    }
+  });
+
+  // DS-HIRE-005: repeated "Hire" but candidate still stuck early
+  const hires = new Set(db.interviews.filter(i=>i.decision==="Hire").map(i=>i.candidate));
+  hires.forEach(cid=>{
+    const c = db.candidates.find(x=>x.id===cid);
+    if(c && ["Sourcing","Screened"].includes(c.status)){
+      alerts.push({code:"DS-HIRE-005", msg:`Candidate ${cid} has Hire scorecards but is still in ${c.status}.`, patch:"Enforce decision routing; advance gate or issue offer within 24h post Gate 3."});
+    }
+  });
+
+  alerts.forEach(a=>db.drift.push({ time: nowIso(), ...a }));
+  save(db);
+  alert(alerts.length ? `Drift scan recorded ${alerts.length} alert(s).` : "No drift detected.");
+}
+
+function moveCandidate(id, dir){
+  const db = load();
+  const cols = ["Sourcing","Screened","Gate2","Gate3","Offer","Accepted","Cleared","Started"];
+  const c = db.candidates.find(x=>x.id===id);
+  if(!c) return;
+  const idx = cols.indexOf(c.status);
+  const prev = c.status;
+  const next = cols[Math.max(0, Math.min(cols.length-1, idx + dir))];
+  if(prev !== next){
+    c.status = next;
+    c.status_changed = nowIso();
+    if(next === "Offer" && !c.offer_date) c.offer_date = nowIso();
+    if(next === "Accepted" && !c.accepted_date) c.accepted_date = nowIso();
+    if(next === "Started" && !c.started_date) c.started_date = nowIso();
+  }
+  save(db);
+}
+
+function newRole(){ clearRole(); setTab("roles"); document.getElementById("roleId").value = uid("DLR-ROLE"); }
+function saveRole(){
+  const db = load();
+  const r = { id:v("roleId"), name:v("roleName"), wave:v("roleWave"), labor:v("roleLabor"),
+    mission:v("roleMission"), must:v("roleMust").split("\\n").filter(x=>x.trim()),
+    nice:v("roleNice").split("\\n").filter(x=>x.trim()),
+    sim:v("roleSim")
+  };
+  if(!r.id || !r.name) return alert("Role ID and Role Name are required.");
+  const idx = db.roles.findIndex(x=>x.id===r.id);
+  if(idx>=0) db.roles[idx]=r; else db.roles.push(r);
+  save(db); hint("roleSavedHint","Saved.");
+}
+function editRole(id){
+  const db = load(); const r = db.roles.find(x=>x.id===id); if(!r) return;
+  setTab("roles");
+  s("roleId", r.id); s("roleName", r.name); s("roleWave", r.wave); s("roleLabor", r.labor||"");
+  s("roleMission", r.mission||""); s("roleMust", (r.must||[]).join("\n")); s("roleNice", (r.nice||[]).join("\n")); s("roleSim", r.sim||"");
+}
+function deleteRole(id){ if(!confirm("Delete role?")) return; const db=load(); db.roles=db.roles.filter(r=>r.id!==id); save(db); }
+function clearRole(){ ["roleId","roleName","roleLabor","roleMission","roleMust","roleNice","roleSim"].forEach(x=>s(x,"")); s("roleWave","Wave 1 — Mobilize"); hint("roleSavedHint",""); }
+
+function newCandidate(){ clearCandidate(); setTab("candidates"); document.getElementById("candId").value = uid("C"); }
+function saveCandidate(){
+  const db = load();
+  const incoming = {
+    id:v("candId"), name:v("candName"), role:v("candRole"), status:v("candStatus"),
+    clearance:v("candClearance"), availability:v("candAvail"), comp:v("candComp"),
+    evidence:v("candEvidence").split("\n").filter(x=>x.trim()),
+    risks:v("candRisks")
+  };
+  if(!incoming.id || !incoming.name || !incoming.role) return alert("Candidate ID, Name, and Role are required.");
+
+  const idx = db.candidates.findIndex(x=>x.id===incoming.id);
+  if(idx>=0){
+    const prev = db.candidates[idx];
+    const statusChanged = (prev.status !== incoming.status);
+    db.candidates[idx] = {
+      ...prev,
+      ...incoming,
+      created: prev.created || nowIso(),
+      status_changed: statusChanged ? nowIso() : (prev.status_changed || prev.created || nowIso()),
+    };
+    const c = db.candidates[idx];
+    if(c.status==="Offer" && !c.offer_date) c.offer_date = nowIso();
+    if(c.status==="Accepted" && !c.accepted_date) c.accepted_date = nowIso();
+    if(c.status==="Started" && !c.started_date) c.started_date = nowIso();
+  } else {
+    const c = { ...incoming, created: nowIso(), status_changed: nowIso() };
+    if(c.status==="Offer") c.offer_date = nowIso();
+    if(c.status==="Accepted") c.accepted_date = nowIso();
+    if(c.status==="Started") c.started_date = nowIso();
+    db.candidates.push(c);
+  }
+  save(db); hint("candSavedHint","Saved.");
+}
+function editCandidate(id){
+  const db = load(); const c = db.candidates.find(x=>x.id===id); if(!c) return;
+  setTab("candidates");
+  s("candId", c.id); s("candName", c.name); s("candRole", c.role); s("candStatus", c.status);
+  s("candClearance", c.clearance||""); s("candAvail", c.availability||""); s("candComp", c.comp||"");
+  s("candEvidence", (c.evidence||[]).join("\n")); s("candRisks", c.risks||"");
+}
+function deleteCandidate(id){
+  if(!confirm("Delete candidate?")) return;
+  const db = load();
+  db.candidates = db.candidates.filter(c=>c.id!==id);
+  db.interviews = db.interviews.filter(i=>i.candidate!==id);
+  save(db);
+}
+function clearCandidate(){ ["candId","candName","candClearance","candAvail","candComp","candEvidence","candRisks"].forEach(x=>s(x,"")); s("candStatus","Sourcing"); hint("candSavedHint",""); }
+
+function newInterview(){ clearInterview(); setTab("interviews"); document.getElementById("intId").value = uid("I"); }
+function saveInterview(){
+  const db = load();
+  const i = {
+    id:v("intId"), candidate:v("intCand"), gate:v("intGate"), interviewer:v("intInterviewer"),
+    rfs:Number(v("sRfs")||0), tps:Number(v("sTps")||0), ur:Number(v("sUr")||0),
+    decision:v("sDecision"),
+    evidence:v("sEvidence").split("\\n").filter(x=>x.trim()),
+    notes:v("sNotes"),
+    flags:v("sFlags"),
+    seal:`${nowIso()}|v1`
+  };
+  if(!i.id || !i.candidate) return alert("Interview ID and Candidate are required.");
+  const idx = db.interviews.findIndex(x=>x.id===i.id);
+  if(idx>=0) db.interviews[idx]=i; else db.interviews.push(i);
+
+  // light status assist
+  const c = db.candidates.find(x=>x.id===i.candidate);
+  if(c){
+    const prev = c.status;
+    let next = prev;
+    if(i.gate.startsWith("Gate 1")) next = "Screened";
+    if(i.gate.startsWith("Gate 2")) next = "Gate2";
+    if(i.gate.startsWith("Gate 3")) next = (i.decision==="Hire") ? "Offer" : "Gate3";
+    if(next !== prev){
+      c.status = next;
+      c.status_changed = nowIso();
+      if(next === "Offer" && !c.offer_date) c.offer_date = nowIso();
+    }
+  }
+  save(db); hint("intSavedHint","Saved & sealed.");
+}
+function editInterview(id){
+  const db = load(); const i = db.interviews.find(x=>x.id===id); if(!i) return;
+  setTab("interviews");
+  s("intId", i.id); s("intCand", i.candidate); s("intGate", i.gate); s("intInterviewer", i.interviewer||"");
+  s("sRfs", i.rfs); s("sTps", i.tps); s("sUr", i.ur); s("sDecision", i.decision);
+  s("sEvidence", (i.evidence||[]).join("\n")); s("sNotes", i.notes||""); s("sFlags", i.flags||"");
+}
+function deleteInterview(id){ if(!confirm("Delete interview?")) return; const db=load(); db.interviews=db.interviews.filter(i=>i.id!==id); save(db); }
+function clearInterview(){ ["intId","intInterviewer","sRfs","sTps","sUr","sEvidence","sNotes","sFlags"].forEach(x=>s(x,"")); s("intGate","Gate 1 — Screen"); s("sDecision","Hire"); hint("intSavedHint",""); }
+
+// -------- ARTIFACT GENERATION --------
+
+function isSafeExport(){
+  return (document.getElementById("safeExport")?.value || "false") === "true";
+}
+function safeLevel(){
+  return document.getElementById("safeExportLevel")?.value || "lite";
+}
+function redactCandidate(c, idx){
+  if(!isSafeExport()) return c;
+  const lvl = safeLevel();
+  const masked = {...c};
+  masked.name = `Candidate-${String(idx+1).padStart(3,"0")}`;
+  if(masked.comp) masked.comp = "(masked)";
+  if(masked.clearance) masked.clearance = "(masked)";
+  if(lvl === "strict") masked.evidence = [];
+  return masked;
+}
+function packMeta(){
+  return {
+    prefix: v("packPrefix") || "SEQUOIA",
+    program: v("orgProgram") || "NGA — SEQUOIA",
+    steward: v("cohSteward") || "(unassigned)",
+    authority: v("authorityNote") || "(not specified)",
+    generated: nowIso(),
+    date: today(),
+    version: "1.0",
+    safe_export: isSafeExport(),
+    safe_export_level: safeLevel()
+  };
+}
+
+
+function mdRole(r, meta){
+  const must = (r.must||[]).slice(0,5).map(x=>`- ${x}`).join("\n") || "- (none)";
+  const nice = (r.nice||[]).map(x=>`- ${x}`).join("\n") || "- (none)";
+  return `# ${r.id} — ${r.name}
+**Program:** ${meta.program}  
+**Wave:** ${r.wave}  
+**Labor Category:** ${r.labor || "(tbd)"}  
+**Generated:** ${meta.generated}
+
+## Mission (90 days)
+${r.mission || "(tbd)"}
+
+## Must-Haves (≤ 5)
+${must}
+
+## Nice-to-Haves
+${nice}
+
+## Gate 2 Simulation (Week 1)
+${r.sim || "(tbd)"}
+
+## Deep Sigma Controls
+- 🛑 Seal→Version→Patch: role packet changes are versioned.
+- 🧬 MG linkage: hire decisions link to role packet + evidence.
+- 🧾 DS: hiring drift triggers create patch tickets.
+- 🔍 RS: weekly calibration of rubric + outcomes.
+
+## Authority / Approvals
+${meta.authority}
+`;
+}
+
+function buildMG(meta){
+  const db = load();
+  // simple node/edge graph export (MG)
+  const nodes = [];
+  const edges = [];
+
+  db.roles.forEach(r=>{
+    nodes.push({type:"Role", id:r.id, name:r.name, wave:r.wave, labor:r.labor || null});
+  });
+
+  db.candidates.forEach((c,idx)=>{
+    c = redactCandidate(c, idx);
+    nodes.push({type:"Candidate", id:c.id, name:c.name, role:c.role, status:c.status,
+      clearance:c.clearance || null, availability:c.availability || null, comp:c.comp || null,
+      evidence:c.evidence || [], risks:c.risks || ""});
+    edges.push({type:"TARGETS_ROLE", from:c.id, to:c.role});
+  });
+
+  db.interviews.forEach(i=>{
+    nodes.push({type:"Interview", id:i.id, candidate:i.candidate, gate:i.gate, interviewer:i.interviewer || null,
+      rfs:i.rfs, tps:i.tps, ur:i.ur, decision:i.decision, seal:i.seal});
+    edges.push({type:"HAS_INTERVIEW", from:i.candidate, to:i.id});
+  });
+
+  // de-dupe nodes by (type,id)
+  const seen = new Set();
+  const uniqNodes = [];
+  for(const n of nodes){
+    const k = `${n.type}:${n.id}`;
+    if(seen.has(k)) continue;
+    seen.add(k);
+    uniqNodes.push(n);
+  }
+
+  return { meta, nodes: uniqNodes, edges };
+}
+
+function buildScorecards(meta){
+  const db = load();
+  if(!isSafeExport()) return { meta, interviews: db.interviews };
+  const candIndex = new Map(db.candidates.map((c,i)=>[c.id, i]));
+  const interviews = db.interviews.map(i=>{
+    const idx = candIndex.has(i.candidate) ? candIndex.get(i.candidate) : 0;
+    return {...i, candidate_name: `Candidate-${String(idx+1).padStart(3,"0")}`};
+  });
+  return { meta, interviews };
+}
+
+function buildDS(meta){
+  const db = load();
+  return `# DS_HIRING — Drift Snapshot
+**Program:** ${meta.program}  
+**Generated:** ${meta.generated}
+
+## Recorded Drift Alerts
+${db.drift.length ? db.drift.slice().reverse().map(d=>`- **${d.code}** (${d.time}) — ${d.msg}\n  - Patch hint: ${d.patch}`).join("\n") : "- None"}
+
+## Patch Queue (manual)
+- [ ] Review DS alerts
+- [ ] Decide patch: rubric, sourcing lane, comp band, loop capacity, gate design
+- [ ] Seal patch decision into next RS
+`;
+}
+
+function buildRS(meta){
+  const db = load();
+  const counts = (status)=>db.candidates.filter(c=>c.status===status).length;
+  return `# RS_HIRING_WEEKLY — Weekly Hiring Reflection
+**Program:** ${meta.program}  
+**Week of:** ${meta.date}  
+**Generated:** ${meta.generated}  
+**Coherence Steward:** ${meta.steward}
+
+## Operating Snapshot
+- Open roles: ${db.roles.length}
+- Candidates: ${db.candidates.length}
+- Sourcing: ${counts("Sourcing")}
+- Screened: ${counts("Screened")}
+- Gate2: ${counts("Gate2")}
+- Gate3: ${counts("Gate3")}
+- Offer: ${counts("Offer")}
+- Accepted: ${counts("Accepted")}
+- Cleared: ${counts("Cleared")}
+- Started: ${counts("Started")}
+
+## SLO Check (fill)
+- Time-to-offer ≤ 7 days: (Pass/Fail) — evidence:
+- Offer acceptance ≥ 70%: (Pass/Fail) — evidence:
+- Variance ≤ 15 RFS: (Pass/Fail) — evidence:
+- Why-retrieval ≤ 60s: (Pass/Fail) — evidence:
+
+## Drift (DS) Review
+${db.drift.length ? db.drift.slice(-10).reverse().map(d=>`- ${d.code} — ${d.msg} (${d.time})`).join("\n") : "- None"}
+
+## Decisions (Seal)
+- Decision 1:
+- Decision 2:
+- Decision 3:
+
+## Patches (Seal→Version→Patch)
+- Patch 1 (what changes in the hiring system):
+- Patch 2:
+`;
+}
+
+function buildOfferMD(candidate, role, meta){
+  // Minimal offer DLR (non-proprietary)
+  return `# DLR-OFFER — ${candidate.id} (${candidate.name})
+**Program:** ${meta.program}  
+**Role:** ${role.id} — ${role.name}  
+**Generated:** ${meta.generated}
+
+## Candidate Snapshot (MG)
+- Candidate ID: ${candidate.id}
+- Status: ${candidate.status}
+- Clearance: ${candidate.clearance || "(tbd)"}
+- Availability: ${candidate.availability || "(tbd)"}
+- Compensation (candidate stated): ${candidate.comp || "(tbd)"}
+- Evidence:
+${(candidate.evidence||[]).length ? candidate.evidence.map(e=>`  - ${e}`).join("\n") : "  - (none)"}
+- Risk flags:
+${candidate.risks ? candidate.risks.split("\\n").map(x=>`  - ${x}`).join("\n") : "  - (none)"}
+
+## Offer Terms (fill)
+- Labor category mapping:
+- Bill rate / salary:
+- Work mode:
+- Start date:
+- Contingencies (clearance/customer approval):
+- Travel:
+- Period of performance alignment:
+
+## Decision Basis (link to sealed scorecards)
+- Interviews referencing candidate: ${countInterviews(candidate.id)} (see SCORECARDS export)
+- Decision: (Offer / Hold / No-offer)
+- Approver:
+- Seal:
+`;
+}
+
+function countInterviews(cid){
+  const db = load();
+  return db.interviews.filter(i=>i.candidate===cid).length;
+}
+
+function previewText(txt){
+  document.getElementById("preview").textContent = txt;
+}
+
+function downloadText(filename, text){
+  const blob = new Blob([text], {type:"text/plain;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+
+function downloadJson(filename, obj){
+  const blob = new Blob([JSON.stringify(obj,null,2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+
+function downloadRoleMDs(){
+  const db = load();
+  const meta = packMeta();
+  if(!db.roles.length) return alert("No roles to export.");
+  // download each role MD
+  const first = mdRole(db.roles[0], meta);
+  previewText(first);
+  db.roles.forEach(r=>{
+    const fn = `${safeFile(meta.prefix)}_${safeFile(r.id)}_${safeFile(r.name)}.md`;
+    downloadText(fn, mdRole(r, meta));
+  });
+}
+
+function downloadMG(){
+  const meta = packMeta();
+  const mg = buildMG(meta);
+  previewText(JSON.stringify(mg, null, 2).slice(0, 3000) + "\n…");
+  downloadJson(`${safeFile(meta.prefix)}_MG_TalentGraph_${meta.date}.json`, mg);
+}
+
+function downloadScorecards(){
+  const meta = packMeta();
+  const sc = buildScorecards(meta);
+  previewText(JSON.stringify(sc, null, 2).slice(0, 3000) + "\n…");
+  downloadJson(`${safeFile(meta.prefix)}_SCORECARDS_${meta.date}.json`, sc);
+}
+
+function downloadRS(){
+  const meta = packMeta();
+  const rs = buildRS(meta);
+  previewText(rs);
+  downloadText(`${safeFile(meta.prefix)}_RS_HIRING_WEEKLY_${meta.date}.md`, rs);
+}
+
+function downloadDS(){
+  const meta = packMeta();
+  const ds = buildDS(meta);
+  previewText(ds);
+  downloadText(`${safeFile(meta.prefix)}_DS_HIRING_${meta.date}.md`, ds);
+}
+
+function refreshOffersList(){
+  const db = load();
+  const meta = packMeta();
+  const offers = db.candidates.filter(c=>c.status==="Offer");
+  const el = document.getElementById("offersList");
+  if(!el) return;
+  if(!offers.length){ el.textContent = "No candidates in Offer status."; return; }
+
+  el.innerHTML = offers.map(c=>{
+    const role = db.roles.find(r=>r.id===c.role) || {id:c.role, name:"(role not found)"};
+    const fn = `${safeFile(meta.prefix)}_DLR_OFFER_${safeFile(c.id)}_${safeFile(c.name)}_${meta.date}.md`;
+    return `<div style="border:1px solid #1b2a3a;border-radius:12px;padding:10px;margin-bottom:8px">
+      <div><b>${c.name}</b> <span class="muted mono">${c.id}</span></div>
+      <div class="muted small">${role.id} — ${role.name}</div>
+      <div class="right" style="margin-top:8px">
+        <button class="primary" data-action="offer-dlr" data-id="${c.id}">Download Offer DLR</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function downloadOffer(candidateId){
+  const db = load();
+  const meta = packMeta();
+  const c = db.candidates.find(x=>x.id===candidateId);
+  if(!c) return alert("Candidate not found.");
+  const r = db.roles.find(x=>x.id===c.role) || {id:c.role, name:"(role not found)"};
+  const txt = buildOfferMD(c, r, meta);
+  previewText(txt);
+  const fn = `${safeFile(meta.prefix)}_DLR_OFFER_${safeFile(c.id)}_${safeFile(c.name)}_${meta.date}.md`;
+  downloadText(fn, txt);
+}
+
+// -------- UTILITIES + EXPORT/IMPORT --------
+function v(id){ return document.getElementById(id).value.trim(); }
+function s(id,val){ document.getElementById(id).value = val; }
+function hint(id,msg){ document.getElementById(id).textContent = msg; setTimeout(()=>document.getElementById(id).textContent="", 1500); }
+
+// Export/Import/Reset
+document.getElementById("btnExport").addEventListener("click", ()=>{
+  const db = load();
+  const blob = new Blob([JSON.stringify(db,null,2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `sequoia_hiring_console_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+});
+document.getElementById("btnImport").addEventListener("click", ()=>document.getElementById("fileImport").click());
+document.getElementById("fileImport").addEventListener("change", (e)=>{
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const db = JSON.parse(reader.result);
+      setStoreItem(KEY, JSON.stringify(db));
+      refreshAll();
+      alert("Imported.");
+    } catch(err){ alert("Invalid JSON."); }
+  };
+  reader.readAsText(file);
+});
+document.getElementById("btnReset").addEventListener("click", ()=>{
+  if(!confirm("Reset ALL local data?")) return;
+  removeStoreItem(KEY);
+  load(); refreshAll();
+});
+
+
+
+function renderRSModal(){
+  const m = document.getElementById("rsModal");
+  if(!m) return;
+  m.innerHTML = `
+    <div class="card" style="position:sticky;top:0;z-index:1">
+      <div style="display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap">
+        <div>
+          <b>RS Console (overlay mode)</b>
+          <div class="muted small">If your layout collapses tabs, RS renders here.</div>
+        </div>
+        <div class="flex">
+          <button id="rsModalClose" class="danger">Close</button>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      ${document.getElementById("tab-rs") ? document.getElementById("tab-rs").innerHTML.replace(/id="rsFallback"[\s\S]*?<\/div>/g,"") : '<div class="card"><h3>RS section not found in DOM</h3></div>'}
+    </div>
+  `;
+  // Clean up any stray fallback renders
+  m.querySelectorAll("#rsFallback").forEach(n=>n.remove());
+  // Re-bind RS buttons inside modal by reusing IDs (they exist now inside modal)
+  document.getElementById("rsModalClose")?.addEventListener("click", ()=>{
+    m.style.display="none";
+  });
+  // Bind RS controls (these IDs are now inside modal)
+  document.getElementById("btnCreateRSNow")?.addEventListener("click", ()=>{ defaultRSFields(); autoFillRS(); saveRS(); });
+  document.getElementById("btnAutoFillRS")?.addEventListener("click", autoFillRS);
+  document.getElementById("btnAddPatch")?.addEventListener("click", addPatch);
+  document.getElementById("btnSaveRS")?.addEventListener("click", saveRS);
+  document.getElementById("btnExportRS")?.addEventListener("click", exportRS);
+  document.getElementById("btnExportExec")?.addEventListener("click", exportExec);
+  document.getElementById("btnClearRS")?.addEventListener("click", defaultRSFields);
+
+  document.getElementById("patchesTable")?.addEventListener("click", (e)=>{
+    const b = e.target.closest("button"); if(!b) return;
+    if(b.dataset.action==="patch-del"){
+      rsEditingPatches = rsEditingPatches.filter(p=>p.id!==b.dataset.id);
+      renderPatchesTable();
+    }
+  });
+  document.getElementById("rsTable")?.addEventListener("click", (e)=>{
+    const b = e.target.closest("button"); if(!b) return;
+    e.preventDefault();
+    const a = b.dataset.action; const id = b.dataset.id;
+    if(a==="rs-edit"){ openRS(id); }
+    if(a==="rs-del"){ deleteRS(id); }
+  }, true);
+
+  // force render list/snapshot defaults
+  renderRSList();
+  defaultRSFields();
+}
+
+// ---------------- RS (Reflection Sessions) ----------------
+let rsEditingPatches = [];
+let rsLastSnapshot = null;
+
+function defaultRSFields(){
+  document.getElementById("rsId").value = uid("RS");
+  document.getElementById("rsWeek").value = today();
+  document.getElementById("rsSteward").value = document.getElementById("cohSteward")?.value || "";
+  document.getElementById("rsSealed").value = "false";
+  document.getElementById("rsDecisions").value = "";
+  rsEditingPatches = [];
+  rsLastSnapshot = null;
+  renderPatchesTable();
+  document.getElementById("rsSnapshot").innerHTML = `<div class="muted">Create an RS to populate snapshot.</div>`;
+  hint("rsSavedHint","");
+}
+
+function computeSnapshot(){
+  const db = load();
+  const now = Date.now();
+  const days = (iso)=> Math.max(0, Math.round((now - new Date(iso).getTime()) / (1000*60*60*24)));
+
+  const statuses = ["Sourcing","Screened","Gate2","Gate3","Offer","Accepted","Cleared","Started"];
+  const counts = {};
+  const oldest = {};
+  statuses.forEach(s=>{ counts[s]=0; oldest[s]=0; });
+
+  db.candidates.forEach((c,idx)=>{
+    c = redactCandidate(c, idx);
+    const st = c.status || "Sourcing";
+    counts[st] = (counts[st]||0) + 1;
+    const age = days(c.status_changed || c.created || nowIso());
+    oldest[st] = Math.max(oldest[st]||0, age);
+  });
+
+  const offers = db.candidates.filter(c=>c.offer_date);
+  const accepted = db.candidates.filter(c=>c.accepted_date);
+  const offerAcceptance = offers.length ? Math.round((accepted.length / offers.length)*100) : null;
+
+  const tto = offers
+    .filter(c=>c.created)
+    .map(c => (new Date(c.offer_date).getTime() - new Date(c.created).getTime()) / (1000*60*60*24))
+    .filter(x=>x>=0);
+  const avgTimeToOffer = tto.length ? Math.round((tto.reduce((a,b)=>a+b,0)/tto.length)*10)/10 : null;
+
+  const byCand = {};
+  db.interviews.forEach(i=>{
+    byCand[i.candidate] ||= [];
+    byCand[i.candidate].push(Number(i.rfs));
+  });
+  let varianceBreaches = 0;
+  Object.values(byCand).forEach(scores=>{
+    if(scores.length >= 2){
+      const mx = Math.max(...scores), mn = Math.min(...scores);
+      if(mx - mn > 15) varianceBreaches += 1;
+    }
+  });
+
+  const stuck = [];
+  const thresh = {Sourcing:7, Screened:5, Gate2:3, Gate3:3, Offer:2, Accepted:5, Cleared:10, Started:9999};
+  db.candidates.forEach((c,idx)=>{
+    c = redactCandidate(c, idx);
+    const st = c.status || "Sourcing";
+    const age = days(c.status_changed || c.created || nowIso());
+    if(age > (thresh[st] ?? 7)){
+      stuck.push({id:c.id, name:c.name, status:st, days:age, role:c.role});
+    }
+  });
+
+  const driftRecent = db.drift.slice(-10).reverse();
+
+  return {
+    generated: nowIso(),
+    counts,
+    oldest,
+    slo: {
+      time_to_offer_days_avg: avgTimeToOffer,
+      offer_acceptance_pct: offerAcceptance,
+      variance_breaches_count: varianceBreaches
+    },
+    stuck,
+    driftRecent
+  };
+}
+
+function renderSnapshotBox(s){
+  const sCounts = Object.entries(s.counts).map(([k,v])=>`<span class="pill">${k}: ${v}</span>`).join(" ");
+  const sOld = Object.entries(s.oldest).map(([k,v])=>`<span class="pill">${k} oldest: ${v}d</span>`).join(" ");
+  const slo = s.slo;
+  const tto = (slo.time_to_offer_days_avg==null) ? "—" : `${slo.time_to_offer_days_avg}d`;
+  const acc = (slo.offer_acceptance_pct==null) ? "—" : `${slo.offer_acceptance_pct}%`;
+  const varb = `${slo.variance_breaches_count}`;
+  const stuckTop = s.stuck.slice(0,8).map(x=>`<div class="muted">• ${x.name} (${x.id}) — ${x.status} ${x.days}d</div>`).join("") || `<div class="muted">None</div>`;
+  const driftTop = s.driftRecent.slice(0,6).map(d=>`<div class="muted">• <b>${d.code}</b> — ${d.msg}</div>`).join("") || `<div class="muted">None</div>`;
+
+  return `
+  <div class="muted small">Generated: <span class="mono">${s.generated}</span></div>
+  <div style="margin-top:8px">${sCounts}</div>
+  <div style="margin-top:8px">${sOld}</div>
+  <div class="grid" style="margin-top:10px">
+    <div class="card"><div class="muted">Avg Time-to-Offer</div><b>${tto}</b></div>
+    <div class="card"><div class="muted">Offer Acceptance</div><b>${acc}</b></div>
+  </div>
+  <div class="card" style="margin-top:10px">
+    <h3>Variance Breaches (RFS range > 15)</h3>
+    <div class="muted">${varb}</div>
+  </div>
+  <div class="card" style="margin-top:10px">
+    <h3>Stuck Candidates (top)</h3>
+    ${stuckTop}
+  </div>
+  <div class="card" style="margin-top:10px">
+    <h3>Recent Drift Alerts (top)</h3>
+    ${driftTop}
+  </div>
+  `;
+}
+
+function autoFillRS(){
+  rsLastSnapshot = computeSnapshot();
+  document.getElementById("rsSnapshot").innerHTML = renderSnapshotBox(rsLastSnapshot);
+}
+
+function renderPatchesTable(){
+  const el = document.getElementById("patchesTable");
+  if(!el) return;
+  if(!rsEditingPatches.length){
+    el.innerHTML = `<div class="muted">No patches yet.</div>`;
+    return;
+  }
+  el.innerHTML = `<table>
+    <thead><tr><th>ID</th><th>Title</th><th>Owner</th><th>Due</th><th>Success metric</th><th></th></tr></thead>
+    <tbody>
+      ${rsEditingPatches.map(p=>`
+        <tr>
+          <td class="mono">${p.id}</td>
+          <td>${p.title}</td>
+          <td class="muted">${p.owner||""}</td>
+          <td class="muted">${p.due||""}</td>
+          <td class="muted">${p.metric||""}</td>
+          <td><button class="danger" data-action="patch-del" data-id="${p.id}">Delete</button></td>
+        </tr>`).join("")}
+    </tbody></table>`;
+}
+
+function addPatch(){
+  const title = document.getElementById("patchTitle").value.trim();
+  if(!title) return alert("Patch title required.");
+  rsEditingPatches.push({
+    id: uid("PATCH"),
+    title,
+    owner: document.getElementById("patchOwner").value.trim(),
+    due: document.getElementById("patchDue").value.trim(),
+    metric: document.getElementById("patchMetric").value.trim()
+  });
+  document.getElementById("patchTitle").value = "";
+  document.getElementById("patchOwner").value = "";
+  document.getElementById("patchDue").value = "";
+  document.getElementById("patchMetric").value = "";
+  renderPatchesTable();
+}
+
+function saveRS(){
+  const db = load();
+  const id = document.getElementById("rsId").value.trim();
+  const week = document.getElementById("rsWeek").value.trim() || today();
+  const steward = document.getElementById("rsSteward").value.trim() || "(unassigned)";
+  const sealed = document.getElementById("rsSealed").value === "true";
+  const decisions = document.getElementById("rsDecisions").value.split("\\n").map(x=>x.trim()).filter(Boolean);
+
+  const rs = {
+    id,
+    week_of: week,
+    steward,
+    created: nowIso(),
+    sealed,
+    seal: sealed ? `${nowIso()}|v1` : null,
+    snapshot: rsLastSnapshot || computeSnapshot(),
+    decisions,
+    patches: rsEditingPatches.slice()
+  };
+
+  if(!id) return alert("RS ID required.");
+
+  const idx = db.rs.findIndex(x=>x.id===id);
+  if(idx >= 0){
+    if(db.rs[idx].sealed) return alert("RS is sealed. Create a new RS next week.");
+    db.rs[idx] = { ...db.rs[idx], ...rs, created: db.rs[idx].created };
+  } else {
+    db.rs.push(rs);
+  }
+
+  save(db);
+  renderRSList();
+  hint("rsSavedHint","Saved.");
+}
+
+function rsToMarkdown(rs, meta){
+  const c = rs.snapshot.counts;
+  const slo = rs.snapshot.slo;
+  const tto = slo.time_to_offer_days_avg==null ? "—" : `${slo.time_to_offer_days_avg} days`;
+  const acc = slo.offer_acceptance_pct==null ? "—" : `${slo.offer_acceptance_pct}%`;
+  const drift = rs.snapshot.driftRecent.map(d=>`- **${d.code}** (${d.time}) — ${d.msg}\n  - Patch hint: ${d.patch}`).join("\n") || "- None";
+  const stuck = rs.snapshot.stuck.map(x=>`- ${x.name} (${x.id}) — ${x.status} ${x.days}d`).join("\n") || "- None";
+  const dec = rs.decisions.map(d=>`- ${d}`).join("\n") || "- None";
+  const patches = rs.patches.map(p=>`- **${p.id}** — ${p.title}\n  - Owner: ${p.owner||"(tbd)"} | Due: ${p.due||"(tbd)"}\n  - Success: ${p.metric||"(tbd)"}`).join("\n") || "- None";
+
+  return `# RS_HIRING_WEEKLY — ${rs.week_of}
+**Program:** ${meta.program}  
+**RS ID:** ${rs.id}  
+**Generated:** ${meta.generated}  
+**Coherence Steward:** ${rs.steward}  
+**Seal:** ${rs.sealed ? rs.seal : "(open)"}  
+
+## Operating Snapshot
+- Open roles: ${load().roles.length}
+- Candidates: ${load().candidates.length}
+- Sourcing: ${c.Sourcing||0}
+- Screened: ${c.Screened||0}
+- Gate2: ${c.Gate2||0}
+- Gate3: ${c.Gate3||0}
+- Offer: ${c.Offer||0}
+- Accepted: ${c.Accepted||0}
+- Cleared: ${c.Cleared||0}
+- Started: ${c.Started||0}
+
+## SLO Check
+- Avg Time-to-Offer: ${tto}
+- Offer Acceptance: ${acc}
+- Variance breaches (RFS range > 15): ${rs.snapshot.slo.variance_breaches_count}
+
+## Drift (DS) Review
+${drift}
+
+## Stuck Candidates
+${stuck}
+
+## Decisions (Seal)
+${dec}
+
+## Patches (Seal→Version→Patch)
+${patches}
+`;
+}
+
+function rsExecBrief(rs, meta){
+  const slo = rs.snapshot.slo;
+  const tto = slo.time_to_offer_days_avg==null ? "—" : `${slo.time_to_offer_days_avg}d`;
+  const acc = slo.offer_acceptance_pct==null ? "—" : `${slo.offer_acceptance_pct}%`;
+  const c = rs.snapshot.counts;
+  const topDrift = rs.snapshot.driftRecent.slice(0,3).map(d=>`- ${d.code}: ${d.msg}`).join("\n") || "- None";
+  const topStuck = rs.snapshot.stuck.slice(0,5).map(x=>`- ${x.name} (${x.id}) — ${x.status} ${x.days}d`).join("\n") || "- None";
+  const topPatches = rs.patches.slice(0,5).map(p=>`- ${p.id}: ${p.title} (Owner: ${p.owner||"tbd"}, Due: ${p.due||"tbd"})`).join("\n") || "- None";
+
+  return `# Hiring Exec Brief — ${rs.week_of}
+**Program:** ${meta.program}  
+**RS ID:** ${rs.id}  
+**Seal:** ${rs.sealed ? rs.seal : "(open)"}  
+
+## KPIs
+- Avg Time-to-Offer: ${tto}
+- Offer Acceptance: ${acc}
+- Variance breaches: ${rs.snapshot.slo.variance_breaches_count}
+
+## Pipeline
+- Roles: ${load().roles.length}
+- Candidates: ${load().candidates.length}
+- Sourcing ${c.Sourcing||0} | Screened ${c.Screened||0} | Gate2 ${c.Gate2||0} | Gate3 ${c.Gate3||0} | Offer ${c.Offer||0} | Accepted ${c.Accepted||0} | Started ${c.Started||0}
+
+## Top Drift
+${topDrift}
+
+## Top Stuck
+${topStuck}
+
+## Patches Shipping
+${topPatches}
+`;
+}
+
+function exportRS(){
+  const db = load();
+  const id = document.getElementById("rsId").value.trim();
+  const rs = db.rs.find(x=>x.id===id);
+  if(!rs) return alert("Save RS first.");
+  const meta = packMeta();
+  const txt = rsToMarkdown(rs, meta);
+  previewText(txt);
+  downloadText(`${safeFile(meta.prefix)}_RS_${safeFile(rs.id)}_${rs.week_of}.md`, txt);
+}
+
+function exportExec(){
+  const db = load();
+  const id = document.getElementById("rsId").value.trim();
+  const rs = db.rs.find(x=>x.id===id);
+  if(!rs) return alert("Save RS first.");
+  const meta = packMeta();
+  const txt = rsExecBrief(rs, meta);
+  previewText(txt);
+  downloadText(`${safeFile(meta.prefix)}_EXEC_BRIEF_${safeFile(rs.id)}_${rs.week_of}.md`, txt);
+}
+
+function renderRSList(){
+  const db = load();
+  const el = document.getElementById("rsTable");
+  if(!el) return;
+  if(!db.rs.length){
+    el.innerHTML = `<div class="muted">No RS sessions yet.</div>`;
+    return;
+  }
+  el.innerHTML = `<table>
+    <thead><tr><th>ID</th><th>Week</th><th>Steward</th><th>Seal</th><th>Patches</th><th></th></tr></thead>
+    <tbody>
+      ${db.rs.slice().reverse().map(r=>`
+        <tr>
+          <td class="mono">${r.id}</td>
+          <td class="muted">${r.week_of}</td>
+          <td class="muted">${r.steward}</td>
+          <td class="muted mono">${r.sealed ? r.seal : "(open)"}</td>
+          <td class="muted">${(r.patches||[]).length}</td>
+          <td>
+            <button data-action="rs-edit" data-id="${r.id}">Open</button>
+            <button class="danger" data-action="rs-del" data-id="${r.id}">Delete</button>
+          </td>
+        </tr>`).join("")}
+    </tbody></table>`;
+}
+
+function openRS(id){
+  const db = load();
+  const rs = db.rs.find(x=>x.id===id);
+  if(!rs) return;
+
+  const modal = document.getElementById("rsModal");
+  const scope = (modal && modal.style.display==="block") ? modal : document;
+  const q = (sel)=> scope.querySelector(sel);
+
+  q("#rsId").value = rs.id;
+  q("#rsWeek").value = rs.week_of;
+  q("#rsSteward").value = rs.steward;
+  q("#rsSealed").value = rs.sealed ? "true" : "false";
+  q("#rsDecisions").value = (rs.decisions||[]).join("\n");
+
+  rsEditingPatches = (rs.patches||[]).slice();
+  rsLastSnapshot = rs.snapshot || null;
+
+  const snap = q("#rsSnapshot");
+  if(snap) snap.innerHTML = rsLastSnapshot ? renderSnapshotBox(rsLastSnapshot) : `<div class="muted">No snapshot.</div>`;
+
+  renderPatchesTable();
+}
+
+function deleteRS(id){
+  const db = load();
+  if(!confirm("Delete RS session?")) return;
+  db.rs = db.rs.filter(x=>x.id!==id);
+  save(db);
+  renderRSList();
+}
+
+function bindEvents(){
+  document.getElementById("btnSeed")?.addEventListener("click", seedSequoia);
+  document.getElementById("btnNewRole")?.addEventListener("click", newRole);
+  document.getElementById("btnNewCandidate")?.addEventListener("click", newCandidate);
+  document.getElementById("btnNewInterview")?.addEventListener("click", newInterview);
+  document.getElementById("btnGoArtifacts")?.addEventListener("click", ()=>setTab("artifacts"));
+  document.getElementById("btnGoRS")?.addEventListener("click", ()=>setTab("rs"));
+
+  document.getElementById("btnSaveRole")?.addEventListener("click", saveRole);
+  document.getElementById("btnClearRole")?.addEventListener("click", clearRole);
+  document.getElementById("btnSaveCandidate")?.addEventListener("click", saveCandidate);
+  document.getElementById("btnClearCandidate")?.addEventListener("click", clearCandidate);
+  document.getElementById("btnSaveInterview")?.addEventListener("click", saveInterview);
+  document.getElementById("btnClearInterview")?.addEventListener("click", clearInterview);
+
+  document.getElementById("btnRunDrift")?.addEventListener("click", runDriftScan);
+
+  document.getElementById("btnDLRRoles")?.addEventListener("click", downloadRoleMDs);
+  document.getElementById("btnMG")?.addEventListener("click", downloadMG);
+  document.getElementById("btnScorecards")?.addEventListener("click", downloadScorecards);
+  document.getElementById("btnRSTemplate")?.addEventListener("click", downloadRS);
+  document.getElementById("btnDSTemplate")?.addEventListener("click", downloadDS);
+  document.getElementById("btnZipPack")?.addEventListener("click", downloadZipPack);
+  document.getElementById("btnSyncPack")?.addEventListener("click", syncPackNow);
+  document.getElementById("btnRetryOutbox")?.addEventListener("click", retryOutbox);
+  document.getElementById("edgeEndpoint")?.addEventListener("change", saveEdgeCfg);
+  document.getElementById("edgeToken")?.addEventListener("change", saveEdgeCfg);
+  document.getElementById("edgeSignKey")?.addEventListener("change", saveEdgeCfg);
+
+  document.getElementById("btnAutoFillRS")?.addEventListener("click", autoFillRS);
+    document.getElementById("btnCreateRSNow")?.addEventListener("click", ()=>{ defaultRSFields(); autoFillRS(); saveRS(); });
+  document.getElementById("btnSaveRS")?.addEventListener("click", saveRS);
+  document.getElementById("btnExportRS")?.addEventListener("click", exportRS);
+  document.getElementById("btnExportExec")?.addEventListener("click", exportExec);
+  document.getElementById("btnClearRS")?.addEventListener("click", defaultRSFields);
+  document.getElementById("btnAddPatch")?.addEventListener("click", addPatch);
+
+  document.getElementById("rolesTable")?.addEventListener("click", (e)=>{
+    const b = e.target.closest("button"); if(!b) return;
+    const a = b.dataset.action; const id = b.dataset.id;
+    if(a==="role-edit") editRole(id);
+    if(a==="role-delete") deleteRole(id);
+  });
+
+  document.getElementById("candsTable")?.addEventListener("click", (e)=>{
+    const b = e.target.closest("button"); if(!b) return;
+    const a = b.dataset.action; const id = b.dataset.id;
+    if(a==="cand-edit") editCandidate(id);
+    if(a==="cand-delete") deleteCandidate(id);
+  });
+
+  document.getElementById("intsTable")?.addEventListener("click", (e)=>{
+    const b = e.target.closest("button"); if(!b) return;
+    const a = b.dataset.action; const id = b.dataset.id;
+    if(a==="int-edit") editInterview(id);
+    if(a==="int-delete") deleteInterview(id);
+  });
+
+  document.getElementById("boardTable")?.addEventListener("click", (e)=>{
+    const b = e.target.closest("button"); if(!b) return;
+    if(b.dataset.action==="cand-move"){
+      moveCandidate(b.dataset.id, Number(b.dataset.dir));
+    }
+  });
+
+  document.getElementById("offersList")?.addEventListener("click", (e)=>{
+    const b = e.target.closest("button"); if(!b) return;
+    if(b.dataset.action==="offer-dlr") downloadOffer(b.dataset.id);
+  });
+
+  document.getElementById("rsTable")?.addEventListener("click", (e)=>{
+    const b = e.target.closest("button"); if(!b) return;
+    const a = b.dataset.action; const id = b.dataset.id;
+    if(a==="rs-edit"){ setTab("rs"); openRS(id); }
+    if(a==="rs-del") deleteRS(id);
+  });
+
+  document.getElementById("patchesTable")?.addEventListener("click", (e)=>{
+    const b = e.target.closest("button"); if(!b) return;
+    if(b.dataset.action==="patch-del"){
+      rsEditingPatches = rsEditingPatches.filter(p=>p.id!==b.dataset.id);
+      renderPatchesTable();
+    }
+  });
+}
+
+
+// ---- Diagnostics ----
+window.addEventListener("error", (e)=>{
+  try{
+    const msg = (e && e.message) ? e.message : "Unknown error";
+    const box = document.createElement("div");
+    box.style.position="fixed"; box.style.left="12px"; box.style.right="12px"; box.style.bottom="12px";
+    box.style.background="rgba(255,107,107,.12)"; box.style.border="1px solid rgba(255,107,107,.4)";
+    box.style.padding="10px"; box.style.borderRadius="12px"; box.style.zIndex="9999";
+    box.innerHTML = `<b>JS Error:</b> <span class="mono">${msg}</span> — open DevTools Console for details.`;
+    document.body.appendChild(box);
+  }catch(_){}
+});
+
+function routeHash(){
+  const h = (location.hash||"").replace("#","").trim();
+  if(h && ["dashboard","roles","candidates","interviews","board","drift","test","rs","artifacts"].includes(h)){
+    setTab(h);
+  }
+}
+window.addEventListener("hashchange", routeHash);
+
+
+// ---------------- Test Mode ----------------
+function tmLog(msg){
+  const el = document.getElementById("tmLog");
+  if(!el) return;
+  const line = `[${new Date().toISOString()}] ${msg}\n`;
+  el.textContent = (el.textContent || "") + line;
+  el.scrollTop = el.scrollHeight;
+}
+function tmClearLog(){ const el=document.getElementById("tmLog"); if(el) el.textContent=""; }
+
+function tmSetSafe(mode){
+  const safe = document.getElementById("safeExport");
+  const lvl = document.getElementById("safeExportLevel");
+  if(!safe || !lvl) return;
+  if(mode==="false"){ safe.value="false"; return; }
+  safe.value="true";
+  lvl.value = (mode==="strict") ? "strict" : "lite";
+}
+
+function tmRandPick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function tmNowMinusDays(d){
+  const dt = new Date(Date.now() - d*24*60*60*1000);
+  return dt.toISOString();
+}
+
+function tmSeed(){
+  try{ seedSequoia(); tmLog("Seeded SEQUOIA roles."); } catch(e){ tmLog("Seed roles failed: "+e.message); }
+}
+
+function tmGenerateData(){
+  const db = load();
+  const n = Math.max(1, Math.min(200, Number(document.getElementById("tmCount")?.value || 10)));
+  if(!db.roles.length){ tmLog("No roles found. Seed roles first."); return; }
+
+  const statuses = ["Sourcing","Screened","Gate2","Gate3"];
+  const clearances = ["TS/SCI (eligible)","Secret","None"];
+  const comps = ["$120k-$150k","$150k-$185k","$185k-$220k","$220k-$250k"];
+  const ev = ["Portfolio link","Prior program reference","GitHub (redacted)","Writing sample"];
+
+  for(let i=0;i<n;i++){
+    const role = tmRandPick(db.roles).id;
+    const id = `C-${String(db.candidates.length+1).padStart(4,"0")}`;
+    const c = {
+      id,
+      name: `Sample Candidate ${db.candidates.length+1}`,
+      role,
+      status: tmRandPick(statuses),
+      clearance: tmRandPick(clearances),
+      availability: new Date(Date.now()+ (7+Math.floor(Math.random()*30))*24*60*60*1000).toISOString().slice(0,10),
+      comp: tmRandPick(comps),
+      evidence: [tmRandPick(ev)],
+      risks: ""
+    };
+    c.created = nowIso();
+    c.status_changed = c.created;
+    db.candidates.push(c);
+
+    db.interviews.push({
+      id: `I-${String(db.interviews.length+1).padStart(4,"0")}`,
+      candidate: c.id,
+      gate: "Gate 1 — Screen",
+      interviewer: "TestRunner",
+      rfs: 80 + Math.floor(Math.random()*10),
+      tps: 70 + Math.floor(Math.random()*15),
+      ur: 0.65 + Math.round(Math.random()*25)/100,
+      decision: "Hire",
+      evidence: ["Test evidence"],
+      notes: "",
+      flags: "",
+      seal: `${nowIso()}|v1`
+    });
+  }
+
+  save(db);
+  tmLog(`Generated ${n} candidates + Gate 1 interviews.`);
+}
+
+function tmTriggerVariance(){
+  const db = load();
+  if(!db.candidates.length){ tmLog("No candidates."); return; }
+  const c = db.candidates[0];
+  db.interviews.push({
+    id: `I-${String(db.interviews.length+1).padStart(4,"0")}`,
+    candidate: c.id,
+    gate: "Gate 2 — Simulation",
+    interviewer: "Interviewer-A",
+    rfs: 95, tps: 85, ur: 0.85, decision: "Hire",
+    evidence: ["A"], notes:"", flags:"", seal:`${nowIso()}|v1`
+  });
+  db.interviews.push({
+    id: `I-${String(db.interviews.length+1).padStart(4,"0")}`,
+    candidate: c.id,
+    gate: "Gate 2 — Simulation",
+    interviewer: "Interviewer-B",
+    rfs: 60, tps: 70, ur: 0.70, decision: "Hold",
+    evidence: ["B"], notes:"", flags:"", seal:`${nowIso()}|v1`
+  });
+  save(db);
+  tmLog(`Variance breach injected for ${c.id} (95 vs 60).`);
+}
+
+function tmMakeOfferAccepted(){
+  const db = load();
+  if(!db.candidates.length){ tmLog("No candidates."); return; }
+  const c = db.candidates[0];
+  c.status = "Offer"; c.offer_date = nowIso(); c.status_changed = nowIso();
+  c.status = "Accepted"; c.accepted_date = nowIso(); c.status_changed = nowIso();
+  save(db);
+  tmLog(`Candidate ${c.id} moved to Offer then Accepted.`);
+}
+
+function tmSimulateAging(){
+  const db = load();
+  const days = Math.max(0, Math.min(60, Number(document.getElementById("tmAgeDays")?.value || 10)));
+  db.candidates.forEach((c,idx)=>{
+    if(idx % 2 === 0){
+      c.created = tmNowMinusDays(days+2);
+      c.status_changed = tmNowMinusDays(days);
+    }
+  });
+  save(db);
+  tmLog(`Simulated aging on ~50% by ${days} days.`);
+}
+
+async function tmRunAll(){
+  tmClearLog();
+  tmLog("Starting FULL TEST…");
+  const mode = document.getElementById("tmSafe")?.value || "false";
+  tmSetSafe(mode==="true" ? "lite" : mode);
+
+  if(load().roles.length === 0) tmSeed();
+  tmGenerateData();
+  tmTriggerVariance();
+  tmMakeOfferAccepted();
+  tmSimulateAging();
+
+  refreshAll();
+  tmLog("Auto DS executed via dashboard refresh. Check Drift tab.");
+  tmLog("Now click Download ZIP Pack to validate: manifest + hashes + safe export.");
+}
+
+function tmResetAll(){
+  if(!confirm("Reset ALL local data?")) return;
+  removeStoreItem(KEY);
+  load();
+  refreshAll();
+  tmClearLog();
+  tmLog("Reset complete.");
+}
+
+function bindTestMode(){
+  document.getElementById("tmSeedRoles")?.addEventListener("click", tmSeed);
+  document.getElementById("tmGenData")?.addEventListener("click", tmGenerateData);
+  document.getElementById("tmTriggerVariance")?.addEventListener("click", tmTriggerVariance);
+  document.getElementById("tmMakeOffer")?.addEventListener("click", tmMakeOfferAccepted);
+  document.getElementById("tmSimAging")?.addEventListener("click", tmSimulateAging);
+  document.getElementById("tmRunAll")?.addEventListener("click", tmRunAll);
+  document.getElementById("tmDownloadZip")?.addEventListener("click", downloadZipPack);
+  document.getElementById("tmReset")?.addEventListener("click", tmResetAll);
+}
+
+(function init(){
+  load();
+  const edgeCfg = loadEdgeCfg();
+  s("edgeEndpoint", edgeCfg.endpoint || "");
+  s("edgeToken", edgeCfg.token || "");
+  s("edgeSignKey", edgeCfg.sign_key || "");
+  updateOutboxBadge();
+  refreshAll();
+  bindEvents();
+  bindTestMode();
+  if(!storageAvailable()){ const w=document.getElementById("storeWarn"); if(w) w.style.display="inline"; }
+  renderRSList();
+  defaultRSFields();
+  // Respect URL hash first; default to dashboard only if no valid hash.
+  const h = (location.hash||"").replace("#","").trim();
+  const valid = ["dashboard","roles","candidates","interviews","board","drift","test","rs","artifacts"];
+  if(h && valid.includes(h)){
+    setTab(h);
+  } else {
+    setTab("dashboard");
+  }
+})();
+</script>
+</body>
+</html>

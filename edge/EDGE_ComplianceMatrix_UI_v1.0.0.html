@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Deep Sigma — Compliance Matrix Console v001</title>
+  <style>
+    :root { --bg:#0b0f14; --card:#111824; --muted:#8aa0b5; --txt:#e7eef7; --accent:#7df9ff; --warn:#ffcc66; --bad:#ff6b6b; --ok:#5dff93; }
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:var(--bg);color:var(--txt)}
+    header{padding:16px 18px;border-bottom:1px solid #1b2a3a;display:flex;gap:12px;align-items:center;justify-content:space-between}
+    .brand{display:flex;flex-direction:column;gap:2px}
+    .brand b{letter-spacing:.5px}
+    .brand small{color:var(--muted)}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+    button{background:#182235;color:var(--txt);border:1px solid #243449;border-radius:10px;padding:10px 12px;cursor:pointer}
+    button:hover{border-color:#2f4765}
+    button.primary{border-color:rgba(125,249,255,.45);box-shadow:0 0 0 1px rgba(125,249,255,.12) inset}
+    button.danger{border-color:rgba(255,107,107,.45)}
+    main{display:grid;grid-template-columns:300px 1fr;min-height:calc(100vh - 66px)}
+    nav{border-right:1px solid #1b2a3a;padding:14px}
+    .tab{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--txt);margin-bottom:8px}
+    .tab.active{background:#101a28;border-color:#243449}
+    .wrap{padding:14px 16px;max-width:1300px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .card{background:var(--card);border:1px solid #1b2a3a;border-radius:14px;padding:12px}
+    .card h3{margin:0 0 10px 0;font-size:14px;color:#cfe2f7;letter-spacing:.3px}
+    label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
+    input,textarea,select{width:100%;box-sizing:border-box;background:#0d1520;color:var(--txt);border:1px solid #243449;border-radius:10px;padding:10px 10px;font-size:13px}
+    textarea{min-height:90px;resize:vertical}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th,td{padding:10px;border-bottom:1px solid #1b2a3a;vertical-align:top}
+    th{color:#b9d3ea;text-align:left;font-weight:600}
+    .muted{color:var(--muted);font-size:12px}
+    .small{font-size:12px}
+    .kpi{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+    .pill{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid #243449;color:var(--muted);font-size:12px;margin-right:6px}
+    .hidden{display:none}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace}
+    .flex{display:flex;gap:10px;flex-wrap:wrap}
+    .right{display:flex;gap:10px;justify-content:flex-end;align-items:center}
+    .ok{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+    .warnbox{border:1px solid rgba(255,204,102,.35);background:rgba(255,204,102,.06);border-radius:12px;padding:10px}
+  </style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <b>Deep Sigma — Compliance Matrix Console v001</b>
+    <small>RFP Intake · Requirements · Mapping · Deliverables · Gaps/DS · Export Pack</small>
+  </div>
+  <div class="row">
+    <button id="btnExport" class="primary">Export JSON</button>
+    <button id="btnImport">Import JSON</button>
+    <button id="btnReset" class="danger">Reset</button>
+  </div>
+</header>
+<main>
+  <nav>
+    <button class="tab active" data-tab="dashboard">Dashboard</button>
+    <button class="tab" data-tab="intake">RFP Intake</button>
+    <button class="tab" data-tab="requirements">Requirements</button>
+    <button class="tab" data-tab="mapping">Compliance Mapping</button>
+    <button class="tab" data-tab="deliverables">Deliverables Registry</button>
+    <button class="tab" data-tab="gaps">Gaps + Q&A Queue</button>
+    <button class="tab" data-tab="artifacts">Artifacts Export</button>
+    <button class="tab" data-tab="test">Test Mode</button>
+    <div class="muted" style="margin-top:14px">Data stored in <span class="mono">localStorage</span>. Offline-first.</div>
+  </nav>
+
+  <div class="wrap">
+    <section id="tab-dashboard">
+      <div class="kpi">
+        <div class="card"><div class="muted">Total Requirements</div><b id="kReq">0</b></div>
+        <div class="card"><div class="muted">Coverage %</div><b id="kCov">0%</b></div>
+        <div class="card"><div class="muted">Unassigned</div><b id="kUnassigned">0</b></div>
+        <div class="card"><div class="muted">Open Gaps</div><b id="kGaps">0</b></div>
+        <div class="card"><div class="muted">Due Soon</div><b id="kDueSoon">0</b></div>
+      </div>
+      <div class="kpi" style="margin-top:10px">
+        <div class="card"><div class="muted">Change Churn (24h)</div><b id="kChurn">0</b></div>
+        <div class="card"><div class="muted">Auto DS Alerts</div><b id="kDs">0</b></div>
+        <div class="card"><div class="muted">Baseline Seal</div><b id="kSeal">Open</b></div>
+        <div class="card"><div class="muted">Decisions Pending</div><b id="kPending">0</b></div>
+        <div class="card"><div class="muted">Coverage Gap to 90%</div><b id="kGap90">0%</b></div>
+      </div>
+      <div class="grid" style="margin-top:12px">
+        <div class="card"><h3>Top DS Alerts</h3><div id="dashDs" class="muted">No DS alerts.</div></div>
+        <div class="card"><h3>Thresholds</h3><ul class="muted"><li>Coverage target by T-3 days: ≥90%</li><li>Unassigned reqs: 0</li><li>Gaps older than 5 days: alert</li></ul></div>
+      </div>
+    </section>
+
+    <section id="tab-intake" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <h3>RFP Intake</h3>
+          <label>Solicitation ID</label><input id="rfpSolicitation" placeholder="SOL-2026-001"/>
+          <label>Title</label><input id="rfpTitle" placeholder="Title"/>
+          <label>Customer</label><input id="rfpCustomer"/>
+          <label>RFP Due Date</label><input id="rfpDue" type="date"/>
+          <label>Q&A Due Date</label><input id="rfpQDue" type="date"/>
+          <label>Volumes/Sections</label><textarea id="rfpSections" placeholder="Vol I...\nSec L...\nSec M..."></textarea>
+          <div class="right" style="margin-top:10px">
+            <button id="btnSaveIntake" class="primary">Save Intake</button>
+            <button id="btnSealBaseline">Baseline Seal</button>
+          </div>
+          <div id="intakeHint" class="muted"></div>
+        </div>
+        <div class="card"><h3>Baseline</h3><pre id="baselinePreview" class="mono" style="white-space:pre-wrap"></pre></div>
+      </div>
+    </section>
+
+    <section id="tab-requirements" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <h3>Add / Edit Requirement</h3>
+          <label>Requirement ID</label><input id="reqId" placeholder="auto if empty"/>
+          <label>Section Ref</label><input id="reqSection" placeholder="L.3.2"/>
+          <label>Type</label><select id="reqType"><option>Shall</option><option>Will</option><option>Info</option></select>
+          <label>Priority</label><select id="reqPriority"><option>High</option><option>Med</option><option>Low</option></select>
+          <label>Requirement Text</label><textarea id="reqText"></textarea>
+          <label>Owner</label><input id="reqOwner"/>
+          <label>Status</label><select id="reqStatus"><option>New</option><option>Assigned</option><option>Drafted</option><option>Reviewed</option><option>Final</option><option>N/A</option></select>
+          <div class="right" style="margin-top:10px"><button id="btnReqClear">Clear</button><button id="btnReqSave" class="primary">Save Requirement</button></div>
+          <div id="reqHint" class="muted"></div>
+        </div>
+        <div class="card">
+          <h3>Bulk Paste Requirements</h3>
+          <div class="muted">One requirement per line.</div>
+          <textarea id="reqBulk" placeholder="System shall ...\nSystem shall ..."></textarea>
+          <div class="right" style="margin-top:10px"><button id="btnReqBulk" class="primary">Split + Add</button></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px"><h3>Requirements Table</h3><div id="reqTable" class="muted">No requirements yet.</div></div>
+    </section>
+
+    <section id="tab-mapping" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <h3>Compliance Mapping</h3>
+          <label>Requirement</label><select id="mapReq"></select>
+          <label>Compliance Statement</label><textarea id="mapStatement"></textarea>
+          <label>Evidence Links/Artifacts</label><textarea id="mapEvidence" placeholder="artifact/path.md\nhttps://..."></textarea>
+          <label>Dependencies (Req IDs, comma-separated)</label><input id="mapDeps"/>
+          <label>Verification Method</label><select id="mapVerify"><option>test</option><option>inspect</option><option>demonstrate</option><option>analysis</option></select>
+          <div class="right" style="margin-top:10px"><button id="btnMapSave" class="primary">Save Mapping</button></div>
+        </div>
+        <div class="card"><h3>Mapping Snapshot</h3><pre id="mapPreview" class="mono" style="white-space:pre-wrap"></pre></div>
+      </div>
+    </section>
+
+    <section id="tab-deliverables" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <h3>Add Deliverable</h3>
+          <label>Deliverable ID</label><input id="delId" placeholder="DEL-001"/>
+          <label>Description</label><textarea id="delDesc"></textarea>
+          <label>Due Date</label><input id="delDue" type="date"/>
+          <label>Mapped Requirement IDs (comma-separated)</label><input id="delReqs"/>
+          <label>Owner</label><input id="delOwner"/>
+          <label>Status</label><select id="delStatus"><option>Open</option><option>In Progress</option><option>Done</option></select>
+          <div class="right" style="margin-top:10px"><button id="btnDelSave" class="primary">Save Deliverable</button></div>
+        </div>
+        <div class="card"><h3>Deliverables</h3><div id="delTable" class="muted">No deliverables yet.</div></div>
+      </div>
+    </section>
+
+    <section id="tab-gaps" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <h3>Gap / Q&A Item</h3>
+          <label>Requirement</label><select id="gapReq"></select>
+          <label>Gap Item</label><textarea id="gapText"></textarea>
+          <label>Question for Customer</label><textarea id="gapQuestion"></textarea>
+          <label>Resolution Notes</label><textarea id="gapResolution"></textarea>
+          <label>Status</label><select id="gapStatus"><option>Open</option><option>Resolved</option></select>
+          <div class="right" style="margin-top:10px"><button id="btnGapSave" class="primary">Save Gap</button></div>
+        </div>
+        <div class="card"><h3>Gap Queue</h3><div id="gapTable" class="muted">No gaps yet.</div></div>
+      </div>
+    </section>
+
+    <section id="tab-artifacts" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <h3>Artifacts Export</h3>
+          <div class="warnbox muted">Exports to local ZIP with manifest + hashes + pack_hash.</div>
+          <label>Pack Prefix</label><input id="packPrefix" value="SEQUOIA"/>
+          <label>Organization / Program</label><input id="orgProgram" value="NGA — SEQUOIA"/>
+          <label>Coherence Steward</label><input id="cohSteward"/>
+          <div class="grid">
+            <div>
+              <label>Safe Export</label>
+              <select id="safeExport"><option value="false">Off</option><option value="true">On</option></select>
+            </div>
+            <div>
+              <label>Safe Level</label>
+              <select id="safeExportLevel"><option value="lite">Lite</option><option value="strict">Strict (strip req text)</option></select>
+            </div>
+          </div>
+          <div class="flex" style="margin-top:10px"><button id="btnZipPack" class="primary">Download ZIP Pack</button></div>
+        </div>
+        <div class="card"><h3>Preview</h3><pre id="preview" class="mono" style="white-space:pre-wrap"></pre></div>
+      </div>
+    </section>
+
+    <section id="tab-test" class="hidden">
+      <div class="card">
+        <h3>Test Mode</h3>
+        <div class="muted">Generates sample RFP + 50 requirements + mappings + gaps, runs DS rules, then export.</div>
+        <div class="flex" style="margin-top:10px">
+          <button id="tmRunAll" class="primary">RUN FULL TEST</button>
+          <button id="tmDownloadZip" class="primary">Download ZIP Pack</button>
+          <button id="tmReset" class="danger">Reset Data</button>
+        </div>
+        <pre id="tmLog" class="mono" style="white-space:pre-wrap;margin-top:10px"></pre>
+      </div>
+    </section>
+  </div>
+</main>
+
+<input id="fileImport" type="file" accept="application/json" class="hidden"/>
+<script>
+const KEY = "ds_compliance_matrix_v1";
+const DS_GAP_AGE_DAYS = 5;
+const DS_COVERAGE_T3 = 90;
+
+function storageAvailable(){ try{ const x="__ds_test__"; localStorage.setItem(x,x); localStorage.removeItem(x); return true; }catch(_){ return false; } }
+function getStoreItem(k){ if(storageAvailable()) return localStorage.getItem(k); window.__ds_memstore ||= {}; return window.__ds_memstore[k] || null; }
+function setStoreItem(k,v){ if(storageAvailable()) return localStorage.setItem(k,v); window.__ds_memstore ||= {}; window.__ds_memstore[k] = v; }
+function removeStoreItem(k){ if(storageAvailable()) return localStorage.removeItem(k); if(window.__ds_memstore) delete window.__ds_memstore[k]; }
+
+function nowIso(){ return new Date().toISOString(); }
+function today(){ return new Date().toISOString().slice(0,10); }
+function uid(prefix){ return `${prefix}-${Math.random().toString(16).slice(2,8).toUpperCase()}`; }
+function v(id){ return (document.getElementById(id)?.value || "").trim(); }
+function s(id,val){ const el=document.getElementById(id); if(el) el.value = val || ""; }
+function esc(x){ return String(x || "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
+function asDate(x){ const s = String(x || ""); return /^\d{4}-\d{2}-\d{2}$/.test(s) ? s : ""; }
+function daysOld(iso){ const a = new Date(iso || nowIso()).getTime(); const b = Date.now(); return Math.max(0, Math.floor((b-a)/(1000*60*60*24))); }
+
+function emptyDb(){
+  return {
+    intake: { solicitation_id:"", title:"", customer:"", due_date:"", qa_due_date:"", sections:"", baseline_sealed:false, baseline_seal:null, baseline_snapshot:null },
+    requirements: [],
+    deliverables: [],
+    gaps: [],
+    ds_manual: [],
+    rs: [],
+    meta: {created: nowIso(), version: "1.0"}
+  };
+}
+function load(){
+  const raw = getStoreItem(KEY);
+  if(!raw){ const db=emptyDb(); setStoreItem(KEY, JSON.stringify(db)); return db; }
+  try{
+    const db = JSON.parse(raw);
+    db.intake ||= emptyDb().intake;
+    db.requirements ||= [];
+    db.deliverables ||= [];
+    db.gaps ||= [];
+    db.ds_manual ||= [];
+    db.rs ||= [];
+    db.meta ||= {created: nowIso(), version:"1.0"};
+    return db;
+  }catch(_){
+    const db=emptyDb(); setStoreItem(KEY, JSON.stringify(db)); return db;
+  }
+}
+function save(db){ setStoreItem(KEY, JSON.stringify(db)); refreshAll(); }
+
+function safeFile(sv){ return (sv||"").replace(/[^a-z0-9_\-]+/gi,"_").replace(/_+/g,"_").replace(/^_+|_+$/g,""); }
+function isSafeExport(){ return (document.getElementById("safeExport")?.value || "false") === "true"; }
+function safeLevel(){ return document.getElementById("safeExportLevel")?.value || "lite"; }
+
+function setTab(tab){
+  ["dashboard","intake","requirements","mapping","deliverables","gaps","artifacts","test"].forEach(t=>{
+    const el = document.getElementById(`tab-${t}`);
+    if(el) el.classList.toggle("hidden", t!==tab);
+  });
+  document.querySelectorAll(".tab").forEach(b=> b.classList.toggle("active", b.dataset.tab===tab));
+  try{ location.hash = "#" + tab; }catch(_){ }
+}
+
+function reqOptionsHtml(db){
+  if(!db.requirements.length) return `<option value="">(no requirements)</option>`;
+  return db.requirements.map(r=>`<option value="${esc(r.id)}">${esc(r.id)} — ${esc(r.section_ref || "")}</option>`).join("");
+}
+function bindReqSelects(){
+  const db = load();
+  ["mapReq","gapReq"].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML = reqOptionsHtml(db); });
+}
+
+function saveIntake(){
+  const db = load();
+  db.intake.solicitation_id = v("rfpSolicitation");
+  db.intake.title = v("rfpTitle");
+  db.intake.customer = v("rfpCustomer");
+  db.intake.due_date = asDate(v("rfpDue"));
+  db.intake.qa_due_date = asDate(v("rfpQDue"));
+  db.intake.sections = v("rfpSections");
+  save(db);
+  document.getElementById("intakeHint").textContent = "Intake saved.";
+}
+async function sealBaseline(){
+  const db = load();
+  const snap = {
+    intake: {...db.intake},
+    requirement_ids: db.requirements.map(r=>r.id).sort(),
+    count_requirements: db.requirements.length,
+    sealed_at: nowIso()
+  };
+  const hash = await sha256Hex(strToUtf8Bytes(JSON.stringify(snap, null, 2)));
+  db.intake.baseline_sealed = true;
+  db.intake.baseline_seal = `${snap.sealed_at}|sha256:${hash}`;
+  db.intake.baseline_snapshot = snap;
+  save(db);
+  document.getElementById("intakeHint").textContent = "Baseline sealed.";
+}
+
+function saveRequirement(){
+  const db = load();
+  const id = v("reqId") || `REQ-${String(db.requirements.length+1).padStart(4,"0")}`;
+  const r = {
+    id,
+    section_ref: v("reqSection"),
+    type: v("reqType") || "Shall",
+    priority: v("reqPriority") || "Med",
+    text: v("reqText"),
+    owner: v("reqOwner"),
+    status: v("reqStatus") || "New",
+    compliance_statement: db.requirements.find(x=>x.id===id)?.compliance_statement || "",
+    evidence: db.requirements.find(x=>x.id===id)?.evidence || [],
+    dependencies: db.requirements.find(x=>x.id===id)?.dependencies || [],
+    verification_method: db.requirements.find(x=>x.id===id)?.verification_method || "analysis",
+    updated: nowIso(),
+    created: db.requirements.find(x=>x.id===id)?.created || nowIso()
+  };
+  const i = db.requirements.findIndex(x=>x.id===id);
+  if(i>=0) db.requirements[i]=r; else db.requirements.push(r);
+  save(db);
+  document.getElementById("reqHint").textContent = `Saved ${id}`;
+}
+function clearRequirement(){ ["reqId","reqSection","reqText","reqOwner"].forEach(x=>s(x,"")); s("reqType","Shall"); s("reqPriority","Med"); s("reqStatus","New"); }
+function editRequirement(id){
+  const r = load().requirements.find(x=>x.id===id); if(!r) return;
+  s("reqId",r.id); s("reqSection",r.section_ref); s("reqType",r.type); s("reqPriority",r.priority); s("reqText",r.text); s("reqOwner",r.owner); s("reqStatus",r.status);
+  setTab("requirements");
+}
+function deleteRequirement(id){
+  if(!confirm("Delete requirement?")) return;
+  const db = load();
+  db.requirements = db.requirements.filter(r=>r.id!==id);
+  db.gaps = db.gaps.filter(g=>g.req_id!==id);
+  db.deliverables = db.deliverables.map(d=>({...d, req_ids: d.req_ids.filter(x=>x!==id)}));
+  save(db);
+}
+function bulkAddRequirements(){
+  const db = load();
+  const lines = v("reqBulk").split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  if(!lines.length) return alert("Paste requirement lines first.");
+  lines.forEach(line=>{
+    const id = `REQ-${String(db.requirements.length+1).padStart(4,"0")}`;
+    db.requirements.push({
+      id, section_ref:"", type:"Shall", priority:"Med", text:line, owner:"", status:"New",
+      compliance_statement:"", evidence:[], dependencies:[], verification_method:"analysis",
+      created: nowIso(), updated: nowIso()
+    });
+  });
+  save(db);
+  s("reqBulk","");
+}
+
+function saveMapping(){
+  const db = load();
+  const id = v("mapReq"); if(!id) return alert("Select requirement");
+  const r = db.requirements.find(x=>x.id===id); if(!r) return alert("Requirement not found");
+  r.compliance_statement = v("mapStatement");
+  r.evidence = v("mapEvidence").split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  r.dependencies = v("mapDeps").split(",").map(x=>x.trim()).filter(Boolean);
+  r.verification_method = v("mapVerify") || "analysis";
+  r.updated = nowIso();
+  save(db);
+}
+
+function saveDeliverable(){
+  const db = load();
+  const id = v("delId") || `DEL-${String(db.deliverables.length+1).padStart(3,"0")}`;
+  const d = {
+    id,
+    description: v("delDesc"),
+    due: asDate(v("delDue")),
+    req_ids: v("delReqs").split(",").map(x=>x.trim()).filter(Boolean),
+    owner: v("delOwner"),
+    status: v("delStatus") || "Open",
+    created: db.deliverables.find(x=>x.id===id)?.created || nowIso(),
+    updated: nowIso()
+  };
+  const i = db.deliverables.findIndex(x=>x.id===id);
+  if(i>=0) db.deliverables[i]=d; else db.deliverables.push(d);
+  save(db);
+}
+
+function saveGap(){
+  const db = load();
+  const g = {
+    id: uid("GAP"),
+    req_id: v("gapReq"),
+    text: v("gapText"),
+    question: v("gapQuestion"),
+    resolution: v("gapResolution"),
+    status: v("gapStatus") || "Open",
+    created: nowIso(),
+    updated: nowIso()
+  };
+  if(!g.req_id || !g.text) return alert("Requirement + gap text required.");
+  db.gaps.push(g);
+  save(db);
+  ["gapText","gapQuestion","gapResolution"].forEach(x=>s(x,"")); s("gapStatus","Open");
+}
+
+function computeAutoDs(db){
+  const alerts = [];
+  const reqs = db.requirements;
+  const unassigned = reqs.filter(r=>!r.owner).length;
+  if(unassigned > 0) alerts.push({code:"DS-COMP-001", msg:`Unassigned requirements: ${unassigned}`});
+
+  const oldGaps = db.gaps.filter(g=>g.status!=="Resolved" && daysOld(g.created) > DS_GAP_AGE_DAYS).length;
+  if(oldGaps > 0) alerts.push({code:"DS-COMP-002", msg:`Open gaps older than ${DS_GAP_AGE_DAYS} days: ${oldGaps}`});
+
+  const covered = reqs.filter(r=>r.compliance_statement && r.compliance_statement.trim().length>0).length;
+  const coverage = reqs.length ? (covered/reqs.length)*100 : 0;
+  const due = db.intake.due_date ? new Date(db.intake.due_date + "T00:00:00Z").getTime() : null;
+  const t3 = due ? (Date.now() >= (due - (3*24*60*60*1000))) : false;
+  if(t3 && coverage < DS_COVERAGE_T3) alerts.push({code:"DS-COMP-003", msg:`Coverage below ${DS_COVERAGE_T3}% at T-3 days (${coverage.toFixed(1)}%)`});
+
+  const noMap = reqs.filter(r=>!(r.compliance_statement && r.compliance_statement.trim())).length;
+  if(noMap > 0) alerts.push({code:"DS-COMP-004", msg:`Requirements without compliance statement: ${noMap}`});
+
+  return alerts.map(a=>({time: nowIso(), code:a.code, msg:a.msg, patch:"Assign owner + map evidence"}));
+}
+
+function renderDashboard(){
+  const db = load();
+  const totalReq = db.requirements.length;
+  const covered = db.requirements.filter(r=>r.compliance_statement && r.compliance_statement.trim()).length;
+  const coverage = totalReq ? Math.round((covered/totalReq)*1000)/10 : 0;
+  const unassigned = db.requirements.filter(r=>!r.owner).length;
+  const openGaps = db.gaps.filter(g=>g.status!=="Resolved").length;
+  const dueSoon = db.deliverables.filter(d=>d.status!=="Done" && d.due && (new Date(d.due).getTime()-Date.now()) <= (5*24*60*60*1000)).length;
+  const churn = db.requirements.filter(r=>daysOld(r.updated)===0).length;
+  const ds = computeAutoDs(db);
+  const pending = db.requirements.filter(r=>!(["Final","N/A"].includes(r.status))).length;
+
+  document.getElementById("kReq").textContent = String(totalReq);
+  document.getElementById("kCov").textContent = `${coverage}%`;
+  document.getElementById("kUnassigned").textContent = String(unassigned);
+  document.getElementById("kGaps").textContent = String(openGaps);
+  document.getElementById("kDueSoon").textContent = String(dueSoon);
+  document.getElementById("kChurn").textContent = String(churn);
+  document.getElementById("kDs").textContent = String(ds.length);
+  document.getElementById("kSeal").textContent = db.intake.baseline_sealed ? "Sealed" : "Open";
+  document.getElementById("kPending").textContent = String(pending);
+  document.getElementById("kGap90").textContent = `${Math.max(0, (90-coverage)).toFixed(1)}%`;
+
+  const dsEl = document.getElementById("dashDs");
+  dsEl.innerHTML = ds.length ? ds.map(x=>`<div><span class="pill">${esc(x.code)}</span> ${esc(x.msg)}</div>`).join("") : "No DS alerts.";
+}
+
+function renderIntake(){
+  const db = load();
+  s("rfpSolicitation", db.intake.solicitation_id);
+  s("rfpTitle", db.intake.title);
+  s("rfpCustomer", db.intake.customer);
+  s("rfpDue", db.intake.due_date);
+  s("rfpQDue", db.intake.qa_due_date);
+  s("rfpSections", db.intake.sections);
+  document.getElementById("baselinePreview").textContent = db.intake.baseline_snapshot ? JSON.stringify({seal:db.intake.baseline_seal, snapshot:db.intake.baseline_snapshot}, null, 2) : "No baseline snapshot yet.";
+}
+
+function renderRequirements(){
+  const db = load();
+  const el = document.getElementById("reqTable");
+  if(!db.requirements.length){ el.innerHTML = "<div class='muted'>No requirements yet.</div>"; return; }
+  el.innerHTML = `<table><thead><tr><th>ID</th><th>Section</th><th>Type</th><th>Priority</th><th>Owner</th><th>Status</th><th>Mapped</th><th></th></tr></thead><tbody>${db.requirements.map(r=>`<tr>
+    <td class="mono">${esc(r.id)}</td><td>${esc(r.section_ref)}</td><td>${esc(r.type)}</td><td>${esc(r.priority)}</td><td>${esc(r.owner)}</td><td>${esc(r.status)}</td><td>${r.compliance_statement ? "Yes" : "No"}</td>
+    <td><button data-action="edit" data-id="${esc(r.id)}">Edit</button> <button class="danger" data-action="del" data-id="${esc(r.id)}">Delete</button></td>
+  </tr>`).join("")}</tbody></table>`;
+}
+function renderMapping(){
+  const db = load();
+  const id = v("mapReq");
+  const r = db.requirements.find(x=>x.id===id);
+  if(!r){ document.getElementById("mapPreview").textContent = "Select requirement."; return; }
+  s("mapStatement", r.compliance_statement || "");
+  s("mapEvidence", (r.evidence||[]).join("\n"));
+  s("mapDeps", (r.dependencies||[]).join(", "));
+  s("mapVerify", r.verification_method || "analysis");
+  document.getElementById("mapPreview").textContent = JSON.stringify({id:r.id, statement:r.compliance_statement, evidence:r.evidence, deps:r.dependencies, verify:r.verification_method}, null, 2);
+}
+function renderDeliverables(){
+  const db = load();
+  const el = document.getElementById("delTable");
+  if(!db.deliverables.length){ el.innerHTML = "<div class='muted'>No deliverables yet.</div>"; return; }
+  el.innerHTML = `<table><thead><tr><th>ID</th><th>Description</th><th>Due</th><th>Req IDs</th><th>Owner</th><th>Status</th></tr></thead><tbody>${db.deliverables.map(d=>`<tr>
+    <td class="mono">${esc(d.id)}</td><td>${esc(d.description)}</td><td>${esc(d.due)}</td><td class="mono">${esc((d.req_ids||[]).join(","))}</td><td>${esc(d.owner)}</td><td>${esc(d.status)}</td>
+  </tr>`).join("")}</tbody></table>`;
+}
+function renderGaps(){
+  const db = load();
+  const el = document.getElementById("gapTable");
+  if(!db.gaps.length){ el.innerHTML = "<div class='muted'>No gaps yet.</div>"; return; }
+  el.innerHTML = `<table><thead><tr><th>Req</th><th>Gap</th><th>Question</th><th>Status</th><th>Age</th></tr></thead><tbody>${db.gaps.slice().reverse().map(g=>`<tr>
+    <td class="mono">${esc(g.req_id)}</td><td>${esc(g.text)}</td><td>${esc(g.question)}</td><td>${esc(g.status)}</td><td>${daysOld(g.created)}d</td>
+  </tr>`).join("")}</tbody></table>`;
+}
+
+function buildCanonicalMatrix(db, meta){
+  const reqs = db.requirements.map(r=>{
+    const rr = {...r};
+    if(isSafeExport() && safeLevel()==="strict"){
+      rr.text = "(masked)";
+      rr.compliance_statement = rr.compliance_statement ? "(masked)" : "";
+      rr.evidence = [];
+    }
+    return rr;
+  });
+  return {
+    schema: "deepsigma_compliance_matrix_v1",
+    meta,
+    intake: db.intake,
+    requirements: reqs,
+    deliverables: db.deliverables,
+    gaps: db.gaps,
+    ds_auto: computeAutoDs(db)
+  };
+}
+function baselineMarkdown(db, meta){
+  return `# DLR — Requirements Baseline\n**Program:** ${meta.program}  \n**Generated:** ${meta.generated}  \n\n## Intake\n- Solicitation: ${db.intake.solicitation_id || "(unset)"}\n- Title: ${db.intake.title || "(unset)"}\n- Customer: ${db.intake.customer || "(unset)"}\n- Due: ${db.intake.due_date || "(unset)"}\n\n## Baseline Seal\n- Sealed: ${db.intake.baseline_sealed ? "true" : "false"}\n- Seal: ${db.intake.baseline_seal || "(none)"}\n\n## Requirement Counts\n- Total: ${db.requirements.length}\n- Unassigned: ${db.requirements.filter(r=>!r.owner).length}\n- Mapped: ${db.requirements.filter(r=>r.compliance_statement).length}\n`;
+}
+function dsMarkdown(db, ds){
+  return `# DS Compliance — ${today()}\n\n## Auto Alerts\n${ds.length ? ds.map(d=>`- **${d.code}** (${d.time}) — ${d.msg}`).join("\n") : "- None"}\n\n## Open Gaps\n${db.gaps.filter(g=>g.status!=="Resolved").length ? db.gaps.filter(g=>g.status!=="Resolved").map(g=>`- ${g.req_id}: ${g.text} (${daysOld(g.created)}d)`).join("\n") : "- None"}\n`;
+}
+
+function crc32(buf){ let c = 0 ^ (-1); for(let i=0;i<buf.length;i++) c = (c>>>8) ^ CRC_TABLE[(c ^ buf[i]) & 0xFF]; return (c ^ (-1)) >>> 0; }
+const CRC_TABLE = (()=>{ const t=new Uint32Array(256); for(let i=0;i<256;i++){ let c=i; for(let k=0;k<8;k++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1); t[i]=c>>>0; } return t; })();
+function u16(n){ return [n & 0xFF, (n>>>8)&0xFF]; }
+function u32(n){ return [n & 0xFF, (n>>>8)&0xFF, (n>>>16)&0xFF, (n>>>24)&0xFF]; }
+function strToUtf8Bytes(s){ return new TextEncoder().encode(s); }
+function buildZip(entries){
+  const fileParts=[]; const central=[]; let offset=0;
+  for(const e of entries){
+    const nameBytes=strToUtf8Bytes(e.name), data=e.bytes, crc=crc32(data), size=data.length;
+    const dt=e.mtime||new Date();
+    const dosTime=((dt.getHours()&0x1F)<<11)|((dt.getMinutes()&0x3F)<<5)|((Math.floor(dt.getSeconds()/2))&0x1F);
+    const dosDate=(((dt.getFullYear()-1980)&0x7F)<<9)|(((dt.getMonth()+1)&0x0F)<<5)|(dt.getDate()&0x1F);
+    const local=[...u32(0x04034b50),...u16(20),...u16(0),...u16(0),...u16(dosTime),...u16(dosDate),...u32(crc),...u32(size),...u32(size),...u16(nameBytes.length),...u16(0)];
+    fileParts.push(new Uint8Array(local), nameBytes, data);
+    const c=[...u32(0x02014b50),...u16(0x0314),...u16(20),...u16(0),...u16(0),...u16(dosTime),...u16(dosDate),...u32(crc),...u32(size),...u32(size),...u16(nameBytes.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(offset)];
+    central.push(new Uint8Array(c), nameBytes);
+    offset += local.length + nameBytes.length + size;
+  }
+  const centralStart=offset;
+  for(const p of central){ fileParts.push(p); offset += p.length; }
+  const centralSize=offset-centralStart;
+  const eocd=[...u32(0x06054b50),...u16(0),...u16(0),...u16(entries.length),...u16(entries.length),...u32(centralSize),...u32(centralStart),...u16(0)];
+  fileParts.push(new Uint8Array(eocd));
+  return new Blob(fileParts,{type:"application/zip"});
+}
+async function sha256Hex(bytes){ const out = await crypto.subtle.digest("SHA-256", bytes.buffer ? bytes.buffer : bytes); return Array.from(new Uint8Array(out)).map(b=>b.toString(16).padStart(2,"0")).join(""); }
+
+async function createZipPackPayload(){
+  const db = load();
+  const meta = {
+    prefix: v("packPrefix") || "SEQUOIA",
+    program: v("orgProgram") || "NGA — SEQUOIA",
+    steward: v("cohSteward") || "(unassigned)",
+    generated: nowIso(),
+    date: today(),
+    safe_export: isSafeExport(),
+    safe_export_level: safeLevel(),
+    version: "1.0"
+  };
+  const root = `${safeFile(meta.prefix)}_CompliancePack_${meta.date}`;
+  const entries = []; const ts = new Date();
+  const addJson = (path,obj)=>{ const bytes=strToUtf8Bytes(JSON.stringify(obj,null,2)); entries.push({name:`${root}/${path}`, bytes, mtime:ts}); return bytes; };
+  const addText = (path,text)=>{ const bytes=strToUtf8Bytes(text); entries.push({name:`${root}/${path}`, bytes, mtime:ts}); return bytes; };
+
+  const matrix = buildCanonicalMatrix(db, meta);
+  const dsAuto = computeAutoDs(db);
+  addJson(`matrix/${safeFile(meta.prefix)}_COMPLIANCE_MATRIX.json`, matrix);
+  addText(`baseline/${safeFile(meta.prefix)}_DLR_REQUIREMENTS_BASELINE.md`, baselineMarkdown(db, meta));
+  addText(`ds/${safeFile(meta.prefix)}_DS_COMPLIANCE_${meta.date}.md`, dsMarkdown(db, dsAuto));
+
+  const manifest = {
+    schema: "deepsigma_ingest_manifest_v1",
+    meta,
+    counts: {
+      requirements: db.requirements.length,
+      deliverables: db.deliverables.length,
+      gaps: db.gaps.length,
+      ds_auto: dsAuto.length
+    },
+    hashes_file: "hashes.json"
+  };
+  const hashes = {};
+  for(const e of entries) hashes[e.name] = await sha256Hex(e.bytes);
+  const material = strToUtf8Bytes(Object.entries(hashes).sort((a,b)=>a[0].localeCompare(b[0])).map(([k,v])=>`${k} ${v}`).join("\n"));
+  const pack_hash = await sha256Hex(material);
+  manifest.pack_hash = pack_hash;
+  addJson("ingest_manifest.json", manifest);
+  addJson("hashes.json", {pack_hash, hashes});
+  addText("README.md", `# ${meta.prefix} Compliance Pack\nProgram: ${meta.program}\nGenerated: ${meta.generated}\nSafe export: ${meta.safe_export} (${meta.safe_export_level})\n`);
+
+  const zipBlob = buildZip(entries);
+  return {root, manifest, zipBlob};
+}
+async function downloadZipPack(){
+  const {root, manifest, zipBlob} = await createZipPackPayload();
+  document.getElementById("preview").textContent = JSON.stringify(manifest, null, 2);
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(zipBlob);
+  a.download = `${root}.zip`;
+  a.click();
+}
+
+function tmLog(msg){ const el=document.getElementById("tmLog"); if(!el) return; el.textContent += `[${nowIso()}] ${msg}\n`; el.scrollTop = el.scrollHeight; }
+function tmResetAll(){ if(!confirm("Reset ALL local data?")) return; removeStoreItem(KEY); load(); refreshAll(); document.getElementById("tmLog").textContent=""; tmLog("Reset complete."); }
+function tmRunAll(){
+  const db = load();
+  db.intake = { solicitation_id:"SOL-TEST-001", title:"Sample Compliance RFP", customer:"Sample Agency", due_date:today(), qa_due_date:today(), sections:"Vol I\nSec L\nSec M", baseline_sealed:false, baseline_seal:null, baseline_snapshot:null };
+  db.requirements = [];
+  for(let i=1;i<=50;i++){
+    const id = `REQ-${String(i).padStart(4,"0")}`;
+    db.requirements.push({
+      id,
+      section_ref:`L.${Math.ceil(i/5)}.${(i%5)+1}`,
+      type: i%7===0 ? "Info" : "Shall",
+      priority: i%3===0 ? "High" : "Med",
+      text:`Requirement ${i}: Contractor shall provide capability ${i}.`,
+      owner: i%6===0 ? "" : `Owner-${(i%8)+1}`,
+      status: i%5===0 ? "Drafted" : "Assigned",
+      compliance_statement: i%4===0 ? "" : `We comply via approach ${i}.`,
+      evidence: i%4===0 ? [] : [`artifact-${i}.md`],
+      dependencies: i>1 && i%10===0 ? [`REQ-${String(i-1).padStart(4,"0")}`] : [],
+      verification_method: ["test","inspect","demonstrate","analysis"][i%4],
+      created: nowIso(),
+      updated: nowIso()
+    });
+  }
+  db.deliverables = [
+    {id:"DEL-001", description:"Volume 1 Technical", due:today(), req_ids:["REQ-0001","REQ-0002"], owner:"Lead-1", status:"In Progress", created:nowIso(), updated:nowIso()},
+    {id:"DEL-002", description:"Volume 2 Management", due:today(), req_ids:["REQ-0010","REQ-0011"], owner:"Lead-2", status:"Open", created:nowIso(), updated:nowIso()}
+  ];
+  db.gaps = [
+    {id:uid("GAP"), req_id:"REQ-0004", text:"Need customer clarification on latency target", question:"Confirm latency threshold?", resolution:"", status:"Open", created:new Date(Date.now()-6*24*60*60*1000).toISOString(), updated:nowIso()},
+    {id:uid("GAP"), req_id:"REQ-0012", text:"Missing interface spec", question:"Provide ICD version?", resolution:"", status:"Open", created:nowIso(), updated:nowIso()}
+  ];
+  db.ds_manual = [];
+  db.rs = [{id:uid("RS"), week_of:today(), steward:"Compliance Steward", notes:"Focus on unassigned high-priority requirements", created:nowIso()}];
+  save(db);
+  tmLog("Generated sample intake + 50 requirements + mappings + gaps.");
+  tmLog(`Auto DS count: ${computeAutoDs(db).length}`);
+}
+
+function bindEvents(){
+  document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click", ()=>setTab(b.dataset.tab)));
+
+  document.getElementById("btnSaveIntake")?.addEventListener("click", saveIntake);
+  document.getElementById("btnSealBaseline")?.addEventListener("click", sealBaseline);
+
+  document.getElementById("btnReqSave")?.addEventListener("click", saveRequirement);
+  document.getElementById("btnReqClear")?.addEventListener("click", clearRequirement);
+  document.getElementById("btnReqBulk")?.addEventListener("click", bulkAddRequirements);
+  document.getElementById("reqTable")?.addEventListener("click", (e)=>{
+    const b=e.target.closest("button"); if(!b) return;
+    if(b.dataset.action==="edit") editRequirement(b.dataset.id);
+    if(b.dataset.action==="del") deleteRequirement(b.dataset.id);
+  });
+
+  document.getElementById("mapReq")?.addEventListener("change", renderMapping);
+  document.getElementById("btnMapSave")?.addEventListener("click", saveMapping);
+
+  document.getElementById("btnDelSave")?.addEventListener("click", saveDeliverable);
+  document.getElementById("btnGapSave")?.addEventListener("click", saveGap);
+
+  document.getElementById("btnZipPack")?.addEventListener("click", downloadZipPack);
+
+  document.getElementById("btnExport")?.addEventListener("click", ()=>{
+    const blob = new Blob([JSON.stringify(load(),null,2)], {type:"application/json"});
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `compliance_matrix_console_${today()}.json`; a.click();
+  });
+  document.getElementById("btnImport")?.addEventListener("click", ()=>document.getElementById("fileImport")?.click());
+  document.getElementById("fileImport")?.addEventListener("change", (e)=>{
+    const file = e.target.files?.[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      try{
+        const db = JSON.parse(reader.result);
+        if(!db || typeof db !== "object" || Array.isArray(db)) throw new Error("Invalid root object");
+        setStoreItem(KEY, JSON.stringify(db));
+        refreshAll();
+        alert("Imported.");
+      }catch(err){ alert(`Invalid JSON: ${err.message || "Import failed"}`); }
+    };
+    reader.readAsText(file);
+  });
+  document.getElementById("btnReset")?.addEventListener("click", tmResetAll);
+
+  document.getElementById("tmRunAll")?.addEventListener("click", tmRunAll);
+  document.getElementById("tmDownloadZip")?.addEventListener("click", downloadZipPack);
+  document.getElementById("tmReset")?.addEventListener("click", tmResetAll);
+}
+
+function refreshAll(){
+  bindReqSelects();
+  renderDashboard();
+  renderIntake();
+  renderRequirements();
+  renderMapping();
+  renderDeliverables();
+  renderGaps();
+}
+
+(function init(){
+  load();
+  bindEvents();
+  refreshAll();
+  const h = (location.hash||"").replace("#","").trim();
+  const valid = ["dashboard","intake","requirements","mapping","deliverables","gaps","artifacts","test"];
+  if(valid.includes(h)) setTab(h); else setTab("dashboard");
+})();
+</script>
+</body>
+</html>
