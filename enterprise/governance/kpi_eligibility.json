@@ -11,12 +11,12 @@
     "technical_completeness": {
       "simulated": ["scripts/compute_ci.py", "tests"],
       "real": ["release_kpis/issues_all.json", "release_kpis/prs_merged.json"],
-      "production": [".github/workflows/ci.yml", "release_kpis/KPI_GATE_REPORT.md"]
+      "production": ["../.github/workflows/ci.yml", "release_kpis/KPI_GATE_REPORT.md"]
     },
     "automation_depth": {
-      "simulated": [".github/workflows/kpi.yml", "scripts/kpi_run.py"],
-      "real": [".github/workflows/kpi_gate.yml", "release_kpis/ISSUE_LABEL_GATE_REPORT.md"],
-      "production": [".github/workflows/roadmap_guard.yml", "release_kpis/ROADMAP_SCOPE_GATE_REPORT.md"]
+      "simulated": ["../.github/workflows/kpi.yml", "scripts/kpi_run.py"],
+      "real": ["../.github/workflows/kpi_gate.yml", "release_kpis/ISSUE_LABEL_GATE_REPORT.md"],
+      "production": ["../.github/workflows/roadmap_guard.yml", "release_kpis/ROADMAP_SCOPE_GATE_REPORT.md"]
     },
     "authority_modeling": {
       "simulated": ["scripts/export_authority_ledger.py"],
@@ -30,7 +30,7 @@
     },
     "scalability": {
       "simulated": ["release_kpis/scalability_metrics.json"],
-      "real": ["scripts/reencrypt_benchmark.py", ".github/workflows/reencrypt_benchmark.yml"],
+      "real": ["scripts/reencrypt_benchmark.py", "../.github/workflows/reencrypt_benchmark.yml"],
       "production": ["docs/scaling/STATELESS_API_SCALE_GUIDE.md"]
     },
     "data_integration": {
