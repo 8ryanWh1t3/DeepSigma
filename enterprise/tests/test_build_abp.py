@@ -341,5 +341,133 @@ class TestAbpSchemaValidation(unittest.TestCase):
             jsonschema.validate(abp, schema)
 
 
+SAMPLE_DELEGATION_REVIEW = {
+    "triggers": [
+        {
+            "id": "DRT-001",
+            "name": "recurring_drift_fingerprint",
+            "condition": {"fingerprint_repeats": 3, "window_days": 14},
+            "severity": "warn",
+            "auto_open": True,
+        },
+        {
+            "id": "DRT-002",
+            "name": "irreversible_action_blocked",
+            "condition": {"blocked_count_gt": 5, "window_days": 7},
+            "severity": "critical",
+            "auto_open": True,
+        },
+    ],
+    "review_policy": {
+        "approver_role": "Reviewer",
+        "threshold": 1,
+        "timeout_ms": 604800000,
+        "output": "abp_patch",
+    },
+}
+
+
+class TestDelegationReview(unittest.TestCase):
+    """Test delegation_review section in ABP."""
+
+    def test_build_with_delegation_review(self):
+        abp = build_abp(
+            scope=DEMO_SCOPE,
+            authority_ref=DEMO_AUTH_REF,
+            delegation_review=SAMPLE_DELEGATION_REVIEW,
+            clock=FIXED_CLOCK,
+        )
+        self.assertIn("delegation_review", abp)
+        self.assertEqual(len(abp["delegation_review"]["triggers"]), 2)
+        self.assertEqual(abp["delegation_review"]["review_policy"]["output"], "abp_patch")
+        self.assertTrue(verify_abp_hash(abp))
+
+    def test_build_without_delegation_review(self):
+        abp = build_abp(
+            scope=DEMO_SCOPE,
+            authority_ref=DEMO_AUTH_REF,
+            clock=FIXED_CLOCK,
+        )
+        self.assertNotIn("delegation_review", abp)
+        self.assertTrue(verify_abp_hash(abp))
+
+    def test_delegation_review_changes_hash(self):
+        abp_without = build_abp(
+            scope=DEMO_SCOPE,
+            authority_ref=DEMO_AUTH_REF,
+            clock=FIXED_CLOCK,
+        )
+        abp_with = build_abp(
+            scope=DEMO_SCOPE,
+            authority_ref=DEMO_AUTH_REF,
+            delegation_review=SAMPLE_DELEGATION_REVIEW,
+            clock=FIXED_CLOCK,
+        )
+        self.assertNotEqual(abp_without["hash"], abp_with["hash"])
+
+    def test_delegation_review_preserves_id(self):
+        """ABP ID should not change — ID depends only on scope + authority_ref + created_at."""
+        abp_without = build_abp(
+            scope=DEMO_SCOPE,
+            authority_ref=DEMO_AUTH_REF,
+            clock=FIXED_CLOCK,
+        )
+        abp_with = build_abp(
+            scope=DEMO_SCOPE,
+            authority_ref=DEMO_AUTH_REF,
+            delegation_review=SAMPLE_DELEGATION_REVIEW,
+            clock=FIXED_CLOCK,
+        )
+        self.assertEqual(abp_without["abp_id"], abp_with["abp_id"])
+
+    def test_delegation_review_schema_validation(self):
+        try:
+            import jsonschema
+        except ImportError:
+            self.skipTest("jsonschema not installed")
+
+        schema = json.loads(SCHEMA_PATH.read_text())
+        abp = build_abp(
+            scope=DEMO_SCOPE,
+            authority_ref=DEMO_AUTH_REF,
+            delegation_review=SAMPLE_DELEGATION_REVIEW,
+            clock=FIXED_CLOCK,
+        )
+        jsonschema.validate(abp, schema)
+
+    def test_compose_merges_delegation_review(self):
+        child1 = build_abp(
+            scope={"contract_id": "C1", "program": "P1", "modules": ["a"]},
+            authority_ref=DEMO_AUTH_REF,
+            delegation_review={
+                "triggers": [{"id": "DRT-001", "name": "t1", "condition": {}, "severity": "warn", "auto_open": True}],
+                "review_policy": {"approver_role": "Reviewer", "threshold": 1, "timeout_ms": 604800000, "output": "abp_patch"},
+            },
+            clock=FIXED_CLOCK,
+        )
+        child2 = build_abp(
+            scope={"contract_id": "C2", "program": "P2", "modules": ["b"]},
+            authority_ref=DEMO_AUTH_REF,
+            delegation_review={
+                "triggers": [{"id": "DRT-002", "name": "t2", "condition": {}, "severity": "critical", "auto_open": False}],
+                "review_policy": {"approver_role": "Admin", "threshold": 1, "timeout_ms": 300000, "output": "abp_replace"},
+            },
+            clock=FIXED_CLOCK,
+        )
+        parent = compose_abps(
+            parent_scope={"contract_id": "P", "program": "PP", "modules": ["a", "b"]},
+            parent_authority_ref=DEMO_AUTH_REF,
+            children=[child1, child2],
+            clock=FIXED_CLOCK,
+        )
+        self.assertIn("delegation_review", parent)
+        dr = parent["delegation_review"]
+        self.assertEqual(len(dr["triggers"]), 2)
+        trigger_ids = {t["id"] for t in dr["triggers"]}
+        self.assertEqual(trigger_ids, {"DRT-001", "DRT-002"})
+        # Tightest timeout wins
+        self.assertEqual(dr["review_policy"]["timeout_ms"], 300000)
+
+
 if __name__ == "__main__":
     unittest.main()

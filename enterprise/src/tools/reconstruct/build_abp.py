@@ -103,6 +103,7 @@ def build_abp(
     escalation: dict | None = None,
     runtime: dict | None = None,
     proof: dict | None = None,
+    delegation_review: dict | None = None,
     clock: str | None = None,
     effective_at: str | None = None,
     expires_at: str | None = None,
@@ -135,6 +136,10 @@ def build_abp(
         "created_at": created_at,
         "hash": "",
     }
+
+    # Conditionally include delegation_review (optional section)
+    if delegation_review is not None:
+        abp["delegation_review"] = delegation_review
 
     abp["abp_id"] = _compute_abp_id(scope, authority_ref, created_at)
     _check_contradictions(abp)
@@ -169,6 +174,10 @@ def compose_abps(
     merged_proof: set[str] = set()
     child_refs: list[dict] = []
 
+    merged_deleg_triggers: list[dict] = []
+    merged_review_policy: dict | None = None
+    seen_drt_ids: set[str] = set()
+
     for child in children:
         merged_objectives["allowed"].extend(child["objectives"]["allowed"])
         merged_objectives["denied"].extend(child["objectives"]["denied"])
@@ -183,6 +192,30 @@ def compose_abps(
             "abp_id": child["abp_id"],
             "abp_hash": child["hash"],
         })
+        # Merge delegation_review triggers (deduplicate by ID)
+        dr = child.get("delegation_review")
+        if dr:
+            for t in dr.get("triggers", []):
+                if t["id"] not in seen_drt_ids:
+                    merged_deleg_triggers.append(t)
+                    seen_drt_ids.add(t["id"])
+            rp = dr.get("review_policy")
+            if rp and (merged_review_policy is None or
+                       (rp.get("timeout_ms") or float("inf")) <
+                       (merged_review_policy.get("timeout_ms") or float("inf"))):
+                merged_review_policy = rp
+
+    merged_delegation = None
+    if merged_deleg_triggers:
+        merged_delegation = {
+            "triggers": merged_deleg_triggers,
+            "review_policy": merged_review_policy or {
+                "approver_role": "Reviewer",
+                "threshold": 1,
+                "timeout_ms": 604800000,
+                "output": "abp_patch",
+            },
+        }
 
     parent = build_abp(
         scope=parent_scope,
@@ -194,6 +227,7 @@ def compose_abps(
         escalation=merged_escalation,
         runtime=merged_runtime,
         proof={"required": sorted(merged_proof)},
+        delegation_review=merged_delegation,
         clock=clock,
         effective_at=effective_at,
         expires_at=expires_at,
@@ -253,7 +287,7 @@ def main() -> int:
     parser.add_argument("--authority-ledger", type=Path, default=None,
                         help="Path to authority ledger NDJSON")
     parser.add_argument("--config", type=Path, default=None,
-                        help="JSON config with objectives/tools/data/approvals/escalation/runtime/proof")
+                        help="JSON config with objectives/tools/data/approvals/escalation/runtime/proof/delegation_review")
     parser.add_argument("--clock", default=None,
                         help="Fixed clock (ISO8601 UTC)")
     parser.add_argument("--effective-at", default=None,
@@ -287,6 +321,7 @@ def main() -> int:
         escalation=config.get("escalation"),
         runtime=config.get("runtime"),
         proof=config.get("proof"),
+        delegation_review=config.get("delegation_review"),
         clock=args.clock,
         effective_at=args.effective_at,
         expires_at=args.expires_at,

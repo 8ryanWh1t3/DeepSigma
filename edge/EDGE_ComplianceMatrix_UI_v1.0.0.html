@@ -1066,7 +1066,57 @@ function refreshAll(){
   "effective_at": "2026-02-25T00:00:00Z",
   "expires_at": null,
   "created_at": "2026-02-25T00:00:00Z",
-  "hash": "sha256:7b60bf989114006faf001ff55f0a0c77e951a41390a3639f84e99c3dd8ec9fe5"
+  "hash": "sha256:c01f3565f11678598e098083ab01d7fc429d985525756300f932f44eea722789",
+  "delegation_review": {
+    "triggers": [
+      {
+        "id": "DRT-001",
+        "name": "recurring_drift_fingerprint",
+        "condition": {
+          "fingerprint_repeats": 3,
+          "window_days": 14
+        },
+        "severity": "warn",
+        "auto_open": true
+      },
+      {
+        "id": "DRT-002",
+        "name": "irreversible_action_blocked",
+        "condition": {
+          "blocked_count_gt": 5,
+          "window_days": 7
+        },
+        "severity": "critical",
+        "auto_open": true
+      },
+      {
+        "id": "DRT-003",
+        "name": "linkage_score_sustained_drop",
+        "condition": {
+          "overall_coherence_lt": 60,
+          "consecutive_runs": 3
+        },
+        "severity": "critical",
+        "auto_open": true
+      },
+      {
+        "id": "DRT-004",
+        "name": "assumption_expiry_breach",
+        "condition": {
+          "expired_claims_gt": 4,
+          "window_days": 30
+        },
+        "severity": "warn",
+        "auto_open": false
+      }
+    ],
+    "review_policy": {
+      "approver_role": "Reviewer",
+      "threshold": 1,
+      "timeout_ms": 604800000,
+      "output": "abp_patch"
+    }
+  }
 }
 </script>
 <div id="abpStatusBar" class="abp-status"></div>

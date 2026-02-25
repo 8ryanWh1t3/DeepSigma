@@ -298,6 +298,73 @@
         }
       }
     },
+    "delegation_review": {
+      "type": "object",
+      "description": "Delegation Review triggers and review policy. Optional. When present, defines conditions under which the ABP itself should be reassessed.",
+      "required": ["triggers", "review_policy"],
+      "additionalProperties": false,
+      "properties": {
+        "triggers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "name", "condition", "severity", "auto_open"],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^DRT-[0-9]{3}$",
+                "description": "Delegation Review Trigger identifier."
+              },
+              "name": {
+                "type": "string",
+                "description": "Human-readable trigger name."
+              },
+              "condition": {
+                "type": "object",
+                "description": "Trigger-specific condition parameters."
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["warn", "critical"],
+                "description": "Trigger severity level."
+              },
+              "auto_open": {
+                "type": "boolean",
+                "description": "Whether tripping this trigger automatically opens a Delegation Review session."
+              }
+            }
+          },
+          "description": "Conditions under which ABP delegation should be reassessed."
+        },
+        "review_policy": {
+          "type": "object",
+          "required": ["approver_role", "threshold", "timeout_ms", "output"],
+          "additionalProperties": false,
+          "properties": {
+            "approver_role": {
+              "type": "string",
+              "description": "Role required to approve delegation review outcomes."
+            },
+            "threshold": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Number of approvals required."
+            },
+            "timeout_ms": {
+              "type": ["integer", "null"],
+              "description": "Review timeout in milliseconds. Null for no timeout."
+            },
+            "output": {
+              "type": "string",
+              "enum": ["abp_patch", "abp_replace", "abp_revoke"],
+              "description": "Output artifact type produced by a completed review."
+            }
+          },
+          "description": "Policy governing how delegation reviews are resolved."
+        }
+      }
+    },
     "effective_at": {
       "type": "string",
       "format": "date-time",

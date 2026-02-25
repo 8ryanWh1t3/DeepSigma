@@ -156,6 +156,27 @@ def check_file(
         "abpSelfVerify function found" if has_js else "No abpSelfVerify function found",
     ))
 
+    # 10. Delegation review (optional section — informational)
+    dr = abp.get("delegation_review")
+    if dr:
+        triggers = dr.get("triggers", [])
+        policy = dr.get("review_policy", {})
+        has_triggers = len(triggers) > 0
+        has_policy = bool(policy.get("approver_role"))
+        dr_valid = has_triggers and has_policy
+        checks.append((
+            "gate.delegation_review_present",
+            dr_valid,
+            f"{len(triggers)} triggers, policy.approver={policy.get('approver_role', 'n/a')}"
+            if dr_valid else "delegation_review section incomplete",
+        ))
+    else:
+        checks.append((
+            "gate.delegation_review_present",
+            True,  # Optional — absence is not a failure
+            "Not present (optional section)",
+        ))
+
     return checks
 
 

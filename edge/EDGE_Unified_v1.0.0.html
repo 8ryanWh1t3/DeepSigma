@@ -197,6 +197,30 @@
 .abp-bar-item .dot.yellow{background:#ffcc66}
 .abp-bar-item .dot.cyan{background:var(--accent)}
 .abp-bar-none{color:var(--muted);font-size:11px;font-style:italic}
+
+/* Delegation Review Panel */
+.deleg-pane{padding:16px;overflow-y:auto;max-height:calc(100vh - 140px)}
+.deleg-header{margin-bottom:14px}
+.deleg-header h2{margin:0;color:var(--accent);font-size:18px;letter-spacing:.5px}
+.deleg-sub{color:var(--muted);font-size:12px}
+.deleg-trigger-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin:12px 0}
+.deleg-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.deleg-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.deleg-card-id{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--accent)}
+.deleg-card-name{font-size:13px;font-weight:600;color:var(--txt);margin-bottom:4px}
+.deleg-status-pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.5px}
+.deleg-status-pill.armed{background:rgba(125,249,255,.12);color:var(--accent);border:1px solid rgba(125,249,255,.25)}
+.deleg-status-pill.tripped{background:rgba(255,107,107,.15);color:#ff6b6b;border:1px solid rgba(255,107,107,.3)}
+.deleg-status-pill.clear{background:rgba(93,255,147,.12);color:#5dff93;border:1px solid rgba(93,255,147,.25)}
+.deleg-condition{font-size:12px;color:var(--muted);margin:6px 0}
+.deleg-progress{height:6px;background:#1a2538;border-radius:3px;overflow:hidden;margin:6px 0}
+.deleg-progress-fill{height:100%;border-radius:3px;transition:width .3s}
+.deleg-section{margin:14px 0}
+.deleg-section h3{font-size:14px;color:#cfe2f7;margin:0 0 8px}
+.deleg-review-item{padding:10px;background:var(--card);border:1px solid var(--line);border-radius:8px;margin-bottom:8px;font-size:12px}
+.deleg-abp-summary{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;font-size:12px}
+.deleg-abp-summary div{margin-bottom:4px}
+.deleg-abp-summary strong{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -219,6 +243,7 @@
     <button class="tab" data-id="compliance">Compliance Matrix</button>
     <button class="tab" data-id="boe">BOE/Pricing</button>
     <button class="tab" data-id="iris">IRIS</button>
+    <button class="tab" data-id="delegation">Delegation</button>
     <button class="tab" data-id="utility">Utility</button>
     <div class="meta">
       <h3 id="mTitle">Suite Control</h3>
@@ -319,6 +344,26 @@
       </div>
     </div>
 
+    <!-- Delegation Review Panel (host-level, not iframe) -->
+    <div id="delegationPane" class="deleg-pane hidden">
+      <div class="deleg-header">
+        <h2>Delegation Review</h2>
+        <div class="deleg-sub">Authority boundary reassessment triggers and review history</div>
+      </div>
+      <div class="deleg-section">
+        <h3>Trigger Board</h3>
+        <div id="delegTriggerGrid" class="deleg-trigger-grid"></div>
+      </div>
+      <div class="deleg-section">
+        <h3>Current ABP Summary</h3>
+        <div id="delegAbpSummary" class="deleg-abp-summary">No ABP loaded.</div>
+      </div>
+      <div class="deleg-section">
+        <h3>Review History</h3>
+        <div id="delegReviewHistory"></div>
+      </div>
+    </div>
+
     <!-- IRIS Artifact Popover -->
     <div id="iris-popover-overlay">
       <div id="iris-popover-modal">
@@ -364,6 +409,10 @@
     ],
     boe: [
       'ds_boe_pricing_v1'
+    ],
+    delegation: [
+      'ds_delegation_review_state_v1',
+      'ds_abp_v1'
     ],
     abp: [
       'ds_abp_v1'
@@ -2813,11 +2862,14 @@
   function setActive(id) {
     const isUtility = id === 'utility';
     const isIris = id === 'iris';
-    const isHostPanel = isUtility || isIris;
+    const isDelegation = id === 'delegation';
+    const isHostPanel = isUtility || isIris || isDelegation;
     const mod = isUtility
       ? { title: 'Utility', desc: 'Host-level tools, verifier, test runner, and cache controls.' }
       : isIris
       ? { title: 'IRIS', desc: 'Interface for Resolution, Insight & Status — read-only query engine.' }
+      : isDelegation
+      ? { title: 'Delegation', desc: 'Delegation Review triggers, ABP reassessment, and review history.' }
       : (MODULES[id] || MODULES.suite);
     activeId = isHostPanel ? id : (id in MODULES ? id : 'suite');
 
@@ -2828,9 +2880,11 @@
     const modulePane = document.getElementById('modulePane');
     const utilityPane = document.getElementById('utilityPane');
     const irisPane = document.getElementById('irisPane');
+    const delegationPane = document.getElementById('delegationPane');
     if (modulePane) modulePane.classList.toggle('hidden', isHostPanel);
     if (utilityPane) utilityPane.classList.toggle('hidden', !isUtility);
     if (irisPane) irisPane.classList.toggle('hidden', !isIris);
+    if (delegationPane) delegationPane.classList.toggle('hidden', !isDelegation);
 
     const openBtn = document.getElementById('btnOpenExternal');
     if (openBtn) openBtn.disabled = isHostPanel;
@@ -2852,11 +2906,15 @@
       if (activeId === 'suite') setTimeout(installSuitePopovers, 160);
     }
 
+    if (isDelegation) renderDelegationPanel();
+
     const bs = document.getElementById('bootStatusTop');
     if (bs) bs.textContent = isUtility
       ? 'Utility tab active: host-level controls enabled.'
       : isIris
       ? 'IRIS active: read-only query resolution engine.'
+      : isDelegation
+      ? 'Delegation active: authority boundary reassessment triggers.'
       : `Lazy-load active: ${activeId} mounted and state preserved across tabs.`;
 
     if (isUtility || activeId === 'suite') hostRollup();
@@ -3521,6 +3579,158 @@ ${mods.map(m => {
     }
   }
 
+  /* ── Delegation Review — trigger evaluation + review history ── */
+
+  const DELEG_STATE_KEY = 'ds_delegation_review_state_v1';
+
+  function getDelegationReviewTriggers() {
+    const abp = readJsonSafe('ds_abp_v1');
+    if (!abp || !abp.delegation_review) return [];
+    return abp.delegation_review.triggers || [];
+  }
+
+  function evaluateDRT001(trigger) {
+    // recurring_drift_fingerprint: same fingerprint N times in T days
+    const cond = trigger.condition || {};
+    const maxRepeats = cond.fingerprint_repeats || 3;
+    const windowDays = cond.window_days || 14;
+    const cutoff = Date.now() - (windowDays * 86400000);
+    const hiring = readJsonSafe('ds_sequoia_hiring_console_v2_artifacts') || {};
+    const bid = readJsonSafe('ds_bidnobid_console_v1') || {};
+    const allDrift = [
+      ...(Array.isArray(hiring.drift) ? hiring.drift : []),
+      ...(Array.isArray(bid.drift) ? bid.drift : []),
+    ];
+    const fpCounts = {};
+    allDrift.forEach(function(d) {
+      const ts = new Date(d.detected_at || d.detectedAt || '').getTime();
+      if (!Number.isFinite(ts) || ts < cutoff) return;
+      const key = (d.fingerprint && d.fingerprint.key) || d.fingerprint_key || 'unknown';
+      fpCounts[key] = (fpCounts[key] || 0) + 1;
+    });
+    const vals = Object.values(fpCounts);
+    const worst = vals.length ? Math.max.apply(null, vals) : 0;
+    return { tripped: worst >= maxRepeats, current: worst, threshold: maxRepeats, detail: 'Worst fingerprint: ' + worst + '/' + maxRepeats + ' in ' + windowDays + 'd' };
+  }
+
+  function evaluateDRT002(trigger) {
+    // irreversible_action_blocked: gate failures as proxy
+    const cond = trigger.condition || {};
+    const maxBlocked = cond.blocked_count_gt || 5;
+    const rollup = buildHostRollup();
+    const gates = rollup.control_gates || [];
+    var failCount = 0;
+    gates.forEach(function(g) { if (g.status === 'FAIL') failCount++; });
+    return { tripped: failCount > maxBlocked, current: failCount, threshold: maxBlocked, detail: 'Blocked actions: ' + failCount + '/' + maxBlocked + ' in ' + (cond.window_days || 7) + 'd' };
+  }
+
+  function evaluateDRT003(trigger) {
+    // linkage_score_sustained_drop: coherence < X for Y consecutive runs
+    const cond = trigger.condition || {};
+    const threshold = cond.overall_coherence_lt || 60;
+    const consecutive = cond.consecutive_runs || 3;
+    const rollup = buildHostRollup();
+    const composite = rollup.composite_score || 0;
+    var state = readJsonSafe(DELEG_STATE_KEY) || {};
+    var scoreHistory = state.coherence_history || [];
+    scoreHistory.push({ score: composite, ts: new Date().toISOString() });
+    if (scoreHistory.length > 20) scoreHistory = scoreHistory.slice(scoreHistory.length - 20);
+    state.coherence_history = scoreHistory;
+    writeJsonSafe(DELEG_STATE_KEY, state);
+    var recent = scoreHistory.slice(-consecutive);
+    var allBelow = recent.length >= consecutive;
+    if (allBelow) { for (var i = 0; i < recent.length; i++) { if (recent[i].score >= threshold) { allBelow = false; break; } } }
+    return { tripped: allBelow, current: composite, threshold: threshold, detail: 'Current: ' + composite + ', need ' + consecutive + ' runs < ' + threshold };
+  }
+
+  function evaluateDRT004(trigger) {
+    // assumption_expiry_breach: expired claims > X in Y days
+    const cond = trigger.condition || {};
+    const maxExpired = cond.expired_claims_gt || 4;
+    const windowDays = cond.window_days || 30;
+    const bid = readJsonSafe('ds_bidnobid_console_v1') || {};
+    const boe = readJsonSafe('ds_boe_pricing_v1') || {};
+    const allAssumptions = [
+      ...(Array.isArray(bid.assumptions) ? bid.assumptions : []),
+      ...(Array.isArray(boe.assumptions) ? boe.assumptions : []),
+    ];
+    const now = Date.now();
+    var expired = 0;
+    allAssumptions.forEach(function(a) {
+      const ex = new Date(a && (a.expiry || a.expires || a.ttl) || '').getTime();
+      if (Number.isFinite(ex) && ex < now && (now - ex) < (windowDays * 86400000)) expired++;
+    });
+    return { tripped: expired > maxExpired, current: expired, threshold: maxExpired, detail: 'Expired: ' + expired + '/' + maxExpired + ' in ' + windowDays + 'd' };
+  }
+
+  const DRT_EVALUATORS = {
+    'DRT-001': evaluateDRT001,
+    'DRT-002': evaluateDRT002,
+    'DRT-003': evaluateDRT003,
+    'DRT-004': evaluateDRT004,
+  };
+
+  function renderDelegationPanel() {
+    invalidateJsonCache();
+    const triggers = getDelegationReviewTriggers();
+    const abp = readJsonSafe('ds_abp_v1');
+    const grid = document.getElementById('delegTriggerGrid');
+    const summary = document.getElementById('delegAbpSummary');
+    const historyEl = document.getElementById('delegReviewHistory');
+    if (!grid) return;
+
+    if (!triggers.length) {
+      grid.innerHTML = '<div class="deleg-condition">No delegation review triggers defined in ABP.</div>';
+    } else {
+      grid.innerHTML = triggers.map(function(t) {
+        const evaluator = DRT_EVALUATORS[t.id];
+        const result = evaluator ? evaluator(t) : { tripped: false, current: 0, threshold: 1, detail: 'No evaluator' };
+        const status = result.tripped ? 'tripped' : 'armed';
+        const pct = Math.min(100, Math.round((result.current / Math.max(result.threshold, 1)) * 100));
+        const barColor = result.tripped ? '#ff6b6b' : pct > 60 ? '#ffcc66' : '#5dff93';
+        return '<div class="deleg-card">' +
+          '<div class="deleg-card-header">' +
+            '<span class="deleg-card-id">' + escapeHtml(t.id) + '</span>' +
+            '<span class="deleg-status-pill ' + status + '">' + status.toUpperCase() + '</span>' +
+          '</div>' +
+          '<div class="deleg-card-name">' + escapeHtml(t.name) + '</div>' +
+          '<div class="deleg-condition">' + escapeHtml(result.detail) + '</div>' +
+          '<div class="deleg-progress"><div class="deleg-progress-fill" style="width:' + pct + '%;background:' + barColor + '"></div></div>' +
+          '<div class="deleg-condition">Severity: ' + escapeHtml(t.severity) + ' | Auto-open: ' + t.auto_open + '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    if (abp) {
+      const dr = abp.delegation_review;
+      const rp = dr && dr.review_policy;
+      summary.innerHTML =
+        '<div><strong>ABP ID:</strong> <span style="font-family:monospace;color:var(--accent)">' + escapeHtml(abp.abp_id) + '</span></div>' +
+        '<div><strong>Scope:</strong> ' + escapeHtml((abp.scope && abp.scope.program) || '') + ' / ' + escapeHtml((abp.scope && abp.scope.contract_id) || '') + '</div>' +
+        '<div><strong>Effective:</strong> ' + escapeHtml(abp.effective_at || 'n/a') + '</div>' +
+        '<div><strong>Expires:</strong> ' + escapeHtml(abp.expires_at || 'none') + '</div>' +
+        '<div><strong>Review Policy:</strong> ' + (rp
+          ? 'approver=' + escapeHtml(rp.approver_role) + ', output=' + escapeHtml(rp.output) + ', timeout=' + (rp.timeout_ms ? Math.round(rp.timeout_ms / 86400000) + 'd' : 'none')
+          : 'Not configured') + '</div>';
+    } else {
+      summary.innerHTML = '<div class="deleg-condition">No ABP loaded in localStorage.</div>';
+    }
+
+    var state = readJsonSafe(DELEG_STATE_KEY) || {};
+    var reviews = state.reviews || [];
+    if (reviews.length) {
+      historyEl.innerHTML = reviews.slice().reverse().map(function(r) {
+        return '<div class="deleg-review-item">' +
+          '<strong>' + escapeHtml(r.trigger_id) + '</strong> tripped at ' + escapeHtml(r.tripped_at) + ' | ' +
+          'Status: ' + escapeHtml(r.status || 'pending') + ' | ' +
+          'Output: ' + escapeHtml(r.output_type || 'n/a') +
+        '</div>';
+      }).join('');
+    } else {
+      historyEl.innerHTML = '<div class="deleg-condition">No delegation reviews have been triggered yet.</div>';
+    }
+  }
+
   /* ── ABP Context Bar (per-tab enforcement surface) ── */
 
   const ABP_TAB_MAP = {
@@ -3608,6 +3818,27 @@ ${mods.map(m => {
         if (esc.length) cols.push({ title: 'Escalation Paths', items: esc.map(e => ({ dot: e.severity === 'critical' ? 'red' : 'yellow', text: e.trigger + ' → ' + e.destination + ' (' + e.severity + ', auto=' + e.auto + ')' })) });
         const validators = (abp.runtime?.validators || []).filter(v => v.when === 'periodic');
         if (validators.length) cols.push({ title: 'Periodic Validators', items: validators.map(v => ({ dot: 'cyan', text: v.name + ' → ' + v.fail_action })) });
+        return cols;
+      }
+    },
+    delegation: {
+      label: 'Delegation',
+      module: null,
+      getContext(abp) {
+        const cols = [];
+        const dr = abp.delegation_review;
+        if (dr && dr.triggers) {
+          cols.push({
+            title: 'Delegation Triggers',
+            items: dr.triggers.map(function(t) { return { dot: t.severity === 'critical' ? 'red' : 'yellow', text: t.id + ': ' + t.name + ' (severity=' + t.severity + ', auto=' + t.auto_open + ')' }; })
+          });
+        }
+        if (dr && dr.review_policy) {
+          cols.push({
+            title: 'Review Policy',
+            items: [{ dot: 'cyan', text: 'approver=' + dr.review_policy.approver_role + ', output=' + dr.review_policy.output }]
+          });
+        }
         return cols;
       }
     },
@@ -3719,75 +3950,296 @@ ${mods.map(m => {
   },
   "objectives": {
     "allowed": [
-      {"id": "OBJ-001", "description": "Evaluate bid/no-bid for opportunity DEC-001"},
-      {"id": "OBJ-002", "description": "Assess staffing readiness for contract execution"},
-      {"id": "OBJ-003", "description": "Map compliance requirements to deliverables"},
-      {"id": "OBJ-004", "description": "Generate basis-of-estimate pricing models"},
-      {"id": "OBJ-005", "description": "Estimate award staffing allocation and costs"},
-      {"id": "OBJ-006", "description": "Monitor claim coherence and drift signals"},
-      {"id": "OBJ-007", "description": "Present read-only unified decision surface"},
-      {"id": "OBJ-008", "description": "Export verifiable evidence packs from any module"}
+      {
+        "id": "OBJ-001",
+        "description": "Evaluate bid/no-bid for opportunity DEC-001"
+      },
+      {
+        "id": "OBJ-002",
+        "description": "Assess staffing readiness for contract execution"
+      },
+      {
+        "id": "OBJ-003",
+        "description": "Map compliance requirements to deliverables"
+      },
+      {
+        "id": "OBJ-004",
+        "description": "Generate basis-of-estimate pricing models"
+      },
+      {
+        "id": "OBJ-005",
+        "description": "Estimate award staffing allocation and costs"
+      },
+      {
+        "id": "OBJ-006",
+        "description": "Monitor claim coherence and drift signals"
+      },
+      {
+        "id": "OBJ-007",
+        "description": "Present read-only unified decision surface"
+      },
+      {
+        "id": "OBJ-008",
+        "description": "Export verifiable evidence packs from any module"
+      }
     ],
     "denied": [
-      {"id": "OBJ-D01", "description": "Modify sealed decisions", "reason": "Sealed artifacts are immutable per governance policy"},
-      {"id": "OBJ-D02", "description": "Bypass ABP verification on export", "reason": "All EDGE exports must carry verified ABP"},
-      {"id": "OBJ-D03", "description": "Alter coherence scores without re-evaluation", "reason": "Coherence values are derived from evidence chains"}
+      {
+        "id": "OBJ-D01",
+        "description": "Modify sealed decisions",
+        "reason": "Sealed artifacts are immutable per governance policy"
+      },
+      {
+        "id": "OBJ-D02",
+        "description": "Bypass ABP verification on export",
+        "reason": "All EDGE exports must carry verified ABP"
+      },
+      {
+        "id": "OBJ-D03",
+        "description": "Alter coherence scores without re-evaluation",
+        "reason": "Coherence values are derived from evidence chains"
+      }
     ]
   },
   "tools": {
     "allow": [
-      {"name": "seal_bundle", "scope": "DEC-001"},
-      {"name": "sign_artifact", "scope": "DEC-001"},
-      {"name": "replay_sealed_run", "scope": null},
-      {"name": "verify_pack", "scope": null},
-      {"name": "verify_abp", "scope": null},
-      {"name": "gate_abp", "scope": null},
-      {"name": "export_evidence_pack", "scope": "SEQUOIA"}
+      {
+        "name": "seal_bundle",
+        "scope": "DEC-001"
+      },
+      {
+        "name": "sign_artifact",
+        "scope": "DEC-001"
+      },
+      {
+        "name": "replay_sealed_run",
+        "scope": null
+      },
+      {
+        "name": "verify_pack",
+        "scope": null
+      },
+      {
+        "name": "verify_abp",
+        "scope": null
+      },
+      {
+        "name": "gate_abp",
+        "scope": null
+      },
+      {
+        "name": "export_evidence_pack",
+        "scope": "SEQUOIA"
+      }
     ],
     "deny": [
-      {"name": "authority_ledger_revoke", "reason": "Only reviewers may revoke authority grants"},
-      {"name": "transparency_log_delete", "reason": "Append-only log cannot be truncated"}
+      {
+        "name": "authority_ledger_revoke",
+        "reason": "Only reviewers may revoke authority grants"
+      },
+      {
+        "name": "transparency_log_delete",
+        "reason": "Append-only log cannot be truncated"
+      }
     ]
   },
   "data": {
     "permissions": [
-      {"resource": "decision_log.csv", "operations": ["read"], "roles": ["Operator"], "sensitivity": "internal"},
-      {"resource": "sealed_runs/*", "operations": ["read", "write"], "roles": ["Operator"], "sensitivity": "confidential"},
-      {"resource": "hiring_console/*", "operations": ["read", "write"], "roles": ["Operator"], "sensitivity": "confidential"},
-      {"resource": "bid_console/*", "operations": ["read", "write"], "roles": ["Operator"], "sensitivity": "confidential"},
-      {"resource": "compliance_matrix/*", "operations": ["read", "write"], "roles": ["Operator"], "sensitivity": "confidential"},
-      {"resource": "boe_pricing/*", "operations": ["read", "write"], "roles": ["Operator"], "sensitivity": "confidential"},
-      {"resource": "award_staffing/*", "operations": ["read", "write"], "roles": ["Operator"], "sensitivity": "internal"},
-      {"resource": "coherence_dashboard/*", "operations": ["read"], "roles": ["Operator", "Reviewer"], "sensitivity": "internal"},
-      {"resource": "evidence_packs/*", "operations": ["read"], "roles": ["Operator", "Reviewer", "Auditor"], "sensitivity": "public"}
+      {
+        "resource": "decision_log.csv",
+        "operations": [
+          "read"
+        ],
+        "roles": [
+          "Operator"
+        ],
+        "sensitivity": "internal"
+      },
+      {
+        "resource": "sealed_runs/*",
+        "operations": [
+          "read",
+          "write"
+        ],
+        "roles": [
+          "Operator"
+        ],
+        "sensitivity": "confidential"
+      },
+      {
+        "resource": "hiring_console/*",
+        "operations": [
+          "read",
+          "write"
+        ],
+        "roles": [
+          "Operator"
+        ],
+        "sensitivity": "confidential"
+      },
+      {
+        "resource": "bid_console/*",
+        "operations": [
+          "read",
+          "write"
+        ],
+        "roles": [
+          "Operator"
+        ],
+        "sensitivity": "confidential"
+      },
+      {
+        "resource": "compliance_matrix/*",
+        "operations": [
+          "read",
+          "write"
+        ],
+        "roles": [
+          "Operator"
+        ],
+        "sensitivity": "confidential"
+      },
+      {
+        "resource": "boe_pricing/*",
+        "operations": [
+          "read",
+          "write"
+        ],
+        "roles": [
+          "Operator"
+        ],
+        "sensitivity": "confidential"
+      },
+      {
+        "resource": "award_staffing/*",
+        "operations": [
+          "read",
+          "write"
+        ],
+        "roles": [
+          "Operator"
+        ],
+        "sensitivity": "internal"
+      },
+      {
+        "resource": "coherence_dashboard/*",
+        "operations": [
+          "read"
+        ],
+        "roles": [
+          "Operator",
+          "Reviewer"
+        ],
+        "sensitivity": "internal"
+      },
+      {
+        "resource": "evidence_packs/*",
+        "operations": [
+          "read"
+        ],
+        "roles": [
+          "Operator",
+          "Reviewer",
+          "Auditor"
+        ],
+        "sensitivity": "public"
+      }
     ]
   },
   "approvals": {
     "required": [
-      {"action": "seal_decision", "approver_role": "Reviewer", "threshold": 1, "timeout_ms": null},
-      {"action": "revoke_authority", "approver_role": "Admin", "threshold": 1, "timeout_ms": 86400000},
-      {"action": "export_restricted_data", "approver_role": "Reviewer", "threshold": 1, "timeout_ms": 3600000}
+      {
+        "action": "seal_decision",
+        "approver_role": "Reviewer",
+        "threshold": 1,
+        "timeout_ms": null
+      },
+      {
+        "action": "revoke_authority",
+        "approver_role": "Admin",
+        "threshold": 1,
+        "timeout_ms": 86400000
+      },
+      {
+        "action": "export_restricted_data",
+        "approver_role": "Reviewer",
+        "threshold": 1,
+        "timeout_ms": 3600000
+      }
     ]
   },
   "escalation": {
     "paths": [
-      {"trigger": "gate_fail", "destination": "Reviewer", "severity": "warn", "auto": true},
-      {"trigger": "authority_expired", "destination": "Admin", "severity": "critical", "auto": true},
-      {"trigger": "abp_missing_on_export", "destination": "Reviewer", "severity": "critical", "auto": true},
-      {"trigger": "coherence_drift_threshold", "destination": "Reviewer", "severity": "warn", "auto": true}
+      {
+        "trigger": "gate_fail",
+        "destination": "Reviewer",
+        "severity": "warn",
+        "auto": true
+      },
+      {
+        "trigger": "authority_expired",
+        "destination": "Admin",
+        "severity": "critical",
+        "auto": true
+      },
+      {
+        "trigger": "abp_missing_on_export",
+        "destination": "Reviewer",
+        "severity": "critical",
+        "auto": true
+      },
+      {
+        "trigger": "coherence_drift_threshold",
+        "destination": "Reviewer",
+        "severity": "warn",
+        "auto": true
+      }
     ]
   },
   "runtime": {
     "validators": [
-      {"name": "authority_envelope_complete", "when": "pre_action", "fail_action": "block", "config": {}},
-      {"name": "policy_hash_matches", "when": "pre_action", "fail_action": "block", "config": {}},
-      {"name": "abp_present_on_export", "when": "pre_action", "fail_action": "block", "config": {}},
-      {"name": "abp_hash_valid", "when": "pre_action", "fail_action": "block", "config": {}},
-      {"name": "drift_threshold", "when": "periodic", "fail_action": "escalate", "config": {"max_ds": 6}}
+      {
+        "name": "authority_envelope_complete",
+        "when": "pre_action",
+        "fail_action": "block",
+        "config": {}
+      },
+      {
+        "name": "policy_hash_matches",
+        "when": "pre_action",
+        "fail_action": "block",
+        "config": {}
+      },
+      {
+        "name": "abp_present_on_export",
+        "when": "pre_action",
+        "fail_action": "block",
+        "config": {}
+      },
+      {
+        "name": "abp_hash_valid",
+        "when": "pre_action",
+        "fail_action": "block",
+        "config": {}
+      },
+      {
+        "name": "drift_threshold",
+        "when": "periodic",
+        "fail_action": "escalate",
+        "config": {
+          "max_ds": 6
+        }
+      }
     ]
   },
   "proof": {
-    "required": ["authority_ledger", "manifest", "pack_hash", "seal", "transparency_log"]
+    "required": [
+      "authority_ledger",
+      "manifest",
+      "pack_hash",
+      "seal",
+      "transparency_log"
+    ]
   },
   "composition": {
     "parent_abp_id": null,
@@ -3797,7 +4249,57 @@ ${mods.map(m => {
   "effective_at": "2026-02-25T00:00:00Z",
   "expires_at": null,
   "created_at": "2026-02-25T00:00:00Z",
-  "hash": "sha256:7b60bf989114006faf001ff55f0a0c77e951a41390a3639f84e99c3dd8ec9fe5"
+  "hash": "sha256:c01f3565f11678598e098083ab01d7fc429d985525756300f932f44eea722789",
+  "delegation_review": {
+    "triggers": [
+      {
+        "id": "DRT-001",
+        "name": "recurring_drift_fingerprint",
+        "condition": {
+          "fingerprint_repeats": 3,
+          "window_days": 14
+        },
+        "severity": "warn",
+        "auto_open": true
+      },
+      {
+        "id": "DRT-002",
+        "name": "irreversible_action_blocked",
+        "condition": {
+          "blocked_count_gt": 5,
+          "window_days": 7
+        },
+        "severity": "critical",
+        "auto_open": true
+      },
+      {
+        "id": "DRT-003",
+        "name": "linkage_score_sustained_drop",
+        "condition": {
+          "overall_coherence_lt": 60,
+          "consecutive_runs": 3
+        },
+        "severity": "critical",
+        "auto_open": true
+      },
+      {
+        "id": "DRT-004",
+        "name": "assumption_expiry_breach",
+        "condition": {
+          "expired_claims_gt": 4,
+          "window_days": 30
+        },
+        "severity": "warn",
+        "auto_open": false
+      }
+    ],
+    "review_policy": {
+      "approver_role": "Reviewer",
+      "threshold": 1,
+      "timeout_ms": 604800000,
+      "output": "abp_patch"
+    }
+  }
 }
 </script>
 <div id="abpStatusBar"></div>

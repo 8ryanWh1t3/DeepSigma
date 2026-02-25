@@ -203,6 +203,34 @@ def verify_abp(
     else:
         result.check("abp.no_contradictions", True, "No contradictions")
 
+    # 8. Delegation review (optional section — structural validation)
+    dr = abp.get("delegation_review")
+    if dr:
+        triggers = dr.get("triggers", [])
+        policy = dr.get("review_policy", {})
+        trigger_ids = [t.get("id", "") for t in triggers]
+        dup_ids = len(trigger_ids) != len(set(trigger_ids))
+        valid_severities = all(
+            t.get("severity") in ("warn", "critical") for t in triggers
+        )
+        has_policy = bool(policy.get("approver_role")) and bool(policy.get("output"))
+
+        if dup_ids:
+            result.check("abp.delegation_review_valid", False,
+                         "Duplicate trigger IDs in delegation_review")
+        elif not valid_severities:
+            result.check("abp.delegation_review_valid", False,
+                         "Invalid severity in delegation_review triggers (must be warn|critical)")
+        elif not has_policy:
+            result.check("abp.delegation_review_valid", False,
+                         "delegation_review.review_policy missing approver_role or output")
+        else:
+            result.check("abp.delegation_review_valid", True,
+                         f"{len(triggers)} triggers, policy output={policy.get('output')}")
+    else:
+        result.check("abp.delegation_review_valid", True,
+                     "Not present (optional section)")
+
     return result
 
 
