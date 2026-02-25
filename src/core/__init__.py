@@ -33,21 +33,21 @@ try:
 except PackageNotFoundError:
     __version__ = "0.0.0-dev"
 
-from core.manifest import CoherenceManifest
-from core.dlr import (
+from .manifest import CoherenceManifest
+from .dlr import (
     DLRBuilder,
     ClaimNativeDLRBuilder,
     ClaimNativeDLREntry,
     ClaimRef,
     RationaleEdge,
 )
-from core.rs import ReflectionSession
-from core.ds import DriftSignalCollector
-from core.mg import MemoryGraph, NodeKind, EdgeKind
-from core.audit import CoherenceAuditor
-from core.scoring import CoherenceScorer
-from core.reconciler import Reconciler
-from core.iris import (
+from .rs import ReflectionSession
+from .ds import DriftSignalCollector
+from .mg import MemoryGraph, NodeKind, EdgeKind
+from .audit import CoherenceAuditor
+from .scoring import CoherenceScorer
+from .reconciler import Reconciler
+from .iris import (
     IRISEngine,
     IRISQuery,
     IRISResponse,
@@ -55,9 +55,9 @@ from core.iris import (
     IRISConfig,
     ResolutionStatus,
 )
-from core.normalize import normalize_keys
-from core.coherence_gate import CoherenceGate, GateConfig, GateResult, Signal
-from core.prime import (
+from .normalize import normalize_keys
+from .coherence_gate import CoherenceGate, GateConfig, GateResult, Signal
+from .prime import (
     PRIMEGate,
     PRIMEConfig,
     PRIMEContext,

@@ -32,7 +32,7 @@ COPY enterprise/dashboard/server/ /app/dashboard/server/
 RUN touch /app/dashboard/__init__.py /app/dashboard/server/__init__.py
 COPY src/core/ /app/core/
 COPY enterprise/src/engine/ /app/engine/
-COPY enterprise/src/verifiers/ /app/verifiers/
+COPY enterprise/src/_experimental/verifiers/ /app/verifiers/
 COPY enterprise/src/tools/ /app/tools/
 COPY enterprise/src/adapters/ /app/adapters/
 

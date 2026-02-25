@@ -6,11 +6,12 @@ on:
     tags: ['v*']
     paths:
       - 'src/core/**'
-      - 'src/engine/**'
-      - 'src/verifiers/**'
-      - 'src/tools/**'
+      - 'enterprise/src/engine/**'
+      - 'enterprise/src/_experimental/verifiers/**'
+      - 'enterprise/src/tools/**'
+      - 'enterprise/src/adapters/**'
+      - 'enterprise/src/demos/**'
       - 'specs/**'
-      - 'src/adapters/**'
       - 'pyproject.toml'
       - 'enterprise/docker/Dockerfile.coherence'
       - '.github/workflows/docker-coherence.yml'

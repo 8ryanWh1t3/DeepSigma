@@ -1,8 +1,8 @@
 """
 Tests for verifiers — read_after_write and invariant_check.
 """
-from verifiers.read_after_write import verify as raw_verify
-from verifiers.invariant_check import verify as invariant_verify
+from _experimental.verifiers.read_after_write import verify as raw_verify
+from _experimental.verifiers.invariant_check import verify as invariant_verify
 
 
 # ── read_after_write ──

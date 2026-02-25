@@ -6,7 +6,7 @@ permissions:
 on:
   push:
     paths:
-      - 'src/tools/reconstruct/**'
+      - 'enterprise/src/tools/reconstruct/**'
       - 'schemas/reconstruct/signature_block_v1.json'
       - 'tests/test_signature_support.py'
 jobs:
