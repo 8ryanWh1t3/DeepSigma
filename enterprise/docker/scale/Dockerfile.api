@@ -11,7 +11,8 @@ RUN pip install --no-cache-dir \
 
 COPY pyproject.toml /app/
 COPY src/ /app/src/
-COPY dashboard/ /app/dashboard/
+COPY enterprise/src/ /app/enterprise/src/
+COPY enterprise/dashboard/ /app/dashboard/
 COPY docs/examples/ /app/docs/examples/
 
 RUN pip install --no-cache-dir -e /app

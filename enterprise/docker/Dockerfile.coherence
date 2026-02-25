@@ -29,11 +29,11 @@ WORKDIR /app
 
 COPY pyproject.toml /app/
 COPY src/core/ /app/core/
-COPY src/engine/ /app/engine/
-COPY src/verifiers/ /app/verifiers/
-COPY src/tools/ /app/tools/
-COPY src/adapters/ /app/adapters/
-COPY src/demos/ /app/demos/
+COPY enterprise/src/engine/ /app/engine/
+COPY enterprise/src/verifiers/ /app/verifiers/
+COPY enterprise/src/tools/ /app/tools/
+COPY enterprise/src/adapters/ /app/adapters/
+COPY enterprise/src/demos/ /app/demos/
 
 RUN pip install --no-cache-dir -e /app
 
