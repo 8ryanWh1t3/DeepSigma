@@ -18,10 +18,10 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
-from core.dlr import DLRBuilder
-from core.ds import DriftSignalCollector
-from core.mg import MemoryGraph
-from core.rs import ReflectionSession
+from .dlr import DLRBuilder
+from .ds import DriftSignalCollector
+from .mg import MemoryGraph
+from .rs import ReflectionSession
 
 logger = logging.getLogger(__name__)
 

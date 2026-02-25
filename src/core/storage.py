@@ -22,6 +22,8 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from .normalize import normalize_keys
+
 logger = logging.getLogger(__name__)
 
 
@@ -164,16 +166,19 @@ class SQLiteStorageBackend(StorageBackend):
     # -- Episodes --
 
     def save_episode(self, episode: Dict[str, Any]) -> None:
+        episode = normalize_keys(episode)
         data = json.dumps(episode, default=str)
-        ep_id = episode.get("episodeId", episode.get("episode_id", ""))
+        ep_id = episode.get("episodeId", "")
+        outcome = episode.get("outcome", {})
+        outcome_code = outcome.get("code") if isinstance(outcome, dict) else None
         with self._lock:
             self._conn.execute(
                 "INSERT OR REPLACE INTO episodes "
                 "(episode_id, decision_type, sealed_at, outcome_code, data) "
                 "VALUES (?, ?, ?, ?, ?)",
-                (ep_id, episode.get("decisionType", episode.get("decision_type")),
-                 episode.get("sealedAt", episode.get("sealed_at")),
-                 episode.get("outcome", {}).get("code") if isinstance(episode.get("outcome"), dict) else episode.get("outcome_code"),
+                (ep_id, episode.get("decisionType"),
+                 episode.get("sealedAt"),
+                 outcome_code,
                  data),
             )
             self._conn.commit()
@@ -194,17 +199,18 @@ class SQLiteStorageBackend(StorageBackend):
     # -- Drift --
 
     def append_drift(self, drift: Dict[str, Any]) -> None:
+        drift = normalize_keys(drift)
         data = json.dumps(drift, default=str)
         with self._lock:
             self._conn.execute(
                 "INSERT OR IGNORE INTO drifts "
                 "(drift_id, episode_id, drift_type, severity, detected_at, data) "
                 "VALUES (?, ?, ?, ?, ?, ?)",
-                (drift.get("driftId", drift.get("drift_id")),
-                 drift.get("episodeId", drift.get("episode_id")),
-                 drift.get("driftType", drift.get("drift_type")),
+                (drift.get("driftId"),
+                 drift.get("episodeId"),
+                 drift.get("driftType"),
                  drift.get("severity"),
-                 drift.get("detectedAt", drift.get("detected_at")),
+                 drift.get("detectedAt"),
                  data),
             )
             self._conn.commit()
@@ -219,18 +225,19 @@ class SQLiteStorageBackend(StorageBackend):
     # -- DLRs --
 
     def save_dlr(self, dlr: Dict[str, Any]) -> None:
+        dlr = normalize_keys(dlr)
         data = json.dumps(dlr, default=str)
-        dlr_id = dlr.get("dlr_id", dlr.get("dlrId", ""))
+        dlr_id = dlr.get("dlrId", "")
         with self._lock:
             self._conn.execute(
                 "INSERT OR REPLACE INTO dlrs "
                 "(dlr_id, episode_id, decision_type, recorded_at, outcome_code, data) "
                 "VALUES (?, ?, ?, ?, ?, ?)",
                 (dlr_id,
-                 dlr.get("episode_id", dlr.get("episodeId")),
-                 dlr.get("decision_type", dlr.get("decisionType")),
-                 dlr.get("recorded_at", dlr.get("recordedAt")),
-                 dlr.get("outcome_code", dlr.get("outcomeCode")),
+                 dlr.get("episodeId"),
+                 dlr.get("decisionType"),
+                 dlr.get("recordedAt"),
+                 dlr.get("outcomeCode"),
                  data),
             )
             self._conn.commit()
@@ -309,7 +316,8 @@ class JSONLStorageBackend(StorageBackend):
     # -- Episodes --
 
     def save_episode(self, episode: Dict[str, Any]) -> None:
-        ep_id = episode.get("episodeId", episode.get("episode_id", "unknown"))
+        episode = normalize_keys(episode)
+        ep_id = episode.get("episodeId", "unknown")
         ep_dir = self._dir / "episodes"
         ep_dir.mkdir(parents=True, exist_ok=True)
         with self._lock:
@@ -340,7 +348,8 @@ class JSONLStorageBackend(StorageBackend):
     # -- DLRs --
 
     def save_dlr(self, dlr: Dict[str, Any]) -> None:
-        dlr_id = dlr.get("dlr_id", dlr.get("dlrId", "unknown"))
+        dlr = normalize_keys(dlr)
+        dlr_id = dlr.get("dlrId", "unknown")
         dlr_dir = self._dir / "dlrs"
         dlr_dir.mkdir(parents=True, exist_ok=True)
         with self._lock:
@@ -448,10 +457,11 @@ class PostgreSQLStorageBackend(StorageBackend):
     # -- Episodes --
 
     def save_episode(self, episode: Dict[str, Any]) -> None:
+        episode = normalize_keys(episode)
         data = json.dumps(episode, default=str)
-        ep_id = episode.get("episodeId", episode.get("episode_id", ""))
+        ep_id = episode.get("episodeId", "")
         outcome = episode.get("outcome", {})
-        outcome_code = outcome.get("code") if isinstance(outcome, dict) else episode.get("outcome_code")
+        outcome_code = outcome.get("code") if isinstance(outcome, dict) else None
         with self._pool.connection() as conn:
             conn.execute(
                 "INSERT INTO episodes (episode_id, decision_type, sealed_at, outcome_code, data) "
@@ -459,8 +469,8 @@ class PostgreSQLStorageBackend(StorageBackend):
                 "ON CONFLICT (episode_id) DO UPDATE SET "
                 "decision_type=EXCLUDED.decision_type, sealed_at=EXCLUDED.sealed_at, "
                 "outcome_code=EXCLUDED.outcome_code, data=EXCLUDED.data",
-                (ep_id, episode.get("decisionType", episode.get("decision_type")),
-                 episode.get("sealedAt", episode.get("sealed_at")),
+                (ep_id, episode.get("decisionType"),
+                 episode.get("sealedAt"),
                  outcome_code, data),
             )
             conn.commit()
@@ -485,16 +495,17 @@ class PostgreSQLStorageBackend(StorageBackend):
     # -- Drift --
 
     def append_drift(self, drift: Dict[str, Any]) -> None:
+        drift = normalize_keys(drift)
         data = json.dumps(drift, default=str)
         with self._pool.connection() as conn:
             conn.execute(
                 "INSERT INTO drifts (drift_id, episode_id, drift_type, severity, detected_at, data) "
                 "VALUES (%s, %s, %s, %s, %s, %s::jsonb) ON CONFLICT (drift_id) DO NOTHING",
-                (drift.get("driftId", drift.get("drift_id")),
-                 drift.get("episodeId", drift.get("episode_id")),
-                 drift.get("driftType", drift.get("drift_type")),
+                (drift.get("driftId"),
+                 drift.get("episodeId"),
+                 drift.get("driftType"),
                  drift.get("severity"),
-                 drift.get("detectedAt", drift.get("detected_at")),
+                 drift.get("detectedAt"),
                  data),
             )
             conn.commit()
@@ -510,8 +521,9 @@ class PostgreSQLStorageBackend(StorageBackend):
     # -- DLRs --
 
     def save_dlr(self, dlr: Dict[str, Any]) -> None:
+        dlr = normalize_keys(dlr)
         data = json.dumps(dlr, default=str)
-        dlr_id = dlr.get("dlr_id", dlr.get("dlrId", ""))
+        dlr_id = dlr.get("dlrId", "")
         with self._pool.connection() as conn:
             conn.execute(
                 "INSERT INTO dlrs (dlr_id, episode_id, decision_type, recorded_at, outcome_code, data) "
@@ -521,10 +533,10 @@ class PostgreSQLStorageBackend(StorageBackend):
                 "recorded_at=EXCLUDED.recorded_at, outcome_code=EXCLUDED.outcome_code, "
                 "data=EXCLUDED.data",
                 (dlr_id,
-                 dlr.get("episode_id", dlr.get("episodeId")),
-                 dlr.get("decision_type", dlr.get("decisionType")),
-                 dlr.get("recorded_at", dlr.get("recordedAt")),
-                 dlr.get("outcome_code", dlr.get("outcomeCode")),
+                 dlr.get("episodeId"),
+                 dlr.get("decisionType"),
+                 dlr.get("recordedAt"),
+                 dlr.get("outcomeCode"),
                  data),
             )
             conn.commit()

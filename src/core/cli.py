@@ -28,11 +28,8 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List
 
-_REPO_ROOT = Path(__file__).resolve().parents[2]
-if str(_REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(_REPO_ROOT))
-
-from core import (  # noqa: E402
+from core import __version__
+from . import (
     CoherenceAuditor,
     CoherenceManifest,
     CoherenceScorer,
@@ -41,13 +38,14 @@ from core import (  # noqa: E402
     MemoryGraph,
     ReflectionSession,
 )
-from core.iris import (  # noqa: E402
+from .iris import (
     IRISConfig,
     IRISEngine,
     IRISQuery,
     QueryType,
 )
-from core.manifest import ArtifactDeclaration, ArtifactKind, ComplianceLevel  # noqa: E402
+from .manifest import ArtifactDeclaration, ArtifactKind, ComplianceLevel
+from .normalize import normalize_keys
 
 
 def _load_json_like(text: str) -> List[Dict[str, Any]]:
@@ -62,12 +60,12 @@ def _load_json_like(text: str) -> List[Dict[str, Any]]:
 def _load_episodes(path: str) -> List[Dict[str, Any]]:
     p = Path(path)
     if p.is_file():
-        return _load_json_like(p.read_text())
+        return normalize_keys(_load_json_like(p.read_text()))
     if p.is_dir():
         episodes: List[Dict[str, Any]] = []
         for f in sorted(p.glob("*.json")):
             episodes.extend(_load_json_like(f.read_text()))
-        return episodes
+        return normalize_keys(episodes)
 
     print(f"Error: {path} is not a file or directory", file=sys.stderr)
     sys.exit(1)
@@ -85,7 +83,7 @@ def _load_drift(path: str) -> List[Dict[str, Any]]:
             drift_file = candidates[0]
 
     if drift_file and drift_file.exists():
-        return _load_json_like(drift_file.read_text())
+        return normalize_keys(_load_json_like(drift_file.read_text()))
 
     return []
 
@@ -139,7 +137,7 @@ def cmd_audit(args: argparse.Namespace) -> None:
         ds=ds,
         mg=mg,
     )
-    report = auditor.run(run_id="cli-audit")
+    report = auditor.run(audit_id="cli-audit")
 
     print(f"Coherence Audit | system: {report.manifest_system_id}")
     print(f"Result: {'PASSED' if report.passed else 'FAILED'}")
@@ -231,7 +229,7 @@ def cmd_reconcile(args: argparse.Namespace) -> None:
     drift_events = _load_drift(args.path)
     dlr, _rs, ds, mg = _build_pipeline(episodes, drift_events)
 
-    from core.reconciler import Reconciler
+    from .reconciler import Reconciler
     reconciler = Reconciler(dlr_builder=dlr, ds=ds, mg=mg)
     result = reconciler.reconcile()
 
@@ -261,7 +259,7 @@ def cmd_schema_validate(args: argparse.Namespace) -> None:
     data = json.loads(p.read_text())
     items = data if isinstance(data, list) else [data]
 
-    from engine.schema_validator import validate
+    from .schema_validator import validate
     all_valid = True
     results = []
     for i, item in enumerate(items):
@@ -295,7 +293,7 @@ def cmd_dte_check(args: argparse.Namespace) -> None:
 
     dte_spec = json.loads(dte_path.read_text())
 
-    from engine.dte_enforcer import DTEEnforcer
+    from .dte_enforcer import DTEEnforcer
     enforcer = DTEEnforcer(dte_spec)
 
     results = []
@@ -343,40 +341,6 @@ def cmd_dte_check(args: argparse.Namespace) -> None:
     sys.exit(1 if results else 0)
 
 
-def cmd_golden_path(args: argparse.Namespace) -> None:
-    """Run the 7-step Golden Path decision governance loop."""
-    from demos.golden_path.config import GoldenPathConfig
-    from demos.golden_path.pipeline import GoldenPathPipeline
-
-    config = GoldenPathConfig(
-        source=args.source,
-        fixture_path=args.fixture,
-        episode_id=getattr(args, "episode_id", "gp-demo"),
-        decision_type=getattr(args, "decision_type", "ingest"),
-        output_dir=getattr(args, "output", "./golden_path_output"),
-        supervised=getattr(args, "supervised", False),
-        list_id=getattr(args, "list_id", ""),
-        table_name=getattr(args, "table", ""),
-        sql=getattr(args, "sql", ""),
-        prompt=getattr(args, "prompt", ""),
-    )
-
-    pipeline = GoldenPathPipeline(config)
-    result = pipeline.run()
-
-    if getattr(args, "json", False):
-        print(json.dumps(result.to_dict(), indent=2))
-    else:
-        print(f"\nGolden Path complete: {len(result.steps_completed)}/7 steps")
-        print(f"  Records: {result.canonical_records}  Claims: {result.claims_extracted}")
-        print(f"  Baseline: {result.baseline_score:.1f} ({result.baseline_grade})")
-        print(f"  Drift: {result.drift_events} events  Patch: {result.patch_applied}")
-        print(f"  Patched:  {result.patched_score:.1f} ({result.patched_grade})")
-        print(f"  IRIS: {result.iris_queries}")
-        print(f"  Output:   {result.output_dir}")
-        print(f"  Elapsed:  {result.elapsed_ms:.0f}ms")
-
-
 def cmd_demo(args: argparse.Namespace) -> None:  # noqa: ARG001
     parser = argparse.ArgumentParser(
         prog="coherence demo",
@@ -395,6 +359,9 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         prog="coherence",
         description="Coherence Ops CLI",
+    )
+    parser.add_argument(
+        "--version", action="version", version=f"%(prog)s {__version__}",
     )
     parser.set_defaults(func=None)
     subparsers = parser.add_subparsers(dest="command", required=False)
@@ -483,28 +450,6 @@ def main() -> None:
     p_dte_check.add_argument("--dte", required=True, help="Path to DTE spec JSON")
     p_dte_check.add_argument("--json", action="store_true", help="Output JSON")
     p_dte_check.set_defaults(func=cmd_dte_check)
-
-    # ── golden-path ────────────────────────────────────────────────
-    p_gp = subparsers.add_parser(
-        "golden-path",
-        help="Run the 7-step Golden Path decision governance loop",
-    )
-    p_gp.add_argument(
-        "source",
-        choices=["sharepoint", "snowflake", "dataverse", "asksage"],
-        help="Data source connector",
-    )
-    p_gp.add_argument("--fixture", default=None, help="Path to fixture directory")
-    p_gp.add_argument("--episode-id", default="gp-demo", help="Episode ID")
-    p_gp.add_argument("--decision-type", default="ingest", help="Decision type")
-    p_gp.add_argument("--output", default="./golden_path_output", help="Output directory")
-    p_gp.add_argument("--supervised", action="store_true", help="Pause before patch")
-    p_gp.add_argument("--list-id", default="", help="SharePoint list ID")
-    p_gp.add_argument("--table", default="", help="Dataverse table name")
-    p_gp.add_argument("--sql", default="", help="Snowflake SQL query")
-    p_gp.add_argument("--prompt", default="", help="AskSage prompt")
-    p_gp.add_argument("--json", action="store_true", help="Output JSON result")
-    p_gp.set_defaults(func=cmd_golden_path)
 
     # ── demo ─────────────────────────────────────────────────────
     p_demo = subparsers.add_parser(

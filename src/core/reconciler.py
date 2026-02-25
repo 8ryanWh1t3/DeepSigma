@@ -17,9 +17,9 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from core.dlr import DLRBuilder
-from core.ds import DriftSignalCollector
-from core.mg import MemoryGraph, NodeKind
+from .dlr import DLRBuilder
+from .ds import DriftSignalCollector
+from .mg import MemoryGraph, NodeKind
 
 logger = logging.getLogger(__name__)
 
@@ -212,7 +212,7 @@ class Reconciler:
         """Apply a single auto-fixable proposal."""
         if proposal.kind == RepairKind.ADD_MG_NODE and self.mg is not None:
             # Create a minimal episode node in the graph
-            from core.mg import GraphNode
+            from .mg import GraphNode
             self.mg._add_node(GraphNode(
                 node_id=proposal.target_id,
                 kind=NodeKind.EPISODE,

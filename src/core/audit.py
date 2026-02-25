@@ -16,11 +16,11 @@ from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from core.dlr import DLRBuilder
-from core.ds import DriftSignalCollector
-from core.mg import MemoryGraph
-from core.rs import ReflectionSession
-from core.manifest import CoherenceManifest, ArtifactKind, ComplianceLevel
+from .dlr import DLRBuilder
+from .ds import DriftSignalCollector
+from .mg import MemoryGraph
+from .rs import ReflectionSession
+from .manifest import CoherenceManifest, ArtifactKind, ComplianceLevel
 
 logger = logging.getLogger(__name__)
 

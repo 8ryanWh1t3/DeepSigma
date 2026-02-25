@@ -30,6 +30,9 @@ jobs:
           make edition-guard
           make secret-scan
 
+      - name: Type check
+        run: pyright src/core/
+
       - name: CORE demo + baseline + tests
         run: |
           make core-ci
@@ -49,7 +52,8 @@ jobs:
       - name: Install ENTERPRISE
         run: |
           python -m pip install --upgrade pip
-          pip install -e ".[enterprise,dev]"
+          pip install -e ".[dev]"
+          pip install -e "./enterprise[dev]"
 
       - name: Guardrails
         run: |

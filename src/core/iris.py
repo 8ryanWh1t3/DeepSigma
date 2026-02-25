@@ -575,7 +575,7 @@ class IRISEngine:
 
         # CoherenceScorer: primary source (+0.70)
         try:
-            from core.scoring import CoherenceScorer
+            from .scoring import CoherenceScorer
             scorer = CoherenceScorer(
                 dlr_builder=None,  # pass a compatible wrapper
                 rs=self._rs,

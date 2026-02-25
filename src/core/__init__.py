@@ -26,7 +26,12 @@ ResolutionStatus   — OK | PARTIAL | NOT_FOUND | ERROR
 """
 from __future__ import annotations
 
-__version__ = "2.0.3"
+from importlib.metadata import version as _pkg_version, PackageNotFoundError
+
+try:
+    __version__ = _pkg_version("deepsigma")
+except PackageNotFoundError:
+    __version__ = "0.0.0-dev"
 
 from core.manifest import CoherenceManifest
 from core.dlr import (
@@ -50,6 +55,8 @@ from core.iris import (
     IRISConfig,
     ResolutionStatus,
 )
+from core.normalize import normalize_keys
+from core.coherence_gate import CoherenceGate, GateConfig, GateResult, Signal
 from core.prime import (
     PRIMEGate,
     PRIMEConfig,
@@ -91,4 +98,9 @@ __all__ = [
     "ConfidenceBand",
     "IRISConfig",
     "ResolutionStatus",
+    "normalize_keys",
+    "CoherenceGate",
+    "GateConfig",
+    "GateResult",
+    "Signal",
 ]

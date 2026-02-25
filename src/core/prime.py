@@ -136,6 +136,9 @@ class PRIMEConfig:
     temperature_ceiling: float = 0.8
     require_seal: bool = False
     contested_claim_policy: str = "defer"
+    tool_allowlist: list[str] = field(default_factory=list)
+    cost_cap_usd: float = 0.0
+    offline_lane: bool = False
 
     def validate(self) -> list[str]:
         issues = []

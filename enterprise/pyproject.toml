@@ -1,0 +1,96 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deepsigma-enterprise"
+version = "2.0.6"
+description = "DeepSigma Enterprise — adapters, mesh, demos, and tooling overlay"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Bryan David White", email = "8ryanWh1t3@gmail.com"},
+]
+
+dependencies = [
+    "deepsigma>=2.0.6",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "ruff",
+]
+azure = [
+    "msal>=1.25.0",
+]
+excel = [
+    "openpyxl>=3.1.0",
+]
+exhaust-llm = [
+    "anthropic>=0.40.0",
+]
+langgraph = [
+    "langgraph>=0.2.0",
+]
+local = [
+    "httpx>=0.25.0",
+]
+mesh = [
+    "httpx>=0.25.0",
+    "uvicorn>=0.24.0",
+    "msgpack>=1.0.0",
+]
+openclaw = [
+    "wasmtime>=23.0",
+]
+otel = [
+    "opentelemetry-api>=1.20.0",
+    "opentelemetry-sdk>=1.20.0",
+    "opentelemetry-exporter-otlp>=1.20.0",
+]
+postgresql = [
+    "psycopg[binary]>=3.1.0",
+]
+rdf = [
+    "rdflib<8,>=7.0",
+    "pyparsing>=3.1",
+    "pyshacl>=0.25",
+]
+snowflake = [
+    "cryptography>=42.0",
+]
+viz = [
+    "matplotlib>=3.10.0",
+]
+all = [
+    "deepsigma-enterprise[azure,excel,exhaust-llm,langgraph,local,mesh,openclaw,otel,postgresql,rdf,snowflake,viz]",
+]
+
+[project.urls]
+Homepage = "https://github.com/8ryanWh1t3/DeepSigma"
+Repository = "https://github.com/8ryanWh1t3/DeepSigma"
+
+[project.scripts]
+deepsigma = "deepsigma.cli.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = [
+    "adapters*",
+    "credibility_engine*",
+    "deepsigma*",
+    "demos*",
+    "engine*",
+    "governance*",
+    "mdpt*",
+    "mesh*",
+    "services*",
+    "tenancy*",
+    "tools*",
+    "verifiers*",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
