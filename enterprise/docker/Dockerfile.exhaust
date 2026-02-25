@@ -28,13 +28,13 @@ RUN pip install --no-cache-dir \
 WORKDIR /app
 
 COPY pyproject.toml /app/
-COPY dashboard/server/ /app/dashboard/server/
+COPY enterprise/dashboard/server/ /app/dashboard/server/
 RUN touch /app/dashboard/__init__.py /app/dashboard/server/__init__.py
-COPY src/engine/ /app/engine/
 COPY src/core/ /app/core/
-COPY src/verifiers/ /app/verifiers/
-COPY src/tools/ /app/tools/
-COPY src/adapters/ /app/adapters/
+COPY enterprise/src/engine/ /app/engine/
+COPY enterprise/src/verifiers/ /app/verifiers/
+COPY enterprise/src/tools/ /app/tools/
+COPY enterprise/src/adapters/ /app/adapters/
 
 RUN pip install --no-cache-dir -e /app
 

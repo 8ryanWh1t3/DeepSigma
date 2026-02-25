@@ -587,7 +587,7 @@ class IRISEngine:
                 class _DLRWrap:
                     def __init__(self, entries: list) -> None:
                         self.entries = entries
-                scorer.dlr = _DLRWrap(self._dlr_entries)
+                scorer.dlr = _DLRWrap(self._dlr_entries)  # type: ignore[assignment]
 
             report = scorer.score()
             confidence += 0.70

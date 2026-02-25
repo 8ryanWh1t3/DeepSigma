@@ -7,7 +7,7 @@ RUN pip install --no-cache-dir \
     "uvicorn[standard]>=0.24.0"
 
 COPY pyproject.toml /app/
-COPY src/mesh/ /app/mesh/
+COPY enterprise/src/mesh/ /app/mesh/
 
 RUN pip install --no-cache-dir -e /app
 
