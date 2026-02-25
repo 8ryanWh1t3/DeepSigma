@@ -1,9 +1,9 @@
 """Unit tests for the full coherence bridge: episode -> all four pillars."""
 import json
-from core.dlr import DLRBuilder
-from core.rs import ReflectionSession
-from core.ds import DriftSignalCollector
-from core.mg import MemoryGraph
+from core.decision_log import DLRBuilder
+from core.reflection import ReflectionSession
+from core.drift_signal import DriftSignalCollector
+from core.memory_graph import MemoryGraph
 
 
 # ---------------------------------------------------------------------------

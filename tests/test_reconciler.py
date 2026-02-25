@@ -36,10 +36,10 @@ def _make_drift_event(episode_id="ep_001", fingerprint_key="drift:test:v1", seve
 
 
 def _build_pipeline(episodes, drift_events=None):
-    from core.dlr import DLRBuilder
-    from core.rs import ReflectionSession
-    from core.ds import DriftSignalCollector
-    from core.mg import MemoryGraph
+    from core.decision_log import DLRBuilder
+    from core.reflection import ReflectionSession
+    from core.drift_signal import DriftSignalCollector
+    from core.memory_graph import MemoryGraph
 
     dlr = DLRBuilder()
     dlr.from_episodes(episodes)

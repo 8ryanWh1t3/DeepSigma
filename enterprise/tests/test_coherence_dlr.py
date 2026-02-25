@@ -1,6 +1,6 @@
-"""Unit tests for core.dlr — Decision Log Record builder."""
+"""Unit tests for core.decision_log — Decision Log Record builder."""
 import json
-from core.dlr import DLRBuilder, DLREntry
+from core.decision_log import DLRBuilder, DLREntry
 
 
 # ---------------------------------------------------------------------------

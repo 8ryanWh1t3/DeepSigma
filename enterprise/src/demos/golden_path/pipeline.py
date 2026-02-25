@@ -154,10 +154,10 @@ class GoldenPathPipeline:
         claims: List[Dict[str, Any]],
     ) -> Tuple[Any, Any, Any, Any, Any]:
         """Step 4: Build DLR, RS, DS, MG and score."""
-        from core.dlr import DLRBuilder
-        from core.rs import ReflectionSession
-        from core.ds import DriftSignalCollector
-        from core.mg import MemoryGraph
+        from core.decision_log import DLRBuilder
+        from core.reflection import ReflectionSession
+        from core.drift_signal import DriftSignalCollector
+        from core.memory_graph import MemoryGraph
         from core.scoring import CoherenceScorer
 
         dlr = DLRBuilder()
@@ -206,10 +206,10 @@ class GoldenPathPipeline:
     ) -> Tuple[List[Dict[str, Any]], Any, Any]:
         """Step 6: Emit patches, rebuild artifacts, re-score."""
         from datetime import datetime, timezone
-        from core.dlr import DLRBuilder
-        from core.rs import ReflectionSession
-        from core.ds import DriftSignalCollector
-        from core.mg import MemoryGraph
+        from core.decision_log import DLRBuilder
+        from core.reflection import ReflectionSession
+        from core.drift_signal import DriftSignalCollector
+        from core.memory_graph import MemoryGraph
         from core.scoring import CoherenceScorer
 
         now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"

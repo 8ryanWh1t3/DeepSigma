@@ -1,6 +1,6 @@
-"""Unit tests for core.ds — Drift Signal Collector (Decision Scaffold)."""
+"""Unit tests for core.drift_signal — Drift Signal Collector (Decision Scaffold)."""
 import json
-from core.ds import DriftSignalCollector, DriftSummary
+from core.drift_signal import DriftSignalCollector, DriftSummary
 
 
 def _drift(drift_type="freshness", severity="yellow", fp_key="AQ:freshness:geo",

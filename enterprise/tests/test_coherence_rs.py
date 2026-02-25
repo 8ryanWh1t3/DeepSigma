@@ -1,6 +1,6 @@
-"""Unit tests for core.rs — Reflection Session (Reality Snapshot)."""
+"""Unit tests for core.reflection — Reflection Session (Reality Snapshot)."""
 import json
-from core.rs import ReflectionSession, ReflectionSummary
+from core.reflection import ReflectionSession, ReflectionSummary
 
 
 def _ep(episode_id="ep-1", outcome="success", degrade="none", verify="pass"):

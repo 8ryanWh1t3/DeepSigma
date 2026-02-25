@@ -34,16 +34,16 @@ except PackageNotFoundError:
     __version__ = "0.0.0-dev"
 
 from .manifest import CoherenceManifest
-from .dlr import (
+from .decision_log import (
     DLRBuilder,
     ClaimNativeDLRBuilder,
     ClaimNativeDLREntry,
     ClaimRef,
     RationaleEdge,
 )
-from .rs import ReflectionSession
-from .ds import DriftSignalCollector
-from .mg import MemoryGraph, NodeKind, EdgeKind
+from .reflection import ReflectionSession
+from .drift_signal import DriftSignalCollector
+from .memory_graph import MemoryGraph, NodeKind, EdgeKind
 from .audit import CoherenceAuditor
 from .scoring import CoherenceScorer
 from .reconciler import Reconciler

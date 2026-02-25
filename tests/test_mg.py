@@ -1,6 +1,6 @@
-"""Unit tests for core.mg — Memory Graph node/edge creation."""
+"""Unit tests for core.memory_graph — Memory Graph node/edge creation."""
 import json
-from core.mg import MemoryGraph
+from core.memory_graph import MemoryGraph
 
 
 def _episode(episode_id="ep-1", decision_type="AccountQuarantine"):

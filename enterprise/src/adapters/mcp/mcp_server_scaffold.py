@@ -449,7 +449,7 @@ def handle_tools_call(_id: Any, params: Dict[str, Any]) -> Dict[str, Any]:
             _load_pipeline()
         if _iris_pipeline is None:
             return rpc_error(_id, -32000, "No data loaded. Call iris.reload first or set DATA_DIR.")
-        from core.dlr import DLRBuilder
+        from core.decision_log import DLRBuilder
         dlr_builder = DLRBuilder()
         entry = dlr_builder.from_episode(episode)
         mg = _iris_pipeline["mg"]
