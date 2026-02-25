@@ -5,6 +5,15 @@
 
 # DeepSigma
 
+> **Organizational coherence** is the ability to see, decide, and act as one system over time—because its truth, reasoning, and memory stay aligned across people, tools, and turnover.
+>
+> In practice, coherence means:
+> - the "why" is retrievable (not tribal)
+> - authority is explicit (not implied)
+> - changes are patched, not overwritten
+> - cross-team work links (people ↔ scope ↔ cost ↔ requirements)
+> - drift is detected early and corrected consistently
+
 DeepSigma is institutional decision infrastructure: capture intent, run governed execution, detect drift, and patch safely.
 
 This repository ships as one product line with one version and two editions:
