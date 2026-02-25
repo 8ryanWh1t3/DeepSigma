@@ -5,6 +5,38 @@
 
 # DeepSigma
 
+Institutional decision infrastructure: capture intent, run governed execution, detect drift, and patch safely.
+
+## 60-Second Proof
+
+```bash
+pip install deepsigma
+./run_money_demo.sh
+```
+
+Expected output:
+
+```
+BASELINE  score=90.00  grade=A
+DRIFT     score=85.75  grade=B  red_flags=1
+PATCH     score=90.00  grade=A  patch=RETCON  drift_resolved=true
+```
+
+**What just happened:**
+
+1. **BASELINE** — scored an entity under a policy pack, produced a sealed episode
+2. **DRIFT** — re-scored after a data change, detected coherence drift automatically
+3. **PATCH** — applied a governed retcon patch, restored coherence, sealed the resolution
+
+8 deterministic artifacts land in `docs/examples/demo-stack/drift_patch_cycle_run/`.
+Every run produces the same scores, same grades, same artifacts — verify with:
+
+```bash
+make core-baseline   # SHA-256 proof in CORE_BASELINE_REPORT.json
+```
+
+## What It Does
+
 > **Organizational coherence** is the ability to see, decide, and act as one system over time—because its truth, reasoning, and memory stay aligned across people, tools, and turnover.
 >
 > In practice, coherence means:
@@ -14,39 +46,14 @@
 > - cross-team work links (people ↔ scope ↔ cost ↔ requirements)
 > - drift is detected early and corrected consistently
 
-DeepSigma is institutional decision infrastructure: capture intent, run governed execution, detect drift, and patch safely.
+## Editions
 
-This repository ships as one product line with one version and two editions:
+One product line, one version, two editions:
 
 - **CORE edition:** minimal, demo-first, deterministic (`pip install deepsigma`)
 - **ENTERPRISE edition:** extended adapters, dashboards, and ops surfaces (repo-native under `enterprise/`)
 
-Edition boundary ledger:
-- `EDITION_DIFF.md`
-
-## Quick Start (Core)
-
-```bash
-pip install deepsigma
-./run_money_demo.sh
-```
-
-What this gives you immediately:
-
-- Drift -> Patch demo run
-- Contract test verification (`tests/test_money_demo.py`)
-- Deterministic artifacts in `docs/examples/demo-stack/drift_patch_cycle_run/`
-
-Optional baseline proof:
-
-```bash
-make core-baseline
-```
-
-Outputs:
-
-- `docs/examples/demo-stack/CORE_BASELINE_REPORT.json`
-- `docs/examples/demo-stack/CORE_BASELINE_REPORT.md`
+Edition boundary ledger: `EDITION_DIFF.md`
 
 ## Operating Modes
 

@@ -13,7 +13,6 @@ This file is the canonical boundary ledger between CORE and ENTERPRISE.
 
 - CORE code lives in:
   - `src/core/`
-  - `src/coherence_ops/`
 - ENTERPRISE code lives in:
   - `enterprise/src/`
   - `enterprise/dashboard/`

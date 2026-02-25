@@ -44,8 +44,8 @@ def is_core_file(path: str) -> bool:
         return True
     if p.parts[0] in {"docs", "tests", "requirements", "src"}:
         if p.parts[0] == "src":
-            # Core edition ships only core namespace + temporary shim.
-            return len(p.parts) > 1 and p.parts[1] in {"core", "coherence_ops"}
+            # Core edition ships only core namespace.
+            return len(p.parts) > 1 and p.parts[1] == "core"
         return True
     return False
 
