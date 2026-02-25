@@ -552,19 +552,15 @@
         }
 
         .ci-value-box {
-            position: absolute;
-            bottom: -2px;
-            left: 50%;
-            transform: translateX(-50%);
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2px;
+            margin-top: 4px;
         }
 
         .ci-value {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 800;
             color: var(--success);
             line-height: 1;
@@ -1477,27 +1473,97 @@
         }
 
         /* IRIS query results */
-        .iris-result {
-            padding: 10px 12px;
+        .iris-response {
+            padding: 12px;
             background: var(--bg-secondary);
             border-radius: 8px;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             border-left: 3px solid var(--accent);
         }
-        .iris-result-title {
-            font-size: 12px;
-            font-weight: 600;
+        .iris-response.RESOLVED { border-left-color: var(--success); }
+        .iris-response.PARTIAL { border-left-color: var(--warning); }
+        .iris-response.NOT_FOUND { border-left-color: var(--text-muted); }
+        .iris-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
         }
-        .iris-result-body {
-            font-size: 11px;
+        .iris-query-type {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--accent);
+            color: white;
+        }
+        .iris-status {
+            font-size: 9px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .iris-status.RESOLVED { background: rgba(34,197,94,0.15); color: var(--success); }
+        .iris-status.PARTIAL { background: rgba(234,179,8,0.15); color: var(--warning); }
+        .iris-status.NOT_FOUND { background: rgba(100,100,100,0.15); color: var(--text-muted); }
+        .iris-summary {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .iris-confidence {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
             color: var(--text-secondary);
-            margin-top: 4px;
+            margin-bottom: 8px;
+        }
+        .iris-conf-bar {
+            width: 60px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .iris-conf-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.3s;
         }
         .iris-provenance {
-            font-size: 9px;
-            color: var(--text-muted);
-            margin-top: 4px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border);
         }
+        .iris-prov-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            color: var(--text-muted);
+            padding: 2px 0;
+        }
+        .iris-artifact {
+            font-weight: 700;
+            font-size: 9px;
+            padding: 1px 4px;
+            border-radius: 3px;
+            min-width: 24px;
+            text-align: center;
+        }
+        .iris-artifact.MG { background: rgba(139,92,246,0.2); color: #a78bfa; }
+        .iris-artifact.DLR { background: rgba(59,130,246,0.2); color: #60a5fa; }
+        .iris-artifact.RS { background: rgba(34,197,94,0.2); color: #4ade80; }
+        .iris-artifact.DS { background: rgba(249,115,22,0.2); color: #fb923c; }
+        .iris-data-row {
+            font-size: 11px;
+            color: var(--text-secondary);
+            padding: 2px 0;
+        }
+        .iris-data-label { font-weight: 600; color: var(--text-primary); }
 
         /* Toast Notifications */
         .toast-container {
@@ -2981,10 +3047,10 @@
                                             <path class="gauge-track" d="M 16 80 A 64 64 0 0 1 144 80"/>
                                             <path class="gauge-fill" id="ciGauge" d="M 16 80 A 64 64 0 0 1 144 80"/>
                                         </svg>
-                                        <div class="ci-value-box">
-                                            <span class="ci-value"><span id="ciValue">0</span><span class="grade-badge" id="ciGrade">-</span></span>
-                                            <div class="ci-label">CI Score</div>
-                                        </div>
+                                    </div>
+                                    <div class="ci-value-box">
+                                        <span class="ci-value"><span id="ciValue">0</span><span class="grade-badge" id="ciGrade">-</span></span>
+                                        <div class="ci-label">CI Score</div>
                                     </div>
                                     <div class="ci-status">
                                         <div class="live-dot"></div>
@@ -4813,77 +4879,280 @@
             document.getElementById('cmdResults').innerHTML = html;
         }
 
-        function renderIRISQuery(type, term) {
-            var html = '<div class="cmd-group"><div class="cmd-group-label">IRIS: ' + escapeHtml(type.toUpperCase()) + '</div>';
-            var t = term.toLowerCase();
+        // ──────────────────────────────────────────────────────────
+        // IRIS Engine (client-side, mirrors src/core/iris.py)
+        // ──────────────────────────────────────────────────────────
 
-            if (type === 'why') {
+        function irisResolve(queryType, term) {
+            var start = performance.now();
+            var queryId = 'iris-' + Math.random().toString(36).substr(2, 12);
+            var t = (term || '').toLowerCase();
+            var provenance = [];
+            var confidence = 0.0;
+            var summary = '';
+            var dataOut = {};
+            var status = 'NOT_FOUND';
+            var warnings = [];
+
+            if (queryType === 'WHY') {
+                // WHY: claim → evidence → source provenance (MG=0.50 DLR=0.35 RS=0.15)
                 var claim = data.claims.find(function(c) { return c.claimId.toLowerCase().includes(t); });
                 if (claim) {
-                    var evList = (claim.evidence || []).map(function(e) { return escapeHtml(e.summary || e.ref); }).join(', ') || 'No evidence';
-                    var srcList = (claim.sources || []).map(function(s) { return escapeHtml(s.ref) + ' (' + escapeHtml(s.reliability) + ')'; }).join(', ') || 'No sources';
-                    html += '<div class="iris-result">' +
-                        '<div style="font-weight:600;">' + escapeHtml(claim.claimId) + ': ' + escapeHtml(claim.statement.substring(0, 60)) + '</div>' +
-                        '<div style="margin-top:4px;font-size:11px;"><strong>Evidence:</strong> ' + evList + '</div>' +
-                        '<div style="margin-top:2px;font-size:11px;"><strong>Sources:</strong> ' + srcList + '</div>' +
-                        '<div style="margin-top:2px;font-size:11px;"><strong>Confidence:</strong> ' + claim.confidence.score.toFixed(2) + ' — ' + escapeHtml(claim.confidence.explanation) + '</div>' +
-                    '</div>';
-                } else {
-                    html += '<div class="iris-result">No claim matching "' + escapeHtml(term) + '"</div>';
-                }
-            } else if (type === 'drift') {
-                var signals = data.driftSignals.filter(function(d) {
-                    return (d.evidenceRefs || []).some(function(r) { return r.toLowerCase().includes(t); }) || d.driftId.toLowerCase().includes(t);
-                });
-                if (signals.length > 0) {
-                    signals.forEach(function(ds) {
-                        html += '<div class="iris-result" onclick="showDriftDetail(\'' + escapeHtml(ds.driftId) + '\'); closeCommandPalette();" style="cursor:pointer;">' +
-                            '<span class="drift-severity ' + ds.severity + '" style="display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;"></span>' +
-                            '<strong>' + escapeHtml(ds.driftId) + '</strong> ' + escapeHtml(ds.driftType) + ' — ' + escapeHtml(ds.notes) +
-                        '</div>';
+                    // MG: claim node provenance (+0.50)
+                    confidence += 0.50;
+                    dataOut.claim = { claimId: claim.claimId, truthType: claim.truthType, statement: claim.statement, statusLight: claim.statusLight };
+                    provenance.push({ artifact: 'MG', ref: claim.claimId, role: 'source', detail: 'Claim node in MemoryGraph' });
+                    (claim.evidence || []).forEach(function(ev) {
+                        provenance.push({ artifact: 'MG', ref: ev.ref || ev.summary, role: 'evidence', detail: ev.summary || ev.ref });
                     });
+                    // DLR: policy context via sources (+0.35)
+                    if (claim.sources && claim.sources.length > 0) {
+                        confidence += 0.35;
+                        dataOut.sources = claim.sources;
+                        claim.sources.forEach(function(s) {
+                            provenance.push({ artifact: 'DLR', ref: s.ref, role: 'context', detail: 'Source: ' + s.ref + ' (reliability: ' + s.reliability + ')' });
+                        });
+                    }
+                    // RS: confidence context (+0.15)
+                    if (claim.confidence.explanation) {
+                        confidence += 0.15;
+                        dataOut.confidence = claim.confidence;
+                        provenance.push({ artifact: 'RS', ref: 'confidence', role: 'context', detail: 'Confidence: ' + claim.confidence.score.toFixed(2) + ' — ' + claim.confidence.explanation });
+                    }
+                    // Graph neighbors
+                    dataOut.graph = claim.graph;
+                    summary = claim.claimId + ': ' + claim.statement.substring(0, 80);
                 } else {
-                    html += '<div class="iris-result">No drift signals matching "' + escapeHtml(term) + '"</div>';
+                    summary = 'Claim "' + term + '" not found in any artifact.';
+                    warnings.push('Try a full or partial CLAIM-YYYY-NNNN ID');
                 }
-            } else if (type === 'status') {
-                var counts = { green: 0, yellow: 0, red: 0 };
-                data.claims.forEach(function(c) { counts[c.statusLight] = (counts[c.statusLight] || 0) + 1; });
-                html += '<div class="iris-result">' +
-                    '<div><span class="status-light green">green</span> ' + counts.green + ' claims</div>' +
-                    '<div><span class="status-light yellow">yellow</span> ' + counts.yellow + ' claims</div>' +
-                    '<div><span class="status-light red">red</span> ' + counts.red + ' claims</div>' +
-                    '<div style="margin-top:4px;">Overall coherence: <strong>' + data.coherenceReport.overall + '</strong> (' + data.coherenceReport.grade + ')</div>' +
-                '</div>';
-            } else if (type === 'changed') {
-                var changedClaims = data.claims.filter(function(c) {
+            } else if (queryType === 'WHAT_DRIFTED') {
+                // WHAT_DRIFTED: DS severity + fingerprint buckets + resolution ratio (DS=0.60 MG=0.40)
+                var signals = data.driftSignals;
+                if (t) {
+                    signals = signals.filter(function(d) {
+                        return d.driftId.toLowerCase().includes(t) || d.driftType.toLowerCase().includes(t) ||
+                            (d.evidenceRefs || []).some(function(r) { return r.toLowerCase().includes(t); });
+                    });
+                }
+                if (signals.length > 0) {
+                    // DS: primary (+0.60)
+                    confidence += 0.60;
+                    var bySev = { green: 0, yellow: 0, red: 0 };
+                    var byType = {};
+                    signals.forEach(function(s) {
+                        bySev[s.severity] = (bySev[s.severity] || 0) + 1;
+                        byType[s.driftType] = (byType[s.driftType] || 0) + 1;
+                    });
+                    dataOut.total_signals = signals.length;
+                    dataOut.by_severity = bySev;
+                    dataOut.by_type = byType;
+                    dataOut.signals = signals;
+                    provenance.push({ artifact: 'DS', ref: 'drift-scan', role: 'source', detail: signals.length + ' signals, ' + (bySev.red || 0) + ' red' });
+                    // MG: resolution ratio (+0.40)
+                    var resolved = signals.filter(function(s) { return s.recommendedPatchType; }).length;
+                    confidence += 0.40;
+                    dataOut.resolution_ratio = signals.length > 0 ? (resolved / signals.length) : 0;
+                    provenance.push({ artifact: 'MG', ref: 'mg-stats', role: 'evidence', detail: 'Resolution ratio: ' + (dataOut.resolution_ratio * 100).toFixed(0) + '% (' + resolved + '/' + signals.length + ')' });
+                    summary = signals.length + ' drift signals (' + (bySev.red || 0) + ' red). Resolution: ' + (dataOut.resolution_ratio * 100).toFixed(0) + '%.';
+                } else {
+                    summary = 'No drift signals found' + (t ? ' matching "' + term + '"' : '') + '.';
+                }
+            } else if (queryType === 'STATUS') {
+                // STATUS: CoherenceScorer 4D composite (scorer=0.70 DS=0.15 MG=0.15)
+                var cr = data.coherenceReport;
+                // Scorer: primary (+0.70)
+                confidence += 0.70;
+                dataOut.overall_score = cr.overall;
+                dataOut.grade = cr.grade;
+                dataOut.dimensions = cr.dimensions;
+                provenance.push({ artifact: 'DLR', ref: 'coherence-scorer', role: 'source', detail: 'CoherenceScorer: ' + cr.overall + '/100 (' + cr.grade + ')' });
+                cr.dimensions.forEach(function(d) {
+                    provenance.push({ artifact: 'DLR', ref: d.name, role: 'evidence', detail: d.name + ': ' + d.score.toFixed(1) + ' (w=' + d.weight + ')' });
+                });
+                // DS: drift headline (+0.15)
+                var redCount = data.driftSignals.filter(function(d) { return d.severity === 'red'; }).length;
+                if (data.driftSignals.length > 0) {
+                    confidence += 0.15;
+                    dataOut.drift_headline = { total: data.driftSignals.length, red: redCount };
+                    provenance.push({ artifact: 'DS', ref: 'drift-scan', role: 'evidence', detail: data.driftSignals.length + ' signals, ' + redCount + ' red' });
+                }
+                // MG: graph stats (+0.15)
+                var totalNodes = data.claims.length;
+                confidence += 0.15;
+                dataOut.mg_stats = { total_nodes: totalNodes };
+                provenance.push({ artifact: 'MG', ref: 'mg-stats', role: 'evidence', detail: totalNodes + ' claim nodes in graph' });
+                summary = 'Coherence: ' + cr.overall + '/100 (' + cr.grade + '). Drift signals: ' + data.driftSignals.length + '.';
+            } else if (queryType === 'WHAT_CHANGED') {
+                // WHAT_CHANGED: DLR outcome + MG patches + DS drift (DLR=0.45 MG=0.35 DS=0.20)
+                var changed = data.claims.filter(function(c) {
                     return c.graph.supersedes || (c.graph.patches && c.graph.patches.length > 0);
                 });
-                if (changedClaims.length > 0) {
-                    changedClaims.forEach(function(c) {
-                        html += '<div class="iris-result" onclick="showClaimDetail(\'' + escapeHtml(c.claimId) + '\'); closeCommandPalette();" style="cursor:pointer;">' +
-                            escapeHtml(c.claimId) + ' — ' + (c.graph.supersedes ? 'supersedes ' + escapeHtml(c.graph.supersedes) : 'has patches') +
-                        '</div>';
-                    });
-                } else {
-                    html += '<div class="iris-result">No changed claims found</div>';
+                if (t) {
+                    changed = changed.filter(function(c) { return c.claimId.toLowerCase().includes(t); });
                 }
-            } else if (type === 'recall') {
+                if (changed.length > 0) {
+                    confidence += 0.45;
+                    dataOut.changed_claims = changed.map(function(c) { return { claimId: c.claimId, supersedes: c.graph.supersedes, patches: c.graph.patches }; });
+                    provenance.push({ artifact: 'DLR', ref: 'dlr-summary', role: 'source', detail: changed.length + ' claims with supersedes/patches' });
+                    changed.forEach(function(c) {
+                        provenance.push({ artifact: 'MG', ref: c.claimId, role: 'evidence', detail: c.graph.supersedes ? 'supersedes ' + c.graph.supersedes : c.graph.patches.length + ' patches' });
+                    });
+                    confidence += 0.35;
+                }
+                if (data.driftSignals.length > 0) {
+                    confidence += 0.20;
+                    dataOut.drift_total = data.driftSignals.length;
+                    provenance.push({ artifact: 'DS', ref: 'drift-scan', role: 'context', detail: data.driftSignals.length + ' drift signals' });
+                }
+                summary = changed.length > 0
+                    ? changed.length + ' changed claims, ' + data.driftSignals.length + ' drift signals.'
+                    : 'No changed claims found' + (t ? ' matching "' + term + '"' : '') + '.';
+            } else if (queryType === 'RECALL') {
+                // RECALL: full graph walk + DLR enrichment (MG=0.50 DLR=0.30 RS=0.20)
                 var matches = data.claims.filter(function(c) {
                     return c.claimId.toLowerCase().includes(t) ||
                         c.statement.toLowerCase().includes(t) ||
                         c.owner.toLowerCase().includes(t) ||
                         (c.tags || []).some(function(tag) { return tag.toLowerCase().includes(t); });
                 });
-                matches.forEach(function(c) {
-                    html += '<div class="iris-result" onclick="showClaimDetail(\'' + escapeHtml(c.claimId) + '\'); closeCommandPalette();" style="cursor:pointer;">' +
-                        '<span class="status-light ' + escapeHtml(c.statusLight) + '" style="font-size:9px;">' + escapeHtml(c.statusLight) + '</span> ' +
-                        escapeHtml(c.claimId) + ' — ' + escapeHtml(c.statement.substring(0, 50)) +
-                    '</div>';
-                });
-                if (matches.length === 0) html += '<div class="iris-result">No results for "' + escapeHtml(term) + '"</div>';
+                if (matches.length > 0) {
+                    confidence += 0.50;
+                    dataOut.matches = matches.map(function(c) { return { claimId: c.claimId, statement: c.statement, statusLight: c.statusLight, truthType: c.truthType, confidence: c.confidence.score }; });
+                    provenance.push({ artifact: 'MG', ref: 'recall-walk', role: 'source', detail: matches.length + ' claims matched' });
+                    // DLR enrichment (+0.30)
+                    confidence += 0.30;
+                    var typeDist = {};
+                    matches.forEach(function(c) { typeDist[c.truthType] = (typeDist[c.truthType] || 0) + 1; });
+                    dataOut.type_distribution = typeDist;
+                    provenance.push({ artifact: 'DLR', ref: 'type-dist', role: 'context', detail: 'Types: ' + Object.keys(typeDist).map(function(k) { return k + '=' + typeDist[k]; }).join(', ') });
+                    // RS: avg confidence (+0.20)
+                    var avgConf = matches.reduce(function(s, c) { return s + c.confidence.score; }, 0) / matches.length;
+                    confidence += 0.20;
+                    dataOut.avg_confidence = avgConf;
+                    provenance.push({ artifact: 'RS', ref: 'confidence-agg', role: 'context', detail: 'Avg confidence: ' + avgConf.toFixed(2) });
+                    summary = matches.length + ' claims matching "' + term + '". Avg confidence: ' + avgConf.toFixed(2) + '.';
+                } else {
+                    summary = 'No claims matching "' + term + '" in any artifact.';
+                    warnings.push('Try a keyword, claim ID, owner name, or tag');
+                }
             }
 
-            html += '</div>';
+            confidence = Math.min(1.0, confidence);
+            if (confidence >= 0.5) status = 'RESOLVED';
+            else if (confidence > 0) status = 'PARTIAL';
+
+            return {
+                queryId: queryId,
+                queryType: queryType,
+                status: status,
+                summary: summary,
+                data: dataOut,
+                provenance: provenance,
+                confidence: confidence,
+                warnings: warnings,
+                elapsedMs: performance.now() - start
+            };
+        }
+
+        function renderIRISQuery(type, term) {
+            var typeMap = { why: 'WHY', drift: 'WHAT_DRIFTED', status: 'STATUS', changed: 'WHAT_CHANGED', recall: 'RECALL' };
+            var queryType = typeMap[type] || type.toUpperCase();
+            var resp = irisResolve(queryType, term);
+
+            var confColor = resp.confidence >= 0.7 ? 'var(--success)' : resp.confidence >= 0.4 ? 'var(--warning)' : 'var(--danger)';
+
+            var html = '<div class="cmd-group">' +
+                '<div class="cmd-group-label" style="display:flex;align-items:center;gap:8px;">' +
+                    '<span>IRIS</span>' +
+                    '<span style="font-size:9px;color:var(--text-muted);">' + escapeHtml(resp.queryId) + ' | ' + resp.elapsedMs.toFixed(0) + 'ms</span>' +
+                '</div>' +
+                '<div class="iris-response ' + resp.status + '">' +
+                    '<div class="iris-header">' +
+                        '<span class="iris-query-type">' + escapeHtml(resp.queryType) + '</span>' +
+                        '<span class="iris-status ' + resp.status + '">' + escapeHtml(resp.status) + '</span>' +
+                    '</div>' +
+                    '<div class="iris-summary">' + escapeHtml(resp.summary) + '</div>' +
+                    '<div class="iris-confidence">' +
+                        '<span>Confidence:</span>' +
+                        '<div class="iris-conf-bar"><div class="iris-conf-fill" style="width:' + (resp.confidence * 100) + '%;background:' + confColor + ';"></div></div>' +
+                        '<span style="font-weight:700;color:' + confColor + ';">' + (resp.confidence * 100).toFixed(0) + '%</span>' +
+                    '</div>';
+
+            // Data section — type-specific rendering
+            if (resp.queryType === 'STATUS' && resp.data.dimensions) {
+                html += '<div style="margin-bottom:8px;">';
+                resp.data.dimensions.forEach(function(d) {
+                    var dColor = d.score >= 85 ? 'var(--success)' : d.score >= 60 ? 'var(--warning)' : 'var(--danger)';
+                    html += '<div class="iris-data-row"><span class="iris-data-label">' + escapeHtml(d.name) + '</span> ' + d.score.toFixed(1) + ' <span style="color:var(--text-muted);">(w=' + d.weight + ')</span></div>';
+                });
+                html += '</div>';
+            }
+            if (resp.queryType === 'WHAT_DRIFTED' && resp.data.signals) {
+                html += '<div style="margin-bottom:8px;">';
+                resp.data.signals.slice(0, 5).forEach(function(ds) {
+                    html += '<div class="iris-data-row" onclick="showDriftDetail(\'' + escapeHtml(ds.driftId) + '\'); closeCommandPalette();" style="cursor:pointer;">' +
+                        '<span class="drift-severity ' + ds.severity + '" style="display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;"></span>' +
+                        '<span class="iris-data-label">' + escapeHtml(ds.driftId) + '</span> ' + escapeHtml(ds.driftType) + ' — ' + escapeHtml(ds.notes) +
+                    '</div>';
+                });
+                html += '</div>';
+            }
+            if (resp.queryType === 'RECALL' && resp.data.matches) {
+                html += '<div style="margin-bottom:8px;">';
+                resp.data.matches.slice(0, 8).forEach(function(m) {
+                    html += '<div class="iris-data-row" onclick="showClaimDetail(\'' + escapeHtml(m.claimId) + '\'); closeCommandPalette();" style="cursor:pointer;">' +
+                        '<span class="status-light ' + escapeHtml(m.statusLight) + '" style="font-size:8px;">' + escapeHtml(m.statusLight) + '</span> ' +
+                        '<span class="iris-data-label">' + escapeHtml(m.claimId) + '</span> ' + escapeHtml(m.statement.substring(0, 45)) + '...' +
+                    '</div>';
+                });
+                html += '</div>';
+            }
+            if (resp.queryType === 'WHY' && resp.data.claim) {
+                html += '<div style="margin-bottom:8px;" onclick="showClaimDetail(\'' + escapeHtml(resp.data.claim.claimId) + '\'); closeCommandPalette();" style="cursor:pointer;">' +
+                    '<div class="iris-data-row"><span class="iris-data-label">Truth Type:</span> ' + escapeHtml(resp.data.claim.truthType) + '</div>' +
+                    '<div class="iris-data-row"><span class="iris-data-label">Status:</span> <span class="status-light ' + escapeHtml(resp.data.claim.statusLight) + '">' + escapeHtml(resp.data.claim.statusLight) + '</span></div>';
+                if (resp.data.graph) {
+                    var edges = [];
+                    if (resp.data.graph.dependsOn && resp.data.graph.dependsOn.length) edges.push('depends on ' + resp.data.graph.dependsOn.length);
+                    if (resp.data.graph.supports && resp.data.graph.supports.length) edges.push('supports ' + resp.data.graph.supports.length);
+                    if (resp.data.graph.contradicts && resp.data.graph.contradicts.length) edges.push('contradicts ' + resp.data.graph.contradicts.length);
+                    if (edges.length) html += '<div class="iris-data-row"><span class="iris-data-label">Graph:</span> ' + escapeHtml(edges.join(', ')) + '</div>';
+                }
+                html += '</div>';
+            }
+            if (resp.queryType === 'WHAT_CHANGED' && resp.data.changed_claims) {
+                html += '<div style="margin-bottom:8px;">';
+                resp.data.changed_claims.forEach(function(c) {
+                    html += '<div class="iris-data-row" onclick="showClaimDetail(\'' + escapeHtml(c.claimId) + '\'); closeCommandPalette();" style="cursor:pointer;">' +
+                        '<span class="iris-data-label">' + escapeHtml(c.claimId) + '</span> — ' +
+                        (c.supersedes ? 'supersedes ' + escapeHtml(c.supersedes) : c.patches.length + ' patches') +
+                    '</div>';
+                });
+                html += '</div>';
+            }
+
+            // Warnings
+            if (resp.warnings.length > 0) {
+                resp.warnings.forEach(function(w) {
+                    html += '<div style="font-size:10px;color:var(--warning);margin-bottom:4px;">⚠ ' + escapeHtml(w) + '</div>';
+                });
+            }
+
+            // Provenance chain
+            if (resp.provenance.length > 0) {
+                html += '<div class="iris-provenance">';
+                html += '<div style="font-size:9px;font-weight:700;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">Provenance Chain</div>';
+                resp.provenance.forEach(function(p) {
+                    html += '<div class="iris-prov-item">' +
+                        '<span class="iris-artifact ' + escapeHtml(p.artifact) + '">' + escapeHtml(p.artifact) + '</span>' +
+                        '<span style="color:var(--text-secondary);">' + escapeHtml(p.detail) + '</span>' +
+                    '</div>';
+                });
+                html += '</div>';
+            }
+
+            html += '</div></div>';
             return html;
         }
 
