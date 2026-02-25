@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = ROOT.parent
 
 
 def count_files(glob_pat: str) -> int:
@@ -170,9 +171,9 @@ def score_enterprise_readiness() -> float:
     points = 0
     points += 1 if file_exists("docs/docs/pilot/BRANCH_PROTECTION.md") else 0
     points += 1 if file_exists("docs/docs/pilot/PILOT_CONTRACT_ONEPAGER.md") else 0
-    points += 1 if file_exists(".github/workflows/kpi.yml") else 0
-    points += 1 if file_exists(".github/workflows/kpi_gate.yml") else 0
-    points += 1 if file_exists("Makefile") else 0
+    points += 1 if (REPO_ROOT / ".github/workflows/kpi.yml").exists() else 0
+    points += 1 if (REPO_ROOT / ".github/workflows/kpi_gate.yml").exists() else 0
+    points += 1 if (REPO_ROOT / "Makefile").exists() else 0
     return clamp(points * 2)
 
 
@@ -202,15 +203,19 @@ def score_technical_completeness() -> float:
     points += 2 if (ROOT / "src").exists() else 0
     points += 2 if file_exists("scripts/compute_ci.py") else 0
     points += 2 if (ROOT / "tests").exists() else 0
-    points += 2 if (ROOT / ".github" / "workflows").exists() else 0
+    points += 2 if (REPO_ROOT / ".github" / "workflows").exists() else 0
     points += 2 if file_exists("pyproject.toml") or file_exists("setup.py") else 0
     return clamp(points)
 
 
+def count_repo_files(glob_pat: str) -> int:
+    return len(list(REPO_ROOT.glob(glob_pat)))
+
+
 def score_automation_depth() -> float:
-    workflows = count_files(".github/workflows/*.yml") + count_files(".github/workflows/*.yaml")
+    workflows = count_repo_files(".github/workflows/*.yml") + count_repo_files(".github/workflows/*.yaml")
     scripts = count_files("scripts/*.py")
-    make = 2 if file_exists("Makefile") else 0
+    make = 2 if (REPO_ROOT / "Makefile").exists() else 0
     value = (workflows * 1.2) + (scripts / 30 * 4) + make
     return clamp(value)
 
@@ -238,7 +243,7 @@ def main() -> int:
         "operational_maturity": round(score_operational_maturity(), 2),
         "_telemetry": {
             "test_files": count_files("tests/test_*.py") + count_files("tests/**/test_*.py"),
-            "workflows": count_files(".github/workflows/*.yml") + count_files(".github/workflows/*.yaml"),
+            "workflows": count_repo_files(".github/workflows/*.yml") + count_repo_files(".github/workflows/*.yaml"),
             "docs_md": len(list(docs_root.glob("**/*.md"))) if docs_root.exists() else 0,
             "security_metrics_present": metrics is not None,
             "scalability_metrics_present": scalability_metrics is not None,
