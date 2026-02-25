@@ -4,7 +4,8 @@
 	test-money release-artifacts pulse-insights \
 	icr-health pcr-health tec-ctec health-summary health-v2 \
 	icr-health-gh pcr-health-gh health-v2-gh tec \
-	roadmap-refresh roadmap-gate
+	roadmap-refresh roadmap-gate \
+	milestone-gate issue-label-gate kpi-issues kpi stability
 
 demo:
 	bash run_money_demo.sh
@@ -88,3 +89,18 @@ roadmap-refresh:
 
 roadmap-gate:
 	python enterprise/scripts/roadmap_scope_gate.py
+
+milestone-gate:
+	python enterprise/scripts/validate_v2_1_0_milestone.py
+
+issue-label-gate:
+	python enterprise/scripts/issue_label_gate.py
+
+kpi-issues:
+	python enterprise/scripts/kpi_from_issues.py
+
+stability:
+	python enterprise/scripts/nonlinear_stability.py
+
+kpi:
+	cd enterprise && python scripts/kpi_run.py
