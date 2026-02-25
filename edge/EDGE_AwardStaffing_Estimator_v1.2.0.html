@@ -1,0 +1,996 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Deep Sigma EDGE — Award Staffing Estimator v1.2.0</title>
+<style>
+:root{--bg:#0b0f14;--card:#111824;--line:#1b2a3a;--txt:#e7eef7;--muted:#8aa0b5;--ok:#5dff93;--warn:#ffcc66;--bad:#ff6b6b;--accent:#7df9ff;}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:var(--bg);color:var(--txt);}
+header{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand b{letter-spacing:.4px}
+.brand small{display:block;color:var(--muted);margin-top:4px}
+button{background:#182235;color:var(--txt);border:1px solid #243449;border-radius:10px;padding:10px 12px;cursor:pointer;font-size:13px}
+button:hover{border-color:#2f4765}
+button.primary{border-color:rgba(125,249,255,.45);box-shadow:0 0 0 1px rgba(125,249,255,.12) inset}
+button.danger{border-color:rgba(255,107,107,.45)}
+button.ok-btn{border-color:rgba(93,255,147,.45)}
+main{padding:14px 16px;max-width:1200px;margin:0 auto}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+h2{margin:0 0 10px 0;font-size:14px;color:#cfe2f7;letter-spacing:.25px}
+h3{margin:0 0 8px 0;font-size:13px;color:#cfe2f7;letter-spacing:.2px}
+label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
+input,select{width:100%;box-sizing:border-box;background:#0d1520;color:var(--txt);border:1px solid #243449;border-radius:10px;padding:10px;font-size:13px}
+input:focus,select:focus{border-color:rgba(125,249,255,.5);outline:none}
+.small{font-size:12px}
+.muted{color:var(--muted)}
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kpi .card{padding:10px}
+.kpi .v{font-size:20px;font-weight:800;margin-top:6px}
+.badge{display:inline-block;padding:3px 8px;border-radius:999px;border:1px solid #243449;color:var(--muted);font-size:12px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:#b9d3ea;text-align:left;font-weight:600}
+hr{border:0;border-top:1px solid var(--line);margin:12px 0}
+.ok{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+.alert{border:1px solid rgba(255,204,102,.35);background:rgba(255,204,102,.06);border-radius:12px;padding:10px}
+.hidden{display:none}
+.toggle{display:flex;gap:10px;align-items:center;margin-top:8px}
+.toggle input{width:auto}
+pre{white-space:pre-wrap;margin:0}
+
+/* v1.2.0 additions */
+.progress-mini{height:6px;background:#1a2538;border-radius:3px;overflow:hidden;margin-top:6px}
+.progress-mini-fill{height:100%;border-radius:3px;transition:width .3s}
+.delta-up{color:var(--ok)}
+.delta-down{color:var(--bad)}
+svg text{font-family:system-ui,-apple-system,sans-serif}
+.viz-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
+.donut-legend{display:flex;gap:14px;justify-content:center;margin-top:8px;font-size:12px}
+.donut-legend-item{display:flex;align-items:center;gap:5px}
+.donut-legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.scenario-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
+.scenario-row:last-child{border-bottom:none}
+.scenario-name{flex:1;font-size:13px}
+.scenario-ts{font-size:11px;color:var(--muted)}
+.scenario-check{width:auto;margin:0}
+.sensitivity-highlight{background:rgba(125,249,255,.12);font-weight:700}
+.mc-card{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+.mc-cell{text-align:center;padding:10px;border-radius:10px;border:1px solid var(--line);background:#0d1520}
+.mc-cell .mc-label{font-size:11px;color:var(--muted);margin-bottom:4px}
+.mc-cell .mc-val{font-size:18px;font-weight:700}
+.inline-input{width:160px;display:inline-block}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+@media(max-width:600px){.kpi{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <b>Deep Sigma EDGE — Award Staffing Estimator</b>
+    <small>v1.2.0 • Scenarios + Sensitivity + Monte Carlo • Local-only</small>
+  </div>
+  <div class="row">
+    <button id="btnRun" class="primary">Run Estimate</button>
+    <button id="btnTest">Load TS-50-in-60 Test</button>
+    <button id="btnExport">Export JSON</button>
+    <button id="btnReset" class="danger">Reset</button>
+  </div>
+</header>
+
+<main>
+  <div class="kpi">
+    <div class="card"><div class="muted">Positions</div><div class="v" id="kPos">—</div></div>
+    <div class="card"><div class="muted">Target Days</div><div class="v" id="kDays">—</div><div class="muted small" id="kClearNote"></div></div>
+    <div class="card"><div class="muted">With DS: Est. Benefit</div><div class="v" id="kBenefit">—</div><div class="muted small" id="kBenefitSub"></div></div>
+    <div class="card">
+      <div class="muted">Schedule Hit Prob.</div>
+      <div class="v" id="kProb">—</div>
+      <div class="progress-mini"><div class="progress-mini-fill" id="kProbBar" style="width:0;background:var(--muted)"></div></div>
+      <div class="muted small">Without → With DS</div>
+    </div>
+  </div>
+
+  <div class="grid" style="margin-top:12px">
+    <div class="card">
+      <h2>Inputs</h2>
+
+      <div class="grid">
+        <div>
+          <label>Positions to staff</label>
+          <input id="positions" type="number" min="1" value="50"/>
+        </div>
+        <div>
+          <label>Target timeline (days)</label>
+          <input id="target_days" type="number" min="1" value="60"/>
+        </div>
+      </div>
+
+      <hr/>
+      <h3>Clearance Mix (must sum to 100%)</h3>
+      <div class="grid">
+        <div>
+          <label>Top Secret (%)</label>
+          <input id="pct_TS" type="number" min="0" max="100" step="1" value="100"/>
+        </div>
+        <div>
+          <label>Secret (%)</label>
+          <input id="pct_S" type="number" min="0" max="100" step="1" value="0"/>
+        </div>
+      </div>
+      <div class="grid">
+        <div>
+          <label>Uncleared (%)</label>
+          <input id="pct_U" type="number" min="0" max="100" step="1" value="0"/>
+        </div>
+        <div>
+          <label>Mix status</label>
+          <div id="mixStatus" class="alert muted">—</div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:12px">Lead Days by Clearance</h3>
+      <div class="grid">
+        <div>
+          <label>Lead Days — Top Secret</label>
+          <input id="lead_TS" type="number" min="0" step="1" value="10"/>
+          <div class="muted small">Transfer/read-in/provisioning lag</div>
+        </div>
+        <div>
+          <label>Lead Days — Secret</label>
+          <input id="lead_S" type="number" min="0" step="1" value="7"/>
+        </div>
+      </div>
+      <div class="grid">
+        <div>
+          <label>Lead Days — Uncleared</label>
+          <input id="lead_U" type="number" min="0" step="1" value="90"/>
+          <div class="muted small">Clear + seat</div>
+        </div>
+        <div class="muted small" style="margin-top:28px">
+          Schedule feasibility flags if lead_days &gt; target_days.
+        </div>
+      </div>
+
+      <hr/>
+      <h3>Default Funnel (percent)</h3>
+      <div class="grid">
+        <div>
+          <label>Offer Accept Rate (%)</label>
+          <input id="pct_accept_default" type="number" min="1" max="99" step="1" value="62"/>
+        </div>
+        <div>
+          <label>Screen-to-Interview Rate (%)</label>
+          <input id="pct_scr2int_default" type="number" min="1" max="99" step="1" value="50"/>
+        </div>
+      </div>
+      <div class="grid">
+        <div>
+          <label>Interview-to-Offer Rate (%)</label>
+          <input id="pct_int2off_default" type="number" min="1" max="99" step="1" value="53"/>
+        </div>
+        <div class="toggle">
+          <input id="toggleFunnel" type="checkbox"/>
+          <label for="toggleFunnel" style="margin:0;color:var(--txt)">Override funnel by clearance</label>
+        </div>
+      </div>
+
+      <div id="funnelOverrides" class="hidden">
+        <hr/>
+        <h3>Funnel Overrides (percent)</h3>
+        <div class="grid">
+          <div class="card">
+            <h3>Top Secret Funnel</h3>
+            <label>Accept Rate (%)</label><input id="pct_accept_TS" type="number" min="1" max="99" step="1" value="62"/>
+            <label>Screen-to-Interview (%)</label><input id="pct_scr2int_TS" type="number" min="1" max="99" step="1" value="50"/>
+            <label>Interview-to-Offer (%)</label><input id="pct_int2off_TS" type="number" min="1" max="99" step="1" value="53"/>
+          </div>
+          <div class="card">
+            <h3>Secret Funnel</h3>
+            <label>Accept Rate (%)</label><input id="pct_accept_S" type="number" min="1" max="99" step="1" value="65"/>
+            <label>Screen-to-Interview (%)</label><input id="pct_scr2int_S" type="number" min="1" max="99" step="1" value="55"/>
+            <label>Interview-to-Offer (%)</label><input id="pct_int2off_S" type="number" min="1" max="99" step="1" value="55"/>
+          </div>
+        </div>
+        <div class="grid" style="margin-top:12px">
+          <div class="card">
+            <h3>Uncleared Funnel</h3>
+            <label>Accept Rate (%)</label><input id="pct_accept_U" type="number" min="1" max="99" step="1" value="55"/>
+            <label>Screen-to-Interview (%)</label><input id="pct_scr2int_U" type="number" min="1" max="99" step="1" value="45"/>
+            <label>Interview-to-Offer (%)</label><input id="pct_int2off_U" type="number" min="1" max="99" step="1" value="45"/>
+          </div>
+          <div class="muted small" style="margin-top:18px">
+            If overrides are on, each clearance group uses its own funnel rates.
+          </div>
+        </div>
+      </div>
+
+      <hr/>
+      <h3>Effort Model</h3>
+      <div class="grid">
+        <div>
+          <label>Interview Rounds (avg)</label>
+          <input id="rounds" type="number" min="1" step="1" value="2"/>
+        </div>
+        <div>
+          <label>Interviewers per Round</label>
+          <input id="panel" type="number" min="1" step="1" value="3"/>
+        </div>
+      </div>
+      <div class="grid">
+        <div>
+          <label>Hours per Interview (incl. debrief)</label>
+          <input id="hrsInt" type="number" min="0.25" step="0.25" value="1.5"/>
+        </div>
+        <div>
+          <label>Ops Hours per Interview</label>
+          <input id="hrsOpsInt" type="number" min="0" step="0.25" value="1.0"/>
+        </div>
+      </div>
+      <div class="grid">
+        <div>
+          <label>Ops Hours per Offer</label>
+          <input id="hrsOpsOff" type="number" min="0" step="0.25" value="2.0"/>
+        </div>
+        <div>
+          <label>Labor Rate ($/hr)</label>
+          <input id="rate" type="number" min="1" step="1" value="175"/>
+        </div>
+      </div>
+
+      <hr/>
+      <h3>Deep Sigma vs Baseline</h3>
+      <div class="grid">
+        <div>
+          <label>Rework Rate — Without DS (%)</label>
+          <input id="pct_rework_no" type="number" min="0" max="100" step="1" value="22"/>
+        </div>
+        <div>
+          <label>Rework Rate — With DS (%)</label>
+          <input id="pct_rework_yes" type="number" min="0" max="100" step="1" value="8"/>
+        </div>
+      </div>
+      <div class="grid">
+        <div>
+          <label>DS Efficiency Gain — Interviews (%)</label>
+          <input id="pct_eff_int" type="number" min="0" max="60" step="1" value="18"/>
+        </div>
+        <div>
+          <label>DS Efficiency Gain — Ops (%)</label>
+          <input id="pct_eff_ops" type="number" min="0" max="60" step="1" value="20"/>
+        </div>
+      </div>
+
+      <hr/>
+      <h3>Vacancy Economics</h3>
+      <div class="grid">
+        <div>
+          <label>Vacancy Cost per Seat/Day ($)</label>
+          <input id="vac" type="number" min="0" step="50" value="1000"/>
+        </div>
+        <div>
+          <label>Avg. Days Saved with DS</label>
+          <input id="daysSaved" type="number" min="0" step="1" value="5"/>
+        </div>
+      </div>
+
+      <div class="muted small" style="margin-top:10px">
+        Output is a throughput/effort estimate. Use feasibility flags (lead days) to sanity-check deadline realism.
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h2>Results</h2>
+        <div id="resultSummary" class="muted">Run estimate to see results.</div>
+
+        <div class="viz-card" id="funnelVizCard" style="display:none">
+          <h3>Funnel Pipeline</h3>
+          <div id="funnelViz"></div>
+        </div>
+
+        <div class="viz-card" id="compBarsCard" style="display:none">
+          <h3>With / Without Deep Sigma</h3>
+          <div id="compBars"></div>
+        </div>
+
+        <div style="margin-top:12px" class="card">
+          <div class="row" style="align-items:flex-start;gap:16px">
+            <div style="flex:1">
+              <h2>By Clearance (Funnel + Feasibility)</h2>
+              <div id="byClear"></div>
+            </div>
+            <div id="mixDonut" style="flex-shrink:0"></div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px" class="card">
+          <h2>Hours &amp; Cost Breakdown</h2>
+          <div id="breakdown"></div>
+        </div>
+
+        <div style="margin-top:12px" class="card">
+          <h2>Notes</h2>
+          <div id="notes" class="muted"></div>
+        </div>
+      </div>
+
+      <!-- Scenario Manager -->
+      <div class="card" style="margin-top:12px">
+        <h2>Scenarios</h2>
+        <div class="row" style="margin-bottom:10px">
+          <input id="scenarioName" type="text" placeholder="Scenario name..." class="inline-input"/>
+          <button id="btnSaveScenario" class="ok-btn">Save Scenario</button>
+          <button id="btnCompare">Compare Selected</button>
+        </div>
+        <div id="scenarioList" class="muted small">No saved scenarios.</div>
+        <div id="compareResults"></div>
+      </div>
+
+      <!-- Sensitivity -->
+      <div class="card" style="margin-top:12px">
+        <h2>Sensitivity Analysis</h2>
+        <div class="row" style="margin-bottom:10px">
+          <select id="selSensParam" class="inline-input">
+            <option value="positions">Positions</option>
+            <option value="target_days">Target Days</option>
+            <option value="pct_accept_default">Accept Rate %</option>
+            <option value="pct_rework_no">Rework % (No DS)</option>
+            <option value="vac">Vacancy $/day</option>
+          </select>
+          <button id="btnSensitivity" class="primary">Run Sensitivity</button>
+        </div>
+        <div id="sensitivityResults" class="muted small">Select a parameter and run.</div>
+      </div>
+
+      <!-- Monte Carlo -->
+      <div class="card" style="margin-top:12px">
+        <h2>Monte Carlo Lite</h2>
+        <div class="row" style="margin-bottom:10px">
+          <button id="btnMC" class="primary">Run 500 Simulations</button>
+          <span class="muted small">±10% noise on funnel + rework rates</span>
+        </div>
+        <div id="mcResults" class="muted small">Click to run.</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const KEY = "ds_edge_award_staffing_v1_2";
+const KEY_OLD = "ds_edge_award_staffing_estimator_v1_1";
+const KEY_SCENARIOS = "ds_edge_scenarios_v1";
+
+/* ── Utilities ── */
+function pctToRate(p){ return Math.max(0.01, Math.min(0.99, Number(p)/100)); }
+function clamp(n,a,b){ return Math.max(a, Math.min(b,n)); }
+function money(x){ return "$" + Math.round(x).toLocaleString(); }
+function pct(x){ return Math.round(x*100) + "%"; }
+function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+/* ── State persistence ── */
+const INPUT_IDS = [
+  "positions","target_days","pct_TS","pct_S","pct_U","lead_TS","lead_S","lead_U",
+  "pct_accept_default","pct_scr2int_default","pct_int2off_default","toggleFunnel",
+  "pct_accept_TS","pct_scr2int_TS","pct_int2off_TS",
+  "pct_accept_S","pct_scr2int_S","pct_int2off_S",
+  "pct_accept_U","pct_scr2int_U","pct_int2off_U",
+  "rounds","panel","hrsInt","hrsOpsInt","hrsOpsOff","rate",
+  "pct_rework_no","pct_rework_yes","pct_eff_int","pct_eff_ops","vac","daysSaved"
+];
+
+function saveState(){
+  const o = {};
+  INPUT_IDS.forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    if(el.type==="checkbox") o[id]=el.checked;
+    else o[id]=el.value;
+  });
+  localStorage.setItem(KEY, JSON.stringify(o));
+}
+
+function restoreState(){
+  try{
+    let raw = localStorage.getItem(KEY);
+    if(!raw){
+      raw = localStorage.getItem(KEY_OLD);
+      if(raw) localStorage.setItem(KEY, raw);
+    }
+    if(!raw) return;
+    const s=JSON.parse(raw);
+    Object.keys(s).forEach(k=>{
+      const el=document.getElementById(k);
+      if(!el) return;
+      if(el.type==="checkbox") el.checked=!!s[k];
+      else el.value=s[k];
+    });
+  }catch(e){}
+}
+
+function applyInputs(obj){
+  Object.keys(obj).forEach(k=>{
+    const el=document.getElementById(k);
+    if(!el) return;
+    if(el.type==="checkbox") el.checked=!!obj[k];
+    else el.value=obj[k];
+  });
+}
+
+function captureInputs(){
+  const o={};
+  INPUT_IDS.forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    if(el.type==="checkbox") o[id]=el.checked;
+    else o[id]=el.value;
+  });
+  return o;
+}
+
+/* ── Mix check ── */
+function mixCheck(){
+  const ts=Number(document.getElementById("pct_TS").value||0);
+  const s=Number(document.getElementById("pct_S").value||0);
+  const u=Number(document.getElementById("pct_U").value||0);
+  const sum=ts+s+u;
+  const el=document.getElementById("mixStatus");
+  if(sum===100){
+    el.className="alert muted";
+    el.innerHTML=`<span class="ok"><b>OK</b></span> &bull; Sum = 100% (TS ${ts} / S ${s} / U ${u})`;
+    return {ok:true, ts,s,u,sum};
+  }
+  el.className="alert muted";
+  el.innerHTML=`<span class="warn"><b>FIX</b></span> &bull; Sum = ${sum}%. Must equal 100%.`;
+  return {ok:false, ts,s,u,sum};
+}
+
+/* ── readInputs (DOM → plain object) ── */
+function readInputs(){
+  const mix = mixCheck();
+  const overrides = document.getElementById("toggleFunnel").checked;
+  const defFunnel = {
+    accept: pctToRate(document.getElementById("pct_accept_default").value),
+    scr2int: pctToRate(document.getElementById("pct_scr2int_default").value),
+    int2off: pctToRate(document.getElementById("pct_int2off_default").value),
+  };
+  function rr(prefix){
+    return {
+      accept: pctToRate(document.getElementById(`pct_accept_${prefix}`).value),
+      scr2int: pctToRate(document.getElementById(`pct_scr2int_${prefix}`).value),
+      int2off: pctToRate(document.getElementById(`pct_int2off_${prefix}`).value),
+    };
+  }
+  return {
+    positions: Math.max(1, Number(document.getElementById("positions").value||1)),
+    targetDays: Math.max(1, Number(document.getElementById("target_days").value||1)),
+    mix: { ts: mix.ts, s: mix.s, u: mix.u, ok: mix.ok },
+    lead: {
+      TS: Math.max(0, Number(document.getElementById("lead_TS").value||0)),
+      S:  Math.max(0, Number(document.getElementById("lead_S").value||0)),
+      U:  Math.max(0, Number(document.getElementById("lead_U").value||0)),
+    },
+    funnel: {
+      overrides,
+      TS: overrides ? rr("TS") : defFunnel,
+      S: overrides ? rr("S") : defFunnel,
+      U: overrides ? rr("U") : defFunnel,
+      default: defFunnel,
+    },
+    rounds: Math.max(1, Math.round(Number(document.getElementById("rounds").value||2))),
+    panel: Math.max(1, Math.round(Number(document.getElementById("panel").value||3))),
+    hrsInt: Math.max(0.25, Number(document.getElementById("hrsInt").value||1.5)),
+    hrsOpsInt: Math.max(0, Number(document.getElementById("hrsOpsInt").value||1.0)),
+    hrsOpsOff: Math.max(0, Number(document.getElementById("hrsOpsOff").value||2.0)),
+    rate: Math.max(1, Number(document.getElementById("rate").value||175)),
+    reworkNo: clamp(Number(document.getElementById("pct_rework_no").value||0)/100, 0, 2),
+    reworkYes: clamp(Number(document.getElementById("pct_rework_yes").value||0)/100, 0, 2),
+    effInt: clamp(Number(document.getElementById("pct_eff_int").value||0)/100, 0, 0.9),
+    effOps: clamp(Number(document.getElementById("pct_eff_ops").value||0)/100, 0, 0.9),
+    vac: Math.max(0, Number(document.getElementById("vac").value||0)),
+    daysSaved: Math.max(0, Number(document.getElementById("daysSaved").value||0)),
+  };
+}
+
+/* ── compute (pure function, no DOM) ── */
+function compute(inp){
+  const groups = [
+    {k:"TS", pct: inp.mix.ts, lead: inp.lead.TS, r: inp.funnel.TS},
+    {k:"S",  pct: inp.mix.s,  lead: inp.lead.S,  r: inp.funnel.S},
+    {k:"U",  pct: inp.mix.u,  lead: inp.lead.U,  r: inp.funnel.U},
+  ];
+  let totals = {positions:0, offers:0, interviews:0, screens:0, feasiblePos:0, infeasiblePos:0};
+  let by = [];
+  groups.forEach(g=>{
+    const pos = inp.positions * (g.pct/100);
+    const offers = pos / g.r.accept;
+    const interviews = offers / g.r.int2off;
+    const screens = interviews / g.r.scr2int;
+    const feasible = (g.lead <= inp.targetDays) ? pos : 0;
+    const infeasible = (g.lead > inp.targetDays) ? pos : 0;
+    totals.positions += pos;
+    totals.offers += offers;
+    totals.interviews += interviews;
+    totals.screens += screens;
+    totals.feasiblePos += feasible;
+    totals.infeasiblePos += infeasible;
+    by.push({
+      clearance:g.k, pct:g.pct, pos, offers, interviews, screens,
+      accept:g.r.accept, scr2int:g.r.scr2int, int2off:g.r.int2off,
+      lead:g.lead, feasible:(g.lead<=inp.targetDays)
+    });
+  });
+
+  const interviewHours = totals.interviews * inp.rounds * inp.panel * inp.hrsInt;
+  const opsInterviewHours = totals.interviews * inp.rounds * inp.hrsOpsInt;
+  const opsOfferHours = totals.offers * inp.hrsOpsOff;
+
+  const hoursNo = (interviewHours + opsInterviewHours + opsOfferHours) * (1 + inp.reworkNo);
+  const costNo = hoursNo * inp.rate;
+
+  const interviewHoursYes = interviewHours * (1 - inp.effInt);
+  const opsInterviewHoursYes = opsInterviewHours * (1 - inp.effOps);
+  const opsOfferHoursYes = opsOfferHours * (1 - inp.effOps*0.5);
+
+  const hoursYes = (interviewHoursYes + opsInterviewHoursYes + opsOfferHoursYes) * (1 + inp.reworkYes);
+  const costYes = hoursYes * inp.rate;
+
+  const laborSavings = costNo - costYes;
+  const vacancyValue = inp.positions * inp.daysSaved * inp.vac;
+  const totalBenefit = laborSavings + vacancyValue;
+
+  const infeasibleShare = totals.positions ? (totals.infeasiblePos / totals.positions) : 0;
+  const baseNo = clamp(0.62 - 0.55*infeasibleShare, 0.05, 0.90);
+  const baseYes = clamp(0.82 - 0.45*infeasibleShare, 0.05, 0.95);
+
+  return {
+    version:"1.2.0", inputs:inp, by, totals:{
+      screens:Math.ceil(totals.screens), interviews:Math.ceil(totals.interviews),
+      offers:Math.ceil(totals.offers), infeasiblePos:Math.round(totals.infeasiblePos),
+    },
+    hours:{
+      interviewHours, opsInterviewHours, opsOfferHours,
+      interviewHoursYes, opsInterviewHoursYes, opsOfferHoursYes,
+    },
+    without_ds:{hours:hoursNo, cost:costNo},
+    with_ds:{hours:hoursYes, cost:costYes},
+    delta:{labor_savings:laborSavings, vacancy_value:vacancyValue, total_benefit:totalBenefit},
+    schedule:{hit_prob_without:baseNo, hit_prob_with:baseYes},
+  };
+}
+
+/* ── SVG: Funnel ── */
+function renderFunnelSvg(res){
+  const stages = [
+    {label:"Screened", count:res.totals.screens},
+    {label:"Interviewed", count:res.totals.interviews},
+    {label:"Offered", count:res.totals.offers},
+    {label:"Accepted", count:Math.round(res.inputs.positions)},
+  ];
+  const maxCount = stages[0].count || 1;
+  const W=440, H=160, pad=10, stageH=30, gap=8;
+  const totalH = stages.length*(stageH+gap)-gap;
+  const startY = (H-totalH)/2;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px">`;
+  stages.forEach((s,i)=>{
+    const ratio = Math.max(0.15, s.count/maxCount);
+    const nextRatio = i<stages.length-1 ? Math.max(0.15, stages[i+1].count/maxCount) : ratio*0.85;
+    const y = startY + i*(stageH+gap);
+    const cx = W/2;
+    const topW = (W-120)*ratio;
+    const botW = (W-120)*(i<stages.length-1 ? nextRatio : ratio*0.85);
+    const x1=cx-topW/2, x2=cx+topW/2;
+    const x3=cx+botW/2, x4=cx-botW/2;
+    const opacity = 1 - i*0.2;
+    svg += `<polygon points="${x1},${y} ${x2},${y} ${x3},${y+stageH} ${x4},${y+stageH}" fill="rgba(125,249,255,${opacity*0.3})" stroke="rgba(125,249,255,${opacity*0.6})" stroke-width="1"/>`;
+    svg += `<text x="${cx}" y="${y+stageH/2+4}" text-anchor="middle" fill="#e7eef7" font-size="12" font-weight="600">${s.label}</text>`;
+    svg += `<text x="${x2+8}" y="${y+stageH/2+4}" fill="#8aa0b5" font-size="11">${s.count.toLocaleString()}</text>`;
+  });
+  svg += `</svg>`;
+  return svg;
+}
+
+/* ── SVG: Comparison bars ── */
+function renderComparisonBars(res){
+  const W=440, H=110;
+  const maxH = Math.max(res.without_ds.hours, 1);
+  const maxC = Math.max(res.without_ds.cost, 1);
+  function bar(x, y, w, val, maxVal, color, label, valStr){
+    const bw = Math.max(4, (val/maxVal)*(W-180));
+    return `<rect x="${x}" y="${y}" width="${bw}" height="${w}" rx="4" fill="${color}" opacity="0.7"/>` +
+      `<text x="${x+bw+6}" y="${y+w/2+4}" fill="#e7eef7" font-size="11">${valStr}</text>` +
+      `<text x="${x-4}" y="${y+w/2+4}" text-anchor="end" fill="#8aa0b5" font-size="11">${label}</text>`;
+  }
+  let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px">`;
+  svg += `<text x="80" y="14" fill="#b9d3ea" font-size="12" font-weight="600">Hours</text>`;
+  svg += bar(80, 20, 14, res.without_ds.hours, maxH, "#ff6b6b", "No DS", Math.round(res.without_ds.hours).toLocaleString());
+  svg += bar(80, 38, 14, res.with_ds.hours, maxH, "#5dff93", "With DS", Math.round(res.with_ds.hours).toLocaleString());
+  svg += `<text x="80" y="68" fill="#b9d3ea" font-size="12" font-weight="600">Cost</text>`;
+  svg += bar(80, 74, 14, res.without_ds.cost, maxC, "#ff6b6b", "No DS", money(res.without_ds.cost));
+  svg += bar(80, 92, 14, res.with_ds.cost, maxC, "#5dff93", "With DS", money(res.with_ds.cost));
+  svg += `</svg>`;
+  return svg;
+}
+
+/* ── SVG: Donut ── */
+function renderMixDonut(mix){
+  const segments = [
+    {label:"TS", pct:mix.ts, color:"#7df9ff"},
+    {label:"S",  pct:mix.s,  color:"#ffcc66"},
+    {label:"U",  pct:mix.u,  color:"#8aa0b5"},
+  ].filter(s=>s.pct>0);
+  if(!segments.length) return "";
+  const size=120, cx=60, cy=60, r=44, sw=14;
+  const circ = 2*Math.PI*r;
+  let offset = 0;
+  let svg = `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">`;
+  segments.forEach(s=>{
+    const dash = (s.pct/100)*circ;
+    svg += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${s.color}" stroke-width="${sw}" stroke-dasharray="${dash} ${circ-dash}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${cx} ${cy})" opacity="0.8"/>`;
+    offset += dash;
+  });
+  svg += `</svg>`;
+  let legend = `<div class="donut-legend">`;
+  segments.forEach(s=>{
+    legend += `<div class="donut-legend-item"><span class="donut-legend-dot" style="background:${s.color}"></span>${s.label} ${s.pct}%</div>`;
+  });
+  legend += `</div>`;
+  return svg + legend;
+}
+
+/* ── renderResult (DOM writer) ── */
+function renderResult(res){
+  const inp = res.inputs;
+  document.getElementById("kPos").textContent = Math.round(inp.positions).toLocaleString();
+  document.getElementById("kDays").textContent = inp.targetDays;
+  document.getElementById("kClearNote").textContent = res.totals.infeasiblePos>0
+    ? `\u26a0 ${res.totals.infeasiblePos} positions infeasible by lead-days`
+    : `Feasible by lead-days`;
+
+  const benefit = Math.max(0, res.delta.total_benefit);
+  document.getElementById("kBenefit").innerHTML = `${money(benefit)} <span class="delta-up" style="font-size:14px">\u25b2</span>`;
+  document.getElementById("kBenefitSub").textContent = `${money(Math.max(0,res.delta.labor_savings))} labor + ${money(Math.max(0,res.delta.vacancy_value))} vacancy`;
+
+  document.getElementById("kProb").textContent = `${pct(res.schedule.hit_prob_without)} \u2192 ${pct(res.schedule.hit_prob_with)}`;
+  const probBar = document.getElementById("kProbBar");
+  probBar.style.width = pct(res.schedule.hit_prob_with);
+  probBar.style.background = res.schedule.hit_prob_with >= 0.7 ? "var(--ok)" : res.schedule.hit_prob_with >= 0.5 ? "var(--warn)" : "var(--bad)";
+
+  document.getElementById("resultSummary").innerHTML = `
+    <div class="row"><span class="badge">Funnel</span>
+      <span class="muted">~${res.totals.screens.toLocaleString()} screened \u2192 ${res.totals.interviews.toLocaleString()} interviewed \u2192 ${res.totals.offers.toLocaleString()} offers \u2192 ${Math.round(inp.positions).toLocaleString()} starts</span>
+    </div>
+    <div class="row" style="margin-top:10px"><span class="badge">Without DS</span>
+      <b class="bad">${money(res.without_ds.cost)}</b><span class="muted">(${Math.round(res.without_ds.hours).toLocaleString()} hrs)</span>
+    </div>
+    <div class="row" style="margin-top:6px"><span class="badge">With DS</span>
+      <b class="ok">${money(res.with_ds.cost)}</b><span class="muted">(${Math.round(res.with_ds.hours).toLocaleString()} hrs)</span>
+    </div>
+    <div class="row" style="margin-top:8px"><span class="badge">Delta</span>
+      <b>${money(Math.max(0,res.delta.labor_savings))}</b><span class="muted">labor saved</span>
+    </div>
+    <div class="row" style="margin-top:6px"><span class="badge">Schedule Value</span>
+      <b>${money(Math.max(0,res.delta.vacancy_value))}</b><span class="muted">(${Math.round(inp.positions)} seats \u00d7 ${inp.daysSaved} days \u00d7 ${money(inp.vac)}/day)</span>
+    </div>`;
+
+  // Funnel SVG
+  document.getElementById("funnelViz").innerHTML = renderFunnelSvg(res);
+  document.getElementById("funnelVizCard").style.display = "";
+
+  // Comparison bars
+  document.getElementById("compBars").innerHTML = renderComparisonBars(res);
+  document.getElementById("compBarsCard").style.display = "";
+
+  // Mix donut
+  document.getElementById("mixDonut").innerHTML = renderMixDonut(inp.mix);
+
+  // By clearance table
+  document.getElementById("byClear").innerHTML = `
+    <table>
+      <thead><tr><th>Clear.</th><th>Mix</th><th>Pos</th><th>Lead</th><th>Feas?</th><th>Scrn</th><th>Int</th><th>Off</th><th>Funnel</th></tr></thead>
+      <tbody>${res.by.map(x=>{
+        const feas = x.feasible ? `<span class="ok"><b>YES</b></span>` : `<span class="bad"><b>NO</b></span>`;
+        return `<tr><td>${x.clearance}</td><td>${x.pct}%</td><td>${Math.round(x.pos)}</td><td>${x.lead}</td><td>${feas}</td><td>${Math.ceil(x.screens).toLocaleString()}</td><td>${Math.ceil(x.interviews).toLocaleString()}</td><td>${Math.ceil(x.offers).toLocaleString()}</td><td class="muted">${pct(x.accept)}/${pct(x.scr2int)}/${pct(x.int2off)}</td></tr>`;
+      }).join("")}</tbody>
+    </table>`;
+
+  // Breakdown
+  function row(label, noH, yesH){
+    return `<tr><td>${label}</td><td>${Math.round(noH).toLocaleString()}</td><td>${Math.round(yesH).toLocaleString()}</td><td>${Math.round(noH-yesH).toLocaleString()}</td></tr>`;
+  }
+  const h = res.hours;
+  const noInt = h.interviewHours*(1+inp.reworkNo), yesInt = h.interviewHoursYes*(1+inp.reworkYes);
+  const noOpsInt = h.opsInterviewHours*(1+inp.reworkNo), yesOpsInt = h.opsInterviewHoursYes*(1+inp.reworkYes);
+  const noOpsOff = h.opsOfferHours*(1+inp.reworkNo), yesOpsOff = h.opsOfferHoursYes*(1+inp.reworkYes);
+  document.getElementById("breakdown").innerHTML = `
+    <table>
+      <thead><tr><th>Component</th><th>Hrs (No DS)</th><th>Hrs (With DS)</th><th>Saved</th></tr></thead>
+      <tbody>
+        ${row("Interview hours", noInt, yesInt)}
+        ${row("Ops (interviews)", noOpsInt, yesOpsInt)}
+        ${row("Ops (offers)", noOpsOff, yesOpsOff)}
+        <tr><td><b>Total</b></td><td><b>${Math.round(res.without_ds.hours).toLocaleString()}</b></td><td><b>${Math.round(res.with_ds.hours).toLocaleString()}</b></td><td><b>${Math.round(res.without_ds.hours-res.with_ds.hours).toLocaleString()}</b></td></tr>
+      </tbody>
+    </table>`;
+
+  // Notes
+  const mixWarn = inp.mix.ok ? "" : "Mix does not sum to 100%\u2014fix inputs for meaningful results.";
+  const infeasWarn = res.totals.infeasiblePos>0 ? `Some positions are infeasible by lead-days within ${inp.targetDays} days.` : "Lead-days are within target timeline for all groups.";
+  const overrideNote = inp.funnel.overrides ? "Clearance-specific funnel overrides are ON." : "Default funnel applied to all groups.";
+  document.getElementById("notes").innerHTML = `
+    <div><b>Interpretation</b></div>
+    <div class="muted" style="margin-top:6px">
+      &bull; ${overrideNote}<br/>
+      &bull; ${infeasWarn}<br/>
+      &bull; Deep Sigma value = reduced rework + efficiency on interview/ops hours + days saved (vacancy value).<br/>
+      ${mixWarn ? "&bull; " + mixWarn : ""}
+    </div>`;
+
+  return res;
+}
+
+/* ── estimate() thin wrapper ── */
+function estimate(){
+  const inp = readInputs();
+  const res = compute(inp);
+  renderResult(res);
+  return res;
+}
+
+/* ── Scenario Manager ── */
+function getScenarios(){
+  try{ return JSON.parse(localStorage.getItem(KEY_SCENARIOS)||"[]"); }catch(e){ return []; }
+}
+function putScenarios(arr){
+  localStorage.setItem(KEY_SCENARIOS, JSON.stringify(arr.slice(0,10)));
+}
+
+function saveScenario(){
+  const nameEl = document.getElementById("scenarioName");
+  const name = (nameEl.value||"").trim() || ("Scenario " + (getScenarios().length+1));
+  const scenarios = getScenarios();
+  scenarios.push({ name, timestamp: new Date().toISOString(), inputs: captureInputs() });
+  putScenarios(scenarios);
+  nameEl.value = "";
+  renderScenarioList();
+}
+
+function renderScenarioList(){
+  const scenarios = getScenarios();
+  const el = document.getElementById("scenarioList");
+  if(!scenarios.length){ el.innerHTML = "No saved scenarios."; return; }
+  el.innerHTML = scenarios.map((s,i)=>`
+    <div class="scenario-row">
+      <input type="checkbox" class="scenario-check" data-idx="${i}"/>
+      <span class="scenario-name">${esc(s.name)}</span>
+      <span class="scenario-ts">${s.timestamp.slice(0,16)}</span>
+      <button onclick="loadScenario(${i})">Load</button>
+      <button onclick="deleteScenario(${i})" class="danger" style="padding:6px 8px">Del</button>
+    </div>
+  `).join("");
+}
+
+function loadScenario(idx){
+  const scenarios = getScenarios();
+  if(!scenarios[idx]) return;
+  applyInputs(scenarios[idx].inputs);
+  syncToggle();
+  saveState();
+  estimate();
+}
+
+function deleteScenario(idx){
+  const scenarios = getScenarios();
+  scenarios.splice(idx,1);
+  putScenarios(scenarios);
+  renderScenarioList();
+}
+
+function compareScenarios(){
+  const checks = document.querySelectorAll(".scenario-check:checked");
+  const indices = Array.from(checks).map(c=>Number(c.dataset.idx));
+  if(indices.length<2){ document.getElementById("compareResults").innerHTML = '<div class="muted small">Select at least 2 scenarios to compare.</div>'; return; }
+  const scenarios = getScenarios();
+  const results = indices.map(i=>{
+    const s = scenarios[i];
+    if(!s) return null;
+    // Build inputs from saved state
+    const tmpInp = buildInputsFromSaved(s.inputs);
+    return { name: s.name, result: compute(tmpInp) };
+  }).filter(Boolean);
+
+  let html = `<table style="margin-top:10px">
+    <thead><tr><th>Metric</th>${results.map(r=>`<th>${esc(r.name)}</th>`).join("")}</tr></thead><tbody>`;
+  html += `<tr><td>Positions</td>${results.map(r=>`<td>${Math.round(r.result.inputs.positions)}</td>`).join("")}</tr>`;
+  html += `<tr><td>Target Days</td>${results.map(r=>`<td>${r.result.inputs.targetDays}</td>`).join("")}</tr>`;
+  html += `<tr><td>Total Benefit</td>${results.map(r=>`<td class="ok">${money(Math.max(0,r.result.delta.total_benefit))}</td>`).join("")}</tr>`;
+  html += `<tr><td>Hours Saved</td>${results.map(r=>`<td>${Math.round(r.result.without_ds.hours-r.result.with_ds.hours).toLocaleString()}</td>`).join("")}</tr>`;
+  html += `<tr><td>Cost (No DS)</td>${results.map(r=>`<td class="bad">${money(r.result.without_ds.cost)}</td>`).join("")}</tr>`;
+  html += `<tr><td>Cost (With DS)</td>${results.map(r=>`<td class="ok">${money(r.result.with_ds.cost)}</td>`).join("")}</tr>`;
+  html += `<tr><td>Schedule Prob</td>${results.map(r=>`<td>${pct(r.result.schedule.hit_prob_without)} \u2192 ${pct(r.result.schedule.hit_prob_with)}</td>`).join("")}</tr>`;
+  html += `</tbody></table>`;
+  document.getElementById("compareResults").innerHTML = html;
+}
+
+function buildInputsFromSaved(saved){
+  const overrides = !!saved.toggleFunnel;
+  const defFunnel = {
+    accept: pctToRate(saved.pct_accept_default||62),
+    scr2int: pctToRate(saved.pct_scr2int_default||50),
+    int2off: pctToRate(saved.pct_int2off_default||53),
+  };
+  function rr(prefix){
+    return {
+      accept: pctToRate(saved[`pct_accept_${prefix}`]||50),
+      scr2int: pctToRate(saved[`pct_scr2int_${prefix}`]||50),
+      int2off: pctToRate(saved[`pct_int2off_${prefix}`]||50),
+    };
+  }
+  return {
+    positions: Math.max(1, Number(saved.positions||50)),
+    targetDays: Math.max(1, Number(saved.target_days||60)),
+    mix: { ts: Number(saved.pct_TS||0), s: Number(saved.pct_S||0), u: Number(saved.pct_U||0), ok: true },
+    lead: {
+      TS: Math.max(0, Number(saved.lead_TS||0)),
+      S: Math.max(0, Number(saved.lead_S||0)),
+      U: Math.max(0, Number(saved.lead_U||0)),
+    },
+    funnel: {
+      overrides,
+      TS: overrides ? rr("TS") : defFunnel,
+      S: overrides ? rr("S") : defFunnel,
+      U: overrides ? rr("U") : defFunnel,
+      default: defFunnel,
+    },
+    rounds: Math.max(1, Number(saved.rounds||2)),
+    panel: Math.max(1, Number(saved.panel||3)),
+    hrsInt: Math.max(0.25, Number(saved.hrsInt||1.5)),
+    hrsOpsInt: Math.max(0, Number(saved.hrsOpsInt||1.0)),
+    hrsOpsOff: Math.max(0, Number(saved.hrsOpsOff||2.0)),
+    rate: Math.max(1, Number(saved.rate||175)),
+    reworkNo: clamp(Number(saved.pct_rework_no||22)/100, 0, 2),
+    reworkYes: clamp(Number(saved.pct_rework_yes||8)/100, 0, 2),
+    effInt: clamp(Number(saved.pct_eff_int||18)/100, 0, 0.9),
+    effOps: clamp(Number(saved.pct_eff_ops||20)/100, 0, 0.9),
+    vac: Math.max(0, Number(saved.vac||1000)),
+    daysSaved: Math.max(0, Number(saved.daysSaved||5)),
+  };
+}
+
+/* ── Sensitivity ── */
+function runSensitivity(){
+  const paramId = document.getElementById("selSensParam").value;
+  const inp = readInputs();
+  const saved = captureInputs();
+  const currentVal = Number(saved[paramId]||0);
+  const multipliers = [0.8, 0.9, 1.0, 1.1, 1.2];
+  const rows = multipliers.map(m=>{
+    const testVal = Math.round(currentVal * m);
+    const testSaved = Object.assign({}, saved, {[paramId]: testVal});
+    const testInp = buildInputsFromSaved(testSaved);
+    const res = compute(testInp);
+    return { multiplier: m, value: testVal, benefit: res.delta.total_benefit, probWith: res.schedule.hit_prob_with };
+  });
+
+  const labels = {positions:"Positions", target_days:"Target Days", pct_accept_default:"Accept %", pct_rework_no:"Rework % (No DS)", vac:"Vacancy $/day"};
+  let html = `<table><thead><tr><th>${esc(labels[paramId]||paramId)}</th><th>Total Benefit</th><th>Sched. Prob</th></tr></thead><tbody>`;
+  rows.forEach(r=>{
+    const cls = r.multiplier===1.0 ? ' class="sensitivity-highlight"' : '';
+    html += `<tr${cls}><td>${r.value.toLocaleString()}${r.multiplier===1.0?" (current)":""}</td><td>${money(Math.max(0,r.benefit))}</td><td>${pct(r.probWith)}</td></tr>`;
+  });
+  html += `</tbody></table>`;
+  document.getElementById("sensitivityResults").innerHTML = html;
+}
+
+/* ── Monte Carlo Lite ── */
+function runMonteCarlo(){
+  const saved = captureInputs();
+  const N = 500;
+  const benefits = [], probs = [];
+  for(let i=0;i<N;i++){
+    const noisy = Object.assign({}, saved);
+    // Add ±10% noise to funnel and rework rates
+    const noisyFields = ["pct_accept_default","pct_scr2int_default","pct_int2off_default","pct_rework_no","pct_rework_yes"];
+    noisyFields.forEach(f=>{
+      const base = Number(saved[f]||0);
+      const noise = base * (0.9 + Math.random()*0.2);
+      noisy[f] = Math.round(clamp(noise, 1, 99));
+    });
+    // If overrides are on, also noise those
+    if(saved.toggleFunnel){
+      ["TS","S","U"].forEach(pfx=>{
+        ["pct_accept_","pct_scr2int_","pct_int2off_"].forEach(pre=>{
+          const key = pre+pfx;
+          const base = Number(saved[key]||50);
+          noisy[key] = Math.round(clamp(base*(0.9+Math.random()*0.2), 1, 99));
+        });
+      });
+    }
+    const inp = buildInputsFromSaved(noisy);
+    const res = compute(inp);
+    benefits.push(res.delta.total_benefit);
+    probs.push(res.schedule.hit_prob_with);
+  }
+  benefits.sort((a,b)=>a-b);
+  probs.sort((a,b)=>a-b);
+  const p = (arr,q) => arr[Math.floor(q*arr.length)];
+
+  document.getElementById("mcResults").innerHTML = `
+    <div class="mc-card">
+      <div class="mc-cell"><div class="mc-label">P10 (pessimistic)</div><div class="mc-val bad">${money(Math.max(0,p(benefits,0.1)))}</div><div class="muted small">${pct(p(probs,0.1))} sched.</div></div>
+      <div class="mc-cell"><div class="mc-label">P50 (median)</div><div class="mc-val" style="color:var(--accent)">${money(Math.max(0,p(benefits,0.5)))}</div><div class="muted small">${pct(p(probs,0.5))} sched.</div></div>
+      <div class="mc-cell"><div class="mc-label">P90 (optimistic)</div><div class="mc-val ok">${money(Math.max(0,p(benefits,0.9)))}</div><div class="muted small">${pct(p(probs,0.9))} sched.</div></div>
+    </div>
+    <div class="muted small" style="margin-top:8px">${N} simulations &bull; \u00b110% uniform noise on accept/screen-to-interview/interview-to-offer/rework rates</div>`;
+}
+
+/* ── Test data loader ── */
+function loadTest(){
+  document.getElementById("positions").value = 50;
+  document.getElementById("target_days").value = 60;
+  document.getElementById("pct_TS").value = 100;
+  document.getElementById("pct_S").value = 0;
+  document.getElementById("pct_U").value = 0;
+  document.getElementById("lead_TS").value = 10;
+  document.getElementById("lead_S").value = 7;
+  document.getElementById("lead_U").value = 90;
+  document.getElementById("pct_accept_default").value = 62;
+  document.getElementById("pct_scr2int_default").value = 50;
+  document.getElementById("pct_int2off_default").value = 53;
+  document.getElementById("toggleFunnel").checked = false;
+  document.getElementById("rounds").value = 2;
+  document.getElementById("panel").value = 3;
+  document.getElementById("hrsInt").value = 1.5;
+  document.getElementById("hrsOpsInt").value = 1.0;
+  document.getElementById("hrsOpsOff").value = 2.0;
+  document.getElementById("rate").value = 175;
+  document.getElementById("pct_rework_no").value = 22;
+  document.getElementById("pct_rework_yes").value = 8;
+  document.getElementById("pct_eff_int").value = 18;
+  document.getElementById("pct_eff_ops").value = 20;
+  document.getElementById("vac").value = 1000;
+  document.getElementById("daysSaved").value = 5;
+}
+
+function syncToggle(){
+  document.getElementById("funnelOverrides").classList.toggle("hidden", !document.getElementById("toggleFunnel").checked);
+}
+
+/* ── Event wiring ── */
+document.getElementById("toggleFunnel").addEventListener("change", ()=>{ syncToggle(); saveState(); estimate(); });
+["pct_TS","pct_S","pct_U"].forEach(id=>{
+  document.getElementById(id).addEventListener("input", ()=>{ mixCheck(); saveState(); });
+});
+document.getElementById("btnRun").addEventListener("click", ()=>{ saveState(); syncToggle(); estimate(); });
+document.getElementById("btnTest").addEventListener("click", ()=>{ loadTest(); saveState(); syncToggle(); estimate(); });
+document.getElementById("btnExport").addEventListener("click", ()=>{
+  const res = estimate();
+  const blob = new Blob([JSON.stringify(res,null,2)], {type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`EDGE_AwardStaffing_Estimate_v1.2.0_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+});
+document.getElementById("btnReset").addEventListener("click", ()=>{
+  if(!confirm("Reset saved inputs?")) return;
+  localStorage.removeItem(KEY);
+  location.reload();
+});
+document.getElementById("btnSaveScenario").addEventListener("click", saveScenario);
+document.getElementById("btnCompare").addEventListener("click", compareScenarios);
+document.getElementById("btnSensitivity").addEventListener("click", runSensitivity);
+document.getElementById("btnMC").addEventListener("click", runMonteCarlo);
+
+/* ── Init ── */
+(function init(){
+  restoreState();
+  syncToggle();
+  mixCheck();
+  estimate();
+  renderScenarioList();
+})();
+</script>
+</body>
+</html>

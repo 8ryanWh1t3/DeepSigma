@@ -1,0 +1,1128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Deep Sigma — Bid/No-Bid Console v003</title>
+  <style>
+    :root { --bg:#0b0f14; --card:#111824; --muted:#8aa0b5; --txt:#e7eef7; --accent:#7df9ff; --warn:#ffcc66; --bad:#ff6b6b; --ok:#5dff93; }
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:var(--bg);color:var(--txt);}
+    header{padding:16px 18px;border-bottom:1px solid #1b2a3a;display:flex;gap:12px;align-items:center;justify-content:space-between;}
+    .brand{display:flex;flex-direction:column;gap:2px}
+    .brand b{letter-spacing:.5px}
+    .brand small{color:var(--muted)}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
+    button{background:#182235;color:var(--txt);border:1px solid #243449;border-radius:10px;padding:10px 12px;cursor:pointer}
+    button:hover{border-color:#2f4765}
+    button.primary{border-color:rgba(125,249,255,.45);box-shadow:0 0 0 1px rgba(125,249,255,.12) inset}
+    button.danger{border-color:rgba(255,107,107,.45)}
+    main{display:grid;grid-template-columns:290px 1fr;min-height:calc(100vh - 66px)}
+    nav{border-right:1px solid #1b2a3a;padding:14px}
+    .tab{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--txt);margin-bottom:8px}
+    .tab.active{background:#101a28;border-color:#243449}
+    .wrap{padding:14px 16px;max-width:1300px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .card{background:var(--card);border:1px solid #1b2a3a;border-radius:14px;padding:12px}
+    .card h3{margin:0 0 10px 0;font-size:14px;color:#cfe2f7;letter-spacing:.3px}
+    label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
+    input,textarea,select{width:100%;box-sizing:border-box;background:#0d1520;color:var(--txt);border:1px solid #243449;border-radius:10px;padding:10px 10px;font-size:13px}
+    textarea{min-height:90px;resize:vertical}
+    .muted{color:var(--muted);font-size:12px}
+    .small{font-size:12px}
+    .pill{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid #243449;color:var(--muted);font-size:12px;margin-right:6px}
+    .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th,td{padding:10px;border-bottom:1px solid #1b2a3a;vertical-align:top}
+    th{color:#b9d3ea;text-align:left;font-weight:600}
+    .hidden{display:none}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;}
+    .flex{display:flex;gap:10px;flex-wrap:wrap}
+    .right{display:flex;gap:10px;justify-content:flex-end;align-items:center}
+    .warnbox{border:1px solid rgba(255,204,102,.35);background:rgba(255,204,102,.06);border-radius:12px;padding:10px}
+    .ok{color:var(--ok)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+  </style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <b>Deep Sigma — Bid/No-Bid Console v003</b>
+    <small>DLR · RS · DS · MG · Seal→Version→Patch (single-file edge)</small>
+  </div>
+  <div class="row">
+    <button id="btnExport" class="primary">Export JSON</button>
+    <button id="btnImport">Import JSON</button>
+    <button id="btnReset" class="danger">Reset</button>
+  </div>
+</header>
+<main>
+  <nav>
+    <button class="tab active" data-tab="dashboard">Dashboard</button>
+    <button class="tab" data-tab="opps">Opportunities</button>
+    <button class="tab" data-tab="gate">Gate 0 Score</button>
+    <button class="tab" data-tab="assumptions">Assumptions</button>
+    <button class="tab" data-tab="risks">Risks (KRIs)</button>
+    <button class="tab" data-tab="decision">Decision (DLR)</button>
+    <button class="tab" data-tab="drift">Drift + RS</button>
+    <button class="tab" data-tab="artifacts">Artifacts Export</button>
+    <button class="tab" data-tab="test">Test Mode</button>
+    <div style="margin-top:14px" class="muted">Data stored in <span class="mono">localStorage</span>.</div>
+  </nav>
+  <div class="wrap">
+    <section id="tab-dashboard">
+      <div class="kpi">
+        <div class="card"><div class="muted">Open Opportunities</div><b id="kOpen">0</b></div>
+        <div class="card"><div class="muted">Pending Approval</div><b id="kPending">0</b></div>
+        <div class="card"><div class="muted">Bid Rate</div><b id="kBidRate">—</b></div>
+        <div class="card"><div class="muted">Kill Rate</div><b id="kKillRate">—</b></div>
+      </div>
+      <div class="kpi" style="margin-top:10px">
+        <div class="card"><div class="muted">Avg Time-to-Decision</div><b id="kTTD">—</b></div>
+        <div class="card"><div class="muted">Top Risks (Open)</div><b id="kRiskOpen">0</b></div>
+        <div class="card"><div class="muted">Watch Decisions</div><b id="kWatch">0</b></div>
+        <div class="card"><div class="muted">Auto DS Alerts</div><b id="kDs">0</b></div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h3>Top Risks This Week</h3>
+        <div id="dashTopRisks" class="muted">No risks yet.</div>
+      </div>
+    </section>
+
+    <section id="tab-opps" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <h3>Create / Edit Opportunity</h3>
+          <label>Opportunity ID</label><input id="oppId" placeholder="OPP-001"/>
+          <label>Customer</label><input id="oppCustomer" placeholder="Agency / Office"/>
+          <label>Office / Program</label><input id="oppOffice" placeholder="Program office"/>
+          <label>Vehicle</label><input id="oppVehicle" placeholder="IDIQ / GWAC / BPA"/>
+          <label>NAICS</label><input id="oppNaics" placeholder="541715"/>
+          <label>Est Value Band</label><input id="oppValueBand" placeholder="$50M-$100M"/>
+          <label>Place of Performance</label><input id="oppPop" placeholder="CONUS / OCONUS"/>
+          <label>RFI Date</label><input id="oppRfi" type="date"/>
+          <label>RFP Date</label><input id="oppRfp" type="date"/>
+          <label>Questions Due</label><input id="oppQDue" type="date"/>
+          <label>Proposal Due</label><input id="oppDue" type="date"/>
+          <label>Award Estimate</label><input id="oppAward" type="date"/>
+          <label>Incumbent + Competitors</label><textarea id="oppComp" placeholder="Incumbent: ...\nCompetitors: ..."></textarea>
+          <label>Security / Data / Facility Needs</label><textarea id="oppSec" placeholder="CUI / TS-SCI / SCIF / IL5 ..."></textarea>
+          <div class="right" style="margin-top:10px">
+            <button id="btnOppClear">Clear</button>
+            <button id="btnOppSave" class="primary">Save Opportunity</button>
+          </div>
+          <div id="oppHint" class="muted"></div>
+        </div>
+        <div class="card">
+          <h3>Opportunity List</h3>
+          <div id="oppTable" class="muted">No opportunities yet.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-gate" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <h3>Gate 0 Weighted Score</h3>
+          <label>Opportunity</label><select id="gateOpp"></select>
+          <div id="gateInputs"></div>
+          <div class="card" style="margin-top:10px">
+            <div>Total Score: <b id="gateTotal">0</b> / 100</div>
+            <div>Recommendation: <b id="gateReco">No-Bid</b></div>
+            <div class="muted small">Thresholds: Bid ≥ 80 | Watch 65–79 | No-Bid &lt; 65</div>
+          </div>
+          <div class="right" style="margin-top:10px">
+            <button id="btnGateSave" class="primary">Save Score</button>
+          </div>
+          <div id="gateHint" class="muted"></div>
+        </div>
+        <div class="card">
+          <h3>Scoring Weights</h3>
+          <ul class="muted">
+            <li>Strategic fit (15%)</li>
+            <li>Customer access / relationship strength (15%)</li>
+            <li>Capability fit (15%)</li>
+            <li>Past performance match (10%)</li>
+            <li>Capacity / staffing feasibility (15%)</li>
+            <li>Differentiation strength (10%)</li>
+            <li>Price/margin viability (10%)</li>
+            <li>Risk level / complexity (10%)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-assumptions" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <h3>Add Assumption</h3>
+          <label>Opportunity</label><select id="aOpp"></select>
+          <label>Assumption</label><textarea id="aText"></textarea>
+          <label>Category</label>
+          <select id="aCat"><option>technical</option><option>staffing</option><option>pricing</option><option>schedule</option><option>customer</option></select>
+          <label>Expiry Date</label><input id="aExp" type="date"/>
+          <label>Confidence</label><select id="aConf"><option>Low</option><option>Med</option><option>High</option></select>
+          <label>Disconfirmers</label><textarea id="aDis"></textarea>
+          <div class="right" style="margin-top:10px"><button id="btnASave" class="primary">Save Assumption</button></div>
+        </div>
+        <div class="card"><h3>Assumptions</h3><div id="aTable" class="muted">None.</div></div>
+      </div>
+    </section>
+
+    <section id="tab-risks" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <h3>Add Risk (KRI)</h3>
+          <label>Opportunity</label><select id="rOpp"></select>
+          <label>Risk Description</label><textarea id="rText"></textarea>
+          <label>Severity</label><select id="rSev"><option>Low</option><option>Med</option><option>High</option></select>
+          <label>Mitigation</label><textarea id="rMit"></textarea>
+          <label>Owner</label><input id="rOwner"/>
+          <label>Due Date</label><input id="rDue" type="date"/>
+          <label>Tripwire Metric</label><input id="rTrip" placeholder="Trigger condition"/>
+          <div class="right" style="margin-top:10px"><button id="btnRSave" class="primary">Save Risk</button></div>
+        </div>
+        <div class="card"><h3>Risk Register</h3><div id="rTable" class="muted">None.</div></div>
+      </div>
+    </section>
+
+    <section id="tab-decision" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <h3>Decision (DLR)</h3>
+          <label>Opportunity</label><select id="dOpp"></select>
+          <label>Decision</label><select id="dDecision"><option>Bid</option><option>No-Bid</option><option>Watch</option></select>
+          <label>Approver</label><input id="dApprover"/>
+          <label>Authority Note</label><textarea id="dAuthority"></textarea>
+          <label>Decision Rationale</label><textarea id="dRationale"></textarea>
+          <label>Seal</label><select id="dSeal"><option value="false">Open</option><option value="true">Sealed</option></select>
+          <div class="right" style="margin-top:10px"><button id="btnDSave" class="primary">Save Decision</button></div>
+          <div id="dHint" class="muted"></div>
+        </div>
+        <div class="card"><h3>Decision Snapshot</h3><pre id="dPreview" class="mono" style="white-space:pre-wrap"></pre></div>
+      </div>
+    </section>
+
+    <section id="tab-drift" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <h3>Drift Signals (DS)</h3>
+          <label>Code</label><input id="dsCode" placeholder="DS-ACCESS-001"/>
+          <label>Message</label><textarea id="dsMsg"></textarea>
+          <label>Patch Hint</label><input id="dsPatch"/>
+          <div class="right" style="margin-top:10px"><button id="btnDsSave" class="primary">Add DS</button></div>
+          <h3 style="margin-top:14px">Weekly RS</h3>
+          <label>Week Of</label><input id="rsWeek" type="date"/>
+          <label>Steward</label><input id="rsSteward"/>
+          <label>Notes</label><textarea id="rsNotes"></textarea>
+          <div class="right" style="margin-top:10px"><button id="btnRsSave">Save RS</button></div>
+        </div>
+        <div class="card"><h3>DS + RS Log</h3><div id="dsTable" class="muted">None.</div></div>
+      </div>
+    </section>
+
+    <section id="tab-artifacts" class="hidden">
+      <div class="grid">
+        <div class="card">
+          <h3>Artifacts Export</h3>
+          <div class="warnbox muted">Local export only unless Edge Sync is configured.</div>
+          <label>Opportunity for export</label><select id="packOpp"></select>
+          <label>Pack Prefix</label><input id="packPrefix" value="SEQUOIA"/>
+          <label>Organization / Program</label><input id="orgProgram" value="NGA — SEQUOIA"/>
+          <label>Coherence Steward</label><input id="cohSteward"/>
+          <label>Approval / Authority Note</label><textarea id="authorityNote"></textarea>
+          <div class="grid">
+            <div>
+              <label>Safe Export</label>
+              <select id="safeExport"><option value="false">Off</option><option value="true">On</option></select>
+            </div>
+            <div>
+              <label>Safe Level</label>
+              <select id="safeExportLevel"><option value="lite">Lite</option><option value="strict">Strict</option></select>
+            </div>
+          </div>
+          <div class="flex" style="margin-top:10px">
+            <button id="btnZipPack" class="primary">Download ZIP Pack</button>
+          </div>
+
+          <div class="card" style="margin-top:12px">
+            <h3>Edge Sync (DeepSigma Enterprise)</h3>
+            <label>Enterprise Intake Endpoint</label><input id="edgeEndpoint" placeholder="https://host/api/edge/intake"/>
+            <label>Bearer Token</label><input id="edgeToken" type="password"/>
+            <label>Manifest Signing Key (HMAC)</label><input id="edgeSignKey" type="password"/>
+            <div class="muted" id="edgeOutboxCount">Outbox: 0 pending</div>
+            <div class="flex" style="margin-top:10px">
+              <button id="btnSyncPack" class="primary">Sync ZIP Pack to Enterprise</button>
+              <button id="btnRetryOutbox">Retry Outbox</button>
+            </div>
+            <div id="edgeSyncStatus" class="muted">Status: not synced</div>
+            <div class="muted" id="edgeAuditCount" style="margin-top:6px">Receipts: 0</div>
+            <div class="flex" style="margin-top:8px">
+              <button id="btnDownloadReceipts">Download Sync Receipts</button>
+            </div>
+            <pre id="edgeAuditPreview" class="mono small" style="white-space:pre-wrap;margin-top:8px;max-height:140px;overflow:auto"></pre>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Preview</h3>
+          <pre id="preview" class="mono" style="white-space:pre-wrap"></pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-test" class="hidden">
+      <div class="card">
+        <h3>Test Mode</h3>
+        <div class="muted">Generate sample opportunity + assumptions + risks + sealed decision, then export/sync in under 60s.</div>
+        <div class="flex" style="margin-top:10px">
+          <button id="tmRunAll" class="primary">RUN FULL TEST</button>
+          <button id="tmDownloadZip" class="primary">Download ZIP Pack</button>
+          <button id="tmReset" class="danger">Reset Data</button>
+        </div>
+        <pre id="tmLog" class="mono" style="white-space:pre-wrap;margin-top:10px"></pre>
+      </div>
+    </section>
+  </div>
+</main>
+
+<input id="fileImport" type="file" accept="application/json" class="hidden"/>
+<script>
+const KEY = "ds_bidnobid_console_v1";
+const EDGE_CFG_KEY = "ds_bidnobid_edge_cfg_v1";
+const EDGE_OUTBOX_KEY = "ds_bidnobid_edge_outbox_v1";
+const EDGE_AUDIT_KEY = "ds_bidnobid_edge_audit_v1";
+const SCORE_CFG = [
+  {id:"strategic_fit", name:"Strategic fit", weight:15},
+  {id:"customer_access", name:"Customer access / relationship strength", weight:15},
+  {id:"capability_fit", name:"Capability fit", weight:15},
+  {id:"past_perf", name:"Past performance match", weight:10},
+  {id:"capacity_staffing", name:"Capacity / staffing feasibility", weight:15},
+  {id:"differentiation", name:"Differentiation strength", weight:10},
+  {id:"price_margin", name:"Price/margin viability", weight:10},
+  {id:"risk_complexity", name:"Risk level / complexity", weight:10}
+];
+
+function storageAvailable(){
+  try{ const x="__ds_test__"; localStorage.setItem(x,x); localStorage.removeItem(x); return true; }
+  catch(_){ return false; }
+}
+function getStoreItem(k){ if(storageAvailable()) return localStorage.getItem(k); window.__ds_memstore ||= {}; return window.__ds_memstore[k] || null; }
+function setStoreItem(k,v){ if(storageAvailable()) return localStorage.setItem(k,v); window.__ds_memstore ||= {}; window.__ds_memstore[k]=v; }
+function removeStoreItem(k){ if(storageAvailable()) return localStorage.removeItem(k); if(window.__ds_memstore) delete window.__ds_memstore[k]; }
+
+function nowIso(){ return new Date().toISOString(); }
+function today(){ return new Date().toISOString().slice(0,10); }
+function uid(prefix){ return `${prefix}-${Math.random().toString(16).slice(2,8).toUpperCase()}`; }
+function v(id){ return (document.getElementById(id)?.value || "").trim(); }
+function s(id,val){ const el=document.getElementById(id); if(el) el.value = val || ""; }
+function esc(x){ return String(x || "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m])); }
+function asStr(x, maxLen=4000){ return String(x ?? "").slice(0, maxLen); }
+function asDate(x){ const s = asStr(x, 32); return /^\\d{4}-\\d{2}-\\d{2}$/.test(s) ? s : ""; }
+function asIso(x){ const s = asStr(x, 40); return /^\\d{4}-\\d{2}-\\d{2}T/.test(s) ? s : nowIso(); }
+function asBool(x){ return x === true; }
+function asEnum(x, allowed, fallback){ return allowed.includes(x) ? x : fallback; }
+function asNumRange(x, lo, hi, fallback=0){ const n = Number(x); if(!Number.isFinite(n)) return fallback; return Math.max(lo, Math.min(hi, n)); }
+function uniqBy(arr, keyFn){ const seen = new Set(); const out = []; for(const x of arr){ const k = keyFn(x); if(seen.has(k)) continue; seen.add(k); out.push(x); } return out; }
+
+function emptyDb(){
+  return { opportunities:[], assumptions:[], risks:[], drift:[], rs:[], meta:{created:nowIso(), version:"1.0"} };
+}
+function normalizeScores(scores){
+  const out = {};
+  for(const c of SCORE_CFG) out[c.id] = asNumRange(scores?.[c.id], 0, 5, 0);
+  return out;
+}
+function normalizeOpportunity(o){
+  const id = asStr(o?.id, 64) || uid("OPP");
+  const scoreScores = normalizeScores(o?.score?.scores || {});
+  const scoreTotal = computeScore(scoreScores);
+  const scoreReco = decisionForScore(scoreTotal);
+  let decision = null;
+  if(o?.decision && typeof o.decision === "object"){
+    const sealed = asBool(o.decision.sealed);
+    decision = {
+      value: asEnum(asStr(o.decision.value, 20), ["Bid","No-Bid","Watch"], "Watch"),
+      approver: asStr(o.decision.approver, 256),
+      authority: asStr(o.decision.authority, 2000),
+      rationale: asStr(o.decision.rationale, 6000),
+      sealed,
+      seal: sealed ? asStr(o.decision.seal, 120) || `${nowIso()}|v1` : null,
+      updated: asIso(o.decision.updated),
+    };
+  }
+  return {
+    id,
+    customer: asStr(o?.customer, 256),
+    office: asStr(o?.office, 256),
+    vehicle: asStr(o?.vehicle, 128),
+    naics: asStr(o?.naics, 64),
+    value_band: asStr(o?.value_band, 64),
+    pop: asStr(o?.pop, 128),
+    dates: {
+      rfi: asDate(o?.dates?.rfi),
+      rfp: asDate(o?.dates?.rfp),
+      q_due: asDate(o?.dates?.q_due),
+      due: asDate(o?.dates?.due),
+      award_est: asDate(o?.dates?.award_est),
+    },
+    competitors: asStr(o?.competitors, 4000),
+    security_needs: asStr(o?.security_needs, 4000),
+    score: {scores: scoreScores, total: scoreTotal, recommendation: scoreReco, updated: asIso(o?.score?.updated)},
+    decision,
+    created: asIso(o?.created),
+    updated: asIso(o?.updated),
+  };
+}
+function normalizeAssumption(a){
+  return {
+    id: asStr(a?.id, 64) || uid("ASM"),
+    opp_id: asStr(a?.opp_id, 64),
+    text: asStr(a?.text, 4000),
+    category: asEnum(asStr(a?.category, 32), ["technical","staffing","pricing","schedule","customer"], "technical"),
+    expiry: asDate(a?.expiry),
+    confidence: asEnum(asStr(a?.confidence, 16), ["Low","Med","High"], "Med"),
+    disconfirmers: asStr(a?.disconfirmers, 4000),
+    created: asIso(a?.created),
+  };
+}
+function normalizeRisk(r){
+  return {
+    id: asStr(r?.id, 64) || uid("RISK"),
+    opp_id: asStr(r?.opp_id, 64),
+    text: asStr(r?.text, 4000),
+    severity: asEnum(asStr(r?.severity, 16), ["Low","Med","High"], "Med"),
+    mitigation: asStr(r?.mitigation, 4000),
+    owner: asStr(r?.owner, 128),
+    due: asDate(r?.due),
+    tripwire: asStr(r?.tripwire, 400),
+    status: asEnum(asStr(r?.status, 24), ["Open","Closed"], "Open"),
+    created: asIso(r?.created),
+  };
+}
+function normalizeDrift(d){
+  return {
+    time: asIso(d?.time),
+    code: asStr(d?.code, 64) || uid("DS"),
+    msg: asStr(d?.msg, 4000),
+    patch: asStr(d?.patch, 512),
+  };
+}
+function normalizeRs(r){
+  return {
+    id: asStr(r?.id, 64) || uid("RS"),
+    week_of: asDate(r?.week_of) || today(),
+    steward: asStr(r?.steward, 128),
+    notes: asStr(r?.notes, 6000),
+    created: asIso(r?.created),
+  };
+}
+function normalizeDb(input, strict=false){
+  if(!input || typeof input !== "object" || Array.isArray(input)) throw new Error("Invalid root object");
+  const db = {
+    opportunities: Array.isArray(input.opportunities) ? input.opportunities.map(normalizeOpportunity) : [],
+    assumptions: Array.isArray(input.assumptions) ? input.assumptions.map(normalizeAssumption) : [],
+    risks: Array.isArray(input.risks) ? input.risks.map(normalizeRisk) : [],
+    drift: Array.isArray(input.drift) ? input.drift.map(normalizeDrift) : [],
+    rs: Array.isArray(input.rs) ? input.rs.map(normalizeRs) : [],
+    meta: {created: asIso(input.meta?.created), version: "1.0"},
+  };
+  db.opportunities = uniqBy(db.opportunities, x=>x.id);
+  const oppIds = new Set(db.opportunities.map(x=>x.id));
+  db.assumptions = db.assumptions.filter(a=>a.opp_id && oppIds.has(a.opp_id));
+  db.risks = db.risks.filter(r=>r.opp_id && oppIds.has(r.opp_id));
+  if(strict && db.opportunities.length===0 && (input.opportunities?.length || input.assumptions?.length || input.risks?.length)){
+    throw new Error("Import rejected: no valid opportunities after validation");
+  }
+  return db;
+}
+function load(){
+  const raw = getStoreItem(KEY);
+  if(!raw){ const db = emptyDb(); setStoreItem(KEY, JSON.stringify(db)); return db; }
+  try{
+    const db = normalizeDb(JSON.parse(raw), false);
+    setStoreItem(KEY, JSON.stringify(db));
+    return db;
+  }catch(_){
+    const db = emptyDb();
+    setStoreItem(KEY, JSON.stringify(db));
+    return db;
+  }
+}
+function save(db){
+  const clean = normalizeDb(db, false);
+  setStoreItem(KEY, JSON.stringify(clean));
+  refreshAll();
+}
+
+function safeFile(sv){ return (sv||"").replace(/[^a-z0-9_\-]+/gi,"_").replace(/_+/g,"_").replace(/^_+|_+$/g,""); }
+function isSafeExport(){ return (document.getElementById("safeExport")?.value || "false") === "true"; }
+function safeLevel(){ return document.getElementById("safeExportLevel")?.value || "lite"; }
+function redactOpp(o){
+  if(!isSafeExport()) return {...o};
+  const x = {...o};
+  x.customer = "(masked)";
+  if(safeLevel()==="strict") x.competitors = "(masked)";
+  return x;
+}
+function packMeta(){
+  return {
+    prefix: v("packPrefix") || "SEQUOIA",
+    program: v("orgProgram") || "NGA — SEQUOIA",
+    steward: v("cohSteward") || "(unassigned)",
+    authority: v("authorityNote") || "(not specified)",
+    generated: nowIso(), date: today(), version: "1.0",
+    safe_export: isSafeExport(), safe_export_level: safeLevel()
+  };
+}
+
+function decisionForScore(score){
+  if(score >= 80) return "Bid";
+  if(score >= 65) return "Watch";
+  return "No-Bid";
+}
+function computeScore(scores){
+  let total = 0;
+  SCORE_CFG.forEach(c=>{
+    const raw = Number(scores?.[c.id] || 0);
+    const bounded = Math.max(0, Math.min(5, raw));
+    total += (bounded/5) * c.weight;
+  });
+  return Math.round(total*10)/10;
+}
+
+function buildGateInputs(){
+  const root = document.getElementById("gateInputs");
+  if(!root) return;
+  root.innerHTML = SCORE_CFG.map(c=>`
+    <label>${esc(c.name)} (${c.weight}%)</label>
+    <input type="range" min="0" max="5" step="1" value="0" id="sc_${c.id}"/>
+    <div class="muted" id="sc_${c.id}_v">0</div>
+  `).join("");
+  SCORE_CFG.forEach(c=>{
+    const el = document.getElementById(`sc_${c.id}`);
+    el?.addEventListener("input", ()=>{
+      const vv = document.getElementById(`sc_${c.id}_v`);
+      if(vv) vv.textContent = String(el.value);
+      refreshGatePreview();
+    });
+  });
+}
+function gateScoresFromUi(){
+  const x = {};
+  SCORE_CFG.forEach(c=> x[c.id] = Number(document.getElementById(`sc_${c.id}`)?.value || 0));
+  return x;
+}
+function setGateScores(scores){
+  SCORE_CFG.forEach(c=>{
+    const n = Number(scores?.[c.id] || 0);
+    const el = document.getElementById(`sc_${c.id}`);
+    const vv = document.getElementById(`sc_${c.id}_v`);
+    if(el) el.value = String(n);
+    if(vv) vv.textContent = String(n);
+  });
+}
+function refreshGatePreview(){
+  const score = computeScore(gateScoresFromUi());
+  const reco = decisionForScore(score);
+  const t = document.getElementById("gateTotal");
+  const r = document.getElementById("gateReco");
+  if(t) t.textContent = String(score);
+  if(r){ r.textContent = reco; r.className = reco==="Bid" ? "ok" : reco==="Watch" ? "warn" : "bad"; }
+}
+
+function tabList(){ return ["dashboard","opps","gate","assumptions","risks","decision","drift","artifacts","test"]; }
+function setTab(tab){
+  tabList().forEach(t=>{
+    const sec = document.getElementById(`tab-${t}`);
+    if(sec) sec.classList.toggle("hidden", t!==tab);
+  });
+  document.querySelectorAll(".tab").forEach(b=> b.classList.toggle("active", b.dataset.tab===tab));
+  try{ location.hash = "#" + tab; }catch(_){ }
+}
+
+function oppOptionsHtml(db){
+  if(!db.opportunities.length) return `<option value="">(no opportunities)</option>`;
+  return db.opportunities.map(o=>`<option value="${esc(o.id)}">${esc(o.id)} — ${esc(o.customer)}</option>`).join("");
+}
+function bindOppSelects(){
+  const db = load();
+  ["gateOpp","aOpp","rOpp","dOpp","packOpp"].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = oppOptionsHtml(db);
+  });
+}
+
+function saveOpportunity(){
+  const db = load();
+  const id = v("oppId") || uid("OPP");
+  const opp = {
+    id,
+    customer: v("oppCustomer"), office: v("oppOffice"), vehicle: v("oppVehicle"), naics: v("oppNaics"),
+    value_band: v("oppValueBand"), pop: v("oppPop"),
+    dates: { rfi: v("oppRfi"), rfp: v("oppRfp"), q_due: v("oppQDue"), due: v("oppDue"), award_est: v("oppAward") },
+    competitors: v("oppComp"), security_needs: v("oppSec"),
+    score: db.opportunities.find(o=>o.id===id)?.score || {scores:{}, total:0, recommendation:"No-Bid"},
+    decision: db.opportunities.find(o=>o.id===id)?.decision || null,
+    created: db.opportunities.find(o=>o.id===id)?.created || nowIso(),
+    updated: nowIso()
+  };
+  const i = db.opportunities.findIndex(x=>x.id===id);
+  if(i>=0) db.opportunities[i]=opp; else db.opportunities.push(opp);
+  save(db);
+  document.getElementById("oppHint").textContent = `Saved ${id}`;
+}
+function clearOpportunity(){
+  ["oppId","oppCustomer","oppOffice","oppVehicle","oppNaics","oppValueBand","oppPop","oppRfi","oppRfp","oppQDue","oppDue","oppAward","oppComp","oppSec"].forEach(x=>s(x,""));
+}
+function editOpportunity(id){
+  const o = load().opportunities.find(x=>x.id===id); if(!o) return;
+  setTab("opps");
+  s("oppId",o.id); s("oppCustomer",o.customer); s("oppOffice",o.office); s("oppVehicle",o.vehicle); s("oppNaics",o.naics);
+  s("oppValueBand",o.value_band); s("oppPop",o.pop); s("oppRfi",o.dates?.rfi); s("oppRfp",o.dates?.rfp); s("oppQDue",o.dates?.q_due);
+  s("oppDue",o.dates?.due); s("oppAward",o.dates?.award_est); s("oppComp",o.competitors); s("oppSec",o.security_needs);
+}
+function deleteOpportunity(id){
+  if(!confirm("Delete opportunity?")) return;
+  const db = load();
+  db.opportunities = db.opportunities.filter(o=>o.id!==id);
+  db.assumptions = db.assumptions.filter(a=>a.opp_id!==id);
+  db.risks = db.risks.filter(r=>r.opp_id!==id);
+  save(db);
+}
+
+function saveGateScore(){
+  const db = load();
+  const oppId = v("gateOpp"); if(!oppId) return alert("Select opportunity");
+  const o = db.opportunities.find(x=>x.id===oppId); if(!o) return alert("Opportunity not found");
+  const scores = gateScoresFromUi();
+  const total = computeScore(scores);
+  const recommendation = decisionForScore(total);
+  o.score = {scores,total,recommendation,updated:nowIso()};
+  o.updated = nowIso();
+  save(db);
+  document.getElementById("gateHint").textContent = `Saved score for ${oppId}`;
+}
+
+function saveAssumption(){
+  const db = load();
+  const x = {
+    id: uid("ASM"), opp_id: v("aOpp"), text: v("aText"), category: v("aCat"), expiry: v("aExp"),
+    confidence: v("aConf"), disconfirmers: v("aDis"), created: nowIso()
+  };
+  if(!x.opp_id || !x.text) return alert("Opportunity and assumption are required.");
+  db.assumptions.push(x); save(db);
+  ["aText","aDis","aExp"].forEach(id=>s(id,"")); s("aConf","Med");
+}
+function saveRisk(){
+  const db = load();
+  const x = {
+    id: uid("RISK"), opp_id: v("rOpp"), text: v("rText"), severity: v("rSev"), mitigation: v("rMit"),
+    owner: v("rOwner"), due: v("rDue"), tripwire: v("rTrip"), status:"Open", created: nowIso()
+  };
+  if(!x.opp_id || !x.text) return alert("Opportunity and risk are required.");
+  db.risks.push(x); save(db);
+  ["rText","rMit","rOwner","rDue","rTrip"].forEach(id=>s(id,"")); s("rSev","Med");
+}
+function saveDecision(){
+  const db = load();
+  const oppId = v("dOpp"); if(!oppId) return alert("Select opportunity");
+  const o = db.opportunities.find(x=>x.id===oppId); if(!o) return alert("Opportunity not found");
+  const sealed = v("dSeal")==="true";
+  o.decision = {
+    value: v("dDecision"), approver: v("dApprover"), authority: v("dAuthority"), rationale: v("dRationale"),
+    sealed, seal: sealed ? `${nowIso()}|v1` : null, updated: nowIso()
+  };
+  o.updated = nowIso();
+  save(db);
+  document.getElementById("dHint").textContent = `Saved decision for ${oppId}`;
+}
+
+function saveDS(){
+  const db = load();
+  const x = {time: nowIso(), code: v("dsCode") || uid("DS"), msg: v("dsMsg"), patch: v("dsPatch")};
+  if(!x.msg) return alert("DS message required.");
+  db.drift.push(x); save(db);
+  s("dsCode",""); s("dsMsg",""); s("dsPatch","");
+}
+function saveRS(){
+  const db = load();
+  const x = {id: uid("RS"), week_of: v("rsWeek") || today(), steward: v("rsSteward"), notes: v("rsNotes"), created: nowIso()};
+  db.rs.push(x); save(db);
+  s("rsWeek",""); s("rsSteward",""); s("rsNotes","");
+}
+
+function renderOppTable(){
+  const db = load();
+  const el = document.getElementById("oppTable");
+  if(!db.opportunities.length){ el.innerHTML = "<div class='muted'>No opportunities yet.</div>"; return; }
+  el.innerHTML = `<table><thead><tr><th>ID</th><th>Customer</th><th>Due</th><th>Score</th><th>Decision</th><th></th></tr></thead><tbody>${
+    db.opportunities.map(o=>`<tr>
+      <td class="mono">${esc(o.id)}</td>
+      <td>${esc(o.customer)}</td>
+      <td class="muted">${esc(o.dates?.due || "")}</td>
+      <td>${o.score ? `${o.score.total} (${esc(o.score.recommendation)})` : "—"}</td>
+      <td>${o.decision ? `${esc(o.decision.value)} ${o.decision.sealed ? "(sealed)" : "(open)"}` : "—"}</td>
+      <td><button data-action="edit" data-id="${esc(o.id)}">Edit</button> <button class="danger" data-action="del" data-id="${esc(o.id)}">Delete</button></td>
+    </tr>`).join("")
+  }</tbody></table>`;
+}
+function renderAssumptions(){
+  const db = load();
+  const el = document.getElementById("aTable");
+  if(!db.assumptions.length){ el.innerHTML = "<div class='muted'>None.</div>"; return; }
+  el.innerHTML = `<table><thead><tr><th>Opp</th><th>Assumption</th><th>Category</th><th>Expiry</th><th>Conf</th></tr></thead><tbody>${
+    db.assumptions.slice().reverse().map(a=>`<tr><td class="mono">${esc(a.opp_id)}</td><td>${esc(a.text)}</td><td>${esc(a.category)}</td><td>${esc(a.expiry)}</td><td>${esc(a.confidence)}</td></tr>`).join("")
+  }</tbody></table>`;
+}
+function renderRisks(){
+  const db = load();
+  const el = document.getElementById("rTable");
+  if(!db.risks.length){ el.innerHTML = "<div class='muted'>None.</div>"; return; }
+  el.innerHTML = `<table><thead><tr><th>Opp</th><th>Risk</th><th>Sev</th><th>Owner</th><th>Tripwire</th></tr></thead><tbody>${
+    db.risks.slice().reverse().map(r=>`<tr><td class="mono">${esc(r.opp_id)}</td><td>${esc(r.text)}</td><td>${esc(r.severity)}</td><td>${esc(r.owner)}</td><td>${esc(r.tripwire)}</td></tr>`).join("")
+  }</tbody></table>`;
+}
+function renderDSRS(){
+  const db = load();
+  const el = document.getElementById("dsTable");
+  const parts = [];
+  if(db.drift.length){
+    parts.push("<h3>Drift Signals</h3>");
+    parts.push(`<table><thead><tr><th>Time</th><th>Code</th><th>Message</th><th>Patch</th></tr></thead><tbody>${db.drift.slice().reverse().map(d=>`<tr><td class=\"muted mono\">${esc(d.time)}</td><td class=\"mono\">${esc(d.code)}</td><td>${esc(d.msg)}</td><td>${esc(d.patch)}</td></tr>`).join("")}</tbody></table>`);
+  }
+  if(db.rs.length){
+    parts.push("<h3 style='margin-top:12px'>RS Entries</h3>");
+    parts.push(`<table><thead><tr><th>ID</th><th>Week</th><th>Steward</th><th>Notes</th></tr></thead><tbody>${db.rs.slice().reverse().map(r=>`<tr><td class=\"mono\">${esc(r.id)}</td><td>${esc(r.week_of)}</td><td>${esc(r.steward)}</td><td>${esc(r.notes)}</td></tr>`).join("")}</tbody></table>`);
+  }
+  el.innerHTML = parts.length ? parts.join("") : "<div class='muted'>None.</div>";
+}
+function refreshDecisionPreview(){
+  const db = load();
+  const id = v("dOpp");
+  const o = db.opportunities.find(x=>x.id===id);
+  const el = document.getElementById("dPreview");
+  if(!o || !o.decision){ el.textContent = "No decision yet."; return; }
+  el.textContent = JSON.stringify(o.decision, null, 2);
+}
+
+function computeDashboard(){
+  const db = load();
+  const open = db.opportunities.length;
+  const pending = db.opportunities.filter(o=>!o.decision || !o.decision.sealed).length;
+  const decided = db.opportunities.filter(o=>o.decision).length;
+  const bid = db.opportunities.filter(o=>o.decision?.value==="Bid").length;
+  const nobid = db.opportunities.filter(o=>o.decision?.value==="No-Bid").length;
+  const watch = db.opportunities.filter(o=>o.decision?.value==="Watch").length;
+  const ttdVals = db.opportunities.filter(o=>o.decision).map(o=>{
+    const a = new Date(o.created || o.updated || nowIso()).getTime();
+    const b = new Date(o.decision.updated || nowIso()).getTime();
+    return Math.max(0, Math.round((b-a)/(1000*60*60*24)));
+  });
+  const avgTtd = ttdVals.length ? (ttdVals.reduce((x,y)=>x+y,0)/ttdVals.length).toFixed(1)+"d" : "—";
+  const bidRate = decided ? Math.round((bid/decided)*100)+"%" : "—";
+  const killRate = decided ? Math.round((nobid/decided)*100)+"%" : "—";
+  const riskOpen = db.risks.filter(r=>r.status!=="Closed").length;
+  const autoDs = db.drift.length;
+
+  document.getElementById("kOpen").textContent = String(open);
+  document.getElementById("kPending").textContent = String(pending);
+  document.getElementById("kBidRate").textContent = bidRate;
+  document.getElementById("kKillRate").textContent = killRate;
+  document.getElementById("kTTD").textContent = avgTtd;
+  document.getElementById("kRiskOpen").textContent = String(riskOpen);
+  document.getElementById("kWatch").textContent = String(watch);
+  document.getElementById("kDs").textContent = String(autoDs);
+
+  const top = db.risks.slice().reverse().slice(0,5);
+  document.getElementById("dashTopRisks").innerHTML = top.length
+    ? top.map(r=>`<div><span class="pill">${esc(r.severity)}</span> ${esc(r.text)} <span class="muted">(${esc(r.opp_id)})</span></div>`).join("")
+    : "No risks yet.";
+}
+
+// ZIP + HASH
+function crc32(buf){
+  let c = 0 ^ (-1);
+  for(let i=0;i<buf.length;i++) c = (c>>>8) ^ CRC_TABLE[(c ^ buf[i]) & 0xFF];
+  return (c ^ (-1)) >>> 0;
+}
+const CRC_TABLE = (()=>{ const t=new Uint32Array(256); for(let i=0;i<256;i++){ let c=i; for(let k=0;k<8;k++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1); t[i]=c>>>0; } return t; })();
+function u16(n){ return [n & 0xFF, (n>>>8)&0xFF]; }
+function u32(n){ return [n & 0xFF, (n>>>8)&0xFF, (n>>>16)&0xFF, (n>>>24)&0xFF]; }
+function strToUtf8Bytes(s){ return new TextEncoder().encode(s); }
+function buildZip(entries){
+  const fileParts=[]; const central=[]; let offset=0;
+  for(const e of entries){
+    const nameBytes=strToUtf8Bytes(e.name), data=e.bytes, crc=crc32(data), size=data.length;
+    const dt=e.mtime||new Date();
+    const dosTime=((dt.getHours()&0x1F)<<11)|((dt.getMinutes()&0x3F)<<5)|((Math.floor(dt.getSeconds()/2))&0x1F);
+    const dosDate=(((dt.getFullYear()-1980)&0x7F)<<9)|(((dt.getMonth()+1)&0x0F)<<5)|(dt.getDate()&0x1F);
+    const local=[...u32(0x04034b50),...u16(20),...u16(0),...u16(0),...u16(dosTime),...u16(dosDate),...u32(crc),...u32(size),...u32(size),...u16(nameBytes.length),...u16(0)];
+    fileParts.push(new Uint8Array(local), nameBytes, data);
+    const c=[...u32(0x02014b50),...u16(0x0314),...u16(20),...u16(0),...u16(0),...u16(dosTime),...u16(dosDate),...u32(crc),...u32(size),...u32(size),...u16(nameBytes.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(offset)];
+    central.push(new Uint8Array(c), nameBytes);
+    offset += local.length + nameBytes.length + size;
+  }
+  const centralStart=offset;
+  for(const p of central){ fileParts.push(p); offset += p.length; }
+  const centralSize=offset-centralStart;
+  const eocd=[...u32(0x06054b50),...u16(0),...u16(0),...u16(entries.length),...u16(entries.length),...u32(centralSize),...u32(centralStart),...u16(0)];
+  fileParts.push(new Uint8Array(eocd));
+  return new Blob(fileParts,{type:"application/zip"});
+}
+async function sha256Hex(bytes){
+  const b = bytes.buffer ? bytes.buffer : bytes;
+  const out = await crypto.subtle.digest("SHA-256", b);
+  return Array.from(new Uint8Array(out)).map(x=>x.toString(16).padStart(2,"0")).join("");
+}
+
+function buildOpportunityGraph(meta, opp, assumptions, risks){
+  const nodes=[{type:"opportunity", id:opp.id, customer:opp.customer, vehicle:opp.vehicle}];
+  const edges=[];
+  assumptions.forEach(a=>{ nodes.push({type:"assumption", id:a.id, expiry:a.expiry, confidence:a.confidence}); edges.push({type:"HAS_ASSUMPTION", from:opp.id, to:a.id}); });
+  risks.forEach(r=>{ nodes.push({type:"risk", id:r.id, severity:r.severity, owner:r.owner}); edges.push({type:"HAS_RISK", from:opp.id, to:r.id}); });
+  if(opp.decision){
+    const did = `${opp.id}-DECISION`;
+    nodes.push({type:"decision", id:did, value:opp.decision.value, sealed:opp.decision.sealed});
+    edges.push({type:"HAS_DECISION", from:opp.id, to:did});
+  }
+  return {meta, nodes, edges};
+}
+function dlrMarkdown(meta, opp){
+  const d = opp.decision || {};
+  return `# DLR — Bid/No-Bid (${opp.id})\n**Program:** ${meta.program}  \n**Generated:** ${meta.generated}  \n\n## Opportunity\n- ID: ${opp.id}\n- Customer: ${opp.customer}\n- Vehicle: ${opp.vehicle}\n- Value Band: ${opp.value_band}\n\n## Gate 0 Score\n- Total: ${opp.score?.total ?? "—"} / 100\n- Recommendation: ${opp.score?.recommendation ?? "—"}\n\n## Decision\n- Value: ${d.value || "(unset)"}\n- Approver: ${d.approver || "(unset)"}\n- Authority: ${d.authority || "(unset)"}\n- Seal: ${d.sealed ? d.seal : "(open)"}\n\n## Rationale\n${d.rationale || "(none)"}\n`;
+}
+function dsMarkdown(db, oppId){
+  const list = db.drift.slice().reverse().map(d=>`- **${d.code}** (${d.time}) — ${d.msg}\n  - Patch: ${d.patch}`).join("\n") || "- None";
+  return `# DS Capture — ${today()}\n\n## Opportunity\n- ${oppId || "(all)"}\n\n## Drift\n${list}\n`;
+}
+function rsMarkdown(db){
+  const list = db.rs.slice().reverse().map(r=>`- ${r.id} | week ${r.week_of} | ${r.steward}\n  - ${r.notes}`).join("\n") || "- None";
+  return `# RS Capture Weekly — ${today()}\n\n${list}\n`;
+}
+
+async function createZipPackPayload(){
+  const db = load();
+  const meta = packMeta();
+  const oppId = v("packOpp");
+  const opp = db.opportunities.find(x=>x.id===oppId) || db.opportunities[0];
+  if(!opp) throw new Error("No opportunities available for export.");
+
+  const oppx = redactOpp(opp);
+  const assumptions = db.assumptions.filter(a=>a.opp_id===opp.id);
+  const risks = db.risks.filter(r=>r.opp_id===opp.id);
+  const mg = buildOpportunityGraph(meta, oppx, assumptions, risks);
+  const dlr = dlrMarkdown(meta, oppx);
+  const ds = dsMarkdown(db, opp.id);
+  const rs = rsMarkdown(db);
+
+  const root = `${safeFile(meta.prefix)}_BidNoBidPack_${safeFile(opp.id)}_${meta.date}`;
+  const entries = []; const ts = new Date();
+  const addText = (path, text)=>{ const bytes=strToUtf8Bytes(text); entries.push({name:`${root}/${path}`, bytes, mtime:ts}); return bytes; };
+  const addJson = (path, obj)=>{ const text=JSON.stringify(obj,null,2); const bytes=strToUtf8Bytes(text); entries.push({name:`${root}/${path}`, bytes, mtime:ts}); return bytes; };
+
+  addJson(`mg/${safeFile(meta.prefix)}_MG_OpportunityGraph_${safeFile(opp.id)}_${meta.date}.json`, mg);
+  addText(`dlr/${safeFile(meta.prefix)}_DLR_BIDNOBID_${safeFile(opp.id)}_${meta.date}.md`, dlr);
+  addJson(`assumptions/${safeFile(meta.prefix)}_ASSUMPTIONS_${safeFile(opp.id)}_${meta.date}.json`, assumptions);
+  addJson(`risks/${safeFile(meta.prefix)}_RISKS_${safeFile(opp.id)}_${meta.date}.json`, risks);
+  addText(`ds/${safeFile(meta.prefix)}_DS_CAPTURE_${meta.date}.md`, ds);
+  addText(`rs/${safeFile(meta.prefix)}_RS_CAPTURE_WEEKLY_${meta.date}.md`, rs);
+
+  const manifest = {
+    schema: "deepsigma_ingest_manifest_v1",
+    meta,
+    opportunity_id: opp.id,
+    counts: {
+      opportunities: db.opportunities.length,
+      assumptions: assumptions.length,
+      risks: risks.length,
+      drift: db.drift.length,
+      rs_sessions: db.rs.length
+    },
+    hashes_file: "hashes.json"
+  };
+  const hashes = {};
+  for(const e of entries) hashes[e.name] = await sha256Hex(e.bytes);
+  const packHashMaterial = strToUtf8Bytes(Object.entries(hashes).sort((a,b)=>a[0].localeCompare(b[0])).map(([k,v])=>`${k} ${v}`).join("\n"));
+  const pack_hash = await sha256Hex(packHashMaterial);
+  manifest.pack_hash = pack_hash;
+
+  addJson("ingest_manifest.json", manifest);
+  addJson("hashes.json", {pack_hash, hashes});
+  addText("README.md", `# ${meta.prefix} Bid/No-Bid Pack\nProgram: ${meta.program}\nGenerated: ${meta.generated}\nSafe export: ${meta.safe_export} (${meta.safe_export_level})\n`);
+
+  const zipBlob = buildZip(entries);
+  return {root, manifest, hashes, zipBlob};
+}
+async function downloadZipPack(){
+  const {root, manifest, zipBlob} = await createZipPackPayload();
+  document.getElementById("preview").textContent = JSON.stringify(manifest, null, 2);
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(zipBlob);
+  a.download = `${root}.zip`;
+  a.click();
+}
+
+function edgeCfgDefault(){ return {endpoint:"", token:"", sign_key:""}; }
+function loadEdgeCfg(){ try{ return {...edgeCfgDefault(), ...(JSON.parse(getStoreItem(EDGE_CFG_KEY) || "{}"))}; }catch(_){ return edgeCfgDefault(); } }
+function saveEdgeCfg(){ setStoreItem(EDGE_CFG_KEY, JSON.stringify({endpoint:v("edgeEndpoint"), token:v("edgeToken"), sign_key:v("edgeSignKey")})); }
+function loadOutbox(){ try{ const x = JSON.parse(getStoreItem(EDGE_OUTBOX_KEY) || "[]"); return Array.isArray(x)?x:[]; }catch(_){ return []; } }
+function saveOutbox(xs){ setStoreItem(EDGE_OUTBOX_KEY, JSON.stringify(xs)); updateOutboxBadge(); }
+function updateOutboxBadge(){ const el=document.getElementById("edgeOutboxCount"); if(el) el.textContent = `Outbox: ${loadOutbox().length} pending`; }
+function syncStatus(msg, ok){ const el=document.getElementById("edgeSyncStatus"); if(!el) return; el.textContent=`Status: ${msg}`; el.style.color = ok===true?"var(--ok)":ok===false?"var(--bad)":"var(--muted)"; }
+function loadAudit(){ try{ const x = JSON.parse(getStoreItem(EDGE_AUDIT_KEY) || "[]"); return Array.isArray(x) ? x : []; }catch(_){ return []; } }
+function saveAudit(xs){ setStoreItem(EDGE_AUDIT_KEY, JSON.stringify(xs)); updateAuditUI(); }
+function addAudit(entry){
+  const q = loadAudit();
+  q.push(entry);
+  while(q.length > 200) q.shift();
+  saveAudit(q);
+}
+function updateAuditUI(){
+  const logs = loadAudit();
+  const cnt = document.getElementById("edgeAuditCount");
+  const pv = document.getElementById("edgeAuditPreview");
+  if(cnt) cnt.textContent = `Receipts: ${logs.length}`;
+  if(pv){
+    const last = logs.slice(-5).reverse();
+    pv.textContent = last.length ? last.map(x =>
+      `[${x.at}] ${x.action} ${x.result} ${x.status_code ?? "-"} req=${x.request_id} root=${x.root || "-"}`
+    ).join("\n") : "No sync receipts yet.";
+  }
+}
+function downloadReceipts(){
+  const blob = new Blob([JSON.stringify({schema:"deepsigma_sync_receipts_v1", generated_at: nowIso(), receipts: loadAudit()}, null, 2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `deepsigma_sync_receipts_${today()}.json`;
+  a.click();
+}
+function stableStringify(vv){ if(vv===null||typeof vv!=="object") return JSON.stringify(vv); if(Array.isArray(vv)) return `[${vv.map(stableStringify).join(",")}]`; const ks=Object.keys(vv).sort(); return `{${ks.map(k=>`${JSON.stringify(k)}:${stableStringify(vv[k])}`).join(",")}}`; }
+function b64FromBytes(bytes){ let s=""; const arr = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes); for(let i=0;i<arr.length;i++) s += String.fromCharCode(arr[i]); return btoa(s); }
+async function signManifest(manifest, signKey){
+  if(!signKey) return null;
+  const key = await crypto.subtle.importKey("raw", strToUtf8Bytes(signKey), {name:"HMAC", hash:"SHA-256"}, false, ["sign"]);
+  const sig = await crypto.subtle.sign("HMAC", key, strToUtf8Bytes(stableStringify(manifest)));
+  return b64FromBytes(new Uint8Array(sig));
+}
+async function postPackToEnterprise(pack, cfg){
+  const zipBytes = new Uint8Array(await pack.zipBlob.arrayBuffer());
+  const signature = await signManifest(pack.manifest, cfg.sign_key || "");
+  const requestId = `REQ-${Math.random().toString(16).slice(2,10).toUpperCase()}`;
+  const payload = {
+    schema: "deepsigma_edge_sync_v1",
+    sent_at: nowIso(),
+    client: {app:"NGA_SEQUOIA_BIDNOBID_UI", version:"0.03"},
+    request_id: requestId,
+    root: pack.root,
+    manifest: pack.manifest,
+    hashes: pack.hashes,
+    zip_b64: b64FromBytes(zipBytes),
+    signature: signature ? {alg:"HMAC-SHA256", value_b64: signature} : null
+  };
+  const headers = {"Content-Type":"application/json"};
+  if(cfg.token) headers["Authorization"] = `Bearer ${cfg.token}`;
+  if(signature) headers["X-DeepSigma-Signature"] = signature;
+  const res = await fetch(cfg.endpoint, {method:"POST", headers, body:JSON.stringify(payload)});
+  const txt = await res.text().catch(()=>"");
+  return {ok: res.ok, status: res.status, response_text: txt.slice(0, 500), signature_used: !!signature, request_id: requestId};
+}
+async function syncPackNow(){
+  saveEdgeCfg();
+  const cfg = loadEdgeCfg();
+  if(!cfg.endpoint) return alert("Set Enterprise Intake Endpoint first.");
+  syncStatus("syncing...", null);
+  try{
+    const pack = await createZipPackPayload();
+    const resp = await postPackToEnterprise(pack, cfg);
+    if(resp.ok){
+      addAudit({
+        at: nowIso(), action:"sync", result:"success", status_code: resp.status, request_id: resp.request_id,
+        endpoint: cfg.endpoint, root: pack.root, manifest_hash: pack.manifest.pack_hash, signature_used: resp.signature_used
+      });
+      syncStatus(`synced ${pack.root} (HTTP ${resp.status})`, true);
+      return;
+    }
+    const signature = await signManifest(pack.manifest, cfg.sign_key || "");
+    const q = loadOutbox();
+    q.push({queued_at:nowIso(), endpoint:cfg.endpoint, root:pack.root, manifest:pack.manifest, hashes:pack.hashes, zip_b64:b64FromBytes(new Uint8Array(await pack.zipBlob.arrayBuffer())), signature});
+    saveOutbox(q);
+    addAudit({
+      at: nowIso(), action:"sync", result:"queued", status_code: resp.status, request_id: resp.request_id,
+      endpoint: cfg.endpoint, root: pack.root, manifest_hash: pack.manifest.pack_hash, signature_used: !!signature, error: resp.response_text || `HTTP ${resp.status}`
+    });
+    syncStatus(`queued (HTTP ${resp.status})`, false);
+  }catch(err){
+    const pack = await createZipPackPayload();
+    const signature = await signManifest(pack.manifest, cfg.sign_key || "");
+    const q = loadOutbox();
+    q.push({queued_at:nowIso(), endpoint:cfg.endpoint, root:pack.root, manifest:pack.manifest, hashes:pack.hashes, zip_b64:b64FromBytes(new Uint8Array(await pack.zipBlob.arrayBuffer())), signature});
+    saveOutbox(q);
+    addAudit({
+      at: nowIso(), action:"sync", result:"queued", status_code: null, request_id: `REQ-LOCAL-${Math.random().toString(16).slice(2,8).toUpperCase()}`,
+      endpoint: cfg.endpoint, root: pack.root, manifest_hash: pack.manifest.pack_hash, signature_used: !!signature, error: err.message || "network/unknown error"
+    });
+    syncStatus(`queued (${err.message || "sync failed"})`, false);
+  }
+}
+async function retryOutbox(){
+  saveEdgeCfg();
+  const cfg = loadEdgeCfg();
+  let q = loadOutbox();
+  if(!q.length) return syncStatus("outbox empty", true);
+  if(!cfg.endpoint) return alert("Set Enterprise Intake Endpoint first.");
+  let ok=0; const keep=[];
+  for(const item of q){
+    try{
+      const requestId = `REQ-${Math.random().toString(16).slice(2,10).toUpperCase()}`;
+      const payload = {schema:"deepsigma_edge_sync_v1", sent_at:nowIso(), client:{app:"NGA_SEQUOIA_BIDNOBID_UI",version:"0.03"}, request_id:requestId, root:item.root, manifest:item.manifest, hashes:item.hashes, zip_b64:item.zip_b64, signature:item.signature?{alg:"HMAC-SHA256",value_b64:item.signature}:null};
+      const headers={"Content-Type":"application/json"};
+      if(cfg.token) headers["Authorization"]=`Bearer ${cfg.token}`;
+      if(item.signature) headers["X-DeepSigma-Signature"]=item.signature;
+      const res = await fetch(item.endpoint || cfg.endpoint, {method:"POST", headers, body:JSON.stringify(payload)});
+      const txt = await res.text().catch(()=> "");
+      if(!res.ok){
+        keep.push(item);
+        addAudit({
+          at: nowIso(), action:"retry", result:"failed", status_code: res.status, request_id: requestId,
+          endpoint: item.endpoint || cfg.endpoint, root: item.root, manifest_hash: item.manifest?.pack_hash || null,
+          signature_used: !!item.signature, error: txt.slice(0, 300) || `HTTP ${res.status}`
+        });
+        continue;
+      }
+      ok += 1;
+      addAudit({
+        at: nowIso(), action:"retry", result:"success", status_code: res.status, request_id: requestId,
+        endpoint: item.endpoint || cfg.endpoint, root: item.root, manifest_hash: item.manifest?.pack_hash || null,
+        signature_used: !!item.signature
+      });
+    }catch(err){
+      keep.push(item);
+      addAudit({
+        at: nowIso(), action:"retry", result:"failed", status_code: null, request_id: `REQ-LOCAL-${Math.random().toString(16).slice(2,8).toUpperCase()}`,
+        endpoint: item.endpoint || cfg.endpoint, root: item.root, manifest_hash: item.manifest?.pack_hash || null,
+        signature_used: !!item.signature, error: err.message || "network/unknown error"
+      });
+    }
+  }
+  saveOutbox(keep);
+  syncStatus(`outbox sent=${ok}, pending=${keep.length}`, keep.length===0);
+}
+
+function tmLog(msg){ const el=document.getElementById("tmLog"); if(!el) return; el.textContent += `[${nowIso()}] ${msg}\n`; el.scrollTop = el.scrollHeight; }
+function tmResetAll(){ if(!confirm("Reset ALL local data?")) return; removeStoreItem(KEY); load(); refreshAll(); document.getElementById("tmLog").textContent=""; tmLog("Reset complete."); }
+function tmRunAll(){
+  const db = load();
+  const id = uid("OPP");
+  db.opportunities.push({
+    id, customer:"Sample Agency", office:"Sample Office", vehicle:"IDIQ", naics:"541715", value_band:"$50M-$100M", pop:"CONUS",
+    dates:{rfi:today(), rfp:today(), q_due:today(), due:today(), award_est:today()}, competitors:"Incumbent: ExampleCo", security_needs:"CUI",
+    score:{scores:{strategic_fit:4,customer_access:3,capability_fit:4,past_perf:4,capacity_staffing:3,differentiation:3,price_margin:3,risk_complexity:2}, total:0, recommendation:"Watch"},
+    decision:null, created:nowIso(), updated:nowIso()
+  });
+  const o = db.opportunities[db.opportunities.length-1];
+  o.score.total = computeScore(o.score.scores);
+  o.score.recommendation = decisionForScore(o.score.total);
+  db.assumptions.push({id:uid("ASM"), opp_id:id, text:"Pricing data will hold through amendment 1", category:"pricing", expiry:today(), confidence:"Med", disconfirmers:"Gov updates IGCE", created:nowIso()});
+  db.risks.push({id:uid("RISK"), opp_id:id, text:"Access risk to customer tech lead", severity:"High", mitigation:"Exec intro", owner:"Capture Lead", due:today(), tripwire:"No meeting by +7 days", status:"Open", created:nowIso()});
+  db.drift.push({time:nowIso(), code:"DS-ACCESS-001", msg:"Customer access lag", patch:"Escalate sponsor"});
+  db.rs.push({id:uid("RS"), week_of:today(), steward:"Coherence Steward", notes:"Tighten gate on access evidence", created:nowIso()});
+  o.decision = {value:o.score.recommendation, approver:"Test Approver", authority:"Capture Authority", rationale:"Auto test decision", sealed:true, seal:`${nowIso()}|v1`, updated:nowIso()};
+  o.updated = nowIso();
+  save(db);
+  s("packOpp", id);
+  tmLog(`Generated sample opportunity ${id}`);
+  tmLog(`Score=${o.score.total}, Recommendation=${o.score.recommendation}, Sealed decision created.`);
+}
+
+function refreshAll(){
+  bindOppSelects();
+  renderOppTable();
+  renderAssumptions();
+  renderRisks();
+  renderDSRS();
+  computeDashboard();
+  refreshGatePreview();
+  refreshDecisionPreview();
+}
+
+function bindEvents(){
+  document.querySelectorAll(".tab").forEach(b=> b.addEventListener("click", ()=>setTab(b.dataset.tab)));
+  document.getElementById("btnOppSave")?.addEventListener("click", saveOpportunity);
+  document.getElementById("btnOppClear")?.addEventListener("click", clearOpportunity);
+  document.getElementById("oppTable")?.addEventListener("click", (e)=>{
+    const b=e.target.closest("button"); if(!b) return;
+    if(b.dataset.action==="edit") editOpportunity(b.dataset.id);
+    if(b.dataset.action==="del") deleteOpportunity(b.dataset.id);
+  });
+
+  document.getElementById("gateOpp")?.addEventListener("change", ()=>{
+    const db=load(); const o=db.opportunities.find(x=>x.id===v("gateOpp"));
+    setGateScores(o?.score?.scores || {});
+    refreshGatePreview();
+  });
+  document.getElementById("btnGateSave")?.addEventListener("click", saveGateScore);
+
+  document.getElementById("btnASave")?.addEventListener("click", saveAssumption);
+  document.getElementById("btnRSave")?.addEventListener("click", saveRisk);
+  document.getElementById("btnDsSave")?.addEventListener("click", saveDS);
+  document.getElementById("btnRsSave")?.addEventListener("click", saveRS);
+
+  document.getElementById("dOpp")?.addEventListener("change", ()=>{
+    const db=load(); const o=db.opportunities.find(x=>x.id===v("dOpp"));
+    if(o?.decision){ s("dDecision",o.decision.value); s("dApprover",o.decision.approver); s("dAuthority",o.decision.authority); s("dRationale",o.decision.rationale); s("dSeal",o.decision.sealed?"true":"false"); }
+    else { s("dDecision","Watch"); s("dApprover",""); s("dAuthority",""); s("dRationale",""); s("dSeal","false"); }
+    refreshDecisionPreview();
+  });
+  document.getElementById("btnDSave")?.addEventListener("click", saveDecision);
+
+  document.getElementById("btnZipPack")?.addEventListener("click", downloadZipPack);
+  document.getElementById("btnSyncPack")?.addEventListener("click", syncPackNow);
+  document.getElementById("btnRetryOutbox")?.addEventListener("click", retryOutbox);
+  document.getElementById("btnDownloadReceipts")?.addEventListener("click", downloadReceipts);
+  document.getElementById("edgeEndpoint")?.addEventListener("change", saveEdgeCfg);
+  document.getElementById("edgeToken")?.addEventListener("change", saveEdgeCfg);
+  document.getElementById("edgeSignKey")?.addEventListener("change", saveEdgeCfg);
+
+  document.getElementById("btnExport")?.addEventListener("click", ()=>{
+    const blob = new Blob([JSON.stringify(load(),null,2)], {type:"application/json"});
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `bidnobid_console_${today()}.json`; a.click();
+  });
+  document.getElementById("btnImport")?.addEventListener("click", ()=>document.getElementById("fileImport")?.click());
+  document.getElementById("fileImport")?.addEventListener("change", (e)=>{
+    const file = e.target.files?.[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      try{
+        const parsed = JSON.parse(reader.result);
+        const db = normalizeDb(parsed, true);
+        setStoreItem(KEY, JSON.stringify(db));
+        refreshAll();
+        alert("Imported.");
+      }catch(err){
+        alert(`Invalid JSON/schema: ${err.message || "Import rejected."}`);
+      }
+    };
+    reader.readAsText(file);
+  });
+  document.getElementById("btnReset")?.addEventListener("click", tmResetAll);
+
+  document.getElementById("tmRunAll")?.addEventListener("click", tmRunAll);
+  document.getElementById("tmDownloadZip")?.addEventListener("click", downloadZipPack);
+  document.getElementById("tmReset")?.addEventListener("click", tmResetAll);
+}
+
+(function init(){
+  load();
+  buildGateInputs();
+  const cfg = loadEdgeCfg();
+  s("edgeEndpoint", cfg.endpoint || "");
+  s("edgeToken", cfg.token || "");
+  s("edgeSignKey", cfg.sign_key || "");
+  updateOutboxBadge();
+  updateAuditUI();
+  bindEvents();
+  refreshAll();
+  const h = (location.hash||"").replace("#","").trim();
+  if(tabList().includes(h)) setTab(h); else setTab("dashboard");
+})();
+</script>
+</body>
+</html>
