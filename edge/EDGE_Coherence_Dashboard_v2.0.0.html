@@ -1565,6 +1565,63 @@
         }
         .iris-data-label { font-weight: 600; color: var(--text-primary); }
 
+        /* Analysis: Audit Health Checks */
+        .audit-check {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .audit-check:last-child { border-bottom: none; }
+        .audit-icon { font-size: 18px; flex-shrink: 0; }
+        .audit-info { flex: 1; min-width: 0; }
+        .audit-label { font-size: 12px; font-weight: 600; }
+        .audit-detail { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+        .audit-status {
+            font-size: 9px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+        .audit-status.PASS { background: rgba(34,197,94,0.15); color: var(--success); }
+        .audit-status.WARN { background: rgba(234,179,8,0.15); color: var(--warning); }
+        .audit-status.FAIL { background: rgba(239,68,68,0.15); color: var(--danger); }
+
+        /* Analysis: Decay Legend */
+        .decay-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 8px 0 0;
+        }
+        .decay-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 10px;
+            color: var(--text-secondary);
+        }
+        .decay-legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        /* Analysis: Radar Labels */
+        .radar-label {
+            font-size: 10px;
+            font-weight: 600;
+            fill: var(--text-primary);
+        }
+        .radar-score {
+            font-size: 9px;
+            fill: var(--text-secondary);
+        }
+
         /* Toast Notifications */
         .toast-container {
             position: fixed;
@@ -3288,6 +3345,45 @@
                             </div>
                         </div>
                     </div>
+                    <div class="grid grid-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">Half-Life Decay Curves</span>
+                                <span class="card-badge badge-warning" id="decayClaimCount">5</span>
+                            </div>
+                            <div class="card-body">
+                                <svg id="decayChart" width="100%" height="220" viewBox="0 0 500 220"></svg>
+                                <div class="decay-legend" id="decayLegend"></div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">Confidence Distribution</span>
+                            </div>
+                            <div class="card-body">
+                                <svg id="confHistogram" width="100%" height="220" viewBox="0 0 500 220"></svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">4D Coherence Radar</span>
+                            </div>
+                            <div class="card-body" style="display:flex;justify-content:center;">
+                                <svg id="radarChart" width="300" height="300" viewBox="0 0 300 300"></svg>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">Audit Health Checks</span>
+                                <span class="card-badge" id="auditPassBadge">0/5</span>
+                            </div>
+                            <div class="card-body">
+                                <div id="auditChecks"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Blast Radius -->
@@ -3885,6 +3981,10 @@
             renderClaimsTable();
             renderTrendChart();
             renderCalendar();
+            renderDecayCurves();
+            renderConfidenceDistribution();
+            renderCoherenceRadar();
+            renderAuditChecks();
             renderDriftPanel();
             populateBlastSelect();
             renderBlastRadius();
@@ -4100,6 +4200,272 @@
             }
 
             document.getElementById('calendar').innerHTML = html;
+        }
+
+        function renderDecayCurves() {
+            var svg = document.getElementById('decayChart');
+            if (!svg) return;
+            var claims = data.claims.slice().filter(function(c) {
+                return c.halfLife && c.halfLife.expiresAt;
+            }).sort(function(a, b) {
+                return new Date(a.halfLife.expiresAt) - new Date(b.halfLife.expiresAt);
+            }).slice(0, 5);
+
+            var badge = document.getElementById('decayClaimCount');
+            if (badge) badge.textContent = claims.length;
+
+            var colors = ['#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#a855f7'];
+            var pad = { top: 20, right: 20, bottom: 30, left: 40 };
+            var w = 500 - pad.left - pad.right;
+            var h = 220 - pad.top - pad.bottom;
+            var maxDays = 90;
+            var now = new Date();
+            var html = '';
+
+            // Red zone below 0.50
+            var y50 = pad.top + h * (1 - 0.50);
+            html += '<rect x="' + pad.left + '" y="' + y50 + '" width="' + w + '" height="' + (pad.top + h - y50) + '" fill="rgba(239,68,68,0.06)"/>';
+
+            // Grid lines
+            for (var g = 0; g <= 4; g++) {
+                var yg = pad.top + (h / 4) * g;
+                var val = (1 - g / 4).toFixed(1);
+                html += '<line x1="' + pad.left + '" y1="' + yg + '" x2="' + (pad.left + w) + '" y2="' + yg + '" stroke="var(--border)" stroke-dasharray="3,3"/>';
+                html += '<text x="' + (pad.left - 6) + '" y="' + (yg + 3) + '" text-anchor="end" fill="var(--text-muted)" font-size="9">' + val + '</text>';
+            }
+
+            // X-axis labels
+            for (var xd = 0; xd <= 90; xd += 30) {
+                var xx = pad.left + (xd / maxDays) * w;
+                html += '<text x="' + xx + '" y="' + (pad.top + h + 18) + '" text-anchor="middle" fill="var(--text-muted)" font-size="9">' + xd + 'd</text>';
+            }
+
+            // Axes
+            html += '<line x1="' + pad.left + '" y1="' + pad.top + '" x2="' + pad.left + '" y2="' + (pad.top + h) + '" stroke="var(--border)"/>';
+            html += '<line x1="' + pad.left + '" y1="' + (pad.top + h) + '" x2="' + (pad.left + w) + '" y2="' + (pad.top + h) + '" stroke="var(--border)"/>';
+
+            // 0.50 threshold line
+            html += '<line x1="' + pad.left + '" y1="' + y50 + '" x2="' + (pad.left + w) + '" y2="' + y50 + '" stroke="var(--danger)" stroke-dasharray="4,2" opacity="0.5"/>';
+            html += '<text x="' + (pad.left + w + 2) + '" y="' + (y50 + 3) + '" fill="var(--danger)" font-size="8">0.50</text>';
+
+            // Decay curves
+            var legendHtml = '';
+            claims.forEach(function(c, i) {
+                var col = colors[i % colors.length];
+                var initConf = c.confidence.score;
+                var hlDays = c.halfLife.value || 30;
+                var points = [];
+                for (var day = 0; day <= maxDays; day += 1) {
+                    var eff = initConf * Math.pow(0.5, day / hlDays);
+                    var px = pad.left + (day / maxDays) * w;
+                    var py = pad.top + h * (1 - eff);
+                    points.push(px.toFixed(1) + ',' + py.toFixed(1));
+                }
+                html += '<polyline points="' + points.join(' ') + '" fill="none" stroke="' + col + '" stroke-width="2"/>';
+
+                // Endpoint label
+                var lastEff = initConf * Math.pow(0.5, maxDays / hlDays);
+                var lastY = pad.top + h * (1 - lastEff);
+                html += '<text x="' + (pad.left + w - 2) + '" y="' + (lastY - 4) + '" text-anchor="end" fill="' + col + '" font-size="8">' + escapeHtml(c.claimId.slice(-4)) + '</text>';
+
+                // Days remaining
+                var daysLeft = Math.max(0, Math.round((new Date(c.halfLife.expiresAt) - now) / 86400000));
+                legendHtml += '<div class="decay-legend-item"><div class="decay-legend-dot" style="background:' + col + '"></div>' + escapeHtml(c.claimId) + ' (' + daysLeft + 'd)</div>';
+            });
+
+            svg.innerHTML = html;
+            var legendEl = document.getElementById('decayLegend');
+            if (legendEl) legendEl.innerHTML = legendHtml;
+        }
+
+        function renderConfidenceDistribution() {
+            var svg = document.getElementById('confHistogram');
+            if (!svg) return;
+            var bins = [
+                { label: '0-0.2', min: 0, max: 0.2, count: 0 },
+                { label: '0.2-0.4', min: 0.2, max: 0.4, count: 0 },
+                { label: '0.4-0.6', min: 0.4, max: 0.6, count: 0 },
+                { label: '0.6-0.8', min: 0.6, max: 0.8, count: 0 },
+                { label: '0.8-1.0', min: 0.8, max: 1.01, count: 0 }
+            ];
+            data.claims.forEach(function(c) {
+                var s = c.confidence.score;
+                for (var b = 0; b < bins.length; b++) {
+                    if (s >= bins[b].min && s < bins[b].max) { bins[b].count++; break; }
+                }
+            });
+
+            var pad = { top: 20, right: 20, bottom: 30, left: 40 };
+            var w = 500 - pad.left - pad.right;
+            var h = 220 - pad.top - pad.bottom;
+            var maxCount = Math.max.apply(null, bins.map(function(b) { return b.count; }));
+            if (maxCount === 0) maxCount = 1;
+            var barW = w / bins.length - 10;
+            var html = '';
+
+            // Red zone behind low-confidence bins (< 0.50 → first 2.5 bins)
+            var redW = (w / bins.length) * 2;
+            html += '<rect x="' + pad.left + '" y="' + pad.top + '" width="' + redW + '" height="' + h + '" fill="rgba(239,68,68,0.06)"/>';
+
+            // Y-axis grid
+            for (var g = 0; g <= 4; g++) {
+                var yg = pad.top + (h / 4) * g;
+                var val = Math.round(maxCount * (1 - g / 4));
+                html += '<line x1="' + pad.left + '" y1="' + yg + '" x2="' + (pad.left + w) + '" y2="' + yg + '" stroke="var(--border)" stroke-dasharray="3,3"/>';
+                html += '<text x="' + (pad.left - 6) + '" y="' + (yg + 3) + '" text-anchor="end" fill="var(--text-muted)" font-size="9">' + val + '</text>';
+            }
+
+            // Bars
+            bins.forEach(function(b, i) {
+                var barH = (b.count / maxCount) * h;
+                var x = pad.left + i * (w / bins.length) + 5;
+                var y = pad.top + h - barH;
+                var col;
+                if (b.max <= 0.4) col = 'var(--danger)';
+                else if (b.max <= 0.8) col = 'var(--warning)';
+                else col = 'var(--success)';
+                html += '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" fill="' + col + '" rx="3" opacity="0.8"/>';
+                // Count label
+                html += '<text x="' + (x + barW / 2) + '" y="' + (y - 5) + '" text-anchor="middle" fill="var(--text-primary)" font-size="11" font-weight="600">' + b.count + '</text>';
+                // X-axis label
+                html += '<text x="' + (x + barW / 2) + '" y="' + (pad.top + h + 16) + '" text-anchor="middle" fill="var(--text-muted)" font-size="9">' + b.label + '</text>';
+            });
+
+            // Axes
+            html += '<line x1="' + pad.left + '" y1="' + pad.top + '" x2="' + pad.left + '" y2="' + (pad.top + h) + '" stroke="var(--border)"/>';
+            html += '<line x1="' + pad.left + '" y1="' + (pad.top + h) + '" x2="' + (pad.left + w) + '" y2="' + (pad.top + h) + '" stroke="var(--border)"/>';
+
+            svg.innerHTML = html;
+        }
+
+        function renderCoherenceRadar() {
+            var svg = document.getElementById('radarChart');
+            if (!svg) return;
+            var dims = data.coherenceReport.dimensions;
+            var cx = 150, cy = 150, maxR = 110;
+            var n = dims.length;
+            var html = '';
+
+            // Background grid rings at 25%, 50%, 75%, 100%
+            [0.25, 0.50, 0.75, 1.0].forEach(function(pct) {
+                var r = maxR * pct;
+                var pts = [];
+                for (var i = 0; i < n; i++) {
+                    var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+                    pts.push((cx + r * Math.cos(angle)).toFixed(1) + ',' + (cy + r * Math.sin(angle)).toFixed(1));
+                }
+                html += '<polygon points="' + pts.join(' ') + '" fill="none" stroke="var(--border)" stroke-dasharray="' + (pct < 1 ? '2,2' : '0') + '"/>';
+                if (pct < 1) {
+                    html += '<text x="' + (cx + 3) + '" y="' + (cy - r + 3) + '" fill="var(--text-muted)" font-size="7">' + Math.round(pct * 100) + '%</text>';
+                }
+            });
+
+            // Axis lines
+            var labelNames = {
+                'policy_adherence': 'Policy',
+                'outcome_health': 'Outcomes',
+                'drift_control': 'Drift Ctrl',
+                'memory_completeness': 'Memory'
+            };
+            dims.forEach(function(d, i) {
+                var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+                var ex = cx + maxR * Math.cos(angle);
+                var ey = cy + maxR * Math.sin(angle);
+                html += '<line x1="' + cx + '" y1="' + cy + '" x2="' + ex.toFixed(1) + '" y2="' + ey.toFixed(1) + '" stroke="var(--border)" opacity="0.5"/>';
+
+                // Label
+                var lx = cx + (maxR + 18) * Math.cos(angle);
+                var ly = cy + (maxR + 18) * Math.sin(angle);
+                var anchor = Math.abs(Math.cos(angle)) < 0.1 ? 'middle' : (Math.cos(angle) > 0 ? 'start' : 'end');
+                var label = labelNames[d.name] || d.name;
+                html += '<text class="radar-label" x="' + lx.toFixed(1) + '" y="' + ly.toFixed(1) + '" text-anchor="' + anchor + '" dominant-baseline="middle">' + escapeHtml(label) + '</text>';
+
+                // Score at vertex
+                var sx = cx + (maxR * d.score / 100 + 12) * Math.cos(angle);
+                var sy = cy + (maxR * d.score / 100 + 12) * Math.sin(angle);
+                html += '<text class="radar-score" x="' + sx.toFixed(1) + '" y="' + sy.toFixed(1) + '" text-anchor="' + anchor + '" dominant-baseline="middle">' + d.score.toFixed(0) + '</text>';
+            });
+
+            // Filled polygon for current scores
+            var dataPts = [];
+            dims.forEach(function(d, i) {
+                var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+                var r = maxR * (d.score / 100);
+                dataPts.push((cx + r * Math.cos(angle)).toFixed(1) + ',' + (cy + r * Math.sin(angle)).toFixed(1));
+            });
+            html += '<polygon points="' + dataPts.join(' ') + '" fill="rgba(59,130,246,0.2)" stroke="#3b82f6" stroke-width="2"/>';
+
+            // Vertex dots
+            dims.forEach(function(d, i) {
+                var angle = (Math.PI * 2 * i / n) - Math.PI / 2;
+                var r = maxR * (d.score / 100);
+                html += '<circle cx="' + (cx + r * Math.cos(angle)).toFixed(1) + '" cy="' + (cy + r * Math.sin(angle)).toFixed(1) + '" r="4" fill="#3b82f6"/>';
+            });
+
+            svg.innerHTML = html;
+        }
+
+        function renderAuditChecks() {
+            var el = document.getElementById('auditChecks');
+            if (!el) return;
+            var claims = data.claims;
+            var driftSignals = data.driftSignals || [];
+
+            // 1. Manifest Coverage — all 4 artifact kinds present
+            var truthTypes = {};
+            claims.forEach(function(c) { truthTypes[c.truthType] = true; });
+            var distinctTypes = Object.keys(truthTypes).length;
+            var manifestPass = distinctTypes >= 4;
+
+            // 2. DLR Completeness — claims with evidence refs
+            var withEvidence = claims.filter(function(c) { return c.evidence && c.evidence.length > 0; }).length;
+            var dlrPct = Math.round((withEvidence / claims.length) * 100);
+            var dlrStatus = dlrPct >= 80 ? 'PASS' : dlrPct >= 50 ? 'WARN' : 'FAIL';
+
+            // 3. Drift Resolution — red/recurring drift that has patches
+            var redDrift = driftSignals.filter(function(ds) { return ds.severity === 'red'; });
+            var patchedDrift = redDrift.filter(function(ds) { return ds.recommendedPatchType && ds.recommendedPatchType !== 'none'; });
+            var driftStatus = redDrift.length === 0 ? 'PASS' : patchedDrift.length === redDrift.length ? 'PASS' : patchedDrift.length > 0 ? 'WARN' : 'FAIL';
+
+            // 4. MG Orphans — claims with graph edges vs orphans
+            var orphans = claims.filter(function(c) {
+                var g = c.graph || {};
+                var hasEdge = (g.dependsOn && g.dependsOn.length > 0) || (g.supports && g.supports.length > 0) || (g.contradicts && g.contradicts.length > 0) || g.supersedes || (g.patches && g.patches.length > 0);
+                return !hasEdge;
+            });
+            var orphanPct = Math.round((orphans.length / claims.length) * 100);
+            var mgStatus = orphanPct <= 10 ? 'PASS' : orphanPct <= 30 ? 'WARN' : 'FAIL';
+
+            // 5. Verification Consistency — claims with high reliability sources
+            var verified = claims.filter(function(c) { return c.sources && c.sources.some(function(s) { return s.reliability === 'high'; }); }).length;
+            var verPct = Math.round((verified / claims.length) * 100);
+            var verStatus = verPct >= 70 ? 'PASS' : verPct >= 40 ? 'WARN' : 'FAIL';
+
+            var checks = [
+                { label: 'Manifest Coverage', detail: distinctTypes + ' truth types present (' + (manifestPass ? '≥4 required' : 'need 4+') + ')', status: manifestPass ? 'PASS' : 'FAIL' },
+                { label: 'DLR Completeness', detail: withEvidence + '/' + claims.length + ' claims have evidence (' + dlrPct + '%)', status: dlrStatus },
+                { label: 'Drift Resolution', detail: redDrift.length + ' red signals, ' + patchedDrift.length + ' with patches', status: driftStatus },
+                { label: 'MG Orphans', detail: orphans.length + '/' + claims.length + ' claims unlinked (' + orphanPct + '%)', status: mgStatus },
+                { label: 'Verification Consistency', detail: verified + '/' + claims.length + ' with high-reliability sources (' + verPct + '%)', status: verStatus }
+            ];
+
+            var icons = { PASS: '&#10003;', WARN: '&#9888;', FAIL: '&#10007;' };
+            var iconColors = { PASS: 'var(--success)', WARN: 'var(--warning)', FAIL: 'var(--danger)' };
+            var passCount = checks.filter(function(ch) { return ch.status === 'PASS'; }).length;
+
+            el.innerHTML = checks.map(function(ch) {
+                return '<div class="audit-check">' +
+                    '<div class="audit-icon" style="color:' + iconColors[ch.status] + '">' + icons[ch.status] + '</div>' +
+                    '<div class="audit-info"><div class="audit-label">' + escapeHtml(ch.label) + '</div><div class="audit-detail">' + escapeHtml(ch.detail) + '</div></div>' +
+                    '<div class="audit-status ' + ch.status + '">' + ch.status + '</div>' +
+                    '</div>';
+            }).join('');
+
+            var badgeEl = document.getElementById('auditPassBadge');
+            if (badgeEl) {
+                badgeEl.textContent = passCount + '/5';
+                badgeEl.className = 'card-badge ' + (passCount >= 4 ? 'badge-success' : passCount >= 2 ? 'badge-warning' : 'badge-danger');
+            }
         }
 
         function renderDriftPanel() {
