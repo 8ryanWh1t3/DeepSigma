@@ -33,6 +33,7 @@ The runtime enforces four contracts on every decision before it is sealed.
 | [Sealing & Episodes](Sealing-and-Episodes) | Immutable `DecisionEpisode` envelope + SHA-256 seal |
 | [Runtime Flow](Runtime-Flow) | Step-by-step request lifecycle |
 | [Policy Packs](Policy-Packs) | Versioned bundles of DTE + Action constraints |
+| [Authority Boundary Primitive](Authority-Boundary-Primitive) | Pre-runtime governance declaration — what's allowed/denied/required before enforcement |
 
 ---
 
@@ -86,6 +87,7 @@ Captures AI interaction exhaust (prompts, completions, tool calls, metrics) and 
 | [Claim Schema](Unified-Atomic-Claims) | Unified Atomic Claim |
 | [Canon Schema](Canon) | Canon entry format |
 | [Retcon Schema](Retcon) | Retroactive correction record |
+| [ABP Schema](Authority-Boundary-Primitive) | Authority Boundary Primitive v1 |
 | [Schemas](Schemas) | Full index of all JSON Schema specs |
 
 ---

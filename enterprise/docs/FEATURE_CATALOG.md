@@ -23,6 +23,25 @@ Governance enforced before execution: default deny, halt on ambiguity, proof-fir
   - Enforcement: scripts/pre_exec_gate.py, scripts/validate_v2_1_0_milestone.py
   - KPI axes: Authority_Modeling, Operational_Maturity
 
+### Authority Boundary Primitive
+Stack-independent pre-runtime governance declarations: what's allowed, denied, and required before enforcement.
+
+- **ABP v1** (`ABP_V1`)
+  - Portable JSON primitive declaring scope, authority ref, objectives, tools, data permissions, approvals, escalation, runtime validators, and proof requirements.
+  - Artifacts: schemas/reconstruct/abp_v1.json, artifacts/public_demo_pack/abp_v1.json
+  - Enforcement: src/tools/reconstruct/build_abp.py, src/tools/reconstruct/verify_abp.py
+  - KPI axes: Authority_Modeling, Enterprise_Readiness, Technical_Completeness
+- **ABP Composition** (`ABP_COMPOSITION`)
+  - Program-level ABPs compose module-level ABPs with merged boundaries and child references.
+  - Artifacts: artifacts/public_demo_pack/abp_v1.json
+  - Enforcement: src/tools/reconstruct/build_abp.py (compose_abps)
+  - KPI axes: Authority_Modeling, Enterprise_Readiness
+- **ABP Pipeline Integration** (`ABP_PIPELINE`)
+  - Auto-build or attach ABP during seal-and-prove; auto-verify during pack verification.
+  - Artifacts: abp_v1.json (in admissibility pack)
+  - Enforcement: src/tools/reconstruct/seal_and_prove.py --auto-abp, src/tools/reconstruct/verify_pack.py
+  - KPI axes: Authority_Modeling, Operational_Maturity
+
 ### Intent Capture & Governance
 Intent declared pre-action and bound to execution.
 

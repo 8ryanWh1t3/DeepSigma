@@ -13,6 +13,7 @@
   - [Verifiers](Verifiers)
   - [Sealing & Episodes](Sealing-and-Episodes)
   - [Drift → Patch](Drift-to-Patch)
+  - [Authority Boundary Primitive](Authority-Boundary-Primitive)
 - **Schemas**
   - [Schemas](Schemas)
   - [Episode Schema](Episode-Schema)
@@ -24,6 +25,7 @@
   - [DLR Schema](Unified-Atomic-Claims)
   - [Canon Schema](Canon)
   - [Retcon Schema](Retcon)
+  - [ABP Schema](Authority-Boundary-Primitive)
 - **Exhaust Inbox**
   - [Exhaust Inbox](Exhaust-Inbox)
 - **Integrations**

@@ -18,6 +18,7 @@ Canonical wiki structure for Sigma OVERWATCH / DeepSigma docs.
 - [Drift -> Patch](Drift-to-Patch)
 - [Coherence Ops Mapping](Coherence-Ops-Mapping)
 - [IRIS](IRIS)
+- [Authority Boundary Primitive](Authority-Boundary-Primitive)
 
 ## Data Model + Schemas
 
@@ -30,6 +31,7 @@ Canonical wiki structure for Sigma OVERWATCH / DeepSigma docs.
 - [Unified Atomic Claims](Unified-Atomic-Claims)
 - [Canon](Canon)
 - [Retcon](Retcon)
+- [ABP Schema](Authority-Boundary-Primitive)
 
 ## Integrations
 
