@@ -187,7 +187,7 @@ if HAS_FASTAPI:
     def _build_dlr(episode_id: str) -> Optional[Dict[str, Any]]:
         """Build a DLR entry for a specific episode (lazy import)."""
         try:
-            from core.dlr import DLRBuilder
+            from core.decision_log import DLRBuilder
         except ImportError:
             return None
         episodes = _get_episodes()

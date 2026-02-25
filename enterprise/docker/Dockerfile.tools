@@ -46,7 +46,7 @@ WORKDIR /app
 COPY pyproject.toml /app/
 COPY src/core/ /app/core/
 COPY enterprise/src/engine/ /app/engine/
-COPY enterprise/src/verifiers/ /app/verifiers/
+COPY enterprise/src/_experimental/verifiers/ /app/verifiers/
 COPY enterprise/src/tools/ /app/tools/
 COPY enterprise/src/adapters/ /app/adapters/
 COPY enterprise/src/demos/ /app/demos/

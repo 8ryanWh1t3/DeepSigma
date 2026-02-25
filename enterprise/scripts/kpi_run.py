@@ -6,6 +6,7 @@ from pathlib import Path
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = ROOT.parent
 
 
 def format_layer_coverage() -> str:
@@ -80,13 +81,14 @@ def main() -> int:
     )
     subprocess.check_call(["python", "scripts/kpi_confidence_bands.py"])
 
-    # Gate + history update.
-    subprocess.check_call(["python", "scripts/kpi_gate.py"])
+    # Gate + history update.  Run gate first but defer failure so remaining
+    # artifacts (trend, radar, roadmap, stability, tec) are still generated.
+    gate_result = subprocess.run(["python", "scripts/kpi_gate.py"])
     subprocess.check_call(["python", "scripts/render_kpi_trend.py"])
     subprocess.check_call(["python", "scripts/render_composite_radar.py"])
-    subprocess.check_call(["make", "roadmap-refresh"])
-    subprocess.check_call(["make", "stability"])
-    subprocess.check_call(["make", "tec"])
+    subprocess.check_call(["make", "roadmap-refresh"], cwd=REPO_ROOT)
+    subprocess.check_call(["make", "stability"], cwd=REPO_ROOT)
+    subprocess.check_call(["make", "tec"], cwd=REPO_ROOT)
 
     radar_png = f"release_kpis/radar_{version}.png"
     radar_svg = f"release_kpis/radar_{version}.svg"
@@ -175,7 +177,7 @@ def main() -> int:
     (outdir / "PR_COMMENT.md").write_text(comment, encoding="utf-8")
     append_feature_coverage_to_pr_comment()
     print("Wrote: release_kpis/PR_COMMENT.md")
-    return 0
+    return gate_result.returncode
 
 
 if __name__ == "__main__":

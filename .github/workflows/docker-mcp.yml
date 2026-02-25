@@ -5,9 +5,11 @@ on:
     branches: [main]
     tags: ['v*']
     paths:
-      - 'src/adapters/mcp/**'
-      - 'src/engine/**'
       - 'src/core/**'
+      - 'enterprise/src/adapters/mcp/**'
+      - 'enterprise/src/engine/**'
+      - 'enterprise/src/tools/**'
+      - 'enterprise/src/_experimental/verifiers/**'
       - 'specs/**'
       - 'pyproject.toml'
       - 'enterprise/docker/Dockerfile.mcp'

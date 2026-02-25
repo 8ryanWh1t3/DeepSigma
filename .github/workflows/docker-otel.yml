@@ -5,9 +5,9 @@ on:
     branches: [main]
     tags: ['v*']
     paths:
-      - 'src/adapters/otel/**'
-      - 'src/engine/**'
       - 'src/core/**'
+      - 'enterprise/src/adapters/otel/**'
+      - 'enterprise/src/engine/**'
       - 'pyproject.toml'
       - 'enterprise/docker/Dockerfile.otel'
       - '.github/workflows/docker-otel.yml'

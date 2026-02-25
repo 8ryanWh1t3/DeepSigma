@@ -5,12 +5,13 @@ on:
     branches: [main]
     tags: ['v*']
     paths:
-      - 'src/tools/**'
-      - 'src/engine/**'
       - 'src/core/**'
-      - 'src/verifiers/**'
+      - 'enterprise/src/tools/**'
+      - 'enterprise/src/engine/**'
+      - 'enterprise/src/_experimental/verifiers/**'
+      - 'enterprise/src/adapters/**'
+      - 'enterprise/src/demos/**'
       - 'specs/**'
-      - 'src/adapters/**'
       - 'docs/policy_packs/**'
       - 'pyproject.toml'
       - 'enterprise/docker/Dockerfile.tools'

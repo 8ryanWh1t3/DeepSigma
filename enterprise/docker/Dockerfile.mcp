@@ -38,7 +38,7 @@ COPY src/core/ /app/core/
 COPY enterprise/src/adapters/mcp/ /app/adapters/mcp/
 COPY enterprise/src/adapters/__init__.py /app/adapters/__init__.py
 COPY enterprise/src/engine/ /app/engine/
-COPY enterprise/src/verifiers/ /app/verifiers/
+COPY enterprise/src/_experimental/verifiers/ /app/verifiers/
 COPY enterprise/src/tools/ /app/tools/
 
 RUN pip install --no-cache-dir -e /app

@@ -15,7 +15,7 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-from .mg import EdgeKind, GraphEdge, GraphNode, NodeKind
+from .memory_graph import EdgeKind, GraphEdge, GraphNode, NodeKind
 
 logger = logging.getLogger(__name__)
 

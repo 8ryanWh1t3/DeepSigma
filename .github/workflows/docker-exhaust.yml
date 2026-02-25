@@ -5,15 +5,13 @@ on:
     branches: [main]
     tags: ['v*']
     paths:
-      - 'dashboard/server/exhaust_api.py'
-      - 'dashboard/server/exhaust_main.py'
-      - 'dashboard/server/models_exhaust.py'
-      - 'src/engine/exhaust_refiner.py'
-      - 'src/engine/exhaust_llm_extractor.py'
       - 'src/core/**'
-      - 'src/engine/**'
+      - 'enterprise/dashboard/server/**'
+      - 'enterprise/src/engine/**'
+      - 'enterprise/src/adapters/**'
+      - 'enterprise/src/tools/**'
+      - 'enterprise/src/_experimental/verifiers/**'
       - 'specs/**'
-      - 'src/adapters/**'
       - 'pyproject.toml'
       - 'enterprise/docker/Dockerfile.exhaust'
       - '.github/workflows/docker-exhaust.yml'

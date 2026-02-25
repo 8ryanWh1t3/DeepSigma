@@ -28,48 +28,57 @@ jobs:
           pip install -r requirements/locks/kpi.txt
           pip install pyyaml
 
-      - name: Run KPI issue deltas
-        run: |
-          make milestone-gate
-          make issue-label-gate
-          make kpi-issues
-          make roadmap-gate
-          make pulse-insights
+      - name: Milestone gate (v2.1.0)
+        continue-on-error: true
+        run: make milestone-gate
+
+      - name: Issue label gate
+        run: make issue-label-gate
+
+      - name: KPI issue deltas
+        run: make kpi-issues
+
+      - name: Roadmap gate
+        run: make roadmap-gate
+
+      - name: Pulse insights
+        run: make pulse-insights
 
       - name: Run KPI
-        run: |
-          make kpi
+        id: run-kpi
+        run: make kpi
 
       - name: Upload KPI artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: repo-kpi
           path: |
-            release_kpis/PR_COMMENT.md
-            release_kpis/KPI_GATE_REPORT.md
-            release_kpis/ISSUE_LABEL_GATE_REPORT.md
-            release_kpis/ROADMAP_SCOPE_GATE_REPORT.md
-            release_kpis/kpi_confidence.json
-            release_kpis/kpi_bands_*.json
-            release_kpis/history.json
-            release_kpis/issue_deltas.json
-            release_kpis/insights_metrics.json
-            release_kpis/badge_latest.svg
-            release_kpis/roadmap_badge.svg
-            release_kpis/roadmap_forecast.json
-            release_kpis/roadmap_forecast.md
-            release_kpis/roadmap_timeline.svg
-            release_kpis/roadmap_timeline.md
-            release_kpis/stability_*.json
-            release_kpis/stability_simulation_*.json
-            release_kpis/stability_adjusted_forecast.json
-            release_kpis/nonlinear_stability_report.md
-            release_kpis/kpi_trend.png
-            release_kpis/kpi_trend.svg
-            release_kpis/radar_*.png
-            release_kpis/radar_*.svg
-            release_kpis/radar_composite_latest.md
-            release_kpis/kpi_*merged.json
+            enterprise/release_kpis/PR_COMMENT.md
+            enterprise/release_kpis/KPI_GATE_REPORT.md
+            enterprise/release_kpis/ISSUE_LABEL_GATE_REPORT.md
+            enterprise/release_kpis/ROADMAP_SCOPE_GATE_REPORT.md
+            enterprise/release_kpis/kpi_confidence.json
+            enterprise/release_kpis/kpi_bands_*.json
+            enterprise/release_kpis/history.json
+            enterprise/release_kpis/issue_deltas.json
+            enterprise/release_kpis/insights_metrics.json
+            enterprise/release_kpis/badge_latest.svg
+            enterprise/release_kpis/roadmap_badge.svg
+            enterprise/release_kpis/roadmap_forecast.json
+            enterprise/release_kpis/roadmap_forecast.md
+            enterprise/release_kpis/roadmap_timeline.svg
+            enterprise/release_kpis/roadmap_timeline.md
+            enterprise/release_kpis/stability_*.json
+            enterprise/release_kpis/stability_simulation_*.json
+            enterprise/release_kpis/stability_adjusted_forecast.json
+            enterprise/release_kpis/nonlinear_stability_report.md
+            enterprise/release_kpis/kpi_trend.png
+            enterprise/release_kpis/kpi_trend.svg
+            enterprise/release_kpis/radar_*.png
+            enterprise/release_kpis/radar_*.svg
+            enterprise/release_kpis/radar_composite_latest.md
+            enterprise/release_kpis/kpi_*merged.json
             pilot_pack/**
 
       - name: Post PR comment (Repo KPI)
@@ -78,7 +87,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const body = fs.readFileSync('release_kpis/PR_COMMENT.md', 'utf8');
+            const body = fs.readFileSync('enterprise/release_kpis/PR_COMMENT.md', 'utf8');
             const { owner, repo } = context.repo;
             const issue_number = context.payload.pull_request.number;
             const marker = "## Repo Radar KPI —";

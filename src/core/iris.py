@@ -120,7 +120,7 @@ class IRISEngine:
         STATUS:       scorer=0.70  DS=0.15  MG=0.15
 
     Usage:
-        from core.mg import MemoryGraph
+        from core.memory_graph import MemoryGraph
         mg = MemoryGraph()
         engine = IRISEngine(config=IRISConfig(), memory_graph=mg,
                             dlr_entries=dlr.entries, rs=rs, ds=ds)

@@ -17,6 +17,8 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Dict, List
 
+from .normalize import normalize_keys
+
 logger = logging.getLogger(__name__)
 
 
@@ -61,7 +63,7 @@ class ReflectionSession:
 
     def ingest(self, episodes: List[Dict[str, Any]]) -> None:
         """Add episodes to the session."""
-        self._episodes.extend(episodes)
+        self._episodes.extend(normalize_keys(ep, style="snake") for ep in episodes)
         logger.debug("Ingested %d episodes into RS %s", len(episodes), self.session_id)
 
     def summarise(self) -> ReflectionSummary:
@@ -117,7 +119,7 @@ class ReflectionSession:
             # Verification failed but action still succeeded — suspicious
             if verify == "fail" and outcome == "success":
                 divs.append(Divergence(
-                    episode_id=ep.get("episodeId", ""),
+                    episode_id=ep.get("episode_id", ""),
                     field="verification_vs_outcome",
                     expected="outcome should not be success when verification fails",
                     actual=f"verify={verify}, outcome={outcome}",
@@ -127,7 +129,7 @@ class ReflectionSession:
             # Degrade triggered but outcome still success — may be masking
             if degrade not in ("none", None) and outcome == "success":
                 divs.append(Divergence(
-                    episode_id=ep.get("episodeId", ""),
+                    episode_id=ep.get("episode_id", ""),
                     field="degrade_vs_outcome",
                     expected="degraded episodes may not fully succeed",
                     actual=f"degrade={degrade}, outcome={outcome}",

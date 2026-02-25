@@ -17,6 +17,8 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
+from .normalize import normalize_keys
+
 logger = logging.getLogger(__name__)
 
 # Canonical drift types from schemas/core/drift.schema.json
@@ -76,13 +78,14 @@ class DriftSignalCollector:
     def ingest(self, events: List[Dict[str, Any]]) -> None:
         """Add drift events and update fingerprint buckets."""
         for ev in events:
+            ev = normalize_keys(ev, style="snake")
             self._events.append(ev)
             self._bucket_event(ev)
         logger.debug("Ingested %d drift events (total: %d)", len(events), len(self._events))
 
     def summarise(self) -> DriftSummary:
         """Produce a DriftSummary from all ingested events."""
-        by_type: Counter = Counter(ev.get("driftType", "unknown") for ev in self._events)
+        by_type: Counter = Counter(ev.get("drift_type", "unknown") for ev in self._events)
         by_severity: Counter = Counter(ev.get("severity", "green") for ev in self._events)
 
         sorted_buckets = sorted(
@@ -120,11 +123,11 @@ class DriftSignalCollector:
         """Place an event into its fingerprint bucket."""
         fp = ev.get("fingerprint", {})
         key = fp.get("key", "unknown")
-        drift_type = ev.get("driftType", "unknown")
+        drift_type = ev.get("drift_type", "unknown")
         severity = ev.get("severity", "green")
-        detected_at = ev.get("detectedAt", "")
-        episode_id = ev.get("episodeId", "")
-        patch_type = ev.get("recommendedPatchType", "")
+        detected_at = ev.get("detected_at", "")
+        episode_id = ev.get("episode_id", "")
+        patch_type = ev.get("recommended_patch_type", "")
 
         if key not in self._buckets:
             self._buckets[key] = DriftBucket(

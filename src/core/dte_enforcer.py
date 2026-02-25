@@ -19,6 +19,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
+from .normalize import normalize_keys
+
 
 @dataclass
 class DTEViolation:
@@ -41,7 +43,7 @@ class DTEEnforcer:
     """
 
     def __init__(self, dte_spec: Dict[str, Any]) -> None:
-        self.spec = dte_spec
+        self.spec = normalize_keys(dte_spec, style="snake")
 
     def enforce(
         self,
@@ -64,7 +66,7 @@ class DTEEnforcer:
     # ── Deadline ────────────────────────────────────────────────
 
     def _check_deadline(self, elapsed_ms: int) -> List[DTEViolation]:
-        deadline = self.spec.get("deadlineMs")
+        deadline = self.spec.get("deadline_ms")
         if deadline is None:
             return []
         if elapsed_ms > deadline:
@@ -81,7 +83,7 @@ class DTEEnforcer:
     # ── Stage Budgets ───────────────────────────────────────────
 
     def _check_stage_budgets(self, stage_elapsed: Dict[str, int]) -> List[DTEViolation]:
-        budgets = self.spec.get("stageBudgetsMs", {})
+        budgets = self.spec.get("stage_budgets_ms", {})
         violations: List[DTEViolation] = []
         for stage in ("context", "plan", "act", "verify"):
             budget = budgets.get(stage)
@@ -101,9 +103,9 @@ class DTEEnforcer:
 
     def _check_freshness(self, feature_ages: Dict[str, int]) -> List[DTEViolation]:
         freshness = self.spec.get("freshness", {})
-        default_ttl = freshness.get("defaultTtlMs")
-        feature_ttls = freshness.get("featureTtls", {})
-        allow_stale = freshness.get("allowStaleIfSafe", False)
+        default_ttl = freshness.get("default_ttl_ms")
+        feature_ttls = freshness.get("feature_ttls", {})
+        allow_stale = freshness.get("allow_stale_if_safe", False)
 
         violations: List[DTEViolation] = []
         for feature, age_ms in feature_ages.items():
@@ -128,10 +130,10 @@ class DTEEnforcer:
         limits = self.spec.get("limits", {})
         violations: List[DTEViolation] = []
         limit_map = {
-            "hops": "maxHops",
-            "fanout": "maxFanout",
-            "tool_calls": "maxToolCalls",
-            "chain_depth": "maxChainDepth",
+            "hops": "max_hops",
+            "fanout": "max_fanout",
+            "tool_calls": "max_tool_calls",
+            "chain_depth": "max_chain_depth",
         }
         for count_key, spec_key in limit_map.items():
             max_val = limits.get(spec_key)

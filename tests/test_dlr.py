@@ -1,6 +1,6 @@
-"""Unit tests for core.dlr — Decision Log Record builder."""
+"""Unit tests for core.decision_log — Decision Log Record builder."""
 import json
-from core.dlr import DLRBuilder, DLREntry
+from core.decision_log import DLRBuilder, DLREntry
 
 
 # ---------------------------------------------------------------------------
@@ -66,15 +66,15 @@ class TestDLRBuilder:
     def test_dte_ref_preserved(self):
         builder = DLRBuilder()
         entry = builder.from_episode(_make_episode())
-        assert entry.dte_ref["deadlineBudgetMs"] == 250
+        assert entry.dte_ref["deadline_budget_ms"] == 250
 
     def test_action_contract_extracted(self):
         builder = DLRBuilder()
         entry = builder.from_episode(_make_episode())
         assert entry.action_contract is not None
-        assert entry.action_contract["blastRadiusTier"] == "account"
-        assert entry.action_contract["idempotencyKey"] == "ik-001"
-        assert entry.action_contract["authMode"] == "rbac"
+        assert entry.action_contract["blast_radius_tier"] == "account"
+        assert entry.action_contract["idempotency_key"] == "ik-001"
+        assert entry.action_contract["auth_mode"] == "rbac"
 
     def test_no_actions_yields_none(self):
         builder = DLRBuilder()
@@ -89,7 +89,7 @@ class TestDLRBuilder:
     def test_policy_stamp_stored(self):
         builder = DLRBuilder()
         entry = builder.from_episode(_make_episode())
-        assert entry.policy_stamp["policyPackId"] == "demo_policy_pack_v1"
+        assert entry.policy_stamp["policy_pack_id"] == "demo_policy_pack_v1"
 
     def test_degrade_step(self):
         builder = DLRBuilder()

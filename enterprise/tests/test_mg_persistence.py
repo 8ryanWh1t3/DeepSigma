@@ -1,7 +1,7 @@
 """Tests for Memory Graph persistence backends."""
 
-from core.mg import EdgeKind, GraphEdge, GraphNode, MemoryGraph, NodeKind
-from core.mg_backends import InMemoryBackend, JSONLBackend, SQLiteMGBackend
+from core.memory_graph import EdgeKind, GraphEdge, GraphNode, MemoryGraph, NodeKind
+from core.memory_graph_backends import InMemoryBackend, JSONLBackend, SQLiteMGBackend
 
 
 SAMPLE_EPISODE = {

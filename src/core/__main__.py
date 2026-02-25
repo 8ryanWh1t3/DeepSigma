@@ -1,4 +1,4 @@
 """Allow running core as a module: python -m core."""
-from core.cli import main
+from .cli import main
 
 main()

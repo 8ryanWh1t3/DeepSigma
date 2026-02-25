@@ -16,6 +16,8 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
+from .normalize import normalize_keys
+
 logger = logging.getLogger(__name__)
 
 
@@ -62,15 +64,16 @@ class DLRBuilder:
         Returns:
             The constructed DLREntry.
         """
-        episode_id = episode.get("episodeId", "")
+        episode = normalize_keys(episode, style="snake")
+        episode_id = episode.get("episode_id", "")
         dlr_id = self._make_dlr_id(episode_id)
 
         entry = DLREntry(
             dlr_id=dlr_id,
             episode_id=episode_id,
-            decision_type=episode.get("decisionType", ""),
+            decision_type=episode.get("decision_type", ""),
             recorded_at=datetime.now(timezone.utc).isoformat(),
-            dte_ref=episode.get("dteRef", {}),
+            dte_ref=episode.get("dte_ref", {}),
             action_contract=self._extract_action_contract(episode),
             verification=episode.get("verification"),
             policy_stamp=episode.get("policy"),
@@ -115,10 +118,10 @@ class DLRBuilder:
             return None
         first = actions[0] if isinstance(actions, list) else actions
         return {
-            "blastRadiusTier": first.get("blastRadiusTier"),
-            "idempotencyKey": first.get("idempotencyKey"),
-            "rollbackPlan": first.get("rollbackPlan"),
-            "authMode": first.get("authorization", {}).get("mode"),
+            "blast_radius_tier": first.get("blast_radius_tier"),
+            "idempotency_key": first.get("idempotency_key"),
+            "rollback_plan": first.get("rollback_plan"),
+            "auth_mode": first.get("authorization", {}).get("mode"),
         }
 
 
@@ -186,25 +189,28 @@ class ClaimNativeDLRBuilder:
         claims: Optional[List[Dict[str, Any]]] = None,
     ) -> ClaimNativeDLREntry:
         """Build a claim-native DLR entry from a sealed episode and its claims."""
-        ep_id = episode.get("episodeId", "")
+        episode = normalize_keys(episode, style="snake")
+        if claims:
+            claims = [normalize_keys(c, style="snake") for c in claims]
+        ep_id = episode.get("episode_id", "")
         dlr_id = f"DLR-CN-{ep_id}"
 
         claim_refs = []
         if claims:
             for c in claims:
                 claim_refs.append(ClaimRef(
-                    claim_id=c.get("claimId", ""),
+                    claim_id=c.get("claim_id", ""),
                     role=c.get("role", "supporting"),
                     confidence_at_decision=c.get("confidence", {}).get("score"),
-                    status_at_decision=c.get("statusLight"),
+                    status_at_decision=c.get("status_light"),
                 ))
 
         rationale_edges = []
         if claims:
             for c in claims:
                 graph = c.get("graph", {})
-                cid = c.get("claimId", "")
-                for dep in graph.get("dependsOn", []):
+                cid = c.get("claim_id", "")
+                for dep in graph.get("depends_on", []):
                     rationale_edges.append(RationaleEdge(
                         source=cid, target=dep, relation="depends_on",
                     ))
@@ -225,11 +231,11 @@ class ClaimNativeDLRBuilder:
         entry = ClaimNativeDLREntry(
             dlr_id=dlr_id,
             episode_id=ep_id,
-            decision_type=episode.get("decisionType", ""),
+            decision_type=episode.get("decision_type", ""),
             claims=claim_refs,
             rationale_edges=rationale_edges,
-            policy_pack_id=episode.get("policyPack", {}).get("policyPackId"),
-            sealed_at=episode.get("sealedAt"),
+            policy_pack_id=episode.get("policy_pack", {}).get("policy_pack_id"),
+            sealed_at=episode.get("sealed_at"),
             outcome_code=episode.get("outcome", {}).get("code"),
         )
         self._entries.append(entry)
