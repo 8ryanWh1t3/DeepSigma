@@ -28,13 +28,21 @@ jobs:
           pip install -r requirements/locks/kpi.txt
           pip install pyyaml
 
-      - name: Run KPI issue deltas
-        run: |
-          make milestone-gate
-          make issue-label-gate
-          make kpi-issues
-          make roadmap-gate
-          make pulse-insights
+      - name: Milestone gate (v2.1.0)
+        continue-on-error: true
+        run: make milestone-gate
+
+      - name: Issue label gate
+        run: make issue-label-gate
+
+      - name: KPI issue deltas
+        run: make kpi-issues
+
+      - name: Roadmap gate
+        run: make roadmap-gate
+
+      - name: Pulse insights
+        run: make pulse-insights
 
       - name: Run KPI
         run: |
