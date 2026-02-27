@@ -28,7 +28,7 @@ RUN pip install --no-cache-dir \
 WORKDIR /app
 
 COPY pyproject.toml /app/
-COPY src/core/ /app/core/
+COPY src/core/ /app/src/core/
 COPY enterprise/src/engine/ /app/engine/
 COPY enterprise/src/_experimental/verifiers/ /app/verifiers/
 COPY enterprise/src/tools/ /app/tools/
