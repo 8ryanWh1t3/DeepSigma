@@ -327,7 +327,7 @@ def write_markdown(stability: dict, forecast: dict, simulation: dict) -> None:
         lines.append("")
 
     lines.extend([
-        "## D) v2.0.6 Instability Simulation",
+        f"## D) {version} Instability Simulation",
         "",
         "Scenario stress-tests on the current release baseline:",
         "",

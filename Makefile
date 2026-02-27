@@ -7,7 +7,8 @@
 	roadmap-refresh roadmap-gate \
 	milestone-gate issue-label-gate kpi-issues kpi stability \
 	validate-feeds test-feeds-bus test-feeds-ingest test-feeds-consumers test-feeds-canon test-feeds \
-	constitution-gate
+	constitution-gate \
+	verify-release-artifacts validate-kpi-eligibility tec-sensitivity
 
 demo:
 	bash run_money_demo.sh
@@ -47,9 +48,7 @@ domain-scrub:
 	@python scripts/domain_scrub.py
 
 security-gate: secret-scan
-	@mkdir -p enterprise/release_kpis
-	@echo '{"status":"PASS"}' > enterprise/release_kpis/SECURITY_GATE_REPORT.json
-	@echo "PASS: security gate" > enterprise/release_kpis/SECURITY_GATE_REPORT.md
+	@python enterprise/scripts/security_proof_pack.py
 
 openapi-check:
 	@test -f enterprise/docs/api/openapi.json
@@ -133,3 +132,12 @@ site-content:
 
 constitution-gate:
 	python scripts/constitution_gate.py
+
+verify-release-artifacts:
+	python scripts/verify_release_artifacts.py
+
+validate-kpi-eligibility:
+	python scripts/validate_kpi_eligibility.py
+
+tec-sensitivity:
+	python enterprise/scripts/tec_sensitivity.py

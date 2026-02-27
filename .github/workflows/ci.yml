@@ -33,6 +33,9 @@ jobs:
       - name: Type check
         run: pyright src/core/
 
+      - name: Verify release artifacts
+        run: make verify-release-artifacts
+
       - name: CORE demo + baseline + tests
         run: |
           make core-ci

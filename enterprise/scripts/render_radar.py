@@ -43,7 +43,15 @@ def read_kpis(kpi_json: Path) -> Tuple[str, Dict[str, float]]:
     return version, {k: float(v) for k, v in values.items()}
 
 
-def render_radar(version: str, labels: List[str], values: List[float], out_png: Path, out_svg: Path) -> None:
+def render_radar(
+    version: str,
+    labels: List[str],
+    values: List[float],
+    out_png: Path,
+    out_svg: Path,
+    bands_low: List[float] | None = None,
+    bands_high: List[float] | None = None,
+) -> None:
     n = len(labels)
     angles = [2 * math.pi * i / n for i in range(n)]
     angles += angles[:1]
@@ -64,10 +72,17 @@ def render_radar(version: str, labels: List[str], values: List[float], out_png: 
     ax.set_yticks([2, 4, 6, 8, 10])
     ax.set_yticklabels(["2", "4", "6", "8", "10"], fontsize=8)
 
+    # Confidence band envelope (if provided).
+    if bands_low is not None and bands_high is not None:
+        lo = bands_low + bands_low[:1]
+        hi = bands_high + bands_high[:1]
+        ax.fill_between(angles, lo, hi, alpha=0.10, color="orange", label="Confidence band")
+
     ax.plot(angles, vals, linewidth=2)
     ax.fill(angles, vals, alpha=0.20)
 
-    ax.set_title(f"Repo KPI Radar — {version}", y=1.14, fontsize=14, fontweight="bold")
+    title_suffix = " (banded)" if bands_low is not None else ""
+    ax.set_title(f"Repo KPI Radar — {version}{title_suffix}", y=1.14, fontsize=14, fontweight="bold")
     fig.text(0.5, 0.02, "Scale: 0–10 (rings at 2/4/6/8/10)", ha="center", fontsize=8)
 
     out_png.parent.mkdir(parents=True, exist_ok=True)
@@ -101,6 +116,24 @@ def main() -> int:
     render_radar(version, labels, values, out_png, out_svg)
     print(f"Wrote: {out_png}")
     print(f"Wrote: {out_svg}")
+
+    # Banded radar: render with confidence bands if available.
+    bands_path = outdir / f"kpi_bands_{version}.json"
+    if bands_path.exists():
+        bands = json.loads(bands_path.read_text(encoding="utf-8"))
+        bands_data = bands.get("bands", {})
+        lo_vals: List[float] = []
+        hi_vals: List[float] = []
+        for key, _label in spec:
+            b = bands_data.get(key, {})
+            lo_vals.append(max(0.0, float(b.get("low", vals.get(key, 0)))))
+            hi_vals.append(min(10.0, float(b.get("high", vals.get(key, 0)))))
+        bands_png = outdir / f"radar_{version}_bands.png"
+        bands_svg = outdir / f"radar_{version}_bands.svg"
+        render_radar(version, labels, values, bands_png, bands_svg, lo_vals, hi_vals)
+        print(f"Wrote: {bands_png}")
+        print(f"Wrote: {bands_svg}")
+
     return 0
 
 

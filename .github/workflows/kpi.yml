@@ -44,6 +44,13 @@ jobs:
       - name: Pulse insights
         run: make pulse-insights
 
+      - name: Verify release artifacts
+        run: make verify-release-artifacts
+
+      - name: TEC sensitivity analysis
+        continue-on-error: true
+        run: make tec-sensitivity
+
       - name: Run KPI
         id: run-kpi
         run: make kpi
@@ -92,6 +99,10 @@ jobs:
             enterprise/release_kpis/kpi_*merged.json
             enterprise/release_kpis/tec_*.json
             enterprise/release_kpis/TEC_SUMMARY.md
+            enterprise/release_kpis/tec_sensitivity*.json
+            enterprise/release_kpis/tec_sensitivity_report.md
+            enterprise/release_kpis/security_proof_pack.json
+            enterprise/release_kpis/SECURITY_GATE_REPORT.md
             enterprise/release_kpis/health/*.json
             enterprise/release_kpis/health/*.md
             pilot_pack/**

@@ -2,6 +2,19 @@
 
 All contract surface changes are logged here with compatibility annotations.
 
+## v2.0.7 — Nonlinear Stability + Credibility Hardening
+
+`COMPATIBLE:` Add stale artifact kill-switch, TEC sensitivity analysis, security proof pack v2, banded radar rendering, and KPI eligibility tier validation. No schema changes. Policy version aligned to GOV-2.0.7.
+
+### Migration
+
+**Affected schemas**: None
+**Consumer action**: None — no schema changes in this release.
+**Rollback**: Yes — all changes are additive governance tooling.
+**Fingerprint**: `sha256:6a0c479e7a0fcaeb`
+
+---
+
 ## v2.0.6-a — Compat Rules + Contract Fingerprint
 
 `ADDITIVE:` Add `contractFingerprint` to FEEDS envelope schema and credibility packets. Add `COMPAT_RULES.md` defining MAJOR/MINOR/PATCH break classification. Contract fingerprint is a single SHA-256 digest of the schema manifest, embedded in every emitted artifact for tamper-evident provenance.
