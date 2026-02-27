@@ -1,6 +1,6 @@
 # Mermaid Diagrams (Canonical)
 
-Fifteen diagrams define the visual language of Sigma OVERWATCH. Everything else is archived to reduce drift.
+Sixteen diagrams define the visual language of Sigma OVERWATCH. Everything else is archived to reduce drift.
 
 ## Canonical Set
 
@@ -20,6 +20,7 @@ Fifteen diagrams define the visual language of Sigma OVERWATCH. Everything else 
 | 18 | [SDK Package Architecture](18-sdk-package-architecture.md) | Graph | Three pip packages wrapping AgentSession with publish workflow |
 | 19 | [FEEDS Pipeline](19-feeds-pipeline.md) | Graph | Five-stage event-driven pipeline: envelope → bus → ingest → consumers → canon |
 | 20 | [Stability & Credibility Pipeline](20-stability-credibility-pipeline.md) | Flowchart | SSI, TEC sensitivity, security proof pack, and artifact kill-switch (v2.0.7) |
+| 21 | [Scalability Benchmark Pipeline](21-scalability-benchmark-pipeline.md) | Flowchart | CI-eligible benchmark, regression gate, trend visualization, KPI integration (v2.0.8) |
 
 ## Archive
 
@@ -43,5 +44,6 @@ New diagrams require justification and must map to one of these canonical purpos
 11. **SDK packages** — standalone pip packages wrapping governance primitives for framework integration
 12. **FEEDS pipeline** — event-driven pub/sub connecting governance primitives
 13. **Stability & credibility** — nonlinear stability, economic sensitivity, security proof, artifact gates
+14. **Scalability benchmark** — CI-eligible benchmark evidence, regression gate, trend visualization
 
 To add a diagram, update this index and ensure `tools/mermaid_audit.py` passes.

@@ -27,8 +27,27 @@ Generate site data files: `make site-content` produces `docs/site/data/demo.json
 
 - Gate report: `release_kpis/KPI_GATE_REPORT.md`
 - Label gate: `release_kpis/ISSUE_LABEL_GATE_REPORT.md`
+- Scalability gate: `release_kpis/SCALABILITY_GATE_REPORT.md`
 - Trend: `release_kpis/kpi_trend.png`
 - Composite: `release_kpis/radar_composite_latest.png`
+- Benchmark trend: `release_kpis/benchmark_trend.png`
+
+## Scalability Benchmark Metrics
+
+Produced by `make benchmark` (re-encrypt benchmark with `--ci-mode`). Stored in `release_kpis/scalability_metrics.json`.
+
+| Metric | Unit | Description |
+| --- | --- | --- |
+| `throughput_records_per_second` | rps | Records processed per second |
+| `throughput_mb_per_minute` | MB/min | Data throughput rate |
+| `wall_clock_seconds` | seconds | Wall clock time for full benchmark |
+| `cpu_seconds` | seconds | CPU time consumed |
+| `rss_peak_bytes` | bytes | Peak resident set size |
+| `scalability_score` | score (0-10) | Composite: base(2) + MTTR(0-3) + throughput(0-3) + MB/min(0-2) |
+| `kpi_eligible` | boolean | Whether evidence counts for KPI uplift |
+| `evidence_level` | string | `real_workload`, `ci_benchmark`, or `simulated` |
+
+Regression gate (`make scalability-gate`): throughput must stay >= 80% of previous run.
 
 ## System Stability Index (SSI)
 

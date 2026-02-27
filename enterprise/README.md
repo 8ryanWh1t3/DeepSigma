@@ -10,22 +10,25 @@
 
 # Σ OVERWATCH
 
-**Current pilot release:** v2.0.6  
+**Current pilot release:** v2.0.8
 See: [docs/release/RELEASE_NOTES_v2.0.6.md](docs/release/RELEASE_NOTES_v2.0.6.md)
 
 ## Repo Radar KPI (latest)
 [![Repo KPI Badge](release_kpis/badge_latest.svg)](release_kpis/radar_composite_latest.png)
 [![Roadmap Badge](release_kpis/roadmap_badge.svg)](release_kpis/roadmap_timeline.svg)
 
-- Current release radar: [release_kpis/radar_v2.0.6.png](release_kpis/radar_v2.0.6.png)
+- Current release radar: [release_kpis/radar_v2.0.8.png](release_kpis/radar_v2.0.8.png)
 - Composite release radar: [release_kpis/radar_composite_latest.png](release_kpis/radar_composite_latest.png)
 - Composite release delta table: [release_kpis/radar_composite_latest.md](release_kpis/radar_composite_latest.md)
 - Gate report: [release_kpis/KPI_GATE_REPORT.md](release_kpis/KPI_GATE_REPORT.md)
 - Issue label gate: [release_kpis/ISSUE_LABEL_GATE_REPORT.md](release_kpis/ISSUE_LABEL_GATE_REPORT.md)
+- Scalability gate: [release_kpis/SCALABILITY_GATE_REPORT.md](release_kpis/SCALABILITY_GATE_REPORT.md)
 - KPI history: [release_kpis/history.json](release_kpis/history.json)
 - KPI eligibility tiers: [governance/kpi_eligibility.json](governance/kpi_eligibility.json)
 - KPI confidence: [release_kpis/kpi_confidence.json](release_kpis/kpi_confidence.json)
-- KPI bands: [release_kpis/kpi_bands_v2.0.6.json](release_kpis/kpi_bands_v2.0.6.json)
+- KPI bands: [release_kpis/kpi_bands_v2.0.8.json](release_kpis/kpi_bands_v2.0.8.json)
+- Benchmark trend: [release_kpis/benchmark_trend.png](release_kpis/benchmark_trend.png)
+- Benchmark history: [release_kpis/benchmark_history.json](release_kpis/benchmark_history.json)
 - TEC summary (C-TEC v1.0): [release_kpis/TEC_SUMMARY.md](release_kpis/TEC_SUMMARY.md)
 - TEC internal tier: [release_kpis/tec_internal.json](release_kpis/tec_internal.json)
 - TEC executive tier: [release_kpis/tec_executive.json](release_kpis/tec_executive.json)
@@ -35,7 +38,7 @@ See: [docs/release/RELEASE_NOTES_v2.0.6.md](docs/release/RELEASE_NOTES_v2.0.6.md
 - Roadmap timeline: [release_kpis/roadmap_timeline.svg](release_kpis/roadmap_timeline.svg)
 - Roadmap scope gate: [release_kpis/ROADMAP_SCOPE_GATE_REPORT.md](release_kpis/ROADMAP_SCOPE_GATE_REPORT.md)
 - Nonlinear stability report: [release_kpis/nonlinear_stability_report.md](release_kpis/nonlinear_stability_report.md)
-- SSI artifact (current release): [release_kpis/stability_v2.0.6.json](release_kpis/stability_v2.0.6.json)
+- SSI artifact (current release): [release_kpis/stability_v2.0.8.json](release_kpis/stability_v2.0.8.json)
 - Stability-adjusted forecast: [release_kpis/stability_adjusted_forecast.json](release_kpis/stability_adjusted_forecast.json)
 - Feature catalog (human): [docs/FEATURE_CATALOG.md](docs/FEATURE_CATALOG.md)
 - Feature catalog (machine): [release_kpis/feature_catalog.json](release_kpis/feature_catalog.json)
@@ -210,9 +213,11 @@ All connectors conform to the [Connector Contract v1.0](schemas/core/connector_c
 - [Key Lifecycle](docs/docs/security/KEY_LIFECYCLE.md) — key versioning, TTL, and rotation cadence.
 - [Recovery Runbook](docs/docs/security/RECOVERY_RUNBOOK.md) — compromise response and re-encryption recovery sequence.
 - [10-Minute Security Demo](docs/docs/security/DEMO_10_MIN.md) — reproducible DISR drill (`make security-gate` + `make security-demo`).
-- [DISR Re-encrypt Benchmark](docs/docs/security/DEMO_10_MIN.md) — pilot-scale telemetry (`make reencrypt-benchmark`) with output in `release_kpis/scalability_metrics.json`.
+- [DISR Re-encrypt Benchmark](docs/docs/security/DEMO_10_MIN.md) — CI-eligible benchmark (`make benchmark`) with output in `release_kpis/scalability_metrics.json`.
+- [Scalability Regression Gate](release_kpis/SCALABILITY_GATE_REPORT.md) — prevents throughput regressions (`make scalability-gate`).
+- [Benchmark Trend](release_kpis/benchmark_trend.png) — historical throughput visualization (`make benchmark-trend`).
 
-Note: default demo/benchmark commands run in dry-run mode and are marked as simulated evidence; KPI uplift is capped unless real workload mode is used.
+Note: `--ci-mode` runs produce deterministic, KPI-eligible benchmark evidence. Use `--real-workload` for full AES-256-GCM crypto operations with production keys.
 
 ## Monitoring
 

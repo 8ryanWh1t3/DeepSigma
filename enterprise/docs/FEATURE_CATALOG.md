@@ -356,6 +356,21 @@ Tenant registry, RBAC, isolated paths, per-tenant policy enforcement, and immuta
   - Artifacts: scripts/validate_kpi_eligibility.py
   - Enforcement: make validate-kpi-eligibility, CI: ci.yml
   - KPI axes: Automation_Depth, Operational_Maturity
+- **CI-Eligible Benchmark** (`REAL_BENCHMARK`)
+  - Deterministic re-encrypt benchmark with --ci-mode producing KPI-eligible evidence (kpi_eligible=true, evidence_level=real_workload) for scalability scoring.
+  - Artifacts: release_kpis/scalability_metrics.json, release_kpis/benchmark_history.json, artifacts/benchmarks/reencrypt/benchmark_summary.json
+  - Enforcement: scripts/reencrypt_benchmark.py --ci-mode, make benchmark, CI: reencrypt_benchmark.yml
+  - KPI axes: Scalability, Enterprise_Readiness
+- **Scalability Regression Gate** (`SCALABILITY_GATE`)
+  - CI gate enforcing 80% throughput floor relative to previous benchmark and requiring real_workload evidence level.
+  - Artifacts: release_kpis/SCALABILITY_GATE_REPORT.md
+  - Enforcement: scripts/scalability_regression_gate.py, make scalability-gate, CI: ci.yml, CI: reencrypt_benchmark.yml
+  - KPI axes: Scalability, Automation_Depth
+- **Benchmark Trend Visualization** (`BENCHMARK_TREND`)
+  - Throughput trend chart and markdown table from benchmark_history.json with 80% regression floor overlay.
+  - Artifacts: release_kpis/benchmark_trend.png, release_kpis/benchmark_trend.svg, release_kpis/benchmark_trend.md
+  - Enforcement: scripts/render_benchmark_trend.py, make benchmark-trend, CI: kpi.yml
+  - KPI axes: Scalability, Operational_Maturity
 
 ### Health & Stability Monitoring
 ICR/PCR/TEC health watchers, nonlinear stability analysis, roadmap forecasting, and pulse insights.
