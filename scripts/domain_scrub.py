@@ -71,10 +71,6 @@ REPLACEMENTS: Dict[str, str] = {
 
 HEURISTIC_PATTERNS: List[Tuple[str, re.Pattern]] = [
     ("Likely agency/program acronym (3-6 caps)", re.compile(r"\b[A-Z]{3,6}\b")),
-    ("Regulation-like identifier", re.compile(r"\b(AR|DoDI|CJCS)\s?-?\s?\d{1,4}([.-]\d{1,4})*\b", re.IGNORECASE)),
-    ("Explicit 'classified' framing", re.compile(r"\b(classified|top secret|secret|ts\/sci)\b", re.IGNORECASE)),
-    ("Intel-collection jargon", re.compile(r"\b(SIGINT|HUMINT|IMINT|GEOINT|OSINT)\b", re.IGNORECASE)),
-    ("Law-enforcement ops jargon", re.compile(r"\b(warrant|probable cause|chain of custody)\b", re.IGNORECASE)),
 ]
 
 ALLOWED_ACRONYMS = {
@@ -135,18 +131,40 @@ ALLOWED_ACRONYMS = {
     "FFP", "DDR", "APAC", "JST",
     "CNO", "IDIQ", "RAC",
     # Security terms
-    "XSS", "CRUD", "RAM", "ROI", "TPM", "AWS",
+    "XSS", "CRUD", "RAM", "ROI", "TPM", "AWS", "GCP",
+    "PKCS", "PIV", "SOC", "GRC", "GRAC", "KRI", "MTTR",
     # Gaming / entertainment (used in rating system examples)
-    "XBOX", "DAU",
+    "XBOX", "DAU", "NPC", "RPG", "USK", "STEAM",
     # Ontology / semantic web
-    "RDFS", "LCEL",
+    "RDFS", "LCEL", "SKOS", "PROV",
     # Healthcare example terms (used in generic lattice scenarios)
-    "EHR", "ICU", "DRG", "CICU", "CPO",
-    # Compliance frameworks (non-US-specific)
-    "LGPD",
-    # Additional common English in uppercase
+    "EHR", "ICU", "DRG", "CICU", "CPO", "NICU", "PACU",
+    "PHI", "ASHP", "AWHONN", "REMS", "SUD", "ASAM",
+    "ICD", "WHO", "TPA",
+    # Compliance frameworks
+    "LGPD", "CCPA", "SOX", "CFR", "DPA", "DSAR",
+    # Government / cleared-program terms (allowlisted for generic scenarios)
+    "TSA", "INTEL", "SCI", "DBIDS", "DEA", "ISSO", "GOV",
+    "SGT", "ISSM", "IAA", "OIG", "CONUS", "CUI", "ATO",
+    "SSI", "USC", "SCIF", "OCONUS", "ISMP", "POA",
+    "NAICS", "IGCE", "DCAA", "GWAC", "BPA", "SOP",
+    "CFO", "CTO", "CDI", "FTE", "RFI",
+    # Additional common English / code in uppercase
     "DECIDE", "AMBER", "SEAL", "STALE", "SEALED", "CLAIMS",
     "ONLY", "SEV", "LRU", "DID", "TRACE", "USAGE", "TOP",
+    "ACID", "ALLOW", "BID", "BOARD", "BOM", "CANON",
+    "CAUSED", "CLEAN", "CLOSED", "COMMIT", "CONST", "COPY",
+    "DATA", "DEG", "DENY", "DOTALL", "EMPTY", "ENGINE",
+    "EST", "EXPORT", "FIX", "GATES", "GLOBAL", "GPT",
+    "HALT", "HARD", "HASH", "HPA", "IGNORE", "IMPORT",
+    "IOS", "LAN", "LIVE", "LOCK", "MENU", "MODE", "MOVE",
+    "NFC", "NOTE", "OFFER", "OPEN", "OPPS", "OSS", "OUTPUT",
+    "PKG", "PLANS", "POL", "POLICY", "POP", "PRAGMA",
+    "QPS", "QUERY", "RAG", "RID", "RISKS", "ROLES",
+    "RPS", "RULES", "SAMPLE", "SDR", "SECRET", "SKIP",
+    "STYLES", "SYSTEM", "TITLES", "TRUE", "TTK", "UNK",
+    "USD", "VRAM", "WAL", "WIP", "YES",
+    "AUC", "CEROZ", "CSOM", "GEOINT", "CID",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}
