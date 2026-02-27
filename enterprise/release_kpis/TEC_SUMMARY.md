@@ -5,25 +5,25 @@
 - PCR: **extreme** (CCF=0.7, CL14=570)
 
 ## Edition Metrics
-- CORE: TEC=105.6 | C-TEC=73.92 | KPI=1.0
-- ENTERPRISE: TEC=1227.8 | C-TEC=859.46 | KPI=1.0
-- TOTAL: TEC=2025.6 | C-TEC=1417.92 | KPI=1.0
+- CORE: TEC=316.2 | C-TEC=221.34 | KPI=1.0
+- ENTERPRISE: TEC=1397.4 | C-TEC=978.18 | KPI=1.0
+- TOTAL: TEC=18139.0 | C-TEC=12697.3 | KPI=1.0
 
 ## Tiers (from TOTAL C-TEC)
 ### Internal @ $150/hr
-- Low:  1134.3 hrs | $170150
-- Base: 1417.9 hrs | $212688
-- High: 1914.2 hrs | $287129
+- Low:  10157.8 hrs | $1523676
+- Base: 12697.3 hrs | $1904595
+- High: 17141.4 hrs | $2571203
 
 ### Executive @ $225/hr
-- Low:  1134.3 hrs | $255226
-- Base: 1417.9 hrs | $319032
-- High: 1914.2 hrs | $430693
+- Low:  10157.8 hrs | $2285514
+- Base: 12697.3 hrs | $2856892
+- High: 17141.4 hrs | $3856805
 
 ### DoD Fully Burdened @ $275/hr
-- Low:  1134.3 hrs | $311942
-- Base: 1417.9 hrs | $389928
-- High: 1914.2 hrs | $526403
+- Low:  10157.8 hrs | $2793406
+- Base: 12697.3 hrs | $3491758
+- High: 17141.4 hrs | $4713873
 
 ## Why This Is More Accurate
 - Uses edition-scoped inventory plus full-repo `total` scope, so complexity is measured across actual shipped surfaces.
