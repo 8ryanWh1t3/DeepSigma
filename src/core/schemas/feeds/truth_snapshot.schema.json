@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/truth_snapshot.schema.json",
+  "title": "FEEDS Truth Snapshot Payload",
+  "description": "Point-in-time snapshot of asserted truth claims with coherence score and evidence summary.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["snapshotId", "capturedAt", "claims", "evidenceSummary", "coherenceScore", "seal"],
+  "properties": {
+    "snapshotId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique snapshot identifier."
+    },
+    "capturedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this truth snapshot was captured."
+    },
+    "claims": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/claimRef" },
+      "description": "Claims included in this snapshot."
+    },
+    "evidenceSummary": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable summary of the evidence base."
+    },
+    "coherenceScore": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Coherence score at snapshot time."
+    },
+    "seal": {
+      "$ref": "#/$defs/seal"
+    }
+  },
+  "$defs": {
+    "claimRef": {
+      "type": "object",
+      "required": ["claimId"],
+      "additionalProperties": false,
+      "properties": {
+        "claimId": { "type": "string", "minLength": 1 },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "statusLight": { "type": "string", "enum": ["green", "yellow", "red"] },
+        "wasFresh": { "type": "boolean" }
+      }
+    },
+    "seal": {
+      "type": "object",
+      "required": ["hash", "sealedAt", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "hash": { "type": "string" },
+        "sealedAt": { "type": "string", "format": "date-time" },
+        "version": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

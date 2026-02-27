@@ -88,6 +88,7 @@ ALLOWED_ACRONYMS = {
     "RAL", "DTE", "ICR", "PCR", "TEC", "CTEC", "DISR", "ABP",
     "DRT", "DEC", "CLM", "MDPT", "EDGE", "DRIFT", "PATCH",
     "SIGNAL", "RECALL", "CLAIM", "GATE", "SYNC", "CORE",
+    "FEEDS", "ALS", "DLQ", "PUB", "SUB", "ACK", "INBOX", "OTHER", "POSIX",
     "BEACON", "SKEW", "BOOT", "RETCON", "PEGI", "CERO", "ESRB",
     "RONIN", "DLC", "DRI", "BOE", "SLO", "CMS", "MVP",
     # Standards / formats / compliance
@@ -102,7 +103,7 @@ ALLOWED_ACRONYMS = {
     "GET", "POST", "PUT", "DELETE", "UPDATE",
     "SELECT", "INSERT", "INTO", "VALUES", "CREATE",
     "EXISTS", "TABLE", "WHERE", "UNIQUE", "DESC",
-    "LIMIT", "OFFSET",
+    "LIMIT", "OFFSET", "COUNT", "GROUP",
     # Common English words appearing in uppercase labels/headings
     "RED", "GREEN", "YELLOW", "ORANGE", "STATUS", "TEXT",
     "ERROR", "WARN", "NULL", "FROM", "KEY", "ALL", "NOT",

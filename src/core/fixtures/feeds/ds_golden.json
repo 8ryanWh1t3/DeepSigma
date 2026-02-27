@@ -1,0 +1,24 @@
+{
+  "eventId": "evt-ds-001",
+  "packetId": "CP-2026-02-27-0001",
+  "topic": "drift_signal",
+  "recordType": "DS",
+  "uid": "evt-ds-001",
+  "sequence": 3,
+  "createdAt": "2026-02-27T11:00:00Z",
+  "producer": "coherence-cli",
+  "classification": "LEVEL_0",
+  "payload": {
+    "driftId": "DS-2026-0001",
+    "episodeId": "ep-2026-0001",
+    "driftType": "freshness",
+    "severity": "yellow",
+    "detectedAt": "2026-02-27T11:00:00Z",
+    "evidenceRefs": ["evidence-ref-001", "evidence-ref-002"],
+    "recommendedPatchType": "ttl_change",
+    "fingerprint": {"key": "AQ:freshness:geo", "version": "1"},
+    "notes": "Claim CLAIM-2026-0001 exceeded half-life by 2 hours."
+  },
+  "payloadHash": "sha256:57c24b7b74d05e84fe93585deba9c866b54737ddf32a5731fc30f3e4a19fc829",
+  "schemaVersion": "1.0.0"
+}

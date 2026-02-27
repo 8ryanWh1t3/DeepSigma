@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/packet_index.schema.json",
+  "title": "FEEDS Packet Index Payload",
+  "description": "Manifest of all events within a coherence packet.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["packetId", "createdAt", "producer", "artifactManifest", "totalEvents", "seal"],
+  "properties": {
+    "packetId": {
+      "type": "string",
+      "pattern": "^CP-\\d{4}-\\d{2}-\\d{2}-\\d{4}$",
+      "description": "Coherence packet identifier."
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this packet was assembled."
+    },
+    "producer": {
+      "type": "string",
+      "minLength": 1,
+      "description": "System that produced this packet."
+    },
+    "artifactManifest": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["topic", "recordType", "eventId", "payloadHash"],
+        "additionalProperties": false,
+        "properties": {
+          "topic": {
+            "type": "string",
+            "enum": [
+              "truth_snapshot", "authority_slice", "decision_lineage",
+              "drift_signal", "canon_entry", "packet_index"
+            ]
+          },
+          "recordType": {
+            "type": "string",
+            "enum": ["TS", "ALS", "DLR", "DS", "CE", "MANIFEST"]
+          },
+          "eventId": { "type": "string", "minLength": 1 },
+          "payloadHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+        }
+      },
+      "description": "Ordered list of events in this packet."
+    },
+    "totalEvents": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total number of events in the packet."
+    },
+    "seal": {
+      "type": "object",
+      "required": ["hash", "sealedAt", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "hash": { "type": "string" },
+        "sealedAt": { "type": "string", "format": "date-time" },
+        "version": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

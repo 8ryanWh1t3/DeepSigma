@@ -57,7 +57,7 @@ include = [
 ]
 
 [tool.setuptools.package-data]
-core = ["schemas/*.schema.json", "py.typed"]
+core = ["schemas/*.schema.json", "schemas/feeds/*.schema.json", "fixtures/feeds/*.json", "py.typed"]
 
 [tool.ruff]
 select = ["E", "F", "W"]

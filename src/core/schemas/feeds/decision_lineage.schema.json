@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/decision_lineage.schema.json",
+  "title": "FEEDS Decision Lineage Payload",
+  "description": "DLR-derived decision lineage record carried as a FEEDS payload.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["dlrId", "episodeId", "decisionType", "recordedAt", "claims", "rationaleGraph", "outcome", "dteRef", "seal"],
+  "properties": {
+    "dlrId": {
+      "type": "string",
+      "pattern": "^DLR-[a-f0-9]{12,}$",
+      "description": "Deterministic DLR identifier."
+    },
+    "episodeId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Sealed episode this DLR was extracted from."
+    },
+    "decisionType": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Decision class."
+    },
+    "recordedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this DLR was created."
+    },
+    "claims": {
+      "type": "object",
+      "required": ["context", "rationale", "action", "verification", "outcome"],
+      "additionalProperties": false,
+      "properties": {
+        "context": { "type": "array", "items": { "$ref": "#/$defs/claimRef" } },
+        "rationale": { "type": "array", "items": { "$ref": "#/$defs/claimRef" } },
+        "action": { "type": "array", "items": { "$ref": "#/$defs/claimRef" } },
+        "verification": { "type": "array", "items": { "$ref": "#/$defs/claimRef" } },
+        "outcome": { "type": "array", "items": { "$ref": "#/$defs/claimRef" } }
+      }
+    },
+    "rationaleGraph": {
+      "type": "object",
+      "required": ["edges"],
+      "additionalProperties": false,
+      "properties": {
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["from", "to", "rel"],
+            "additionalProperties": false,
+            "properties": {
+              "from": { "type": "string" },
+              "to": { "type": "string" },
+              "rel": {
+                "type": "string",
+                "enum": ["depends_on", "supports", "contradicts", "supersedes", "informs", "justifies", "verifies"]
+              },
+              "weight": { "type": "number", "minimum": 0, "maximum": 1 }
+            }
+          }
+        },
+        "rootClaims": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "required": ["code"],
+      "additionalProperties": false,
+      "properties": {
+        "code": { "type": "string", "enum": ["success", "partial", "fail", "abstain", "bypassed"] },
+        "reason": { "type": "string" }
+      }
+    },
+    "dteRef": {
+      "type": "object",
+      "required": ["decisionType", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "decisionType": { "type": "string" },
+        "version": { "type": "string" },
+        "policyPackHash": { "type": "string" }
+      }
+    },
+    "seal": {
+      "type": "object",
+      "required": ["hash", "sealedAt", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "hash": { "type": "string" },
+        "sealedAt": { "type": "string", "format": "date-time" },
+        "version": { "type": "integer", "minimum": 1 }
+      }
+    }
+  },
+  "$defs": {
+    "claimRef": {
+      "type": "object",
+      "required": ["claimId"],
+      "additionalProperties": false,
+      "properties": {
+        "claimId": { "type": "string" },
+        "truthType": {
+          "type": "string",
+          "enum": ["observation", "inference", "assumption", "forecast", "norm", "constraint"]
+        },
+        "confidenceAtDecision": { "type": "number", "minimum": 0, "maximum": 1 },
+        "statusLightAtDecision": { "type": "string", "enum": ["green", "yellow", "red"] },
+        "wasFresh": { "type": "boolean" },
+        "role": { "type": "string" }
+      }
+    }
+  }
+}

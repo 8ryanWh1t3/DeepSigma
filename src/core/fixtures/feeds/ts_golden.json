@@ -1,0 +1,32 @@
+{
+  "eventId": "evt-ts-001",
+  "packetId": "CP-2026-02-27-0001",
+  "topic": "truth_snapshot",
+  "recordType": "TS",
+  "uid": "evt-ts-001",
+  "sequence": 0,
+  "createdAt": "2026-02-27T10:00:00Z",
+  "producer": "coherence-cli",
+  "classification": "LEVEL_0",
+  "payload": {
+    "snapshotId": "TS-2026-0001",
+    "capturedAt": "2026-02-27T10:00:00Z",
+    "claims": [
+      {
+        "claimId": "CLAIM-2026-0001",
+        "confidence": 0.92,
+        "statusLight": "green",
+        "wasFresh": true
+      }
+    ],
+    "evidenceSummary": "Primary evidence from automated telemetry pipeline with 3 corroborating sources.",
+    "coherenceScore": 87,
+    "seal": {
+      "hash": "sha256:aabbccdd",
+      "sealedAt": "2026-02-27T10:00:01Z",
+      "version": 1
+    }
+  },
+  "payloadHash": "sha256:9782b2ab21b39658f740aa7381b4f409a7937a59e1c8ea9ded800a2be879c765",
+  "schemaVersion": "1.0.0"
+}

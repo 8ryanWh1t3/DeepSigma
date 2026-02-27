@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/feeds_event_envelope.schema.json",
+  "title": "FEEDS Event Envelope",
+  "description": "Shared envelope wrapping every FEEDS event. Carries routing, classification, and integrity metadata.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "eventId",
+    "packetId",
+    "topic",
+    "recordType",
+    "uid",
+    "sequence",
+    "createdAt",
+    "producer",
+    "classification",
+    "payload",
+    "payloadHash",
+    "schemaVersion"
+  ],
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique event identifier (UUID)."
+    },
+    "packetId": {
+      "type": "string",
+      "pattern": "^CP-\\d{4}-\\d{2}-\\d{2}-\\d{4}$",
+      "description": "Coherence packet identifier. Format: CP-YYYY-MM-DD-NNNN."
+    },
+    "topic": {
+      "type": "string",
+      "enum": [
+        "truth_snapshot",
+        "authority_slice",
+        "decision_lineage",
+        "drift_signal",
+        "canon_entry",
+        "packet_index"
+      ],
+      "description": "FEEDS topic routing key."
+    },
+    "recordType": {
+      "type": "string",
+      "enum": ["TS", "ALS", "DLR", "DS", "CE", "MANIFEST"],
+      "description": "Record type code."
+    },
+    "subtype": {
+      "type": "string",
+      "description": "Optional subtype for finer-grained routing."
+    },
+    "uid": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique identifier for deduplication."
+    },
+    "humanId": {
+      "type": "string",
+      "description": "Optional human-readable identifier."
+    },
+    "sequence": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Monotonic sequence number within a packet."
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Event creation timestamp."
+    },
+    "producer": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Identity of the producing system or component."
+    },
+    "classification": {
+      "type": "string",
+      "enum": ["LEVEL_0", "LEVEL_1", "LEVEL_2", "LEVEL_3", "LEVEL_4", "LEVEL_5", "LEVEL_6", "OTHER"],
+      "description": "Generic classification token (GPE-safe)."
+    },
+    "classificationDetail": {
+      "type": "string",
+      "description": "Optional free-text classification context."
+    },
+    "payload": {
+      "type": "object",
+      "description": "Topic-specific payload (validated separately)."
+    },
+    "payloadHash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 hash of canonical JSON payload."
+    },
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Schema version (semver)."
+    }
+  }
+}
