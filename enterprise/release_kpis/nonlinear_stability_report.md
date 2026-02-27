@@ -10,9 +10,9 @@ Where each component is normalized to `0..100` (higher is more stable):
 - Authority sensitivity score: authority strength and authority volatility penalty
 - Economic variance score: TEC spread ratio and economic KPI variance penalty
 
-- SSI: **36.94**
+- SSI: **36.47**
 - Confidence: **0.89**
-- Band: **[34.74, 39.14]**
+- Band: **[34.27, 38.67]**
 
 ## B) Instability Gating Thresholds
 
@@ -57,19 +57,19 @@ Scenario stress-tests on the current release baseline:
 
 ### Mild
 - Description: single-cycle turbulence with constrained spread
-- Projected SSI: **20.44**
+- Projected SSI: **19.97**
 - Projected drift_acceleration_index: **1.0**
 - Gate: **FAIL**
 
 ### Moderate
 - Description: broad system stress and governance lag
-- Projected SSI: **15.94**
+- Projected SSI: **15.47**
 - Projected drift_acceleration_index: **1.0**
 - Gate: **FAIL**
 
 ### Severe
 - Description: compound drift with authority + economic instability
-- Projected SSI: **10.27**
+- Projected SSI: **9.8**
 - Projected drift_acceleration_index: **1.0**
 - Gate: **FAIL**
 
