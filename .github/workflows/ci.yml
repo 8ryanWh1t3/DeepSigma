@@ -66,3 +66,6 @@ jobs:
       - name: ENTERPRISE demo + tests
         run: |
           make enterprise-ci
+
+      - name: Scalability regression gate
+        run: make scalability-gate

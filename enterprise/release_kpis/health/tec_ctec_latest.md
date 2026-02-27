@@ -12,15 +12,15 @@
 - R-TEC: **663.0**
 
 ## ENTERPRISE
-- TEC: **1425.4**
+- TEC: **1443.6**
 - KPI coverage: **1.0**
 - Control coverage: **0.595**
-- C-TEC: **848.11**
-- R-TEC: **1743.4**
+- C-TEC: **858.94**
+- R-TEC: **1761.6**
 
 ## TOTAL
-- TEC: **18307.2**
+- TEC: **18334.0**
 - KPI coverage: **1.0**
 - Control coverage: **0.595**
-- C-TEC: **10892.78**
-- R-TEC: **18625.2**
+- C-TEC: **10908.73**
+- R-TEC: **18652.0**

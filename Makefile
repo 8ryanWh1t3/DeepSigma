@@ -8,7 +8,8 @@
 	milestone-gate issue-label-gate kpi-issues kpi stability \
 	validate-feeds test-feeds-bus test-feeds-ingest test-feeds-consumers test-feeds-canon test-feeds \
 	constitution-gate \
-	verify-release-artifacts validate-kpi-eligibility tec-sensitivity
+	verify-release-artifacts validate-kpi-eligibility tec-sensitivity \
+	benchmark scalability-gate benchmark-trend
 
 demo:
 	bash run_money_demo.sh
@@ -141,3 +142,12 @@ validate-kpi-eligibility:
 
 tec-sensitivity:
 	python enterprise/scripts/tec_sensitivity.py
+
+benchmark:
+	python enterprise/scripts/reencrypt_benchmark.py --ci-mode
+
+scalability-gate:
+	python scripts/scalability_regression_gate.py
+
+benchmark-trend:
+	python enterprise/scripts/render_benchmark_trend.py

@@ -2,6 +2,7 @@
 
 ## Recently Shipped
 
+- **v2.0.8 "Scalability Evidence + SSI Recovery"** — CI-eligible benchmark evidence for scalability KPI (5.38 → 10.0), scalability regression gate, benchmark trend visualization. SSI trajectory: 37.71 → 39.05. Issues #410-#412 closed.
 - **v2.0.7 "Nonlinear Stability + Credibility Hardening"** — SSI metric, drift acceleration detection, TEC sensitivity analysis, stale artifact kill-switch, security proof pack v2, banded radar rendering, KPI eligibility tier CI validation. 392 tests, issues #314-#317 + #337-#339 closed, epics #311 + #340 closed.
 - **v2.3.0 "Reference Layer"** — SDK packages (langchain-deepsigma, deepsigma-middleware, openai-deepsigma), reference layer manifesto, static demo site with GitHub Pages, coherence metrics collector, site content generation script. 433 tests, issues #477-#483 closed.
 - **v2.2.0 "Mechanical Authority"** — AgentSession, authority ledger, claim trigger pipeline, coherence metrics module, FEEDS event surface (5-stage event-driven: envelope+schemas, file-bus pub/sub, manifest-first ingest, authority/evidence/triage consumers, canon store). 383 tests, issues #430-#459 (FEEDS) + #462-#476 closed.
@@ -10,17 +11,11 @@
 - **ABP v1** — Authority Boundary Primitive: stack-independent, pre-runtime governance declaration (#419)
 - **TEC/C-TEC v2** — Health pipeline + roadmap auto-sync (#391)
 
-## v2.0.8 — SSI Recovery
-
-**Gate:** SSI >= 55 (WARN threshold). Current SSI is ~37 (FAIL) due to historical drift acceleration from large KPI swings in v2.0.4-v2.0.6. Recovery requires stable KPI trends across v2.0.8+.
-
-- [#461](https://github.com/8ryanWh1t3/DeepSigma/issues/461) SSI Recovery >= 55
-
 ## v2.1.0 — Decision Infrastructure Hardening
 
-**Gate:** All 8 KPI axes >= 7.0 (#394)
+**Gate:** All 8 KPI axes >= 7.0 (#394), SSI >= 55
 
-Two workstreams: KPI gap closure (6 epics, 18 child tasks) and DISR architecture.
+Two workstreams: KPI gap closure (remaining epics) and DISR architecture.
 
 ### KPI Gap Closure
 
@@ -44,12 +39,6 @@ Each epic targets a single KPI axis below 7.0. Child tasks are the concrete deli
 - [#407](https://github.com/8ryanWh1t3/DeepSigma/issues/407) Enterprise Deploy Sanity Workflow (docker/helm/config)
 - [#408](https://github.com/8ryanWh1t3/DeepSigma/issues/408) Audit-Neutral Pack Completeness Validator
 - [#409](https://github.com/8ryanWh1t3/DeepSigma/issues/409) Enterprise Operator Runbook + Release Checklist Gate
-
-**Scalability** (#398)
-
-- [#410](https://github.com/8ryanWh1t3/DeepSigma/issues/410) Deterministic Scale Benchmark Harness
-- [#411](https://github.com/8ryanWh1t3/DeepSigma/issues/411) Scalability Regression Threshold Gate
-- [#412](https://github.com/8ryanWh1t3/DeepSigma/issues/412) Benchmark Trend Export into KPI Pipeline
 
 **Authority Modeling** (#399)
 

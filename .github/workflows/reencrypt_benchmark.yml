@@ -1,9 +1,11 @@
-name: DISR Reencrypt Benchmark
+name: DISR Re-encrypt Benchmark
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "30 3 * * *"
+  push:
+    paths:
+      - "enterprise/scripts/reencrypt_benchmark.py"
+      - "enterprise/src/deepsigma/security/reencrypt.py"
 
 permissions:
   contents: read
@@ -19,19 +21,23 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Run benchmark suite
+      - name: Install package
         run: |
-          make security-demo
-          make reencrypt-benchmark ARGS="--records 20000 --reset-dataset"
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: Run re-encrypt benchmark
+        run: make benchmark
+
+      - name: Scalability regression gate
+        run: make scalability-gate
 
       - name: Upload benchmark artifacts
         uses: actions/upload-artifact@v4
         with:
           name: disr-benchmark
           path: |
-            release_kpis/security_metrics.json
-            release_kpis/scalability_metrics.json
-            release_kpis/benchmark_history.json
-            artifacts/benchmarks/reencrypt/benchmark_summary.json
-            artifacts/benchmarks/reencrypt/security_events.jsonl
-            artifacts/benchmarks/reencrypt/authority_ledger.json
+            enterprise/release_kpis/scalability_metrics.json
+            enterprise/release_kpis/security_metrics.json
+            enterprise/release_kpis/benchmark_history.json
+            enterprise/artifacts/benchmarks/reencrypt/benchmark_summary.json

@@ -2,6 +2,18 @@
 
 All contract surface changes are logged here with compatibility annotations.
 
+## v2.0.8 — Scalability Evidence + SSI Recovery
+
+`COMPATIBLE:` Promote re-encrypt benchmark to CI-eligible evidence, add scalability regression gate, benchmark trend visualization. Scalability KPI 5.38 → 10.0 via real benchmark infrastructure. SSI trajectory improving: 37.71 → 39.05. No schema changes.
+
+### Migration
+
+**Affected schemas**: None
+**Consumer action**: None — no schema changes in this release.
+**Rollback**: Yes — all changes are additive tooling and evidence.
+
+---
+
 ## v2.0.7 — Nonlinear Stability + Credibility Hardening
 
 `COMPATIBLE:` Add stale artifact kill-switch, TEC sensitivity analysis, security proof pack v2, banded radar rendering, and KPI eligibility tier validation. No schema changes. Policy version aligned to GOV-2.0.7.

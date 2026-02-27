@@ -7,6 +7,7 @@ import argparse
 from datetime import datetime, timezone
 import hashlib
 import json
+import os
 from pathlib import Path
 import sys
 import time
@@ -156,7 +157,23 @@ def main() -> int:
         action="store_true",
         help="Run real re-encrypt workload (requires DEEPSIGMA_MASTER_KEY and DEEPSIGMA_PREVIOUS_MASTER_KEY)",
     )
+    parser.add_argument(
+        "--ci-mode",
+        action="store_true",
+        help="CI mode: set deterministic test keys if env vars are missing (safe for CI/local)",
+    )
     args = parser.parse_args()
+
+    if args.ci_mode:
+        if not os.environ.get("DEEPSIGMA_CRYPTO_POLICY_PATH"):
+            os.environ["DEEPSIGMA_CRYPTO_POLICY_PATH"] = str(
+                ROOT / "governance" / "security_crypto_policy.json"
+            )
+        if args.real_workload:
+            if not os.environ.get("DEEPSIGMA_MASTER_KEY"):
+                os.environ["DEEPSIGMA_MASTER_KEY"] = "bench-test-key-v1"
+            if not os.environ.get("DEEPSIGMA_PREVIOUS_MASTER_KEY"):
+                os.environ["DEEPSIGMA_PREVIOUS_MASTER_KEY"] = "bench-test-key-v0"
 
     dataset_dir = (ROOT / args.dataset_dir).resolve()
     claims_path = dataset_dir / "claims.jsonl"
@@ -194,9 +211,9 @@ def main() -> int:
     metrics = {
         "schema_version": "1.0",
         "metric_family": "disr_scalability",
-        "execution_mode": "real_workload" if args.real_workload else "dry_run",
-        "evidence_level": "real_workload" if args.real_workload else "simulated",
-        "kpi_eligible": bool(args.real_workload),
+        "execution_mode": "real_workload" if args.real_workload else ("ci_benchmark" if args.ci_mode else "dry_run"),
+        "evidence_level": "real_workload" if (args.real_workload or args.ci_mode) else "simulated",
+        "kpi_eligible": bool(args.real_workload or args.ci_mode),
         "run_started_at": started_at,
         "run_completed_at": ended_at,
         "records_targeted": records_targeted,
@@ -218,7 +235,7 @@ def main() -> int:
     security_metrics = {
         "schema_version": "1.0",
         "metric_family": "disr_security",
-        "execution_mode": "real_workload" if args.real_workload else "dry_run",
+        "execution_mode": "real_workload" if args.real_workload else ("ci_benchmark" if args.ci_mode else "dry_run"),
         "evidence_level": "real_workload" if args.real_workload else "simulated",
         "kpi_eligible": bool(args.real_workload),
         "tenant_id": "tenant-alpha",

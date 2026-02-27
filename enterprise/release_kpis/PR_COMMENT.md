@@ -1,10 +1,10 @@
-## Repo Radar KPI — v2.0.7
+## Repo Radar KPI — v2.0.8
 
 ![badge](release_kpis/badge_latest.svg)
 
 **Radar:**
-- PNG: `release_kpis/radar_v2.0.7.png`
-- SVG: `release_kpis/radar_v2.0.7.svg`
+- PNG: `release_kpis/radar_v2.0.8.png`
+- SVG: `release_kpis/radar_v2.0.8.svg`
 
 **Composite Release Radar:**
 - PNG: `release_kpis/radar_composite_latest.png`
@@ -18,8 +18,8 @@
 - Scope gate: `release_kpis/ROADMAP_SCOPE_GATE_REPORT.md`
 
 **Nonlinear Stability:**
-- SSI JSON: `release_kpis/stability_v2.0.7.json`
-- Simulation: `release_kpis/stability_simulation_v2.0.7.json`
+- SSI JSON: `release_kpis/stability_v2.0.8.json`
+- Simulation: `release_kpis/stability_simulation_v2.0.8.json`
 - Report: `release_kpis/nonlinear_stability_report.md`
 
 **Trend:**
@@ -33,12 +33,12 @@
 **Eligibility + Confidence:**
 - Eligibility tiers: `governance/kpi_eligibility.json`
 - KPI confidence: `release_kpis/kpi_confidence.json`
-- KPI bands: `release_kpis/kpi_bands_v2.0.7.json`
+- KPI bands: `release_kpis/kpi_bands_v2.0.8.json`
 
 **TEC (ROM):**
-- Internal: 10892.8 hrs | $1,633,917
-- Executive: 10892.8 hrs | $2,450,876
-- Public Sector: 10892.8 hrs | $2,995,514
+- Internal: 10908.7 hrs | $1,636,310
+- Executive: 10908.7 hrs | $2,454,464
+- Public Sector: 10908.7 hrs | $2,999,901
 - Full detail: `release_kpis/TEC_SUMMARY.md`
 
 **Notes:**

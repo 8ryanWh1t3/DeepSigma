@@ -23,14 +23,20 @@ jobs:
           pip install -e .
           pip install httpx
 
-      - name: Run 3-replica benchmark
+      - name: Run reencrypt benchmark (real workload)
+        run: make benchmark
+
+      - name: Run 3-replica HTTP benchmark
         run: |
-          bash scripts/run_scale_stack.sh
+          bash enterprise/scripts/run_scale_stack.sh
 
       - name: Upload benchmark artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: stateless-api-scale-benchmark
+          name: scale-benchmark
           path: |
-            docs/examples/scale/report_latest.json
-            docs/examples/scale/report_latest.md
+            enterprise/release_kpis/scalability_metrics.json
+            enterprise/release_kpis/security_metrics.json
+            enterprise/release_kpis/benchmark_history.json
+            enterprise/docs/examples/scale/report_latest.json
+            enterprise/docs/examples/scale/report_latest.md

@@ -53,6 +53,12 @@ def main() -> int:
     if not manual.exists():
         raise SystemExit(f"Missing {manual}. Create it first.")
 
+    # Run benchmark to refresh scalability_metrics.json before merge.
+    subprocess.check_call([
+        "python", "enterprise/scripts/reencrypt_benchmark.py",
+        "--ci-mode",
+    ])
+
     # Merge telemetry into kpi_{version}_merged.json.
     subprocess.check_call(["python", "enterprise/scripts/kpi_merge.py"])
     merged = outdir / f"kpi_{version}_merged.json"
@@ -91,6 +97,7 @@ def main() -> int:
     subprocess.check_call(["make", "roadmap-refresh"], cwd=REPO_ROOT)
     subprocess.check_call(["make", "stability"], cwd=REPO_ROOT)
     subprocess.check_call(["make", "tec"], cwd=REPO_ROOT)
+    subprocess.check_call(["python", "enterprise/scripts/render_benchmark_trend.py"])
 
     radar_png = f"release_kpis/radar_{version}.png"
     radar_svg = f"release_kpis/radar_{version}.svg"

@@ -1,0 +1,122 @@
+{
+  "version": "v2.0.8",
+  "scale": {
+    "min": 0,
+    "max": 10
+  },
+  "values": {
+    "technical_completeness": 10.0,
+    "automation_depth": 10.0,
+    "authority_modeling": 6.0,
+    "enterprise_readiness": 10.0,
+    "scalability": 10.0,
+    "data_integration": 10.0,
+    "economic_measurability": 4.88,
+    "operational_maturity": 10.0
+  },
+  "telemetry": {
+    "test_files": 202,
+    "workflows": 39,
+    "docs_md": 19,
+    "security_metrics_present": true,
+    "scalability_metrics_present": true,
+    "insights_metrics_present": true,
+    "insights": {
+      "present": true,
+      "source": "release_kpis/insights_metrics.json",
+      "score": 6.16,
+      "signals": 3
+    }
+  },
+  "eligibility": {
+    "schema": "kpi_eligibility_v1",
+    "tier_order": [
+      "unverified",
+      "simulated",
+      "real",
+      "production"
+    ],
+    "kpis": {
+      "technical_completeness": {
+        "tier": "production",
+        "tier_cap": 10.0,
+        "confidence": 0.9,
+        "missing_by_tier": {
+          "simulated": [],
+          "real": [],
+          "production": []
+        }
+      },
+      "automation_depth": {
+        "tier": "production",
+        "tier_cap": 10.0,
+        "confidence": 0.9,
+        "missing_by_tier": {
+          "simulated": [],
+          "real": [],
+          "production": []
+        }
+      },
+      "authority_modeling": {
+        "tier": "production",
+        "tier_cap": 10.0,
+        "confidence": 0.9,
+        "missing_by_tier": {
+          "simulated": [],
+          "real": [],
+          "production": []
+        }
+      },
+      "enterprise_readiness": {
+        "tier": "production",
+        "tier_cap": 10.0,
+        "confidence": 0.9,
+        "missing_by_tier": {
+          "simulated": [],
+          "real": [],
+          "production": []
+        }
+      },
+      "scalability": {
+        "tier": "production",
+        "tier_cap": 10.0,
+        "confidence": 0.9,
+        "missing_by_tier": {
+          "simulated": [],
+          "real": [],
+          "production": []
+        }
+      },
+      "data_integration": {
+        "tier": "production",
+        "tier_cap": 10.0,
+        "confidence": 0.9,
+        "missing_by_tier": {
+          "simulated": [],
+          "real": [],
+          "production": []
+        }
+      },
+      "economic_measurability": {
+        "tier": "production",
+        "tier_cap": 10.0,
+        "confidence": 0.9,
+        "missing_by_tier": {
+          "simulated": [],
+          "real": [],
+          "production": []
+        }
+      },
+      "operational_maturity": {
+        "tier": "production",
+        "tier_cap": 10.0,
+        "confidence": 0.9,
+        "missing_by_tier": {
+          "simulated": [],
+          "real": [],
+          "production": []
+        }
+      }
+    }
+  }
+}
