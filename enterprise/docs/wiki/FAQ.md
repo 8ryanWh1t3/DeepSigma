@@ -85,7 +85,7 @@ A CI gate (`make scalability-gate`) that compares the latest benchmark against t
 
 ## How does SSI recovery work?
 
-SSI (System Stability Index) penalizes large release-to-release KPI swings. Historical oscillations in automation_depth (v2.0.3–v2.0.7) drove `drift_acceleration_score` to 0.0 (30% of SSI weight). Recovery requires multiple consecutive stable releases to dilute the acceleration average below the 1.0 threshold. v2.0.8 improved SSI from 37.71 to 39.05 by adding scalability evidence (+4.62) while holding all other KPIs stable. SSI >= 55 is projected around v2.1.0.
+SSI (System Stability Index) penalizes large release-to-release KPI swings. Historical oscillations in automation_depth (v2.0.3–v2.0.7) drove `drift_acceleration_score` to 0.0 (30% of SSI weight). Recovery requires multiple consecutive stable releases to dilute the acceleration average below the 1.0 threshold. v2.0.9 SSI is 34.64 — the authority (+3.72) and economic (+5.12) lifts increased volatility short-term, but all 8 KPIs are now >= 7.0. Stability-focused releases (v2.1.0+) with minimal KPI deltas will drive SSI toward the >= 55 target.
 
 ## What is authority evidence?
 
@@ -98,6 +98,14 @@ The economic metrics artifact (`make economic-metrics`) produces `economic_metri
 ## What is a refusal contract?
 
 A refusal contract is an explicit authority action that blocks a specific action type. Created via `create_refusal_contract()`, it produces a `REFUSE:<action_type>` contract. The authority ledger records `AUTHORITY_REFUSAL` entries, and the FEEDS authority gate consumer checks for active refusals, emitting an `AUTHORITY_REFUSED` drift signal (severity red) when a refused action is attempted.
+
+## Are all 8 KPIs passing?
+
+Yes, as of v2.0.9. The KPI gate requires all 8 axes >= 7.0. v2.0.9 lifted the final two blockers: authority_modeling (6.0 → 9.72 via P0 #325 closure + signature custody/refusal/evidence chain) and economic_measurability (4.88 → 10.0 via dedicated `economic_metrics.json` with `kpi_eligible=true`). Current scores: technical_completeness=10, automation_depth=10, authority_modeling=9.72, enterprise_readiness=10, scalability=10, data_integration=10, economic_measurability=10, operational_maturity=10.
+
+## What is authority custody?
+
+Production signing key lifecycle management. Keys are generated via `openssl rand -hex 32`, stored in CI secrets (`DEEPSIGMA_SIGNING_KEY`), rotated every 90 days, and revoked via authority ledger entries. Each authority action now tracks `signing_key_id` for key provenance. See `docs/docs/security/KEY_CUSTODY.md`.
 
 ## What is the Reference Layer Manifesto?
 

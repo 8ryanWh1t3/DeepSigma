@@ -44,7 +44,7 @@ flowchart TD
     subgraph KPI["KPI Pipeline Integration"]
         SM --> KC["kpi_compute.py<br/>score_scalability()"]
         KC --> KM["kpi_merge.py<br/>eligibility tier: production"]
-        KM --> MERGED["kpi_v2.0.8_merged.json<br/>scalability: 10.0"]
+        KM --> MERGED["kpi_v2.0.9_merged.json<br/>scalability: 10.0"]
     end
 
     style Inputs fill:#16213e,stroke:#0f3460,color:#fff

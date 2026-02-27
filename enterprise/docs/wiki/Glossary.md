@@ -18,3 +18,5 @@
 - **Refusal Authority**: Explicit block on a specific action type via AUTHORITY_REFUSAL ledger entry and REFUSE action contract; triggers AUTHORITY_REFUSED drift signal
 - **Decision Cost Ledger**: Per-decision cost tracking derived from TEC pipeline — avg cost per decision, total cost, drift remediation delta, and patch value ratio
 - **Economic Evidence**: Dedicated `economic_metrics.json` artifact with `kpi_eligible=true` sourced from TEC + benchmark data, uncapping economic_measurability KPI
+- **Authority Custody**: Production signing key lifecycle — generation (`openssl rand`), env-based storage (`DEEPSIGMA_SIGNING_KEY`), 90-day rotation, revocation via authority ledger, with `signing_key_id` tracking
+- **KPI Gate**: Release gate requiring all 8 KPI axes >= 7.0; satisfied as of v2.0.9 with authority_modeling at 9.72 and economic_measurability at 10.0

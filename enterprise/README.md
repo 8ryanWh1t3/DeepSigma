@@ -10,14 +10,14 @@
 
 # Σ OVERWATCH
 
-**Current pilot release:** v2.0.8
-See: [docs/release/RELEASE_NOTES_v2.0.6.md](docs/release/RELEASE_NOTES_v2.0.6.md)
+**Current pilot release:** v2.0.9
+See: [docs/release/RELEASE_NOTES_v2.0.9.md](docs/release/RELEASE_NOTES_v2.0.9.md)
 
 ## Repo Radar KPI (latest)
 [![Repo KPI Badge](release_kpis/badge_latest.svg)](release_kpis/radar_composite_latest.png)
 [![Roadmap Badge](release_kpis/roadmap_badge.svg)](release_kpis/roadmap_timeline.svg)
 
-- Current release radar: [release_kpis/radar_v2.0.8.png](release_kpis/radar_v2.0.8.png)
+- Current release radar: [release_kpis/radar_v2.0.9.png](release_kpis/radar_v2.0.9.png)
 - Composite release radar: [release_kpis/radar_composite_latest.png](release_kpis/radar_composite_latest.png)
 - Composite release delta table: [release_kpis/radar_composite_latest.md](release_kpis/radar_composite_latest.md)
 - Gate report: [release_kpis/KPI_GATE_REPORT.md](release_kpis/KPI_GATE_REPORT.md)
@@ -26,7 +26,7 @@ See: [docs/release/RELEASE_NOTES_v2.0.6.md](docs/release/RELEASE_NOTES_v2.0.6.md
 - KPI history: [release_kpis/history.json](release_kpis/history.json)
 - KPI eligibility tiers: [governance/kpi_eligibility.json](governance/kpi_eligibility.json)
 - KPI confidence: [release_kpis/kpi_confidence.json](release_kpis/kpi_confidence.json)
-- KPI bands: [release_kpis/kpi_bands_v2.0.8.json](release_kpis/kpi_bands_v2.0.8.json)
+- KPI bands: [release_kpis/kpi_bands_v2.0.9.json](release_kpis/kpi_bands_v2.0.9.json)
 - Benchmark trend: [release_kpis/benchmark_trend.png](release_kpis/benchmark_trend.png)
 - Benchmark history: [release_kpis/benchmark_history.json](release_kpis/benchmark_history.json)
 - TEC summary (C-TEC v1.0): [release_kpis/TEC_SUMMARY.md](release_kpis/TEC_SUMMARY.md)
@@ -38,19 +38,21 @@ See: [docs/release/RELEASE_NOTES_v2.0.6.md](docs/release/RELEASE_NOTES_v2.0.6.md
 - Roadmap timeline: [release_kpis/roadmap_timeline.svg](release_kpis/roadmap_timeline.svg)
 - Roadmap scope gate: [release_kpis/ROADMAP_SCOPE_GATE_REPORT.md](release_kpis/ROADMAP_SCOPE_GATE_REPORT.md)
 - Nonlinear stability report: [release_kpis/nonlinear_stability_report.md](release_kpis/nonlinear_stability_report.md)
-- SSI artifact (current release): [release_kpis/stability_v2.0.8.json](release_kpis/stability_v2.0.8.json)
+- SSI artifact (current release): [release_kpis/stability_v2.0.9.json](release_kpis/stability_v2.0.9.json)
+- Authority evidence: [release_kpis/authority_evidence.json](release_kpis/authority_evidence.json)
+- Economic metrics: [release_kpis/economic_metrics.json](release_kpis/economic_metrics.json)
 - Stability-adjusted forecast: [release_kpis/stability_adjusted_forecast.json](release_kpis/stability_adjusted_forecast.json)
 - Feature catalog (human): [docs/FEATURE_CATALOG.md](docs/FEATURE_CATALOG.md)
 - Feature catalog (machine): [release_kpis/feature_catalog.json](release_kpis/feature_catalog.json)
 - Feature catalog renderer: [scripts/render_feature_catalog.py](scripts/render_feature_catalog.py)
 
-### Active Track (v2.1.0 — Security Hardening)
+### Active Track (v2.1.0 — Decision Infrastructure Hardening)
+
+- All 8 KPIs >= 7.0 (gate satisfied as of v2.0.9)
+- SSI >= 55 (stability recovery in progress)
 - DISR hardening
-- Confidence bands
-- Eligibility tiers
-- Security determinism enforcement
-- KPI integrity gating
-- TEC/C-TEC formalization
+- Deterministic replay + replay reproducibility
+- Enterprise deploy sanity + operator runbook
 
 ### Future Track (v2.1.1 — Institutional Expansion)
 - Enterprise Connectors

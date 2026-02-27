@@ -36,4 +36,5 @@ Mermaid diagrams:
 - [KPI Confidence Bands Flow](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/docs/mermaid/14-kpi-confidence-bands-flow.md)
 - [DISR Dual-Mode Architecture](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/docs/mermaid/15-disr-dual-mode-architecture.md)
 - [Authority Boundary Primitive](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/docs/mermaid/16-authority-boundary-primitive.md)
+- [Authority + Economic Evidence Pipeline](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/docs/mermaid/22-authority-economic-evidence.md)
 - [Archive Index](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/docs/archive/mermaid/ARCHIVE_INDEX.md)

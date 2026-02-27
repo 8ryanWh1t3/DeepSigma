@@ -130,7 +130,7 @@ Captures AI interaction exhaust (prompts, completions, tool calls, metrics) and 
 
 | Asset | Link |
 |------|------|
-| Latest release notes | [v2.0.6](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/docs/release/RELEASE_NOTES_v2.0.6.md) |
+| Latest release notes | [v2.0.9](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/docs/release/RELEASE_NOTES_v2.0.9.md) |
 | KPI composite radar | [release_kpis/radar_composite_latest.png](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/release_kpis/radar_composite_latest.png) |
 | KPI delta table | [release_kpis/radar_composite_latest.md](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/release_kpis/radar_composite_latest.md) |
 | TEC summary (C-TEC v1.0) | [release_kpis/TEC_SUMMARY.md](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/release_kpis/TEC_SUMMARY.md) |
