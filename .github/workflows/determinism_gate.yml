@@ -7,10 +7,10 @@ on:
   push:
     paths:
       - 'enterprise/src/tools/reconstruct/**'
-      - 'schemas/reconstruct/**'
-      - 'tests/test_deterministic_seal.py'
-      - 'tests/test_reconstruct_replay.py'
-      - 'tests/golden/**'
+      - 'enterprise/schemas/reconstruct/**'
+      - 'enterprise/tests/test_deterministic_seal.py'
+      - 'enterprise/tests/test_reconstruct_replay.py'
+      - 'enterprise/tests/golden/**'
 jobs:
   determinism:
     name: Determinism Verification
@@ -24,12 +24,12 @@ jobs:
 
       - name: Run unit tests
         run: |
-          python -m unittest tests.test_reconstruct_replay -v
-          python -m unittest tests.test_deterministic_seal -v
+          python -m unittest enterprise.tests.test_reconstruct_replay -v
+          python -m unittest enterprise.tests.test_deterministic_seal -v
 
       - name: Seal run 1 (fixed clock)
         run: >
-          python src/tools/reconstruct/seal_bundle.py
+          python enterprise/src/tools/reconstruct/seal_bundle.py
           --decision-id DEC-001
           --clock 2026-02-21T00:00:00Z
           --deterministic true
@@ -38,7 +38,7 @@ jobs:
 
       - name: Seal run 2 (same fixed clock)
         run: >
-          python src/tools/reconstruct/seal_bundle.py
+          python enterprise/src/tools/reconstruct/seal_bundle.py
           --decision-id DEC-001
           --clock 2026-02-21T00:00:00Z
           --deterministic true
@@ -68,14 +68,14 @@ jobs:
       - name: Replay sealed run 1
         run: |
           sealed=$(ls "$RUNNER_TEMP"/sealed1/RUN-*.json | grep -v manifest | head -1)
-          python src/tools/reconstruct/replay_sealed_run.py --sealed "$sealed"
+          python enterprise/src/tools/reconstruct/replay_sealed_run.py --sealed "$sealed"
 
       - name: Replay sealed run 2
         run: |
           sealed=$(ls "$RUNNER_TEMP"/sealed2/RUN-*.json | grep -v manifest | head -1)
-          python src/tools/reconstruct/replay_sealed_run.py --sealed "$sealed"
+          python enterprise/src/tools/reconstruct/replay_sealed_run.py --sealed "$sealed"
 
       - name: Determinism audit (sealed run 1)
         run: |
           sealed=$(ls "$RUNNER_TEMP"/sealed1/RUN-*.json | grep -v manifest | head -1)
-          python src/tools/reconstruct/determinism_audit.py --sealed "$sealed" --strict
+          python enterprise/src/tools/reconstruct/determinism_audit.py --sealed "$sealed" --strict

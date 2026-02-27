@@ -5,7 +5,7 @@ on:
     branches: [main]
     tags: ['v*']
     paths:
-      - 'docs/rdf/**'
+      - 'enterprise/docs/rdf/**'
       - 'enterprise/docker/Dockerfile.rdf'
       - '.github/workflows/docker-rdf.yml'
   workflow_dispatch:

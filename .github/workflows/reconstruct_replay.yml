@@ -6,10 +6,10 @@ permissions:
 on:
   push:
     paths:
-      - 'schemas/reconstruct/**'
+      - 'enterprise/schemas/reconstruct/**'
       - 'enterprise/src/tools/reconstruct/**'
-      - 'docs/governance/**'
-      - 'tests/test_reconstruct_*.py'
+      - 'enterprise/docs/governance/**'
+      - 'enterprise/tests/test_reconstruct_*.py'
 jobs:
   reconstruct:
     name: Seal + Replay Validation
@@ -23,7 +23,7 @@ jobs:
 
       - name: Run seal bundle builder (deterministic)
         run: >
-          python src/tools/reconstruct/seal_bundle.py
+          python enterprise/src/tools/reconstruct/seal_bundle.py
           --decision-id DEC-001
           --clock 2026-02-21T00:00:00Z
           --deterministic true
@@ -33,9 +33,9 @@ jobs:
       - name: Run replay on sealed output
         run: |
           sealed=$(ls "$RUNNER_TEMP"/sealed_runs/RUN-*.json | grep -v manifest | head -1)
-          python src/tools/reconstruct/replay_sealed_run.py --sealed "$sealed"
+          python enterprise/src/tools/reconstruct/replay_sealed_run.py --sealed "$sealed"
 
       - name: Run unit tests
         run: |
-          python -m unittest tests.test_reconstruct_replay -v
-          python -m unittest tests.test_deterministic_seal -v
+          python -m unittest enterprise.tests.test_reconstruct_replay -v
+          python -m unittest enterprise.tests.test_deterministic_seal -v

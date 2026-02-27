@@ -6,11 +6,11 @@ permissions:
 on:
   push:
     paths:
-      - 'artifacts/sample_data/prompt_os_v2/**'
-      - 'schemas/prompt_os/**'
+      - 'enterprise/artifacts/sample_data/prompt_os_v2/**'
+      - 'enterprise/schemas/prompt_os/**'
       - 'enterprise/src/tools/prompt_os/**'
-      - 'docs/prompt_os/**'
-      - 'tests/test_prompt_os_*.py'
+      - 'enterprise/docs/prompt_os/**'
+      - 'enterprise/tests/test_prompt_os_*.py'
 jobs:
   validate:
     name: CSV ↔ Schema Validation
@@ -23,17 +23,17 @@ jobs:
           python-version: '3.12'
 
       - name: Run schema validator
-        run: python src/tools/prompt_os/validate_prompt_os.py
+        run: python enterprise/src/tools/prompt_os/validate_prompt_os.py
 
       - name: Run hero loop smoke test
         run: >
-          python src/tools/prompt_os/drift_to_patch_demo.py
+          python enterprise/src/tools/prompt_os/drift_to_patch_demo.py
           --run-id RUN-CI
           --user ci
           --out-dir "$RUNNER_TEMP/sealed_runs"
 
       - name: Run unit tests
-        run: python -m unittest tests.test_prompt_os_hero_loop -v
+        run: python -m unittest enterprise.tests.test_prompt_os_hero_loop -v
 
   drift-guard:
     name: Drift Guard
@@ -46,11 +46,11 @@ jobs:
           status=0
 
           required_files=(
-            "docs/prompt_os/TABS_AND_SCHEMA.md"
-            "docs/prompt_os/SCORING.md"
-            "docs/prompt_os/PROMPTS.md"
-            "schemas/prompt_os/prompt_os_schema_v2.json"
-            "src/tools/prompt_os/validate_prompt_os.py"
+            "enterprise/docs/prompt_os/TABS_AND_SCHEMA.md"
+            "enterprise/docs/prompt_os/SCORING.md"
+            "enterprise/docs/prompt_os/PROMPTS.md"
+            "enterprise/schemas/prompt_os/prompt_os_schema_v2.json"
+            "enterprise/src/tools/prompt_os/validate_prompt_os.py"
           )
 
           for f in "${required_files[@]}"; do
@@ -63,12 +63,12 @@ jobs:
           done
 
           # Check that at least one CSV exists in sample_data
-          csv_count=$(find artifacts/sample_data/prompt_os_v2 -name '*.csv' 2>/dev/null | wc -l)
+          csv_count=$(find enterprise/artifacts/sample_data/prompt_os_v2 -name '*.csv' 2>/dev/null | wc -l)
           if [ "$csv_count" -eq 0 ]; then
-            echo "MISSING: artifacts/sample_data/prompt_os_v2/*.csv (no CSV files found)"
+            echo "MISSING: enterprise/artifacts/sample_data/prompt_os_v2/*.csv (no CSV files found)"
             status=1
           else
-            echo "OK:      artifacts/sample_data/prompt_os_v2/ ($csv_count CSV files)"
+            echo "OK:      enterprise/artifacts/sample_data/prompt_os_v2/ ($csv_count CSV files)"
           fi
 
           exit $status

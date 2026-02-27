@@ -24,15 +24,15 @@ LABEL org.opencontainers.image.description="Σ OVERWATCH RDF — Jena Fuseki SPA
 LABEL org.opencontainers.image.licenses="MIT"
 
 # Copy all ontology TTL files
-COPY docs/rdf/coherence-ops-ontology.ttl /staging/
-COPY docs/rdf/namespaces.ttl             /staging/
-COPY docs/rdf/ontology/claim_primitive.ttl       /staging/
-COPY docs/rdf/ontology/coherence_ops_core.ttl   /staging/
-COPY docs/rdf/ontology/coherence_ops_extended.ttl /staging/
+COPY enterprise/docs/rdf/coherence-ops-ontology.ttl /staging/
+COPY enterprise/docs/rdf/namespaces.ttl             /staging/
+COPY enterprise/docs/rdf/ontology/claim_primitive.ttl       /staging/
+COPY enterprise/docs/rdf/ontology/coherence_ops_core.ttl   /staging/
+COPY enterprise/docs/rdf/ontology/coherence_ops_extended.ttl /staging/
 
 # Copy sample data and SHACL shapes
-COPY docs/rdf/sample_data/ /staging/sample_data/
-COPY docs/rdf/shapes/      /staging/shapes/
+COPY enterprise/docs/rdf/sample_data/ /staging/sample_data/
+COPY enterprise/docs/rdf/shapes/      /staging/shapes/
 
 # Create Fuseki dataset config
 COPY <<'FUSEKI_CONF' /fuseki/configuration/deepsigma.ttl

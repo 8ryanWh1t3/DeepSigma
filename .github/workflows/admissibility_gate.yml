@@ -7,13 +7,13 @@ on:
   push:
     paths:
       - 'enterprise/src/tools/reconstruct/**'
-      - 'schemas/reconstruct/**'
-      - 'tests/test_transparency*'
-      - 'tests/test_multisig*'
-      - 'tests/test_merkle*'
-      - 'tests/test_seal_and_prove*'
-      - 'tests/test_authority_ledger*'
-      - 'tests/test_verify_pack*'
+      - 'enterprise/schemas/reconstruct/**'
+      - 'enterprise/tests/test_transparency*'
+      - 'enterprise/tests/test_multisig*'
+      - 'enterprise/tests/test_merkle*'
+      - 'enterprise/tests/test_seal_and_prove*'
+      - 'enterprise/tests/test_authority_ledger*'
+      - 'enterprise/tests/test_verify_pack*'
 jobs:
   admissibility:
     name: Court-Grade Admissibility
@@ -27,18 +27,18 @@ jobs:
 
       - name: Run new test suites
         run: |
-          python -m unittest tests.test_merkle_commitments -v
-          python -m unittest tests.test_transparency_log -v
-          python -m unittest tests.test_multisig -v
-          python -m unittest tests.test_seal_and_prove -v
-          python -m unittest tests.test_authority_ledger -v
-          python -m unittest tests.test_verify_pack -v
+          python -m unittest enterprise.tests.test_merkle_commitments -v
+          python -m unittest enterprise.tests.test_transparency_log -v
+          python -m unittest enterprise.tests.test_multisig -v
+          python -m unittest enterprise.tests.test_seal_and_prove -v
+          python -m unittest enterprise.tests.test_authority_ledger -v
+          python -m unittest enterprise.tests.test_verify_pack -v
 
       - name: Run existing regression suites
         run: |
-          python -m unittest tests.test_deterministic_seal -v
-          python -m unittest tests.test_reconstruct_replay -v
-          python -m unittest tests.test_signature_support -v
+          python -m unittest enterprise.tests.test_deterministic_seal -v
+          python -m unittest enterprise.tests.test_reconstruct_replay -v
+          python -m unittest enterprise.tests.test_signature_support -v
 
       - name: Generate HMAC key
         run: |
@@ -47,7 +47,7 @@ jobs:
 
       - name: Seal-and-prove pipeline
         run: >
-          python src/tools/reconstruct/seal_and_prove.py
+          python enterprise/src/tools/reconstruct/seal_and_prove.py
           --decision-id DEC-001
           --clock 2026-02-21T00:00:00Z
           --sign-algo hmac
@@ -62,14 +62,14 @@ jobs:
 
       - name: Verify transparency chain
         run: >
-          python src/tools/reconstruct/transparency_log_append.py
+          python enterprise/src/tools/reconstruct/transparency_log_append.py
           --log-path "$RUNNER_TEMP/log.ndjson"
           --verify-only
 
       - name: Full replay with all flags
         run: |
           sealed=$(ls "$RUNNER_TEMP"/sealed/RUN-*.json | grep -v '\.sig\.' | grep -v manifest | head -1)
-          python src/tools/reconstruct/replay_sealed_run.py \
+          python enterprise/src/tools/reconstruct/replay_sealed_run.py \
             --sealed "$sealed" \
             --verify-signature true \
             --key "$SIGN_KEY" \
@@ -79,16 +79,16 @@ jobs:
       - name: Determinism audit (strict)
         run: |
           sealed=$(ls "$RUNNER_TEMP"/sealed/RUN-*.json | grep -v '\.sig\.' | grep -v manifest | head -1)
-          python src/tools/reconstruct/determinism_audit.py --sealed "$sealed" --strict
+          python enterprise/src/tools/reconstruct/determinism_audit.py --sealed "$sealed" --strict
 
       - name: Authority ledger chain verification
         run: >
-          python src/tools/reconstruct/authority_ledger_append.py
+          python enterprise/src/tools/reconstruct/authority_ledger_append.py
           --ledger-path "$RUNNER_TEMP/ledger.ndjson"
           --verify-only
 
       - name: Verify pack (one-command)
         run: >
-          python src/tools/reconstruct/verify_pack.py
+          python enterprise/src/tools/reconstruct/verify_pack.py
           --pack "$RUNNER_TEMP/pack"
           --key "$SIGN_KEY"
