@@ -1,6 +1,6 @@
 # Constitution Gate Report
 
-**Generated:** 2026-02-27T22:51:55.817527+00:00
+**Generated:** 2026-02-27T23:34:23.320403+00:00
 **Result:** PASS
 
 
@@ -10,7 +10,7 @@
 
 ## Version Parity: PASS
 
-pyproject=2.0.7 policy=GOV-2.0.8
+pyproject=2.0.9 policy=GOV-2.0.9
 
 ## GPE Sub-Scan: PASS
 
@@ -18,7 +18,7 @@ pyproject=2.0.7 policy=GOV-2.0.8
 
 ## VERSION File: PASS
 
-Written: 2.0.7
+Written: 2.0.9
 
 ## CHANGELOG Annotation: PASS
 

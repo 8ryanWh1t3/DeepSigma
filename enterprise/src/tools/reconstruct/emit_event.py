@@ -21,7 +21,7 @@ from canonical_json import canonical_dumps, sha256_text
 from deterministic_ids import det_id
 from time_controls import observed_now
 
-DEFAULT_TELEMETRY_DIR = Path("artifacts/sample_data/prompt_os_telemetry")
+DEFAULT_TELEMETRY_DIR = Path("enterprise/artifacts/sample_data/prompt_os_telemetry")
 
 VALID_EVENT_TYPES = [
     "drift_flag",

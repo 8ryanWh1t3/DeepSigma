@@ -29,12 +29,12 @@ from time_controls import format_utc, format_utc_compact, observed_now, parse_cl
 
 
 # ── Defaults ──────────────────────────────────────────────────────
-DEFAULT_DATA_DIR = Path("artifacts/sample_data/prompt_os_v2")
-DEFAULT_OUT_DIR = Path("artifacts/sealed_runs")
-DEFAULT_PROMPTS_DIR = Path("prompts")
-DEFAULT_SCHEMAS_DIR = Path("schemas")
-DEFAULT_POLICY_BASELINE = Path("docs/governance/POLICY_BASELINE.md")
-DEFAULT_POLICY_VERSION = Path("docs/governance/POLICY_VERSION.txt")
+DEFAULT_DATA_DIR = Path("enterprise/artifacts/sample_data/prompt_os_v2")
+DEFAULT_OUT_DIR = Path("enterprise/artifacts/sealed_runs")
+DEFAULT_PROMPTS_DIR = Path("enterprise/prompts")
+DEFAULT_SCHEMAS_DIR = Path("enterprise/schemas")
+DEFAULT_POLICY_BASELINE = Path("enterprise/docs/governance/POLICY_BASELINE.md")
+DEFAULT_POLICY_VERSION = Path("enterprise/docs/governance/POLICY_VERSION.txt")
 
 REFUSAL_CHECKS = [
     "authority_present",

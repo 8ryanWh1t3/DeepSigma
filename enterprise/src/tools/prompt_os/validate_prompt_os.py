@@ -156,12 +156,12 @@ def main() -> int:
     parser.add_argument(
         "--csv-dir",
         type=Path,
-        default=Path("artifacts/sample_data/prompt_os_v2"),
+        default=Path("enterprise/artifacts/sample_data/prompt_os_v2"),
     )
     parser.add_argument(
         "--schema",
         type=Path,
-        default=Path("schemas/prompt_os/prompt_os_schema_v2.json"),
+        default=Path("enterprise/schemas/prompt_os/prompt_os_schema_v2.json"),
     )
     args = parser.parse_args()
 

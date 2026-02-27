@@ -53,12 +53,12 @@ from sign_artifact import append_signature, sign_artifact  # noqa: E402
 from transparency_log_append import append_entry  # noqa: E402
 
 
-DEFAULT_DATA_DIR = Path("artifacts/sample_data/prompt_os_v2")
-DEFAULT_OUT_DIR = Path("artifacts/sealed_runs")
-DEFAULT_PROMPTS_DIR = Path("prompts")
-DEFAULT_SCHEMAS_DIR = Path("schemas")
-DEFAULT_POLICY_BASELINE = Path("docs/governance/POLICY_BASELINE.md")
-DEFAULT_POLICY_VERSION = Path("docs/governance/POLICY_VERSION.txt")
+DEFAULT_DATA_DIR = Path("enterprise/artifacts/sample_data/prompt_os_v2")
+DEFAULT_OUT_DIR = Path("enterprise/artifacts/sealed_runs")
+DEFAULT_PROMPTS_DIR = Path("enterprise/prompts")
+DEFAULT_SCHEMAS_DIR = Path("enterprise/schemas")
+DEFAULT_POLICY_BASELINE = Path("enterprise/docs/governance/POLICY_BASELINE.md")
+DEFAULT_POLICY_VERSION = Path("enterprise/docs/governance/POLICY_VERSION.txt")
 DEFAULT_LOG_PATH = Path("artifacts/transparency_log/log.ndjson")
 DEFAULT_AUTHORITY_LEDGER = Path("artifacts/authority_ledger/ledger.ndjson")
 

@@ -31,12 +31,12 @@ DEMO_KEY_ID = "ds-demo-public-2026"
 FIXED_CLOCK = "2026-02-21T00:00:00Z"
 DEMO_DECISION_ID = "DEC-001"
 
-DEFAULT_OUT_DIR = Path("artifacts/public_demo_pack")
-DEFAULT_DATA_DIR = Path("artifacts/sample_data/prompt_os_v2")
-DEFAULT_PROMPTS_DIR = Path("prompts")
-DEFAULT_SCHEMAS_DIR = Path("schemas")
-DEFAULT_POLICY_BASELINE = Path("docs/governance/POLICY_BASELINE.md")
-DEFAULT_POLICY_VERSION = Path("docs/governance/POLICY_VERSION.txt")
+DEFAULT_OUT_DIR = Path("enterprise/artifacts/public_demo_pack")
+DEFAULT_DATA_DIR = Path("enterprise/artifacts/sample_data/prompt_os_v2")
+DEFAULT_PROMPTS_DIR = Path("enterprise/prompts")
+DEFAULT_SCHEMAS_DIR = Path("enterprise/schemas")
+DEFAULT_POLICY_BASELINE = Path("enterprise/docs/governance/POLICY_BASELINE.md")
+DEFAULT_POLICY_VERSION = Path("enterprise/docs/governance/POLICY_VERSION.txt")
 
 
 def generate_demo_pack(
