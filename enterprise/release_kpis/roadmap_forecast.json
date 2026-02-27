@@ -1,22 +1,22 @@
 {
   "schema": "roadmap_forecast_v2",
   "inputs": {
-    "kpi_source": "kpi_v2.0.6_merged.json",
+    "kpi_source": "kpi_v2.0.7_merged.json",
     "control_source": "release_kpis/health/tec_ctec_latest.json",
-    "control_factor": 0.7
+    "control_factor": 0.595
   },
   "forecast": {
     "v2.1.0": {
       "status": "active",
       "kpi_current": {
         "technical_completeness": 10.0,
-        "automation_depth": 6.0,
+        "automation_depth": 10.0,
         "authority_modeling": 6.0,
         "enterprise_readiness": 10.0,
         "scalability": 5.38,
-        "data_integration": 9.88,
-        "economic_measurability": 4.54,
-        "operational_maturity": 9.3
+        "data_integration": 10.0,
+        "economic_measurability": 4.88,
+        "operational_maturity": 10.0
       },
       "kpi_delta_raw": {
         "technical_completeness": 0.4,
@@ -29,39 +29,39 @@
         "operational_maturity": 2.0
       },
       "kpi_delta_expected": {
-        "technical_completeness": 0.28,
-        "automation_depth": 1.4,
-        "authority_modeling": 0.35,
+        "technical_completeness": 0.24,
+        "automation_depth": 1.19,
+        "authority_modeling": 0.3,
         "enterprise_readiness": 0.0,
         "scalability": 0.0,
         "data_integration": 0.0,
-        "economic_measurability": 1.4,
-        "operational_maturity": 1.4
+        "economic_measurability": 1.19,
+        "operational_maturity": 1.19
       },
       "kpi_projected": {
         "technical_completeness": 10.0,
-        "automation_depth": 7.4,
-        "authority_modeling": 6.35,
+        "automation_depth": 10.0,
+        "authority_modeling": 6.3,
         "enterprise_readiness": 10.0,
         "scalability": 5.38,
-        "data_integration": 9.88,
-        "economic_measurability": 5.94,
+        "data_integration": 10.0,
+        "economic_measurability": 6.07,
         "operational_maturity": 10.0
       },
-      "confidence": 0.71,
+      "confidence": 0.69,
       "notes": "Forecast is deterministic from roadmap statements and auto-scaled by current control coverage (C-TEC total control factor)."
     },
     "v2.1.1": {
       "status": "dormant",
       "kpi_current": {
         "technical_completeness": 10.0,
-        "automation_depth": 6.0,
+        "automation_depth": 10.0,
         "authority_modeling": 6.0,
         "enterprise_readiness": 10.0,
         "scalability": 5.38,
-        "data_integration": 9.88,
-        "economic_measurability": 4.54,
-        "operational_maturity": 9.3
+        "data_integration": 10.0,
+        "economic_measurability": 4.88,
+        "operational_maturity": 10.0
       },
       "kpi_delta_raw": {
         "technical_completeness": 0.3,
@@ -74,26 +74,26 @@
         "operational_maturity": 2.0
       },
       "kpi_delta_expected": {
-        "technical_completeness": 0.21,
+        "technical_completeness": 0.18,
         "automation_depth": 0.0,
-        "authority_modeling": 1.05,
-        "enterprise_readiness": 0.84,
-        "scalability": 0.77,
-        "data_integration": 1.4,
+        "authority_modeling": 0.89,
+        "enterprise_readiness": 0.71,
+        "scalability": 0.65,
+        "data_integration": 1.19,
         "economic_measurability": 0.0,
-        "operational_maturity": 1.4
+        "operational_maturity": 1.19
       },
       "kpi_projected": {
         "technical_completeness": 10.0,
-        "automation_depth": 6.0,
-        "authority_modeling": 7.05,
+        "automation_depth": 10.0,
+        "authority_modeling": 6.89,
         "enterprise_readiness": 10.0,
-        "scalability": 6.15,
+        "scalability": 6.03,
         "data_integration": 10.0,
-        "economic_measurability": 4.54,
+        "economic_measurability": 4.88,
         "operational_maturity": 10.0
       },
-      "confidence": 0.42,
+      "confidence": 0.41,
       "notes": "Forecast is deterministic from roadmap statements and auto-scaled by current control coverage (C-TEC total control factor)."
     }
   }

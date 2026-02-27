@@ -1,4 +1,4 @@
-# Nonlinear Stability Report — v2.0.6
+# Nonlinear Stability Report — v2.0.7
 
 ## A) System Stability Index (SSI) Math
 
@@ -10,9 +10,9 @@ Where each component is normalized to `0..100` (higher is more stable):
 - Authority sensitivity score: authority strength and authority volatility penalty
 - Economic variance score: TEC spread ratio and economic KPI variance penalty
 
-- SSI: **36.47**
+- SSI: **37.71**
 - Confidence: **0.89**
-- Band: **[34.27, 38.67]**
+- Band: **[35.51, 39.91]**
 
 ## B) Instability Gating Thresholds
 
@@ -26,50 +26,50 @@ Where each component is normalized to `0..100` (higher is more stable):
 ## C) Forecasted Radar Movement (Stability-Adjusted)
 
 ### v2.1.0 (active)
-- Factors: roadmap_confidence=0.71, drift_factor=0.6
+- Factors: roadmap_confidence=0.69, drift_factor=0.6
 | KPI | Adjusted Delta |
 |---|---:|
-| technical_completeness | 0.12 |
-| automation_depth | 0.60 |
-| authority_modeling | 0.15 |
+| technical_completeness | 0.10 |
+| automation_depth | 0.49 |
+| authority_modeling | 0.12 |
 | enterprise_readiness | 0.00 |
 | scalability | 0.00 |
 | data_integration | 0.00 |
-| economic_measurability | 0.60 |
-| operational_maturity | 0.60 |
+| economic_measurability | 0.49 |
+| operational_maturity | 0.49 |
 
 ### v2.1.1 (dormant)
-- Factors: roadmap_confidence=0.42, drift_factor=0.6
+- Factors: roadmap_confidence=0.41, drift_factor=0.6
 | KPI | Adjusted Delta |
 |---|---:|
-| technical_completeness | 0.05 |
+| technical_completeness | 0.04 |
 | automation_depth | 0.00 |
-| authority_modeling | 0.26 |
-| enterprise_readiness | 0.21 |
-| scalability | 0.19 |
-| data_integration | 0.35 |
+| authority_modeling | 0.22 |
+| enterprise_readiness | 0.17 |
+| scalability | 0.16 |
+| data_integration | 0.29 |
 | economic_measurability | 0.00 |
-| operational_maturity | 0.35 |
+| operational_maturity | 0.29 |
 
-## D) v2.0.6 Instability Simulation
+## D) v2.0.7 Instability Simulation
 
 Scenario stress-tests on the current release baseline:
 
 ### Mild
 - Description: single-cycle turbulence with constrained spread
-- Projected SSI: **19.97**
+- Projected SSI: **21.21**
 - Projected drift_acceleration_index: **1.0**
 - Gate: **FAIL**
 
 ### Moderate
 - Description: broad system stress and governance lag
-- Projected SSI: **15.47**
+- Projected SSI: **16.71**
 - Projected drift_acceleration_index: **1.0**
 - Gate: **FAIL**
 
 ### Severe
 - Description: compound drift with authority + economic instability
-- Projected SSI: **9.8**
+- Projected SSI: **11.04**
 - Projected drift_acceleration_index: **1.0**
 - Gate: **FAIL**
 

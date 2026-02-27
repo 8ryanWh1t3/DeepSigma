@@ -1,7 +1,7 @@
 {
   "schema": "tec_ctec_v2",
   "mode": "report_only",
-  "generated_at": "2026-02-27T18:29:19Z",
+  "generated_at": "2026-02-27T22:12:56Z",
   "inputs": {
     "policy": "enterprise/governance/tec_ctec_policy.json",
     "icr_latest_present": true,
@@ -17,16 +17,16 @@
   },
   "core": {
     "inventory": {
-      "files": 118,
-      "directories": 14,
+      "files": 266,
+      "directories": 22,
       "loc": 17040,
       "packages": 8,
       "configs": 45,
       "tests": 20,
       "run_surfaces": 3,
-      "artifacts": 20
+      "artifacts": 21
     },
-    "tec": 197.0,
+    "tec": 345.0,
     "controls": {
       "required": 6,
       "passed": 6,
@@ -41,21 +41,21 @@
       }
     },
     "control_coverage": 0.595,
-    "ctec": 117.21,
-    "r_tec": 515.0
+    "ctec": 205.27,
+    "r_tec": 663.0
   },
   "enterprise": {
     "inventory": {
-      "files": 885,
-      "directories": 144,
-      "loc": 90528,
+      "files": 1069,
+      "directories": 182,
+      "loc": 91434,
       "packages": 32,
-      "configs": 123,
+      "configs": 132,
       "tests": 1,
-      "run_surfaces": 114,
-      "artifacts": 192
+      "run_surfaces": 116,
+      "artifacts": 204
     },
-    "tec": 1235.6,
+    "tec": 1425.4,
     "controls": {
       "required": 6,
       "passed": 6,
@@ -70,21 +70,21 @@
       }
     },
     "control_coverage": 0.595,
-    "ctec": 735.18,
-    "r_tec": 1553.6
+    "ctec": 848.11,
+    "r_tec": 1743.4
   },
   "total": {
     "inventory": {
-      "files": 1489,
-      "directories": 255,
-      "loc": 142594,
+      "files": 17255,
+      "directories": 3181,
+      "loc": 228057,
       "packages": 43,
-      "configs": 320,
+      "configs": 1906,
       "tests": 129,
-      "run_surfaces": 138,
-      "artifacts": 200
+      "run_surfaces": 142,
+      "artifacts": 212
     },
-    "tec": 2216.0,
+    "tec": 18307.2,
     "controls": {
       "required": 12,
       "passed": 12,
@@ -92,7 +92,7 @@
       "checks_scope": "composite(core+enterprise)"
     },
     "control_coverage": 0.595,
-    "ctec": 1318.52,
-    "r_tec": 2534.0
+    "ctec": 10892.78,
+    "r_tec": 18625.2
   }
 }

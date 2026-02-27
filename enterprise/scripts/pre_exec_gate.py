@@ -36,7 +36,7 @@ def run_gate(
     decision_path: Path | None,
 ) -> None:
     check = subprocess.run(
-        [sys.executable, "scripts/validate_intent_packet.py", "--path", str(intent_path)],
+        [sys.executable, "enterprise/scripts/validate_intent_packet.py", "--path", str(intent_path)],
         capture_output=True,
         text=True,
     )

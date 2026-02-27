@@ -108,7 +108,7 @@ stability:
 	python enterprise/scripts/nonlinear_stability.py
 
 kpi:
-	cd enterprise && python scripts/kpi_run.py
+	python enterprise/scripts/kpi_run.py
 
 validate-feeds:
 	python -m pytest tests/test_feeds_schemas.py tests/test_feeds_envelope.py tests/test_feeds_cli.py -v

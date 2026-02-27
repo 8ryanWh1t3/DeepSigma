@@ -32,7 +32,7 @@ def export_pack(pack_dir: Path, files: list[Path]) -> None:
 
 
 def generate_proof() -> None:
-    result = subprocess.run([sys.executable, "scripts/crypto_proof.py"], capture_output=True, text=True)
+    result = subprocess.run([sys.executable, "enterprise/scripts/crypto_proof.py"], capture_output=True, text=True)
     if result.returncode != 0:
         raise RuntimeError((result.stdout + "\n" + result.stderr).strip())
 

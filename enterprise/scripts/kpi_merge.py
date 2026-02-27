@@ -19,7 +19,7 @@ def main() -> int:
     values = dict(manual.get("values", {}))
 
     telemetry = json.loads(
-        subprocess.check_output(["python", "scripts/kpi_compute.py"], text=True)
+        subprocess.check_output(["python", "enterprise/scripts/kpi_compute.py"], text=True)
     )
 
     for key, value in telemetry.items():

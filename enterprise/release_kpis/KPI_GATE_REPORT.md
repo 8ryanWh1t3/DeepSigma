@@ -1,4 +1,4 @@
-# KPI Gate Report - v2.0.6
+# KPI Gate Report - v2.0.7
 
 
 ## PASS

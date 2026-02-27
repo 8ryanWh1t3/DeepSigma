@@ -12,7 +12,7 @@ ART = ROOT / "artifacts" / "sealed_runs"
 
 
 def run_ci() -> int:
-    out = subprocess.check_output(["python", "scripts/compute_ci.py"], text=True)
+    out = subprocess.check_output(["python", "enterprise/scripts/compute_ci.py"], text=True)
     for line in out.splitlines():
         if line.strip().startswith("CI score:"):
             return int(line.split(":")[1].strip())

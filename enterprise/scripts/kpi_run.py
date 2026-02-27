@@ -54,15 +54,18 @@ def main() -> int:
         raise SystemExit(f"Missing {manual}. Create it first.")
 
     # Merge telemetry into kpi_{version}_merged.json.
-    subprocess.check_call(["python", "scripts/kpi_merge.py"])
+    subprocess.check_call(["python", "enterprise/scripts/kpi_merge.py"])
     merged = outdir / f"kpi_{version}_merged.json"
     merged_data = json.loads(merged.read_text(encoding="utf-8"))
+
+    # Generate confidence bands before radar so banded radar can be rendered.
+    subprocess.check_call(["python", "enterprise/scripts/kpi_confidence_bands.py"])
 
     # Render radar + badge from merged values.
     subprocess.check_call(
         [
             "python",
-            "scripts/render_radar.py",
+            "enterprise/scripts/render_radar.py",
             "--kpi",
             str(merged),
             "--outdir",
@@ -72,20 +75,19 @@ def main() -> int:
     subprocess.check_call(
         [
             "python",
-            "scripts/render_badge.py",
+            "enterprise/scripts/render_badge.py",
             "--kpi",
             str(merged),
             "--out",
             "release_kpis/badge_latest.svg",
         ]
     )
-    subprocess.check_call(["python", "scripts/kpi_confidence_bands.py"])
 
     # Gate + history update.  Run gate first but defer failure so remaining
     # artifacts (trend, radar, roadmap, stability, tec) are still generated.
-    gate_result = subprocess.run(["python", "scripts/kpi_gate.py"])
-    subprocess.check_call(["python", "scripts/render_kpi_trend.py"])
-    subprocess.check_call(["python", "scripts/render_composite_radar.py"])
+    gate_result = subprocess.run(["python", "enterprise/scripts/kpi_gate.py"])
+    subprocess.check_call(["python", "enterprise/scripts/render_kpi_trend.py"])
+    subprocess.check_call(["python", "enterprise/scripts/render_composite_radar.py"])
     subprocess.check_call(["make", "roadmap-refresh"], cwd=REPO_ROOT)
     subprocess.check_call(["make", "stability"], cwd=REPO_ROOT)
     subprocess.check_call(["make", "tec"], cwd=REPO_ROOT)

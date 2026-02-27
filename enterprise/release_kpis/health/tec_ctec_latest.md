@@ -5,22 +5,22 @@
 - PCR: **extreme** (CCF=0.7, CL14=687)
 
 ## CORE
-- TEC: **197.0**
+- TEC: **345.0**
 - KPI coverage: **1.0**
 - Control coverage: **0.595**
-- C-TEC: **117.21**
-- R-TEC: **515.0**
+- C-TEC: **205.27**
+- R-TEC: **663.0**
 
 ## ENTERPRISE
-- TEC: **1235.6**
+- TEC: **1425.4**
 - KPI coverage: **1.0**
 - Control coverage: **0.595**
-- C-TEC: **735.18**
-- R-TEC: **1553.6**
+- C-TEC: **848.11**
+- R-TEC: **1743.4**
 
 ## TOTAL
-- TEC: **2216.0**
+- TEC: **18307.2**
 - KPI coverage: **1.0**
 - Control coverage: **0.595**
-- C-TEC: **1318.52**
-- R-TEC: **2534.0**
+- C-TEC: **10892.78**
+- R-TEC: **18625.2**
