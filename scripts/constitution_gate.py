@@ -3,10 +3,12 @@
 Constitution Gate — enforces the immutable contract surface.
 
 Checks:
-  1. Schema fingerprints match manifest (detects silent breaks)
+  1. Schema fingerprints + contract fingerprint match manifest
   2. Policy version parity (POLICY_VERSION.txt ↔ pyproject.toml)
   3. GPE sub-scan on constitution paths
   4. VERSION file reflects pyproject.toml
+  5. CHANGELOG annotation (BREAKING/COMPATIBLE/ADDITIVE)
+  6. TEC/C-TEC policy structure (formula weights, required keys)
 
 Usage:
   python scripts/constitution_gate.py          # validate
@@ -163,6 +165,38 @@ def validate_changelog_annotation() -> tuple[bool, str]:
     return False, "Latest CHANGELOG entry missing BREAKING:/COMPATIBLE:/ADDITIVE: annotation."
 
 
+TEC_POLICY = ROOT / "enterprise" / "governance" / "tec_ctec_policy.json"
+TEC_REQUIRED_KEYS = {"tec_formula", "icr_rcf", "ccf_map", "tec_rates", "edition_roots"}
+TEC_FORMULA_VARS = {"F", "P", "C", "R", "T"}
+
+
+def validate_tec_policy() -> tuple[bool, str]:
+    """Validate the TEC/C-TEC policy JSON is structurally sound."""
+    if not TEC_POLICY.exists():
+        return False, "enterprise/governance/tec_ctec_policy.json not found."
+    try:
+        policy = json.loads(TEC_POLICY.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as e:
+        return False, f"Invalid JSON: {e}"
+
+    missing = TEC_REQUIRED_KEYS - set(policy.keys())
+    if missing:
+        return False, f"Missing keys: {', '.join(sorted(missing))}"
+
+    formula = policy.get("tec_formula", {})
+    missing_vars = TEC_FORMULA_VARS - set(formula.keys())
+    if missing_vars:
+        return False, f"Missing formula variables: {', '.join(sorted(missing_vars))}"
+
+    for var in TEC_FORMULA_VARS:
+        val = formula.get(var)
+        if not isinstance(val, (int, float)):
+            return False, f"Formula variable {var} must be numeric, got {type(val).__name__}"
+
+    weights = " ".join(f"{k}={formula[k]}" for k in sorted(TEC_FORMULA_VARS))
+    return True, f"Policy valid. Formula: {weights}"
+
+
 def write_version(version: str) -> None:
     VERSION_FILE.write_text(version + "\n", encoding="utf-8")
 
@@ -244,6 +278,10 @@ def main() -> int:
     # 5. CHANGELOG annotation
     cl_pass, cl_detail = validate_changelog_annotation()
     checks.append(("CHANGELOG Annotation", cl_pass, cl_detail))
+
+    # 6. TEC/C-TEC policy
+    tec_pass, tec_detail = validate_tec_policy()
+    checks.append(("TEC Policy", tec_pass, tec_detail))
 
     # Write report
     all_pass = write_report(checks)

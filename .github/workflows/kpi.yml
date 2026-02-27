@@ -89,6 +89,10 @@ jobs:
             enterprise/release_kpis/radar_*.svg
             enterprise/release_kpis/radar_composite_latest.md
             enterprise/release_kpis/kpi_*merged.json
+            enterprise/release_kpis/tec_*.json
+            enterprise/release_kpis/TEC_SUMMARY.md
+            enterprise/release_kpis/health/*.json
+            enterprise/release_kpis/health/*.md
             pilot_pack/**
 
       - name: Post PR comment (Repo KPI)

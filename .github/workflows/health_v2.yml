@@ -11,7 +11,7 @@ on:
     - cron: "15 13 * * 1-5"
 
 permissions:
-  contents: read
+  contents: write
   issues: read
   pull-requests: write
 
@@ -54,7 +54,16 @@ jobs:
           python enterprise/scripts/tec_ctec.py --snapshot
           python enterprise/scripts/health_summary.py
 
+      - name: Commit TEC/C-TEC results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add enterprise/release_kpis/health/ enterprise/release_kpis/tec_*.json enterprise/release_kpis/TEC_SUMMARY.md
+          git diff --cached --quiet || git commit -m "chore(tec): update health + TEC/C-TEC artifacts [skip ci]"
+          git push
+
       - name: Upload health artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: health-v2-artifacts
@@ -62,3 +71,5 @@ jobs:
             enterprise/release_kpis/health/*.json
             enterprise/release_kpis/health/*.md
             enterprise/release_kpis/health/history/*.json
+            enterprise/release_kpis/tec_*.json
+            enterprise/release_kpis/TEC_SUMMARY.md

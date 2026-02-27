@@ -1,6 +1,6 @@
 # Constitution Gate Report
 
-**Generated:** 2026-02-27T18:11:30.031513+00:00
+**Generated:** 2026-02-27T18:21:10.277937+00:00
 **Result:** PASS
 
 
@@ -23,4 +23,8 @@ Written: 2.0.6
 ## CHANGELOG Annotation: PASS
 
 Latest entry has `ADDITIVE:` annotation.
+
+## TEC Policy: PASS
+
+Policy valid. Formula: C=0.2 F=1.0 P=3.0 R=2.0 T=2.0
 
