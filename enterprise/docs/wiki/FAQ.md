@@ -59,6 +59,22 @@ Four composable metric points via `coherence metrics`:
 
 Yes. The static site lives at `docs/site/` and deploys to GitHub Pages on push to `main`. No JavaScript or build tooling — pure HTML/CSS with a terminal aesthetic. Run `make site-content` to regenerate the data files.
 
+## What is the System Stability Index (SSI)?
+
+A 0-100 composite metric that detects unsustainable KPI swings across releases. Formula: `SSI = 0.35*Volatility + 0.30*DriftAccel + 0.20*Authority + 0.15*Economic`. Gates: PASS >= 70, WARN >= 55, FAIL < 55. SSI penalizes large release-to-release KPI deltas (volatility) and accelerating drift (second derivative of KPI movements). Recovery requires multiple stable releases to dilute historical acceleration. See `enterprise/scripts/nonlinear_stability.py`.
+
+## What is TEC sensitivity analysis?
+
+An economic fragility assessment that measures how C-TEC costs shift when governance health factors (RCF from ICR, CCF from PCR) change by one tier. Outputs: cost volatility index (stddev/mean of tier costs), sensitivity bands, economic fragility score (0-100), and a human-readable report. Run via `make tec-sensitivity`.
+
+## What is the security proof pack?
+
+An integrity-chain-aware security report replacing the earlier stub gate. Checks four areas: (1) key lifecycle documentation (generation, rotation, revocation), (2) crypto proof script validity, (3) seal chain integrity (hash chain continuity), (4) contract fingerprint consistency. Outputs `security_proof_pack.json` and enriched `SECURITY_GATE_REPORT.md`. Run via `make security-gate`.
+
+## What is the stale artifact kill-switch?
+
+A CI gate that prevents stale or missing release artifacts from passing the pipeline. Five checks: version match, current-version radar exists, badge freshness, history appended, contract fingerprint match. Run via `make verify-release-artifacts`.
+
 ## What is the Reference Layer Manifesto?
 
 The manifesto (`docs/manifesto.md`) defines three institutional failures that agentic AI creates — decision amnesia, authority vacuum, and silent drift — and the contract a reference layer must satisfy: intent explicit, authority verified, logic auditable, outcomes sealed.

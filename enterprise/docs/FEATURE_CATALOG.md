@@ -221,6 +221,11 @@ Rotatable keyring, multi-cloud KMS, re-encryption at rest, authority ledger, cry
   - Artifacts: src/deepsigma/security/policy.py, governance/crypto_policy.yaml
   - Enforcement: scripts/crypto_misuse_scan.py, CI: signature_gate.yml
   - KPI axes: Authority_Modeling, Technical_Completeness
+- **Security Proof Pack v2** (`SECURITY_PROOF_PACK`)
+  - Integrity-chain-aware security proof: key lifecycle verification (generation/rotation/revocation), crypto proof validation, seal chain integrity, contract fingerprint consistency.
+  - Artifacts: release_kpis/security_proof_pack.json, release_kpis/SECURITY_GATE_REPORT.md
+  - Enforcement: scripts/security_proof_pack.py, make security-gate, CI: security_gate.yml
+  - KPI axes: Operational_Maturity, Authority_Modeling
 
 ### Connector & Integration Framework
 ConnectorV1 protocol, LLM framework adapters, enterprise SaaS connectors, MCP server, OpenTelemetry.
@@ -336,6 +341,21 @@ Tenant registry, RBAC, isolated paths, per-tenant policy enforcement, and immuta
   - Artifacts: release_kpis/layer_kpi_mapping.json, release_kpis/PR_COMMENT.md
   - Enforcement: scripts/kpi_run.py
   - KPI axes: Operational_Maturity, Enterprise_Readiness
+- **Stale Artifact Kill-Switch** (`ARTIFACT_KILLSWITCH`)
+  - Validates release artifact freshness: version match (pyproject vs VERSION.txt), current-version radar exists, badge <7 days old, history appended, contract fingerprint match.
+  - Artifacts: scripts/verify_release_artifacts.py
+  - Enforcement: make verify-release-artifacts, CI: ci.yml, CI: kpi.yml
+  - KPI axes: Automation_Depth, Operational_Maturity
+- **Banded Radar Rendering** (`BANDED_RADAR`)
+  - Overlays confidence band envelope (low/high shaded polygon) on KPI radar chart using kpi_bands data.
+  - Artifacts: release_kpis/radar_*_bands.png, release_kpis/radar_*_bands.svg
+  - Enforcement: scripts/render_radar.py, CI: kpi.yml
+  - KPI axes: All
+- **KPI Eligibility CI Validation** (`KPI_ELIGIBILITY_CI`)
+  - CI gate verifying every KPI has an explicit tier declaration; fails on missing, warns on unverified.
+  - Artifacts: scripts/validate_kpi_eligibility.py
+  - Enforcement: make validate-kpi-eligibility, CI: ci.yml
+  - KPI axes: Automation_Depth, Operational_Maturity
 
 ### Health & Stability Monitoring
 ICR/PCR/TEC health watchers, nonlinear stability analysis, roadmap forecasting, and pulse insights.
@@ -384,6 +404,11 @@ Time/Effort/Cost modeling with complexity-adjusted variants, 3-tier audience out
   - Artifacts: release_kpis/health/history/TEC_SNAPSHOT_*.json, release_kpis/health/tec_ctec_latest.json
   - Enforcement: scripts/tec_ctec.py --snapshot
   - KPI axes: Economic_Measurability, Operational_Maturity
+- **TEC Sensitivity Analysis** (`TEC_SENSITIVITY`)
+  - Cost volatility index, sensitivity bands (RCF/CCF ±1 tier shift), economic fragility score, and complexity-weighted issue cost analysis.
+  - Artifacts: release_kpis/tec_sensitivity.json, release_kpis/tec_sensitivity_report.md
+  - Enforcement: scripts/tec_sensitivity.py, make tec-sensitivity, CI: kpi.yml
+  - KPI axes: Economic_Measurability
 
 ### Pilot & Operator Readiness
 Pilot-in-a-box deployment, 60-second challenge, pilot pack generation, and project intake.

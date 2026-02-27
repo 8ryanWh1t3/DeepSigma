@@ -15,9 +15,9 @@ import pathlib
 import re
 import sys
 
-REPO_ROOT = pathlib.Path(__file__).resolve().parents[2]
-MERMAID_DIR = REPO_ROOT / "docs" / "mermaid"
-ARCHIVE_DIR = REPO_ROOT / "docs" / "archive" / "mermaid"
+REPO_ROOT = pathlib.Path(__file__).resolve().parents[3]
+MERMAID_DIR = REPO_ROOT / "enterprise" / "docs" / "mermaid"
+ARCHIVE_DIR = REPO_ROOT / "enterprise" / "docs" / "archive" / "mermaid"
 
 CANONICAL = {
     "README.md",
@@ -30,9 +30,14 @@ CANONICAL = {
     "13-release-preflight-flow.md",
     "14-kpi-confidence-bands-flow.md",
     "15-disr-dual-mode-architecture.md",
+    "16-authority-boundary-primitive.md",
+    "17-edge-system.md",
+    "18-sdk-package-architecture.md",
+    "19-feeds-pipeline.md",
+    "20-stability-credibility-pipeline.md",
 }
 
-MAX_CANONICAL = 9  # diagrams (excludes README)
+MAX_CANONICAL = 14  # diagrams (excludes README)
 
 MERMAID_BLOCK_RE = re.compile(r"^```mermaid", re.MULTILINE)
 

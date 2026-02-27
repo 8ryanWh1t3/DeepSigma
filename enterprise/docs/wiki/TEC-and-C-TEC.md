@@ -310,6 +310,34 @@ Requires `release_kpis/issues_all.json` and `release_kpis/prs_merged.json` (gene
 
 ---
 
+## TEC Sensitivity Analysis
+
+The sensitivity pipeline (`make tec-sensitivity`) reads existing TEC tier outputs and computes economic fragility metrics.
+
+### Metrics
+
+| Metric | Formula | Range |
+| --- | --- | --- |
+| **Cost Volatility Index** | stddev(tier costs) / mean(tier costs) | 0.0 - 1.0 |
+| **Spread Ratio** | (max cost - min cost) / max cost | 0.0 - 1.0 |
+| **Economic Fragility** | spread_ratio * 100, bounded by sensitivity amplitude | 0 - 100 |
+| **Economic Stability** | 100 - fragility | 0 - 100 |
+
+### Sensitivity Bands
+
+For each governance factor (RCF, CCF), the analysis simulates what happens to C-TEC if the factor shifts one tier up or down. This reveals which factors have the largest cost impact and where the economic model is most brittle.
+
+### Output Artifacts
+
+| File | Content |
+| --- | --- |
+| `release_kpis/tec_sensitivity.json` | Full analysis: volatility, bands, fragility, per-tier breakdown |
+| `release_kpis/tec_sensitivity_report.md` | Human-readable summary |
+
+CI enforcement: `make tec-sensitivity` in `.github/workflows/kpi.yml` (continue-on-error).
+
+---
+
 ## See Also
 
 - [SLOs and Metrics](SLOs-and-Metrics) — SLO targets and Repo Radar KPI

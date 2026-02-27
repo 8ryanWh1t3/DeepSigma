@@ -55,6 +55,7 @@ Canonical wiki structure for Sigma OVERWATCH / DeepSigma docs.
 
 ## Release + Evidence
 
+- [Release Notes v2.0.7](https://github.com/8ryanWh1t3/DeepSigma/releases/tag/v2.0.7)
 - [Release Notes v2.0.6](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/docs/release/RELEASE_NOTES_v2.0.6.md)
 - [Repo Radar Composite](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/release_kpis/radar_composite_latest.png)
 - [Repo Radar Delta](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/release_kpis/radar_composite_latest.md)

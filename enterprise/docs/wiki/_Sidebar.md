@@ -47,6 +47,7 @@
   - [Operations](Operations)
   - [SLOs & Metrics](SLOs-and-Metrics)
   - [TEC and C-TEC](TEC-and-C-TEC)
+  - [Release Notes v2.0.7](https://github.com/8ryanWh1t3/DeepSigma/releases/tag/v2.0.7)
   - [Release Notes v2.0.6](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/docs/release/RELEASE_NOTES_v2.0.6.md)
   - [Repo Radar Composite](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/release_kpis/radar_composite_latest.png)
   - [TEC Summary](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/release_kpis/TEC_SUMMARY.md)

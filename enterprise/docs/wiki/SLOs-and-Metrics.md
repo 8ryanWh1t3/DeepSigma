@@ -30,6 +30,19 @@ Generate site data files: `make site-content` produces `docs/site/data/demo.json
 - Trend: `release_kpis/kpi_trend.png`
 - Composite: `release_kpis/radar_composite_latest.png`
 
+## System Stability Index (SSI)
+
+Nonlinear stability metric (0-100) tracking KPI volatility and drift acceleration across releases.
+
+| Component | Weight | Source |
+| --- | --- | --- |
+| Volatility Score | 35% | Mean absolute KPI delta across releases |
+| Drift Acceleration Score | 30% | Second derivative of KPI movements |
+| Authority Score | 20% | authority_modeling KPI (normalized) |
+| Economic Score | 15% | economic_measurability KPI (normalized) |
+
+Gates: PASS >= 70, WARN >= 55, FAIL < 55. Report: `release_kpis/nonlinear_stability_report.md`.
+
 ## TEC / C-TEC (ROM)
 
 See **[TEC and C-TEC](TEC-and-C-TEC)** for the full methodology, formulas, governance factors, and output artifacts.

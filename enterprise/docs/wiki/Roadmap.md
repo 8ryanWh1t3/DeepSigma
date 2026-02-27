@@ -2,6 +2,7 @@
 
 ## Recently Shipped
 
+- **v2.0.7 "Nonlinear Stability + Credibility Hardening"** — SSI metric, drift acceleration detection, TEC sensitivity analysis, stale artifact kill-switch, security proof pack v2, banded radar rendering, KPI eligibility tier CI validation. 392 tests, issues #314-#317 + #337-#339 closed, epics #311 + #340 closed.
 - **v2.3.0 "Reference Layer"** — SDK packages (langchain-deepsigma, deepsigma-middleware, openai-deepsigma), reference layer manifesto, static demo site with GitHub Pages, coherence metrics collector, site content generation script. 433 tests, issues #477-#483 closed.
 - **v2.2.0 "Mechanical Authority"** — AgentSession, authority ledger, claim trigger pipeline, coherence metrics module, FEEDS event surface (5-stage event-driven: envelope+schemas, file-bus pub/sub, manifest-first ingest, authority/evidence/triage consumers, canon store). 383 tests, issues #430-#459 (FEEDS) + #462-#476 closed.
 - **v2.1.0 "Decision Infrastructure Hardening"** — Core package extraction into `src/core/`. PRIME threshold gate, CoherenceGate (GREEN/YELLOW/RED), 4D CoherenceScorer, CoherenceAuditor, Reconciler, IRIS operator query engine, DTE enforcer, schema validator, key normalization, CLI (`coherence audit|score|mg export|iris query`). Edition guard (CORE never imports ENTERPRISE). 171 tests.
@@ -9,21 +10,11 @@
 - **ABP v1** — Authority Boundary Primitive: stack-independent, pre-runtime governance declaration (#419)
 - **TEC/C-TEC v2** — Health pipeline + roadmap auto-sync (#391)
 
-## v2.0.7 — Stability & Credibility Hardening
+## v2.0.8 — SSI Recovery
 
-Two workstreams: nonlinear stability metrics and credibility evidence.
+**Gate:** SSI >= 55 (WARN threshold). Current SSI is ~37 (FAIL) due to historical drift acceleration from large KPI swings in v2.0.4-v2.0.6. Recovery requires stable KPI trends across v2.0.8+.
 
-### Nonlinear Stability Layer (#340 EPIC)
-
-- [#337](https://github.com/8ryanWh1t3/DeepSigma/issues/337) System Stability Index (SSI) metric
-- [#338](https://github.com/8ryanWh1t3/DeepSigma/issues/338) Drift Acceleration Detection Engine
-- [#339](https://github.com/8ryanWh1t3/DeepSigma/issues/339) TEC Sensitivity & Variance Modeling
-
-### Credibility Evidence
-
-- [#315](https://github.com/8ryanWh1t3/DeepSigma/issues/315) KPI Eligibility Tiers (Simulated/Real/Production)
-- [#316](https://github.com/8ryanWh1t3/DeepSigma/issues/316) Stale Artifact Kill-Switch (P0)
-- [#317](https://github.com/8ryanWh1t3/DeepSigma/issues/317) Security Posture Proof Pack v2
+- [#461](https://github.com/8ryanWh1t3/DeepSigma/issues/461) SSI Recovery >= 55
 
 ## v2.1.0 — Decision Infrastructure Hardening
 
