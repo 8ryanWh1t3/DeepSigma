@@ -1,6 +1,6 @@
 # Roadmap KPI Forecast
 
-- KPI baseline source: `kpi_v2.0.8_merged.json`
+- KPI baseline source: `kpi_v2.0.9_merged.json`
 - Control factor source: `release_kpis/health/tec_ctec_latest.json`
 - Applied control factor: **0.59**
 
@@ -11,11 +11,11 @@
 |---|---:|---:|---:|
 | technical_completeness | 10.00 | 0.24 | 10.00 |
 | automation_depth | 10.00 | 1.19 | 10.00 |
-| authority_modeling | 6.00 | 0.30 | 6.30 |
+| authority_modeling | 9.72 | 0.30 | 10.00 |
 | enterprise_readiness | 10.00 | 0.00 | 10.00 |
 | scalability | 10.00 | 0.00 | 10.00 |
 | data_integration | 10.00 | 0.00 | 10.00 |
-| economic_measurability | 4.88 | 1.19 | 6.07 |
+| economic_measurability | 10.00 | 1.19 | 10.00 |
 | operational_maturity | 10.00 | 1.19 | 10.00 |
 
 ## v2.1.1 (dormant)
@@ -25,9 +25,9 @@
 |---|---:|---:|---:|
 | technical_completeness | 10.00 | 0.18 | 10.00 |
 | automation_depth | 10.00 | 0.00 | 10.00 |
-| authority_modeling | 6.00 | 0.89 | 6.89 |
+| authority_modeling | 9.72 | 0.89 | 10.00 |
 | enterprise_readiness | 10.00 | 0.71 | 10.00 |
 | scalability | 10.00 | 0.65 | 10.00 |
 | data_integration | 10.00 | 1.19 | 10.00 |
-| economic_measurability | 4.88 | 0.00 | 4.88 |
+| economic_measurability | 10.00 | 0.00 | 10.00 |
 | operational_maturity | 10.00 | 1.19 | 10.00 |

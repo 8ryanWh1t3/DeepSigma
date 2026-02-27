@@ -1,7 +1,7 @@
 {
   "schema": "tec_ctec_v2",
   "mode": "report_only",
-  "generated_at": "2026-02-27T23:06:23Z",
+  "generated_at": "2026-02-27T23:48:10Z",
   "inputs": {
     "policy": "enterprise/governance/tec_ctec_policy.json",
     "icr_latest_present": true,
@@ -19,7 +19,7 @@
     "inventory": {
       "files": 266,
       "directories": 22,
-      "loc": 17040,
+      "loc": 17077,
       "packages": 8,
       "configs": 45,
       "tests": 20,
@@ -46,16 +46,16 @@
   },
   "enterprise": {
     "inventory": {
-      "files": 1085,
-      "directories": 182,
-      "loc": 91888,
+      "files": 1105,
+      "directories": 183,
+      "loc": 92880,
       "packages": 32,
-      "configs": 138,
+      "configs": 145,
       "tests": 1,
-      "run_surfaces": 117,
-      "artifacts": 223
+      "run_surfaces": 119,
+      "artifacts": 235
     },
-    "tec": 1444.6,
+    "tec": 1470.0,
     "controls": {
       "required": 6,
       "passed": 6,
@@ -70,21 +70,21 @@
       }
     },
     "control_coverage": 0.595,
-    "ctec": 859.54,
-    "r_tec": 1762.6
+    "ctec": 874.65,
+    "r_tec": 1788.0
   },
   "total": {
     "inventory": {
-      "files": 17277,
-      "directories": 3182,
-      "loc": 228694,
+      "files": 17305,
+      "directories": 3184,
+      "loc": 230057,
       "packages": 43,
-      "configs": 1915,
-      "tests": 129,
-      "run_surfaces": 144,
-      "artifacts": 231
+      "configs": 1923,
+      "tests": 131,
+      "run_surfaces": 146,
+      "artifacts": 243
     },
-    "tec": 18335.0,
+    "tec": 18372.6,
     "controls": {
       "required": 12,
       "passed": 12,
@@ -92,7 +92,7 @@
       "checks_scope": "composite(core+enterprise)"
     },
     "control_coverage": 0.595,
-    "ctec": 10909.32,
-    "r_tec": 18653.0
+    "ctec": 10931.7,
+    "r_tec": 18690.6
   }
 }

@@ -1,4 +1,4 @@
-# Nonlinear Stability Report — v2.0.8
+# Nonlinear Stability Report — v2.0.9
 
 ## A) System Stability Index (SSI) Math
 
@@ -10,9 +10,9 @@ Where each component is normalized to `0..100` (higher is more stable):
 - Authority sensitivity score: authority strength and authority volatility penalty
 - Economic variance score: TEC spread ratio and economic KPI variance penalty
 
-- SSI: **39.05**
+- SSI: **34.64**
 - Confidence: **0.89**
-- Band: **[36.85, 41.25]**
+- Band: **[32.44, 36.84]**
 
 ## B) Instability Gating Thresholds
 
@@ -51,25 +51,25 @@ Where each component is normalized to `0..100` (higher is more stable):
 | economic_measurability | 0.00 |
 | operational_maturity | 0.29 |
 
-## D) v2.0.8 Instability Simulation
+## D) v2.0.9 Instability Simulation
 
 Scenario stress-tests on the current release baseline:
 
 ### Mild
 - Description: single-cycle turbulence with constrained spread
-- Projected SSI: **22.55**
+- Projected SSI: **18.14**
 - Projected drift_acceleration_index: **1.0**
 - Gate: **FAIL**
 
 ### Moderate
 - Description: broad system stress and governance lag
-- Projected SSI: **18.05**
+- Projected SSI: **13.64**
 - Projected drift_acceleration_index: **1.0**
 - Gate: **FAIL**
 
 ### Severe
 - Description: compound drift with authority + economic instability
-- Projected SSI: **12.38**
+- Projected SSI: **7.97**
 - Projected drift_acceleration_index: **1.0**
 - Gate: **FAIL**
 
