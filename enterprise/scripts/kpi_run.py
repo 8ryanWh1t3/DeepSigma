@@ -97,6 +97,8 @@ def main() -> int:
     subprocess.check_call(["make", "roadmap-refresh"], cwd=REPO_ROOT)
     subprocess.check_call(["make", "stability"], cwd=REPO_ROOT)
     subprocess.check_call(["make", "tec"], cwd=REPO_ROOT)
+    subprocess.check_call(["make", "authority-evidence"], cwd=REPO_ROOT)
+    subprocess.check_call(["make", "economic-metrics"], cwd=REPO_ROOT)
     subprocess.check_call(["python", "enterprise/scripts/render_benchmark_trend.py"])
 
     radar_png = f"release_kpis/radar_{version}.png"

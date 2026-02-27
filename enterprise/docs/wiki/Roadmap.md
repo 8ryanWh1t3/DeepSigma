@@ -2,6 +2,7 @@
 
 ## Recently Shipped
 
+- **v2.0.9 "Authority + Economic Evidence"** — Signature key custody (#413), refusal authority contract (#414), authority evidence chain export (#415). P0 #325 closed → authority cap lifted 6.0 → 7.0. Decision cost ledger + economic metrics (#404, #405), economic KPI ingestion gate (#406) — economic measurability 4.88 → 10.0. All 8 KPIs >= 7.0.
 - **v2.0.8 "Scalability Evidence + SSI Recovery"** — CI-eligible benchmark evidence for scalability KPI (5.38 → 10.0), scalability regression gate, benchmark trend visualization. SSI trajectory: 37.71 → 39.05. Issues #410-#412 closed.
 - **v2.0.7 "Nonlinear Stability + Credibility Hardening"** — SSI metric, drift acceleration detection, TEC sensitivity analysis, stale artifact kill-switch, security proof pack v2, banded radar rendering, KPI eligibility tier CI validation. 392 tests, issues #314-#317 + #337-#339 closed, epics #311 + #340 closed.
 - **v2.3.0 "Reference Layer"** — SDK packages (langchain-deepsigma, deepsigma-middleware, openai-deepsigma), reference layer manifesto, static demo site with GitHub Pages, coherence metrics collector, site content generation script. 433 tests, issues #477-#483 closed.
@@ -29,9 +30,9 @@ Each epic targets a single KPI axis below 7.0. Child tasks are the concrete deli
 
 **Economic Measurability** (#396)
 
-- [#404](https://github.com/8ryanWh1t3/DeepSigma/issues/404) Decision Cost Ledger Schema + Emitter
-- [#405](https://github.com/8ryanWh1t3/DeepSigma/issues/405) Drift-to-Patch Value Delta Calculator
-- [#406](https://github.com/8ryanWh1t3/DeepSigma/issues/406) Economic KPI Ingestion Gate
+- ~~[#404](https://github.com/8ryanWh1t3/DeepSigma/issues/404) Decision Cost Ledger Schema + Emitter~~ (v2.0.9)
+- ~~[#405](https://github.com/8ryanWh1t3/DeepSigma/issues/405) Drift-to-Patch Value Delta Calculator~~ (v2.0.9)
+- ~~[#406](https://github.com/8ryanWh1t3/DeepSigma/issues/406) Economic KPI Ingestion Gate~~ (v2.0.9)
 - [#392](https://github.com/8ryanWh1t3/DeepSigma/issues/392) Economic Evidence Ledger
 
 **Enterprise Readiness** (#397)
@@ -42,9 +43,9 @@ Each epic targets a single KPI axis below 7.0. Child tasks are the concrete deli
 
 **Authority Modeling** (#399)
 
-- [#413](https://github.com/8ryanWh1t3/DeepSigma/issues/413) Production Signature Key Custody + Verification Path
-- [#414](https://github.com/8ryanWh1t3/DeepSigma/issues/414) Structural Refusal Authority Contract
-- [#415](https://github.com/8ryanWh1t3/DeepSigma/issues/415) Authority Evidence Chain Export
+- ~~[#413](https://github.com/8ryanWh1t3/DeepSigma/issues/413) Production Signature Key Custody + Verification Path~~ (v2.0.9)
+- ~~[#414](https://github.com/8ryanWh1t3/DeepSigma/issues/414) Structural Refusal Authority Contract~~ (v2.0.9)
+- ~~[#415](https://github.com/8ryanWh1t3/DeepSigma/issues/415) Authority Evidence Chain Export~~ (v2.0.9)
 
 **Technical Completeness** (#400)
 
@@ -60,7 +61,7 @@ Each epic targets a single KPI axis below 7.0. Child tasks are the concrete deli
 ### DISR Architecture
 
 - [#324](https://github.com/8ryanWh1t3/DeepSigma/issues/324) DISR Provider Interface Abstraction
-- [#325](https://github.com/8ryanWh1t3/DeepSigma/issues/325) Authority-Bound Action Contracts (P0)
+- ~~[#325](https://github.com/8ryanWh1t3/DeepSigma/issues/325) Authority-Bound Action Contracts (P0)~~ (v2.0.9)
 - [#326](https://github.com/8ryanWh1t3/DeepSigma/issues/326) Streaming Re-encrypt Engine with Checkpointing
 - [#327](https://github.com/8ryanWh1t3/DeepSigma/issues/327) Signed Telemetry Event Chain
 

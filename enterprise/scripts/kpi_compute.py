@@ -61,6 +61,19 @@ def parse_scalability_metrics() -> dict | None:
     return obj
 
 
+def parse_economic_metrics() -> dict | None:
+    path = ROOT / "release_kpis" / "economic_metrics.json"
+    if not path.exists():
+        return None
+    try:
+        obj = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    if not isinstance(obj, dict):
+        return None
+    return obj
+
+
 def parse_insights_metrics() -> dict | None:
     path = ROOT / "release_kpis" / "insights_metrics.json"
     if not path.exists():
@@ -234,6 +247,7 @@ def main() -> int:
     docs_root = ROOT / "docs" / "docs"
     metrics = parse_security_metrics()
     scalability_metrics = parse_scalability_metrics()
+    economic_metrics = parse_economic_metrics()
     insights_metrics = parse_insights_metrics()
     out = {
         "technical_completeness": round(score_technical_completeness(), 2),
@@ -247,12 +261,15 @@ def main() -> int:
             "docs_md": len(list(docs_root.glob("**/*.md"))) if docs_root.exists() else 0,
             "security_metrics_present": metrics is not None,
             "scalability_metrics_present": scalability_metrics is not None,
+            "economic_metrics_present": economic_metrics is not None,
             "insights_metrics_present": insights_metrics is not None,
             "insights": summarize_insights(insights_metrics),
         },
     }
-    if metrics is not None:
-        out["economic_measurability"] = round(score_economic_measurability(metrics), 2)
+    # Prefer dedicated economic_metrics.json over security_metrics.json for economic scoring
+    econ_source = economic_metrics if economic_metrics is not None else metrics
+    if econ_source is not None:
+        out["economic_measurability"] = round(score_economic_measurability(econ_source), 2)
     if scalability_metrics is not None:
         out["scalability"] = round(score_scalability(scalability_metrics), 2)
     print(json.dumps(out, indent=2))

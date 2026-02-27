@@ -15,3 +15,6 @@
 - **CI-Eligible Evidence**: Benchmark output produced with `--ci-mode` that sets `kpi_eligible=true` and `evidence_level=real_workload`, uncapping telemetry-derived KPI scores from the 4.0 simulated ceiling
 - **Scalability Regression Gate**: CI gate preventing throughput regressions — enforces 80% throughput floor vs. previous benchmark and requires real_workload evidence level
 - **Benchmark Trend**: Historical throughput visualization from `benchmark_history.json` showing records/sec over time with 80% regression floor overlay
+- **Refusal Authority**: Explicit block on a specific action type via AUTHORITY_REFUSAL ledger entry and REFUSE action contract; triggers AUTHORITY_REFUSED drift signal
+- **Decision Cost Ledger**: Per-decision cost tracking derived from TEC pipeline — avg cost per decision, total cost, drift remediation delta, and patch value ratio
+- **Economic Evidence**: Dedicated `economic_metrics.json` artifact with `kpi_eligible=true` sourced from TEC + benchmark data, uncapping economic_measurability KPI

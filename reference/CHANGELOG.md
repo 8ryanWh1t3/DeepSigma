@@ -2,6 +2,18 @@
 
 All contract surface changes are logged here with compatibility annotations.
 
+## v2.0.9 — Authority + Economic Evidence
+
+`COMPATIBLE:` Production signature key custody + verification (#413), structural refusal authority contract (#414), authority evidence chain export (#415). P0 #325 closed — authority cap lifted 6.0 → 7.0. Decision cost ledger + economic_metrics.json (#404, #405), economic KPI ingestion gate (#406) — dedicated evidence path uncaps economic measurability 4.88 → 10.0. All 8 KPIs now >= 7.0.
+
+### Migration
+
+**Affected schemas**: None
+**Consumer action**: None — no schema changes in this release.
+**Rollback**: Yes — all changes are additive evidence and tooling.
+
+---
+
 ## v2.0.8 — Scalability Evidence + SSI Recovery
 
 `COMPATIBLE:` Promote re-encrypt benchmark to CI-eligible evidence, add scalability regression gate, benchmark trend visualization. Scalability KPI 5.38 → 10.0 via real benchmark infrastructure. SSI trajectory improving: 37.71 → 39.05. No schema changes.

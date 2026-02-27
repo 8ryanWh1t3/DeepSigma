@@ -89,6 +89,7 @@ def append_authority_rotation_entry(
     authority_role: str,
     authority_reason: str,
     signing_key: str,
+    signing_key_id: str = "default",
 ) -> dict[str, Any]:
     return append_authority_action_entry(
         ledger_path=ledger_path,
@@ -98,6 +99,7 @@ def append_authority_rotation_entry(
         authority_reason=authority_reason,
         signing_key=signing_key,
         action_type="AUTHORIZED_KEY_ROTATION",
+        signing_key_id=signing_key_id,
     )
 
 
@@ -111,6 +113,7 @@ def append_authority_action_entry(
     signing_key: str,
     action_type: str,
     action_contract: dict[str, Any] | None = None,
+    signing_key_id: str = "default",
 ) -> dict[str, Any]:
     path = Path(ledger_path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -156,6 +159,7 @@ def append_authority_action_entry(
         "action_contract_id": (action_contract or {}).get("action_id"),
         "action_contract_dri": (action_contract or {}).get("dri"),
         "action_contract_approver": (action_contract or {}).get("approver"),
+        "signing_key_id": signing_key_id,
     }
     signature = _event_signature(unsigned, signing_key)
     entry = dict(unsigned)
@@ -176,6 +180,65 @@ def append_authority_action_entry(
             "event_hash": authority_event.get("event_hash"),
             "authority_dri": authority_dri,
             "authority_role": authority_role,
+            "entry_id": entry["entry_id"],
+        },
+    )
+    return entry
+
+
+def append_authority_refusal_entry(
+    *,
+    ledger_path: str | Path,
+    authority_event: dict[str, Any],
+    refused_by: str,
+    refused_action_type: str,
+    refusal_reason: str,
+    signing_key: str,
+    signing_key_id: str = "default",
+) -> dict[str, Any]:
+    """Append a refusal entry to the authority ledger."""
+    path = Path(ledger_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    entries: list[dict[str, Any]] = []
+    if path.exists():
+        raw = path.read_text(encoding="utf-8").strip()
+        if raw:
+            obj = json.loads(raw)
+            if isinstance(obj, list):
+                entries = [item for item in obj if isinstance(item, dict)]
+
+    prev_hash = entries[-1]["entry_hash"] if entries else None
+    unsigned = {
+        "schema_version": LEDGER_SCHEMA_VERSION,
+        "entry_type": "AUTHORITY_REFUSAL",
+        "event_id": authority_event["event_id"],
+        "event_hash": authority_event["event_hash"],
+        "tenant_id": authority_event["tenant_id"],
+        "refused_by": refused_by,
+        "refused_action_type": refused_action_type,
+        "refusal_reason": refusal_reason,
+        "signing_key_id": signing_key_id,
+        "recorded_at": authority_event["occurred_at"],
+        "prev_entry_hash": prev_hash,
+    }
+    signature = _event_signature(unsigned, signing_key)
+    entry = dict(unsigned)
+    entry["event_signature"] = signature
+    entry["signature_alg"] = "HMAC-SHA256"
+    entry["entry_id"] = f"AUTHREF-{authority_event['event_hash'][:12]}"
+    entry["entry_hash"] = _entry_hash({**entry, "entry_hash": ""})
+
+    entries.append(entry)
+    path.write_text(json.dumps(entries, indent=2) + "\n", encoding="utf-8")
+    _write_snapshot(
+        ledger_path=path,
+        entries=entries,
+        provenance={
+            "action_type": "AUTHORITY_REFUSAL",
+            "event_id": authority_event.get("event_id"),
+            "refused_by": refused_by,
+            "refused_action_type": refused_action_type,
             "entry_id": entry["entry_id"],
         },
     )

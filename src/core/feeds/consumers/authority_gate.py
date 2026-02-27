@@ -71,3 +71,46 @@ class AuthorityGateConsumer:
             "fingerprint": {"key": f"auth-gate:{dlr_id}", "version": "1"},
             "notes": f"Unblessed action claims: {', '.join(unblessed)}",
         }
+
+    def check_refusals(
+        self,
+        dlr_payload: Dict[str, Any],
+        refusal_entries: List[Dict[str, Any]],
+    ) -> Optional[Dict[str, Any]]:
+        """Check if any DLR action claims have been explicitly refused.
+
+        Args:
+            dlr_payload: The decision lineage payload.
+            refusal_entries: Authority ledger entries with entry_type AUTHORITY_REFUSAL.
+
+        Returns:
+            A drift signal payload if refused claims found, else None.
+        """
+        action_ids = _extract_action_claim_ids(dlr_payload)
+        if not action_ids:
+            return None
+
+        refused_types = {
+            e.get("refused_action_type")
+            for e in refusal_entries
+            if e.get("entry_type") == "AUTHORITY_REFUSAL"
+        }
+        if not refused_types:
+            return None
+
+        # Check if any action claim type matches a refused action type
+        refused_claims = [cid for cid in action_ids if cid in refused_types]
+        if not refused_claims:
+            return None
+
+        dlr_id = dlr_payload.get("dlrId", "unknown")
+        return {
+            "driftId": f"DS-refused-{uuid.uuid4().hex[:12]}",
+            "driftType": "authority_refused",
+            "severity": "red",
+            "detectedAt": datetime.now(timezone.utc).isoformat(),
+            "evidenceRefs": [f"dlr:{dlr_id}"] + [f"refused:{c}" for c in refused_claims],
+            "recommendedPatchType": "authority_review",
+            "fingerprint": {"key": f"auth-refused:{dlr_id}", "version": "1"},
+            "notes": f"Explicitly refused action types: {', '.join(refused_claims)}",
+        }

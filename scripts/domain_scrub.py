@@ -186,6 +186,8 @@ ALLOWED_ACRONYMS = {
     "XYZ", "BBBB", "AAAA", "NOPE", "III", "PILOT", "ECON",
     # Semver / compat terminology
     "MAJOR", "MINOR",
+    # Authority / governance terms
+    "REFUSE", "REFUSAL", "REFUSED", "REF",
     # Fixture / test data terms
     "VALUE", "TIER", "SOURCE", "SUM", "PRJ", "TSK", "PMP",
     "APR", "YOU", "ARE",
@@ -193,6 +195,7 @@ ALLOWED_ACRONYMS = {
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}
 SKIP_DIRS = {".git", ".github", ".venv", "venv", "node_modules", "__pycache__", "dist", "build", ".pytest_cache"}
+SKIP_FILES = {"issues_all.json", "prs_merged.json"}  # Generated GitHub export data
 
 
 # ----------------------------
@@ -227,6 +230,8 @@ def iter_files(root: Path, paths: List[str]) -> Iterable[Path]:
             if any(part in SKIP_DIRS for part in f.parts):
                 continue
             if f.suffix.lower() not in SCAN_EXTS:
+                continue
+            if f.name in SKIP_FILES:
                 continue
             yield f
 

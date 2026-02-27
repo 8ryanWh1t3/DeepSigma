@@ -10,7 +10,7 @@
 	constitution-gate \
 	verify-release-artifacts validate-kpi-eligibility tec-sensitivity \
 	benchmark scalability-gate benchmark-trend \
-	tec-estimate export-telemetry
+	tec-estimate export-telemetry authority-evidence economic-metrics
 
 demo:
 	bash run_money_demo.sh
@@ -79,6 +79,12 @@ tec-estimate:
 
 export-telemetry:
 	cd enterprise && bash scripts/export_repo_telemetry.sh
+
+authority-evidence:
+	python enterprise/scripts/export_authority_evidence.py
+
+economic-metrics:
+	python enterprise/scripts/economic_metrics.py
 
 tec: tec-ctec tec-estimate
 

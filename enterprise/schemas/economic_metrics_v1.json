@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Economic Metrics v1",
+  "description": "Evidence artifact for economic_measurability KPI scoring.",
+  "type": "object",
+  "required": [
+    "schema",
+    "kpi_eligible",
+    "evidence_level",
+    "tec_base_hours",
+    "decision_count",
+    "avg_cost_per_decision_usd",
+    "total_cost_internal_usd",
+    "mttr_seconds",
+    "reencrypt_records_per_second",
+    "reencrypt_mb_per_minute",
+    "evidence_sources"
+  ],
+  "properties": {
+    "schema": { "const": "economic_metrics_v1" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "kpi_eligible": { "type": "boolean" },
+    "evidence_level": { "type": "string", "enum": ["simulated", "real_workload", "production"] },
+    "tec_base_hours": { "type": "number", "minimum": 0 },
+    "decision_count": { "type": "integer", "minimum": 0 },
+    "avg_cost_per_decision_usd": { "type": "number", "minimum": 0 },
+    "total_cost_internal_usd": { "type": "number", "minimum": 0 },
+    "drift_remediation_cost_delta": { "type": "number" },
+    "patch_value_ratio": { "type": "number", "minimum": 0 },
+    "mttr_seconds": { "type": "number", "minimum": 0 },
+    "reencrypt_records_per_second": { "type": "number", "minimum": 0 },
+    "reencrypt_mb_per_minute": { "type": "number", "minimum": 0 },
+    "evidence_sources": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}

@@ -227,6 +227,27 @@ Rotatable keyring, multi-cloud KMS, re-encryption at rest, authority ledger, cry
   - Enforcement: scripts/security_proof_pack.py, make security-gate, CI: security_gate.yml
   - KPI axes: Operational_Maturity, Authority_Modeling
 
+- **Authority Custody** (`AUTHORITY_CUSTODY`)
+  - Production signature key custody: generation, rotation (90-day), revocation, and verification path with signing_key_id tracking in authority ledger entries.
+  - Artifacts: docs/docs/security/KEY_CUSTODY.md, governance/security_crypto_policy.json
+  - Enforcement: tests/test_authority_signature_custody.py
+  - KPI axes: Authority_Modeling, Enterprise_Readiness
+- **Refusal Contract** (`REFUSAL_CONTRACT`)
+  - Explicit refusal authority: REFUSE action type in action contracts, AUTHORITY_REFUSAL ledger entries, and AUTHORITY_REFUSED drift signal emission in authority gate consumer.
+  - Artifacts: src/deepsigma/security/action_contract.py, src/deepsigma/security/authority_ledger.py, src/core/feeds/consumers/authority_gate.py
+  - Enforcement: tests/test_authority_refusal.py
+  - KPI axes: Authority_Modeling, Operational_Maturity
+- **Authority Evidence Export** (`AUTHORITY_EVIDENCE`)
+  - Release artifact exporting authority evidence chain: ledger entries, chain verification, grant/refusal counts, signing key IDs, and verification hash.
+  - Artifacts: release_kpis/authority_evidence.json
+  - Enforcement: scripts/export_authority_evidence.py, make authority-evidence
+  - KPI axes: Authority_Modeling, Enterprise_Readiness
+- **Economic Metrics** (`ECONOMIC_METRICS`)
+  - Dedicated economic evidence artifact sourced from TEC pipeline + security benchmarks. Provides kpi_eligible=true + evidence_level=real_workload to uncap economic_measurability KPI.
+  - Artifacts: release_kpis/economic_metrics.json, schemas/economic_metrics_v1.json
+  - Enforcement: scripts/economic_metrics.py, make economic-metrics
+  - KPI axes: Economic_Measurability
+
 ### Connector & Integration Framework
 ConnectorV1 protocol, LLM framework adapters, enterprise SaaS connectors, MCP server, OpenTelemetry.
 

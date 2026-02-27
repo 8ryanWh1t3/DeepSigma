@@ -8,6 +8,12 @@
   "allowed_algorithms": [
     "AES-256-GCM"
   ],
+  "signing": {
+    "algorithm": "HMAC-SHA256",
+    "key_sources": ["env:DEEPSIGMA_SIGNING_KEY"],
+    "rotation_schedule_days": 90,
+    "min_key_length_bytes": 32
+  },
   "min_ttl_days": 1,
   "max_ttl_days": 30,
   "envelope_version_current": "1.0",

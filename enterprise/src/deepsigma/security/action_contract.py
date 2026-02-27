@@ -151,3 +151,41 @@ def validate_action_contract(
     if current > expires_at:
         raise ValueError("Action contract is expired")
     return parsed
+
+
+def create_refusal_contract(
+    *,
+    refused_action_type: str,
+    refused_by: str,
+    reason: str,
+    dri: str,
+    signing_key: str,
+    ttl: int = 900,
+    now: datetime | None = None,
+) -> ActionContract:
+    """Create a signed refusal contract explicitly denying an action."""
+    return create_action_contract(
+        action_type=f"REFUSE:{refused_action_type}",
+        requested_by=refused_by,
+        dri=dri,
+        approver=refused_by,
+        signing_key=signing_key,
+        ttl=ttl,
+        now=now,
+    )
+
+
+def validate_refusal_contract(
+    contract: dict[str, Any],
+    *,
+    refused_action_type: str,
+    signing_key: str,
+    now: datetime | None = None,
+) -> ActionContract:
+    """Validate a signed refusal contract."""
+    return validate_action_contract(
+        contract,
+        expected_action_type=f"REFUSE:{refused_action_type}",
+        signing_key=signing_key,
+        now=now,
+    )
