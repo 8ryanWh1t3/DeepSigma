@@ -375,7 +375,7 @@ ICR/PCR/TEC health watchers, nonlinear stability analysis, roadmap forecasting, 
 Time/Effort/Cost modeling with complexity-adjusted variants, 3-tier audience outputs, and daily snapshots.
 
 - **TEC / C-TEC Engine** (`TEC_CTEC`)
-  - Complexity-adjusted effort/cost estimation producing internal, executive, and DoD audience variants.
+  - Complexity-adjusted effort/cost estimation producing internal, executive, and fully-burdened audience variants.
   - Artifacts: release_kpis/tec_internal.json, release_kpis/tec_executive.json, release_kpis/tec_dod.json, release_kpis/TEC_SUMMARY.md
   - Enforcement: scripts/tec_ctec.py, make tec
   - KPI axes: Economic_Measurability

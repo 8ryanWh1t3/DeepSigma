@@ -82,7 +82,7 @@ ALLOWED_ACRONYMS = {
     "RBAC", "OIDC", "JWT", "HMAC", "SHA", "RSA", "AES",
     "GCM", "PEM", "CORS", "CSRF", "PII", "SSE", "SSO",
     "RPC", "CDN", "NTP", "OTLP", "NATS", "WAN", "HSM",
-    "ACL", "KMS", "AUTH", "PAT", "SRC", "DOM",
+    "ACL", "KMS", "AUTH", "PAT", "SRC", "DOM", "ENV",
     # DeepSigma / Coherence Ops primitives
     "DLR", "RS", "DS", "MG", "IRIS", "PRIME", "GPE", "GPR", "TTL",
     "RAL", "DTE", "ICR", "PCR", "TEC", "CTEC", "DISR", "ABP",
