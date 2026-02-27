@@ -9,7 +9,7 @@ DeepSigma produces deterministic economic metrics from repo telemetry. Two pipel
 | **TEC / C-TEC v2** | `enterprise/scripts/tec_ctec.py` | Surface inventory complexity, governance control coverage | `release_kpis/health/tec_ctec_latest.json` |
 | **TEC Estimate** | `enterprise/scripts/tec_estimate.py` | Effort hours from issues, PRs, and repo structure | `release_kpis/tec_internal.json`, `tec_executive.json`, `tec_dod.json` |
 
-Both pipelines produce tiered cost estimates (Internal, Executive, DoD) with uncertainty bands.
+Both pipelines produce tiered cost estimates (Internal, Executive, CustomerOrg) with uncertainty bands.
 
 ---
 
@@ -248,7 +248,7 @@ Three billing tiers produce cost estimates from the same hour base:
 | --- | --- | --- |
 | Internal | $150/hr | Internal planning and resource allocation |
 | Executive | $225/hr | Executive briefings and budget requests |
-| DoD Fully Burdened | $275/hr | Government contract pricing (DCAA-compatible) |
+| CustomerOrg Fully Burdened | $275/hr | Government contract pricing (DCAA-compatible) |
 
 Each tier gets all three uncertainty bands, producing a 3x3 matrix of hours and costs.
 
@@ -266,7 +266,7 @@ Each tier gets all three uncertainty bands, producing a 3x3 matrix of hours and 
 | `release_kpis/TEC_SUMMARY.md` | Factors, edition metrics, tiered cost estimates |
 | `release_kpis/tec_internal.json` | Internal tier with cost bands |
 | `release_kpis/tec_executive.json` | Executive tier with cost bands |
-| `release_kpis/tec_dod.json` | DoD tier with cost bands |
+| `release_kpis/tec_dod.json` | CustomerOrg tier with cost bands |
 | `release_kpis/health/history/TEC_SNAPSHOT_YYYY-MM-DD.json` | Daily snapshot (with `--snapshot` flag) |
 
 ### From `tec_estimate.py` (Effort Estimation)
@@ -275,7 +275,7 @@ Each tier gets all three uncertainty bands, producing a 3x3 matrix of hours and 
 | --- | --- |
 | `release_kpis/tec_internal.json` | Internal tier: counts, hours breakdown, complexity, tiers |
 | `release_kpis/tec_executive.json` | Executive tier |
-| `release_kpis/tec_dod.json` | DoD tier |
+| `release_kpis/tec_dod.json` | CustomerOrg tier |
 | `release_kpis/TEC_SUMMARY.md` | Counts, effort breakdown, complexity stats, insights, tiers |
 
 Note: Both pipelines write to the same output paths. The effort estimation pipeline runs second in CI and overwrites the surface inventory outputs, adding the issue/PR-derived effort model.

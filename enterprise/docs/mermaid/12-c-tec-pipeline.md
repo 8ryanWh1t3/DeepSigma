@@ -1,6 +1,6 @@
 # C-TEC Pipeline (v1.0)
 
-Complexity-Weighted TEC (C-TEC) derives Time/Effort/Cost from deterministic repo telemetry and publishes three lenses: Internal, Executive, and DoD.
+Complexity-Weighted TEC (C-TEC) derives Time/Effort/Cost from deterministic repo telemetry and publishes three lenses: Internal, Executive, and CustomerOrg.
 
 ```mermaid
 flowchart TD
@@ -30,7 +30,7 @@ flowchart TD
     subgraph Outputs["Tiered Outputs"]
         O1["Internal ROM"]
         O2["Executive ROM"]
-        O3["DoD ROM"]
+        O3["CustomerOrg ROM"]
         O4["TEC_SUMMARY.md"]
         O5["PR_COMMENT.md TEC block"]
     end

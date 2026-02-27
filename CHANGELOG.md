@@ -498,7 +498,7 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - **Claim Primitive v1.0**: `specs/claim.schema.json` — Universal Atomic Claim JSON Schema with confidence, status light, half-life, seal, graph edges, and provenance chain
 - - **Claim-Native DLR v1.0**: `specs/dlr.schema.json` — Refactored Decision Lineage Record composing from claim references with rationale graph
-  - - **Claim Primitive Example**: `llm_data_model/03_examples/claim_primitive_example.json` — SIGINT credential-stuffing scenario (CLAIM-2026-0001)
+  - - **Claim Primitive Example**: `llm_data_model/03_examples/claim_primitive_example.json` — SignalSource credential-stuffing scenario (CLAIM-2026-0001)
     - - **DLR Claim-Native Example**: `llm_data_model/03_examples/dlr_claim_native_example.json` — AccountQuarantine decision with 3 claims
       - - **Docs**: `docs/19-claim-primitive.md`, `docs/20-dlr-claim-native.md`
         - - **Wiki**: `wiki/Unified-Atomic-Claims.md` with sidebar navigation update

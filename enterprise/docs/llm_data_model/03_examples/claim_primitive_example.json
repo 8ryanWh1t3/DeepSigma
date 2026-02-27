@@ -1,26 +1,26 @@
 {
     "claimId": "CLAIM-2026-0001",
-    "statement": "SIGINT pattern X matches pre-action signature Y at 94% correlation across Theater A intercepts.",
+    "statement": "SignalSource pattern X matches pre-action signature Y at 94% correlation across Theater A intercepts.",
     "scope": {
           "where": "Theater A",
           "when": "next 96 hours",
-          "context": "Active collection posture, elevated SIGINT tasking"
+          "context": "Active collection posture, elevated SignalSource tasking"
     },
     "truthType": "observation",
     "confidence": {
           "score": 0.94,
-          "explanation": "Pattern match at 94% correlation across 12 independent intercepts; 3 HUMINT reports corroborate timing."
+          "explanation": "Pattern match at 94% correlation across 12 independent intercepts; 3 HumanSource reports corroborate timing."
     },
     "statusLight": "green",
     "sources": [
           {
-                  "ref": "SRC-NSA-2026-THEATER-A-0442",
+                  "ref": "SRC-ExternalAgency-2026-THEATER-A-0442",
                   "type": "sensor",
                   "capturedAt": "2026-02-14T08:30:00Z",
                   "reliability": "high"
           },
           {
-                  "ref": "SRC-HUMINT-2026-0118",
+                  "ref": "SRC-HumanSource-2026-0118",
                   "type": "human",
                   "capturedAt": "2026-02-14T06:15:00Z",
                   "reliability": "medium"
@@ -28,13 +28,13 @@
     ],
     "evidence": [
           {
-                  "ref": "EVD-TRACE-2026-A-0442-SIGINT",
+                  "ref": "EVD-TRACE-2026-A-0442-SignalSource",
                   "type": "trace",
                   "method": "pattern_correlation_engine_v4",
                   "summary": "12 intercepts matched against baseline signature Y with 94% mean correlation, 91% minimum."
           },
           {
-                  "ref": "EVD-HUMINT-2026-0118-DEBRIEF",
+                  "ref": "EVD-HumanSource-2026-0118-DEBRIEF",
                   "type": "excerpt",
                   "method": "structured_debrief",
                   "summary": "Source reports pre-positioning activity consistent with signature Y timeline."
@@ -64,28 +64,28 @@
           },
           {
                   "type": "evidence",
-                  "ref": "EVD-TRACE-2026-A-0442-SIGINT",
+                  "ref": "EVD-TRACE-2026-A-0442-SignalSource",
                   "role": "primary_evidence"
           },
           {
                   "type": "evidence",
-                  "ref": "EVD-HUMINT-2026-0118-DEBRIEF",
+                  "ref": "EVD-HumanSource-2026-0118-DEBRIEF",
                   "role": "corroborating_evidence"
           },
           {
                   "type": "source",
-                  "ref": "SRC-NSA-2026-THEATER-A-0442",
+                  "ref": "SRC-ExternalAgency-2026-THEATER-A-0442",
                   "role": "primary_source"
           },
           {
                   "type": "source",
-                  "ref": "SRC-HUMINT-2026-0118",
+                  "ref": "SRC-HumanSource-2026-0118",
                   "role": "corroborating_source"
           }
     ],
     "classificationTag": "restricted",
     "tags": [
-          "sigint",
+          "SignalSource",
           "pattern-match",
           "pre-action",
           "theater-a",

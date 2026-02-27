@@ -544,7 +544,7 @@
           </div>
 
           <label>Organization / Program</label>
-          <input id="orgProgram" placeholder="NGA — SEQUOIA"/>
+          <input id="orgProgram" placeholder="ExternalAgency — SEQUOIA"/>
 
           <label>Coherence Steward</label>
           <input id="cohSteward" placeholder="(name)"/>
@@ -1503,7 +1503,7 @@ function redactCandidate(c, idx){
 function packMeta(){
   return {
     prefix: v("packPrefix") || "SEQUOIA",
-    program: v("orgProgram") || "NGA — SEQUOIA",
+    program: v("orgProgram") || "ExternalAgency — SEQUOIA",
     steward: v("cohSteward") || "(unassigned)",
     authority: v("authorityNote") || "(not specified)",
     generated: nowIso(),

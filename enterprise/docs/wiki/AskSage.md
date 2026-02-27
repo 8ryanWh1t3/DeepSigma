@@ -1,6 +1,6 @@
 # AskSage
 
-Integration with [AskSage](https://asksage.ai) for DoD/IC-grade LLM query, training, and dataset management.
+Integration with [AskSage](https://asksage.ai) for CustomerOrg/IC-grade LLM query, training, and dataset management.
 
 ## Overview
 

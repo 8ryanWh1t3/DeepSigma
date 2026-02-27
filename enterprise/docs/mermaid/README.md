@@ -11,7 +11,7 @@ Eleven diagrams define the visual language of Sigma OVERWATCH. Everything else i
 | 06 | [Coherence Ops Pipeline](06-coherence-ops-pipeline.md) | Graph + Pie | DLR / RS / DS / MG data flow through audit, scoring, and reconciliation |
 | 10 | [Integration Map](10-integration-map.md) | Graph | Connectors, surfaces, and runtime integrations (MCP, LangChain, OTel, Foundry, Power Platform) |
 | 11 | [Seal-and-Prove Pipeline](11-seal-and-prove.md) | Flowchart + State | Court-grade admissibility and transparency chain |
-| 12 | [C-TEC Pipeline](12-c-tec-pipeline.md) | Flowchart | Time/Effort/Cost from deterministic telemetry with complexity weighting (Internal/Executive/DoD) |
+| 12 | [C-TEC Pipeline](12-c-tec-pipeline.md) | Flowchart | Time/Effort/Cost from deterministic telemetry with complexity weighting (Internal/Executive/CustomerOrg) |
 | 13 | [Release Preflight Flow](13-release-preflight-flow.md) | Flowchart | Tag integrity gate before PyPI/GHCR publishing |
 | 14 | [KPI Confidence Bands Flow](14-kpi-confidence-bands-flow.md) | Flowchart | KPI score + confidence/bands pipeline from evidence signals |
 | 15 | [DISR Dual-Mode Architecture](15-disr-dual-mode-architecture.md) | Graph | Local default crypto provider with optional KMS plug-ins and authority controls |

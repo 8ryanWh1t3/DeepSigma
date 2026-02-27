@@ -115,3 +115,16 @@ Thank you for your interest in contributing to DeepSigma! This document provides
                                                                                   - ## Questions?
                                                                                  
                                                                                   - Check the [FAQ](https://github.com/8ryanWh1t3/DeepSigma/wiki/FAQ) on the wiki, or open a [Discussion](https://github.com/8ryanWh1t3/DeepSigma/discussions) for questions that aren't bug reports or feature requests.
+
+## Generic Primitive Enforcement (GPE)
+This repo is enforced as 100% generic primitives:
+- No client names, government entities, program names, regulations, or locations.
+- Use tokens: OrgA, PolicyOffice, ProgramOffice, PartnerOrg, SystemX, PersonA, Policy-001.
+- PRs must pass the GPE check (CI).
+
+Run locally:
+- `python scripts/domain_scrub.py`
+- `python scripts/domain_scrub.py --fix`
+
+Pre-commit hook (optional):
+- `pip install pre-commit && pre-commit install`

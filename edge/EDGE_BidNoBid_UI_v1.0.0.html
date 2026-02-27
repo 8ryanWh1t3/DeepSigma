@@ -236,7 +236,7 @@
           <div class="warnbox muted">Local export only unless Edge Sync is configured.</div>
           <label>Opportunity for export</label><select id="packOpp"></select>
           <label>Pack Prefix</label><input id="packPrefix" value="SEQUOIA"/>
-          <label>Organization / Program</label><input id="orgProgram" value="NGA — SEQUOIA"/>
+          <label>Organization / Program</label><input id="orgProgram" value="ExternalAgency — SEQUOIA"/>
           <label>Coherence Steward</label><input id="cohSteward"/>
           <label>Approval / Authority Note</label><textarea id="authorityNote"></textarea>
           <div class="grid">
@@ -475,7 +475,7 @@ function redactOpp(o){
 function packMeta(){
   return {
     prefix: v("packPrefix") || "SEQUOIA",
-    program: v("orgProgram") || "NGA — SEQUOIA",
+    program: v("orgProgram") || "ExternalAgency — SEQUOIA",
     steward: v("cohSteward") || "(unassigned)",
     authority: v("authorityNote") || "(not specified)",
     generated: nowIso(), date: today(), version: "1.0",

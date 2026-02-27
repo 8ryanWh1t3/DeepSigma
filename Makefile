@@ -1,6 +1,6 @@
 .PHONY: demo core-demo core-baseline test-core core-ci \
 	enterprise-demo test-enterprise enterprise-ci \
-	edition-guard secret-scan security-gate openapi-check version-sync-check \
+	edition-guard secret-scan domain-scrub security-gate openapi-check version-sync-check \
 	test-money release-artifacts pulse-insights \
 	icr-health pcr-health tec-ctec health-summary health-v2 \
 	icr-health-gh pcr-health-gh health-v2-gh tec \
@@ -39,6 +39,10 @@ edition-guard:
 secret-scan:
 	@echo "==> Secret scan (lightweight patterns)"
 	@python enterprise/scripts/secret_scan.py
+
+domain-scrub:
+	@echo "==> GPE: Generic Primitive Enforcement scan"
+	@python scripts/domain_scrub.py
 
 security-gate: secret-scan
 	@mkdir -p enterprise/release_kpis

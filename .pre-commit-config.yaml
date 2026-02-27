@@ -1,0 +1,8 @@
+repos:
+  - repo: local
+    hooks:
+      - id: gpe-domain-scrub
+        name: Generic Primitive Enforcement (GPE)
+        entry: python scripts/domain_scrub.py
+        language: system
+        files: \.(md|txt|py|html|yml|yaml|json|toml)$

@@ -209,7 +209,7 @@
         <div class="card">
           <h3>Artifacts Export</h3>
           <label>Prefix</label><input id="packPrefix" value="SEQUOIA"/>
-          <label>Program</label><input id="orgProgram" value="NGA - SEQUOIA"/>
+          <label>Program</label><input id="orgProgram" value="ExternalAgency - SEQUOIA"/>
           <label>Steward</label><input id="cohSteward" value="Pricing Steward"/>
           <label>Safe Export</label><select id="safeExport"><option value="false">OFF</option><option value="true">ON</option></select>
           <label>Safe Level</label><select id="safeExportLevel"><option value="lite">Lite (mask customer/title/notes)</option><option value="strict">Strict (strip narrative)</option></select>
@@ -598,7 +598,7 @@ async function createZipPackPayload(){
   const level = document.getElementById("safeExportLevel")?.value || "lite";
   const meta = {
     prefix: v("packPrefix") || "SEQUOIA",
-    program: v("orgProgram") || "NGA - SEQUOIA",
+    program: v("orgProgram") || "ExternalAgency - SEQUOIA",
     steward: v("cohSteward") || "Pricing Steward",
     generated: nowIso(),
     date: today(),

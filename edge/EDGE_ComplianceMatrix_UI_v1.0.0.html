@@ -195,7 +195,7 @@
           <h3>Artifacts Export</h3>
           <div class="warnbox muted">Exports to local ZIP with manifest + hashes + pack_hash.</div>
           <label>Pack Prefix</label><input id="packPrefix" value="SEQUOIA"/>
-          <label>Organization / Program</label><input id="orgProgram" value="NGA — SEQUOIA"/>
+          <label>Organization / Program</label><input id="orgProgram" value="ExternalAgency — SEQUOIA"/>
           <label>Coherence Steward</label><input id="cohSteward"/>
           <div class="grid">
             <div>
@@ -582,7 +582,7 @@ async function createZipPackPayload(){
   const db = load();
   const meta = {
     prefix: v("packPrefix") || "SEQUOIA",
-    program: v("orgProgram") || "NGA — SEQUOIA",
+    program: v("orgProgram") || "ExternalAgency — SEQUOIA",
     steward: v("cohSteward") || "(unassigned)",
     generated: nowIso(),
     date: today(),

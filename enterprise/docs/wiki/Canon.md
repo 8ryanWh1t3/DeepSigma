@@ -17,7 +17,7 @@
 > | Trigger | Example |
 > |---|---|
 > | A claim has survived multiple DLR cycles without contradiction | "Supplier X delivers within 48 hours" — confirmed across 12 decisions |
-> | A policy decision has been ratified | "All SIGINT claims require ≥2 independent sources" |
+> | A policy decision has been ratified | "All SignalSource claims require ≥2 independent sources" |
 > | An organizational fact needs to be centralized | "Our SLA for Tier 1 incidents is 15 minutes" |
 > | A forecast has been validated by outcome | "Q4 demand will exceed 10,000 units" — confirmed by actuals |
 >
