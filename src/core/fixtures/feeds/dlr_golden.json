@@ -1,0 +1,37 @@
+{
+  "eventId": "evt-dlr-001",
+  "packetId": "CP-2026-02-27-0001",
+  "topic": "decision_lineage",
+  "recordType": "DLR",
+  "uid": "evt-dlr-001",
+  "sequence": 2,
+  "createdAt": "2026-02-27T10:05:00Z",
+  "producer": "coherence-cli",
+  "classification": "LEVEL_0",
+  "payload": {
+    "dlrId": "DLR-aabbccddee11",
+    "episodeId": "ep-2026-0001",
+    "decisionType": "AccountQuarantine",
+    "recordedAt": "2026-02-27T10:05:00Z",
+    "claims": {
+      "context": [{"claimId": "CLAIM-2026-0001"}],
+      "rationale": [{"claimId": "CLAIM-2026-0002", "truthType": "inference", "confidenceAtDecision": 0.88}],
+      "action": [{"claimId": "CLAIM-2026-0003", "role": "constraint"}],
+      "verification": [{"claimId": "CLAIM-2026-0004", "wasFresh": true}],
+      "outcome": [{"claimId": "CLAIM-2026-0005"}]
+    },
+    "rationaleGraph": {
+      "edges": [{"from": "CLAIM-2026-0001", "to": "CLAIM-2026-0002", "rel": "supports"}],
+      "rootClaims": ["CLAIM-2026-0001"]
+    },
+    "outcome": {"code": "success", "reason": "Quarantine applied successfully"},
+    "dteRef": {"decisionType": "AccountQuarantine", "version": "1.0"},
+    "seal": {
+      "hash": "sha256:22334455",
+      "sealedAt": "2026-02-27T10:05:01Z",
+      "version": 1
+    }
+  },
+  "payloadHash": "sha256:b1383894b1975e074a0c76bf96e2895501a77aa7139a4be8674bed1ee0b50752",
+  "schemaVersion": "1.0.0"
+}

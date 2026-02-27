@@ -5,7 +5,8 @@
 	icr-health pcr-health tec-ctec health-summary health-v2 \
 	icr-health-gh pcr-health-gh health-v2-gh tec \
 	roadmap-refresh roadmap-gate \
-	milestone-gate issue-label-gate kpi-issues kpi stability
+	milestone-gate issue-label-gate kpi-issues kpi stability \
+	validate-feeds test-feeds-bus test-feeds-ingest test-feeds-consumers test-feeds-canon test-feeds
 
 demo:
 	bash run_money_demo.sh
@@ -108,3 +109,20 @@ stability:
 
 kpi:
 	cd enterprise && python scripts/kpi_run.py
+
+validate-feeds:
+	python -m pytest tests/test_feeds_schemas.py tests/test_feeds_envelope.py tests/test_feeds_cli.py -v
+
+test-feeds-bus:
+	python -m pytest tests/test_feeds_bus.py -v
+
+test-feeds-ingest:
+	python -m pytest tests/test_feeds_ingest.py -v
+
+test-feeds-consumers:
+	python -m pytest tests/test_feeds_consumers.py -v
+
+test-feeds-canon:
+	python -m pytest tests/test_feeds_canon.py -v
+
+test-feeds: validate-feeds test-feeds-bus test-feeds-ingest test-feeds-consumers test-feeds-canon

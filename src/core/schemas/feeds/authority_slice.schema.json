@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/authority_slice.schema.json",
+  "title": "FEEDS Authority Slice Payload",
+  "description": "A time-bound slice of authority declaring which claims are blessed by a given authority source.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["sliceId", "authoritySource", "authorityRole", "scope", "claimsBlessed", "effectiveAt", "seal"],
+  "properties": {
+    "sliceId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique authority slice identifier."
+    },
+    "authoritySource": {
+      "type": "string",
+      "minLength": 1,
+      "description": "System or role that provides this authority."
+    },
+    "authorityRole": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Role under which authority is granted."
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Domain or boundary within which this authority applies."
+    },
+    "claimsBlessed": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Claim IDs blessed under this authority."
+    },
+    "effectiveAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this authority slice becomes effective."
+    },
+    "expiresAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this authority slice expires."
+    },
+    "seal": {
+      "type": "object",
+      "required": ["hash", "sealedAt", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "hash": { "type": "string" },
+        "sealedAt": { "type": "string", "format": "date-time" },
+        "version": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

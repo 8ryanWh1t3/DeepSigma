@@ -121,3 +121,53 @@ def coherence_pipeline(sample_episodes, sample_drift_events):
         mg.add_drift(d)
 
     return dlr, rs, ds, mg
+
+
+# ── FEEDS fixtures ────────────────────────────────────────────────
+
+FEEDS_FIXTURES_DIR = _REPO_ROOT / "src" / "core" / "fixtures" / "feeds"
+
+
+@pytest.fixture
+def feeds_golden_fixtures():
+    """Load all FEEDS golden fixtures as a dict keyed by topic."""
+    fixtures = {}
+    for f in sorted(FEEDS_FIXTURES_DIR.glob("*_golden.json")):
+        fixtures[f.stem.replace("_golden", "")] = json.loads(f.read_text())
+    return fixtures
+
+
+@pytest.fixture
+def tmp_topics_root(tmp_path):
+    """Temporary topics root directory for FEEDS bus testing."""
+    from core.feeds.types import FeedTopic
+    for topic in FeedTopic:
+        for sub in ("inbox", "processing", "ack", "dlq"):
+            (tmp_path / topic.value / sub).mkdir(parents=True)
+    return tmp_path
+
+
+@pytest.fixture
+def minimal_feed_envelope():
+    """Factory fixture producing minimal valid FEEDS envelope dicts."""
+    from core.feeds import build_envelope, FeedTopic
+
+    def _make(topic=FeedTopic.TRUTH_SNAPSHOT, payload=None, **overrides):
+        if payload is None:
+            payload = {
+                "snapshotId": "TS-test-001",
+                "capturedAt": "2026-02-27T10:00:00Z",
+                "claims": [{"claimId": "CLAIM-2026-0001"}],
+                "evidenceSummary": "Test evidence.",
+                "coherenceScore": 80,
+                "seal": {"hash": "sha256:test", "sealedAt": "2026-02-27T10:00:01Z", "version": 1},
+            }
+        env = build_envelope(
+            topic=topic,
+            payload=payload,
+            packet_id="CP-2026-02-27-0001",
+            producer="test-producer",
+        )
+        env.update(overrides)
+        return env
+    return _make

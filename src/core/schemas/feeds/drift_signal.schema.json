@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/drift_signal.schema.json",
+  "title": "FEEDS Drift Signal Payload",
+  "description": "Drift signal detected by FEEDS consumers. Extends core drift types with authority_mismatch and process_gap.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["driftId", "driftType", "severity", "detectedAt", "evidenceRefs", "recommendedPatchType", "fingerprint"],
+  "properties": {
+    "driftId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique drift signal identifier."
+    },
+    "episodeId": {
+      "type": "string",
+      "description": "Associated episode, if applicable."
+    },
+    "driftType": {
+      "type": "string",
+      "enum": [
+        "time", "freshness", "fallback", "bypass", "verify",
+        "outcome", "fanout", "contention",
+        "authority_mismatch", "process_gap"
+      ],
+      "description": "Drift type. Includes FEEDS-specific types: authority_mismatch, process_gap."
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["green", "yellow", "red"],
+      "description": "Severity level."
+    },
+    "detectedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this drift was detected."
+    },
+    "evidenceRefs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "References to evidence artifacts."
+    },
+    "recommendedPatchType": {
+      "type": "string",
+      "enum": [
+        "dte_change", "ttl_change", "cache_bundle_change",
+        "routing_change", "verification_change",
+        "action_scope_tighten", "manual_review",
+        "authority_update", "process_fix"
+      ],
+      "description": "Recommended remediation type. Includes FEEDS-specific: authority_update, process_fix."
+    },
+    "fingerprint": {
+      "type": "object",
+      "required": ["key", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "key": { "type": "string" },
+        "version": { "type": "string" }
+      },
+      "description": "Deduplication fingerprint."
+    },
+    "notes": {
+      "type": "string",
+      "description": "Human-readable notes."
+    }
+  }
+}

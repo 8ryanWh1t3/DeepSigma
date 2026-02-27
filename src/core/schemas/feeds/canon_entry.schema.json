@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/canon_entry.schema.json",
+  "title": "FEEDS Canon Entry Payload",
+  "description": "Canon entry carried as a FEEDS payload. Mirrors core canon structure.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["canonId", "title", "claimIds", "blessedBy", "blessedAt", "scope", "version", "seal"],
+  "properties": {
+    "canonId": {
+      "type": "string",
+      "pattern": "^CANON-[0-9]{4}-[0-9]{4,}$",
+      "description": "Stable canon identifier. Format: CANON-YYYY-NNNN."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 5,
+      "description": "Human-readable title."
+    },
+    "description": {
+      "type": "string",
+      "description": "Extended description."
+    },
+    "claimIds": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" },
+      "description": "Ordered claim IDs promoted to canon."
+    },
+    "dlrIds": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "DLR IDs that produced the decisions leading to these claims."
+    },
+    "blessedBy": {
+      "type": "string",
+      "description": "Authority that approved this canon entry."
+    },
+    "blessedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this canon entry was approved."
+    },
+    "scope": {
+      "type": "object",
+      "required": ["domain"],
+      "additionalProperties": false,
+      "properties": {
+        "domain": { "type": "string" },
+        "region": { "type": "string" },
+        "context": { "type": "string" }
+      }
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Semantic version."
+    },
+    "supersedes": {
+      "type": "string",
+      "description": "Prior canonId this entry replaces."
+    },
+    "seal": {
+      "type": "object",
+      "required": ["hash", "sealedAt", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "hash": { "type": "string" },
+        "sealedAt": { "type": "string", "format": "date-time" },
+        "version": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Free-form tags."
+    }
+  }
+}

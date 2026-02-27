@@ -28,6 +28,10 @@ class NodeKind(str, Enum):
     PATCH = "patch"
     EVIDENCE = "evidence"
     CLAIM = "claim"
+    TRUTH_SNAPSHOT = "truth_snapshot"
+    AUTHORITY_SLICE = "authority_slice"
+    CANON_ENTRY = "canon_entry"
+    PACKET_INDEX = "packet_index"
 
 
 class EdgeKind(str, Enum):
@@ -46,6 +50,10 @@ class EdgeKind(str, Enum):
     CLAIM_EVIDENCE = "claim_evidence"        # claim -> evidence
     CLAIM_SOURCE = "claim_source"            # claim -> source node
     DECIDES_CLAIM = "decides_claim"          # episode -> claim
+    PACKET_CONTAINS = "packet_contains"      # packet -> event
+    DETECTED_FROM = "detected_from"          # drift signal -> evidence ref
+    CE_RESOLVES = "ce_resolves"              # canon entry -> claim
+    ALS_AUTHORIZES = "als_authorizes"        # authority slice -> claim
 
 
 @dataclass

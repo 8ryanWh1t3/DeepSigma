@@ -1,0 +1,31 @@
+{
+  "eventId": "evt-manifest-001",
+  "packetId": "CP-2026-02-27-0001",
+  "topic": "packet_index",
+  "recordType": "MANIFEST",
+  "uid": "evt-manifest-001",
+  "sequence": 5,
+  "createdAt": "2026-02-27T12:00:00Z",
+  "producer": "coherence-cli",
+  "classification": "LEVEL_0",
+  "payload": {
+    "packetId": "CP-2026-02-27-0001",
+    "createdAt": "2026-02-27T12:00:00Z",
+    "producer": "coherence-cli",
+    "artifactManifest": [
+      {"topic": "truth_snapshot", "recordType": "TS", "eventId": "evt-ts-001", "payloadHash": "sha256:9782b2ab21b39658f740aa7381b4f409a7937a59e1c8ea9ded800a2be879c765"},
+      {"topic": "authority_slice", "recordType": "ALS", "eventId": "evt-als-001", "payloadHash": "sha256:ad3f1d9fe2e1539f9cfcb498eedaf41cc47add7693fcf02fb02d214ba74959e0"},
+      {"topic": "decision_lineage", "recordType": "DLR", "eventId": "evt-dlr-001", "payloadHash": "sha256:b1383894b1975e074a0c76bf96e2895501a77aa7139a4be8674bed1ee0b50752"},
+      {"topic": "drift_signal", "recordType": "DS", "eventId": "evt-ds-001", "payloadHash": "sha256:57c24b7b74d05e84fe93585deba9c866b54737ddf32a5731fc30f3e4a19fc829"},
+      {"topic": "canon_entry", "recordType": "CE", "eventId": "evt-ce-001", "payloadHash": "sha256:8bbe7a8a4b0717a2f42dbc28eb0c5e3067977623c242cfff946f678c4c708c42"}
+    ],
+    "totalEvents": 6,
+    "seal": {
+      "hash": "sha256:aabb0011",
+      "sealedAt": "2026-02-27T12:00:01Z",
+      "version": 1
+    }
+  },
+  "payloadHash": "sha256:2fbd9042525bf6ee5f2070613c2785849ab14643a796ee86606746a509bed07d",
+  "schemaVersion": "1.0.0"
+}

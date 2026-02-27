@@ -1,0 +1,27 @@
+{
+  "eventId": "evt-ce-001",
+  "packetId": "CP-2026-02-27-0001",
+  "topic": "canon_entry",
+  "recordType": "CE",
+  "uid": "evt-ce-001",
+  "sequence": 4,
+  "createdAt": "2026-02-27T08:00:00Z",
+  "producer": "coherence-cli",
+  "classification": "LEVEL_0",
+  "payload": {
+    "canonId": "CANON-2026-0001",
+    "title": "Security quarantine policy baseline v1",
+    "claimIds": ["CLAIM-2026-0001", "CLAIM-2026-0003"],
+    "blessedBy": "security-policy-owner",
+    "blessedAt": "2026-02-27T08:00:00Z",
+    "scope": {"domain": "security-operations"},
+    "version": "1.0.0",
+    "seal": {
+      "hash": "sha256:66778899",
+      "sealedAt": "2026-02-27T08:00:01Z",
+      "version": 1
+    }
+  },
+  "payloadHash": "sha256:8bbe7a8a4b0717a2f42dbc28eb0c5e3067977623c242cfff946f678c4c708c42",
+  "schemaVersion": "1.0.0"
+}

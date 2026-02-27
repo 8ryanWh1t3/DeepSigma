@@ -341,6 +341,252 @@ def cmd_dte_check(args: argparse.Namespace) -> None:
     sys.exit(1 if results else 0)
 
 
+def cmd_feeds_validate(args: argparse.Namespace) -> None:
+    p = Path(args.path)
+    if not p.exists():
+        print(f"Error: {args.path} not found", file=sys.stderr)
+        sys.exit(1)
+
+    items: list = []
+    if p.is_file():
+        items = _load_json_like(p.read_text())
+    elif p.is_dir():
+        for f in sorted(p.glob("*.json")):
+            items.extend(_load_json_like(f.read_text()))
+
+    from .feeds.validate import validate_feed_event
+
+    all_valid = True
+    results = []
+    for i, item in enumerate(items):
+        result = validate_feed_event(item)
+        results.append({"index": i, "valid": result.valid, "errors": [
+            {"path": e.path, "message": e.message} for e in result.errors
+        ]})
+        if not result.valid:
+            all_valid = False
+
+    if getattr(args, "json", False):
+        print(json.dumps({"valid": all_valid, "results": results}, indent=2))
+    else:
+        status = "PASS" if all_valid else "FAIL"
+        print(f"FEEDS Validation: {status}")
+        for r in results:
+            if not r["valid"]:
+                for e in r["errors"]:
+                    print(f"  [{r['index']}] {e['path']}: {e['message']}")
+
+    sys.exit(0 if all_valid else 1)
+
+
+def cmd_feeds_ingest(args: argparse.Namespace) -> None:
+    from .feeds.ingest import IngestOrchestrator
+    from .feeds.types import Classification
+
+    classification = getattr(args, "classification", "LEVEL_0")
+    orchestrator = IngestOrchestrator(
+        topics_root=args.topics,
+        producer="coherence-cli",
+        classification=classification,
+    )
+    result = orchestrator.ingest(args.packet_dir)
+
+    if getattr(args, "json", False):
+        from dataclasses import asdict
+        print(json.dumps(asdict(result), indent=2))
+    else:
+        status = "OK" if result.success else "FAIL"
+        print(f"Ingest {status}: packet={result.packet_id}, events={result.events_published}")
+        if result.errors:
+            for err in result.errors:
+                print(f"  ERROR: {err}")
+        if result.drift_signal_id:
+            print(f"  PROCESS_GAP drift: {result.drift_signal_id}")
+
+    sys.exit(0 if result.success else 1)
+
+
+def cmd_feeds_triage_list(args: argparse.Namespace) -> None:
+    from .feeds.consumers.triage import TriageStore
+
+    store = TriageStore(args.db)
+    state = getattr(args, "state", None)
+    entries = store.list_entries(state=state)
+    store.close()
+
+    if getattr(args, "json", False):
+        print(json.dumps([{
+            "driftId": e.drift_id, "state": e.state.value,
+            "severity": e.severity, "driftType": e.drift_type,
+            "packetId": e.packet_id, "updatedAt": e.updated_at,
+            "notes": e.notes,
+        } for e in entries], indent=2))
+    else:
+        if not entries:
+            print("No triage entries found.")
+        else:
+            for e in entries:
+                print(f"  [{e.state.value}] {e.drift_id}  sev={e.severity}  type={e.drift_type}")
+
+
+def cmd_feeds_triage_set_state(args: argparse.Namespace) -> None:
+    from .feeds.consumers.triage import TriageStore
+
+    store = TriageStore(args.db)
+    try:
+        entry = store.set_state(args.drift_id, args.new_state, notes=getattr(args, "notes", ""))
+        print(f"Updated {entry.drift_id} -> {entry.state.value}")
+    except (KeyError, ValueError) as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        sys.exit(1)
+    finally:
+        store.close()
+
+
+def cmd_feeds_triage_stats(args: argparse.Namespace) -> None:
+    from .feeds.consumers.triage import TriageStore
+
+    store = TriageStore(args.db)
+    stats = store.stats()
+    store.close()
+
+    if getattr(args, "json", False):
+        print(json.dumps(stats, indent=2))
+    else:
+        print(f"Total: {stats['total']}")
+        print("  By state:")
+        for s, c in stats.get("by_state", {}).items():
+            print(f"    {s}: {c}")
+        print("  By severity:")
+        for s, c in stats.get("by_severity", {}).items():
+            print(f"    {s}: {c}")
+
+
+def cmd_feeds_canon_list(args: argparse.Namespace) -> None:
+    from .feeds.canon.store import CanonStore
+
+    store = CanonStore(args.db)
+    domain = getattr(args, "domain", None)
+    entries = store.list_entries(domain=domain)
+    store.close()
+
+    if getattr(args, "json", False):
+        print(json.dumps(entries, indent=2))
+    else:
+        if not entries:
+            print("No canon entries found.")
+        else:
+            for e in entries:
+                sup = f"  supersededBy={e['supersededBy']}" if e.get("supersededBy") else ""
+                print(f"  [{e['version']}] {e['canonId']}  domain={e['domain']}{sup}")
+
+
+def cmd_feeds_canon_add(args: argparse.Namespace) -> None:
+    from .feeds.canon.store import CanonStore
+
+    p = Path(args.file)
+    if not p.exists():
+        print(f"Error: {args.file} not found", file=sys.stderr)
+        sys.exit(1)
+
+    canon_entry = json.loads(p.read_text())
+    # Accept either a bare payload or an envelope
+    if "payload" in canon_entry and "topic" in canon_entry:
+        canon_entry = canon_entry["payload"]
+
+    topics_root = getattr(args, "topics", None)
+    store = CanonStore(args.db, topics_root=topics_root)
+    canon_id = store.add(canon_entry)
+    store.close()
+    print(f"Added canon entry: {canon_id}")
+
+
+def cmd_feeds_graph_build(args: argparse.Namespace) -> None:
+    from .feeds.canon.mg_writer import MGWriter
+
+    topics_root = Path(args.topics)
+    packet_id = args.packet_id
+
+    # Collect all events from ack/ dirs that match the packet_id
+    events: list = []
+    for topic_dir in topics_root.iterdir():
+        if not topic_dir.is_dir() or topic_dir.name.startswith("."):
+            continue
+        for sub in ("ack", "inbox"):
+            sub_dir = topic_dir / sub
+            if not sub_dir.is_dir():
+                continue
+            for f in sub_dir.glob("*.json"):
+                try:
+                    event = json.loads(f.read_text())
+                    if event.get("packetId") == packet_id:
+                        events.append(event)
+                except (json.JSONDecodeError, KeyError):
+                    continue
+
+    if not events:
+        print(f"No events found for packet {packet_id}", file=sys.stderr)
+        sys.exit(1)
+
+    writer = MGWriter()
+    output = getattr(args, "output", ".")
+    path = writer.write_graph(packet_id, events, output)
+    print(f"Graph written: {path}")
+
+
+def cmd_feeds_bus_init(args: argparse.Namespace) -> None:
+    from .feeds.bus import init_topic_layout
+    root = init_topic_layout(args.topics_root)
+    print(f"FEEDS bus initialized at {root}")
+
+
+def cmd_feeds_publish(args: argparse.Namespace) -> None:
+    p = Path(args.file)
+    if not p.exists():
+        print(f"Error: {args.file} not found", file=sys.stderr)
+        sys.exit(1)
+
+    event = json.loads(p.read_text())
+    from .feeds.bus import Publisher
+    pub = Publisher(args.topics)
+    try:
+        written = pub.publish(args.topic, event)
+        print(f"Published: {written.name}")
+    except (ValueError, FileNotFoundError) as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        sys.exit(1)
+
+
+def cmd_feeds_poll(args: argparse.Namespace) -> None:
+    from .feeds.bus import Subscriber
+    sub = Subscriber(args.topics, args.topic)
+
+    processed: list = []
+    def _handler(event: dict) -> None:
+        processed.append(event.get("eventId", "unknown"))
+
+    acked = sub.poll(_handler, batch_size=args.batch)
+    if getattr(args, "json", False):
+        print(json.dumps({"acked": acked, "eventIds": processed}, indent=2))
+    else:
+        print(f"Polled {acked} event(s) from {args.topic}")
+        for eid in processed:
+            print(f"  - {eid}")
+
+
+def cmd_feeds_replay_dlq(args: argparse.Namespace) -> None:
+    from .feeds.bus import DLQManager
+    dlq = DLQManager(args.topics, args.topic)
+
+    event_id = getattr(args, "event_id", None)
+    replayed = dlq.replay(event_id=event_id)
+
+    if getattr(args, "json", False):
+        print(json.dumps({"replayed": replayed}, indent=2))
+    else:
+        print(f"Replayed {replayed} event(s) from {args.topic} DLQ")
+
+
 def cmd_demo(args: argparse.Namespace) -> None:  # noqa: ARG001
     parser = argparse.ArgumentParser(
         prog="coherence demo",
@@ -450,6 +696,94 @@ def main() -> None:
     p_dte_check.add_argument("--dte", required=True, help="Path to DTE spec JSON")
     p_dte_check.add_argument("--json", action="store_true", help="Output JSON")
     p_dte_check.set_defaults(func=cmd_dte_check)
+
+    # ── feeds ─────────────────────────────────────────────────────
+    p_feeds = subparsers.add_parser("feeds", help="FEEDS operations")
+    feeds_sub = p_feeds.add_subparsers(dest="feeds_command", required=True)
+
+    p_feeds_validate = feeds_sub.add_parser("validate", help="Validate FEEDS event(s)")
+    p_feeds_validate.add_argument("path", help="Path to FEEDS event JSON file or directory")
+    p_feeds_validate.add_argument("--json", action="store_true", help="Output JSON")
+    p_feeds_validate.set_defaults(func=cmd_feeds_validate)
+
+    p_feeds_bus_init = feeds_sub.add_parser("bus-init", help="Initialize FEEDS topic layout")
+    p_feeds_bus_init.add_argument("topics_root", help="Root directory for FEEDS topics")
+    p_feeds_bus_init.set_defaults(func=cmd_feeds_bus_init)
+
+    p_feeds_publish = feeds_sub.add_parser("publish", help="Publish a FEEDS event")
+    p_feeds_publish.add_argument("topic", help="Target FEEDS topic")
+    p_feeds_publish.add_argument("file", help="Path to event JSON file")
+    p_feeds_publish.add_argument("--topics", required=True, help="Topics root directory")
+    p_feeds_publish.set_defaults(func=cmd_feeds_publish)
+
+    p_feeds_poll = feeds_sub.add_parser("poll", help="Poll a FEEDS topic inbox")
+    p_feeds_poll.add_argument("topic", help="FEEDS topic to poll")
+    p_feeds_poll.add_argument("--topics", required=True, help="Topics root directory")
+    p_feeds_poll.add_argument("--batch", type=int, default=10, help="Batch size")
+    p_feeds_poll.add_argument("--json", action="store_true", help="Output JSON")
+    p_feeds_poll.set_defaults(func=cmd_feeds_poll)
+
+    p_feeds_replay = feeds_sub.add_parser("replay-dlq", help="Replay DLQ events")
+    p_feeds_replay.add_argument("topic", help="FEEDS topic")
+    p_feeds_replay.add_argument("--topics", required=True, help="Topics root directory")
+    p_feeds_replay.add_argument("--event-id", default=None, help="Specific event ID to replay")
+    p_feeds_replay.add_argument("--json", action="store_true", help="Output JSON")
+    p_feeds_replay.set_defaults(func=cmd_feeds_replay_dlq)
+
+    p_feeds_ingest = feeds_sub.add_parser("ingest", help="Ingest a coherence packet")
+    p_feeds_ingest.add_argument("packet_dir", help="Path to packet directory")
+    p_feeds_ingest.add_argument("--topics", required=True, help="Topics root directory")
+    p_feeds_ingest.add_argument("--classification", default="LEVEL_0", help="Classification level")
+    p_feeds_ingest.add_argument("--json", action="store_true", help="Output JSON")
+    p_feeds_ingest.set_defaults(func=cmd_feeds_ingest)
+
+    # ── triage ──
+    p_triage = feeds_sub.add_parser("triage", help="Drift triage operations")
+    triage_sub = p_triage.add_subparsers(dest="triage_command", required=True)
+
+    p_triage_list = triage_sub.add_parser("list", help="List triage entries")
+    p_triage_list.add_argument("--state", default=None, help="Filter by state")
+    p_triage_list.add_argument("--db", default="drift_triage.db", help="Triage DB path")
+    p_triage_list.add_argument("--json", action="store_true", help="Output JSON")
+    p_triage_list.set_defaults(func=cmd_feeds_triage_list)
+
+    p_triage_set = triage_sub.add_parser("set-state", help="Transition triage entry state")
+    p_triage_set.add_argument("drift_id", help="Drift signal ID")
+    p_triage_set.add_argument("new_state", help="Target state")
+    p_triage_set.add_argument("--notes", default="", help="Transition notes")
+    p_triage_set.add_argument("--db", default="drift_triage.db", help="Triage DB path")
+    p_triage_set.set_defaults(func=cmd_feeds_triage_set_state)
+
+    p_triage_stats = triage_sub.add_parser("stats", help="Triage statistics")
+    p_triage_stats.add_argument("--db", default="drift_triage.db", help="Triage DB path")
+    p_triage_stats.add_argument("--json", action="store_true", help="Output JSON")
+    p_triage_stats.set_defaults(func=cmd_feeds_triage_stats)
+
+    # ── canon ──
+    p_canon = feeds_sub.add_parser("canon", help="Canon store operations")
+    canon_sub = p_canon.add_subparsers(dest="canon_command", required=True)
+
+    p_canon_list = canon_sub.add_parser("list", help="List canon entries")
+    p_canon_list.add_argument("--domain", default=None, help="Filter by domain")
+    p_canon_list.add_argument("--db", default="canon_store.db", help="Canon DB path")
+    p_canon_list.add_argument("--json", action="store_true", help="Output JSON")
+    p_canon_list.set_defaults(func=cmd_feeds_canon_list)
+
+    p_canon_add = canon_sub.add_parser("add", help="Add a canon entry")
+    p_canon_add.add_argument("file", help="Path to canon entry JSON file")
+    p_canon_add.add_argument("--db", default="canon_store.db", help="Canon DB path")
+    p_canon_add.add_argument("--topics", default=None, help="Topics root for cache invalidation")
+    p_canon_add.set_defaults(func=cmd_feeds_canon_add)
+
+    # ── graph ──
+    p_graph = feeds_sub.add_parser("graph", help="Memory graph operations")
+    graph_sub = p_graph.add_subparsers(dest="graph_command", required=True)
+
+    p_graph_build = graph_sub.add_parser("build", help="Build per-packet memory graph")
+    p_graph_build.add_argument("packet_id", help="Coherence packet ID")
+    p_graph_build.add_argument("--topics", required=True, help="Topics root directory")
+    p_graph_build.add_argument("--output", default=".", help="Output directory")
+    p_graph_build.set_defaults(func=cmd_feeds_graph_build)
 
     # ── demo ─────────────────────────────────────────────────────
     p_demo = subparsers.add_parser(

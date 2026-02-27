@@ -1,0 +1,26 @@
+{
+  "eventId": "evt-als-001",
+  "packetId": "CP-2026-02-27-0001",
+  "topic": "authority_slice",
+  "recordType": "ALS",
+  "uid": "evt-als-001",
+  "sequence": 1,
+  "createdAt": "2026-02-27T09:00:00Z",
+  "producer": "coherence-cli",
+  "classification": "LEVEL_0",
+  "payload": {
+    "sliceId": "ALS-2026-0001",
+    "authoritySource": "governance-engine",
+    "authorityRole": "policy-owner",
+    "scope": "security-operations",
+    "claimsBlessed": ["CLAIM-2026-0001", "CLAIM-2026-0002"],
+    "effectiveAt": "2026-02-27T09:00:00Z",
+    "seal": {
+      "hash": "sha256:eeff0011",
+      "sealedAt": "2026-02-27T09:00:01Z",
+      "version": 1
+    }
+  },
+  "payloadHash": "sha256:ad3f1d9fe2e1539f9cfcb498eedaf41cc47add7693fcf02fb02d214ba74959e0",
+  "schemaVersion": "1.0.0"
+}
