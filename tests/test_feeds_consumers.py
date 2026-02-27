@@ -1,11 +1,15 @@
-"""Tests for FEEDS consumers — authority gate, evidence check, triage store."""
+"""Tests for FEEDS consumers — authority gate, evidence check, triage store, claim trigger."""
 
 import json
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
 from core.feeds.consumers import (
     AuthorityGateConsumer,
+    ClaimSubmitResult,
+    ClaimTriggerPipeline,
+    ClaimTriggerResult,
     EvidenceCheckConsumer,
     TriageEntry,
     TriageState,
@@ -309,3 +313,137 @@ class TestTriageStore:
         assert entry is not None
         assert entry.drift_id == "DS-P1"
         store2.close()
+
+
+# ── Claim Trigger Pipeline Tests ─────────────────────────────────
+
+
+class TestClaimTriggerPipeline:
+    def test_clean_claim_accepted(self, minimal_claim):
+        pipeline = ClaimTriggerPipeline()
+        result = pipeline.submit([minimal_claim()])
+        assert result.submitted == 1
+        assert result.accepted == 1
+        assert result.rejected == 0
+        assert result.results[0].accepted is True
+
+    def test_contradiction_generates_drift(self, minimal_claim):
+        canon = [{"claimId": "CANON-001"}]
+        claim = minimal_claim(
+            claim_id="TEST-C",
+            graph={"contradicts": ["CANON-001"]},
+        )
+        pipeline = ClaimTriggerPipeline(canon_claims=canon)
+        result = pipeline.submit([claim])
+        assert result.rejected == 1
+        assert result.drift_signals_emitted >= 1
+        assert result.results[0].accepted is False
+        issue_types = [i["type"] for i in result.results[0].issues]
+        assert "contradiction" in issue_types
+
+    def test_expired_claim_generates_drift(self, minimal_claim):
+        old_time = (datetime.now(timezone.utc) - timedelta(hours=48)).isoformat()
+        claim = minimal_claim(
+            claim_id="TEST-EXP",
+            timestampCreated=old_time,
+            halfLife={"value": 1, "unit": "hours"},
+        )
+        pipeline = ClaimTriggerPipeline()
+        result = pipeline.submit([claim])
+        # Expired is yellow, so still accepted (no red)
+        assert result.accepted == 1
+        assert result.drift_signals_emitted >= 1
+        issue_types = [i["type"] for i in result.results[0].issues]
+        assert "expired" in issue_types
+
+    def test_unauthorized_claim_rejected(self, minimal_claim):
+        from core.authority import AuthorityLedger
+        ledger = AuthorityLedger()  # empty — no grants
+        claim = minimal_claim(claim_id="UNAUTH-001")
+        pipeline = ClaimTriggerPipeline(authority_ledger=ledger)
+        result = pipeline.submit([claim])
+        assert result.rejected == 1
+        assert result.results[0].accepted is False
+        issue_types = [i["type"] for i in result.results[0].issues]
+        assert "unauthorized" in issue_types
+
+    def test_authorized_claim_accepted(self, minimal_claim, minimal_authority_entry):
+        from core.authority import AuthorityLedger
+        ledger = AuthorityLedger()
+        ledger.append(minimal_authority_entry(claims=["AUTH-OK"]))
+        claim = minimal_claim(claim_id="AUTH-OK")
+        pipeline = ClaimTriggerPipeline(authority_ledger=ledger)
+        result = pipeline.submit([claim])
+        assert result.accepted == 1
+        assert result.results[0].accepted is True
+
+    def test_batch_mixed_results(self, minimal_claim):
+        canon = [{"claimId": "CANON-X"}]
+        good = minimal_claim(claim_id="GOOD-001")
+        bad = minimal_claim(
+            claim_id="BAD-001",
+            graph={"contradicts": ["CANON-X"]},
+        )
+        pipeline = ClaimTriggerPipeline(canon_claims=canon)
+        result = pipeline.submit([good, bad])
+        assert result.submitted == 2
+        assert result.accepted == 1
+        assert result.rejected == 1
+
+    def test_graph_node_created(self, minimal_claim):
+        from core.memory_graph import MemoryGraph
+        mg = MemoryGraph()
+        claim = minimal_claim(claim_id="MG-001")
+        pipeline = ClaimTriggerPipeline(mg=mg)
+        result = pipeline.submit([claim], episode_id="ep-test-001")
+        assert result.results[0].graph_node_id is not None
+
+    def test_drift_ingested_into_collector(self, minimal_claim):
+        from core.drift_signal import DriftSignalCollector
+        ds = DriftSignalCollector()
+        canon = [{"claimId": "CANON-D"}]
+        claim = minimal_claim(
+            claim_id="DRIFT-001",
+            graph={"contradicts": ["CANON-D"]},
+        )
+        pipeline = ClaimTriggerPipeline(canon_claims=canon, ds=ds)
+        pipeline.submit([claim])
+        assert ds.event_count >= 1
+
+    def test_publish_to_feeds(self, minimal_claim, tmp_topics_root):
+        claim = minimal_claim(claim_id="PUB-001")
+        canon = [{"claimId": "CANON-P"}]
+        bad_claim = minimal_claim(
+            claim_id="PUB-BAD",
+            graph={"contradicts": ["CANON-P"]},
+        )
+        pipeline = ClaimTriggerPipeline(
+            canon_claims=canon,
+            topics_root=tmp_topics_root,
+        )
+        result = pipeline.submit([bad_claim], packet_id="CP-2026-02-27-0001")
+        assert len(result.results[0].published_events) >= 1
+
+    def test_no_publish_without_topics(self, minimal_claim):
+        canon = [{"claimId": "CANON-NP"}]
+        claim = minimal_claim(
+            claim_id="NP-001",
+            graph={"contradicts": ["CANON-NP"]},
+        )
+        pipeline = ClaimTriggerPipeline(canon_claims=canon)
+        result = pipeline.submit([claim])
+        assert result.results[0].published_events == []
+
+    def test_empty_batch(self):
+        pipeline = ClaimTriggerPipeline()
+        result = pipeline.submit([])
+        assert result.submitted == 0
+        assert result.accepted == 0
+        assert result.rejected == 0
+        assert result.results == []
+
+    def test_result_shape(self, minimal_claim):
+        pipeline = ClaimTriggerPipeline()
+        result = pipeline.submit([minimal_claim()])
+        assert isinstance(result, ClaimTriggerResult)
+        assert isinstance(result.results[0], ClaimSubmitResult)

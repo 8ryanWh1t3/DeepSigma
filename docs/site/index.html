@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DeepSigma — Reference Layer for Agentic AI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="active">Home</a>
+  <a href="quickstart.html">Quickstart</a>
+  <a href="demo.html">Demo</a>
+  <a href="manifesto.html">Manifesto</a>
+  <a href="metrics.html">Metrics</a>
+</nav>
+
+<h1>Reference Layer for Agentic AI</h1>
+<p>Decision infrastructure that makes autonomous systems observable, auditable, and governable.</p>
+
+<div style="margin: 1rem 0;">
+  <span class="badge badge-green">coherence 90/100</span>
+  <span class="badge badge-blue">383 tests</span>
+  <span class="badge badge-green">MIT</span>
+</div>
+
+<h2>Three Failures That Break Autonomous Systems</h2>
+
+<div class="card-grid">
+  <div class="card">
+    <h3>Decision Amnesia</h3>
+    <p>Agents act, but nothing remembers why. Reasoning evaporates after execution. Auditors find silence where there should be evidence.</p>
+  </div>
+  <div class="card">
+    <h3>Authority Vacuum</h3>
+    <p>No verifiable chain from human intent to machine action. Policies exist somewhere, but the connection is invisible and unverifiable.</p>
+  </div>
+  <div class="card">
+    <h3>Silent Drift</h3>
+    <p>Behavior changes and nobody notices. Confidence shifts, outcome distributions rotate. The first sign of drift is a production incident.</p>
+  </div>
+</div>
+
+<h2>Before and After</h2>
+
+<h3>Before: No Reference Layer</h3>
+<pre class="terminal"><span class="comment"># Agent makes a decision...</span>
+<span class="prompt">$</span> agent.execute("quarantine account acc-12345")
+<span class="value">OK</span>
+
+<span class="comment"># Later: why did it do that?</span>
+<span class="prompt">$</span> audit.explain("acc-12345")
+<span class="error">ERROR: No decision record found</span></pre>
+
+<h3>After: With Reference Layer</h3>
+<pre class="terminal"><span class="prompt">$</span> coherence demo --json | jq '.baseline.overall_score'
+<span class="value">90.0</span>
+
+<span class="prompt">$</span> coherence agent prove ep-fraud-detector-v3-0001
+<span class="value">{
+  "episodeId": "ep-fraud-detector-v3-0001",
+  "decisionType": "quarantine_account",
+  "actor": {"type": "agent", "id": "fraud-detector-v3"},
+  "seal": {"sealHash": "sha256:a1b2c3..."}
+}</span></pre>
+
+<h2>Quick Start</h2>
+<pre class="terminal"><span class="prompt">$</span> pip install deepsigma
+<span class="prompt">$</span> python -c "
+from core import AgentSession
+session = AgentSession('my-agent')
+session.log_decision({
+    'action': 'quarantine_account',
+    'reason': 'Suspicious activity',
+    'actor': {'type': 'agent', 'id': 'my-agent'},
+    'confidence': 0.92,
+})
+report = session.score()
+print(f'Coherence: {report[\"overall_score\"]}/100 ({report[\"grade\"]})')
+"
+<span class="value">Coherence: 90.0/100 (A)</span></pre>
+
+</body>
+</html>

@@ -2,48 +2,58 @@
 [![PyPI](https://img.shields.io/pypi/v/deepsigma)](https://pypi.org/project/deepsigma/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
+[![Coherence Score](https://img.shields.io/badge/coherence-90%2F100-brightgreen)](./docs/metrics.md)
 
 # DeepSigma
 
-Institutional decision infrastructure: capture intent, run governed execution, detect drift, and patch safely.
+**DeepSigma prevents decision amnesia in AI systems.**
+
+Log every agent decision. Detect when it drifts. Prove what happened.
+
+## Quickstart
+
+```bash
+pip install deepsigma
+
+# Log an agent decision
+coherence agent log decision.json
+
+# Audit all logged decisions
+coherence agent audit --json
+
+# Coherence score
+coherence agent score
+```
 
 ## 60-Second Proof
 
 ```bash
-pip install deepsigma
-./run_money_demo.sh
+coherence demo
 ```
 
-Expected output:
-
 ```
-BASELINE  score=90.00  grade=A
-DRIFT     score=85.75  grade=B  red_flags=1
-PATCH     score=90.00  grade=A  patch=RETCON  drift_resolved=true
+BASELINE   90.00 (A)
+DRIFT      85.75 (B)   red=1
+PATCH      90.00 (A)   patch=RETCON  drift_resolved=true
 ```
 
-**What just happened:**
+Three states, deterministic every run:
+1. **BASELINE** — sealed episode, coherence scored
+2. **DRIFT** — data changed, drift detected automatically
+3. **PATCH** — governed retcon applied, coherence restored
 
-1. **BASELINE** — scored an entity under a policy pack, produced a sealed episode
-2. **DRIFT** — re-scored after a data change, detected coherence drift automatically
-3. **PATCH** — applied a governed retcon patch, restored coherence, sealed the resolution
-
-8 deterministic artifacts land in `docs/examples/demo-stack/drift_patch_cycle_run/`.
-Every run produces the same scores, same grades, same artifacts — verify with:
-
-```bash
-make core-baseline   # SHA-256 proof in CORE_BASELINE_REPORT.json
-```
+Machine-readable: `coherence demo --json`
 
 ## What It Does
 
-> **Organizational coherence** is the ability to see, decide, and act as one system over time—because its truth, reasoning, and memory stay aligned across people, tools, and turnover.
->
-> In practice, coherence means:
+DeepSigma is the institutional memory layer that makes AI decisions reconstructable.
+
+Every agent decision becomes a sealed, hash-chained episode. Drift between decisions is detected automatically across 8 types. Authority is captured cryptographically, not implied. The full "why" is retrievable in under 60 seconds.
+
+> In practice:
 > - the "why" is retrievable (not tribal)
 > - authority is explicit (not implied)
 > - changes are patched, not overwritten
-> - cross-team work links (people ↔ scope ↔ cost ↔ requirements)
 > - drift is detected early and corrected consistently
 
 ## Editions

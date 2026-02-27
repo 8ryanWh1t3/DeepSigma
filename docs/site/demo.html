@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Demo — DeepSigma</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <a href="index.html">Home</a>
+  <a href="quickstart.html">Quickstart</a>
+  <a href="demo.html" class="active">Demo</a>
+  <a href="manifesto.html">Manifesto</a>
+  <a href="metrics.html">Metrics</a>
+</nav>
+
+<h1>Three-Phase Demo</h1>
+<p>Baseline, drift injection, and patch — demonstrating the full coherence lifecycle.</p>
+
+<h2>Phase 1: Baseline</h2>
+<p>Three clean episodes. No drift. Full memory coverage.</p>
+<pre class="terminal"><span class="prompt">$</span> coherence demo --json | jq '.baseline'
+{
+  <span class="value">"overall_score": 90.0</span>,
+  "grade": <span class="value">"A"</span>,
+  "dimensions": [
+    {"name": "policy_adherence",    "score": <span class="value">100.0</span>, "weight": 0.25},
+    {"name": "outcome_health",      "score": <span class="value">66.67</span>, "weight": 0.30},
+    {"name": "drift_control",       "score": <span class="value">100.0</span>, "weight": 0.25},
+    {"name": "memory_completeness", "score": <span class="value">100.0</span>, "weight": 0.20}
+  ]
+}</pre>
+
+<h2>Phase 2: Drift Injection</h2>
+<p>Outcome changes and confidence shifts trigger typed drift signals.</p>
+<pre class="terminal"><span class="prompt">$</span> coherence demo --json | jq '.drift'
+{
+  <span class="warn">"overall_score": 85.75</span>,
+  "grade": <span class="warn">"B"</span>,
+  "dimensions": [
+    {"name": "policy_adherence",    "score": <span class="value">100.0</span>},
+    {"name": "outcome_health",      "score": <span class="warn">66.67</span>},
+    {"name": "drift_control",       "score": <span class="warn">66.67</span>},
+    {"name": "memory_completeness", "score": <span class="value">100.0</span>}
+  ]
+}
+
+<span class="comment"># Drift signals detected:</span>
+<span class="comment">#   outcome   (yellow) — outcome code changed</span>
+<span class="comment">#   freshness (red)    — confidence shifted by 0.42</span></pre>
+
+<h2>Phase 3: Patch</h2>
+<p>New episodes restore health. Score recovers toward baseline.</p>
+<pre class="terminal"><span class="prompt">$</span> coherence demo --json | jq '.patched'
+{
+  <span class="value">"overall_score": 89.5</span>,
+  "grade": <span class="value">"B"</span>,
+  "dimensions": [
+    {"name": "policy_adherence",    "score": <span class="value">100.0</span>},
+    {"name": "outcome_health",      "score": <span class="value">80.0</span>},
+    {"name": "drift_control",       "score": <span class="value">80.0</span>},
+    {"name": "memory_completeness", "score": <span class="value">100.0</span>}
+  ]
+}</pre>
+
+<h2>What Happened</h2>
+<table>
+  <tr><th>Phase</th><th>Score</th><th>Grade</th><th>Drift Signals</th></tr>
+  <tr><td>Baseline</td><td>90.0</td><td>A</td><td>0</td></tr>
+  <tr><td>Drift</td><td>85.75</td><td>B</td><td>2</td></tr>
+  <tr><td>Patched</td><td>89.5</td><td>B</td><td>2 (absorbed)</td></tr>
+</table>
+
+<p>The reference layer detected both drift signals, scored the impact, and tracked recovery — all without manual intervention.</p>
+
+</body>
+</html>

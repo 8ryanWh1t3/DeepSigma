@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/authority_ledger.schema.json",
+  "title": "Authority Ledger",
+  "description": "Hash-chained array of authority entries.",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": [
+      "entry_id",
+      "entry_type",
+      "authority_source",
+      "authority_role",
+      "scope",
+      "claims_blessed",
+      "effective_at",
+      "entry_hash"
+    ],
+    "properties": {
+      "entry_id": { "type": "string", "minLength": 1 },
+      "entry_type": {
+        "type": "string",
+        "enum": ["grant", "revocation", "snapshot"]
+      },
+      "authority_source": { "type": "string", "minLength": 1 },
+      "authority_role": { "type": "string", "minLength": 1 },
+      "scope": { "type": "string", "minLength": 1 },
+      "claims_blessed": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "effective_at": { "type": "string", "format": "date-time" },
+      "expires_at": { "type": ["string", "null"] },
+      "entry_hash": { "type": "string" },
+      "prev_entry_hash": { "type": ["string", "null"] },
+      "recorded_at": { "type": "string" },
+      "metadata": { "type": "object" }
+    }
+  }
+}

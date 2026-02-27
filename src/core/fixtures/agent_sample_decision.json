@@ -1,0 +1,11 @@
+{
+  "action": "quarantine_account",
+  "reason": "Anomalous transaction pattern detected by fraud detection model",
+  "actor": {
+    "type": "agent",
+    "id": "fraud-detector-v3"
+  },
+  "targets": ["acc-12345"],
+  "evidence": ["alert-789", "pattern-match-45"],
+  "confidence": 0.92
+}

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Manifesto — DeepSigma</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <a href="index.html">Home</a>
+  <a href="quickstart.html">Quickstart</a>
+  <a href="demo.html">Demo</a>
+  <a href="manifesto.html" class="active">Manifesto</a>
+  <a href="metrics.html">Metrics</a>
+</nav>
+
+<h1>The Reference Layer Manifesto</h1>
+
+<h2>Three Failures</h2>
+
+<div class="card-grid">
+  <div class="card">
+    <h3>Decision Amnesia</h3>
+    <p>Agents act, but nothing remembers why. A model quarantines an account, escalates a ticket, or approves a trade. Seconds later the reasoning is gone.</p>
+  </div>
+  <div class="card">
+    <h3>Authority Vacuum</h3>
+    <p>No one can prove who authorized the action. The chain from human intent to machine execution is undocumented, unverifiable, and invisible.</p>
+  </div>
+  <div class="card">
+    <h3>Silent Drift</h3>
+    <p>The system changes behavior and nobody notices. Without continuous measurement the first sign of drift is a production incident.</p>
+  </div>
+</div>
+
+<h2>What a Reference Layer Does</h2>
+
+<p>A reference layer sits between the agent runtime and the outside world. Every decision passes through four artifacts:</p>
+
+<table>
+  <tr><th>Artifact</th><th>Purpose</th></tr>
+  <tr><td>Episode Sealing</td><td>Tamper-evident decision log with cryptographic hashes, timestamps, actors, and outcomes</td></tr>
+  <tr><td>Authority Binding</td><td>Named grants with scope and expiry, provable for any claim at any time</td></tr>
+  <tr><td>Drift Detection</td><td>Typed signals with severity, fingerprint, and recommended patch type</td></tr>
+  <tr><td>Claim Lifecycle</td><td>Validation, authority check, graph recording, and drift emission in one pipeline</td></tr>
+</table>
+
+<h2>Proof</h2>
+
+<pre class="terminal"><span class="prompt">$</span> coherence demo --json | jq '.baseline'
+{
+  "overall_score": <span class="value">90.0</span>,
+  "grade": <span class="value">"A"</span>,
+  "dimensions": [
+    {"name": "policy_adherence",    "score": <span class="value">100.0</span>},
+    {"name": "outcome_health",      "score": <span class="value">66.67</span>},
+    {"name": "drift_control",       "score": <span class="value">100.0</span>},
+    {"name": "memory_completeness", "score": <span class="value">100.0</span>}
+  ]
+}</pre>
+
+<h2>The Contract</h2>
+<div class="card-grid">
+  <div class="card"><h3>Intent is explicit</h3><p>Every decision records what the agent planned to do and why.</p></div>
+  <div class="card"><h3>Authority is verified</h3><p>Every claim traces back to a named grant with scope, source, and expiry.</p></div>
+  <div class="card"><h3>Logic is auditable</h3><p>The full provenance chain is retrievable for any decision at any time.</p></div>
+  <div class="card"><h3>Outcomes are sealed</h3><p>Cryptographic hashes bind the record to its content. Tampering breaks the chain.</p></div>
+</div>
+
+</body>
+</html>

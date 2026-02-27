@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deepsigma-middleware"
+version = "0.1.0"
+description = "REST middleware that logs every request as a sealed decision through the coherence pipeline."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+dependencies = [
+    "deepsigma>=2.0.0",
+]
+
+[project.optional-dependencies]
+fastapi = ["starlette>=0.27"]
+flask = ["flask>=2.0"]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21",
+    "deepsigma>=2.0.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

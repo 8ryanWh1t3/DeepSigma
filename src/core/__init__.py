@@ -57,6 +57,9 @@ from .iris import (
 )
 from .normalize import normalize_keys
 from .coherence_gate import CoherenceGate, GateConfig, GateResult, Signal
+from .agent import AgentSession
+from .authority import AuthorityLedger, AuthorityEntry
+from .metrics import MetricsCollector, MetricsReport, MetricPoint
 from .prime import (
     PRIMEGate,
     PRIMEConfig,
@@ -103,4 +106,10 @@ __all__ = [
     "GateConfig",
     "GateResult",
     "Signal",
+    "AgentSession",
+    "AuthorityLedger",
+    "AuthorityEntry",
+    "MetricsCollector",
+    "MetricsReport",
+    "MetricPoint",
 ]

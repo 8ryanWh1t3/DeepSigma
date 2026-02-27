@@ -82,13 +82,13 @@ ALLOWED_ACRONYMS = {
     "RBAC", "OIDC", "JWT", "HMAC", "SHA", "RSA", "AES",
     "GCM", "PEM", "CORS", "CSRF", "PII", "SSE", "SSO",
     "RPC", "CDN", "NTP", "OTLP", "NATS", "WAN", "HSM",
-    "ACL", "KMS", "AUTH", "PAT", "SRC", "DOM", "ENV",
+    "ACL", "KMS", "AUTH", "PAT", "SRC", "DOM", "ENV", "DIR", "PATH",
     # DeepSigma / Coherence Ops primitives
     "DLR", "RS", "DS", "MG", "IRIS", "PRIME", "GPE", "GPR", "TTL",
     "RAL", "DTE", "ICR", "PCR", "TEC", "CTEC", "DISR", "ABP",
     "DRT", "DEC", "CLM", "MDPT", "EDGE", "DRIFT", "PATCH",
     "SIGNAL", "RECALL", "CLAIM", "GATE", "SYNC", "CORE",
-    "FEEDS", "ALS", "DLQ", "PUB", "SUB", "ACK", "INBOX", "OTHER", "POSIX",
+    "FEEDS", "ALS", "DLQ", "PUB", "SUB", "ACK", "INBOX", "OTHER", "POSIX", "ASGI", "WSGI",
     "BEACON", "SKEW", "BOOT", "RETCON", "PEGI", "CERO", "ESRB",
     "RONIN", "DLC", "DRI", "BOE", "SLO", "CMS", "MVP",
     # Standards / formats / compliance
@@ -115,7 +115,7 @@ ALLOWED_ACRONYMS = {
     "YYYY", "NNNN", "VALID", "ACTION", "SERIAL", "SET",
     "ACCESS", "LOCAL", "NEW", "FORM", "HALF", "LIFE",
     "DRAFT", "RESULT", "SHOULD", "ABOUT", "SHOW", "SWITCH",
-    "DENIED", "TIMING", "LAG", "WEST",
+    "DENIED", "TIMING", "LAG", "WEST", "BROKEN",
     # Project domain short codes (dashboards, fields, variable prefixes)
     "REG", "OPS", "CLN", "CRE", "OBJ", "PLT", "FIN",
     "MON", "DAT", "ZIP", "REQ", "MSG", "ACC", "REV",
@@ -315,7 +315,7 @@ def main() -> int:
         "--paths",
         nargs="*",
         default=[
-            "docs", "enterprise/docs", "edge", "src",
+            "docs", "enterprise/docs", "edge", "src", "packages",
             "README.md", "CONTRIBUTING.md", "CHANGELOG.md",
             "SECURITY.md", "EDITION_DIFF.md",
         ],

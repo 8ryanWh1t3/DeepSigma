@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "langchain-deepsigma"
+version = "0.2.0"
+description = "Callback handlers that bridge chain and graph runtimes to the coherence pipeline."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+dependencies = [
+    "deepsigma>=2.0.0",
+]
+
+[project.optional-dependencies]
+langchain = ["langchain-core>=0.1.0"]
+dev = [
+    "pytest>=7.0",
+    "deepsigma>=2.0.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

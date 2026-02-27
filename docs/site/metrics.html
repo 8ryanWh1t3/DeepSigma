@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Metrics — DeepSigma</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <a href="index.html">Home</a>
+  <a href="quickstart.html">Quickstart</a>
+  <a href="demo.html">Demo</a>
+  <a href="manifesto.html">Manifesto</a>
+  <a href="metrics.html" class="active">Metrics</a>
+</nav>
+
+<h1>Coherence Metrics</h1>
+<p>Four composable metric points for observability.</p>
+
+<div style="margin: 1rem 0;">
+  <span class="badge badge-green">coherence_score 90/100</span>
+  <span class="badge badge-green">drift_density 0.0</span>
+  <span class="badge badge-green">authority_coverage 1.0</span>
+  <span class="badge badge-green">memory_coverage 1.0</span>
+</div>
+
+<h2>Metric Definitions</h2>
+
+<table>
+  <tr><th>Metric</th><th>Unit</th><th>Description</th></tr>
+  <tr>
+    <td><code>coherence_score</code></td>
+    <td>score (0-100)</td>
+    <td>Weighted composite of policy adherence, outcome health, drift control, and memory completeness</td>
+  </tr>
+  <tr>
+    <td><code>drift_density</code></td>
+    <td>ratio</td>
+    <td>Number of drift signals divided by episode count. Lower is better. Zero means no drift detected.</td>
+  </tr>
+  <tr>
+    <td><code>authority_coverage</code></td>
+    <td>ratio</td>
+    <td>Fraction of claims in the memory graph that have a valid authority grant. 1.0 means full coverage.</td>
+  </tr>
+  <tr>
+    <td><code>memory_coverage</code></td>
+    <td>ratio</td>
+    <td>Fraction of expected episodes that appear in the memory graph. 1.0 means all decisions are remembered.</td>
+  </tr>
+</table>
+
+<h2>CLI Usage</h2>
+
+<pre class="terminal"><span class="prompt">$</span> coherence metrics src/core/examples/ --json
+{
+  "metrics": [
+    {"name": "coherence_score",    "value": <span class="value">90.0</span>,  "unit": "score"},
+    {"name": "drift_density",      "value": <span class="value">0.0</span>,   "unit": "ratio"},
+    {"name": "authority_coverage",  "value": <span class="value">1.0</span>,   "unit": "ratio"},
+    {"name": "memory_coverage",    "value": <span class="value">1.0</span>,   "unit": "ratio"}
+  ]
+}</pre>
+
+<pre class="terminal"><span class="prompt">$</span> coherence agent metrics --agent fraud-detector-v3
+<span class="value">coherence_score:    90.0 / 100  (A)
+drift_density:      0.0000
+authority_coverage: 1.0000
+memory_coverage:    1.0000</span></pre>
+
+</body>
+</html>

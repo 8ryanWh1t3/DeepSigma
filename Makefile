@@ -126,3 +126,6 @@ test-feeds-canon:
 	python -m pytest tests/test_feeds_canon.py -v
 
 test-feeds: validate-feeds test-feeds-bus test-feeds-ingest test-feeds-consumers test-feeds-canon
+
+site-content:
+	python scripts/generate_site_content.py

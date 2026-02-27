@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quickstart — DeepSigma</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <a href="index.html">Home</a>
+  <a href="quickstart.html" class="active">Quickstart</a>
+  <a href="demo.html">Demo</a>
+  <a href="manifesto.html">Manifesto</a>
+  <a href="metrics.html">Metrics</a>
+</nav>
+
+<h1>Quickstart</h1>
+<p>Five steps to observable decisions.</p>
+
+<h2>1. Install</h2>
+<pre class="terminal"><span class="prompt">$</span> pip install deepsigma</pre>
+
+<h2>2. Create a Session</h2>
+<pre class="terminal">from core import AgentSession
+
+session = AgentSession("fraud-detector-v3")</pre>
+
+<h2>3. Log Decisions</h2>
+<pre class="terminal">sealed = session.log_decision({
+    "action": "quarantine_account",
+    "reason": "Suspicious activity detected",
+    "actor": {"type": "agent", "id": "fraud-detector-v3"},
+    "targets": ["acc-12345"],
+    "evidence": ["alert-789"],
+    "confidence": 0.92,
+})
+<span class="comment"># sealed episode has: episodeId, seal.sealHash, actor, actions, outcome</span></pre>
+
+<h2>4. Score Coherence</h2>
+<pre class="terminal">report = session.score()
+print(f"Score: {report['overall_score']}/100 ({report['grade']})")
+<span class="comment"># Score: 90.0/100 (A)</span>
+
+<span class="comment"># Four dimensions measured:</span>
+<span class="comment">#   policy_adherence    — are all episodes DTE-stamped?</span>
+<span class="comment">#   outcome_health      — success and verification rates</span>
+<span class="comment">#   drift_control       — drift signals vs episode count</span>
+<span class="comment">#   memory_completeness — graph coverage of episodes</span></pre>
+
+<h2>5. Detect Drift</h2>
+<pre class="terminal">signals = session.detect_drift({
+    "action": "quarantine_account",
+    "reason": "Different pattern detected",
+    "actor": {"type": "agent", "id": "fraud-detector-v3"},
+    "confidence": 0.45,  <span class="comment"># dropped from 0.92</span>
+})
+<span class="comment"># returns: [{"driftType": "freshness", "severity": "red", ...}]</span></pre>
+
+<h2>Framework Integration</h2>
+
+<h3>REST Middleware</h3>
+<pre class="terminal"><span class="prompt">$</span> pip install deepsigma-middleware
+
+from deepsigma_middleware import DeepSigmaMiddleware, configure
+
+configure(agent_id="my-api")
+app = DeepSigmaMiddleware(app)
+<span class="comment"># every HTTP request is now a sealed decision</span></pre>
+
+<h3>Chain Runtime Bridge</h3>
+<pre class="terminal"><span class="prompt">$</span> pip install langchain-deepsigma
+
+from langchain_deepsigma import ExhaustCallbackHandler
+
+handler = ExhaustCallbackHandler(project="my-project")
+chain.invoke(input, config={"callbacks": [handler]})
+<span class="comment"># every LLM call and tool use is logged</span></pre>
+
+<h3>Agent Wrapper</h3>
+<pre class="terminal"><span class="prompt">$</span> pip install openai-deepsigma
+
+from openai_deepsigma import DeepSigmaAgentWrapper
+
+wrapper = DeepSigmaAgentWrapper(agent, session)
+result = wrapper.run("What is the weather?")
+<span class="comment"># intent, tool calls, and completion are sealed</span></pre>
+
+</body>
+</html>

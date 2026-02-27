@@ -1,0 +1,163 @@
+/* ── Dark terminal theme ─────────────────────────────────────────────────── */
+
+:root {
+  --bg:      #0d1117;
+  --surface: #161b22;
+  --border:  #30363d;
+  --text:    #c9d1d9;
+  --muted:   #8b949e;
+  --green:   #3fb950;
+  --yellow:  #d29922;
+  --red:     #f85149;
+  --blue:    #58a6ff;
+  --mono:    'SF Mono', 'Cascadia Code', 'Fira Code', 'Menlo', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--mono);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── Navigation ──────────────────────────────────────────────────────────── */
+
+nav {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+nav a {
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+nav a:hover,
+nav a.active {
+  color: var(--green);
+}
+
+/* ── Typography ──────────────────────────────────────────────────────────── */
+
+h1 {
+  font-size: 1.75rem;
+  color: var(--green);
+  margin-bottom: 0.5rem;
+}
+
+h2 {
+  font-size: 1.25rem;
+  color: var(--text);
+  margin: 2rem 0 1rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+}
+
+h3 {
+  font-size: 1rem;
+  color: var(--muted);
+  margin: 1.5rem 0 0.5rem;
+}
+
+p, li {
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+
+/* ── Terminal blocks ─────────────────────────────────────────────────────── */
+
+pre.terminal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 1rem 0;
+  white-space: pre;
+}
+
+pre.terminal .prompt { color: var(--green); }
+pre.terminal .comment { color: var(--muted); }
+pre.terminal .value { color: var(--blue); }
+pre.terminal .warn { color: var(--yellow); }
+pre.terminal .error { color: var(--red); }
+
+/* ── Cards ───────────────────────────────────────────────────────────────── */
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.25rem;
+}
+
+.card h3 {
+  margin-top: 0;
+  color: var(--text);
+}
+
+/* ── Badges ──────────────────────────────────────────────────────────────── */
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.badge-green  { background: #1a3a1a; color: var(--green); border: 1px solid var(--green); }
+.badge-yellow { background: #3a2e1a; color: var(--yellow); border: 1px solid var(--yellow); }
+.badge-red    { background: #3a1a1a; color: var(--red); border: 1px solid var(--red); }
+.badge-blue   { background: #1a2a3a; color: var(--blue); border: 1px solid var(--blue); }
+
+/* ── Table ───────────────────────────────────────────────────────────────── */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+}
+
+th, td {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+
+th { color: var(--text); }
+td { color: var(--muted); }
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  body { padding: 1rem; }
+  nav { gap: 1rem; }
+  .card-grid { grid-template-columns: 1fr; }
+}

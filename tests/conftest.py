@@ -154,6 +154,52 @@ def tmp_topics_root(tmp_path):
 
 
 @pytest.fixture
+def minimal_claim():
+    """Factory fixture producing minimal valid claim dicts."""
+    def _make(claim_id="CLAIM-TEST-001", confidence=0.92, status="green", **overrides):
+        c = {
+            "claimId": claim_id,
+            "statement": f"Test claim {claim_id}",
+            "scope": {"where": "test-system"},
+            "truthType": "observation",
+            "confidence": {"score": confidence},
+            "statusLight": status,
+            "sources": [{"ref": "test-source", "type": "document"}],
+            "evidence": [{"ref": "test-evidence", "type": "metric", "method": "test"}],
+            "owner": "test-owner",
+            "timestampCreated": "2026-02-27T10:00:00Z",
+            "version": "1.0.0",
+            "halfLife": {"value": 24, "unit": "hours"},
+            "graph": {},
+            "seal": {"hash": "sha256:test", "sealedAt": "2026-02-27T10:00:01Z", "version": 1},
+        }
+        c.update(overrides)
+        return c
+    return _make
+
+
+@pytest.fixture
+def minimal_authority_entry():
+    """Factory fixture producing minimal authority entry dicts for grants."""
+    def _make(claims=None, source="governance-engine", role="policy-owner",
+              scope="security-ops"):
+        from core.authority import AuthorityEntry
+        return AuthorityEntry(
+            entry_id="",
+            entry_type="grant",
+            authority_source=source,
+            authority_role=role,
+            scope=scope,
+            claims_blessed=claims or ["CLAIM-TEST-001"],
+            effective_at="2026-02-27T10:00:00Z",
+            expires_at=None,
+            entry_hash="",
+            prev_entry_hash=None,
+        )
+    return _make
+
+
+@pytest.fixture
 def minimal_feed_envelope():
     """Factory fixture producing minimal valid FEEDS envelope dicts."""
     from core.feeds import build_envelope, FeedTopic

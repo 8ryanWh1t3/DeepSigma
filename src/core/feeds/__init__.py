@@ -11,6 +11,9 @@ from .bus import DLQManager, Publisher, Subscriber, init_topic_layout
 from .ingest import IngestOrchestrator, IngestResult
 from .consumers import (
     AuthorityGateConsumer,
+    ClaimSubmitResult,
+    ClaimTriggerPipeline,
+    ClaimTriggerResult,
     EvidenceCheckConsumer,
     TriageEntry,
     TriageState,
@@ -21,6 +24,9 @@ from .canon import CanonStore, ClaimValidator, MGWriter
 __all__ = [
     "AuthorityGateConsumer",
     "CanonStore",
+    "ClaimSubmitResult",
+    "ClaimTriggerPipeline",
+    "ClaimTriggerResult",
     "ClaimValidator",
     "Classification",
     "DLQManager",

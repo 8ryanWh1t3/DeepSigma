@@ -1,0 +1,20 @@
+{
+  "claimId": "CLAIM-2026-0001",
+  "statement": "Fraud detection model accuracy exceeds 95% for Q1 2026",
+  "scope": {"where": "fraud-detection-system"},
+  "truthType": "observation",
+  "confidence": {"score": 0.92},
+  "statusLight": "green",
+  "sources": [{"ref": "model-eval-report-q1", "type": "document"}],
+  "evidence": [{"ref": "eval-metrics-001", "type": "metric", "method": "cross_validation"}],
+  "owner": "ml-team",
+  "timestampCreated": "2026-02-27T10:00:00Z",
+  "version": "1.0.0",
+  "halfLife": {"value": 24, "unit": "hours"},
+  "graph": {},
+  "seal": {
+    "hash": "sha256:sample",
+    "sealedAt": "2026-02-27T10:00:01Z",
+    "version": 1
+  }
+}

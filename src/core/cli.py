@@ -587,18 +587,465 @@ def cmd_feeds_replay_dlq(args: argparse.Namespace) -> None:
         print(f"Replayed {replayed} event(s) from {args.topic} DLQ")
 
 
-def cmd_demo(args: argparse.Namespace) -> None:  # noqa: ARG001
-    parser = argparse.ArgumentParser(
-        prog="coherence demo",
-        description="Demo: score and IRIS status query",
+def cmd_feeds_claim_validate(args: argparse.Namespace) -> None:
+    from .feeds.canon.claim_validator import ClaimValidator
+
+    p = Path(args.file)
+    if not p.exists():
+        print(f"Error: {args.file} not found", file=sys.stderr)
+        sys.exit(1)
+
+    data = json.loads(p.read_text())
+    claims = data if isinstance(data, list) else [data]
+
+    canon_db = getattr(args, "canon_db", None)
+    canon_claims: list = []
+    if canon_db and Path(canon_db).exists():
+        from .feeds.canon.store import CanonStore
+        store = CanonStore(canon_db)
+        canon_claims = store.list_entries()
+        store.close()
+
+    validator = ClaimValidator(canon_claims=canon_claims)
+    all_results = []
+    for claim in claims:
+        issues = validator.validate_claim(claim)
+        all_results.append({
+            "claimId": claim.get("claimId", "unknown"),
+            "valid": len(issues) == 0,
+            "issues": issues,
+        })
+
+    all_valid = all(r["valid"] for r in all_results)
+    if getattr(args, "json", False):
+        print(json.dumps({"valid": all_valid, "results": all_results}, indent=2))
+    else:
+        status = "PASS" if all_valid else "FAIL"
+        print(f"Claim Validation: {status}")
+        for r in all_results:
+            if not r["valid"]:
+                for issue in r["issues"]:
+                    print(f"  [{r['claimId']}] {issue['type']}: {issue['detail']}")
+
+    sys.exit(0 if all_valid else 1)
+
+
+def cmd_feeds_claim_submit(args: argparse.Namespace) -> None:
+    from .feeds.consumers.claim_trigger import ClaimTriggerPipeline
+
+    p = Path(args.file)
+    if not p.exists():
+        print(f"Error: {args.file} not found", file=sys.stderr)
+        sys.exit(1)
+
+    data = json.loads(p.read_text())
+    claims = data if isinstance(data, list) else [data]
+
+    # Optional components
+    canon_claims: list = []
+    canon_db = getattr(args, "canon_db", None)
+    if canon_db and Path(canon_db).exists():
+        from .feeds.canon.store import CanonStore
+        store = CanonStore(canon_db)
+        canon_claims = store.list_entries()
+        store.close()
+
+    topics_root = getattr(args, "topics", None)
+    if topics_root:
+        topics_root = Path(topics_root)
+
+    authority_ledger = None
+    ledger_path = getattr(args, "ledger", None)
+    if ledger_path and Path(ledger_path).exists():
+        from .authority import AuthorityLedger
+        authority_ledger = AuthorityLedger(path=Path(ledger_path))
+
+    mg = MemoryGraph()
+    ds = DriftSignalCollector()
+
+    pipeline = ClaimTriggerPipeline(
+        canon_claims=canon_claims,
+        mg=mg,
+        ds=ds,
+        topics_root=topics_root,
+        authority_ledger=authority_ledger,
     )
-    parser.add_argument("path", help="Path to episodes file or directory")
-    parser.add_argument("--json", action="store_true", help="Output JSON")
-    parsed = parser.parse_args(args.remaining or [])
 
-    score_args = argparse.Namespace(path=parsed.path, json=parsed.json)
-    cmd_score(score_args)
+    episode_id = getattr(args, "episode_id", None)
+    result = pipeline.submit(claims, episode_id=episode_id)
 
+    if getattr(args, "json", False):
+        print(json.dumps({
+            "submitted": result.submitted,
+            "accepted": result.accepted,
+            "rejected": result.rejected,
+            "drift_signals_emitted": result.drift_signals_emitted,
+            "results": [
+                {
+                    "claim_id": r.claim_id,
+                    "accepted": r.accepted,
+                    "issues": r.issues,
+                    "drift_signals": len(r.drift_signals),
+                    "graph_node_id": r.graph_node_id,
+                    "published_events": r.published_events,
+                }
+                for r in result.results
+            ],
+        }, indent=2))
+    else:
+        print(
+            f"Claims: {result.submitted} submitted, "
+            f"{result.accepted} accepted, {result.rejected} rejected"
+        )
+        if result.drift_signals_emitted:
+            print(f"  Drift signals: {result.drift_signals_emitted}")
+        for r in result.results:
+            status = "OK" if r.accepted else "REJECTED"
+            print(f"  [{status}] {r.claim_id}")
+
+    sys.exit(0 if result.rejected == 0 else 1)
+
+
+def cmd_demo(args: argparse.Namespace) -> None:
+    """Run the deterministic drift-patch demo using bundled sample data.
+
+    Three-state cycle: BASELINE (sealed) -> DRIFT (injected) -> PATCH (resolved).
+    Produces identical output on every run.
+    """
+    # Load bundled sample episodes
+    sample_path = Path(__file__).parent / "examples" / "sample_episodes.json"
+    if not sample_path.exists():
+        print("Error: bundled sample_episodes.json not found", file=sys.stderr)
+        sys.exit(1)
+    episodes = json.loads(sample_path.read_text(encoding="utf-8"))
+
+    ep_id = episodes[0].get("episodeId", "ep-demo-001")
+    NOW = "2026-02-16T15:00:00Z"
+    DRIFT_ID = "drift-cycle-001"
+    PATCH_ID = "patch-cycle-001"
+
+    # ── BASELINE ──
+    dlr_b, rs_b, ds_b, mg_b = _build_pipeline(episodes, [])
+    report_base = CoherenceScorer(dlr_builder=dlr_b, rs=rs_b, ds=ds_b, mg=mg_b).score()
+
+    # ── DRIFT ──
+    drift_event = {
+        "driftId": DRIFT_ID,
+        "episodeId": ep_id,
+        "driftType": "bypass",
+        "severity": "red",
+        "detectedAt": NOW,
+        "fingerprint": {"key": "bypass-gate-cycle"},
+        "recommendedPatchType": "RETCON",
+    }
+    dlr_d, rs_d, ds_d, mg_d = _build_pipeline(episodes, [drift_event])
+    scorer_drift = CoherenceScorer(dlr_builder=dlr_d, rs=rs_d, ds=ds_d, mg=mg_d)
+    report_drift = scorer_drift.score()
+
+    # ── PATCH ──
+    dlr_p, rs_p, ds_p, mg_p = _build_pipeline(episodes, [])
+    mg_p.add_drift(drift_event)
+    mg_p.add_patch({
+        "patchId": PATCH_ID,
+        "driftId": DRIFT_ID,
+        "patchType": "RETCON",
+        "appliedAt": NOW,
+        "description": "Retcon: bypass gate drift resolved by re-evaluation",
+        "changes": [{"field": "verification.result", "from": "bypass", "to": "pass"}],
+    })
+    scorer_patch = CoherenceScorer(dlr_builder=dlr_p, rs=rs_p, ds=ds_p, mg=mg_p)
+    report_after = scorer_patch.score()
+
+    if getattr(args, "json", False):
+        from dataclasses import asdict as _asdict
+        result = {
+            "baseline": _asdict(report_base),
+            "drift": _asdict(report_drift),
+            "patch": _asdict(report_after),
+        }
+        print(json.dumps(result, indent=2))
+        return
+
+    # Write artifacts if requested
+    artifacts_dir = getattr(args, "artifacts", None)
+    if artifacts_dir:
+        out = Path(artifacts_dir)
+        out.mkdir(parents=True, exist_ok=True)
+        from dataclasses import asdict as _asdict
+        for name, report in [("baseline", report_base), ("drift", report_drift), ("patch", report_after)]:
+            (out / f"report_{name}.json").write_text(
+                json.dumps(_asdict(report), indent=2) + "\n"
+            )
+        (out / "memory_graph.json").write_text(mg_p.to_json(indent=2) + "\n")
+        print(f"Artifacts written to {out}/")
+
+    print(f"BASELINE  {report_base.overall_score:6.2f} ({report_base.grade})")
+    print(f"DRIFT     {report_drift.overall_score:6.2f} ({report_drift.grade})   red=1")
+    print(
+        f"PATCH     {report_after.overall_score:6.2f} ({report_after.grade})"
+        f"   patch=RETCON  drift_resolved=true"
+    )
+
+
+
+# ── agent commands ────────────────────────────────────────────
+_DEFAULT_SESSION_DIR = Path.home() / ".deepsigma" / "agent"
+
+
+def cmd_agent_log(args: argparse.Namespace) -> None:
+    from .agent import AgentSession
+
+    p = Path(args.file)
+    if not p.exists():
+        print(f"Error: {args.file} not found", file=sys.stderr)
+        sys.exit(1)
+
+    decision = json.loads(p.read_text())
+    session_dir = getattr(args, "session_dir", None) or _DEFAULT_SESSION_DIR
+    session = AgentSession(agent_id="cli", storage_dir=session_dir)
+    episode = session.log_decision(decision)
+
+    if getattr(args, "json", False):
+        print(json.dumps(episode, indent=2))
+    else:
+        print(f"Logged: {episode['episodeId']}  seal={episode['seal']['sealHash'][:30]}...")
+
+
+def cmd_agent_audit(args: argparse.Namespace) -> None:
+    from .agent import AgentSession
+
+    session_dir = getattr(args, "session_dir", None) or _DEFAULT_SESSION_DIR
+    session = AgentSession(agent_id="cli", storage_dir=session_dir)
+
+    if not session._episodes:
+        print("No decisions logged yet.", file=sys.stderr)
+        sys.exit(1)
+
+    report = session.audit()
+
+    if getattr(args, "json", False):
+        print(json.dumps(report, indent=2))
+    else:
+        passed = report.get("passed", False)
+        summary = report.get("summary", "")
+        print(f"Audit: {'PASSED' if passed else 'FAILED'}")
+        print(f"  {summary}")
+
+
+def cmd_agent_score(args: argparse.Namespace) -> None:
+    from .agent import AgentSession
+
+    session_dir = getattr(args, "session_dir", None) or _DEFAULT_SESSION_DIR
+    session = AgentSession(agent_id="cli", storage_dir=session_dir)
+
+    if not session._episodes:
+        print("No decisions logged yet.", file=sys.stderr)
+        sys.exit(1)
+
+    report = session.score()
+
+    if getattr(args, "json", False):
+        print(json.dumps(report, indent=2))
+    else:
+        print(f"Score: {report['overall_score']}/100  Grade: {report['grade']}")
+        print(f"  Episodes: {len(session._episodes)}")
+
+
+# ── metrics commands ──────────────────────────────────────────
+
+
+def cmd_metrics(args: argparse.Namespace) -> None:
+    from .metrics import MetricsCollector
+
+    episodes = _load_episodes(args.path)
+    drift_events = _load_drift(args.path)
+    dlr, rs, ds, mg = _build_pipeline(episodes, drift_events)
+
+    authority_ledger = None
+    ledger_path = getattr(args, "ledger", None)
+    if ledger_path and Path(ledger_path).exists():
+        from .authority import AuthorityLedger
+        authority_ledger = AuthorityLedger(path=Path(ledger_path))
+
+    collector = MetricsCollector(
+        dlr_builder=dlr, rs=rs, ds=ds, mg=mg,
+        authority_ledger=authority_ledger,
+    )
+    report = collector.collect()
+
+    if getattr(args, "json", False):
+        print(report.to_json())
+    else:
+        for m in report.metrics:
+            if m.unit == "score":
+                grade = m.details.get("grade", "")
+                print(f"  {m.name}: {m.value:.1f}/100  ({grade})")
+            elif m.unit == "ratio":
+                print(f"  {m.name}: {m.value:.4f}")
+            else:
+                print(f"  {m.name}: {m.value}")
+
+
+def cmd_agent_metrics(args: argparse.Namespace) -> None:
+    from .agent import AgentSession
+    from .metrics import MetricsCollector
+
+    session_dir = getattr(args, "session_dir", None) or _DEFAULT_SESSION_DIR
+    session = AgentSession(agent_id="cli", storage_dir=session_dir)
+
+    if not session._episodes:
+        print("No decisions logged yet.", file=sys.stderr)
+        sys.exit(1)
+
+    dlr, rs, ds, mg = session._build_pipeline()
+
+    authority_ledger = None
+    ledger_path = getattr(args, "ledger", None)
+    if ledger_path and Path(ledger_path).exists():
+        from .authority import AuthorityLedger
+        authority_ledger = AuthorityLedger(path=Path(ledger_path))
+
+    collector = MetricsCollector(
+        dlr_builder=dlr, rs=rs, ds=ds, mg=mg,
+        authority_ledger=authority_ledger,
+    )
+    report = collector.collect()
+
+    if getattr(args, "json", False):
+        print(report.to_json())
+    else:
+        print(f"Agent Metrics ({len(session._episodes)} episodes):")
+        for m in report.metrics:
+            if m.unit == "score":
+                grade = m.details.get("grade", "")
+                print(f"  {m.name}: {m.value:.1f}/100  ({grade})")
+            elif m.unit == "ratio":
+                print(f"  {m.name}: {m.value:.4f}")
+            else:
+                print(f"  {m.name}: {m.value}")
+
+
+# ── authority commands ──────────────────────────────────────────
+_DEFAULT_LEDGER_PATH = Path.home() / ".deepsigma" / "authority_ledger.json"
+
+
+def cmd_authority_grant(args: argparse.Namespace) -> None:
+    from .authority import AuthorityEntry, AuthorityLedger
+
+    p = Path(args.file)
+    if not p.exists():
+        print(f"Error: {args.file} not found", file=sys.stderr)
+        sys.exit(1)
+    data = json.loads(p.read_text())
+    ledger_path = Path(getattr(args, "ledger", None) or _DEFAULT_LEDGER_PATH)
+    ledger = AuthorityLedger(path=ledger_path)
+    entry = AuthorityEntry(
+        entry_id=data.get("entry_id", ""),
+        entry_type="grant",
+        authority_source=data["authority_source"],
+        authority_role=data["authority_role"],
+        scope=data["scope"],
+        claims_blessed=data["claims_blessed"],
+        effective_at=data["effective_at"],
+        expires_at=data.get("expires_at"),
+        entry_hash="",
+        prev_entry_hash=None,
+    )
+    ledger.append(entry)
+    if getattr(args, "json", False):
+        from dataclasses import asdict
+        print(json.dumps(asdict(entry), indent=2))
+    else:
+        print(
+            f"Grant appended: {entry.entry_id}  "
+            f"hash={entry.entry_hash[:40]}..."
+        )
+
+
+def cmd_authority_revoke(args: argparse.Namespace) -> None:
+    from .authority import AuthorityEntry, AuthorityLedger
+
+    p = Path(args.file)
+    if not p.exists():
+        print(f"Error: {args.file} not found", file=sys.stderr)
+        sys.exit(1)
+    data = json.loads(p.read_text())
+    ledger_path = Path(getattr(args, "ledger", None) or _DEFAULT_LEDGER_PATH)
+    ledger = AuthorityLedger(path=ledger_path)
+    entry = AuthorityEntry(
+        entry_id=data.get("entry_id", ""),
+        entry_type="revocation",
+        authority_source=data["authority_source"],
+        authority_role=data["authority_role"],
+        scope=data["scope"],
+        claims_blessed=data["claims_blessed"],
+        effective_at=data["effective_at"],
+        expires_at=data.get("expires_at"),
+        entry_hash="",
+        prev_entry_hash=None,
+    )
+    ledger.append(entry)
+    if getattr(args, "json", False):
+        from dataclasses import asdict
+        print(json.dumps(asdict(entry), indent=2))
+    else:
+        print(
+            f"Revocation appended: {entry.entry_id}  "
+            f"hash={entry.entry_hash[:40]}..."
+        )
+
+
+def cmd_authority_list(args: argparse.Namespace) -> None:
+    from .authority import AuthorityLedger
+
+    ledger_path = Path(getattr(args, "ledger", None) or _DEFAULT_LEDGER_PATH)
+    ledger = AuthorityLedger(path=ledger_path)
+    if getattr(args, "json", False):
+        from dataclasses import asdict
+        print(json.dumps([asdict(e) for e in ledger.entries], indent=2))
+    else:
+        if not ledger.entries:
+            print("No authority entries.")
+        else:
+            for e in ledger.entries:
+                print(
+                    f"  [{e.entry_type}] {e.entry_id}  "
+                    f"claims={len(e.claims_blessed)}  scope={e.scope}"
+                )
+
+
+def cmd_authority_verify(args: argparse.Namespace) -> None:
+    from .authority import AuthorityLedger
+
+    ledger_path = Path(getattr(args, "ledger", None) or _DEFAULT_LEDGER_PATH)
+    ledger = AuthorityLedger(path=ledger_path)
+    valid = ledger.verify_chain()
+    snapshot = ledger.snapshot()
+    if getattr(args, "json", False):
+        print(json.dumps({**snapshot, "chain_valid": valid}, indent=2))
+    else:
+        status = "VALID" if valid else "BROKEN"
+        print(f"Authority Chain: {status}  entries={snapshot['entry_count']}")
+    sys.exit(0 if valid else 1)
+
+
+def cmd_authority_prove(args: argparse.Namespace) -> None:
+    from .authority import AuthorityLedger
+
+    ledger_path = Path(getattr(args, "ledger", None) or _DEFAULT_LEDGER_PATH)
+    ledger = AuthorityLedger(path=ledger_path)
+    proof = ledger.prove_authority(args.claim_id)
+    if proof is None:
+        print(f"No authority found for {args.claim_id}", file=sys.stderr)
+        sys.exit(1)
+    if getattr(args, "json", False):
+        print(json.dumps(proof, indent=2))
+    else:
+        print(
+            f"Authority proof: {proof['entry_id']}  "
+            f"source={proof['authority_source']}  "
+            f"role={proof['authority_role']}"
+        )
 
 
 def main() -> None:
@@ -697,6 +1144,13 @@ def main() -> None:
     p_dte_check.add_argument("--json", action="store_true", help="Output JSON")
     p_dte_check.set_defaults(func=cmd_dte_check)
 
+    # ── metrics ──────────────────────────────────────────────────
+    p_metrics = subparsers.add_parser("metrics", help="Collect coherence metrics")
+    p_metrics.add_argument("path", help="Path to episodes file or directory")
+    p_metrics.add_argument("--ledger", default=None, help="Authority ledger path")
+    p_metrics.add_argument("--json", action="store_true", help="Output JSON")
+    p_metrics.set_defaults(func=cmd_metrics)
+
     # ── feeds ─────────────────────────────────────────────────────
     p_feeds = subparsers.add_parser("feeds", help="FEEDS operations")
     feeds_sub = p_feeds.add_subparsers(dest="feeds_command", required=True)
@@ -785,13 +1239,92 @@ def main() -> None:
     p_graph_build.add_argument("--output", default=".", help="Output directory")
     p_graph_build.set_defaults(func=cmd_feeds_graph_build)
 
+    # ── claim ──
+    p_claim = feeds_sub.add_parser("claim", help="Claim trigger operations")
+    claim_sub = p_claim.add_subparsers(dest="claim_command", required=True)
+
+    p_claim_validate = claim_sub.add_parser("validate", help="Validate claim(s)")
+    p_claim_validate.add_argument("file", help="Path to claim JSON file")
+    p_claim_validate.add_argument("--canon-db", default=None, help="Canon DB for contradiction check")
+    p_claim_validate.add_argument("--json", action="store_true", help="Output JSON")
+    p_claim_validate.set_defaults(func=cmd_feeds_claim_validate)
+
+    p_claim_submit = claim_sub.add_parser("submit", help="Submit claim(s) through trigger pipeline")
+    p_claim_submit.add_argument("file", help="Path to claim JSON file")
+    p_claim_submit.add_argument("--episode-id", default=None, help="Episode ID to link claims to")
+    p_claim_submit.add_argument("--topics", default=None, help="Topics root for FEEDS publishing")
+    p_claim_submit.add_argument("--canon-db", default=None, help="Canon DB for contradiction check")
+    p_claim_submit.add_argument("--ledger", default=None, help="Authority ledger for authorization check")
+    p_claim_submit.add_argument("--json", action="store_true", help="Output JSON")
+    p_claim_submit.set_defaults(func=cmd_feeds_claim_submit)
+
+    # ── agent ─────────────────────────────────────────────────────
+    p_agent = subparsers.add_parser("agent", help="Agent decision logging")
+    agent_sub = p_agent.add_subparsers(dest="agent_command", required=True)
+
+    p_agent_log = agent_sub.add_parser("log", help="Log a decision")
+    p_agent_log.add_argument("file", help="Path to decision JSON file")
+    p_agent_log.add_argument("--session-dir", default=None, help="Session storage directory")
+    p_agent_log.add_argument("--json", action="store_true", help="Output JSON")
+    p_agent_log.set_defaults(func=cmd_agent_log)
+
+    p_agent_audit = agent_sub.add_parser("audit", help="Audit logged decisions")
+    p_agent_audit.add_argument("--session-dir", default=None, help="Session storage directory")
+    p_agent_audit.add_argument("--json", action="store_true", help="Output JSON")
+    p_agent_audit.set_defaults(func=cmd_agent_audit)
+
+    p_agent_score = agent_sub.add_parser("score", help="Score logged decisions")
+    p_agent_score.add_argument("--session-dir", default=None, help="Session storage directory")
+    p_agent_score.add_argument("--json", action="store_true", help="Output JSON")
+    p_agent_score.set_defaults(func=cmd_agent_score)
+
+    p_agent_metrics = agent_sub.add_parser("metrics", help="Collect coherence metrics")
+    p_agent_metrics.add_argument("--session-dir", default=None, help="Session storage directory")
+    p_agent_metrics.add_argument("--ledger", default=None, help="Authority ledger path")
+    p_agent_metrics.add_argument("--json", action="store_true", help="Output JSON")
+    p_agent_metrics.set_defaults(func=cmd_agent_metrics)
+
+    # ── authority ──────────────────────────────────────────────────
+    p_authority = subparsers.add_parser("authority", help="Authority ledger operations")
+    authority_sub = p_authority.add_subparsers(dest="authority_command", required=True)
+
+    p_auth_grant = authority_sub.add_parser("grant", help="Append a grant entry")
+    p_auth_grant.add_argument("file", help="Path to grant JSON file")
+    p_auth_grant.add_argument("--ledger", default=None, help="Ledger file path")
+    p_auth_grant.add_argument("--json", action="store_true", help="Output JSON")
+    p_auth_grant.set_defaults(func=cmd_authority_grant)
+
+    p_auth_revoke = authority_sub.add_parser("revoke", help="Append a revocation entry")
+    p_auth_revoke.add_argument("file", help="Path to revocation JSON file")
+    p_auth_revoke.add_argument("--ledger", default=None, help="Ledger file path")
+    p_auth_revoke.add_argument("--json", action="store_true", help="Output JSON")
+    p_auth_revoke.set_defaults(func=cmd_authority_revoke)
+
+    p_auth_list = authority_sub.add_parser("list", help="List authority entries")
+    p_auth_list.add_argument("--ledger", default=None, help="Ledger file path")
+    p_auth_list.add_argument("--json", action="store_true", help="Output JSON")
+    p_auth_list.set_defaults(func=cmd_authority_list)
+
+    p_auth_verify = authority_sub.add_parser("verify", help="Verify hash chain integrity")
+    p_auth_verify.add_argument("--ledger", default=None, help="Ledger file path")
+    p_auth_verify.add_argument("--json", action="store_true", help="Output JSON")
+    p_auth_verify.set_defaults(func=cmd_authority_verify)
+
+    p_auth_prove = authority_sub.add_parser("prove", help="Prove authority for a claim")
+    p_auth_prove.add_argument("claim_id", help="Claim ID to prove authority for")
+    p_auth_prove.add_argument("--ledger", default=None, help="Ledger file path")
+    p_auth_prove.add_argument("--json", action="store_true", help="Output JSON")
+    p_auth_prove.set_defaults(func=cmd_authority_prove)
+
     # ── demo ─────────────────────────────────────────────────────
     p_demo = subparsers.add_parser(
         "demo",
-        help="Demo: coherence score",
+        help="Run deterministic drift-patch demo",
     )
+    p_demo.add_argument("--json", action="store_true", help="Output JSON")
+    p_demo.add_argument("--artifacts", default=None, metavar="DIR",
+                        help="Write artifact files to directory")
     p_demo.set_defaults(func=cmd_demo)
-    p_demo.add_argument("remaining", nargs=argparse.REMAINDER)
 
     args = parser.parse_args()
 
