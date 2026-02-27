@@ -4,7 +4,7 @@
     "catalog_version": "v2",
     "repo_release_line": "v2.x",
     "source_of_truth": "release_kpis/feature_catalog.json",
-    "last_updated": "2026-02-25"
+    "last_updated": "2026-02-27"
   },
   "categories": [
     {
@@ -99,6 +99,85 @@
           "artifacts": ["src/core/audit.py"],
           "enforcement": ["CI: ci.yml"],
           "kpi_axes": ["Operational_Maturity", "Technical_Completeness"]
+        }
+      ]
+    },
+    {
+      "id": "FEEDS_SURFACE",
+      "name": "FEEDS Event Surface",
+      "summary": "Federated Event Envelope Distribution Surface — event-driven pub/sub connecting governance primitives (TS, ALS, DLR, DS, CE) via file-based bus with manifest-first ingest, deterministic drift detection, authority validation, triage state machine, and canon versioning.",
+      "features": [
+        {
+          "id": "FEEDS_ENVELOPE",
+          "name": "Event Envelope + Schemas",
+          "description": "Canonical event envelope with 6 topic-specific payload schemas, SHA-256 payload hashing, two-phase validation (envelope then payload), and golden fixtures.",
+          "artifacts": ["src/core/feeds/types.py", "src/core/feeds/envelope.py", "src/core/feeds/validate.py", "src/core/schemas/feeds/feeds_event_envelope.schema.json", "src/core/schemas/feeds/truth_snapshot.schema.json", "src/core/schemas/feeds/authority_slice.schema.json", "src/core/schemas/feeds/decision_lineage.schema.json", "src/core/schemas/feeds/drift_signal.schema.json", "src/core/schemas/feeds/canon_entry.schema.json", "src/core/schemas/feeds/packet_index.schema.json"],
+          "enforcement": ["CI: coherence_ci.yml", "make validate-feeds"],
+          "kpi_axes": ["Technical_Completeness", "Automation_Depth"]
+        },
+        {
+          "id": "FEEDS_BUS",
+          "name": "File-Bus Pub/Sub + DLQ",
+          "description": "Atomic file-based publisher (temp+rename), poll-based subscriber with claim lifecycle (inbox→processing→ack), dead-letter queue with replay, and multi-worker safety via rename semantics.",
+          "artifacts": ["src/core/feeds/bus/publisher.py", "src/core/feeds/bus/subscriber.py", "src/core/feeds/bus/dlq.py", "src/core/feeds/bus/__init__.py"],
+          "enforcement": ["CI: coherence_ci.yml", "make test-feeds-bus"],
+          "kpi_axes": ["Data_Integration", "Operational_Maturity"]
+        },
+        {
+          "id": "FEEDS_INGEST",
+          "name": "Manifest-First Ingest Orchestrator",
+          "description": "All-or-none packet ingest: manifest verification, SHA-256 hash checks, schema validation, per-topic extraction, atomic staging, and PROCESS_GAP drift emission on failure.",
+          "artifacts": ["src/core/feeds/ingest/orchestrator.py", "src/core/feeds/ingest/extractors.py"],
+          "enforcement": ["CI: coherence_ci.yml", "make test-feeds-ingest"],
+          "kpi_axes": ["Data_Integration", "Technical_Completeness"]
+        },
+        {
+          "id": "FEEDS_AUTHORITY_GATE",
+          "name": "Authority Gate Consumer",
+          "description": "Compares DLR action claims against ALS blessed claims; emits AUTHORITY_MISMATCH drift signal when unblessed claims detected.",
+          "artifacts": ["src/core/feeds/consumers/authority_gate.py"],
+          "enforcement": ["CI: coherence_ci.yml", "make test-feeds-consumers"],
+          "kpi_axes": ["Authority_Modeling", "Operational_Maturity"]
+        },
+        {
+          "id": "FEEDS_EVIDENCE_CHECK",
+          "name": "Evidence Completeness Consumer",
+          "description": "Cross-references DLR evidence refs against packet_index manifest; emits PROCESS_GAP drift signal on missing refs.",
+          "artifacts": ["src/core/feeds/consumers/evidence_check.py"],
+          "enforcement": ["CI: coherence_ci.yml", "make test-feeds-consumers"],
+          "kpi_axes": ["Operational_Maturity", "Technical_Completeness"]
+        },
+        {
+          "id": "FEEDS_TRIAGE",
+          "name": "Drift Triage State Machine",
+          "description": "SQLite-backed drift triage with enforced state transitions (NEW→TRIAGED→PATCH_PLANNED→PATCHED→VERIFIED), severity tracking, recurrence fingerprinting, and operator CLI.",
+          "artifacts": ["src/core/feeds/consumers/triage.py"],
+          "enforcement": ["CI: coherence_ci.yml", "make test-feeds-consumers"],
+          "kpi_axes": ["Operational_Maturity", "Automation_Depth"]
+        },
+        {
+          "id": "FEEDS_CANON_STORE",
+          "name": "Canon Store",
+          "description": "Append-only SQLite canon store with semantic versioning, supersedes chain, domain filtering, version chain traversal, and cache invalidation event emission.",
+          "artifacts": ["src/core/feeds/canon/store.py"],
+          "enforcement": ["CI: coherence_ci.yml", "make test-feeds-canon"],
+          "kpi_axes": ["Authority_Modeling", "Data_Integration"]
+        },
+        {
+          "id": "FEEDS_CLAIM_VALIDATOR",
+          "name": "Claim Validator",
+          "description": "Validates claims for contradictions (via graph.contradicts), TTL expiry (halfLife + timestampCreated), and confidence/statusLight consistency; emits drift signals on issues.",
+          "artifacts": ["src/core/feeds/canon/claim_validator.py"],
+          "enforcement": ["CI: coherence_ci.yml", "make test-feeds-canon"],
+          "kpi_axes": ["Authority_Modeling", "Technical_Completeness"]
+        },
+        {
+          "id": "FEEDS_MG_WRITER",
+          "name": "Memory Graph Writer",
+          "description": "Idempotent per-packet JSON graph writer with typed nodes (by topic) and edges (packet_contains, ds_detected_from, ce_resolves, als_authorizes).",
+          "artifacts": ["src/core/feeds/canon/mg_writer.py"],
+          "enforcement": ["CI: coherence_ci.yml", "make test-feeds-canon"],
+          "kpi_axes": ["Data_Integration", "Technical_Completeness"]
         }
       ]
     },
