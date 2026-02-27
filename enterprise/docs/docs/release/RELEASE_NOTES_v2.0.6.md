@@ -6,7 +6,7 @@
   - `TEC_SUMMARY.md`
   - `tec_internal.json`
   - `tec_executive.json`
-  - `tec_dod.json`
+  - `tec_public_sector.json`
 - Wired TEC generation into KPI pipeline (`make kpi`) and PR comment output.
 
 ## C-TEC v1.0 Upgrade

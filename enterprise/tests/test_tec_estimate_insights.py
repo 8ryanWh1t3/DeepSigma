@@ -19,7 +19,7 @@ def _write_weights(path: Path) -> None:
 rates:
   internal_hourly: 150
   exec_hourly: 225
-  dod_fully_burdened_hourly: 275
+  public_sector_fully_burdened_hourly: 275
 uncertainty:
   low: 0.8
   base: 1.0

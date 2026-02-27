@@ -13,7 +13,7 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - `release_kpis/TEC_SUMMARY.md`
   - `release_kpis/tec_internal.json`
   - `release_kpis/tec_executive.json`
-  - `release_kpis/tec_dod.json`
+  - `release_kpis/tec_public_sector.json`
 - C-TEC v1.0 complexity weighting signals:
   - PR diff size (`additions + deletions`)
   - files changed per PR

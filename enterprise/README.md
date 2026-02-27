@@ -29,7 +29,7 @@ See: [docs/release/RELEASE_NOTES_v2.0.6.md](docs/release/RELEASE_NOTES_v2.0.6.md
 - TEC summary (C-TEC v1.0): [release_kpis/TEC_SUMMARY.md](release_kpis/TEC_SUMMARY.md)
 - TEC internal tier: [release_kpis/tec_internal.json](release_kpis/tec_internal.json)
 - TEC executive tier: [release_kpis/tec_executive.json](release_kpis/tec_executive.json)
-- TEC DoD tier: [release_kpis/tec_dod.json](release_kpis/tec_dod.json)
+- TEC Public Sector tier: [release_kpis/tec_public_sector.json](release_kpis/tec_public_sector.json)
 - C-TEC mermaid flow: [docs/mermaid/12-c-tec-pipeline.md](docs/mermaid/12-c-tec-pipeline.md)
 - Roadmap forecast: [release_kpis/roadmap_forecast.md](release_kpis/roadmap_forecast.md)
 - Roadmap timeline: [release_kpis/roadmap_timeline.svg](release_kpis/roadmap_timeline.svg)

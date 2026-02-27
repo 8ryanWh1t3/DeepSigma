@@ -305,7 +305,7 @@ def main() -> int:
 
     internal_rate = float(WEIGHTS["rates"]["internal_hourly"])
     executive_rate = float(WEIGHTS["rates"]["exec_hourly"])
-    dod_rate = float(WEIGHTS["rates"]["dod_fully_burdened_hourly"])
+    ps_rate = float(WEIGHTS["rates"]["public_sector_fully_burdened_hourly"])
 
     OUT.mkdir(parents=True, exist_ok=True)
     _write_json(
@@ -317,8 +317,8 @@ def main() -> int:
         {"tier": "executive", **data, **_build_tier(executive_rate, ctec_hours, uncertainty)},
     )
     _write_json(
-        OUT / "tec_dod.json",
-        {"tier": "dod", **data, **_build_tier(dod_rate, ctec_hours, uncertainty)},
+        OUT / "tec_public_sector.json",
+        {"tier": "public_sector", **data, **_build_tier(ps_rate, ctec_hours, uncertainty)},
     )
 
     md_lines = ["# TEC Summary (ROM)", "", "## Counts"]
@@ -349,7 +349,7 @@ def main() -> int:
     for name, rate in (
         ("Internal", internal_rate),
         ("Executive", executive_rate),
-        ("DoD Fully Burdened", dod_rate),
+        ("Public Sector Fully Burdened", ps_rate),
     ):
         low = ctec_hours * float(uncertainty["low"])
         base = ctec_hours * float(uncertainty["base"])

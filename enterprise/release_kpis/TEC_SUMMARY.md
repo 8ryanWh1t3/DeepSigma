@@ -20,7 +20,7 @@
 - Base: 12697.3 hrs | $2856892
 - High: 17141.4 hrs | $3856805
 
-### DoD Fully Burdened @ $275/hr
+### Public Sector Fully Burdened @ $275/hr
 - Low:  10157.8 hrs | $2793406
 - Base: 12697.3 hrs | $3491758
 - High: 17141.4 hrs | $4713873

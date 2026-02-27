@@ -95,12 +95,12 @@ def main() -> int:
     badge_svg = "release_kpis/badge_latest.svg"
     tec_internal = outdir / "tec_internal.json"
     tec_executive = outdir / "tec_executive.json"
-    tec_dod = outdir / "tec_dod.json"
-    if not (tec_internal.exists() and tec_executive.exists() and tec_dod.exists()):
-        raise SystemExit("Missing TEC artifacts. Expected tec_internal/executive/dod json files.")
+    tec_ps = outdir / "tec_public_sector.json"
+    if not (tec_internal.exists() and tec_executive.exists() and tec_ps.exists()):
+        raise SystemExit("Missing TEC artifacts. Expected tec_internal/executive/public_sector json files.")
     tec_internal_data = json.loads(tec_internal.read_text(encoding="utf-8"))
     tec_executive_data = json.loads(tec_executive.read_text(encoding="utf-8"))
-    tec_dod_data = json.loads(tec_dod.read_text(encoding="utf-8"))
+    tec_ps_data = json.loads(tec_ps.read_text(encoding="utf-8"))
     telemetry = merged_data.get("telemetry", {})
     insights = telemetry.get("insights", {})
     insights_section = ""
@@ -164,7 +164,7 @@ def main() -> int:
 **TEC (ROM):**
 - Internal: {tec_internal_data["base"]["hours"]} hrs | ${int(tec_internal_data["base"]["cost"]):,}
 - Executive: {tec_executive_data["base"]["hours"]} hrs | ${int(tec_executive_data["base"]["cost"]):,}
-- DoD: {tec_dod_data["base"]["hours"]} hrs | ${int(tec_dod_data["base"]["cost"]):,}
+- Public Sector: {tec_ps_data["base"]["hours"]} hrs | ${int(tec_ps_data["base"]["cost"]):,}
 - Full detail: `release_kpis/TEC_SUMMARY.md`
 
 **Notes:**

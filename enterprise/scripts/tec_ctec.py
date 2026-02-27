@@ -379,7 +379,7 @@ def write_release_kpi_outputs(payload: dict[str, Any]) -> None:
     tier_data = {
         "internal": _build_tier(float(rates.get("internal", 150.0)), base_hours, uncertainty),
         "executive": _build_tier(float(rates.get("executive", 225.0)), base_hours, uncertainty),
-        "dod": _build_tier(float(rates.get("dod", 275.0)), base_hours, uncertainty),
+        "public_sector": _build_tier(float(rates.get("public_sector", 275.0)), base_hours, uncertainty),
     }
 
     for tier, data in tier_data.items():
@@ -420,10 +420,10 @@ def write_release_kpi_outputs(payload: dict[str, Any]) -> None:
         f"- Base: {tier_data['executive']['base']['hours']} hrs | ${int(tier_data['executive']['base']['cost'])}",
         f"- High: {tier_data['executive']['high']['hours']} hrs | ${int(tier_data['executive']['high']['cost'])}",
         "",
-        "### DoD Fully Burdened @ $275/hr",
-        f"- Low:  {tier_data['dod']['low']['hours']} hrs | ${int(tier_data['dod']['low']['cost'])}",
-        f"- Base: {tier_data['dod']['base']['hours']} hrs | ${int(tier_data['dod']['base']['cost'])}",
-        f"- High: {tier_data['dod']['high']['hours']} hrs | ${int(tier_data['dod']['high']['cost'])}",
+        "### Public Sector Fully Burdened @ $275/hr",
+        f"- Low:  {tier_data['public_sector']['low']['hours']} hrs | ${int(tier_data['public_sector']['low']['cost'])}",
+        f"- Base: {tier_data['public_sector']['base']['hours']} hrs | ${int(tier_data['public_sector']['base']['cost'])}",
+        f"- High: {tier_data['public_sector']['high']['hours']} hrs | ${int(tier_data['public_sector']['high']['cost'])}",
         "",
         "## Why This Is More Accurate",
         "- Uses edition-scoped inventory plus full-repo `total` scope, so complexity is measured across actual shipped surfaces.",
@@ -449,7 +449,7 @@ def main() -> int:
     print(f"Wrote: {RK_ROOT / 'TEC_SUMMARY.md'}")
     print(f"Wrote: {RK_ROOT / 'tec_internal.json'}")
     print(f"Wrote: {RK_ROOT / 'tec_executive.json'}")
-    print(f"Wrote: {RK_ROOT / 'tec_dod.json'}")
+    print(f"Wrote: {RK_ROOT / 'tec_public_sector.json'}")
     if args.snapshot:
         print("Wrote: daily TEC snapshot")
 

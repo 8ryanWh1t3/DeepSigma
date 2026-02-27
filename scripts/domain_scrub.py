@@ -169,7 +169,7 @@ ALLOWED_ACRONYMS = {
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}
-SKIP_DIRS = {".git", ".github", ".venv", "venv", "node_modules", "__pycache__", "dist", "build", ".pytest_cache"}
+SKIP_DIRS = {".git", ".github", ".venv", "venv", "node_modules", "__pycache__", "dist", "build", ".pytest_cache", "fixtures"}
 
 
 # ----------------------------
