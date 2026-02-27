@@ -138,6 +138,7 @@ class CanonStore:
     ) -> None:
         """Publish a canon_entry event as a cache invalidation signal."""
         try:
+            assert self._topics_root is not None
             envelope = build_envelope(
                 topic=FeedTopic.CANON_ENTRY,
                 payload=canon_entry,
