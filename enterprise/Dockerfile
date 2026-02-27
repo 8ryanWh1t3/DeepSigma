@@ -47,7 +47,7 @@ COPY dashboard/server/ /app/dashboard/server/
 RUN touch /app/dashboard/__init__.py /app/dashboard/server/__init__.py
 COPY pyproject.toml setup.cfg* /app/
 COPY src/engine/ /app/engine/
-COPY src/core/ /app/core/
+COPY src/core/ /app/src/core/
 COPY src/verifiers/ /app/verifiers/
 COPY src/tools/ /app/tools/
 COPY schemas/ /app/schemas/

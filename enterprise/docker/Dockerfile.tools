@@ -44,15 +44,15 @@ RUN pip install --no-cache-dir \
 WORKDIR /app
 
 COPY pyproject.toml /app/
-COPY src/core/ /app/core/
+COPY src/core/ /app/src/core/
 COPY enterprise/src/engine/ /app/engine/
 COPY enterprise/src/_experimental/verifiers/ /app/verifiers/
 COPY enterprise/src/tools/ /app/tools/
 COPY enterprise/src/adapters/ /app/adapters/
 COPY enterprise/src/demos/ /app/demos/
 COPY docs/examples/ /app/examples/
-COPY docs/llm_data_model/ /app/llm_data_model/
-COPY docs/policy_packs/ /app/policy_packs/
+COPY enterprise/docs/llm_data_model/ /app/llm_data_model/
+COPY enterprise/docs/policy_packs/ /app/policy_packs/
 
 RUN pip install --no-cache-dir -e /app
 

@@ -40,7 +40,7 @@ RUN if [ "$INSTALL_OTLP" = "grpc" ] || [ "$INSTALL_OTLP" = "both" ]; then \
 WORKDIR /app
 
 COPY pyproject.toml /app/
-COPY src/core/ /app/core/
+COPY src/core/ /app/src/core/
 COPY enterprise/src/adapters/otel/ /app/adapters/otel/
 COPY enterprise/src/adapters/__init__.py /app/adapters/__init__.py
 COPY enterprise/src/engine/ /app/engine/
