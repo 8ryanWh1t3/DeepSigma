@@ -99,6 +99,124 @@
           "artifacts": ["src/core/audit.py"],
           "enforcement": ["CI: ci.yml"],
           "kpi_axes": ["Operational_Maturity", "Technical_Completeness"]
+        },
+        {
+          "id": "AGENT_SESSION",
+          "name": "Agent Decision Session",
+          "description": "Stateful session for AI agent decision logging — facade over DLR, DriftSignal, MemoryGraph, and CoherenceScorer. Accepts simplified decision format, builds sealed episodes with 5-hash chain, detects drift, and provides audit/score/prove/export.",
+          "artifacts": ["src/core/agent.py", "src/core/fixtures/agent_sample_decision.json"],
+          "enforcement": ["CI: ci.yml", "tests/test_agent.py"],
+          "kpi_axes": ["Technical_Completeness", "Operational_Maturity"]
+        },
+        {
+          "id": "AUTHORITY_LEDGER_CORE",
+          "name": "Core Authority Ledger",
+          "description": "Hash-chained append-only ledger recording who authorized what. SHA-256 chain integrity, grant/revocation lifecycle, time-windowed authority, scope binding. Core version without HMAC/tier enforcement.",
+          "artifacts": ["src/core/authority.py"],
+          "enforcement": ["CI: ci.yml", "tests/test_agent.py"],
+          "kpi_axes": ["Authority_Modeling", "Technical_Completeness"]
+        },
+        {
+          "id": "NORMALIZE",
+          "name": "Key Normalization",
+          "description": "Automatic camelCase-to-snake_case normalization at all ingestion boundaries ensuring consistent key format across the pipeline.",
+          "artifacts": ["src/core/normalize.py"],
+          "enforcement": ["CI: ci.yml"],
+          "kpi_axes": ["Technical_Completeness", "Data_Integration"]
+        },
+        {
+          "id": "COHERENCE_MANIFEST",
+          "name": "Coherence Manifest",
+          "description": "System-level declaration of artifact coverage — declares which governance artifacts are present and their completeness state.",
+          "artifacts": ["src/core/manifest.py"],
+          "enforcement": ["CI: ci.yml"],
+          "kpi_axes": ["Technical_Completeness", "Operational_Maturity"]
+        },
+        {
+          "id": "COHERENCE_DEMO",
+          "name": "Self-Contained Coherence Demo",
+          "description": "Zero-argument deterministic demo producing BASELINE→DRIFT→PATCH 3-state cycle with bundled sample data. Supports --json and --artifacts flags.",
+          "artifacts": ["src/core/cli.py"],
+          "enforcement": ["CI: ci.yml", "tests/test_agent.py"],
+          "kpi_axes": ["Operational_Maturity", "Enterprise_Readiness"]
+        },
+        {
+          "id": "AGENT_CLI",
+          "name": "Agent CLI Commands",
+          "description": "CLI surface for agent decision logging: coherence agent log|audit|score with session persistence and JSON output.",
+          "artifacts": ["src/core/cli.py", "src/core/fixtures/agent_sample_decision.json"],
+          "enforcement": ["CI: ci.yml", "tests/test_agent.py"],
+          "kpi_axes": ["Operational_Maturity", "Automation_Depth"]
+        },
+        {
+          "id": "COHERENCE_METRICS",
+          "name": "Coherence Metrics Collector",
+          "description": "Four composable metric points — coherence_score (0-100), drift_density (ratio), authority_coverage (ratio), memory_coverage (ratio) — computed from DLR, RS, DS, and MG pipelines.",
+          "artifacts": ["src/core/metrics.py"],
+          "enforcement": ["CI: ci.yml", "tests/test_site_content.py"],
+          "kpi_axes": ["Operational_Maturity", "Technical_Completeness"]
+        }
+      ]
+    },
+    {
+      "id": "SDK_PACKAGES",
+      "name": "SDK Packages",
+      "summary": "Standalone pip-installable packages for framework integration: LangChain bridge, REST middleware (FastAPI + Flask), and agent wrapper for tool-calling agent SDKs.",
+      "features": [
+        {
+          "id": "LANGCHAIN_BRIDGE",
+          "name": "LangChain Bridge Package",
+          "description": "Standalone pip package repackaging exhaust + governance callbacks, LangGraph connector, and LangGraph exhaust tracker with optional AgentSession integration.",
+          "artifacts": ["packages/langchain-deepsigma/src/langchain_deepsigma/exhaust.py", "packages/langchain-deepsigma/src/langchain_deepsigma/governance.py", "packages/langchain-deepsigma/src/langchain_deepsigma/langgraph_connector.py", "packages/langchain-deepsigma/src/langchain_deepsigma/langgraph_exhaust.py"],
+          "enforcement": ["packages/langchain-deepsigma/tests/", "CI: publish-langchain.yml"],
+          "kpi_axes": ["Data_Integration", "Enterprise_Readiness"]
+        },
+        {
+          "id": "REST_MIDDLEWARE",
+          "name": "REST Middleware Package",
+          "description": "Generic REST middleware with @log_decision decorator, ASGI middleware for FastAPI, and Flask extension — all backed by AgentSession via contextvars for async safety.",
+          "artifacts": ["packages/deepsigma-middleware/src/deepsigma_middleware/decorator.py", "packages/deepsigma-middleware/src/deepsigma_middleware/fastapi_mw.py", "packages/deepsigma-middleware/src/deepsigma_middleware/flask_mw.py"],
+          "enforcement": ["packages/deepsigma-middleware/tests/", "CI: publish-middleware.yml"],
+          "kpi_axes": ["Data_Integration", "Operational_Maturity"]
+        },
+        {
+          "id": "AGENT_WRAPPER",
+          "name": "Agent Wrapper Package",
+          "description": "Generic wrapper for tool-calling agent SDKs — logs intent, intercepts tool calls, seals completion episodes, and optionally detects drift across runs.",
+          "artifacts": ["packages/openai-deepsigma/src/openai_deepsigma/wrapper.py"],
+          "enforcement": ["packages/openai-deepsigma/tests/", "CI: publish-openai.yml"],
+          "kpi_axes": ["Data_Integration", "Automation_Depth"]
+        }
+      ]
+    },
+    {
+      "id": "REFERENCE_SITE",
+      "name": "Reference Layer Site",
+      "summary": "Static demo site, reference layer manifesto, site content generation, and GitHub Pages deployment for public documentation.",
+      "features": [
+        {
+          "id": "MANIFESTO",
+          "name": "Reference Layer Manifesto",
+          "description": "Defines three institutional failures (decision amnesia, authority vacuum, silent drift) and the reference layer contract: intent explicit, authority verified, logic auditable, outcomes sealed.",
+          "artifacts": ["docs/manifesto.md", "docs/manifesto-short.md"],
+          "enforcement": ["scripts/domain_scrub.py"],
+          "kpi_axes": ["Enterprise_Readiness", "Operational_Maturity"]
+        },
+        {
+          "id": "STATIC_SITE",
+          "name": "Static Demo Site",
+          "description": "Six-page static site (index, quickstart, demo, manifesto, metrics) with dark terminal theme, no JS/npm dependencies, deployed via GitHub Pages.",
+          "artifacts": ["docs/site/index.html", "docs/site/quickstart.html", "docs/site/demo.html", "docs/site/manifesto.html", "docs/site/metrics.html", "docs/site/style.css"],
+          "enforcement": ["CI: gh-pages.yml"],
+          "kpi_axes": ["Enterprise_Readiness", "Operational_Maturity"]
+        },
+        {
+          "id": "SITE_CONTENT_GEN",
+          "name": "Site Content Generator",
+          "description": "Script generating demo.json and metrics.json data files from coherence demo and metrics pipelines for the static site.",
+          "artifacts": ["scripts/generate_site_content.py", "tests/test_site_content.py"],
+          "enforcement": ["CI: ci.yml", "make site-content"],
+          "kpi_axes": ["Automation_Depth", "Operational_Maturity"]
         }
       ]
     },

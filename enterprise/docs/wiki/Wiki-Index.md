@@ -36,6 +36,7 @@ Canonical wiki structure for Sigma OVERWATCH / DeepSigma docs.
 ## Integrations
 
 - [Integrations](Integrations)
+- [SDK Packages](SDK-Packages)
 - [MCP](MCP)
 - [LangChain](LangChain)
 - [OpenTelemetry](OpenTelemetry)
@@ -83,4 +84,3 @@ Canonical wiki structure for Sigma OVERWATCH / DeepSigma docs.
 - [Roadmap](Roadmap)
 - [Glossary](Glossary)
 - [Contributing](Contributing)
-

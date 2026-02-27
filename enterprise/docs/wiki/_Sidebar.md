@@ -26,9 +26,12 @@
   - [Canon Schema](Canon)
   - [Retcon Schema](Retcon)
   - [ABP Schema](Authority-Boundary-Primitive)
-- **Exhaust Inbox**
+- **FEEDS + Exhaust**
   - [Exhaust Inbox](Exhaust-Inbox)
+  - [FEEDS Schemas](Schemas)
 - **Integrations**
+  - [Integrations](Integrations)
+  - [SDK Packages](SDK-Packages)
   - [MCP](MCP)
   - [LangChain](LangChain)
   - [LangChain Governance](LangChain-Governance)
@@ -37,6 +40,9 @@
   - [Palantir Foundry](Palantir-Foundry)
   - [Power Platform](Power-Platform)
   - [OpenTelemetry](OpenTelemetry)
+- **Reference Layer**
+  - [Manifesto](https://github.com/8ryanWh1t3/DeepSigma/blob/main/docs/manifesto.md)
+  - [Static Site](https://github.com/8ryanWh1t3/DeepSigma/tree/main/docs/site)
 - **Ops**
   - [Operations](Operations)
   - [SLOs & Metrics](SLOs-and-Metrics)

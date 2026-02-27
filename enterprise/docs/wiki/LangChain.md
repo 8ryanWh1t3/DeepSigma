@@ -20,3 +20,11 @@ Three violation modes:
 Composes cleanly with `ExhaustCallbackHandler` -- pass both in the callback list.
 
 See [LangChain Governance](LangChain-Governance.md) for full API reference, configuration, and comparison with the LangGraph DTETracker.
+
+## Standalone Package
+
+The `langchain-deepsigma` pip package repackages the enterprise adapters into a standalone distribution with optional `AgentSession` integration. Install with `pip install langchain-deepsigma`.
+
+Exports: `ExhaustCallbackHandler`, `GovernanceCallbackHandler`, `DTEViolationError`, `LangGraphExhaustTracker`, `LangGraphConnector`.
+
+See [SDK Packages](SDK-Packages.md) for full usage docs.

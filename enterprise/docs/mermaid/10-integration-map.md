@@ -10,6 +10,12 @@ graph TB
         SEAL[Episode Sealer]
     end
 
+    subgraph SDKPackages["SDK Packages"]
+        LCPKG[langchain-deepsigma<br/>pip package]
+        MWPKG[deepsigma-middleware<br/>FastAPI · Flask]
+        OAIPKG[openai-deepsigma<br/>Agent Wrapper]
+    end
+
     subgraph AgentFrameworks["Agent Frameworks"]
         LC[LangChain<br/>adapters/langchain]
         LG[LangGraph]
@@ -23,6 +29,7 @@ graph TB
     subgraph Observability["Observability"]
         OTEL[OpenTelemetry<br/>adapters/otel<br/>Spans + Metrics]
         DASH[Dashboard<br/>dashboard/<br/>React + HTML Demo]
+        SITE[Static Site<br/>docs/site/<br/>GitHub Pages]
     end
 
     subgraph DataPlatforms["Data Platforms"]
@@ -34,16 +41,23 @@ graph TB
 
     subgraph Governance["Governance"]
         COHOPS[Coherence Ops<br/>core/<br/>DLR · RS · DS · MG]
+        METRICS[Metrics Collector<br/>4 metric points]
     end
 
     LC -->|wrap agent calls| SUP
     LG -->|wrap agent calls| SUP
     OCLAW -->|skill_run to action_contract| SUP
 
+    LCPKG -->|repackages| LC
+    LCPKG -->|repackages| LG
+    MWPKG -->|log_decision| SEAL
+    OAIPKG -->|wrap + seal| SEAL
+
     SUP <-->|expose tools| MCPS
 
     SEAL -->|spans + metrics| OTEL
     SEAL -->|episodes + telemetry| DASH
+    METRICS -->|site data| SITE
 
     SUP -->|read/write| FOUNDRY
     SUP -->|read/write| POWER
@@ -51,8 +65,10 @@ graph TB
     SUP -->|complete/query| SNOW
 
     SEAL -->|sealed episodes| COHOPS
+    COHOPS -->|collect| METRICS
 
     style Core fill:#e94560,stroke:#e94560,color:#fff
+    style SDKPackages fill:#533483,stroke:#e94560,color:#fff
     style AgentFrameworks fill:#16213e,stroke:#0f3460,color:#fff
     style Transport fill:#162447,stroke:#1f4068,color:#fff
     style Observability fill:#1a1a2e,stroke:#e94560,color:#fff

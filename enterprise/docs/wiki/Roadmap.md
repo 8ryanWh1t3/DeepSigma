@@ -2,6 +2,9 @@
 
 ## Recently Shipped
 
+- **v2.3.0 "Reference Layer"** — SDK packages (langchain-deepsigma, deepsigma-middleware, openai-deepsigma), reference layer manifesto, static demo site with GitHub Pages, coherence metrics collector, site content generation script. 433 tests, issues #477-#483 closed.
+- **v2.2.0 "Mechanical Authority"** — AgentSession, authority ledger, claim trigger pipeline, coherence metrics module, FEEDS event surface (5-stage event-driven: envelope+schemas, file-bus pub/sub, manifest-first ingest, authority/evidence/triage consumers, canon store). 383 tests, issues #430-#459 (FEEDS) + #462-#476 closed.
+- **v2.1.0 "Decision Infrastructure Hardening"** — Core package extraction into `src/core/`. PRIME threshold gate, CoherenceGate (GREEN/YELLOW/RED), 4D CoherenceScorer, CoherenceAuditor, Reconciler, IRIS operator query engine, DTE enforcer, schema validator, key normalization, CLI (`coherence audit|score|mg export|iris query`). Edition guard (CORE never imports ENTERPRISE). 171 tests.
 - **v2.0.6** — KPI confidence bands, C-TEC pipeline, DISR dual-mode crypto, release preflight flow
 - **ABP v1** — Authority Boundary Primitive: stack-independent, pre-runtime governance declaration (#419)
 - **TEC/C-TEC v2** — Health pipeline + roadmap auto-sync (#391)

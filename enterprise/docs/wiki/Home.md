@@ -61,6 +61,18 @@ The runtime enforces four contracts on every decision before it is sealed.
 
 ---
 
+## FEEDS Event Surface
+
+Event-driven pub/sub connecting governance primitives (TS, ALS, DLR, DS, CE) via file-based bus with manifest-first ingest, authority validation, triage state machine, and canon versioning.
+
+| Stage | What it does |
+|------|---------------|
+| Event Envelope | 7 schemas, 6 golden fixtures, SHA-256 payload hashing, two-phase validation |
+| File-Bus | Atomic publisher, poll subscriber, DLQ + replay, multi-worker safety |
+| Ingest | Manifest-first, hash verification, atomic staging, PROCESS_GAP drift on failure |
+| Consumers | Authority gate (DLR vs ALS), evidence completeness, SQLite triage store |
+| Canon | Append-only store, claim validator, MG writer, supersedes chain |
+
 ## Exhaust Inbox
 
 Captures AI interaction exhaust (prompts, completions, tool calls, metrics) and routes it into the governance pipeline automatically.
@@ -95,7 +107,8 @@ Captures AI interaction exhaust (prompts, completions, tool calls, metrics) and 
 ## Integrations
 
 | Integration | Page |
-|------------|------|
+| --- | --- |
+| SDK Packages | [SDK-Packages](SDK-Packages) |
 | MCP (Model Context Protocol) | [MCP](MCP) |
 | LangChain | [LangChain](LangChain) |
 | Palantir Foundry | [Palantir-Foundry](Palantir-Foundry) |

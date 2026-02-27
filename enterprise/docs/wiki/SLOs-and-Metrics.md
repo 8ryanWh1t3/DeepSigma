@@ -10,6 +10,19 @@ Recommended SLOs:
 
 Export via OpenTelemetry where possible.
 
+## Coherence Metrics
+
+Four composable metric points computed from DLR, RS, DS, and MG pipelines. Available via `coherence metrics` CLI or `MetricsCollector` API.
+
+| Metric | Unit | Description |
+| --- | --- | --- |
+| `coherence_score` | score (0-100) | Weighted composite of policy adherence, outcome health, drift control, and memory completeness |
+| `drift_density` | ratio | Drift signals divided by episode count. Lower is better. Zero means no drift. |
+| `authority_coverage` | ratio | Fraction of claims with a valid authority grant. 1.0 = full coverage. |
+| `memory_coverage` | ratio | Fraction of expected episodes in the memory graph. 1.0 = all decisions remembered. |
+
+Generate site data files: `make site-content` produces `docs/site/data/demo.json` and `docs/site/data/metrics.json`.
+
 ## Repo Radar KPI
 
 - Gate report: `release_kpis/KPI_GATE_REPORT.md`

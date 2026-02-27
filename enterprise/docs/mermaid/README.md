@@ -1,6 +1,6 @@
 # Mermaid Diagrams (Canonical)
 
-Eleven diagrams define the visual language of Sigma OVERWATCH. Everything else is archived to reduce drift.
+Fourteen diagrams define the visual language of Sigma OVERWATCH. Everything else is archived to reduce drift.
 
 ## Canonical Set
 
@@ -8,8 +8,8 @@ Eleven diagrams define the visual language of Sigma OVERWATCH. Everything else i
 |---|---------|------|---------|
 | 01 | [System Architecture](01-system-architecture.md) | Graph | Where RAL sits between agents, data planes, observability, and Coherence Ops |
 | 05 | [Drift to Patch](05-drift-to-patch.md) | Flowchart | 8 drift types → severity → fingerprint → 7 patch recommendations |
-| 06 | [Coherence Ops Pipeline](06-coherence-ops-pipeline.md) | Graph + Pie | DLR / RS / DS / MG data flow through audit, scoring, and reconciliation |
-| 10 | [Integration Map](10-integration-map.md) | Graph | Connectors, surfaces, and runtime integrations (MCP, LangChain, OTel, Foundry, Power Platform) |
+| 06 | [Coherence Ops Pipeline](06-coherence-ops-pipeline.md) | Graph + Pie | DLR / RS / DS / MG data flow through AgentSession, audit, scoring, PRIME gate, CoherenceGate, IRIS, and MetricsCollector |
+| 10 | [Integration Map](10-integration-map.md) | Graph | Connectors, surfaces, SDK packages, and runtime integrations (MCP, LangChain, OTel, Foundry, Power Platform) |
 | 11 | [Seal-and-Prove Pipeline](11-seal-and-prove.md) | Flowchart + State | Court-grade admissibility and transparency chain |
 | 12 | [C-TEC Pipeline](12-c-tec-pipeline.md) | Flowchart | Time/Effort/Cost from deterministic telemetry with complexity weighting (Internal/Executive/CustomerOrg) |
 | 13 | [Release Preflight Flow](13-release-preflight-flow.md) | Flowchart | Tag integrity gate before PyPI/GHCR publishing |
@@ -17,6 +17,8 @@ Eleven diagrams define the visual language of Sigma OVERWATCH. Everything else i
 | 15 | [DISR Dual-Mode Architecture](15-disr-dual-mode-architecture.md) | Graph | Local default crypto provider with optional KMS plug-ins and authority controls |
 | 16 | [Authority Boundary Primitive](16-authority-boundary-primitive.md) | Flowchart + Graph | Pre-runtime ABP lifecycle: declare → build → attach → verify + composition model |
 | 17 | [EDGE System](17-edge-system.md) | Flowchart + Graph | EDGE module map, gate enforcement flow, delegation review loop, Unified tab architecture |
+| 18 | [SDK Package Architecture](18-sdk-package-architecture.md) | Graph | Three pip packages wrapping AgentSession with publish workflow |
+| 19 | [FEEDS Pipeline](19-feeds-pipeline.md) | Graph | Five-stage event-driven pipeline: envelope → bus → ingest → consumers → canon |
 
 ## Archive
 
@@ -37,5 +39,7 @@ New diagrams require justification and must map to one of these canonical purpos
 8. **DISR security architecture** — provider model + authority contracts
 9. **Authority boundaries** — pre-runtime governance declarations and composition
 10. **EDGE surfaces** — exportable decision modules, gate enforcement, delegation review
+11. **SDK packages** — standalone pip packages wrapping governance primitives for framework integration
+12. **FEEDS pipeline** — event-driven pub/sub connecting governance primitives
 
 To add a diagram, update this index and ensure `tools/mermaid_audit.py` passes.
