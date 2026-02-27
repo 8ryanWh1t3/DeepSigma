@@ -21,8 +21,9 @@
 # ─────────────────────────────────────────────────────────────
 FROM python:3.12-slim
 
+ARG APP_VERSION=0.0.0-dev
 LABEL org.opencontainers.image.source="https://github.com/8ryanWh1t3/DeepSigma"
-LABEL org.opencontainers.image.version="1.0.0"
+LABEL org.opencontainers.image.version="${APP_VERSION}"
 LABEL org.opencontainers.image.description="Σ OVERWATCH MCP Server — JSON-RPC stdio server for Model Context Protocol clients"
 LABEL org.opencontainers.image.licenses="MIT"
 
@@ -34,7 +35,7 @@ RUN pip install --no-cache-dir \
 WORKDIR /app
 
 COPY pyproject.toml /app/
-COPY src/core/ /app/core/
+COPY src/core/ /app/src/core/
 COPY enterprise/src/adapters/mcp/ /app/adapters/mcp/
 COPY enterprise/src/adapters/__init__.py /app/adapters/__init__.py
 COPY enterprise/src/engine/ /app/engine/

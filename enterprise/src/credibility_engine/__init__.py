@@ -9,7 +9,12 @@ Abstract institutional credibility architecture.
 No real-world system modeled.
 """
 
-__version__ = "1.0.0"
+from importlib.metadata import version as _pkg_version, PackageNotFoundError
+
+try:
+    __version__ = _pkg_version("deepsigma")
+except PackageNotFoundError:
+    __version__ = "0.0.0-dev"
 
 from credibility_engine.constants import DEFAULT_TENANT_ID
 from credibility_engine.engine import CredibilityEngine
