@@ -166,6 +166,24 @@ ALLOWED_ACRONYMS = {
     "STYLES", "SYSTEM", "TITLES", "TRUE", "TTK", "UNK",
     "USD", "VRAM", "WAL", "WIP", "YES",
     "AUC", "CEROZ", "CSOM", "GEOINT", "CID",
+    # GitHub issue export metadata (author names, label colors, states)
+    "BRYAN", "DAVID", "WHITE", "MERGED", "EDEDED", "NEEDS",
+    # Infrastructure / runtime terms
+    "WASM", "PREFIX", "ROOT", "TENANT", "REPO", "HOT", "WARM",
+    "COLD", "TOTAL", "PNG", "MESH", "HEALTH", "ASCII", "NIST",
+    "CSF", "DOCKER", "NONCE", "MOCK", "ARGS", "ARG", "HEAD",
+    "AUTO", "PERF", "OAUTH", "BENCH", "TESTDB", "TODO", "TBD",
+    "DONE", "NONE", "PARENT", "PACKET", "USER", "OWNER", "OUT",
+    "OLD", "AFTER", "NAME", "ONLINE", "PUBLIC", "SAFE",
+    # Project short codes (coherence, signals, services)
+    "COH", "LADDER", "SWC", "SRV", "CDS", "EVT", "SIG", "YEL",
+    "TLE", "ENT", "PKT", "DRF", "BOGUS", "GOLDEN", "GOLD",
+    "REC", "SER",
+    # Security / supply-chain / identity
+    "SLSA", "SPIFFE", "PVC", "AAD", "SSR", "RACI", "AML",
+    "RNG", "OSI", "RSS", "XRAY",
+    # Test / placeholder tokens
+    "XYZ", "BBBB", "AAAA", "NOPE", "III", "PILOT", "ECON",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}
@@ -315,7 +333,8 @@ def main() -> int:
         "--paths",
         nargs="*",
         default=[
-            "docs", "enterprise/docs", "edge", "src", "packages", "reference",
+            "docs", "enterprise/docs", "enterprise/tests", "enterprise/release_kpis",
+            "edge", "src", "packages", "reference",
             "README.md", "CONTRIBUTING.md", "CHANGELOG.md",
             "SECURITY.md", "EDITION_DIFF.md",
         ],
