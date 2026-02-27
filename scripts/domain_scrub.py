@@ -315,7 +315,7 @@ def main() -> int:
         "--paths",
         nargs="*",
         default=[
-            "docs", "enterprise/docs", "edge", "src", "packages",
+            "docs", "enterprise/docs", "edge", "src", "packages", "reference",
             "README.md", "CONTRIBUTING.md", "CHANGELOG.md",
             "SECURITY.md", "EDITION_DIFF.md",
         ],

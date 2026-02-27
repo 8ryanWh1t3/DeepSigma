@@ -1,0 +1,41 @@
+name: Constitution Gate
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/core/schemas/**'
+      - 'enterprise/docs/governance/**'
+      - 'docs/manifesto.md'
+      - 'edge/abp_v1.json'
+      - 'reference/**'
+      - 'pyproject.toml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/core/schemas/**'
+      - 'enterprise/docs/governance/**'
+      - 'docs/manifesto.md'
+      - 'edge/abp_v1.json'
+      - 'reference/**'
+      - 'pyproject.toml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  constitution-gate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Run Constitution Gate
+        run: python scripts/constitution_gate.py

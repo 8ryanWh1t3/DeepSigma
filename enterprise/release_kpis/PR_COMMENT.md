@@ -36,9 +36,9 @@
 - KPI bands: `release_kpis/kpi_bands_v2.0.6.json`
 
 **TEC (ROM):**
-- Internal: 1417.9 hrs | $212,688
-- Executive: 1417.9 hrs | $319,032
-- DoD: 1417.9 hrs | $389,928
+- Internal: 12784.7 hrs | $1,917,699
+- Executive: 12784.7 hrs | $2,876,548
+- Public Sector: 12784.7 hrs | $3,515,782
 - Full detail: `release_kpis/TEC_SUMMARY.md`
 
 **Notes:**
@@ -60,9 +60,21 @@
 
 
 ## 🧩 Feature Coverage (Catalog)
+- **Core Decision Engine**: 18 features
+- **SDK Packages**: 3 features
+- **Reference Layer Site**: 3 features
+- **FEEDS Event Surface**: 9 features
 - **Deterministic Governance Boundary**: 3 features
 - **Intent Capture & Governance**: 3 features
 - **Audit-Neutral Decision Logic**: 3 features
-- **Deterministic Replay & Proof Chain**: 3 features
-- **Repo Radar KPI System**: 2 features
+- **Deterministic Replay & Proof Chain**: 5 features
+- **Security & Key Management**: 4 features
+- **Connector & Integration Framework**: 6 features
+- **Credibility Engine**: 2 features
+- **Mesh Federation**: 2 features
+- **Multi-Tenancy**: 2 features
+- **Repo Radar KPI System**: 7 features
+- **Health & Stability Monitoring**: 6 features
 - **Economic Measurability (TEC / C-TEC)**: 2 features
+- **Pilot & Operator Readiness**: 4 features
+- **Container Infrastructure**: 1 features

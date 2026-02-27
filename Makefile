@@ -6,7 +6,8 @@
 	icr-health-gh pcr-health-gh health-v2-gh tec \
 	roadmap-refresh roadmap-gate \
 	milestone-gate issue-label-gate kpi-issues kpi stability \
-	validate-feeds test-feeds-bus test-feeds-ingest test-feeds-consumers test-feeds-canon test-feeds
+	validate-feeds test-feeds-bus test-feeds-ingest test-feeds-consumers test-feeds-canon test-feeds \
+	constitution-gate
 
 demo:
 	bash run_money_demo.sh
@@ -129,3 +130,6 @@ test-feeds: validate-feeds test-feeds-bus test-feeds-ingest test-feeds-consumers
 
 site-content:
 	python scripts/generate_site_content.py
+
+constitution-gate:
+	python scripts/constitution_gate.py

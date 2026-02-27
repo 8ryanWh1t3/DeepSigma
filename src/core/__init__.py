@@ -31,7 +31,12 @@ from importlib.metadata import version as _pkg_version, PackageNotFoundError
 try:
     __version__ = _pkg_version("deepsigma")
 except PackageNotFoundError:
-    __version__ = "0.0.0-dev"
+    # Fallback: read from pyproject.toml when running from source without pip install
+    import re as _re
+    from pathlib import Path as _Path
+    _pyproject = _Path(__file__).resolve().parent.parent.parent / "pyproject.toml"
+    _m = _re.search(r'^version\s*=\s*"([^"]+)"', _pyproject.read_text()) if _pyproject.exists() else None
+    __version__ = _m.group(1) + "-dev" if _m else "0.0.0-dev"
 
 from .manifest import CoherenceManifest
 from .decision_log import (
