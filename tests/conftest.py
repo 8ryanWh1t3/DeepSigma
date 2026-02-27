@@ -1,11 +1,17 @@
 """Shared test fixtures for DeepSigma core test suite."""
 
 import json
+import sys
 from pathlib import Path
 
 import pytest
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
+_SRC_ROOT = _REPO_ROOT / "src"
+
+# Ensure imports resolve without requiring `pip install -e .`
+if str(_SRC_ROOT) not in sys.path:
+    sys.path.insert(0, str(_SRC_ROOT))
 SAMPLE_EPISODES_PATH = _REPO_ROOT / "src" / "core" / "examples" / "sample_episodes.json"
 SAMPLE_DRIFT_PATH = _REPO_ROOT / "src" / "core" / "examples" / "sample_drift.json"
 
