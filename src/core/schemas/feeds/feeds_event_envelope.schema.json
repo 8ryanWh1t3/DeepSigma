@@ -97,6 +97,11 @@
       "type": "string",
       "pattern": "^\\d+\\.\\d+\\.\\d+$",
       "description": "Schema version (semver)."
+    },
+    "contractFingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{16}$",
+      "description": "Contract surface fingerprint. SHA-256 digest of schema manifest for tamper-evident provenance."
     }
   }
 }

@@ -15,12 +15,22 @@ from __future__ import annotations
 import hashlib
 import json
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from credibility_engine.engine import CredibilityEngine
 
 SEAL_CHAIN_FILE = "seal_chain.jsonl"
+_FINGERPRINT_FILE = Path(__file__).resolve().parent.parent.parent.parent / "reference" / "CONTRACT_FINGERPRINT"
+
+
+def _load_contract_fingerprint() -> str | None:
+    """Read the contract fingerprint from reference/CONTRACT_FINGERPRINT."""
+    try:
+        return _FINGERPRINT_FILE.read_text(encoding="utf-8").strip() or None
+    except FileNotFoundError:
+        return None
 
 
 def _now_iso() -> str:
@@ -100,11 +110,15 @@ def generate_credibility_packet(
     # Policy evaluation summary (if available)
     policy_eval = getattr(engine, "_last_policy_eval", None)
 
+    # Contract fingerprint
+    contract_fp = _load_contract_fingerprint()
+
     packet = {
         "tenant_id": engine.tenant_id,
         "packet_id": packet_id,
         "generated_at": ts,
         "generated_by": user,
+        "contract_fingerprint": contract_fp,
         "credibility_index": {
             "score": engine.credibility_index,
             "band": engine.index_band,
@@ -230,6 +244,7 @@ def seal_credibility_packet(
         "prev_seal_hash": prev_seal_hash,
         "policy_hash": policy_hash,
         "snapshot_hash": snapshot_hash,
+        "contract_fingerprint": _load_contract_fingerprint(),
     }
     _append_seal_chain(engine, chain_entry)
 

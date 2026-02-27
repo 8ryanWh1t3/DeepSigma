@@ -169,10 +169,11 @@ class ClaimTriggerPipeline:
             return []
         try:
             from core.feeds.bus import Publisher
-            from core.feeds.envelope import build_envelope
+            from core.feeds.envelope import build_envelope, load_contract_fingerprint
             from core.feeds.types import FeedTopic
 
             pub = Publisher(self._topics_root)
+            contract_fp = load_contract_fingerprint()
             event_ids: List[str] = []
             for sig in signals:
                 envelope = build_envelope(
@@ -184,6 +185,7 @@ class ClaimTriggerPipeline:
                         + f"{uuid.uuid4().int % 10000:04d}"
                     ),
                     producer="claim-trigger-pipeline",
+                    contract_fingerprint=contract_fp,
                 )
                 pub.publish(FeedTopic.DRIFT_SIGNAL, envelope)
                 event_ids.append(envelope["eventId"])

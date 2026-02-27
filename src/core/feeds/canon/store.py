@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from ..envelope import build_envelope
+from ..envelope import build_envelope, load_contract_fingerprint
 from ..types import Classification, FeedTopic
 
 
@@ -145,6 +145,7 @@ class CanonStore:
                 packet_id=f"CP-{datetime.now(timezone.utc).strftime('%Y-%m-%d')}-0000",
                 producer=self._producer,
                 classification=self._classification,
+                contract_fingerprint=load_contract_fingerprint(),
             )
             ce_inbox = self._topics_root / "canon_entry" / "inbox"
             if ce_inbox.is_dir():

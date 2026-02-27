@@ -184,10 +184,15 @@ ALLOWED_ACRONYMS = {
     "RNG", "OSI", "RSS", "XRAY",
     # Test / placeholder tokens
     "XYZ", "BBBB", "AAAA", "NOPE", "III", "PILOT", "ECON",
+    # Semver / compat terminology
+    "MAJOR", "MINOR",
+    # Fixture / test data terms
+    "VALUE", "TIER", "SOURCE", "SUM", "PRJ", "TSK", "PMP",
+    "APR", "YOU", "ARE",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}
-SKIP_DIRS = {".git", ".github", ".venv", "venv", "node_modules", "__pycache__", "dist", "build", ".pytest_cache", "fixtures"}
+SKIP_DIRS = {".git", ".github", ".venv", "venv", "node_modules", "__pycache__", "dist", "build", ".pytest_cache"}
 
 
 # ----------------------------

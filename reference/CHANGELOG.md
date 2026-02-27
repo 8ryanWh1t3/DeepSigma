@@ -2,6 +2,19 @@
 
 All contract surface changes are logged here with compatibility annotations.
 
+## v2.0.6-a — Compat Rules + Contract Fingerprint
+
+`ADDITIVE:` Add `contractFingerprint` to FEEDS envelope schema and credibility packets. Add `COMPAT_RULES.md` defining MAJOR/MINOR/PATCH break classification. Contract fingerprint is a single SHA-256 digest of the schema manifest, embedded in every emitted artifact for tamper-evident provenance.
+
+### Migration
+
+**Affected schemas**: `feeds_event_envelope.schema.json`
+**Consumer action**: None — new field is optional. Consumers may read `contractFingerprint` for provenance verification.
+**Rollback**: Yes — old consumers ignore the new optional field.
+**Fingerprint**: `sha256:6a0c479e7a0fcaeb`
+
+---
+
 ## v2.0.6 — Constitution Established
 
 `COMPATIBLE:` Initial constitution lock. 26 schemas fingerprinted. Policy version aligned to GOV-2.0.6. Schema manifest generated. Constitution gate enforced in CI.

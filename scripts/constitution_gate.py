@@ -28,14 +28,28 @@ REF = ROOT / "reference"
 SCHEMAS_DIR = (REF / "schemas").resolve()
 FEEDS_DIR = SCHEMAS_DIR / "feeds"
 MANIFEST = REF / "schema_manifest.json"
+FINGERPRINT_FILE = REF / "CONTRACT_FINGERPRINT"
 VERSION_FILE = REF / "VERSION"
 GATE_REPORT = REF / "GATE_REPORT.md"
+CHANGELOG = REF / "CHANGELOG.md"
 PYPROJECT = ROOT / "pyproject.toml"
 POLICY_VERSION = (REF / "governance" / "POLICY_VERSION.txt").resolve()
+VALID_ANNOTATIONS = {"BREAKING:", "COMPATIBLE:", "ADDITIVE:"}
 
 
 def sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def compute_contract_fingerprint(schemas: dict[str, str]) -> str:
+    """Compute a single SHA-256 digest of the full schema manifest.
+
+    Returns ``sha256:<16hex>`` — a truncated fingerprint for embedding in
+    artifacts.  The full 64-hex digest lives in schema_manifest.json.
+    """
+    canonical = json.dumps(schemas, sort_keys=True, separators=(",", ":"))
+    full_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    return f"sha256:{full_hash[:16]}"
 
 
 def collect_schemas() -> dict[str, str]:
@@ -85,15 +99,19 @@ def run_gpe_subscan() -> tuple[bool, str]:
         return False, str(e)
 
 
-def init_manifest(schemas: dict[str, str], version: str) -> None:
-    """Generate fresh schema manifest."""
+def init_manifest(schemas: dict[str, str], version: str) -> str:
+    """Generate fresh schema manifest. Returns the contract fingerprint."""
+    fingerprint = compute_contract_fingerprint(schemas)
     manifest = {
         "version": version,
         "generated": datetime.now(timezone.utc).isoformat(),
         "schema_count": len(schemas),
+        "contractFingerprint": fingerprint,
         "schemas": schemas,
     }
     MANIFEST.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    FINGERPRINT_FILE.write_text(fingerprint + "\n", encoding="utf-8")
+    return fingerprint
 
 
 def validate_manifest(schemas: dict[str, str]) -> list[str]:
@@ -118,7 +136,31 @@ def validate_manifest(schemas: dict[str, str]) -> list[str]:
         if name not in schemas:
             errors.append(f"REMOVED schema: {name} (still in manifest)")
 
+    # Contract fingerprint
+    stored_fp = stored.get("contractFingerprint")
+    computed_fp = compute_contract_fingerprint(schemas)
+    if stored_fp and stored_fp != computed_fp:
+        errors.append(f"Contract fingerprint mismatch: stored={stored_fp} computed={computed_fp}")
+    elif not stored_fp:
+        errors.append("Contract fingerprint missing from manifest. Run with --init.")
+
     return errors
+
+
+def validate_changelog_annotation() -> tuple[bool, str]:
+    """Check that the latest CHANGELOG entry contains a valid annotation."""
+    if not CHANGELOG.exists():
+        return False, "reference/CHANGELOG.md not found."
+    text = CHANGELOG.read_text(encoding="utf-8")
+    # Find the first ## heading (latest entry)
+    entries = re.split(r"^## ", text, flags=re.M)
+    if len(entries) < 2:
+        return False, "No version entries found in CHANGELOG.md."
+    latest = entries[1]  # text after first ## heading
+    for ann in VALID_ANNOTATIONS:
+        if f"`{ann}`" in latest or latest.lstrip().startswith(ann):
+            return True, f"Latest entry has `{ann}` annotation."
+    return False, "Latest CHANGELOG entry missing BREAKING:/COMPATIBLE:/ADDITIVE: annotation."
 
 
 def write_version(version: str) -> None:
@@ -161,11 +203,11 @@ def main() -> int:
     schemas = collect_schemas()
     checks: list[tuple[str, bool, str]] = []
 
-    # 1. Schema fingerprints
+    # 1. Schema fingerprints + contract fingerprint
     if args.init:
-        init_manifest(schemas, pyproject_v)
+        fingerprint = init_manifest(schemas, pyproject_v)
         checks.append(("Schema Fingerprints", True,
-                        f"Manifest regenerated. {len(schemas)} schemas locked."))
+                        f"Manifest regenerated. {len(schemas)} schemas locked. Fingerprint: {fingerprint}"))
     else:
         errors = validate_manifest(schemas)
         if errors:
@@ -173,8 +215,10 @@ def main() -> int:
             detail += "\n".join(f"- {e}" for e in errors)
             checks.append(("Schema Fingerprints", False, detail))
         else:
+            fingerprint = compute_contract_fingerprint(schemas)
+            FINGERPRINT_FILE.write_text(fingerprint + "\n", encoding="utf-8")
             checks.append(("Schema Fingerprints", True,
-                            f"{len(schemas)} schemas match manifest."))
+                            f"{len(schemas)} schemas match manifest. Fingerprint: {fingerprint}"))
 
     # 2. Version parity
     py_mm = major_minor(pyproject_v)
@@ -196,6 +240,10 @@ def main() -> int:
     # 4. VERSION file
     write_version(pyproject_v)
     checks.append(("VERSION File", True, f"Written: {pyproject_v}"))
+
+    # 5. CHANGELOG annotation
+    cl_pass, cl_detail = validate_changelog_annotation()
+    checks.append(("CHANGELOG Annotation", cl_pass, cl_detail))
 
     # Write report
     all_pass = write_report(checks)

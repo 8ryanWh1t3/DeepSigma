@@ -21,7 +21,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from ..envelope import build_envelope, compute_payload_hash
+from ..envelope import build_envelope, compute_payload_hash, load_contract_fingerprint
 from ..types import Classification, FeedTopic, RecordType
 from ..validate import validate_feed_event
 from .extractors import EXTRACTORS
@@ -83,6 +83,7 @@ class IngestOrchestrator:
             return self._fail(packet_id, errors)
 
         # Phase 2: Extract payloads and build envelopes
+        contract_fp = load_contract_fingerprint()
         envelopes: List[Dict[str, Any]] = []
         errors = []
         sequence = 0
@@ -116,6 +117,7 @@ class IngestOrchestrator:
                     producer=self._producer,
                     classification=self._classification,
                     sequence=sequence,
+                    contract_fingerprint=contract_fp,
                 )
                 # Validate the built envelope
                 result = validate_feed_event(envelope)
@@ -248,6 +250,7 @@ class IngestOrchestrator:
                 packet_id=packet_id,
                 producer=self._producer,
                 classification=self._classification,
+                contract_fingerprint=load_contract_fingerprint(),
             )
             ds_inbox = self._root / "drift_signal" / "inbox"
             if ds_inbox.is_dir():

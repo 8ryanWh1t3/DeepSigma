@@ -8,7 +8,22 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
+from pathlib import Path as _Path
+
 from .types import Classification, FeedTopic, RecordType, TOPIC_TO_RECORD
+
+_FINGERPRINT_FILE = _Path(__file__).resolve().parent.parent.parent.parent / "reference" / "CONTRACT_FINGERPRINT"
+
+
+def load_contract_fingerprint() -> Optional[str]:
+    """Read the contract fingerprint from reference/CONTRACT_FINGERPRINT.
+
+    Returns None when the file doesn't exist (e.g. test environments).
+    """
+    try:
+        return _FINGERPRINT_FILE.read_text(encoding="utf-8").strip() or None
+    except FileNotFoundError:
+        return None
 
 
 def compute_payload_hash(payload: Dict[str, Any]) -> str:
@@ -35,6 +50,7 @@ def build_envelope(
     human_id: Optional[str] = None,
     subtype: Optional[str] = None,
     schema_version: str = "1.0.0",
+    contract_fingerprint: Optional[str] = None,
     created_at: Optional[str] = None,
     record_type: Optional[RecordType | str] = None,
 ) -> Dict[str, Any]:
@@ -78,5 +94,7 @@ def build_envelope(
         envelope["humanId"] = human_id
     if subtype is not None:
         envelope["subtype"] = subtype
+    if contract_fingerprint is not None:
+        envelope["contractFingerprint"] = contract_fingerprint
 
     return envelope
