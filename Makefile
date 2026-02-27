@@ -9,7 +9,8 @@
 	validate-feeds test-feeds-bus test-feeds-ingest test-feeds-consumers test-feeds-canon test-feeds \
 	constitution-gate \
 	verify-release-artifacts validate-kpi-eligibility tec-sensitivity \
-	benchmark scalability-gate benchmark-trend
+	benchmark scalability-gate benchmark-trend \
+	tec-estimate export-telemetry
 
 demo:
 	bash run_money_demo.sh
@@ -73,7 +74,13 @@ pcr-health:
 tec-ctec:
 	python enterprise/scripts/tec_ctec.py --snapshot
 
-tec: tec-ctec
+tec-estimate:
+	python enterprise/scripts/tec_estimate.py
+
+export-telemetry:
+	cd enterprise && bash scripts/export_repo_telemetry.sh
+
+tec: tec-ctec tec-estimate
 
 health-summary:
 	python enterprise/scripts/health_summary.py

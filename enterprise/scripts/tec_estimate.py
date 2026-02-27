@@ -9,6 +9,7 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = ROOT.parent
 OUT = ROOT / "release_kpis"
 WEIGHTS = yaml.safe_load((ROOT / "governance" / "tec_weights.yaml").read_text(encoding="utf-8"))
 
@@ -89,12 +90,13 @@ def _pr_complexity_score(pr: dict, cfg: dict) -> float:
 
 
 def _sum_repo_tree() -> tuple[int, int, int]:
-    workflow_count = (
-        len(list((ROOT / ".github" / "workflows").glob("*.yml")))
-        if (ROOT / ".github" / "workflows").exists()
-        else 0
+    workflow_dir = REPO_ROOT / ".github" / "workflows"
+    workflow_count = len(list(workflow_dir.glob("*.yml"))) if workflow_dir.exists() else 0
+    test_file_count = sum(
+        len(list(d.rglob("test_*.py")))
+        for d in (REPO_ROOT / "tests", REPO_ROOT / "tests-enterprise", ROOT / "tests")
+        if d.exists()
     )
-    test_file_count = len(list((ROOT / "tests").rglob("test_*.py"))) if (ROOT / "tests").exists() else 0
     doc_file_count = len(list((ROOT / "docs").rglob("*.md"))) if (ROOT / "docs").exists() else 0
     return workflow_count, test_file_count, doc_file_count
 

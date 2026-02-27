@@ -1,108 +1,67 @@
 {
-  "schema": "tec_ctec_v2_tier",
-  "source": "enterprise/scripts/tec_ctec.py",
   "tier": "executive",
-  "generated_at": "2026-02-27T22:50:35Z",
-  "mode": "report_only",
-  "core": {
-    "inventory": {
-      "files": 266,
-      "directories": 22,
-      "loc": 17040,
-      "packages": 8,
-      "configs": 45,
-      "tests": 20,
-      "run_surfaces": 3,
-      "artifacts": 21
-    },
-    "tec": 345.0,
-    "controls": {
-      "required": 6,
-      "passed": 6,
-      "kpi_coverage": 1.0,
-      "checks": {
-        "money_demo": true,
-        "baseline": true,
-        "core_tests": true,
-        "boundary_guard": true,
-        "secret_scan": true,
-        "docs_path_to_run": true
-      }
-    },
-    "control_coverage": 0.595,
-    "ctec": 205.27,
-    "r_tec": 663.0
+  "counts": {
+    "issues_total": 247,
+    "prs_merged": 227,
+    "workflows": 39,
+    "test_files": 122,
+    "doc_files": 340,
+    "security_issues_tagged": 4,
+    "committee_cycles_est": 0,
+    "issues_with_pr_link_est": 117
   },
-  "enterprise": {
-    "inventory": {
-      "files": 1084,
-      "directories": 182,
-      "loc": 91902,
-      "packages": 32,
-      "configs": 138,
-      "tests": 1,
-      "run_surfaces": 117,
-      "artifacts": 223
-    },
-    "tec": 1443.6,
-    "controls": {
-      "required": 6,
-      "passed": 6,
-      "kpi_coverage": 1.0,
-      "checks": {
-        "enterprise_demo": true,
-        "enterprise_tests": true,
-        "deploy_sanity": true,
-        "connector_smokes": true,
-        "boundary_guard": true,
-        "secret_scan": true
-      }
-    },
-    "control_coverage": 0.595,
-    "ctec": 858.94,
-    "r_tec": 1761.6
+  "hours": {
+    "issues_weighted": 2475.1,
+    "issues_complexity_weighted": 3156.5,
+    "pr_overhead": 340.5,
+    "workflows": 195.0,
+    "tests": 244.0,
+    "docs": 510.0,
+    "committee": 0.0,
+    "total_base": 3764.6,
+    "total_ctec": 4542.9,
+    "total_ctec_unadjusted": 4446.0,
+    "insights_adjustment_hours": 96.9
   },
-  "total": {
-    "inventory": {
-      "files": 17276,
-      "directories": 3182,
-      "loc": 228690,
-      "packages": 43,
-      "configs": 1915,
-      "tests": 129,
-      "run_surfaces": 144,
-      "artifacts": 231
-    },
-    "tec": 18334.0,
-    "controls": {
-      "required": 12,
-      "passed": 12,
-      "kpi_coverage": 1.0,
-      "checks_scope": "composite(core+enterprise)"
-    },
-    "control_coverage": 0.595,
-    "ctec": 10908.73,
-    "r_tec": 18652.0
+  "complexity": {
+    "avg_index": 1.265,
+    "max_index": 2.275,
+    "config": {
+      "pr_loc_scale": 500,
+      "pr_loc_cap": 3.0,
+      "pr_files_scale": 10,
+      "pr_files_cap": 2.0,
+      "pr_score_weight": 0.15,
+      "pr_multiplier_cap": 1.0,
+      "subsystem_step": 0.15,
+      "subsystem_cap": 0.6,
+      "duration_threshold_days": 14,
+      "duration_window_days": 30,
+      "duration_cap": 0.5,
+      "dependency_ref_step": 0.05,
+      "dependency_ref_cap": 0.4
+    }
   },
-  "factors": {
-    "rcf": 0.85,
-    "icr_status": "YELLOW",
-    "rl_open": 159,
-    "ccf": 0.7,
-    "cl14": 687,
-    "load_bucket": "extreme"
+  "insights": {
+    "enabled": true,
+    "source": "release_kpis/insights_metrics.json",
+    "present": true,
+    "score": 6.16,
+    "signal_count": 3,
+    "factor": 1.0218,
+    "hours_delta": 96.9
   },
   "rate_hourly": 225.0,
   "low": {
-    "hours": 8727.0,
-    "cost": 1963571.0
+    "hours": 3634.3,
+    "cost": 817726.0
   },
   "base": {
-    "hours": 10908.7,
-    "cost": 2454464.0
+    "hours": 4542.9,
+    "cost": 1022158.0
   },
   "high": {
-    "hours": 14726.8,
-    "cost": 3313527.0
+    "hours": 6132.9,
+    "cost": 1379913.0
   }
 }
