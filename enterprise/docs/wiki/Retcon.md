@@ -113,10 +113,24 @@
 >
 > This means you can always answer: "What did we believe then? What do we believe now? Why did it change?"
 >
+> ## Runtime Implementation
+>
+> Retcon is now executable via domain mode handlers:
+>
+> - **FRAN-F04** (`retcon_assess`): Impact assessment — enumerates dependent claims, canon entries, and DLRs affected by the retcon. Returns blast radius classification.
+> - **FRAN-F05** (`retcon_execute`): Executes the retcon — creates superseding claim, updates canon state to RETCONNED, emits drift signals, records audit trail.
+> - **FRAN-F06** (`retcon_propagate`): Propagates downstream — invalidates dependent claims, flags affected episodes, triggers cascade rules.
+>
+> The cascade engine automatically propagates retcon events cross-domain: FranOps retcon → ReflectionOps episode flag + IntelOps dependent claim invalidation.
+>
+> See `src/core/modes/franops.py` and `src/core/feeds/canon/retcon_executor.py`.
+>
 > ## Related Pages
 >
 > - [Unified Atomic Claims](Unified-Atomic-Claims) — the Claim Primitive that Retcon corrects
 > - [Canon](Canon) — blessed claim memory that may need retcon
+> - [FranOps](FranOps) — domain mode that executes retcons (FRAN-F04/F05/F06)
+> - [Cascade Engine](Cascade-Engine) — cross-domain propagation of retcon events
 > - [Sealing & Episodes](Sealing-and-Episodes) — immutability model
 > - [Drift to Patch](Drift-to-Patch) — the drift lifecycle (patches vs retcons)
 > - [Schemas](Schemas) — all JSON Schema specs

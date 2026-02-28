@@ -20,6 +20,8 @@ from .consumers import (
     TriageStore,
 )
 from .canon import CanonStore, ClaimValidator, MGWriter
+from .contracts import RoutingTable, load_routing_table
+from .validate import validate_with_contract
 
 __all__ = [
     "AuthorityGateConsumer",
@@ -46,4 +48,7 @@ __all__ = [
     "compute_payload_hash",
     "init_topic_layout",
     "validate_feed_event",
+    "validate_with_contract",
+    "RoutingTable",
+    "load_routing_table",
 ]

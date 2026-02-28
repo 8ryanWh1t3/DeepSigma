@@ -1,0 +1,69 @@
+{
+  "records": [
+    {
+      "recordId": "REC-001",
+      "source": "sharepoint",
+      "title": "Q4 Revenue Target",
+      "data": {"metric": "revenue", "target": 10000000, "period": "Q4-2025"},
+      "createdAt": "2025-12-01T00:00:00Z"
+    },
+    {
+      "recordId": "REC-002",
+      "source": "sharepoint",
+      "title": "Customer Churn Model v3",
+      "data": {"metric": "churn_rate", "model": "v3", "accuracy": 0.92},
+      "createdAt": "2025-12-15T00:00:00Z"
+    },
+    {
+      "recordId": "REC-003",
+      "source": "snowflake",
+      "title": "Risk Assessment Policy",
+      "data": {"policyId": "RISK-001", "threshold": 0.7, "escalation": "auto"},
+      "createdAt": "2026-01-10T00:00:00Z"
+    }
+  ],
+  "claims": [
+    {
+      "claimId": "CLAIM-MONEY-001",
+      "statement": "Q4 revenue target is $10M based on current pipeline",
+      "confidence": {"score": 0.88},
+      "statusLight": "green",
+      "sources": [{"ref": "REC-001", "type": "record"}],
+      "evidence": [{"ref": "REC-001", "type": "metric", "method": "pipeline_analysis"}],
+      "owner": "finance-team",
+      "timestampCreated": "2025-12-01T00:00:00Z",
+      "version": "1.0.0",
+      "halfLife": {"value": 30, "unit": "days"},
+      "graph": {},
+      "seal": {"hash": "sha256:baseline001", "sealedAt": "2025-12-01T00:00:01Z", "version": 1}
+    },
+    {
+      "claimId": "CLAIM-MONEY-002",
+      "statement": "Customer churn model v3 has 92% accuracy",
+      "confidence": {"score": 0.92},
+      "statusLight": "green",
+      "sources": [{"ref": "REC-002", "type": "record"}],
+      "evidence": [{"ref": "REC-002", "type": "model", "method": "backtest"}],
+      "owner": "data-science",
+      "timestampCreated": "2025-12-15T00:00:00Z",
+      "version": "1.0.0",
+      "halfLife": {"value": 60, "unit": "days"},
+      "graph": {},
+      "seal": {"hash": "sha256:baseline002", "sealedAt": "2025-12-15T00:00:01Z", "version": 1}
+    },
+    {
+      "claimId": "CLAIM-MONEY-003",
+      "statement": "Risk threshold is 0.7 with auto-escalation",
+      "confidence": {"score": 0.95},
+      "statusLight": "green",
+      "sources": [{"ref": "REC-003", "type": "record"}],
+      "evidence": [{"ref": "REC-003", "type": "policy", "method": "policy_review"}],
+      "owner": "risk-team",
+      "timestampCreated": "2026-01-10T00:00:00Z",
+      "version": "1.0.0",
+      "halfLife": {"value": 90, "unit": "days"},
+      "graph": {},
+      "seal": {"hash": "sha256:baseline003", "sealedAt": "2026-01-10T00:00:01Z", "version": 1}
+    }
+  ]
+}

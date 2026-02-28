@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/routing_table.schema.json",
+  "title": "FEEDS Routing Table",
+  "description": "Manifest of all domain functions and events with deterministic routing declarations.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "generatedAt", "functions", "events"],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Routing table schema version."
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this routing table was generated."
+    },
+    "contractFingerprint": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$",
+      "description": "SHA-256 of the routing table canonical JSON for tamper detection."
+    },
+    "functions": {
+      "type": "object",
+      "description": "Map of Function ID -> contract.",
+      "patternProperties": {
+        "^(INTEL|FRAN|RE)-F\\d{2}$": {
+          "$ref": "https://sigma-overwatch.dev/schemas/event_contract.schema.json"
+        }
+      },
+      "additionalProperties": false
+    },
+    "events": {
+      "type": "object",
+      "description": "Map of Event ID -> event declaration.",
+      "patternProperties": {
+        "^(INTEL|FRAN|RE|CASCADE)-E\\d{2}$": {
+          "type": "object",
+          "required": ["name", "domain", "topic", "subtype", "producedBy"],
+          "additionalProperties": false,
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "domain": {
+              "type": "string",
+              "enum": ["intelops", "franops", "reflectionops", "cascade"]
+            },
+            "description": {
+              "type": "string"
+            },
+            "topic": {
+              "type": "string",
+              "enum": [
+                "truth_snapshot",
+                "authority_slice",
+                "decision_lineage",
+                "drift_signal",
+                "canon_entry",
+                "packet_index"
+              ]
+            },
+            "subtype": {
+              "type": "string",
+              "minLength": 1
+            },
+            "producedBy": {
+              "type": "array",
+              "items": {"type": "string"}
+            },
+            "consumedBy": {
+              "type": "array",
+              "items": {"type": "string"}
+            },
+            "severity": {
+              "type": "string",
+              "enum": ["green", "yellow", "red"]
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

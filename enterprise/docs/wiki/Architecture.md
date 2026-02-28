@@ -13,6 +13,14 @@ Agent Frameworks (LangChain/LangGraph/etc)
    │  - Safe Action Contract        │
    │  - Verification                │
    │  - Sealing + Drift→Patch       │
+   │  ┌───────────────────────────┐ │
+   │  │  Domain Modes (36 funcs)  │ │
+   │  │  IntelOps → FranOps       │ │
+   │  │      ↕ Cascade ↕          │ │
+   │  │  ReflectionOps            │ │
+   │  └───────────────────────────┘ │
+   │  - Event Contracts (39 events) │
+   │  - FEEDS pub/sub routing       │
    └───────────────────────────────┘
           |
           v
@@ -37,4 +45,5 @@ Mermaid diagrams:
 - [DISR Dual-Mode Architecture](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/docs/mermaid/15-disr-dual-mode-architecture.md)
 - [Authority Boundary Primitive](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/docs/mermaid/16-authority-boundary-primitive.md)
 - [Authority + Economic Evidence Pipeline](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/docs/mermaid/22-authority-economic-evidence.md)
+- [Domain Modes & Cascade](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/docs/mermaid/24-domain-modes-cascade.md)
 - [Archive Index](https://github.com/8ryanWh1t3/DeepSigma/blob/main/enterprise/docs/archive/mermaid/ARCHIVE_INDEX.md)

@@ -61,6 +61,21 @@ The runtime enforces four contracts on every decision before it is sealed.
 
 ---
 
+## Domain Modes & Cascade Engine
+
+Three executable domain mode modules (36 function handlers total) with cross-domain cascade propagation, event contracts, and deterministic replay.
+
+| Page | What it covers |
+|------|---------------|
+| [IntelOps](IntelOps) | 12 handlers (INTEL-F01–F12): claim ingest → validate → drift → patch → MG update → canon promote |
+| [FranOps](FranOps) | 12 handlers (FRAN-F01–F12): canon propose/bless/enforce, retcon assess/execute/propagate, inflation |
+| [ReflectionOps](ReflectionOps) | 12 handlers (RE-F01–F12): episodes, gates, killswitch, severity, audit, coherence, IRIS, replay |
+| [Cascade Engine](Cascade-Engine) | 7 cross-domain rules with depth-limited propagation |
+| [Event Contracts](Event-Contracts) | Routing table: 36 functions + 39 events → FEEDS topics/subtypes/handlers |
+| [Money Demo v2](Money-Demo-v2) | 10-step end-to-end pipeline exercising all 3 domain modes |
+
+---
+
 ## FEEDS Event Surface
 
 Event-driven pub/sub connecting governance primitives (TS, ALS, DLR, DS, CE) via file-based bus with manifest-first ingest, authority validation, triage state machine, and canon versioning.

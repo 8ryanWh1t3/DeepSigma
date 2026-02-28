@@ -548,6 +548,80 @@ Docker images for coherence, exhaust, MCP, tools, and OTEL workloads with CI val
   - Enforcement: CI: docker-coherence.yml, CI: docker-exhaust.yml, CI: docker-mcp.yml, CI: docker-tools.yml, CI: docker-otel.yml
   - KPI axes: Enterprise_Readiness, Scalability
 
+### Domain Modes & Cascade Engine
+Three executable domain mode modules (IntelOps, FranOps, ReflectionOps) with 36 function handlers, cross-domain cascade propagation, event contracts, and deterministic replay.
+
+- **IntelOps Domain Mode** (`INTELOPS`)
+  - Claim lifecycle automation: ingest, validate, drift detect, patch recommend, MG update, canon promote, authority check, evidence verify, triage, supersede, half-life check, confidence recalc. 12 function handlers (INTEL-F01 through INTEL-F12).
+  - Artifacts: src/core/modes/intelops.py, src/core/modes/base.py
+  - Enforcement: tests/test_intelops.py, make test-intelops
+  - KPI axes: Technical_Completeness, Operational_Maturity
+- **FranOps Domain Mode** (`FRANOPS`)
+  - Canon enforcement and retcon engine: propose, bless, enforce, retcon assess/execute/propagate, inflation monitor, expire, supersede, scope check, drift detect, rollback. 12 function handlers (FRAN-F01 through FRAN-F12).
+  - Artifacts: src/core/modes/franops.py, src/core/feeds/canon/workflow.py, src/core/feeds/canon/retcon_executor.py, src/core/feeds/canon/inflation_monitor.py
+  - Enforcement: tests/test_franops.py, make test-franops
+  - KPI axes: Technical_Completeness, Authority_Modeling
+- **ReflectionOps Domain Mode** (`REFLECTIONOPS`)
+  - Gate enforcement and episode lifecycle: episode begin/seal/archive, gate evaluate/degrade/killswitch, non-coercion audit, severity scoring, coherence check, reflection ingest, IRIS resolve, episode replay. 12 function handlers (RE-F01 through RE-F12).
+  - Artifacts: src/core/modes/reflectionops.py, src/core/episode_state.py, src/core/severity.py, src/core/audit_log.py, src/core/killswitch.py
+  - Enforcement: tests/test_reops.py, make test-reops
+  - KPI axes: Technical_Completeness, Operational_Maturity
+- **Cascade Engine** (`CASCADE_ENGINE`)
+  - Cross-domain event propagation with 7 declarative rules: claim contradiction → canon review, claim supersede → canon update, canon retcon → episode flag, canon retcon → dependent claim invalidation, episode freeze → stale claims, killswitch → all domains freeze, red drift → auto-degrade. Depth-limited to prevent infinite loops.
+  - Artifacts: src/core/modes/cascade.py, src/core/modes/cascade_rules.py
+  - Enforcement: tests/test_cascade.py, make test-cascade
+  - KPI axes: Technical_Completeness, Automation_Depth
+- **Event Contracts & Routing Table** (`EVENT_CONTRACTS`)
+  - Declarative routing table mapping 36 functions + 39 events to FEEDS topics, subtypes, handler paths, required payload fields, and emitted events. Contract validation at publish time.
+  - Artifacts: src/core/feeds/contracts/routing_table.json, src/core/feeds/contracts/loader.py, src/core/feeds/contracts/validator.py
+  - Enforcement: tests/test_feeds_contracts.py, make validate-contracts
+  - KPI axes: Technical_Completeness, Automation_Depth
+- **Canon Workflow State Machine** (`CANON_WORKFLOW`)
+  - Canon entry lifecycle: PROPOSED → BLESSED → ACTIVE → UNDER_REVIEW → SUPERSEDED/RETCONNED/EXPIRED. Transition validation prevents illegal state changes.
+  - Artifacts: src/core/feeds/canon/workflow.py
+  - Enforcement: tests/test_franops.py
+  - KPI axes: Authority_Modeling, Technical_Completeness
+- **Episode State Machine** (`EPISODE_STATE`)
+  - Episode lifecycle: PENDING → ACTIVE → SEALED → ARCHIVED. Freeze support for killswitch scenarios. freeze_all() for emergency halt.
+  - Artifacts: src/core/episode_state.py
+  - Enforcement: tests/test_reops.py
+  - KPI axes: Operational_Maturity, Technical_Completeness
+- **Non-Coercion Audit Log** (`AUDIT_LOG`)
+  - Append-only, hash-chained NDJSON audit log. Each entry chains to previous via SHA-256 hash. verify_chain() for tamper detection. Non-coercion attestation for every domain mode action.
+  - Artifacts: src/core/audit_log.py
+  - Enforcement: tests/test_reops.py
+  - KPI axes: Authority_Modeling, Enterprise_Readiness
+- **Domain Killswitch** (`DOMAIN_KILLSWITCH`)
+  - Emergency freeze: halts all ACTIVE episodes, emits sealed halt proof with authorization details, logs to audit trail, emits drift signal on all topics.
+  - Artifacts: src/core/killswitch.py
+  - Enforcement: tests/test_reops.py
+  - KPI axes: Operational_Maturity, Authority_Modeling
+- **Severity Scorer** (`SEVERITY_SCORER`)
+  - Centralized drift severity computation with drift-type weights, multi-signal aggregation, and GREEN/YELLOW/RED classification.
+  - Artifacts: src/core/severity.py
+  - Enforcement: tests/test_reops.py
+  - KPI axes: Operational_Maturity, Technical_Completeness
+- **Retcon Executor** (`RETCON_EXECUTOR`)
+  - Retcon assessment (impact analysis, dependent claim enumeration) and execution (supersede chain, audit trail, drift signal emission).
+  - Artifacts: src/core/feeds/canon/retcon_executor.py
+  - Enforcement: tests/test_franops.py
+  - KPI axes: Authority_Modeling, Technical_Completeness
+- **Inflation Monitor** (`INFLATION_MONITOR`)
+  - Per-domain canon health monitoring: claim count > 50, contradiction density > 10%, avg age > 30 days, supersedes depth > 5. Breaches emit canon_inflation drift signal.
+  - Artifacts: src/core/feeds/canon/inflation_monitor.py
+  - Enforcement: tests/test_franops.py
+  - KPI axes: Operational_Maturity, Authority_Modeling
+- **Money Demo v2** (`MONEY_DEMO_V2`)
+  - 10-step end-to-end pipeline: LOAD → INTELOPS INGEST → VALIDATE → DELTA → FRANOPS PROPOSE → RETCON → REOPS EPISODE → CASCADE → COHERENCE → SEAL. Exercises all 3 domain modes with drift detection, retcon execution, and cascade propagation.
+  - Artifacts: enterprise/src/demos/money_demo/pipeline.py, enterprise/src/demos/money_demo/fixtures/
+  - Enforcement: tests/test_money_demo_v2.py, make test-money-v2
+  - KPI axes: Operational_Maturity, Technical_Completeness
+- **Coverage Gate** (`COVERAGE_GATE`)
+  - CI gate enforcing test coverage for all 36 function handlers. Coverage matrix maps every Function ID to its test file and class.
+  - Artifacts: tests/coverage_matrix.json, tests/test_coverage_gate.py
+  - Enforcement: make validate-coverage
+  - KPI axes: Automation_Depth, Technical_Completeness
+
 ## Outer-Edge Boundaries
 
 - Not claiming full jurisdictional policy packs (EU AI Act article-by-article enforcement) yet

@@ -87,9 +87,20 @@ Organized by layer — from brand identity through runtime architecture to opera
 
 | Term | Definition |
 |------|-----------|
-| **FranOPS** | Franchise Operations mode. Coherence Ops tuned for multi-location consistency: playbook drift detection, operational standard enforcement, brand coherence scoring, distributed decision alignment. |
-| **IntelOps** | Intelligence Operations mode. Coherence Ops tuned for analytical rigor: source provenance, claim verification, confidence band tracking, information freshness enforcement, compartmentalized access, competing-hypothesis management. |
-| **ReflectionOps** | Reflection Operations mode. Coherence Ops tuned for organizational learning: reflection session cadence, divergence tracking, institutional memory accumulation, pattern detection, lesson-learned sealing. |
+| **FranOPS** | Franchise Operations mode. 12 function handlers (FRAN-F01–F12): canon propose/bless/enforce, retcon assess/execute/propagate, inflation monitor, expire, supersede, scope check, drift detect, rollback. Canon workflow state machine: PROPOSED → BLESSED → ACTIVE → UNDER_REVIEW → SUPERSEDED/RETCONNED/EXPIRED. Implementation: `core/modes/franops.py`. |
+| **IntelOps** | Intelligence Operations mode. 12 function handlers (INTEL-F01–F12): claim ingest, validate, drift detect, patch recommend, MG update, canon promote, authority check, evidence verify, triage, supersede, half-life check, confidence recalc. Implementation: `core/modes/intelops.py`. |
+| **ReflectionOps** | Reflection Operations mode. 12 function handlers (RE-F01–F12): episode begin/seal/archive, gate evaluate/degrade/killswitch, non-coercion audit, severity scoring, coherence check, reflection ingest, IRIS resolve, episode replay. Implementation: `core/modes/reflectionops.py`. |
+| **DomainMode** | Base class for all domain modes. Provides `handle(function_id, event, context) → FunctionResult` dispatch and `replay()` for deterministic verification. Implementation: `core/modes/base.py`. |
+| **FunctionResult** | Return type from every domain mode handler. Contains: `function_id`, `success`, `events_emitted`, `drift_signals`, `mg_updates`, `elapsed_ms`, `replay_hash` (SHA-256 of deterministic output). |
+| **Cascade Engine** | Cross-domain event propagation engine with 7 declarative rules. When an event in one domain triggers a rule, the cascade engine invokes the target domain's handler with depth limiting to prevent infinite loops. Implementation: `core/modes/cascade.py`. |
+| **Event Contracts** | Declarative routing table mapping 36 functions + 39 events to FEEDS topics, subtypes, handler paths, required payload fields, and emitted events. Validated at publish time. Implementation: `core/feeds/contracts/routing_table.json`. |
+| **Canon Workflow** | State machine governing canon entry lifecycle: PROPOSED → BLESSED → ACTIVE → UNDER_REVIEW → SUPERSEDED/RETCONNED/EXPIRED. Also REJECTED and FROZEN states. Transition validation prevents illegal state changes. Implementation: `core/feeds/canon/workflow.py`. |
+| **Episode State Machine** | State machine governing episode lifecycle: PENDING → ACTIVE → SEALED → ARCHIVED. Supports FROZEN state for killswitch scenarios. `freeze_all()` halts all active episodes. Implementation: `core/episode_state.py`. |
+| **Non-Coercion Audit Log** | Append-only, hash-chained NDJSON audit log for domain mode actions. Each entry chains to the previous via SHA-256 hash. `verify_chain()` detects tampering. Implementation: `core/audit_log.py`. |
+| **Killswitch** | Emergency halt mechanism: freezes all ACTIVE episodes, emits sealed halt proof with authorization details, logs to audit trail. Requires explicit authority check to resume. Implementation: `core/killswitch.py`. |
+| **Severity Scorer** | Centralized drift severity computation using drift-type weights, multi-signal aggregation, and GREEN/YELLOW/RED classification. All domains call this for consistent severity assessment. Implementation: `core/severity.py`. |
+| **Retcon Executor** | Retcon assessment (impact analysis, dependent claim enumeration) and execution (supersede chain, audit trail, drift signal emission). Called by FranOps FRAN-F04 and FRAN-F05. Implementation: `core/feeds/canon/retcon_executor.py`. |
+| **Inflation Monitor** | Per-domain canon health monitoring with four threshold types: claim count > 50, contradiction density > 10%, avg claim age > 30 days, supersedes depth > 5. Breaches emit `canon_inflation` drift signal. Implementation: `core/feeds/canon/inflation_monitor.py`. |
 
 ---
 

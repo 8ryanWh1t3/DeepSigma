@@ -10,7 +10,9 @@
 	constitution-gate \
 	verify-release-artifacts validate-kpi-eligibility tec-sensitivity \
 	benchmark scalability-gate benchmark-trend \
-	tec-estimate export-telemetry authority-evidence economic-metrics
+	tec-estimate export-telemetry authority-evidence economic-metrics \
+	test-intelops test-franops test-reops test-cascade test-domains \
+	test-replay validate-coverage
 
 demo:
 	bash run_money_demo.sh
@@ -139,7 +141,13 @@ test-feeds-consumers:
 test-feeds-canon:
 	python -m pytest tests/test_feeds_canon.py -v
 
-test-feeds: validate-feeds test-feeds-bus test-feeds-ingest test-feeds-consumers test-feeds-canon
+test-feeds-contracts:
+	python -m pytest tests/test_feeds_contracts.py -v
+
+validate-contracts:
+	python -m pytest tests/test_feeds_contracts.py::TestRoutingTableIntegrity -v
+
+test-feeds: validate-feeds test-feeds-bus test-feeds-ingest test-feeds-consumers test-feeds-canon test-feeds-contracts
 
 site-content:
 	python scripts/generate_site_content.py
@@ -164,3 +172,26 @@ scalability-gate:
 
 benchmark-trend:
 	python enterprise/scripts/render_benchmark_trend.py
+
+test-intelops:
+	python -m pytest tests/test_intelops.py -v
+
+test-franops:
+	python -m pytest tests/test_franops.py -v
+
+test-reops:
+	python -m pytest tests/test_reops.py -v
+
+test-cascade:
+	python -m pytest tests/test_cascade.py -v
+
+test-domains: test-intelops test-franops test-reops test-cascade
+
+test-replay:
+	python -m pytest tests/test_coverage_gate.py::TestDeterminism -v
+
+validate-coverage:
+	python -m pytest tests/test_coverage_gate.py::TestCoverageGate -v
+
+test-money-v2:
+	python -m pytest tests/test_money_demo_v2.py -v

@@ -57,9 +57,18 @@ LinkedIn content primarily uses "Coherence Ops" and "Deep Sigma" language. This 
 |-----------------|---------------|--------|
 | PRIME (threshold gate) | `core/prime.py` | 🔜 Planned — Phase 1 |
 | IRIS (operator interface) | `core/iris.py`, `specs/iris_query.schema.json`, `docs/18-iris.md` | ✅ Implemented — claim-graph queries |
-| FranOPS (franchise operations mode) | `core/modes/franops.py` | 🔜 Planned — Phase 3 |
-| IntelOps (intelligence operations mode) | `core/modes/intelops.py` | 🔜 Planned — Phase 3 |
-| ReflectionOps (reflection operations mode) | `core/modes/reflectionops.py` | 🔜 Planned — Phase 3 |
+| FranOPS (franchise operations mode) | `core/modes/franops.py` | ✅ Implemented — 12 handlers (canon lifecycle, retcon engine, inflation monitor) |
+| IntelOps (intelligence operations mode) | `core/modes/intelops.py` | ✅ Implemented — 12 handlers (claim ingest→validate→drift→patch→MG update) |
+| ReflectionOps (reflection operations mode) | `core/modes/reflectionops.py` | ✅ Implemented — 12 handlers (episodes, gates, severity, audit, killswitch) |
+| Domain Mode Base | `core/modes/base.py` | ✅ Implemented — DomainMode + FunctionResult + deterministic replay |
+| Cascade Engine | `core/modes/cascade.py` | ✅ Implemented — 7 cross-domain cascade rules with depth-limited propagation |
+| Event Contracts / Routing Table | `core/feeds/contracts/routing_table.json` | ✅ Implemented — 36 functions + 39 events with full contracts |
+| Canon Workflow State Machine | `core/feeds/canon/workflow.py` | ✅ Implemented — PROPOSED→BLESSED→ACTIVE→SUPERSEDED/RETCONNED/EXPIRED |
+| Episode State Machine | `core/episode_state.py` | ✅ Implemented — PENDING→ACTIVE→SEALED→ARCHIVED + FROZEN |
+| Non-Coercion Audit Log | `core/audit_log.py` | ✅ Implemented — append-only, hash-chained NDJSON |
+| Killswitch | `core/killswitch.py` | ✅ Implemented — freeze all episodes + halt proof |
+| Severity Scorer | `core/severity.py` | ✅ Implemented — centralized drift severity computation |
+| Money Demo (v2) | `enterprise/src/demos/money_demo/` | ✅ Implemented — 10-step end-to-end pipeline |
 | CTI (Coherence Threat Index) | `core/scoring.py` (internal) | ⚡ Exists internally, being promoted to first-class |
 | DAT (Dynamic Assertion Testing) | `tools/dat.py` | 🔜 Planned — Phase 4 |
 | DDR (Deep Dive Review) | `tools/ddr.py` | 🔜 Planned — Phase 4 |
@@ -112,4 +121,4 @@ LinkedIn content primarily uses "Coherence Ops" and "Deep Sigma" language. This 
 
 ---
 
-*This map is updated as new features land. Last updated: 2026-02-23.*
+*This map is updated as new features land. Last updated: 2026-02-27.*

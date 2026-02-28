@@ -66,3 +66,46 @@ def validate_feed_event(event: Dict[str, Any]) -> ValidationResult:
         )
 
     return ValidationResult(valid=True, schema_name="feeds_event_envelope")
+
+
+def validate_with_contract(
+    event: Dict[str, Any],
+    function_id: str,
+) -> ValidationResult:
+    """Validate a FEEDS event against both schema and contract.
+
+    Phase 1 — Envelope schema.
+    Phase 2 — Payload schema + hash verification.
+    Phase 3 — Contract validation (topic, subtype, required fields).
+
+    Returns the first failing result, or a passing result if all pass.
+    """
+    # Phase 1 + 2
+    result = validate_feed_event(event)
+    if not result.valid:
+        return result
+
+    # Phase 3: contract validation (lazy import to avoid circular deps)
+    from .contracts.loader import load_routing_table
+    from .contracts.validator import validate_event_contract
+
+    table = load_routing_table()
+    contract_result = validate_event_contract(event, function_id, table)
+    if not contract_result.valid:
+        from core.schema_validator import SchemaError
+
+        errors = [
+            SchemaError(
+                path=v.field,
+                message=v.message,
+                schema_path="",
+            )
+            for v in contract_result.violations
+        ]
+        return ValidationResult(
+            valid=False,
+            errors=errors,
+            schema_name="event_contract",
+        )
+
+    return ValidationResult(valid=True, schema_name="feeds_event_envelope+contract")

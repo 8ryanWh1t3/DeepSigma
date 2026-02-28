@@ -191,6 +191,8 @@ ALLOWED_ACRONYMS = {
     # Fixture / test data terms
     "VALUE", "TIER", "SOURCE", "SUM", "PRJ", "TSK", "PMP",
     "APR", "YOU", "ARE",
+    # Domain mode state machine / pipeline step names
+    "FROZEN", "LOAD", "INGEST", "DELTA", "REOPS",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}
