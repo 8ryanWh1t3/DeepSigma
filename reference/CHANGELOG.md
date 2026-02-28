@@ -2,6 +2,18 @@
 
 All contract surface changes are logged here with compatibility annotations.
 
+## v2.0.10 — Automation Closure
+
+`COMPATIBLE:` Wire pre-execution gate (#401), idempotency guard (#402), and replay validation (#403) into CI determinism gate. All three scripts pass `--self-check`. Automation depth epic #395 closed. SSI stability release — zero KPI movement.
+
+### Migration
+
+**Affected schemas**: None
+**Consumer action**: None — no schema changes in this release.
+**Rollback**: Yes — CI wiring only.
+
+---
+
 ## v2.0.9 — Authority + Economic Evidence
 
 `COMPATIBLE:` Production signature key custody + verification (#413), structural refusal authority contract (#414), authority evidence chain export (#415). P0 #325 closed — authority cap lifted 6.0 → 7.0. Decision cost ledger + economic_metrics.json (#404, #405), economic KPI ingestion gate (#406) — dedicated evidence path uncaps economic measurability 4.88 → 10.0. All 8 KPIs now >= 7.0.

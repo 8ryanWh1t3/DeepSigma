@@ -79,3 +79,12 @@ jobs:
         run: |
           sealed=$(ls "$RUNNER_TEMP"/sealed1/RUN-*.json | grep -v manifest | head -1)
           python enterprise/src/tools/reconstruct/determinism_audit.py --sealed "$sealed" --strict
+
+      - name: Pre-execution gate self-check
+        run: python enterprise/scripts/pre_exec_gate.py --self-check
+
+      - name: Idempotency guard self-check
+        run: python enterprise/scripts/idempotency_guard.py --self-check
+
+      - name: Replay validation self-check
+        run: python enterprise/scripts/replay_run.py --self-check
