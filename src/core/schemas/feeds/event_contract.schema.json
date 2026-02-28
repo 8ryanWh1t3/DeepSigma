@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/event_contract.schema.json",
+  "title": "FEEDS Event Contract",
+  "description": "Contract for a single domain function: declares inputs, outputs, routing, and emitted events.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "domain", "inputTopic", "inputSubtype", "handler", "emitsEvents"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable function name (e.g. claim_ingest)."
+    },
+    "domain": {
+      "type": "string",
+      "enum": ["intelops", "franops", "reflectionops", "cascade"],
+      "description": "Owning domain mode."
+    },
+    "description": {
+      "type": "string",
+      "description": "What this function does."
+    },
+    "inputTopic": {
+      "type": "string",
+      "enum": [
+        "truth_snapshot",
+        "authority_slice",
+        "decision_lineage",
+        "drift_signal",
+        "canon_entry",
+        "packet_index"
+      ],
+      "description": "FEEDS topic this function subscribes to."
+    },
+    "inputSubtype": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Subtype filter on the input topic."
+    },
+    "outputTopics": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "truth_snapshot",
+          "authority_slice",
+          "decision_lineage",
+          "drift_signal",
+          "canon_entry",
+          "packet_index"
+        ]
+      },
+      "description": "FEEDS topics this function publishes to."
+    },
+    "outputSubtypes": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Subtypes emitted on output topics."
+    },
+    "handler": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Dotted path to the handler function (e.g. core.modes.intelops.claim_ingest)."
+    },
+    "requiredPayloadFields": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Payload fields required for this function to execute."
+    },
+    "emitsEvents": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(INTEL|FRAN|RE|CASCADE)-E\\d{2}$"
+      },
+      "description": "Event IDs this function produces."
+    },
+    "consumesEvents": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(INTEL|FRAN|RE|CASCADE)-E\\d{2}$"
+      },
+      "description": "Event IDs this function reacts to."
+    },
+    "stateWrites": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "State stores this function writes to (e.g. memory_graph, canon_store, authority_ledger)."
+    },
+    "preconditions": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Conditions that must hold before execution."
+    },
+    "postconditions": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Conditions guaranteed after successful execution."
+    }
+  }
+}

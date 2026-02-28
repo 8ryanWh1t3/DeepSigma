@@ -1,0 +1,19 @@
+{
+  "description": "Delta with contradiction: new evidence shows churn model v3 underperforms.",
+  "claims": [
+    {
+      "claimId": "CLAIM-MONEY-004",
+      "statement": "Customer churn model v3 has only 78% accuracy on 2026 data",
+      "confidence": {"score": 0.85},
+      "statusLight": "yellow",
+      "sources": [{"ref": "REC-DELTA-001", "type": "record"}],
+      "evidence": [{"ref": "REC-DELTA-001", "type": "backtest", "method": "2026_holdout"}],
+      "owner": "data-science",
+      "timestampCreated": "2026-02-25T00:00:00Z",
+      "version": "1.0.0",
+      "halfLife": {"value": 30, "unit": "days"},
+      "graph": {"contradicts": ["CLAIM-MONEY-002"]},
+      "seal": {"hash": "sha256:delta001", "sealedAt": "2026-02-25T00:00:01Z", "version": 1}
+    }
+  ]
+}
