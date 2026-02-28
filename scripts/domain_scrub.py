@@ -197,6 +197,9 @@ ALLOWED_ACRONYMS = {
     "JRM", "SURI", "SNRT", "AGNT", "MAL", "EVE", "GID", "SID",
     "DST", "PORT", "PROTO", "RAT", "GPL", "SCAN", "TLD", "USEC",
     "NOTIFY",
+    # EDGE JRM module — pipeline stage names, HTML/JS tokens, mock data
+    "STAGES", "RAW", "JOIN", "PARSE", "PARSED", "CVE", "TXT",
+    "INPUT", "HEADER", "MAIN", "TABS", "EVENT", "WIRING",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}

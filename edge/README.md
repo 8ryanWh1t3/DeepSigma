@@ -43,7 +43,7 @@ flowchart TD
         ABP["abp_v1.json\nABP-bf0afe15\nsha256:c01f..."]
     end
 
-    subgraph EDGE["EDGE Modules (8)"]
+    subgraph EDGE["EDGE Modules (9)"]
         UNI["Unified\n(8 tabs)"]
         HIR["Hiring UI"]
         BID["Bid/NoBid UI"]
@@ -52,6 +52,7 @@ flowchart TD
         AWD["Award Staffing"]
         COH["Coherence Dashboard"]
         SRO["Suite ReadOnly"]
+        JRM["JRM EDGE"]
     end
 
     subgraph Gate["Gate Enforcement"]
@@ -75,9 +76,9 @@ flowchart TD
     CONFIG --> BUILDER
     BUILDER --> ABP
 
-    ABP --> UNI & HIR & BID & CMP & BOE & AWD & COH & SRO
+    ABP --> UNI & HIR & BID & CMP & BOE & AWD & COH & SRO & JRM
 
-    UNI & HIR & BID & CMP & BOE & AWD & COH & SRO --> GATE
+    UNI & HIR & BID & CMP & BOE & AWD & COH & SRO & JRM --> GATE
     GATE -->|"ALL PASS"| DIST["Distribution"]
     GATE -->|"ANY FAIL"| BLOCK["Blocked"]
 
@@ -111,6 +112,7 @@ flowchart TD
 | `EDGE_ComplianceMatrix_UI_v1.0.0.html` | 1.0.0 | `compliance` | Compliance requirements mapped to deliverables |
 | `EDGE_AwardStaffing_Estimator_v1.2.0.html` | 1.2.0 | `award_staffing` | Award staffing allocation and cost estimation |
 | `EDGE_Suite_ReadOnly_v1.0.0.html` | 1.0.0 | `suite_readonly` | Read-only wrapper with telemetry and rollup export |
+| `EDGE_JRM_EDGE_v1.0.0.html` | 1.0.0 | `jrm` | JRM pipeline visualizer — 9-stage ribbon, coherence meter, trace drawer, packet viewer |
 
 ### Supporting Files
 
