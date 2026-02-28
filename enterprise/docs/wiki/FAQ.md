@@ -192,3 +192,59 @@ An emergency halt mechanism: freezes all ACTIVE episodes, emits a sealed halt pr
 ## What is the Money Demo v2?
 
 A 10-step end-to-end pipeline exercising all 3 domain modes: LOAD → INTELOPS INGEST → VALIDATE → DELTA → FRANOPS PROPOSE → RETCON → REOPS EPISODE → CASCADE → COHERENCE → SEAL. Uses fixture data (3 baseline claims + 1 contradiction) to demonstrate drift detection, retcon execution, cascade propagation, and coherence scoring. Run via `make demo-money` or `python -m demos.money_demo`.
+
+## What is JRM?
+
+The Judgment Refinement Module — a log-agnostic coherence engine that ingests external telemetry (Suricata EVE, Snort fast.log, Copilot agent logs), normalizes events via format-specific adapters, runs a 5-stage coherence pipeline (Truth → Reasoning → Drift → Patch → Memory Graph), and outputs standardized JRM-X packet zips. JRM is independent from FEEDS but reuses the same hashing conventions (`sha256:<hex>`) and memory graph primitives. See `src/core/jrm/`.
+
+## What log formats does JRM support?
+
+Three built-in adapters:
+
+| Adapter | Format | Event Types |
+| --- | --- | --- |
+| `suricata_eve` | Suricata EVE JSON lines | alert, dns, http, flow, tls, fileinfo |
+| `snort_fastlog` | Snort fast.log `[GID:SID:REV]` | alerts with priority mapping |
+| `copilot_agent` | Copilot/agent JSONL | prompt, tool_call, response, guardrail |
+
+All adapters are lossless — malformed lines become `MALFORMED` event type with raw bytes preserved. New adapters plug in via `register_adapter()`.
+
+## What is a JRM-X packet?
+
+A zip file containing 6 canonical data files + manifest: truth_snapshot.json, authority_slice.json, decision_lineage.jsonl, drift_signal.jsonl, memory_graph.json, canon_entry.json, and manifest.json (SHA-256 per file). The rolling packet builder auto-flushes at 50k events or 25MB zip size. Naming convention: `JRM_X_PACKET_<ENV>_<start>_<end>_partNN`.
+
+## What drift does JRM detect locally?
+
+Four local drift types:
+
+- **FP_SPIKE** — same signature fires many times with low confidence (false positive burst)
+- **MISSING_MAPPING** — events with no corresponding claim in the truth layer
+- **STALE_LOGIC** — conflicting signature revisions across events in the same window
+- **ASSUMPTION_EXPIRED** — assumptions past their half-life TTL
+
+## What is JRM federation?
+
+Enterprise-only cross-environment coherence. The JRM Hub ingests packets from multiple SOC environments and detects cross-env drift:
+
+- **VERSION_SKEW** — same signature_id has different active revisions across environments
+- **POSTURE_DIVERGENCE** — same signature_id has confidence delta >0.3 across environments
+
+The Gate validates packet integrity and enforces environment scope. The Advisory Engine publishes drift advisories that operators can accept or decline. Packets are signed with HMAC-SHA256.
+
+## How do I run JRM?
+
+```bash
+# Normalize Suricata logs
+coherence jrm ingest --adapter suricata_eve --in eve.json --out normalized.ndjson
+
+# Run pipeline and produce packets
+coherence jrm run --in normalized.ndjson --env SOC_EAST --packet-out /tmp/packets/
+
+# Validate a packet
+coherence jrm validate /tmp/packets/*.zip
+
+# List available adapters
+coherence jrm adapters
+```
+
+Enterprise federation commands are available via the `deepsigma` CLI: `jrm federate`, `jrm gate validate`, `jrm hub replay`, `jrm advisory publish`.

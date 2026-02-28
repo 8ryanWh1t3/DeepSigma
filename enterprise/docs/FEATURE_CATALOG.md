@@ -622,6 +622,61 @@ Three executable domain mode modules (IntelOps, FranOps, ReflectionOps) with 36 
   - Enforcement: make validate-coverage
   - KPI axes: Automation_Depth, Technical_Completeness
 
+### JRM (Judgment Refinement Module)
+
+Log-agnostic coherence engine ingesting external telemetry (Suricata EVE, Snort fast.log, Copilot agent logs), normalizing events, running a 5-stage coherence pipeline, and outputting JRM-X packet zips. Enterprise adds cross-environment federation.
+
+- **JRM Adapters** (`JRM_ADAPTERS`)
+  - Three lossless adapters (Suricata EVE, Snort fast.log, Copilot agent) normalizing external logs into JRMEvent records with sha256 evidence hashing and malformed-line preservation.
+  - Artifacts: src/core/jrm/adapters/suricata_eve.py, src/core/jrm/adapters/snort_fastlog.py, src/core/jrm/adapters/copilot_agent.py, src/core/jrm/adapters/registry.py
+  - Enforcement: tests/test_jrm/test_adapters.py, CI: ci.yml
+  - KPI axes: Data_Integration, Technical_Completeness
+- **JRM Pipeline** (`JRM_PIPELINE`)
+  - 5-stage coherence pipeline: Truth (claim clustering), Reasoning (decision lane assignment), Drift (FP_SPIKE/MISSING_MAPPING/STALE_LOGIC/ASSUMPTION_EXPIRED detection), Patch (rev++ with lineage), Memory Graph (evidence/claim/drift/patch graph + canon postures).
+  - Artifacts: src/core/jrm/pipeline/truth.py, src/core/jrm/pipeline/reasoning.py, src/core/jrm/pipeline/drift.py, src/core/jrm/pipeline/patch.py, src/core/jrm/pipeline/memory_graph.py, src/core/jrm/pipeline/runner.py
+  - Enforcement: tests/test_jrm/test_pipeline.py, CI: ci.yml
+  - KPI axes: Technical_Completeness, Operational_Maturity
+- **JRM-X Packet Builder** (`JRM_PACKET_BUILDER`)
+  - Rolling packet builder producing 6-file zip output (truth_snapshot, authority_slice, decision_lineage, drift_signal, memory_graph, canon_entry + manifest) with hybrid thresholds (50k events or 25MB zip) and auto-incrementing part numbering.
+  - Artifacts: src/core/jrm/packet/builder.py, src/core/jrm/packet/manifest.py, src/core/jrm/packet/naming.py
+  - Enforcement: tests/test_jrm/test_packet.py, CI: ci.yml
+  - KPI axes: Technical_Completeness, Data_Integration
+- **JRM CLI** (`JRM_CLI`)
+  - CLI commands: `coherence jrm ingest` (adapter normalize), `coherence jrm run` (pipeline execute), `coherence jrm validate` (packet verify), `coherence jrm adapters` (list available). Extension hooks for enterprise subcommands.
+  - Artifacts: src/core/jrm/cli.py
+  - Enforcement: tests/test_jrm/test_cli.py, CI: ci.yml
+  - KPI axes: Operational_Maturity, Automation_Depth
+- **JRM Schemas** (`JRM_SCHEMAS`)
+  - JSON Schema Draft 2020-12 for normalized JRM events (11 required fields, sha256 evidence hash pattern) and JRM-X packet manifests (6 required file hashes, naming convention).
+  - Artifacts: src/core/schemas/jrm/jrm_core.schema.json, src/core/schemas/jrm/jrm_packet.schema.json
+  - Enforcement: tests/test_jrm/test_schemas.py, CI: ci.yml
+  - KPI axes: Technical_Completeness, Automation_Depth
+- **JRM Extension Hooks** (`JRM_HOOKS`)
+  - Pluggable registries for custom drift detectors, packet validators, stream connectors, and CLI hooks. Enterprise auto-registration via hook system.
+  - Artifacts: src/core/jrm/hooks/registry.py
+  - Enforcement: CI: ci.yml
+  - KPI axes: Data_Integration, Enterprise_Readiness
+- **JRM Federation Gate** (`JRM_GATE`)
+  - Packet integrity validation (manifest hash checks, required file verification), environment scope enforcement (allowlist), and field redaction (recursive field stripping with redacted zip output).
+  - Artifacts: enterprise/src/deepsigma/jrm_ext/federation/gate.py
+  - Enforcement: tests-enterprise/test_jrm_ext/test_gate.py
+  - KPI axes: Authority_Modeling, Enterprise_Readiness
+- **JRM Federation Hub** (`JRM_HUB`)
+  - Multi-environment packet ingestion, cross-env drift detection (VERSION_SKEW via rev comparison, POSTURE_DIVERGENCE via confidence delta >0.3), memory graph merge, and federation report generation.
+  - Artifacts: enterprise/src/deepsigma/jrm_ext/federation/hub.py
+  - Enforcement: tests-enterprise/test_jrm_ext/test_hub.py
+  - KPI axes: Enterprise_Readiness, Operational_Maturity
+- **JRM Advisory Engine** (`JRM_ADVISORY`)
+  - Cross-environment drift advisory lifecycle: publish advisories from drift detections, accept/decline with status tracking and recommendations per drift type.
+  - Artifacts: enterprise/src/deepsigma/jrm_ext/federation/advisory.py
+  - Enforcement: tests-enterprise/test_jrm_ext/test_advisory.py
+  - KPI axes: Enterprise_Readiness, Operational_Maturity
+- **JRM Packet Security** (`JRM_PACKET_SECURITY`)
+  - HMAC-SHA256 manifest signing with canonical JSON, pluggable interface for KMS subclassing. Packet validator for signature verification on ingest.
+  - Artifacts: enterprise/src/deepsigma/jrm_ext/security/signer.py, enterprise/src/deepsigma/jrm_ext/security/validator.py
+  - Enforcement: tests-enterprise/test_jrm_ext/test_security.py
+  - KPI axes: Authority_Modeling, Enterprise_Readiness
+
 ## Outer-Edge Boundaries
 
 - Not claiming full jurisdictional policy packs (EU AI Act article-by-article enforcement) yet

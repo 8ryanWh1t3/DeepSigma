@@ -146,6 +146,37 @@ All 36 functions route through the existing 6 FEEDS topics:
 | `mg_update` | INTEL-F05 |
 | `coherence_report` | RE-F09 |
 
+## JRM Pipeline (5 Stages)
+
+The Judgment Refinement Module extends the routing table with a 5-stage coherence pipeline for external telemetry. JRM adapters normalize log sources into `JRMEvent` records, which flow through the pipeline and produce JRM-X packet zips.
+
+### Adapters (3)
+
+| ID | Name | Input Format |
+|----|------|-------------|
+| JRM-A01 | `suricata_eve` | Suricata EVE JSON lines (alert, dns, http, flow, tls, fileinfo) |
+| JRM-A02 | `snort_fastlog` | Snort fast.log `[GID:SID:REV]` format |
+| JRM-A03 | `copilot_agent` | Copilot/agent JSONL (prompt, tool_call, response, guardrail) |
+
+### Pipeline Stages (5)
+
+| ID | Stage | Purpose | Output |
+|----|-------|---------|--------|
+| JRM-S01 | `truth` | Cluster events into claims by (source, signature) | Claims + truth_snapshot |
+| JRM-S02 | `reasoning` | Assign decision lanes (LOG_ONLY/NOTIFY/QUEUE_PATCH/REQUIRE_REVIEW) | ReasoningResults + DLR entries |
+| JRM-S03 | `drift` | Detect FP_SPIKE, MISSING_MAPPING, STALE_LOGIC, ASSUMPTION_EXPIRED | DriftDetections + DS entries |
+| JRM-S04 | `patch` | Create rev++ patch records with lineage preservation | PatchRecords |
+| JRM-S05 | `memory_graph` | Build evidence/claim/drift/patch graph + canon postures | MG delta + canon entries |
+
+### Enterprise Federation (4)
+
+| ID | Name | Purpose |
+|----|------|---------|
+| JRM-E01 | `gate_validate` | Validate packet integrity, enforce environment scope, redact fields |
+| JRM-E02 | `hub_ingest` | Ingest multi-env packets, detect cross-env drift (VERSION_SKEW, POSTURE_DIVERGENCE) |
+| JRM-E03 | `advisory_publish` | Publish/accept/decline drift advisories with recommendations |
+| JRM-E04 | `packet_sign` | HMAC-SHA256 manifest signing and validation |
+
 ## Related Pages
 
 - [IntelOps](IntelOps) — claim lifecycle domain
@@ -153,3 +184,4 @@ All 36 functions route through the existing 6 FEEDS topics:
 - [ReflectionOps](ReflectionOps) — gate enforcement domain
 - [Cascade Engine](Cascade-Engine) — cross-domain propagation
 - [FEEDS Pipeline](FEEDS-Pipeline) — event-driven pub/sub
+- [JRM Pipeline](JRM-Pipeline) — log-agnostic refinement engine
