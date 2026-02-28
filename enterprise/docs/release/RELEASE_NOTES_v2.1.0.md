@@ -32,7 +32,7 @@ v2.1.0 completes the SSI recovery arc from v2.0.9 (SSI = 34.64, FAIL). Seven int
 | v2.0.16 | 57.46 | 0.73 | WARN |
 | **v2.1.0** | **60.02** | **0.68** | **WARN** |
 
-## Issues Closed (22)
+## Issues Closed (29)
 
 ### Automation (v2.0.10)
 - #401 — Pre-exec gate CI
@@ -69,8 +69,16 @@ v2.1.0 completes the SSI recovery arc from v2.0.9 (SSI = 34.64, FAIL). Seven int
 - #332 — Scope freeze
 - #358 — Milestone gate
 
-### Tracking (v2.1.0)
+### Reference Layer (v2.1.0)
+
 - #461 — SSI trajectory
+- #469 — Authority chain verification (`verify_chain`)
+- #470 — Replay detection (`detect_replay`)
+- #472 — Evidence source binding schema
+- #473 — Economic cost ledger
+- #474 — Intent mutation detection
+- #475 — Schema version enforcement
+- #476 — Reference layer badges
 
 ## Key Additions
 

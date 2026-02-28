@@ -10,14 +10,14 @@
 
 # Σ OVERWATCH
 
-**Current pilot release:** v2.0.9
-See: [docs/release/RELEASE_NOTES_v2.0.9.md](docs/release/RELEASE_NOTES_v2.0.9.md)
+**Current release:** v2.1.0
+See: [docs/release/RELEASE_NOTES_v2.1.0.md](docs/release/RELEASE_NOTES_v2.1.0.md)
 
 ## Repo Radar KPI (latest)
 [![Repo KPI Badge](release_kpis/badge_latest.svg)](release_kpis/radar_composite_latest.png)
 [![Roadmap Badge](release_kpis/roadmap_badge.svg)](release_kpis/roadmap_timeline.svg)
 
-- Current release radar: [release_kpis/radar_v2.0.9.png](release_kpis/radar_v2.0.9.png)
+- Current release radar: [release_kpis/radar_v2.1.0.png](release_kpis/radar_v2.1.0.png)
 - Composite release radar: [release_kpis/radar_composite_latest.png](release_kpis/radar_composite_latest.png)
 - Composite release delta table: [release_kpis/radar_composite_latest.md](release_kpis/radar_composite_latest.md)
 - Gate report: [release_kpis/KPI_GATE_REPORT.md](release_kpis/KPI_GATE_REPORT.md)
@@ -26,10 +26,10 @@ See: [docs/release/RELEASE_NOTES_v2.0.9.md](docs/release/RELEASE_NOTES_v2.0.9.md
 - KPI history: [release_kpis/history.json](release_kpis/history.json)
 - KPI eligibility tiers: [governance/kpi_eligibility.json](governance/kpi_eligibility.json)
 - KPI confidence: [release_kpis/kpi_confidence.json](release_kpis/kpi_confidence.json)
-- KPI bands: [release_kpis/kpi_bands_v2.0.9.json](release_kpis/kpi_bands_v2.0.9.json)
+- KPI bands: [release_kpis/kpi_bands_v2.1.0.json](release_kpis/kpi_bands_v2.1.0.json)
 - Benchmark trend: [release_kpis/benchmark_trend.png](release_kpis/benchmark_trend.png)
 - Benchmark history: [release_kpis/benchmark_history.json](release_kpis/benchmark_history.json)
-- TEC summary (C-TEC v1.0): [release_kpis/TEC_SUMMARY.md](release_kpis/TEC_SUMMARY.md)
+- TEC summary (C-TEC v2.0): [release_kpis/TEC_SUMMARY.md](release_kpis/TEC_SUMMARY.md)
 - TEC internal tier: [release_kpis/tec_internal.json](release_kpis/tec_internal.json)
 - TEC executive tier: [release_kpis/tec_executive.json](release_kpis/tec_executive.json)
 - TEC Public Sector tier: [release_kpis/tec_public_sector.json](release_kpis/tec_public_sector.json)
@@ -38,7 +38,7 @@ See: [docs/release/RELEASE_NOTES_v2.0.9.md](docs/release/RELEASE_NOTES_v2.0.9.md
 - Roadmap timeline: [release_kpis/roadmap_timeline.svg](release_kpis/roadmap_timeline.svg)
 - Roadmap scope gate: [release_kpis/ROADMAP_SCOPE_GATE_REPORT.md](release_kpis/ROADMAP_SCOPE_GATE_REPORT.md)
 - Nonlinear stability report: [release_kpis/nonlinear_stability_report.md](release_kpis/nonlinear_stability_report.md)
-- SSI artifact (current release): [release_kpis/stability_v2.0.9.json](release_kpis/stability_v2.0.9.json)
+- SSI artifact (current release): [release_kpis/stability_v2.1.0.json](release_kpis/stability_v2.1.0.json)
 - Authority evidence: [release_kpis/authority_evidence.json](release_kpis/authority_evidence.json)
 - Economic metrics: [release_kpis/economic_metrics.json](release_kpis/economic_metrics.json)
 - Stability-adjusted forecast: [release_kpis/stability_adjusted_forecast.json](release_kpis/stability_adjusted_forecast.json)
@@ -46,15 +46,18 @@ See: [docs/release/RELEASE_NOTES_v2.0.9.md](docs/release/RELEASE_NOTES_v2.0.9.md
 - Feature catalog (machine): [release_kpis/feature_catalog.json](release_kpis/feature_catalog.json)
 - Feature catalog renderer: [scripts/render_feature_catalog.py](scripts/render_feature_catalog.py)
 
-### Active Track (v2.1.0 — Decision Infrastructure Hardening)
+### Completed Track (v2.1.0 — Decision Infrastructure Hardening)
 
-- All 8 KPIs >= 7.0 (gate satisfied as of v2.0.9)
-- SSI >= 55 (stability recovery in progress)
-- DISR hardening
-- Deterministic replay + replay reproducibility
-- Enterprise deploy sanity + operator runbook
+- All 8 KPIs >= 7.0 PASS
+- SSI >= 55 PASS (60.02)
+- 22 issues closed across 7 stability releases (v2.0.10–v2.0.16)
+- Authority ledger chain verification + replay detection
+- Evidence source binding + economic cost ledger
+- Intent mutation detection + schema version enforcement
+- Enterprise release checklist + operator runbook
 
-### Future Track (v2.1.1 — Institutional Expansion)
+### Next Track (v2.2.0 — Institutional Expansion)
+
 - Enterprise Connectors
 - Multi-provider DISR abstraction
 - Authority-bound contract enforcement expansion

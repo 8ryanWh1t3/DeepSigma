@@ -20,3 +20,8 @@
 - **Economic Evidence**: Dedicated `economic_metrics.json` artifact with `kpi_eligible=true` sourced from TEC + benchmark data, uncapping economic_measurability KPI
 - **Authority Custody**: Production signing key lifecycle — generation (`openssl rand`), env-based storage (`DEEPSIGMA_SIGNING_KEY`), 90-day rotation, revocation via authority ledger, with `signing_key_id` tracking
 - **KPI Gate**: Release gate requiring all 8 KPI axes >= 7.0; satisfied as of v2.0.9 with authority_modeling at 9.72 and economic_measurability at 10.0
+- **Drift Acceleration Index**: Normalized 0–1 measure of how quickly KPI movements are accelerating across releases; computed as the windowed average of second-derivative KPI deltas. Values > 0.80 indicate unsustainable velocity. v2.1.0 value: 0.68 (WARN band)
+- **C-TEC**: Complexity-adjusted Time/Effort/Cost — edition-scoped variant of TEC that applies live governance factors (ICR for infrastructure coherence, PCR for PR complexity) to base hours, producing Internal, Executive, and Public Sector cost tiers
+- **Evidence Source Binding**: Schema linking an evidence artifact to its originating source with provenance metadata, hash verification, and authority reference — ensures every claim traces to auditable evidence
+- **Intent Mutation**: Detection of drift between the intent packet hash at episode seal time and the hash at a later replay or audit; flags unauthorized changes to decision intent as governance violations
+- **FEEDS**: Federated Event Envelope Distribution Surface — a 5-stage event-driven pipeline connecting governance primitives (TS, ALS, DLR, DS, CE) via file-based pub/sub with manifest-first ingest, deterministic drift detection, authority validation, triage state machine, and canon versioning

@@ -85,7 +85,7 @@ A CI gate (`make scalability-gate`) that compares the latest benchmark against t
 
 ## How does SSI recovery work?
 
-SSI (System Stability Index) penalizes large release-to-release KPI swings. Historical oscillations in automation_depth (v2.0.3–v2.0.7) drove `drift_acceleration_score` to 0.0 (30% of SSI weight). Recovery requires multiple consecutive stable releases to dilute the acceleration average below the 1.0 threshold. v2.0.9 SSI is 34.64 — the authority (+3.72) and economic (+5.12) lifts increased volatility short-term, but all 8 KPIs are now >= 7.0. Stability-focused releases (v2.1.0+) with minimal KPI deltas will drive SSI toward the >= 55 target.
+SSI (System Stability Index) penalizes large release-to-release KPI swings. Historical oscillations in automation_depth (v2.0.3–v2.0.7) drove `drift_acceleration_score` to 0.0 (30% of SSI weight). Recovery required multiple consecutive stable releases to dilute the acceleration average below the 1.0 threshold. Seven stability releases (v2.0.10–v2.0.16) shipped zero-drift KPI holds while closing 22 issues, driving SSI from 34.64 (v2.0.9) to 60.02 (v2.1.0) and drift_acceleration_index from 1.00 to 0.68. The SSI >= 55 gate is now satisfied.
 
 ## What is authority evidence?
 
@@ -101,7 +101,7 @@ A refusal contract is an explicit authority action that blocks a specific action
 
 ## Are all 8 KPIs passing?
 
-Yes, as of v2.0.9. The KPI gate requires all 8 axes >= 7.0. v2.0.9 lifted the final two blockers: authority_modeling (6.0 → 9.72 via P0 #325 closure + signature custody/refusal/evidence chain) and economic_measurability (4.88 → 10.0 via dedicated `economic_metrics.json` with `kpi_eligible=true`). Current scores: technical_completeness=10, automation_depth=10, authority_modeling=9.72, enterprise_readiness=10, scalability=10, data_integration=10, economic_measurability=10, operational_maturity=10.
+Yes, since v2.0.9 and continuing through v2.1.0. The KPI gate requires all 8 axes >= 7.0. v2.0.9 lifted the final two blockers: authority_modeling (6.0 → 9.72 via P0 #325 closure + signature custody/refusal/evidence chain) and economic_measurability (4.88 → 10.0 via dedicated `economic_metrics.json` with `kpi_eligible=true`). v2.1.0 scores: technical_completeness=10, automation_depth=10, authority_modeling=9.72, enterprise_readiness=10, scalability=10, data_integration=10, economic_measurability=10, operational_maturity=10.
 
 ## What is authority custody?
 
@@ -110,3 +110,23 @@ Production signing key lifecycle management. Keys are generated via `openssl ran
 ## What is the Reference Layer Manifesto?
 
 The manifesto (`docs/manifesto.md`) defines three institutional failures that agentic AI creates — decision amnesia, authority vacuum, and silent drift — and the contract a reference layer must satisfy: intent explicit, authority verified, logic auditable, outcomes sealed.
+
+## What is authority chain verification?
+
+`verify_chain` walks the authority ledger and validates the SHA-256 hash chain linking every entry to its predecessor. If any entry has been tampered with, removed, or reordered, the chain breaks and verification fails. This makes the ledger tamper-evident. See `src/core/authority.py`.
+
+## What is replay detection?
+
+`detect_replay` fingerprints authority grant/revoke entries and detects duplicate submissions. This prevents replay attacks where an attacker resubmits a previously valid authority action. The fingerprint covers the action type, scope, principal, and timestamp.
+
+## What is intent mutation detection?
+
+Intent mutation detection compares the intent packet hash sealed into an episode against the hash at a later point (replay, audit, or subsequent run). If the hashes diverge, the intent was mutated after sealing — a governance violation. This catches unauthorized post-hoc changes to decision intent.
+
+## What is the drift acceleration index?
+
+A normalized 0–1 measure of how quickly KPI movements are accelerating across releases. Computed as the windowed average of second-derivative KPI deltas. Values > 0.80 indicate unsustainable release velocity. v2.1.0 value: 0.68 (WARN band, gate threshold is 0.50 for PASS).
+
+## What is C-TEC?
+
+Complexity-adjusted Time/Effort/Cost. C-TEC applies live governance health factors — ICR (Infrastructure Coherence Ratio) and PCR (PR Complexity Ratio) — to base TEC hours, producing three audience tiers: Internal ($1.64M), Executive ($2.47M), and Public Sector ($3.01M). v2.1.0 base hours: 10,963. Run via `make tec`.

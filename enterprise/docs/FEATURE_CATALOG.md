@@ -200,6 +200,42 @@ Hash chain, signature verification, Merkle commitments, authority ledger, and de
   - Artifacts: runs/proof_bundle.json
   - Enforcement: scripts/idempotency_guard.py
   - KPI axes: Operational_Maturity, Technical_Completeness
+- **Authority Chain Verification** (`AUTHORITY_CHAIN_VERIFY`)
+  - Verifies SHA-256 hash chain integrity across all authority ledger entries via `verify_chain`; detects tampered or missing entries.
+  - Artifacts: src/core/authority.py
+  - Enforcement: tests/test_agent.py, CI: ci.yml
+  - KPI axes: Authority_Modeling, Technical_Completeness
+  - Added: v2.1.0 (#469)
+- **Replay Detection** (`REPLAY_DETECTION`)
+  - Detects duplicate authority grant/revoke attempts via `detect_replay` using entry fingerprinting; prevents replay attacks on the authority ledger.
+  - Artifacts: src/core/authority.py
+  - Enforcement: tests/test_agent.py, CI: ci.yml
+  - KPI axes: Authority_Modeling, Operational_Maturity
+  - Added: v2.1.0 (#470)
+- **Evidence Source Binding** (`EVIDENCE_SOURCE_BINDING`)
+  - Schema and validator binding evidence artifacts to their originating source with provenance metadata and hash verification.
+  - Artifacts: src/core/authority.py, schemas/evidence_source_binding.schema.json
+  - Enforcement: tests/test_agent.py, CI: ci.yml
+  - KPI axes: Technical_Completeness, Enterprise_Readiness
+  - Added: v2.1.0 (#472)
+- **Economic Cost Ledger** (`ECONOMIC_COST_LEDGER`)
+  - Per-decision cost tracking with drift-to-patch value ratio, linking remediation costs to governance outcomes.
+  - Artifacts: release_kpis/economic_metrics.json
+  - Enforcement: scripts/economic_metrics.py, CI: kpi.yml
+  - KPI axes: Economic_Measurability, Operational_Maturity
+  - Added: v2.1.0 (#473)
+- **Intent Mutation Detection** (`INTENT_MUTATION_DETECT`)
+  - Detects intent drift between sealed runs by comparing intent packet hashes across episodes; flags mutations as governance violations.
+  - Artifacts: src/core/cli.py, src/core/agent.py
+  - Enforcement: tests/test_agent.py, CI: ci.yml
+  - KPI axes: Authority_Modeling, Operational_Maturity
+  - Added: v2.1.0 (#474)
+- **Schema Version Enforcement** (`SCHEMA_VERSION_ENFORCE`)
+  - CI gate enforcing schema version parity across all governance artifacts; blocks releases with mismatched schema versions.
+  - Artifacts: scripts/validate_v2_1_0_milestone.py
+  - Enforcement: CI: ci.yml, CI: kpi_gate.yml
+  - KPI axes: Automation_Depth, Technical_Completeness
+  - Added: v2.1.0 (#475)
 
 ### Security & Key Management
 Rotatable keyring, multi-cloud KMS, re-encryption at rest, authority ledger, crypto policy enforcement.

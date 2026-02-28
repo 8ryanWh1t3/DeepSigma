@@ -1,6 +1,6 @@
 # Mermaid Diagrams (Canonical)
 
-Seventeen diagrams define the visual language of Sigma OVERWATCH. Everything else is archived to reduce drift.
+Sixteen diagrams define the visual language of Sigma OVERWATCH. Everything else is archived to reduce drift.
 
 ## Canonical Set
 
