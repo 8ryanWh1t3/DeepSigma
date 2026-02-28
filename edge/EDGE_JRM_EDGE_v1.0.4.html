@@ -134,11 +134,15 @@
     .file-input-wrap input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
 
     /* ── Drawer ────────────────────────────────── */
-    .drawer{width:var(--drawer-w);min-width:var(--drawer-w);background:var(--card);border-left:1px solid var(--line);transform:translateX(100%);transition:transform .25s ease;overflow-y:auto;position:relative;z-index:50}
-    .drawer.open{transform:translateX(0)}
+    .drawer{width:0;min-width:0;background:var(--card);border-left:1px solid var(--line);overflow:hidden;transition:width .25s ease,min-width .25s ease;position:relative;z-index:50}
+    .drawer.open{width:var(--drawer-w);min-width:var(--drawer-w);overflow-y:auto}
     .drawer-head{padding:10px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;position:sticky;top:0;background:var(--card);z-index:10}
     .drawer-head .close-btn{margin-left:auto;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:2px 6px}
     .drawer-head .close-btn:hover{color:var(--txt)}
+    .drawer-collapse-bar{display:flex;align-items:center;justify-content:space-between;padding:6px 14px;background:#0a0f16;border-bottom:1px solid var(--line);cursor:pointer;-webkit-user-select:none;user-select:none}
+    .drawer-collapse-bar:hover{background:#0f1520}
+    .drawer-collapse-bar .collapse-arrow{font-size:16px;color:var(--accent);transition:transform .2s}
+    .drawer-collapse-bar .collapse-label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.5px}
     .drawer-body{padding:0 14px 14px}
     .dsection{margin-top:10px}
     .dsection-hdr{display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 0;border-bottom:1px solid #141e2d;font-size:12px;font-weight:600;color:#9ab8d3;user-select:none}
@@ -162,7 +166,15 @@
     .sub-bar-fill{height:100%;border-radius:3px;transition:width .3s}
 
     /* ── Health Tab ────────────────────────────── */
-    .health-score-ring{width:120px;height:120px;border-radius:50%;border:5px solid #243449;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;margin:16px auto}
+    .health-ring-wrap{position:relative;display:inline-block;padding:20px;cursor:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24'><text y='18' font-size='18' fill='%237df9ff'>%CE%A3</text></svg>") 12 12,pointer}
+    .health-ring-wrap .health-tip{display:none;position:absolute;left:50%;top:100%;transform:translateX(-50%);z-index:100;width:420px;padding:14px 18px;background:#0d1219;border:1px solid var(--accent);border-radius:10px;font-size:13px;line-height:1.7;color:var(--txt);white-space:pre-line;box-shadow:0 8px 32px rgba(0,0,0,.6);pointer-events:none}
+    .health-ring-wrap:hover .health-tip{display:block}
+    .health-tip .tip-title{font-size:15px;font-weight:700;color:var(--accent);margin-bottom:6px}
+    .health-tip .tip-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #1a2638}
+    .health-tip .tip-row-label{color:var(--muted)}
+    .health-tip .tip-row-val{font-weight:700;font-variant-numeric:tabular-nums}
+    .health-tip .tip-formula{margin-top:8px;padding:8px 10px;background:rgba(125,249,255,.04);border:1px solid rgba(125,249,255,.1);border-radius:6px;font-family:ui-monospace,monospace;font-size:12px;color:var(--accent)}
+    .health-score-ring{width:120px;height:120px;border-radius:50%;border:5px solid #243449;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700}
     .health-score-ring.green{border-color:var(--ok);color:var(--ok)}
     .health-score-ring.yellow{border-color:var(--warn);color:var(--warn)}
     .health-score-ring.red{border-color:var(--bad);color:var(--bad)}
@@ -175,6 +187,51 @@
     .health-flag.flag-warn{color:#ff9f43;background:rgba(255,159,67,.1);border:1px solid rgba(255,159,67,.3)}
     .health-flag.flag-danger{color:#ff6b6b;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.3)}
     .health-flag.flag-info{color:#7df9ff;background:rgba(125,249,255,.1);border:1px solid rgba(125,249,255,.3)}
+
+    /* ── Pipeline Logic Process ─────────────────── */
+    .pipeline-flow{display:flex;align-items:stretch;gap:0;margin:12px 0;overflow-x:auto}
+    .pipeline-stage{flex:1;min-width:80px;text-align:center;position:relative}
+    .pipeline-stage-hdr{font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:6px 4px;color:var(--muted);border-bottom:2px solid var(--line)}
+    .pipeline-stage-hdr.stage-ok{color:var(--ok);border-bottom-color:var(--ok)}
+    .pipeline-stage-hdr.stage-warn{color:var(--warn);border-bottom-color:var(--warn)}
+    .pipeline-stage-hdr.stage-bad{color:var(--bad);border-bottom-color:var(--bad)}
+    .pipeline-stage-body{padding:6px 4px;font-size:11px}
+    .pipeline-stage-pct{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
+    .pipeline-stage-bar{height:4px;border-radius:2px;background:#1a2638;margin:4px auto;width:80%;overflow:hidden}
+    .pipeline-stage-bar-fill{height:100%;border-radius:2px;transition:width .3s}
+    .pipeline-arrow{display:flex;align-items:center;color:#2a3a4e;font-size:14px;padding:0 2px;margin-top:12px}
+    .pipeline-cascade{margin-top:10px;padding:10px;background:#0a0f16;border:1px solid #141e2d;border-radius:8px}
+    .cascade-row{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:11px}
+    .cascade-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .cascade-dot.c-ok{background:var(--ok)}.cascade-dot.c-fail{background:var(--bad)}.cascade-dot.c-skip{background:#3a4a5e}
+    .cascade-label{color:var(--muted);min-width:70px;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.3px}
+    .cascade-count{font-variant-numeric:tabular-nums;font-weight:600}
+    .cascade-reason{color:var(--muted);font-size:10px;margin-left:auto}
+    .logic-section{margin-top:10px;padding:10px;background:#0a0f16;border:1px solid #141e2d;border-radius:8px}
+    .logic-section h4{margin:0 0 6px;font-size:12px;color:var(--accent);letter-spacing:.3px}
+    .logic-formula{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:11px;color:var(--txt);padding:6px 8px;background:rgba(125,249,255,.03);border:1px solid rgba(125,249,255,.1);border-radius:6px;margin:4px 0;line-height:1.6}
+    .logic-rule{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid #141e2d;font-size:11px}
+    .logic-rule:last-child{border-bottom:none}
+    .logic-rule-lane{min-width:110px;font-weight:600}
+    .logic-rule-cond{color:var(--muted);flex:1}
+    .logic-rule-arrow{color:#2a3a4e}
+    .logic-scale{display:flex;gap:4px;margin:4px 0}
+    .logic-scale-item{flex:1;text-align:center;padding:4px;border-radius:4px;font-size:10px;border:1px solid var(--line);cursor:pointer;transition:transform .1s,box-shadow .1s}
+    .logic-scale-item:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.4)}
+    .logic-scale-item.active{outline:2px solid var(--accent);outline-offset:1px}
+    .heat-records{margin-top:8px;max-height:260px;overflow-y:auto;background:#0a0f16;border:1px solid #141e2d;border-radius:6px;padding:8px}
+    .claim-bar{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid #141e2d;font-size:11px}
+    .claim-bar:last-child{border-bottom:none}
+    .claim-key{min-width:180px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .claim-evidence-bar{display:block;flex:1;height:14px;background:#1a2638;border-radius:3px;overflow:hidden;position:relative}
+    .claim-evidence-fill{display:block;height:100%;border-radius:3px;width:0;transition:width .6s ease-out}
+    .claim-conf{min-width:44px;text-align:right;font-weight:600;font-variant-numeric:tabular-nums;font-size:11px}
+    .claim-evts{min-width:30px;text-align:center;font-size:10px;color:var(--muted)}
+    .q-expand-btn{background:none;border:none;color:var(--accent);font-size:10px;cursor:pointer;padding:1px 4px}
+    .q-detail-row{background:#0a0f16;font-size:10px;color:var(--muted)}
+    .q-detail-row td{padding:6px 8px;border-bottom:1px solid #0d1520}
+    .q-detail-item{margin:2px 0;line-height:1.5}
+    .q-detail-item strong{color:var(--txt);font-weight:600}
 
     /* ── Packet Viewer ─────────────────────────── */
     .pkt-split{display:grid;grid-template-columns:280px 1fr;gap:14px;min-height:400px}
@@ -631,8 +688,26 @@
     <!-- ── Health Tab ── -->
     <section id="tab-health" class="hidden">
       <div style="text-align:center;margin-bottom:14px">
-        <div class="health-score-ring" id="healthRing">--</div>
-        <div class="muted small">Logic Health Score</div>
+        <div class="health-ring-wrap">
+          <div class="health-score-ring" id="healthRing">--</div>
+          <div class="muted small">Logic Health Score</div>
+          <div class="health-tip" id="healthTip"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>&#9881; Pipeline Logic Process</h3>
+        <div class="muted small" style="margin-bottom:8px">9-stage pipeline: per-stage pass/fail rates and failure cascade analysis.</div>
+        <div id="healthPipeline" class="muted">Run the pipeline to see stage health.</div>
+      </div>
+      <div class="card">
+        <h3>&#128269; Decision Logic Explained</h3>
+        <div class="muted small" style="margin-bottom:8px">The rules, formulas, and thresholds DeepSigma uses to reach conclusions.</div>
+        <div id="healthLogicExplained" class="muted">Run the pipeline to see decision logic.</div>
+      </div>
+      <div class="card">
+        <h3>&#128200; Claim Evidence Map</h3>
+        <div class="muted small" style="margin-bottom:8px">How claims are built from source events and how confidence converges.</div>
+        <div id="healthClaimMap" class="muted">Run the pipeline to see claim evidence.</div>
       </div>
       <div class="grid2">
         <div class="card">
@@ -646,7 +721,7 @@
       </div>
       <div class="card">
         <h3>&#9829; Questionable Records</h3>
-        <div class="muted small" style="margin-bottom:8px">Events flagged for uncertain or contradictory scoring.</div>
+        <div class="muted small" style="margin-bottom:8px">Events flagged for uncertain or contradictory scoring. Click rows to expand detail.</div>
         <div id="healthQuestionable" class="muted">Run the pipeline to see health metrics.</div>
       </div>
       <div class="grid2">
@@ -666,6 +741,10 @@
   <!-- ── Right Trace Drawer ── -->
   <!-- Note: view-toggle is rendered at bottom of page after main-area -->
   <div class="drawer" id="traceDrawer">
+    <div class="drawer-collapse-bar" id="drawerCollapseBar">
+      <span class="collapse-label">EVENT TRACE</span>
+      <span class="collapse-arrow">&#8594;</span>
+    </div>
     <div class="drawer-head">
       <div class="drawer-view-toggle" id="drawerViewToggle">
         <button class="active" data-viewmode="all">All</button>
@@ -680,6 +759,7 @@
         <button id="btnCardMD" style="font-size:10px;padding:3px 10px">Card MD</button>
         <button id="btnCardPNG" style="font-size:10px;padding:3px 10px">Card PNG</button>
       </div>
+      <button id="btnCollapseAll" style="font-size:10px;padding:3px 10px" title="Collapse / Expand all sections">▲ Collapse</button>
       <button class="close-btn" id="btnCloseDrawer">✕</button>
     </div>
     <div class="drawer-body" id="drawerBody"></div>
@@ -1339,7 +1419,7 @@ function renderDrawerContent(evt,idx){
     {title:"8. PATCH",content:renderPatchSection(evt)},
     {title:"9. MEMORY",content:renderMemorySection(evt)},
   ];
-  body.innerHTML=sections.map(s=>`<div class="dsection"${s.id?' id="'+s.id+'"':''}><div class="dsection-hdr" onclick="this.nextElementSibling.classList.toggle('hidden');this.querySelector('.arrow').classList.toggle('collapsed')"><span class="arrow">▾</span> ${s.title}</div><div class="dsection-body">${s.content}</div></div>`).join("");
+  body.innerHTML=sections.map(s=>`<div class="dsection"${s.id?' id="'+s.id+'"':''}><div class="dsection-hdr"><span class="arrow">▾</span> ${s.title}</div><div class="dsection-body">${s.content}</div></div>`).join("");
 }
 
 function renderSummarySection(evt){
@@ -1543,7 +1623,7 @@ function renderFullTrace(evt,idx){
     {title:"9. MEMORY",content:renderMemorySection(evt)},
   ];
   el.innerHTML=`<h3 style="margin:0 0 10px">Trace: Event #${idx+1} — ${esc(evt.event_id)}</h3>`+
-    sections.map(s=>`<div class="card"><h3>${s.title}</h3>${s.content}</div>`).join("");
+    sections.map(s=>`<div class="card"><div class="dsection"><div class="dsection-hdr"><span class="arrow">▾</span> ${s.title}</div><div class="dsection-body">${s.content}</div></div></div>`).join("");
 }
 
 /* ── Compress View ─────────────────────────────────────────────────── */
@@ -1665,7 +1745,8 @@ function renderCohTab(){
 function renderHealthTab(){
   var evts=S.events.filter(function(e){return e._stageStatus});
   var n=evts.length;
-  var ids=["healthOverview","healthQuality","healthQuestionable","healthSigTable","healthScenarios"];
+  var stageNames=["RAW","PARSE","NORMALIZE","JOIN","TRUTH","REASONING","DRIFT","PATCH","MEMORY"];
+  var ids=["healthPipeline","healthLogicExplained","healthClaimMap","healthOverview","healthQuality","healthQuestionable","healthSigTable","healthScenarios"];
   if(n===0){
     ids.forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML='<span class="muted">Run the pipeline to see health metrics.</span>'});
     var ring=document.getElementById("healthRing");if(ring){ring.textContent="--";ring.className="health-score-ring"}
@@ -1745,6 +1826,235 @@ function renderHealthTab(){
   // ── Render ring ──────────────────────────────────────
   var ring=document.getElementById("healthRing");
   if(ring){ring.textContent=healthScore;ring.className="health-score-ring "+hCls}
+  var tip=document.getElementById("healthTip");
+  if(tip){
+    tip.innerHTML='<div class="tip-title">Logic Health Score: '+healthScore+' / 100</div>'+
+      '<div class="tip-row"><span class="tip-row-label">Confidence (40%)</span><span class="tip-row-val">'+confScore+'</span></div>'+
+      '<div style="font-size:11px;color:var(--muted);padding:0 0 4px">Mean event confidence \u00d7 100</div>'+
+      '<div class="tip-row"><span class="tip-row-label">Record Quality (20%)</span><span class="tip-row-val">'+qScore+'</span></div>'+
+      '<div style="font-size:11px;color:var(--muted);padding:0 0 4px">(1 \u2212 questionable/total) \u00d7 100</div>'+
+      '<div class="tip-row"><span class="tip-row-label">Drift Stability (20%)</span><span class="tip-row-val">'+driftStab+'</span></div>'+
+      '<div style="font-size:11px;color:var(--muted);padding:0 0 4px">(1 \u2212 drifted/total) \u00d7 100</div>'+
+      '<div class="tip-row"><span class="tip-row-label">Claim Convergence (20%)</span><span class="tip-row-val">'+convScore+'</span></div>'+
+      '<div style="font-size:11px;color:var(--muted);padding:0 0 4px">Stable claims / total claims \u00d7 100</div>'+
+      '<div class="tip-formula">'+confScore+' \u00d7 0.4 + '+qScore+' \u00d7 0.2 + '+driftStab+' \u00d7 0.2 + '+convScore+' \u00d7 0.2 = <strong>'+healthScore+'</strong></div>';
+  }
+
+  // ── Card A: Pipeline Logic Process ──────────────────
+  var plEl=document.getElementById("healthPipeline");
+  if(plEl){
+    var stageStats={};
+    stageNames.forEach(function(s){stageStats[s]={ok:0,fail:0,reasons:{}}});
+    evts.forEach(function(e){
+      if(!e._stageStatus)return;
+      stageNames.forEach(function(s){
+        var st=e._stageStatus[s];if(!st)return;
+        if(st.ok){stageStats[s].ok++}
+        else{stageStats[s].fail++;var r=st.reason||"unknown";stageStats[s].reasons[r]=(stageStats[s].reasons[r]||0)+1}
+      });
+    });
+    var pipeHtml='<div class="pipeline-flow">';
+    stageNames.forEach(function(s,i){
+      var stat=stageStats[s];var total=stat.ok+stat.fail;
+      var pctOk=total>0?Math.round((stat.ok/total)*100):100;
+      var cls=pctOk>=90?"stage-ok":pctOk>=70?"stage-warn":"stage-bad";
+      var barColor=pctOk>=90?"var(--ok)":pctOk>=70?"var(--warn)":"var(--bad)";
+      if(i>0)pipeHtml+='<div class="pipeline-arrow">\u2192</div>';
+      pipeHtml+='<div class="pipeline-stage"><div class="pipeline-stage-hdr '+cls+'">'+s+'</div>'+
+        '<div class="pipeline-stage-body"><div class="pipeline-stage-pct" style="color:'+barColor+'">'+pctOk+'%</div>'+
+        '<div class="pipeline-stage-bar"><div class="pipeline-stage-bar-fill" style="width:'+pctOk+'%;background:'+barColor+'"></div></div>'+
+        '<div class="muted" style="font-size:9px">'+stat.ok+' ok / '+stat.fail+' fail</div></div></div>';
+    });
+    pipeHtml+='</div>';
+    // Cascade analysis
+    var cascadeHtml='';
+    var parseF=stageStats.PARSE.fail,joinF=stageStats.JOIN.fail,patchF=stageStats.PATCH.fail;
+    if(parseF>0)cascadeHtml+='<div class="cascade-row"><span class="cascade-dot c-fail"></span><span style="color:var(--bad);font-size:11px">PARSE failures (\u00d7'+parseF+') cascade: NORMALIZE skips, JOIN may fail</span></div>';
+    var indepJoin=joinF-parseF;
+    if(indepJoin>0)cascadeHtml+='<div class="cascade-row"><span class="cascade-dot c-fail"></span><span style="color:var(--warn);font-size:11px">'+indepJoin+' independent JOIN failures from missing mapping keys</span></div>';
+    if(patchF>0)cascadeHtml+='<div class="cascade-row"><span class="cascade-dot c-skip"></span><span style="color:var(--muted);font-size:11px">'+patchF+' events had no drift to patch (expected for clean events)</span></div>';
+    // Per-stage failure reasons
+    var reasonsHtml='';
+    stageNames.forEach(function(s){
+      var rKeys=Object.keys(stageStats[s].reasons);
+      rKeys.forEach(function(r){
+        var cnt=stageStats[s].reasons[r];
+        var dotCls=r.indexOf("skipped")>=0?"c-skip":"c-fail";
+        reasonsHtml+='<div class="cascade-row"><span class="cascade-dot '+dotCls+'"></span>'+
+          '<span class="cascade-label">'+s+'</span>'+
+          '<span class="cascade-count" style="color:var(--bad)">\u00d7'+cnt+'</span>'+
+          '<span class="cascade-reason">'+esc(r)+'</span></div>';
+      });
+    });
+    if(cascadeHtml||reasonsHtml){
+      pipeHtml+='<div class="pipeline-cascade">';
+      pipeHtml+='<div style="font-size:11px;font-weight:600;color:#9ab8d3;margin-bottom:6px">Failure Cascade &amp; Stage Reasons</div>';
+      pipeHtml+=cascadeHtml;
+      if(reasonsHtml)pipeHtml+='<div style="margin-top:6px;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.3px">Per-Stage Failure Reasons</div>'+reasonsHtml;
+      pipeHtml+='</div>';
+    }
+    plEl.innerHTML=pipeHtml;
+  }
+
+  // ── Card B: Decision Logic Explained ───────────────
+  var dlEl=document.getElementById("healthLogicExplained");
+  if(dlEl){
+    var exEvt=evts.find(function(e){return e.source_system==="suricata"&&e.severity&&e.confidence>0})||evts[0];
+    var exSev=exEvt?exEvt.severity:"high";
+    var exSevNum={critical:1,high:2,medium:3,low:4,info:5}[exSev]||3;
+    var exConf=exEvt?exEvt.confidence.toFixed(2):"0.55";
+    var dlHtml='<div class="logic-section"><h4>1. Confidence Formula</h4>'+
+      '<div class="logic-formula"><strong>EVE/Snort:</strong> clamp(1 - severity_num \u00d7 0.15, 0.20, 0.99)<br>'+
+      '<span class="muted">severity_num: critical=1, high=2, medium=3, low=4</span><br>'+
+      '<span style="color:var(--accent)">Example: severity='+esc(exSev)+' ('+exSevNum+') \u2192 1 - '+exSevNum+' \u00d7 0.15 = '+(1-exSevNum*0.15).toFixed(2)+' \u2192 conf = '+exConf+'</span><br><br>'+
+      '<strong>Copilot:</strong> uses JSON-provided confidence, default 0.5<br>'+
+      '<span class="muted">guardrail_flags present \u2192 forces severity="high"</span></div></div>';
+    // Lane rules
+    dlHtml+='<div class="logic-section"><h4>2. Lane Assignment Rules</h4>';
+    var laneRules=[
+      {lane:"REQUIRE_REVIEW",cond:"severity \u2208 {critical, high} AND confidence \u2265 0.80"},
+      {lane:"QUEUE_PATCH",cond:"severity = high AND confidence < 0.80"},
+      {lane:"NOTIFY",cond:"severity = medium"},
+      {lane:"LOG_ONLY",cond:"everything else (low, info, or unmatched)"}
+    ];
+    laneRules.forEach(function(r){
+      dlHtml+='<div class="logic-rule"><span class="logic-rule-lane"><span class="badge lane-'+r.lane+'" style="font-size:9px">'+r.lane+'</span></span>'+
+        '<span class="logic-rule-arrow">\u2190</span><span class="logic-rule-cond">'+r.cond+'</span></div>';
+    });
+    dlHtml+='<div style="margin-top:6px;font-size:10px;color:var(--muted)">Current run: '+
+      Object.keys(lanes).map(function(l){return '<span class="badge lane-'+l+'" style="font-size:8px">'+l+'</span> '+lanes[l]}).join(' &nbsp; ')+'</div></div>';
+    // Drift rules
+    dlHtml+='<div class="logic-section"><h4>3. Drift Detection Rules</h4>';
+    [{type:"FP_SPIKE",cond:"sig_count \u2265 5 AND avg_confidence < 0.70",note:"Possible false-positive flooding"},
+     {type:"STALE_LOGIC",cond:"signature has > 1 revision seen",note:"Conflicting rule versions in feed"},
+     {type:"MISSING_MAPPING",cond:"JOIN stage failed (no signature_id or action)",note:"Event couldn\u2019t map to a claim"}
+    ].forEach(function(r){
+      dlHtml+='<div class="logic-rule"><span style="min-width:120px"><span class="badge drift-badge">'+r.type+'</span></span>'+
+        '<span class="logic-rule-cond">'+r.cond+' <span class="muted small">'+r.note+'</span></span></div>';
+    });
+    dlHtml+='</div>';
+    // Heat scale
+    // Build heat buckets for click-to-reveal
+    var heatBuckets={0:[],1:[],3:[],5:[]};
+    evts.forEach(function(e,i){
+      var hs=e._driftScore||0;
+      if(hs===0)heatBuckets[0].push(i);
+      else if(hs<=1)heatBuckets[1].push(i);
+      else if(hs<=3)heatBuckets[3].push(i);
+      else heatBuckets[5].push(i);
+    });
+    dlHtml+='<div class="logic-section"><h4>4. Drift Heat Scale</h4><div class="logic-scale">';
+    [{val:0,label:"None",desc:"No drifts",bg:"#1a2e1a",color:"#5dff93"},
+     {val:1,label:"Mild",desc:"1 drift, low/med sev",bg:"#2a3a1a",color:"#a8e06c"},
+     {val:3,label:"High",desc:"sev=high OR \u22652 drifts",bg:"#3a2a1a",color:"#ffcc66"},
+     {val:5,label:"Critical",desc:"sev=critical OR REQUIRE_REVIEW",bg:"#4a1010",color:"#ff6b6b"}
+    ].forEach(function(h){
+      var cnt=heatBuckets[h.val].length;
+      dlHtml+='<div class="logic-scale-item" data-heat="'+h.val+'" style="background:'+h.bg+';color:'+h.color+';border-color:'+h.color+'30">'+
+        '<div style="font-size:16px;font-weight:700">'+h.val+'</div>'+
+        '<div style="font-size:9px;font-weight:600">'+h.label+'</div>'+
+        '<div style="font-size:8px;opacity:.7">'+h.desc+'</div>'+
+        '<div style="font-size:9px;margin-top:2px;font-weight:700">'+cnt+' events</div></div>';
+    });
+    dlHtml+='</div><div id="heatRecordsPanel"></div></div>';
+    // Health score weights
+    dlHtml+='<div class="logic-section"><h4>5. Health Score Weights</h4>'+
+      '<div class="logic-formula">Health = <strong style="color:var(--accent)">Confidence \u00d7 0.40</strong> + '+
+      '<strong style="color:var(--ok)">Record Quality \u00d7 0.20</strong> + '+
+      '<strong style="color:var(--warn)">Drift Stability \u00d7 0.20</strong> + '+
+      '<strong style="color:#cc5de8">Claim Convergence \u00d7 0.20</strong><br>'+
+      '<span class="muted">Current: '+confScore+' \u00d7 0.4 + '+qScore+' \u00d7 0.2 + '+driftStab+' \u00d7 0.2 + '+convScore+' \u00d7 0.2 = <strong style="color:var(--txt)">'+healthScore+'</strong></span></div></div>';
+    // Claim merging
+    dlHtml+='<div class="logic-section"><h4>6. Claim Confidence Merging</h4>'+
+      '<div class="logic-formula">new_confidence = (existing_confidence + event_confidence) / 2<br>'+
+      '<span class="muted">Rolling average: with many events, confidence converges toward the group mean.<br>'+
+      'Stable: \u22653 source events AND confidence \u2265 0.60 &nbsp;|&nbsp; Fluctuating: \u22653 source events AND confidence < 0.60</span></div></div>';
+    dlEl.innerHTML=dlHtml;
+    // Wire heat scale click handlers
+    dlEl.querySelectorAll(".logic-scale-item[data-heat]").forEach(function(item){
+      item.addEventListener("click",function(){
+        var hv=Number(item.getAttribute("data-heat"));
+        var panel=document.getElementById("heatRecordsPanel");
+        if(!panel)return;
+        // Toggle off if same clicked again
+        var wasActive=item.classList.contains("active");
+        dlEl.querySelectorAll(".logic-scale-item").forEach(function(el){el.classList.remove("active")});
+        if(wasActive){panel.innerHTML="";return}
+        item.classList.add("active");
+        var idxs=heatBuckets[hv]||[];
+        if(idxs.length===0){panel.innerHTML='<div class="heat-records"><span class="muted">No events at heat level '+hv+'.</span></div>';return}
+        var show=idxs.slice(0,50);
+        var rows=show.map(function(idx){
+          var e=S.events[idx];if(!e)return"";
+          var lane=e._dlr?e._dlr.lane:"--";
+          var drifts=e._drift?e._drift.map(function(d){return d.drift_type}).join(", "):"none";
+          return '<tr style="cursor:pointer" onclick="S.selectedIdx='+idx+';openDrawer('+idx+')">'+
+            '<td>'+(idx+1)+'</td>'+
+            '<td class="mono small">'+esc((e.timestamp||"").slice(11,19))+'</td>'+
+            '<td><span class="badge sev-'+e.severity+'">'+esc(e.event_type)+'</span></td>'+
+            '<td><span class="badge sev-'+e.severity+'">'+esc(e.severity)+'</span></td>'+
+            '<td class="mono">'+e.confidence.toFixed(2)+'</td>'+
+            '<td>'+(lane!=="--"?'<span class="badge lane-'+lane+'">'+lane+'</span>':lane)+'</td>'+
+            '<td class="small">'+esc(drifts)+'</td>'+
+            '<td><span class="drift-heat drift-heat-'+(e._driftScore||0)+'">'+(e._driftScore||0)+'</span></td></tr>';
+        }).join("");
+        var cap=idxs.length>50?'<div class="muted small" style="margin-bottom:4px">Showing 50 of '+idxs.length+' events.</div>':"";
+        panel.innerHTML='<div class="heat-records">'+cap+
+          '<table><thead><tr><th>#</th><th>Time</th><th>Type</th><th>Sev</th><th>Conf</th><th>Lane</th><th>Drifts</th><th>Heat</th></tr></thead>'+
+          '<tbody>'+rows+'</tbody></table></div>';
+      });
+    });
+  }
+
+  // ── Card C: Claim Evidence Map ─────────────────────
+  var cmEl=document.getElementById("healthClaimMap");
+  if(cmEl){
+    if(claimKeys.length===0){
+      cmEl.innerHTML='<span class="muted">No claims built yet.</span>';
+    }else{
+      var claimsSorted=claimKeys.map(function(k){
+        var cl=S._claimMap[k];return{key:k,evtCount:cl.source_events.length,conf:cl.confidence};
+      }).sort(function(a,b){return b.evtCount-a.evtCount});
+      var maxEvts=claimsSorted[0].evtCount;
+      var cmHtml='<div style="font-size:11px;font-weight:600;color:#9ab8d3;margin-bottom:6px">Top Claims by Evidence Count</div>';
+      claimsSorted.slice(0,15).forEach(function(c){
+        var pct=maxEvts>0?Math.round((c.evtCount/maxEvts)*100):0;
+        var confColor=c.conf>=0.7?"var(--ok)":c.conf>=0.5?"var(--warn)":"var(--bad)";
+        cmHtml+='<div class="claim-bar"><span class="claim-key" title="'+esc(c.key)+'">'+esc(c.key)+'</span>'+
+          '<span class="claim-evts">'+c.evtCount+'</span>'+
+          '<span class="claim-evidence-bar"><span class="claim-evidence-fill" data-w="'+pct+'" style="background:'+confColor+'"></span></span>'+
+          '<span class="claim-conf" style="color:'+confColor+'">'+c.conf.toFixed(2)+'</span></div>';
+      });
+      if(claimsSorted.length>15)cmHtml+='<div class="muted small" style="margin-top:4px">'+(claimsSorted.length-15)+' more claims not shown.</div>';
+      // Unstable claims
+      var unstable=claimsSorted.filter(function(c){return c.evtCount>=3&&c.conf<0.6}).sort(function(a,b){return a.conf-b.conf}).slice(0,10);
+      if(unstable.length>0){
+        cmHtml+='<div style="margin-top:12px;font-size:11px;font-weight:600;color:var(--warn);margin-bottom:6px">\u26A0 Least Stable Claims (conf < 0.60, \u22653 events)</div>';
+        unstable.forEach(function(c){
+          cmHtml+='<div class="claim-bar"><span class="claim-key" title="'+esc(c.key)+'">'+esc(c.key)+'</span>'+
+            '<span class="claim-evts">'+c.evtCount+'</span>'+
+            '<span class="claim-evidence-bar"><span class="claim-evidence-fill" data-w="'+Math.round((c.evtCount/maxEvts)*100)+'" style="background:var(--bad)"></span></span>'+
+            '<span class="claim-conf" style="color:var(--bad)">'+c.conf.toFixed(2)+'</span></div>';
+        });
+      }
+      // Summary
+      var totalClaims=claimKeys.length;
+      var avgEvts=claimsSorted.reduce(function(s,c){return s+c.evtCount},0)/totalClaims;
+      var avgClConf=claimsSorted.reduce(function(s,c){return s+c.conf},0)/totalClaims;
+      cmHtml+='<div style="display:flex;gap:16px;margin-top:10px;padding-top:8px;border-top:1px solid var(--line);font-size:11px;flex-wrap:wrap">'+
+        '<span><span class="muted">Total Claims:</span> <strong>'+totalClaims+'</strong></span>'+
+        '<span><span class="muted">Avg Events/Claim:</span> <strong>'+avgEvts.toFixed(1)+'</strong></span>'+
+        '<span><span class="muted">Avg Claim Conf:</span> <strong style="color:'+(avgClConf>=0.6?"var(--ok)":"var(--warn)")+'">'+avgClConf.toFixed(2)+'</strong></span>'+
+        '<span><span class="muted">Stable:</span> <strong style="color:var(--ok)">'+stableClaims+'</strong></span>'+
+        '<span><span class="muted">Fluctuating:</span> <strong style="color:'+(fluctClaims>0?"var(--warn)":"var(--muted)")+'">'+fluctClaims+'</strong></span></div>';
+      cmEl.innerHTML=cmHtml;
+      requestAnimationFrame(function(){requestAnimationFrame(function(){
+        cmEl.querySelectorAll(".claim-evidence-fill[data-w]").forEach(function(bar,i){
+          setTimeout(function(){bar.style.width=bar.getAttribute("data-w")+"%"},i*40);
+        });
+      });});
+    }
+  }
 
   // ── Card 1: Logic Health Overview ────────────────────
   var ovEl=document.getElementById("healthOverview");
@@ -1806,7 +2116,39 @@ function renderHealthTab(){
         }).join(" ");
         var driftBadges=drifts!=="--"?drifts.split(", ").map(function(d){return '<span class="badge drift-badge">'+esc(d)+'</span>'}).join(" "):drifts;
         var scenBdg=e._scenario?'<span class="scenario-badge scen-'+(scenMap[e._scenario]||"medium")+'">'+esc(e._scenario)+'</span>':"";
-        return '<tr><td>'+(q.idx+1)+'</td>'+
+        // Build expandable detail
+        var details=[];
+        q.reasons.forEach(function(r){
+          if(r.indexOf("Low confidence")>=0){
+            details.push('<div class="q-detail-item"><strong>Threshold violated:</strong> confidence ('+e.confidence.toFixed(2)+') < 0.60 with severity '+esc(e.severity)+'</div>');
+            if(e.source_system==="suricata"||e.source_system==="snort"){
+              var sevNum={critical:1,high:2,medium:3,low:4,info:5}[e.severity]||3;
+              details.push('<div class="q-detail-item"><strong>Confidence origin:</strong> clamp(1 - '+sevNum+' \u00d7 0.15, 0.20, 0.99) = '+(Math.max(0.2,Math.min(0.99,1-sevNum*0.15))).toFixed(2)+'</div>');
+            }else{
+              details.push('<div class="q-detail-item"><strong>Confidence origin:</strong> Copilot JSON-provided or default 0.50</div>');
+            }
+          }
+          if(r.indexOf("drift signals")>=0){
+            details.push('<div class="q-detail-item"><strong>Threshold:</strong> \u22652 drift signals on single event. Actual: '+e._drift.length+'</div>');
+            e._drift.forEach(function(d){details.push('<div class="q-detail-item" style="margin-left:12px">\u2022 '+esc(d.drift_type)+': '+esc(d.notes||"")+'</div>')});
+          }
+          if(r.indexOf("Drift heat")>=0){
+            details.push('<div class="q-detail-item"><strong>Drift heat:</strong> '+e._driftScore+' (scale: 0=none, 1=mild, 3=high, 5=critical)</div>');
+          }
+          if(r.indexOf("JOIN failure")>=0){
+            details.push('<div class="q-detail-item"><strong>Stage origin:</strong> JOIN \u2014 '+(e._join?esc(e._join.reason||"unknown"):"unknown")+'</div>');
+            details.push('<div class="q-detail-item"><strong>Cascade:</strong> No claim built, MISSING_MAPPING drift emitted</div>');
+          }
+          if(r.indexOf("Malformed")>=0){
+            details.push('<div class="q-detail-item"><strong>Stage origin:</strong> PARSE \u2014 event_type="malformed", NORMALIZE skipped</div>');
+          }
+        });
+        // Stage pass/fail summary
+        if(e._stageStatus){
+          var stgSum=stageNames.map(function(s){var st=e._stageStatus[s];return st?(st.ok?'\u2713':'\u2717'):'\u2013'}).join(" ");
+          details.push('<div class="q-detail-item"><strong>Stages:</strong> <span class="mono small">'+stageNames.join(" ")+'</span><br><span class="mono small">'+stgSum+'</span></div>');
+        }
+        return '<tr style="cursor:pointer" data-evidx="'+q.idx+'" onclick="S.selectedIdx='+q.idx+';openDrawer('+q.idx+');(function(el){var d=el.nextElementSibling;d.style.display=d.style.display===\'none\'?\'table-row\':\'none\'})(this)"><td>'+(q.idx+1)+'</td>'+
           '<td class="mono small">'+esc((e.timestamp||"").slice(11,19))+'</td>'+
           '<td><span class="badge sev-'+e.severity+'">'+esc(e.event_type)+'</span></td>'+
           '<td><span class="badge sev-'+e.severity+'">'+esc(e.severity)+'</span></td>'+
@@ -1814,7 +2156,8 @@ function renderHealthTab(){
           '<td>'+(lane!=="--"?'<span class="badge lane-'+lane+'">'+lane+'</span>':lane)+'</td>'+
           '<td>'+driftBadges+'</td>'+
           '<td>'+scenBdg+'</td>'+
-          '<td>'+flagBadges+'</td></tr>';
+          '<td>'+flagBadges+' <span class="q-expand-btn">\u25BC</span></td></tr>'+
+          '<tr class="q-detail-row" style="display:none"><td colspan="9">'+details.join("")+'</td></tr>';
       }).join("");
       var cap=questionable.length>100?'<div class="muted small" style="margin-bottom:6px">Showing first 100 of '+questionable.length+' questionable records.</div>':"";
       qtEl.innerHTML=cap+'<div style="max-height:400px;overflow-y:auto">'+
@@ -2653,6 +2996,7 @@ window.addEventListener("DOMContentLoaded",()=>{
   });
 
   // Drawer
+  document.getElementById("drawerCollapseBar").addEventListener("click",closeDrawer);
   document.getElementById("btnCloseDrawer").addEventListener("click",closeDrawer);
   document.getElementById("btnWhy").addEventListener("click",()=>{
     const sec=document.getElementById("sec-reasoning");
@@ -2660,6 +3004,14 @@ window.addEventListener("DOMContentLoaded",()=>{
   });
   document.getElementById("btnCopyTrace").addEventListener("click",copyTrace);
   document.getElementById("btnCompress").addEventListener("click",toggleCompress);
+  document.getElementById("btnCollapseAll").addEventListener("click",function(){
+    var bodies=document.querySelectorAll("#drawerBody .dsection-body");
+    var arrows=document.querySelectorAll("#drawerBody .dsection-hdr .arrow");
+    var allHidden=bodies.length&&Array.prototype.every.call(bodies,function(b){return b.classList.contains("hidden")});
+    bodies.forEach(function(b){b.classList.toggle("hidden",!allHidden)});
+    arrows.forEach(function(a){a.classList.toggle("collapsed",!allHidden)});
+    this.textContent=allHidden?"▲ Collapse":"▼ Expand";
+  });
 
   // View mode toggle
   document.querySelectorAll(".view-toggle button").forEach(function(b){
@@ -2851,6 +3203,19 @@ window.addEventListener("DOMContentLoaded",()=>{
   // Drawer view toggle (Signal/Judgment)
   document.querySelectorAll("#drawerViewToggle button").forEach(function(btn){
     btn.addEventListener("click",function(){setDrawerViewMode(btn.dataset.viewmode)});
+  });
+
+  // Delegated collapse toggle for dsection headers (drawer + trace full view)
+  ["drawerBody","traceFullView"].forEach(function(id){
+    var container=document.getElementById(id);
+    if(container)container.addEventListener("click",function(e){
+      var hdr=e.target.closest(".dsection-hdr");
+      if(!hdr)return;
+      var body=hdr.nextElementSibling;
+      if(body)body.classList.toggle("hidden");
+      var arrow=hdr.querySelector(".arrow");
+      if(arrow)arrow.classList.toggle("collapsed");
+    });
   });
 
   // Decision card buttons
