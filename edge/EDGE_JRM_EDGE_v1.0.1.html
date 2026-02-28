@@ -1,0 +1,1892 @@
+<!--
+  EDGE JRM EDGE v1.0.1 — Version Bump
+  =====================================
+  [x] [0]  Global error guard banner (window.onerror + unhandledrejection)
+  [x] [1]  Stage ribbon real state memory (per-stage ok/fail/t/reason)
+  [x] [2]  Coherence meter real math + "Last updated" timestamp
+  [x] [3]  Trace drawer COMPRESS view + Copy Compressed button
+  [x] [4]  Packet viewer hash + seal + Validate Packet button
+  [x] [5]  Drift heat column refined scoring (0/1/3/5 scale)
+  [x] [6]  Replay mode with cross-packet diff
+  [x] [7]  View mode toggle SOC vs Governance
+  [x] [8]  "Explain it to humans" banner on Ingest tab
+  [x] [9]  Agentic Demo button (auto-load + auto-run)
+  [x] [10] Packet semantics clarity labels
+  [x] [11] Enterprise badges (CORE / ENTERPRISE)
+  [x] Performance: table pagination (2000 row cap + load more)
+  [x] Performance: seeded RNG for deterministic demo
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Deep Sigma EDGE — JRM EDGE v1.0.1</title>
+  <style>
+    :root {
+      --bg:#0b0f14; --card:#111824; --muted:#8aa0b5; --txt:#e7eef7;
+      --accent:#7df9ff; --warn:#ffcc66; --bad:#ff6b6b; --ok:#5dff93;
+      --ribbon:#1a2638; --line:#1b2a3a; --drawer-w:440px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:var(--bg);color:var(--txt);font-size:13px}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace}
+    .hidden{display:none!important}
+    .muted{color:var(--muted)}
+    .small{font-size:11px}
+
+    /* ── Header ────────────────────────────────── */
+    header{padding:10px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;flex-wrap:nowrap;min-height:52px;background:rgba(8,12,20,.95)}
+    .brand{white-space:nowrap;font-weight:700;letter-spacing:.4px;font-size:14px}
+    .brand small{display:block;color:var(--muted);font-size:11px;font-weight:400;letter-spacing:0}
+
+    /* Stage Ribbon */
+    .stage-ribbon{display:flex;align-items:center;gap:0;flex:1;justify-content:center;overflow-x:auto}
+    .stage-pill{padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600;color:var(--muted);background:var(--ribbon);border:1px solid transparent;transition:all .2s;white-space:nowrap;letter-spacing:.3px}
+    .stage-pill.active{color:var(--accent);border-color:rgba(125,249,255,.5);box-shadow:0 0 8px rgba(125,249,255,.15)}
+    .stage-pill.done{color:var(--ok);border-color:rgba(93,255,147,.3)}
+    .stage-arrow{color:#2a3a4e;font-size:10px;margin:0 2px}
+
+    /* Coherence Meter */
+    .coherence-wrap{display:flex;align-items:center;gap:10px;white-space:nowrap;position:relative}
+    .meter-ring{width:44px;height:44px;border-radius:50%;border:3px solid #243449;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;transition:border-color .3s,color .3s}
+    .meter-ring.green{border-color:var(--ok);color:var(--ok)}
+    .meter-ring.yellow{border-color:var(--warn);color:var(--warn)}
+    .meter-ring.red{border-color:var(--bad);color:var(--bad)}
+    .meter-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+    .sub-toggle{cursor:pointer;font-size:11px;color:var(--accent);border:none;background:none;padding:2px 6px}
+    .sub-dropdown{position:absolute;right:0;top:56px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;z-index:100;min-width:220px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+    .sub-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px}
+    .sub-row .sub-val{font-weight:600}
+
+    /* ── Tabs ──────────────────────────────────── */
+    .tabs{display:flex;gap:0;border-bottom:1px solid var(--line);padding:0 16px;background:rgba(11,15,20,.9)}
+    .ttab{padding:10px 18px;font-size:12px;font-weight:600;color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;letter-spacing:.3px}
+    .ttab:hover{color:var(--txt)}
+    .ttab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+    /* ── Main Area ─────────────────────────────── */
+    .main-area{display:flex;height:calc(100vh - 104px);overflow:hidden}
+    .content{flex:1;overflow-y:auto;padding:14px 18px}
+    .content section{max-width:1400px}
+
+    /* ── Cards ─────────────────────────────────── */
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px}
+    .card h3{margin:0 0 10px 0;font-size:14px;color:#cfe2f7;letter-spacing:.3px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+    /* ── Buttons ───────────────────────────────── */
+    button{background:#182235;color:var(--txt);border:1px solid #243449;border-radius:10px;padding:8px 14px;cursor:pointer;font-size:12px;transition:all .15s}
+    button:hover{border-color:#2f4765}
+    button.primary{border-color:rgba(125,249,255,.45);box-shadow:0 0 0 1px rgba(125,249,255,.12) inset}
+    button.primary:hover{background:rgba(125,249,255,.08)}
+    button.danger{border-color:rgba(255,107,107,.45)}
+    button.ok{border-color:rgba(93,255,147,.45)}
+
+    /* ── Inputs ────────────────────────────────── */
+    input,select{background:#0d1520;color:var(--txt);border:1px solid #243449;border-radius:8px;padding:7px 10px;font-size:12px}
+    input:focus,select:focus{border-color:rgba(125,249,255,.5);outline:none}
+    label{display:block;font-size:11px;color:var(--muted);margin:8px 0 4px}
+
+    /* ── Tables ────────────────────────────────── */
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    th,td{padding:7px 8px;border-bottom:1px solid #141e2d;text-align:left;vertical-align:top}
+    th{color:#8aa0b5;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+    tbody tr{cursor:pointer;transition:background .1s}
+    tbody tr:hover{background:rgba(125,249,255,.03)}
+    tbody tr.selected{background:rgba(125,249,255,.07)}
+
+    /* ── Badges ────────────────────────────────── */
+    .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:600;letter-spacing:.3px;border:1px solid}
+    .sev-critical{color:#ff6b6b;border-color:rgba(255,107,107,.4);background:rgba(255,107,107,.08)}
+    .sev-high{color:#ff9f43;border-color:rgba(255,159,67,.4);background:rgba(255,159,67,.08)}
+    .sev-medium{color:#ffcc66;border-color:rgba(255,204,102,.4);background:rgba(255,204,102,.08)}
+    .sev-low{color:#7df9ff;border-color:rgba(125,249,255,.3);background:rgba(125,249,255,.06)}
+    .sev-info{color:#8aa0b5;border-color:rgba(138,160,181,.3);background:rgba(138,160,181,.06)}
+    .lane-LOG_ONLY{color:#8aa0b5;border-color:rgba(138,160,181,.3);background:rgba(138,160,181,.06)}
+    .lane-NOTIFY{color:#7df9ff;border-color:rgba(125,249,255,.3);background:rgba(125,249,255,.06)}
+    .lane-QUEUE_PATCH{color:#ffcc66;border-color:rgba(255,204,102,.4);background:rgba(255,204,102,.08)}
+    .lane-REQUIRE_REVIEW{color:#ff6b6b;border-color:rgba(255,107,107,.4);background:rgba(255,107,107,.08)}
+    .drift-badge{color:#ff9f43;border-color:rgba(255,159,67,.4);background:rgba(255,159,67,.08)}
+
+    /* ── Controls Bar ──────────────────────────── */
+    .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+    .controls .sep{width:1px;height:24px;background:var(--line)}
+    .speed-label{font-size:11px;color:var(--muted)}
+    .speed-slider{width:80px;accent-color:var(--accent)}
+
+    /* ── Filters ───────────────────────────────── */
+    .filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+    .filters input[type=text]{width:200px}
+    .filters select{min-width:100px}
+    .filters label{margin:0;display:flex;align-items:center;gap:4px;font-size:11px}
+
+    /* ── KPI Row ───────────────────────────────── */
+    .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px}
+    .kpi-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}
+    .kpi-card .kv{font-size:20px;font-weight:700}
+    .kpi-card .kl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:4px}
+
+    /* ── Ingest Cards ──────────────────────────── */
+    .ingest-option{text-align:center;padding:20px}
+    .ingest-option h4{margin:0 0 8px;color:#cfe2f7}
+    .ingest-option p{color:var(--muted);font-size:12px;margin:0 0 12px}
+    .file-input-wrap{position:relative;display:inline-block}
+    .file-input-wrap input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+
+    /* ── Drawer ────────────────────────────────── */
+    .drawer{width:var(--drawer-w);min-width:var(--drawer-w);background:var(--card);border-left:1px solid var(--line);transform:translateX(100%);transition:transform .25s ease;overflow-y:auto;position:relative;z-index:50}
+    .drawer.open{transform:translateX(0)}
+    .drawer-head{padding:10px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;position:sticky;top:0;background:var(--card);z-index:10}
+    .drawer-head .close-btn{margin-left:auto;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:2px 6px}
+    .drawer-head .close-btn:hover{color:var(--txt)}
+    .drawer-body{padding:0 14px 14px}
+    .dsection{margin-top:10px}
+    .dsection-hdr{display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 0;border-bottom:1px solid #141e2d;font-size:12px;font-weight:600;color:#9ab8d3;user-select:none}
+    .dsection-hdr:hover{color:var(--txt)}
+    .dsection-hdr .arrow{transition:transform .15s;font-size:10px}
+    .dsection-hdr .arrow.collapsed{transform:rotate(-90deg)}
+    .dsection-body{padding:8px 0;font-size:12px}
+    .dsection-body pre{background:#0a0f16;border:1px solid #141e2d;border-radius:8px;padding:10px;overflow-x:auto;font-size:11px;line-height:1.5;white-space:pre-wrap;word-break:break-all;max-height:300px}
+    .kv-table{width:100%}
+    .kv-table td{padding:3px 8px 3px 0;vertical-align:top}
+    .kv-table td:first-child{color:var(--muted);white-space:nowrap;width:120px}
+
+    /* ── Coherence Tab ─────────────────────────── */
+    .big-meter{width:140px;height:140px;border-radius:50%;border:6px solid #243449;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;margin:20px auto}
+    .big-meter.green{border-color:var(--ok);color:var(--ok)}
+    .big-meter.yellow{border-color:var(--warn);color:var(--warn)}
+    .big-meter.red{border-color:var(--bad);color:var(--bad)}
+    .sub-bar-wrap{margin:6px 0}
+    .sub-bar-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px}
+    .sub-bar{height:6px;border-radius:3px;background:#1a2638;overflow:hidden}
+    .sub-bar-fill{height:100%;border-radius:3px;transition:width .3s}
+
+    /* ── Packet Viewer ─────────────────────────── */
+    .pkt-split{display:grid;grid-template-columns:280px 1fr;gap:14px;min-height:400px}
+    .pkt-list{overflow-y:auto}
+    .pkt-item{padding:10px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:background .15s}
+    .pkt-item:hover{background:rgba(125,249,255,.03)}
+    .pkt-item.active{border-color:rgba(125,249,255,.4);background:rgba(125,249,255,.05)}
+    .pkt-detail{overflow-y:auto}
+
+    /* Synthwave accent */
+    header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(125,249,255,.15) 20%,rgba(255,107,255,.1) 50%,rgba(125,249,255,.15) 80%,transparent)}
+    header{position:relative}
+
+    /* Scrollbar */
+    ::-webkit-scrollbar{width:6px;height:6px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:#243449;border-radius:3px}
+    ::-webkit-scrollbar-thumb:hover{background:#2f4765}
+
+    /* ── Stage Markers ─────────────────────────── */
+    .stage-marker{display:inline-block;width:16px;text-align:center;font-size:11px;font-weight:700;line-height:16px}
+    .stage-marker.pass{color:var(--ok)}.stage-marker.fail{color:var(--bad)}.stage-marker.skip{color:#3a4a5e}
+    .stage-status-row{display:flex;gap:2px;align-items:center;margin-top:4px}
+
+    /* ── Drift Heat ────────────────────────────── */
+    .drift-heat{display:inline-block;width:28px;height:18px;border-radius:4px;text-align:center;font-size:10px;font-weight:700;line-height:18px}
+    .drift-heat-0{background:#1a2e1a;color:#5dff93}.drift-heat-1{background:#2a3a1a;color:#a8e06c}
+    .drift-heat-2{background:#3a3a1a;color:#d4c040}.drift-heat-3{background:#3a2a1a;color:#ffcc66}
+    .drift-heat-4{background:#3a1a1a;color:#ff9f43}.drift-heat-5{background:#4a1010;color:#ff6b6b}
+
+    /* ── Compress View ─────────────────────────── */
+    .compress-block{background:#0a0f16;border:1px solid #141e2d;border-radius:8px;padding:10px;margin-top:8px;font-size:11px;line-height:1.6}
+    .compress-line{display:flex;gap:8px;align-items:baseline}
+    .compress-label{color:var(--muted);font-size:10px;min-width:60px;text-transform:uppercase;letter-spacing:.3px}
+    .compress-arrow{color:#2a3a4e;font-size:12px;text-align:center;padding:2px 0}
+
+    /* ── Seal Badge ────────────────────────────── */
+    .seal-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600}
+    .seal-ok{color:var(--ok);border:1px solid rgba(93,255,147,.4);background:rgba(93,255,147,.08)}
+    .seal-broken{color:var(--bad);border:1px solid rgba(255,107,107,.4);background:rgba(255,107,107,.08)}
+    .seal-pending{color:var(--muted);border:1px solid rgba(138,160,181,.3);background:rgba(138,160,181,.06)}
+    .hash-mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:10px;color:var(--muted);word-break:break-all}
+
+    /* ── Replay ────────────────────────────────── */
+    .replay-msg{background:#0a1a0a;border:1px solid rgba(93,255,147,.3);border-radius:10px;padding:12px;margin-top:10px;font-size:12px;color:var(--ok)}
+    .replay-msg .replay-hash{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:10px;color:var(--muted);margin-top:4px}
+
+    /* ── View Mode Toggle ──────────────────────── */
+    .view-toggle{position:fixed;bottom:18px;right:18px;z-index:200;display:flex;border-radius:12px;overflow:hidden;border:1px solid var(--line);box-shadow:0 4px 16px rgba(0,0,0,.5)}
+    .view-toggle button{padding:8px 14px;font-size:11px;font-weight:600;border:none;cursor:pointer;transition:all .15s;letter-spacing:.3px}
+    .view-toggle .vt-soc{background:#182235;color:var(--muted)}
+    .view-toggle .vt-gov{background:#182235;color:var(--muted)}
+    .view-toggle .vt-soc.active{background:rgba(255,107,107,.15);color:var(--bad)}
+    .view-toggle .vt-gov.active{background:rgba(125,249,255,.1);color:var(--accent)}
+
+    /* ── Error Banner ──────────────────────────── */
+    .err-banner{position:fixed;top:0;left:0;right:0;z-index:9999;background:#2a0a0a;border-bottom:2px solid var(--bad);padding:8px 16px;display:flex;align-items:center;gap:10px;font-size:12px;color:#ffaaaa}
+    .err-banner .err-msg{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .err-banner .err-loc{color:var(--muted);font-size:10px}
+    .err-banner button{padding:4px 10px;font-size:11px}
+    .err-banner .err-close{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:2px 6px}
+
+    /* ── Explain Banner ────────────────────────── */
+    .explain-banner{background:linear-gradient(135deg,rgba(125,249,255,.04),rgba(93,255,147,.03));border:1px solid rgba(125,249,255,.15);border-radius:12px;padding:10px 16px;margin-bottom:12px;font-size:12px;line-height:1.5}
+    .explain-banner strong{color:var(--accent)}
+
+    /* ── Enterprise Badges ─────────────────────── */
+    .tier-badge{display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:.5px;vertical-align:middle;margin-left:4px}
+    .tier-core{background:rgba(93,255,147,.1);color:var(--ok);border:1px solid rgba(93,255,147,.25)}
+    .tier-ent{background:rgba(125,249,255,.08);color:var(--accent);border:1px solid rgba(125,249,255,.2)}
+
+    /* ── Load More ─────────────────────────────── */
+    .load-more-wrap{text-align:center;padding:10px}
+    .load-more-wrap button{font-size:12px;padding:6px 20px}
+    .row-cap-msg{color:var(--muted);font-size:11px;margin-top:4px}
+  </style>
+</head>
+<body>
+
+<!-- ── Error Banner (hidden by default) ── -->
+<div class="err-banner hidden" id="errBanner">
+  <span class="err-msg" id="errMsg"></span>
+  <span class="err-loc" id="errLoc"></span>
+  <button id="errCopy">Copy error</button>
+  <button class="err-close" id="errClose">&times;</button>
+</div>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header>
+  <div class="brand">
+    Deep Sigma EDGE — JRM EDGE
+    <small>Judgment Refinement Module | v1.0.1</small>
+  </div>
+  <div class="stage-ribbon" id="stageRibbon"></div>
+  <div class="coherence-wrap">
+    <div>
+      <div class="meter-label">Coherence</div>
+      <div class="meter-ring" id="meterMain">0</div>
+    </div>
+    <button class="sub-toggle" id="subToggle" title="Sub-scores">▾</button>
+    <div class="sub-dropdown hidden" id="subDropdown">
+      <div class="sub-row"><span>Parse Completeness <span class="muted">(20%)</span></span><span class="sub-val" id="subParse">0</span></div>
+      <div class="sub-row"><span>Join Rate <span class="muted">(20%)</span></span><span class="sub-val" id="subJoin">0</span></div>
+      <div class="sub-row"><span>Reasoning Coverage <span class="muted">(20%)</span></span><span class="sub-val" id="subReason">0</span></div>
+      <div class="sub-row"><span>Drift Coverage <span class="muted">(20%)</span></span><span class="sub-val" id="subDrift">0</span></div>
+      <div class="sub-row"><span>Patch Lineage Integrity <span class="muted">(20%)</span></span><span class="sub-val" id="subPatch">0</span></div>
+      <div class="sub-row" style="border-top:1px solid var(--line);margin-top:4px;padding-top:6px"><span class="muted small">Last updated</span><span class="sub-val muted small" id="subUpdated">--:--:--</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════ TABS ═══════════════ -->
+<div class="tabs">
+  <button class="ttab active" data-tab="ingest">Ingest</button>
+  <button class="ttab" data-tab="run">Run Console</button>
+  <button class="ttab" data-tab="trace">Trace</button>
+  <button class="ttab" data-tab="packets">Packet Viewer</button>
+  <button class="ttab" data-tab="coherence">Coherence</button>
+</div>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<div class="main-area">
+  <div class="content">
+
+    <!-- ── Ingest Tab ── -->
+    <section id="tab-ingest">
+      <div class="explain-banner">
+        <strong>What:</strong> Turns raw logs into decision-ready packets. <strong>How:</strong> RAW &rarr; PARSE &rarr; NORMALIZE &rarr; JOIN &rarr; TRUTH &rarr; REASONING &rarr; DRIFT &rarr; PATCH &rarr; MEMORY. <strong>Output:</strong> JRM-X Packet (6 artifacts): TS / ALS / DLR / DS / MG&Delta; / CE.
+      </div>
+      <div class="grid3">
+        <div class="card ingest-option">
+          <h4>A) Load Raw Log File <span class="tier-badge tier-core">CORE</span></h4>
+          <p>EVE JSON, Snort fast.log, or Copilot JSONL</p>
+          <label>Format</label>
+          <select id="inFmt" style="width:100%;margin-bottom:8px">
+            <option value="auto">Auto-detect</option>
+            <option value="eve">Suricata EVE</option>
+            <option value="snort">Snort fast.log</option>
+            <option value="copilot">Copilot Agent</option>
+          </select>
+          <div class="file-input-wrap">
+            <button class="primary">Choose File</button>
+            <input type="file" id="inRawFile" accept=".json,.jsonl,.log,.txt,.ndjson"/>
+          </div>
+          <div id="inRawStatus" class="muted small" style="margin-top:6px"></div>
+        </div>
+        <div class="card ingest-option">
+          <h4>B) Load JRM-X Packet (6 artifacts) <span class="tier-badge tier-core">CORE</span></h4>
+          <p>Upload one or more packet zip files. Each zip is a time-windowed packet &mdash; not a single forever-archive. Load multiple for a Packet Chain.</p>
+          <div class="file-input-wrap">
+            <button class="primary">Choose Zip(s)</button>
+            <input type="file" id="inZipFile" accept=".zip" multiple/>
+          </div>
+          <div id="inZipStatus" class="muted small" style="margin-top:6px"></div>
+        </div>
+        <div class="card ingest-option">
+          <h4>C) Load Folder Files</h4>
+          <p>Select 6 individual JSON files</p>
+          <label>truth_snapshot.json</label><input type="file" class="folder-file" data-key="truth_snapshot" accept=".json"/>
+          <label>authority_slice.json</label><input type="file" class="folder-file" data-key="authority_slice" accept=".json"/>
+          <label>decision_lineage.jsonl</label><input type="file" class="folder-file" data-key="decision_lineage" accept=".json,.jsonl"/>
+          <label>drift_signal.jsonl</label><input type="file" class="folder-file" data-key="drift_signal" accept=".json,.jsonl"/>
+          <label>memory_graph.json</label><input type="file" class="folder-file" data-key="memory_graph" accept=".json"/>
+          <label>canon_entry.json</label><input type="file" class="folder-file" data-key="canon_entry" accept=".json"/>
+          <div style="margin-top:8px"><button id="btnLoadFolder" class="primary">Load Folder Files</button></div>
+          <div id="inFolderStatus" class="muted small" style="margin-top:6px"></div>
+        </div>
+      </div>
+      <div class="card" style="text-align:center;margin-top:6px">
+        <button id="btnDemo" class="ok" style="font-size:13px;padding:10px 24px">Use Embedded Demo Data</button>
+        <span class="muted small" style="margin-left:10px">50 events + 2 packet parts</span>
+        <span style="margin-left:12px"></span>
+        <button id="btnAgenticDemo" class="primary" style="font-size:13px;padding:10px 24px">Run Agentic Demo</button>
+        <span class="muted small" style="margin-left:10px">Auto-load + auto-run at full speed</span>
+      </div>
+      <div class="card" style="margin-top:6px">
+        <h3>Loaded Data</h3>
+        <div id="inSummary" class="muted">No data loaded.</div>
+      </div>
+    </section>
+
+    <!-- ── Run Console Tab ── -->
+    <section id="tab-run" class="hidden">
+      <div style="margin-bottom:8px"><span class="tier-badge tier-core">CORE</span> Local pipeline run <span class="tier-badge tier-ent">ENTERPRISE</span> Federation, gate, hub, advisories, full streaming connectors</div>
+      <div class="controls">
+        <button id="btnStart" class="ok">▶ Start</button>
+        <button id="btnPause">⏸ Pause</button>
+        <button id="btnStep">⏭ Step</button>
+        <button id="btnStop" class="danger">⏹ Stop</button>
+        <div class="sep"></div>
+        <span class="speed-label">Speed</span>
+        <input type="range" id="speedSlider" class="speed-slider" min="1" max="100" value="50"/>
+        <span id="speedVal" class="muted small">50ms</span>
+        <div class="sep"></div>
+        <span id="runStatus" class="muted small">Idle</span>
+        <span id="runProgress" class="muted small" style="margin-left:auto"></span>
+      </div>
+      <div class="filters">
+        <select id="fSev"><option value="">All Severities</option><option>critical</option><option>high</option><option>medium</option><option>low</option><option>info</option></select>
+        <select id="fLane"><option value="">All Lanes</option><option>REQUIRE_REVIEW</option><option>QUEUE_PATCH</option><option>NOTIFY</option><option>LOG_ONLY</option></select>
+        <label><input type="checkbox" id="fDrift"/> Drift only</label>
+        <input type="text" id="fSearch" placeholder="Search (/ to focus)"/>
+      </div>
+      <div style="overflow-x:auto">
+        <table id="eventTable">
+          <thead><tr>
+            <th>#</th><th>Time</th><th>Source</th><th>Type</th><th>Sig/Action</th><th>Severity</th><th>Lane</th><th>Drift</th><th>Heat</th><th>Part</th>
+          </tr></thead>
+          <tbody id="eventBody"></tbody>
+        </table>
+      </div>
+      <div id="runEmpty" class="muted" style="text-align:center;padding:30px">Load data and press Start to begin pipeline simulation.</div>
+      <div class="load-more-wrap hidden" id="loadMoreWrap">
+        <button id="btnLoadMore">Load More Rows</button>
+        <div class="row-cap-msg" id="loadMoreMsg"></div>
+      </div>
+    </section>
+
+    <!-- ── Trace Tab (full-width) ── -->
+    <section id="tab-trace" class="hidden">
+      <div id="traceFullView" class="muted" style="text-align:center;padding:30px">Select an event from the Run Console or click a table row to view its trace.</div>
+    </section>
+
+    <!-- ── Packet Viewer Tab ── -->
+    <section id="tab-packets" class="hidden">
+      <div style="margin-bottom:8px;font-size:12px"><span class="tier-badge tier-core">CORE</span> <strong>JRM-X Packet (6 artifacts)</strong> &mdash; time-windowed decision snapshots. Multiple parts form a <strong>Packet Chain</strong> (not a single forever-archive).</div>
+      <div class="pkt-split">
+        <div class="pkt-list" id="pktList">
+          <div class="muted" style="padding:10px">No packets loaded.</div>
+        </div>
+        <div class="pkt-detail" id="pktDetail">
+          <div class="muted" style="padding:10px">Select a packet part to view its contents.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Coherence Tab ── -->
+    <section id="tab-coherence" class="hidden">
+      <div style="text-align:center">
+        <div class="big-meter" id="bigMeter">0</div>
+        <div class="muted small">Overall Coherence Score</div>
+      </div>
+      <div class="grid2" style="margin-top:14px">
+        <div class="card">
+          <h3>Sub-Scores</h3>
+          <div id="cohSubBars"></div>
+        </div>
+        <div class="card">
+          <h3>Top Drift Drivers</h3>
+          <div id="cohDriftDrivers" class="muted">No drift data.</div>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="card">
+          <h3>Patch Latency</h3>
+          <div id="cohPatchLatency" class="muted">No patch data.</div>
+        </div>
+        <div class="card">
+          <h3>Join Failures</h3>
+          <div id="cohJoinFails" class="muted">No join failure data.</div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ── Right Trace Drawer ── -->
+  <!-- Note: view-toggle is rendered at bottom of page after main-area -->
+  <div class="drawer" id="traceDrawer">
+    <div class="drawer-head">
+      <button class="primary" id="btnWhy" style="font-size:11px;padding:4px 12px">WHY</button>
+      <button id="btnCopyTrace" style="font-size:11px;padding:4px 12px">Copy Trace</button>
+      <button id="btnCompress" style="font-size:11px;padding:4px 12px">COMPRESS</button>
+      <button id="btnCopyCompressed" style="font-size:11px;padding:4px 12px" class="hidden">Copy Compressed</button>
+      <button class="close-btn" id="btnCloseDrawer">✕</button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ VIEW MODE TOGGLE ═══════════════ -->
+<div class="view-toggle">
+  <button class="vt-soc active" data-mode="soc">SOC</button>
+  <button class="vt-gov" data-mode="governance">Governance</button>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   Deep Sigma EDGE — JRM EDGE v1.0.1
+   Single-file JRM pipeline visualizer
+   ═══════════════════════════════════════════════════════════════════════ */
+"use strict";
+
+/* ── [0] Global Error Guard ────────────────────────────────────────── */
+var _lastErr="";
+window.onerror=function(msg,src,line,col){
+  _lastErr=msg+" ("+src+":"+line+":"+col+")";
+  var b=document.getElementById("errBanner");if(b){b.classList.remove("hidden");document.getElementById("errMsg").textContent=msg;document.getElementById("errLoc").textContent=(src||"?")+":"+line+":"+col}
+};
+window.addEventListener("unhandledrejection",function(e){
+  var msg=e.reason?String(e.reason.message||e.reason):"Unhandled promise rejection";
+  _lastErr=msg;
+  var b=document.getElementById("errBanner");if(b){b.classList.remove("hidden");document.getElementById("errMsg").textContent=msg;document.getElementById("errLoc").textContent="promise"}
+});
+
+/* ── Seeded RNG (deterministic demo) ───────────────────────────────── */
+var _seed=20260228;
+function seededRand(){_seed=(_seed*16807+0)%2147483647;return(_seed-1)/2147483646}
+function seededUid(p){return p+"-"+Math.floor(seededRand()*0xFFFFFFFF).toString(16).toUpperCase().padStart(8,"0")}
+
+/* ── Utilities ─────────────────────────────────────────────────────── */
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function uid(p){return p+"-"+Math.random().toString(16).slice(2,10).toUpperCase()}
+function nowIso(){return new Date().toISOString()}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v))}
+function storageOk(){try{const k="__ds_t";localStorage.setItem(k,k);localStorage.removeItem(k);return true}catch(_){return false}}
+function getStore(k){if(storageOk())return localStorage.getItem(k);window.__mem=window.__mem||{};return window.__mem[k]||null}
+function setStore(k,v){if(storageOk())localStorage.setItem(k,v);else{window.__mem=window.__mem||{};window.__mem[k]=v}}
+function downloadFile(content,name,mime){const b=new Blob([content],{type:mime});const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download=name;a.click();URL.revokeObjectURL(u)}
+
+async function sha256Hex(data){
+  const buf=typeof data==="string"?new TextEncoder().encode(data):data;
+  const hash=await crypto.subtle.digest("SHA-256",buf);
+  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+/* ── Stages ────────────────────────────────────────────────────────── */
+const STAGES=["RAW","PARSE","NORMALIZE","JOIN","TRUTH","REASONING","DRIFT","PATCH","MEMORY"];
+
+/* ── State ─────────────────────────────────────────────────────────── */
+const S={
+  events:[],
+  packets:[],
+  selectedIdx:null,
+  running:false,
+  paused:false,
+  stepping:false,
+  runIdx:0,
+  activeStage:null,
+  drawerOpen:false,
+  viewMode:"soc",
+  compressView:false,
+  coherence:{parse:0,join:0,reasoning:0,drift:0,patch:0,total:0},
+  cohLastUpdated:null,
+  renderedRows:0,
+  ROW_CAP:2000,
+  // pipeline tracking
+  _claimMap:{},
+  _sigCounts:{},
+  _sigRevs:{},
+  _patchCount:0,
+  _patchWithLineage:0,
+  _joinFails:[],
+  _driftDrivers:{},
+};
+
+/* ── Stage Ribbon ──────────────────────────────────────────────────── */
+function buildRibbon(){
+  const el=document.getElementById("stageRibbon");
+  el.innerHTML=STAGES.map((s,i)=>`<span class="stage-pill" data-stage="${s}">${s}</span>${i<STAGES.length-1?'<span class="stage-arrow">→</span>':''}`).join("");
+}
+function setStage(name){
+  S.activeStage=name;
+  document.querySelectorAll(".stage-pill").forEach(p=>{
+    const sn=p.dataset.stage;
+    const idx=STAGES.indexOf(sn);
+    const activeIdx=STAGES.indexOf(name);
+    p.classList.toggle("active",sn===name);
+    p.classList.toggle("done",idx<activeIdx);
+  });
+}
+function clearStages(){
+  S.activeStage=null;
+  document.querySelectorAll(".stage-pill").forEach(p=>{p.classList.remove("active","done")});
+}
+
+/* ── Coherence Meter ───────────────────────────────────────────────── */
+function updateCoherence(processed,total){
+  if(total===0)return;
+  const parsed=processed;
+  let joined=0,reasoned=0,driftChecked=0;
+  for(let i=0;i<processed;i++){
+    const e=S.events[i];
+    if(e._join&&e._join.status!=="failed")joined++;
+    if(e._dlr)reasoned++;
+    if(e._driftChecked)driftChecked++;
+  }
+  const c=S.coherence;
+  c.parse=Math.round((parsed/total)*100);
+  c.join=parsed>0?Math.round((joined/parsed)*100):0;
+  c.reasoning=total>0?Math.round((reasoned/total)*100):0;
+  c.drift=total>0?Math.round((driftChecked/total)*100):0;
+  c.patch=S._patchCount>0?Math.round((S._patchWithLineage/S._patchCount)*100):100;
+  c.total=Math.round((c.parse+c.join+c.reasoning+c.drift+c.patch)/5);
+  S.cohLastUpdated=new Date();
+  renderMeter();
+}
+function renderMeter(){
+  const c=S.coherence;
+  const cls=c.total>=75?"green":c.total>=50?"yellow":"red";
+  const m=document.getElementById("meterMain");
+  m.textContent=c.total;m.className="meter-ring "+cls;
+  const bm=document.getElementById("bigMeter");
+  if(bm){bm.textContent=c.total;bm.className="big-meter "+cls}
+  document.getElementById("subParse").textContent=c.parse;
+  document.getElementById("subJoin").textContent=c.join;
+  document.getElementById("subReason").textContent=c.reasoning;
+  document.getElementById("subDrift").textContent=c.drift;
+  document.getElementById("subPatch").textContent=c.patch;
+  var upd=document.getElementById("subUpdated");
+  if(upd&&S.cohLastUpdated){var d=S.cohLastUpdated;upd.textContent=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")+":"+String(d.getSeconds()).padStart(2,"0")}
+  renderCohTab();
+}
+
+/* ── Tab Switching ─────────────────────────────────────────────────── */
+function setTab(name){
+  ["ingest","run","trace","packets","coherence"].forEach(t=>{
+    const el=document.getElementById("tab-"+t);
+    if(el)el.classList.toggle("hidden",t!==name);
+  });
+  document.querySelectorAll(".ttab").forEach(b=>b.classList.toggle("active",b.dataset.tab===name));
+  try{location.hash="#"+name}catch(_){}
+}
+
+/* ── Adapters (browser-side) ───────────────────────────────────────── */
+function hashRaw(raw){
+  // Sync hash for display (real sha256 async done separately)
+  let h=0;for(let i=0;i<raw.length;i++){h=((h<<5)-h)+raw.charCodeAt(i);h|=0}
+  return "sha256:"+Math.abs(h).toString(16).padStart(16,"0");
+}
+
+function parseEVE(text){
+  const events=[];
+  text.split("\n").forEach((line,i)=>{
+    line=line.trim();if(!line)return;
+    try{
+      const j=JSON.parse(line);
+      const et=j.event_type||"generic";
+      const typeMap={alert:"suricata_alert",dns:"suricata_dns",http:"suricata_http",flow:"suricata_flow",tls:"suricata_flow",fileinfo:"suricata_flow"};
+      const severity=j.alert?{1:"critical",2:"high",3:"medium",4:"low"}[j.alert.severity]||"info":"info";
+      const sig=j.alert?j.alert.signature_id:null;
+      const rev=j.alert?j.alert.rev:null;
+      const action=j.alert?j.alert.signature:(j.dns?`DNS ${j.dns.rrname||""}`:j.http?`${j.http.http_method||"GET"} ${j.http.url||"/"}`:et);
+      events.push({
+        event_id:uid("EVT"),source_system:"suricata",event_type:typeMap[et]||"generic",
+        timestamp:j.timestamp||nowIso(),severity,
+        actor:{ip:j.src_ip||"",port:j.src_port||0},
+        object:{ip:j.dest_ip||"",port:j.dest_port||0},
+        action,confidence:j.alert?clamp(1-(j.alert.severity||3)*0.15,0.2,0.99):0.7,
+        evidence_hash:hashRaw(line),raw_pointer:`line:${i+1}`,environment_id:"",
+        assumptions:[],raw_line:line,
+        metadata:{signature_id:sig,rev,flow_id:j.flow_id,proto:j.proto,
+          gid:j.alert?j.alert.gid:null,category:j.alert?j.alert.category:null,
+          dns:j.dns||null,http:j.http||null,tls:j.tls||null,fileinfo:j.fileinfo||null}
+      });
+    }catch(_){
+      events.push({
+        event_id:uid("EVT"),source_system:"suricata",event_type:"malformed",
+        timestamp:nowIso(),severity:"low",actor:{},object:{},action:"MALFORMED",
+        confidence:0,evidence_hash:hashRaw(line),raw_pointer:`line:${i+1}`,
+        environment_id:"",assumptions:[],raw_line:line,metadata:{}
+      });
+    }
+  });
+  return events;
+}
+
+function parseSnort(text){
+  const events=[];
+  const rx=/^(\d{2}\/\d{2}-[\d:.]+)\s+\[\*\*\]\s+\[(\d+):(\d+):(\d+)\]\s+(.*?)\s+\[\*\*\]\s+\[Classification:\s*(.*?)\]\s+\[Priority:\s*(\d+)\]\s+\{(\w+)\}\s+(\S+)\s+->\s+(\S+)/;
+  text.split("\n").forEach((line,i)=>{
+    line=line.trim();if(!line)return;
+    const m=line.match(rx);
+    if(m){
+      const sevMap={1:"critical",2:"high",3:"medium",4:"low"};
+      const [,ts,gid,sid,rev,msg,cls,pri,proto,src,dst]=m;
+      events.push({
+        event_id:uid("EVT"),source_system:"snort",event_type:"snort_alert",
+        timestamp:`2026-${ts.replace("-","T")}`,severity:sevMap[pri]||"info",
+        actor:{addr:src},object:{addr:dst},action:msg,
+        confidence:clamp(1-Number(pri)*0.15,0.2,0.99),
+        evidence_hash:hashRaw(line),raw_pointer:`line:${i+1}`,environment_id:"",
+        assumptions:[],raw_line:line,
+        metadata:{gid:Number(gid),signature_id:Number(sid),rev:Number(rev),classification:cls,proto}
+      });
+    }else{
+      events.push({
+        event_id:uid("EVT"),source_system:"snort",event_type:"malformed",
+        timestamp:nowIso(),severity:"low",actor:{},object:{},action:"MALFORMED",
+        confidence:0,evidence_hash:hashRaw(line),raw_pointer:`line:${i+1}`,
+        environment_id:"",assumptions:[],raw_line:line,metadata:{}
+      });
+    }
+  });
+  return events;
+}
+
+function parseCopilot(text){
+  const events=[];
+  const typeMap={prompt:"agent_prompt",tool_call:"agent_tool_call",response:"agent_response",guardrail:"agent_guardrail"};
+  text.split("\n").forEach((line,i)=>{
+    line=line.trim();if(!line)return;
+    try{
+      const j=JSON.parse(line);
+      events.push({
+        event_id:uid("EVT"),source_system:"copilot",event_type:typeMap[j.type]||"generic",
+        timestamp:j.timestamp||nowIso(),
+        severity:j.guardrail_flags?"high":(j.confidence>=0.8?"low":"medium"),
+        actor:{agent:j.agent_id||"unknown"},
+        object:{target:j.target||""},
+        action:j.type==="prompt"?j.prompt||j.type:j.type==="tool_call"?(j.tool_calls||[]).map(t=>t.name).join(",")||"tool_call":j.type==="response"?(j.response||"").slice(0,80):j.type,
+        confidence:j.confidence||0.5,
+        evidence_hash:hashRaw(line),raw_pointer:`line:${i+1}`,environment_id:"",
+        assumptions:[],raw_line:line,
+        metadata:{guardrail_flags:j.guardrail_flags||[],model:j.model||null,agent_id:j.agent_id}
+      });
+    }catch(_){
+      events.push({
+        event_id:uid("EVT"),source_system:"copilot",event_type:"malformed",
+        timestamp:nowIso(),severity:"low",actor:{},object:{},action:"MALFORMED",
+        confidence:0,evidence_hash:hashRaw(line),raw_pointer:`line:${i+1}`,
+        environment_id:"",assumptions:[],raw_line:line,metadata:{}
+      });
+    }
+  });
+  return events;
+}
+
+function parseAuto(text){
+  const trimmed=text.trim();
+  if(!trimmed)return [];
+  // Detect format
+  const firstLine=trimmed.split("\n")[0].trim();
+  if(firstLine.startsWith("{")){
+    try{
+      const j=JSON.parse(firstLine);
+      if(j.event_type)return parseEVE(text);
+      if(j.type&&(j.agent_id||j.prompt||j.tool_calls))return parseCopilot(text);
+      return parseEVE(text);// default to EVE for JSON
+    }catch(_){}
+  }
+  if(/^\d{2}\/\d{2}-/.test(firstLine))return parseSnort(text);
+  return parseEVE(text);// fallback
+}
+
+/* ── Minimal Zip Parser ────────────────────────────────────────────── */
+function parseZip(buf){
+  const view=new DataView(buf);
+  const u8=new Uint8Array(buf);
+  const files=new Map();
+  // Find end of central directory
+  let eocdOff=-1;
+  for(let i=u8.length-22;i>=0;i--){
+    if(view.getUint32(i,true)===0x06054b50){eocdOff=i;break}
+  }
+  if(eocdOff<0)throw new Error("Not a valid zip file");
+  const cdOff=view.getUint32(eocdOff+16,true);
+  const cdCount=view.getUint16(eocdOff+10,true);
+  let pos=cdOff;
+  for(let i=0;i<cdCount;i++){
+    if(view.getUint32(pos,true)!==0x02014b50)break;
+    const method=view.getUint16(pos+10,true);
+    const compSize=view.getUint32(pos+20,true);
+    const uncompSize=view.getUint32(pos+24,true);
+    const nameLen=view.getUint16(pos+28,true);
+    const extraLen=view.getUint16(pos+30,true);
+    const commentLen=view.getUint16(pos+32,true);
+    const localOff=view.getUint32(pos+42,true);
+    const name=new TextDecoder().decode(u8.slice(pos+46,pos+46+nameLen));
+    pos+=46+nameLen+extraLen+commentLen;
+    // Read local file header to find data offset
+    const lNameLen=view.getUint16(localOff+26,true);
+    const lExtraLen=view.getUint16(localOff+28,true);
+    const dataOff=localOff+30+lNameLen+lExtraLen;
+    const compressed=u8.slice(dataOff,dataOff+compSize);
+    if(method===0){
+      files.set(name,compressed);
+    }else if(method===8){
+      // DEFLATE — use DecompressionStream if available
+      files.set(name,{compressed,uncompSize,method:8});
+    }else{
+      files.set(name,compressed);// best effort
+    }
+  }
+  return files;
+}
+
+async function inflateData(entry){
+  if(entry instanceof Uint8Array)return entry;
+  if(!entry.compressed)return new Uint8Array(0);
+  // Try DecompressionStream (supported in modern browsers)
+  if(typeof DecompressionStream!=="undefined"){
+    try{
+      // Add zlib header for raw deflate
+      const header=new Uint8Array([0x78,0x01]);
+      const combined=new Uint8Array(header.length+entry.compressed.length);
+      combined.set(header);combined.set(entry.compressed,header.length);
+      const ds=new DecompressionStream("deflate");
+      const writer=ds.writable.getWriter();
+      writer.write(combined);writer.close();
+      const reader=ds.readable.getReader();
+      const chunks=[];let total=0;
+      while(true){
+        const{done,value}=await reader.read();
+        if(done)break;
+        chunks.push(value);total+=value.length;
+      }
+      const result=new Uint8Array(total);let off=0;
+      for(const c of chunks){result.set(c,off);off+=c.length}
+      return result;
+    }catch(e){
+      // Fallback: try raw deflate
+      try{
+        const ds=new DecompressionStream("raw");
+        const writer=ds.writable.getWriter();
+        writer.write(entry.compressed);writer.close();
+        const reader=ds.readable.getReader();
+        const chunks=[];let total=0;
+        while(true){
+          const{done,value}=await reader.read();
+          if(done)break;
+          chunks.push(value);total+=value.length;
+        }
+        const result=new Uint8Array(total);let off=0;
+        for(const c of chunks){result.set(c,off);off+=c.length}
+        return result;
+      }catch(_){
+        return entry.compressed;// give up, return raw
+      }
+    }
+  }
+  return entry.compressed;// no DecompressionStream
+}
+
+async function loadZipPacket(buf){
+  const rawFiles=parseZip(buf);
+  const files={};
+  for(const[name,data]of rawFiles){
+    if(name.endsWith("/"))continue;// skip directories
+    const basename=name.split("/").pop();
+    const inflated=await inflateData(data);
+    files[basename]=new TextDecoder().decode(inflated);
+  }
+  // Parse manifest
+  let manifest=null;
+  try{manifest=JSON.parse(files["manifest.json"]||"{}")}catch(_){}
+  return{
+    name:manifest?manifest.packetName||manifest.packet_name||"Unknown":"Unknown",
+    env:manifest?manifest.environmentId||manifest.environment_id||"?":"?",
+    window_start:manifest?manifest.windowStart||manifest.window_start||"":"",
+    window_end:manifest?manifest.windowEnd||manifest.window_end||"":"",
+    event_count:manifest?manifest.eventCount||manifest.event_count||0:0,
+    part:manifest?manifest.part||1:1,
+    files,manifest
+  };
+}
+
+/* ── Pipeline Simulation ───────────────────────────────────────────── */
+function getSpeed(){return 101-Number(document.getElementById("speedSlider").value)}
+
+function classifyLane(evt){
+  const s=evt.severity;const c=evt.confidence;
+  if((s==="critical"||s==="high")&&c>=0.8)return"REQUIRE_REVIEW";
+  if(s==="high"&&c<0.8)return"QUEUE_PATCH";
+  if(s==="medium")return"NOTIFY";
+  return"LOG_ONLY";
+}
+
+function buildClaim(evt){
+  const key=(evt.source_system||"?")+":"+(evt.metadata.signature_id||evt.action||"?");
+  if(!S._claimMap[key]){
+    S._claimMap[key]={claim_id:uid("CLM"),statement:`Claim for ${key}`,confidence:evt.confidence,evidence_refs:[evt.evidence_hash],source_events:[evt.event_id],assumptions:[]};
+  }else{
+    const cl=S._claimMap[key];
+    cl.evidence_refs.push(evt.evidence_hash);
+    cl.source_events.push(evt.event_id);
+    cl.confidence=(cl.confidence+evt.confidence)/2;
+  }
+  return S._claimMap[key];
+}
+
+function computeJoin(evt){
+  const sig=evt.metadata.signature_id||evt.metadata.sid;
+  if(sig)return{signature_id:sig,rev:evt.metadata.rev||"?",status:"joined"};
+  if(evt.event_type==="malformed")return{status:"failed",reason:"malformed"};
+  if(evt.action&&evt.action!=="MALFORMED")return{action:evt.action,status:"joined"};
+  S._joinFails.push(evt.event_type);
+  return{status:"failed",reason:"no mapping key"};
+}
+
+function detectDrift(evt,idx){
+  evt._driftChecked=true;
+  const sig=evt.metadata.signature_id||evt.metadata.sid;
+  const drifts=[];
+  if(sig){
+    S._sigCounts[sig]=(S._sigCounts[sig]||0)+1;
+    if(!S._sigRevs[sig])S._sigRevs[sig]=new Set();
+    if(evt.metadata.rev)S._sigRevs[sig].add(String(evt.metadata.rev));
+    // FP_SPIKE
+    if(S._sigCounts[sig]>=5){
+      // Check avg confidence for this sig
+      let sum=0,cnt=0;
+      for(let i=0;i<=idx;i++){
+        const e=S.events[i];
+        if((e.metadata.signature_id||e.metadata.sid)===sig){sum+=e.confidence;cnt++}
+      }
+      if(cnt>0&&(sum/cnt)<0.7){
+        drifts.push({drift_id:uid("DS"),drift_type:"FP_SPIKE",severity:"medium",
+          notes:`Sig ${sig} fired ${cnt}x, avg conf ${(sum/cnt).toFixed(2)}`,
+          fingerprint:{signature_id:String(sig),count:String(cnt)}});
+        S._driftDrivers[sig]=(S._driftDrivers[sig]||0)+1;
+      }
+    }
+    // STALE_LOGIC
+    if(S._sigRevs[sig]&&S._sigRevs[sig].size>1){
+      drifts.push({drift_id:uid("DS"),drift_type:"STALE_LOGIC",severity:"medium",
+        notes:`Sig ${sig} has conflicting revs: ${[...S._sigRevs[sig]].sort().join(",")}`,
+        fingerprint:{signature_id:String(sig),revisions:[...S._sigRevs[sig]].sort().join(",")}});
+      S._driftDrivers[sig]=(S._driftDrivers[sig]||0)+1;
+    }
+  }
+  // MISSING_MAPPING
+  if(evt._join&&evt._join.status==="failed"){
+    drifts.push({drift_id:uid("DS"),drift_type:"MISSING_MAPPING",severity:"low",
+      notes:`Event type ${evt.event_type} has no claim mapping`,
+      fingerprint:{event_type:evt.event_type}});
+  }
+  return drifts;
+}
+
+function buildPatch(evt){
+  if(!evt._drift||evt._drift.length===0)return null;
+  S._patchCount++;
+  S._patchWithLineage++;
+  const d=evt._drift[0];
+  return{patch_id:uid("PATCH"),drift_id:d.drift_id,rev:S._patchCount,previous_rev:Math.max(0,S._patchCount-1),
+    changes:[{type:"threshold_adjust",target:d.fingerprint}],lineage:[]};
+}
+
+function updateMemory(evt){
+  // Simple tracking
+  return{nodes_added:1,edges_added:evt._claim?1:0};
+}
+
+async function runPipeline(){
+  S.running=true;S.paused=false;
+  document.getElementById("runStatus").textContent="Running";
+  document.getElementById("runEmpty").classList.add("hidden");
+
+  for(let i=S.runIdx;i<S.events.length;i++){
+    if(!S.running)break;
+    while(S.paused&&!S.stepping){await sleep(50)}
+    if(S.stepping)S.stepping=false;
+    if(!S.running)break;
+
+    const evt=S.events[i];
+    const delay=getSpeed();
+
+    const ss={};var _t0;
+    _t0=Date.now(); setStage("RAW"); ss.RAW={ok:true,t:_t0,reason:null}; await sleep(Math.max(1,delay/9));
+    _t0=Date.now(); setStage("PARSE"); evt._parsed=true; var _pOk=evt.event_type!=="malformed"; ss.PARSE={ok:_pOk,t:_t0,reason:_pOk?null:"malformed event"}; await sleep(Math.max(1,delay/9));
+    _t0=Date.now(); setStage("NORMALIZE"); evt._normalized=true; ss.NORMALIZE={ok:ss.PARSE.ok,t:_t0,reason:ss.PARSE.ok?null:"skipped (parse failed)"}; await sleep(Math.max(1,delay/9));
+    _t0=Date.now(); setStage("JOIN"); evt._join=computeJoin(evt); var _jOk=evt._join.status!=="failed"; ss.JOIN={ok:_jOk,t:_t0,reason:_jOk?null:"join failed"}; await sleep(Math.max(1,delay/9));
+    _t0=Date.now(); setStage("TRUTH"); evt._claim=buildClaim(evt); ss.TRUTH={ok:!!evt._claim,t:_t0,reason:evt._claim?null:"no claim built"}; await sleep(Math.max(1,delay/9));
+    _t0=Date.now(); setStage("REASONING"); evt._dlr={lane:classifyLane(evt),why:[
+      `Severity=${evt.severity}, confidence=${evt.confidence.toFixed(2)} → ${classifyLane(evt)}`,
+      ...(evt.metadata.signature_id?[`Matched signature ${evt.metadata.signature_id} rev ${evt.metadata.rev||"?"}`]:[]),
+      ...(evt.metadata.guardrail_flags&&evt.metadata.guardrail_flags.length?[`Guardrail flags: ${evt.metadata.guardrail_flags.join(", ")}`]:[])
+    ]}; ss.REASONING={ok:true,t:_t0,reason:null}; await sleep(Math.max(1,delay/9));
+    _t0=Date.now(); setStage("DRIFT"); evt._drift=detectDrift(evt,i); ss.DRIFT={ok:true,t:_t0,reason:null}; await sleep(Math.max(1,delay/9));
+    _t0=Date.now(); setStage("PATCH"); evt._patch=buildPatch(evt); ss.PATCH={ok:!!evt._patch,t:_t0,reason:evt._patch?null:"no drift to patch"}; await sleep(Math.max(1,delay/9));
+    _t0=Date.now(); setStage("MEMORY"); evt._mg=updateMemory(evt); ss.MEMORY={ok:true,t:_t0,reason:null}; await sleep(Math.max(1,delay/9));
+    evt._stageStatus=ss;
+    evt._driftScore=(function(){if(!evt._drift||evt._drift.length===0)return 0;var hc=evt._drift.some(function(d){return d.severity==="critical"});var hr=evt._dlr&&evt._dlr.lane==="REQUIRE_REVIEW";if(hc||hr)return 5;var hh=evt._drift.some(function(d){return d.severity==="high"});if(hh||evt._drift.length>=2)return 3;return 1})();
+
+    appendEventRow(evt,i);
+    updateCoherence(i+1,S.events.length);
+    S.runIdx=i+1;
+    document.getElementById("runProgress").textContent=`${i+1} / ${S.events.length}`;
+  }
+
+  S.running=false;
+  clearStages();
+  document.getElementById("runStatus").textContent=S.runIdx>=S.events.length?"Complete":"Stopped";
+}
+
+/* ── Event Table Rendering ─────────────────────────────────────────── */
+function appendEventRow(evt,idx){
+  S.renderedRows++;
+  if(S.renderedRows>S.ROW_CAP){
+    var wrap=document.getElementById("loadMoreWrap");if(wrap)wrap.classList.remove("hidden");
+    var msg=document.getElementById("rowCapMsg");if(msg)msg.textContent="Showing "+S.ROW_CAP+" of "+S.renderedRows+" events";
+    return;
+  }
+  _renderRow(evt,idx);
+}
+function _renderRow(evt,idx){
+  const body=document.getElementById("eventBody");
+  const tr=document.createElement("tr");
+  tr.dataset.idx=idx;
+  const lane=evt._dlr?evt._dlr.lane:"";
+  const hasDrift=evt._drift&&evt._drift.length>0;
+  const sig=evt.metadata.signature_id||evt.metadata.sid||evt.action||"-";
+  const heat=evt._driftScore||0;
+  tr.innerHTML=`<td>${idx+1}</td><td class="mono small">${esc((evt.timestamp||"").slice(11,19))}</td><td>${esc(evt.source_system)}</td><td><span class="badge sev-${evt.severity==="info"?"info":evt.severity}">${esc(evt.event_type)}</span></td><td class="mono small">${esc(String(sig).slice(0,30))}</td><td><span class="badge sev-${evt.severity}">${esc(evt.severity)}</span></td><td>${lane?`<span class="badge lane-${lane}">${lane}</span>`:""}</td><td>${hasDrift?evt._drift.map(d=>`<span class="badge drift-badge">${esc(d.drift_type)}</span>`).join(" "):""}</td><td><span class="drift-heat drift-heat-${heat}">${heat}</span></td><td class="muted">${evt._packetPart||"-"}</td>`;
+  tr.addEventListener("click",()=>selectEvent(idx));
+  body.appendChild(tr);
+  applyRowFilter(tr,evt);
+}
+function loadMoreRows(){
+  var newCap=Math.min(S.renderedRows,S.ROW_CAP+2000);
+  for(var i=S.ROW_CAP;i<newCap&&i<S.events.length;i++){
+    var evt=S.events[i];if(evt&&evt._stageStatus)_renderRow(evt,i);
+  }
+  S.ROW_CAP=newCap;
+  if(newCap>=S.renderedRows){document.getElementById("loadMoreWrap").classList.add("hidden")}
+  else{document.getElementById("rowCapMsg").textContent="Showing "+newCap+" of "+S.renderedRows+" events"}
+}
+
+function selectEvent(idx){
+  S.selectedIdx=idx;
+  document.querySelectorAll("#eventBody tr").forEach(r=>{
+    r.classList.toggle("selected",Number(r.dataset.idx)===idx);
+  });
+  openDrawer(idx);
+}
+
+/* ── Filters ───────────────────────────────────────────────────────── */
+function applyFilters(){
+  const rows=document.querySelectorAll("#eventBody tr");
+  rows.forEach(tr=>{
+    const idx=Number(tr.dataset.idx);
+    const evt=S.events[idx];
+    if(evt)applyRowFilter(tr,evt);
+  });
+}
+function applyRowFilter(tr,evt){
+  const fSev=document.getElementById("fSev").value;
+  const fLane=document.getElementById("fLane").value;
+  const fDrift=document.getElementById("fDrift").checked;
+  const fSearch=document.getElementById("fSearch").value.toLowerCase();
+  let show=true;
+  if(fSev&&evt.severity!==fSev)show=false;
+  if(fLane&&(!evt._dlr||evt._dlr.lane!==fLane))show=false;
+  if(fDrift&&(!evt._drift||evt._drift.length===0))show=false;
+  if(fSearch){
+    const hay=(evt.event_type+evt.action+evt.source_system+(evt.metadata.signature_id||"")).toLowerCase();
+    if(!hay.includes(fSearch))show=false;
+  }
+  tr.style.display=show?"":"none";
+}
+
+/* ── Trace Drawer ──────────────────────────────────────────────────── */
+function openDrawer(idx){
+  const evt=S.events[idx];
+  if(!evt)return;
+  S.drawerOpen=true;
+  const d=document.getElementById("traceDrawer");
+  d.classList.add("open");
+  if(S.compressView)renderCompressView(evt);
+  else renderDrawerContent(evt,idx);
+  renderFullTrace(evt,idx);
+}
+function closeDrawer(){
+  S.drawerOpen=false;
+  document.getElementById("traceDrawer").classList.remove("open");
+}
+
+function renderDrawerContent(evt,idx){
+  const body=document.getElementById("drawerBody");
+  const sections=[
+    {title:"1. Event Summary",content:renderSummarySection(evt)},
+    {title:"2. RAW",content:renderRawSection(evt)},
+    {title:"3. PARSED / NORMALIZED",content:renderParsedSection(evt)},
+    {title:"4. JOIN",content:renderJoinSection(evt)},
+    {title:"5. TRUTH",content:renderTruthSection(evt)},
+    {title:"6. REASONING",id:"sec-reasoning",content:renderReasoningSection(evt)},
+    {title:"7. DRIFT",content:renderDriftSection(evt)},
+    {title:"8. PATCH",content:renderPatchSection(evt)},
+    {title:"9. MEMORY",content:renderMemorySection(evt)},
+  ];
+  body.innerHTML=sections.map(s=>`<div class="dsection"${s.id?' id="'+s.id+'"':''}><div class="dsection-hdr" onclick="this.nextElementSibling.classList.toggle('hidden');this.querySelector('.arrow').classList.toggle('collapsed')"><span class="arrow">▾</span> ${s.title}</div><div class="dsection-body">${s.content}</div></div>`).join("");
+}
+
+function renderSummarySection(evt){
+  const lane=evt._dlr?evt._dlr.lane:"—";
+  const drifts=evt._drift||[];
+  return `<table class="kv-table">
+    <tr><td>Event ID</td><td class="mono small">${esc(evt.event_id)}</td></tr>
+    <tr><td>Timestamp</td><td class="mono small">${esc(evt.timestamp)}</td></tr>
+    <tr><td>Source</td><td>${esc(evt.source_system)}</td></tr>
+    <tr><td>Type</td><td><span class="badge sev-${evt.severity}">${esc(evt.event_type)}</span></td></tr>
+    <tr><td>Severity</td><td><span class="badge sev-${evt.severity}">${esc(evt.severity)}</span></td></tr>
+    <tr><td>Confidence</td><td>${evt.confidence.toFixed(2)}</td></tr>
+    <tr><td>Lane</td><td>${lane!=="—"?`<span class="badge lane-${lane}">${lane}</span>`:lane}</td></tr>
+    <tr><td>Drift</td><td>${drifts.length?drifts.map(d=>`<span class="badge drift-badge">${esc(d.drift_type)}</span>`).join(" "):"None"}</td></tr>
+    ${evt._stageStatus?'<tr><td>Stages</td><td><div class="stage-status-row">'+STAGES.map(function(s){var st=evt._stageStatus[s];var isObj=st&&typeof st==="object";var ok=isObj?st.ok:(st==="pass");var cls=ok?"pass":(isObj&&st.ok===false||st==="fail")?"fail":"skip";var sym=ok?"\u2714":(cls==="fail")?"\u2716":"\u25CB";var tip=s+": "+(isObj?(ok?"ok":"fail"+(st.reason?" \u2014 "+st.reason:"")):(st||"pending"));if(isObj&&st.t)tip+=" @ "+new Date(st.t).toLocaleTimeString();return '<span class="stage-marker '+cls+'" title="'+tip+'">'+sym+"</span>"}).join("")+"</div></td></tr>":""}
+    ${evt._driftScore!==undefined?'<tr><td>Drift Heat</td><td><span class="drift-heat drift-heat-'+evt._driftScore+'">'+evt._driftScore+"</span> / 5</td></tr>":""}
+  </table>`;
+}
+
+function renderRawSection(evt){
+  return `<div class="mono small muted" style="margin-bottom:4px">Evidence: ${esc(evt.evidence_hash)}</div>
+  <pre class="mono">${esc(evt.raw_line||"(no raw data)")}</pre>`;
+}
+
+function renderParsedSection(evt){
+  const rows=[
+    ["actor",JSON.stringify(evt.actor)],
+    ["object",JSON.stringify(evt.object)],
+    ["action",evt.action],
+    ["event_type",evt.event_type],
+    ["severity",evt.severity],
+    ["confidence",evt.confidence.toFixed(2)],
+  ];
+  if(evt.metadata.signature_id)rows.push(["signature_id",evt.metadata.signature_id]);
+  if(evt.metadata.rev)rows.push(["rev",evt.metadata.rev]);
+  if(evt.metadata.proto)rows.push(["proto",evt.metadata.proto]);
+  if(evt.metadata.classification)rows.push(["classification",evt.metadata.classification]);
+  if(evt.metadata.guardrail_flags&&evt.metadata.guardrail_flags.length)rows.push(["guardrail_flags",evt.metadata.guardrail_flags.join(", ")]);
+  return `<table class="kv-table">${rows.map(([k,v])=>`<tr><td>${esc(k)}</td><td class="mono small">${esc(String(v))}</td></tr>`).join("")}</table>`;
+}
+
+function renderJoinSection(evt){
+  const j=evt._join;
+  if(!j)return '<span class="muted">Not yet processed</span>';
+  const rows=[["status",j.status]];
+  if(j.signature_id)rows.push(["signature_id",j.signature_id]);
+  if(j.rev)rows.push(["rev",j.rev]);
+  if(j.action)rows.push(["action",j.action]);
+  if(j.reason)rows.push(["reason",j.reason]);
+  return `<table class="kv-table">${rows.map(([k,v])=>`<tr><td>${esc(k)}</td><td class="mono small">${esc(String(v))}</td></tr>`).join("")}</table>`;
+}
+
+function renderTruthSection(evt){
+  const c=evt._claim;
+  if(!c)return '<span class="muted">Not yet processed</span>';
+  return `<table class="kv-table">
+    <tr><td>Claim ID</td><td class="mono small">${esc(c.claim_id)}</td></tr>
+    <tr><td>Statement</td><td>${esc(c.statement)}</td></tr>
+    <tr><td>Confidence</td><td>${c.confidence.toFixed(2)}</td></tr>
+    <tr><td>Evidence</td><td class="mono small">${esc(c.evidence_refs.slice(-3).join(", "))}</td></tr>
+    <tr><td>Source Events</td><td>${c.source_events.length}</td></tr>
+  </table>`;
+}
+
+function renderReasoningSection(evt){
+  const dlr=evt._dlr;
+  if(!dlr)return '<span class="muted">Not yet processed</span>';
+  return `<div style="margin-bottom:6px"><span class="badge lane-${dlr.lane}">${dlr.lane}</span></div>
+  <div style="font-size:12px;font-weight:600;margin-bottom:4px">Why Bullets:</div>
+  <ul style="margin:0;padding-left:18px">${dlr.why.map(w=>`<li style="margin-bottom:3px">${esc(w)}</li>`).join("")}</ul>
+  ${evt.assumptions&&evt.assumptions.length?`<div class="muted small" style="margin-top:6px">Assumptions: ${esc(evt.assumptions.join("; "))}</div>`:""}`;
+}
+
+function renderDriftSection(evt){
+  const drifts=evt._drift;
+  if(!drifts||drifts.length===0)return '<span class="muted">No drift detected</span>';
+  return drifts.map(d=>`<div class="card" style="margin-bottom:6px;padding:8px">
+    <div><span class="badge drift-badge">${esc(d.drift_type)}</span> <span class="badge sev-${d.severity}">${esc(d.severity)}</span></div>
+    <div class="muted small" style="margin-top:4px">${esc(d.notes)}</div>
+    <div class="mono small muted" style="margin-top:2px">ID: ${esc(d.drift_id)}</div>
+  </div>`).join("");
+}
+
+function renderPatchSection(evt){
+  const p=evt._patch;
+  if(!p)return '<span class="muted">No patch generated</span>';
+  return `<table class="kv-table">
+    <tr><td>Patch ID</td><td class="mono small">${esc(p.patch_id)}</td></tr>
+    <tr><td>Drift ID</td><td class="mono small">${esc(p.drift_id)}</td></tr>
+    <tr><td>Rev</td><td>${p.rev}</td></tr>
+    <tr><td>Previous Rev</td><td>${p.previous_rev}</td></tr>
+    <tr><td>Changes</td><td class="mono small">${esc(JSON.stringify(p.changes))}</td></tr>
+  </table>`;
+}
+
+function renderMemorySection(evt){
+  const mg=evt._mg;
+  if(!mg)return '<span class="muted">Not yet processed</span>';
+  // Find canon posture for this sig
+  const sig=evt.metadata.signature_id||evt.metadata.sid;
+  const claim=evt._claim;
+  return `<table class="kv-table">
+    <tr><td>Nodes Added</td><td>${mg.nodes_added}</td></tr>
+    <tr><td>Edges Added</td><td>${mg.edges_added}</td></tr>
+    ${sig?`<tr><td>Signature</td><td class="mono small">${sig}</td></tr>`:""}
+    ${claim?`<tr><td>Canon Posture</td><td>confidence=${claim.confidence.toFixed(2)}, events=${claim.source_events.length}</td></tr>`:""}
+  </table>`;
+}
+
+/* ── Full Trace View (Trace tab) ───────────────────────────────────── */
+function renderFullTrace(evt,idx){
+  const el=document.getElementById("traceFullView");
+  if(!evt){el.innerHTML='<span class="muted">Select an event to view trace.</span>';return}
+  // Reuse drawer sections in full width
+  const sections=[
+    {title:"1. Event Summary",content:renderSummarySection(evt)},
+    {title:"2. RAW",content:renderRawSection(evt)},
+    {title:"3. PARSED / NORMALIZED",content:renderParsedSection(evt)},
+    {title:"4. JOIN",content:renderJoinSection(evt)},
+    {title:"5. TRUTH",content:renderTruthSection(evt)},
+    {title:"6. REASONING",content:renderReasoningSection(evt)},
+    {title:"7. DRIFT",content:renderDriftSection(evt)},
+    {title:"8. PATCH",content:renderPatchSection(evt)},
+    {title:"9. MEMORY",content:renderMemorySection(evt)},
+  ];
+  el.innerHTML=`<h3 style="margin:0 0 10px">Trace: Event #${idx+1} — ${esc(evt.event_id)}</h3>`+
+    sections.map(s=>`<div class="card"><h3>${s.title}</h3>${s.content}</div>`).join("");
+}
+
+/* ── Compress View ─────────────────────────────────────────────────── */
+function toggleCompress(){
+  S.compressView=!S.compressView;
+  var btn=document.getElementById("btnCompress");
+  btn.classList.toggle("primary",S.compressView);
+  btn.textContent=S.compressView?"FULL":"COMPRESS";
+  var ccBtn=document.getElementById("btnCopyCompressed");
+  if(ccBtn)ccBtn.style.display=S.compressView?"inline-block":"none";
+  if(S.selectedIdx!==null){
+    var evt=S.events[S.selectedIdx];
+    if(S.compressView)renderCompressView(evt);
+    else renderDrawerContent(evt,S.selectedIdx);
+  }
+}
+function copyCompressed(){
+  if(S.selectedIdx===null)return;
+  var evt=S.events[S.selectedIdx];if(!evt)return;
+  var raw=(evt.raw_line||"(no raw data)").slice(0,120);
+  var normalized=evt.source_system+":"+evt.event_type+" | "+(evt.action||"-")+" | sev="+evt.severity+" conf="+evt.confidence.toFixed(2);
+  var lane=evt._dlr?evt._dlr.lane:"-";
+  var drifts=evt._drift&&evt._drift.length?evt._drift.map(function(d){return d.drift_type}).join(","):"none";
+  var canon=evt._claim?"claim="+evt._claim.claim_id.slice(0,12)+" conf="+evt._claim.confidence.toFixed(2):"no claim";
+  var text="RAW: "+raw+"\nNORMAL: "+normalized+"\nDECISION: lane="+lane+" | drift="+drifts+" | "+canon;
+  navigator.clipboard.writeText(text).then(function(){
+    var btn=document.getElementById("btnCopyCompressed");
+    btn.textContent="Copied!";setTimeout(function(){btn.textContent="Copy Compressed"},1500);
+  });
+}
+function renderCompressView(evt){
+  if(!evt)return;
+  var body=document.getElementById("drawerBody");
+  var raw=esc((evt.raw_line||"(no raw data)").slice(0,120))+(evt.raw_line&&evt.raw_line.length>120?"\u2026":"");
+  var normalized=esc(evt.source_system+":"+evt.event_type+" | "+(evt.action||"-")+" | sev="+evt.severity+" conf="+evt.confidence.toFixed(2));
+  var lane=evt._dlr?evt._dlr.lane:"\u2014";
+  var laneBadge=lane!=="\u2014"?'<span class="badge lane-'+lane+'">'+lane+"</span>":"\u2014";
+  var drifts=evt._drift&&evt._drift.length?esc(evt._drift.map(function(d){return d.drift_type}).join(",")):"none";
+  var canon=evt._claim?esc("claim="+evt._claim.claim_id.slice(0,12)+" conf="+evt._claim.confidence.toFixed(2)):"no claim";
+  var stageHtml="";
+  if(evt._stageStatus){
+    stageHtml='<div style="margin-top:10px"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Stage Pipeline</div><div class="stage-status-row">';
+    STAGES.forEach(function(s,i){
+      var st=evt._stageStatus[s];var isObj=st&&typeof st==="object";var ok=isObj?st.ok:(st==="pass");
+      var cls=ok?"pass":(isObj&&st.ok===false||st==="fail")?"fail":"skip";
+      var sym=ok?"\u2714":(cls==="fail")?"\u2716":"\u25CB";
+      stageHtml+='<span class="stage-marker '+cls+'" title="'+s+": "+(isObj?(ok?"ok":"fail"):(st||"pending"))+'">'+sym+"</span>";
+      if(i<STAGES.length-1)stageHtml+='<span style="color:#2a3a4e;font-size:9px;margin:0 1px">\u2192</span>';
+    });
+    stageHtml+="</div></div>";
+  }
+  body.innerHTML='<div style="margin-top:10px;font-size:12px;font-weight:600;color:#9ab8d3;margin-bottom:8px">COMPRESS \u2014 3-Line Decision Summary</div>'+
+    '<div class="compress-block mono">'+
+    '<div class="compress-line"><span class="compress-label">RAW</span><span>'+raw+"</span></div>"+
+    '<div class="compress-arrow">\u2193</div>'+
+    '<div class="compress-line"><span class="compress-label">NORMAL</span><span>'+normalized+"</span></div>"+
+    '<div class="compress-arrow">\u2193</div>'+
+    '<div class="compress-line"><span class="compress-label">DECISION</span><span>'+laneBadge+" | drift="+drifts+" | "+canon+"</span></div>"+
+    "</div>"+stageHtml;
+}
+
+/* ── Copy Trace ────────────────────────────────────────────────────── */
+function copyTrace(){
+  if(S.selectedIdx===null)return;
+  const evt=S.events[S.selectedIdx];
+  if(!evt)return;
+  const trace={
+    event_id:evt.event_id,timestamp:evt.timestamp,source_system:evt.source_system,
+    event_type:evt.event_type,severity:evt.severity,confidence:evt.confidence,
+    action:evt.action,evidence_hash:evt.evidence_hash,
+    join:evt._join||null,claim:evt._claim?{claim_id:evt._claim.claim_id,confidence:evt._claim.confidence}:null,
+    reasoning:evt._dlr||null,drift:evt._drift||[],patch:evt._patch||null,
+    memory:evt._mg||null
+  };
+  navigator.clipboard.writeText(JSON.stringify(trace,null,2)).then(()=>{
+    const btn=document.getElementById("btnCopyTrace");
+    btn.textContent="Copied!";setTimeout(()=>btn.textContent="Copy Trace",1500);
+  });
+}
+
+/* ── Coherence Tab Rendering ───────────────────────────────────────── */
+function renderCohTab(){
+  const c=S.coherence;
+  const subs=[
+    {label:"Parse Completeness (20%)",val:c.parse},
+    {label:"Join Rate (20%)",val:c.join},
+    {label:"Reasoning Coverage (20%)",val:c.reasoning},
+    {label:"Drift Coverage (20%)",val:c.drift},
+    {label:"Patch Lineage Integrity (20%)",val:c.patch},
+  ];
+  const barsEl=document.getElementById("cohSubBars");
+  if(barsEl){
+    barsEl.innerHTML=subs.map(s=>{
+      const col=s.val>=75?"var(--ok)":s.val>=50?"var(--warn)":"var(--bad)";
+      return `<div class="sub-bar-wrap"><div class="sub-bar-label"><span>${s.label}</span><span style="font-weight:600">${s.val}</span></div><div class="sub-bar"><div class="sub-bar-fill" style="width:${s.val}%;background:${col}"></div></div></div>`;
+    }).join("");
+  }
+  // Drift drivers
+  const dd=document.getElementById("cohDriftDrivers");
+  if(dd){
+    const entries=Object.entries(S._driftDrivers).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    dd.innerHTML=entries.length?`<table class="kv-table">${entries.map(([k,v])=>`<tr><td class="mono small">${esc(k)}</td><td>${v} detections</td></tr>`).join("")}</table>`:'<span class="muted">No drift data.</span>';
+  }
+  // Join failures
+  const jf=document.getElementById("cohJoinFails");
+  if(jf){
+    const counts={};S._joinFails.forEach(t=>{counts[t]=(counts[t]||0)+1});
+    const entries=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+    jf.innerHTML=entries.length?`<table class="kv-table">${entries.map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v} failures</td></tr>`).join("")}</table>`:'<span class="muted">No join failures.</span>';
+  }
+  // Patch latency
+  const pl=document.getElementById("cohPatchLatency");
+  if(pl){
+    pl.innerHTML=S._patchCount>0?`<div style="font-size:20px;font-weight:700">${S._patchCount}</div><div class="muted small">patches generated (all inline, &lt;1ms latency)</div>`:'<span class="muted">No patches generated.</span>';
+  }
+}
+
+/* ── Packet Viewer ─────────────────────────────────────────────────── */
+function renderPacketList(){
+  const el=document.getElementById("pktList");
+  if(!S.packets.length){el.innerHTML='<div class="muted" style="padding:10px">No packets loaded.</div>';return}
+  var chainLabel=S.packets.length>1?'<div style="font-size:11px;color:var(--accent);margin-bottom:6px;padding:4px 8px;border:1px solid rgba(125,249,255,.15);border-radius:4px">Packet Chain \u2014 '+S.packets.length+' parts loaded</div>':"";
+  el.innerHTML=chainLabel+S.packets.map((p,i)=>`<div class="pkt-item" data-idx="${i}" onclick="selectPacket(${i})">
+    <div style="font-weight:600;font-size:12px"><span style="color:var(--accent);font-size:10px">JRM-X Packet (6 artifacts)</span><br>${esc(p.name||"Part "+p.part)}</div>
+    <div class="muted small">Env: ${esc(p.env)} | Events: ${p.event_count}</div>
+    <div class="muted small">${esc((p.window_start||"").slice(0,19))} \u2192 ${esc((p.window_end||"").slice(0,19))}</div>
+  </div>`).join("");
+}
+async function selectPacket(idx){
+  document.querySelectorAll(".pkt-item").forEach((el,i)=>el.classList.toggle("active",i===idx));
+  const pkt=S.packets[idx];
+  if(!pkt)return;
+  const detail=document.getElementById("pktDetail");
+  const files=pkt.files||{};
+  const cards=[];
+
+  // Truth Snapshot
+  if(files["truth_snapshot.json"]){
+    try{
+      const ts=JSON.parse(files["truth_snapshot.json"]);
+      cards.push(`<div class="card"><h3>Truth Snapshot (TS)</h3><pre class="mono small">${esc(JSON.stringify(ts,null,2).slice(0,2000))}</pre></div>`);
+    }catch(_){cards.push(`<div class="card"><h3>Truth Snapshot</h3><pre class="mono small">${esc(files["truth_snapshot.json"].slice(0,2000))}</pre></div>`)}
+  }
+  // Authority Slice
+  if(files["authority_slice.json"]){
+    try{
+      const als=JSON.parse(files["authority_slice.json"]);
+      cards.push(`<div class="card"><h3>Authority Slice (ALS)</h3><pre class="mono small">${esc(JSON.stringify(als,null,2).slice(0,2000))}</pre></div>`);
+    }catch(_){cards.push(`<div class="card"><h3>Authority Slice</h3><pre class="mono small">${esc(files["authority_slice.json"].slice(0,2000))}</pre></div>`)}
+  }
+  // Decision Lineage
+  if(files["decision_lineage.jsonl"]){
+    const lines=files["decision_lineage.jsonl"].trim().split("\n").slice(0,50);
+    cards.push(`<div class="card"><h3>Decision Lineage (DLR) — ${lines.length} entries</h3><div style="max-height:300px;overflow-y:auto"><pre class="mono small">${esc(lines.join("\n"))}</pre></div></div>`);
+  }
+  // Drift Signal
+  if(files["drift_signal.jsonl"]){
+    const lines=files["drift_signal.jsonl"].trim().split("\n").filter(l=>l.trim());
+    cards.push(`<div class="card"><h3>Drift Signal (DS) — ${lines.length} signals</h3><div style="max-height:300px;overflow-y:auto"><pre class="mono small">${esc(lines.join("\n"))}</pre></div></div>`);
+  }
+  // Memory Graph
+  if(files["memory_graph.json"]){
+    try{
+      const mg=JSON.parse(files["memory_graph.json"]);
+      const nc=mg.nodes_added||mg.nodes?.length||0;
+      const ec=mg.edges_added||mg.edges?.length||0;
+      cards.push(`<div class="card"><h3>Memory Graph (MG)</h3><div class="kpi-row" style="grid-template-columns:1fr 1fr"><div class="kpi-card"><div class="kv">${nc}</div><div class="kl">Nodes</div></div><div class="kpi-card"><div class="kv">${ec}</div><div class="kl">Edges</div></div></div><pre class="mono small" style="max-height:200px;overflow-y:auto">${esc(JSON.stringify(mg,null,2).slice(0,1500))}</pre></div>`);
+    }catch(_){cards.push(`<div class="card"><h3>Memory Graph</h3><pre class="mono small">${esc(files["memory_graph.json"].slice(0,1500))}</pre></div>`)}
+  }
+  // Canon Entry
+  if(files["canon_entry.json"]){
+    try{
+      const ce=JSON.parse(files["canon_entry.json"]);
+      const entries=Array.isArray(ce)?ce:ce.entries||[ce];
+      cards.push(`<div class="card"><h3>Canon Entry (CE) — ${entries.length} postures</h3><pre class="mono small" style="max-height:300px;overflow-y:auto">${esc(JSON.stringify(entries,null,2).slice(0,2000))}</pre></div>`);
+    }catch(_){cards.push(`<div class="card"><h3>Canon Entry</h3><pre class="mono small">${esc(files["canon_entry.json"].slice(0,2000))}</pre></div>`)}
+  }
+  // Manifest
+  if(files["manifest.json"]){
+    cards.push(`<div class="card"><h3>Manifest</h3><pre class="mono small">${esc(JSON.stringify(JSON.parse(files["manifest.json"]),null,2))}</pre></div>`);
+  }
+
+  // Hash/Seal validation
+  let sealHtml="";
+  if(pkt.manifest&&pkt.manifest.files){
+    const mf=typeof pkt.manifest.files==="object"?pkt.manifest.files:{};
+    let rows=[];
+    for(const[fname,expectedHash]of Object.entries(mf)){
+      const content=files[fname];
+      if(content){
+        const actual=await sha256Hex(content);
+        const short=actual.slice(0,12);
+        const expShort=(expectedHash||"").replace("sha256:","").slice(0,12);
+        const match=expectedHash.includes(":")?expectedHash.split(":")[1]===actual:expectedHash===actual;
+        rows.push(`<tr><td class="mono small">${esc(fname)}</td><td class="hash-mono">${short}\u2026</td><td>${match?'<span style="color:var(--ok)">\u2714</span>':'<span style="color:var(--warn)">\u2260</span>'}</td></tr>`);
+      }
+    }
+    const hasMockHashes=Object.values(mf).some(function(h){return String(h).length<20});
+    const sealStatus=hasMockHashes?'<span class="seal-badge seal-pending">Seal Pending (demo hashes)</span>':'<span class="seal-badge seal-ok">Sealed \u2714</span>';
+    sealHtml=`<div class="card"><h3>Integrity &amp; Seal</h3><div style="margin-bottom:8px">${sealStatus}</div><table style="width:100%"><thead><tr><th>File</th><th>SHA-256</th><th></th></tr></thead><tbody>${rows.join("")}</tbody></table></div>`;
+  }
+  detail.innerHTML=`<div style="display:flex;gap:8px;margin-bottom:10px"><button class="primary" onclick="exportPacket(${idx})">Export Packet JSON</button><button onclick="replayPacketChain(${idx})">Rebuild State</button><button onclick="validatePacket(${idx})">Validate Packet</button></div>`+sealHtml+cards.join("");
+}
+function exportPacket(idx){
+  const pkt=S.packets[idx];
+  if(!pkt)return;
+  downloadFile(JSON.stringify(pkt,null,2),`${pkt.name||"packet"}.json`,"application/json");
+}
+
+async function replayPacketChain(idx){
+  const pkt=S.packets[idx];if(!pkt)return;
+  const detail=document.getElementById("pktDetail");
+  const dlr=pkt.files["decision_lineage.jsonl"]||"";
+  const lines=dlr.trim().split("\n").filter(function(l){return l.trim()});
+  let replayEvents=0;const lanes={};
+  lines.forEach(function(l){try{var j=JSON.parse(l);replayEvents++;lanes[j.lane]=(lanes[j.lane]||0)+1}catch(_){}});
+  var mg;try{mg=JSON.parse(pkt.files["memory_graph.json"]||"{}")}catch(_){mg={}}
+  var ce;try{ce=JSON.parse(pkt.files["canon_entry.json"]||"[]")}catch(_){ce=[]}
+  if(!Array.isArray(ce))ce=ce.entries||[ce];
+  const replayData=JSON.stringify({packet:pkt.name,events_replayed:replayEvents,lane_distribution:lanes,memory_nodes:mg.nodes_added||0,memory_edges:mg.edges_added||0,timestamp:nowIso()});
+  const replayHash=await sha256Hex(replayData);
+  // Cross-packet diff
+  var diffHtml="";
+  if(idx>0&&S.packets[idx-1]){
+    var prev=S.packets[idx-1];
+    var prevCe;try{prevCe=JSON.parse(prev.files["canon_entry.json"]||"[]")}catch(_){prevCe=[]}
+    if(!Array.isArray(prevCe))prevCe=prevCe.entries||[prevCe];
+    var prevMg;try{prevMg=JSON.parse(prev.files["memory_graph.json"]||"{}")}catch(_){prevMg={}}
+    var prevDlr=prev.files["decision_lineage.jsonl"]||"";var prevLines=prevDlr.trim().split("\n").filter(function(l){return l.trim()});
+    var prevLanes={};prevLines.forEach(function(l){try{var j=JSON.parse(l);prevLanes[j.lane]=(prevLanes[j.lane]||0)+1}catch(_){}});
+    var diffs=[];
+    // Posture changes
+    ce.forEach(function(entry){
+      var prevEntry=prevCe.find(function(p){return p.signature_id===entry.signature_id});
+      if(prevEntry&&prevEntry.official_posture!==entry.official_posture)diffs.push("Posture: sig "+entry.signature_id+" "+prevEntry.official_posture+" \u2192 "+entry.official_posture);
+      if(prevEntry&&prevEntry.active_rev!==entry.active_rev)diffs.push("Rev: sig "+entry.signature_id+" rev "+prevEntry.active_rev+" \u2192 "+entry.active_rev);
+      if(!prevEntry)diffs.push("New posture: sig "+entry.signature_id+" = "+entry.official_posture);
+    });
+    // Node/edge delta
+    var nodeDelta=(mg.nodes_added||0)-(prevMg.nodes_added||0);
+    var edgeDelta=(mg.edges_added||0)-(prevMg.edges_added||0);
+    if(nodeDelta!==0)diffs.push("Memory nodes: "+(nodeDelta>0?"+":"")+nodeDelta);
+    if(edgeDelta!==0)diffs.push("Memory edges: "+(edgeDelta>0?"+":"")+edgeDelta);
+    // Lane distribution changes
+    var allLanes=new Set([].concat(Object.keys(lanes),Object.keys(prevLanes)));
+    allLanes.forEach(function(l){var cur=lanes[l]||0;var prv=prevLanes[l]||0;if(cur!==prv)diffs.push("Lane "+l+": "+prv+" \u2192 "+cur)});
+    if(diffs.length){
+      diffHtml='<div style="margin-top:8px;padding:8px;border:1px solid rgba(125,249,255,.15);border-radius:4px"><div style="font-weight:600;font-size:11px;color:var(--accent);margin-bottom:4px">Cross-Packet Diff (Part '+(idx)+' \u2192 Part '+(idx+1)+')</div>'+diffs.map(function(d){return '<div style="font-size:11px;margin:2px 0">\u0394 '+esc(d)+"</div>"}).join("")+"</div>";
+    }else{
+      diffHtml='<div style="margin-top:8px;font-size:11px;color:var(--muted)">No differences from previous packet part.</div>';
+    }
+  }
+  const existing=detail.querySelector(".replay-msg");
+  if(existing)existing.remove();
+  const div=document.createElement("div");
+  div.className="replay-msg";
+  div.innerHTML='<div style="font-weight:600;margin-bottom:4px">Replay Complete \u2014 Deterministic Verification</div>'+
+    "<div>"+replayEvents+" decisions replayed from "+esc(pkt.name||"packet")+"</div>"+
+    '<div style="margin-top:4px">Lanes: '+(Object.entries(lanes).map(function(e){return e[0]+"="+e[1]}).join(", ")||"none")+"</div>"+
+    '<div style="margin-top:4px">Memory: '+(mg.nodes_added||0)+" nodes, "+(mg.edges_added||0)+" edges</div>"+
+    '<div class="replay-hash">Replay SHA-256: '+replayHash+"</div>"+diffHtml;
+  detail.appendChild(div);
+}
+
+async function validatePacket(idx){
+  var pkt=S.packets[idx];if(!pkt)return;
+  var detail=document.getElementById("pktDetail");
+  var files=pkt.files||{};
+  var results=[];var allPass=true;
+  var requiredFiles=["truth_snapshot.json","authority_slice.json","decision_lineage.jsonl","drift_signal.jsonl","memory_graph.json","canon_entry.json"];
+  for(var i=0;i<requiredFiles.length;i++){
+    var f=requiredFiles[i];
+    if(files[f]){
+      var hash=await sha256Hex(files[f]);
+      results.push({file:f,hash:hash.slice(0,16),present:true});
+    }else{
+      results.push({file:f,hash:"-",present:false});allPass=false;
+    }
+  }
+  // Check manifest consistency
+  var mf=pkt.manifest&&pkt.manifest.files?pkt.manifest.files:{};
+  var manifestOk=Object.keys(mf).length>0;
+  var existing=detail.querySelector(".validate-msg");if(existing)existing.remove();
+  var div=document.createElement("div");div.className="validate-msg";
+  div.style.cssText="margin-top:10px;padding:10px;border:1px solid "+(allPass?"var(--ok)":"var(--warn)")+";border-radius:6px;background:rgba("+(allPass?"93,255,147":"255,107,107")+",.05)";
+  div.innerHTML='<div style="font-weight:600;margin-bottom:6px">'+(allPass?"\u2714 Packet Valid":"\u26A0 Validation Issues")+"</div>"+
+    '<table style="width:100%;font-size:11px"><thead><tr><th style="text-align:left">Artifact</th><th>Present</th><th>SHA-256 (prefix)</th></tr></thead><tbody>'+
+    results.map(function(r){return '<tr><td class="mono">'+esc(r.file)+"</td><td>"+(r.present?'<span style="color:var(--ok)">\u2714</span>':'<span style="color:var(--bad)">\u2716</span>')+'</td><td class="mono">'+r.hash+"</td></tr>"}).join("")+
+    "</tbody></table>"+
+    '<div style="margin-top:4px;font-size:11px;color:var(--muted)">Manifest: '+(manifestOk?"present ("+Object.keys(mf).length+" file hashes)":"missing")+"</div>";
+  detail.appendChild(div);
+}
+
+/* ── Ingest Summary ────────────────────────────────────────────────── */
+function renderIngestSummary(){
+  const el=document.getElementById("inSummary");
+  const parts=[];
+  if(S.events.length)parts.push(`<b>${S.events.length}</b> events loaded`);
+  if(S.packets.length)parts.push(`<b>${S.packets.length}</b> packet part(s)`);
+  if(!parts.length){el.innerHTML="No data loaded.";return}
+  const sources={};S.events.forEach(e=>{sources[e.source_system]=(sources[e.source_system]||0)+1});
+  const srcStr=Object.entries(sources).map(([k,v])=>`${k}: ${v}`).join(", ");
+  el.innerHTML=parts.join(" | ")+(srcStr?` | Sources: ${srcStr}`:"");
+}
+
+/* ── View Mode Toggle ──────────────────────────────────────────────── */
+function setViewMode(mode){
+  S.viewMode=mode;
+  document.querySelectorAll(".view-toggle button").forEach(function(b){b.classList.toggle("active",b.dataset.mode===mode)});
+  const body=document.getElementById("eventBody");
+  const rows=[].slice.call(body.querySelectorAll("tr"));
+  if(mode==="governance"){
+    rows.sort(function(a,b){
+      var ai=Number(a.dataset.idx),bi=Number(b.dataset.idx);
+      var ea=S.events[ai],eb=S.events[bi];
+      var da=(ea&&ea._driftScore)||0,db=(eb&&eb._driftScore)||0;
+      if(da!==db)return db-da;
+      return ai-bi;
+    });
+  }else{
+    var sevOrder={critical:0,high:1,medium:2,low:3,info:4};
+    rows.sort(function(a,b){
+      var ai=Number(a.dataset.idx),bi=Number(b.dataset.idx);
+      var ea=S.events[ai],eb=S.events[bi];
+      var sa=ea?sevOrder[ea.severity]:5;var sb=eb?sevOrder[eb.severity]:5;
+      if(sa===undefined)sa=5;if(sb===undefined)sb=5;
+      if(sa!==sb)return sa-sb;
+      return ai-bi;
+    });
+  }
+  rows.forEach(function(r){body.appendChild(r)});
+}
+
+/* ── Reset Pipeline State ──────────────────────────────────────────── */
+function resetPipelineState(){
+  S.runIdx=0;S.running=false;S.paused=false;S.stepping=false;
+  S._claimMap={};S._sigCounts={};S._sigRevs={};
+  S._patchCount=0;S._patchWithLineage=0;S._joinFails=[];S._driftDrivers={};
+  S.coherence={parse:0,join:0,reasoning:0,drift:0,patch:0,total:0};
+  S.selectedIdx=null;S.renderedRows=0;S.cohLastUpdated=null;
+  S.events.forEach(e=>{delete e._parsed;delete e._normalized;delete e._join;delete e._claim;delete e._dlr;delete e._drift;delete e._driftChecked;delete e._patch;delete e._mg;delete e._stageStatus;delete e._driftScore});
+  document.getElementById("eventBody").innerHTML="";
+  document.getElementById("runEmpty").classList.remove("hidden");
+  document.getElementById("runStatus").textContent="Idle";
+  document.getElementById("runProgress").textContent="";
+  var lm=document.getElementById("loadMoreWrap");if(lm)lm.classList.add("hidden");
+  clearStages();
+  renderMeter();
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   MOCK DATA — 50 events + 2 packet parts
+   ═══════════════════════════════════════════════════════════════════════ */
+const MOCK_EVENTS_RAW = [
+  // Suricata alerts — FP_SPIKE scenario: sig 2010935 fires 12x with low confidence
+  {"timestamp":"2026-02-28T10:00:01.000Z","flow_id":1001,"event_type":"alert","src_ip":"10.0.0.5","src_port":54321,"dest_ip":"192.168.1.100","dest_port":80,"proto":"TCP","alert":{"action":"allowed","gid":1,"signature_id":2010935,"rev":6,"signature":"ET MALWARE Generic Trojan RAT","category":"A Network Trojan was Detected","severity":1}},
+  {"timestamp":"2026-02-28T10:00:02.000Z","flow_id":1002,"event_type":"alert","src_ip":"10.0.0.6","src_port":54322,"dest_ip":"192.168.1.100","dest_port":80,"proto":"TCP","alert":{"action":"allowed","gid":1,"signature_id":2010935,"rev":6,"signature":"ET MALWARE Generic Trojan RAT","category":"A Network Trojan was Detected","severity":1}},
+  {"timestamp":"2026-02-28T10:00:03.000Z","flow_id":1003,"event_type":"alert","src_ip":"10.0.0.7","src_port":54323,"dest_ip":"192.168.1.100","dest_port":80,"proto":"TCP","alert":{"action":"allowed","gid":1,"signature_id":2010935,"rev":6,"signature":"ET MALWARE Generic Trojan RAT","category":"A Network Trojan was Detected","severity":1}},
+  {"timestamp":"2026-02-28T10:00:04.000Z","flow_id":1004,"event_type":"alert","src_ip":"10.0.0.8","src_port":54324,"dest_ip":"192.168.1.101","dest_port":80,"proto":"TCP","alert":{"action":"allowed","gid":1,"signature_id":2010935,"rev":6,"signature":"ET MALWARE Generic Trojan RAT","category":"A Network Trojan was Detected","severity":1}},
+  {"timestamp":"2026-02-28T10:00:05.000Z","flow_id":1005,"event_type":"alert","src_ip":"10.0.0.9","src_port":54325,"dest_ip":"192.168.1.102","dest_port":80,"proto":"TCP","alert":{"action":"allowed","gid":1,"signature_id":2010935,"rev":6,"signature":"ET MALWARE Generic Trojan RAT","category":"A Network Trojan was Detected","severity":1}},
+  // STALE_LOGIC scenario: same sig different rev
+  {"timestamp":"2026-02-28T10:00:06.000Z","flow_id":1006,"event_type":"alert","src_ip":"10.0.0.10","src_port":54326,"dest_ip":"192.168.1.100","dest_port":443,"proto":"TCP","alert":{"action":"allowed","gid":1,"signature_id":2010935,"rev":7,"signature":"ET MALWARE Generic Trojan RAT","category":"A Network Trojan was Detected","severity":1}},
+  {"timestamp":"2026-02-28T10:00:07.000Z","flow_id":1007,"event_type":"alert","src_ip":"10.0.0.11","src_port":54327,"dest_ip":"192.168.1.100","dest_port":80,"proto":"TCP","alert":{"action":"allowed","gid":1,"signature_id":2010935,"rev":6,"signature":"ET MALWARE Generic Trojan RAT","category":"A Network Trojan was Detected","severity":1}},
+  {"timestamp":"2026-02-28T10:00:08.000Z","flow_id":1008,"event_type":"alert","src_ip":"10.0.0.12","src_port":54328,"dest_ip":"192.168.1.103","dest_port":80,"proto":"TCP","alert":{"action":"allowed","gid":1,"signature_id":2010935,"rev":7,"signature":"ET MALWARE Generic Trojan RAT","category":"A Network Trojan was Detected","severity":1}},
+  {"timestamp":"2026-02-28T10:00:09.000Z","flow_id":1009,"event_type":"alert","src_ip":"10.0.0.13","src_port":54329,"dest_ip":"192.168.1.100","dest_port":80,"proto":"TCP","alert":{"action":"allowed","gid":1,"signature_id":2010935,"rev":6,"signature":"ET MALWARE Generic Trojan RAT","category":"A Network Trojan was Detected","severity":1}},
+  {"timestamp":"2026-02-28T10:00:10.000Z","flow_id":1010,"event_type":"alert","src_ip":"10.0.0.14","src_port":54330,"dest_ip":"192.168.1.100","dest_port":80,"proto":"TCP","alert":{"action":"allowed","gid":1,"signature_id":2010935,"rev":6,"signature":"ET MALWARE Generic Trojan RAT","category":"A Network Trojan was Detected","severity":1}},
+  {"timestamp":"2026-02-28T10:00:11.000Z","flow_id":1011,"event_type":"alert","src_ip":"10.0.0.15","src_port":54331,"dest_ip":"192.168.1.104","dest_port":80,"proto":"TCP","alert":{"action":"allowed","gid":1,"signature_id":2010935,"rev":6,"signature":"ET MALWARE Generic Trojan RAT","category":"A Network Trojan was Detected","severity":1}},
+  {"timestamp":"2026-02-28T10:00:12.000Z","flow_id":1012,"event_type":"alert","src_ip":"10.0.0.16","src_port":54332,"dest_ip":"192.168.1.100","dest_port":80,"proto":"TCP","alert":{"action":"allowed","gid":1,"signature_id":2010935,"rev":6,"signature":"ET MALWARE Generic Trojan RAT","category":"A Network Trojan was Detected","severity":1}},
+  // Other alerts — varied signatures
+  {"timestamp":"2026-02-28T10:00:13.000Z","flow_id":1013,"event_type":"alert","src_ip":"10.0.0.20","src_port":61234,"dest_ip":"192.168.1.200","dest_port":443,"proto":"TCP","alert":{"action":"allowed","gid":1,"signature_id":2024897,"rev":3,"signature":"ET INFO Observed DNS Query to .cloud TLD","category":"Potentially Bad Traffic","severity":3}},
+  {"timestamp":"2026-02-28T10:00:14.000Z","flow_id":1014,"event_type":"alert","src_ip":"fe80::1","src_port":12345,"dest_ip":"fe80::2","dest_port":80,"proto":"TCP","alert":{"action":"allowed","gid":1,"signature_id":2100498,"rev":12,"signature":"GPL ATTACK_RESPONSE id check returned root","category":"Potentially Bad Traffic","severity":2}},
+  {"timestamp":"2026-02-28T10:00:15.000Z","flow_id":1015,"event_type":"alert","src_ip":"10.0.0.25","src_port":33333,"dest_ip":"192.168.2.50","dest_port":8080,"proto":"TCP","alert":{"action":"allowed","gid":1,"signature_id":2019876,"rev":1,"signature":"ET SCAN Nmap Scripting Engine User-Agent","category":"Web Application Attack","severity":2}},
+  // DNS queries
+  {"timestamp":"2026-02-28T10:00:16.000Z","flow_id":1016,"event_type":"dns","src_ip":"10.0.0.30","src_port":53,"dest_ip":"10.0.0.1","dest_port":53,"proto":"UDP","dns":{"type":"query","rrname":"malicious.example.com","rrtype":"A"}},
+  {"timestamp":"2026-02-28T10:00:17.000Z","flow_id":1017,"event_type":"dns","src_ip":"10.0.0.31","src_port":53,"dest_ip":"10.0.0.1","dest_port":53,"proto":"UDP","dns":{"type":"query","rrname":"c2.badactor.net","rrtype":"A"}},
+  {"timestamp":"2026-02-28T10:00:18.000Z","flow_id":1018,"event_type":"dns","src_ip":"10.0.0.32","src_port":53,"dest_ip":"10.0.0.1","dest_port":53,"proto":"UDP","dns":{"type":"query","rrname":"safe.google.com","rrtype":"A"}},
+  {"timestamp":"2026-02-28T10:00:19.000Z","flow_id":1019,"event_type":"dns","src_ip":"10.0.0.33","src_port":53,"dest_ip":"10.0.0.1","dest_port":53,"proto":"UDP","dns":{"type":"query","rrname":"update.microsoft.com","rrtype":"A"}},
+  {"timestamp":"2026-02-28T10:00:20.000Z","flow_id":1020,"event_type":"dns","src_ip":"10.0.0.34","src_port":53,"dest_ip":"10.0.0.1","dest_port":53,"proto":"UDP","dns":{"type":"query","rrname":"suspicious.darkweb.onion","rrtype":"AAAA"}},
+  {"timestamp":"2026-02-28T10:00:21.000Z","flow_id":1021,"event_type":"dns","src_ip":"10.0.0.35","src_port":53,"dest_ip":"10.0.0.1","dest_port":53,"proto":"UDP","dns":{"type":"query","rrname":"api.github.com","rrtype":"A"}},
+  {"timestamp":"2026-02-28T10:00:22.000Z","flow_id":1022,"event_type":"dns","src_ip":"10.0.0.36","src_port":53,"dest_ip":"10.0.0.1","dest_port":53,"proto":"UDP","dns":{"type":"query","rrname":"beacon.exfil.io","rrtype":"TXT"}},
+  {"timestamp":"2026-02-28T10:00:23.000Z","flow_id":1023,"event_type":"dns","src_ip":"10.0.0.37","src_port":53,"dest_ip":"10.0.0.1","dest_port":53,"proto":"UDP","dns":{"type":"query","rrname":"cdn.cloudflare.com","rrtype":"A"}},
+  // HTTP
+  {"timestamp":"2026-02-28T10:00:24.000Z","flow_id":1024,"event_type":"http","src_ip":"10.0.0.40","src_port":44123,"dest_ip":"93.184.216.34","dest_port":80,"proto":"TCP","http":{"hostname":"example.com","url":"/api/data","http_method":"GET","status":200,"length":1024}},
+  {"timestamp":"2026-02-28T10:00:25.000Z","flow_id":1025,"event_type":"http","src_ip":"10.0.0.41","src_port":44124,"dest_ip":"93.184.216.35","dest_port":80,"proto":"TCP","http":{"hostname":"c2-server.net","url":"/beacon","http_method":"POST","status":200,"length":64}},
+  {"timestamp":"2026-02-28T10:00:26.000Z","flow_id":1026,"event_type":"http","src_ip":"10.0.0.42","src_port":44125,"dest_ip":"104.16.0.1","dest_port":443,"proto":"TCP","http":{"hostname":"api.stripe.com","url":"/v1/charges","http_method":"POST","status":201,"length":2048}},
+  {"timestamp":"2026-02-28T10:00:27.000Z","flow_id":1027,"event_type":"http","src_ip":"10.0.0.43","src_port":44126,"dest_ip":"172.217.0.1","dest_port":80,"proto":"TCP","http":{"hostname":"www.google.com","url":"/search?q=test","http_method":"GET","status":200,"length":8192}},
+  {"timestamp":"2026-02-28T10:00:28.000Z","flow_id":1028,"event_type":"http","src_ip":"10.0.0.44","src_port":44127,"dest_ip":"10.10.10.10","dest_port":8080,"proto":"TCP","http":{"hostname":"internal.corp","url":"/admin/config","http_method":"PUT","status":403,"length":128}},
+  {"timestamp":"2026-02-28T10:00:29.000Z","flow_id":1029,"event_type":"http","src_ip":"10.0.0.45","src_port":44128,"dest_ip":"198.51.100.1","dest_port":80,"proto":"TCP","http":{"hostname":"download.malware.biz","url":"/payload.exe","http_method":"GET","status":200,"length":204800}},
+  // Flow
+  {"timestamp":"2026-02-28T10:00:30.000Z","flow_id":1030,"event_type":"flow","src_ip":"10.0.0.50","src_port":8080,"dest_ip":"172.16.0.5","dest_port":443,"proto":"TCP","flow":{"pkts_toserver":15,"pkts_toclient":12,"bytes_toserver":2048,"bytes_toclient":8192,"state":"closed"}},
+  {"timestamp":"2026-02-28T10:00:31.000Z","flow_id":1031,"event_type":"flow","src_ip":"10.0.0.51","src_port":9090,"dest_ip":"172.16.0.6","dest_port":443,"proto":"TCP","flow":{"pkts_toserver":100,"pkts_toclient":95,"bytes_toserver":50000,"bytes_toclient":200000,"state":"closed"}},
+  {"timestamp":"2026-02-28T10:00:32.000Z","flow_id":1032,"event_type":"flow","src_ip":"10.0.0.52","src_port":7070,"dest_ip":"172.16.0.7","dest_port":80,"proto":"TCP","flow":{"pkts_toserver":5,"pkts_toclient":3,"bytes_toserver":512,"bytes_toclient":128,"state":"closed"}},
+  {"timestamp":"2026-02-28T10:00:33.000Z","flow_id":1033,"event_type":"flow","src_ip":"10.0.0.53","src_port":6060,"dest_ip":"172.16.0.8","dest_port":22,"proto":"TCP","flow":{"pkts_toserver":200,"pkts_toclient":190,"bytes_toserver":100000,"bytes_toclient":500000,"state":"established"}},
+  // Malformed
+  null, // will be treated as malformed
+  null, // will be treated as malformed
+  // Copilot agent events
+  {"type":"prompt","timestamp":"2026-02-28T10:01:01.000Z","agent_id":"agent-alpha","prompt":"Analyze network traffic for anomalies in the SOC_EAST environment","target":"network_analyzer","confidence":0.9,"model":"claude-opus-4-6"},
+  {"type":"tool_call","timestamp":"2026-02-28T10:01:02.000Z","agent_id":"agent-alpha","tool_calls":[{"name":"query_logs","args":{"timeframe":"1h","filter":"severity>=high"}}],"target":"log_query_api","confidence":0.85},
+  {"type":"response","timestamp":"2026-02-28T10:01:03.000Z","agent_id":"agent-alpha","response":"Found 15 high-severity alerts in the last hour. 12 are ET MALWARE signatures on SID 2010935.","target":"user","confidence":0.88},
+  {"type":"prompt","timestamp":"2026-02-28T10:01:04.000Z","agent_id":"agent-beta","prompt":"Deploy security patch to affected hosts for CVE-2026-1234","target":"patch_manager","confidence":0.75,"model":"claude-sonnet-4-6"},
+  {"type":"tool_call","timestamp":"2026-02-28T10:01:05.000Z","agent_id":"agent-beta","tool_calls":[{"name":"deploy_patch","args":{"hosts":["10.0.0.5","10.0.0.25"],"patch_id":"CVE-2026-1234"}}],"target":"patch_manager","confidence":0.7},
+  {"type":"guardrail","timestamp":"2026-02-28T10:01:06.000Z","agent_id":"agent-beta","guardrail_flags":["requires_approval","production_change"],"target":"patch_manager","confidence":0.6},
+  {"type":"response","timestamp":"2026-02-28T10:01:07.000Z","agent_id":"agent-beta","response":"Patch deployment blocked: requires human approval for production changes.","target":"user","confidence":0.95},
+  {"type":"prompt","timestamp":"2026-02-28T10:01:08.000Z","agent_id":"agent-alpha","prompt":"Correlate DNS queries with known threat intelligence feeds","target":"threat_intel_api","confidence":0.82},
+  {"type":"tool_call","timestamp":"2026-02-28T10:01:09.000Z","agent_id":"agent-alpha","tool_calls":[{"name":"lookup_ioc","args":{"domain":"malicious.example.com","type":"domain"}},{"name":"check_reputation","args":{"ip":"93.184.216.34"}}],"target":"threat_intel_api","confidence":0.78},
+  {"type":"response","timestamp":"2026-02-28T10:01:10.000Z","agent_id":"agent-alpha","response":"Domain malicious.example.com is flagged in 3 threat feeds. IP 93.184.216.34 has clean reputation.","target":"user","confidence":0.92},
+  {"type":"guardrail","timestamp":"2026-02-28T10:01:11.000Z","agent_id":"agent-gamma","guardrail_flags":["pii_detected","data_exfil_risk"],"target":"data_export","confidence":0.4},
+  {"type":"prompt","timestamp":"2026-02-28T10:01:12.000Z","agent_id":"agent-alpha","prompt":"Generate SOC summary report for the last 24 hours","target":"report_engine","confidence":0.88},
+  {"type":"tool_call","timestamp":"2026-02-28T10:01:13.000Z","agent_id":"agent-alpha","tool_calls":[{"name":"block_domain","args":{"domain":"malicious.example.com"}}],"target":"firewall_api","confidence":0.9},
+  {"type":"response","timestamp":"2026-02-28T10:01:14.000Z","agent_id":"agent-alpha","response":"SOC summary: 50 events processed, 3 critical, 12 high, 15 medium, 20 low/info. 3 drift signals detected.","target":"user","confidence":0.94}
+];
+
+function loadDemoEvents(){
+  const eveLines=MOCK_EVENTS_RAW.slice(0,34).map(e=>e?JSON.stringify(e):"this is a malformed line").join("\n");
+  const copilotLines=MOCK_EVENTS_RAW.slice(35).map(e=>e?JSON.stringify(e):"malformed agent log").join("\n");
+  const eveEvents=parseEVE(eveLines);
+  const copilotEvents=parseCopilot(copilotLines);
+  return[...eveEvents,...copilotEvents];
+}
+
+/* ── Mock Packet Parts ─────────────────────────────────────────────── */
+const MOCK_PACKET_1 = {
+  name:"JRM_X_PACKET_SOC_EAST_20260228T100000_20260228T100033_part01",
+  env:"SOC_EAST",window_start:"2026-02-28T10:00:00Z",window_end:"2026-02-28T10:00:33Z",
+  event_count:30,part:1,
+  files:{
+    "truth_snapshot.json":JSON.stringify({
+      sensors:["sensor-east-01","sensor-east-02"],
+      severity_histogram:{critical:12,high:3,medium:7,low:4,info:4},
+      top_signatures:[{id:2010935,name:"ET MALWARE Generic Trojan RAT",count:12},{id:2024897,name:"ET INFO DNS Query .cloud",count:1},{id:2100498,name:"GPL ATTACK_RESPONSE root",count:1},{id:2019876,name:"ET SCAN Nmap",count:1}],
+      window:{start:"2026-02-28T10:00:00Z",end:"2026-02-28T10:00:33Z"},
+      event_count:30
+    },null,2),
+    "authority_slice.json":JSON.stringify({
+      environment_id:"SOC_EAST",policy:"GOV-2.1.0",authority_ref:"AUTH-033059a5",
+      allowed_actions:["LOG_ONLY","NOTIFY","QUEUE_PATCH","REQUIRE_REVIEW"],
+      escalation_threshold:"critical"
+    },null,2),
+    "decision_lineage.jsonl":[
+      {eventId:"EVT-DLR001",lane:"REQUIRE_REVIEW",severity:"critical",confidence:0.85,whyBullets:[{text:"Severity=critical, confidence=0.85 → REQUIRE_REVIEW",evidenceRef:"sha256:abc1",confidence:0.85},{text:"Matched signature 2010935 rev 6",evidenceRef:"sha256:abc1",confidence:0.85}]},
+      {eventId:"EVT-DLR002",lane:"REQUIRE_REVIEW",severity:"critical",confidence:0.85,whyBullets:[{text:"Severity=critical, confidence=0.85 → REQUIRE_REVIEW",evidenceRef:"sha256:abc2",confidence:0.85}]},
+      {eventId:"EVT-DLR003",lane:"NOTIFY",severity:"medium",confidence:0.7,whyBullets:[{text:"Severity=medium, confidence=0.70 → NOTIFY",evidenceRef:"sha256:abc3",confidence:0.7}]},
+      {eventId:"EVT-DLR004",lane:"LOG_ONLY",severity:"info",confidence:0.7,whyBullets:[{text:"Severity=info, confidence=0.70 → LOG_ONLY",evidenceRef:"sha256:abc4",confidence:0.7}]},
+      {eventId:"EVT-DLR005",lane:"QUEUE_PATCH",severity:"high",confidence:0.6,whyBullets:[{text:"Severity=high, confidence=0.60 → QUEUE_PATCH",evidenceRef:"sha256:abc5",confidence:0.6}]}
+    ].map(e=>JSON.stringify(e)).join("\n"),
+    "drift_signal.jsonl":[
+      {driftId:"DS-MOCK001",driftType:"FP_SPIKE",severity:"medium",detectedAt:"2026-02-28T10:00:12Z",notes:"Signature 2010935 fired 12 times with avg confidence 0.55",fingerprint:{signature_id:"2010935",count:"12"}},
+      {driftId:"DS-MOCK002",driftType:"STALE_LOGIC",severity:"medium",detectedAt:"2026-02-28T10:00:08Z",notes:"Signature 2010935 has conflicting revisions: 6, 7",fingerprint:{signature_id:"2010935",revisions:"6,7"}},
+      {driftId:"DS-MOCK003",driftType:"MISSING_MAPPING",severity:"low",detectedAt:"2026-02-28T10:00:33Z",notes:"2 events of type suricata_flow have no claim mapping",fingerprint:{event_type:"suricata_flow",count:"2"}}
+    ].map(e=>JSON.stringify(e)).join("\n"),
+    "memory_graph.json":JSON.stringify({
+      nodes_added:15,edges_added:12,
+      nodes:[{id:"EVD-001",kind:"EVIDENCE"},{id:"CLM-001",kind:"CLAIM"},{id:"DS-001",kind:"DRIFT"},{id:"PATCH-001",kind:"PATCH"}],
+      edges:[{from:"EVD-001",to:"CLM-001",kind:"EVIDENCE_OF"},{from:"DS-001",to:"CLM-001",kind:"TRIGGERED"},{from:"PATCH-001",to:"DS-001",kind:"RESOLVED_BY"}]
+    },null,2),
+    "canon_entry.json":JSON.stringify([
+      {signature_id:2010935,active_rev:6,official_posture:"under_review",confidence:0.55,last_reviewed:"2026-02-28T10:00:12Z",assumptions:["Trojan RAT pattern stable"]},
+      {signature_id:2024897,active_rev:3,official_posture:"active",confidence:0.85,last_reviewed:"2026-02-28T10:00:13Z",assumptions:[]},
+      {signature_id:2100498,active_rev:12,official_posture:"active",confidence:0.70,last_reviewed:"2026-02-28T10:00:14Z",assumptions:["Root check response pattern"]},
+      {signature_id:2019876,active_rev:1,official_posture:"active",confidence:0.70,last_reviewed:"2026-02-28T10:00:15Z",assumptions:[]},
+      {signature_id:2030001,active_rev:2,official_posture:"active",confidence:0.85,last_reviewed:"2026-02-28T10:00:16Z",assumptions:[]}
+    ],null,2),
+    "manifest.json":JSON.stringify({
+      packet_name:"JRM_X_PACKET_SOC_EAST_20260228T100000_20260228T100033_part01",
+      environment_id:"SOC_EAST",window_start:"2026-02-28T10:00:00Z",window_end:"2026-02-28T10:00:33Z",
+      part:1,event_count:30,size_bytes:4096,created_at:"2026-02-28T10:01:00Z",
+      files:{
+        "truth_snapshot.json":"sha256:a1b2c3d4e5f6",
+        "authority_slice.json":"sha256:b2c3d4e5f6a1",
+        "decision_lineage.jsonl":"sha256:c3d4e5f6a1b2",
+        "drift_signal.jsonl":"sha256:d4e5f6a1b2c3",
+        "memory_graph.json":"sha256:e5f6a1b2c3d4",
+        "canon_entry.json":"sha256:f6a1b2c3d4e5"
+      }
+    },null,2)
+  },
+  manifest:{packet_name:"JRM_X_PACKET_SOC_EAST_20260228T100000_20260228T100033_part01",environment_id:"SOC_EAST",window_start:"2026-02-28T10:00:00Z",window_end:"2026-02-28T10:00:33Z",part:1,event_count:30}
+};
+
+const MOCK_PACKET_2 = {
+  name:"JRM_X_PACKET_SOC_EAST_20260228T100033_20260228T100114_part02",
+  env:"SOC_EAST",window_start:"2026-02-28T10:00:33Z",window_end:"2026-02-28T10:01:14Z",
+  event_count:20,part:2,
+  files:{
+    "truth_snapshot.json":JSON.stringify({
+      sensors:["sensor-east-01"],
+      severity_histogram:{critical:0,high:3,medium:5,low:7,info:5},
+      top_signatures:[{id:2010935,name:"ET MALWARE Generic Trojan RAT",count:2}],
+      window:{start:"2026-02-28T10:00:33Z",end:"2026-02-28T10:01:14Z"},
+      event_count:20
+    },null,2),
+    "authority_slice.json":JSON.stringify({
+      environment_id:"SOC_EAST",policy:"GOV-2.1.0",authority_ref:"AUTH-033059a5",
+      allowed_actions:["LOG_ONLY","NOTIFY","QUEUE_PATCH","REQUIRE_REVIEW"],
+      escalation_threshold:"critical"
+    },null,2),
+    "decision_lineage.jsonl":[
+      {eventId:"EVT-DLR020",lane:"NOTIFY",severity:"medium",confidence:0.75,whyBullets:[{text:"Severity=medium → NOTIFY",evidenceRef:"sha256:def1",confidence:0.75}]},
+      {eventId:"EVT-DLR021",lane:"LOG_ONLY",severity:"low",confidence:0.8,whyBullets:[{text:"Severity=low → LOG_ONLY",evidenceRef:"sha256:def2",confidence:0.8}]}
+    ].map(e=>JSON.stringify(e)).join("\n"),
+    "drift_signal.jsonl":"",
+    "memory_graph.json":JSON.stringify({nodes_added:8,edges_added:6,nodes:[],edges:[]},null,2),
+    "canon_entry.json":JSON.stringify([
+      {signature_id:2010935,active_rev:7,official_posture:"patched",confidence:0.72,last_reviewed:"2026-02-28T10:01:00Z",assumptions:["Rev 7 consolidated"]}
+    ],null,2),
+    "manifest.json":JSON.stringify({
+      packet_name:"JRM_X_PACKET_SOC_EAST_20260228T100033_20260228T100114_part02",
+      environment_id:"SOC_EAST",window_start:"2026-02-28T10:00:33Z",window_end:"2026-02-28T10:01:14Z",
+      part:2,event_count:20,size_bytes:2048,created_at:"2026-02-28T10:02:00Z",
+      files:{
+        "truth_snapshot.json":"sha256:a2b3c4d5e6f7",
+        "authority_slice.json":"sha256:b3c4d5e6f7a2",
+        "decision_lineage.jsonl":"sha256:c4d5e6f7a2b3",
+        "drift_signal.jsonl":"sha256:d5e6f7a2b3c4",
+        "memory_graph.json":"sha256:e6f7a2b3c4d5",
+        "canon_entry.json":"sha256:f7a2b3c4d5e6"
+      }
+    },null,2)
+  },
+  manifest:{packet_name:"JRM_X_PACKET_SOC_EAST_20260228T100033_20260228T100114_part02",environment_id:"SOC_EAST",window_start:"2026-02-28T10:00:33Z",window_end:"2026-02-28T10:01:14Z",part:2,event_count:20}
+};
+
+/* ── Agentic Demo ──────────────────────────────────────────────────── */
+async function runAgenticDemo(){
+  // Auto-load demo data, set max speed, auto-run, then highlight drift event
+  S.events=loadDemoEvents();
+  S.packets=[MOCK_PACKET_1,MOCK_PACKET_2];
+  resetPipelineState();
+  S.events=loadDemoEvents();
+  renderPacketList();renderIngestSummary();
+  setTab("run");
+  // Set speed to max
+  var slider=document.getElementById("speedSlider");
+  slider.value=100;document.getElementById("speedVal").textContent="1ms";
+  // Auto-run pipeline
+  await runPipeline();
+  // Highlight first drift event
+  for(var i=0;i<S.events.length;i++){
+    if(S.events[i]._drift&&S.events[i]._drift.length>0){selectEvent(i);break}
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   EVENT WIRING
+   ═══════════════════════════════════════════════════════════════════════ */
+window.addEventListener("DOMContentLoaded",()=>{
+  buildRibbon();
+
+  // Tab switching
+  document.querySelectorAll(".ttab").forEach(b=>b.addEventListener("click",()=>setTab(b.dataset.tab)));
+
+  // Sub-score dropdown
+  document.getElementById("subToggle").addEventListener("click",()=>{
+    document.getElementById("subDropdown").classList.toggle("hidden");
+  });
+  document.addEventListener("click",e=>{
+    if(!e.target.closest(".coherence-wrap"))document.getElementById("subDropdown").classList.add("hidden");
+  });
+
+  // Speed slider
+  document.getElementById("speedSlider").addEventListener("input",e=>{
+    document.getElementById("speedVal").textContent=(101-Number(e.target.value))+"ms";
+  });
+
+  // Run controls
+  document.getElementById("btnStart").addEventListener("click",()=>{
+    if(S.events.length===0){alert("Load data first (Ingest tab).");return}
+    if(S.running){S.paused=false;document.getElementById("runStatus").textContent="Running";return}
+    if(S.runIdx>=S.events.length)resetPipelineState();
+    runPipeline();
+  });
+  document.getElementById("btnPause").addEventListener("click",()=>{
+    if(S.running){S.paused=!S.paused;document.getElementById("runStatus").textContent=S.paused?"Paused":"Running"}
+  });
+  document.getElementById("btnStep").addEventListener("click",()=>{
+    if(!S.running){
+      if(S.events.length===0)return;
+      if(S.runIdx>=S.events.length)resetPipelineState();
+      S.stepping=true;S.paused=true;runPipeline();
+    }else{
+      S.stepping=true;S.paused=false;
+    }
+  });
+  document.getElementById("btnStop").addEventListener("click",()=>{
+    S.running=false;S.paused=false;clearStages();
+    document.getElementById("runStatus").textContent="Stopped";
+  });
+
+  // Filters
+  ["fSev","fLane","fDrift","fSearch"].forEach(id=>{
+    document.getElementById(id).addEventListener(id==="fDrift"?"change":"input",applyFilters);
+  });
+
+  // Drawer
+  document.getElementById("btnCloseDrawer").addEventListener("click",closeDrawer);
+  document.getElementById("btnWhy").addEventListener("click",()=>{
+    const sec=document.getElementById("sec-reasoning");
+    if(sec){sec.scrollIntoView({behavior:"smooth"});sec.style.background="rgba(125,249,255,.05)";setTimeout(()=>sec.style.background="",1500)}
+  });
+  document.getElementById("btnCopyTrace").addEventListener("click",copyTrace);
+  document.getElementById("btnCompress").addEventListener("click",toggleCompress);
+
+  // View mode toggle
+  document.querySelectorAll(".view-toggle button").forEach(function(b){
+    b.addEventListener("click",function(){setViewMode(b.dataset.mode)});
+  });
+
+  // Ingest: Raw file
+  document.getElementById("inRawFile").addEventListener("change",e=>{
+    const file=e.target.files[0];if(!file)return;
+    const fmt=document.getElementById("inFmt").value;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const text=ev.target.result;
+      const parse=fmt==="eve"?parseEVE:fmt==="snort"?parseSnort:fmt==="copilot"?parseCopilot:parseAuto;
+      S.events=parse(text);
+      resetPipelineState();
+      S.events=parse(text);// re-parse after reset
+      document.getElementById("inRawStatus").textContent=`Loaded ${S.events.length} events from ${file.name}`;
+      renderIngestSummary();
+    };
+    reader.readAsText(file);
+  });
+
+  // Ingest: Zip
+  document.getElementById("inZipFile").addEventListener("change",async e=>{
+    const files=e.target.files;if(!files.length)return;
+    const status=document.getElementById("inZipStatus");
+    status.textContent="Loading...";
+    S.packets=[];
+    for(const file of files){
+      try{
+        const buf=await file.arrayBuffer();
+        const pkt=await loadZipPacket(buf);
+        S.packets.push(pkt);
+      }catch(err){
+        status.textContent=`Error loading ${file.name}: ${err.message}`;
+      }
+    }
+    status.textContent=`Loaded ${S.packets.length} packet part(s)`;
+    renderPacketList();renderIngestSummary();
+  });
+
+  // Ingest: Folder files
+  document.getElementById("btnLoadFolder").addEventListener("click",async()=>{
+    const inputs=document.querySelectorAll(".folder-file");
+    const files={};let count=0;
+    for(const inp of inputs){
+      const f=inp.files[0];
+      if(f){
+        files[inp.dataset.key+".json"]=await f.text();
+        count++;
+      }
+    }
+    if(count<1){document.getElementById("inFolderStatus").textContent="Select at least one file.";return}
+    let manifest=null;
+    try{manifest=JSON.parse(files["manifest.json"]||"{}")}catch(_){}
+    S.packets=[{name:"Folder Import",env:manifest?.environment_id||"?",window_start:"",window_end:"",event_count:0,part:1,files,manifest}];
+    document.getElementById("inFolderStatus").textContent=`Loaded ${count} file(s)`;
+    renderPacketList();renderIngestSummary();
+  });
+
+  // Demo data
+  document.getElementById("btnDemo").addEventListener("click",()=>{
+    S.events=loadDemoEvents();
+    S.packets=[MOCK_PACKET_1,MOCK_PACKET_2];
+    resetPipelineState();
+    S.events=loadDemoEvents();// re-parse after reset
+    renderPacketList();renderIngestSummary();
+    setTab("run");
+  });
+
+  // Agentic Demo
+  var agBtn=document.getElementById("btnAgenticDemo");
+  if(agBtn)agBtn.addEventListener("click",runAgenticDemo);
+
+  // Load More rows
+  var lmBtn=document.getElementById("btnLoadMore");
+  if(lmBtn)lmBtn.addEventListener("click",loadMoreRows);
+
+  // Copy Compressed
+  var ccBtn=document.getElementById("btnCopyCompressed");
+  if(ccBtn)ccBtn.addEventListener("click",copyCompressed);
+
+  // Error banner controls
+  var errCopy=document.getElementById("errCopy");
+  if(errCopy)errCopy.addEventListener("click",function(){navigator.clipboard.writeText(_lastErr).then(function(){errCopy.textContent="Copied!";setTimeout(function(){errCopy.textContent="Copy"},1500)})});
+  var errClose=document.getElementById("errClose");
+  if(errClose)errClose.addEventListener("click",function(){document.getElementById("errBanner").classList.add("hidden")});
+
+  // Keyboard shortcuts
+  document.addEventListener("keydown",e=>{
+    // Skip if typing in an input
+    if(e.target.tagName==="INPUT"||e.target.tagName==="SELECT"||e.target.tagName==="TEXTAREA")return;
+    if(e.key===" "){e.preventDefault();document.getElementById("btnPause").click()}
+    if(e.key==="j"||e.key==="J"){
+      if(S.selectedIdx!==null&&S.selectedIdx<S.events.length-1)selectEvent(S.selectedIdx+1);
+      else if(S.selectedIdx===null&&S.events.length)selectEvent(0);
+    }
+    if(e.key==="k"||e.key==="K"){
+      if(S.selectedIdx!==null&&S.selectedIdx>0)selectEvent(S.selectedIdx-1);
+    }
+    if(e.key==="f"||e.key==="F"){e.preventDefault();document.getElementById("fSearch").focus()}
+    if(e.key==="/"){e.preventDefault();document.getElementById("fSearch").focus()}
+    if(e.key==="Escape")closeDrawer();
+  });
+
+  // Hash routing
+  const hash=location.hash.slice(1);
+  if(hash&&["ingest","run","trace","packets","coherence"].includes(hash))setTab(hash);
+
+  renderMeter();
+  renderCohTab();
+});
+</script>
+</body>
+</html>

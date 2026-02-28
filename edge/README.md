@@ -113,6 +113,7 @@ flowchart TD
 | `EDGE_AwardStaffing_Estimator_v1.2.0.html` | 1.2.0 | `award_staffing` | Award staffing allocation and cost estimation |
 | `EDGE_Suite_ReadOnly_v1.0.0.html` | 1.0.0 | `suite_readonly` | Read-only wrapper with telemetry and rollup export |
 | `EDGE_JRM_EDGE_v1.0.0.html` | 1.0.0 | `jrm` | JRM pipeline visualizer — 9-stage ribbon, coherence meter, trace drawer, packet viewer |
+| `EDGE_JRM_EDGE_v1.0.1.html` | 1.0.1 | `jrm` | JRM EDGE enhanced — error guard, stage timestamps, refined drift heat, agentic demo, packet validation, cross-packet diff, table pagination |
 
 ### Supporting Files
 
