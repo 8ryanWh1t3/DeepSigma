@@ -69,8 +69,8 @@ def register_jrm_commands(subparsers: argparse._SubParsersAction) -> None:
 
 
 def cmd_jrm_ingest(args: argparse.Namespace) -> None:
-    from .adapters.registry import get_adapter
-    from .types import JRMEvent
+    from core.jrm.adapters.registry import get_adapter
+    from core.jrm.types import JRMEvent
 
     AdapterCls = get_adapter(args.adapter)
     adapter = AdapterCls()
@@ -235,7 +235,7 @@ def cmd_jrm_validate(args: argparse.Namespace) -> None:
 
 
 def cmd_jrm_adapters(args: argparse.Namespace) -> None:
-    from .adapters.registry import list_adapters
+    from core.jrm.adapters.registry import list_adapters
 
     adapters = list_adapters()
     if args.json_output:
