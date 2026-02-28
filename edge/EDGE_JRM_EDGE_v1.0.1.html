@@ -255,11 +255,11 @@
     Deep Sigma EDGE — JRM EDGE
     <small>Judgment Refinement Module | v1.0.1</small>
   </div>
-  <div class="stage-ribbon" id="stageRibbon"></div>
+  <div class="stage-ribbon" id="stageRibbon" role="status" aria-label="Pipeline stage progress"></div>
   <div class="coherence-wrap">
     <div>
       <div class="meter-label">Coherence</div>
-      <div class="meter-ring" id="meterMain">0</div>
+      <div class="meter-ring" id="meterMain" role="meter" aria-label="Coherence score" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">0</div>
     </div>
     <button class="sub-toggle" id="subToggle" title="Sub-scores">▾</button>
     <div class="sub-dropdown hidden" id="subDropdown">
@@ -444,8 +444,8 @@
 
 <!-- ═══════════════ VIEW MODE TOGGLE ═══════════════ -->
 <div class="view-toggle">
-  <button class="vt-soc active" data-mode="soc">SOC</button>
-  <button class="vt-gov" data-mode="governance">Governance</button>
+  <button class="vt-soc active" data-mode="soc" aria-label="SOC view mode">SOC</button>
+  <button class="vt-gov" data-mode="governance" aria-label="Governance view mode">Governance</button>
 </div>
 
 <script>
@@ -564,7 +564,7 @@ function renderMeter(){
   const c=S.coherence;
   const cls=c.total>=75?"green":c.total>=50?"yellow":"red";
   const m=document.getElementById("meterMain");
-  m.textContent=c.total;m.className="meter-ring "+cls;
+  m.textContent=c.total;m.className="meter-ring "+cls;m.setAttribute("aria-valuenow",c.total);
   const bm=document.getElementById("bigMeter");
   if(bm){bm.textContent=c.total;bm.className="big-meter "+cls}
   document.getElementById("subParse").textContent=c.parse;
@@ -936,7 +936,8 @@ async function runPipeline(){
     _t0=Date.now(); setStage("PATCH"); evt._patch=buildPatch(evt); ss.PATCH={ok:!!evt._patch,t:_t0,reason:evt._patch?null:"no drift to patch"}; await sleep(Math.max(1,delay/9));
     _t0=Date.now(); setStage("MEMORY"); evt._mg=updateMemory(evt); ss.MEMORY={ok:true,t:_t0,reason:null}; await sleep(Math.max(1,delay/9));
     evt._stageStatus=ss;
-    evt._driftScore=(function(){if(!evt._drift||evt._drift.length===0)return 0;var hc=evt._drift.some(function(d){return d.severity==="critical"});var hr=evt._dlr&&evt._dlr.lane==="REQUIRE_REVIEW";if(hc||hr)return 5;var hh=evt._drift.some(function(d){return d.severity==="high"});if(hh||evt._drift.length>=2)return 3;return 1})();
+    // Drift heat scale: 0=none, 1=mild, 3=drift emitted (DS exists), 5=requires review or SEV-1
+    evt._driftScore=(function(){if(!evt._drift||evt._drift.length===0)return 0;var hc=evt._drift.some(function(d){return d&&d.severity==="critical"});var hr=evt._dlr&&evt._dlr.lane==="REQUIRE_REVIEW";if(hc||hr)return 5;var hh=evt._drift.some(function(d){return d&&d.severity==="high"});if(hh||evt._drift.length>=2)return 3;return 1})();
 
     appendEventRow(evt,i);
     updateCoherence(i+1,S.events.length);
@@ -954,7 +955,7 @@ function appendEventRow(evt,idx){
   S.renderedRows++;
   if(S.renderedRows>S.ROW_CAP){
     var wrap=document.getElementById("loadMoreWrap");if(wrap)wrap.classList.remove("hidden");
-    var msg=document.getElementById("rowCapMsg");if(msg)msg.textContent="Showing "+S.ROW_CAP+" of "+S.renderedRows+" events";
+    var msg=document.getElementById("loadMoreMsg");if(msg)msg.textContent="Showing "+S.ROW_CAP+" of "+S.renderedRows+" events";
     return;
   }
   _renderRow(evt,idx);
@@ -979,10 +980,11 @@ function loadMoreRows(){
   }
   S.ROW_CAP=newCap;
   if(newCap>=S.renderedRows){document.getElementById("loadMoreWrap").classList.add("hidden")}
-  else{document.getElementById("rowCapMsg").textContent="Showing "+newCap+" of "+S.renderedRows+" events"}
+  else{document.getElementById("loadMoreMsg").textContent="Showing "+newCap+" of "+S.renderedRows+" events"}
 }
 
 function selectEvent(idx){
+  if(idx<0||idx>=S.events.length)return;
   S.selectedIdx=idx;
   document.querySelectorAll("#eventBody tr").forEach(r=>{
     r.classList.toggle("selected",Number(r.dataset.idx)===idx);
@@ -1365,7 +1367,8 @@ async function selectPacket(idx){
         const actual=await sha256Hex(content);
         const short=actual.slice(0,12);
         const expShort=(expectedHash||"").replace("sha256:","").slice(0,12);
-        const match=expectedHash.includes(":")?expectedHash.split(":")[1]===actual:expectedHash===actual;
+        const expVal=expectedHash.includes(":")?expectedHash.split(":").slice(1).join(":"):expectedHash;
+        const match=expVal&&expVal.length>0&&expVal===actual;
         rows.push(`<tr><td class="mono small">${esc(fname)}</td><td class="hash-mono">${short}\u2026</td><td>${match?'<span style="color:var(--ok)">\u2714</span>':'<span style="color:var(--warn)">\u2260</span>'}</td></tr>`);
       }
     }
@@ -1419,7 +1422,7 @@ async function replayPacketChain(idx){
     var allLanes=new Set([].concat(Object.keys(lanes),Object.keys(prevLanes)));
     allLanes.forEach(function(l){var cur=lanes[l]||0;var prv=prevLanes[l]||0;if(cur!==prv)diffs.push("Lane "+l+": "+prv+" \u2192 "+cur)});
     if(diffs.length){
-      diffHtml='<div style="margin-top:8px;padding:8px;border:1px solid rgba(125,249,255,.15);border-radius:4px"><div style="font-weight:600;font-size:11px;color:var(--accent);margin-bottom:4px">Cross-Packet Diff (Part '+(idx)+' \u2192 Part '+(idx+1)+')</div>'+diffs.map(function(d){return '<div style="font-size:11px;margin:2px 0">\u0394 '+esc(d)+"</div>"}).join("")+"</div>";
+      diffHtml='<div style="margin-top:8px;padding:8px;border:1px solid rgba(125,249,255,.15);border-radius:4px"><div style="font-weight:600;font-size:11px;color:var(--accent);margin-bottom:4px">Cross-Packet Diff (Part '+(prev.part||idx)+' \u2192 Part '+(pkt.part||(idx+1))+')</div>'+diffs.map(function(d){return '<div style="font-size:11px;margin:2px 0">\u0394 '+esc(d)+"</div>"}).join("")+"</div>";
     }else{
       diffHtml='<div style="margin-top:8px;font-size:11px;color:var(--muted)">No differences from previous packet part.</div>';
     }
@@ -1698,7 +1701,6 @@ const MOCK_PACKET_2 = {
 /* ── Agentic Demo ──────────────────────────────────────────────────── */
 async function runAgenticDemo(){
   // Auto-load demo data, set max speed, auto-run, then highlight drift event
-  S.events=loadDemoEvents();
   S.packets=[MOCK_PACKET_1,MOCK_PACKET_2];
   resetPipelineState();
   S.events=loadDemoEvents();
@@ -1837,10 +1839,9 @@ window.addEventListener("DOMContentLoaded",()=>{
 
   // Demo data
   document.getElementById("btnDemo").addEventListener("click",()=>{
-    S.events=loadDemoEvents();
     S.packets=[MOCK_PACKET_1,MOCK_PACKET_2];
     resetPipelineState();
-    S.events=loadDemoEvents();// re-parse after reset
+    S.events=loadDemoEvents();
     renderPacketList();renderIngestSummary();
     setTab("run");
   });
