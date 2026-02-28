@@ -1,4 +1,4 @@
-# Nonlinear Stability Report — v2.0.13
+# Nonlinear Stability Report — v2.0.14
 
 ## A) System Stability Index (SSI) Math
 
@@ -10,9 +10,9 @@ Where each component is normalized to `0..100` (higher is more stable):
 - Authority sensitivity score: authority strength and authority volatility penalty
 - Economic variance score: TEC spread ratio and economic KPI variance penalty
 
-- SSI: **46.84**
+- SSI: **51.0**
 - Confidence: **0.8**
-- Band: **[42.84, 50.84]**
+- Band: **[47.0, 55.0]**
 
 ## B) Instability Gating Thresholds
 
@@ -20,56 +20,56 @@ Where each component is normalized to `0..100` (higher is more stable):
 - `WARN`: 55 <= SSI < 70 or 0.55 <= drift_acceleration_index < 0.75
 - `FAIL`: SSI < 55 or drift_acceleration_index >= 0.75
 
-- Current drift_acceleration_index: **0.952**
+- Current drift_acceleration_index: **0.8655**
 - Current gate: **FAIL**
 
 ## C) Forecasted Radar Movement (Stability-Adjusted)
 
 ### v2.1.0 (active)
-- Factors: roadmap_confidence=0.69, drift_factor=0.619
+- Factors: roadmap_confidence=0.69, drift_factor=0.654
 | KPI | Adjusted Delta |
 |---|---:|
-| technical_completeness | 0.10 |
-| automation_depth | 0.51 |
-| authority_modeling | 0.13 |
+| technical_completeness | 0.11 |
+| automation_depth | 0.54 |
+| authority_modeling | 0.14 |
 | enterprise_readiness | 0.00 |
 | scalability | 0.00 |
 | data_integration | 0.00 |
-| economic_measurability | 0.51 |
-| operational_maturity | 0.51 |
+| economic_measurability | 0.54 |
+| operational_maturity | 0.54 |
 
 ### v2.1.1 (dormant)
-- Factors: roadmap_confidence=0.41, drift_factor=0.619
+- Factors: roadmap_confidence=0.41, drift_factor=0.654
 | KPI | Adjusted Delta |
 |---|---:|
 | technical_completeness | 0.05 |
 | automation_depth | 0.00 |
-| authority_modeling | 0.23 |
-| enterprise_readiness | 0.18 |
+| authority_modeling | 0.24 |
+| enterprise_readiness | 0.19 |
 | scalability | 0.17 |
-| data_integration | 0.30 |
+| data_integration | 0.32 |
 | economic_measurability | 0.00 |
-| operational_maturity | 0.30 |
+| operational_maturity | 0.32 |
 
-## D) v2.0.13 Instability Simulation
+## D) v2.0.14 Instability Simulation
 
 Scenario stress-tests on the current release baseline:
 
 ### Mild
 - Description: single-cycle turbulence with constrained spread
-- Projected SSI: **30.34**
+- Projected SSI: **34.5**
 - Projected drift_acceleration_index: **1.0**
 - Gate: **FAIL**
 
 ### Moderate
 - Description: broad system stress and governance lag
-- Projected SSI: **25.84**
+- Projected SSI: **30.0**
 - Projected drift_acceleration_index: **1.0**
 - Gate: **FAIL**
 
 ### Severe
 - Description: compound drift with authority + economic instability
-- Projected SSI: **20.17**
+- Projected SSI: **24.33**
 - Projected drift_acceleration_index: **1.0**
 - Gate: **FAIL**
 

@@ -2,6 +2,18 @@
 
 All contract surface changes are logged here with compatibility annotations.
 
+## v2.0.14 — Evidence + Economic
+
+`COMPATIBLE:` Evidence source binding schema + validator (#393), economic cost ledger with per-decision tracking and drift-to-patch delta (#392). Evidence binding maps KPI artifacts to source files with SHA-256 hashes. SSI stability release — zero KPI movement.
+
+### Migration
+
+**Affected schemas**: None (new additive schema only)
+**Consumer action**: None — new evidence_source_binding.schema.json is optional.
+**Rollback**: Yes — additive scripts + schema only.
+
+---
+
 ## v2.0.13 — DISR Closure
 
 `COMPATIBLE:` Authority ledger verify_chain() and detect_replay() (#327), audit summary export mode for export_authority_ledger.py (#326 streaming re-encrypt checkpoint already complete), DISR provider abstraction confirmed with 5 providers (#324). DISR architecture epic #313 closed. SSI stability release — zero KPI movement.

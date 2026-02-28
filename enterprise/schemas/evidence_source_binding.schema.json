@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Evidence Source Binding",
+  "description": "Maps KPI evidence artifacts to their source systems and validation status.",
+  "type": "object",
+  "required": ["schema", "generated_at", "bindings"],
+  "properties": {
+    "schema": {
+      "const": "evidence_source_binding_v1"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "bindings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["evidence_id", "source_type", "source_path", "hash"],
+        "properties": {
+          "evidence_id": {
+            "type": "string",
+            "description": "Unique identifier for this evidence artifact"
+          },
+          "source_type": {
+            "type": "string",
+            "enum": ["file", "api", "computed"],
+            "description": "How the evidence was obtained"
+          },
+          "source_path": {
+            "type": "string",
+            "description": "Relative path or URI to the source artifact"
+          },
+          "hash": {
+            "type": "string",
+            "description": "SHA-256 hash of the source content"
+          },
+          "kpi_targets": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Which KPIs this evidence supports"
+          },
+          "validated": {
+            "type": "boolean",
+            "description": "Whether the source was validated at bind time"
+          }
+        }
+      }
+    }
+  }
+}
