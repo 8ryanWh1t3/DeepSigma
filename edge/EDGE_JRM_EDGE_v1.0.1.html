@@ -237,9 +237,80 @@
     .load-more-wrap{text-align:center;padding:10px}
     .load-more-wrap button{font-size:12px;padding:6px 20px}
     .row-cap-msg{color:var(--muted);font-size:11px;margin-top:4px}
+
+    /* ── Toast Notifications ───────────────────── */
+    .toast-wrap{position:fixed;bottom:60px;right:18px;z-index:8000;display:flex;flex-direction:column-reverse;gap:6px;pointer-events:none}
+    .toast{pointer-events:auto;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.5);animation:toastIn .25s ease-out,toastOut .3s ease-in 2.7s forwards;max-width:340px}
+    .toast-ok{background:rgba(93,255,147,.12);border:1px solid rgba(93,255,147,.3);color:var(--ok)}
+    .toast-warn{background:rgba(255,204,102,.1);border:1px solid rgba(255,204,102,.3);color:var(--warn)}
+    .toast-info{background:rgba(125,249,255,.08);border:1px solid rgba(125,249,255,.2);color:var(--accent)}
+    @keyframes toastIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes toastOut{from{opacity:1}to{opacity:0;transform:translateY(-8px)}}
+
+    /* ── Progress Bar ──────────────────────────── */
+    .progress-wrap{height:3px;background:rgba(125,249,255,.08);border-radius:2px;margin-top:6px;overflow:hidden}
+    .progress-bar{height:100%;width:0%;background:var(--accent);border-radius:2px;transition:width .15s linear}
+
+    /* ── Onboarding Overlay ────────────────────── */
+    .onboard-overlay{position:fixed;inset:0;z-index:7000;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center}
+    .onboard-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px 32px;max-width:520px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+    .onboard-card h2{margin:0 0 14px;color:var(--accent);font-size:18px}
+    .onboard-steps{list-style:none;padding:0;margin:0 0 18px}
+    .onboard-steps li{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;font-size:13px;line-height:1.5}
+    .onboard-step-num{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:rgba(125,249,255,.12);border:1px solid rgba(125,249,255,.3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent)}
+    .onboard-actions{display:flex;align-items:center;gap:12px}
+    .onboard-dismiss{font-size:11px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:4px}
+
+    /* ── Shortcut Bar ──────────────────────────── */
+    .shortcut-bar{position:fixed;bottom:0;left:0;right:0;z-index:150;background:rgba(11,15,20,.92);border-top:1px solid var(--line);padding:4px 16px;display:flex;align-items:center;gap:14px;font-size:10px;color:var(--muted);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+    .shortcut-bar kbd{display:inline-block;padding:1px 5px;border-radius:3px;background:rgba(125,249,255,.08);border:1px solid rgba(125,249,255,.15);font-family:inherit;font-size:10px;color:var(--accent);margin:0 1px}
+    .shortcut-bar .shortcut-close{margin-left:auto;cursor:pointer;padding:2px 6px;color:var(--muted);font-size:12px}
+
+    /* ── Row Click Hint ────────────────────────── */
+    .row-hint{text-align:center;padding:4px;font-size:10px;color:var(--muted);opacity:.7;transition:opacity .3s}
+    #eventBody tr{cursor:pointer}
+    #eventBody tr:hover{background:rgba(125,249,255,.04)}
+
+    /* ── Speed Slider Labels ───────────────────── */
+    .speed-labels{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted)}
+    .speed-labels .speed-end{opacity:.6}
+
+    /* ── Tab Step Numbers ──────────────────────── */
+    .ttab .step-num{display:inline-block;width:16px;height:16px;border-radius:50%;background:rgba(125,249,255,.08);font-size:9px;line-height:16px;text-align:center;color:var(--accent);margin-right:4px;font-weight:700}
+    .ttab.active .step-num{background:rgba(125,249,255,.2)}
   </style>
 </head>
 <body>
+
+<!-- ── Toast Container ── -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- ── Onboarding Overlay (hidden after first dismiss) ── -->
+<div class="onboard-overlay" id="onboardOverlay" style="display:none">
+  <div class="onboard-card">
+    <h2>Welcome to JRM EDGE</h2>
+    <p style="color:var(--muted);font-size:12px;margin:0 0 16px">This tool visualizes events flowing through a 9-stage Judgment Refinement pipeline. Here's how to get started:</p>
+    <ol class="onboard-steps">
+      <li><span class="onboard-step-num">1</span><div><strong>Ingest</strong> — Load raw logs (EVE, Snort, Copilot) or JRM-X packet zips. Or click <em>Use Embedded Demo Data</em> to explore with sample data.</div></li>
+      <li><span class="onboard-step-num">2</span><div><strong>Run</strong> — Press Start to stream events through RAW &rarr; PARSE &rarr; &hellip; &rarr; MEMORY. Watch the stage ribbon animate and coherence score update in real time.</div></li>
+      <li><span class="onboard-step-num">3</span><div><strong>Explore</strong> — Click any table row to open the trace drawer. Use the Trace, Packets, and Coherence tabs for deeper inspection.</div></li>
+    </ol>
+    <div class="onboard-actions">
+      <button class="primary" id="onboardStart" style="padding:8px 20px">Get Started</button>
+      <button class="ok" id="onboardDemo" style="padding:8px 20px">Load Demo Data</button>
+      <label class="onboard-dismiss"><input type="checkbox" id="onboardDontShow"/> Don't show again</label>
+    </div>
+  </div>
+</div>
+
+<!-- ── Shortcut Bar ── -->
+<div class="shortcut-bar" id="shortcutBar">
+  <span><kbd>Space</kbd> Pause/Resume</span>
+  <span><kbd>J</kbd><kbd>K</kbd> Navigate rows</span>
+  <span><kbd>F</kbd> or <kbd>/</kbd> Search</span>
+  <span><kbd>Esc</kbd> Close drawer</span>
+  <span class="shortcut-close" id="shortcutClose" title="Hide shortcut bar">&times;</span>
+</div>
 
 <!-- ── Error Banner (hidden by default) ── -->
 <div class="err-banner hidden" id="errBanner">
@@ -259,7 +330,7 @@
   <div class="coherence-wrap">
     <div>
       <div class="meter-label">Coherence</div>
-      <div class="meter-ring" id="meterMain" role="meter" aria-label="Coherence score" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">0</div>
+      <div class="meter-ring" id="meterMain" role="meter" aria-label="Coherence score" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" title="75+ = Good | 50-74 = Warning | &lt;50 = Critical. Click &#9662; for sub-scores.">0</div>
     </div>
     <button class="sub-toggle" id="subToggle" title="Sub-scores">▾</button>
     <div class="sub-dropdown hidden" id="subDropdown">
@@ -275,11 +346,11 @@
 
 <!-- ═══════════════ TABS ═══════════════ -->
 <div class="tabs">
-  <button class="ttab active" data-tab="ingest">Ingest</button>
-  <button class="ttab" data-tab="run">Run Console</button>
-  <button class="ttab" data-tab="trace">Trace</button>
-  <button class="ttab" data-tab="packets">Packet Viewer</button>
-  <button class="ttab" data-tab="coherence">Coherence</button>
+  <button class="ttab active" data-tab="ingest"><span class="step-num">1</span>Ingest</button>
+  <button class="ttab" data-tab="run"><span class="step-num">2</span>Run</button>
+  <button class="ttab" data-tab="trace"><span class="step-num">3</span>Trace</button>
+  <button class="ttab" data-tab="packets"><span class="step-num">4</span>Packets</button>
+  <button class="ttab" data-tab="coherence"><span class="step-num">5</span>Coherence</button>
 </div>
 
 <!-- ═══════════════ MAIN ═══════════════ -->
@@ -352,13 +423,17 @@
         <button id="btnStep">⏭ Step</button>
         <button id="btnStop" class="danger">⏹ Stop</button>
         <div class="sep"></div>
-        <span class="speed-label">Speed</span>
-        <input type="range" id="speedSlider" class="speed-slider" min="1" max="100" value="50"/>
-        <span id="speedVal" class="muted small">50ms</span>
+        <div class="speed-labels">
+          <span class="speed-end">Slow</span>
+          <input type="range" id="speedSlider" class="speed-slider" min="1" max="100" value="50"/>
+          <span class="speed-end">Fast</span>
+          <span id="speedVal" class="muted small" style="margin-left:4px">50ms</span>
+        </div>
         <div class="sep"></div>
         <span id="runStatus" class="muted small">Idle</span>
         <span id="runProgress" class="muted small" style="margin-left:auto"></span>
       </div>
+      <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
       <div class="filters">
         <select id="fSev"><option value="">All Severities</option><option>critical</option><option>high</option><option>medium</option><option>low</option><option>info</option></select>
         <select id="fLane"><option value="">All Lanes</option><option>REQUIRE_REVIEW</option><option>QUEUE_PATCH</option><option>NOTIFY</option><option>LOG_ONLY</option></select>
@@ -373,7 +448,8 @@
           <tbody id="eventBody"></tbody>
         </table>
       </div>
-      <div id="runEmpty" class="muted" style="text-align:center;padding:30px">Load data and press Start to begin pipeline simulation.</div>
+      <div class="row-hint" id="rowHint" style="display:none">Click any row to open the trace drawer &nbsp;|&nbsp; <kbd style="font-size:10px;padding:1px 4px;border-radius:3px;background:rgba(125,249,255,.08);border:1px solid rgba(125,249,255,.15);color:var(--accent)">J</kbd> <kbd style="font-size:10px;padding:1px 4px;border-radius:3px;background:rgba(125,249,255,.08);border:1px solid rgba(125,249,255,.15);color:var(--accent)">K</kbd> to navigate</div>
+      <div id="runEmpty" class="muted" style="text-align:center;padding:30px">No data loaded yet. <button onclick="setTab('ingest')" style="background:none;border:none;color:var(--accent);cursor:pointer;text-decoration:underline;font-size:inherit">Go to Ingest</button> to load events, then press <strong>Start</strong>.</div>
       <div class="load-more-wrap hidden" id="loadMoreWrap">
         <button id="btnLoadMore">Load More Rows</button>
         <div class="row-cap-msg" id="loadMoreMsg"></div>
@@ -382,7 +458,7 @@
 
     <!-- ── Trace Tab (full-width) ── -->
     <section id="tab-trace" class="hidden">
-      <div id="traceFullView" class="muted" style="text-align:center;padding:30px">Select an event from the Run Console or click a table row to view its trace.</div>
+      <div id="traceFullView" class="muted" style="text-align:center;padding:30px">Run the pipeline on the <button onclick="setTab('run')" style="background:none;border:none;color:var(--accent);cursor:pointer;text-decoration:underline;font-size:inherit">Run</button> tab, then click any event row to view its full 9-stage trace here.</div>
     </section>
 
     <!-- ── Packet Viewer Tab ── -->
@@ -390,7 +466,7 @@
       <div style="margin-bottom:8px;font-size:12px"><span class="tier-badge tier-core">CORE</span> <strong>JRM-X Packet (6 artifacts)</strong> &mdash; time-windowed decision snapshots. Multiple parts form a <strong>Packet Chain</strong> (not a single forever-archive).</div>
       <div class="pkt-split">
         <div class="pkt-list" id="pktList">
-          <div class="muted" style="padding:10px">No packets loaded.</div>
+          <div class="muted" style="padding:10px">No packets loaded. <button onclick="setTab('ingest')" style="background:none;border:none;color:var(--accent);cursor:pointer;text-decoration:underline;font-size:inherit">Load JRM-X packets</button> from the Ingest tab.</div>
         </div>
         <div class="pkt-detail" id="pktDetail">
           <div class="muted" style="padding:10px">Select a packet part to view its contents.</div>
@@ -466,6 +542,26 @@ window.addEventListener("unhandledrejection",function(e){
   _lastErr=msg;
   var b=document.getElementById("errBanner");if(b){b.classList.remove("hidden");document.getElementById("errMsg").textContent=msg;document.getElementById("errLoc").textContent="promise"}
 });
+
+/* ── Toast Notifications ───────────────────────────────────────────── */
+function showToast(msg,type){
+  type=type||"info";
+  var wrap=document.getElementById("toastWrap");if(!wrap)return;
+  var el=document.createElement("div");el.className="toast toast-"+type;el.textContent=msg;
+  wrap.appendChild(el);
+  setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el)},3200);
+}
+
+/* ── Onboarding ────────────────────────────────────────────────────── */
+function showOnboarding(){
+  try{if(localStorage.getItem("ds_jrm_edge_onboard")==="dismissed")return}catch(_){}
+  var overlay=document.getElementById("onboardOverlay");if(overlay)overlay.style.display="";
+}
+function dismissOnboarding(){
+  var overlay=document.getElementById("onboardOverlay");if(overlay)overlay.style.display="none";
+  var cb=document.getElementById("onboardDontShow");
+  if(cb&&cb.checked){try{localStorage.setItem("ds_jrm_edge_onboard","dismissed")}catch(_){}}
+}
 
 /* ── Seeded RNG (deterministic demo) ───────────────────────────────── */
 var _seed=20260228;
@@ -911,6 +1007,8 @@ async function runPipeline(){
   S.running=true;S.paused=false;
   document.getElementById("runStatus").textContent="Running";
   document.getElementById("runEmpty").classList.add("hidden");
+  var rowHint=document.getElementById("rowHint");if(rowHint)rowHint.style.display="";
+  var pBar=document.getElementById("progressBar");if(pBar)pBar.style.width="0%";
 
   for(let i=S.runIdx;i<S.events.length;i++){
     if(!S.running)break;
@@ -943,11 +1041,15 @@ async function runPipeline(){
     updateCoherence(i+1,S.events.length);
     S.runIdx=i+1;
     document.getElementById("runProgress").textContent=`${i+1} / ${S.events.length}`;
+    var _pct=Math.round(((i+1)/S.events.length)*100);
+    var _pb=document.getElementById("progressBar");if(_pb)_pb.style.width=_pct+"%";
   }
 
   S.running=false;
   clearStages();
+  var _pbDone=document.getElementById("progressBar");if(_pbDone)_pbDone.style.width=S.runIdx>=S.events.length?"100%":"0%";
   document.getElementById("runStatus").textContent=S.runIdx>=S.events.length?"Complete":"Stopped";
+  if(S.runIdx>=S.events.length)showToast("Pipeline complete \u2014 "+S.events.length+" events processed","ok");
 }
 
 /* ── Event Table Rendering ─────────────────────────────────────────── */
@@ -1201,7 +1303,7 @@ function copyCompressed(){
   var text="RAW: "+raw+"\nNORMAL: "+normalized+"\nDECISION: lane="+lane+" | drift="+drifts+" | "+canon;
   navigator.clipboard.writeText(text).then(function(){
     var btn=document.getElementById("btnCopyCompressed");
-    btn.textContent="Copied!";setTimeout(function(){btn.textContent="Copy Compressed"},1500);
+    btn.textContent="Copied!";setTimeout(function(){btn.textContent="Copy Compressed"},1500);showToast("Compressed trace copied to clipboard","ok");
   });
 }
 function renderCompressView(evt){
@@ -1250,7 +1352,7 @@ function copyTrace(){
   };
   navigator.clipboard.writeText(JSON.stringify(trace,null,2)).then(()=>{
     const btn=document.getElementById("btnCopyTrace");
-    btn.textContent="Copied!";setTimeout(()=>btn.textContent="Copy Trace",1500);
+    btn.textContent="Copied!";setTimeout(()=>btn.textContent="Copy Trace",1500);showToast("Full trace copied to clipboard","ok");
   });
 }
 
@@ -1382,6 +1484,7 @@ function exportPacket(idx){
   const pkt=S.packets[idx];
   if(!pkt)return;
   downloadFile(JSON.stringify(pkt,null,2),`${pkt.name||"packet"}.json`,"application/json");
+  showToast("Packet exported as JSON","ok");
 }
 
 async function replayPacketChain(idx){
@@ -1466,6 +1569,7 @@ async function validatePacket(idx){
     "</tbody></table>"+
     '<div style="margin-top:4px;font-size:11px;color:var(--muted)">Manifest: '+(manifestOk?"present ("+Object.keys(mf).length+" file hashes)":"missing")+"</div>";
   detail.appendChild(div);
+  showToast(allPass?"Packet validation passed":"Packet has validation issues",allPass?"ok":"warn");
 }
 
 /* ── Ingest Summary ────────────────────────────────────────────────── */
@@ -1843,6 +1947,7 @@ window.addEventListener("DOMContentLoaded",()=>{
     resetPipelineState();
     S.events=loadDemoEvents();
     renderPacketList();renderIngestSummary();
+    showToast("Demo data loaded \u2014 50 events + 2 packets","info");
     setTab("run");
   });
 
@@ -1860,7 +1965,7 @@ window.addEventListener("DOMContentLoaded",()=>{
 
   // Error banner controls
   var errCopy=document.getElementById("errCopy");
-  if(errCopy)errCopy.addEventListener("click",function(){navigator.clipboard.writeText(_lastErr).then(function(){errCopy.textContent="Copied!";setTimeout(function(){errCopy.textContent="Copy"},1500)})});
+  if(errCopy)errCopy.addEventListener("click",function(){navigator.clipboard.writeText(_lastErr).then(function(){errCopy.textContent="Copied!";setTimeout(function(){errCopy.textContent="Copy error"},1500);showToast("Error details copied","info")})});
   var errClose=document.getElementById("errClose");
   if(errClose)errClose.addEventListener("click",function(){document.getElementById("errBanner").classList.add("hidden")});
 
@@ -1884,6 +1989,24 @@ window.addEventListener("DOMContentLoaded",()=>{
   // Hash routing
   const hash=location.hash.slice(1);
   if(hash&&["ingest","run","trace","packets","coherence"].includes(hash))setTab(hash);
+
+  // Onboarding
+  var onStart=document.getElementById("onboardStart");
+  if(onStart)onStart.addEventListener("click",dismissOnboarding);
+  var onDemo=document.getElementById("onboardDemo");
+  if(onDemo)onDemo.addEventListener("click",function(){
+    dismissOnboarding();
+    document.getElementById("btnDemo").click();
+  });
+  showOnboarding();
+
+  // Shortcut bar dismiss
+  var scClose=document.getElementById("shortcutClose");
+  if(scClose)scClose.addEventListener("click",function(){
+    document.getElementById("shortcutBar").style.display="none";
+    try{localStorage.setItem("ds_jrm_edge_shortcuts","hidden")}catch(_){}
+  });
+  try{if(localStorage.getItem("ds_jrm_edge_shortcuts")==="hidden"){var sb=document.getElementById("shortcutBar");if(sb)sb.style.display="none"}}catch(_){}
 
   renderMeter();
   renderCohTab();
