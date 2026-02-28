@@ -617,17 +617,23 @@ def cmd_feeds_claim_validate(args: argparse.Namespace) -> None:
         })
 
     all_valid = all(r["valid"] for r in all_results)
+    # Hard fail only on red-severity issues (contradictions); yellow = warning
+    has_red = any(
+        issue.get("severity") == "red"
+        for r in all_results
+        for issue in r.get("issues", [])
+    )
     if getattr(args, "json", False):
         print(json.dumps({"valid": all_valid, "results": all_results}, indent=2))
     else:
-        status = "PASS" if all_valid else "FAIL"
+        status = "PASS" if all_valid else ("FAIL" if has_red else "WARN")
         print(f"Claim Validation: {status}")
         for r in all_results:
             if not r["valid"]:
                 for issue in r["issues"]:
                     print(f"  [{r['claimId']}] {issue['type']}: {issue['detail']}")
 
-    sys.exit(0 if all_valid else 1)
+    sys.exit(1 if has_red else 0)
 
 
 def cmd_feeds_claim_submit(args: argparse.Namespace) -> None:
