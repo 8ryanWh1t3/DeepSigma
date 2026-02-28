@@ -46,6 +46,10 @@ class DriftType(str, Enum):
     missing_policy = "missing_policy"
     low_claim_coverage = "low_claim_coverage"
     stale_reference = "stale_reference"
+    # Fairness drift types (hybrid — signals from external fairness tools)
+    demographic_parity_violation = "demographic_parity_violation"
+    disparate_impact = "disparate_impact"
+    fairness_metric_degradation = "fairness_metric_degradation"
 
 
 class ItemStatus(str, Enum):

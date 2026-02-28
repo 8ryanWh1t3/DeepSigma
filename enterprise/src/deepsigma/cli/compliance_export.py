@@ -52,10 +52,30 @@ def register(subparsers: argparse._SubParsersAction) -> None:
         help="Strip user identifiers from export artifacts",
     )
     export.add_argument("--json", action="store_true", help="Print run summary as JSON")
+    export.add_argument(
+        "--encrypt",
+        action="store_true",
+        help="Encrypt output artifacts at rest (requires DEEPSIGMA_ENCRYPTION_KEY)",
+    )
+    export.add_argument(
+        "--schedule",
+        metavar="DAYS",
+        type=int,
+        help="Auto-export mode: export the last N days of evidence (cron-friendly)",
+    )
     export.set_defaults(func=run_export)
 
 
 def run_export(args: argparse.Namespace) -> int:
+    # --schedule N: auto-compute date window as last N days
+    if getattr(args, "schedule", None):
+        today = date.today()
+        from_dt = today - __import__("datetime").timedelta(days=args.schedule)
+        to_dt = today
+        if not args.from_date:
+            args.from_date = from_dt.isoformat()
+        if not args.to_date:
+            args.to_date = to_dt.isoformat()
     from_dt = _parse_date(args.from_date, flag="--from")
     to_dt = _parse_date(args.to_date, flag="--to")
     if from_dt > to_dt:
@@ -109,11 +129,24 @@ def run_export(args: argparse.Namespace) -> int:
         },
     )
 
+    # --encrypt: encrypt all output artifacts at rest
+    encrypted_files: list[str] = []
+    if getattr(args, "encrypt", False):
+        from governance.encryption import FileEncryptor
+
+        enc = FileEncryptor()
+        if enc.enabled:
+            for child in out_dir.iterdir():
+                if child.is_file() and not child.name.endswith(".enc"):
+                    enc.encrypt_file(child)
+                    encrypted_files.append(child.name + ".enc")
+
     result = {
         "tenant_id": tenant_id,
         "window": {"from": from_dt.date().isoformat(), "to": to_dt.date().isoformat()},
         "output_dir": str(out_dir),
         "redacted": bool(args.redact),
+        "encrypted": bool(encrypted_files),
         "files": [
             "audit_log.json",
             "audit_log.csv",
@@ -123,7 +156,7 @@ def run_export(args: argparse.Namespace) -> int:
             "tenant_configuration.json",
             "data_flow_diagram.mmd",
             "compliance_summary.md",
-        ],
+        ] + encrypted_files,
     }
     if args.json:
         print(json.dumps(result, indent=2))

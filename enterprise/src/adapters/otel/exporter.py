@@ -29,17 +29,31 @@ from adapters.otel.spans import (
     ATTR_EPISODE_DECISION_TYPE,
     ATTR_EPISODE_DEGRADE_STEP,
     ATTR_EPISODE_ID,
+    ATTR_LLM_COMPLETION_TOKENS,
+    ATTR_LLM_LATENCY_MS,
+    ATTR_LLM_MODEL,
+    ATTR_LLM_PROMPT_TOKENS,
+    ATTR_LLM_TOTAL_TOKENS,
     ATTR_PHASE_DURATION_MS,
     ATTR_PHASE_NAME,
+    ATTR_TOOL_DURATION_MS,
+    ATTR_TOOL_NAME,
+    ATTR_TOOL_STATUS,
+    ATTR_TOOL_VERSION,
     EVENT_DEGRADE_TRIGGERED,
     METRIC_COHERENCE_SCORE,
     METRIC_DRIFT_TOTAL,
     METRIC_EPISODE_LATENCY_MS,
     METRIC_EPISODES_TOTAL,
+    METRIC_LLM_LATENCY_MS,
+    METRIC_LLM_TOKENS_TOTAL,
+    METRIC_TOOL_LATENCY_MS,
     SPAN_COHERENCE_EVAL,
     SPAN_DECISION_EPISODE,
     SPAN_DRIFT_EVENT,
+    SPAN_LLM_COMPLETION,
     SPAN_PHASE_PREFIX,
+    SPAN_TOOL_CALL,
 )
 
 logger = logging.getLogger(__name__)
@@ -157,6 +171,21 @@ class OtelExporter:
             description="Total number of drift events",
             unit="1",
         )
+        self._tool_latency_histogram = self._meter.create_histogram(
+            name=METRIC_TOOL_LATENCY_MS,
+            description="Per-tool-call latency in milliseconds",
+            unit="ms",
+        )
+        self._llm_latency_histogram = self._meter.create_histogram(
+            name=METRIC_LLM_LATENCY_MS,
+            description="Per-LLM-call latency in milliseconds",
+            unit="ms",
+        )
+        self._llm_tokens_counter = self._meter.create_counter(
+            name=METRIC_LLM_TOKENS_TOTAL,
+            description="Total LLM tokens consumed",
+            unit="1",
+        )
         self._meter.create_observable_gauge(
             name=METRIC_COHERENCE_SCORE,
             description="Latest coherence score (0-100)",
@@ -267,3 +296,55 @@ class OtelExporter:
                     f"{ATTR_COHERENCE_DIMENSION_PREFIX}.{dim.get('name', 'unknown')}",
                     dim.get("score", 0.0),
                 )
+
+    def export_tool_call(self, tool: Dict[str, Any]) -> None:
+        """Export a tool invocation as an OTel span + latency histogram.
+
+        Args:
+            tool: Dict with keys: tool_name, tool_version, status, duration_ms.
+        """
+        if not self._tracer:
+            return
+
+        tool_name = tool.get("tool_name", "unknown")
+        duration_ms = tool.get("duration_ms", 0)
+
+        with self._tracer.start_as_current_span(SPAN_TOOL_CALL) as span:
+            span.set_attribute(ATTR_TOOL_NAME, tool_name)
+            span.set_attribute(ATTR_TOOL_VERSION, tool.get("tool_version", ""))
+            span.set_attribute(ATTR_TOOL_STATUS, tool.get("status", "unknown"))
+            span.set_attribute(ATTR_TOOL_DURATION_MS, duration_ms)
+
+            if tool.get("status") == "error":
+                span.set_status(StatusCode.ERROR, tool.get("error", ""))
+
+        if self._tool_latency_histogram and duration_ms > 0:
+            self._tool_latency_histogram.record(duration_ms, {"tool_name": tool_name})
+
+    def export_llm_call(self, llm: Dict[str, Any]) -> None:
+        """Export an LLM API call as an OTel span + token counter + latency histogram.
+
+        Args:
+            llm: Dict with keys: model, prompt_tokens, completion_tokens,
+                 total_tokens, latency_ms.
+        """
+        if not self._tracer:
+            return
+
+        model = llm.get("model", "unknown")
+        prompt_tokens = llm.get("prompt_tokens", 0)
+        completion_tokens = llm.get("completion_tokens", 0)
+        total_tokens = llm.get("total_tokens", prompt_tokens + completion_tokens)
+        latency_ms = llm.get("latency_ms", 0)
+
+        with self._tracer.start_as_current_span(SPAN_LLM_COMPLETION) as span:
+            span.set_attribute(ATTR_LLM_MODEL, model)
+            span.set_attribute(ATTR_LLM_PROMPT_TOKENS, prompt_tokens)
+            span.set_attribute(ATTR_LLM_COMPLETION_TOKENS, completion_tokens)
+            span.set_attribute(ATTR_LLM_TOTAL_TOKENS, total_tokens)
+            span.set_attribute(ATTR_LLM_LATENCY_MS, latency_ms)
+
+        if self._llm_tokens_counter and total_tokens > 0:
+            self._llm_tokens_counter.add(total_tokens, {"model": model})
+        if self._llm_latency_histogram and latency_ms > 0:
+            self._llm_latency_histogram.record(latency_ms, {"model": model})
