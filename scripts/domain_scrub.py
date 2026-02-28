@@ -80,7 +80,7 @@ ALLOWED_ACRONYMS = {
     "CSV", "PDF", "RFC", "SDK", "URL", "REST", "CSS",
     "TLS", "SSH", "DNS", "TCP", "UDP", "SQL", "GRPC",
     "RBAC", "OIDC", "JWT", "HMAC", "SHA", "RSA", "AES",
-    "GCM", "PEM", "CORS", "CSRF", "PII", "SSE", "SSO",
+    "CBC", "GCM", "PEM", "CORS", "CSRF", "PII", "SSE", "SSO",
     "RPC", "CDN", "NTP", "OTLP", "NATS", "WAN", "HSM",
     "ACL", "KMS", "AUTH", "PAT", "SRC", "DOM", "ENV", "DIR", "PATH",
     # DeepSigma / Coherence Ops primitives
