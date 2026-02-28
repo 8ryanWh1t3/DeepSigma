@@ -23,9 +23,11 @@ from pathlib import Path
 
 
 # ── Defaults ──────────────────────────────────────────────────────
-DEFAULT_DATA_DIR = Path("artifacts/sample_data/prompt_os_v2")
-DEFAULT_TELEMETRY_DIR = Path("artifacts/sample_data/prompt_os_telemetry")
-DEFAULT_OUT_DIR = Path("artifacts/sealed_runs")
+_SCRIPT_DIR = Path(__file__).resolve().parent
+_ENTERPRISE_ROOT = _SCRIPT_DIR.parent.parent.parent  # enterprise/
+DEFAULT_DATA_DIR = _ENTERPRISE_ROOT / "artifacts" / "sample_data" / "prompt_os_v2"
+DEFAULT_TELEMETRY_DIR = _ENTERPRISE_ROOT / "artifacts" / "sample_data" / "prompt_os_telemetry"
+DEFAULT_OUT_DIR = _ENTERPRISE_ROOT / "artifacts" / "sealed_runs"
 
 DECISION_LOG = "decision_log.csv"
 PATCH_LOG = "patch_log.csv"
