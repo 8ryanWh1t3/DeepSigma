@@ -2,6 +2,18 @@
 
 All contract surface changes are logged here with compatibility annotations.
 
+## v2.0.11 — Enterprise Hardening
+
+`COMPATIBLE:` Fix Helm chart appVersion alignment (#407), audit-neutral pack CI validation (#408), operator runbook enterprise release checklist + release readiness gate (#409). Enterprise readiness epic #397 closed. Helm lint, audit-pack self-check, and release-check self-check wired into CI. SSI stability release — zero KPI movement.
+
+### Migration
+
+**Affected schemas**: None
+**Consumer action**: None — no schema changes in this release.
+**Rollback**: Yes — CI wiring + docs only.
+
+---
+
 ## v2.0.10 — Automation Closure
 
 `COMPATIBLE:` Wire pre-execution gate (#401), idempotency guard (#402), and replay validation (#403) into CI determinism gate. All three scripts pass `--self-check`. Automation depth epic #395 closed. SSI stability release — zero KPI movement.

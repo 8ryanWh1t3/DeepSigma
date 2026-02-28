@@ -69,3 +69,14 @@ jobs:
 
       - name: Scalability regression gate
         run: make scalability-gate
+
+      - name: Audit-neutral pack self-check
+        run: python enterprise/scripts/export_audit_neutral_pack.py --self-check
+
+      - name: Release readiness self-check
+        run: python enterprise/scripts/release_check.py --self-check
+
+      - name: Helm chart lint
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+          helm lint enterprise/charts/deepsigma/

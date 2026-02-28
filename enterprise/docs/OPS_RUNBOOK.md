@@ -330,4 +330,44 @@ For each release or significant data update:
 
 ---
 
+## 7. Enterprise Release Checklist
+
+For each enterprise release (v2.0.x), verify the following before tagging:
+
+### Pre-Release Gates
+
+- [ ] `pytest tests/ enterprise/tests/ -v` — all tests pass
+- [ ] `python enterprise/scripts/constitution_gate.py` — PASS
+- [ ] `make kpi` — merged KPI values match expected baseline
+- [ ] `make stability` — SSI computed and gate status documented
+- [ ] `make domain-scrub` — GPE 0/0
+
+### Helm Chart Validation
+
+- [ ] `helm lint enterprise/charts/deepsigma/` — chart lints cleanly
+- [ ] `appVersion` in `Chart.yaml` matches release version
+- [ ] Values file reviewed for environment-specific overrides
+
+### Audit Pack
+
+- [ ] `python enterprise/scripts/export_audit_neutral_pack.py --self-check` — PASS
+- [ ] Proof bundle contains all required hash-chain fields
+- [ ] Pack directory archived for compliance record
+
+### Release Artifacts
+
+- [ ] `enterprise/release_kpis/kpi_v2.0.XX.json` created with correct values
+- [ ] `enterprise/release_kpis/history.json` updated
+- [ ] `reference/CHANGELOG.md` entry added
+- [ ] Version files bumped (pyproject.toml ×2, VERSION.txt, POLICY_VERSION.txt, reference/VERSION)
+- [ ] Git tag created and pushed
+
+### Post-Release
+
+- [ ] GitHub issues closed with release reference
+- [ ] Release notes published (if applicable)
+- [ ] SSI trajectory confirmed on expected path
+
+---
+
 *See also: [TROUBLESHOOTING.md](TROUBLESHOOTING.md) · [CONFIG_REFERENCE.md](CONFIG_REFERENCE.md) · [TEST_STRATEGY.md](TEST_STRATEGY.md)*
