@@ -75,6 +75,15 @@ Canonical wiki structure for Sigma OVERWATCH / DeepSigma docs.
 - [Delegation Review](Delegation-Review)
 - [Authority Ledger Binding](Authority-Ledger-Binding)
 
+## Domain Modes
+
+- [IntelOps](IntelOps)
+- [FranOps](FranOps)
+- [ReflectionOps](ReflectionOps)
+- [Cascade Engine](Cascade-Engine)
+- [Event Contracts](Event-Contracts)
+- [Money Demo v2](Money-Demo-v2)
+
 ## Domain Packs
 
 - [Exhaust Inbox](Exhaust-Inbox)

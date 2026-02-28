@@ -65,6 +65,13 @@
   - [Gate Enforcement](Gate-Enforcement)
   - [Delegation Review](Delegation-Review)
   - [Authority Ledger Binding](Authority-Ledger-Binding)
+- **Domain Modes**
+  - [IntelOps](IntelOps)
+  - [FranOps](FranOps)
+  - [ReflectionOps](ReflectionOps)
+  - [Cascade Engine](Cascade-Engine)
+  - [Event Contracts](Event-Contracts)
+  - [Money Demo v2](Money-Demo-v2)
 - **Governance**
   - [Coherence Ops Mapping](Coherence-Ops-Mapping)
   - [IRIS](IRIS)

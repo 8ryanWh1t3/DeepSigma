@@ -154,3 +154,41 @@ The OTel exporter now has `export_tool_call()` and `export_llm_call()` methods. 
 ## How does fairness monitoring work?
 
 DeepSigma uses a hybrid approach: external fairness tools (AIF360, Fairlearn, or custom pipelines) compute fairness metrics, and DeepSigma ingests their reports as drift signals. Three new drift types: `demographic_parity_violation`, `disparate_impact`, `fairness_metric_degradation`. The `ingest_fairness_report()` function converts external JSON reports to DriftSignal objects. Convenience wrappers exist for AIF360 and Fairlearn output. See `src/adapters/fairness/ingest.py`.
+
+## What are domain modes?
+
+Three executable domain mode modules that wire existing building blocks (FEEDS, Memory Graph, claim validator, canon store, drift detection) into automated pipelines with deterministic replay:
+
+- **IntelOps** — 12 function handlers (INTEL-F01–F12) for claim lifecycle automation: ingest, validate, drift detect, patch recommend, MG update, canon promote, authority check, evidence verify, triage, supersede, half-life check, confidence recalc.
+- **FranOps** — 12 function handlers (FRAN-F01–F12) for canon enforcement: propose, bless, enforce, retcon assess/execute/propagate, inflation monitor, expire, supersede, scope check, drift detect, rollback.
+- **ReflectionOps** — 12 function handlers (RE-F01–F12) for gate enforcement: episode begin/seal/archive, gate evaluate/degrade/killswitch, non-coercion audit, severity score, coherence check, reflection ingest, IRIS resolve, episode replay.
+
+Every handler returns a `FunctionResult` with `replay_hash` (SHA-256) for deterministic verification. See `src/core/modes/`.
+
+## What is the cascade engine?
+
+Cross-domain event propagation with 7 declarative rules. When an event in one domain matches a rule, the cascade engine invokes the target domain's handler. Rules include: claim contradiction → canon review, canon retcon → episode flag, killswitch → all domains freeze. Depth-limited to prevent infinite loops. See `src/core/modes/cascade.py`.
+
+## What are event contracts?
+
+A declarative routing table (`src/core/feeds/contracts/routing_table.json`) mapping all 36 function handlers + 39 events to their FEEDS topics, subtypes, handler paths, required payload fields, and emitted events. Contract validation occurs at publish time. Query the table via `RoutingTable.get_function()` and `get_event()`.
+
+## What is the canon workflow state machine?
+
+Canon entries have a lifecycle: PROPOSED → BLESSED → ACTIVE → UNDER_REVIEW → SUPERSEDED/RETCONNED/EXPIRED. Also supports REJECTED and FROZEN states. Transition validation prevents illegal state changes (e.g., EXPIRED cannot return to ACTIVE). See `src/core/feeds/canon/workflow.py`.
+
+## What is the episode state machine?
+
+Episodes have a lifecycle: PENDING → ACTIVE → SEALED → ARCHIVED. The FROZEN state supports killswitch scenarios. `freeze_all()` halts all active episodes. See `src/core/episode_state.py`.
+
+## What is the non-coercion audit log?
+
+An append-only, hash-chained NDJSON log for domain mode actions. Each entry chains to the previous via SHA-256 hash, making the log tamper-evident. `verify_chain()` validates integrity. Used by ReflectionOps RE-F07 for non-coercion attestation. See `src/core/audit_log.py`.
+
+## What is the domain killswitch?
+
+An emergency halt mechanism: freezes all ACTIVE episodes, emits a sealed halt proof with authorization details, logs to the audit trail, and emits a drift signal on all FEEDS topics. Requires explicit authority check to resume. See `src/core/killswitch.py`.
+
+## What is the Money Demo v2?
+
+A 10-step end-to-end pipeline exercising all 3 domain modes: LOAD → INTELOPS INGEST → VALIDATE → DELTA → FRANOPS PROPOSE → RETCON → REOPS EPISODE → CASCADE → COHERENCE → SEAL. Uses fixture data (3 baseline claims + 1 contradiction) to demonstrate drift detection, retcon execution, cascade propagation, and coherence scoring. Run via `make demo-money` or `python -m demos.money_demo`.

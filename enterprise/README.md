@@ -62,6 +62,16 @@ See: [docs/release/RELEASE_NOTES_v2.1.0.md](docs/release/RELEASE_NOTES_v2.1.0.md
 - Authority-bound contract enforcement expansion
 - Integration schema finalization
 
+### Domain Modes (v2.1.0)
+
+- IntelOps — 12 function handlers: claim ingest, validate, drift detect, patch, MG update, canon promote, authority/evidence check, triage, supersede, half-life, confidence recalc
+- FranOps — 12 function handlers: canon propose/bless/enforce, retcon assess/execute/propagate, inflation monitor, expire, supersede, scope check, drift detect, rollback
+- ReflectionOps — 12 function handlers: episode begin/seal/archive, gate evaluate/degrade/killswitch, audit non-coercion, severity score, coherence check, reflection ingest, IRIS resolve, replay
+- Cascade Engine — 7 cross-domain rules with depth-limited propagation
+- Event Contracts — routing table mapping 36 functions + 39 events
+- Money Demo v2 — 10-step end-to-end pipeline (`make demo-money`)
+- 207 new tests, 581 total passing
+
 ### Competitive Gap Closure (v2.1.0)
 
 - Tool-call + LLM span tracing (OTel)
@@ -206,6 +216,10 @@ python src/tools/reconstruct/verify_pack.py --pack /tmp/pack --key "$KEY"
 | **OTel Span Tracing** | Tool-call + LLM completion spans, connector auto-instrumentation, W3C context propagation | [src/adapters/otel/](src/adapters/otel/) |
 | **Compliance Export** | SOC 2 evidence packages with encryption-at-rest + scheduled auto-export | [CLI: compliance export](src/deepsigma/cli/compliance_export.py) |
 | **Fairness Adapter** | Hybrid fairness monitoring — ingest AIF360/Fairlearn reports as drift signals | [src/adapters/fairness/](src/adapters/fairness/) |
+| **Domain Modes** | IntelOps (12), FranOps (12), ReflectionOps (12) — 36 function handlers with deterministic replay | [src/core/modes/](src/core/modes/) |
+| **Cascade Engine** | Cross-domain event propagation with 7 declarative rules and depth-limited cascading | [src/core/modes/cascade.py](src/core/modes/cascade.py) |
+| **Event Contracts** | Routing table: 36 functions + 39 events mapped to FEEDS topics, subtypes, and handlers | [src/core/feeds/contracts/](src/core/feeds/contracts/) |
+| **Money Demo v2** | 10-step pipeline exercising all 3 domain modes with drift, retcon, and cascade | [src/demos/money_demo/](src/demos/money_demo/) |
 
 ## Connectors
 
