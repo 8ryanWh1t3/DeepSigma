@@ -1,10 +1,10 @@
-> NOTE (v2.0.5): This stability contract describes the stable core surfaces originally formalized at v1.0.0.
-> The repo's current pilot release is v2.0.5. The contract remains applicable to the stable surfaces;
-> see `docs/release/RELEASE_NOTES_v2.0.5.md` and root `CHANGELOG.md` for v2 changes.
+> NOTE (v2.1.0): This stability contract describes the stable core surfaces originally formalized at v1.0.0.
+> The repo's current release is v2.1.0. The contract remains applicable to the stable surfaces;
+> see `docs/release/RELEASE_NOTES_v2.1.0.md` and root `CHANGELOG.md` for v2 changes.
 
 # Σ OVERWATCH — Stability Contract
 
-**Version:** v1.0.0
+**Version:** v2.1.0
 **Status:** Beta — core architecture stable, experimental modules clearly marked
 **See also:** [CONFIG_REFERENCE.md](CONFIG_REFERENCE.md) · [CHANGELOG.md](../CHANGELOG.md)
 

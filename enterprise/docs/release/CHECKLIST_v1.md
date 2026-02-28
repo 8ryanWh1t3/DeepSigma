@@ -1,8 +1,8 @@
 ---
 title: "Release Readiness Checklist — v1"
-version: "1.0.0"
+version: "2.1.0"
 status: "Living Document"
-last_updated: "2026-02-16"
+last_updated: "2026-02-28"
 ---
 
 # Release Readiness Checklist — v1

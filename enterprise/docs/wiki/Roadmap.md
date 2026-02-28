@@ -24,22 +24,22 @@ Each epic targets a single KPI axis below 7.0. Child tasks are the concrete deli
 
 **Automation Depth** (#395)
 
-- [#401](https://github.com/8ryanWh1t3/DeepSigma/issues/401) Pre-Exec Gate Required in CI and Runtime Entry
-- [#402](https://github.com/8ryanWh1t3/DeepSigma/issues/402) Idempotency/Nonce Enforcement with Replay Block
-- [#403](https://github.com/8ryanWh1t3/DeepSigma/issues/403) Deterministic Replay Gate and Artifact Validation
+- ~~[#401](https://github.com/8ryanWh1t3/DeepSigma/issues/401) Pre-Exec Gate Required in CI and Runtime Entry~~ (v2.0.10)
+- ~~[#402](https://github.com/8ryanWh1t3/DeepSigma/issues/402) Idempotency/Nonce Enforcement with Replay Block~~ (v2.0.10)
+- ~~[#403](https://github.com/8ryanWh1t3/DeepSigma/issues/403) Deterministic Replay Gate and Artifact Validation~~ (v2.0.10)
 
 **Economic Measurability** (#396)
 
 - ~~[#404](https://github.com/8ryanWh1t3/DeepSigma/issues/404) Decision Cost Ledger Schema + Emitter~~ (v2.0.9)
 - ~~[#405](https://github.com/8ryanWh1t3/DeepSigma/issues/405) Drift-to-Patch Value Delta Calculator~~ (v2.0.9)
 - ~~[#406](https://github.com/8ryanWh1t3/DeepSigma/issues/406) Economic KPI Ingestion Gate~~ (v2.0.9)
-- [#392](https://github.com/8ryanWh1t3/DeepSigma/issues/392) Economic Evidence Ledger
+- ~~[#392](https://github.com/8ryanWh1t3/DeepSigma/issues/392) Economic Evidence Ledger~~ (v2.0.14)
 
 **Enterprise Readiness** (#397)
 
-- [#407](https://github.com/8ryanWh1t3/DeepSigma/issues/407) Enterprise Deploy Sanity Workflow (docker/helm/config)
-- [#408](https://github.com/8ryanWh1t3/DeepSigma/issues/408) Audit-Neutral Pack Completeness Validator
-- [#409](https://github.com/8ryanWh1t3/DeepSigma/issues/409) Enterprise Operator Runbook + Release Checklist Gate
+- ~~[#407](https://github.com/8ryanWh1t3/DeepSigma/issues/407) Enterprise Deploy Sanity Workflow (docker/helm/config)~~ (v2.0.11)
+- ~~[#408](https://github.com/8ryanWh1t3/DeepSigma/issues/408) Audit-Neutral Pack Completeness Validator~~ (v2.0.11)
+- ~~[#409](https://github.com/8ryanWh1t3/DeepSigma/issues/409) Enterprise Operator Runbook + Release Checklist Gate~~ (v2.0.11)
 
 **Authority Modeling** (#399)
 
@@ -49,26 +49,26 @@ Each epic targets a single KPI axis below 7.0. Child tasks are the concrete deli
 
 **Technical Completeness** (#400)
 
-- [#416](https://github.com/8ryanWh1t3/DeepSigma/issues/416) Sealed Input Snapshot + Environment Fingerprint Contract
-- [#417](https://github.com/8ryanWh1t3/DeepSigma/issues/417) Intent/Decision/Evidence Schema Version Enforcement
-- [#418](https://github.com/8ryanWh1t3/DeepSigma/issues/418) Replay Reproducibility Tests in CI
+- ~~[#416](https://github.com/8ryanWh1t3/DeepSigma/issues/416) Sealed Input Snapshot + Environment Fingerprint Contract~~ (v2.0.12)
+- ~~[#417](https://github.com/8ryanWh1t3/DeepSigma/issues/417) Intent/Decision/Evidence Schema Version Enforcement~~ (v2.0.12)
+- ~~[#418](https://github.com/8ryanWh1t3/DeepSigma/issues/418) Replay Reproducibility Tests in CI~~ (v2.0.12)
 
 #### Standalone
 
-- [#393](https://github.com/8ryanWh1t3/DeepSigma/issues/393) Evidence Source Binding Schema (Data Integration)
-- [#349](https://github.com/8ryanWh1t3/DeepSigma/issues/349) Intent Mutation Detection (P2, Operational Maturity)
+- ~~[#393](https://github.com/8ryanWh1t3/DeepSigma/issues/393) Evidence Source Binding Schema (Data Integration)~~ (v2.0.14)
+- ~~[#349](https://github.com/8ryanWh1t3/DeepSigma/issues/349) Intent Mutation Detection (P2, Operational Maturity)~~ (v2.0.15)
 
 ### DISR Architecture
 
-- [#324](https://github.com/8ryanWh1t3/DeepSigma/issues/324) DISR Provider Interface Abstraction
+- ~~[#324](https://github.com/8ryanWh1t3/DeepSigma/issues/324) DISR Provider Interface Abstraction~~ (v2.0.13)
 - ~~[#325](https://github.com/8ryanWh1t3/DeepSigma/issues/325) Authority-Bound Action Contracts (P0)~~ (v2.0.9)
-- [#326](https://github.com/8ryanWh1t3/DeepSigma/issues/326) Streaming Re-encrypt Engine with Checkpointing
-- [#327](https://github.com/8ryanWh1t3/DeepSigma/issues/327) Signed Telemetry Event Chain
+- ~~[#326](https://github.com/8ryanWh1t3/DeepSigma/issues/326) Streaming Re-encrypt Engine with Checkpointing~~ (v2.0.13)
+- ~~[#327](https://github.com/8ryanWh1t3/DeepSigma/issues/327) Signed Telemetry Event Chain~~ (v2.0.13)
 
 ### Controls
 
-- [#332](https://github.com/8ryanWh1t3/DeepSigma/issues/332) LOCK: v2.1.0 Scope Freeze
-- [#358](https://github.com/8ryanWh1t3/DeepSigma/issues/358) MILESTONE: v2.1.0 Decision Infrastructure Hardening
+- ~~[#332](https://github.com/8ryanWh1t3/DeepSigma/issues/332) LOCK: v2.1.0 Scope Freeze~~ (v2.0.16)
+- ~~[#358](https://github.com/8ryanWh1t3/DeepSigma/issues/358) MILESTONE: v2.1.0 Decision Infrastructure Hardening~~ (v2.0.16)
 
 ## v2.1.1 — Institutional Expansion (Dormant)
 

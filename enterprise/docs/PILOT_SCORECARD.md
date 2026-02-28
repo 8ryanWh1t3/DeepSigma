@@ -1,4 +1,4 @@
-# Pilot Scorecard (v2.0.5 GitHub-Native)
+# Pilot Scorecard (v2.1.0 GitHub-Native)
 
 Pass/fail criteria for pilot release gate:
 

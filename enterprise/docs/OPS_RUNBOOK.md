@@ -1,7 +1,7 @@
 # Σ OVERWATCH — Ops Runbook
 
 **Audience:** Operators, on-call engineers, CI maintainers
-**Version:** v0.3.2
+**Version:** v2.1.0
 **SLO Reference:** [TEST_STRATEGY.md](TEST_STRATEGY.md) · [metrics/coherence_slos.md](metrics/coherence_slos.md)
 
 ---

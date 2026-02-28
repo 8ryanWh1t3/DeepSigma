@@ -1,13 +1,15 @@
 ---
 title: "Public Roadmap"
-version: "1.0.0"
-status: "Living Document"
-last_updated: "2026-02-16"
+version: "2.1.0"
+status: "Archived — see wiki/Roadmap.md for current roadmap"
+last_updated: "2026-02-28"
 ---
 
 # Roadmap
 
-## Current: v0.2.0 — Unified Atomic Claims
+> **This file is archived.** The canonical roadmap is maintained at [wiki/Roadmap.md](../wiki/Roadmap.md).
+
+## Historical: v0.2.0 — Unified Atomic Claims
 
 - AtomicClaim as universal truth primitive
 - - Claim-native DLR schema and builder
