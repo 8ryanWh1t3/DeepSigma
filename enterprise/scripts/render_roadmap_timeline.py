@@ -20,7 +20,7 @@ def main() -> int:
     spacing = 380 if len(versions) <= 2 else max(180, int((width - 180) / max(1, len(versions) - 1)))
     start_x = 120
 
-    colors = {"active": "#1F8B4C", "dormant": "#C47F00", "planned": "#666"}
+    colors = {"active": "#1F8B4C", "released": "#2563EB", "dormant": "#C47F00", "planned": "#666"}
 
     circles = []
     labels = []

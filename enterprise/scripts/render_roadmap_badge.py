@@ -22,12 +22,20 @@ SVG = """<svg xmlns='http://www.w3.org/2000/svg' width='420' height='36' role='i
 def main() -> int:
     roadmap = json.loads(ROADMAP_PATH.read_text(encoding="utf-8"))
     active = [v for v, payload in roadmap.items() if payload.get("status") == "active"]
+    released = [v for v, payload in roadmap.items() if payload.get("status") == "released"]
     dormant = [v for v, payload in roadmap.items() if payload.get("status") == "dormant"]
 
-    active_text = active[0] if active else "none"
+    if active:
+        current_text = f"active {active[0]}"
+        color = "#1F8B4C"
+    elif released:
+        current_text = f"released {released[-1]}"
+        color = "#1F8B4C"
+    else:
+        current_text = "none"
+        color = "#B00020"
     next_text = dormant[0] if dormant else "none"
-    text = f"active {active_text} • next {next_text}"
-    color = "#1F8B4C" if active else "#B00020"
+    text = f"{current_text} • next {next_text}"
 
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(
