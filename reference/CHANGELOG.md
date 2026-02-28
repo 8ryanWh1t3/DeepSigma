@@ -2,6 +2,18 @@
 
 All contract surface changes are logged here with compatibility annotations.
 
+## v2.0.13 — DISR Closure
+
+`COMPATIBLE:` Authority ledger verify_chain() and detect_replay() (#327), audit summary export mode for export_authority_ledger.py (#326 streaming re-encrypt checkpoint already complete), DISR provider abstraction confirmed with 5 providers (#324). DISR architecture epic #313 closed. SSI stability release — zero KPI movement.
+
+### Migration
+
+**Affected schemas**: None
+**Consumer action**: None — no schema changes in this release.
+**Rollback**: Yes — additive methods + tests only.
+
+---
+
 ## v2.0.12 — Schema + Determinism
 
 `COMPATIBLE:` Schema version enforcement self-check wired into CI (#417), input snapshot fingerprint CI validation (#416), replay reproducibility tests promoted to required enterprise CI check (#418). Technical completeness epic #400 closed. Reconstruct replay workflow expanded with PR trigger. SSI stability release — zero KPI movement.

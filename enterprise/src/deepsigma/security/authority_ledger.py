@@ -245,6 +245,63 @@ def append_authority_refusal_entry(
     return entry
 
 
+def verify_chain(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Verify hash chain integrity across all ledger entries.
+
+    Returns a list of error dicts. Empty list means chain is valid.
+    """
+    errors: list[dict[str, Any]] = []
+    for i, entry in enumerate(entries):
+        # Verify prev_entry_hash links
+        expected_prev = entries[i - 1]["entry_hash"] if i > 0 else None
+        actual_prev = entry.get("prev_entry_hash")
+        if actual_prev != expected_prev:
+            errors.append({
+                "index": i,
+                "entry_id": entry.get("entry_id"),
+                "error": "prev_entry_hash mismatch",
+                "expected": expected_prev,
+                "actual": actual_prev,
+            })
+
+        # Verify entry_hash is correct
+        recorded_hash = entry.get("entry_hash")
+        recomputed = _entry_hash({**entry, "entry_hash": ""})
+        if recorded_hash != recomputed:
+            errors.append({
+                "index": i,
+                "entry_id": entry.get("entry_id"),
+                "error": "entry_hash tampered",
+                "expected": recomputed,
+                "actual": recorded_hash,
+            })
+
+    return errors
+
+
+def detect_replay(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Detect duplicate event_id entries in the ledger (replay attacks).
+
+    Returns a list of duplicate event dicts. Empty list means no replays.
+    """
+    seen: dict[str, int] = {}
+    duplicates: list[dict[str, Any]] = []
+    for i, entry in enumerate(entries):
+        event_id = entry.get("event_id")
+        if event_id is None:
+            continue
+        if event_id in seen:
+            duplicates.append({
+                "index": i,
+                "entry_id": entry.get("entry_id"),
+                "event_id": event_id,
+                "first_seen_index": seen[event_id],
+            })
+        else:
+            seen[event_id] = i
+    return duplicates
+
+
 def load_authority_ledger(ledger_path: str | Path) -> list[dict[str, Any]]:
     path = Path(ledger_path)
     if not path.exists():
