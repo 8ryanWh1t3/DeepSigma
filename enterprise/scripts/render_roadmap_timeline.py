@@ -15,17 +15,17 @@ def main() -> int:
     versions = list(roadmap.keys())
 
     max_items = 8
-    line_height = 22
-    font_size = 14
-    width = 1200
-    baseline_y = 100
-    spacing = 500 if len(versions) <= 2 else max(240, int((width - 240) / max(1, len(versions) - 1)))
-    start_x = 230
+    line_height = 40
+    font_size = 26
+    width = 1800
+    baseline_y = 140
+    spacing = 800 if len(versions) <= 2 else max(400, int((width - 400) / max(1, len(versions) - 1)))
+    start_x = 360
 
     # Compute height from tallest item list
     max_bullet_count = max(min(len(p.get("scope") or p.get("focus") or []), max_items) for p in roadmap.values())
-    box_h = 30 + (max_bullet_count * line_height)
-    height = baseline_y + 40 + box_h + 30
+    box_h = 50 + (max_bullet_count * line_height)
+    height = baseline_y + 70 + box_h + 50
 
     colors = {"active": "#1F8B4C", "released": "#2563EB", "dormant": "#C47F00", "planned": "#666"}
 
@@ -42,21 +42,21 @@ def main() -> int:
         display_items = items[:max_items]
         remaining = len(items) - max_items
         title = f"{version} ({status})"
-        circles.append(f"<circle cx='{x}' cy='{baseline_y}' r='16' fill='{color}' />")
-        labels.append(f"<text x='{x}' y='{baseline_y - 26}' text-anchor='middle' font-size='16' font-weight='bold' fill='#111'>{title}</text>")
-        labels.append(f"<text x='{x}' y='{baseline_y + 5}' text-anchor='middle' font-size='13' fill='#fff'>{idx + 1}</text>")
+        circles.append(f"<circle cx='{x}' cy='{baseline_y}' r='24' fill='{color}' />")
+        labels.append(f"<text x='{x}' y='{baseline_y - 40}' text-anchor='middle' font-size='28' font-weight='bold' fill='#111'>{title}</text>")
+        labels.append(f"<text x='{x}' y='{baseline_y + 9}' text-anchor='middle' font-size='20' fill='#fff'>{idx + 1}</text>")
 
-        box_y = baseline_y + 40
-        box_w = 400
+        box_y = baseline_y + 70
+        box_w = 650
         box_x = x - (box_w // 2)
         bullet_lines = "".join(
-            f"<text x='{box_x + 14}' y='{box_y + 24 + (line_idx * line_height)}' font-size='{font_size}' fill='#111'>- {text}</text>"
+            f"<text x='{box_x + 20}' y='{box_y + 38 + (line_idx * line_height)}' font-size='{font_size}' fill='#111'>- {text}</text>"
             for line_idx, text in enumerate(display_items)
         )
         if remaining > 0:
-            bullet_lines += f"<text x='{box_x + 14}' y='{box_y + 24 + (len(display_items) * line_height)}' font-size='{font_size}' fill='#888'>  +{remaining} more</text>"
+            bullet_lines += f"<text x='{box_x + 20}' y='{box_y + 38 + (len(display_items) * line_height)}' font-size='{font_size}' fill='#888'>  +{remaining} more</text>"
         boxes.append(
-            f"<rect x='{box_x}' y='{box_y}' width='{box_w}' height='{box_h}' rx='8' fill='#f5f7fb' stroke='#d4d8e3'/>"
+            f"<rect x='{box_x}' y='{box_y}' width='{box_w}' height='{box_h}' rx='12' fill='#f5f7fb' stroke='#d4d8e3' stroke-width='2'/>"
             + bullet_lines
         )
 
@@ -64,12 +64,12 @@ def main() -> int:
     for idx in range(len(versions) - 1):
         x1 = start_x + (idx * spacing)
         x2 = start_x + ((idx + 1) * spacing)
-        connectors.append(f"<line x1='{x1 + 16}' y1='{baseline_y}' x2='{x2 - 16}' y2='{baseline_y}' stroke='#222' stroke-width='3' />")
+        connectors.append(f"<line x1='{x1 + 24}' y1='{baseline_y}' x2='{x2 - 24}' y2='{baseline_y}' stroke='#222' stroke-width='4' />")
 
     svg = (
         f"<svg xmlns='http://www.w3.org/2000/svg' width='{width}' height='{height}' role='img' aria-label='Roadmap timeline'>"
         "<rect width='100%' height='100%' fill='#fff'/>"
-        "<text x='30' y='36' font-size='24' font-family='DejaVu Sans,Verdana,sans-serif' font-weight='bold' fill='#111'>DeepSigma Roadmap Timeline</text>"
+        "<text x='40' y='55' font-size='36' font-family='DejaVu Sans,Verdana,sans-serif' font-weight='bold' fill='#111'>DeepSigma Roadmap Timeline</text>"
         + "".join(connectors)
         + "".join(circles)
         + "".join(labels)
