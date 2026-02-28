@@ -1,0 +1,32 @@
+{
+  "eventId": "SURI-a1b2c3d4e5f6",
+  "sourceSystem": "suricata",
+  "eventType": "suricata_alert",
+  "timestamp": "2026-02-28T10:00:01.000000+0000",
+  "severity": "critical",
+  "actor": {
+    "type": "host",
+    "id": "10.0.0.5",
+    "ip": "10.0.0.5",
+    "port": 54321
+  },
+  "object": {
+    "type": "host",
+    "id": "192.168.1.100",
+    "ip": "192.168.1.100",
+    "port": 80
+  },
+  "action": "alert:sid=2010935:rev=6",
+  "confidence": 0.95,
+  "evidenceHash": "sha256:a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+  "rawPointer": "inline:sha256:a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+  "environmentId": "SOC_EAST",
+  "assumptions": [],
+  "metadata": {
+    "signature_id": 2010935,
+    "rev": 6,
+    "signature": "ET MALWARE Generic Trojan RAT",
+    "flow_id": 1234567890,
+    "proto": "TCP"
+  }
+}
