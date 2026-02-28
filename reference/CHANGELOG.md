@@ -2,6 +2,18 @@
 
 All contract surface changes are logged here with compatibility annotations.
 
+## v2.0.16 — Stability Hold
+
+`COMPATIBLE:` Scope freeze enforced (#332) — no KPI-moving changes accepted. Milestone governance gate validated (#358). SSI crosses 55 threshold. All v2.1.0 issues resolved. Governance-only release — zero code changes, zero KPI movement.
+
+### Migration
+
+**Affected schemas**: None
+**Consumer action**: None — governance closure only.
+**Rollback**: Yes — no code changes.
+
+---
+
 ## v2.0.15 — Intent Safety
 
 `COMPATIBLE:` Intent mutation detection script with field-level diff and hash stability (#349). Compares intent packets across sealed runs to flag unintended changes to decision intent fields. Self-check mode for CI validation. SSI stability release — zero KPI movement.
