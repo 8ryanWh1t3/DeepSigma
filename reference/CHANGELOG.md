@@ -2,6 +2,18 @@
 
 All contract surface changes are logged here with compatibility annotations.
 
+## v2.0.12 — Schema + Determinism
+
+`COMPATIBLE:` Schema version enforcement self-check wired into CI (#417), input snapshot fingerprint CI validation (#416), replay reproducibility tests promoted to required enterprise CI check (#418). Technical completeness epic #400 closed. Reconstruct replay workflow expanded with PR trigger. SSI stability release — zero KPI movement.
+
+### Migration
+
+**Affected schemas**: None
+**Consumer action**: None — no schema changes in this release.
+**Rollback**: Yes — CI wiring + test expansion only.
+
+---
+
 ## v2.0.11 — Enterprise Hardening
 
 `COMPATIBLE:` Fix Helm chart appVersion alignment (#407), audit-neutral pack CI validation (#408), operator runbook enterprise release checklist + release readiness gate (#409). Enterprise readiness epic #397 closed. Helm lint, audit-pack self-check, and release-check self-check wired into CI. SSI stability release — zero KPI movement.

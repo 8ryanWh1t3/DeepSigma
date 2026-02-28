@@ -5,6 +5,13 @@ permissions:
 
 on:
   push:
+    branches: [main]
+    paths:
+      - 'enterprise/schemas/reconstruct/**'
+      - 'enterprise/src/tools/reconstruct/**'
+      - 'enterprise/docs/governance/**'
+      - 'enterprise/tests/test_reconstruct_*.py'
+  pull_request:
     paths:
       - 'enterprise/schemas/reconstruct/**'
       - 'enterprise/src/tools/reconstruct/**'

@@ -80,3 +80,12 @@ jobs:
         run: |
           curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
           helm lint enterprise/charts/deepsigma/
+
+      - name: Input snapshot self-check
+        run: python enterprise/scripts/capture_run_snapshot.py --self-check
+
+      - name: Schema version enforcement
+        run: python src/core/schema_validator.py --self-check
+
+      - name: Replay reproducibility tests
+        run: python -m pytest enterprise/tests/test_reconstruct_replay.py -v

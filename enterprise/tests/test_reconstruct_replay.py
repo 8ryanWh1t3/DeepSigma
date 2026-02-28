@@ -179,6 +179,26 @@ class TestSealAndReplay(ReconstructTestBase):
         self.assertIn("scope.decisions", failed_names)
 
 
+    def test_schema_version_enforced(self) -> None:
+        """Schema version must be '1.0' — replay rejects invalid versions."""
+        sealed_path = self._seal()
+
+        sealed = json.loads(sealed_path.read_text())
+        self.assertEqual(sealed["schema_version"], "1.0")
+
+        # Tamper: set invalid schema version
+        sealed["schema_version"] = "0.0"
+        # Recompute hash so only version check triggers
+        from canonical_json import sha256_text
+        from canonical_json import canonical_dumps as cd
+        sealed["hash"] = ""
+        sealed["hash"] = sha256_text(cd(sealed))
+        sealed_path.write_text(json.dumps(sealed))
+
+        result = replay.replay(sealed_path)
+        self.assertFalse(result.passed, "Replay should reject invalid schema_version")
+
+
 class TestSealBundleErrors(ReconstructTestBase):
     """Test error handling in seal_bundle."""
 

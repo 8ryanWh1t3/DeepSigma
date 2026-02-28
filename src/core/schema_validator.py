@@ -154,3 +154,73 @@ def clear_cache() -> None:
     global _REGISTRY
     _VALIDATORS.clear()
     _REGISTRY = None
+
+
+def _run_self_check() -> int:
+    """Verify schema loading and validation work correctly."""
+    clear_cache()
+
+    # Check that schemas directory exists and has files
+    schema_files = list(SPECS_DIR.glob("*.schema.json"))
+    if not schema_files:
+        print("FAIL: no schema files found in", SPECS_DIR)
+        return 2
+
+    # Validate a known-good episode payload against the current schema
+    result = validate(
+        {
+            "episodeId": "ep-self-check",
+            "decisionType": "test",
+            "startedAt": "2026-01-01T00:00:00Z",
+            "endedAt": "2026-01-01T00:01:00Z",
+            "decisionWindowMs": 60000,
+            "actor": {"type": "system", "id": "self-check"},
+            "dteRef": {"decisionType": "test", "version": "1.0"},
+            "context": {
+                "snapshotId": "snap-1",
+                "capturedAt": "2026-01-01T00:00:00Z",
+                "ttlMs": 3600000,
+                "maxFeatureAgeMs": 7200000,
+                "ttlBreachesCount": 0,
+                "evidenceRefs": [],
+            },
+            "plan": {"planner": "rules", "summary": "self-check plan"},
+            "actions": [],
+            "verification": {"required": False, "result": "na"},
+            "outcome": {"code": "success"},
+            "telemetry": {
+                "endToEndMs": 100,
+                "stageMs": {"context": 10, "plan": 20, "act": 50, "verify": 20},
+                "p95Ms": 90,
+                "p99Ms": 95,
+                "jitterMs": 5,
+                "fallbackUsed": False,
+                "fallbackStep": "",
+                "hopCount": 1,
+                "fanout": 1,
+            },
+            "seal": {"sealedAt": "2026-01-01T00:01:00Z", "sealHash": "sha256:abc"},
+        },
+        "episode",
+    )
+    if not result.valid:
+        print(f"FAIL: valid episode rejected: {result.errors}")
+        return 2
+
+    # Validate that an invalid payload is rejected
+    result = validate({"bad": True}, "episode")
+    if result.valid:
+        print("FAIL: invalid episode should be rejected")
+        return 2
+
+    print(f"PASS: schema validator self-check passed ({len(schema_files)} schemas loaded)")
+    return 0
+
+
+if __name__ == "__main__":
+    import sys
+
+    if "--self-check" in sys.argv:
+        raise SystemExit(_run_self_check())
+    print("Usage: python schema_validator.py --self-check")
+    raise SystemExit(1)
