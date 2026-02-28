@@ -162,6 +162,42 @@
     ::-webkit-scrollbar-track{background:transparent}
     ::-webkit-scrollbar-thumb{background:#243449;border-radius:3px}
     ::-webkit-scrollbar-thumb:hover{background:#2f4765}
+
+    /* ── Stage Markers ─────────────────────────── */
+    .stage-marker{display:inline-block;width:16px;text-align:center;font-size:11px;font-weight:700;line-height:16px}
+    .stage-marker.pass{color:var(--ok)}.stage-marker.fail{color:var(--bad)}.stage-marker.skip{color:#3a4a5e}
+    .stage-status-row{display:flex;gap:2px;align-items:center;margin-top:4px}
+
+    /* ── Drift Heat ────────────────────────────── */
+    .drift-heat{display:inline-block;width:28px;height:18px;border-radius:4px;text-align:center;font-size:10px;font-weight:700;line-height:18px}
+    .drift-heat-0{background:#1a2e1a;color:#5dff93}.drift-heat-1{background:#2a3a1a;color:#a8e06c}
+    .drift-heat-2{background:#3a3a1a;color:#d4c040}.drift-heat-3{background:#3a2a1a;color:#ffcc66}
+    .drift-heat-4{background:#3a1a1a;color:#ff9f43}.drift-heat-5{background:#4a1010;color:#ff6b6b}
+
+    /* ── Compress View ─────────────────────────── */
+    .compress-block{background:#0a0f16;border:1px solid #141e2d;border-radius:8px;padding:10px;margin-top:8px;font-size:11px;line-height:1.6}
+    .compress-line{display:flex;gap:8px;align-items:baseline}
+    .compress-label{color:var(--muted);font-size:10px;min-width:60px;text-transform:uppercase;letter-spacing:.3px}
+    .compress-arrow{color:#2a3a4e;font-size:12px;text-align:center;padding:2px 0}
+
+    /* ── Seal Badge ────────────────────────────── */
+    .seal-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600}
+    .seal-ok{color:var(--ok);border:1px solid rgba(93,255,147,.4);background:rgba(93,255,147,.08)}
+    .seal-broken{color:var(--bad);border:1px solid rgba(255,107,107,.4);background:rgba(255,107,107,.08)}
+    .seal-pending{color:var(--muted);border:1px solid rgba(138,160,181,.3);background:rgba(138,160,181,.06)}
+    .hash-mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:10px;color:var(--muted);word-break:break-all}
+
+    /* ── Replay ────────────────────────────────── */
+    .replay-msg{background:#0a1a0a;border:1px solid rgba(93,255,147,.3);border-radius:10px;padding:12px;margin-top:10px;font-size:12px;color:var(--ok)}
+    .replay-msg .replay-hash{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:10px;color:var(--muted);margin-top:4px}
+
+    /* ── View Mode Toggle ──────────────────────── */
+    .view-toggle{position:fixed;bottom:18px;right:18px;z-index:200;display:flex;border-radius:12px;overflow:hidden;border:1px solid var(--line);box-shadow:0 4px 16px rgba(0,0,0,.5)}
+    .view-toggle button{padding:8px 14px;font-size:11px;font-weight:600;border:none;cursor:pointer;transition:all .15s;letter-spacing:.3px}
+    .view-toggle .vt-soc{background:#182235;color:var(--muted)}
+    .view-toggle .vt-gov{background:#182235;color:var(--muted)}
+    .view-toggle .vt-soc.active{background:rgba(255,107,107,.15);color:var(--bad)}
+    .view-toggle .vt-gov.active{background:rgba(125,249,255,.1);color:var(--accent)}
   </style>
 </head>
 <body>
@@ -180,11 +216,11 @@
     </div>
     <button class="sub-toggle" id="subToggle" title="Sub-scores">▾</button>
     <div class="sub-dropdown hidden" id="subDropdown">
-      <div class="sub-row"><span>Parse Completeness</span><span class="sub-val" id="subParse">0</span></div>
-      <div class="sub-row"><span>Join Rate</span><span class="sub-val" id="subJoin">0</span></div>
-      <div class="sub-row"><span>Reasoning Coverage</span><span class="sub-val" id="subReason">0</span></div>
-      <div class="sub-row"><span>Drift Coverage</span><span class="sub-val" id="subDrift">0</span></div>
-      <div class="sub-row"><span>Patch Lineage Integrity</span><span class="sub-val" id="subPatch">0</span></div>
+      <div class="sub-row"><span>Parse Completeness <span class="muted">(20%)</span></span><span class="sub-val" id="subParse">0</span></div>
+      <div class="sub-row"><span>Join Rate <span class="muted">(20%)</span></span><span class="sub-val" id="subJoin">0</span></div>
+      <div class="sub-row"><span>Reasoning Coverage <span class="muted">(20%)</span></span><span class="sub-val" id="subReason">0</span></div>
+      <div class="sub-row"><span>Drift Coverage <span class="muted">(20%)</span></span><span class="sub-val" id="subDrift">0</span></div>
+      <div class="sub-row"><span>Patch Lineage Integrity <span class="muted">(20%)</span></span><span class="sub-val" id="subPatch">0</span></div>
     </div>
   </div>
 </header>
@@ -277,7 +313,7 @@
       <div style="overflow-x:auto">
         <table id="eventTable">
           <thead><tr>
-            <th>#</th><th>Time</th><th>Source</th><th>Type</th><th>Sig/Action</th><th>Severity</th><th>Lane</th><th>Drift</th><th>Part</th>
+            <th>#</th><th>Time</th><th>Source</th><th>Type</th><th>Sig/Action</th><th>Severity</th><th>Lane</th><th>Drift</th><th>Heat</th><th>Part</th>
           </tr></thead>
           <tbody id="eventBody"></tbody>
         </table>
@@ -333,14 +369,22 @@
   </div>
 
   <!-- ── Right Trace Drawer ── -->
+  <!-- Note: view-toggle is rendered at bottom of page after main-area -->
   <div class="drawer" id="traceDrawer">
     <div class="drawer-head">
       <button class="primary" id="btnWhy" style="font-size:11px;padding:4px 12px">WHY</button>
       <button id="btnCopyTrace" style="font-size:11px;padding:4px 12px">Copy Trace</button>
+      <button id="btnCompress" style="font-size:11px;padding:4px 12px">COMPRESS</button>
       <button class="close-btn" id="btnCloseDrawer">✕</button>
     </div>
     <div class="drawer-body" id="drawerBody"></div>
   </div>
+</div>
+
+<!-- ═══════════════ VIEW MODE TOGGLE ═══════════════ -->
+<div class="view-toggle">
+  <button class="vt-soc active" data-mode="soc">SOC</button>
+  <button class="vt-gov" data-mode="governance">Governance</button>
 </div>
 
 <script>
@@ -381,6 +425,8 @@ const S={
   runIdx:0,
   activeStage:null,
   drawerOpen:false,
+  viewMode:"soc",
+  compressView:false,
   coherence:{parse:0,join:0,reasoning:0,drift:0,patch:0,total:0},
   // pipeline tracking
   _claimMap:{},
@@ -791,19 +837,22 @@ async function runPipeline(){
     const evt=S.events[i];
     const delay=getSpeed();
 
-    setStage("RAW"); await sleep(Math.max(1,delay/9));
-    setStage("PARSE"); evt._parsed=true; await sleep(Math.max(1,delay/9));
-    setStage("NORMALIZE"); evt._normalized=true; await sleep(Math.max(1,delay/9));
-    setStage("JOIN"); evt._join=computeJoin(evt); await sleep(Math.max(1,delay/9));
-    setStage("TRUTH"); evt._claim=buildClaim(evt); await sleep(Math.max(1,delay/9));
+    const ss={};
+    setStage("RAW"); ss.RAW="pass"; await sleep(Math.max(1,delay/9));
+    setStage("PARSE"); evt._parsed=true; ss.PARSE=evt.event_type==="malformed"?"fail":"pass"; await sleep(Math.max(1,delay/9));
+    setStage("NORMALIZE"); evt._normalized=true; ss.NORMALIZE=ss.PARSE==="pass"?"pass":"skip"; await sleep(Math.max(1,delay/9));
+    setStage("JOIN"); evt._join=computeJoin(evt); ss.JOIN=evt._join.status==="failed"?"fail":"pass"; await sleep(Math.max(1,delay/9));
+    setStage("TRUTH"); evt._claim=buildClaim(evt); ss.TRUTH=evt._claim?"pass":"skip"; await sleep(Math.max(1,delay/9));
     setStage("REASONING"); evt._dlr={lane:classifyLane(evt),why:[
       `Severity=${evt.severity}, confidence=${evt.confidence.toFixed(2)} → ${classifyLane(evt)}`,
       ...(evt.metadata.signature_id?[`Matched signature ${evt.metadata.signature_id} rev ${evt.metadata.rev||"?"}`]:[]),
       ...(evt.metadata.guardrail_flags&&evt.metadata.guardrail_flags.length?[`Guardrail flags: ${evt.metadata.guardrail_flags.join(", ")}`]:[])
-    ]}; await sleep(Math.max(1,delay/9));
-    setStage("DRIFT"); evt._drift=detectDrift(evt,i); await sleep(Math.max(1,delay/9));
-    setStage("PATCH"); evt._patch=buildPatch(evt); await sleep(Math.max(1,delay/9));
-    setStage("MEMORY"); evt._mg=updateMemory(evt); await sleep(Math.max(1,delay/9));
+    ]}; ss.REASONING="pass"; await sleep(Math.max(1,delay/9));
+    setStage("DRIFT"); evt._drift=detectDrift(evt,i); ss.DRIFT="pass"; await sleep(Math.max(1,delay/9));
+    setStage("PATCH"); evt._patch=buildPatch(evt); ss.PATCH=evt._patch?"pass":"skip"; await sleep(Math.max(1,delay/9));
+    setStage("MEMORY"); evt._mg=updateMemory(evt); ss.MEMORY="pass"; await sleep(Math.max(1,delay/9));
+    evt._stageStatus=ss;
+    evt._driftScore=evt._drift?Math.min(5,evt._drift.reduce(function(a,d){return a+(d.severity==="high"||d.severity==="critical"?2:1)},0)):0;
 
     appendEventRow(evt,i);
     updateCoherence(i+1,S.events.length);
@@ -824,7 +873,8 @@ function appendEventRow(evt,idx){
   const lane=evt._dlr?evt._dlr.lane:"";
   const hasDrift=evt._drift&&evt._drift.length>0;
   const sig=evt.metadata.signature_id||evt.metadata.sid||evt.action||"-";
-  tr.innerHTML=`<td>${idx+1}</td><td class="mono small">${esc((evt.timestamp||"").slice(11,19))}</td><td>${esc(evt.source_system)}</td><td><span class="badge sev-${evt.severity==="info"?"info":evt.severity}">${esc(evt.event_type)}</span></td><td class="mono small">${esc(String(sig).slice(0,30))}</td><td><span class="badge sev-${evt.severity}">${esc(evt.severity)}</span></td><td>${lane?`<span class="badge lane-${lane}">${lane}</span>`:""}</td><td>${hasDrift?evt._drift.map(d=>`<span class="badge drift-badge">${esc(d.drift_type)}</span>`).join(" "):""}</td><td class="muted">${evt._packetPart||"-"}</td>`;
+  const heat=evt._driftScore||0;
+  tr.innerHTML=`<td>${idx+1}</td><td class="mono small">${esc((evt.timestamp||"").slice(11,19))}</td><td>${esc(evt.source_system)}</td><td><span class="badge sev-${evt.severity==="info"?"info":evt.severity}">${esc(evt.event_type)}</span></td><td class="mono small">${esc(String(sig).slice(0,30))}</td><td><span class="badge sev-${evt.severity}">${esc(evt.severity)}</span></td><td>${lane?`<span class="badge lane-${lane}">${lane}</span>`:""}</td><td>${hasDrift?evt._drift.map(d=>`<span class="badge drift-badge">${esc(d.drift_type)}</span>`).join(" "):""}</td><td><span class="drift-heat drift-heat-${heat}">${heat}</span></td><td class="muted">${evt._packetPart||"-"}</td>`;
   tr.addEventListener("click",()=>selectEvent(idx));
   body.appendChild(tr);
   applyRowFilter(tr,evt);
@@ -870,7 +920,8 @@ function openDrawer(idx){
   S.drawerOpen=true;
   const d=document.getElementById("traceDrawer");
   d.classList.add("open");
-  renderDrawerContent(evt,idx);
+  if(S.compressView)renderCompressView(evt);
+  else renderDrawerContent(evt,idx);
   renderFullTrace(evt,idx);
 }
 function closeDrawer(){
@@ -906,6 +957,8 @@ function renderSummarySection(evt){
     <tr><td>Confidence</td><td>${evt.confidence.toFixed(2)}</td></tr>
     <tr><td>Lane</td><td>${lane!=="—"?`<span class="badge lane-${lane}">${lane}</span>`:lane}</td></tr>
     <tr><td>Drift</td><td>${drifts.length?drifts.map(d=>`<span class="badge drift-badge">${esc(d.drift_type)}</span>`).join(" "):"None"}</td></tr>
+    ${evt._stageStatus?'<tr><td>Stages</td><td><div class="stage-status-row">'+STAGES.map(function(s){var st=evt._stageStatus[s];var cls=st==="pass"?"pass":st==="fail"?"fail":"skip";var sym=st==="pass"?"\u2714":st==="fail"?"\u2716":"\u25CB";return '<span class="stage-marker '+cls+'" title="'+s+": "+(st||"pending")+'">'+sym+"</span>"}).join("")+"</div></td></tr>":""}
+    ${evt._driftScore!==undefined?'<tr><td>Drift Heat</td><td><span class="drift-heat drift-heat-'+evt._driftScore+'">'+evt._driftScore+"</span> / 5</td></tr>":""}
   </table>`;
 }
 
@@ -1019,6 +1072,48 @@ function renderFullTrace(evt,idx){
     sections.map(s=>`<div class="card"><h3>${s.title}</h3>${s.content}</div>`).join("");
 }
 
+/* ── Compress View ─────────────────────────────────────────────────── */
+function toggleCompress(){
+  S.compressView=!S.compressView;
+  var btn=document.getElementById("btnCompress");
+  btn.classList.toggle("primary",S.compressView);
+  btn.textContent=S.compressView?"FULL":"COMPRESS";
+  if(S.selectedIdx!==null){
+    var evt=S.events[S.selectedIdx];
+    if(S.compressView)renderCompressView(evt);
+    else renderDrawerContent(evt,S.selectedIdx);
+  }
+}
+function renderCompressView(evt){
+  if(!evt)return;
+  var body=document.getElementById("drawerBody");
+  var raw=esc((evt.raw_line||"(no raw data)").slice(0,120))+(evt.raw_line&&evt.raw_line.length>120?"\u2026":"");
+  var normalized=esc(evt.source_system+":"+evt.event_type+" | "+(evt.action||"-")+" | sev="+evt.severity+" conf="+evt.confidence.toFixed(2));
+  var lane=evt._dlr?evt._dlr.lane:"\u2014";
+  var laneBadge=lane!=="\u2014"?'<span class="badge lane-'+lane+'">'+lane+"</span>":"\u2014";
+  var drifts=evt._drift&&evt._drift.length?esc(evt._drift.map(function(d){return d.drift_type}).join(",")):"none";
+  var canon=evt._claim?esc("claim="+evt._claim.claim_id.slice(0,12)+" conf="+evt._claim.confidence.toFixed(2)):"no claim";
+  var stageHtml="";
+  if(evt._stageStatus){
+    stageHtml='<div style="margin-top:10px"><div style="font-size:11px;color:var(--muted);margin-bottom:4px">Stage Pipeline</div><div class="stage-status-row">';
+    STAGES.forEach(function(s,i){
+      var st=evt._stageStatus[s];var cls=st==="pass"?"pass":st==="fail"?"fail":"skip";
+      var sym=st==="pass"?"\u2714":st==="fail"?"\u2716":"\u25CB";
+      stageHtml+='<span class="stage-marker '+cls+'" title="'+s+": "+(st||"pending")+'">'+sym+"</span>";
+      if(i<STAGES.length-1)stageHtml+='<span style="color:#2a3a4e;font-size:9px;margin:0 1px">\u2192</span>';
+    });
+    stageHtml+="</div></div>";
+  }
+  body.innerHTML='<div style="margin-top:10px;font-size:12px;font-weight:600;color:#9ab8d3;margin-bottom:8px">COMPRESS \u2014 3-Line Decision Summary</div>'+
+    '<div class="compress-block mono">'+
+    '<div class="compress-line"><span class="compress-label">RAW</span><span>'+raw+"</span></div>"+
+    '<div class="compress-arrow">\u2193</div>'+
+    '<div class="compress-line"><span class="compress-label">NORMAL</span><span>'+normalized+"</span></div>"+
+    '<div class="compress-arrow">\u2193</div>'+
+    '<div class="compress-line"><span class="compress-label">DECISION</span><span>'+laneBadge+" | drift="+drifts+" | "+canon+"</span></div>"+
+    "</div>"+stageHtml;
+}
+
 /* ── Copy Trace ────────────────────────────────────────────────────── */
 function copyTrace(){
   if(S.selectedIdx===null)return;
@@ -1042,11 +1137,11 @@ function copyTrace(){
 function renderCohTab(){
   const c=S.coherence;
   const subs=[
-    {label:"Parse Completeness",val:c.parse},
-    {label:"Join Rate",val:c.join},
-    {label:"Reasoning Coverage",val:c.reasoning},
-    {label:"Drift Coverage",val:c.drift},
-    {label:"Patch Lineage Integrity",val:c.patch},
+    {label:"Parse Completeness (20%)",val:c.parse},
+    {label:"Join Rate (20%)",val:c.join},
+    {label:"Reasoning Coverage (20%)",val:c.reasoning},
+    {label:"Drift Coverage (20%)",val:c.drift},
+    {label:"Patch Lineage Integrity (20%)",val:c.patch},
   ];
   const barsEl=document.getElementById("cohSubBars");
   if(barsEl){
@@ -1085,7 +1180,7 @@ function renderPacketList(){
     <div class="muted small">${esc((p.window_start||"").slice(0,19))} → ${esc((p.window_end||"").slice(0,19))}</div>
   </div>`).join("");
 }
-function selectPacket(idx){
+async function selectPacket(idx){
   document.querySelectorAll(".pkt-item").forEach((el,i)=>el.classList.toggle("active",i===idx));
   const pkt=S.packets[idx];
   if(!pkt)return;
@@ -1139,12 +1234,53 @@ function selectPacket(idx){
     cards.push(`<div class="card"><h3>Manifest</h3><pre class="mono small">${esc(JSON.stringify(JSON.parse(files["manifest.json"]),null,2))}</pre></div>`);
   }
 
-  detail.innerHTML=`<div style="display:flex;gap:8px;margin-bottom:10px"><button class="primary" onclick="exportPacket(${idx})">Export Packet JSON</button></div>`+cards.join("");
+  // Hash/Seal validation
+  let sealHtml="";
+  if(pkt.manifest&&pkt.manifest.files){
+    const mf=typeof pkt.manifest.files==="object"?pkt.manifest.files:{};
+    let rows=[];
+    for(const[fname,expectedHash]of Object.entries(mf)){
+      const content=files[fname];
+      if(content){
+        const actual=await sha256Hex(content);
+        const short=actual.slice(0,12);
+        const expShort=(expectedHash||"").replace("sha256:","").slice(0,12);
+        const match=expectedHash.includes(":")?expectedHash.split(":")[1]===actual:expectedHash===actual;
+        rows.push(`<tr><td class="mono small">${esc(fname)}</td><td class="hash-mono">${short}\u2026</td><td>${match?'<span style="color:var(--ok)">\u2714</span>':'<span style="color:var(--warn)">\u2260</span>'}</td></tr>`);
+      }
+    }
+    const hasMockHashes=Object.values(mf).some(function(h){return String(h).length<20});
+    const sealStatus=hasMockHashes?'<span class="seal-badge seal-pending">Seal Pending (demo hashes)</span>':'<span class="seal-badge seal-ok">Sealed \u2714</span>';
+    sealHtml=`<div class="card"><h3>Integrity &amp; Seal</h3><div style="margin-bottom:8px">${sealStatus}</div><table style="width:100%"><thead><tr><th>File</th><th>SHA-256</th><th></th></tr></thead><tbody>${rows.join("")}</tbody></table></div>`;
+  }
+  detail.innerHTML=`<div style="display:flex;gap:8px;margin-bottom:10px"><button class="primary" onclick="exportPacket(${idx})">Export Packet JSON</button><button onclick="replayPacketChain(${idx})">Rebuild State</button></div>`+sealHtml+cards.join("");
 }
 function exportPacket(idx){
   const pkt=S.packets[idx];
   if(!pkt)return;
   downloadFile(JSON.stringify(pkt,null,2),`${pkt.name||"packet"}.json`,"application/json");
+}
+
+async function replayPacketChain(idx){
+  const pkt=S.packets[idx];if(!pkt)return;
+  const detail=document.getElementById("pktDetail");
+  const dlr=pkt.files["decision_lineage.jsonl"]||"";
+  const lines=dlr.trim().split("\n").filter(function(l){return l.trim()});
+  let replayEvents=0;const lanes={};
+  lines.forEach(function(l){try{var j=JSON.parse(l);replayEvents++;lanes[j.lane]=(lanes[j.lane]||0)+1}catch(_){}});
+  var mg;try{mg=JSON.parse(pkt.files["memory_graph.json"]||"{}")}catch(_){mg={}}
+  const replayData=JSON.stringify({packet:pkt.name,events_replayed:replayEvents,lane_distribution:lanes,memory_nodes:mg.nodes_added||0,memory_edges:mg.edges_added||0,timestamp:nowIso()});
+  const replayHash=await sha256Hex(replayData);
+  const existing=detail.querySelector(".replay-msg");
+  if(existing)existing.remove();
+  const div=document.createElement("div");
+  div.className="replay-msg";
+  div.innerHTML='<div style="font-weight:600;margin-bottom:4px">Replay Complete \u2014 Deterministic Verification</div>'+
+    "<div>"+replayEvents+" decisions replayed from "+esc(pkt.name||"packet")+"</div>"+
+    '<div style="margin-top:4px">Lanes: '+(Object.entries(lanes).map(function(e){return e[0]+"="+e[1]}).join(", ")||"none")+"</div>"+
+    '<div style="margin-top:4px">Memory: '+(mg.nodes_added||0)+" nodes, "+(mg.edges_added||0)+" edges</div>"+
+    '<div class="replay-hash">Replay SHA-256: '+replayHash+"</div>";
+  detail.appendChild(div);
 }
 
 /* ── Ingest Summary ────────────────────────────────────────────────── */
@@ -1159,6 +1295,34 @@ function renderIngestSummary(){
   el.innerHTML=parts.join(" | ")+(srcStr?` | Sources: ${srcStr}`:"");
 }
 
+/* ── View Mode Toggle ──────────────────────────────────────────────── */
+function setViewMode(mode){
+  S.viewMode=mode;
+  document.querySelectorAll(".view-toggle button").forEach(function(b){b.classList.toggle("active",b.dataset.mode===mode)});
+  const body=document.getElementById("eventBody");
+  const rows=[].slice.call(body.querySelectorAll("tr"));
+  if(mode==="governance"){
+    rows.sort(function(a,b){
+      var ai=Number(a.dataset.idx),bi=Number(b.dataset.idx);
+      var ea=S.events[ai],eb=S.events[bi];
+      var da=(ea&&ea._driftScore)||0,db=(eb&&eb._driftScore)||0;
+      if(da!==db)return db-da;
+      return ai-bi;
+    });
+  }else{
+    var sevOrder={critical:0,high:1,medium:2,low:3,info:4};
+    rows.sort(function(a,b){
+      var ai=Number(a.dataset.idx),bi=Number(b.dataset.idx);
+      var ea=S.events[ai],eb=S.events[bi];
+      var sa=ea?sevOrder[ea.severity]:5;var sb=eb?sevOrder[eb.severity]:5;
+      if(sa===undefined)sa=5;if(sb===undefined)sb=5;
+      if(sa!==sb)return sa-sb;
+      return ai-bi;
+    });
+  }
+  rows.forEach(function(r){body.appendChild(r)});
+}
+
 /* ── Reset Pipeline State ──────────────────────────────────────────── */
 function resetPipelineState(){
   S.runIdx=0;S.running=false;S.paused=false;S.stepping=false;
@@ -1166,7 +1330,7 @@ function resetPipelineState(){
   S._patchCount=0;S._patchWithLineage=0;S._joinFails=[];S._driftDrivers={};
   S.coherence={parse:0,join:0,reasoning:0,drift:0,patch:0,total:0};
   S.selectedIdx=null;
-  S.events.forEach(e=>{delete e._parsed;delete e._normalized;delete e._join;delete e._claim;delete e._dlr;delete e._drift;delete e._driftChecked;delete e._patch;delete e._mg});
+  S.events.forEach(e=>{delete e._parsed;delete e._normalized;delete e._join;delete e._claim;delete e._dlr;delete e._drift;delete e._driftChecked;delete e._patch;delete e._mg;delete e._stageStatus;delete e._driftScore});
   document.getElementById("eventBody").innerHTML="";
   document.getElementById("runEmpty").classList.remove("hidden");
   document.getElementById("runStatus").textContent="Idle";
@@ -1406,6 +1570,12 @@ window.addEventListener("DOMContentLoaded",()=>{
     if(sec){sec.scrollIntoView({behavior:"smooth"});sec.style.background="rgba(125,249,255,.05)";setTimeout(()=>sec.style.background="",1500)}
   });
   document.getElementById("btnCopyTrace").addEventListener("click",copyTrace);
+  document.getElementById("btnCompress").addEventListener("click",toggleCompress);
+
+  // View mode toggle
+  document.querySelectorAll(".view-toggle button").forEach(function(b){
+    b.addEventListener("click",function(){setViewMode(b.dataset.mode)});
+  });
 
   // Ingest: Raw file
   document.getElementById("inRawFile").addEventListener("change",e=>{

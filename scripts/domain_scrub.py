@@ -200,6 +200,7 @@ ALLOWED_ACRONYMS = {
     # EDGE JRM module — pipeline stage names, HTML/JS tokens, mock data
     "STAGES", "RAW", "JOIN", "PARSE", "PARSED", "CVE", "TXT",
     "INPUT", "HEADER", "MAIN", "TABS", "EVENT", "WIRING",
+    "TOGGLE", "NORMAL", "VIEW", "MODE",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}
