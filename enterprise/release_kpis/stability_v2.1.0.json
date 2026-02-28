@@ -1,0 +1,45 @@
+{
+  "version": "v2.1.0",
+  "ssi": 60.02,
+  "ssi_band": {
+    "low": 56.02,
+    "high": 64.02
+  },
+  "confidence": 0.8,
+  "components": {
+    "kpi_volatility_score": 74.21,
+    "drift_acceleration_score": 32.0,
+    "authority_sensitivity_score": 86.6,
+    "economic_variance_score": 47.5
+  },
+  "raw": {
+    "avg_abs_kpi_delta": 0.3868,
+    "avg_abs_kpi_acceleration": 0.68,
+    "drift_acceleration_index": 0.68,
+    "positive_acceleration_ratio": 0.125,
+    "tec_spread_ratio": 0.55
+  },
+  "thresholds": {
+    "pass": {
+      "ssi_min": 70,
+      "drift_acceleration_index_max": 0.55
+    },
+    "warn": {
+      "ssi_min": 55,
+      "drift_acceleration_index_max": 0.75
+    },
+    "fail": {
+      "ssi_below": 55,
+      "or_drift_acceleration_index_gte": 0.75
+    }
+  },
+  "gate": "warn",
+  "evidence_signals": {
+    "history_depth_ge_4": true,
+    "kpi_merged_present": false,
+    "tec_present": true,
+    "security_metrics_present": true,
+    "scalability_metrics_present": true,
+    "roadmap_forecast_present": true
+  }
+}

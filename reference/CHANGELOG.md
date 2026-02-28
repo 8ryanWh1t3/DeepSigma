@@ -2,6 +2,18 @@
 
 All contract surface changes are logged here with compatibility annotations.
 
+## [2.1.0] — Decision Infrastructure Hardening
+
+`COMPATIBLE:` v2.1.0 milestone release. All 8 KPIs >= 7.0 and SSI >= 55. 23 issues closed across 7 intermediate stability releases (v2.0.10–v2.0.16). Automation closure, enterprise hardening, schema determinism, DISR architecture, evidence binding, economic ledger, intent safety, and stability governance — all validated and CI-gated.
+
+### Migration
+
+**Affected schemas**: None (all changes additive across v2.0.10–v2.0.16)
+**Consumer action**: None — consumers on v2.0.9+ are fully compatible.
+**Rollback**: Yes — v2.0.16 is functionally equivalent.
+
+---
+
 ## v2.0.16 — Stability Hold
 
 `COMPATIBLE:` Scope freeze enforced (#332) — no KPI-moving changes accepted. Milestone governance gate validated (#358). SSI crosses 55 threshold. All v2.1.0 issues resolved. Governance-only release — zero code changes, zero KPI movement.
