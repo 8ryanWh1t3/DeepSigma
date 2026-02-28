@@ -406,3 +406,83 @@ class TestClaimCLI:
         data = json.loads(result.stdout)
         assert data["submitted"] == 1
         assert data["accepted"] == 1
+
+
+class TestAuthorityCLIExtended:
+    def test_authority_revoke(self, tmp_path):
+        ledger = tmp_path / "ledger.json"
+        # Grant first
+        subprocess.run(
+            [sys.executable, "-m", "core.cli", "authority", "grant",
+             str(AUTHORITY_FIXTURE), "--ledger", str(ledger)],
+            capture_output=True, text=True, cwd=str(REPO_ROOT),
+        )
+        # Revoke using same fixture (reuses fields)
+        result = subprocess.run(
+            [sys.executable, "-m", "core.cli", "authority", "revoke",
+             str(AUTHORITY_FIXTURE), "--ledger", str(ledger), "--json"],
+            capture_output=True, text=True, cwd=str(REPO_ROOT),
+        )
+        assert result.returncode == 0
+        data = json.loads(result.stdout)
+        assert data["entry_type"] == "revocation"
+
+    def test_authority_list(self, tmp_path):
+        ledger = tmp_path / "ledger.json"
+        subprocess.run(
+            [sys.executable, "-m", "core.cli", "authority", "grant",
+             str(AUTHORITY_FIXTURE), "--ledger", str(ledger)],
+            capture_output=True, text=True, cwd=str(REPO_ROOT),
+        )
+        result = subprocess.run(
+            [sys.executable, "-m", "core.cli", "authority", "list",
+             "--ledger", str(ledger), "--json"],
+            capture_output=True, text=True, cwd=str(REPO_ROOT),
+        )
+        assert result.returncode == 0
+        data = json.loads(result.stdout)
+        assert isinstance(data, list)
+        assert len(data) >= 1
+        assert data[0]["entry_type"] == "grant"
+
+
+class TestMetricsCLI:
+    def test_metrics_json(self, tmp_path):
+        # Write a minimal episode file
+        episode = {
+            "episodeId": "ep-test-1",
+            "decisionType": "test",
+            "outcome": {"code": "success"},
+            "startedAt": "2026-01-01T00:00:00Z",
+            "endedAt": "2026-01-01T00:01:00Z",
+        }
+        ep_file = tmp_path / "episodes.json"
+        ep_file.write_text(json.dumps([episode]))
+        result = subprocess.run(
+            [sys.executable, "-m", "core.cli", "metrics",
+             str(ep_file), "--json"],
+            capture_output=True, text=True, cwd=str(REPO_ROOT),
+        )
+        assert result.returncode == 0
+        data = json.loads(result.stdout)
+        assert "metrics" in data
+        assert len(data["metrics"]) >= 1
+
+    def test_agent_metrics_json(self, tmp_path):
+        session_dir = tmp_path / "session"
+        # Log a decision via agent CLI first
+        result = subprocess.run(
+            [sys.executable, "-m", "core.cli", "agent", "log",
+             str(FIXTURE), "--session-dir", str(session_dir), "--json"],
+            capture_output=True, text=True, cwd=str(REPO_ROOT),
+        )
+        assert result.returncode == 0
+        # Now collect metrics
+        result = subprocess.run(
+            [sys.executable, "-m", "core.cli", "agent", "metrics",
+             "--session-dir", str(session_dir), "--json"],
+            capture_output=True, text=True, cwd=str(REPO_ROOT),
+        )
+        assert result.returncode == 0
+        data = json.loads(result.stdout)
+        assert "metrics" in data

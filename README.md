@@ -3,6 +3,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
 [![Coherence Score](https://img.shields.io/badge/coherence-90%2F100-brightgreen)](./docs/metrics.md)
+[![Authority Coverage](https://img.shields.io/badge/authority_coverage-100%25-brightgreen)](./enterprise/release_kpis/authority_evidence.json)
+[![Drift Density](https://img.shields.io/badge/drift_density-0.0000-brightgreen)](./enterprise/release_kpis/KPI_GATE_REPORT.md)
+[![Memory Coverage](https://img.shields.io/badge/memory_coverage-1.0-brightgreen)](./enterprise/release_kpis/KPI_GATE_REPORT.md)
 
 # DeepSigma
 
