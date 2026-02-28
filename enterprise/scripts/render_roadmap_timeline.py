@@ -14,66 +14,64 @@ def main() -> int:
     roadmap = json.loads(ROADMAP_PATH.read_text(encoding="utf-8"))
     versions = list(roadmap.keys())
 
-    max_items = 10
-    line_height = 60
-    font_size = 40
-    width = 2800
-    baseline_y = 200
-    spacing = 1200 if len(versions) <= 2 else max(600, int((width - 600) / max(1, len(versions) - 1)))
-    start_x = 550
-
-    # Compute height from tallest item list
-    max_bullet_count = max(min(len(p.get("scope") or p.get("focus") or []), max_items) for p in roadmap.values())
-    box_h = 70 + (max_bullet_count * line_height)
-    height = baseline_y + 100 + box_h + 80
+    # Vertical layout — keeps SVG close to GitHub's ~800px container so text stays large
+    max_items = 12
+    line_height = 32
+    font_size = 22
+    width = 880
+    margin_x = 40
+    box_w = width - (margin_x * 2)
+    title_y = 50
+    section_gap = 30
 
     colors = {"active": "#1F8B4C", "released": "#2563EB", "dormant": "#C47F00", "planned": "#666"}
 
-    circles = []
-    labels = []
-    boxes = []
+    elements: list[str] = []
+    cursor_y = title_y + 40  # after main title
 
     for idx, version in enumerate(versions):
         payload = roadmap[version]
         status = str(payload.get("status", "planned"))
-        x = start_x + (idx * spacing)
         color = colors.get(status, colors["planned"])
         items = payload.get("scope") or payload.get("focus") or []
         display_items = items[:max_items]
         remaining = len(items) - max_items
-        title = f"{version} ({status})"
-        circles.append(f"<circle cx='{x}' cy='{baseline_y}' r='36' fill='{color}' />")
-        labels.append(f"<text x='{x}' y='{baseline_y - 56}' text-anchor='middle' font-size='44' font-weight='bold' fill='#111'>{title}</text>")
-        labels.append(f"<text x='{x}' y='{baseline_y + 14}' text-anchor='middle' font-size='30' fill='#fff'>{idx + 1}</text>")
+        heading = f"{version}  —  {status}"
 
-        box_y = baseline_y + 100
-        box_w = 1000
-        box_x = x - (box_w // 2)
-        bullet_lines = "".join(
-            f"<text x='{box_x + 30}' y='{box_y + 55 + (line_idx * line_height)}' font-size='{font_size}' fill='#111'>- {text}</text>"
-            for line_idx, text in enumerate(display_items)
-        )
+        # Connector dot + vertical line between sections
+        if idx > 0:
+            elements.append(f"<line x1='{width // 2}' y1='{cursor_y - section_gap}' x2='{width // 2}' y2='{cursor_y}' stroke='#222' stroke-width='4' />")
+        dot_y = cursor_y + 16
+        elements.append(f"<circle cx='{width // 2}' cy='{dot_y}' r='14' fill='{color}' />")
+        elements.append(f"<text x='{width // 2}' y='{dot_y + 6}' text-anchor='middle' font-size='14' fill='#fff'>{idx + 1}</text>")
+
+        # Version heading
+        heading_y = dot_y + 40
+        elements.append(f"<text x='{width // 2}' y='{heading_y}' text-anchor='middle' font-size='26' font-weight='bold' fill='#111'>{heading}</text>")
+
+        # Scope box
+        box_y = heading_y + 14
+        n_lines = len(display_items) + (1 if remaining > 0 else 0)
+        box_h = 20 + (n_lines * line_height) + 10
+        elements.append(f"<rect x='{margin_x}' y='{box_y}' width='{box_w}' height='{box_h}' rx='10' fill='#f5f7fb' stroke='#d4d8e3' stroke-width='2'/>")
+        for line_idx, text in enumerate(display_items):
+            elements.append(
+                f"<text x='{margin_x + 20}' y='{box_y + 20 + line_height // 2 + (line_idx * line_height)}' font-size='{font_size}' fill='#111'>• {text}</text>"
+            )
         if remaining > 0:
-            bullet_lines += f"<text x='{box_x + 30}' y='{box_y + 55 + (len(display_items) * line_height)}' font-size='{font_size}' fill='#888'>  +{remaining} more</text>"
-        boxes.append(
-            f"<rect x='{box_x}' y='{box_y}' width='{box_w}' height='{box_h}' rx='16' fill='#f5f7fb' stroke='#d4d8e3' stroke-width='3'/>"
-            + bullet_lines
-        )
+            elements.append(
+                f"<text x='{margin_x + 20}' y='{box_y + 20 + line_height // 2 + (len(display_items) * line_height)}' font-size='{font_size}' fill='#888'>  +{remaining} more</text>"
+            )
 
-    connectors = []
-    for idx in range(len(versions) - 1):
-        x1 = start_x + (idx * spacing)
-        x2 = start_x + ((idx + 1) * spacing)
-        connectors.append(f"<line x1='{x1 + 40}' y1='{baseline_y}' x2='{x2 - 40}' y2='{baseline_y}' stroke='#222' stroke-width='6' />")
+        cursor_y = box_y + box_h + section_gap
+
+    height = cursor_y + 20
 
     svg = (
         f"<svg xmlns='http://www.w3.org/2000/svg' width='{width}' height='{height}' role='img' aria-label='Roadmap timeline'>"
         "<rect width='100%' height='100%' fill='#fff'/>"
-        "<text x='60' y='80' font-size='56' font-family='DejaVu Sans,Verdana,sans-serif' font-weight='bold' fill='#111'>DeepSigma Roadmap Timeline</text>"
-        + "".join(connectors)
-        + "".join(circles)
-        + "".join(labels)
-        + "".join(boxes)
+        f"<text x='{width // 2}' y='{title_y}' text-anchor='middle' font-size='30' font-family='DejaVu Sans,Verdana,sans-serif' font-weight='bold' fill='#111'>DeepSigma Roadmap Timeline</text>"
+        + "".join(elements)
         + "</svg>"
     )
 
