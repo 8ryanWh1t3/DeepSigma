@@ -192,7 +192,7 @@ ALLOWED_ACRONYMS = {
     "VALUE", "TIER", "SOURCE", "SUM", "PRJ", "TSK", "PMP",
     "APR", "YOU", "ARE",
     # Domain mode state machine / pipeline step names
-    "FROZEN", "LOAD", "INGEST", "DELTA", "REOPS",
+    "FROZEN", "LOAD", "INGEST", "DELTA", "REOPS", "MONEY",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}
