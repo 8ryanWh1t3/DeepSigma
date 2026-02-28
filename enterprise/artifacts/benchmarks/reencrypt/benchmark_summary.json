@@ -1,0 +1,52 @@
+{
+  "metrics": {
+    "schema_version": "1.0",
+    "metric_family": "disr_scalability",
+    "execution_mode": "ci_benchmark",
+    "evidence_level": "real_workload",
+    "kpi_eligible": true,
+    "run_started_at": "2026-02-28T02:30:09.062066Z",
+    "run_completed_at": "2026-02-28T02:30:09.088262Z",
+    "records_targeted": 100000,
+    "bytes_targeted": 19100000,
+    "wall_clock_seconds": 0.025894,
+    "cpu_seconds": 0.02535,
+    "rss_peak_bytes": 86458368,
+    "throughput_records_per_second": 3861910.888,
+    "throughput_mb_per_minute": 42207.239891,
+    "scalability_score": 10.0,
+    "dataset_sha256": "91841054cc5b3c6b1be1e15f8b8881416cdb68e55f3095bcc9c50336a8c00bdd",
+    "deterministic_seed": "DISR-BENCH-2026"
+  },
+  "security_metrics": {
+    "schema_version": "1.0",
+    "metric_family": "disr_security",
+    "execution_mode": "ci_benchmark",
+    "evidence_level": "simulated",
+    "kpi_eligible": false,
+    "tenant_id": "tenant-alpha",
+    "compromise_started_at": "2026-02-28T02:30:09.062066Z",
+    "rotation_completed_at": "2026-02-28T02:30:09.062066Z",
+    "recovery_completed_at": "2026-02-28T02:30:09.088262Z",
+    "mttr_seconds": 0.025894,
+    "records_targeted": 100000,
+    "bytes_targeted": 19100000,
+    "reencrypt_records_per_second": 3861910.888,
+    "reencrypt_mb_per_minute": 42207.239891,
+    "signing_mode": "hmac",
+    "signing_key_source": "benchmark_signing_key",
+    "signing_notice": "Benchmark uses deterministic test signing key."
+  },
+  "reencrypt_summary": {
+    "tenant_id": "tenant-alpha",
+    "dry_run": true,
+    "resumed": false,
+    "checkpoint_path": "/Users/bryanwhite/DeepSigma/enterprise/artifacts/benchmarks/reencrypt/reencrypt_checkpoint.json",
+    "files_targeted": 4,
+    "records_targeted": 100003,
+    "files_rewritten": 0,
+    "records_reencrypted": 0,
+    "status": "dry_run"
+  },
+  "dataset_path": "/Users/bryanwhite/DeepSigma/enterprise/artifacts/benchmarks/reencrypt/claims.jsonl"
+}

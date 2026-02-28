@@ -8,7 +8,7 @@ Compared to previous release: `v2.0.16`
 |---|---:|---:|---:|
 | Technical Completeness | 10.00 | 10.00 | +0.00 |
 | Automation Depth | 10.00 | 10.00 | +0.00 |
-| Authority Modeling | 9.72 | 9.72 | +0.00 |
+| Authority Modeling | 9.72 | 10.00 | +0.28 |
 | Enterprise Readiness | 10.00 | 10.00 | +0.00 |
 | Scalability | 10.00 | 10.00 | +0.00 |
 | Data Integration | 10.00 | 10.00 | +0.00 |

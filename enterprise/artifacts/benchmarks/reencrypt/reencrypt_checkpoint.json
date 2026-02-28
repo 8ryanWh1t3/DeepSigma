@@ -1,0 +1,33 @@
+{
+  "tenant_id": "tenant-alpha",
+  "status": "dry_run",
+  "updated_at": "2026-02-28T02:30:09.087984Z",
+  "batch_size": 1000,
+  "idempotency_key": "reencrypt-460d387c132c4549a29faebcb8ea0ddc",
+  "files_targeted": 4,
+  "records_targeted": 100003,
+  "files_rewritten": 0,
+  "records_reencrypted": 0,
+  "progress": {
+    "benchmark_summary.json": {
+      "line_offset": 0,
+      "temp_path": "/Users/bryanwhite/DeepSigma/enterprise/artifacts/benchmarks/reencrypt/benchmark_summary.json.reenc.tmp",
+      "completed": false
+    },
+    "claims.jsonl": {
+      "line_offset": 0,
+      "temp_path": "/Users/bryanwhite/DeepSigma/enterprise/artifacts/benchmarks/reencrypt/claims.jsonl.reenc.tmp",
+      "completed": false
+    },
+    "local_keystore.json": {
+      "line_offset": 0,
+      "temp_path": "/Users/bryanwhite/DeepSigma/enterprise/artifacts/benchmarks/reencrypt/local_keystore.json.reenc.tmp",
+      "completed": false
+    },
+    "reencrypt_checkpoint.json": {
+      "line_offset": 0,
+      "temp_path": "/Users/bryanwhite/DeepSigma/enterprise/artifacts/benchmarks/reencrypt/reencrypt_checkpoint.json.reenc.tmp",
+      "completed": false
+    }
+  }
+}

@@ -1,52 +1,32 @@
-# TEC Summary (ROM)
+# TEC Summary (C-TEC v2)
 
-## Counts
-- issues_total: **247**
-- prs_merged: **227**
-- workflows: **39**
-- test_files: **124**
-- doc_files: **341**
-- security_issues_tagged: **4**
-- committee_cycles_est: **0**
-- issues_with_pr_link_est: **117**
+## Latest Factors
+- ICR: **YELLOW** (RCF=0.85, RL_open=159)
+- PCR: **extreme** (CCF=0.7, CL14=687)
 
-## Effort (Base hours breakdown)
-- issues_weighted: **2475.1**
-- issues_complexity_weighted: **3156.5**
-- pr_overhead: **340.5**
-- workflows: **195.0**
-- tests: **248.0**
-- docs: **511.5**
-- committee: **0.0**
-- total_base: **3770.1**
-- total_ctec: **4548.5**
-- total_ctec_unadjusted: **4451.5**
-- insights_adjustment_hours: **97.0**
+## Edition Metrics
+- CORE: TEC=347.0 | C-TEC=206.47 | KPI=1.0
+- ENTERPRISE: TEC=1518.4 | C-TEC=903.45 | KPI=1.0
+- TOTAL: TEC=18425.2 | C-TEC=10962.99 | KPI=1.0
 
-## Complexity (C-TEC v1.0)
-- avg_index: **1.265**
-- max_index: **2.275**
-- signals: PR diff size, changed files, cross-subsystem touch, issue duration, dependency refs
-
-## Pulse Insights Adjustment
-- insights_present: **True**
-- insights_score: **6.16**
-- signal_count: **3**
-- adjustment_factor: **1.0218x**
-- adjustment_hours: **97.0**
-
-## Tiers (Low / Base / High)
+## Tiers (from TOTAL C-TEC)
 ### Internal @ $150/hr
-- Low:  3638.8 hrs | $545825.0
-- Base: 4548.5 hrs | $682281.0
-- High: 6140.5 hrs | $921080.0
+- Low:  8770.4 hrs | $1315559
+- Base: 10963.0 hrs | $1644448
+- High: 14800.0 hrs | $2220005
 
 ### Executive @ $225/hr
-- Low:  3638.8 hrs | $818738.0
-- Base: 4548.5 hrs | $1023422.0
-- High: 6140.5 hrs | $1381620.0
+- Low:  8770.4 hrs | $1973338
+- Base: 10963.0 hrs | $2466673
+- High: 14800.0 hrs | $3330008
 
 ### Public Sector Fully Burdened @ $275/hr
-- Low:  3638.8 hrs | $1000679.0
-- Base: 4548.5 hrs | $1250849.0
-- High: 6140.5 hrs | $1688646.0
+- Low:  8770.4 hrs | $2411858
+- Base: 10963.0 hrs | $3014822
+- High: 14800.0 hrs | $4070010
+
+## Why This Is More Accurate
+- Uses edition-scoped inventory plus full-repo `total` scope, so complexity is measured across actual shipped surfaces.
+- Applies live governance factors (`RCF` from issue risk health, `CCF` from 14-day PR change load) instead of static effort-only multipliers.
+- Computes C-TEC as control-adjusted complexity (`TEC x KPI_Coverage x RCF x CCF`), which reflects execution discipline, not just size.
+- Produces deterministic daily snapshots (`ICR/PCR/TEC`) so trend direction is measurable and auditable over time.
