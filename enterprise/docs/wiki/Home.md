@@ -76,6 +76,17 @@ Three executable domain mode modules (36 function handlers total) with cross-dom
 
 ---
 
+## JRM (Judgment Refinement Module)
+
+Log-agnostic coherence engine for external telemetry with cross-environment federation.
+
+| Page | What it covers |
+|------|---------------|
+| [JRM Pipeline](JRM-Pipeline) | 3 adapters (Suricata, Snort, Copilot), 5-stage pipeline, JRM-X packet builder, CLI |
+| [JRM Federation](JRM-Federation) | Gate validation, hub drift detection, advisory engine, HMAC-SHA256 signing |
+
+---
+
 ## FEEDS Event Surface
 
 Event-driven pub/sub connecting governance primitives (TS, ALS, DLR, DS, CE) via file-based bus with manifest-first ingest, authority validation, triage state machine, and canon versioning.

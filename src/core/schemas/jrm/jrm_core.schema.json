@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/jrm_core.schema.json",
+  "title": "JRM Core Event",
+  "description": "Normalized event produced by a JRM adapter.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "eventId",
+    "sourceSystem",
+    "eventType",
+    "timestamp",
+    "severity",
+    "actor",
+    "object",
+    "action",
+    "confidence",
+    "evidenceHash",
+    "rawPointer",
+    "environmentId"
+  ],
+  "properties": {
+    "eventId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceSystem": {
+      "type": "string",
+      "minLength": 1
+    },
+    "eventType": {
+      "type": "string",
+      "enum": [
+        "suricata_alert",
+        "suricata_dns",
+        "suricata_http",
+        "suricata_flow",
+        "snort_alert",
+        "agent_prompt",
+        "agent_tool_call",
+        "agent_response",
+        "agent_guardrail",
+        "malformed",
+        "generic"
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low", "info"]
+    },
+    "actor": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string" },
+        "id": { "type": "string" },
+        "ip": { "type": "string" }
+      },
+      "required": ["type", "id"]
+    },
+    "object": {
+      "type": "object",
+      "properties": {
+        "type": { "type": "string" },
+        "id": { "type": "string" },
+        "ip": { "type": "string" },
+        "port": { "type": "integer" }
+      },
+      "required": ["type", "id"]
+    },
+    "action": {
+      "type": "string",
+      "minLength": 1
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "evidenceHash": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "rawPointer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "environmentId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "assumptions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "metadata": {
+      "type": "object",
+      "default": {}
+    }
+  }
+}

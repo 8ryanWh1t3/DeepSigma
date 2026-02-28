@@ -70,7 +70,8 @@ See: [docs/release/RELEASE_NOTES_v2.1.0.md](docs/release/RELEASE_NOTES_v2.1.0.md
 - Cascade Engine — 7 cross-domain rules with depth-limited propagation
 - Event Contracts — routing table mapping 36 functions + 39 events
 - Money Demo v2 — 10-step end-to-end pipeline (`make demo-money`)
-- 207 new tests, 581 total passing
+- JRM — log-agnostic refinement engine: 3 adapters, 5-stage pipeline, JRM-X packet builder, enterprise federation
+- 105 JRM tests, 207 domain mode tests, 686 total passing
 
 ### Competitive Gap Closure (v2.1.0)
 
@@ -220,6 +221,8 @@ python src/tools/reconstruct/verify_pack.py --pack /tmp/pack --key "$KEY"
 | **Cascade Engine** | Cross-domain event propagation with 7 declarative rules and depth-limited cascading | [src/core/modes/cascade.py](src/core/modes/cascade.py) |
 | **Event Contracts** | Routing table: 36 functions + 39 events mapped to FEEDS topics, subtypes, and handlers | [src/core/feeds/contracts/](src/core/feeds/contracts/) |
 | **Money Demo v2** | 10-step pipeline exercising all 3 domain modes with drift, retcon, and cascade | [src/demos/money_demo/](src/demos/money_demo/) |
+| **JRM Pipeline** | Log-agnostic Judgment Refinement Module — 3 adapters (Suricata, Snort, Copilot), 5-stage coherence pipeline, JRM-X packet zips | [src/core/jrm/](src/core/jrm/) |
+| **JRM Federation** | Cross-environment gate, hub, advisory engine, HMAC-SHA256 packet signing | [enterprise/src/deepsigma/jrm_ext/](src/deepsigma/jrm_ext/) |
 
 ## Connectors
 

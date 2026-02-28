@@ -74,6 +74,9 @@ def main(argv: list[str] | None = None) -> int:
     compliance_export.register(subparsers)
     new_connector.register(subparsers)
 
+    from deepsigma.jrm_ext import cli as jrm_ext_cli
+    jrm_ext_cli.register(subparsers)
+
     args = parser.parse_args(argv)
 
     if not hasattr(args, "func") or args.func is None:

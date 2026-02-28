@@ -1,0 +1,13 @@
+{"type":"prompt","timestamp":"2026-02-28T10:00:01Z","agent_id":"agent-alpha","prompt":"Analyze network traffic for anomalies","target":"network_analyzer","confidence":0.9,"model":"claude-opus-4-6"}
+{"type":"tool_call","timestamp":"2026-02-28T10:00:02Z","agent_id":"agent-alpha","tool_calls":[{"name":"query_logs","args":{"timeframe":"1h","filter":"severity>=high"}}],"target":"log_query_api","confidence":0.85}
+{"type":"response","timestamp":"2026-02-28T10:00:03Z","agent_id":"agent-alpha","response":"Found 15 high-severity alerts in the last hour. 12 are ET MALWARE signatures on SID 2010935.","target":"user","confidence":0.88}
+{"type":"prompt","timestamp":"2026-02-28T10:00:04Z","agent_id":"agent-beta","prompt":"Deploy security patch to affected hosts","target":"patch_manager","confidence":0.75,"model":"claude-sonnet-4-6"}
+{"type":"tool_call","timestamp":"2026-02-28T10:00:05Z","agent_id":"agent-beta","tool_calls":[{"name":"deploy_patch","args":{"hosts":["10.0.0.5","10.0.0.25"],"patch_id":"CVE-2026-1234"}}],"target":"patch_manager","confidence":0.7}
+{"type":"guardrail","timestamp":"2026-02-28T10:00:06Z","agent_id":"agent-beta","guardrail_flags":["requires_approval","production_change"],"target":"patch_manager","confidence":0.6}
+{"type":"response","timestamp":"2026-02-28T10:00:07Z","agent_id":"agent-beta","response":"Patch deployment blocked: requires human approval for production changes.","target":"user","confidence":0.95}
+{"type":"prompt","timestamp":"2026-02-28T10:00:08Z","agent_id":"agent-alpha","prompt":"Correlate DNS queries with known threat intelligence","target":"threat_intel_api","confidence":0.82}
+{"type":"tool_call","timestamp":"2026-02-28T10:00:09Z","agent_id":"agent-alpha","tool_calls":[{"name":"lookup_ioc","args":{"domain":"malicious.example.com","type":"domain"}},{"name":"check_reputation","args":{"ip":"93.184.216.34"}}],"target":"threat_intel_api","confidence":0.78}
+{"type":"response","timestamp":"2026-02-28T10:00:10Z","agent_id":"agent-alpha","response":"Domain malicious.example.com is flagged in 3 threat feeds. IP 93.184.216.34 has clean reputation.","target":"user","confidence":0.92}
+{"type":"guardrail","timestamp":"2026-02-28T10:00:11Z","agent_id":"agent-gamma","guardrail_flags":["pii_detected","data_exfil_risk"],"target":"data_export","confidence":0.4}
+this is a malformed agent log line
+{"type":"tool_call","timestamp":"2026-02-28T10:00:13Z","agent_id":"agent-alpha","tool_calls":[{"name":"block_domain","args":{"domain":"malicious.example.com"}}],"target":"firewall_api","confidence":0.9}

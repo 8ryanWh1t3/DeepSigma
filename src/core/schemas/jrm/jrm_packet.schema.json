@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/jrm_packet.schema.json",
+  "title": "JRM-X Packet Manifest",
+  "description": "Manifest for a JRM-X packet zip containing 6 canonical files.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "packetName",
+    "environmentId",
+    "windowStart",
+    "windowEnd",
+    "part",
+    "files",
+    "eventCount",
+    "sizeBytes",
+    "createdAt"
+  ],
+  "properties": {
+    "packetName": {
+      "type": "string",
+      "pattern": "^JRM_X_PACKET_"
+    },
+    "environmentId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "windowStart": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "windowEnd": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "part": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "files": {
+      "type": "object",
+      "required": [
+        "truth_snapshot.json",
+        "authority_slice.json",
+        "decision_lineage.jsonl",
+        "drift_signal.jsonl",
+        "memory_graph.json",
+        "canon_entry.json"
+      ],
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^sha256:[a-f0-9]{64}$"
+      }
+    },
+    "eventCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "sizeBytes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "signature": {
+      "type": "object",
+      "properties": {
+        "algorithm": { "type": "string" },
+        "value": { "type": "string" },
+        "signerId": { "type": "string" }
+      }
+    }
+  }
+}

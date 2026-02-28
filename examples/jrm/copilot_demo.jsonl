@@ -1,0 +1,200 @@
+{"type": "tool_call", "timestamp": "2026-02-28T10:00:00+00:00", "agent_id": "agent-alpha", "confidence": 0.82, "tool_calls": [{"name": "check_reputation", "args": {"target": "10.0.0.95"}}], "target": "check_reputation"}
+{"type": "response", "timestamp": "2026-02-28T10:00:05+00:00", "agent_id": "agent-gamma", "confidence": 0.37, "response": "Analysis complete. Found 38 issues.", "target": "user"}
+{"type": "response", "timestamp": "2026-02-28T10:00:10+00:00", "agent_id": "agent-beta", "confidence": 0.65, "response": "Analysis complete. Found 36 issues.", "target": "user"}
+{"type": "response", "timestamp": "2026-02-28T10:00:15+00:00", "agent_id": "agent-beta", "confidence": 0.94, "response": "Analysis complete. Found 48 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:00:20+00:00", "agent_id": "agent-beta", "confidence": 0.34, "tool_calls": [{"name": "query_logs", "args": {"target": "10.0.0.210"}}], "target": "query_logs"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:00:25+00:00", "agent_id": "agent-alpha", "confidence": 0.37, "tool_calls": [{"name": "block_domain", "args": {"target": "10.0.0.214"}}], "target": "block_domain"}
+{"type": "prompt", "timestamp": "2026-02-28T10:00:30+00:00", "agent_id": "agent-beta", "confidence": 0.56, "prompt": "Investigate failed login attempts", "target": "system", "model": "claude-sonnet-4-6"}
+{"type": "prompt", "timestamp": "2026-02-28T10:00:35+00:00", "agent_id": "agent-gamma", "confidence": 0.34, "prompt": "Investigate failed login attempts", "target": "system", "model": "claude-opus-4-6"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:00:40+00:00", "agent_id": "agent-alpha", "confidence": 0.87, "guardrail_flags": ["data_exfil_risk"], "target": "lookup_ioc"}
+{"type": "response", "timestamp": "2026-02-28T10:00:45+00:00", "agent_id": "agent-alpha", "confidence": 0.37, "response": "Analysis complete. Found 37 issues.", "target": "user"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:00:50+00:00", "agent_id": "agent-gamma", "confidence": 0.76, "guardrail_flags": ["requires_approval", "production_change"], "target": "create_ticket"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:00:55+00:00", "agent_id": "agent-gamma", "confidence": 0.74, "tool_calls": [{"name": "scan_host", "args": {"target": "10.0.0.85"}}], "target": "scan_host"}
+{"type": "response", "timestamp": "2026-02-28T10:01:00+00:00", "agent_id": "agent-beta", "confidence": 0.78, "response": "Analysis complete. Found 10 issues.", "target": "user"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:01:05+00:00", "agent_id": "agent-alpha", "confidence": 0.83, "guardrail_flags": ["requires_approval", "production_change"], "target": "block_domain"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:01:10+00:00", "agent_id": "agent-beta", "confidence": 0.43, "tool_calls": [{"name": "block_domain", "args": {"target": "10.0.0.19"}}], "target": "block_domain"}
+{"type": "response", "timestamp": "2026-02-28T10:01:15+00:00", "agent_id": "agent-gamma", "confidence": 0.5, "response": "Analysis complete. Found 49 issues.", "target": "user"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:01:20+00:00", "agent_id": "agent-gamma", "confidence": 0.79, "guardrail_flags": ["requires_approval", "production_change"], "target": "check_reputation"}
+{"type": "response", "timestamp": "2026-02-28T10:01:25+00:00", "agent_id": "agent-beta", "confidence": 0.36, "response": "Analysis complete. Found 8 issues.", "target": "user"}
+{"type": "prompt", "timestamp": "2026-02-28T10:01:30+00:00", "agent_id": "agent-gamma", "confidence": 0.75, "prompt": "Deploy security patch to affected hosts", "target": "system", "model": "claude-sonnet-4-6"}
+{"type": "response", "timestamp": "2026-02-28T10:01:35+00:00", "agent_id": "agent-alpha", "confidence": 0.59, "response": "Analysis complete. Found 37 issues.", "target": "user"}
+{"type": "prompt", "timestamp": "2026-02-28T10:01:40+00:00", "agent_id": "agent-alpha", "confidence": 0.37, "prompt": "Analyze network traffic for anomalies", "target": "system", "model": "claude-opus-4-6"}
+{"type": "prompt", "timestamp": "2026-02-28T10:01:45+00:00", "agent_id": "agent-gamma", "confidence": 0.83, "prompt": "Correlate DNS queries with threat intelligence", "target": "system", "model": "claude-opus-4-6"}
+{"type": "response", "timestamp": "2026-02-28T10:01:50+00:00", "agent_id": "agent-gamma", "confidence": 0.48, "response": "Analysis complete. Found 48 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:01:55+00:00", "agent_id": "agent-gamma", "confidence": 0.53, "tool_calls": [{"name": "check_reputation", "args": {"target": "10.0.0.23"}}], "target": "check_reputation"}
+{"type": "prompt", "timestamp": "2026-02-28T10:02:00+00:00", "agent_id": "agent-gamma", "confidence": 0.79, "prompt": "Review firewall rule changes", "target": "system", "model": "claude-opus-4-6"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:02:05+00:00", "agent_id": "agent-gamma", "confidence": 0.57, "guardrail_flags": ["rate_limit_exceeded"], "target": "create_ticket"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:02:10+00:00", "agent_id": "agent-beta", "confidence": 0.34, "tool_calls": [{"name": "block_domain", "args": {"target": "10.0.0.46"}}], "target": "block_domain"}
+{"type": "response", "timestamp": "2026-02-28T10:02:15+00:00", "agent_id": "agent-alpha", "confidence": 0.96, "response": "Analysis complete. Found 42 issues.", "target": "user"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:02:20+00:00", "agent_id": "agent-alpha", "confidence": 0.45, "guardrail_flags": ["pii_detected"], "target": "create_ticket"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:02:25+00:00", "agent_id": "agent-alpha", "confidence": 0.86, "guardrail_flags": ["rate_limit_exceeded"], "target": "deploy_patch"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:02:30+00:00", "agent_id": "agent-alpha", "confidence": 0.34, "tool_calls": [{"name": "query_logs", "args": {"target": "10.0.0.7"}}], "target": "query_logs"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:02:35+00:00", "agent_id": "agent-gamma", "confidence": 0.88, "guardrail_flags": ["requires_approval", "production_change"], "target": "block_domain"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:02:40+00:00", "agent_id": "agent-beta", "confidence": 0.39, "tool_calls": [{"name": "create_ticket", "args": {"target": "10.0.0.101"}}], "target": "create_ticket"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:02:45+00:00", "agent_id": "agent-alpha", "confidence": 0.37, "tool_calls": [{"name": "deploy_patch", "args": {"target": "10.0.0.32"}}], "target": "deploy_patch"}
+{"type": "response", "timestamp": "2026-02-28T10:02:50+00:00", "agent_id": "agent-gamma", "confidence": 0.44, "response": "Analysis complete. Found 27 issues.", "target": "user"}
+{"type": "prompt", "timestamp": "2026-02-28T10:02:55+00:00", "agent_id": "agent-alpha", "confidence": 0.56, "prompt": "Correlate DNS queries with threat intelligence", "target": "system", "model": "claude-sonnet-4-6"}
+{"type": "response", "timestamp": "2026-02-28T10:03:00+00:00", "agent_id": "agent-beta", "confidence": 0.67, "response": "Analysis complete. Found 9 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:03:05+00:00", "agent_id": "agent-gamma", "confidence": 0.46, "tool_calls": [{"name": "query_logs", "args": {"target": "10.0.0.69"}}], "target": "query_logs"}
+{"type": "response", "timestamp": "2026-02-28T10:03:10+00:00", "agent_id": "agent-beta", "confidence": 0.49, "response": "Analysis complete. Found 41 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:03:15+00:00", "agent_id": "agent-alpha", "confidence": 0.53, "tool_calls": [{"name": "lookup_ioc", "args": {"target": "10.0.0.58"}}], "target": "lookup_ioc"}
+{"type": "response", "timestamp": "2026-02-28T10:03:20+00:00", "agent_id": "agent-alpha", "confidence": 0.62, "response": "Analysis complete. Found 40 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:03:25+00:00", "agent_id": "agent-alpha", "confidence": 0.75, "tool_calls": [{"name": "lookup_ioc", "args": {"target": "10.0.0.186"}}], "target": "lookup_ioc"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:03:30+00:00", "agent_id": "agent-beta", "confidence": 0.51, "guardrail_flags": ["rate_limit_exceeded"], "target": "create_ticket"}
+{"type": "response", "timestamp": "2026-02-28T10:03:35+00:00", "agent_id": "agent-gamma", "confidence": 0.79, "response": "Analysis complete. Found 33 issues.", "target": "user"}
+{"type": "prompt", "timestamp": "2026-02-28T10:03:40+00:00", "agent_id": "agent-gamma", "confidence": 0.72, "prompt": "Deploy security patch to affected hosts", "target": "system", "model": "claude-opus-4-6"}
+{"type": "prompt", "timestamp": "2026-02-28T10:03:45+00:00", "agent_id": "agent-gamma", "confidence": 0.9, "prompt": "Analyze network traffic for anomalies", "target": "system", "model": "claude-opus-4-6"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:03:50+00:00", "agent_id": "agent-alpha", "confidence": 0.72, "guardrail_flags": ["requires_approval", "production_change"], "target": "lookup_ioc"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:03:55+00:00", "agent_id": "agent-alpha", "confidence": 0.61, "tool_calls": [{"name": "lookup_ioc", "args": {"target": "10.0.0.17"}}], "target": "lookup_ioc"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:04:00+00:00", "agent_id": "agent-beta", "confidence": 0.77, "tool_calls": [{"name": "check_reputation", "args": {"target": "10.0.0.36"}}], "target": "check_reputation"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:04:05+00:00", "agent_id": "agent-alpha", "confidence": 0.54, "guardrail_flags": ["data_exfil_risk"], "target": "query_logs"}
+{"type": "response", "timestamp": "2026-02-28T10:04:10+00:00", "agent_id": "agent-beta", "confidence": 0.6, "response": "Analysis complete. Found 19 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:04:15+00:00", "agent_id": "agent-alpha", "confidence": 0.61, "tool_calls": [{"name": "lookup_ioc", "args": {"target": "10.0.0.78"}}], "target": "lookup_ioc"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:04:20+00:00", "agent_id": "agent-beta", "confidence": 0.7, "tool_calls": [{"name": "block_domain", "args": {"target": "10.0.0.164"}}], "target": "block_domain"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:04:25+00:00", "agent_id": "agent-alpha", "confidence": 0.51, "guardrail_flags": ["pii_detected"], "target": "create_ticket"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:04:30+00:00", "agent_id": "agent-alpha", "confidence": 0.42, "tool_calls": [{"name": "scan_host", "args": {"target": "10.0.0.151"}}], "target": "scan_host"}
+{"type": "response", "timestamp": "2026-02-28T10:04:35+00:00", "agent_id": "agent-gamma", "confidence": 0.92, "response": "Analysis complete. Found 16 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:04:40+00:00", "agent_id": "agent-beta", "confidence": 0.66, "tool_calls": [{"name": "lookup_ioc", "args": {"target": "10.0.0.214"}}], "target": "lookup_ioc"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:04:45+00:00", "agent_id": "agent-alpha", "confidence": 0.65, "guardrail_flags": ["pii_detected"], "target": "query_logs"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:04:50+00:00", "agent_id": "agent-beta", "confidence": 0.82, "tool_calls": [{"name": "lookup_ioc", "args": {"target": "10.0.0.25"}}], "target": "lookup_ioc"}
+{"type": "response", "timestamp": "2026-02-28T10:04:55+00:00", "agent_id": "agent-alpha", "confidence": 0.65, "response": "Analysis complete. Found 3 issues.", "target": "user"}
+{"type": "response", "timestamp": "2026-02-28T10:05:00+00:00", "agent_id": "agent-beta", "confidence": 0.73, "response": "Analysis complete. Found 35 issues.", "target": "user"}
+{"type": "response", "timestamp": "2026-02-28T10:05:05+00:00", "agent_id": "agent-beta", "confidence": 0.95, "response": "Analysis complete. Found 0 issues.", "target": "user"}
+{"type": "response", "timestamp": "2026-02-28T10:05:10+00:00", "agent_id": "agent-gamma", "confidence": 0.63, "response": "Analysis complete. Found 4 issues.", "target": "user"}
+{"type": "prompt", "timestamp": "2026-02-28T10:05:15+00:00", "agent_id": "agent-beta", "confidence": 0.79, "prompt": "Review firewall rule changes", "target": "system", "model": "claude-opus-4-6"}
+{"type": "response", "timestamp": "2026-02-28T10:05:20+00:00", "agent_id": "agent-gamma", "confidence": 0.59, "response": "Analysis complete. Found 9 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:05:25+00:00", "agent_id": "agent-alpha", "confidence": 0.36, "tool_calls": [{"name": "lookup_ioc", "args": {"target": "10.0.0.236"}}], "target": "lookup_ioc"}
+{"type": "prompt", "timestamp": "2026-02-28T10:05:30+00:00", "agent_id": "agent-alpha", "confidence": 0.68, "prompt": "Correlate DNS queries with threat intelligence", "target": "system", "model": "claude-opus-4-6"}
+{"type": "response", "timestamp": "2026-02-28T10:05:35+00:00", "agent_id": "agent-alpha", "confidence": 0.44, "response": "Analysis complete. Found 7 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:05:40+00:00", "agent_id": "agent-beta", "confidence": 0.31, "tool_calls": [{"name": "scan_host", "args": {"target": "10.0.0.22"}}], "target": "scan_host"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:05:45+00:00", "agent_id": "agent-alpha", "confidence": 0.93, "guardrail_flags": ["pii_detected"], "target": "deploy_patch"}
+{"type": "response", "timestamp": "2026-02-28T10:05:50+00:00", "agent_id": "agent-alpha", "confidence": 0.33, "response": "Analysis complete. Found 7 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:05:55+00:00", "agent_id": "agent-alpha", "confidence": 0.35, "tool_calls": [{"name": "create_ticket", "args": {"target": "10.0.0.129"}}], "target": "create_ticket"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:06:00+00:00", "agent_id": "agent-gamma", "confidence": 0.84, "guardrail_flags": ["pii_detected"], "target": "lookup_ioc"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:06:05+00:00", "agent_id": "agent-beta", "confidence": 0.43, "tool_calls": [{"name": "deploy_patch", "args": {"target": "10.0.0.161"}}], "target": "deploy_patch"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:06:10+00:00", "agent_id": "agent-gamma", "confidence": 0.84, "tool_calls": [{"name": "check_reputation", "args": {"target": "10.0.0.243"}}], "target": "check_reputation"}
+{"type": "response", "timestamp": "2026-02-28T10:06:15+00:00", "agent_id": "agent-gamma", "confidence": 0.58, "response": "Analysis complete. Found 21 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:06:20+00:00", "agent_id": "agent-beta", "confidence": 0.8, "tool_calls": [{"name": "check_reputation", "args": {"target": "10.0.0.112"}}], "target": "check_reputation"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:06:25+00:00", "agent_id": "agent-gamma", "confidence": 0.63, "guardrail_flags": ["requires_approval", "production_change"], "target": "block_domain"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:06:30+00:00", "agent_id": "agent-alpha", "confidence": 0.91, "tool_calls": [{"name": "deploy_patch", "args": {"target": "10.0.0.197"}}], "target": "deploy_patch"}
+{"type": "prompt", "timestamp": "2026-02-28T10:06:35+00:00", "agent_id": "agent-alpha", "confidence": 0.35, "prompt": "Analyze network traffic for anomalies", "target": "system", "model": "claude-opus-4-6"}
+{"type": "response", "timestamp": "2026-02-28T10:06:40+00:00", "agent_id": "agent-alpha", "confidence": 0.47, "response": "Analysis complete. Found 44 issues.", "target": "user"}
+{"type": "response", "timestamp": "2026-02-28T10:06:45+00:00", "agent_id": "agent-gamma", "confidence": 0.66, "response": "Analysis complete. Found 14 issues.", "target": "user"}
+{"type": "response", "timestamp": "2026-02-28T10:06:50+00:00", "agent_id": "agent-beta", "confidence": 0.31, "response": "Analysis complete. Found 20 issues.", "target": "user"}
+{"type": "prompt", "timestamp": "2026-02-28T10:06:55+00:00", "agent_id": "agent-beta", "confidence": 0.36, "prompt": "Analyze network traffic for anomalies", "target": "system", "model": "claude-opus-4-6"}
+{"type": "prompt", "timestamp": "2026-02-28T10:07:00+00:00", "agent_id": "agent-gamma", "confidence": 0.59, "prompt": "Analyze network traffic for anomalies", "target": "system", "model": "claude-opus-4-6"}
+{"type": "response", "timestamp": "2026-02-28T10:07:05+00:00", "agent_id": "agent-gamma", "confidence": 0.68, "response": "Analysis complete. Found 27 issues.", "target": "user"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:07:10+00:00", "agent_id": "agent-gamma", "confidence": 0.54, "guardrail_flags": ["data_exfil_risk"], "target": "lookup_ioc"}
+{"type": "response", "timestamp": "2026-02-28T10:07:15+00:00", "agent_id": "agent-beta", "confidence": 0.67, "response": "Analysis complete. Found 28 issues.", "target": "user"}
+{"type": "response", "timestamp": "2026-02-28T10:07:20+00:00", "agent_id": "agent-gamma", "confidence": 0.32, "response": "Analysis complete. Found 0 issues.", "target": "user"}
+{"type": "prompt", "timestamp": "2026-02-28T10:07:25+00:00", "agent_id": "agent-alpha", "confidence": 0.48, "prompt": "Investigate failed login attempts", "target": "system", "model": "claude-sonnet-4-6"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:07:30+00:00", "agent_id": "agent-alpha", "confidence": 0.51, "tool_calls": [{"name": "query_logs", "args": {"target": "10.0.0.241"}}], "target": "query_logs"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:07:35+00:00", "agent_id": "agent-gamma", "confidence": 0.83, "tool_calls": [{"name": "create_ticket", "args": {"target": "10.0.0.81"}}], "target": "create_ticket"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:07:40+00:00", "agent_id": "agent-alpha", "confidence": 0.84, "tool_calls": [{"name": "deploy_patch", "args": {"target": "10.0.0.139"}}], "target": "deploy_patch"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:07:45+00:00", "agent_id": "agent-alpha", "confidence": 0.54, "tool_calls": [{"name": "check_reputation", "args": {"target": "10.0.0.73"}}], "target": "check_reputation"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:07:50+00:00", "agent_id": "agent-alpha", "confidence": 0.64, "tool_calls": [{"name": "deploy_patch", "args": {"target": "10.0.0.230"}}], "target": "deploy_patch"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:07:55+00:00", "agent_id": "agent-alpha", "confidence": 0.59, "tool_calls": [{"name": "deploy_patch", "args": {"target": "10.0.0.57"}}], "target": "deploy_patch"}
+{"type": "response", "timestamp": "2026-02-28T10:08:00+00:00", "agent_id": "agent-gamma", "confidence": 0.48, "response": "Analysis complete. Found 31 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:08:05+00:00", "agent_id": "agent-gamma", "confidence": 0.96, "tool_calls": [{"name": "lookup_ioc", "args": {"target": "10.0.0.74"}}], "target": "lookup_ioc"}
+{"type": "response", "timestamp": "2026-02-28T10:08:10+00:00", "agent_id": "agent-alpha", "confidence": 0.72, "response": "Analysis complete. Found 32 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:08:15+00:00", "agent_id": "agent-gamma", "confidence": 0.68, "tool_calls": [{"name": "check_reputation", "args": {"target": "10.0.0.188"}}], "target": "check_reputation"}
+this is a malformed agent log line
+{"type": "guardrail", "timestamp": "2026-02-28T10:08:25+00:00", "agent_id": "agent-beta", "confidence": 0.32, "guardrail_flags": ["requires_approval", "production_change"], "target": "deploy_patch"}
+{"type": "prompt", "timestamp": "2026-02-28T10:08:30+00:00", "agent_id": "agent-beta", "confidence": 0.54, "prompt": "Investigate failed login attempts", "target": "system", "model": "claude-sonnet-4-6"}
+{"type": "response", "timestamp": "2026-02-28T10:08:35+00:00", "agent_id": "agent-alpha", "confidence": 0.65, "response": "Analysis complete. Found 26 issues.", "target": "user"}
+{"type": "prompt", "timestamp": "2026-02-28T10:08:40+00:00", "agent_id": "agent-gamma", "confidence": 0.92, "prompt": "Deploy security patch to affected hosts", "target": "system", "model": "claude-sonnet-4-6"}
+{"type": "response", "timestamp": "2026-02-28T10:08:45+00:00", "agent_id": "agent-beta", "confidence": 0.78, "response": "Analysis complete. Found 36 issues.", "target": "user"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:08:50+00:00", "agent_id": "agent-gamma", "confidence": 0.34, "guardrail_flags": ["pii_detected"], "target": "query_logs"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:08:55+00:00", "agent_id": "agent-beta", "confidence": 0.53, "guardrail_flags": ["pii_detected"], "target": "scan_host"}
+{"type": "prompt", "timestamp": "2026-02-28T10:09:00+00:00", "agent_id": "agent-alpha", "confidence": 0.84, "prompt": "Correlate DNS queries with threat intelligence", "target": "system", "model": "claude-sonnet-4-6"}
+{"type": "response", "timestamp": "2026-02-28T10:09:05+00:00", "agent_id": "agent-alpha", "confidence": 0.98, "response": "Analysis complete. Found 2 issues.", "target": "user"}
+{"type": "prompt", "timestamp": "2026-02-28T10:09:10+00:00", "agent_id": "agent-alpha", "confidence": 0.5, "prompt": "Investigate failed login attempts", "target": "system", "model": "claude-opus-4-6"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:09:15+00:00", "agent_id": "agent-gamma", "confidence": 0.54, "guardrail_flags": ["requires_approval", "production_change"], "target": "lookup_ioc"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:09:20+00:00", "agent_id": "agent-gamma", "confidence": 0.54, "tool_calls": [{"name": "query_logs", "args": {"target": "10.0.0.172"}}], "target": "query_logs"}
+{"type": "response", "timestamp": "2026-02-28T10:09:25+00:00", "agent_id": "agent-beta", "confidence": 0.81, "response": "Analysis complete. Found 9 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:09:30+00:00", "agent_id": "agent-alpha", "confidence": 0.49, "tool_calls": [{"name": "lookup_ioc", "args": {"target": "10.0.0.16"}}], "target": "lookup_ioc"}
+{"type": "prompt", "timestamp": "2026-02-28T10:09:35+00:00", "agent_id": "agent-beta", "confidence": 0.98, "prompt": "Investigate failed login attempts", "target": "system", "model": "claude-sonnet-4-6"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:09:40+00:00", "agent_id": "agent-beta", "confidence": 0.77, "guardrail_flags": ["requires_approval", "production_change"], "target": "deploy_patch"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:09:45+00:00", "agent_id": "agent-alpha", "confidence": 0.91, "guardrail_flags": ["data_exfil_risk"], "target": "query_logs"}
+{"type": "response", "timestamp": "2026-02-28T10:09:50+00:00", "agent_id": "agent-gamma", "confidence": 0.94, "response": "Analysis complete. Found 45 issues.", "target": "user"}
+{"type": "prompt", "timestamp": "2026-02-28T10:09:55+00:00", "agent_id": "agent-gamma", "confidence": 0.53, "prompt": "Correlate DNS queries with threat intelligence", "target": "system", "model": "claude-opus-4-6"}
+{"type": "prompt", "timestamp": "2026-02-28T10:10:00+00:00", "agent_id": "agent-alpha", "confidence": 0.67, "prompt": "Investigate failed login attempts", "target": "system", "model": "claude-sonnet-4-6"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:10:05+00:00", "agent_id": "agent-beta", "confidence": 0.46, "tool_calls": [{"name": "deploy_patch", "args": {"target": "10.0.0.125"}}], "target": "deploy_patch"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:10:10+00:00", "agent_id": "agent-alpha", "confidence": 0.94, "tool_calls": [{"name": "check_reputation", "args": {"target": "10.0.0.179"}}], "target": "check_reputation"}
+{"type": "prompt", "timestamp": "2026-02-28T10:10:15+00:00", "agent_id": "agent-beta", "confidence": 0.33, "prompt": "Correlate DNS queries with threat intelligence", "target": "system", "model": "claude-sonnet-4-6"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:10:20+00:00", "agent_id": "agent-alpha", "confidence": 0.57, "tool_calls": [{"name": "create_ticket", "args": {"target": "10.0.0.10"}}], "target": "create_ticket"}
+{"type": "response", "timestamp": "2026-02-28T10:10:25+00:00", "agent_id": "agent-gamma", "confidence": 0.92, "response": "Analysis complete. Found 3 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:10:30+00:00", "agent_id": "agent-alpha", "confidence": 0.87, "tool_calls": [{"name": "deploy_patch", "args": {"target": "10.0.0.173"}}], "target": "deploy_patch"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:10:35+00:00", "agent_id": "agent-alpha", "confidence": 0.93, "guardrail_flags": ["rate_limit_exceeded"], "target": "create_ticket"}
+{"type": "prompt", "timestamp": "2026-02-28T10:10:40+00:00", "agent_id": "agent-beta", "confidence": 0.66, "prompt": "Analyze network traffic for anomalies", "target": "system", "model": "claude-sonnet-4-6"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:10:45+00:00", "agent_id": "agent-alpha", "confidence": 0.83, "tool_calls": [{"name": "lookup_ioc", "args": {"target": "10.0.0.184"}}], "target": "lookup_ioc"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:10:50+00:00", "agent_id": "agent-gamma", "confidence": 0.59, "tool_calls": [{"name": "block_domain", "args": {"target": "10.0.0.173"}}], "target": "block_domain"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:10:55+00:00", "agent_id": "agent-gamma", "confidence": 0.54, "guardrail_flags": ["data_exfil_risk"], "target": "query_logs"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:11:00+00:00", "agent_id": "agent-beta", "confidence": 0.46, "guardrail_flags": ["data_exfil_risk"], "target": "block_domain"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:11:05+00:00", "agent_id": "agent-beta", "confidence": 0.9, "tool_calls": [{"name": "create_ticket", "args": {"target": "10.0.0.216"}}], "target": "create_ticket"}
+{"type": "response", "timestamp": "2026-02-28T10:11:10+00:00", "agent_id": "agent-gamma", "confidence": 0.33, "response": "Analysis complete. Found 6 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:11:15+00:00", "agent_id": "agent-beta", "confidence": 0.59, "tool_calls": [{"name": "create_ticket", "args": {"target": "10.0.0.250"}}], "target": "create_ticket"}
+{"type": "response", "timestamp": "2026-02-28T10:11:20+00:00", "agent_id": "agent-alpha", "confidence": 0.8, "response": "Analysis complete. Found 32 issues.", "target": "user"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:11:25+00:00", "agent_id": "agent-alpha", "confidence": 0.93, "guardrail_flags": ["pii_detected"], "target": "query_logs"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:11:30+00:00", "agent_id": "agent-beta", "confidence": 0.31, "tool_calls": [{"name": "lookup_ioc", "args": {"target": "10.0.0.104"}}], "target": "lookup_ioc"}
+{"type": "prompt", "timestamp": "2026-02-28T10:11:35+00:00", "agent_id": "agent-beta", "confidence": 0.58, "prompt": "Review firewall rule changes", "target": "system", "model": "claude-opus-4-6"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:11:40+00:00", "agent_id": "agent-alpha", "confidence": 0.74, "tool_calls": [{"name": "query_logs", "args": {"target": "10.0.0.106"}}], "target": "query_logs"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:11:45+00:00", "agent_id": "agent-alpha", "confidence": 0.75, "guardrail_flags": ["rate_limit_exceeded"], "target": "lookup_ioc"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:11:50+00:00", "agent_id": "agent-alpha", "confidence": 0.52, "guardrail_flags": ["data_exfil_risk"], "target": "create_ticket"}
+{"type": "response", "timestamp": "2026-02-28T10:11:55+00:00", "agent_id": "agent-beta", "confidence": 0.89, "response": "Analysis complete. Found 36 issues.", "target": "user"}
+{"type": "response", "timestamp": "2026-02-28T10:12:00+00:00", "agent_id": "agent-beta", "confidence": 0.66, "response": "Analysis complete. Found 38 issues.", "target": "user"}
+{"type": "prompt", "timestamp": "2026-02-28T10:12:05+00:00", "agent_id": "agent-beta", "confidence": 0.98, "prompt": "Correlate DNS queries with threat intelligence", "target": "system", "model": "claude-sonnet-4-6"}
+{"type": "prompt", "timestamp": "2026-02-28T10:12:10+00:00", "agent_id": "agent-gamma", "confidence": 0.66, "prompt": "Review firewall rule changes", "target": "system", "model": "claude-sonnet-4-6"}
+{"type": "response", "timestamp": "2026-02-28T10:12:15+00:00", "agent_id": "agent-gamma", "confidence": 0.31, "response": "Analysis complete. Found 36 issues.", "target": "user"}
+{"type": "response", "timestamp": "2026-02-28T10:12:20+00:00", "agent_id": "agent-alpha", "confidence": 0.68, "response": "Analysis complete. Found 0 issues.", "target": "user"}
+{"type": "response", "timestamp": "2026-02-28T10:12:25+00:00", "agent_id": "agent-alpha", "confidence": 0.92, "response": "Analysis complete. Found 43 issues.", "target": "user"}
+{"type": "response", "timestamp": "2026-02-28T10:12:30+00:00", "agent_id": "agent-alpha", "confidence": 0.56, "response": "Analysis complete. Found 13 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:12:35+00:00", "agent_id": "agent-beta", "confidence": 0.95, "tool_calls": [{"name": "deploy_patch", "args": {"target": "10.0.0.234"}}], "target": "deploy_patch"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:12:40+00:00", "agent_id": "agent-gamma", "confidence": 0.45, "tool_calls": [{"name": "deploy_patch", "args": {"target": "10.0.0.63"}}], "target": "deploy_patch"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:12:45+00:00", "agent_id": "agent-gamma", "confidence": 0.36, "tool_calls": [{"name": "query_logs", "args": {"target": "10.0.0.46"}}], "target": "query_logs"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:12:50+00:00", "agent_id": "agent-beta", "confidence": 0.94, "tool_calls": [{"name": "lookup_ioc", "args": {"target": "10.0.0.133"}}], "target": "lookup_ioc"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:12:55+00:00", "agent_id": "agent-alpha", "confidence": 0.32, "tool_calls": [{"name": "query_logs", "args": {"target": "10.0.0.212"}}], "target": "query_logs"}
+{"type": "prompt", "timestamp": "2026-02-28T10:13:00+00:00", "agent_id": "agent-alpha", "confidence": 0.5, "prompt": "Analyze network traffic for anomalies", "target": "system", "model": "claude-opus-4-6"}
+{"type": "response", "timestamp": "2026-02-28T10:13:05+00:00", "agent_id": "agent-beta", "confidence": 0.75, "response": "Analysis complete. Found 17 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:13:10+00:00", "agent_id": "agent-gamma", "confidence": 0.84, "tool_calls": [{"name": "deploy_patch", "args": {"target": "10.0.0.232"}}], "target": "deploy_patch"}
+{"type": "prompt", "timestamp": "2026-02-28T10:13:15+00:00", "agent_id": "agent-alpha", "confidence": 0.45, "prompt": "Investigate failed login attempts", "target": "system", "model": "claude-sonnet-4-6"}
+{"type": "response", "timestamp": "2026-02-28T10:13:20+00:00", "agent_id": "agent-alpha", "confidence": 0.86, "response": "Analysis complete. Found 2 issues.", "target": "user"}
+{"type": "prompt", "timestamp": "2026-02-28T10:13:25+00:00", "agent_id": "agent-beta", "confidence": 0.78, "prompt": "Deploy security patch to affected hosts", "target": "system", "model": "claude-sonnet-4-6"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:13:30+00:00", "agent_id": "agent-gamma", "confidence": 0.57, "tool_calls": [{"name": "check_reputation", "args": {"target": "10.0.0.186"}}], "target": "check_reputation"}
+{"type": "response", "timestamp": "2026-02-28T10:13:35+00:00", "agent_id": "agent-gamma", "confidence": 0.32, "response": "Analysis complete. Found 19 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:13:40+00:00", "agent_id": "agent-beta", "confidence": 0.38, "tool_calls": [{"name": "block_domain", "args": {"target": "10.0.0.27"}}], "target": "block_domain"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:13:45+00:00", "agent_id": "agent-alpha", "confidence": 0.52, "tool_calls": [{"name": "create_ticket", "args": {"target": "10.0.0.51"}}], "target": "create_ticket"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:13:50+00:00", "agent_id": "agent-beta", "confidence": 0.38, "tool_calls": [{"name": "deploy_patch", "args": {"target": "10.0.0.191"}}], "target": "deploy_patch"}
+{"type": "response", "timestamp": "2026-02-28T10:13:55+00:00", "agent_id": "agent-gamma", "confidence": 0.68, "response": "Analysis complete. Found 37 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:14:00+00:00", "agent_id": "agent-beta", "confidence": 0.42, "tool_calls": [{"name": "deploy_patch", "args": {"target": "10.0.0.20"}}], "target": "deploy_patch"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:14:05+00:00", "agent_id": "agent-alpha", "confidence": 0.8, "tool_calls": [{"name": "block_domain", "args": {"target": "10.0.0.4"}}], "target": "block_domain"}
+{"type": "response", "timestamp": "2026-02-28T10:14:10+00:00", "agent_id": "agent-beta", "confidence": 0.79, "response": "Analysis complete. Found 50 issues.", "target": "user"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:14:15+00:00", "agent_id": "agent-beta", "confidence": 0.4, "guardrail_flags": ["pii_detected"], "target": "lookup_ioc"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:14:20+00:00", "agent_id": "agent-alpha", "confidence": 0.33, "tool_calls": [{"name": "check_reputation", "args": {"target": "10.0.0.199"}}], "target": "check_reputation"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:14:25+00:00", "agent_id": "agent-beta", "confidence": 0.87, "tool_calls": [{"name": "scan_host", "args": {"target": "10.0.0.34"}}], "target": "scan_host"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:14:30+00:00", "agent_id": "agent-gamma", "confidence": 0.96, "tool_calls": [{"name": "create_ticket", "args": {"target": "10.0.0.119"}}], "target": "create_ticket"}
+{"type": "prompt", "timestamp": "2026-02-28T10:14:35+00:00", "agent_id": "agent-alpha", "confidence": 0.62, "prompt": "Analyze network traffic for anomalies", "target": "system", "model": "claude-sonnet-4-6"}
+{"type": "response", "timestamp": "2026-02-28T10:14:40+00:00", "agent_id": "agent-alpha", "confidence": 0.96, "response": "Analysis complete. Found 28 issues.", "target": "user"}
+{"type": "response", "timestamp": "2026-02-28T10:14:45+00:00", "agent_id": "agent-beta", "confidence": 0.41, "response": "Analysis complete. Found 1 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:14:50+00:00", "agent_id": "agent-gamma", "confidence": 0.64, "tool_calls": [{"name": "block_domain", "args": {"target": "10.0.0.98"}}], "target": "block_domain"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:14:55+00:00", "agent_id": "agent-gamma", "confidence": 0.71, "tool_calls": [{"name": "query_logs", "args": {"target": "10.0.0.235"}}], "target": "query_logs"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:15:00+00:00", "agent_id": "agent-gamma", "confidence": 0.39, "tool_calls": [{"name": "deploy_patch", "args": {"target": "10.0.0.228"}}], "target": "deploy_patch"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:15:05+00:00", "agent_id": "agent-beta", "confidence": 0.84, "tool_calls": [{"name": "query_logs", "args": {"target": "10.0.0.156"}}], "target": "query_logs"}
+{"type": "response", "timestamp": "2026-02-28T10:15:10+00:00", "agent_id": "agent-alpha", "confidence": 0.31, "response": "Analysis complete. Found 8 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:15:15+00:00", "agent_id": "agent-beta", "confidence": 0.64, "tool_calls": [{"name": "scan_host", "args": {"target": "10.0.0.91"}}], "target": "scan_host"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:15:20+00:00", "agent_id": "agent-beta", "confidence": 0.58, "tool_calls": [{"name": "query_logs", "args": {"target": "10.0.0.131"}}], "target": "query_logs"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:15:25+00:00", "agent_id": "agent-beta", "confidence": 0.8, "guardrail_flags": ["requires_approval", "production_change"], "target": "block_domain"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:15:30+00:00", "agent_id": "agent-gamma", "confidence": 0.85, "tool_calls": [{"name": "block_domain", "args": {"target": "10.0.0.15"}}], "target": "block_domain"}
+{"type": "prompt", "timestamp": "2026-02-28T10:15:35+00:00", "agent_id": "agent-alpha", "confidence": 0.5, "prompt": "Correlate DNS queries with threat intelligence", "target": "system", "model": "claude-opus-4-6"}
+{"type": "prompt", "timestamp": "2026-02-28T10:15:40+00:00", "agent_id": "agent-alpha", "confidence": 0.9, "prompt": "Correlate DNS queries with threat intelligence", "target": "system", "model": "claude-sonnet-4-6"}
+{"type": "response", "timestamp": "2026-02-28T10:15:45+00:00", "agent_id": "agent-alpha", "confidence": 0.85, "response": "Analysis complete. Found 45 issues.", "target": "user"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:15:50+00:00", "agent_id": "agent-alpha", "confidence": 0.63, "guardrail_flags": ["rate_limit_exceeded"], "target": "deploy_patch"}
+{"type": "response", "timestamp": "2026-02-28T10:15:55+00:00", "agent_id": "agent-gamma", "confidence": 0.82, "response": "Analysis complete. Found 43 issues.", "target": "user"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:16:00+00:00", "agent_id": "agent-beta", "confidence": 0.33, "guardrail_flags": ["requires_approval", "production_change"], "target": "deploy_patch"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:16:05+00:00", "agent_id": "agent-gamma", "confidence": 0.66, "tool_calls": [{"name": "create_ticket", "args": {"target": "10.0.0.23"}}], "target": "create_ticket"}
+{"type": "response", "timestamp": "2026-02-28T10:16:10+00:00", "agent_id": "agent-beta", "confidence": 0.79, "response": "Analysis complete. Found 11 issues.", "target": "user"}
+{"type": "guardrail", "timestamp": "2026-02-28T10:16:15+00:00", "agent_id": "agent-gamma", "confidence": 0.37, "guardrail_flags": ["requires_approval", "production_change"], "target": "create_ticket"}
+{"type": "response", "timestamp": "2026-02-28T10:16:20+00:00", "agent_id": "agent-gamma", "confidence": 0.69, "response": "Analysis complete. Found 18 issues.", "target": "user"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:16:25+00:00", "agent_id": "agent-alpha", "confidence": 0.98, "tool_calls": [{"name": "block_domain", "args": {"target": "10.0.0.18"}}], "target": "block_domain"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:16:30+00:00", "agent_id": "agent-gamma", "confidence": 0.4, "tool_calls": [{"name": "query_logs", "args": {"target": "10.0.0.148"}}], "target": "query_logs"}
+{"type": "tool_call", "timestamp": "2026-02-28T10:16:35+00:00", "agent_id": "agent-alpha", "confidence": 0.38, "tool_calls": [{"name": "query_logs", "args": {"target": "10.0.0.136"}}], "target": "query_logs"}

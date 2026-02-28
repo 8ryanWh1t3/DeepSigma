@@ -193,6 +193,10 @@ ALLOWED_ACRONYMS = {
     "APR", "YOU", "ARE",
     # Domain mode state machine / pipeline step names
     "FROZEN", "LOAD", "INGEST", "DELTA", "REOPS", "MONEY",
+    # JRM (Judgment Refinement Module) adapters, pipeline, fixtures
+    "JRM", "SURI", "SNRT", "AGNT", "MAL", "EVE", "GID", "SID",
+    "DST", "PORT", "PROTO", "RAT", "GPL", "SCAN", "TLD", "USEC",
+    "NOTIFY",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}

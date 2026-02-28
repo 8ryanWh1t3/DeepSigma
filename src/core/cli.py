@@ -1316,6 +1316,10 @@ def main() -> None:
     p_auth_prove.add_argument("--json", action="store_true", help="Output JSON")
     p_auth_prove.set_defaults(func=cmd_authority_prove)
 
+    # ── jrm ──────────────────────────────────────────────────────
+    from .jrm.cli import register_jrm_commands
+    register_jrm_commands(subparsers)
+
     # ── demo ─────────────────────────────────────────────────────
     p_demo = subparsers.add_parser(
         "demo",

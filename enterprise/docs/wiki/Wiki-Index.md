@@ -84,6 +84,11 @@ Canonical wiki structure for Sigma OVERWATCH / DeepSigma docs.
 - [Event Contracts](Event-Contracts)
 - [Money Demo v2](Money-Demo-v2)
 
+## JRM (Judgment Refinement Module)
+
+- [JRM Pipeline](JRM-Pipeline)
+- [JRM Federation](JRM-Federation)
+
 ## Domain Packs
 
 - [Exhaust Inbox](Exhaust-Inbox)
