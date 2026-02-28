@@ -315,6 +315,36 @@ ConnectorV1 protocol, LLM framework adapters, enterprise SaaS connectors, MCP se
   - Artifacts: src/adapters/otel/otel_exporter.py, src/adapters/otel/sidecar.py
   - Enforcement: CI: docker-otel.yml
   - KPI axes: Operational_Maturity, Enterprise_Readiness
+- **Tool-Call / LLM Span Tracing** (`OTEL_TOOL_SPANS`)
+  - Per-tool-call and per-LLM-completion child spans with token counters and latency histograms. Registered in span registry with CI gate enforcement.
+  - Artifacts: src/adapters/otel/exporter.py, src/adapters/otel/spans.py
+  - Enforcement: tests/test_otel_span_registry.py, CI: ci.yml
+  - KPI axes: Operational_Maturity, Enterprise_Readiness
+  - Added: v2.1.0
+- **Connector Auto-Instrumentation** (`OTEL_INSTRUMENTATION`)
+  - `@traced` decorator and `InstrumentedConnector` mixin wrapping adapter methods with OTel spans. W3C `traceparent` inject/extract for cross-service propagation.
+  - Artifacts: src/adapters/otel/instrumentation.py
+  - Enforcement: CI: ci.yml
+  - KPI axes: Operational_Maturity, Data_Integration
+  - Added: v2.1.0
+- **Runtime Gate** (`RUNTIME_GATE`)
+  - Composable pre-execution policy constraint evaluator with 5 gate types (freshness, verification, latency_slo, quota, custom expr). SLO circuit breaker trips on sustained metric breach.
+  - Artifacts: src/engine/runtime_gate.py
+  - Enforcement: CI: ci.yml
+  - KPI axes: Automation_Depth, Authority_Modeling
+  - Added: v2.1.0
+- **Encryption at Rest** (`ENCRYPTION_AT_REST`)
+  - Fernet (AES-128-CBC + HMAC-SHA256) file-level encryption for sealed episodes and audit logs. Key from env var or key file.
+  - Artifacts: src/governance/encryption.py
+  - Enforcement: CI: ci.yml
+  - KPI axes: Enterprise_Readiness, Authority_Modeling
+  - Added: v2.1.0
+- **Fairness Monitoring Adapter** (`FAIRNESS_ADAPTER`)
+  - Hybrid fairness monitoring: ingests external fairness audit reports (AIF360, Fairlearn, custom) as drift signals. Three fairness drift types added to DriftType enum.
+  - Artifacts: src/adapters/fairness/ingest.py, schemas/fairness_audit_v1.json, dashboard/server/models_exhaust.py
+  - Enforcement: CI: ci.yml
+  - KPI axes: Enterprise_Readiness, Operational_Maturity
+  - Added: v2.1.0
 - **OpenClaw Policy Adapter** (`OPENCLAW`)
   - Institutional control flow adapter with OVERWATCH-compatible wrapper for policy-driven routing.
   - Artifacts: src/adapters/openclaw/adapter.py, src/adapters/openclaw/runtime.py

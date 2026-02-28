@@ -25,3 +25,9 @@
 - **Evidence Source Binding**: Schema linking an evidence artifact to its originating source with provenance metadata, hash verification, and authority reference — ensures every claim traces to auditable evidence
 - **Intent Mutation**: Detection of drift between the intent packet hash at episode seal time and the hash at a later replay or audit; flags unauthorized changes to decision intent as governance violations
 - **FEEDS**: Federated Event Envelope Distribution Surface — a 5-stage event-driven pipeline connecting governance primitives (TS, ALS, DLR, DS, CE) via file-based pub/sub with manifest-first ingest, deterministic drift detection, authority validation, triage state machine, and canon versioning
+- **Runtime Gate**: Composable pre-execution policy constraint evaluator with 5 gate types (freshness, verification, latency_slo, quota, custom expression). Returns allow/deny/degrade with machine-readable rationale. See `src/engine/runtime_gate.py`
+- **SLO Circuit Breaker**: Trips when a monitored metric (e.g. P99 latency) breaches a threshold for a sustained time window, triggering automatic degradation. Resets when the metric recovers
+- **Connector Auto-Instrumentation**: `@traced` decorator and `InstrumentedConnector` mixin that auto-wrap adapter methods with OTel spans. Provides per-connector operation visibility without manual instrumentation
+- **W3C Trace Context**: Cross-service trace propagation via `traceparent` header injection/extraction. Enables distributed tracing across connector calls and downstream services
+- **Encryption at Rest**: Fernet (AES-128-CBC + HMAC-SHA256) file-level encryption for sealed episodes and compliance export artifacts. Key sourced from `DEEPSIGMA_ENCRYPTION_KEY` env var or key file
+- **Fairness Drift Types**: Three drift types for external fairness monitoring: `demographic_parity_violation`, `disparate_impact`, `fairness_metric_degradation`. Ingested from AIF360/Fairlearn via the fairness adapter

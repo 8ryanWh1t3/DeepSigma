@@ -1,6 +1,6 @@
 # Mermaid Diagrams (Canonical)
 
-Sixteen diagrams define the visual language of Sigma OVERWATCH. Everything else is archived to reduce drift.
+Seventeen diagrams define the visual language of Sigma OVERWATCH. Everything else is archived to reduce drift.
 
 ## Canonical Set
 
@@ -22,6 +22,7 @@ Sixteen diagrams define the visual language of Sigma OVERWATCH. Everything else 
 | 20 | [Stability & Credibility Pipeline](20-stability-credibility-pipeline.md) | Flowchart | SSI, TEC sensitivity, security proof pack, and artifact kill-switch (v2.0.7) |
 | 21 | [Scalability Benchmark Pipeline](21-scalability-benchmark-pipeline.md) | Flowchart | CI-eligible benchmark, regression gate, trend visualization, KPI integration (v2.0.8) |
 | 22 | [Authority + Economic Evidence](22-authority-economic-evidence.md) | Flowchart | Authority custody, refusal contracts, evidence export, economic metrics uncapping (v2.0.9) |
+| 23 | [Competitive Gap Closure](23-competitive-gap-closure.md) | Graph | RuntimeGate, OTel span tracing, connector instrumentation, encryption-at-rest, fairness adapter (v2.1.0) |
 
 ## Archive
 
@@ -47,5 +48,6 @@ New diagrams require justification and must map to one of these canonical purpos
 13. **Stability & credibility** — nonlinear stability, economic sensitivity, security proof, artifact gates
 14. **Scalability benchmark** — CI-eligible benchmark evidence, regression gate, trend visualization
 15. **Authority + economic evidence** — custody lifecycle, refusal contracts, evidence export, economic metrics pipeline
+16. **Competitive gap closure** — runtime gates, OTel span tracing, connector instrumentation, compliance encryption, fairness adapter
 
 To add a diagram, update this index and ensure `tools/mermaid_audit.py` passes.

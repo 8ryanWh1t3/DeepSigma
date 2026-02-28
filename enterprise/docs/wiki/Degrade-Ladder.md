@@ -62,6 +62,24 @@ This makes every degrade visible in the DLR and queryable via IRIS `WHAT_CHANGED
 
 ---
 
+## RuntimeGate (Generalized Gates)
+
+The **RuntimeGate** (`src/engine/runtime_gate.py`) generalizes the degrade ladder's three hard gates into a composable policy constraint system. Operators define gate rules in their policy pack's `"gates"` array:
+
+```json
+"gates": [
+    {"type": "freshness", "max_age_ms": 500, "on_fail": "abstain"},
+    {"type": "verification", "require": "pass", "on_fail": "hitl"},
+    {"type": "latency_slo", "p99_max_ms": 400, "window_s": 300, "on_fail": "degrade"},
+    {"type": "quota", "max_per_hour": 120, "on_fail": "deny"},
+    {"type": "custom", "expr": "drift_count < 10", "on_fail": "deny"}
+]
+```
+
+The RuntimeGate evaluates all constraints before execution and returns allow/deny/degrade with a machine-readable rationale. It also supports **SLO circuit breakers** that trip when a metric breaches a threshold for a sustained window.
+
+---
+
 ## Related Pages
 
 - [DTE Schema](DTE-Schema) — where the ladder is configured per decision type
@@ -69,3 +87,4 @@ This makes every degrade visible in the DLR and queryable via IRIS `WHAT_CHANGED
 - [Drift Schema](Drift-Schema) — drift types emitted during degrade (`fallback`, `bypass`, `verify`)
 - [Verifiers](Verifiers) — verifier failure is a primary degrade trigger
 - [Operations](Operations) — tuning ladders for production SLOs
+- [OpenTelemetry](OpenTelemetry) — OTel metrics that feed SLO circuit breakers

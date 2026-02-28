@@ -62,6 +62,14 @@ See: [docs/release/RELEASE_NOTES_v2.1.0.md](docs/release/RELEASE_NOTES_v2.1.0.md
 - Authority-bound contract enforcement expansion
 - Integration schema finalization
 
+### Competitive Gap Closure (v2.1.0)
+
+- Tool-call + LLM span tracing (OTel)
+- Connector auto-instrumentation + W3C trace context
+- RuntimeGate + SLO circuit breaker
+- Compliance export encryption-at-rest + scheduled export
+- Fairness drift types + external tool adapter (AIF360, Fairlearn)
+
 ## Positioning Shift
 - Not AI governance tooling
 - Not compliance software
@@ -194,6 +202,10 @@ python src/tools/reconstruct/verify_pack.py --pack /tmp/pack --key "$KEY"
 | **API Reference** | Auto-generated OpenAPI + static Redoc docs | [API Docs](docs/api/index.html) |
 | **RDF/SPARQL** | Semantic lattice queries via in-process SPARQL 1.1 | [SPARQL Service](services/sparql_service.py) |
 | **Dashboard** | React dashboard with Trust Scorecard + Zustand store | [Dashboard](dashboard/) |
+| **Runtime Gate** | Composable pre-execution policy constraints with SLO circuit breaker | [src/engine/runtime_gate.py](src/engine/runtime_gate.py) |
+| **OTel Span Tracing** | Tool-call + LLM completion spans, connector auto-instrumentation, W3C context propagation | [src/adapters/otel/](src/adapters/otel/) |
+| **Compliance Export** | SOC 2 evidence packages with encryption-at-rest + scheduled auto-export | [CLI: compliance export](src/deepsigma/cli/compliance_export.py) |
+| **Fairness Adapter** | Hybrid fairness monitoring — ingest AIF360/Fairlearn reports as drift signals | [src/adapters/fairness/](src/adapters/fairness/) |
 
 ## Connectors
 

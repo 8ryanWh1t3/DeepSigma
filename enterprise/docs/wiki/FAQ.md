@@ -130,3 +130,27 @@ A normalized 0–1 measure of how quickly KPI movements are accelerating across 
 ## What is C-TEC?
 
 Complexity-adjusted Time/Effort/Cost. C-TEC applies live governance health factors — ICR (Infrastructure Coherence Ratio) and PCR (PR Complexity Ratio) — to base TEC hours, producing three audience tiers: Internal ($1.64M), Executive ($2.47M), and Public Sector ($3.01M). v2.1.0 base hours: 10,963. Run via `make tec`.
+
+## What is the RuntimeGate?
+
+A composable pre-execution policy constraint evaluator. Operators define gate rules in their policy pack (`"gates"` array); the RuntimeGate evaluates all constraints before execution and returns allow/deny/degrade with a machine-readable rationale. Five gate types: freshness, verification, latency_slo, quota, and custom expression. Generalizes the degrade ladder's hard gates into a pluggable system. See `src/engine/runtime_gate.py`.
+
+## What is the SLO circuit breaker?
+
+A metric-level safety mechanism that trips when a monitored value (e.g., P99 latency) exceeds a threshold for a sustained time window. When tripped, the RuntimeGate automatically degrades or denies execution. Resets when the metric returns to normal. Configured per gate rule in the policy pack.
+
+## How does connector auto-instrumentation work?
+
+The `@traced` decorator wraps any adapter method in an OTel span with connector name, operation, duration, and status attributes. The `InstrumentedConnector` mixin auto-wraps all public methods on subclass initialization. W3C `traceparent` inject/extract helpers propagate trace context across HTTP calls. See `src/adapters/otel/instrumentation.py`.
+
+## How does tool-call span tracing work?
+
+The OTel exporter now has `export_tool_call()` and `export_llm_call()` methods. Each produces a child span with tool/model-specific attributes (tool_name, tool_version, status, duration_ms for tools; model, prompt_tokens, completion_tokens, total_tokens, latency_ms for LLM calls). Three new histograms: `sigma.tool.latency_ms`, `sigma.llm.latency_ms`, `sigma.llm.tokens.total`.
+
+## How does encryption-at-rest work?
+
+`FileEncryptor` uses Fernet (AES-128-CBC + HMAC-SHA256) from the `cryptography` package. Key sourced from `DEEPSIGMA_ENCRYPTION_KEY` env var or `DEEPSIGMA_ENCRYPTION_KEY_FILE`. The compliance export CLI accepts `--encrypt` to encrypt all output artifacts and `--schedule N` for cron-friendly auto-export of the last N days. See `src/governance/encryption.py`.
+
+## How does fairness monitoring work?
+
+DeepSigma uses a hybrid approach: external fairness tools (AIF360, Fairlearn, or custom pipelines) compute fairness metrics, and DeepSigma ingests their reports as drift signals. Three new drift types: `demographic_parity_violation`, `disparate_impact`, `fairness_metric_degradation`. The `ingest_fairness_report()` function converts external JSON reports to DriftSignal objects. Convenience wrappers exist for AIF360 and Fairlearn output. See `src/adapters/fairness/ingest.py`.
