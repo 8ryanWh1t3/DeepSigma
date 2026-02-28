@@ -2,6 +2,18 @@
 
 All contract surface changes are logged here with compatibility annotations.
 
+## v2.0.15 — Intent Safety
+
+`COMPATIBLE:` Intent mutation detection script with field-level diff and hash stability (#349). Compares intent packets across sealed runs to flag unintended changes to decision intent fields. Self-check mode for CI validation. SSI stability release — zero KPI movement.
+
+### Migration
+
+**Affected schemas**: None
+**Consumer action**: None — new additive script only.
+**Rollback**: Yes — standalone script.
+
+---
+
 ## v2.0.14 — Evidence + Economic
 
 `COMPATIBLE:` Evidence source binding schema + validator (#393), economic cost ledger with per-decision tracking and drift-to-patch delta (#392). Evidence binding maps KPI artifacts to source files with SHA-256 hashes. SSI stability release — zero KPI movement.
