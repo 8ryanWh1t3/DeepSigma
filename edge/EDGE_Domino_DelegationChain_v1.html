@@ -23,7 +23,7 @@ body{font-family:var(--font-body);color:var(--txt);background:var(--bg);line-hei
 
 /* ── Header ──────────────────────────────────────────── */
 .header{
-  text-align:center;padding:36px 24px 28px;margin-bottom:24px;
+  text-align:center;padding:30px 24px 22px;margin-bottom:20px;
   border:1px solid var(--card-border);border-radius:12px;
   background:linear-gradient(135deg,rgba(18,18,58,.9),rgba(10,10,26,.95));
   box-shadow:var(--glow-purple);position:relative;
@@ -34,11 +34,11 @@ body{font-family:var(--font-body);color:var(--txt);background:var(--bg);line-hei
   opacity:.3;filter:blur(1px);
 }
 .header h1{
-  font-size:1.8rem;font-weight:800;letter-spacing:2px;
+  font-size:1.7rem;font-weight:800;letter-spacing:2px;
   background:linear-gradient(90deg,var(--neon-pink),var(--neon-purple),var(--neon-cyan));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
-.header .sub{color:var(--txt-muted);font-size:.78rem;margin-top:6px;letter-spacing:.5px}
+.header .sub{color:var(--txt-muted);font-size:.78rem;margin-top:6px;letter-spacing:.3px}
 .badge-row{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
 .badge{
   display:inline-block;padding:3px 10px;border-radius:4px;font-size:.65rem;font-weight:700;
@@ -47,6 +47,29 @@ body{font-family:var(--font-body);color:var(--txt);background:var(--bg);line-hei
 .badge-edge{background:rgba(255,45,149,.15);color:var(--neon-pink);border:1px solid rgba(255,45,149,.4)}
 .badge-ver{background:rgba(0,240,255,.1);color:var(--neon-cyan);border:1px solid rgba(0,240,255,.3)}
 .badge-offline{background:rgba(57,255,20,.1);color:var(--neon-green);border:1px solid rgba(57,255,20,.3)}
+
+/* ── Progress Bar ────────────────────────────────────── */
+.progress-bar{display:flex;align-items:flex-start;justify-content:center;gap:0;margin:0 0 20px;padding:0 12px}
+.prog-step{display:flex;flex-direction:column;align-items:center;cursor:pointer;opacity:.4;transition:opacity .3s}
+.prog-step.active,.prog-step.done{opacity:1}
+.prog-num{
+  width:32px;height:32px;border-radius:50%;background:var(--card);
+  border:2px solid var(--txt-dim);display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;font-weight:700;color:var(--txt-dim);font-family:var(--font-mono);transition:all .3s;
+}
+.prog-step.active .prog-num{border-color:var(--neon-cyan);color:var(--neon-cyan);box-shadow:var(--glow-cyan)}
+.prog-step.done .prog-num{border-color:var(--neon-green);background:rgba(57,255,20,.15);color:var(--neon-green)}
+.prog-label{font-size:.62rem;margin-top:4px;color:var(--txt-dim);font-weight:600;letter-spacing:.3px;text-align:center}
+.prog-step.active .prog-label{color:var(--neon-cyan)}
+.prog-step.done .prog-label{color:var(--neon-green)}
+.prog-line{flex:1;height:2px;background:var(--txt-dim);max-width:80px;margin:15px 8px 0;transition:background .3s}
+.prog-line.done{background:var(--neon-green)}
+
+/* ── Wizard Steps ────────────────────────────────────── */
+.step{display:none}
+.step.active{display:block;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.step-nav{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding:0 2px;gap:8px}
 
 /* ── Cards ────────────────────────────────────────────── */
 .card{
@@ -57,6 +80,27 @@ body{font-family:var(--font-body);color:var(--txt);background:var(--bg);line-hei
 .card h3{font-size:1rem;font-weight:700;margin-bottom:10px;color:var(--neon-cyan);letter-spacing:.5px}
 .card h4{font-size:.82rem;font-weight:700;color:var(--neon-purple);margin:10px 0 4px}
 .card p,.card li{font-size:.85rem;color:var(--txt);line-height:1.7}
+.card-intro{font-size:.82rem;color:var(--txt-muted);margin-bottom:14px;line-height:1.6}
+
+/* ── Tooltips ────────────────────────────────────────── */
+.tip{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:18px;height:18px;border-radius:50%;
+  background:rgba(180,77,255,.15);border:1px solid rgba(180,77,255,.3);
+  color:var(--neon-purple);font-size:.6rem;font-weight:700;
+  cursor:help;position:relative;vertical-align:middle;margin-left:6px;
+}
+.tip:hover::after{
+  content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;
+  transform:translateX(-50%);background:var(--bg2);border:1px solid var(--card-border);
+  border-radius:8px;padding:10px 14px;font-size:.72rem;font-weight:400;color:var(--txt);
+  width:260px;white-space:normal;line-height:1.5;z-index:100;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);pointer-events:none;
+}
+.tip:hover::before{
+  content:'';position:absolute;bottom:calc(100% + 2px);left:50%;transform:translateX(-50%);
+  border:6px solid transparent;border-top-color:var(--card-border);z-index:101;
+}
 
 /* ── Form Elements ────────────────────────────────────── */
 textarea{
@@ -79,12 +123,15 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
   font-family:var(--font-mono);font-size:.72rem;font-weight:700;letter-spacing:.5px;
   transition:all .2s;text-transform:uppercase;
 }
+.btn:disabled{opacity:.35;cursor:not-allowed}
 .btn-primary{background:rgba(180,77,255,.2);border-color:rgba(180,77,255,.5);color:#fff}
-.btn-primary:hover{background:rgba(180,77,255,.35)}
+.btn-primary:hover:not(:disabled){background:rgba(180,77,255,.35)}
 .btn-master{background:rgba(0,240,255,.15);border-color:rgba(0,240,255,.4);color:var(--neon-cyan)}
-.btn-master:hover{background:rgba(0,240,255,.3)}
+.btn-master:hover:not(:disabled){background:rgba(0,240,255,.3)}
 .btn-reset{background:rgba(255,45,149,.12);border-color:rgba(255,45,149,.35);color:var(--neon-pink)}
-.btn-reset:hover{background:rgba(255,45,149,.25)}
+.btn-reset:hover:not(:disabled){background:rgba(255,45,149,.25)}
+.btn-green{background:rgba(57,255,20,.12);border-color:rgba(57,255,20,.3);color:var(--neon-green)}
+.btn-green:hover:not(:disabled){background:rgba(57,255,20,.22)}
 .btn-copy{
   padding:3px 10px;font-size:.62rem;border-radius:4px;
   background:rgba(180,77,255,.15);border:1px solid rgba(180,77,255,.3);color:var(--neon-purple);
@@ -92,6 +139,8 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
 }
 .btn-copy:hover{background:rgba(180,77,255,.3)}
 .btn-copy.copied{background:rgba(57,255,20,.2);border-color:rgba(57,255,20,.4);color:var(--neon-green)}
+.btn-sm{padding:5px 12px;font-size:.65rem}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
 
 /* ── Output Fields ────────────────────────────────────── */
 .out{
@@ -103,16 +152,6 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
 .out-row{display:flex;gap:6px;align-items:start;margin:4px 0}
 .out-row .out{flex:1}
 
-.pill{
-  display:inline-block;padding:2px 8px;border-radius:3px;font-size:.6rem;font-weight:700;
-  letter-spacing:.5px;font-family:var(--font-mono);text-transform:uppercase;margin-right:4px;
-}
-.pill-cyan{background:rgba(0,240,255,.12);color:var(--neon-cyan);border:1px solid rgba(0,240,255,.25)}
-.pill-pink{background:rgba(255,45,149,.12);color:var(--neon-pink);border:1px solid rgba(255,45,149,.25)}
-.pill-green{background:rgba(57,255,20,.12);color:var(--neon-green);border:1px solid rgba(57,255,20,.25)}
-.pill-yellow{background:rgba(255,225,77,.12);color:var(--neon-yellow);border:1px solid rgba(255,225,77,.25)}
-.pill-purple{background:rgba(180,77,255,.12);color:var(--neon-purple);border:1px solid rgba(180,77,255,.25)}
-
 /* ── Status Bar ───────────────────────────────────────── */
 .status-bar{
   padding:8px 14px;border-radius:6px;font-size:.75rem;font-weight:600;
@@ -122,6 +161,19 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
 .status-warn{background:rgba(255,225,77,.08);border:1px solid rgba(255,225,77,.25);color:var(--neon-yellow)}
 .status-err{background:rgba(255,45,149,.08);border:1px solid rgba(255,45,149,.25);color:var(--neon-pink)}
 .status-idle{background:rgba(180,77,255,.05);border:1px solid rgba(180,77,255,.15);color:var(--txt-muted)}
+
+/* ── Tile Palette ─────────────────────────────────────── */
+.tile-palette{display:flex;flex-wrap:wrap;gap:4px;margin:8px 0;justify-content:center}
+.pal-tile{
+  display:inline-flex;align-items:center;padding:3px 6px;border-radius:4px;
+  border:1px solid var(--card-border);background:rgba(0,0,0,.2);
+  font-family:var(--font-mono);font-size:.7rem;font-weight:700;color:var(--neon-green);
+  cursor:pointer;transition:all .2s;gap:2px;
+}
+.pal-tile:hover:not(.pal-used){border-color:var(--neon-cyan);background:rgba(0,240,255,.1)}
+.pal-used{opacity:.25;cursor:not-allowed;text-decoration:line-through}
+.pal-sep{display:inline-block;width:1px;height:12px;background:var(--txt-dim)}
+.pal-count{font-size:.68rem;color:var(--txt-muted);margin-top:4px;text-align:center}
 
 /* ── Participant Rows ─────────────────────────────────── */
 .p-row{
@@ -135,14 +187,23 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
 }
 .p-role{flex:1;min-width:80px;padding:5px 8px;border-radius:4px;border:1px solid var(--card-border);background:rgba(0,0,0,.3);color:var(--txt);font-family:var(--font-mono);font-size:.72rem}
 .p-role:focus{outline:none;border-color:var(--neon-purple)}
+.tile-input-wrap{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .p-tile-input{width:60px;text-align:center;padding:5px 6px;border-radius:4px;border:1px solid var(--card-border);background:rgba(0,0,0,.3);color:var(--neon-green);font-family:var(--font-mono);font-size:.78rem;font-weight:700}
 .p-tile-input:focus{outline:none;border-color:var(--neon-cyan)}
+.tile-preview{
+  padding:2px 8px;border-radius:4px;font-size:.78rem;font-weight:700;
+  font-family:var(--font-mono);white-space:nowrap;
+  background:rgba(0,240,255,.1);border:1px solid rgba(0,240,255,.3);color:var(--neon-cyan);
+}
+.tile-preview.tile-err{
+  background:rgba(255,45,149,.1);border:1px solid rgba(255,45,149,.3);
+  color:var(--neon-pink);font-weight:400;font-size:.65rem;
+}
 .p-flip{
   padding:4px 8px;border-radius:4px;cursor:pointer;border:1px solid rgba(180,77,255,.3);
   background:rgba(180,77,255,.12);color:var(--neon-purple);font-size:.78rem;transition:all .2s;
 }
 .p-flip:hover{background:rgba(180,77,255,.25)}
-.p-status{font-size:.82rem;font-family:var(--font-mono);width:20px;text-align:center;flex-shrink:0}
 .p-remove{
   padding:3px 7px;border-radius:4px;cursor:pointer;border:1px solid rgba(255,45,149,.3);
   background:rgba(255,45,149,.1);color:var(--neon-pink);font-size:.72rem;font-weight:700;transition:all .2s;
@@ -163,19 +224,113 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
 .chain-arrow.a-ok{color:var(--neon-green)}
 .chain-arrow.a-fail{color:var(--neon-pink)}
 
+/* ── Fix Suggestion ──────────────────────────────────── */
+.fix-box{
+  margin-top:10px;padding:10px 14px;border-radius:8px;
+  background:rgba(255,225,77,.06);border:1px solid rgba(255,225,77,.25);
+  font-size:.78rem;color:var(--neon-yellow);
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;line-height:1.6;
+}
+.fix-box .btn{flex-shrink:0}
+
+/* ── Seal Summary ────────────────────────────────────── */
+.seal-summary{
+  display:flex;gap:20px;flex-wrap:wrap;padding:16px;border-radius:8px;
+  background:rgba(180,77,255,.06);border:1px solid rgba(180,77,255,.25);margin-bottom:12px;
+}
+.seal-field{flex:1;min-width:200px}
+.seal-field .sf-label{font-size:.65rem;color:var(--txt-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.seal-field .sf-value{font-family:var(--font-mono);font-size:.88rem;color:var(--neon-green);font-weight:700}
+
+/* ── Details (collapsed) ─────────────────────────────── */
+.detail-wrap{margin-top:12px;border:1px solid var(--card-border);border-radius:8px;overflow:hidden}
+.detail-wrap summary{
+  padding:10px 14px;cursor:pointer;font-size:.78rem;font-weight:600;
+  color:var(--txt-muted);background:rgba(0,0,0,.15);-webkit-user-select:none;user-select:none;list-style:none;
+}
+.detail-wrap summary::-webkit-details-marker{display:none}
+.detail-wrap summary::before{content:'\25b6  ';font-size:.6rem;transition:transform .2s;display:inline-block}
+.detail-wrap[open] summary::before{transform:rotate(90deg)}
+.detail-wrap summary:hover{color:var(--txt)}
+.detail-wrap[open] summary{border-bottom:1px solid var(--card-border)}
+.detail-body{padding:14px}
+
+/* ── Tabs ────────────────────────────────────────────── */
+.tab-bar{display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid var(--card-border)}
+.tab{
+  padding:10px 18px;background:transparent;border:none;
+  border-bottom:2px solid transparent;color:var(--txt-muted);
+  font-family:var(--font-mono);font-size:.75rem;font-weight:700;
+  cursor:pointer;transition:all .2s;letter-spacing:.5px;margin-bottom:-2px;
+}
+.tab:hover{color:var(--txt)}
+.tab.active{color:var(--neon-cyan);border-bottom-color:var(--neon-cyan)}
+.tab-panel{display:none}
+.tab-panel.active{display:block;animation:fadeIn .2s ease}
+
+/* ── Verify Banner ───────────────────────────────────── */
+.verify-banner{
+  text-align:center;padding:24px;border-radius:10px;margin:12px 0;
+  font-size:1.4rem;font-weight:800;letter-spacing:2px;font-family:var(--font-mono);
+}
+.verify-banner.pass{
+  background:rgba(57,255,20,.1);border:2px solid rgba(57,255,20,.4);
+  color:var(--neon-green);box-shadow:0 0 30px rgba(57,255,20,.15);
+}
+.verify-banner.fail{
+  background:rgba(255,45,149,.1);border:2px solid rgba(255,45,149,.4);
+  color:var(--neon-pink);box-shadow:0 0 30px rgba(255,45,149,.15);
+}
+.verify-checks{margin-top:12px}
+.verify-check{
+  padding:8px 12px;margin:4px 0;border-radius:6px;font-size:.82rem;
+  display:flex;align-items:center;gap:8px;
+}
+.check-pass{background:rgba(57,255,20,.06);color:var(--neon-green)}
+.check-fail{background:rgba(255,45,149,.06);color:var(--neon-pink)}
+
 /* ── Security Notes ───────────────────────────────────── */
-.sec-notes{border:1px solid rgba(255,225,77,.25);border-radius:10px;padding:16px;background:rgba(255,225,77,.03);margin-top:16px}
-.sec-notes h3{color:var(--neon-yellow);font-size:.9rem;margin-bottom:8px}
-.sec-notes ul{padding-left:18px}
+.sec-notes{border:1px solid rgba(255,225,77,.25);border-radius:10px;overflow:hidden;margin-top:16px}
+.sec-notes summary{
+  padding:14px 18px;cursor:pointer;font-size:.9rem;font-weight:700;
+  color:var(--neon-yellow);background:rgba(255,225,77,.03);-webkit-user-select:none;user-select:none;list-style:none;
+}
+.sec-notes summary::-webkit-details-marker{display:none}
+.sec-notes summary::before{content:'\25b6  ';font-size:.6rem;transition:transform .2s;display:inline-block}
+.sec-notes[open] summary::before{transform:rotate(90deg)}
+.sec-notes[open] summary{border-bottom:1px solid rgba(255,225,77,.2)}
+.sec-notes ul{padding:14px 18px 14px 34px}
 .sec-notes li{font-size:.78rem;color:var(--txt-muted);margin:3px 0;line-height:1.7}
+
+/* ── File Input ──────────────────────────────────────── */
+.file-label{display:inline-block;cursor:pointer}
+.file-label input[type="file"]{display:none}
 
 /* ── Responsive ───────────────────────────────────────── */
 @media(max-width:640px){
   html{font-size:14px}
   .header h1{font-size:1.2rem}
+  .header{padding:20px 16px 16px}
   .btn{padding:7px 12px;font-size:.68rem}
-  .p-row{flex-wrap:wrap}
-  .p-role{min-width:60px}
+  .p-row{flex-wrap:wrap;gap:6px}
+  .p-role{min-width:60px;flex:1 1 100%;order:2}
+  .tile-input-wrap{order:3}
+  .p-num{order:1}
+  .p-flip,.p-remove{order:4}
+  .prog-label{display:none}
+  .prog-num{width:26px;height:26px;font-size:.65rem}
+  .prog-line{max-width:36px;margin:12px 4px 0}
+  .step-nav{
+    position:sticky;bottom:0;background:var(--bg);
+    border-top:1px solid var(--card-border);
+    padding:12px 8px;margin:16px -3% 0;z-index:50;
+  }
+  .wrap{padding-bottom:20px}
+  .tab{padding:8px 12px;font-size:.68rem}
+  .seal-summary{gap:12px;padding:12px}
+  .chain-viz{padding:10px 4px;gap:4px}
+  .tile-half{width:24px;height:24px}
+  .verify-banner{font-size:1.1rem;padding:16px}
 }
 </style>
 </head>
@@ -186,7 +341,7 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
 <!-- ═══════════════ HEADER ═══════════════ -->
 <header class="header">
   <h1>Deep Sigma EDGE</h1>
-  <div class="sub">Domino Delegation Chain &mdash; Physical co-presence proof, chain-bound encryption, offline single-file.</div>
+  <div class="sub">Domino Delegation Chain &mdash; Prove your delegation ceremony with domino tiles</div>
   <div class="badge-row">
     <span class="badge badge-edge">EDGE Module</span>
     <span class="badge badge-ver">v1.0</span>
@@ -194,126 +349,233 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
   </div>
 </header>
 
+<!-- ═══════════════ PROGRESS BAR ═══════════════ -->
+<div class="progress-bar">
+  <div class="prog-step active" onclick="progClick(1)">
+    <div class="prog-num">1</div>
+    <div class="prog-label">Add People</div>
+  </div>
+  <div class="prog-line" id="progLine1"></div>
+  <div class="prog-step" onclick="progClick(2)">
+    <div class="prog-num">2</div>
+    <div class="prog-label">Build Chain</div>
+  </div>
+  <div class="prog-line" id="progLine2"></div>
+  <div class="prog-step" onclick="progClick(3)">
+    <div class="prog-num">3</div>
+    <div class="prog-label">Seal</div>
+  </div>
+  <div class="prog-line" id="progLine3"></div>
+  <div class="prog-step" onclick="progClick(4)">
+    <div class="prog-num">4</div>
+    <div class="prog-label">Use It</div>
+  </div>
+</div>
+
 <!-- ═══════════════ STATUS ═══════════════ -->
-<div id="statusBar" class="status-bar status-idle">Ready. Add participants and enter domino tiles.</div>
+<div id="statusBar" class="status-bar status-idle">Ready &mdash; add participants and enter domino tiles, or try an example.</div>
 
-<!-- ═══════════════ CHAIN BUILDER ═══════════════ -->
-<div class="card">
-  <h3>Chain Builder</h3>
-  <p style="font-size:.78rem;color:var(--txt-muted);margin-bottom:10px">
-    Each participant draws a domino tile. The right pip of each tile must match the left pip of the next
-    (standard domino chaining). Use &#x21c4; to flip orientation.
-  </p>
-  <div id="participantList"></div>
-  <div style="display:flex;gap:8px;margin-top:10px">
-    <button class="btn btn-primary" onclick="addParticipant()">+ Add Participant</button>
-    <button class="btn btn-master" onclick="validateAndBuild()">Validate Chain</button>
+<!-- ═══════════════ Step 1: Add People ═══════════════ -->
+<div class="step active" id="step1">
+  <div class="card">
+    <h3>Who is in the ceremony?
+      <span class="tip" data-tip="Each participant draws a physical domino tile. The tiles form a chain that proves everyone was present.">?</span>
+    </h3>
+    <p class="card-intro">
+      Add each person in the delegation chain. Give them a role and enter the domino tile they drew.
+      Tiles are two numbers 0&ndash;6 (e.g. <strong>3-4</strong> or <strong>2,5</strong> or <strong>(1 6)</strong>).
+    </p>
+    <div class="btn-row">
+      <button class="btn btn-green btn-sm" onclick="loadExample()">Try an Example</button>
+      <button class="btn btn-primary btn-sm" onclick="addParticipant()">+ Add Person</button>
+    </div>
+    <div id="participantList" style="margin-top:10px"></div>
+    <div style="margin-top:14px">
+      <label>Tile Set
+        <span class="tip" data-tip="A double-six domino set has 28 unique tiles. Taken tiles are dimmed. Click an available tile to assign it to the next empty participant.">?</span>
+      </label>
+      <div class="tile-palette" id="tilePalette"></div>
+      <div class="pal-count" id="palCount">28 of 28 available</div>
+    </div>
+  </div>
+  <div class="step-nav">
+    <div></div>
+    <button class="btn btn-master" onclick="goToStep(2)">Next: Build Chain &rarr;</button>
   </div>
 </div>
 
-<!-- ═══════════════ CHAIN VISUALIZATION ═══════════════ -->
-<div class="card" id="vizCard" style="display:none">
-  <h3>Chain Visualization</h3>
-  <div class="chain-viz" id="chainViz"></div>
-  <div id="chainStatus" class="status-bar status-idle" style="margin-top:8px">—</div>
-</div>
-
-<!-- ═══════════════ CHAIN RECORD ═══════════════ -->
-<div class="card" id="recordCard" style="display:none;border-color:rgba(180,77,255,.4);box-shadow:var(--glow-purple)">
-  <h3 style="color:var(--neon-purple)">Chain Record</h3>
-  <h4><span class="pill pill-purple">Chain</span></h4>
-  <div class="out-row">
-    <div id="chainStr" class="out empty">&mdash;</div>
-    <button class="btn-copy" onclick="copyField('chainStr',this)">COPY</button>
+<!-- ═══════════════ Step 2: Build Chain ═══════════════ -->
+<div class="step" id="step2">
+  <div class="card">
+    <h3>Chain Preview
+      <span class="tip" data-tip="For a valid chain, the right side of each tile must match the left side of the next tile. This is standard domino chaining.">?</span>
+    </h3>
+    <p class="card-intro">
+      The right side of each tile must match the left side of the next.
+      If there is a break, try flipping a tile.
+    </p>
+    <div class="chain-viz" id="chainViz"></div>
+    <div id="chainStatus" class="status-bar status-idle">&mdash;</div>
+    <div id="fixSuggestion"></div>
   </div>
-  <h4><span class="pill pill-purple">Chain Hash</span> (SHA-256, 64 hex)</h4>
-  <div class="out-row">
-    <div id="chainHash" class="out empty">&mdash;</div>
-    <button class="btn-copy" onclick="copyField('chainHash',this)">COPY</button>
-  </div>
-  <h4><span class="pill pill-purple">Fingerprint</span> (first 16 hex of chain hash)</h4>
-  <div class="out-row">
-    <div id="chainFP" class="out empty">&mdash;</div>
-    <button class="btn-copy" onclick="copyField('chainFP',this)">COPY</button>
-  </div>
-  <h4><span class="pill pill-cyan">Domino Fingerprint</span> (verbal)</h4>
-  <div id="chainDominoFP" class="out empty">&mdash;</div>
-  <h4><span class="pill pill-green">Ceremony Record</span> (JSON &mdash; embed in authority ledger)</h4>
-  <div class="out-row">
-    <div id="ceremonyJSON" class="out empty" style="white-space:pre-wrap;max-height:240px;overflow:auto">&mdash;</div>
-    <button class="btn-copy" onclick="copyField('ceremonyJSON',this)">COPY</button>
+  <div class="step-nav">
+    <button class="btn btn-primary" onclick="goToStep(1)">&larr; Back</button>
+    <button class="btn btn-master" id="sealBtn" onclick="goToStep(3)" disabled>Seal Chain &rarr;</button>
   </div>
 </div>
 
-<!-- ═══════════════ CHAIN VERIFIER ═══════════════ -->
-<div class="card" style="border-color:rgba(255,225,77,.25)">
-  <h3 style="color:var(--neon-yellow)">Chain Verifier</h3>
-  <p style="font-size:.78rem;color:var(--txt-muted);margin-bottom:8px">Paste a ceremony record JSON to verify hash integrity and chain connectivity.</p>
-  <textarea id="verifyInput" placeholder="Paste ceremony record JSON here..." style="min-height:70px"></textarea>
-  <div style="margin-top:8px">
-    <button class="btn btn-primary" onclick="verifyRecord()">Verify</button>
+<!-- ═══════════════ Step 3: Seal ═══════════════ -->
+<div class="step" id="step3">
+  <div class="card" style="border-color:rgba(180,77,255,.4);box-shadow:var(--glow-purple)">
+    <h3 style="color:var(--neon-purple)">Chain Sealed
+      <span class="tip" data-tip="The chain seal is a SHA-256 hash of the tile sequence. The Quick ID and Domino Name let you verify over the phone.">?</span>
+    </h3>
+
+    <!-- Always visible: Quick ID + Domino Name -->
+    <div class="seal-summary">
+      <div class="seal-field">
+        <div class="sf-label">Quick ID
+          <span class="tip" data-tip="First 16 characters of the chain seal (SHA-256 hash). Use this to quickly identify a ceremony.">?</span>
+        </div>
+        <div class="sf-value" id="chainFP">&mdash;</div>
+      </div>
+      <div class="seal-field">
+        <div class="sf-label">Domino Name
+          <span class="tip" data-tip="Two domino tile names derived from the seal. Say these over the phone for verbal verification.">?</span>
+        </div>
+        <div class="sf-value" id="chainDominoFP">&mdash;</div>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="btn-row">
+      <button class="btn btn-green btn-sm" onclick="downloadJSON()">Download Record</button>
+      <button class="btn btn-primary btn-sm" id="copyJSONBtn" onclick="copyJSON(this)">Copy JSON</button>
+    </div>
+
+    <!-- Collapsed details -->
+    <details class="detail-wrap">
+      <summary>Show full details</summary>
+      <div class="detail-body">
+        <h4>Chain String</h4>
+        <div class="out-row">
+          <div id="chainStr" class="out empty">&mdash;</div>
+          <button class="btn-copy" onclick="copyField('chainStr',this)">COPY</button>
+        </div>
+        <h4>Full Seal (SHA-256)</h4>
+        <div class="out-row">
+          <div id="chainHash" class="out empty">&mdash;</div>
+          <button class="btn-copy" onclick="copyField('chainHash',this)">COPY</button>
+        </div>
+        <h4>Ceremony Record (JSON)</h4>
+        <div class="out-row">
+          <div id="ceremonyJSON" class="out empty" style="white-space:pre-wrap;max-height:240px;overflow:auto">&mdash;</div>
+          <button class="btn-copy" onclick="copyField('ceremonyJSON',this)">COPY</button>
+        </div>
+      </div>
+    </details>
   </div>
-  <div id="verifyResult" class="out empty" style="margin-top:8px;white-space:pre-wrap">Awaiting input</div>
+  <div class="step-nav">
+    <button class="btn btn-primary" onclick="goToStep(2)">&larr; Back</button>
+    <button class="btn btn-master" onclick="goToStep(4)">Next: Use It &rarr;</button>
+  </div>
 </div>
 
-<!-- ═══════════════ ENCRYPT ═══════════════ -->
-<div class="card" style="border-color:rgba(0,240,255,.3)">
-  <h3 style="color:var(--neon-cyan)">Encrypt</h3>
-  <p style="font-size:.78rem;color:var(--txt-muted);margin-bottom:8px">
-    Encrypt with a key derived from chain hash + passphrase via HKDF-SHA256 &rarr; AES-256-GCM.
-    The chain binds ciphertext to this specific delegation ceremony.
-  </p>
-  <label for="encPass">Passphrase</label>
-  <input type="password" id="encPass" placeholder="Enter passphrase" style="margin-bottom:8px"/>
-  <label for="encPlain">Plaintext</label>
-  <textarea id="encPlain" placeholder="Text to encrypt..."></textarea>
-  <div style="margin-top:8px">
-    <button class="btn btn-master" onclick="encryptPayload()">Encrypt</button>
+<!-- ═══════════════ Step 4: Use It ═══════════════ -->
+<div class="step" id="step4">
+  <div class="tab-bar">
+    <button class="tab active" data-tab="verify" onclick="switchTab('verify')">Verify</button>
+    <button class="tab" data-tab="lock" onclick="switchTab('lock')">Lock Message</button>
+    <button class="tab" data-tab="unlock" onclick="switchTab('unlock')">Unlock Message</button>
   </div>
-  <h4><span class="pill pill-cyan">Ciphertext</span> (base64)</h4>
-  <div class="out-row">
-    <div id="encOutput" class="out empty">No ciphertext yet</div>
-    <button class="btn-copy" onclick="copyField('encOutput',this)">COPY</button>
-  </div>
-</div>
 
-<!-- ═══════════════ DECRYPT ═══════════════ -->
-<div class="card" style="border-color:rgba(255,45,149,.3)">
-  <h3 style="color:var(--neon-pink)">Decrypt</h3>
-  <p style="font-size:.78rem;color:var(--txt-muted);margin-bottom:8px">
-    Decrypt with the same chain + passphrase used during encryption.
-    Failure reveals no information about which input was wrong.
-  </p>
-  <label for="decPass">Passphrase</label>
-  <input type="password" id="decPass" placeholder="Enter passphrase" style="margin-bottom:8px"/>
-  <label for="decCipher">Ciphertext (base64)</label>
-  <textarea id="decCipher" placeholder="Paste base64 ciphertext..."></textarea>
-  <div style="margin-top:8px">
-    <button class="btn btn-reset" onclick="decryptPayload()">Decrypt</button>
+  <!-- Verify Tab -->
+  <div class="tab-panel active" id="tab-verify">
+    <div class="card" style="border-color:rgba(255,225,77,.25)">
+      <h3 style="color:var(--neon-yellow)">Verify a Record
+        <span class="tip" data-tip="Paste a ceremony record JSON to verify that the seal (hash) is correct and all tiles connect properly.">?</span>
+      </h3>
+      <p class="card-intro">Paste a ceremony record or load a saved file. We will re-compute the seal and check that everything matches.</p>
+      <div class="btn-row">
+        <label class="btn btn-primary btn-sm file-label">
+          Load JSON File
+          <input type="file" accept=".json" onchange="loadJSONFile(this)"/>
+        </label>
+      </div>
+      <textarea id="verifyInput" placeholder="Paste ceremony record JSON here..." style="min-height:70px"></textarea>
+      <div style="margin-top:8px">
+        <button class="btn btn-primary" onclick="verifyRecord()">Verify</button>
+      </div>
+      <div id="verifyBanner" style="display:none"></div>
+      <div id="verifyDetails"></div>
+    </div>
   </div>
-  <h4><span class="pill pill-pink">Plaintext</span></h4>
-  <div id="decOutput" class="out empty">No plaintext yet</div>
-</div>
 
-<!-- ═══════════════ RESET ═══════════════ -->
-<div style="text-align:center;margin:16px 0">
-  <button class="btn btn-reset" onclick="resetAll()">Reset All</button>
+  <!-- Lock Message Tab -->
+  <div class="tab-panel" id="tab-lock">
+    <div class="card" style="border-color:rgba(0,240,255,.3)">
+      <h3 style="color:var(--neon-cyan)">Lock a Message
+        <span class="tip" data-tip="Encrypts your text using AES-256-GCM. The key is derived from the chain seal + your passphrase, so only someone with the same chain and passphrase can unlock it.">?</span>
+      </h3>
+      <p class="card-intro">
+        Encrypt text so only someone with this exact chain and the passphrase can read it.
+      </p>
+      <label for="encPass">Passphrase</label>
+      <input type="password" id="encPass" placeholder="Enter a strong passphrase" style="margin-bottom:8px"/>
+      <label for="encPlain">Message to lock</label>
+      <textarea id="encPlain" placeholder="Type or paste the text you want to encrypt..."></textarea>
+      <div style="margin-top:8px">
+        <button class="btn btn-master" onclick="encryptPayload()">Lock Message</button>
+      </div>
+      <h4>Locked output</h4>
+      <div class="out-row">
+        <div id="encOutput" class="out empty">No output yet</div>
+        <button class="btn-copy" onclick="copyField('encOutput',this)">COPY</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Unlock Message Tab -->
+  <div class="tab-panel" id="tab-unlock">
+    <div class="card" style="border-color:rgba(255,45,149,.3)">
+      <h3 style="color:var(--neon-pink)">Unlock a Message
+        <span class="tip" data-tip="Decrypts text that was locked with the same chain and passphrase. If either is wrong, decryption will fail without revealing which one was incorrect.">?</span>
+      </h3>
+      <p class="card-intro">
+        Decrypt a message using the same chain and passphrase that was used to lock it.
+      </p>
+      <label for="decPass">Passphrase</label>
+      <input type="password" id="decPass" placeholder="Enter the passphrase" style="margin-bottom:8px"/>
+      <label for="decCipher">Locked text (base64)</label>
+      <textarea id="decCipher" placeholder="Paste the encrypted text here..."></textarea>
+      <div style="margin-top:8px">
+        <button class="btn btn-reset" onclick="decryptPayload()">Unlock Message</button>
+      </div>
+      <h4>Unlocked output</h4>
+      <div id="decOutput" class="out empty">No output yet</div>
+    </div>
+  </div>
+
+  <div class="step-nav">
+    <button class="btn btn-primary" onclick="goToStep(3)">&larr; Back</button>
+    <button class="btn btn-reset" onclick="resetAll()">Start Over</button>
+  </div>
 </div>
 
 <!-- ═══════════════ SECURITY NOTES ═══════════════ -->
-<div class="sec-notes">
-  <h3>Security &amp; Usage Notes</h3>
+<details class="sec-notes">
+  <summary>Security &amp; Usage Notes</summary>
   <ul>
     <li><strong>Chain coordination.</strong> Standard domino chaining: the right value of each tile must match the left value of the next. This constrains tile selection and proves sequential coordination between participants.</li>
-    <li><strong>Ceremony binding.</strong> Encrypt/decrypt keys are derived via HKDF-SHA256 using the chain hash as input key material and SHA-256(passphrase) as salt. Different chains produce different keys even with the same passphrase.</li>
+    <li><strong>Ceremony binding.</strong> Lock/Unlock keys are derived via HKDF-SHA256 using the chain seal as input and SHA-256(passphrase) as salt. Different chains produce different keys even with the same passphrase.</li>
     <li><strong>Passphrase is the secret.</strong> The chain string is public (it appears in the ceremony record). Security depends entirely on passphrase strength. Use a strong passphrase.</li>
     <li><strong>No information leakage.</strong> Decryption failure (wrong chain or wrong passphrase) produces the same generic error. AES-GCM authentication catches both key mismatch and ciphertext tampering.</li>
-    <li><strong>Ceremony record.</strong> The JSON output contains the chain, hash, fingerprints, participants, and timestamp. Embed this in authority ledger entries as a <code>ceremony_proof</code> field for auditable delegation.</li>
-    <li><strong>Domino fingerprint.</strong> Maps the first two bytes of the chain hash to domino tile names for verbal verification. 784 possible combinations &mdash; sufficient for quick phone or radio confirmation.</li>
-    <li><strong>Deterministic.</strong> Same tile inputs and orientations always produce the same chain hash. Independent verification on air-gapped machines is possible.</li>
+    <li><strong>Ceremony record.</strong> The JSON output contains the chain, seal, fingerprints, participants, and timestamp. Embed this in authority ledger entries as a <code>ceremony_proof</code> field.</li>
+    <li><strong>Domino name.</strong> Maps the first two bytes of the chain seal to domino tile names for verbal verification. 784 possible combinations.</li>
+    <li><strong>Deterministic.</strong> Same tile inputs and orientations always produce the same chain seal. Independent verification on air-gapped machines is possible.</li>
     <li><strong>No network calls.</strong> This file runs entirely in-browser. Verify by inspecting source or running with network disabled.</li>
   </ul>
-</div>
+</details>
 
 </div><!-- /.wrap -->
 
@@ -329,12 +591,14 @@ var state={
   chainHashHex:"",
   dominoFP:"",
   chainString:"",
-  valid:false
+  valid:false,
+  sealed:false,
+  currentStep:1
 };
 
 var encoder=new TextEncoder();
 
-/* ── Domino Lookup Table (index 0-27 → [a,b]) ────────── */
+/* ── Domino Lookup Table (index 0-27 -> [a,b]) ────────── */
 var DOMINO_TABLE=[];
 (function(){
   for(var b=0;b<=6;b++){
@@ -352,7 +616,7 @@ function tileName(a,b){
   return TILE_WORDS[lo]+"-"+TILE_WORDS[hi];
 }
 
-/* Map first 2 bytes of hex → two domino tile names */
+/* Map first 2 bytes of hex to two domino tile names */
 function dominoFingerprint(hex){
   if(!hex||hex.length<4)return "\u2014";
   var b0=parseInt(hex.substring(0,2),16);
@@ -429,31 +693,156 @@ function copyField(id,btn){
   var text=el.textContent;
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(text).then(function(){
+      var orig=btn.textContent;
       btn.textContent="COPIED!";btn.classList.add("copied");
-      setTimeout(function(){btn.textContent="COPY";btn.classList.remove("copied")},2000);
+      setTimeout(function(){btn.textContent=orig;btn.classList.remove("copied")},2000);
     });
   }else{
     var ta=document.createElement("textarea");
     ta.value=text;ta.style.position="fixed";ta.style.opacity="0";
     document.body.appendChild(ta);ta.select();
-    try{document.execCommand("copy");btn.textContent="COPIED!";btn.classList.add("copied");
-      setTimeout(function(){btn.textContent="COPY";btn.classList.remove("copied")},2000);
+    try{document.execCommand("copy");
+      var orig=btn.textContent;
+      btn.textContent="COPIED!";btn.classList.add("copied");
+      setTimeout(function(){btn.textContent=orig;btn.classList.remove("copied")},2000);
     }catch(e){/* fallback failed */}
     document.body.removeChild(ta);
   }
 }
 
-/* ── Tile Parsing ─────────────────────────────────────── */
+/* ── Tile Parsing (enhanced: accepts 2-5, 2 5, 2,5, (2,5)) ── */
 function parseSingleTile(str){
-  var s=(str||"").trim();
+  var s=(str||"").trim().replace(/[()]/g,"");
   if(!s)return{ok:false,error:"empty"};
   var parts=s.split(/[\s,\-]+/);
-  if(parts.length!==2)return{ok:false,error:"expected two values"};
+  if(parts.length!==2)return{ok:false,error:"Enter two numbers, e.g. 3-4"};
   var a=parseInt(parts[0],10);
   var b=parseInt(parts[1],10);
-  if(isNaN(a)||isNaN(b))return{ok:false,error:"non-numeric"};
-  if(a<0||a>6||b<0||b>6)return{ok:false,error:"values must be 0-6"};
+  if(isNaN(a)||isNaN(b))return{ok:false,error:"Use numbers 0\u20136"};
+  if(a<0||a>6||b<0||b>6)return{ok:false,error:"Each side must be 0\u20136"};
   return{ok:true,a:a,b:b};
+}
+
+/* ── Wizard Navigation ──────────────────────────────────── */
+function goToStep(n){
+  if(n===state.currentStep||n<1||n>4)return;
+
+  /* Going backward */
+  if(n<state.currentStep){
+    if(n===1){clearSeal()}
+    showStep(n);
+    if(n===2){refreshViz()}
+    return;
+  }
+
+  /* Going forward from step 1 */
+  if(state.currentStep===1){
+    syncAllInputs();
+    if(!allParsed()){setStatus("Enter a valid tile for every participant first.","warn");return}
+    var c=checkChain();
+    state.valid=c.valid;
+    renderChainViz(c);
+    updateSealBtn();
+    if(!c.valid){showStep(2);setStatus(c.reason,"err");return}
+    /* Valid chain: seal and advance */
+    computeSeal(function(){
+      showStep(n>3?3:n);
+      if(n>3){setTimeout(function(){goToStep(n)},50)}
+    });
+    return;
+  }
+
+  /* Going forward from step 2 */
+  if(state.currentStep===2){
+    if(!state.valid){setStatus("Fix the chain before continuing.","warn");return}
+    computeSeal(function(){
+      showStep(n);
+    });
+    return;
+  }
+
+  /* Step 3 to 4: no validation */
+  showStep(n);
+}
+
+function progClick(n){
+  if(n<=state.currentStep||n===state.currentStep+1){
+    goToStep(n);
+  }
+}
+
+function showStep(n){
+  state.currentStep=n;
+  for(var i=1;i<=4;i++){
+    var el=document.getElementById("step"+i);
+    if(el){el.classList.toggle("active",i===n)}
+  }
+  updateProgressBar();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function updateProgressBar(){
+  var steps=document.querySelectorAll(".prog-step");
+  var lines=document.querySelectorAll(".prog-line");
+  for(var i=0;i<steps.length;i++){
+    var sn=i+1;
+    steps[i].classList.toggle("active",sn===state.currentStep);
+    steps[i].classList.toggle("done",sn<state.currentStep);
+  }
+  for(var i=0;i<lines.length;i++){
+    lines[i].classList.toggle("done",i+1<state.currentStep);
+  }
+}
+
+function updateSealBtn(){
+  var btn=document.getElementById("sealBtn");
+  if(btn)btn.disabled=!state.valid;
+}
+
+function allParsed(){
+  for(var i=0;i<state.participants.length;i++){
+    if(!state.participants[i].parsed)return false;
+  }
+  return true;
+}
+
+function clearSeal(){
+  state.sealed=false;state.chainHashBytes=null;state.chainFingerprint="";
+  state.chainHashHex="";state.dominoFP="";state.chainString="";state.valid=false;
+}
+
+function refreshViz(){
+  syncAllInputs();
+  var c=checkChain();
+  state.valid=c.valid;
+  renderChainViz(c);
+  updateSealBtn();
+}
+
+function computeSeal(cb){
+  if(state.sealed){renderSealRecord();if(cb)cb();return}
+  state.chainString=buildChainString();
+  sha256Bytes(encoder.encode(state.chainString)).then(function(h){
+    state.chainHashBytes=h;
+    state.chainHashHex=bytesToHex(h);
+    state.chainFingerprint=state.chainHashHex.substring(0,16);
+    state.dominoFP=dominoFingerprint(state.chainHashHex);
+    state.sealed=true;
+    renderSealRecord();
+    setStatus("Chain sealed. Quick ID: "+state.chainFingerprint+" \u2022 "+state.dominoFP,"ok");
+    if(cb)cb();
+  });
+}
+
+/* ── Load Example ────────────────────────────────────── */
+function loadExample(){
+  state.participants=[
+    {role:"Authority",tile:"3-4",a:3,b:4,parsed:true},
+    {role:"Regional Lead",tile:"4-1",a:4,b:1,parsed:true},
+    {role:"Field Operator",tile:"1-6",a:1,b:6,parsed:true}
+  ];
+  renderParticipants();
+  setStatus("Example loaded: 3 participants with a valid chain. Click Next to continue.","ok");
 }
 
 /* ── Participant Management ────────────────────────────── */
@@ -471,14 +860,20 @@ function removeParticipant(idx){
   }
   state.participants.splice(idx,1);
   renderParticipants();
-  clearChainOutput();
+  clearSeal();
 }
 
 function flipTile(idx){
   var p=state.participants[idx];
   if(!p.parsed)return;
   var tmp=p.a;p.a=p.b;p.b=tmp;
+  p.tile=p.a+"-"+p.b;
   renderParticipants();
+  clearSeal();
+}
+
+function syncAllInputs(){
+  for(var i=0;i<state.participants.length;i++){syncParticipantInput(i)}
 }
 
 function syncParticipantInput(idx){
@@ -490,9 +885,23 @@ function syncParticipantInput(idx){
   var result=parseSingleTile(p.tile);
   if(result.ok){p.a=result.a;p.b=result.b;p.parsed=true}
   else{p.a=-1;p.b=-1;p.parsed=false}
-  var st=row.querySelector(".p-status");
-  st.textContent=p.parsed?"\u2713":"\u2014";
-  st.style.color=p.parsed?"var(--neon-green)":"var(--txt-dim)";
+  /* Update inline preview/error */
+  var preview=row.querySelector(".tile-preview");
+  if(!preview)return;
+  if(p.parsed){
+    preview.textContent=p.a+"|"+p.b;
+    preview.className="tile-preview";
+    preview.style.display="";
+  }else if(p.tile.trim()){
+    preview.textContent=result.error;
+    preview.className="tile-preview tile-err";
+    preview.style.display="";
+  }else{
+    preview.textContent="";
+    preview.style.display="none";
+  }
+  state.sealed=false;
+  renderTilePalette();
 }
 
 function renderParticipants(){
@@ -508,38 +917,115 @@ function renderParticipants(){
 
     var role=document.createElement("input");
     role.type="text";role.className="p-role";
-    role.placeholder=i===0?"Authority":"Delegate L"+i;
+    role.placeholder=i===0?"e.g. Authority":"e.g. Delegate";
     role.value=p.role;
     role.oninput=(function(idx){return function(){syncParticipantInput(idx)}})(i);
+
+    var tileWrap=document.createElement("div");
+    tileWrap.className="tile-input-wrap";
 
     var tile=document.createElement("input");
     tile.type="text";tile.className="p-tile-input";
     tile.placeholder="3-4";tile.value=p.tile;
+    tile.title="Two numbers 0-6: e.g. 3-4 or 2,5 or (1 6)";
     tile.oninput=(function(idx){return function(){syncParticipantInput(idx)}})(i);
 
+    var preview=document.createElement("span");
+    preview.className="tile-preview";
+    if(p.parsed){preview.textContent=p.a+"|"+p.b}
+    else{preview.style.display="none"}
+
+    tileWrap.appendChild(tile);
+    tileWrap.appendChild(preview);
+
     var flip=document.createElement("button");
-    flip.className="p-flip";flip.textContent="\u21c4";flip.title="Flip orientation";
+    flip.className="p-flip";flip.textContent="\u21c4";flip.title="Flip tile orientation";
     flip.onclick=(function(idx){return function(){flipTile(idx)}})(i);
 
-    var st=document.createElement("span");
-    st.className="p-status";
-    st.textContent=p.parsed?"\u2713":"\u2014";
-    st.style.color=p.parsed?"var(--neon-green)":"var(--txt-dim)";
-
     var rem=document.createElement("button");
-    rem.className="p-remove";rem.textContent="\u2715";
+    rem.className="p-remove";rem.textContent="\u2715";rem.title="Remove";
     rem.onclick=(function(idx){return function(){removeParticipant(idx)}})(i);
 
-    row.appendChild(num);row.appendChild(role);row.appendChild(tile);
-    row.appendChild(flip);row.appendChild(st);row.appendChild(rem);
+    row.appendChild(num);row.appendChild(role);row.appendChild(tileWrap);
+    row.appendChild(flip);row.appendChild(rem);
     container.appendChild(row);
   }
+  renderTilePalette();
+}
+
+/* ── Tile Palette (all 28 tiles in a double-six set) ───── */
+function getUsedTiles(){
+  var used={};
+  for(var i=0;i<state.participants.length;i++){
+    var p=state.participants[i];
+    if(!p.parsed)continue;
+    var lo=Math.min(p.a,p.b),hi=Math.max(p.a,p.b);
+    used[lo+"-"+hi]=i;
+  }
+  return used;
+}
+
+function renderTilePalette(){
+  var pal=document.getElementById("tilePalette");
+  if(!pal)return;
+  pal.innerHTML="";
+  var used=getUsedTiles();
+  var avail=28-Object.keys(used).length;
+  for(var t=0;t<DOMINO_TABLE.length;t++){
+    var pair=DOMINO_TABLE[t];
+    var a=pair[0],b=pair[1];
+    var key=a+"-"+b;
+    var el=document.createElement("div");
+    var taken=used[key]!==undefined;
+    el.className="pal-tile"+(taken?" pal-used":"");
+    el.title=tileName(a,b)+(taken?" (participant "+(used[key]+1)+")":"");
+    var s1=document.createElement("span");s1.textContent=String(a);
+    var sep=document.createElement("span");sep.className="pal-sep";
+    var s2=document.createElement("span");s2.textContent=String(b);
+    el.appendChild(s1);el.appendChild(sep);el.appendChild(s2);
+    if(!taken){
+      el.onclick=(function(aa,bb){return function(){pickTile(aa,bb)}})(a,b);
+    }
+    pal.appendChild(el);
+  }
+  var ct=document.getElementById("palCount");
+  if(ct)ct.textContent=avail+" of 28 available";
+}
+
+function pickTile(a,b){
+  /* Assign to the first participant without a valid tile */
+  var idx=-1;
+  for(var i=0;i<state.participants.length;i++){
+    if(!state.participants[i].parsed){idx=i;break}
+  }
+  if(idx===-1){
+    setStatus("All participants already have tiles. Add another person or clear one.","warn");return;
+  }
+  state.participants[idx].tile=a+"-"+b;
+  state.participants[idx].a=a;
+  state.participants[idx].b=b;
+  state.participants[idx].parsed=true;
+  renderParticipants();
+  setStatus("Assigned "+a+"|"+b+" ("+tileName(a,b)+") to participant "+(idx+1)+".","ok");
+  state.sealed=false;
 }
 
 /* ── Chain Validation ──────────────────────────────────── */
 function checkChain(){
   for(var i=0;i<state.participants.length;i++){
     if(!state.participants[i].parsed)return{valid:false,breakAt:-1,reason:"Not all tiles entered"};
+  }
+  /* Duplicate check: a physical set has only one of each tile (a-b === b-a) */
+  var seen={};
+  for(var i=0;i<state.participants.length;i++){
+    var p=state.participants[i];
+    var lo=Math.min(p.a,p.b),hi=Math.max(p.a,p.b);
+    var key=lo+"-"+hi;
+    if(seen[key]!==undefined){
+      return{valid:false,breakAt:-1,
+        reason:"Duplicate tile: participants "+(seen[key]+1)+" and "+(i+1)+" both drew "+lo+"-"+hi+". A set has only one of each tile."};
+    }
+    seen[key]=i;
   }
   for(var i=1;i<state.participants.length;i++){
     if(state.participants[i-1].b!==state.participants[i].a){
@@ -553,64 +1039,25 @@ function buildChainString(){
   return state.participants.map(function(p){return p.a+"-"+p.b}).join(" \u2192 ");
 }
 
-/* ── Validate & Build Record ──────────────────────────── */
-function validateAndBuild(){
-  /* Sync all inputs first */
-  for(var i=0;i<state.participants.length;i++){
-    var row=document.getElementById("p-row-"+i);
-    if(!row)continue;
-    var p=state.participants[i];
-    p.tile=row.querySelector(".p-tile-input").value;
-    p.role=row.querySelector(".p-role").value;
-    var result=parseSingleTile(p.tile);
-    if(result.ok){p.a=result.a;p.b=result.b;p.parsed=true}
-  }
-
-  var check=checkChain();
-  state.valid=check.valid;
-
-  /* Always show visualization */
-  renderChainViz(check);
-  document.getElementById("vizCard").style.display="";
-
-  if(!check.valid){
-    document.getElementById("recordCard").style.display="none";
-    clearChainOutput();
-    setStatus(check.reason,"err");
-    return;
-  }
-
-  /* Build record */
-  state.chainString=buildChainString();
-  var chainBytes=encoder.encode(state.chainString);
-
-  sha256Bytes(chainBytes).then(function(hash){
-    state.chainHashBytes=hash;
-    state.chainHashHex=bytesToHex(hash);
-    state.chainFingerprint=state.chainHashHex.substring(0,16);
-    state.dominoFP=dominoFingerprint(state.chainHashHex);
-
-    document.getElementById("recordCard").style.display="";
-    setOut("chainStr",state.chainString,false);
-    setOut("chainHash",state.chainHashHex,false);
-    setOut("chainFP",state.chainFingerprint,false);
-    setOut("chainDominoFP",state.dominoFP,false);
-
-    var record={
-      ceremony_type:"delegation_chain",
-      chain:state.chainString,
-      chain_hash:state.chainHashHex,
-      chain_fingerprint:state.chainFingerprint,
-      domino_fingerprint:state.dominoFP,
-      participants:state.participants.map(function(p,i){
-        return{position:i+1,role:p.role||(i===0?"Authority":"Delegate L"+i),tile:p.a+"-"+p.b};
-      }),
-      timestamp:new Date().toISOString(),
-      valid:true
+function getFixSuggestion(breakAt){
+  if(breakAt<1)return null;
+  var prev=state.participants[breakAt-1];
+  var curr=state.participants[breakAt];
+  /* Would flipping curr fix the left connection? */
+  if(prev.b===curr.b){
+    return{
+      msg:"Tile "+(breakAt+1)+" shows "+curr.a+"|"+curr.b+" but needs "+prev.b+" on the left. Flipping it to "+curr.b+"|"+curr.a+" would connect.",
+      idx:breakAt
     };
-    setOut("ceremonyJSON",JSON.stringify(record,null,2),false);
-    setStatus("Valid chain of "+state.participants.length+". Fingerprint: "+state.chainFingerprint+" ("+state.dominoFP+")","ok");
-  });
+  }
+  /* Would flipping prev fix it? */
+  if(prev.a===curr.a){
+    return{
+      msg:"Tile "+breakAt+" shows "+prev.a+"|"+prev.b+" but needs "+curr.a+" on the right. Flipping it to "+prev.b+"|"+prev.a+" would connect.",
+      idx:breakAt-1
+    };
+  }
+  return null;
 }
 
 /* ── Chain Visualization ──────────────────────────────── */
@@ -638,7 +1085,6 @@ function renderChainViz(check){
 
     var face=document.createElement("div");
     face.className="tile-face";
-    /* Determine if this tile has all valid connections */
     var leftOk=i===0||state.participants[i-1].b===p.a;
     var rightOk=i===state.participants.length-1||!state.participants[i+1]||!state.participants[i+1].parsed||p.b===state.participants[i+1].a;
     face.classList.add(leftOk&&rightOk?"t-ok":"t-broken");
@@ -664,23 +1110,152 @@ function renderChainViz(check){
   var cs=document.getElementById("chainStatus");
   cs.textContent=check.reason;
   cs.className="status-bar status-"+(check.valid?"ok":"err");
+
+  /* Fix suggestion */
+  var fixBox=document.getElementById("fixSuggestion");
+  fixBox.innerHTML="";
+  if(!check.valid&&check.breakAt>0){
+    var fix=getFixSuggestion(check.breakAt);
+    if(fix){
+      var div=document.createElement("div");
+      div.className="fix-box";
+      var span=document.createElement("span");
+      span.textContent="Tip: "+fix.msg;
+      var btn=document.createElement("button");
+      btn.className="btn btn-primary btn-sm";
+      btn.textContent="Flip Tile "+(fix.idx+1);
+      btn.onclick=(function(idx){return function(){applyFix(idx)}})(fix.idx);
+      div.appendChild(span);
+      div.appendChild(btn);
+      fixBox.appendChild(div);
+    }
+  }
+}
+
+function applyFix(idx){
+  flipTile(idx);
+  syncAllInputs();
+  var c=checkChain();
+  state.valid=c.valid;
+  renderChainViz(c);
+  updateSealBtn();
+  if(c.valid){
+    computeSeal(function(){
+      setStatus("Fixed! Valid chain of "+state.participants.length+". Ready to seal.","ok");
+    });
+  }
+}
+
+/* ── Seal Record ──────────────────────────────────────── */
+function renderSealRecord(){
+  setOut("chainFP",state.chainFingerprint,false);
+  setOut("chainDominoFP",state.dominoFP,false);
+  setOut("chainStr",state.chainString,false);
+  setOut("chainHash",state.chainHashHex,false);
+  var record=buildCeremonyRecord();
+  setOut("ceremonyJSON",JSON.stringify(record,null,2),false);
+}
+
+function buildCeremonyRecord(){
+  return{
+    ceremony_type:"delegation_chain",
+    chain:state.chainString,
+    chain_hash:state.chainHashHex,
+    chain_fingerprint:state.chainFingerprint,
+    domino_fingerprint:state.dominoFP,
+    participants:state.participants.map(function(p,i){
+      return{position:i+1,role:p.role||(i===0?"Authority":"Delegate L"+i),tile:p.a+"-"+p.b};
+    }),
+    timestamp:new Date().toISOString(),
+    valid:true
+  };
+}
+
+/* ── Download / Copy / Load JSON ──────────────────────── */
+function downloadJSON(){
+  if(!state.sealed){setStatus("Seal the chain first.","warn");return}
+  var record=buildCeremonyRecord();
+  var json=JSON.stringify(record,null,2);
+  var blob=new Blob([json],{type:"application/json"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");
+  a.href=url;
+  a.download="chain-record-"+state.chainFingerprint+".json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  setStatus("Record downloaded.","ok");
+}
+
+function copyJSON(btn){
+  if(!state.sealed){setStatus("Seal the chain first.","warn");return}
+  var record=buildCeremonyRecord();
+  var json=JSON.stringify(record,null,2);
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(json).then(function(){
+      if(btn){
+        btn.textContent="COPIED!";btn.classList.add("copied");
+        setTimeout(function(){btn.textContent="COPY JSON";btn.classList.remove("copied")},2000);
+      }
+      setStatus("JSON copied to clipboard.","ok");
+    });
+  }
+}
+
+function loadJSONFile(input){
+  if(!input.files||!input.files[0])return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    document.getElementById("verifyInput").value=e.target.result;
+    setStatus("JSON loaded into verifier. Click Verify to check.","ok");
+  };
+  reader.readAsText(input.files[0]);
+  input.value="";
+}
+
+/* ── Tab Switching ────────────────────────────────────── */
+function switchTab(name){
+  var tabs=document.querySelectorAll(".tab");
+  var panels=document.querySelectorAll(".tab-panel");
+  for(var i=0;i<tabs.length;i++){
+    tabs[i].classList.toggle("active",tabs[i].getAttribute("data-tab")===name);
+  }
+  for(var i=0;i<panels.length;i++){
+    panels[i].classList.toggle("active",panels[i].id==="tab-"+name);
+  }
 }
 
 /* ── Chain Verifier ────────────────────────────────────── */
 function verifyRecord(){
   var input=document.getElementById("verifyInput").value.trim();
-  var el=document.getElementById("verifyResult");
+  var banner=document.getElementById("verifyBanner");
+  var details=document.getElementById("verifyDetails");
+
   if(!input){
-    setOut("verifyResult","No input provided.",true);return;
+    banner.style.display="none";
+    details.innerHTML="";
+    setStatus("Paste or load a ceremony record first.","warn");
+    return;
   }
 
   var record;
   try{record=JSON.parse(input)}catch(e){
-    setOut("verifyResult","Invalid JSON: "+e.message,true);return;
+    banner.style.display="";
+    banner.className="verify-banner fail";
+    banner.textContent="\u2717 INVALID JSON";
+    details.innerHTML="<div class='verify-check check-fail'><span>\u2717</span> "+e.message+"</div>";
+    setStatus("Verification FAILED: invalid JSON.","err");
+    return;
   }
 
   if(!record.chain||!record.chain_hash){
-    setOut("verifyResult","Missing required fields: chain, chain_hash",true);return;
+    banner.style.display="";
+    banner.className="verify-banner fail";
+    banner.textContent="\u2717 INCOMPLETE";
+    details.innerHTML="<div class='verify-check check-fail'><span>\u2717</span> Missing required fields: chain, chain_hash</div>";
+    setStatus("Verification FAILED: missing fields.","err");
+    return;
   }
 
   /* Re-validate chain connectivity */
@@ -699,23 +1274,35 @@ function verifyRecord(){
     var computedHash=bytesToHex(hash);
     var hashMatch=computedHash===record.chain_hash;
 
-    var lines=[];
-    lines.push(hashMatch?"\u2713 Hash verified":"\u2717 Hash mismatch (computed "+computedHash.substring(0,16)+"\u2026)");
-    lines.push(chainValid?"\u2713 Chain connectivity valid":"\u2717 Chain break at position "+(breakIdx+1));
+    var checks=[];
+    checks.push({pass:hashMatch,label:"Seal integrity",
+      detail:hashMatch?"Computed seal matches recorded seal":"Seal mismatch (computed "+computedHash.substring(0,16)+"\u2026)"});
+    checks.push({pass:chainValid,label:"Chain connectivity",
+      detail:chainValid?"All tiles connect properly":"Break at position "+(breakIdx+1)});
 
     if(record.chain_fingerprint){
       var fpMatch=computedHash.substring(0,16)===record.chain_fingerprint;
-      lines.push(fpMatch?"\u2713 Fingerprint matches":"\u2717 Fingerprint mismatch");
+      checks.push({pass:fpMatch,label:"Quick ID",detail:fpMatch?"Matches":"Mismatch"});
     }
     if(record.domino_fingerprint){
       var domFP=dominoFingerprint(computedHash);
-      lines.push(domFP===record.domino_fingerprint?"\u2713 Domino fingerprint matches":"\u2717 Domino fingerprint mismatch");
+      checks.push({pass:domFP===record.domino_fingerprint,label:"Domino name",
+        detail:domFP===record.domino_fingerprint?"Matches":"Mismatch"});
     }
 
     var allPass=hashMatch&&chainValid;
-    el.textContent=lines.join("\n");
-    el.classList.remove("empty");
-    el.style.color=allPass?"var(--neon-green)":"var(--neon-pink)";
+    banner.style.display="";
+    banner.className="verify-banner "+(allPass?"pass":"fail");
+    banner.textContent=allPass?"\u2713 VERIFIED":"\u2717 FAILED";
+
+    var html="<div class='verify-checks'>";
+    for(var i=0;i<checks.length;i++){
+      html+="<div class='verify-check "+(checks[i].pass?"check-pass":"check-fail")+"'>"+
+        "<span>"+(checks[i].pass?"\u2713":"\u2717")+"</span> "+
+        "<strong>"+checks[i].label+"</strong> &mdash; "+checks[i].detail+"</div>";
+    }
+    html+="</div>";
+    details.innerHTML=html;
     setStatus(allPass?"Verification PASSED":"Verification FAILED",allPass?"ok":"err");
   });
 }
@@ -732,12 +1319,12 @@ function deriveChainKey(chainHashBytes,passphrase){
 
 function encryptPayload(){
   if(!state.chainHashBytes||!state.valid){
-    setStatus("Build a valid chain first.","warn");return;
+    setStatus("Build and seal a valid chain first (steps 1\u20133).","warn");return;
   }
   var pass=document.getElementById("encPass").value;
-  if(!pass){setStatus("Enter a passphrase for encryption.","warn");return}
+  if(!pass){setStatus("Enter a passphrase.","warn");return}
   var plain=document.getElementById("encPlain").value;
-  if(!plain){setStatus("Enter plaintext to encrypt.","warn");return}
+  if(!plain){setStatus("Enter a message to lock.","warn");return}
 
   var iv=window.crypto.getRandomValues(new Uint8Array(12));
   var plainBytes=encoder.encode(plain);
@@ -751,20 +1338,20 @@ function encryptPayload(){
     var binary="";
     for(var i=0;i<combined.length;i++)binary+=String.fromCharCode(combined[i]);
     setOut("encOutput",btoa(binary),false);
-    setStatus("Encrypted. Chain: "+state.chainFingerprint+" ("+state.dominoFP+")","ok");
+    setStatus("Message locked. Chain: "+state.chainFingerprint+" ("+state.dominoFP+")","ok");
   }).catch(function(e){
-    setStatus("Encryption error: "+e.message,"err");
+    setStatus("Lock error: "+e.message,"err");
   });
 }
 
 function decryptPayload(){
   if(!state.chainHashBytes||!state.valid){
-    setStatus("Build a valid chain first.","warn");return;
+    setStatus("Build and seal a valid chain first (steps 1\u20133).","warn");return;
   }
   var pass=document.getElementById("decPass").value;
-  if(!pass){setStatus("Enter the passphrase used for encryption.","warn");return}
+  if(!pass){setStatus("Enter the passphrase.","warn");return}
   var b64=document.getElementById("decCipher").value.trim();
-  if(!b64){setStatus("Paste the base64 ciphertext.","warn");return}
+  if(!b64){setStatus("Paste the locked text.","warn");return}
 
   var binary;
   try{binary=atob(b64)}catch(e){
@@ -775,7 +1362,7 @@ function decryptPayload(){
   for(var i=0;i<binary.length;i++)combined[i]=binary.charCodeAt(i);
   if(combined.length<29){
     /* 12 IV + 16 GCM tag + at least 1 byte ciphertext */
-    setStatus("Ciphertext too short.","err");return;
+    setStatus("Locked text too short.","err");return;
   }
 
   var iv=combined.slice(0,12);
@@ -786,40 +1373,37 @@ function decryptPayload(){
   }).then(function(plainBuf){
     var plaintext=new TextDecoder().decode(plainBuf);
     setOut("decOutput",plaintext,false);
-    setStatus("Decrypted successfully.","ok");
+    setStatus("Message unlocked successfully.","ok");
   }).catch(function(){
     setOut("decOutput","Decryption failed",true);
-    setStatus("Decryption failed \u2014 wrong chain or passphrase.","err");
+    setStatus("Could not unlock \u2014 wrong chain or passphrase.","err");
   });
 }
 
 /* ── Reset ─────────────────────────────────────────────── */
-function clearChainOutput(){
-  state.chainHashBytes=null;state.chainFingerprint="";
-  state.chainHashHex="";state.dominoFP="";state.chainString="";state.valid=false;
-  document.getElementById("vizCard").style.display="none";
-  document.getElementById("recordCard").style.display="none";
-  var ids=["chainStr","chainHash","chainFP","chainDominoFP","ceremonyJSON"];
-  for(var i=0;i<ids.length;i++)setOut(ids[i],"\u2014",true);
-  setOut("encOutput","No ciphertext yet",true);
-  setOut("decOutput","No plaintext yet",true);
-}
-
 function resetAll(){
   state.participants=[
     {role:"",tile:"",a:-1,b:-1,parsed:false},
     {role:"",tile:"",a:-1,b:-1,parsed:false}
   ];
-  clearChainOutput();
+  clearSeal();
+
+  var ids=["chainStr","chainHash","chainFP","chainDominoFP","ceremonyJSON"];
+  for(var i=0;i<ids.length;i++)setOut(ids[i],"\u2014",true);
+  setOut("encOutput","No output yet",true);
+  setOut("decOutput","No output yet",true);
+
   document.getElementById("verifyInput").value="";
-  setOut("verifyResult","Awaiting input",true);
-  document.getElementById("verifyResult").style.color="";
+  document.getElementById("verifyBanner").style.display="none";
+  document.getElementById("verifyDetails").innerHTML="";
   document.getElementById("encPass").value="";
   document.getElementById("encPlain").value="";
   document.getElementById("decPass").value="";
   document.getElementById("decCipher").value="";
+
   renderParticipants();
-  setStatus("Ready. Add participants and enter domino tiles.","idle");
+  showStep(1);
+  setStatus("Ready \u2014 add participants and enter domino tiles, or try an example.","idle");
 }
 
 /* ── Init ──────────────────────────────────────────────── */
