@@ -995,92 +995,153 @@
     <!-- ═══════════════ CONSISTENCY GATE TAB (v1.0.8) ═══════════════ -->
     <section id="tab-cgate" class="hidden">
       <div class="explain-banner">
-        <strong>Consistency Gate (Sheaf-Residue Engine):</strong> Build a claim graph, score coherence via edge residues, auto-emit drift signals on threshold breach, and suggest patches. Two modes: <strong>basic</strong> (type-weighted disagreement) and <strong>sheaf</strong> (similarity-weighted via Token Jaccard).
+        <strong>Consistency Gate</strong> checks whether your claims agree or contradict each other.<br/>
+        <span class="muted" style="font-size:11px">Add statements ("claims"), draw relationships between them, and score the graph. Contradictions raise the score; agreements lower it. High scores trigger alerts and suggest fixes.</span>
+      </div>
+      <!-- Quick Start Bar -->
+      <div style="display:flex;gap:8px;align-items:center;padding:8px 12px;background:var(--card);border:1px solid var(--line);border-radius:8px;margin-bottom:10px">
+        <button class="primary" id="cgQuickDemo" style="white-space:nowrap">Quick Demo</button>
+        <span style="font-size:11px;color:var(--muted)">Load a sample scenario with contradicting claims, score it, and see drift signals + patch suggestions instantly.</span>
+        <span style="margin-left:auto;font-size:10px;color:var(--accent);cursor:pointer" id="cgHowToggle">How does this work? &#9660;</span>
+      </div>
+      <!-- Collapsible How-It-Works -->
+      <div id="cgHowPanel" class="hidden" style="padding:12px 14px;background:var(--card);border:1px solid var(--line);border-radius:8px;margin-bottom:10px;font-size:11px;line-height:1.7;color:var(--txt)">
+        <div style="font-weight:700;color:var(--accent);margin-bottom:6px">How the Consistency Gate Works</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px">
+          <div style="background:var(--bg);padding:8px;border-radius:6px;border:1px solid var(--line)">
+            <div style="color:var(--accent);font-weight:700;font-size:14px;margin-bottom:2px">1. Add Claims</div>
+            <div>Enter statements from different sources. Each claim has a <strong>key</strong> (ID), <strong>text</strong> (what it says), <strong>authority</strong> (who said it), and <strong>confidence</strong> (how sure).</div>
+          </div>
+          <div style="background:var(--bg);padding:8px;border-radius:6px;border:1px solid var(--line)">
+            <div style="color:var(--accent);font-weight:700;font-size:14px;margin-bottom:2px">2. Connect Them</div>
+            <div>Draw edges between claims: <strong style="color:var(--bad)">contradicts</strong> (they disagree), <strong style="color:var(--ok)">supports</strong> (they agree), or <strong style="color:var(--warn)">depends</strong> (one relies on the other).</div>
+          </div>
+          <div style="background:var(--bg);padding:8px;border-radius:6px;border:1px solid var(--line)">
+            <div style="color:var(--accent);font-weight:700;font-size:14px;margin-bottom:2px">3. Score</div>
+            <div>Hit <strong>Score</strong> to compute the <strong>CRS</strong> (0-100). Higher = more disagreement. Contradictions raise it, supports lower it. Stale claims fade over time.</div>
+          </div>
+          <div style="background:var(--bg);padding:8px;border-radius:6px;border:1px solid var(--line)">
+            <div style="color:var(--accent);font-weight:700;font-size:14px;margin-bottom:2px">4. Act</div>
+            <div>If the score is high, the system emits <strong>drift signals</strong> (alerts) and suggests <strong>patches</strong> (e.g. expire a stale claim, request more evidence). You can simulate patches before applying.</div>
+          </div>
+        </div>
+        <div style="color:var(--muted)">
+          <strong>Two scoring modes:</strong>
+          <strong>Basic</strong> scores purely by edge type and weight.
+          <strong>Sheaf</strong> also considers how similar the claim texts are &mdash; if two "contradicting" claims actually say nearly the same thing, the conflict score is reduced.
+        </div>
       </div>
       <div class="cg-layout">
         <!-- Left: Controls -->
         <div class="cg-panel">
           <div class="cg-group">
-            <h4 data-tip="Choose where claims come from: enter manually, pull from the pipeline, or load a test fixture" class="tip-down tip-right">Claim Source</h4>
+            <h4 data-tip="Choose where claims come from: enter manually, pull from the pipeline, or load a test fixture" class="tip-down tip-right">
+              <span style="color:var(--accent);margin-right:4px">1.</span> Where do claims come from?
+            </h4>
             <div id="cgSourceBtns">
-              <button class="cg-source-btn active tip-down" data-src="manual" data-tip="Enter claims and edges by hand using the forms below">Manual</button>
-              <button class="cg-source-btn tip-down" data-src="pipeline" data-tip="Import claims from the last pipeline run (requires running the pipeline first on the Run tab)">Pipeline Claims</button>
-              <button class="cg-source-btn tip-down" data-src="fixture" data-tip="Use predefined test fixtures from the CG Harness (run via Test Lab tab)">Fixture</button>
+              <button class="cg-source-btn active tip-down" data-src="manual" data-tip="Type in claims and edges yourself">Manual</button>
+              <button class="cg-source-btn tip-down" data-src="pipeline" data-tip="Pull claims from the last pipeline run (run the pipeline on the Run tab first)">From Pipeline</button>
+              <button class="cg-source-btn tip-down" data-src="fixture" data-tip="Use built-in test scenarios from the CG Harness (Test Lab tab)">Test Fixture</button>
             </div>
           </div>
           <div class="cg-group" id="cgManualEntry">
-            <h4 data-tip="Define a claim node in the consistency graph. Claims are statements that can agree or disagree with each other." class="tip-down tip-right">Add Claim</h4>
-            <input type="text" id="cgClaimKey" placeholder="claim key (e.g. C-001)" data-tip="Unique identifier for this claim (e.g. C-001, VULN-A). Used as the node ID in the graph." class="tip-down tip-right" style="width:100%;margin-bottom:4px"/>
-            <input type="text" id="cgClaimText" placeholder="claim text" data-tip="The natural-language assertion this claim makes. In sheaf mode, text similarity between connected claims affects the residue score." class="tip-down tip-right" style="width:100%;margin-bottom:4px"/>
+            <h4 data-tip="A claim is a statement from some source. Example: 'CPU usage is low' from monitoring with 0.90 confidence." class="tip-down tip-right">
+              <span style="color:var(--accent);margin-right:4px">2.</span> Add a claim (statement)
+            </h4>
+            <input type="text" id="cgClaimKey" placeholder="ID (e.g. C-001)" data-tip="Short unique identifier for this claim" class="tip-down tip-right" style="width:100%;margin-bottom:4px"/>
+            <input type="text" id="cgClaimText" placeholder="What does this claim say? (e.g. CPU usage is low)" data-tip="The actual statement. In Sheaf mode, text similarity between claims affects scoring." class="tip-down tip-right" style="width:100%;margin-bottom:4px"/>
             <div style="display:flex;gap:4px">
-              <input type="text" id="cgClaimAuth" placeholder="authority" data-tip="Who or what originated this claim (e.g. ops-team, monitor-a, audit). Used by patch suggestions to evaluate trustworthiness." class="tip-down tip-right" style="flex:1"/>
-              <input type="number" id="cgClaimConf" placeholder="conf" min="0" max="1" step="0.01" value="0.85" data-tip="Confidence score 0.00-1.00. Lower confidence on contradicted claims triggers REQUEST_EVIDENCE patches." class="tip-down" style="width:60px"/>
-              <button class="primary tip-down tip-left" id="cgAddClaim" style="padding:3px 10px;font-size:11px" data-tip="Add this claim to the graph. You can then connect it to other claims using the Edge Builder below.">Add</button>
+              <input type="text" id="cgClaimAuth" placeholder="Source (e.g. ops-team)" data-tip="Who or what made this claim? (e.g. monitoring, audit, ci-pipeline)" class="tip-down tip-right" style="flex:1"/>
+              <input type="number" id="cgClaimConf" placeholder="conf" min="0" max="1" step="0.01" value="0.85" data-tip="How confident is this claim? 0.00 (no confidence) to 1.00 (certain)" class="tip-down" style="width:60px"/>
+              <button class="primary tip-down tip-left" id="cgAddClaim" style="padding:3px 10px;font-size:11px" data-tip="Add this claim to the graph">Add</button>
             </div>
+            <div style="font-size:10px;color:var(--muted);margin-top:4px" id="cgClaimCount">0 claims added</div>
           </div>
           <div class="cg-group">
-            <h4 data-tip="Create typed relationships between claims. Edges define how claims interact and drive the residue score." class="tip-down tip-right">Edge Builder</h4>
+            <h4 data-tip="Connect two claims with a relationship: contradicts (they disagree), supports (they agree), or depends (one relies on the other)" class="tip-down tip-right">
+              <span style="color:var(--accent);margin-right:4px">3.</span> Connect claims (edges)
+            </h4>
+            <div style="font-size:10px;color:var(--muted);margin-bottom:6px">Pick two claims and choose how they relate:</div>
             <div class="cg-edge-row">
-              <select id="cgEdgeFrom" style="flex:1" data-tip="Source claim for this edge" class="tip-down tip-right"><option value="">from</option></select>
-              <select id="cgEdgeType" data-tip="Edge type: contradicts increases residue (weight 1.0), supports decreases it (-0.3), depends adds moderate residue (0.5)" class="tip-down">
+              <select id="cgEdgeFrom" style="flex:1" data-tip="First claim" class="tip-down tip-right"><option value="">claim A</option></select>
+              <select id="cgEdgeType" data-tip="contradicts = they disagree (raises score), supports = they agree (lowers score), depends = one relies on the other (moderate)" class="tip-down">
                 <option value="contradicts">contradicts</option>
                 <option value="supports">supports</option>
                 <option value="depends">depends</option>
               </select>
-              <select id="cgEdgeTo" style="flex:1" data-tip="Target claim for this edge" class="tip-down"><option value="">to</option></select>
-              <input type="number" id="cgEdgeWeight" value="1.0" min="0" max="2" step="0.1" data-tip="Edge weight multiplier (0.0-2.0). Higher weight amplifies this edge contribution to the CRS. Default 1.0." class="tip-down"/>
-              <button class="primary tip-down tip-left" id="cgAddEdge" style="padding:3px 8px;font-size:11px" data-tip="Add this edge to the graph. Edges appear in the list below and can be removed individually.">+</button>
+              <select id="cgEdgeTo" style="flex:1" data-tip="Second claim" class="tip-down"><option value="">claim B</option></select>
+              <input type="number" id="cgEdgeWeight" value="1.0" min="0" max="2" step="0.1" data-tip="How strong is this relationship? 0.0 (weak) to 2.0 (strong). Default 1.0." class="tip-down"/>
+              <button class="primary tip-down tip-left" id="cgAddEdge" style="padding:3px 8px;font-size:11px" data-tip="Add this connection">+</button>
             </div>
-            <div class="cg-edge-list" id="cgEdgeList" data-tip="Current edges in the graph. Click the X to remove an edge." class="tip-down tip-right"><span class="muted">No edges yet.</span></div>
+            <div class="cg-edge-list" id="cgEdgeList" data-tip="Your connections. Click X to remove one." class="tip-down tip-right"><span class="muted">No connections yet. Add claims first, then connect them here.</span></div>
           </div>
           <div class="cg-group">
-            <h4 data-tip="Scoring parameters that control how the Consistency Residue Score is computed" class="tip-down tip-right">Config</h4>
+            <h4 data-tip="Optional: tweak how scoring works. Defaults are fine for most cases." class="tip-down tip-right">
+              <span style="color:var(--accent);margin-right:4px">4.</span> Settings (optional)
+            </h4>
             <div style="display:flex;gap:8px;align-items:center;font-size:11px;margin-bottom:4px">
-              <label data-tip="Scoring algorithm to use" class="tip-down tip-right">Mode</label>
-              <select id="cgMode" style="flex:1" data-tip="Basic: residue = |type_weight| x edge_weight x freshness. Sheaf: adds Token Jaccard similarity — similar text on contradicting claims produces lower residue." class="tip-down tip-right">
-                <option value="basic">Basic (type-weighted)</option>
-                <option value="sheaf">Sheaf (similarity-weighted)</option>
+              <label data-tip="Scoring method" class="tip-down tip-right">Mode</label>
+              <select id="cgMode" style="flex:1" data-tip="Basic: scores by relationship type and weight. Sheaf: also considers how similar the claim texts are (similar text = lower conflict score)." class="tip-down tip-right">
+                <option value="basic">Basic (simple)</option>
+                <option value="sheaf">Sheaf (text-aware)</option>
               </select>
             </div>
             <div style="display:flex;gap:8px;align-items:center;font-size:11px;margin-bottom:4px">
-              <label data-tip="Time-to-live in seconds. Claims older than TTL have freshness = 0 and contribute no residue. Default 86400 (24 hours)." class="tip-down tip-right">TTL (s)</label>
-              <input type="number" id="cgTTL" value="86400" min="60" style="width:80px" data-tip="Freshness decay window in seconds. Claims age linearly from 1.0 (fresh) to 0.0 (stale). At TTL the claim is fully decayed." class="tip-down"/>
-              <label data-tip="CRS score at or above which a CONSISTENCY_RESIDUE drift signal is emitted" class="tip-down">DS threshold</label>
-              <input type="number" id="cgDSThreshold" value="40" min="0" max="100" style="width:60px" data-tip="When CRS >= this value, a drift signal (DS) is auto-emitted. Lower = more sensitive. Default 40." class="tip-down tip-left"/>
+              <label data-tip="How long until a claim expires. Older claims contribute less to the score." class="tip-down tip-right">Expires after</label>
+              <input type="number" id="cgTTL" value="86400" min="60" style="width:80px" data-tip="Time-to-live in seconds. 86400 = 24 hours. Older claims fade toward zero." class="tip-down"/>
+              <label data-tip="Score threshold that triggers a drift signal alert" class="tip-down">Alert at</label>
+              <input type="number" id="cgDSThreshold" value="40" min="0" max="100" style="width:60px" data-tip="When the score hits this number, an alert is raised. Lower = more sensitive." class="tip-down tip-left"/>
             </div>
           </div>
           <div class="tl-btn-row">
-            <button class="primary" id="cgRunScore" data-tip="Build the claim graph, compute the Consistency Residue Score (CRS), emit drift signals if threshold is exceeded, and generate patch suggestions for high-residue claims">Score CRS</button>
-            <button id="cgClear" data-tip="Remove all claims, edges, scores, drift signals, and patches. Resets the Consistency Gate to a blank state.">Clear All</button>
-            <button id="cgExportProof" style="border-color:rgba(204,93,232,.4);color:#cc5de8" data-tip="Download a JSON proof packet containing all inputs (claims, edges), config, scoring outputs (CRS, residues, per-claim breakdown), drift signals, patch suggestions, and replay data" class="tip-left">Export Proof</button>
+            <button class="primary" id="cgRunScore" data-tip="Compute the consistency score, check for alerts, and suggest fixes" style="font-size:13px;padding:6px 16px">Score</button>
+            <button id="cgClear" data-tip="Reset everything and start over">Clear All</button>
+            <button id="cgExportProof" style="border-color:rgba(204,93,232,.4);color:#cc5de8" data-tip="Download all data as a JSON proof packet for audit or replay" class="tip-left">Export Proof</button>
           </div>
           <div class="cg-group" style="margin-top:10px">
-            <h4 data-tip="Non-destructive what-if analysis: apply a suggested patch to a clone of the graph and compare CRS before vs after" class="tip-down tip-right">Patch Simulation</h4>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Select a suggested patch and simulate its effect on CRS.</div>
-            <select id="cgSimPatch" style="width:100%;margin-bottom:4px" data-tip="Choose a patch suggestion to simulate. Each patch type modifies the cloned graph differently (e.g. EXPIRE_CLAIM removes the claim, DOWNWEIGHT_AUTHORITY halves its confidence)." class="tip-down tip-right"><option value="">No patches yet</option></select>
-            <button id="cgRunSim" style="width:100%" data-tip="Run the selected patch on a clone of the current graph. Shows before/after CRS and the delta. Original graph is NOT modified." class="tip-down tip-right">Simulate Patch</button>
+            <h4 data-tip="Try a suggested fix on a copy of the graph to see if it helps. The real graph is not changed." class="tip-down tip-right">
+              <span style="color:var(--accent);margin-right:4px">5.</span> What-if? (simulate a fix)
+            </h4>
+            <div style="font-size:10px;color:var(--muted);margin-bottom:4px">Pick a suggested fix from the list and preview its effect before applying.</div>
+            <select id="cgSimPatch" style="width:100%;margin-bottom:4px" data-tip="Choose a fix to simulate" class="tip-down tip-right"><option value="">Score first to see suggestions</option></select>
+            <button id="cgRunSim" style="width:100%" data-tip="Run this fix on a copy of the graph. Shows before/after score. Nothing is changed permanently." class="tip-down tip-right">Simulate Fix</button>
             <div id="cgSimResult"></div>
           </div>
         </div>
         <!-- Right: Output -->
         <div class="cg-panel" style="max-height:calc(100vh - 240px);overflow-y:auto">
-          <div class="cg-gauge-wrap" id="cgGaugeWrap" data-tip="Consistency Residue Score (CRS): 0 = fully consistent, 100 = maximum disagreement. Green (0-19) = clean, Cyan (20-49) = mild tension, Yellow (50-79) = significant conflict, Red (80-100) = critical inconsistency.">
+          <!-- Empty state guide -->
+          <div id="cgEmptyState" style="text-align:center;padding:40px 20px">
+            <div style="font-size:48px;margin-bottom:12px;opacity:.3">&#9878;</div>
+            <div style="font-size:14px;font-weight:600;color:var(--txt);margin-bottom:8px">No data yet</div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.7;max-width:280px;margin:0 auto">
+              Click <strong style="color:var(--accent)">Quick Demo</strong> above to see a worked example,<br/>
+              or follow steps 1-4 on the left to build your own claim graph and score it.
+            </div>
+          </div>
+          <div class="cg-gauge-wrap hidden" id="cgGaugeWrap" data-tip="Consistency score: 0 = fully consistent, 100 = maximum disagreement. Green = clean, Cyan = mild, Yellow = significant, Red = critical.">
             <div class="cg-gauge" id="cgGauge">
               <svg viewBox="0 0 140 140">
                 <circle class="cg-gauge-bg" cx="70" cy="70" r="60"/>
                 <circle class="cg-gauge-fill" id="cgGaugeFill" cx="70" cy="70" r="60" stroke-dasharray="377" stroke-dashoffset="377"/>
               </svg>
               <div class="cg-gauge-label">
-                <div class="cg-gauge-score" id="cgScoreVal" data-tip="Current CRS value (0-100)" class="tip-down">--</div>
-                <div class="cg-gauge-sub" data-tip="Consistency Residue Score — normalized sum of edge residues across the claim graph" class="tip-down">CRS</div>
+                <div class="cg-gauge-score" id="cgScoreVal" data-tip="Consistency score (0 = clean, 100 = high conflict)" class="tip-down">--</div>
+                <div class="cg-gauge-sub" data-tip="Consistency Residue Score" class="tip-down">CRS</div>
               </div>
             </div>
-            <div class="cg-mode-label" id="cgModeLabel" data-tip="Current scoring mode: Basic uses type weights only; Sheaf additionally factors in Token Jaccard text similarity between connected claims" class="tip-down">basic mode</div>
+            <div class="cg-mode-label" id="cgModeLabel" data-tip="Scoring mode in use" class="tip-down">basic mode</div>
+            <div style="display:flex;gap:16px;margin-top:8px;font-size:10px">
+              <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--ok);vertical-align:middle"></span> 0-19 Clean</span>
+              <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent);vertical-align:middle"></span> 20-49 Mild</span>
+              <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--warn);vertical-align:middle"></span> 50-79 Conflict</span>
+              <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--bad);vertical-align:middle"></span> 80+ Critical</span>
+            </div>
           </div>
-          <div id="cgClaimTable" data-tip="Per-claim breakdown: shows each claim authority, confidence, total residue (sum of all edge residues touching this claim), and edge count. Higher residue = more inconsistency involving this claim." class="tip-right"></div>
-          <div id="cgDSOutput" data-tip="Drift Signals auto-emitted when CRS exceeds the configured threshold or when individual claims have max residue >= 0.8. Signals include type, severity, score, and affected claim." class="tip-right"></div>
-          <div id="cgPatchOutput" data-tip="Suggested corrective actions ranked by residue. Patch types: EXPIRE_CLAIM (remove stale), REQUEST_EVIDENCE (need proof), DOWNWEIGHT_AUTHORITY (reduce trust), SUPERSEDE_CANON (replace claim), SPLIT_CLAIM (break up)." class="tip-right"></div>
-          <div id="cgHarnessOutput" data-tip="Results from the Consistency Gate Test Harness: 6 fixtures testing specific graph topologies + 5 property tests verifying mathematical invariants (monotonicity, authority weighting, TTL decay, patch effect, determinism)." class="tip-right"></div>
+          <div id="cgClaimTable"></div>
+          <div id="cgDSOutput"></div>
+          <div id="cgPatchOutput"></div>
+          <div id="cgHarnessOutput"></div>
         </div>
       </div>
     </section>
@@ -4898,6 +4959,24 @@ function cgRenderPatches(){
   }
 }
 
+function cgShowResults(){
+  var empty=document.getElementById("cgEmptyState");
+  var gauge=document.getElementById("cgGaugeWrap");
+  if(empty)empty.classList.add("hidden");
+  if(gauge)gauge.classList.remove("hidden");
+}
+function cgShowEmpty(){
+  var empty=document.getElementById("cgEmptyState");
+  var gauge=document.getElementById("cgGaugeWrap");
+  if(empty)empty.classList.remove("hidden");
+  if(gauge)gauge.classList.add("hidden");
+}
+function cgUpdateClaimCount(){
+  var el=document.getElementById("cgClaimCount");
+  var n=Object.keys(S.cg.claims).length;
+  if(el)el.textContent=n===0?"0 claims added":n+" claim"+(n>1?"s":"")+" added";
+}
+
 function cgRunScore(){
   var graph=cgBuildGraph(S.cg.claims,S.cg.edges);
   var config={mode:S.cg.config.mode,ttl:S.cg.config.ttl,now:Date.now()};
@@ -4905,12 +4984,37 @@ function cgRunScore(){
   S.cg.lastScore=result;
   S.cg.dsEvents=cgEmitDS(result,S.cg.config.dsThreshold);
   S.cg.patches=cgSuggestPatches(graph,result);
+  cgShowResults();
   cgRenderGauge(result.crs,result.mode);
   cgRenderClaimTable(graph,result);
   cgRenderDS();
   cgRenderPatches();
-  showToast("CRS: "+result.crs+"/100 ("+result.mode+")",result.crs>=80?"warn":"ok");
+  var label=result.crs>=80?"Critical inconsistency":result.crs>=50?"Significant conflict":result.crs>=20?"Mild tension":"Clean";
+  showToast("Score: "+result.crs+"/100 — "+label,result.crs>=80?"warn":"ok");
   return result;
+}
+
+function cgQuickDemo(){
+  // Clear and load a sample scenario
+  S.cg.claims={};S.cg.edges=[];S.cg.lastScore=null;S.cg.dsEvents=[];S.cg.patches=[];
+  var now=Date.now();
+  S.cg.claims={
+    "C-001":{key:"C-001",text:"CPU usage is low and stable",authority:"monitoring-agent",confidence:0.92,ts:now},
+    "C-002":{key:"C-002",text:"CPU usage is critically high",authority:"alert-system",confidence:0.88,ts:now},
+    "C-003":{key:"C-003",text:"No performance issues detected",authority:"health-check",confidence:0.80,ts:now},
+    "C-004":{key:"C-004",text:"Application response time degraded",authority:"apm-dashboard",confidence:0.75,ts:now}
+  };
+  S.cg.edges=[
+    {from:"C-001",to:"C-002",type:"contradicts",weight:1.0},
+    {from:"C-003",to:"C-004",type:"contradicts",weight:0.9},
+    {from:"C-001",to:"C-003",type:"supports",weight:0.8},
+    {from:"C-002",to:"C-004",type:"supports",weight:0.7}
+  ];
+  cgUpdateClaimSelectors();
+  cgRenderEdgeList();
+  cgUpdateClaimCount();
+  cgRunScore();
+  showToast("Demo loaded: 4 claims with contradictions and supports","info");
 }
 
 function cgLoadPipelineClaims(){
@@ -5625,6 +5729,17 @@ window.addEventListener("DOMContentLoaded",()=>{
   if(pResetBtn)pResetBtn.addEventListener("click",resetPolicyDefaults);
 
   // ── v1.0.8 Consistency Gate Wiring ─────────────────────────────────
+  // Quick Demo
+  var cgDemoBtn=document.getElementById("cgQuickDemo");
+  if(cgDemoBtn)cgDemoBtn.addEventListener("click",cgQuickDemo);
+  // How-It-Works toggle
+  var cgHowToggle=document.getElementById("cgHowToggle");
+  var cgHowPanel=document.getElementById("cgHowPanel");
+  if(cgHowToggle&&cgHowPanel)cgHowToggle.addEventListener("click",function(){
+    var vis=!cgHowPanel.classList.contains("hidden");
+    cgHowPanel.classList.toggle("hidden");
+    cgHowToggle.innerHTML=vis?"How does this work? &#9660;":"Hide &#9650;";
+  });
   // Source buttons
   document.querySelectorAll("#cgSourceBtns .cg-source-btn").forEach(function(btn){
     btn.addEventListener("click",function(){
@@ -5633,7 +5748,7 @@ window.addEventListener("DOMContentLoaded",()=>{
       S.cg.source=btn.dataset.src;
       var manual=document.getElementById("cgManualEntry");
       if(manual)manual.style.display=btn.dataset.src==="manual"?"block":"none";
-      if(btn.dataset.src==="pipeline")cgLoadPipelineClaims();
+      if(btn.dataset.src==="pipeline"){cgLoadPipelineClaims();cgUpdateClaimCount()}
       if(btn.dataset.src==="fixture"){
         showToast("Use Test Lab harness or select a fixture below","info");
       }
@@ -5646,11 +5761,13 @@ window.addEventListener("DOMContentLoaded",()=>{
     var text=document.getElementById("cgClaimText").value.trim();
     var auth=document.getElementById("cgClaimAuth").value.trim()||"manual";
     var conf=parseFloat(document.getElementById("cgClaimConf").value)||0.85;
-    if(!key){showToast("Claim key required","warn");return}
+    if(!key){showToast("Enter a claim ID","warn");return}
+    if(!text){showToast("Enter what this claim says","warn");return}
     S.cg.claims[key]={key:key,text:text,authority:auth,confidence:clamp(conf,0,1),ts:Date.now()};
     document.getElementById("cgClaimKey").value="";
     document.getElementById("cgClaimText").value="";
     cgUpdateClaimSelectors();
+    cgUpdateClaimCount();
     showToast("Claim "+key+" added","ok");
   });
   // Add edge
@@ -5660,11 +5777,11 @@ window.addEventListener("DOMContentLoaded",()=>{
     var to=document.getElementById("cgEdgeTo").value;
     var type=document.getElementById("cgEdgeType").value;
     var weight=parseFloat(document.getElementById("cgEdgeWeight").value)||1.0;
-    if(!from||!to){showToast("Select both claims","warn");return}
-    if(from===to){showToast("Cannot create self-edge","warn");return}
+    if(!from||!to){showToast("Select both claims to connect","warn");return}
+    if(from===to){showToast("A claim cannot contradict itself","warn");return}
     S.cg.edges.push({from:from,to:to,type:type,weight:clamp(weight,0,2)});
     cgRenderEdgeList();
-    showToast("Edge added: "+from+" "+type+" "+to,"ok");
+    showToast("Connected: "+from+" "+type+" "+to,"ok");
   });
   // Remove edge (delegated)
   var cgEdgeListEl=document.getElementById("cgEdgeList");
@@ -5684,7 +5801,8 @@ window.addEventListener("DOMContentLoaded",()=>{
   // Score
   var cgRunBtn=document.getElementById("cgRunScore");
   if(cgRunBtn)cgRunBtn.addEventListener("click",function(){
-    if(Object.keys(S.cg.claims).length===0){showToast("Add claims first","warn");return}
+    if(Object.keys(S.cg.claims).length===0){showToast("Add some claims first (step 2) or click Quick Demo","warn");return}
+    if(S.cg.edges.length===0){showToast("Connect at least two claims (step 3) before scoring","warn");return}
     cgRunScore();
   });
   // Clear
@@ -5692,12 +5810,13 @@ window.addEventListener("DOMContentLoaded",()=>{
   if(cgClearBtn)cgClearBtn.addEventListener("click",function(){
     S.cg.claims={};S.cg.edges=[];S.cg.lastScore=null;S.cg.dsEvents=[];S.cg.patches=[];
     cgUpdateClaimSelectors();cgRenderEdgeList();cgRenderGauge(0,"basic");
+    cgShowEmpty();cgUpdateClaimCount();
     document.getElementById("cgClaimTable").innerHTML="";
     document.getElementById("cgDSOutput").innerHTML="";
     document.getElementById("cgPatchOutput").innerHTML="";
     document.getElementById("cgHarnessOutput").innerHTML="";
     document.getElementById("cgSimResult").innerHTML="";
-    showToast("Consistency Gate cleared","info");
+    showToast("Cleared — ready to start fresh","info");
   });
   // Export proof
   var cgExportBtn=document.getElementById("cgExportProof");
