@@ -43,7 +43,7 @@ flowchart TD
         ABP["abp_v1.json\nABP-bf0afe15\nsha256:c01f..."]
     end
 
-    subgraph EDGE["EDGE Modules (9)"]
+    subgraph EDGE["EDGE Modules (12)"]
         UNI["Unified\n(8 tabs)"]
         HIR["Hiring UI"]
         BID["Bid/NoBid UI"]
@@ -52,11 +52,14 @@ flowchart TD
         AWD["Award Staffing"]
         COH["Coherence Dashboard"]
         SRO["Suite ReadOnly"]
-        JRM["JRM EDGE"]
+        JRM["JRM EDGE\n(v1.0.0 – v1.0.8)"]
+        COPS["Coherence Ops\n(interactive guide)"]
+        RFP["RFP Co-Pilot"]
+        RFPX["RFP Co-Pilot\nExec Brief"]
     end
 
     subgraph Gate["Gate Enforcement"]
-        GATE["gate_abp.py\n10 checks per file\n80/80 total"]
+        GATE["gate_abp.py\n10 checks per file"]
     end
 
     subgraph Verify["Verification"]
@@ -76,9 +79,9 @@ flowchart TD
     CONFIG --> BUILDER
     BUILDER --> ABP
 
-    ABP --> UNI & HIR & BID & CMP & BOE & AWD & COH & SRO & JRM
+    ABP --> UNI & HIR & BID & CMP & BOE & AWD & COH & SRO & JRM & COPS & RFP & RFPX
 
-    UNI & HIR & BID & CMP & BOE & AWD & COH & SRO & JRM --> GATE
+    UNI & HIR & BID & CMP & BOE & AWD & COH & SRO & JRM & COPS & RFP & RFPX --> GATE
     GATE -->|"ALL PASS"| DIST["Distribution"]
     GATE -->|"ANY FAIL"| BLOCK["Blocked"]
 
@@ -114,6 +117,14 @@ flowchart TD
 | `EDGE_Suite_ReadOnly_v1.0.0.html` | 1.0.0 | `suite_readonly` | Read-only wrapper with telemetry and rollup export |
 | `EDGE_JRM_EDGE_v1.0.0.html` | 1.0.0 | `jrm` | JRM pipeline visualizer — 9-stage ribbon, coherence meter, trace drawer, packet viewer |
 | `EDGE_JRM_EDGE_v1.0.1.html` | 1.0.1 | `jrm` | JRM EDGE enhanced — error guard, stage timestamps, refined drift heat, agentic demo, packet validation, cross-packet diff, table pagination |
+| `EDGE_JRM_EDGE_v1.0.4.html` | 1.0.4 | `jrm` | Process proof — 250-event generator, scenario mixer, Health tab with pipeline transparency and drift drill-down |
+| `EDGE_JRM_EDGE_v1.0.5.html` | 1.0.5 | `jrm` | Replay proof — deterministic replay, Health tab refinements |
+| `EDGE_JRM_EDGE_v1.0.6.html` | 1.0.6 | `jrm` | Test Lab tab — drift 0-100 scale, baseline capture, patch simulator |
+| `EDGE_JRM_EDGE_v1.0.7.html` | 1.0.7 | `jrm` | So What panel, Analyzer toggle, timeline visualization, stream mode, policy drawer |
+| `EDGE_JRM_EDGE_v1.0.8.html` | 1.0.8 | `jrm` | Consistency Gate — Sheaf-Residue Engine, claim graph, CRS scoring, force-directed visualization, claim drawer with "How to Fix", fixable claims panel |
+| `EDGE_Coherence_Ops_v1.0.0.html` | 1.0.0 | `coherence_ops` | Interactive Coherence Ops guide — 7 tabs (Overview, How It Works, 3 Domains, 4 Artifacts, Drift→Patch, Quick Start, FAQ), 80s synthwave styling, copy-ready templates |
+| `edge_rfp_copilot_excel_json.html` | — | `rfp_copilot` | RFP Co-Pilot — AI-assisted extraction to Excel/JSON workflow |
+| `edge_rfp_copilot_exec_brief.html` | — | `rfp_copilot` | RFP Co-Pilot Exec Brief — executive summary generator for RFP responses |
 
 ### Supporting Files
 
@@ -175,7 +186,7 @@ Deep-dive reference pages (synced to [GitHub Wiki](https://github.com/8ryanWh1t3
 
 | Page | Topic |
 |------|-------|
-| [EDGE Modules](https://github.com/8ryanWh1t3/DeepSigma/wiki/EDGE-Modules) | All 8 modules, Unified tabs, Coherence Dashboard, localStorage keys |
+| [EDGE Modules](https://github.com/8ryanWh1t3/DeepSigma/wiki/EDGE-Modules) | All 12 modules, Unified tabs, Coherence Dashboard, JRM EDGE versions, Coherence Ops, RFP Co-Pilot, localStorage keys |
 | [ABP Specification](https://github.com/8ryanWh1t3/DeepSigma/wiki/ABP-Specification) | Full structure, deterministic ID/hash, canonical JSON, composition, sections reference |
 | [Delegation Review](https://github.com/8ryanWh1t3/DeepSigma/wiki/Delegation-Review) | Governance loop, 4 DRT triggers, review policy, client-side evaluation |
 | [Gate Enforcement](https://github.com/8ryanWh1t3/DeepSigma/wiki/Gate-Enforcement) | gate_abp.py, 10 checks, file-to-module map, CLI, JSON output |
