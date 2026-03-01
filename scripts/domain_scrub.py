@@ -224,6 +224,8 @@ ALLOWED_ACRONYMS = {
     # Domino Split Key EDGE — crypto/ceremony tokens
     "HKDF", "ENC", "SIGN", "RECOVERY", "DOMINO", "RESET",
     "MASTER", "OPERATOR", "PANELS", "CEREMONY", "PANEL", "NOTES",
+    # Split Key Max Strength v2 — additional tokens
+    "CSPRNG", "ANCHOR", "HIDE", "WITNESS", "SPLITKEY",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}

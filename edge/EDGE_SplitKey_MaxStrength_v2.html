@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Deep Sigma EDGE — Split Key (Max Strength v2)</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a1a;--bg2:#0f0f2a;--card:#12123a;--card-border:#2a1a5e;
+  --neon-pink:#ff2d95;--neon-cyan:#00f0ff;--neon-purple:#b44dff;
+  --neon-yellow:#ffe14d;--neon-orange:#ff6a00;--neon-green:#39ff14;
+  --txt:#e8e0f0;--txt-muted:#8a80a0;--txt-dim:#5a5070;
+  --font-body:'Segoe UI',system-ui,-apple-system,sans-serif;
+  --font-mono:'Courier New',Courier,monospace;
+  --glow-cyan:0 0 20px rgba(0,240,255,.3),0 0 60px rgba(0,240,255,.1);
+  --glow-pink:0 0 20px rgba(255,45,149,.3),0 0 60px rgba(255,45,149,.1);
+  --glow-purple:0 0 20px rgba(180,77,255,.3),0 0 60px rgba(180,77,255,.1);
+}
+html{font-size:clamp(14px,1.1vw,17px);scroll-behavior:smooth}
+body{font-family:var(--font-body);color:var(--txt);background:var(--bg);line-height:1.65;min-height:100vh}
+.wrap{max-width:1100px;width:94%;margin:0 auto;padding:24px 0 60px}
+
+/* ── Header ──────────────────────────────────────────── */
+.header{
+  text-align:center;padding:36px 24px 28px;margin-bottom:20px;
+  border:1px solid var(--card-border);border-radius:12px;
+  background:linear-gradient(135deg,rgba(18,18,58,.9),rgba(10,10,26,.95));
+  box-shadow:var(--glow-pink);position:relative;
+}
+.header::before{
+  content:'';position:absolute;inset:-1px;border-radius:12px;z-index:-1;
+  background:linear-gradient(135deg,var(--neon-pink),var(--neon-purple),var(--neon-cyan));
+  opacity:.3;filter:blur(1px);
+}
+.header h1{
+  font-size:1.7rem;font-weight:800;letter-spacing:2px;
+  background:linear-gradient(90deg,var(--neon-pink),var(--neon-purple),var(--neon-cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.header .sub{color:var(--txt-muted);font-size:.75rem;margin-top:6px;letter-spacing:.4px;max-width:640px;margin-left:auto;margin-right:auto}
+.badge-row{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.badge{
+  display:inline-block;padding:3px 10px;border-radius:4px;font-size:.62rem;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;font-family:var(--font-mono);
+}
+.badge-edge{background:rgba(255,45,149,.15);color:var(--neon-pink);border:1px solid rgba(255,45,149,.4)}
+.badge-ver{background:rgba(0,240,255,.1);color:var(--neon-cyan);border:1px solid rgba(0,240,255,.3)}
+.badge-csprng{background:rgba(57,255,20,.1);color:var(--neon-green);border:1px solid rgba(57,255,20,.3)}
+.badge-offline{background:rgba(180,77,255,.1);color:var(--neon-purple);border:1px solid rgba(180,77,255,.3)}
+
+/* ── Cards ────────────────────────────────────────────── */
+.card{
+  background:var(--card);border:1px solid var(--card-border);border-radius:10px;
+  padding:20px;margin-bottom:16px;transition:border-color .2s,box-shadow .2s;
+}
+.card:hover{border-color:rgba(180,77,255,.35);box-shadow:0 0 14px rgba(180,77,255,.06)}
+.card h3{font-size:.95rem;font-weight:700;margin-bottom:10px;letter-spacing:.5px}
+.card h4{font-size:.78rem;font-weight:700;color:var(--neon-purple);margin:10px 0 4px}
+.card p,.card li{font-size:.82rem;color:var(--txt);line-height:1.7}
+.card ul{padding-left:18px;margin:4px 0}
+.card li{margin:3px 0}
+
+/* ── Operator Grid ────────────────────────────────────── */
+.op-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.op-grid{grid-template-columns:1fr}}
+.op-a h3{color:var(--neon-cyan)}
+.op-a{border-color:rgba(0,240,255,.3)}
+.op-b h3{color:var(--neon-pink)}
+.op-b{border-color:rgba(255,45,149,.3)}
+
+/* ── Buttons ──────────────────────────────────────────── */
+.btn{
+  padding:8px 16px;border-radius:6px;border:1px solid;cursor:pointer;
+  font-family:var(--font-mono);font-size:.7rem;font-weight:700;letter-spacing:.5px;
+  transition:all .2s;text-transform:uppercase;
+}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn-gen{background:rgba(0,240,255,.15);border-color:rgba(0,240,255,.4);color:var(--neon-cyan)}
+.btn-gen:hover:not(:disabled){background:rgba(0,240,255,.3)}
+.btn-gen-b{background:rgba(255,45,149,.15);border-color:rgba(255,45,149,.4);color:var(--neon-pink)}
+.btn-gen-b:hover:not(:disabled){background:rgba(255,45,149,.3)}
+.btn-master{background:rgba(180,77,255,.15);border-color:rgba(180,77,255,.4);color:var(--neon-purple)}
+.btn-master:hover:not(:disabled){background:rgba(180,77,255,.3)}
+.btn-hkdf{background:rgba(57,255,20,.12);border-color:rgba(57,255,20,.35);color:var(--neon-green)}
+.btn-hkdf:hover:not(:disabled){background:rgba(57,255,20,.25)}
+.btn-reset{background:rgba(255,45,149,.12);border-color:rgba(255,45,149,.35);color:var(--neon-pink)}
+.btn-reset:hover{background:rgba(255,45,149,.25)}
+.btn-toggle{
+  padding:2px 8px;font-size:.58rem;border-radius:3px;
+  background:rgba(180,77,255,.12);border:1px solid rgba(180,77,255,.25);color:var(--neon-purple);
+  cursor:pointer;font-family:var(--font-mono);font-weight:700;letter-spacing:.3px;transition:all .2s;
+  margin-left:6px;vertical-align:middle;
+}
+.btn-toggle:hover{background:rgba(180,77,255,.25)}
+.btn-copy{
+  padding:3px 10px;font-size:.6rem;border-radius:4px;
+  background:rgba(180,77,255,.12);border:1px solid rgba(180,77,255,.25);color:var(--neon-purple);
+  cursor:pointer;font-family:var(--font-mono);font-weight:700;letter-spacing:.5px;transition:all .2s;
+}
+.btn-copy:hover{background:rgba(180,77,255,.3)}
+.btn-copy.copied{background:rgba(57,255,20,.2);border-color:rgba(57,255,20,.4);color:var(--neon-green)}
+.btn-copy:disabled{opacity:.3;cursor:not-allowed}
+
+/* ── Output Fields ────────────────────────────────────── */
+.out{
+  font-family:var(--font-mono);font-size:.7rem;padding:8px 10px;border-radius:6px;
+  background:rgba(0,0,0,.3);border:1px solid rgba(42,26,94,.4);color:var(--neon-green);
+  word-break:break-all;min-height:26px;line-height:1.5;margin:4px 0;
+}
+.out.empty{color:var(--txt-dim);font-style:italic}
+.out.hidden-val{color:var(--txt-dim);letter-spacing:2px}
+.out-row{display:flex;gap:6px;align-items:start;margin:4px 0}
+.out-row .out{flex:1}
+.fp-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+.pill{
+  display:inline-block;padding:2px 8px;border-radius:3px;font-size:.58rem;font-weight:700;
+  letter-spacing:.5px;font-family:var(--font-mono);text-transform:uppercase;margin-right:4px;
+}
+.pill-cyan{background:rgba(0,240,255,.12);color:var(--neon-cyan);border:1px solid rgba(0,240,255,.25)}
+.pill-pink{background:rgba(255,45,149,.12);color:var(--neon-pink);border:1px solid rgba(255,45,149,.25)}
+.pill-green{background:rgba(57,255,20,.12);color:var(--neon-green);border:1px solid rgba(57,255,20,.25)}
+.pill-yellow{background:rgba(255,225,77,.12);color:var(--neon-yellow);border:1px solid rgba(255,225,77,.25)}
+.pill-purple{background:rgba(180,77,255,.12);color:var(--neon-purple);border:1px solid rgba(180,77,255,.25)}
+
+/* ── Witness ──────────────────────────────────────────── */
+.witness-row{display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin:10px 0}
+.witness-row label{font-size:.68rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3px;display:block;margin-bottom:3px}
+.witness-input{
+  width:70px;padding:5px 8px;border-radius:5px;border:1px solid var(--card-border);
+  background:rgba(0,0,0,.3);color:var(--neon-yellow);font-family:var(--font-mono);font-size:.78rem;
+  text-align:center;
+}
+.witness-input:focus{outline:none;border-color:var(--neon-yellow)}
+.witness-input::placeholder{color:var(--txt-dim);font-size:.68rem}
+.witness-display{
+  display:inline-block;padding:4px 12px;border-radius:5px;font-family:var(--font-mono);
+  font-size:.75rem;font-weight:700;color:var(--neon-yellow);
+  background:rgba(255,225,77,.08);border:1px solid rgba(255,225,77,.2);
+  letter-spacing:1px;
+}
+.witness-warn{font-size:.68rem;color:var(--neon-orange);margin-top:4px}
+
+/* ── Salt ─────────────────────────────────────────────── */
+input[type="text"].salt-input{
+  width:100%;padding:6px 10px;border-radius:5px;border:1px solid var(--card-border);
+  background:rgba(0,0,0,.3);color:var(--txt);font-family:var(--font-mono);font-size:.75rem;
+}
+input[type="text"].salt-input:focus{outline:none;border-color:var(--neon-purple)}
+label.field-label{font-size:.68rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3px;display:block;margin-bottom:3px}
+
+/* ── Status Bar ───────────────────────────────────────── */
+.status-bar{
+  padding:8px 14px;border-radius:6px;font-size:.72rem;font-weight:600;
+  font-family:var(--font-mono);margin-bottom:16px;transition:all .3s;
+}
+.status-ok{background:rgba(57,255,20,.08);border:1px solid rgba(57,255,20,.25);color:var(--neon-green)}
+.status-warn{background:rgba(255,225,77,.08);border:1px solid rgba(255,225,77,.25);color:var(--neon-yellow)}
+.status-err{background:rgba(255,45,149,.08);border:1px solid rgba(255,45,149,.25);color:var(--neon-pink)}
+.status-idle{background:rgba(180,77,255,.05);border:1px solid rgba(180,77,255,.15);color:var(--txt-muted)}
+
+/* ── Checklist ────────────────────────────────────────── */
+.checklist{list-style:none;padding:0}
+.checklist li{
+  padding:6px 10px;border-left:3px solid var(--neon-purple);margin:5px 0;
+  font-size:.78rem;background:rgba(180,77,255,.04);border-radius:0 6px 6px 0;
+}
+.checklist li strong{color:var(--neon-cyan)}
+
+/* ── Security Notes ───────────────────────────────────── */
+.sec-notes{
+  border:1px solid rgba(255,225,77,.25);border-radius:10px;padding:16px;
+  background:rgba(255,225,77,.03);margin-top:16px;
+}
+.sec-notes h3{color:var(--neon-yellow);font-size:.85rem;margin-bottom:8px}
+.sec-notes li{font-size:.75rem;color:var(--txt-muted);margin:3px 0}
+
+/* ── Responsive ───────────────────────────────────────── */
+@media(max-width:640px){
+  html{font-size:13px}
+  .header h1{font-size:1.15rem}
+  .btn{padding:7px 12px;font-size:.66rem}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header class="header">
+  <h1>Deep Sigma EDGE</h1>
+  <div class="sub">Split Key Ceremony (Max Strength v2) &mdash; Offline. Deterministic derivation from OS-grade CSPRNG shares. Domino witness anchor optional (non-entropy).</div>
+  <div class="badge-row">
+    <span class="badge badge-edge">EDGE Module</span>
+    <span class="badge badge-ver">v2.0</span>
+    <span class="badge badge-csprng">CSPRNG</span>
+    <span class="badge badge-offline">Offline</span>
+  </div>
+</header>
+
+<!-- ═══════════════ STATUS ═══════════════ -->
+<div id="statusBar" class="status-bar status-idle">Ready. Generate shares for each operator to begin.</div>
+
+<!-- ═══════════════ OPERATOR PANELS ═══════════════ -->
+<div class="op-grid">
+
+  <!-- Operator A -->
+  <div class="card op-a">
+    <h3>Operator A</h3>
+    <button class="btn btn-gen" onclick="generateShare('A')">Generate Share A (32 bytes)</button>
+    <h4><span class="pill pill-cyan">Fingerprint A</span> (always visible)</h4>
+    <div class="fp-row">
+      <div id="fpA" class="out empty" style="flex:1">Not generated</div>
+      <button class="btn-copy" onclick="copyField('fpA',this)">COPY</button>
+    </div>
+    <h4><span class="pill pill-cyan">Share A</span> (64 hex) <button class="btn-toggle" id="togA" onclick="toggleVis('A')">SHOW</button></h4>
+    <div class="out-row">
+      <div id="shareA" class="out empty">Not generated</div>
+      <button class="btn-copy" id="copyShareA" onclick="copySecretField('shareA','visA',this)" disabled>COPY</button>
+    </div>
+  </div>
+
+  <!-- Operator B -->
+  <div class="card op-b">
+    <h3>Operator B</h3>
+    <button class="btn btn-gen-b" onclick="generateShare('B')">Generate Share B (32 bytes)</button>
+    <h4><span class="pill pill-pink">Fingerprint B</span> (always visible)</h4>
+    <div class="fp-row">
+      <div id="fpB" class="out empty" style="flex:1">Not generated</div>
+      <button class="btn-copy" onclick="copyField('fpB',this)">COPY</button>
+    </div>
+    <h4><span class="pill pill-pink">Share B</span> (64 hex) <button class="btn-toggle" id="togB" onclick="toggleVis('B')">SHOW</button></h4>
+    <div class="out-row">
+      <div id="shareB" class="out empty">Not generated</div>
+      <button class="btn-copy" id="copyShareB" onclick="copySecretField('shareB','visB',this)" disabled>COPY</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════ WITNESS ANCHOR ═══════════════ -->
+<div class="card" style="border-color:rgba(255,225,77,.2)">
+  <h3 style="color:var(--neon-yellow)">Domino Witness Anchor <span class="pill pill-yellow">Non-Entropy</span></h3>
+  <p style="font-size:.75rem;color:var(--txt-muted);margin-bottom:8px">Optional. Each operator draws one domino tile as a human-memorable anchor for the ceremony record. These tiles do <strong>not</strong> affect key generation.</p>
+  <div class="witness-row">
+    <div>
+      <label for="witA">Operator A Tile</label>
+      <input type="text" class="witness-input" id="witA" placeholder="e.g. 5-2" maxlength="5"/>
+    </div>
+    <div>
+      <label for="witB">Operator B Tile</label>
+      <input type="text" class="witness-input" id="witB" placeholder="e.g. 3-6" maxlength="5"/>
+    </div>
+  </div>
+  <div id="witWarn" class="witness-warn" style="display:none"></div>
+</div>
+
+<!-- ═══════════════ MASTER PANEL ═══════════════ -->
+<div class="card" style="border-color:rgba(180,77,255,.4);box-shadow:var(--glow-purple)">
+  <h3 style="color:var(--neon-purple)">Master Key</h3>
+  <p style="font-size:.75rem;color:var(--txt-muted);margin-bottom:10px">master = SHA-256( shareA_bytes || shareB_bytes )</p>
+  <button class="btn btn-master" id="btnMaster" onclick="computeMaster()" disabled>Compute Master</button>
+
+  <h4><span class="pill pill-purple">Master Fingerprint</span> (always visible)</h4>
+  <div class="fp-row">
+    <div id="fpMaster" class="out empty" style="flex:1">Not computed</div>
+    <div id="witDisplay" style="display:none"></div>
+    <button class="btn-copy" onclick="copyField('fpMaster',this)">COPY</button>
+  </div>
+
+  <h4><span class="pill pill-purple">Master</span> (64 hex) <button class="btn-toggle" id="togM" onclick="toggleVisMaster()">SHOW</button></h4>
+  <div class="out-row">
+    <div id="masterHex" class="out empty">Not computed</div>
+    <button class="btn-copy" id="copyMaster" onclick="copySecretField('masterHex','visM',this)" disabled>COPY</button>
+  </div>
+</div>
+
+<!-- ═══════════════ HKDF PANEL ═══════════════ -->
+<div class="card" style="border-color:rgba(57,255,20,.2)">
+  <h3 style="color:var(--neon-green)">HKDF Key Derivation (Optional)</h3>
+  <p style="font-size:.75rem;color:var(--txt-muted);margin-bottom:10px">Derive purpose-specific keys from the master via HKDF-SHA256.</p>
+  <div style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:10px">
+    <div style="flex:3">
+      <label class="field-label" for="hkdfSalt">Salt (text, default empty)</label>
+      <input type="text" class="salt-input" id="hkdfSalt" placeholder="Optional salt string"/>
+    </div>
+    <div style="flex:1">
+      <button class="btn btn-hkdf" id="btnHkdf" onclick="deriveHkdf()" disabled>Derive Keys</button>
+    </div>
+  </div>
+
+  <h4><span class="pill pill-green">encKey</span> info=EDGE/SPLITKEY/ENC <button class="btn-toggle" id="togEnc" onclick="toggleVisKey('enc')">SHOW</button></h4>
+  <div class="out-row">
+    <div id="encKey" class="out empty">Not derived</div>
+    <button class="btn-copy" id="copyEnc" onclick="copySecretField('encKey','visEnc',this)" disabled>COPY</button>
+  </div>
+
+  <h4><span class="pill pill-green">signKey</span> info=EDGE/SPLITKEY/SIGN <button class="btn-toggle" id="togSign" onclick="toggleVisKey('sign')">SHOW</button></h4>
+  <div class="out-row">
+    <div id="signKey" class="out empty">Not derived</div>
+    <button class="btn-copy" id="copySign" onclick="copySecretField('signKey','visSign',this)" disabled>COPY</button>
+  </div>
+
+  <h4><span class="pill pill-green">recoveryKey</span> info=EDGE/SPLITKEY/RECOVERY <button class="btn-toggle" id="togRecov" onclick="toggleVisKey('recov')">SHOW</button></h4>
+  <div class="out-row">
+    <div id="recoveryKey" class="out empty">Not derived</div>
+    <button class="btn-copy" id="copyRecov" onclick="copySecretField('recoveryKey','visRecov',this)" disabled>COPY</button>
+  </div>
+</div>
+
+<!-- ═══════════════ RESET ═══════════════ -->
+<div style="text-align:center;margin:16px 0">
+  <button class="btn btn-reset" onclick="resetAll()">Reset All</button>
+</div>
+
+<!-- ═══════════════ CEREMONY CHECKLIST ═══════════════ -->
+<div class="card">
+  <h3 style="color:var(--neon-cyan)">Ceremony Checklist</h3>
+  <ul class="checklist">
+    <li><strong>1. Operator A generates share.</strong> Click "Generate Share A." Record fingerprint A. Optionally draw a witness tile.</li>
+    <li><strong>2. Operator B generates share.</strong> Click "Generate Share B." Record fingerprint B. Optionally draw a witness tile.</li>
+    <li><strong>3. Compute master.</strong> Click "Compute Master." Both operators verify the master fingerprint independently.</li>
+    <li><strong>4. Record fingerprint + witness.</strong> Store the master fingerprint and optional witness tiles in the ceremony log. This is the public record.</li>
+    <li><strong>5. Never store master in plaintext.</strong> Each operator stores only their own share (encrypted or on paper, offline). The master exists only when both shares are combined.</li>
+    <li><strong>6. Optionally derive HKDF keys.</strong> If purpose-specific keys are needed, enter a salt and derive. Record which info strings were used.</li>
+  </ul>
+</div>
+
+<!-- ═══════════════ SECURITY NOTES ═══════════════ -->
+<div class="sec-notes">
+  <h3>Security Notes</h3>
+  <ul>
+    <li><strong>OS CSPRNG.</strong> Shares are generated via <code style="color:var(--neon-green)">crypto.getRandomValues()</code>, the browser&rsquo;s interface to the operating system&rsquo;s cryptographic random number generator. Each share has 256 bits of entropy.</li>
+    <li><strong>Hashing compresses, not adds.</strong> SHA-256 combines the two 256-bit shares into a single 256-bit master. The entropy of the master is bounded by the entropy of the inputs (very high here).</li>
+    <li><strong>Domino witness is audit theater.</strong> The witness tiles provide a human-memorable anchor for the ceremony record. They contribute zero entropy to the key. Do not treat them as a security factor.</li>
+    <li><strong>Key rotation.</strong> Do not reuse a single master key across unrelated domains. Use HKDF with distinct info strings to derive domain-separated keys. Rotate periodically.</li>
+    <li><strong>No network calls.</strong> This file runs entirely in-browser. Verify by inspecting the source or running with network disabled.</li>
+    <li><strong>Memory hygiene.</strong> The "Reset All" button zeroes internal state variables. However, JavaScript cannot guarantee that the runtime has cleared all memory. For high-assurance ceremonies, close the browser tab and clear the process after use.</li>
+  </ul>
+</div>
+
+</div><!-- /.wrap -->
+
+<!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+<script>
+"use strict";
+
+/* ── State ──────────────────────────────────────────── */
+var S={
+  shareABytes:null,shareBBytes:null,masterBytes:null,
+  shareAHex:"",shareBHex:"",masterHexVal:"",
+  encHex:"",signHex:"",recovHex:"",
+  visA:false,visB:false,visM:false,visEnc:false,visSign:false,visRecov:false
+};
+var encoder=new TextEncoder();
+
+/* ── Bytes to hex ───────────────────────────────────── */
+function bytesToHex(bytes){
+  var h="";for(var i=0;i<bytes.length;i++){h+=("0"+bytes[i].toString(16)).slice(-2)}return h;
+}
+
+/* ── Concat bytes ───────────────────────────────────── */
+function concatBytes(a,b){
+  var c=new Uint8Array(a.length+b.length);c.set(a,0);c.set(b,a.length);return c;
+}
+
+/* ── SHA-256 → Uint8Array ───────────────────────────── */
+function sha256Bytes(data){
+  return window.crypto.subtle.digest("SHA-256",data).then(function(buf){return new Uint8Array(buf)});
+}
+
+/* ── HKDF-SHA256 ────────────────────────────────────── */
+function hkdfSha256(ikmBytes,saltBytes,infoBytes,length){
+  return window.crypto.subtle.importKey(
+    "raw",ikmBytes,{name:"HKDF"},false,["deriveBits"]
+  ).then(function(key){
+    return window.crypto.subtle.deriveBits(
+      {name:"HKDF",hash:"SHA-256",salt:saltBytes,info:infoBytes},key,length*8
+    );
+  }).then(function(buf){return new Uint8Array(buf)});
+}
+
+/* ── Parse witness tile ─────────────────────────────── */
+function parseWitnessTile(str){
+  str=(str||"").trim();
+  if(!str)return{ok:false,error:""};
+  var parts=str.split(/[\s,\-]+/);
+  if(parts.length!==2)return{ok:false,error:"Expected format: a-b (e.g. 5-2)"};
+  var a=parseInt(parts[0],10),b=parseInt(parts[1],10);
+  if(isNaN(a)||isNaN(b))return{ok:false,error:"Non-numeric values"};
+  if(a<0||a>6||b<0||b>6)return{ok:false,error:"Values must be 0-6"};
+  var lo=Math.min(a,b),hi=Math.max(a,b);
+  return{ok:true,a:lo,b:hi,canonical:"("+lo+","+hi+")"};
+}
+
+/* ── Set output ─────────────────────────────────────── */
+function setOut(id,text,isEmpty){
+  var el=document.getElementById(id);
+  if(!el)return;
+  el.textContent=text;
+  if(isEmpty){el.classList.add("empty");el.classList.remove("hidden-val")}
+  else{el.classList.remove("empty");el.classList.remove("hidden-val")}
+}
+
+function setHidden(id,masked){
+  var el=document.getElementById(id);
+  if(!el)return;
+  el.textContent=masked;
+  el.classList.remove("empty");
+  el.classList.add("hidden-val");
+}
+
+/* ── Status bar ─────────────────────────────────────── */
+function setStatus(msg,level){
+  var bar=document.getElementById("statusBar");
+  bar.textContent=msg;bar.className="status-bar status-"+level;
+}
+
+/* ── Copy helpers ───────────────────────────────────── */
+function flashCopy(btn){
+  btn.textContent="COPIED!";btn.classList.add("copied");
+  setTimeout(function(){btn.textContent="COPY";btn.classList.remove("copied")},2000);
+}
+function doCopy(text,btn){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){flashCopy(btn)});
+  }else{
+    var ta=document.createElement("textarea");
+    ta.value=text;ta.style.position="fixed";ta.style.opacity="0";
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");flashCopy(btn)}catch(e){}
+    document.body.removeChild(ta);
+  }
+}
+function copyField(id,btn){
+  var el=document.getElementById(id);
+  if(!el||el.classList.contains("empty"))return;
+  doCopy(el.textContent,btn);
+}
+function copySecretField(id,visKey,btn){
+  if(!S[visKey]){setStatus("Reveal the field before copying (click SHOW).","warn");return}
+  var hex=id==="shareA"?S.shareAHex:id==="shareB"?S.shareBHex:id==="masterHex"?S.masterHexVal:
+          id==="encKey"?S.encHex:id==="signKey"?S.signHex:S.recovHex;
+  if(!hex)return;
+  doCopy(hex,btn);
+}
+
+/* ── Visibility toggles ─────────────────────────────── */
+function renderVis(id,hex,visKey,togId){
+  if(S[visKey]){
+    setOut(id,hex,false);
+    document.getElementById(togId).textContent="HIDE";
+  }else{
+    setHidden(id,"\u2022".repeat(32));
+    document.getElementById(togId).textContent="SHOW";
+  }
+}
+function toggleVis(op){
+  var key="vis"+op;S[key]=!S[key];
+  var hex=op==="A"?S.shareAHex:S.shareBHex;
+  if(!hex)return;
+  renderVis("share"+op,hex,key,"tog"+op);
+}
+function toggleVisMaster(){
+  S.visM=!S.visM;
+  if(!S.masterHexVal)return;
+  renderVis("masterHex",S.masterHexVal,"visM","togM");
+}
+function toggleVisKey(name){
+  var key="vis"+name.charAt(0).toUpperCase()+name.slice(1);
+  S[key]=!S[key];
+  var hex=name==="enc"?S.encHex:name==="sign"?S.signHex:S.recovHex;
+  if(!hex)return;
+  var elId=name==="enc"?"encKey":name==="sign"?"signKey":"recoveryKey";
+  var togId="tog"+name.charAt(0).toUpperCase()+name.slice(1);
+  renderVis(elId,hex,key,togId);
+}
+
+/* ── Update button states ───────────────────────────── */
+function updateButtons(){
+  var hasA=!!S.shareABytes,hasB=!!S.shareBBytes,hasM=!!S.masterBytes;
+  document.getElementById("btnMaster").disabled=!(hasA&&hasB);
+  document.getElementById("btnHkdf").disabled=!hasM;
+  document.getElementById("copyShareA").disabled=!hasA;
+  document.getElementById("copyShareB").disabled=!hasB;
+  document.getElementById("copyMaster").disabled=!hasM;
+  document.getElementById("copyEnc").disabled=!S.encHex;
+  document.getElementById("copySign").disabled=!S.signHex;
+  document.getElementById("copyRecov").disabled=!S.recovHex;
+}
+
+/* ── Generate share ─────────────────────────────────── */
+function generateShare(op){
+  var bytes=new Uint8Array(32);
+  window.crypto.getRandomValues(bytes);
+  var hex=bytesToHex(bytes);
+
+  if(op==="A"){
+    S.shareABytes=bytes;S.shareAHex=hex;S.visA=false;
+    setHidden("shareA","\u2022".repeat(32));
+    document.getElementById("togA").textContent="SHOW";
+  }else{
+    S.shareBBytes=bytes;S.shareBHex=hex;S.visB=false;
+    setHidden("shareB","\u2022".repeat(32));
+    document.getElementById("togB").textContent="SHOW";
+  }
+
+  sha256Bytes(bytes).then(function(hash){
+    var fp=bytesToHex(hash).substring(0,16);
+    setOut("fp"+op,fp,false);
+    updateButtons();
+    setStatus("Share "+op+" generated (32 bytes, 256 bits entropy). Fingerprint: "+fp,"ok");
+  });
+}
+
+/* ── Compute master ─────────────────────────────────── */
+function computeMaster(){
+  if(!S.shareABytes||!S.shareBBytes){
+    setStatus("Both shares must be generated first.","err");return;
+  }
+  var combined=concatBytes(S.shareABytes,S.shareBBytes);
+
+  sha256Bytes(combined).then(function(master){
+    S.masterBytes=master;
+    S.masterHexVal=bytesToHex(master);
+    S.visM=false;
+    setHidden("masterHex","\u2022".repeat(32));
+    document.getElementById("togM").textContent="SHOW";
+    return sha256Bytes(master);
+  }).then(function(fpHash){
+    var fp=bytesToHex(fpHash).substring(0,16);
+    setOut("fpMaster",fp,false);
+
+    /* Show witness tiles next to fingerprint if provided */
+    var warnEl=document.getElementById("witWarn");
+    var dispEl=document.getElementById("witDisplay");
+    var warns=[];
+    var witA=parseWitnessTile(document.getElementById("witA").value);
+    var witB=parseWitnessTile(document.getElementById("witB").value);
+    var witParts=[];
+    if(witA.ok)witParts.push("A:"+witA.canonical);
+    else if(witA.error)warns.push("Witness A: "+witA.error);
+    if(witB.ok)witParts.push("B:"+witB.canonical);
+    else if(witB.error)warns.push("Witness B: "+witB.error);
+
+    if(witParts.length>0){
+      dispEl.innerHTML='<span class="witness-display">'+witParts.join(" ")+'</span>';
+      dispEl.style.display="inline-block";
+    }else{dispEl.style.display="none"}
+
+    if(warns.length>0){
+      warnEl.textContent=warns.join(" | ");warnEl.style.display="block";
+      setStatus("Master computed. Fingerprint: "+fp+" (witness tile warning)","warn");
+    }else{
+      warnEl.style.display="none";
+      setStatus("Master computed. Fingerprint: "+fp,"ok");
+    }
+
+    updateButtons();
+  });
+}
+
+/* ── Derive HKDF keys ──────────────────────────────── */
+function deriveHkdf(){
+  if(!S.masterBytes){setStatus("Compute master first.","err");return}
+  var saltText=document.getElementById("hkdfSalt").value;
+  var saltBytes=encoder.encode(saltText);
+  var infos=["EDGE/SPLITKEY/ENC","EDGE/SPLITKEY/SIGN","EDGE/SPLITKEY/RECOVERY"];
+  var ids=["encKey","signKey","recoveryKey"];
+  var hexKeys=["encHex","signHex","recovHex"];
+  var visKeys=["visEnc","visSign","visRecov"];
+  var togIds=["togEnc","togSign","togRecov"];
+
+  Promise.all(infos.map(function(info){
+    return hkdfSha256(S.masterBytes,saltBytes,encoder.encode(info),32);
+  })).then(function(keys){
+    for(var i=0;i<keys.length;i++){
+      var hex=bytesToHex(keys[i]);
+      S[hexKeys[i]]=hex;
+      S[visKeys[i]]=false;
+      setHidden(ids[i],"\u2022".repeat(32));
+      document.getElementById(togIds[i]).textContent="SHOW";
+    }
+    updateButtons();
+    setStatus("HKDF keys derived (salt: "+(saltText?"\""+saltText+"\"":"empty")+").","ok");
+  }).catch(function(e){
+    setStatus("HKDF error: "+e.message,"err");
+  });
+}
+
+/* ── Reset all ──────────────────────────────────────── */
+function resetAll(){
+  /* Zero out byte arrays */
+  if(S.shareABytes){S.shareABytes.fill(0);S.shareABytes=null}
+  if(S.shareBBytes){S.shareBBytes.fill(0);S.shareBBytes=null}
+  if(S.masterBytes){S.masterBytes.fill(0);S.masterBytes=null}
+  S.shareAHex="";S.shareBHex="";S.masterHexVal="";
+  S.encHex="";S.signHex="";S.recovHex="";
+  S.visA=false;S.visB=false;S.visM=false;
+  S.visEnc=false;S.visSign=false;S.visRecov=false;
+
+  var fields=[
+    ["shareA","Not generated"],["shareB","Not generated"],
+    ["fpA","Not generated"],["fpB","Not generated"],
+    ["masterHex","Not computed"],["fpMaster","Not computed"],
+    ["encKey","Not derived"],["signKey","Not derived"],["recoveryKey","Not derived"]
+  ];
+  for(var i=0;i<fields.length;i++)setOut(fields[i][0],fields[i][1],true);
+
+  document.getElementById("witA").value="";
+  document.getElementById("witB").value="";
+  document.getElementById("hkdfSalt").value="";
+  document.getElementById("witWarn").style.display="none";
+  document.getElementById("witDisplay").style.display="none";
+
+  ["togA","togB","togM","togEnc","togSign","togRecov"].forEach(function(id){
+    document.getElementById(id).textContent="SHOW";
+  });
+
+  updateButtons();
+  setStatus("Reset complete. All state cleared.","idle");
+}
+</script>
+
+</body>
+</html>
