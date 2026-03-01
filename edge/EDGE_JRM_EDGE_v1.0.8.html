@@ -1119,18 +1119,18 @@
               or follow steps 1-4 on the left to build your own claim graph and score it.
             </div>
           </div>
-          <div class="cg-gauge-wrap hidden" id="cgGaugeWrap" data-tip="Consistency score: 0 = fully consistent, 100 = maximum disagreement. Green = clean, Cyan = mild, Yellow = significant, Red = critical.">
+          <div class="cg-gauge-wrap hidden tip-down" id="cgGaugeWrap" data-tip="Consistency Residue Score: 0 = fully consistent, 100 = maximum disagreement. Green = clean, Cyan = mild, Yellow = significant, Red = critical.">
             <div class="cg-gauge" id="cgGauge">
               <svg viewBox="0 0 140 140">
                 <circle class="cg-gauge-bg" cx="70" cy="70" r="60"/>
                 <circle class="cg-gauge-fill" id="cgGaugeFill" cx="70" cy="70" r="60" stroke-dasharray="377" stroke-dashoffset="377"/>
               </svg>
               <div class="cg-gauge-label">
-                <div class="cg-gauge-score" id="cgScoreVal" data-tip="Consistency score (0 = clean, 100 = high conflict)" class="tip-down">--</div>
-                <div class="cg-gauge-sub" data-tip="Consistency Residue Score" class="tip-down">CRS</div>
+                <div class="cg-gauge-score" id="cgScoreVal">--</div>
+                <div class="cg-gauge-sub">CRS</div>
               </div>
             </div>
-            <div class="cg-mode-label" id="cgModeLabel" data-tip="Scoring mode in use" class="tip-down">basic mode</div>
+            <div class="cg-mode-label" id="cgModeLabel">basic mode</div>
             <div style="display:flex;gap:16px;margin-top:8px;font-size:10px">
               <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--ok);vertical-align:middle"></span> 0-19 Clean</span>
               <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent);vertical-align:middle"></span> 20-49 Mild</span>
