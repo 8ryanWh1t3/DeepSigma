@@ -37,7 +37,7 @@
   --font-mono:'Courier New',Courier,monospace;
 }
 
-html{font-size:15px;scroll-behavior:smooth}
+html{font-size:clamp(15px,1.1vw,18px);scroll-behavior:smooth}
 body{
   font-family:var(--font-body);color:var(--txt);background:var(--bg);
   line-height:1.65;min-height:100vh;overflow-x:hidden;position:relative;
@@ -80,11 +80,11 @@ body::after{
 }
 
 /* ── Main Container ────────────────────────────────────── */
-.wrap{max-width:960px;margin:0 auto;padding:20px 16px 60px;position:relative;z-index:1}
+.wrap{max-width:1200px;width:92%;margin:0 auto;padding:24px 0 60px;position:relative;z-index:1}
 
 /* ── Header Banner ─────────────────────────────────────── */
 .header{
-  text-align:center;padding:36px 20px 28px;margin-bottom:24px;position:relative;
+  text-align:center;padding:44px 28px 36px;margin-bottom:28px;position:relative;
   border:1px solid var(--card-border);border-radius:12px;
   background:linear-gradient(135deg,rgba(18,18,58,.9),rgba(10,10,26,.95));
   box-shadow:var(--glow-pink);
@@ -95,7 +95,7 @@ body::after{
   opacity:.3;filter:blur(1px);
 }
 .header h1{
-  font-size:1.8rem;font-weight:800;letter-spacing:2px;
+  font-size:2.2rem;font-weight:800;letter-spacing:3px;
   background:linear-gradient(90deg,var(--neon-pink),var(--neon-purple),var(--neon-cyan));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
   background-clip:text;
@@ -134,16 +134,16 @@ body::after{
 /* ── Cards ─────────────────────────────────────────────── */
 .card{
   background:var(--card);border:1px solid var(--card-border);border-radius:10px;
-  padding:20px;margin-bottom:16px;position:relative;
+  padding:24px;margin-bottom:18px;position:relative;
   transition:border-color .2s,box-shadow .2s;
 }
 .card:hover{border-color:rgba(180,77,255,.4);box-shadow:0 0 16px rgba(180,77,255,.08)}
 .card h3{
-  font-size:1rem;font-weight:700;margin-bottom:10px;
+  font-size:1.1rem;font-weight:700;margin-bottom:12px;
   color:var(--neon-cyan);letter-spacing:.5px;
 }
 .card h4{font-size:.85rem;font-weight:700;margin:12px 0 6px;color:var(--neon-purple)}
-.card p,.card li{font-size:.85rem;color:var(--txt);line-height:1.7}
+.card p,.card li{font-size:.9rem;color:var(--txt);line-height:1.75}
 .card ul,.card ol{padding-left:20px;margin:6px 0}
 .card li{margin:4px 0}
 
@@ -395,18 +395,18 @@ body::after{
 </header>
 
 <!-- ═══════════════ TAB BAR ═══════════════ -->
-<nav class="tab-bar" role="tablist">
-  <button class="tab-btn active" data-tab="overview" role="tab">Overview</button>
-  <button class="tab-btn" data-tab="howitworks" role="tab">How It Works</button>
-  <button class="tab-btn" data-tab="domains" role="tab">The 3 Domains</button>
-  <button class="tab-btn" data-tab="artifacts" role="tab">The 4 Artifacts</button>
-  <button class="tab-btn" data-tab="driftpatch" role="tab">Drift &rarr; Patch</button>
-  <button class="tab-btn" data-tab="quickstart" role="tab">Quick Start</button>
-  <button class="tab-btn" data-tab="faq" role="tab">FAQ</button>
+<nav class="tab-bar" role="tablist" aria-label="Coherence Ops sections">
+  <button class="tab-btn active" data-tab="overview" role="tab" aria-selected="true" aria-controls="tab-overview" id="btn-overview" tabindex="0">Overview</button>
+  <button class="tab-btn" data-tab="howitworks" role="tab" aria-selected="false" aria-controls="tab-howitworks" id="btn-howitworks" tabindex="-1">How It Works</button>
+  <button class="tab-btn" data-tab="domains" role="tab" aria-selected="false" aria-controls="tab-domains" id="btn-domains" tabindex="-1">The 3 Domains</button>
+  <button class="tab-btn" data-tab="artifacts" role="tab" aria-selected="false" aria-controls="tab-artifacts" id="btn-artifacts" tabindex="-1">The 4 Artifacts</button>
+  <button class="tab-btn" data-tab="driftpatch" role="tab" aria-selected="false" aria-controls="tab-driftpatch" id="btn-driftpatch" tabindex="-1">Drift &rarr; Patch</button>
+  <button class="tab-btn" data-tab="quickstart" role="tab" aria-selected="false" aria-controls="tab-quickstart" id="btn-quickstart" tabindex="-1">Quick Start</button>
+  <button class="tab-btn" data-tab="faq" role="tab" aria-selected="false" aria-controls="tab-faq" id="btn-faq" tabindex="-1">FAQ</button>
 </nav>
 
 <!-- ═══════════════ TAB: OVERVIEW ═══════════════ -->
-<section class="tab-panel active" id="tab-overview" data-title="Overview" role="tabpanel">
+<section class="tab-panel active" id="tab-overview" data-title="Overview" role="tabpanel" aria-labelledby="btn-overview">
 
   <div class="card">
     <h3>Why Organizations Drift Under AI Speed</h3>
@@ -441,6 +441,17 @@ body::after{
     </div>
   </div>
 
+  <div class="card" style="border-color:rgba(180,77,255,.4);box-shadow:var(--glow-purple)">
+    <h3 class="neon-purple">A Decision in 60 Seconds &mdash; A True Story</h3>
+    <ol style="font-size:.85rem;line-height:1.9;padding-left:20px">
+      <li><strong style="color:var(--neon-cyan)">Decision made.</strong> The team chose Vendor A for cloud hosting. Assumptions: &ldquo;pricing stable through Q3,&rdquo; &ldquo;99.9% uptime SLA.&rdquo; Sealed as <span class="mono neon-cyan">DLR-2026-0042 v1</span>.</li>
+      <li><strong style="color:var(--neon-yellow)">Assumption expired.</strong> Three months later, Vendor A raised prices 30%. The system fired a drift signal: <span class="mono neon-orange">DS-2026-0087</span> &mdash; severity ORANGE.</li>
+      <li><strong style="color:var(--neon-orange)">Drift reviewed.</strong> The decision owner confirmed the drift was real. The original reasoning no longer held.</li>
+      <li><strong style="color:var(--neon-green)">Patch shipped.</strong> New patch: switch to Vendor B. Old decision preserved. New canon sealed as <span class="mono neon-green">DLR-2026-0042 v2</span>.</li>
+      <li><strong style="color:var(--neon-pink)">Why retrieved.</strong> Six months later, a new hire asked &ldquo;why Vendor B?&rdquo; Full trace &mdash; original decision, drift signal, patch, reasoning &mdash; retrieved in <strong>30 seconds</strong>.</li>
+    </ol>
+  </div>
+
   <div class="card">
     <h3>What You Get</h3>
     <ul class="checklist">
@@ -461,10 +472,23 @@ body::after{
     </ul>
   </div>
 
+  <div class="card">
+    <h3>Try It: Coherence Index Demo</h3>
+    <p class="muted small mb">Drag the slider to see how coherence levels map to status labels. This is illustrative only.</p>
+    <div class="gauge-wrap">
+      <div class="gauge-label">Coherence Index</div>
+      <div class="gauge-value" id="gaugeValue" style="color:var(--neon-green)">85</div>
+      <div class="gauge-status" id="gaugeStatus" style="color:var(--neon-green)">EXCELLENT</div>
+      <label for="gaugeSlider" class="gauge-label" style="margin-top:8px">Adjust Coherence</label>
+      <input type="range" min="0" max="100" value="85" class="gauge-slider" id="gaugeSlider" title="Coherence index slider" oninput="updateGauge(this.value)"/>
+      <div class="gauge-note">Demo only &mdash; real scores are computed from your decision records, drift signals, and patch history.</div>
+    </div>
+  </div>
+
 </section>
 
 <!-- ═══════════════ TAB: HOW IT WORKS ═══════════════ -->
-<section class="tab-panel" id="tab-howitworks" data-title="How It Works" role="tabpanel">
+<section class="tab-panel" id="tab-howitworks" data-title="How It Works" role="tabpanel" aria-labelledby="btn-howitworks">
 
   <div class="card">
     <h3>The Operating Loop</h3>
@@ -532,7 +556,7 @@ body::after{
 </section>
 
 <!-- ═══════════════ TAB: THE 3 DOMAINS ═══════════════ -->
-<section class="tab-panel" id="tab-domains" data-title="The 3 Domains" role="tabpanel">
+<section class="tab-panel" id="tab-domains" data-title="The 3 Domains" role="tabpanel" aria-labelledby="btn-domains">
 
   <div class="card">
     <h3>Three Domains, One Coherence</h3>
@@ -579,7 +603,7 @@ body::after{
 </section>
 
 <!-- ═══════════════ TAB: THE 4 ARTIFACTS ═══════════════ -->
-<section class="tab-panel" id="tab-artifacts" data-title="The 4 Artifacts" role="tabpanel">
+<section class="tab-panel" id="tab-artifacts" data-title="The 4 Artifacts" role="tabpanel" aria-labelledby="btn-artifacts">
 
   <div class="card">
     <h3>Four Artifacts That Make It Work</h3>
@@ -606,7 +630,7 @@ body::after{
   <!-- RS -->
   <div class="artifact-row" onclick="toggleArtifact(this)">
     <span class="artifact-code rs">RS</span>
-    <span class="artifact-name">Reasoning Snapshot</span>
+    <span class="artifact-name">Reasoning Snapshot <span class="muted small">&mdash; how we were thinking</span></span>
     <span class="artifact-arrow">&#9654;</span>
   </div>
   <div class="artifact-detail">
@@ -640,24 +664,24 @@ body::after{
   <!-- MG -->
   <div class="artifact-row" onclick="toggleArtifact(this)">
     <span class="artifact-code mg">MG</span>
-    <span class="artifact-name">Memory Graft</span>
+    <span class="artifact-name">Memory Graph</span>
     <span class="artifact-arrow">&#9654;</span>
   </div>
   <div class="artifact-detail">
     <div class="label">What It Is</div>
-    <p>When a patch updates a decision, the Memory Graft is the record that gets written into institutional memory. It captures what changed, why, and what the new truth is.</p>
+    <p>The connected graph of decisions, evidence, drift signals, patches, and the links between them. It&rsquo;s the living map of everything your organization knows, decided, and updated &mdash; and how those pieces connect.</p>
     <div class="label">When Created</div>
-    <p>Every time a patch is applied to a sealed decision.</p>
+    <p>It grows continuously. Every DLR, RS, DS, and patch becomes a node; every relationship between them becomes an edge.</p>
     <div class="label">Why It Matters</div>
-    <p>This is how your organization actually learns. Without Memory Grafts, lessons stay in individuals; with them, lessons live in the system.</p>
+    <p>This is how your organization actually learns. Without the Memory Graph, knowledge stays in individuals&rsquo; heads; with it, every decision, patch, and lesson is connected and retrievable.</p>
     <div class="label">Example Line</div>
-    <div class="example">MG-2026-0042-P1 | patched: DLR-2026-0042 | new-canon: "use vendor B (pricing changed)" | prev-version preserved</div>
+    <div class="example">MG node: DLR-2026-0042 → DS-2026-0087 → Patch-P1 → new-canon: "use vendor B" | 3 linked decisions, 1 drift signal, 1 patch</div>
   </div>
 
 </section>
 
 <!-- ═══════════════ TAB: DRIFT → PATCH ═══════════════ -->
-<section class="tab-panel" id="tab-driftpatch" data-title="Drift → Patch" role="tabpanel">
+<section class="tab-panel" id="tab-driftpatch" data-title="Drift → Patch" role="tabpanel" aria-labelledby="btn-driftpatch">
 
   <div class="card">
     <h3>Drift Severity Levels</h3>
@@ -702,7 +726,7 @@ body::after{
     <h3>Drift Report Template</h3>
     <p class="muted small mb">Use this when you spot drift. Copy and fill in the blanks.</p>
     <div class="copy-block">
-      <button class="copy-btn" onclick="copyBlock(this)">COPY</button>
+      <button type="button" class="copy-btn" onclick="copyBlock(this)">COPY</button>
       <pre id="drift-template">DRIFT REPORT
 ============
 Date:           [today's date]
@@ -734,7 +758,7 @@ Notes:
     <h3>Patch Note Template</h3>
     <p class="muted small mb">Use this when applying a patch to a sealed decision.</p>
     <div class="copy-block">
-      <button class="copy-btn" onclick="copyBlock(this)">COPY</button>
+      <button type="button" class="copy-btn" onclick="copyBlock(this)">COPY</button>
       <pre id="patch-template">PATCH NOTE
 ==========
 Patch ID:       [e.g., DLR-2026-0042-P1]
@@ -761,7 +785,7 @@ Supersedes:     [e.g., v1 sealed on 2026-01-15]</pre>
 </section>
 
 <!-- ═══════════════ TAB: QUICK START ═══════════════ -->
-<section class="tab-panel" id="tab-quickstart" data-title="Quick Start (5 Minutes)" role="tabpanel">
+<section class="tab-panel" id="tab-quickstart" data-title="Quick Start (5 Minutes)" role="tabpanel" aria-labelledby="btn-quickstart">
 
   <div class="card">
     <h3>Get Started in 5 Minutes</h3>
@@ -777,7 +801,7 @@ Supersedes:     [e.g., v1 sealed on 2026-01-15]</pre>
     <h4>Step 2: Capture It with the Starter Prompt</h4>
     <p>Paste the prompt below into any LLM. Answer the questions. You&rsquo;ll get a structured decision record in about 90 seconds.</p>
     <div class="copy-block">
-      <button class="copy-btn" onclick="copyBlock(this)">COPY</button>
+      <button type="button" class="copy-btn" onclick="copyBlock(this)">COPY</button>
       <pre id="starter-prompt">You are a Decision Episode Recorder. I will describe a decision
 my team made. Return ONLY the structured record below — no essay,
 no commentary. Keep each field concise.
@@ -830,7 +854,7 @@ Why (one sentence):
 </section>
 
 <!-- ═══════════════ TAB: FAQ ═══════════════ -->
-<section class="tab-panel" id="tab-faq" data-title="FAQ" role="tabpanel">
+<section class="tab-panel" id="tab-faq" data-title="FAQ" role="tabpanel" aria-labelledby="btn-faq">
 
   <div class="card">
     <h3>Frequently Asked Questions</h3>
@@ -879,37 +903,34 @@ Why (one sentence):
 
 </section>
 
-<!-- ═══════════════ COHERENCE GAUGE (Interactive Demo) ═══════════════ -->
-<div class="card" style="margin-top:24px">
-  <h3>Coherence Index &mdash; Demo Gauge</h3>
-  <p class="muted small mb">This is an illustrative toy. Drag the slider to see how coherence levels map to status labels.</p>
-  <div class="gauge-wrap">
-    <div class="gauge-label">Coherence Index</div>
-    <div class="gauge-value" id="gaugeValue" style="color:var(--neon-green)">85</div>
-    <div class="gauge-status" id="gaugeStatus" style="color:var(--neon-green)">EXCELLENT</div>
-    <input type="range" min="0" max="100" value="85" class="gauge-slider" id="gaugeSlider" oninput="updateGauge(this.value)"/>
-    <div class="gauge-note">Demo only &mdash; real scores are computed from your decision records, drift signals, and patch history.</div>
-  </div>
-</div>
-
 </div><!-- /.wrap -->
 
 <!-- ═══════════════ PRINT BUTTON ═══════════════ -->
-<button class="print-btn" onclick="window.print()">&#9113; Print / PDF</button>
+<button type="button" class="print-btn" onclick="window.print()">&#9113; Print / PDF</button>
 
 <!-- ═══════════════ JAVASCRIPT ═══════════════ -->
 <script>
 "use strict";
 
-/* ── Tabs ──────────────────────────────────────────── */
-document.querySelectorAll(".tab-btn").forEach(function(btn){
-  btn.addEventListener("click",function(){
-    document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.remove("active")});
-    document.querySelectorAll(".tab-panel").forEach(function(p){p.classList.remove("active")});
-    btn.classList.add("active");
-    var panel=document.getElementById("tab-"+btn.getAttribute("data-tab"));
-    if(panel)panel.classList.add("active");
+/* ── Tabs (accessible) ─────────────────────────────── */
+function activateTab(btn){
+  var tabs=document.querySelectorAll(".tab-btn");
+  var panels=document.querySelectorAll(".tab-panel");
+  tabs.forEach(function(b){
+    b.classList.remove("active");
+    b.setAttribute("aria-selected","false");
+    b.setAttribute("tabindex","-1");
   });
+  panels.forEach(function(p){p.classList.remove("active")});
+  btn.classList.add("active");
+  btn.setAttribute("aria-selected","true");
+  btn.setAttribute("tabindex","0");
+  btn.focus();
+  var panel=document.getElementById("tab-"+btn.getAttribute("data-tab"));
+  if(panel)panel.classList.add("active");
+}
+document.querySelectorAll(".tab-btn").forEach(function(btn){
+  btn.addEventListener("click",function(){activateTab(btn)});
 });
 
 /* ── Artifact Accordion ────────────────────────────── */
@@ -972,12 +993,16 @@ function updateGauge(val){
 }
 
 /* ── Keyboard nav for tabs ─────────────────────────── */
-document.addEventListener("keydown",function(e){
-  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA")return;
+document.querySelector(".tab-bar").addEventListener("keydown",function(e){
   var tabs=Array.from(document.querySelectorAll(".tab-btn"));
-  var idx=tabs.findIndex(function(t){return t.classList.contains("active")});
-  if(e.key==="ArrowRight"&&idx<tabs.length-1){tabs[idx+1].click()}
-  else if(e.key==="ArrowLeft"&&idx>0){tabs[idx-1].click()}
+  var idx=tabs.indexOf(document.activeElement);
+  if(idx<0)return;
+  var next=-1;
+  if(e.key==="ArrowRight"){next=idx<tabs.length-1?idx+1:0}
+  else if(e.key==="ArrowLeft"){next=idx>0?idx-1:tabs.length-1}
+  else if(e.key==="Home"){next=0}
+  else if(e.key==="End"){next=tabs.length-1}
+  if(next>=0){e.preventDefault();activateTab(tabs[next])}
 });
 </script>
 
