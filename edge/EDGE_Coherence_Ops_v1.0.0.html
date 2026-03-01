@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Deep Sigma EDGE — Coherence Ops v1.0.0</title>
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   DEEP SIGMA EDGE — COHERENCE OPS (Human-Friendly)
+   80's Retro Synthwave / VHS Style
+   v1.0.0 — Single-file, zero dependencies, works offline
+   ═══════════════════════════════════════════════════════════════ */
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#0a0a1a;
+  --bg2:#0f0f2a;
+  --card:#12123a;
+  --card-border:#2a1a5e;
+  --neon-pink:#ff2d95;
+  --neon-cyan:#00f0ff;
+  --neon-purple:#b44dff;
+  --neon-yellow:#ffe14d;
+  --neon-orange:#ff6a00;
+  --neon-green:#39ff14;
+  --txt:#e8e0f0;
+  --txt-muted:#8a80a0;
+  --txt-dim:#5a5070;
+  --sun-top:#ff2d95;
+  --sun-mid:#ff6a00;
+  --sun-bot:#ffe14d;
+  --glow-pink:0 0 20px rgba(255,45,149,.3),0 0 60px rgba(255,45,149,.1);
+  --glow-cyan:0 0 20px rgba(0,240,255,.3),0 0 60px rgba(0,240,255,.1);
+  --glow-purple:0 0 20px rgba(180,77,255,.3),0 0 60px rgba(180,77,255,.1);
+  --font-body:'Segoe UI',system-ui,-apple-system,sans-serif;
+  --font-mono:'Courier New',Courier,monospace;
+}
+
+html{font-size:15px;scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);color:var(--txt);background:var(--bg);
+  line-height:1.65;min-height:100vh;overflow-x:hidden;position:relative;
+}
+
+/* ── Scanlines Overlay ─────────────────────────────────── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:9999;pointer-events:none;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent 0px,transparent 2px,
+    rgba(0,0,0,.06) 2px,rgba(0,0,0,.06) 4px
+  );
+}
+
+/* ── VHS Noise Overlay ─────────────────────────────────── */
+body::after{
+  content:'';position:fixed;inset:0;z-index:9998;pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity:.03;mix-blend-mode:overlay;
+}
+
+/* ── Grid Floor ────────────────────────────────────────── */
+.grid-floor{
+  position:fixed;bottom:0;left:0;right:0;height:40vh;z-index:0;pointer-events:none;
+  background:
+    linear-gradient(to bottom,rgba(10,10,26,.95) 0%,transparent 30%),
+    repeating-linear-gradient(90deg,rgba(180,77,255,.08) 0px,rgba(180,77,255,.08) 1px,transparent 1px,transparent 60px),
+    repeating-linear-gradient(0deg,rgba(180,77,255,.08) 0px,rgba(180,77,255,.08) 1px,transparent 1px,transparent 60px);
+  transform:perspective(400px) rotateX(45deg);
+  transform-origin:center top;
+}
+
+/* ── Neon Sun ──────────────────────────────────────────── */
+.neon-sun{
+  position:fixed;top:-60px;left:50%;transform:translateX(-50%);
+  width:320px;height:320px;border-radius:50%;z-index:0;pointer-events:none;
+  background:radial-gradient(circle,var(--sun-bot) 0%,var(--sun-mid) 35%,var(--sun-top) 60%,transparent 70%);
+  opacity:.18;filter:blur(8px);
+}
+
+/* ── Main Container ────────────────────────────────────── */
+.wrap{max-width:960px;margin:0 auto;padding:20px 16px 60px;position:relative;z-index:1}
+
+/* ── Header Banner ─────────────────────────────────────── */
+.header{
+  text-align:center;padding:36px 20px 28px;margin-bottom:24px;position:relative;
+  border:1px solid var(--card-border);border-radius:12px;
+  background:linear-gradient(135deg,rgba(18,18,58,.9),rgba(10,10,26,.95));
+  box-shadow:var(--glow-pink);
+}
+.header::before{
+  content:'';position:absolute;inset:-1px;border-radius:12px;z-index:-1;
+  background:linear-gradient(135deg,var(--neon-pink),var(--neon-purple),var(--neon-cyan));
+  opacity:.3;filter:blur(1px);
+}
+.header h1{
+  font-size:1.8rem;font-weight:800;letter-spacing:2px;
+  background:linear-gradient(90deg,var(--neon-pink),var(--neon-purple),var(--neon-cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  text-shadow:none;
+}
+.header .subtitle{color:var(--txt-muted);font-size:.85rem;margin-top:4px;letter-spacing:1px}
+.badge-row{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.badge{
+  display:inline-block;padding:3px 12px;border-radius:4px;font-size:.7rem;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;font-family:var(--font-mono);
+}
+.badge-edge{background:rgba(255,45,149,.15);color:var(--neon-pink);border:1px solid rgba(255,45,149,.4)}
+.badge-ver{background:rgba(0,240,255,.1);color:var(--neon-cyan);border:1px solid rgba(0,240,255,.3)}
+
+/* ── Tabs ──────────────────────────────────────────────── */
+.tab-bar{
+  display:flex;gap:4px;flex-wrap:wrap;margin-bottom:20px;padding:4px;
+  background:var(--card);border:1px solid var(--card-border);border-radius:10px;
+}
+.tab-btn{
+  flex:1 1 auto;min-width:100px;padding:9px 10px;border:1px solid transparent;border-radius:7px;
+  background:transparent;color:var(--txt-muted);font-size:.72rem;font-weight:600;
+  cursor:pointer;transition:all .2s;text-align:center;font-family:var(--font-body);
+  letter-spacing:.3px;
+}
+.tab-btn:hover{color:var(--txt);background:rgba(180,77,255,.08)}
+.tab-btn.active{
+  color:#fff;background:rgba(180,77,255,.2);
+  border-color:var(--neon-purple);
+  box-shadow:0 0 12px rgba(180,77,255,.2);
+}
+.tab-panel{display:none}
+.tab-panel.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Cards ─────────────────────────────────────────────── */
+.card{
+  background:var(--card);border:1px solid var(--card-border);border-radius:10px;
+  padding:20px;margin-bottom:16px;position:relative;
+  transition:border-color .2s,box-shadow .2s;
+}
+.card:hover{border-color:rgba(180,77,255,.4);box-shadow:0 0 16px rgba(180,77,255,.08)}
+.card h3{
+  font-size:1rem;font-weight:700;margin-bottom:10px;
+  color:var(--neon-cyan);letter-spacing:.5px;
+}
+.card h4{font-size:.85rem;font-weight:700;margin:12px 0 6px;color:var(--neon-purple)}
+.card p,.card li{font-size:.85rem;color:var(--txt);line-height:1.7}
+.card ul,.card ol{padding-left:20px;margin:6px 0}
+.card li{margin:4px 0}
+
+/* ── Domain Cards (3 Domains) ──────────────────────────── */
+.domain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.domain-card{
+  border-radius:10px;padding:18px;border:1px solid;
+  background:rgba(18,18,58,.7);
+}
+.domain-card.intel{border-color:rgba(0,240,255,.3);box-shadow:var(--glow-cyan)}
+.domain-card.reops{border-color:rgba(180,77,255,.3);box-shadow:var(--glow-purple)}
+.domain-card.fran{border-color:rgba(255,45,149,.3);box-shadow:var(--glow-pink)}
+.domain-card h3{font-size:.95rem;margin-bottom:8px}
+.domain-card .question{
+  font-style:italic;color:var(--neon-yellow);font-size:.8rem;
+  margin-bottom:8px;padding:6px 10px;border-radius:6px;
+  background:rgba(255,225,77,.06);border-left:3px solid var(--neon-yellow);
+}
+.domain-card .produces{font-size:.8rem;color:var(--txt-muted)}
+
+/* ── Artifact Row ──────────────────────────────────────── */
+.artifact-row{
+  display:flex;align-items:center;gap:12px;padding:12px 14px;
+  border:1px solid var(--card-border);border-radius:8px;margin:8px 0;
+  cursor:pointer;transition:all .2s;background:rgba(18,18,58,.5);
+}
+.artifact-row:hover{border-color:var(--neon-cyan);background:rgba(0,240,255,.04)}
+.artifact-row.open{border-color:var(--neon-purple);background:rgba(180,77,255,.06)}
+.artifact-code{
+  font-family:var(--font-mono);font-weight:800;font-size:1rem;
+  min-width:38px;text-align:center;
+}
+.artifact-code.dlr{color:var(--neon-cyan)}
+.artifact-code.rs{color:var(--neon-purple)}
+.artifact-code.ds{color:var(--neon-orange)}
+.artifact-code.mg{color:var(--neon-pink)}
+.artifact-name{font-weight:600;font-size:.85rem;flex:1}
+.artifact-arrow{color:var(--txt-dim);font-size:.8rem;transition:transform .2s}
+.artifact-row.open .artifact-arrow{transform:rotate(90deg)}
+.artifact-detail{
+  display:none;padding:12px 16px;margin:-4px 0 8px;
+  border:1px solid var(--card-border);border-top:none;border-radius:0 0 8px 8px;
+  background:rgba(18,18,58,.6);font-size:.82rem;line-height:1.7;
+}
+.artifact-detail.open{display:block;animation:fadeIn .25s ease}
+.artifact-detail .label{color:var(--neon-yellow);font-weight:700;font-size:.72rem;letter-spacing:.5px;text-transform:uppercase;margin-top:8px}
+.artifact-detail .label:first-child{margin-top:0}
+.artifact-detail .example{
+  font-family:var(--font-mono);font-size:.75rem;background:rgba(0,0,0,.3);
+  padding:8px 10px;border-radius:6px;margin:4px 0 6px;color:var(--neon-green);
+  white-space:pre-wrap;word-break:break-word;
+}
+
+/* ── Severity Strip ────────────────────────────────────── */
+.sev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0}
+.sev-card{
+  padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,.06);
+  background:rgba(18,18,58,.5);
+}
+.sev-card h4{margin:0 0 4px;font-size:.82rem}
+.sev-card p{font-size:.78rem;color:var(--txt-muted);margin:0}
+.sev-green h4{color:#39ff14}.sev-yellow h4{color:#ffe14d}
+.sev-orange h4{color:#ff6a00}.sev-red h4{color:#ff2d55}
+
+/* ── Copy Block ────────────────────────────────────────── */
+.copy-block{position:relative;margin:12px 0}
+.copy-block pre{
+  font-family:var(--font-mono);font-size:.72rem;line-height:1.7;
+  background:rgba(0,0,0,.4);border:1px solid var(--card-border);border-radius:8px;
+  padding:14px 14px 14px;color:var(--neon-green);
+  white-space:pre-wrap;word-break:break-word;overflow-x:auto;max-height:380px;
+}
+.copy-btn{
+  position:absolute;top:8px;right:8px;padding:4px 12px;border-radius:5px;
+  background:rgba(180,77,255,.2);border:1px solid rgba(180,77,255,.4);
+  color:#fff;font-size:.68rem;font-weight:700;cursor:pointer;
+  font-family:var(--font-mono);letter-spacing:.5px;transition:all .2s;
+}
+.copy-btn:hover{background:rgba(180,77,255,.4)}
+.copy-btn.copied{background:rgba(57,255,20,.2);border-color:rgba(57,255,20,.4);color:var(--neon-green)}
+
+/* ── Gauge ─────────────────────────────────────────────── */
+.gauge-wrap{
+  text-align:center;padding:20px;background:rgba(0,0,0,.2);
+  border:1px solid var(--card-border);border-radius:10px;margin:12px 0;
+}
+.gauge-label{font-size:.7rem;color:var(--txt-muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.gauge-value{font-family:var(--font-mono);font-size:2.8rem;font-weight:800;margin:4px 0}
+.gauge-status{font-size:.85rem;font-weight:700;letter-spacing:1px;margin:4px 0 12px}
+.gauge-slider{width:80%;max-width:300px;cursor:pointer;accent-color:var(--neon-purple)}
+.gauge-note{font-size:.68rem;color:var(--txt-dim);margin-top:8px;font-style:italic}
+
+/* ── Loop Diagram ──────────────────────────────────────── */
+.loop-strip{
+  display:flex;gap:0;margin:16px 0;overflow-x:auto;padding:4px 0;
+}
+.loop-step{
+  flex:0 0 auto;text-align:center;padding:10px 14px;position:relative;
+  min-width:100px;
+}
+.loop-step .num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:32px;height:32px;border-radius:50%;font-weight:800;font-size:.8rem;
+  background:rgba(180,77,255,.15);border:2px solid var(--neon-purple);
+  color:var(--neon-cyan);margin-bottom:6px;
+}
+.loop-step .step-label{font-size:.72rem;font-weight:600;color:var(--txt)}
+.loop-step::after{
+  content:'→';position:absolute;right:-8px;top:18px;
+  color:var(--neon-purple);font-size:1rem;font-weight:800;
+}
+.loop-step:last-child::after{content:'↻';color:var(--neon-pink)}
+
+/* ── Before/After Table ────────────────────────────────── */
+.ba-table{width:100%;border-collapse:collapse;font-size:.8rem;margin:12px 0}
+.ba-table th{
+  padding:8px 12px;text-align:left;font-size:.7rem;letter-spacing:1px;
+  text-transform:uppercase;border-bottom:2px solid var(--neon-purple);
+}
+.ba-table th:first-child{color:var(--neon-orange)}
+.ba-table th:last-child{color:var(--neon-green)}
+.ba-table td{padding:8px 12px;border-bottom:1px solid rgba(42,26,94,.4);color:var(--txt-muted)}
+.ba-table tr:hover td{color:var(--txt);background:rgba(180,77,255,.03)}
+
+/* ── Checklist ─────────────────────────────────────────── */
+.checklist{list-style:none;padding:0;margin:8px 0}
+.checklist li{
+  padding:8px 12px;border-left:3px solid var(--neon-purple);margin:6px 0;
+  font-size:.83rem;background:rgba(180,77,255,.04);border-radius:0 6px 6px 0;
+}
+.checklist li strong{color:var(--neon-cyan)}
+
+/* ── FAQ ───────────────────────────────────────────────── */
+.faq-item{
+  border:1px solid var(--card-border);border-radius:8px;margin:8px 0;
+  overflow:hidden;transition:border-color .2s;
+}
+.faq-item:hover{border-color:rgba(180,77,255,.3)}
+.faq-q{
+  padding:12px 16px;cursor:pointer;font-weight:700;font-size:.85rem;
+  display:flex;justify-content:space-between;align-items:center;
+  background:rgba(18,18,58,.5);color:var(--txt);transition:background .2s;
+}
+.faq-q:hover{background:rgba(180,77,255,.06)}
+.faq-q .arrow{color:var(--neon-purple);transition:transform .2s;font-size:.8rem}
+.faq-item.open .faq-q .arrow{transform:rotate(90deg)}
+.faq-a{
+  display:none;padding:12px 16px;font-size:.82rem;color:var(--txt-muted);
+  line-height:1.7;background:rgba(10,10,26,.5);
+}
+.faq-item.open .faq-a{display:block;animation:fadeIn .25s ease}
+
+/* ── Not-Box ───────────────────────────────────────────── */
+.not-box{
+  border:1px solid rgba(255,45,149,.3);border-radius:10px;padding:16px;
+  background:rgba(255,45,149,.04);margin:16px 0;
+}
+.not-box h3{color:var(--neon-pink);font-size:.9rem;margin-bottom:8px}
+.not-box li{font-size:.82rem;color:var(--txt-muted);margin:4px 0}
+
+/* ── Print Button ──────────────────────────────────────── */
+.print-btn{
+  position:fixed;bottom:16px;right:16px;z-index:100;
+  padding:8px 18px;border-radius:8px;border:1px solid rgba(0,240,255,.3);
+  background:var(--card);color:var(--neon-cyan);font-size:.75rem;font-weight:700;
+  cursor:pointer;font-family:var(--font-mono);letter-spacing:.5px;
+  box-shadow:var(--glow-cyan);transition:all .2s;
+}
+.print-btn:hover{background:rgba(0,240,255,.1);border-color:var(--neon-cyan)}
+
+/* ── Utility ───────────────────────────────────────────── */
+.mt{margin-top:14px}.mb{margin-bottom:14px}
+.muted{color:var(--txt-muted)}
+.small{font-size:.78rem}
+.mono{font-family:var(--font-mono)}
+.neon-pink{color:var(--neon-pink)}.neon-cyan{color:var(--neon-cyan)}
+.neon-purple{color:var(--neon-purple)}.neon-yellow{color:var(--neon-yellow)}
+.neon-green{color:var(--neon-green)}.neon-orange{color:var(--neon-orange)}
+.glow-text{text-shadow:0 0 8px currentColor}
+.flex-row{display:flex;gap:12px;flex-wrap:wrap}
+.flex-row>*{flex:1 1 260px}
+
+/* ── Chromatic Aberration on Header ────────────────────── */
+.chromatic{position:relative}
+.chromatic::before,.chromatic::after{
+  content:attr(data-text);position:absolute;top:0;left:0;right:0;
+  pointer-events:none;
+}
+.chromatic::before{
+  color:var(--neon-cyan);clip-path:inset(0 0 50% 0);
+  transform:translate(-1px,-1px);opacity:.4;
+}
+.chromatic::after{
+  color:var(--neon-pink);clip-path:inset(50% 0 0 0);
+  transform:translate(1px,1px);opacity:.4;
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+@media(max-width:640px){
+  html{font-size:14px}
+  .header h1{font-size:1.3rem}
+  .tab-btn{min-width:80px;font-size:.65rem;padding:8px 6px}
+  .loop-strip{flex-wrap:wrap}
+  .loop-step{min-width:80px}
+  .domain-grid{grid-template-columns:1fr}
+  .sev-grid{grid-template-columns:1fr 1fr}
+}
+
+/* ── Print ─────────────────────────────────────────────── */
+@media print{
+  body::before,body::after,.grid-floor,.neon-sun,.print-btn,.tab-bar{display:none!important}
+  body{background:#fff!important;color:#111!important}
+  .wrap{max-width:100%}
+  .tab-panel{display:block!important;page-break-inside:avoid;margin-bottom:20px}
+  .tab-panel::before{
+    content:attr(data-title);display:block;font-size:1.1rem;font-weight:800;
+    margin:16px 0 8px;padding-bottom:4px;border-bottom:2px solid #333;color:#111;
+  }
+  .card,.domain-card,.faq-item,.artifact-row,.copy-block pre,.gauge-wrap,.not-box,.sev-card{
+    background:#f8f8f8!important;border-color:#ccc!important;color:#222!important;
+    box-shadow:none!important;
+  }
+  .card h3,.domain-card h3,.faq-q{color:#111!important}
+  .card p,.card li,.faq-a,.domain-card .produces,.ba-table td,.checklist li{color:#333!important}
+  .artifact-detail{display:block!important}
+  .artifact-detail .example{background:#eee!important;color:#222!important}
+  .faq-a{display:block!important}
+  .copy-block pre{color:#222!important;background:#f0f0f0!important}
+  .gauge-value,.gauge-status{color:#111!important}
+  a{color:#111!important}
+}
+</style>
+</head>
+<body>
+
+<div class="neon-sun"></div>
+<div class="grid-floor"></div>
+
+<div class="wrap">
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header class="header">
+  <h1 class="chromatic" data-text="Deep Sigma EDGE">Deep Sigma EDGE</h1>
+  <div class="subtitle">Coherence Ops &mdash; The Human-Friendly Guide</div>
+  <div class="badge-row">
+    <span class="badge badge-edge">EDGE Module</span>
+    <span class="badge badge-ver">v1.0.0</span>
+  </div>
+</header>
+
+<!-- ═══════════════ TAB BAR ═══════════════ -->
+<nav class="tab-bar" role="tablist">
+  <button class="tab-btn active" data-tab="overview" role="tab">Overview</button>
+  <button class="tab-btn" data-tab="howitworks" role="tab">How It Works</button>
+  <button class="tab-btn" data-tab="domains" role="tab">The 3 Domains</button>
+  <button class="tab-btn" data-tab="artifacts" role="tab">The 4 Artifacts</button>
+  <button class="tab-btn" data-tab="driftpatch" role="tab">Drift &rarr; Patch</button>
+  <button class="tab-btn" data-tab="quickstart" role="tab">Quick Start</button>
+  <button class="tab-btn" data-tab="faq" role="tab">FAQ</button>
+</nav>
+
+<!-- ═══════════════ TAB: OVERVIEW ═══════════════ -->
+<section class="tab-panel active" id="tab-overview" data-title="Overview" role="tabpanel">
+
+  <div class="card">
+    <h3>Why Organizations Drift Under AI Speed</h3>
+    <ul>
+      <li><strong>Decisions outrun documentation.</strong> Teams make calls faster than anyone can record why &mdash; so institutional memory evaporates.</li>
+      <li><strong>Assumptions expire silently.</strong> What was true last quarter may be wrong today, but nobody flags it until something breaks.</li>
+      <li><strong>Retrieval is painful.</strong> When someone asks &ldquo;why did we do X?&rdquo; the answer is buried across Slack threads, docs, and people&rsquo;s heads.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>What Coherence Ops Changes</h3>
+    <ul>
+      <li><strong>Decisions become first-class records.</strong> Every choice gets a structured log with assumptions, confidence, and expiry dates.</li>
+      <li><strong>Drift gets detected early.</strong> When reality changes, the system raises a signal before damage compounds.</li>
+      <li><strong>Why-retrieval drops to under 60 seconds.</strong> Anyone can trace any decision back to its reasoning, evidence, and context &mdash; fast.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>What Is Coherence?</h3>
+    <p>In plain terms: <strong>coherence means your organization&rsquo;s Truth, Reasoning, and Memory all agree with each other.</strong></p>
+    <p class="mt muted small">When they don&rsquo;t? That&rsquo;s drift. And drift is where mistakes, rework, and lost trust come from.</p>
+    <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;justify-content:center">
+      <span class="badge" style="background:rgba(0,240,255,.1);color:var(--neon-cyan);border:1px solid rgba(0,240,255,.3);font-size:.82rem;padding:6px 16px">Truth</span>
+      <span style="color:var(--txt-dim);font-size:1.2rem;align-self:center">+</span>
+      <span class="badge" style="background:rgba(180,77,255,.1);color:var(--neon-purple);border:1px solid rgba(180,77,255,.3);font-size:.82rem;padding:6px 16px">Reasoning</span>
+      <span style="color:var(--txt-dim);font-size:1.2rem;align-self:center">+</span>
+      <span class="badge" style="background:rgba(255,45,149,.1);color:var(--neon-pink);border:1px solid rgba(255,45,149,.3);font-size:.82rem;padding:6px 16px">Memory</span>
+      <span style="color:var(--txt-dim);font-size:1.2rem;align-self:center">=</span>
+      <span class="badge" style="background:rgba(57,255,20,.1);color:var(--neon-green);border:1px solid rgba(57,255,20,.3);font-size:.82rem;padding:6px 16px;font-weight:800">Coherence</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What You Get</h3>
+    <ul class="checklist">
+      <li><strong>Fast retrieval</strong> &mdash; answer &ldquo;why did we decide that?&rdquo; in under 60 seconds</li>
+      <li><strong>Audit-ready history</strong> &mdash; every decision is versioned and sealed, never overwritten</li>
+      <li><strong>Early warning</strong> &mdash; expired assumptions and drifting conditions surface before they cause problems</li>
+      <li><strong>Fewer re-litigations</strong> &mdash; clear records mean people stop re-arguing settled decisions</li>
+      <li><strong>Clean handoffs</strong> &mdash; new team members can read the reasoning chain, not just the outcome</li>
+    </ul>
+  </div>
+
+  <div class="not-box">
+    <h3>What This Is NOT</h3>
+    <ul>
+      <li><strong>Not surveillance.</strong> This tracks decisions and reasoning, not people&rsquo;s behavior.</li>
+      <li><strong>Not a scorecard.</strong> Nobody gets rated. The system measures coherence of information, not performance of individuals.</li>
+      <li><strong>Not bureaucracy.</strong> The goal is less paperwork, not more. Capture once, retrieve forever.</li>
+    </ul>
+  </div>
+
+</section>
+
+<!-- ═══════════════ TAB: HOW IT WORKS ═══════════════ -->
+<section class="tab-panel" id="tab-howitworks" data-title="How It Works" role="tabpanel">
+
+  <div class="card">
+    <h3>The Operating Loop</h3>
+    <p class="muted small mb">This is the cycle that keeps your organization&rsquo;s knowledge healthy. It runs continuously.</p>
+    <div class="loop-strip">
+      <div class="loop-step"><div class="num">1</div><div class="step-label">Assess</div></div>
+      <div class="loop-step"><div class="num">2</div><div class="step-label">Decide</div></div>
+      <div class="loop-step"><div class="num">3</div><div class="step-label">Seal</div></div>
+      <div class="loop-step"><div class="num">4</div><div class="step-label">Monitor</div></div>
+      <div class="loop-step"><div class="num">5</div><div class="step-label">Detect Drift</div></div>
+      <div class="loop-step"><div class="num">6</div><div class="step-label">Patch</div></div>
+      <div class="loop-step"><div class="num">7</div><div class="step-label">Remember</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Each Step in Plain English</h3>
+    <ol>
+      <li><strong>Assess</strong> &mdash; Gather the facts. What do we know? How confident are we?</li>
+      <li><strong>Decide</strong> &mdash; Make the call. Record the options you considered and why you chose this one.</li>
+      <li><strong>Seal</strong> &mdash; Lock the record. It gets a version number. Nobody can quietly edit it later &mdash; they have to issue a patch.</li>
+      <li><strong>Monitor</strong> &mdash; Watch the assumptions. Each one has an expiry date (&ldquo;this is true until Q3&rdquo;).</li>
+      <li><strong>Detect Drift</strong> &mdash; When reality changes and an assumption expires, a drift signal fires.</li>
+      <li><strong>Patch</strong> &mdash; Update the decision with new information. The old version is preserved; the new version is layered on top.</li>
+      <li><strong>Remember</strong> &mdash; The patch becomes part of institutional memory. Next time, the system knows what changed and why.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>Before vs. After</h3>
+    <table class="ba-table">
+      <thead>
+        <tr><th>Before Coherence Ops</th><th>After Coherence Ops</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>&ldquo;Why did we do that?&rdquo; takes days to answer</td><td>Why-retrieval in under 60 seconds</td></tr>
+        <tr><td>Decisions live in people&rsquo;s heads</td><td>Decisions are structured, searchable records</td></tr>
+        <tr><td>Assumptions expire without anyone noticing</td><td>Every assumption has an expiry; drift gets flagged</td></tr>
+        <tr><td>Old decisions get quietly overwritten</td><td>Seal &rarr; Version &rarr; Patch (no overwrites, ever)</td></tr>
+        <tr><td>Handoffs require tribal knowledge</td><td>New people read the chain: decision &rarr; reasoning &rarr; patches</td></tr>
+        <tr><td>Same debates re-litigated every quarter</td><td>Settled decisions have clear records; re-opening requires a patch</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="flex-row">
+    <div class="card">
+      <h3>What Humans Do (Day-to-Day)</h3>
+      <ol>
+        <li><strong>Capture</strong> &mdash; When you make a decision, spend 2 minutes recording the structured episode (use the Starter Prompt).</li>
+        <li><strong>Review</strong> &mdash; When a drift signal arrives, decide: is this noise, or did something real change?</li>
+        <li><strong>Patch</strong> &mdash; If the drift is real, write a short patch note explaining what changed and why.</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3>What Deep Sigma Automates</h3>
+      <ul>
+        <li>Watches assumption expiry dates and fires drift signals automatically</li>
+        <li>Versions and seals every record so nothing gets silently edited</li>
+        <li>Indexes everything for instant why-retrieval across the full history</li>
+      </ul>
+    </div>
+  </div>
+
+</section>
+
+<!-- ═══════════════ TAB: THE 3 DOMAINS ═══════════════ -->
+<section class="tab-panel" id="tab-domains" data-title="The 3 Domains" role="tabpanel">
+
+  <div class="card">
+    <h3>Three Domains, One Coherence</h3>
+    <p>Every organization runs on three things: what it knows to be true, how it reasons about that truth, and what it remembers as settled. These three domains must stay aligned. When they drift apart, confusion follows.</p>
+  </div>
+
+  <div class="domain-grid">
+
+    <div class="domain-card intel">
+      <h3 class="neon-cyan">IntelOps</h3>
+      <div style="font-size:.78rem;color:var(--txt-dim);margin-bottom:8px;font-weight:600">The Truth Domain</div>
+      <div class="question">&ldquo;What do we actually know right now &mdash; and how confident are we?&rdquo;</div>
+      <div class="produces">
+        <strong>Produces:</strong> Evidence records, confidence scores, source verification, assumption lists with expiry dates.
+      </div>
+    </div>
+
+    <div class="domain-card reops">
+      <h3 class="neon-purple">ReOps</h3>
+      <div style="font-size:.78rem;color:var(--txt-dim);margin-bottom:8px;font-weight:600">The Reasoning &amp; Decisions Domain</div>
+      <div class="question">&ldquo;Given what we know, what should we do &mdash; and why this option over the others?&rdquo;</div>
+      <div class="produces">
+        <strong>Produces:</strong> Decision records, options-considered logs, reasoning chains, kill-switch conditions, review dates.
+      </div>
+    </div>
+
+    <div class="domain-card fran">
+      <h3 class="neon-pink">FranOps</h3>
+      <div style="font-size:.78rem;color:var(--txt-dim);margin-bottom:8px;font-weight:600">The Memory &amp; Canon Domain</div>
+      <div class="question">&ldquo;What has been settled, sealed, and should be treated as organizational truth?&rdquo;</div>
+      <div class="produces">
+        <strong>Produces:</strong> Sealed canon, version history, patch logs, institutional memory that survives personnel changes.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card mt">
+    <h3>How They Connect</h3>
+    <p><strong>IntelOps</strong> feeds facts to <strong>ReOps</strong>, which makes decisions. Those decisions get sealed into <strong>FranOps</strong> as canon. When IntelOps detects new facts that conflict with canon, a drift signal fires &mdash; and the loop runs again.</p>
+    <p class="muted small mt">Think of it like: <em>evidence in &rarr; reasoning applied &rarr; decision sealed &rarr; memory updated &rarr; watch for change.</em></p>
+  </div>
+
+</section>
+
+<!-- ═══════════════ TAB: THE 4 ARTIFACTS ═══════════════ -->
+<section class="tab-panel" id="tab-artifacts" data-title="The 4 Artifacts" role="tabpanel">
+
+  <div class="card">
+    <h3>Four Artifacts That Make It Work</h3>
+    <p>Everything in Coherence Ops flows through four structured records. Click each one to see details.</p>
+  </div>
+
+  <!-- DLR -->
+  <div class="artifact-row" onclick="toggleArtifact(this)">
+    <span class="artifact-code dlr">DLR</span>
+    <span class="artifact-name">Decision Ledger Record</span>
+    <span class="artifact-arrow">&#9654;</span>
+  </div>
+  <div class="artifact-detail">
+    <div class="label">What It Is</div>
+    <p>The structured record of a decision: what was decided, what options were considered (and rejected), the assumptions behind it, confidence level, and who owns it.</p>
+    <div class="label">When Created</div>
+    <p>Every time a meaningful decision is made.</p>
+    <div class="label">Why It Matters</div>
+    <p>This is how you answer &ldquo;why did we do that?&rdquo; in seconds instead of days.</p>
+    <div class="label">Example Line</div>
+    <div class="example">DLR-2026-0042 | "Migrate to new vendor" | conf: 0.82 | assumptions: 3 (1 expiring Q3) | owner: ops-lead</div>
+  </div>
+
+  <!-- RS -->
+  <div class="artifact-row" onclick="toggleArtifact(this)">
+    <span class="artifact-code rs">RS</span>
+    <span class="artifact-name">Reasoning Snapshot</span>
+    <span class="artifact-arrow">&#9654;</span>
+  </div>
+  <div class="artifact-detail">
+    <div class="label">What It Is</div>
+    <p>A frozen capture of the reasoning chain at decision time: what evidence was weighted, what trade-offs were considered, what the confidence distribution looked like.</p>
+    <div class="label">When Created</div>
+    <p>Automatically when a DLR is sealed. Think of it as a &ldquo;snapshot of how we were thinking.&rdquo;</p>
+    <div class="label">Why It Matters</div>
+    <p>Six months from now, you can see not just what was decided, but the exact reasoning that led there &mdash; even if the people involved have moved on.</p>
+    <div class="label">Example Line</div>
+    <div class="example">RS-2026-0042 | evidence: 4 sources (3 high-conf) | trade-off: cost vs. speed | rejected: "stay with current" (risk too high)</div>
+  </div>
+
+  <!-- DS -->
+  <div class="artifact-row" onclick="toggleArtifact(this)">
+    <span class="artifact-code ds">DS</span>
+    <span class="artifact-name">Drift Signal</span>
+    <span class="artifact-arrow">&#9654;</span>
+  </div>
+  <div class="artifact-detail">
+    <div class="label">What It Is</div>
+    <p>An alert that something has changed. An assumption expired, new evidence contradicts old reasoning, or conditions have shifted enough to warrant attention.</p>
+    <div class="label">When Created</div>
+    <p>Automatically when monitored conditions change, or manually when someone spots a discrepancy.</p>
+    <div class="label">Why It Matters</div>
+    <p>This is your early warning system. Drift detected early is a quick patch; drift detected late is a crisis.</p>
+    <div class="label">Example Line</div>
+    <div class="example">DS-2026-0087 | type: ASSUMPTION_EXPIRED | sev: YELLOW | "vendor pricing stable through Q3" expired | impacts: DLR-2026-0042</div>
+  </div>
+
+  <!-- MG -->
+  <div class="artifact-row" onclick="toggleArtifact(this)">
+    <span class="artifact-code mg">MG</span>
+    <span class="artifact-name">Memory Graft</span>
+    <span class="artifact-arrow">&#9654;</span>
+  </div>
+  <div class="artifact-detail">
+    <div class="label">What It Is</div>
+    <p>When a patch updates a decision, the Memory Graft is the record that gets written into institutional memory. It captures what changed, why, and what the new truth is.</p>
+    <div class="label">When Created</div>
+    <p>Every time a patch is applied to a sealed decision.</p>
+    <div class="label">Why It Matters</div>
+    <p>This is how your organization actually learns. Without Memory Grafts, lessons stay in individuals; with them, lessons live in the system.</p>
+    <div class="label">Example Line</div>
+    <div class="example">MG-2026-0042-P1 | patched: DLR-2026-0042 | new-canon: "use vendor B (pricing changed)" | prev-version preserved</div>
+  </div>
+
+</section>
+
+<!-- ═══════════════ TAB: DRIFT → PATCH ═══════════════ -->
+<section class="tab-panel" id="tab-driftpatch" data-title="Drift → Patch" role="tabpanel">
+
+  <div class="card">
+    <h3>Drift Severity Levels</h3>
+    <p class="muted small mb">When reality shifts, drift gets classified by how urgently it needs attention.</p>
+    <div class="sev-grid">
+      <div class="sev-card sev-green">
+        <h4>&#x1F7E2; GREEN &mdash; Monitor</h4>
+        <p>Minor shift detected. No action needed yet. Keep watching. Example: a metric moved slightly but is still within tolerance.</p>
+      </div>
+      <div class="sev-card sev-yellow">
+        <h4>&#x1F7E1; YELLOW &mdash; Notify</h4>
+        <p>An assumption is expiring or conditions are changing. The decision owner should be aware. Example: a vendor contract is 30 days from renewal and terms may change.</p>
+      </div>
+      <div class="sev-card sev-orange">
+        <h4>&#x1F7E0; ORANGE &mdash; Escalate</h4>
+        <p>Significant drift. The original decision may no longer be valid. Needs review and likely a patch. Example: a key data source went offline.</p>
+      </div>
+      <div class="sev-card sev-red">
+        <h4>&#x1F534; RED &mdash; Intervene</h4>
+        <p>Critical drift. The decision is actively wrong given current conditions. Immediate action required. Example: a safety assumption has been invalidated.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>What Triggers a Patch?</h3>
+    <ul>
+      <li>An assumption passes its expiry date and is confirmed stale</li>
+      <li>New evidence directly contradicts the original reasoning</li>
+      <li>A dependency (another decision this one relies on) has been patched</li>
+      <li>A human review determines conditions have changed enough to warrant an update</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>The Golden Rule: Seal &rarr; Version &rarr; Patch</h3>
+    <p>Nothing is ever overwritten. The original decision stays intact. Patches are layered on top with a new version number. You can always read the full history: what was decided, when it changed, and why.</p>
+    <p class="muted small mt">Think of it like version control for decisions &mdash; the same way developers track code changes, you track reasoning changes.</p>
+  </div>
+
+  <div class="card">
+    <h3>Drift Report Template</h3>
+    <p class="muted small mb">Use this when you spot drift. Copy and fill in the blanks.</p>
+    <div class="copy-block">
+      <button class="copy-btn" onclick="copyBlock(this)">COPY</button>
+      <pre id="drift-template">DRIFT REPORT
+============
+Date:           [today's date]
+Reporter:       [your name / role]
+
+What drift was observed:
+  [describe what you noticed — e.g., "vendor pricing increased 20%"]
+
+What changed in reality:
+  [what's different now vs. when the decision was made]
+
+What assumption expired:
+  [which specific assumption is no longer valid]
+
+Severity:       [GREEN / YELLOW / ORANGE / RED]
+
+Impacted decisions:
+  [list DLR IDs or decision names affected]
+
+Recommended action:
+  [MONITOR / NOTIFY / ESCALATE / INTERVENE]
+
+Notes:
+  [any additional context]</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Patch Note Template</h3>
+    <p class="muted small mb">Use this when applying a patch to a sealed decision.</p>
+    <div class="copy-block">
+      <button class="copy-btn" onclick="copyBlock(this)">COPY</button>
+      <pre id="patch-template">PATCH NOTE
+==========
+Patch ID:       [e.g., DLR-2026-0042-P1]
+Date:           [today's date]
+Owner:          [who is applying this patch]
+
+What changed:
+  [describe the specific update]
+
+Why it changed:
+  [reference the drift signal or new evidence]
+
+What it affects:
+  [list downstream decisions, processes, or teams impacted]
+
+What is now true (new canon):
+  [the updated statement that replaces the old one]
+
+Version:        [e.g., v2]
+Supersedes:     [e.g., v1 sealed on 2026-01-15]</pre>
+    </div>
+  </div>
+
+</section>
+
+<!-- ═══════════════ TAB: QUICK START ═══════════════ -->
+<section class="tab-panel" id="tab-quickstart" data-title="Quick Start (5 Minutes)" role="tabpanel">
+
+  <div class="card">
+    <h3>Get Started in 5 Minutes</h3>
+    <p>You don&rsquo;t need to change your whole workflow. Start with one decision this week and follow these five steps.</p>
+  </div>
+
+  <div class="card">
+    <h4>Step 1: Pick One Decision</h4>
+    <p>Choose a decision your team made (or is about to make) this week. It doesn&rsquo;t have to be big &mdash; even &ldquo;we chose Tool A over Tool B&rdquo; works.</p>
+  </div>
+
+  <div class="card">
+    <h4>Step 2: Capture It with the Starter Prompt</h4>
+    <p>Paste the prompt below into any LLM. Answer the questions. You&rsquo;ll get a structured decision record in about 90 seconds.</p>
+    <div class="copy-block">
+      <button class="copy-btn" onclick="copyBlock(this)">COPY</button>
+      <pre id="starter-prompt">You are a Decision Episode Recorder. I will describe a decision
+my team made. Return ONLY the structured record below — no essay,
+no commentary. Keep each field concise.
+
+DECISION EPISODE
+================
+Goal:
+  [What were we trying to achieve?]
+
+Options Considered:
+  1. [Option A] — SELECTED
+  2. [Option B] — REJECTED: [one-line reason]
+  3. [Option C] — REJECTED: [one-line reason]
+
+Decision:
+  [State the decision in one sentence]
+
+Assumptions:
+  1. [Assumption] — expires: [date or condition]
+  2. [Assumption] — expires: [date or condition]
+  3. [Assumption] — expires: [date or condition]
+
+Confidence:     [0.00 to 1.00]
+Blast Radius:   [LOW / MEDIUM / HIGH]
+Kill Switch:    [Under what conditions do we reverse this?]
+
+Owner:          [Name / Role]
+Next Review:    [Date]
+
+Why (one sentence):
+  [The single-sentence explanation a new team member would need]</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>Step 3: Set One Assumption Expiry</h4>
+    <p>Look at your assumptions. Pick the shakiest one. Give it a specific expiry date or condition. Example: <em>&ldquo;This pricing is valid until 2026-06-30.&rdquo;</em></p>
+  </div>
+
+  <div class="card">
+    <h4>Step 4: Log One Drift Signal</h4>
+    <p>Think back: has anything changed since a past decision was made? If yes, use the Drift Report template (on the Drift &rarr; Patch tab) to log it. Even a GREEN signal counts.</p>
+  </div>
+
+  <div class="card">
+    <h4>Step 5: Write One Patch Note</h4>
+    <p>If you logged a drift signal above, write the patch. Use the Patch Note template. Congratulations &mdash; you just ran a full Coherence Ops cycle.</p>
+  </div>
+
+</section>
+
+<!-- ═══════════════ TAB: FAQ ═══════════════ -->
+<section class="tab-panel" id="tab-faq" data-title="FAQ" role="tabpanel">
+
+  <div class="card">
+    <h3>Frequently Asked Questions</h3>
+    <p class="muted small">Click any question to expand the answer.</p>
+  </div>
+
+  <div class="faq-item" onclick="toggleFaq(this)">
+    <div class="faq-q"><span>Is this extra work?</span><span class="arrow">&#9654;</span></div>
+    <div class="faq-a">Less than you think. Capturing a decision episode takes about 2 minutes with the Starter Prompt. The payoff is enormous: you stop spending hours re-explaining past decisions, and you catch problems before they snowball. Most teams report it saves more time than it costs within the first two weeks.</div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFaq(this)">
+    <div class="faq-q"><span>What if we&rsquo;re wrong about a decision?</span><span class="arrow">&#9654;</span></div>
+    <div class="faq-a">That&rsquo;s exactly what the patch system is for. Being wrong is normal. The system doesn&rsquo;t punish wrong decisions &mdash; it makes them easy to correct. When you discover a decision was wrong, you issue a patch. The original record stays (so you can learn from it), and the new version becomes the active canon.</div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFaq(this)">
+    <div class="faq-q"><span>Who owns patches?</span><span class="arrow">&#9654;</span></div>
+    <div class="faq-a">The decision owner. Every DLR has an owner field. When drift is detected, the owner is responsible for evaluating it and deciding whether to patch. If the owner has moved on, the team lead inherits ownership. The point is: every decision always has exactly one accountable person.</div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFaq(this)">
+    <div class="faq-q"><span>How do we avoid this becoming political?</span><span class="arrow">&#9654;</span></div>
+    <div class="faq-a">By focusing on information, not blame. The system tracks what was known at the time, not who made a &ldquo;bad call.&rdquo; Confidence scores are honest: a 0.55 confidence decision isn&rsquo;t a bad decision &mdash; it&rsquo;s an honest acknowledgment of uncertainty. That honesty is what prevents politics.</div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFaq(this)">
+    <div class="faq-q"><span>How does AI fit in?</span><span class="arrow">&#9654;</span></div>
+    <div class="faq-a">AI handles the heavy lifting: indexing records for fast retrieval, watching assumption expiry dates, matching new evidence against existing decisions, and surfacing drift signals. Humans stay in control of all decisions and patches. AI assists; humans decide.</div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFaq(this)">
+    <div class="faq-q"><span>Do we need special tools to start?</span><span class="arrow">&#9654;</span></div>
+    <div class="faq-a">No. You can start with a shared document and the templates on the Quick Start tab. The Starter Prompt works with any LLM. As your practice matures, Deep Sigma can automate the monitoring and retrieval &mdash; but the methodology works even on paper.</div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFaq(this)">
+    <div class="faq-q"><span>What does &ldquo;why-retrieval in 60 seconds&rdquo; actually mean?</span><span class="arrow">&#9654;</span></div>
+    <div class="faq-a">It means that when anyone asks &ldquo;why did we decide X?&rdquo; you can pull up the full reasoning chain &mdash; the decision, the evidence, the rejected options, the assumptions, and any patches &mdash; in under a minute. No digging through Slack. No scheduling a meeting with the person who &ldquo;might remember.&rdquo;</div>
+  </div>
+
+  <div class="faq-item" onclick="toggleFaq(this)">
+    <div class="faq-q"><span>How is this different from just keeping meeting notes?</span><span class="arrow">&#9654;</span></div>
+    <div class="faq-a">Meeting notes capture what was said. Coherence Ops captures what was decided, why, what assumptions it depends on, and when those assumptions expire. It&rsquo;s structured, searchable, versioned, and monitored. Meeting notes go stale in a drawer; decision records stay alive and trigger alerts when the world changes.</div>
+  </div>
+
+</section>
+
+<!-- ═══════════════ COHERENCE GAUGE (Interactive Demo) ═══════════════ -->
+<div class="card" style="margin-top:24px">
+  <h3>Coherence Index &mdash; Demo Gauge</h3>
+  <p class="muted small mb">This is an illustrative toy. Drag the slider to see how coherence levels map to status labels.</p>
+  <div class="gauge-wrap">
+    <div class="gauge-label">Coherence Index</div>
+    <div class="gauge-value" id="gaugeValue" style="color:var(--neon-green)">85</div>
+    <div class="gauge-status" id="gaugeStatus" style="color:var(--neon-green)">EXCELLENT</div>
+    <input type="range" min="0" max="100" value="85" class="gauge-slider" id="gaugeSlider" oninput="updateGauge(this.value)"/>
+    <div class="gauge-note">Demo only &mdash; real scores are computed from your decision records, drift signals, and patch history.</div>
+  </div>
+</div>
+
+</div><!-- /.wrap -->
+
+<!-- ═══════════════ PRINT BUTTON ═══════════════ -->
+<button class="print-btn" onclick="window.print()">&#9113; Print / PDF</button>
+
+<!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+<script>
+"use strict";
+
+/* ── Tabs ──────────────────────────────────────────── */
+document.querySelectorAll(".tab-btn").forEach(function(btn){
+  btn.addEventListener("click",function(){
+    document.querySelectorAll(".tab-btn").forEach(function(b){b.classList.remove("active")});
+    document.querySelectorAll(".tab-panel").forEach(function(p){p.classList.remove("active")});
+    btn.classList.add("active");
+    var panel=document.getElementById("tab-"+btn.getAttribute("data-tab"));
+    if(panel)panel.classList.add("active");
+  });
+});
+
+/* ── Artifact Accordion ────────────────────────────── */
+function toggleArtifact(row){
+  var detail=row.nextElementSibling;
+  if(!detail||!detail.classList.contains("artifact-detail"))return;
+  var isOpen=row.classList.contains("open");
+  // Close all
+  document.querySelectorAll(".artifact-row").forEach(function(r){r.classList.remove("open")});
+  document.querySelectorAll(".artifact-detail").forEach(function(d){d.classList.remove("open")});
+  // Toggle
+  if(!isOpen){row.classList.add("open");detail.classList.add("open")}
+}
+
+/* ── FAQ Accordion ─────────────────────────────────── */
+function toggleFaq(item){
+  var wasOpen=item.classList.contains("open");
+  document.querySelectorAll(".faq-item").forEach(function(f){f.classList.remove("open")});
+  if(!wasOpen)item.classList.add("open");
+}
+
+/* ── Copy Blocks ───────────────────────────────────── */
+function copyBlock(btn){
+  var pre=btn.parentElement.querySelector("pre");
+  if(!pre)return;
+  var text=pre.textContent;
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent="COPIED!";btn.classList.add("copied");
+      setTimeout(function(){btn.textContent="COPY";btn.classList.remove("copied")},2000);
+    });
+  }else{
+    // Fallback
+    var ta=document.createElement("textarea");
+    ta.value=text;ta.style.position="fixed";ta.style.opacity="0";
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");btn.textContent="COPIED!";btn.classList.add("copied");
+      setTimeout(function(){btn.textContent="COPY";btn.classList.remove("copied")},2000);
+    }catch(e){}
+    document.body.removeChild(ta);
+  }
+}
+
+/* ── Gauge ─────────────────────────────────────────── */
+function updateGauge(val){
+  val=parseInt(val,10);
+  var el=document.getElementById("gaugeValue");
+  var st=document.getElementById("gaugeStatus");
+  if(!el||!st)return;
+  el.textContent=val;
+  var label,color;
+  if(val>=80){label="EXCELLENT";color="var(--neon-green)"}
+  else if(val>=60){label="GOOD";color="var(--neon-cyan)"}
+  else if(val>=40){label="WARNING";color="var(--neon-yellow)"}
+  else if(val>=20){label="CRITICAL";color="var(--neon-orange)"}
+  else{label="EMERGENCY";color="var(--neon-pink)"}
+  el.style.color=color;
+  st.style.color=color;
+  st.textContent=label;
+}
+
+/* ── Keyboard nav for tabs ─────────────────────────── */
+document.addEventListener("keydown",function(e){
+  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA")return;
+  var tabs=Array.from(document.querySelectorAll(".tab-btn"));
+  var idx=tabs.findIndex(function(t){return t.classList.contains("active")});
+  if(e.key==="ArrowRight"&&idx<tabs.length-1){tabs[idx+1].click()}
+  else if(e.key==="ArrowLeft"&&idx>0){tabs[idx-1].click()}
+});
+</script>
+
+</body>
+</html>

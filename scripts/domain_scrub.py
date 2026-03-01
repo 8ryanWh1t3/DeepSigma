@@ -212,6 +212,9 @@ ALLOWED_ACRONYMS = {
     "STREAM", "THAW", "FROZEN",
     # v1.0.8 — Consistency Gate (Sheaf-Residue Engine) tokens
     "CRS", "CGDS", "CGP", "VULN", "LOWER", "PAD", "GRAPH", "CLAIM",
+    # Coherence Ops EDGE — generic UI / content tokens
+    "VHS", "OPS", "TAB", "BAR", "HOW", "WORKS", "THE", "QUICK", "START",
+    "GAUGE", "PRINT", "GOOD", "DEEP", "SIGMA", "COHERE", "BUTTON",
     # RFP Co-Pilot EDGE — procurement, acquisition, proposal terms
     "RFP", "LPTA", "FFP", "IDIQ", "BPA", "DFARS", "FAR", "NAICS",
     "XLSX", "SOW", "PWS", "LOE", "SME", "BOE", "PII", "FOUO",
