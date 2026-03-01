@@ -551,7 +551,7 @@
  .cg-claim-tbl td{padding:3px 6px;border-bottom:1px solid #141e2d}
 .cg-claim-tbl tbody tr{cursor:pointer;transition:background .12s}.cg-claim-tbl tbody tr:hover{background:rgba(125,249,255,.06)}
  .cg-graph-wrap{margin:12px 0;padding:10px;background:var(--bg);border:1px solid var(--line);border-radius:8px}
- .cg-graph-svg{width:100%;height:360px;background:rgba(11,15,20,.4);border-radius:6px;display:block}
+ .cg-graph-svg{width:100%;background:rgba(11,15,20,.4);border-radius:6px;display:block}
  .cg-graph-node{cursor:pointer;transition:r .15s,filter .15s}.cg-graph-node:hover{filter:brightness(1.4)}
  .cg-graph-label{font-size:10px;fill:var(--txt);pointer-events:none;text-anchor:middle;dominant-baseline:central;font-family:inherit}
  .cg-graph-edge{stroke-width:1.5;fill:none;opacity:.7}
@@ -1144,7 +1144,7 @@
  </div>
  <div id="cgGraphWrap" class="cg-graph-wrap hidden">
  <h4 style="color:var(--muted);font-size:11px;margin:0 0 6px;font-weight:600;letter-spacing:.5px">CLAIM GRAPH</h4>
- <svg id="cgGraphSvg" class="cg-graph-svg" viewBox="0 0 560 360"></svg>
+ <svg id="cgGraphSvg" class="cg-graph-svg"></svg>
  <div style="display:flex;gap:12px;margin-top:6px;font-size:10px;color:var(--muted)">
  <span><span style="display:inline-block;width:16px;height:2px;background:var(--bad);vertical-align:middle;margin-right:3px"></span>contradicts</span>
  <span><span style="display:inline-block;width:16px;height:2px;background:var(--ok);vertical-align:middle;margin-right:3px"></span>supports</span>
@@ -5133,63 +5133,74 @@ function cgRenderGraph(graph,scoreResult){
  var keys=Object.keys(graph.nodes).filter(function(k){return connected[k]});
  if(keys.length===0)return;
 
- var W=560,H=360,PAD=40;
+ // Dynamic sizing — scale with node count
+ var n=keys.length;
+ var W=Math.max(600,n*60);
+ var H=Math.max(400,n*40);
+ var PAD=60;
+ svg.setAttribute("viewBox","0 0 "+W+" "+H);
  var pc=scoreResult?scoreResult.perClaim:{};
+
+ // Pre-compute edge counts
+ var edgeCounts={};
+ keys.forEach(function(k){var nd=graph.nodes[k];edgeCounts[k]=(nd.inEdges.length+nd.outEdges.length)});
+ var maxEdges=Math.max.apply(null,keys.map(function(k){return edgeCounts[k]}))||1;
 
  // Initialize positions — spread in a circle
  var cx=W/2,cy=H/2,rad=Math.min(W,H)/2-PAD;
  var pos={};
  keys.forEach(function(k,i){
- var angle=(2*Math.PI*i)/keys.length-Math.PI/2;
+ var angle=(2*Math.PI*i)/n-Math.PI/2;
  pos[k]={x:cx+rad*Math.cos(angle),y:cy+rad*Math.sin(angle),vx:0,vy:0};
  });
 
- // Force simulation — 80 iterations
+ // Force simulation — more iterations for larger graphs
  var edges=graph.edges;
- for(var iter=0;iter<80;iter++){
- var t=1-iter/80; // cooling
- // Pre-compute edge counts for spacing
- var edgeCounts={};
- keys.forEach(function(k){var n=graph.nodes[k];edgeCounts[k]=(n.inEdges.length+n.outEdges.length)});
- // Repulsion between all nodes — stronger for high-connection nodes
- for(var i=0;i<keys.length;i++){
-  for(var j=i+1;j<keys.length;j++){
+ var iters=Math.max(120,n*8);
+ for(var iter=0;iter<iters;iter++){
+ var t=1-iter/iters; // cooling
+ // Repulsion — scale with node count squared
+ var repK=2000+n*200;
+ for(var i=0;i<n;i++){
+  for(var j=i+1;j<n;j++){
   var a=pos[keys[i]],b=pos[keys[j]];
   var dx=b.x-a.x,dy=b.y-a.y;
   var dist=Math.sqrt(dx*dx+dy*dy)||1;
-  var boost=1+Math.max(edgeCounts[keys[i]],edgeCounts[keys[j]])*0.5;
-  var force=800*boost/(dist*dist);
+  var boost=1+(edgeCounts[keys[i]]+edgeCounts[keys[j]])/maxEdges;
+  var force=repK*boost/(dist*dist);
   var fx=dx/dist*force*t,fy=dy/dist*force*t;
   a.vx-=fx;a.vy-=fy;b.vx+=fx;b.vy+=fy;
   }
  }
- // Attraction along edges — longer rest length for high-connection nodes
+ // Attraction along edges
+ var baseRest=80+n*6;
  edges.forEach(function(e){
   var a=pos[e.from],b=pos[e.to];if(!a||!b)return;
   var dx=b.x-a.x,dy=b.y-a.y;
   var dist=Math.sqrt(dx*dx+dy*dy)||1;
-  var restLen=120+Math.max(edgeCounts[e.from],edgeCounts[e.to])*20;
-  var force=(dist-restLen)*0.05*t;
+  var hubBoost=Math.max(edgeCounts[e.from],edgeCounts[e.to])/maxEdges;
+  var restLen=baseRest+hubBoost*100;
+  var force=(dist-restLen)*0.04*t;
   var fx=dx/dist*force,fy=dy/dist*force;
   a.vx+=fx;a.vy+=fy;b.vx-=fx;b.vy-=fy;
  });
- // Center gravity
+ // Center gravity — gentle
  keys.forEach(function(k){
   var p=pos[k];
-  p.vx+=(cx-p.x)*0.01*t;
-  p.vy+=(cy-p.y)*0.01*t;
+  p.vx+=(cx-p.x)*0.008*t;
+  p.vy+=(cy-p.y)*0.008*t;
  });
  // Apply velocities + damping + clamp
  keys.forEach(function(k){
   var p=pos[k];
-  p.vx*=0.6;p.vy*=0.6;
+  p.vx*=0.55;p.vy*=0.55;
   p.x+=p.vx;p.y+=p.vy;
   p.x=Math.max(PAD,Math.min(W-PAD,p.x));
   p.y=Math.max(PAD,Math.min(H-PAD,p.y));
  });
  }
 
- // Draw edges
+ // Draw edges — color-coded, no per-edge labels (legend covers it)
  var EDGE_COLORS={contradicts:"#ff6b6b",supports:"#5dff93",depends:"#ffcc66"};
  edges.forEach(function(e){
  var a=pos[e.from],b=pos[e.to];if(!a||!b)return;
@@ -5200,38 +5211,29 @@ function cgRenderGraph(graph,scoreResult){
  line.setAttribute("class","cg-graph-edge");
  if(e.weight>1)line.setAttribute("stroke-width",String(e.weight*1.5));
  svg.appendChild(line);
- // Edge type label at midpoint
- var mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
- var lbl=document.createElementNS("http://www.w3.org/2000/svg","text");
- lbl.setAttribute("x",mx);lbl.setAttribute("y",my-6);
- lbl.setAttribute("fill",EDGE_COLORS[e.type]||"#888");
- lbl.setAttribute("font-size","8");lbl.setAttribute("text-anchor","middle");
- lbl.setAttribute("opacity","0.7");
- lbl.textContent=e.type;
- svg.appendChild(lbl);
  });
 
  // Draw nodes
  keys.forEach(function(k){
  var p=pos[k];
- var n=graph.nodes[k];
+ var nd=graph.nodes[k];
  var claimPc=pc[k]||{totalResidue:0,maxResidue:0};
- // Node radius based on edge count
- var edgeCount=(n.inEdges.length+n.outEdges.length);
- var r=Math.max(14,Math.min(28,10+edgeCount*4));
+ var ec=edgeCounts[k];
+ // Node radius: bigger for more connections
+ var r=Math.max(16,Math.min(34,12+ec*2.5));
  // Color by residue
  var color=claimPc.maxResidue>=0.8?"#ff6b6b":claimPc.maxResidue>=0.5?"#ffcc66":claimPc.totalResidue>0?"#7df9ff":"#5dff93";
 
  var g=document.createElementNS("http://www.w3.org/2000/svg","g");
  g.style.cursor="pointer";
- g.setAttribute("data-tip",k+": "+n.text.substring(0,60)+(n.text.length>60?"...":""));
+ g.setAttribute("data-tip",k+": "+nd.text.substring(0,60)+(nd.text.length>60?"...":""));
 
  // Glow for high residue
  if(claimPc.maxResidue>=0.5){
  var glow=document.createElementNS("http://www.w3.org/2000/svg","circle");
- glow.setAttribute("cx",p.x);glow.setAttribute("cy",p.y);glow.setAttribute("r",r+4);
+ glow.setAttribute("cx",p.x);glow.setAttribute("cy",p.y);glow.setAttribute("r",r+5);
  glow.setAttribute("fill","none");glow.setAttribute("stroke",color);
- glow.setAttribute("stroke-width","1");glow.setAttribute("opacity","0.3");
+ glow.setAttribute("stroke-width","2");glow.setAttribute("opacity","0.25");
  g.appendChild(glow);
  }
 
