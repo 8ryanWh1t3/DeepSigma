@@ -549,6 +549,7 @@
  .cg-claim-tbl{width:100%;border-collapse:collapse;font-size:10px;margin-top:6px}
  .cg-claim-tbl th{text-align:left;color:var(--muted);font-weight:600;border-bottom:1px solid var(--line);padding:3px 6px}
  .cg-claim-tbl td{padding:3px 6px;border-bottom:1px solid #141e2d}
+.cg-claim-tbl tbody tr{cursor:pointer;transition:background .12s}.cg-claim-tbl tbody tr:hover{background:rgba(125,249,255,.06)}
  .cg-residue-bar{display:inline-block;height:8px;border-radius:3px;margin-right:4px;vertical-align:middle}
  .cg-sim-delta{display:flex;gap:16px;align-items:center;font-size:13px;padding:12px;background:var(--bg);border:1px solid var(--line);border-radius:6px;margin-top:8px}
  .cg-sim-arrow{color:var(--accent);font-size:18px}
@@ -1367,7 +1368,7 @@ const S={
  _soWhat:{},
  _timelineSelected:null,
  // v1.0.8 Consistency Gate
- cg:{claims:{},edges:[],lastScore:null,dsEvents:[],patches:[],config:{mode:"basic",ttl:86400,dsThreshold:40},source:"manual"},
+ cg:{claims:{},edges:[],lastScore:null,lastGraph:null,dsEvents:[],patches:[],config:{mode:"basic",ttl:86400,dsThreshold:40},source:"manual"},
 };
 
 /* ── Stage Ribbon ──────────────────────────────────────────────────── */
@@ -4917,7 +4918,7 @@ function cgRenderClaimTable(graph,scoreResult){
  var pc=scoreResult.perClaim[k]||{totalResidue:0,edgeCount:0,maxResidue:0};
  var barW=Math.min(100,Math.round(pc.totalResidue*100));
  var barColor=pc.maxResidue>=0.8?"var(--bad)":pc.maxResidue>=0.5?"var(--warn)":"var(--accent)";
- html+='<tr><td class="mono">'+esc(k)+'</td><td>'+esc(n.authority||"-")+'</td>'+
+ html+='<tr onclick="cgOpenClaimDrawer(\''+esc(k)+'\')" data-tip="Click to inspect claim '+esc(k)+' in the trace drawer"><td class="mono">'+esc(k)+'</td><td>'+esc(n.authority||"-")+'</td>'+
  '<td>'+n.confidence.toFixed(2)+'</td>'+
  '<td><span class="cg-residue-bar" style="width:'+barW+'px;background:'+barColor+'"></span>'+pc.totalResidue.toFixed(2)+'</td>'+
  '<td>'+pc.edgeCount+'</td></tr>';
@@ -4957,6 +4958,135 @@ function cgRenderPatches(){
  }
 }
 
+function cgOpenClaimDrawer(key){
+ var claim=S.cg.claims[key];
+ if(!claim){showToast("Claim "+key+" not found","warn");return}
+ var graph=S.cg.lastGraph;
+ var score=S.cg.lastScore;
+ var node=graph?graph.nodes[key]:null;
+ var pc=(score&&score.perClaim)?score.perClaim[key]:null;
+
+ // Collect edges involving this claim
+ var edges=(graph?graph.edges:[]).filter(function(e){return e.from===key||e.to===key});
+ // Collect residues involving this claim
+ var residues=(score?score.residues:[]).filter(function(r){return r.from===key||r.to===key});
+ // Collect drift signals for this claim
+ var ds=S.cg.dsEvents.filter(function(d){return d.claim_key===key});
+ // Collect patches targeting this claim
+ var patches=S.cg.patches.filter(function(p){return p.target===key});
+
+ // Freshness
+ var fr=freshness(claim.ts,Date.now(),S.cg.config.ttl*1000);
+ var frColor=fr>=0.7?"var(--ok)":fr>=0.3?"var(--warn)":"var(--bad)";
+
+ // Residue color
+ var resColor=pc?(pc.maxResidue>=0.8?"var(--bad)":pc.maxResidue>=0.5?"var(--warn)":"var(--accent)"):"var(--muted)";
+
+ var html='';
+
+ // Section 1: Claim Summary
+ html+='<div class="dsection"><div class="dsection-hdr"><span class="arrow">\u25be</span> 1. Claim Summary</div><div class="dsection-body">';
+ html+='<table class="kv-table">';
+ html+='<tr><td>Key</td><td class="mono">'+esc(key)+'</td></tr>';
+ html+='<tr><td>Text</td><td>'+esc(claim.text)+'</td></tr>';
+ html+='<tr><td>Authority</td><td>'+esc(claim.authority||"-")+'</td></tr>';
+ html+='<tr><td>Confidence</td><td>'+claim.confidence.toFixed(2)+'</td></tr>';
+ html+='<tr><td>Created</td><td class="mono small">'+new Date(claim.ts).toLocaleString()+'</td></tr>';
+ html+='<tr><td>Freshness</td><td><span style="color:'+frColor+'">'+fr.toFixed(2)+'</span> <span class="muted">(TTL '+S.cg.config.ttl+'s)</span></td></tr>';
+ if(pc){
+ html+='<tr><td>Total Residue</td><td><span style="color:'+resColor+'">'+pc.totalResidue.toFixed(3)+'</span></td></tr>';
+ html+='<tr><td>Max Residue</td><td><span style="color:'+resColor+'">'+pc.maxResidue.toFixed(3)+'</span></td></tr>';
+ html+='<tr><td>Edge Count</td><td>'+pc.edgeCount+'</td></tr>';
+ }
+ html+='</table></div></div>';
+
+ // Section 2: Edges (connections)
+ html+='<div class="dsection"><div class="dsection-hdr"><span class="arrow">\u25be</span> 2. Connections ('+edges.length+')</div><div class="dsection-body">';
+ if(edges.length===0){
+ html+='<div class="muted">No connections to this claim.</div>';
+ }else{
+ html+='<table class="kv-table"><thead><tr><th>From</th><th>Type</th><th>To</th><th>Weight</th></tr></thead><tbody>';
+ edges.forEach(function(e){
+ var typeColor=e.type==="contradicts"?"var(--bad)":e.type==="supports"?"var(--ok)":"var(--warn)";
+ var fromBold=e.from===key?"font-weight:700":"";
+ var toBold=e.to===key?"font-weight:700":"";
+ html+='<tr><td class="mono" style="'+fromBold+'">'+esc(e.from)+'</td>';
+ html+='<td><span style="color:'+typeColor+'">'+esc(e.type)+'</span></td>';
+ html+='<td class="mono" style="'+toBold+'">'+esc(e.to)+'</td>';
+ html+='<td>'+e.weight.toFixed(1)+'</td></tr>';
+ });
+ html+='</tbody></table>';
+ }
+ html+='</div></div>';
+
+ // Section 3: Residue Breakdown
+ html+='<div class="dsection"><div class="dsection-hdr"><span class="arrow">\u25be</span> 3. Residue Breakdown ('+residues.length+')</div><div class="dsection-body">';
+ if(residues.length===0){
+ html+='<div class="muted">No residues computed. Run Score first.</div>';
+ }else{
+ html+='<table class="kv-table"><thead><tr><th>Edge</th><th>Type</th><th>Residue</th><th>Freshness</th></tr></thead><tbody>';
+ residues.forEach(function(r){
+ var absR=Math.abs(r.residue);
+ var rColor=absR>=0.8?"var(--bad)":absR>=0.5?"var(--warn)":r.residue<0?"var(--ok)":"var(--accent)";
+ html+='<tr><td class="mono small">'+esc(r.from)+' → '+esc(r.to)+'</td>';
+ html+='<td><span style="color:'+(r.type==="contradicts"?"var(--bad)":r.type==="supports"?"var(--ok)":"var(--warn)")+'">'+esc(r.type)+'</span></td>';
+ html+='<td><span style="color:'+rColor+'">'+r.residue.toFixed(3)+'</span></td>';
+ html+='<td>'+r.freshness.toFixed(2)+'</td></tr>';
+ });
+ html+='</tbody></table>';
+ html+='<div class="muted" style="margin-top:6px;font-size:10px">Positive residue = disagreement. Negative = support (reduces total score).</div>';
+ }
+ html+='</div></div>';
+
+ // Section 4: Drift Signals
+ html+='<div class="dsection"><div class="dsection-hdr"><span class="arrow">\u25be</span> 4. Drift Signals ('+ds.length+')</div><div class="dsection-body">';
+ if(ds.length===0){
+ html+='<div class="muted">No drift signals for this claim.</div>';
+ }else{
+ ds.forEach(function(d){
+ html+='<div class="cg-ds-card"><span class="cg-ds-type">'+esc(d.type)+'</span> ';
+ html+='<span class="badge sev-'+(d.severity==="critical"?"critical":d.severity==="high"?"high":"medium")+'">'+d.severity.toUpperCase()+'</span> ';
+ html+='Score: <strong>'+d.score+'</strong>';
+ html+='<div class="muted" style="margin-top:3px">'+esc(d.detail)+'</div>';
+ html+='<div class="mono small muted">'+esc(d.ds_id)+'</div></div>';
+ });
+ }
+ html+='</div></div>';
+
+ // Section 5: Patch Suggestions
+ html+='<div class="dsection"><div class="dsection-hdr"><span class="arrow">\u25be</span> 5. Patch Suggestions ('+patches.length+')</div><div class="dsection-body">';
+ if(patches.length===0){
+ html+='<div class="muted">No patches suggested for this claim.</div>';
+ }else{
+ patches.forEach(function(p){
+ html+='<div class="cg-patch-card"><span class="cg-patch-type">'+esc(p.type)+'</span> ';
+ html+='<div class="muted" style="margin-top:3px">'+esc(p.reason)+'</div>';
+ html+='<div class="mono small muted">'+esc(p.patch_id)+'</div></div>';
+ });
+ }
+ html+='</div></div>';
+
+ // Open drawer
+ S.drawerOpen=true;
+ var d=document.getElementById("traceDrawer");
+ d.classList.add("open");
+ // Update collapse bar label
+ var collapseLabel=d.querySelector(".collapse-label");
+ if(collapseLabel)collapseLabel.textContent="CLAIM: "+key;
+ var body=document.getElementById("drawerBody");
+ body.innerHTML=html;
+ // Wire section collapse/expand
+ body.querySelectorAll(".dsection-hdr").forEach(function(hdr){
+ hdr.addEventListener("click",function(){
+ var sec=hdr.parentElement;
+ var b=sec.querySelector(".dsection-body");
+ var a=hdr.querySelector(".arrow");
+ if(b.style.display==="none"){b.style.display="";a.textContent="\u25be"}
+ else{b.style.display="none";a.textContent="\u25b8"}
+ });
+ });
+}
+
 function cgShowResults(){
  var empty=document.getElementById("cgEmptyState");
  var gauge=document.getElementById("cgGaugeWrap");
@@ -4980,6 +5110,7 @@ function cgRunScore(){
  var config={mode:S.cg.config.mode,ttl:S.cg.config.ttl,now:Date.now()};
  var result=cgScore(graph,config);
  S.cg.lastScore=result;
+ S.cg.lastGraph=graph;
  S.cg.dsEvents=cgEmitDS(result,S.cg.config.dsThreshold);
  S.cg.patches=cgSuggestPatches(graph,result);
  cgShowResults();
@@ -4994,7 +5125,7 @@ function cgRunScore(){
 
 function cgQuickDemo(){
  // Clear and load a sample scenario
- S.cg.claims={};S.cg.edges=[];S.cg.lastScore=null;S.cg.dsEvents=[];S.cg.patches=[];
+ S.cg.claims={};S.cg.edges=[];S.cg.lastScore=null;S.cg.lastGraph=null;S.cg.dsEvents=[];S.cg.patches=[];
  var now=Date.now();
  S.cg.claims={
  "C-001":{key:"C-001",text:"CPU usage is low and stable",authority:"monitoring-agent",confidence:0.92,ts:now},
@@ -5806,7 +5937,7 @@ window.addEventListener("DOMContentLoaded",()=>{
  // Clear
  var cgClearBtn=document.getElementById("cgClear");
  if(cgClearBtn)cgClearBtn.addEventListener("click",function(){
- S.cg.claims={};S.cg.edges=[];S.cg.lastScore=null;S.cg.dsEvents=[];S.cg.patches=[];
+ S.cg.claims={};S.cg.edges=[];S.cg.lastScore=null;S.cg.lastGraph=null;S.cg.dsEvents=[];S.cg.patches=[];
  cgUpdateClaimSelectors();cgRenderEdgeList();cgRenderGauge(0,"basic");
  cgShowEmpty();cgUpdateClaimCount();
  document.getElementById("cgClaimTable").innerHTML="";
