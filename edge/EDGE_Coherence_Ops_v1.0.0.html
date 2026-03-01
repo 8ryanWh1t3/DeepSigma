@@ -442,7 +442,7 @@ body::after{
   </div>
 
   <div class="card" style="border-color:rgba(180,77,255,.4);box-shadow:var(--glow-purple)">
-    <h3 class="neon-purple">A Decision in 60 Seconds &mdash; A True Story</h3>
+    <h3 class="neon-purple">A Decision in 60 Seconds &mdash; Example Scenario</h3>
     <ol style="font-size:.85rem;line-height:1.9;padding-left:20px">
       <li><strong style="color:var(--neon-cyan)">Decision made.</strong> The team chose Vendor A for cloud hosting. Assumptions: &ldquo;pricing stable through Q3,&rdquo; &ldquo;99.9% uptime SLA.&rdquo; Sealed as <span class="mono neon-cyan">DLR-2026-0042 v1</span>.</li>
       <li><strong style="color:var(--neon-yellow)">Assumption expired.</strong> Three months later, Vendor A raised prices 30%. The system fired a drift signal: <span class="mono neon-orange">DS-2026-0087</span> &mdash; severity ORANGE.</li>
@@ -461,6 +461,7 @@ body::after{
       <li><strong>Fewer re-litigations</strong> &mdash; clear records mean people stop re-arguing settled decisions</li>
       <li><strong>Clean handoffs</strong> &mdash; new team members can read the reasoning chain, not just the outcome</li>
     </ul>
+    <p style="margin-top:14px;color:var(--neon-cyan);font-size:.9rem"><strong>Deep Sigma automates this loop</strong> &mdash; sealing, indexing, drift signals, patch logging. Coherence Ops is the operating model; Deep Sigma is the engine that runs it.</p>
   </div>
 
   <div class="not-box">
@@ -813,8 +814,8 @@ Supersedes:     [e.g., v1 sealed on 2026-01-15]</pre>
     <div class="copy-block">
       <button type="button" class="copy-btn" onclick="copyBlock(this)">COPY</button>
       <pre id="starter-prompt">You are a Decision Episode Recorder. I will describe a decision
-my team made. Return ONLY the structured record below — no essay,
-no commentary. Keep each field concise.
+my team made. Return ONLY the structured record below as JSON-like text —
+no essay, no commentary. Keep each field concise.
 
 DECISION EPISODE
 ================
