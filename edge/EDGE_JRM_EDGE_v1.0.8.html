@@ -1111,6 +1111,12 @@
  <button id="cgRunSim" style="width:100%" data-tip="Run this fix on a copy of the graph. Shows before/after score. Nothing is changed permanently." >Simulate Fix</button>
  <div id="cgSimResult"></div>
  </div>
+ <div class="cg-group hidden" id="cgFixableWrap" style="margin-top:10px">
+ <h4 data-tip="Claims that have at least one fix that actually lowers the overall score. Click a claim to inspect it.">
+ <span style="color:var(--ok);margin-right:4px">&#10003;</span> Fixable Claims
+ </h4>
+ <div id="cgFixableList" style="font-size:11px"></div>
+ </div>
  </div>
  <!-- Right: Output -->
  <div class="cg-panel" style="max-height:calc(100vh - 240px);overflow-y:auto">
@@ -5178,6 +5184,46 @@ function cgUpdateClaimCount(){
 }
 
 /* ── CG Graph Visualization (force-directed SVG) ───────────────────── */
+function cgRenderFixable(scoreResult){
+ var wrap=document.getElementById("cgFixableWrap");
+ var list=document.getElementById("cgFixableList");
+ if(!wrap||!list)return;
+ var FIX_ICONS={EXPIRE_CLAIM:"\u23f3",REQUEST_EVIDENCE:"\ud83d\udd0d",DOWNWEIGHT_AUTHORITY:"\u2b07\ufe0f",SUPERSEDE_CANON:"\ud83d\udd04",SPLIT_CLAIM:"\u2702\ufe0f"};
+ var FIX_LABELS={EXPIRE_CLAIM:"Expire",REQUEST_EVIDENCE:"Get evidence",DOWNWEIGHT_AUTHORITY:"Reduce weight",SUPERSEDE_CANON:"Replace",SPLIT_CLAIM:"Split"};
+ var fixable=[];
+ S.cg.patches.forEach(function(p){
+ var cc=JSON.parse(JSON.stringify(S.cg.claims));
+ var ec=JSON.parse(JSON.stringify(S.cg.edges));
+ if(p.type==="EXPIRE_CLAIM"||p.type==="SUPERSEDE_CANON"){
+  delete cc[p.target];ec=ec.filter(function(e){return e.from!==p.target&&e.to!==p.target});
+ }else if(p.type==="DOWNWEIGHT_AUTHORITY"){
+  if(cc[p.target])cc[p.target].confidence=Math.max(0.1,cc[p.target].confidence*0.5);
+ }else if(p.type==="REQUEST_EVIDENCE"){
+  if(cc[p.target])cc[p.target].confidence=Math.min(0.95,cc[p.target].confidence+0.2);
+ }else if(p.type==="SPLIT_CLAIM"){
+  ec=ec.filter(function(e){return!(e.from===p.target&&e.type==="depends")&&!(e.to===p.target&&e.type==="depends")});
+ }
+ var after=cgScore(cgBuildGraph(cc,ec),{mode:S.cg.config.mode,ttl:S.cg.config.ttl,now:Date.now()});
+ if(after.crs<scoreResult.crs){fixable.push({patch:p,before:scoreResult.crs,after:after.crs})}
+ });
+ if(fixable.length===0){wrap.classList.add("hidden");return}
+ wrap.classList.remove("hidden");
+ // Sort by biggest improvement first
+ fixable.sort(function(a,b){return a.after-b.after});
+ list.innerHTML=fixable.map(function(f){
+ var icon=FIX_ICONS[f.patch.type]||"\ud83d\udee0";
+ var label=FIX_LABELS[f.patch.type]||f.patch.type;
+ var delta=f.after-f.before;
+ return'<div onclick="cgOpenClaimDrawer(\''+esc(f.patch.target)+'\')" data-tip="Click to inspect '+esc(f.patch.target)+'" '+
+ 'style="display:flex;align-items:center;gap:8px;padding:6px 8px;cursor:pointer;border-bottom:1px solid #141e2d;transition:background .12s" '+
+ 'onmouseover="this.style.background=\'rgba(125,249,255,.06)\'" onmouseout="this.style.background=\'none\'">'+
+ '<span class="mono" style="font-weight:700;min-width:52px">'+esc(f.patch.target)+'</span>'+
+ '<span>'+icon+' '+esc(label)+'</span>'+
+ '<span style="margin-left:auto;color:var(--ok);font-weight:600;font-size:10px">'+delta+'</span>'+
+ '</div>';
+ }).join("");
+}
+
 function cgRenderGraph(graph,scoreResult){
  var svg=document.getElementById("cgGraphSvg");if(!svg)return;
  svg.innerHTML="";
@@ -5327,6 +5373,7 @@ function cgRunScore(){
  cgRenderDS();
  cgRenderPatches();
  cgRenderGraph(graph,result);
+ cgRenderFixable(result);
  var label=result.crs>=80?"Critical inconsistency":result.crs>=50?"Significant conflict":result.crs>=20?"Mild tension":"Clean";
  showToast("Score: "+result.crs+"/100 — "+label,result.crs>=80?"warn":"ok");
  return result;
@@ -6149,6 +6196,7 @@ window.addEventListener("DOMContentLoaded",()=>{
  S.cg.claims={};S.cg.edges=[];S.cg.lastScore=null;S.cg.lastGraph=null;S.cg.dsEvents=[];S.cg.patches=[];
  cgUpdateClaimSelectors();cgRenderEdgeList();cgRenderGauge(0,"basic");
  cgShowEmpty();cgUpdateClaimCount();
+ var fw=document.getElementById("cgFixableWrap");if(fw)fw.classList.add("hidden");
  document.getElementById("cgClaimTable").innerHTML="";
  document.getElementById("cgDSOutput").innerHTML="";
  document.getElementById("cgPatchOutput").innerHTML="";
