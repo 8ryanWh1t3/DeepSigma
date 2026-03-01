@@ -205,6 +205,9 @@ ALLOWED_ACRONYMS = {
     "BENIGN", "CHAOS", "TISSUE", "EXPLOIT", "TROJAN", "LATERAL",
     "EXFIL", "PROTO", "AGENTIC", "SPIKE", "STALE", "CRITICAL", "RCE",
     "MED", "EXPERT", "QCONF",
+    # v1.0.6 Test Lab — drift severity bands, patch/drift UIDs, scenario labels
+    "CRIT", "HIGH", "TPATCH", "TDS", "ASSUMP", "SUITE", "FAIL",
+    "PROOF", "DEMO", "COMPLETE", "TEST", "LAB", "ENGINE",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}
