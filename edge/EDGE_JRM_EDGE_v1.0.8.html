@@ -5128,7 +5128,9 @@ function cgUpdateClaimCount(){
 function cgRenderGraph(graph,scoreResult){
  var svg=document.getElementById("cgGraphSvg");if(!svg)return;
  svg.innerHTML="";
- var keys=Object.keys(graph.nodes);
+ var connected={};
+ graph.edges.forEach(function(e){connected[e.from]=true;connected[e.to]=true});
+ var keys=Object.keys(graph.nodes).filter(function(k){return connected[k]});
  if(keys.length===0)return;
 
  var W=560,H=360,PAD=40;
