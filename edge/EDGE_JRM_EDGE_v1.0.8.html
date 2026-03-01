@@ -5148,23 +5148,28 @@ function cgRenderGraph(graph,scoreResult){
  var edges=graph.edges;
  for(var iter=0;iter<80;iter++){
  var t=1-iter/80; // cooling
- // Repulsion between all nodes
+ // Pre-compute edge counts for spacing
+ var edgeCounts={};
+ keys.forEach(function(k){var n=graph.nodes[k];edgeCounts[k]=(n.inEdges.length+n.outEdges.length)});
+ // Repulsion between all nodes — stronger for high-connection nodes
  for(var i=0;i<keys.length;i++){
   for(var j=i+1;j<keys.length;j++){
   var a=pos[keys[i]],b=pos[keys[j]];
   var dx=b.x-a.x,dy=b.y-a.y;
   var dist=Math.sqrt(dx*dx+dy*dy)||1;
-  var force=800/(dist*dist);
+  var boost=1+Math.max(edgeCounts[keys[i]],edgeCounts[keys[j]])*0.5;
+  var force=800*boost/(dist*dist);
   var fx=dx/dist*force*t,fy=dy/dist*force*t;
   a.vx-=fx;a.vy-=fy;b.vx+=fx;b.vy+=fy;
   }
  }
- // Attraction along edges
+ // Attraction along edges — longer rest length for high-connection nodes
  edges.forEach(function(e){
   var a=pos[e.from],b=pos[e.to];if(!a||!b)return;
   var dx=b.x-a.x,dy=b.y-a.y;
   var dist=Math.sqrt(dx*dx+dy*dy)||1;
-  var force=(dist-120)*0.05*t;
+  var restLen=120+Math.max(edgeCounts[e.from],edgeCounts[e.to])*20;
+  var force=(dist-restLen)*0.05*t;
   var fx=dx/dist*force,fy=dy/dist*force;
   a.vx+=fx;a.vy+=fy;b.vx-=fx;b.vy-=fy;
  });
