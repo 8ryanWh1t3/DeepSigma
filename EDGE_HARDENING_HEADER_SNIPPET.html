@@ -1,0 +1,108 @@
+<!--
+  ╔══════════════════════════════════════════════════════════════╗
+  ║  EDGE Hardening Header Snippet v1                           ║
+  ║  Paste into every EDGE_*.html file.                         ║
+  ║                                                             ║
+  ║  Placement:                                                 ║
+  ║    1. CSP meta tag        → first child of <head>           ║
+  ║    2. Hardening shim      → <script> in <head>, after CSP   ║
+  ║    3. Action Contract     → inside <body>, after header     ║
+  ║    4. Policy exceptions   → top of file, after <head> open  ║
+  ╚══════════════════════════════════════════════════════════════╝
+-->
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     1. CSP META TAG — paste as the FIRST element inside <head>
+     ═══════════════════════════════════════════════════════════ -->
+
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'"/>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     2. HARDENING SHIM — paste inside <head>, after CSP meta
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- EDGE_HARDENING_V1 BEGIN -->
+<script>
+(function(){
+"use strict";
+/* ──────────────────────────────────────────────────────────
+   EDGE_HARDENING_V1 — Runtime capability lockdown
+   This shim overrides restricted APIs at the window level
+   so that any accidental or injected code cannot use them.
+   The CI linter (tools/edge_lint.py) is the primary gate;
+   this shim is defense-in-depth.
+   ────────────────────────────────────────────────────────── */
+
+var EDGE_BUILD_ID="EDGE_BUILD_ID:SET_ME";
+
+function _block(cap){
+  return function(){throw new Error("EDGE hardening: "+cap+" is blocked")};
+}
+
+/* ── Network ──────────────────────────────────────────── */
+window.fetch          = _block("fetch");
+window.XMLHttpRequest = _block("XMLHttpRequest");
+window.WebSocket      = _block("WebSocket");
+window.EventSource    = _block("EventSource");
+try{navigator.sendBeacon=_block("sendBeacon")}catch(_){}
+
+/* ── Dynamic execution ────────────────────────────────── */
+window.eval = _block("eval");
+
+/* ── Navigation ───────────────────────────────────────── */
+window.open = _block("window.open");
+
+/* ── Persistence ──────────────────────────────────────── */
+try{Object.defineProperty(window,"localStorage",
+  {get:_block("localStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"sessionStorage",
+  {get:_block("sessionStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"indexedDB",
+  {get:_block("indexedDB"),configurable:false})}catch(_){}
+
+/* ── Self-check: no external resources ────────────────── */
+document.addEventListener("DOMContentLoaded",function(){
+  var ext=document.querySelectorAll("script[src],link[href]");
+  if(ext.length>0){
+    document.body.innerHTML=
+      "<h1 style='color:red;font-family:monospace;padding:40px'>" +
+      "EDGE VIOLATION: external resource detected (" +
+      ext.length+" element(s))</h1>";
+  }
+});
+})();
+</script>
+<!-- EDGE_HARDENING_V1 END -->
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     3. ACTION CONTRACT — paste inside <body>, after the header
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- EDGE_ACTION_CONTRACT_V1 -->
+<div id="edgeActionContract" style="
+  margin:8px auto;max-width:1100px;width:94%;padding:6px 14px;
+  border-radius:6px;border:1px solid rgba(57,255,20,.2);
+  background:rgba(57,255,20,.04);
+  font-family:'Courier New',Courier,monospace;font-size:.6rem;
+  color:#8a80a0;display:flex;flex-wrap:wrap;gap:12px;align-items:center;
+">
+  <span style="color:#39ff14;font-weight:700;letter-spacing:1px">ACTION CONTRACT</span>
+  <span>Network: LOCKED</span>
+  <span style="opacity:.5">|</span>
+  <span>Persistence: NONE</span>
+  <span style="opacity:.5">|</span>
+  <span>Side Effects: NONE</span>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     4. POLICY EXCEPTIONS (optional)
+     Uncomment ONLY the lines your module requires.
+     These must appear somewhere in the file (typically near top).
+     ═══════════════════════════════════════════════════════════ -->
+
+<!-- EDGE_POLICY_EXCEPTION: download -->
+<!-- EDGE_POLICY_EXCEPTION: clipboard -->

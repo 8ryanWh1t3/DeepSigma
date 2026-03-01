@@ -228,6 +228,11 @@ ALLOWED_ACRONYMS = {
     "CSPRNG", "ANCHOR", "HIDE", "WITNESS", "SPLITKEY",
     # Domino Delegation Chain EDGE — chain proof, encrypt/decrypt tokens
     "CHAIN", "DECRYPT", "ENCRYPT", "RECORD",
+    # EDGE Hardening CI — linter, snippet, and policy doc tokens
+    "CSP", "SHIM", "BEGIN", "END", "LOCKED", "NEVER", "FIRST",
+    "CLIPBOARD", "WITH", "META", "TAG", "BLOCKED", "PASTE",
+    "EXTERNAL", "DYNAMIC", "EXEC", "PERSISTENCE", "REMOTE",
+    "MISSING", "INVALID", "ALLOWED", "MARKERS", "GATE",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}
