@@ -248,3 +248,23 @@ coherence jrm adapters
 ```
 
 Enterprise federation commands are available via the `deepsigma` CLI: `jrm federate`, `jrm gate validate`, `jrm hub replay`, `jrm advisory publish`.
+
+## What is JRM EDGE?
+
+A standalone single-file HTML app (`edge/EDGE_JRM_EDGE_v1.0.7.html`) that runs the JRM pipeline in the browser. Load Suricata, Snort, or Copilot logs, run a seeded 9-stage pipeline, and explore events, packets, health metrics, and drift — all offline, zero dependencies. Current version: v1.0.7.
+
+## What did JRM EDGE v1.0.7 add?
+
+Five features: (1) **So What panel** — per-stage what/why/next analysis auto-generated from pipeline metrics, (2) **Analyzer vs Deep Sigma view** — toggle between SOC terminology and governance terminology, (3) **Packet chain timeline + diff** — horizontal bar showing packet parts with inter-packet diff computation, (4) **Stream mode + Freeze & Seal** — simulated `tail -f` with rolling window, freeze pauses view, seal captures snapshot, (5) **Policy drawer** — locked-by-default editable thresholds with regression rerun and delta comparison.
+
+## What is the EDGE Policy Drawer?
+
+A guarded panel in JRM EDGE (v1.0.7+) exposing 8 pipeline thresholds: FP spike count/confidence, stale rev count, confidence review/patch thresholds, severity multiplier, confidence floor/ceil. Locked by default — unlock requires confirmation. After editing, "Regression Rerun" re-executes the full test suite and shows delta vs the baseline snapshot.
+
+## What is the RFP Co-Pilot?
+
+An EDGE module (`edge/edge_rfp_copilot_excel_json.html`) for government RFP extraction. One person runs a structured AI prompt against the RFP document, producing a JSON file. Excel Power Query loads the JSON into 6 live tables (Solicitation, Key Dates, Attachments, Amendments, Risks, Open Items). Each proposal role pulls what they need from the shared JSON. Amendments? Rerun the prompt, overwrite the JSON, Refresh All in Excel. A 1-page executive brief is also available (`edge/edge_rfp_copilot_exec_brief.html`).
+
+## How does the RFP Co-Pilot refresh loop work?
+
+Amendment arrives → rerun the extraction prompt with the updated RFP → overwrite `rfp_extract.json` → Ctrl+Alt+F5 (Refresh All) in Excel → all 6 tables update automatically → team stays aligned. No one re-reads the full RFP.

@@ -132,6 +132,21 @@ Organized by layer — from brand identity through runtime architecture to opera
 
 ---
 
+## EDGE Modules
+
+| Term | Definition |
+|------|-----------|
+| **EDGE** | Exportable Decision Governance Engine — standalone single-file HTML applications with embedded governance, zero dependencies, offline-capable. |
+| **JRM EDGE** | Browser-based JRM pipeline explorer (v1.0.7). Loads Suricata/Snort/Copilot logs, runs a 9-stage seeded pipeline, and surfaces events, packets, health metrics, test lab, and policy controls. File: `edge/EDGE_JRM_EDGE_v1.0.7.html`. |
+| **So What Panel** | JRM EDGE v1.0.7 feature: per-stage analysis card showing what happened, why it matters, and recommended next steps — auto-generated from pipeline metrics after each run. |
+| **Analyzer View / Deep Sigma View** | JRM EDGE v1.0.7 presentation toggle: Analyzer view uses technical SOC terminology (Signature, Alert, Rev); Deep Sigma view uses governance terminology (Claim Key, Evidence, Confidence). Same data, different labels. |
+| **Stream Mode** | JRM EDGE v1.0.7 feature: simulated `tail -f` rendering with a rolling window of the last N events. Freeze pauses the view; Seal captures a timestamped snapshot. |
+| **Policy Drawer** | JRM EDGE v1.0.7 feature: locked-by-default panel exposing 8 editable pipeline thresholds (FP spike count/confidence, stale rev count, confidence review/patch thresholds, severity multiplier, confidence floor/ceil). Unlock requires confirmation. Regression rerun compares delta vs baseline. |
+| **RFP Co-Pilot** | EDGE module for government RFP extraction workflow. AI prompt extracts structured JSON from RFP documents; Excel Power Query loads JSON into 6 live tables; role action packets assign tasks to 6 proposal team roles. File: `edge/edge_rfp_copilot_excel_json.html`. |
+| **RFP Co-Pilot Exec Brief** | 1-page executive summary of the RFP Co-Pilot workflow with Print/PDF support. File: `edge/edge_rfp_copilot_exec_brief.html`. |
+
+---
+
 ## Infrastructure & Tooling
 
 | Term | Definition |

@@ -16,7 +16,7 @@ Eighteen diagrams define the visual language of Sigma OVERWATCH. Everything else
 | 14 | [KPI Confidence Bands Flow](14-kpi-confidence-bands-flow.md) | Flowchart | KPI score + confidence/bands pipeline from evidence signals |
 | 15 | [DISR Dual-Mode Architecture](15-disr-dual-mode-architecture.md) | Graph | Local default crypto provider with optional KMS plug-ins and authority controls |
 | 16 | [Authority Boundary Primitive](16-authority-boundary-primitive.md) | Flowchart + Graph | Pre-runtime ABP lifecycle: declare → build → attach → verify + composition model |
-| 17 | [EDGE System](17-edge-system.md) | Flowchart + Graph | EDGE module map, gate enforcement flow, delegation review loop, Unified tab architecture |
+| 17 | [EDGE System](17-edge-system.md) | Flowchart + Graph | EDGE module map (11 modules), JRM EDGE v1.0.7 pipeline + features, RFP Co-Pilot workflow, gate enforcement, delegation review |
 | 18 | [SDK Package Architecture](18-sdk-package-architecture.md) | Graph | Three pip packages wrapping AgentSession with publish workflow |
 | 19 | [FEEDS Pipeline](19-feeds-pipeline.md) | Graph | Five-stage event-driven pipeline: envelope → bus → ingest → consumers → canon |
 | 20 | [Stability & Credibility Pipeline](20-stability-credibility-pipeline.md) | Flowchart | SSI, TEC sensitivity, security proof pack, and artifact kill-switch (v2.0.7) |

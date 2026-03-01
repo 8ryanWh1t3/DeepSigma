@@ -56,3 +56,11 @@
 - **JRM Federation Hub**: Multi-environment packet aggregation: ingest packets from multiple SOC environments, detect cross-env drift (VERSION_SKEW, POSTURE_DIVERGENCE), merge memory graphs, produce federation reports. See `enterprise/src/deepsigma/jrm_ext/federation/hub.py`
 - **JRM Advisory Engine**: Cross-environment drift advisory workflow: publish advisories from detected drift, accept/decline with status tracking and per-drift-type recommendations. See `enterprise/src/deepsigma/jrm_ext/federation/advisory.py`
 - **JRM Packet Signer**: HMAC-SHA256 manifest signing using canonical JSON serialization. Pluggable interface (subclass for KMS). Paired with PacketValidator for signature verification on ingest. See `enterprise/src/deepsigma/jrm_ext/security/`
+- **EDGE**: Exportable Decision Governance Engine — standalone single-file HTML applications with embedded governance, zero dependencies, offline-capable
+- **JRM EDGE**: Browser-based JRM pipeline explorer (v1.0.7). 9-stage seeded pipeline, events table, packets, health ring, test lab, stream mode, So What panel, policy drawer. File: `edge/EDGE_JRM_EDGE_v1.0.7.html`
+- **So What Panel**: JRM EDGE v1.0.7 — per-stage what/why/next analysis auto-generated from pipeline metrics
+- **Analyzer View**: JRM EDGE v1.0.7 — presentation toggle between SOC terminology (Signature, Alert, Rev) and Deep Sigma governance terminology (Claim Key, Evidence, Confidence)
+- **Stream Mode**: JRM EDGE v1.0.7 — simulated `tail -f` rendering with rolling window, freeze, and seal snapshot
+- **Policy Drawer**: JRM EDGE v1.0.7 — locked-by-default editable pipeline thresholds with regression rerun and delta comparison
+- **RFP Co-Pilot**: EDGE module for government RFP extraction → JSON → Excel Power Query → 6 role action packets. File: `edge/edge_rfp_copilot_excel_json.html`
+- **RFP Co-Pilot Exec Brief**: 1-page executive summary of RFP Co-Pilot workflow with Print/PDF. File: `edge/edge_rfp_copilot_exec_brief.html`

@@ -677,6 +677,36 @@ Log-agnostic coherence engine ingesting external telemetry (Suricata EVE, Snort 
   - Enforcement: tests-enterprise/test_jrm_ext/test_security.py
   - KPI axes: Authority_Modeling, Enterprise_Readiness
 
+### EDGE Modules
+
+Exportable single-file HTML applications with embedded governance — zero dependencies, offline-capable. Each module ships as a standalone `.html` file with all CSS, JS, and data inline.
+
+- **JRM EDGE** (`JRM_EDGE`)
+  - Browser-based JRM pipeline explorer. Loads Suricata/Snort/Copilot logs, runs a seeded 9-stage pipeline (RAW→PARSE→NORMALIZE→JOIN→TRUTH→REASONING→DRIFT→PATCH→MEMORY), and surfaces events, packets, health metrics, test lab, drift scoring, and policy controls. v1.0.7 adds So What panel, Analyzer/Deep Sigma view toggle, packet chain timeline with diff, stream mode with Freeze & Seal, and policy drawer with regression rerun.
+  - Artifacts: edge/EDGE_JRM_EDGE_v1.0.7.html
+  - Enforcement: scripts/domain_scrub.py (GPE gate)
+  - KPI axes: Operational_Maturity, Enterprise_Readiness
+- **RFP Co-Pilot** (`RFP_COPILOT`)
+  - AI-assisted RFP extraction workflow. Structured Co-Pilot prompt extracts solicitation data into JSON; Excel Power Query loads JSON into 6 live tables (Solicitation, Key Dates, Attachments, Amendments, Risks, Open Items); role action packets assign tasks to 6 proposal team roles (Proposal Mgr, Compliance, Technical, Cost/Pricing, Contracts, Staffing). Refresh loop: amendment → rerun prompt → overwrite JSON → Refresh All.
+  - Artifacts: edge/edge_rfp_copilot_excel_json.html
+  - Enforcement: scripts/domain_scrub.py (GPE gate)
+  - KPI axes: Enterprise_Readiness, Operational_Maturity
+- **RFP Co-Pilot Exec Brief** (`RFP_COPILOT_BRIEF`)
+  - 1-page executive summary of the RFP Co-Pilot workflow with Print/PDF support. Problem statement, solution flow, quick start checklist, role pull grid, and security reminder.
+  - Artifacts: edge/edge_rfp_copilot_exec_brief.html
+  - Enforcement: scripts/domain_scrub.py (GPE gate)
+  - KPI axes: Enterprise_Readiness
+- **EDGE Unified Suite** (`EDGE_UNIFIED`)
+  - 8-tab unified module: Suite, Hiring, Bid, Compliance, BOE, IRIS, Delegation, Utility. Iframe-based module loading with ABP context bar.
+  - Artifacts: edge/EDGE_Unified_v1.0.0.html
+  - Enforcement: scripts/gate_abp.py (80 checks across 8 files)
+  - KPI axes: Enterprise_Readiness, Authority_Modeling
+- **Coherence Dashboard** (`EDGE_COHERENCE`)
+  - 4-tab coherence overview: Overview, Claims, Drift, Analysis. Visual coherence scoring with drill-down.
+  - Artifacts: edge/EDGE_Coherence_Dashboard_v2.0.0.html
+  - Enforcement: scripts/gate_abp.py
+  - KPI axes: Operational_Maturity, Enterprise_Readiness
+
 ## Outer-Edge Boundaries
 
 - Not claiming full jurisdictional policy packs (EU AI Act article-by-article enforcement) yet

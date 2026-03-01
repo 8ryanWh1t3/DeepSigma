@@ -73,6 +73,28 @@ See: [docs/release/RELEASE_NOTES_v2.1.0.md](docs/release/RELEASE_NOTES_v2.1.0.md
 - JRM — log-agnostic refinement engine: 3 adapters, 5-stage pipeline, JRM-X packet builder, enterprise federation
 - 105 JRM tests, 207 domain mode tests, 686 total passing
 
+### EDGE Modules
+
+Exportable single-file HTML apps — zero dependencies, work offline, governance-ready.
+
+| Module | Version | Description |
+|--------|---------|-------------|
+| EDGE Unified | v1.0.0 | 8-tab suite: Suite, Hiring, Bid, Compliance, BOE, IRIS, Delegation, Utility |
+| Coherence Dashboard | v2.0.0 | 4-tab coherence overview with claims, drift, and analysis |
+| JRM EDGE | v1.0.7 | 9-stage JRM pipeline explorer: events table, packets, health ring, test lab, stream mode, So What panel, policy drawer |
+| RFP Co-Pilot | v1.0.0 | 8-tab RFP extraction workflow: Co-Pilot prompt, JSON spec, Power Query M scripts, role action packets |
+| RFP Co-Pilot Exec Brief | v1.0.0 | 1-page executive summary with Print/PDF |
+| Hiring UI | v1.0.0 | Staffing intake |
+| BidNoBid UI | v1.0.0 | Opportunity evaluation |
+| Compliance Matrix | v1.0.0 | Requirements mapping |
+| BOE Pricing | v1.0.0 | Rate calculations |
+| Award Staffing | v1.2.0 | Cost estimation |
+| Suite ReadOnly | v1.0.0 | Telemetry + rollup |
+
+JRM EDGE v1.0.7 features: So What panel (per-stage what/why/next analysis), Analyzer vs Deep Sigma view toggle, packet chain timeline + diff, live stream mode + Freeze & Seal, policy drawer (guarded) + regression rerun.
+
+RFP Co-Pilot: Parse Once. Execute Everywhere. — AI-assisted RFP extraction into structured JSON, loaded via Excel Power Query, with role-based action packets for 6 proposal team roles.
+
 ### Competitive Gap Closure (v2.1.0)
 
 - Tool-call + LLM span tracing (OTel)

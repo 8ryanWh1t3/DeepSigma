@@ -199,6 +199,19 @@ Source of truth:
 
 ---
 
+## EDGE Modules
+
+Exportable single-file HTML apps — zero dependencies, work offline, governance-ready.
+
+| Page | What it covers |
+|------|---------------|
+| [EDGE Modules](EDGE-Modules) | Full module listing, ABP gate enforcement, delegation review |
+| [JRM EDGE](JRM-EDGE) | Browser-based JRM pipeline explorer (v1.0.7): events, packets, health, test lab, stream mode, So What panel, policy drawer |
+| [RFP Co-Pilot](RFP-Co-Pilot) | AI-assisted RFP extraction → JSON → Excel Power Query → 6 role action packets |
+| [RFP Co-Pilot Exec Brief](RFP-Co-Pilot-Exec-Brief) | 1-page executive summary with Print/PDF |
+
+---
+
 ## Reference
 
 | Page | What it covers |

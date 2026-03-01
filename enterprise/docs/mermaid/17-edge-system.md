@@ -1,6 +1,6 @@
 # EDGE System
 
-Exportable Decision Governance Engine: 8 standalone HTML modules with embedded ABP enforcement, gate verification, and delegation review triggers.
+Exportable Decision Governance Engine: 11 standalone HTML modules with embedded ABP enforcement, gate verification, and delegation review triggers.
 
 ## EDGE Module Map
 
@@ -10,6 +10,9 @@ graph TD
         direction LR
         UNI["Unified v1.0.0\n8 tabs: Suite, Hiring, Bid,\nCompliance, BOE, IRIS,\nDelegation, Utility"]
         COH["Coherence Dashboard v2.0.0\n4 tabs: Overview, Claims,\nDrift, Analysis"]
+        JRM["JRM EDGE v1.0.7\n6 tabs: Run, Events, Packets,\nHealth, Test Lab, Replay"]
+        RFP["RFP Co-Pilot v1.0.0\n8 tabs: Overview, Quick Start,\nPrompt, JSON, Power Query,\nShare, Roles, Troubleshooting"]
+        RFPX["RFP Exec Brief v1.0.0\n1-page summary + Print/PDF"]
 
         HIR["Hiring UI v1.0.0\nStaffing intake"]
         BID["BidNoBid UI v1.0.0\nOpportunity evaluation"]
@@ -32,6 +35,68 @@ graph TD
 
     style EDGE fill:#e8f5e9,stroke:#43a047
     style ABP fill:#fff3bf,stroke:#f59f00
+    style JRM fill:#e3f2fd,stroke:#1e88e5
+    style RFP fill:#fff3e0,stroke:#fb8c00
+    style RFPX fill:#fff3e0,stroke:#fb8c00
+```
+
+## JRM EDGE Pipeline (v1.0.7)
+
+```mermaid
+graph LR
+    subgraph Input["Log Sources"]
+        EVE["Suricata EVE"]
+        SNR["Snort fast.log"]
+        CPL["Copilot JSONL"]
+    end
+
+    subgraph Pipeline["9-Stage Seeded Pipeline"]
+        direction LR
+        S1["RAW"] --> S2["PARSE"] --> S3["NORMALIZE"] --> S4["JOIN"]
+        S4 --> S5["TRUTH"] --> S6["REASONING"] --> S7["DRIFT"]
+        S7 --> S8["PATCH"] --> S9["MEMORY"]
+    end
+
+    subgraph Features["v1.0.7 Features"]
+        SW["So What Panel\nper-stage what/why/next"]
+        AZ["Analyzer ↔ Deep Sigma\nview toggle"]
+        TL["Packet Timeline\nchain + diff"]
+        ST["Stream Mode\nFreeze + Seal"]
+        PD["Policy Drawer\nlocked thresholds\nregression rerun"]
+    end
+
+    EVE & SNR & CPL --> S1
+    S9 --> SW
+    S9 --> AZ
+    S9 --> TL
+    S9 --> ST
+    S9 --> PD
+
+    style Input fill:#e3f2fd,stroke:#1e88e5
+    style Pipeline fill:#e8f5e9,stroke:#43a047
+    style Features fill:#fff3e0,stroke:#fb8c00
+```
+
+## RFP Co-Pilot Workflow
+
+```mermaid
+flowchart LR
+    RFP["RFP Document"] --> PROMPT["AI Extraction\nCo-Pilot Prompt"]
+    PROMPT --> JSON["rfp_extract.json\nStructured Output"]
+    JSON --> PQ["Excel Power Query\n6 M Scripts"]
+    PQ --> TABLES["Live Tables\nSolicitation | Dates\nAttachments | Amendments\nRisks | Open Items"]
+    TABLES --> ROLES["Team Role Pull\n6 Roles"]
+
+    AMD["Amendment"] -.->|"rerun"| PROMPT
+    PQ -.->|"Ctrl+Alt+F5\nRefresh All"| TABLES
+
+    style RFP fill:#e3f2fd,stroke:#1e88e5
+    style PROMPT fill:#fff3bf,stroke:#f59f00
+    style JSON fill:#e0f2f1,stroke:#26a69a
+    style PQ fill:#f3e5f5,stroke:#8e24aa
+    style TABLES fill:#e8f5e9,stroke:#43a047
+    style ROLES fill:#fce4ec,stroke:#e53935
+    style AMD fill:#fff3e0,stroke:#fb8c00
 ```
 
 ## ABP Gate Enforcement Flow

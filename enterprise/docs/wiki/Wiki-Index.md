@@ -68,6 +68,9 @@ Canonical wiki structure for Sigma OVERWATCH / DeepSigma docs.
 ## EDGE + ABP
 
 - [EDGE Modules](EDGE-Modules)
+- [JRM EDGE](JRM-EDGE)
+- [RFP Co-Pilot](RFP-Co-Pilot)
+- [RFP Co-Pilot Exec Brief](RFP-Co-Pilot-Exec-Brief)
 - [ABP Specification](ABP-Specification)
 - [ABP Builder](ABP-Builder)
 - [ABP Verification](ABP-Verification)
