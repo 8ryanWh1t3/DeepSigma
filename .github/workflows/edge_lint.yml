@@ -16,5 +16,8 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Run EDGE hardening linter
+      - name: Run EDGE hardening linter (repo root)
         run: python tools/edge_lint.py
+
+      - name: Run EDGE hardening linter (edge/ directory)
+        run: python tools/edge_lint.py --path edge/

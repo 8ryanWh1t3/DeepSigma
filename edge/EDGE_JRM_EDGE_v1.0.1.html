@@ -19,6 +19,43 @@
 <!doctype html>
 <html lang="en">
 <head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'"/>
+<!-- EDGE_HARDENING_V1 BEGIN -->
+<script>
+(function(){
+"use strict";
+var EDGE_BUILD_ID="EDGE_BUILD_ID:EDGE_JRM_EDGE_v1.0.1";
+function _block(cap){
+  return function(){throw new Error("EDGE hardening: "+cap+" is blocked")};
+}
+window.fetch          = _block("fetch");
+window.XMLHttpRequest = _block("XMLHttpRequest");
+window.WebSocket      = _block("WebSocket");
+window.EventSource    = _block("EventSource");
+try{navigator.sendBeacon=_block("sendBeacon")}catch(_){}
+window.eval = _block("eval");
+window.open = _block("window.open");
+try{Object.defineProperty(window,"localStorage",
+  {get:_block("localStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"sessionStorage",
+  {get:_block("sessionStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"indexedDB",
+  {get:_block("indexedDB"),configurable:false})}catch(_){}
+document.addEventListener("DOMContentLoaded",function(){
+  var ext=document.querySelectorAll("script[src],link[href]");
+  if(ext.length>0){
+    document.body.innerHTML=
+      "<h1 style='color:red;font-family:monospace;padding:40px'>" +
+      "EDGE VIOLATION: external resource detected (" +
+      ext.length+" element(s))</h1>";
+  }
+});
+})();
+</script>
+<!-- EDGE_HARDENING_V1 END -->
+<!-- EDGE_POLICY_EXCEPTION: download -->
+<!-- EDGE_POLICY_EXCEPTION: clipboard -->
+
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Deep Sigma EDGE — JRM EDGE v1.0.1</title>
@@ -281,6 +318,22 @@
   </style>
 </head>
 <body>
+<!-- EDGE_ACTION_CONTRACT_V1 -->
+<div id="edgeActionContract" style="
+  margin:8px auto;max-width:1100px;width:94%;padding:6px 14px;
+  border-radius:6px;border:1px solid rgba(57,255,20,.2);
+  background:rgba(57,255,20,.04);
+  font-family:'Courier New',Courier,monospace;font-size:.6rem;
+  color:#8a80a0;display:flex;flex-wrap:wrap;gap:12px;align-items:center;
+">
+  <span style="color:#39ff14;font-weight:700;letter-spacing:1px">ACTION CONTRACT</span>
+  <span>Network: LOCKED</span>
+  <span style="opacity:.5">|</span>
+  <span>Persistence: NONE</span>
+  <span style="opacity:.5">|</span>
+  <span>Side Effects: NONE</span>
+</div>
+
 
 <!-- ── Toast Container ── -->
 <div class="toast-wrap" id="toastWrap"></div>
@@ -554,13 +607,13 @@ function showToast(msg,type){
 
 /* ── Onboarding ────────────────────────────────────────────────────── */
 function showOnboarding(){
-  try{if(localStorage.getItem("ds_jrm_edge_onboard")==="dismissed")return}catch(_){}
+  try{if(((window.__ds_memstore||{})["ds_jrm_edge_onboard"]||null)==="dismissed")return}catch(_){}
   var overlay=document.getElementById("onboardOverlay");if(overlay)overlay.style.display="";
 }
 function dismissOnboarding(){
   var overlay=document.getElementById("onboardOverlay");if(overlay)overlay.style.display="none";
   var cb=document.getElementById("onboardDontShow");
-  if(cb&&cb.checked){try{localStorage.setItem("ds_jrm_edge_onboard","dismissed")}catch(_){}}
+  if(cb&&cb.checked){try{(window.__ds_memstore=window.__ds_memstore||{},window.__ds_memstore["ds_jrm_edge_onboard"]="dismissed")}catch(_){}}
 }
 
 /* ── Seeded RNG (deterministic demo) ───────────────────────────────── */
@@ -574,9 +627,9 @@ function uid(p){return p+"-"+Math.random().toString(16).slice(2,10).toUpperCase(
 function nowIso(){return new Date().toISOString()}
 function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
 function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v))}
-function storageOk(){try{const k="__ds_t";localStorage.setItem(k,k);localStorage.removeItem(k);return true}catch(_){return false}}
-function getStore(k){if(storageOk())return localStorage.getItem(k);window.__mem=window.__mem||{};return window.__mem[k]||null}
-function setStore(k,v){if(storageOk())localStorage.setItem(k,v);else{window.__mem=window.__mem||{};window.__mem[k]=v}}
+function storageOk(){return false}catch(_){return false}}
+function getStore(k){window.__mem=window.__mem||{};return window.__mem[k]||null};return window.__mem[k]||null}
+function setStore(k,v){window.__mem=window.__mem||{};window.__mem[k]=v};window.__mem[k]=v}}
 function downloadFile(content,name,mime){const b=new Blob([content],{type:mime});const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download=name;a.click();URL.revokeObjectURL(u)}
 
 async function sha256Hex(data){
@@ -2004,9 +2057,9 @@ window.addEventListener("DOMContentLoaded",()=>{
   var scClose=document.getElementById("shortcutClose");
   if(scClose)scClose.addEventListener("click",function(){
     document.getElementById("shortcutBar").style.display="none";
-    try{localStorage.setItem("ds_jrm_edge_shortcuts","hidden")}catch(_){}
+    try{(window.__ds_memstore=window.__ds_memstore||{},window.__ds_memstore["ds_jrm_edge_shortcuts"]="hidden")}catch(_){}
   });
-  try{if(localStorage.getItem("ds_jrm_edge_shortcuts")==="hidden"){var sb=document.getElementById("shortcutBar");if(sb)sb.style.display="none"}}catch(_){}
+  try{if(((window.__ds_memstore||{})["ds_jrm_edge_shortcuts"]||null)==="hidden"){var sb=document.getElementById("shortcutBar");if(sb)sb.style.display="none"}}catch(_){}
 
   renderMeter();
   renderCohTab();

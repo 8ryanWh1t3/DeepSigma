@@ -1,6 +1,42 @@
 <!doctype html>
 <html lang="en">
 <head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'"/>
+<!-- EDGE_HARDENING_V1 BEGIN -->
+<script>
+(function(){
+"use strict";
+var EDGE_BUILD_ID="EDGE_BUILD_ID:EDGE_AwardStaffing_Estimator_v1.2.0";
+function _block(cap){
+  return function(){throw new Error("EDGE hardening: "+cap+" is blocked")};
+}
+window.fetch          = _block("fetch");
+window.XMLHttpRequest = _block("XMLHttpRequest");
+window.WebSocket      = _block("WebSocket");
+window.EventSource    = _block("EventSource");
+try{navigator.sendBeacon=_block("sendBeacon")}catch(_){}
+window.eval = _block("eval");
+window.open = _block("window.open");
+try{Object.defineProperty(window,"localStorage",
+  {get:_block("localStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"sessionStorage",
+  {get:_block("sessionStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"indexedDB",
+  {get:_block("indexedDB"),configurable:false})}catch(_){}
+document.addEventListener("DOMContentLoaded",function(){
+  var ext=document.querySelectorAll("script[src],link[href]");
+  if(ext.length>0){
+    document.body.innerHTML=
+      "<h1 style='color:red;font-family:monospace;padding:40px'>" +
+      "EDGE VIOLATION: external resource detected (" +
+      ext.length+" element(s))</h1>";
+  }
+});
+})();
+</script>
+<!-- EDGE_HARDENING_V1 END -->
+<!-- EDGE_POLICY_EXCEPTION: download -->
+
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Deep Sigma EDGE — Award Staffing Estimator v1.2.0</title>
@@ -77,6 +113,22 @@ svg text{font-family:system-ui,-apple-system,sans-serif}
     </style>
 </head>
 <body>
+<!-- EDGE_ACTION_CONTRACT_V1 -->
+<div id="edgeActionContract" style="
+  margin:8px auto;max-width:1100px;width:94%;padding:6px 14px;
+  border-radius:6px;border:1px solid rgba(57,255,20,.2);
+  background:rgba(57,255,20,.04);
+  font-family:'Courier New',Courier,monospace;font-size:.6rem;
+  color:#8a80a0;display:flex;flex-wrap:wrap;gap:12px;align-items:center;
+">
+  <span style="color:#39ff14;font-weight:700;letter-spacing:1px">ACTION CONTRACT</span>
+  <span>Network: LOCKED</span>
+  <span style="opacity:.5">|</span>
+  <span>Persistence: NONE</span>
+  <span style="opacity:.5">|</span>
+  <span>Side Effects: NONE</span>
+</div>
+
 <header>
   <div class="brand">
     <b>Deep Sigma EDGE — Award Staffing Estimator</b>
@@ -399,15 +451,15 @@ function saveState(){
     if(el.type==="checkbox") o[id]=el.checked;
     else o[id]=el.value;
   });
-  localStorage.setItem(KEY, JSON.stringify(o));
+  (window.__ds_memstore=window.__ds_memstore||{},window.__ds_memstore[KEY]=JSON.stringify(o));
 }
 
 function restoreState(){
   try{
-    let raw = localStorage.getItem(KEY);
+    let raw = ((window.__ds_memstore||{})[KEY]||null);
     if(!raw){
-      raw = localStorage.getItem(KEY_OLD);
-      if(raw) localStorage.setItem(KEY, raw);
+      raw = ((window.__ds_memstore||{})[KEY_OLD]||null);
+      if(raw) (window.__ds_memstore=window.__ds_memstore||{},window.__ds_memstore[KEY]=raw);
     }
     if(!raw) return;
     const s=JSON.parse(raw);
@@ -751,10 +803,10 @@ function estimate(){
 
 /* ── Scenario Manager ── */
 function getScenarios(){
-  try{ return JSON.parse(localStorage.getItem(KEY_SCENARIOS)||"[]"); }catch(e){ return []; }
+  try{ return JSON.parse(((window.__ds_memstore||{})[KEY_SCENARIOS]||null)||"[]"); }catch(e){ return []; }
 }
 function putScenarios(arr){
-  localStorage.setItem(KEY_SCENARIOS, JSON.stringify(arr.slice(0,10)));
+  (window.__ds_memstore=window.__ds_memstore||{},window.__ds_memstore[KEY_SCENARIOS]=JSON.stringify(arr.slice(0,10)));
 }
 
 function saveScenario(){
@@ -985,7 +1037,7 @@ document.getElementById("btnExport").addEventListener("click", ()=>{
 });
 document.getElementById("btnReset").addEventListener("click", ()=>{
   if(!confirm("Reset saved inputs?")) return;
-  localStorage.removeItem(KEY);
+  (window.__ds_memstore=window.__ds_memstore||{},delete window.__ds_memstore[KEY]);
   location.reload();
 });
 document.getElementById("btnSaveScenario").addEventListener("click", saveScenario);
@@ -1444,7 +1496,7 @@ document.getElementById("btnMC").addEventListener("click", runMonteCarlo);
       html += '<span style="color:#ef4444;margin-left:8px">failed: '+esc(fails.join(", "))+"</span>";
     }
     bar.innerHTML = html;
-    try { localStorage.setItem("ds_abp_v1", JSON.stringify(abp)); } catch(_){}
+    /* ABP persistence removed (EDGE hardened) */
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", verify);
   else verify();

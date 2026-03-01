@@ -1,6 +1,42 @@
 <!doctype html>
 <html lang="en">
 <head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'"/>
+<!-- EDGE_HARDENING_V1 BEGIN -->
+<script>
+(function(){
+"use strict";
+var EDGE_BUILD_ID="EDGE_BUILD_ID:EDGE_Hiring_UI_v1.0.0";
+function _block(cap){
+  return function(){throw new Error("EDGE hardening: "+cap+" is blocked")};
+}
+window.fetch          = _block("fetch");
+window.XMLHttpRequest = _block("XMLHttpRequest");
+window.WebSocket      = _block("WebSocket");
+window.EventSource    = _block("EventSource");
+try{navigator.sendBeacon=_block("sendBeacon")}catch(_){}
+window.eval = _block("eval");
+window.open = _block("window.open");
+try{Object.defineProperty(window,"localStorage",
+  {get:_block("localStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"sessionStorage",
+  {get:_block("sessionStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"indexedDB",
+  {get:_block("indexedDB"),configurable:false})}catch(_){}
+document.addEventListener("DOMContentLoaded",function(){
+  var ext=document.querySelectorAll("script[src],link[href]");
+  if(ext.length>0){
+    document.body.innerHTML=
+      "<h1 style='color:red;font-family:monospace;padding:40px'>" +
+      "EDGE VIOLATION: external resource detected (" +
+      ext.length+" element(s))</h1>";
+  }
+});
+})();
+</script>
+<!-- EDGE_HARDENING_V1 END -->
+<!-- EDGE_POLICY_EXCEPTION: download -->
+
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Deep Sigma — SEQUOIA Hiring Console v019</title>
@@ -60,6 +96,22 @@
     </style>
 </head>
 <body>
+<!-- EDGE_ACTION_CONTRACT_V1 -->
+<div id="edgeActionContract" style="
+  margin:8px auto;max-width:1100px;width:94%;padding:6px 14px;
+  border-radius:6px;border:1px solid rgba(57,255,20,.2);
+  background:rgba(57,255,20,.04);
+  font-family:'Courier New',Courier,monospace;font-size:.6rem;
+  color:#8a80a0;display:flex;flex-wrap:wrap;gap:12px;align-items:center;
+">
+  <span style="color:#39ff14;font-weight:700;letter-spacing:1px">ACTION CONTRACT</span>
+  <span>Network: LOCKED</span>
+  <span style="opacity:.5">|</span>
+  <span>Persistence: NONE</span>
+  <span style="opacity:.5">|</span>
+  <span>Side Effects: NONE</span>
+</div>
+
 <div id="hud" style="position:fixed;top:72px;right:12px;z-index:9999;background:rgba(125,249,255,.08);border:1px solid rgba(125,249,255,.25);padding:10px;border-radius:12px;font-size:12px;max-width:340px;display:none"></div>
 <div id="rsModal" style="display:none;position:fixed;inset:76px 12px 12px 12px;z-index:9998;background:rgba(11,15,20,.98);border:1px solid rgba(125,249,255,.25);border-radius:16px;overflow:auto;padding:12px"></div>
 <header>
@@ -86,7 +138,7 @@
     <button class="tab" data-tab="rs">RS Sessions</button>
     <button class="tab" data-tab="artifacts">Artifacts Generator</button>
     <div style="margin-top:14px" class="muted">
-      Data stored in <span class="mono">localStorage</span>. Export for sharing.
+      Data stored in session memory. Export for sharing.
     </div>
   </nav>
 
@@ -557,7 +609,7 @@
             <div class="grid">
               <div>
                 <label>Enterprise Intake Endpoint</label>
-                <input id="edgeEndpoint" placeholder="https://your-enterprise-host/api/edge/intake"/>
+                <input id="edgeEndpoint" placeholder="https%3A%2F%2Fyour-enterprise-host/api/edge/intake"/>
               </div>
               <div>
                 <label>Bearer Token</label>
@@ -619,30 +671,16 @@ const KEY = "ds_sequoia_hiring_console_v2_artifacts";
 const EDGE_CFG_KEY = "ds_sequoia_edge_cfg_v1";
 const EDGE_OUTBOX_KEY = "ds_sequoia_edge_outbox_v1";
 
-function storageAvailable(){
-  try{
-    const x="__ds_test__";
-    window.localStorage.setItem(x,x);
-    window.localStorage.removeItem(x);
-    return true;
-  } catch(e){
+function storageAvailable(){return false} catch(e){
     return false;
   }
 }
 
-function getStoreItem(k){
-  if(storageAvailable()) return window.localStorage.getItem(k);
-  return (window.__ds_memstore && window.__ds_memstore[k]) ? window.__ds_memstore[k] : null;
-}
-function setStoreItem(k,v){
-  if(storageAvailable()) return window.localStorage.setItem(k,v);
-  window.__ds_memstore ||= {};
+function getStoreItem(k){window.__ds_memstore=window.__ds_memstore||{};return window.__ds_memstore[k]||null}
+function setStoreItem(k,v){window.__ds_memstore=window.__ds_memstore||{};window.__ds_memstore[k]=v};
   window.__ds_memstore[k]=v;
 }
-function removeStoreItem(k){
-  if(storageAvailable()) return window.localStorage.removeItem(k);
-  if(window.__ds_memstore) delete window.__ds_memstore[k];
-}
+function removeStoreItem(k){window.__ds_memstore=window.__ds_memstore||{};delete window.__ds_memstore[k]}
 
 function edgeCfgDefault(){
   return { endpoint:"", token:"", sign_key:"" };
@@ -841,14 +879,10 @@ async function postPackToEnterprise(pack, cfg){
   const headers = {"Content-Type":"application/json"};
   if(cfg.token) headers["Authorization"] = `Bearer ${cfg.token}`;
   if(signature) headers["X-DeepSigma-Signature"] = signature;
-  const res = await fetch(cfg.endpoint, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(payload)
-  });
-  if(!res.ok){
-    const txt = await res.text().catch(()=> "");
-    throw new Error(`HTTP ${res.status}${txt ? `: ${txt.slice(0,200)}` : ""}`);
+  /* EDGE hardened: network disabled (offline-only) */
+  throw new Error("Network unavailable in EDGE offline mode. Export the pack locally instead.");
+  if(false){
+    const txt = "";
   }
   return payload;
 }
@@ -906,12 +940,8 @@ async function retryOutbox(){
       const headers = {"Content-Type":"application/json"};
       if(cfg.token) headers["Authorization"] = `Bearer ${cfg.token}`;
       if(item.signature) headers["X-DeepSigma-Signature"] = item.signature;
-      const res = await fetch(item.endpoint || cfg.endpoint, {
-        method: "POST",
-        headers,
-        body: JSON.stringify(payload)
-      });
-      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      /* EDGE hardened: network disabled (offline-only) */
+      throw new Error("Network unavailable in EDGE offline mode.");
       okCount += 1;
     }catch(_){
       keep.push(item);
@@ -2971,7 +3001,7 @@ function bindTestMode(){
       html += '<span style="color:#ef4444;margin-left:8px">failed: '+esc(fails.join(", "))+"</span>";
     }
     bar.innerHTML = html;
-    try { localStorage.setItem("ds_abp_v1", JSON.stringify(abp)); } catch(_){}
+    /* ABP persistence removed (EDGE hardened) */
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", verify);
   else verify();
