@@ -474,14 +474,24 @@ body::after{
 
   <div class="card">
     <h3>Try It: Coherence Index Demo</h3>
-    <p class="muted small mb">Drag the slider to see how coherence levels map to status labels. This is illustrative only.</p>
+    <p class="mb">The <strong>Coherence Index</strong> measures how well your Truth, Reasoning, and Memory align. It combines three things:</p>
+    <ul style="margin-bottom:14px">
+      <li><strong class="neon-cyan">Decision coverage</strong> &mdash; are your key decisions recorded and structured?</li>
+      <li><strong class="neon-purple">Assumption freshness</strong> &mdash; are your assumptions still valid, or have they expired?</li>
+      <li><strong class="neon-pink">Drift response</strong> &mdash; when drift was detected, was it patched promptly?</li>
+    </ul>
+    <p class="muted small mb">Drag the slider to see what each level means and what action it calls for.</p>
     <div class="gauge-wrap">
       <div class="gauge-label">Coherence Index</div>
       <div class="gauge-value" id="gaugeValue" style="color:var(--neon-green)">85</div>
       <div class="gauge-status" id="gaugeStatus" style="color:var(--neon-green)">EXCELLENT</div>
       <label for="gaugeSlider" class="gauge-label" style="margin-top:8px">Adjust Coherence</label>
       <input type="range" min="0" max="100" value="85" class="gauge-slider" id="gaugeSlider" title="Coherence index slider" oninput="updateGauge(this.value)"/>
-      <div class="gauge-note">Demo only &mdash; real scores are computed from your decision records, drift signals, and patch history.</div>
+      <div id="gaugeExplain" style="text-align:left;margin-top:14px;padding:12px;background:rgba(0,0,0,.25);border:1px solid rgba(57,255,20,.2);border-radius:8px;font-size:.82rem;line-height:1.7;color:var(--txt)">
+        <strong style="color:var(--neon-green)">80&ndash;100: EXCELLENT</strong><br/>
+        Truth, Reasoning, and Memory are tightly aligned. Decisions are recorded, assumptions are fresh, and drift signals are being patched quickly. No action needed &mdash; keep doing what you&rsquo;re doing.
+      </div>
+      <div class="gauge-note" style="margin-top:10px">Demo only &mdash; real scores are computed from your decision records, drift signals, and patch history.</div>
     </div>
   </div>
 
@@ -979,17 +989,30 @@ function updateGauge(val){
   val=parseInt(val,10);
   var el=document.getElementById("gaugeValue");
   var st=document.getElementById("gaugeStatus");
+  var ex=document.getElementById("gaugeExplain");
   if(!el||!st)return;
   el.textContent=val;
-  var label,color;
-  if(val>=80){label="EXCELLENT";color="var(--neon-green)"}
-  else if(val>=60){label="GOOD";color="var(--neon-cyan)"}
-  else if(val>=40){label="WARNING";color="var(--neon-yellow)"}
-  else if(val>=20){label="CRITICAL";color="var(--neon-orange)"}
-  else{label="EMERGENCY";color="var(--neon-pink)"}
+  var label,color,explain,borderColor;
+  if(val>=80){
+    label="EXCELLENT";color="var(--neon-green)";borderColor="rgba(57,255,20,.2)";
+    explain='<strong style="color:var(--neon-green)">80\u2013100: EXCELLENT</strong><br/>Truth, Reasoning, and Memory are tightly aligned. Decisions are recorded, assumptions are fresh, and drift signals are being patched quickly. No action needed \u2014 keep doing what you\u2019re doing.';
+  }else if(val>=60){
+    label="GOOD";color="var(--neon-cyan)";borderColor="rgba(0,240,255,.2)";
+    explain='<strong style="color:var(--neon-cyan)">60\u201379: GOOD</strong><br/>Most decisions are tracked and assumptions are reasonably current. A few drift signals may be unresolved. <em>Action:</em> review any open drift signals and patch the stale ones.';
+  }else if(val>=40){
+    label="WARNING";color="var(--neon-yellow)";borderColor="rgba(255,225,77,.2)";
+    explain='<strong style="color:var(--neon-yellow)">40\u201359: WARNING</strong><br/>Significant gaps are forming. Multiple assumptions have expired without patches, or key decisions lack structured records. <em>Action:</em> prioritize capturing undocumented decisions and resolving outstanding drift.';
+  }else if(val>=20){
+    label="CRITICAL";color="var(--neon-orange)";borderColor="rgba(255,106,0,.2)";
+    explain='<strong style="color:var(--neon-orange)">20\u201339: CRITICAL</strong><br/>Truth, Reasoning, and Memory are substantially out of sync. Teams are likely re-litigating settled decisions and operating on stale assumptions. <em>Action:</em> stop and run a coherence review \u2014 identify the top 5 unpatched drift signals and address them now.';
+  }else{
+    label="EMERGENCY";color="var(--neon-pink)";borderColor="rgba(255,45,149,.2)";
+    explain='<strong style="color:var(--neon-pink)">0\u201319: EMERGENCY</strong><br/>Institutional memory has effectively collapsed. Decisions are undocumented, assumptions are expired across the board, and drift is undetected. <em>Action:</em> declare a coherence reset \u2014 start with the Quick Start tab and rebuild from the most critical active decisions.';
+  }
   el.style.color=color;
   st.style.color=color;
   st.textContent=label;
+  if(ex){ex.innerHTML=explain;ex.style.borderColor=borderColor}
 }
 
 /* ── Keyboard nav for tabs ─────────────────────────── */
