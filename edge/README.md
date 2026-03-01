@@ -43,7 +43,7 @@ flowchart TD
         ABP["abp_v1.json\nABP-bf0afe15\nsha256:c01f..."]
     end
 
-    subgraph EDGE["EDGE Modules (14)"]
+    subgraph EDGE["EDGE Modules (15)"]
         UNI["Unified\n(8 tabs)"]
         HIR["Hiring UI"]
         BID["Bid/NoBid UI"]
@@ -58,6 +58,7 @@ flowchart TD
         RFPX["RFP Co-Pilot\nExec Brief"]
         DSK["Domino Split Key\n(2-person ceremony)"]
         SKV2["Split Key Max Strength\n(CSPRNG v2)"]
+        DDC["Domino Delegation Chain\n(chain proof + encrypt)"]
     end
 
     subgraph Gate["Gate Enforcement"]
@@ -81,9 +82,9 @@ flowchart TD
     CONFIG --> BUILDER
     BUILDER --> ABP
 
-    ABP --> UNI & HIR & BID & CMP & BOE & AWD & COH & SRO & JRM & COPS & RFP & RFPX & DSK & SKV2
+    ABP --> UNI & HIR & BID & CMP & BOE & AWD & COH & SRO & JRM & COPS & RFP & RFPX & DSK & SKV2 & DDC
 
-    UNI & HIR & BID & CMP & BOE & AWD & COH & SRO & JRM & COPS & RFP & RFPX & DSK & SKV2 --> GATE
+    UNI & HIR & BID & CMP & BOE & AWD & COH & SRO & JRM & COPS & RFP & RFPX & DSK & SKV2 & DDC --> GATE
     GATE -->|"ALL PASS"| DIST["Distribution"]
     GATE -->|"ANY FAIL"| BLOCK["Blocked"]
 
@@ -129,6 +130,7 @@ flowchart TD
 | `edge_rfp_copilot_exec_brief.html` | — | `rfp_copilot` | RFP Co-Pilot Exec Brief — executive summary generator for RFP responses |
 | `EDGE_Domino_SplitKey_v1.html` | 1.0 | `domino_splitkey` | Domino Split Key ceremony — 2-person offline key derivation using domino tiles, SHA-256, optional HKDF |
 | `EDGE_SplitKey_MaxStrength_v2.html` | 2.0 | `splitkey_v2` | Max Strength Split Key — CSPRNG 32-byte shares, SHA-256 master, HKDF derivation, optional domino witness anchor, hide/show toggles |
+| `EDGE_Domino_DelegationChain_v1.html` | 1.0 | `domino_chain` | Domino Delegation Chain — physical co-presence proof via domino chaining, chain-bound AES-256-GCM encrypt/decrypt, ceremony record with domino fingerprint verbalization |
 
 ### Supporting Files
 
@@ -190,7 +192,7 @@ Deep-dive reference pages (synced to [GitHub Wiki](https://github.com/8ryanWh1t3
 
 | Page | Topic |
 |------|-------|
-| [EDGE Modules](https://github.com/8ryanWh1t3/DeepSigma/wiki/EDGE-Modules) | All 14 modules, Unified tabs, Coherence Dashboard, JRM EDGE versions, Coherence Ops, RFP Co-Pilot, Split Key (v1 + v2), localStorage keys |
+| [EDGE Modules](https://github.com/8ryanWh1t3/DeepSigma/wiki/EDGE-Modules) | All 15 modules, Unified tabs, Coherence Dashboard, JRM EDGE versions, Coherence Ops, RFP Co-Pilot, Split Key (v1 + v2), Delegation Chain, localStorage keys |
 | [ABP Specification](https://github.com/8ryanWh1t3/DeepSigma/wiki/ABP-Specification) | Full structure, deterministic ID/hash, canonical JSON, composition, sections reference |
 | [Delegation Review](https://github.com/8ryanWh1t3/DeepSigma/wiki/Delegation-Review) | Governance loop, 4 DRT triggers, review policy, client-side evaluation |
 | [Gate Enforcement](https://github.com/8ryanWh1t3/DeepSigma/wiki/Gate-Enforcement) | gate_abp.py, 10 checks, file-to-module map, CLI, JSON output |

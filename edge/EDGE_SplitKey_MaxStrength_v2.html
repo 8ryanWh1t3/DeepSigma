@@ -395,6 +395,23 @@ function parseWitnessTile(str){
   return{ok:true,a:lo,b:hi,canonical:"("+lo+","+hi+")"};
 }
 
+/* ── Domino Fingerprint Verbalization ─────────────────── */
+var DOMINO_TABLE=[];
+(function(){for(var b=0;b<=6;b++){for(var a=0;a<=b;a++){DOMINO_TABLE.push([a,b])}}})();
+var TILE_WORDS=["blank","one","two","three","four","five","six"];
+function tileNameV(a,b){
+  if(a===b)return "double-"+TILE_WORDS[a];
+  var lo=Math.min(a,b),hi=Math.max(a,b);
+  return TILE_WORDS[lo]+"-"+TILE_WORDS[hi];
+}
+function dominoFingerprint(hex){
+  if(!hex||hex.length<4)return "\u2014";
+  var b0=parseInt(hex.substring(0,2),16);
+  var b1=parseInt(hex.substring(2,4),16);
+  var t0=DOMINO_TABLE[b0%28];var t1=DOMINO_TABLE[b1%28];
+  return tileNameV(t0[0],t0[1])+", "+tileNameV(t1[0],t1[1]);
+}
+
 /* ── Set output ─────────────────────────────────────── */
 function setOut(id,text,isEmpty){
   var el=document.getElementById(id);
@@ -509,9 +526,10 @@ function generateShare(op){
 
   sha256Bytes(bytes).then(function(hash){
     var fp=bytesToHex(hash).substring(0,16);
-    setOut("fp"+op,fp,false);
+    var domFP=dominoFingerprint(fp);
+    setOut("fp"+op,fp+"  \u2022  "+domFP,false);
     updateButtons();
-    setStatus("Share "+op+" generated (32 bytes, 256 bits entropy). Fingerprint: "+fp,"ok");
+    setStatus("Share "+op+" generated (32 bytes, 256 bits). Fingerprint: "+fp+" ("+domFP+")","ok");
   });
 }
 
@@ -531,7 +549,8 @@ function computeMaster(){
     return sha256Bytes(master);
   }).then(function(fpHash){
     var fp=bytesToHex(fpHash).substring(0,16);
-    setOut("fpMaster",fp,false);
+    var domFP=dominoFingerprint(fp);
+    setOut("fpMaster",fp+"  \u2022  "+domFP,false);
 
     /* Show witness tiles next to fingerprint if provided */
     var warnEl=document.getElementById("witWarn");
@@ -552,10 +571,10 @@ function computeMaster(){
 
     if(warns.length>0){
       warnEl.textContent=warns.join(" | ");warnEl.style.display="block";
-      setStatus("Master computed. Fingerprint: "+fp+" (witness tile warning)","warn");
+      setStatus("Master computed. Fingerprint: "+fp+" ("+domFP+") (witness tile warning)","warn");
     }else{
       warnEl.style.display="none";
-      setStatus("Master computed. Fingerprint: "+fp,"ok");
+      setStatus("Master computed. Fingerprint: "+fp+" ("+domFP+")","ok");
     }
 
     updateButtons();

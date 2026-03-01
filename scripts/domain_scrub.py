@@ -226,6 +226,8 @@ ALLOWED_ACRONYMS = {
     "MASTER", "OPERATOR", "PANELS", "CEREMONY", "PANEL", "NOTES",
     # Split Key Max Strength v2 — additional tokens
     "CSPRNG", "ANCHOR", "HIDE", "WITNESS", "SPLITKEY",
+    # Domino Delegation Chain EDGE — chain proof, encrypt/decrypt tokens
+    "CHAIN", "DECRYPT", "ENCRYPT", "RECORD",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}

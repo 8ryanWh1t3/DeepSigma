@@ -407,6 +407,25 @@ function dominoIndex(a,b){
   return (b*(b+1)/2)+a;
 }
 
+/* ── Domino Fingerprint Verbalization ─────────────────── */
+var DOMINO_TABLE=[];
+(function(){
+  for(var b=0;b<=6;b++){for(var a=0;a<=b;a++){DOMINO_TABLE.push([a,b])}}
+})();
+var TILE_WORDS=["blank","one","two","three","four","five","six"];
+function tileNameV(a,b){
+  if(a===b)return "double-"+TILE_WORDS[a];
+  var lo=Math.min(a,b),hi=Math.max(a,b);
+  return TILE_WORDS[lo]+"-"+TILE_WORDS[hi];
+}
+function dominoFingerprint(hex){
+  if(!hex||hex.length<4)return "\u2014";
+  var b0=parseInt(hex.substring(0,2),16);
+  var b1=parseInt(hex.substring(2,4),16);
+  var t0=DOMINO_TABLE[b0%28];var t1=DOMINO_TABLE[b1%28];
+  return tileNameV(t0[0],t0[1])+", "+tileNameV(t1[0],t1[1]);
+}
+
 /* ── Set output field ───────────────────────────────── */
 function setOut(id,text,isEmpty){
   var el=document.getElementById(id);
@@ -514,8 +533,9 @@ function computeMaster(){
     return sha256Bytes(master);
   }).then(function(fpHash){
     var fpHex=bytesToHex(fpHash).substring(0,16);
-    setOut("fingerprint",fpHex,false);
-    setStatus("Master computed. Fingerprint: "+fpHex,"ok");
+    var domFP=dominoFingerprint(fpHex);
+    setOut("fingerprint",fpHex+"  \u2022  "+domFP,false);
+    setStatus("Master computed. Fingerprint: "+fpHex+" ("+domFP+")","ok");
   });
 }
 
@@ -538,7 +558,9 @@ function deriveHkdf(){
 
   Promise.all(promises).then(function(keys){
     for(var i=0;i<keys.length;i++){
-      setOut(ids[i],bytesToHex(keys[i]),false);
+      var hex=bytesToHex(keys[i]);
+      var fp=hex.substring(0,16);
+      setOut(ids[i],hex+"  \u2022  "+dominoFingerprint(fp),false);
     }
     setStatus("HKDF keys derived (salt: "+(saltText?"\""+saltText+"\"":"empty")+").","ok");
   }).catch(function(e){
