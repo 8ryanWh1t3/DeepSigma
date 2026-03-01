@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Deep Sigma EDGE — Domino Split Key (2-Person)</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a1a;--bg2:#0f0f2a;--card:#12123a;--card-border:#2a1a5e;
+  --neon-pink:#ff2d95;--neon-cyan:#00f0ff;--neon-purple:#b44dff;
+  --neon-yellow:#ffe14d;--neon-orange:#ff6a00;--neon-green:#39ff14;
+  --txt:#e8e0f0;--txt-muted:#8a80a0;--txt-dim:#5a5070;
+  --font-body:'Segoe UI',system-ui,-apple-system,sans-serif;
+  --font-mono:'Courier New',Courier,monospace;
+  --glow-cyan:0 0 20px rgba(0,240,255,.3),0 0 60px rgba(0,240,255,.1);
+  --glow-pink:0 0 20px rgba(255,45,149,.3),0 0 60px rgba(255,45,149,.1);
+  --glow-purple:0 0 20px rgba(180,77,255,.3),0 0 60px rgba(180,77,255,.1);
+}
+html{font-size:clamp(14px,1.1vw,17px);scroll-behavior:smooth}
+body{font-family:var(--font-body);color:var(--txt);background:var(--bg);line-height:1.65;min-height:100vh}
+
+.wrap{max-width:1100px;width:94%;margin:0 auto;padding:24px 0 60px}
+
+/* ── Header ──────────────────────────────────────────── */
+.header{
+  text-align:center;padding:36px 24px 28px;margin-bottom:24px;
+  border:1px solid var(--card-border);border-radius:12px;
+  background:linear-gradient(135deg,rgba(18,18,58,.9),rgba(10,10,26,.95));
+  box-shadow:var(--glow-pink);position:relative;
+}
+.header::before{
+  content:'';position:absolute;inset:-1px;border-radius:12px;z-index:-1;
+  background:linear-gradient(135deg,var(--neon-pink),var(--neon-purple),var(--neon-cyan));
+  opacity:.3;filter:blur(1px);
+}
+.header h1{
+  font-size:1.8rem;font-weight:800;letter-spacing:2px;
+  background:linear-gradient(90deg,var(--neon-pink),var(--neon-purple),var(--neon-cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.header .sub{color:var(--txt-muted);font-size:.78rem;margin-top:6px;letter-spacing:.5px}
+.badge-row{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.badge{
+  display:inline-block;padding:3px 10px;border-radius:4px;font-size:.65rem;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;font-family:var(--font-mono);
+}
+.badge-edge{background:rgba(255,45,149,.15);color:var(--neon-pink);border:1px solid rgba(255,45,149,.4)}
+.badge-ver{background:rgba(0,240,255,.1);color:var(--neon-cyan);border:1px solid rgba(0,240,255,.3)}
+.badge-offline{background:rgba(57,255,20,.1);color:var(--neon-green);border:1px solid rgba(57,255,20,.3)}
+
+/* ── Cards ────────────────────────────────────────────── */
+.card{
+  background:var(--card);border:1px solid var(--card-border);border-radius:10px;
+  padding:20px;margin-bottom:16px;transition:border-color .2s,box-shadow .2s;
+}
+.card:hover{border-color:rgba(180,77,255,.35);box-shadow:0 0 14px rgba(180,77,255,.06)}
+.card h3{font-size:1rem;font-weight:700;margin-bottom:10px;color:var(--neon-cyan);letter-spacing:.5px}
+.card h4{font-size:.82rem;font-weight:700;color:var(--neon-purple);margin:10px 0 4px}
+.card p,.card li{font-size:.85rem;color:var(--txt);line-height:1.7}
+.card ul{padding-left:18px;margin:4px 0}
+.card li{margin:3px 0}
+
+/* ── Operator Grid ────────────────────────────────────── */
+.op-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.op-grid{grid-template-columns:1fr}}
+
+.op-card{position:relative}
+.op-card.op-a{border-color:rgba(0,240,255,.3)}
+.op-card.op-a h3{color:var(--neon-cyan)}
+.op-card.op-b{border-color:rgba(255,45,149,.3)}
+.op-card.op-b h3{color:var(--neon-pink)}
+
+/* ── Form Elements ────────────────────────────────────── */
+textarea{
+  width:100%;min-height:120px;padding:10px;border-radius:6px;border:1px solid var(--card-border);
+  background:rgba(0,0,0,.3);color:var(--neon-green);font-family:var(--font-mono);font-size:.78rem;
+  resize:vertical;line-height:1.6;
+}
+textarea:focus{outline:none;border-color:var(--neon-purple)}
+textarea::placeholder{color:var(--txt-dim)}
+
+select,input[type="text"]{
+  padding:6px 10px;border-radius:5px;border:1px solid var(--card-border);
+  background:rgba(0,0,0,.3);color:var(--txt);font-family:var(--font-mono);font-size:.78rem;
+}
+select:focus,input[type="text"]:focus{outline:none;border-color:var(--neon-purple)}
+input[type="text"]{width:100%}
+
+label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3px;display:block;margin-bottom:4px}
+
+.row{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin:8px 0}
+.row>*{flex:1 1 auto}
+
+/* ── Buttons ──────────────────────────────────────────── */
+.btn{
+  padding:8px 16px;border-radius:6px;border:1px solid;cursor:pointer;
+  font-family:var(--font-mono);font-size:.72rem;font-weight:700;letter-spacing:.5px;
+  transition:all .2s;text-transform:uppercase;
+}
+.btn-primary{
+  background:rgba(180,77,255,.2);border-color:rgba(180,77,255,.5);color:#fff;
+}
+.btn-primary:hover{background:rgba(180,77,255,.35)}
+.btn-master{
+  background:rgba(0,240,255,.15);border-color:rgba(0,240,255,.4);color:var(--neon-cyan);
+}
+.btn-master:hover{background:rgba(0,240,255,.3)}
+.btn-hkdf{
+  background:rgba(57,255,20,.12);border-color:rgba(57,255,20,.35);color:var(--neon-green);
+}
+.btn-hkdf:hover{background:rgba(57,255,20,.25)}
+.btn-reset{
+  background:rgba(255,45,149,.12);border-color:rgba(255,45,149,.35);color:var(--neon-pink);
+}
+.btn-reset:hover{background:rgba(255,45,149,.25)}
+.btn-copy{
+  padding:3px 10px;font-size:.62rem;border-radius:4px;
+  background:rgba(180,77,255,.15);border:1px solid rgba(180,77,255,.3);color:var(--neon-purple);
+  cursor:pointer;font-family:var(--font-mono);font-weight:700;letter-spacing:.5px;transition:all .2s;
+}
+.btn-copy:hover{background:rgba(180,77,255,.3)}
+.btn-copy.copied{background:rgba(57,255,20,.2);border-color:rgba(57,255,20,.4);color:var(--neon-green)}
+
+/* ── Output Fields ────────────────────────────────────── */
+.out{
+  font-family:var(--font-mono);font-size:.72rem;padding:8px 10px;border-radius:6px;
+  background:rgba(0,0,0,.3);border:1px solid rgba(42,26,94,.4);color:var(--neon-green);
+  word-break:break-all;min-height:28px;line-height:1.5;margin:4px 0;
+}
+.out.empty{color:var(--txt-dim);font-style:italic}
+.out-row{display:flex;gap:6px;align-items:start;margin:4px 0}
+.out-row .out{flex:1}
+
+.pill{
+  display:inline-block;padding:2px 8px;border-radius:3px;font-size:.6rem;font-weight:700;
+  letter-spacing:.5px;font-family:var(--font-mono);text-transform:uppercase;margin-right:4px;
+}
+.pill-cyan{background:rgba(0,240,255,.12);color:var(--neon-cyan);border:1px solid rgba(0,240,255,.25)}
+.pill-pink{background:rgba(255,45,149,.12);color:var(--neon-pink);border:1px solid rgba(255,45,149,.25)}
+.pill-green{background:rgba(57,255,20,.12);color:var(--neon-green);border:1px solid rgba(57,255,20,.25)}
+.pill-yellow{background:rgba(255,225,77,.12);color:var(--neon-yellow);border:1px solid rgba(255,225,77,.25)}
+.pill-purple{background:rgba(180,77,255,.12);color:var(--neon-purple);border:1px solid rgba(180,77,255,.25)}
+
+/* ── Status Bar ───────────────────────────────────────── */
+.status-bar{
+  padding:8px 14px;border-radius:6px;font-size:.75rem;font-weight:600;
+  font-family:var(--font-mono);margin:8px 0;transition:all .3s;
+}
+.status-ok{background:rgba(57,255,20,.08);border:1px solid rgba(57,255,20,.25);color:var(--neon-green)}
+.status-warn{background:rgba(255,225,77,.08);border:1px solid rgba(255,225,77,.25);color:var(--neon-yellow)}
+.status-err{background:rgba(255,45,149,.08);border:1px solid rgba(255,45,149,.25);color:var(--neon-pink)}
+.status-idle{background:rgba(180,77,255,.05);border:1px solid rgba(180,77,255,.15);color:var(--txt-muted)}
+
+/* ── Checklist ────────────────────────────────────────── */
+.checklist{list-style:none;padding:0}
+.checklist li{
+  padding:6px 10px;border-left:3px solid var(--neon-purple);margin:5px 0;
+  font-size:.8rem;background:rgba(180,77,255,.04);border-radius:0 6px 6px 0;
+}
+.checklist li strong{color:var(--neon-cyan)}
+
+/* ── Security Notes ───────────────────────────────────── */
+.sec-notes{
+  border:1px solid rgba(255,225,77,.25);border-radius:10px;padding:16px;
+  background:rgba(255,225,77,.03);margin-top:16px;
+}
+.sec-notes h3{color:var(--neon-yellow);font-size:.9rem;margin-bottom:8px}
+.sec-notes li{font-size:.78rem;color:var(--txt-muted);margin:3px 0}
+
+/* ── Responsive ───────────────────────────────────────── */
+@media(max-width:640px){
+  html{font-size:14px}
+  .header h1{font-size:1.2rem}
+  .btn{padding:7px 12px;font-size:.68rem}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header class="header">
+  <h1>Deep Sigma EDGE</h1>
+  <div class="sub">Domino Split Key Ceremony (2-Person) &mdash; Offline, single-file. No network calls. Deterministic. SHA-256 + optional HKDF.</div>
+  <div class="badge-row">
+    <span class="badge badge-edge">EDGE Module</span>
+    <span class="badge badge-ver">v1.0</span>
+    <span class="badge badge-offline">Offline</span>
+  </div>
+</header>
+
+<!-- ═══════════════ STATUS ═══════════════ -->
+<div id="statusBar" class="status-bar status-idle">Ready. Enter domino tiles for each operator.</div>
+
+<!-- ═══════════════ OPERATOR PANELS ═══════════════ -->
+<div class="op-grid">
+
+  <!-- Operator A -->
+  <div class="card op-card op-a">
+    <h3>Operator A</h3>
+    <div class="row">
+      <div>
+        <label for="countA">Tile Count</label>
+        <select id="countA"><option value="8" selected>8 tiles</option><option value="9">9 tiles</option><option value="10">10 tiles</option></select>
+      </div>
+      <div>
+        <button class="btn btn-primary" onclick="parseOperator('A')">Parse &amp; Encode A</button>
+      </div>
+    </div>
+    <label for="tilesA">Tiles (one per line: 5-2, 5,2, or 5 2)</label>
+    <textarea id="tilesA" placeholder="5-2&#10;0-0&#10;3-6&#10;1-4&#10;6-6&#10;2-3&#10;4-5&#10;1-1"></textarea>
+    <h4><span class="pill pill-cyan">Canonical</span> Tiles</h4>
+    <div id="canonA" class="out empty">Not parsed yet</div>
+    <h4><span class="pill pill-cyan">Indices</span></h4>
+    <div id="idxA" class="out empty">Not parsed yet</div>
+    <h4><span class="pill pill-cyan">A String</span></h4>
+    <div id="strA" class="out empty">Not parsed yet</div>
+    <h4><span class="pill pill-cyan">Seed A</span> (SHA-256)</h4>
+    <div class="out-row">
+      <div id="seedA" class="out empty">Not computed yet</div>
+      <button class="btn-copy" onclick="copyField('seedA',this)">COPY</button>
+    </div>
+  </div>
+
+  <!-- Operator B -->
+  <div class="card op-card op-b">
+    <h3>Operator B</h3>
+    <div class="row">
+      <div>
+        <label for="countB">Tile Count</label>
+        <select id="countB"><option value="8" selected>8 tiles</option><option value="9">9 tiles</option><option value="10">10 tiles</option></select>
+      </div>
+      <div>
+        <button class="btn btn-primary" onclick="parseOperator('B')">Parse &amp; Encode B</button>
+      </div>
+    </div>
+    <label for="tilesB">Tiles (one per line: 5-2, 5,2, or 5 2)</label>
+    <textarea id="tilesB" placeholder="6-3&#10;2-2&#10;0-5&#10;4-1&#10;3-3&#10;6-0&#10;5-5&#10;2-4"></textarea>
+    <h4><span class="pill pill-pink">Canonical</span> Tiles</h4>
+    <div id="canonB" class="out empty">Not parsed yet</div>
+    <h4><span class="pill pill-pink">Indices</span></h4>
+    <div id="idxB" class="out empty">Not parsed yet</div>
+    <h4><span class="pill pill-pink">B String</span></h4>
+    <div id="strB" class="out empty">Not parsed yet</div>
+    <h4><span class="pill pill-pink">Seed B</span> (SHA-256)</h4>
+    <div class="out-row">
+      <div id="seedB" class="out empty">Not computed yet</div>
+      <button class="btn-copy" onclick="copyField('seedB',this)">COPY</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════ MASTER PANEL ═══════════════ -->
+<div class="card" style="border-color:rgba(180,77,255,.4);box-shadow:var(--glow-purple)">
+  <h3 style="color:var(--neon-purple)">Master Key</h3>
+  <p style="font-size:.78rem;color:var(--txt-muted);margin-bottom:10px">master = SHA-256( seedA_bytes || seedB_bytes )</p>
+  <button class="btn btn-master" id="btnMaster" onclick="computeMaster()">Compute Master</button>
+  <h4><span class="pill pill-purple">Master</span> (64 hex)</h4>
+  <div class="out-row">
+    <div id="masterHex" class="out empty">Not computed yet</div>
+    <button class="btn-copy" onclick="copyField('masterHex',this)">COPY</button>
+  </div>
+  <h4><span class="pill pill-purple">Fingerprint</span> (first 16 hex of SHA-256(master))</h4>
+  <div class="out-row">
+    <div id="fingerprint" class="out empty">Not computed yet</div>
+    <button class="btn-copy" onclick="copyField('fingerprint',this)">COPY</button>
+  </div>
+</div>
+
+<!-- ═══════════════ HKDF PANEL ═══════════════ -->
+<div class="card" style="border-color:rgba(57,255,20,.25)">
+  <h3 style="color:var(--neon-green)">HKDF Key Derivation (Optional)</h3>
+  <p style="font-size:.78rem;color:var(--txt-muted);margin-bottom:10px">Derive 3 purpose-specific keys from the master using HKDF-SHA256.</p>
+  <div class="row">
+    <div style="flex:3">
+      <label for="hkdfSalt">Salt (text, default empty)</label>
+      <input type="text" id="hkdfSalt" placeholder="Optional salt string"/>
+    </div>
+    <div style="flex:1">
+      <button class="btn btn-hkdf" id="btnHkdf" onclick="deriveHkdf()">Derive HKDF Keys</button>
+    </div>
+  </div>
+  <h4><span class="pill pill-green">encKey</span> info=EDGE/DOMINO/ENC (32 bytes)</h4>
+  <div class="out-row">
+    <div id="encKey" class="out empty">Not derived yet</div>
+    <button class="btn-copy" onclick="copyField('encKey',this)">COPY</button>
+  </div>
+  <h4><span class="pill pill-green">signKey</span> info=EDGE/DOMINO/SIGN (32 bytes)</h4>
+  <div class="out-row">
+    <div id="signKey" class="out empty">Not derived yet</div>
+    <button class="btn-copy" onclick="copyField('signKey',this)">COPY</button>
+  </div>
+  <h4><span class="pill pill-green">recoveryKey</span> info=EDGE/DOMINO/RECOVERY (32 bytes)</h4>
+  <div class="out-row">
+    <div id="recoveryKey" class="out empty">Not derived yet</div>
+    <button class="btn-copy" onclick="copyField('recoveryKey',this)">COPY</button>
+  </div>
+</div>
+
+<!-- ═══════════════ RESET ═══════════════ -->
+<div style="text-align:center;margin:16px 0">
+  <button class="btn btn-reset" onclick="resetAll()">Reset All Fields</button>
+</div>
+
+<!-- ═══════════════ CEREMONY CHECKLIST ═══════════════ -->
+<div class="card">
+  <h3>Ceremony Checklist</h3>
+  <ul class="checklist">
+    <li><strong>1. Prepare</strong> &mdash; Lay all 28 double-six domino tiles face-down. Shuffle thoroughly for at least 60 seconds.</li>
+    <li><strong>2. Operator A draws</strong> &mdash; A draws N tiles (8, 9, or 10) without revealing them to B. Record each tile.</li>
+    <li><strong>3. Operator B draws</strong> &mdash; B draws N tiles from the remaining pool without revealing them to A. Record each tile.</li>
+    <li><strong>4. Enter tiles</strong> &mdash; Each operator enters their tiles into their panel. Parse and verify canonical form and indices.</li>
+    <li><strong>5. Compute master</strong> &mdash; Click "Compute Master" to derive the combined key and fingerprint.</li>
+    <li><strong>6. Verify fingerprint</strong> &mdash; Both operators independently confirm the fingerprint matches. Store the fingerprint publicly; never store the master in plaintext.</li>
+    <li><strong>7. Optionally derive HKDF keys</strong> &mdash; If purpose-specific keys are needed, enter a salt and derive.</li>
+    <li><strong>8. Destroy working data</strong> &mdash; Close this page. Each operator retains only their own tile list (on paper, offline). The master exists only when both halves are combined.</li>
+  </ul>
+</div>
+
+<!-- ═══════════════ SECURITY NOTES ═══════════════ -->
+<div class="sec-notes">
+  <h3>Security Notes</h3>
+  <ul>
+    <li><strong>Limited entropy.</strong> A draw of 8 tiles from 28 dominoes yields C(28,8) &asymp; 3.1 million combinations (&asymp;21.5 bits). Two independent draws combined give &asymp;43 bits. SHA-256 hashing cleans the distribution but does not add entropy.</li>
+    <li><strong>For stronger security,</strong> increase tile draws (10 tiles &asymp; 24.4 bits each, &asymp;48.8 combined), use multi-round ceremonies, or supplement with additional entropy sources.</li>
+    <li><strong>Never store the master key in plaintext long-term.</strong> Store only the fingerprint publicly for verification. Each operator keeps their tile list on paper, offline, in a secure location.</li>
+    <li><strong>Deterministic.</strong> Given the same tile inputs and salt, this tool always produces the same outputs. This enables independent verification on air-gapped machines.</li>
+    <li><strong>No network calls.</strong> This file runs entirely in-browser. Verify by inspecting the source or running with network disabled.</li>
+  </ul>
+</div>
+
+</div><!-- /.wrap -->
+
+<!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+<script>
+"use strict";
+
+/* ── State ──────────────────────────────────────────── */
+var state={
+  seedABytes:null,
+  seedBBytes:null,
+  masterBytes:null
+};
+
+var encoder=new TextEncoder();
+
+/* ── Utility: bytes to hex ──────────────────────────── */
+function bytesToHex(bytes){
+  var hex="";
+  for(var i=0;i<bytes.length;i++){
+    hex+=("0"+bytes[i].toString(16)).slice(-2);
+  }
+  return hex;
+}
+
+/* ── SHA-256 (returns Uint8Array) ───────────────────── */
+function sha256Bytes(data){
+  return window.crypto.subtle.digest("SHA-256",data).then(function(buf){
+    return new Uint8Array(buf);
+  });
+}
+
+/* ── HKDF-SHA256 derivation ─────────────────────────── */
+function hkdfSha256(ikmBytes,saltBytes,infoBytes,length){
+  return window.crypto.subtle.importKey(
+    "raw",ikmBytes,{name:"HKDF"},false,["deriveBits"]
+  ).then(function(key){
+    return window.crypto.subtle.deriveBits(
+      {name:"HKDF",hash:"SHA-256",salt:saltBytes,info:infoBytes},
+      key,
+      length*8
+    );
+  }).then(function(buf){
+    return new Uint8Array(buf);
+  });
+}
+
+/* ── Parse tiles from text ──────────────────────────── */
+function parseTiles(text){
+  var lines=text.trim().split(/\n/);
+  var tiles=[];
+  for(var i=0;i<lines.length;i++){
+    var line=lines[i].trim();
+    if(!line)continue;
+    var parts=line.split(/[\s,\-]+/);
+    if(parts.length!==2)throw new Error("Line "+(i+1)+": expected two numbers, got \""+line+"\"");
+    var a=parseInt(parts[0],10);
+    var b=parseInt(parts[1],10);
+    if(isNaN(a)||isNaN(b))throw new Error("Line "+(i+1)+": non-numeric value in \""+line+"\"");
+    if(a<0||a>6||b<0||b>6)throw new Error("Line "+(i+1)+": values must be 0-6, got "+a+","+b);
+    tiles.push([a,b]);
+  }
+  return tiles;
+}
+
+/* ── Canonicalize a tile pair ───────────────────────── */
+function canonicalize(tile){
+  return tile[0]<=tile[1]?[tile[0],tile[1]]:[tile[1],tile[0]];
+}
+
+/* ── Domino index: T(b)+a where a<=b ────────────────── */
+function dominoIndex(a,b){
+  /* T(b)=b*(b+1)/2, index=T(b)+a */
+  return (b*(b+1)/2)+a;
+}
+
+/* ── Set output field ───────────────────────────────── */
+function setOut(id,text,isEmpty){
+  var el=document.getElementById(id);
+  if(!el)return;
+  el.textContent=text;
+  if(isEmpty){el.classList.add("empty")}else{el.classList.remove("empty")}
+}
+
+/* ── Status bar ─────────────────────────────────────── */
+function setStatus(msg,level){
+  var bar=document.getElementById("statusBar");
+  bar.textContent=msg;
+  bar.className="status-bar status-"+level;
+}
+
+/* ── Copy to clipboard ──────────────────────────────── */
+function copyField(id,btn){
+  var el=document.getElementById(id);
+  if(!el||el.classList.contains("empty"))return;
+  var text=el.textContent;
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent="COPIED!";btn.classList.add("copied");
+      setTimeout(function(){btn.textContent="COPY";btn.classList.remove("copied")},2000);
+    });
+  }else{
+    var ta=document.createElement("textarea");
+    ta.value=text;ta.style.position="fixed";ta.style.opacity="0";
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");btn.textContent="COPIED!";btn.classList.add("copied");
+      setTimeout(function(){btn.textContent="COPY";btn.classList.remove("copied")},2000);
+    }catch(e){}
+    document.body.removeChild(ta);
+  }
+}
+
+/* ── Parse & Encode an operator ─────────────────────── */
+function parseOperator(op){
+  var textEl=document.getElementById("tiles"+op);
+  var countEl=document.getElementById("count"+op);
+  var expected=parseInt(countEl.value,10);
+  var text=textEl.value;
+
+  try{
+    var tiles=parseTiles(text);
+    if(tiles.length!==expected){
+      throw new Error("Expected "+expected+" tiles, got "+tiles.length);
+    }
+
+    var canonical=tiles.map(canonicalize);
+    var indices=canonical.map(function(t){return dominoIndex(t[0],t[1])});
+
+    /* Check for duplicate tiles */
+    var seen={};
+    for(var i=0;i<indices.length;i++){
+      if(seen[indices[i]])throw new Error("Duplicate tile: ("+canonical[i][0]+","+canonical[i][1]+") at index "+indices[i]);
+      seen[indices[i]]=true;
+    }
+
+    var canonStr=canonical.map(function(t){return "("+t[0]+","+t[1]+")"}).join("  ");
+    var idxStr=indices.join(", ");
+    var opString=op+":"+indices.join(",");
+
+    setOut("canon"+op,canonStr,false);
+    setOut("idx"+op,idxStr,false);
+    setOut("str"+op,opString,false);
+
+    /* Compute seed = SHA-256(UTF-8 bytes of opString) */
+    var opBytes=encoder.encode(opString);
+    sha256Bytes(opBytes).then(function(hash){
+      if(op==="A")state.seedABytes=hash;
+      else state.seedBBytes=hash;
+      setOut("seed"+op,bytesToHex(hash),false);
+      setStatus("Operator "+op+" parsed and encoded. "+expected+" tiles, "+indices.length+" indices.","ok");
+    });
+
+  }catch(e){
+    setOut("canon"+op,e.message,true);
+    setOut("idx"+op,"Error",true);
+    setOut("str"+op,"Error",true);
+    setOut("seed"+op,"Error",true);
+    if(op==="A")state.seedABytes=null;
+    else state.seedBBytes=null;
+    setStatus("Operator "+op+": "+e.message,"err");
+  }
+}
+
+/* ── Compute Master ─────────────────────────────────── */
+function computeMaster(){
+  if(!state.seedABytes||!state.seedBBytes){
+    setStatus("Both operators must be parsed before computing master.","warn");
+    return;
+  }
+
+  /* Concatenate raw bytes: seedA || seedB */
+  var combined=new Uint8Array(state.seedABytes.length+state.seedBBytes.length);
+  combined.set(state.seedABytes,0);
+  combined.set(state.seedBBytes,state.seedABytes.length);
+
+  sha256Bytes(combined).then(function(master){
+    state.masterBytes=master;
+    setOut("masterHex",bytesToHex(master),false);
+
+    /* fingerprint = first 16 hex chars of SHA-256(master) */
+    return sha256Bytes(master);
+  }).then(function(fpHash){
+    var fpHex=bytesToHex(fpHash).substring(0,16);
+    setOut("fingerprint",fpHex,false);
+    setStatus("Master computed. Fingerprint: "+fpHex,"ok");
+  });
+}
+
+/* ── Derive HKDF Keys ──────────────────────────────── */
+function deriveHkdf(){
+  if(!state.masterBytes){
+    setStatus("Compute the master key first.","warn");
+    return;
+  }
+
+  var saltText=document.getElementById("hkdfSalt").value;
+  var saltBytes=encoder.encode(saltText);
+
+  var infos=["EDGE/DOMINO/ENC","EDGE/DOMINO/SIGN","EDGE/DOMINO/RECOVERY"];
+  var ids=["encKey","signKey","recoveryKey"];
+
+  var promises=infos.map(function(info){
+    return hkdfSha256(state.masterBytes,saltBytes,encoder.encode(info),32);
+  });
+
+  Promise.all(promises).then(function(keys){
+    for(var i=0;i<keys.length;i++){
+      setOut(ids[i],bytesToHex(keys[i]),false);
+    }
+    setStatus("HKDF keys derived (salt: "+(saltText?"\""+saltText+"\"":"empty")+").","ok");
+  }).catch(function(e){
+    setStatus("HKDF error: "+e.message,"err");
+  });
+}
+
+/* ── Reset ──────────────────────────────────────────── */
+function resetAll(){
+  state.seedABytes=null;
+  state.seedBBytes=null;
+  state.masterBytes=null;
+
+  document.getElementById("tilesA").value="";
+  document.getElementById("tilesB").value="";
+  document.getElementById("hkdfSalt").value="";
+  document.getElementById("countA").value="8";
+  document.getElementById("countB").value="8";
+
+  var fields=["canonA","idxA","strA","seedA","canonB","idxB","strB","seedB",
+              "masterHex","fingerprint","encKey","signKey","recoveryKey"];
+  var defaults={"canonA":"Not parsed yet","idxA":"Not parsed yet","strA":"Not parsed yet",
+                "seedA":"Not computed yet","canonB":"Not parsed yet","idxB":"Not parsed yet",
+                "strB":"Not parsed yet","seedB":"Not computed yet","masterHex":"Not computed yet",
+                "fingerprint":"Not computed yet","encKey":"Not derived yet","signKey":"Not derived yet",
+                "recoveryKey":"Not derived yet"};
+  for(var i=0;i<fields.length;i++){
+    setOut(fields[i],defaults[fields[i]],true);
+  }
+  setStatus("Ready. Enter domino tiles for each operator.","idle");
+}
+</script>
+
+</body>
+</html>
