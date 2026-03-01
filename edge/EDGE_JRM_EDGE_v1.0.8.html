@@ -5068,29 +5068,48 @@ function cgOpenClaimDrawer(key){
  }
  html+='</div></div>';
 
- // Section 5: How to Fix
+ // Section 5: How to Fix — only show patches that actually reduce the score
  var FIX_EXPLAIN={
  EXPIRE_CLAIM:{icon:"\u23f3",label:"Expire this claim",detail:"This claim is stale — its freshness has decayed below 0.3. Expiring it removes it from scoring so outdated information stops inflating the residue."},
  REQUEST_EVIDENCE:{icon:"\ud83d\udd0d",label:"Request more evidence",detail:"This claim is contradicted AND has low confidence. Before trusting or discarding it, gather more data to raise confidence or confirm the contradiction."},
- DOWNWEIGHT_AUTHORITY:{icon:"\u2b07\ufe0f",label:"Downweight the source",detail:"This claim has very high residue from contradictions. Reducing the authority weight of its source means future claims from that source carry less influence."},
+ DOWNWEIGHT_AUTHORITY:{icon:"\u2b07\ufe0f",label:"Reduce connection weights",detail:"This claim has very high residue from contradictions. Halving its confidence reduces how much its edges contribute to the overall score."},
  SUPERSEDE_CANON:{icon:"\ud83d\udd04",label:"Replace with newer claim",detail:"This claim is contradicted and creating residue. Superseding it with a newer, more authoritative version resolves the conflict cleanly."},
  SPLIT_CLAIM:{icon:"\u2702\ufe0f",label:"Split into smaller claims",detail:"This claim has too many dependency edges. Breaking it into more specific sub-claims makes the graph easier to reason about and isolates conflicts."}
  };
+ // Pre-simulate each patch to check if it actually helps
+ var effectivePatches=[];
+ patches.forEach(function(p,i){
+ var cc=JSON.parse(JSON.stringify(S.cg.claims));
+ var ec=JSON.parse(JSON.stringify(S.cg.edges));
+ if(p.type==="EXPIRE_CLAIM"||p.type==="SUPERSEDE_CANON"){
+  delete cc[p.target];ec=ec.filter(function(e){return e.from!==p.target&&e.to!==p.target});
+ }else if(p.type==="DOWNWEIGHT_AUTHORITY"){
+  if(cc[p.target])cc[p.target].confidence=Math.max(0.1,cc[p.target].confidence*0.5);
+ }else if(p.type==="REQUEST_EVIDENCE"){
+  if(cc[p.target])cc[p.target].confidence=Math.min(0.95,cc[p.target].confidence+0.2);
+ }else if(p.type==="SPLIT_CLAIM"){
+  ec=ec.filter(function(e){return!(e.from===p.target&&e.type==="depends")&&!(e.to===p.target&&e.type==="depends")});
+ }
+ var after=cgScore(cgBuildGraph(cc,ec),{mode:S.cg.config.mode,ttl:S.cg.config.ttl,now:Date.now()});
+ if(after.crs<score.crs){effectivePatches.push({patch:p,idx:i,before:score.crs,after:after.crs})}
+ });
  html+='<div class="dsection"><div class="dsection-hdr"><span class="arrow">\u25be</span> 5. How to Fix</div><div class="dsection-body">';
- if(patches.length===0){
+ if(effectivePatches.length===0){
  if(pc&&pc.maxResidue<0.3){
  html+='<div style="padding:10px;background:rgba(93,255,147,.06);border:1px solid rgba(93,255,147,.2);border-radius:6px;font-size:11px"><span style="color:var(--ok);font-weight:700">No fix needed.</span> This claim has low residue and is in good health.</div>';
  }else{
- html+='<div class="muted">No automated fix suggested. Consider adding more edges or adjusting weights manually.</div>';
+ html+='<div style="padding:10px;background:rgba(255,204,102,.06);border:1px solid rgba(255,204,102,.2);border-radius:6px;font-size:11px"><span style="color:var(--warn);font-weight:700">No effective fix found.</span> The available patches do not reduce the overall score. Try adjusting edge weights or removing contradictions manually.</div>';
  }
  }else{
- patches.forEach(function(p,i){
+ effectivePatches.forEach(function(ep){
+ var p=ep.patch;
  var ex=FIX_EXPLAIN[p.type]||{icon:"\ud83d\udee0",label:p.type,detail:p.reason};
+ var delta=ep.after-ep.before;
  html+='<div style="padding:10px;background:var(--bg);border:1px solid var(--line);border-radius:6px;margin-bottom:8px">';
  html+='<div style="font-size:13px;font-weight:700;margin-bottom:4px">'+ex.icon+' '+esc(ex.label)+'</div>';
  html+='<div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:6px">'+esc(ex.detail)+'</div>';
- html+='<div style="font-size:10px;color:var(--muted);margin-bottom:8px"><span class="mono" style="color:var(--accent)">'+esc(p.type)+'</span> — '+esc(p.reason)+'</div>';
- html+='<button class="primary cg-fix-sim-btn" data-patch-idx="'+i+'" data-claim-key="'+esc(key)+'" style="font-size:11px;padding:4px 12px;width:100%">Simulate This Fix</button>';
+ html+='<div style="font-size:10px;margin-bottom:8px"><span style="color:var(--ok);font-weight:600">CRS '+ep.before+' \u2192 '+ep.after+' ('+delta+')</span></div>';
+ html+='<button class="primary cg-fix-sim-btn" data-patch-idx="'+ep.idx+'" data-claim-key="'+esc(key)+'" style="font-size:11px;padding:4px 12px;width:100%">Simulate This Fix</button>';
  html+='</div>';
  });
  }
