@@ -208,6 +208,8 @@ ALLOWED_ACRONYMS = {
     # v1.0.6 Test Lab — drift severity bands, patch/drift UIDs, scenario labels
     "CRIT", "HIGH", "TPATCH", "TDS", "ASSUMP", "SUITE", "FAIL",
     "PROOF", "DEMO", "COMPLETE", "TEST", "LAB", "ENGINE",
+    # v1.0.7 — stream mode, policy panel, analyzer tokens
+    "STREAM", "THAW", "FROZEN",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}
