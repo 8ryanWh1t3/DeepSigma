@@ -1,6 +1,6 @@
 <!--
   ╔══════════════════════════════════════════════════════════════╗
-  ║  EDGE Hardening Header Snippet v1                           ║
+  ║  EDGE Hardening Header Snippet v1.1                         ║
   ║  Paste into every EDGE_*.html file.                         ║
   ║                                                             ║
   ║  Placement:                                                 ║
@@ -27,13 +27,7 @@
 <script>
 (function(){
 "use strict";
-/* ──────────────────────────────────────────────────────────
-   EDGE_HARDENING_V1 — Runtime capability lockdown
-   This shim overrides restricted APIs at the window level
-   so that any accidental or injected code cannot use them.
-   The CI linter (tools/edge_lint.py) is the primary gate;
-   this shim is defense-in-depth.
-   ────────────────────────────────────────────────────────── */
+/* EDGE_HARDENING_V1 — Runtime capability lockdown v1.1 */
 
 var EDGE_BUILD_ID="EDGE_BUILD_ID:SET_ME";
 
@@ -50,9 +44,17 @@ try{navigator.sendBeacon=_block("sendBeacon")}catch(_){}
 
 /* ── Dynamic execution ────────────────────────────────── */
 window.eval = _block("eval");
+try{window.Function=_block("Function constructor")}catch(_){}
 
 /* ── Navigation ───────────────────────────────────────── */
 window.open = _block("window.open");
+
+/* ── Communication channels ──────────────────────────── */
+window.RTCPeerConnection       = _block("RTCPeerConnection");
+window.webkitRTCPeerConnection = _block("RTCPeerConnection");
+window.BroadcastChannel        = _block("BroadcastChannel");
+window.SharedWorker            = _block("SharedWorker");
+window.Worker                  = _block("Worker");
 
 /* ── Persistence ──────────────────────────────────────── */
 try{Object.defineProperty(window,"localStorage",
@@ -62,14 +64,28 @@ try{Object.defineProperty(window,"sessionStorage",
 try{Object.defineProperty(window,"indexedDB",
   {get:_block("indexedDB"),configurable:false})}catch(_){}
 
-/* ── Self-check: no external resources ────────────────── */
+/* ── Data channels ───────────────────────────────────── */
+try{Object.defineProperty(window,"name",
+  {value:"",writable:false,configurable:false})}catch(_){}
+
+/* ── Build ID log ────────────────────────────────────── */
+if(typeof console!=="undefined")console.log("[EDGE] Hardening active: "+EDGE_BUILD_ID);
+
+/* ── Self-check: no external resources or injection ──── */
 document.addEventListener("DOMContentLoaded",function(){
+  var violations=[];
   var ext=document.querySelectorAll("script[src],link[href]");
-  if(ext.length>0){
+  if(ext.length>0)violations.push("external resource ("+ext.length+" element(s))");
+  var handlers=document.querySelectorAll("[onclick],[onerror],[onload],[onmouseover],[onfocus],[onblur],[onsubmit],[onchange],[oninput]");
+  if(handlers.length>0)violations.push("inline event handler ("+handlers.length+" element(s))");
+  var bases=document.querySelectorAll("base[href]");
+  if(bases.length>0)violations.push("base href hijack ("+bases.length+" element(s))");
+  var refresh=document.querySelector("meta[http-equiv='refresh']");
+  if(refresh)violations.push("meta refresh redirect");
+  if(violations.length>0){
     document.body.innerHTML=
       "<h1 style='color:red;font-family:monospace;padding:40px'>" +
-      "EDGE VIOLATION: external resource detected (" +
-      ext.length+" element(s))</h1>";
+      "EDGE VIOLATION: "+violations.join("; ")+"</h1>";
   }
 });
 })();

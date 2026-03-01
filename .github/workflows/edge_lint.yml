@@ -16,8 +16,32 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Scan for EDGE files in unexpected locations
+        run: |
+          echo "Checking for EDGE_*.html outside expected directories..."
+          STRAY=$(find . -name "EDGE_*.html" -not -path "./.git/*" -not -path "./edge/*" -not -path "./EDGE_HARDENING_HEADER_SNIPPET.html" | head -20)
+          if [ -n "$STRAY" ]; then
+            echo "::warning::EDGE files found outside edge/ directory:"
+            echo "$STRAY"
+          fi
+
       - name: Run EDGE hardening linter (repo root)
         run: python tools/edge_lint.py
 
       - name: Run EDGE hardening linter (edge/ directory)
         run: python tools/edge_lint.py --path edge/
+
+      - name: Generate JSON report
+        if: always()
+        run: |
+          mkdir -p lint-reports
+          python tools/edge_lint.py --json > lint-reports/root.json 2>&1 || true
+          python tools/edge_lint.py --json --path edge/ > lint-reports/edge.json 2>&1 || true
+
+      - name: Upload lint report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: edge-lint-report
+          path: lint-reports/
+          retention-days: 30

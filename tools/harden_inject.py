@@ -22,6 +22,7 @@ SHIM_TEMPLATE = """<!-- EDGE_HARDENING_V1 BEGIN -->
 <script>
 (function(){{
 "use strict";
+/* EDGE_HARDENING_V1 — Runtime capability lockdown v1.1 */
 var EDGE_BUILD_ID="EDGE_BUILD_ID:{build_id}";
 function _block(cap){{
   return function(){{throw new Error("EDGE hardening: "+cap+" is blocked")}};
@@ -32,20 +33,36 @@ window.WebSocket      = _block("WebSocket");
 window.EventSource    = _block("EventSource");
 try{{navigator.sendBeacon=_block("sendBeacon")}}catch(_){{}}
 window.eval = _block("eval");
+try{{window.Function=_block("Function constructor")}}catch(_){{}}
 window.open = _block("window.open");
+window.RTCPeerConnection       = _block("RTCPeerConnection");
+window.webkitRTCPeerConnection = _block("RTCPeerConnection");
+window.BroadcastChannel        = _block("BroadcastChannel");
+window.SharedWorker            = _block("SharedWorker");
+window.Worker                  = _block("Worker");
 try{{Object.defineProperty(window,"localStorage",
   {{get:_block("localStorage"),configurable:false}})}}catch(_){{}}
 try{{Object.defineProperty(window,"sessionStorage",
   {{get:_block("sessionStorage"),configurable:false}})}}catch(_){{}}
 try{{Object.defineProperty(window,"indexedDB",
   {{get:_block("indexedDB"),configurable:false}})}}catch(_){{}}
+try{{Object.defineProperty(window,"name",
+  {{value:"",writable:false,configurable:false}})}}catch(_){{}}
+if(typeof console!=="undefined")console.log("[EDGE] Hardening active: "+EDGE_BUILD_ID);
 document.addEventListener("DOMContentLoaded",function(){{
+  var violations=[];
   var ext=document.querySelectorAll("script[src],link[href]");
-  if(ext.length>0){{
+  if(ext.length>0)violations.push("external resource ("+ext.length+" element(s))");
+  var handlers=document.querySelectorAll("[onclick],[onerror],[onload],[onmouseover],[onfocus],[onblur],[onsubmit],[onchange],[oninput]");
+  if(handlers.length>0)violations.push("inline event handler ("+handlers.length+" element(s))");
+  var bases=document.querySelectorAll("base[href]");
+  if(bases.length>0)violations.push("base href hijack ("+bases.length+" element(s))");
+  var refresh=document.querySelector("meta[http-equiv='refresh']");
+  if(refresh)violations.push("meta refresh redirect");
+  if(violations.length>0){{
     document.body.innerHTML=
       "<h1 style='color:red;font-family:monospace;padding:40px'>" +
-      "EDGE VIOLATION: external resource detected (" +
-      ext.length+" element(s))</h1>";
+      "EDGE VIOLATION: "+violations.join("; ")+"</h1>";
   }}
 }});
 }})();
