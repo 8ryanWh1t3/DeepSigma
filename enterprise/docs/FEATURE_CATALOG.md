@@ -707,6 +707,17 @@ Exportable single-file HTML applications with embedded governance — zero depen
   - Enforcement: scripts/gate_abp.py
   - KPI axes: Operational_Maturity, Enterprise_Readiness
 
+- **Domino Delegation Encryption** (`DOMINO_DELEGATION`)
+  - 4-of-7 Shamir threshold encryption ceremony using physical domino tiles as co-presence proof. Seven participants chain domino tiles, generate keywords (Shamir shares over GF(256)), and perform AES-256-GCM encryption/decryption with 1-hour TTL and passphrase derivation via HKDF-SHA256. Self-test gate verifies cryptographic primitives before key generation. Anti-leak UX: press-and-hold reveal, type-to-copy confirmation, clipboard overwrite.
+  - Artifacts: enterprise/edge/EDGE_Domino_Delegation_Encryption.html, core/edge/EDGE_Domino_Delegation_Encryption_Verifier.html
+  - Enforcement: tools/edge_lint.py (EDGE hardening gate), .github/workflows/edge_lint.yml
+  - KPI axes: Enterprise_Readiness, Authority_Modeling
+- **Domino Delegation Verifier** (`DOMINO_VERIFIER`)
+  - Read-only ceremony record verification tool (core edition). Loads ceremony JSON, recomputes chain seal (SHA-256), validates connectivity, checks TTL status, displays session identity and keyword fingerprints. No key generation, no encryption.
+  - Artifacts: core/edge/EDGE_Domino_Delegation_Encryption_Verifier.html
+  - Enforcement: tools/edge_lint.py (EDGE hardening gate)
+  - KPI axes: Enterprise_Readiness
+
 ## Outer-Edge Boundaries
 
 - Not claiming full jurisdictional policy packs (EU AI Act article-by-article enforcement) yet

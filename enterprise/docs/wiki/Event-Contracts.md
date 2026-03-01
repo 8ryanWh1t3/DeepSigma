@@ -133,6 +133,36 @@ At publish time, the validator checks:
 
 The routing table has a SHA-256 fingerprint computed over the `functions` and `events` sections (sorted keys, compact JSON). This fingerprint is embedded in the manifest and verified by CI.
 
+## Domino Delegation Encryption Events
+
+The Domino Delegation Encryption module (EDGE) defines 9 events across 3 domains. These events are emitted by the ceremony tool and can be consumed by Coherence Ops for audit and drift tracking.
+
+### ReOps (3)
+
+| ID | Name | Trigger | Payload |
+|----|------|---------|---------|
+| DELEG-E01 | `reops.delegation.ceremony_initiated` | Self-test passes, chain sealed | `{session_id, chain_fingerprint, participant_count, timestamp}` |
+| DELEG-E02 | `reops.delegation.keywords_generated` | Keywords created | `{session_id, n, t, ttl_ms, created_at, expires_at}` |
+| DELEG-E03 | `reops.delegation.ttl_expired` | TTL countdown reaches zero | `{session_id, expired_at}` |
+
+### FranOps (3)
+
+| ID | Name | Trigger | Payload |
+|----|------|---------|---------|
+| DELEG-E04 | `franops.delegation.quorum_reached` | 4+ valid keywords entered | `{session_id, valid_count, threshold}` |
+| DELEG-E05 | `franops.delegation.message_locked` | Plaintext encrypted | `{session_id, ciphertext_length}` |
+| DELEG-E06 | `franops.delegation.message_unlocked` | Ciphertext decrypted | `{session_id, plaintext_length}` |
+
+### IntelOps (3)
+
+| ID | Name | Trigger | Payload |
+|----|------|---------|---------|
+| DELEG-E07 | `intelops.delegation.ceremony_verified` | Verifier confirms record | `{session_id, chain_fingerprint, all_checks_passed}` |
+| DELEG-E08 | `intelops.delegation.fingerprint_mismatch` | Keyword fails fingerprint check | `{session_id, slot_index, expected_fp}` |
+| DELEG-E09 | `intelops.delegation.seal_tampered` | Chain hash mismatch on verification | `{session_id, expected_hash, computed_hash}` |
+
+---
+
 ## FEEDS Topic Mapping
 
 All 36 functions route through the existing 6 FEEDS topics:

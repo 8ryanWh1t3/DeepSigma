@@ -77,6 +77,7 @@ Canonical wiki structure for Sigma OVERWATCH / DeepSigma docs.
 - [Gate Enforcement](Gate-Enforcement)
 - [Delegation Review](Delegation-Review)
 - [Authority Ledger Binding](Authority-Ledger-Binding)
+- [Domino Delegation Encryption](Domino-Delegation-Encryption)
 
 ## Domain Modes
 

@@ -13,6 +13,7 @@
 - [Compliance Matrix UI](#compliance-matrix-ui)
 - [Award Staffing Estimator](#award-staffing-estimator)
 - [Suite ReadOnly](#suite-readonly)
+- [Domino Delegation Encryption](#domino-delegation-encryption)
 - [Common Patterns](#common-patterns)
 
 ---
@@ -288,6 +289,44 @@ Read-only wrapper providing telemetry rollup and export capabilities without wri
 - **Objectives:** OBJ-007 (Present read-only unified decision surface)
 - **Data Sensitivity:** Internal (decision_log.csv — read only)
 - **Operations:** Read (Operator role)
+
+---
+
+## Domino Delegation Encryption
+
+**File:** `EDGE_Domino_Delegation_Encryption.html` | **Version:** 1.0.0 | **Module:** `domino` | **Lines:** ~2,500
+
+Air-gapped ceremony orchestration for 4-of-7 Shamir threshold encryption using physical dominoes as co-presence proof. EDGE-hardened (v1.1) with CSP, runtime shim, and action contract.
+
+### Wizard Steps
+
+| Step | Purpose |
+|------|---------|
+| **1. Self-Test** | GF(256) arithmetic, Shamir roundtrip, Base64 encoding verification — must pass before ceremony |
+| **2. Chain Ceremony** | 7 participants enter physical domino tiles; tool validates chaining and computes SHA-256 seal |
+| **3. Keywords** | Generate 7 Shamir shares (4-of-7 threshold). Each keyword has fingerprint. TTL starts (1 hour) |
+| **4. Majority Unlock** | Paste 4+ keywords (within TTL) to reconstruct secret; fingerprint verification against ceremony JSON |
+| **5. Encrypt/Decrypt** | Three tabs: Verify (ceremony record), Lock (AES-256-GCM encrypt), Unlock (decrypt) |
+
+### Key Features
+
+- **Shamir Secret Sharing:** 4-of-7 threshold over GF(256) with AES irreducible polynomial
+- **Physical co-presence:** Domino tiles must chain (right side = left side of next)
+- **TTL enforcement:** Keywords valid for 1 hour from generation
+- **HKDF key derivation:** Secret + SHA-256(passphrase) → AES-256-GCM key
+- **Anti-leak UX:** Press-and-hold reveal, type "COPY" to copy, clipboard overwrite
+- **Ceremony JSON:** Public record with chain seal, fingerprints, session ID, TTL — never keywords or secret
+- **Self-test gate:** Cryptographic primitives verified before any keys are generated
+
+### Verifier (Core Edition)
+
+**File:** `EDGE_Domino_Delegation_Encryption_Verifier.html` | **Module:** `domino_verifier`
+
+Read-only verification tool. Loads ceremony JSON and checks: chain connectivity, seal recomputation (SHA-256), TTL status, session ID, keyword fingerprints. Copy buttons for non-secret values. Cannot generate keywords, unlock, or encrypt.
+
+### Runbook
+
+See [enterprise/docs/edge/domino-delegation-encryption.md](../../docs/edge/domino-delegation-encryption.md) for operational procedures, security rules, and troubleshooting.
 
 ---
 

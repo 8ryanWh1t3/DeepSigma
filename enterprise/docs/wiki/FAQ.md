@@ -268,3 +268,23 @@ An EDGE module (`edge/edge_rfp_copilot_excel_json.html`) for government RFP extr
 ## How does the RFP Co-Pilot refresh loop work?
 
 Amendment arrives → rerun the extraction prompt with the updated RFP → overwrite `rfp_extract.json` → Ctrl+Alt+F5 (Refresh All) in Excel → all 6 tables update automatically → team stays aligned. No one re-reads the full RFP.
+
+## What is Domino Delegation Encryption?
+
+A 4-of-7 Shamir threshold encryption ceremony using physical domino tiles as co-presence proof. Seven participants each draw a domino tile, chain them together, generate Shamir keyword shares, and can encrypt/decrypt sensitive text via AES-256-GCM. Keywords are TTL-gated (1 hour) and distributed one at a time in person only. Enterprise edition: `enterprise/edge/EDGE_Domino_Delegation_Encryption.html`. Core verifier: `core/edge/EDGE_Domino_Delegation_Encryption_Verifier.html`.
+
+## How does the Domino ceremony work?
+
+Seven participants each draw a physical domino tile from a double-six set. They enter tiles into the EDGE module in order, validating that the right side of each tile matches the left side of the next (standard domino chaining). The tool computes a SHA-256 seal of the chain, generates 7 Shamir shares (4-of-7 threshold), and assigns each participant one keyword (base64 Shamir share). The ceremony JSON (public record) captures chain fingerprint, participant list, keyword fingerprints, and TTL window. It never includes the keywords or secret.
+
+## What is public vs secret in a Domino ceremony?
+
+**Public (ceremony JSON):** chain string, chain seal (SHA-256), chain fingerprint (quick ID), domino name, participant list, session ID, keyword fingerprints, TTL window. Safe to store, share, and archive. **Secret (never recorded):** the 7 keywords (Shamir shares), the reconstructed secret, the passphrase, and any plaintext. Distribute keywords in person only; never transmit electronically.
+
+## What happens when Domino keywords expire?
+
+Keywords are valid for 1 hour from generation. After TTL expires, the tool revokes the unlock and keywords cannot reconstruct the secret. A new ceremony must be conducted to generate fresh keywords. This enforces ceremony freshness and prevents long-term keyword accumulation.
+
+## What is the Domino Delegation Verifier?
+
+A read-only EDGE tool (`core/edge/EDGE_Domino_Delegation_Encryption_Verifier.html`) that loads a ceremony JSON and verifies: chain connectivity, chain seal recomputation (SHA-256), TTL status (active/expired), session ID, and keyword fingerprints. It cannot generate keywords, accept keywords, or encrypt/decrypt. Useful for independent audit of ceremony records.

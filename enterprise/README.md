@@ -90,6 +90,8 @@ Exportable single-file HTML apps — zero dependencies, work offline, governance
 | BOE Pricing | v1.0.0 | Rate calculations |
 | Award Staffing | v1.2.0 | Cost estimation |
 | Suite ReadOnly | v1.0.0 | Telemetry + rollup |
+| Domino Delegation Encryption | v1.0.0 | 4-of-7 Shamir threshold encryption ceremony with domino chain co-presence proof, TTL-gated keywords, AES-256-GCM |
+| Domino Delegation Verifier | v1.0.0 | Read-only ceremony record verification (core edition) |
 
 JRM EDGE v1.0.7 features: So What panel (per-stage what/why/next analysis), Analyzer vs Deep Sigma view toggle, packet chain timeline + diff, live stream mode + Freeze & Seal, policy drawer (guarded) + regression rerun.
 

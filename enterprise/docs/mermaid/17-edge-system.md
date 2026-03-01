@@ -1,6 +1,6 @@
 # EDGE System
 
-Exportable Decision Governance Engine: 11 standalone HTML modules with embedded ABP enforcement, gate verification, and delegation review triggers.
+Exportable Decision Governance Engine: 13 standalone HTML modules with embedded ABP enforcement, gate verification, and delegation review triggers.
 
 ## EDGE Module Map
 
@@ -20,6 +20,8 @@ graph TD
         BOE["BOE Pricing v1.0.0\nRate calculations"]
         AWD["Award Staffing v1.2.0\nCost estimation"]
         SRO["Suite ReadOnly v1.0.0\nTelemetry + rollup"]
+        DOM["Domino Delegation v1.0.0\n4-of-7 Shamir ceremony"]
+        DVR["Domino Verifier v1.0.0\nCeremony verification"]
     end
 
     ABP["ABP v1\nABP-bf0afe15\nsha256:c01f..."]
@@ -32,8 +34,11 @@ graph TD
     ABP -->|"embedded in"| BOE
     ABP -->|"embedded in"| AWD
     ABP -->|"embedded in"| SRO
+    ABP -->|"embedded in"| DOM
 
     style EDGE fill:#e8f5e9,stroke:#43a047
+    style DOM fill:#f3e5f5,stroke:#8e24aa
+    style DVR fill:#f3e5f5,stroke:#8e24aa
     style ABP fill:#fff3bf,stroke:#f59f00
     style JRM fill:#e3f2fd,stroke:#1e88e5
     style RFP fill:#fff3e0,stroke:#fb8c00
