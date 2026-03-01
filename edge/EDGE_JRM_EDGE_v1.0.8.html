@@ -1019,6 +1019,10 @@
  <div>If the score is high, the system emits <strong>drift signals</strong> (alerts) and suggests <strong>patches</strong> (e.g. expire a stale claim, request more evidence). You can simulate patches before applying.</div>
  </div>
  </div>
+ <div style="background:var(--bg);padding:10px;border-radius:6px;border:1px solid var(--line);margin-bottom:10px">
+ <div style="color:var(--accent);font-weight:700;font-size:12px;margin-bottom:4px">What does "residue" mean?</div>
+ <div><strong>Residue</strong> is the unresolved disagreement between two connected claims &mdash; think of it as <em>tension on a wire</em>. When "CPU is low" contradicts "CPU is high", that contradiction creates residue (leftover conflict the system can't reconcile). Agreements <em>reduce</em> residue. The <strong>CRS</strong> (Consistency Residue Score) is the total residue across all connections, normalized to 0-100. High residue = lots of unresolved contradictions = something needs attention.</div>
+ </div>
  <div style="color:var(--muted)">
  <strong>Two scoring modes:</strong>
  <strong>Basic</strong> scores purely by edge type and weight.
