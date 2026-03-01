@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded",function(){
 
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Deep Sigma EDGE — Domino Delegation Chain</title>
+<title>Deep Sigma EDGE — Domino Delegation Encryption — Real Mode</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -119,6 +119,8 @@ body{font-family:var(--font-body);color:var(--txt);background:var(--bg);line-hei
 .badge-edge{background:rgba(255,45,149,.15);color:var(--neon-pink);border:1px solid rgba(255,45,149,.4)}
 .badge-ver{background:rgba(0,240,255,.1);color:var(--neon-cyan);border:1px solid rgba(0,240,255,.3)}
 .badge-offline{background:rgba(57,255,20,.1);color:var(--neon-green);border:1px solid rgba(57,255,20,.3)}
+.badge-real{background:rgba(255,106,0,.15);color:var(--neon-orange);border:1px solid rgba(255,106,0,.4)}
+.build-id{font-family:var(--font-mono);font-size:.55rem;color:var(--txt-dim);margin-top:8px;letter-spacing:.5px}
 
 /* ── Progress Bar ────────────────────────────────────── */
 .progress-bar{display:flex;align-items:flex-start;justify-content:center;gap:0;margin:0 0 20px;padding:0 12px}
@@ -204,8 +206,10 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
 .btn-reset:hover:not(:disabled){background:rgba(255,45,149,.25)}
 .btn-green{background:rgba(57,255,20,.12);border-color:rgba(57,255,20,.3);color:var(--neon-green)}
 .btn-green:hover:not(:disabled){background:rgba(57,255,20,.22)}
+.btn-danger{background:rgba(255,45,149,.15);border-color:rgba(255,45,149,.4);color:var(--neon-pink)}
+.btn-danger:hover:not(:disabled){background:rgba(255,45,149,.3)}
 .btn-copy{
-  padding:3px 10px;font-size:.62rem;border-radius:4px;
+  padding:5px 14px;font-size:.65rem;min-width:60px;text-align:center;border-radius:4px;
   background:rgba(180,77,255,.15);border:1px solid rgba(180,77,255,.3);color:var(--neon-purple);
   cursor:pointer;font-family:var(--font-mono);font-weight:700;letter-spacing:.5px;transition:all .2s;
 }
@@ -276,11 +280,6 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
   background:rgba(180,77,255,.12);color:var(--neon-purple);font-size:.78rem;transition:all .2s;
 }
 .p-flip:hover{background:rgba(180,77,255,.25)}
-.p-remove{
-  padding:3px 7px;border-radius:4px;cursor:pointer;border:1px solid rgba(255,45,149,.3);
-  background:rgba(255,45,149,.1);color:var(--neon-pink);font-size:.72rem;font-weight:700;transition:all .2s;
-}
-.p-remove:hover{background:rgba(255,45,149,.25)}
 
 /* ── Chain Visualization ──────────────────────────────── */
 .chain-viz{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:16px;justify-content:center}
@@ -310,9 +309,9 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
   display:flex;gap:20px;flex-wrap:wrap;padding:16px;border-radius:8px;
   background:rgba(180,77,255,.06);border:1px solid rgba(180,77,255,.25);margin-bottom:12px;
 }
-.seal-field{flex:1;min-width:200px}
+.seal-field{flex:1;min-width:140px}
 .seal-field .sf-label{font-size:.65rem;color:var(--txt-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
-.seal-field .sf-value{font-family:var(--font-mono);font-size:.88rem;color:var(--neon-green);font-weight:700}
+.seal-field .sf-value{font-family:var(--font-mono);font-size:.82rem;color:var(--neon-green);font-weight:700}
 
 /* ── Details (collapsed) ─────────────────────────────── */
 .detail-wrap{margin-top:12px;border:1px solid var(--card-border);border-radius:8px;overflow:hidden}
@@ -345,11 +344,11 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
   text-align:center;padding:24px;border-radius:10px;margin:12px 0;
   font-size:1.4rem;font-weight:800;letter-spacing:2px;font-family:var(--font-mono);
 }
-.verify-banner.pass{
+.verify-banner.vb-pass{
   background:rgba(57,255,20,.1);border:2px solid rgba(57,255,20,.4);
   color:var(--neon-green);box-shadow:0 0 30px rgba(57,255,20,.15);
 }
-.verify-banner.fail{
+.verify-banner.vb-fail{
   background:rgba(255,45,149,.1);border:2px solid rgba(255,45,149,.4);
   color:var(--neon-pink);box-shadow:0 0 30px rgba(255,45,149,.15);
 }
@@ -378,6 +377,129 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
 .file-label{display:inline-block;cursor:pointer}
 .file-label input[type="file"]{display:none}
 
+/* ── Passphrase Strength ─────────────────────────────── */
+.pass-wrap{position:relative}
+.pass-wrap input{padding-right:60px}
+.show-toggle{
+  position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  background:rgba(180,77,255,.15);border:1px solid rgba(180,77,255,.3);color:var(--neon-purple);
+  font-family:var(--font-mono);font-size:.6rem;font-weight:700;letter-spacing:.5px;
+  padding:3px 8px;border-radius:4px;cursor:pointer;transition:all .2s;
+}
+.show-toggle:hover{background:rgba(180,77,255,.3)}
+.strength-meter{height:6px;border-radius:3px;background:rgba(255,255,255,.06);margin:6px 0 2px;overflow:hidden}
+.strength-bar{height:100%;border-radius:3px;transition:width .3s,background .3s;width:0}
+.strength-label{font-family:var(--font-mono);font-size:.65rem;font-weight:600;margin-bottom:6px}
+.strength-block{
+  padding:8px 12px;border-radius:6px;margin:6px 0 10px;
+  border:1px solid rgba(255,45,149,.25);background:rgba(255,45,149,.06);
+  font-family:var(--font-mono);font-size:.72rem;color:var(--neon-pink);
+}
+.strength-block.strong{border-color:rgba(57,255,20,.25);background:rgba(57,255,20,.06);color:var(--neon-green)}
+.attack-note{
+  font-size:.7rem;color:var(--txt-muted);line-height:1.6;
+  padding:8px 12px;border-radius:6px;margin:6px 0 12px;
+  background:rgba(255,225,77,.04);border:1px solid rgba(255,225,77,.15);
+}
+.attack-note strong{color:var(--neon-yellow);font-weight:700}
+.gen-section{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
+.gen-output{
+  font-family:var(--font-mono);font-size:.75rem;padding:8px 12px;border-radius:6px;
+  background:rgba(57,255,20,.06);border:1px solid rgba(57,255,20,.2);color:var(--neon-green);
+  word-break:break-all;line-height:1.5;min-height:28px;margin:4px 0;
+}
+.gen-output.empty{color:var(--txt-dim);font-style:italic;border-color:var(--card-border);background:rgba(0,0,0,.2)}
+.dec-warn{
+  font-family:var(--font-mono);font-size:.7rem;color:var(--neon-yellow);
+  padding:6px 10px;border-radius:5px;margin:4px 0;
+  background:rgba(255,225,77,.06);border:1px solid rgba(255,225,77,.2);display:none;
+}
+
+/* ── Keyword Cards ─────────────────────────────────────── */
+.kw-cards{display:flex;flex-direction:column;gap:10px;margin:12px 0}
+.kw-card{
+  padding:12px 14px;border-radius:8px;
+  border:1px solid rgba(0,240,255,.25);background:rgba(0,240,255,.04);
+}
+.kw-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.kw-card-title{font-family:var(--font-mono);font-size:.75rem;font-weight:700;color:var(--neon-cyan)}
+.kw-card-fp{font-family:var(--font-mono);font-size:.65rem;color:var(--txt-muted)}
+.kw-card-body{
+  font-family:var(--font-mono);font-size:.7rem;color:var(--neon-green);
+  word-break:break-all;line-height:1.5;padding:6px 8px;border-radius:4px;
+  background:rgba(0,0,0,.3);border:1px solid rgba(42,26,94,.4);
+}
+.kw-card-body.kw-hidden{color:var(--txt-dim);font-style:italic;letter-spacing:2px}
+.kw-card-actions{display:flex;gap:6px;margin-top:6px;align-items:center;flex-wrap:wrap}
+.kw-copy-input{
+  width:120px!important;padding:4px 8px!important;font-size:.65rem!important;
+  text-align:center;border-color:rgba(255,225,77,.3)!important;
+}
+.kw-overwrite-btn{display:none}
+.kw-copy-warn{
+  font-family:var(--font-mono);font-size:.6rem;color:var(--neon-yellow);
+  padding:4px 8px;border-radius:4px;background:rgba(255,225,77,.06);
+  border:1px solid rgba(255,225,77,.15);display:none;margin-top:4px;
+}
+
+/* ── Unlock ────────────────────────────────────────────── */
+.unlock-slots{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.unlock-slot{display:flex;gap:8px;align-items:center}
+.unlock-slot input{flex:1}
+.unlock-slot .slot-status{
+  font-family:var(--font-mono);font-size:.7rem;font-weight:700;min-width:20px;text-align:center;
+}
+.slot-ok{color:var(--neon-green)}
+.slot-err{color:var(--neon-pink)}
+.slot-empty{color:var(--txt-dim)}
+.unlock-banner{
+  text-align:center;padding:16px;border-radius:10px;margin:12px 0;
+  font-size:1.1rem;font-weight:800;letter-spacing:2px;font-family:var(--font-mono);
+}
+.unlock-banner.locked{background:rgba(255,45,149,.08);border:2px solid rgba(255,45,149,.3);color:var(--neon-pink)}
+.unlock-banner.unlocked{
+  background:rgba(57,255,20,.1);border:2px solid rgba(57,255,20,.4);
+  color:var(--neon-green);box-shadow:0 0 30px rgba(57,255,20,.15);
+}
+.majority-info{
+  font-size:.75rem;color:var(--txt-muted);line-height:1.6;
+  padding:10px 14px;border-radius:6px;margin:10px 0;
+  background:rgba(180,77,255,.04);border:1px solid rgba(180,77,255,.15);
+}
+.majority-info strong{color:var(--neon-purple);font-weight:700}
+
+/* ── Self-Test Results ─────────────────────────────────── */
+.test-results{
+  padding:12px;border-radius:8px;margin:10px 0;
+  border:1px solid var(--card-border);background:rgba(0,0,0,.2);
+}
+.test-line{
+  font-family:var(--font-mono);font-size:.72rem;padding:3px 0;
+  display:flex;align-items:center;gap:8px;
+}
+.test-line.t-pass{color:var(--neon-green)}
+.test-line.t-fail{color:var(--neon-pink)}
+.test-gate-pass{
+  padding:10px 14px;border-radius:6px;margin:10px 0;
+  background:rgba(57,255,20,.06);border:1px solid rgba(57,255,20,.25);
+  color:var(--neon-green);font-family:var(--font-mono);font-size:.75rem;font-weight:600;
+}
+.test-gate-fail{
+  padding:10px 14px;border-radius:6px;margin:10px 0;
+  background:rgba(255,45,149,.06);border:1px solid rgba(255,45,149,.25);
+  color:var(--neon-pink);font-family:var(--font-mono);font-size:.75rem;font-weight:600;
+}
+
+/* ── TTL Timer ─────────────────────────────────────────── */
+.ttl-bar{
+  padding:8px 14px;border-radius:6px;margin:8px 0;
+  font-family:var(--font-mono);font-size:.75rem;font-weight:600;
+  display:flex;align-items:center;gap:8px;
+}
+.ttl-active{background:rgba(57,255,20,.06);border:1px solid rgba(57,255,20,.2);color:var(--neon-green)}
+.ttl-warning{background:rgba(255,225,77,.08);border:1px solid rgba(255,225,77,.25);color:var(--neon-yellow)}
+.ttl-expired{background:rgba(255,45,149,.08);border:1px solid rgba(255,45,149,.25);color:var(--neon-pink)}
+
 /* ── Responsive ───────────────────────────────────────── */
 @media(max-width:640px){
   html{font-size:14px}
@@ -388,7 +510,7 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
   .p-role{min-width:60px;flex:1 1 100%;order:2}
   .tile-input-wrap{order:3}
   .p-num{order:1}
-  .p-flip,.p-remove{order:4}
+  .p-flip{order:4}
   .prog-label{display:none}
   .prog-num{width:26px;height:26px;font-size:.65rem}
   .prog-line{max-width:36px;margin:12px 4px 0}
@@ -403,6 +525,9 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
   .chain-viz{padding:10px 4px;gap:4px}
   .tile-half{width:24px;height:24px}
   .verify-banner{font-size:1.1rem;padding:16px}
+  .gen-section{flex-direction:column}
+  .gen-output{font-size:.7rem}
+  .kw-card-actions{flex-direction:column;align-items:flex-start}
 }
 </style>
 </head>
@@ -423,61 +548,88 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
   <span>Side Effects: NONE</span>
 </div>
 
-
 <div class="wrap">
 
 <!-- ═══════════════ HEADER ═══════════════ -->
 <header class="header">
   <h1>Deep Sigma EDGE</h1>
-  <div class="sub">Domino Delegation Chain &mdash; Prove your delegation ceremony with domino tiles</div>
+  <div class="sub">Domino Delegation Encryption &mdash; Real Mode (High-Stakes Custody)</div>
   <div class="badge-row">
     <span class="badge badge-edge">EDGE Module</span>
-    <span class="badge badge-ver">v1.0</span>
+    <span class="badge badge-real">Real Mode</span>
+    <span class="badge badge-ver">7-of-4</span>
     <span class="badge badge-offline">Offline</span>
   </div>
+  <div class="build-id" id="buildIdDisplay"></div>
 </header>
 
 <!-- ═══════════════ PROGRESS BAR ═══════════════ -->
-<div class="progress-bar">
-  <div class="prog-step active" onclick="progClick(1)">
+<div class="progress-bar" id="progBar">
+  <div class="prog-step active" data-step="1">
     <div class="prog-num">1</div>
-    <div class="prog-label">Add People</div>
+    <div class="prog-label">Self-Test</div>
   </div>
   <div class="prog-line" id="progLine1"></div>
-  <div class="prog-step" onclick="progClick(2)">
+  <div class="prog-step" data-step="2">
     <div class="prog-num">2</div>
-    <div class="prog-label">Build Chain</div>
+    <div class="prog-label">Chain</div>
   </div>
   <div class="prog-line" id="progLine2"></div>
-  <div class="prog-step" onclick="progClick(3)">
+  <div class="prog-step" data-step="3">
     <div class="prog-num">3</div>
-    <div class="prog-label">Seal</div>
+    <div class="prog-label">Keywords</div>
   </div>
   <div class="prog-line" id="progLine3"></div>
-  <div class="prog-step" onclick="progClick(4)">
+  <div class="prog-step" data-step="4">
     <div class="prog-num">4</div>
-    <div class="prog-label">Use It</div>
+    <div class="prog-label">Unlock</div>
+  </div>
+  <div class="prog-line" id="progLine4"></div>
+  <div class="prog-step" data-step="5">
+    <div class="prog-num">5</div>
+    <div class="prog-label">Encrypt</div>
   </div>
 </div>
 
 <!-- ═══════════════ STATUS ═══════════════ -->
-<div id="statusBar" class="status-bar status-idle">Ready &mdash; add participants and enter domino tiles, or try an example.</div>
+<div id="statusBar" class="status-bar status-idle">Ready &mdash; run the crypto self-test to begin.</div>
 
-<!-- ═══════════════ Step 1: Add People ═══════════════ -->
+<!-- ═══════════════ Step 1: Self-Test ═══════════════ -->
 <div class="step active" id="step1">
   <div class="card">
-    <h3>Who is in the ceremony?
-      <span class="tip" data-tip="Each participant draws a physical domino tile. The tiles form a chain that proves everyone was present.">?</span>
+    <h3>Crypto Self-Test
+      <span class="tip" data-tip="Verifies GF(256) arithmetic, Shamir split/combine, and Base64 roundtrip before any keys are generated. Must pass to proceed.">?</span>
     </h3>
     <p class="card-intro">
-      Add each person in the delegation chain. Give them a role and enter the domino tile they drew.
-      Tiles are two numbers 0&ndash;6 (e.g. <strong>3-4</strong> or <strong>2,5</strong> or <strong>(1 6)</strong>).
+      Run the cryptographic self-test to verify all primitives work correctly in this browser.
+      Keywords cannot be generated until the self-test passes.
     </p>
     <div class="btn-row">
-      <button class="btn btn-green btn-sm" onclick="loadExample()">Try an Example</button>
-      <button class="btn btn-primary btn-sm" onclick="addParticipant()">+ Add Person</button>
+      <button class="btn btn-master" id="runTestBtn">Run Self-Test</button>
     </div>
-    <div id="participantList" style="margin-top:10px"></div>
+    <div id="testResults" class="test-results" style="display:none"></div>
+    <div id="testGate" class="test-gate-fail">Self-test required before keyword generation.</div>
+  </div>
+  <div class="step-nav">
+    <div></div>
+    <button class="btn btn-master" id="toStep2Btn" disabled>Next: Chain Ceremony &#8594;</button>
+  </div>
+</div>
+
+<!-- ═══════════════ Step 2: Chain Ceremony ═══════════════ -->
+<div class="step" id="step2">
+  <div class="card">
+    <h3>Delegation Chain Ceremony
+      <span class="tip" data-tip="7 participants each draw a physical domino tile. The tiles form a chain that proves everyone was present and participated in order.">?</span>
+    </h3>
+    <p class="card-intro">
+      7 participants required. Each draws a physical domino tile.
+      The right side of each tile must match the left side of the next (standard domino chaining).
+    </p>
+    <div class="btn-row">
+      <button class="btn btn-green btn-sm" id="loadExampleBtn">Load Example</button>
+    </div>
+    <div id="participantList"></div>
     <div style="margin-top:14px">
       <label>Tile Set
         <span class="tip" data-tip="A double-six domino set has 28 unique tiles. Taken tiles are dimmed. Click an available tile to assign it to the next empty participant.">?</span>
@@ -486,113 +638,148 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
       <div class="pal-count" id="palCount">28 of 28 available</div>
     </div>
   </div>
-  <div class="step-nav">
-    <div></div>
-    <button class="btn btn-master" onclick="goToStep(2)">Next: Build Chain &rarr;</button>
-  </div>
-</div>
-
-<!-- ═══════════════ Step 2: Build Chain ═══════════════ -->
-<div class="step" id="step2">
   <div class="card">
     <h3>Chain Preview
-      <span class="tip" data-tip="For a valid chain, the right side of each tile must match the left side of the next tile. This is standard domino chaining.">?</span>
+      <span class="tip" data-tip="For a valid chain, the right side of each tile must match the left side of the next tile.">?</span>
     </h3>
-    <p class="card-intro">
-      The right side of each tile must match the left side of the next.
-      If there is a break, try flipping a tile.
-    </p>
     <div class="chain-viz" id="chainViz"></div>
     <div id="chainStatus" class="status-bar status-idle">&mdash;</div>
     <div id="fixSuggestion"></div>
   </div>
   <div class="step-nav">
-    <button class="btn btn-primary" onclick="goToStep(1)">&larr; Back</button>
-    <button class="btn btn-master" id="sealBtn" onclick="goToStep(3)" disabled>Seal Chain &rarr;</button>
+    <button class="btn btn-primary" id="backToStep1Btn">&#8592; Back</button>
+    <button class="btn btn-master" id="toStep3Btn" disabled>Seal &amp; Continue &#8594;</button>
   </div>
 </div>
 
-<!-- ═══════════════ Step 3: Seal ═══════════════ -->
+<!-- ═══════════════ Step 3: Keywords ═══════════════ -->
 <div class="step" id="step3">
   <div class="card" style="border-color:rgba(180,77,255,.4);box-shadow:var(--glow-purple)">
     <h3 style="color:var(--neon-purple)">Chain Sealed
       <span class="tip" data-tip="The chain seal is a SHA-256 hash of the tile sequence. The Quick ID and Domino Name let you verify over the phone.">?</span>
     </h3>
-
-    <!-- Always visible: Quick ID + Domino Name -->
     <div class="seal-summary">
       <div class="seal-field">
-        <div class="sf-label">Quick ID
-          <span class="tip" data-tip="First 16 characters of the chain seal (SHA-256 hash). Use this to quickly identify a ceremony.">?</span>
-        </div>
+        <div class="sf-label">Quick ID</div>
         <div class="sf-value" id="chainFP">&mdash;</div>
       </div>
       <div class="seal-field">
-        <div class="sf-label">Domino Name
-          <span class="tip" data-tip="Two domino tile names derived from the seal. Say these over the phone for verbal verification.">?</span>
-        </div>
+        <div class="sf-label">Domino Name</div>
         <div class="sf-value" id="chainDominoFP">&mdash;</div>
       </div>
+      <div class="seal-field">
+        <div class="sf-label">Session</div>
+        <div class="sf-value" id="sessionIdDisplay">&mdash;</div>
+      </div>
     </div>
+  </div>
 
-    <!-- Action buttons -->
+  <div class="card" style="border-color:rgba(0,240,255,.3);box-shadow:var(--glow-cyan)">
+    <h3 style="color:var(--neon-cyan)">Generate Keywords
+      <span class="tip" data-tip="Generates 7 Shamir keywords (threshold 4-of-7). Each keyword holder receives one. At least 4 must combine to unlock encryption.">?</span>
+    </h3>
+    <p class="card-intro">
+      A random 256-bit secret is split into 7 keywords via Shamir Secret Sharing over GF(256).
+      Any 4 of 7 keywords can reconstruct the secret. Distribute one keyword to each participant.
+    </p>
+    <div class="majority-info">
+      <strong>Parameters (fixed):</strong> n=7 shares, t=4 threshold, time-to-live = 1 hour.
+      No single keyword reveals any information about the secret (information-theoretic security).
+    </div>
     <div class="btn-row">
-      <button class="btn btn-green btn-sm" onclick="downloadJSON()">Download Record</button>
-      <button class="btn btn-primary btn-sm" id="copyJSONBtn" onclick="copyJSON(this)">Copy JSON</button>
+      <button class="btn btn-master" id="genKeywordsBtn" disabled>Generate Keywords</button>
     </div>
-
-    <!-- Collapsed details -->
-    <details class="detail-wrap">
-      <summary>Show full details</summary>
+    <div id="kwCardsContainer" class="kw-cards" style="display:none"></div>
+    <div id="ttlDisplay" class="ttl-bar ttl-active" style="display:none">
+      Time remaining: <span id="ttlCountdown">60:00</span>
+    </div>
+    <div id="kwActions" class="btn-row" style="display:none">
+      <button class="btn btn-green btn-sm" id="downloadRecordBtn">Download Record</button>
+      <button class="btn btn-primary btn-sm" id="copyRecordBtn">Copy JSON</button>
+      <button class="btn btn-danger btn-sm" id="clearKwBtn">Clear Keywords from Memory</button>
+    </div>
+    <details class="detail-wrap" id="ceremonyDetails" style="display:none">
+      <summary>Show ceremony record</summary>
       <div class="detail-body">
         <h4>Chain String</h4>
         <div class="out-row">
           <div id="chainStr" class="out empty">&mdash;</div>
-          <button class="btn-copy" onclick="copyField('chainStr',this)">COPY</button>
+          <button class="btn-copy" id="copyChainStrBtn">COPY</button>
         </div>
         <h4>Full Seal (SHA-256)</h4>
         <div class="out-row">
           <div id="chainHash" class="out empty">&mdash;</div>
-          <button class="btn-copy" onclick="copyField('chainHash',this)">COPY</button>
+          <button class="btn-copy" id="copyChainHashBtn">COPY</button>
         </div>
         <h4>Ceremony Record (JSON)</h4>
         <div class="out-row">
           <div id="ceremonyJSON" class="out empty" style="white-space:pre-wrap;max-height:240px;overflow:auto">&mdash;</div>
-          <button class="btn-copy" onclick="copyField('ceremonyJSON',this)">COPY</button>
+          <button class="btn-copy" id="copyCeremonyBtn">COPY</button>
         </div>
       </div>
     </details>
   </div>
   <div class="step-nav">
-    <button class="btn btn-primary" onclick="goToStep(2)">&larr; Back</button>
-    <button class="btn btn-master" onclick="goToStep(4)">Next: Use It &rarr;</button>
+    <button class="btn btn-primary" id="backToStep2Btn">&#8592; Back</button>
+    <button class="btn btn-master" id="toStep4Btn" disabled>Next: Unlock &#8594;</button>
   </div>
 </div>
 
-<!-- ═══════════════ Step 4: Use It ═══════════════ -->
+<!-- ═══════════════ Step 4: Majority Unlock ═══════════════ -->
 <div class="step" id="step4">
-  <div class="tab-bar">
-    <button class="tab active" data-tab="verify" onclick="switchTab('verify')">Verify</button>
-    <button class="tab" data-tab="lock" onclick="switchTab('lock')">Lock Message</button>
-    <button class="tab" data-tab="unlock" onclick="switchTab('unlock')">Unlock Message</button>
+  <div id="unlockBanner" class="unlock-banner locked">LOCKED &#8212; enter keywords below to unlock</div>
+  <div class="card" style="border-color:rgba(255,225,77,.25)">
+    <h3 style="color:var(--neon-yellow)">Majority Unlock
+      <span class="tip" data-tip="Paste at least 4 of 7 keywords to reconstruct the secret. Keywords are verified against ceremony fingerprints and time-to-live.">?</span>
+    </h3>
+    <p class="card-intro">
+      Paste <strong>4</strong> of <strong>7</strong> keywords to unlock.
+      Each keyword is a base64 string (44 characters).
+    </p>
+    <label>Paste ceremony JSON (for fingerprint verification)</label>
+    <textarea id="unlockCeremonyInput" placeholder="Paste ceremony record JSON here..." style="min-height:50px;margin-bottom:10px"></textarea>
+    <div id="unlockSlots" class="unlock-slots"></div>
+    <div class="btn-row">
+      <button class="btn btn-sm btn-primary" id="addSlotBtn">+ Add Slot</button>
+    </div>
+    <div id="unlockProgress" style="margin-top:8px;font-family:var(--font-mono);font-size:.72rem;color:var(--txt-muted)">
+      0 of 4 valid keywords entered
+    </div>
+    <div id="unlockFpStatus" style="display:none"></div>
+    <div id="ttlUnlockDisplay" class="ttl-bar ttl-active" style="display:none">
+      Time remaining: <span id="ttlUnlockCountdown">60:00</span>
+    </div>
+  </div>
+  <div class="step-nav">
+    <button class="btn btn-primary" id="backToStep3Btn">&#8592; Back</button>
+    <button class="btn btn-master" id="toStep5Btn" disabled>Next: Encrypt &#8594;</button>
+  </div>
+</div>
+
+<!-- ═══════════════ Step 5: Encrypt / Decrypt ═══════════════ -->
+<div class="step" id="step5">
+  <div class="tab-bar" id="tabBar">
+    <button class="tab active" data-tab="verify">Verify</button>
+    <button class="tab" data-tab="lock">Lock Message</button>
+    <button class="tab" data-tab="unlock-msg">Unlock Message</button>
   </div>
 
   <!-- Verify Tab -->
   <div class="tab-panel active" id="tab-verify">
     <div class="card" style="border-color:rgba(255,225,77,.25)">
       <h3 style="color:var(--neon-yellow)">Verify a Record
-        <span class="tip" data-tip="Paste a ceremony record JSON to verify that the seal (hash) is correct and all tiles connect properly.">?</span>
+        <span class="tip" data-tip="Paste a ceremony record JSON to verify the seal, chain connectivity, time-to-live status, session ID, and keyword fingerprints.">?</span>
       </h3>
       <p class="card-intro">Paste a ceremony record or load a saved file. We will re-compute the seal and check that everything matches.</p>
       <div class="btn-row">
-        <label class="btn btn-primary btn-sm file-label">
+        <label class="btn btn-primary btn-sm file-label" id="loadJsonLabel">
           Load JSON File
-          <input type="file" accept=".json" onchange="loadJSONFile(this)"/>
+          <input type="file" accept=".json" id="loadJsonInput"/>
         </label>
       </div>
       <textarea id="verifyInput" placeholder="Paste ceremony record JSON here..." style="min-height:70px"></textarea>
       <div style="margin-top:8px">
-        <button class="btn btn-primary" onclick="verifyRecord()">Verify</button>
+        <button class="btn btn-primary" id="verifyBtn">Verify</button>
       </div>
       <div id="verifyBanner" style="display:none"></div>
       <div id="verifyDetails"></div>
@@ -603,50 +790,77 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
   <div class="tab-panel" id="tab-lock">
     <div class="card" style="border-color:rgba(0,240,255,.3)">
       <h3 style="color:var(--neon-cyan)">Lock a Message
-        <span class="tip" data-tip="Encrypts your text using AES-256-GCM. The key is derived from the chain seal + your passphrase, so only someone with the same chain and passphrase can unlock it.">?</span>
+        <span class="tip" data-tip="Encrypts your text using AES-256-GCM. The key is derived from the reconstructed secret + your passphrase via HKDF.">?</span>
       </h3>
       <p class="card-intro">
-        Encrypt text so only someone with this exact chain and the passphrase can read it.
+        Encrypt text so only someone with the keywords and passphrase can read it.
       </p>
       <label for="encPass">Passphrase</label>
-      <input type="password" id="encPass" placeholder="Enter a strong passphrase" style="margin-bottom:8px"/>
-      <label for="encPlain">Message to lock</label>
+      <div class="pass-wrap">
+        <input type="password" id="encPass" placeholder="Enter a strong passphrase"/>
+        <button class="show-toggle" id="encShowBtn">SHOW</button>
+      </div>
+      <div class="strength-meter"><div class="strength-bar" id="encStrBar"></div></div>
+      <div class="strength-label" id="encStrLabel" style="color:var(--txt-dim)">Enter passphrase</div>
+      <div id="encStrBlock" class="strength-block" style="display:none">Passphrase too weak for offline attack resistance.</div>
+      <div class="attack-note">
+        <strong>Attack reality:</strong> If an attacker obtains the ceremony JSON + ciphertext, they can guess passphrases offline at high speed.
+        Use a generated passphrase below for strong resistance.
+      </div>
+      <label>Generate a strong passphrase</label>
+      <div class="gen-section">
+        <button class="btn btn-green btn-sm" id="genDiceBtn">Diceware (10 words)</button>
+        <button class="btn btn-primary btn-sm" id="genRandBtn">Random (32 chars)</button>
+        <button class="btn btn-sm btn-copy" id="genCopyBtn" style="display:none">COPY</button>
+        <button class="btn btn-sm btn-primary" id="genUseBtn" style="display:none">Use This</button>
+      </div>
+      <div id="genOutput" class="gen-output empty" style="display:none">No passphrase generated</div>
+      <label for="encPlain" style="margin-top:8px">Message to lock</label>
       <textarea id="encPlain" placeholder="Type or paste the text you want to encrypt..."></textarea>
-      <div style="margin-top:8px">
-        <button class="btn btn-master" onclick="encryptPayload()">Lock Message</button>
+      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-master" id="encBtn" disabled>Lock Message</button>
+        <button class="btn btn-danger btn-sm" id="clearSecretsBtn">Clear Secrets</button>
       </div>
       <h4>Locked output</h4>
       <div class="out-row">
         <div id="encOutput" class="out empty">No output yet</div>
-        <button class="btn-copy" onclick="copyField('encOutput',this)">COPY</button>
+        <button class="btn-copy" id="copyEncBtn">COPY</button>
       </div>
     </div>
   </div>
 
   <!-- Unlock Message Tab -->
-  <div class="tab-panel" id="tab-unlock">
+  <div class="tab-panel" id="tab-unlock-msg">
     <div class="card" style="border-color:rgba(255,45,149,.3)">
       <h3 style="color:var(--neon-pink)">Unlock a Message
-        <span class="tip" data-tip="Decrypts text that was locked with the same chain and passphrase. If either is wrong, decryption will fail without revealing which one was incorrect.">?</span>
+        <span class="tip" data-tip="Decrypts text that was locked with the same keywords and passphrase. If either is wrong, decryption will fail.">?</span>
       </h3>
       <p class="card-intro">
-        Decrypt a message using the same chain and passphrase that was used to lock it.
+        Decrypt a message using the same keywords and passphrase that was used to lock it.
       </p>
       <label for="decPass">Passphrase</label>
-      <input type="password" id="decPass" placeholder="Enter the passphrase" style="margin-bottom:8px"/>
+      <div class="pass-wrap">
+        <input type="password" id="decPass" placeholder="Enter the passphrase"/>
+        <button class="show-toggle" id="decShowBtn">SHOW</button>
+      </div>
+      <div id="decWarn" class="dec-warn">Warning: this passphrase looks weak. Decryption will proceed, but consider using a stronger passphrase for future locks.</div>
       <label for="decCipher">Locked text (base64)</label>
       <textarea id="decCipher" placeholder="Paste the encrypted text here..."></textarea>
-      <div style="margin-top:8px">
-        <button class="btn btn-reset" onclick="decryptPayload()">Unlock Message</button>
+      <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-reset" id="decryptBtn">Unlock Message</button>
+        <button class="btn btn-danger btn-sm" id="clearSecretsBtn2">Clear Secrets</button>
       </div>
       <h4>Unlocked output</h4>
-      <div id="decOutput" class="out empty">No output yet</div>
+      <div class="out-row">
+        <div id="decOutput" class="out empty">No output yet</div>
+        <button class="btn-copy" id="copyDecBtn">COPY</button>
+      </div>
     </div>
   </div>
 
   <div class="step-nav">
-    <button class="btn btn-primary" onclick="goToStep(3)">&larr; Back</button>
-    <button class="btn btn-reset" onclick="resetAll()">Start Over</button>
+    <button class="btn btn-primary" id="backToStep4Btn">&#8592; Back</button>
+    <button class="btn btn-reset" id="resetBtn">Start Over</button>
   </div>
 </div>
 
@@ -654,13 +868,15 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
 <details class="sec-notes">
   <summary>Security &amp; Usage Notes</summary>
   <ul>
-    <li><strong>Chain coordination.</strong> Standard domino chaining: the right value of each tile must match the left value of the next. This constrains tile selection and proves sequential coordination between participants.</li>
-    <li><strong>Ceremony binding.</strong> Lock/Unlock keys are derived via HKDF-SHA256 using the chain seal as input and SHA-256(passphrase) as salt. Different chains produce different keys even with the same passphrase.</li>
-    <li><strong>Passphrase is the secret.</strong> The chain string is public (it appears in the ceremony record). Security depends entirely on passphrase strength. Use a strong passphrase.</li>
-    <li><strong>No information leakage.</strong> Decryption failure (wrong chain or wrong passphrase) produces the same generic error. AES-GCM authentication catches both key mismatch and ciphertext tampering.</li>
-    <li><strong>Ceremony record.</strong> The JSON output contains the chain, seal, fingerprints, participants, and timestamp. Embed this in authority ledger entries as a <code>ceremony_proof</code> field.</li>
-    <li><strong>Domino name.</strong> Maps the first two bytes of the chain seal to domino tile names for verbal verification. 784 possible combinations.</li>
-    <li><strong>Deterministic.</strong> Same tile inputs and orientations always produce the same chain seal. Independent verification on air-gapped machines is possible.</li>
+    <li><strong>Real mode.</strong> Fixed parameters: 7 keywords, threshold 4-of-7, 1 hour time-to-live. No user overrides. Designed for high-stakes custody ceremonies.</li>
+    <li><strong>Chain coordination.</strong> Standard domino chaining: the right value of each tile must match the left value of the next. This constrains tile selection and proves sequential coordination between 7 participants.</li>
+    <li><strong>Threshold cryptography.</strong> A random 256-bit secret is split via Shamir Secret Sharing over GF(256). Any 4 keywords reconstruct the secret. No single keyword reveals any information (information-theoretic security).</li>
+    <li><strong>Key derivation.</strong> Lock/Unlock keys are derived via HKDF-SHA256: input keying material = reconstructed secret, salt = SHA-256(passphrase), info = "EDGE/MAJORITY/ENC". Both keywords and passphrase are required.</li>
+    <li><strong>Anti-leak.</strong> Keywords are hidden by default. Press-and-hold to reveal. Copy requires typing "COPY" as confirmation. Clipboard can be overwritten with spaces after copying.</li>
+    <li><strong>Time-to-live.</strong> Keywords expire 1 hour after generation. Unlock is revoked when the timer expires. The verifier checks time-to-live status.</li>
+    <li><strong>No information leakage.</strong> Decryption failure (wrong keywords or wrong passphrase) produces the same generic error. AES-GCM authentication catches both key mismatch and ciphertext tampering.</li>
+    <li><strong>Ceremony record.</strong> The JSON output contains the chain, seal, fingerprints, participants, session ID, time-to-live window, and keyword fingerprints. Never includes actual keywords or the secret.</li>
+    <li><strong>Self-test gate.</strong> Cryptographic primitives are verified before any keys are generated. GF(256) mul (5 known-answer), GF(256) inv (10 random), Shamir roundtrip (7/4), and Base64 roundtrip.</li>
     <li><strong>No network calls.</strong> This file runs entirely in-browser. Verify by inspecting source or running with network disabled.</li>
   </ul>
 </details>
@@ -670,6 +886,15 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
 <!-- ═══════════════ JAVASCRIPT ═══════════════ -->
 <script>
 "use strict";
+
+/* ── Build ID ──────────────────────────────────────────── */
+var EDGE_BUILD_ID="EDGE_BUILD_ID:EDGE_Domino_DelegationChain_v1";
+
+/* ── Fixed Parameters (Real Mode) ──────────────────────── */
+var N_SHARES=7;
+var THRESHOLD=4;
+var TTL_MS=3600000; /* 1 hour */
+var N_PARTICIPANTS=7;
 
 /* ── State ──────────────────────────────────────────── */
 var state={
@@ -681,12 +906,24 @@ var state={
   chainString:"",
   valid:false,
   sealed:false,
-  currentStep:1
+  currentStep:1,
+  selfTestPassed:false,
+  sessionSecret:null,
+  sessionId:"",
+  kwShares:[],
+  kwFingerprints:{},
+  kwGenerated:false,
+  createdAt:null,
+  expiresAt:null,
+  ttlTimer:null,
+  unlocked:false,
+  reconstructed:null,
+  unlockSlotCount:THRESHOLD
 };
 
 var encoder=new TextEncoder();
 
-/* ── Domino Lookup Table (index 0-27 -> [a,b]) ────────── */
+/* ── Domino Lookup Table ───────────────────────────────── */
 var DOMINO_TABLE=[];
 (function(){
   for(var b=0;b<=6;b++){
@@ -704,7 +941,6 @@ function tileName(a,b){
   return TILE_WORDS[lo]+"-"+TILE_WORDS[hi];
 }
 
-/* Map first 2 bytes of hex to two domino tile names */
 function dominoFingerprint(hex){
   if(!hex||hex.length<4)return "\u2014";
   var b0=parseInt(hex.substring(0,2),16);
@@ -714,14 +950,10 @@ function dominoFingerprint(hex){
   return tileName(t0[0],t0[1])+", "+tileName(t1[0],t1[1]);
 }
 
-/* ── Pip positions per value (col,row in 3x3 grid) ────── */
+/* ── Pip positions per value (3x3 grid) ────────────────── */
 var PIP_POS={
-  0:[],
-  1:[[1,1]],
-  2:[[2,0],[0,2]],
-  3:[[2,0],[1,1],[0,2]],
-  4:[[0,0],[2,0],[0,2],[2,2]],
-  5:[[0,0],[2,0],[1,1],[0,2],[2,2]],
+  0:[],1:[[1,1]],2:[[2,0],[0,2]],3:[[2,0],[1,1],[0,2]],
+  4:[[0,0],[2,0],[0,2],[2,2]],5:[[0,0],[2,0],[1,1],[0,2],[2,2]],
   6:[[0,0],[2,0],[0,1],[2,1],[0,2],[2,2]]
 };
 
@@ -762,6 +994,186 @@ function hkdfSha256(ikmBytes,saltBytes,infoBytes,length){
   }).then(function(buf){return new Uint8Array(buf)});
 }
 
+/* ── Base64 encode/decode ──────────────────────────────── */
+function b64Encode(bytes){
+  var binary="";
+  for(var i=0;i<bytes.length;i++)binary+=String.fromCharCode(bytes[i]);
+  return btoa(binary);
+}
+function b64Decode(str){
+  var binary=atob(str);
+  var bytes=new Uint8Array(binary.length);
+  for(var i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+  return bytes;
+}
+
+/* ── GF(256) Arithmetic (AES polynomial 0x11b) ──────── */
+function gfAdd(a,b){return a^b}
+
+function gfMul(a,b){
+  var r=0;
+  for(var i=0;i<8;i++){
+    if(b&1)r^=a;
+    var hi=a&0x80;
+    a=(a<<1)&0xFF;
+    if(hi)a^=0x1b;
+    b>>=1;
+  }
+  return r;
+}
+
+function gfPow(a,exp){
+  var r=1;var base=a;
+  while(exp>0){
+    if(exp&1)r=gfMul(r,base);
+    base=gfMul(base,base);
+    exp>>=1;
+  }
+  return r;
+}
+
+function gfInv(a){
+  if(a===0)throw new Error("GF256: inverse of zero");
+  return gfPow(a,254);
+}
+
+function gfDiv(a,b){
+  if(b===0)throw new Error("GF256: division by zero");
+  return gfMul(a,gfInv(b));
+}
+
+/* ── Shamir Secret Sharing over GF(256) ─────────────── */
+function sssSplit(secretBytes,n,t){
+  if(n<2||n>255)throw new Error("Shamir: n must be 2-255");
+  if(t<2||t>n)throw new Error("Shamir: t must be 2..n");
+  var shares=[];
+  for(var i=0;i<n;i++){
+    shares.push(new Uint8Array(secretBytes.length+1));
+    shares[i][0]=i+1;
+  }
+  for(var byteIdx=0;byteIdx<secretBytes.length;byteIdx++){
+    var coeffs=new Uint8Array(t);
+    coeffs[0]=secretBytes[byteIdx];
+    var rnd=new Uint8Array(t-1);
+    window.crypto.getRandomValues(rnd);
+    for(var c=1;c<t;c++)coeffs[c]=rnd[c-1];
+    for(var i=0;i<n;i++){
+      var x=i+1;
+      var y=0;
+      for(var c=t-1;c>=0;c--){
+        y=gfAdd(gfMul(y,x),coeffs[c]);
+      }
+      shares[i][byteIdx+1]=y;
+    }
+  }
+  return shares;
+}
+
+function sssCombine(sharesBytes){
+  if(sharesBytes.length<2)throw new Error("Shamir: need at least 2 shares");
+  var len=sharesBytes[0].length-1;
+  var t=sharesBytes.length;
+  var secret=new Uint8Array(len);
+  var xs=[];
+  for(var i=0;i<t;i++)xs.push(sharesBytes[i][0]);
+  for(var byteIdx=0;byteIdx<len;byteIdx++){
+    var value=0;
+    for(var i=0;i<t;i++){
+      var yi=sharesBytes[i][byteIdx+1];
+      var num=1;var den=1;
+      for(var j=0;j<t;j++){
+        if(j===i)continue;
+        num=gfMul(num,xs[j]);
+        den=gfMul(den,gfAdd(xs[i],xs[j]));
+      }
+      var li=gfDiv(num,den);
+      value=gfAdd(value,gfMul(yi,li));
+    }
+    secret[byteIdx]=value;
+  }
+  return secret;
+}
+
+/* ── Keyword fingerprint: SHA-256("KW" + byte(x) + share_bytes) first 16 hex ── */
+function kwFingerprint(shareBytes){
+  var x=shareBytes[0];
+  var prefix=new Uint8Array(3);
+  prefix[0]=0x4B; /* K */
+  prefix[1]=0x57; /* W */
+  prefix[2]=x;
+  var combined=new Uint8Array(3+shareBytes.length);
+  combined.set(prefix,0);
+  combined.set(shareBytes,3);
+  return sha256Bytes(combined).then(function(hash){
+    return bytesToHex(hash).substring(0,16);
+  });
+}
+
+/* ── Key derivation from reconstructed secret + passphrase ── */
+function hkdfAesKeyFromSecretAndPassphrase(secretBytes,passphrase){
+  var passBytes=encoder.encode(passphrase);
+  return sha256Bytes(passBytes).then(function(saltBytes){
+    return hkdfSha256(secretBytes,saltBytes,encoder.encode("EDGE/MAJORITY/ENC"),32);
+  }).then(function(keyBytes){
+    return window.crypto.subtle.importKey("raw",keyBytes,{name:"AES-GCM"},false,["encrypt","decrypt"]);
+  });
+}
+
+/* ── Tile Parsing ──────────────────────────────────────── */
+function parseSingleTile(str){
+  var s=(str||"").trim().replace(/[()]/g,"");
+  if(!s)return{ok:false,error:"empty"};
+  var parts=s.split(/[\s,\-]+/);
+  if(parts.length!==2)return{ok:false,error:"Enter two numbers, e.g. 3-4"};
+  var a=parseInt(parts[0],10);
+  var b=parseInt(parts[1],10);
+  if(isNaN(a)||isNaN(b))return{ok:false,error:"Use numbers 0\u20136"};
+  if(a<0||a>6||b<0||b>6)return{ok:false,error:"Each side must be 0\u20136"};
+  return{ok:true,a:a,b:b};
+}
+
+/* ── Chain Validation ──────────────────────────────────── */
+function checkChain(){
+  for(var i=0;i<state.participants.length;i++){
+    if(!state.participants[i].parsed)return{valid:false,breakAt:-1,reason:"Not all tiles entered"};
+  }
+  var seen={};
+  for(var i=0;i<state.participants.length;i++){
+    var p=state.participants[i];
+    var lo=Math.min(p.a,p.b),hi=Math.max(p.a,p.b);
+    var key=lo+"-"+hi;
+    if(seen[key]!==undefined){
+      return{valid:false,breakAt:-1,
+        reason:"Duplicate tile: participants "+(seen[key]+1)+" and "+(i+1)+" both drew "+lo+"-"+hi};
+    }
+    seen[key]=i;
+  }
+  for(var i=1;i<state.participants.length;i++){
+    if(state.participants[i-1].b!==state.participants[i].a){
+      return{valid:false,breakAt:i,reason:"Break at position "+(i+1)+": right("+state.participants[i-1].b+") \u2260 left("+state.participants[i].a+")"};
+    }
+  }
+  return{valid:true,breakAt:-1,reason:"Valid chain of "+state.participants.length};
+}
+
+function buildChainString(){
+  return state.participants.map(function(p){return p.a+"-"+p.b}).join(" \u2192 ");
+}
+
+function getFixSuggestion(breakAt){
+  if(breakAt<1)return null;
+  var prev=state.participants[breakAt-1];
+  var curr=state.participants[breakAt];
+  if(prev.b===curr.b){
+    return{msg:"Tile "+(breakAt+1)+" shows "+curr.a+"|"+curr.b+" but needs "+prev.b+" on the left. Flipping it to "+curr.b+"|"+curr.a+" would connect.",idx:breakAt};
+  }
+  if(prev.a===curr.a){
+    return{msg:"Tile "+breakAt+" shows "+prev.a+"|"+prev.b+" but needs "+curr.a+" on the right. Flipping it to "+prev.b+"|"+prev.a+" would connect.",idx:breakAt-1};
+  }
+  return null;
+}
+
+/* ── UI Helpers ────────────────────────────────────────── */
 function setOut(id,text,isEmpty){
   var el=document.getElementById(id);
   if(!el)return;
@@ -775,93 +1187,1003 @@ function setStatus(msg,level){
   bar.className="status-bar status-"+level;
 }
 
+function copyToClipboard(text,btn,origLabel){
+  if(!navigator.clipboard||!navigator.clipboard.writeText)return;
+  navigator.clipboard.writeText(text).then(function(){
+    if(btn){
+      btn.textContent="COPIED!";btn.classList.add("copied");
+      setTimeout(function(){btn.textContent=origLabel||"COPY";btn.classList.remove("copied")},2000);
+    }
+  });
+}
+
 function copyField(id,btn){
   var el=document.getElementById(id);
   if(!el||el.classList.contains("empty"))return;
-  var text=el.textContent;
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(function(){
-      var orig=btn.textContent;
-      btn.textContent="COPIED!";btn.classList.add("copied");
-      setTimeout(function(){btn.textContent=orig;btn.classList.remove("copied")},2000);
-    });
+  copyToClipboard(el.textContent,btn,"COPY");
+}
+
+/* ── Diceware Word List (1024 words) ───────────────────── */
+var DICEWARE=("able acid acre acts aged aide aims airy alas ally amid amps ante apex arch area army arts atom aunt auto avid axis back bail bake bald ball band bane bang bank bare bark barn base bash bath bats bead beam bean bear beat beds beef been beer bell belt bend bent best bets bias bike bill bind bird bite blew blob bloc blot blow blue blur boar boat body bold bolt bomb bond bone book boom boot bore born boss both bout bowl bows bred brew brim brit brls brow buck buds bugs bulk bull bump bund bunk burn burp bust busy buzz cafe cage cake calm came camp cane cape card care cart case cash cast cave cell chef chin chip chop chow cite city clad clam clan clap claw clay clip clod clog clot club clue coal coat code coil coin cold cole colt comb come cone cook cool cope copy cord core cork corn cost cosy coup cove cozy crab crew crop crow cube cubs cult curb cure curl cute daft dale dame damp dare dark dart dash data dawn dead deaf deal dean dear debt deck deed deem deep deer demo deny desk dial dice diet dime dine dire dirt disc dish dock does dome done doom door dose dots dove down doze drab drag draw drew drip drop drum dual dubs duck dude duel dull dumb dump dune dunk dusk dust duty dyed each earl earn ease east easy edge edit eels eery eggs emit envy epic euro even ever evil exam exit eyed eyes face fact fade fail fair fake fall fame fang fare farm fast fate fawn fear feat feed feel fell felt fend fern fete feud figs file fill film find fine fire firm fish fist five flag flan flap flat flaw fled flee flew flex flip flit flog flow foam foes foil fold folk fond font food fool foot ford fore fork form fort foul four fowl free frog from fuel full fund fury fuse fuzz gags gain gait gale game gang garb gash gate gave gaze gear gene gift gild gilt gist give glad glee glen glib glob gloom glow glue glut gnaw goat goes gold golf gone good gore grab gram gray grew grid grim grin grip grit grow grub gulf gums gust guts hack hail hair half hall halt hand hang hare harm harp hash hast hate haul have haze head heal heap hear heat heed heel held helm help hens herb herd here hero hers hide high hike hill hilt hint hire hive hobs hock hold hole holy home hone hood hook hope horn hose host hour howl hubs hued huge hulk hull hump hung hunt hurl hurt hush hymn iced icon idea idle inch info into ions iron isle item jabs jack jade jail jams jars java jazz jean jeer jerk jest jets jigs jobs jock join joke jolt jots jump june jury just jute keen keep kelp kept keys kick kids kill kind king kiss kite knack knee knew knit knob knot know lace lack lacy laid lake lamb lame lamp land lane lard lark lash last late lawn laws lead leaf leak lean leap left lend lens less levy liar lick lied lieu life lift limb lime limp line link lint lion lips list live load loaf loan lobe lock loft logo lone long look loom loop lord lore lose loss lost loud love luck lump lung lure lurk lush lust lynx mace made mail main make male mall malt mane many mare mark mars mash mask mass mast mate maze meal mean meat meet meld melt memo mend menu mere mesh mess mice mild milk mill mime mind mine mint mire miss mist mite moan moat mock mode mold mole molt monk mood moon moor more morn moss most moth move much muck mule muse mush must mute myth nail name nape nave navy near neat neck need nest nets newt next nice nick nine node none noon norm nose note noun nude null oaks oath obey odds odor oils okay omen omit once only onto opal open opts oral orca ores ours oust oven over owed owes owls owns pace pack pact page paid pail pain pair pale palm pane pang park part pass past path pave pawn peak peal pear peas peat peck peek peel peer pelt pend perk pest pick pier pike pile pine pink pipe plan play plea plod plot plow ploy plug plum plus pods poem poet poke pole poll polo pond pony pool poor pope pore pork port pose post pour pray prey prod prop prow puck pull pulp pump punk pure push quad quay quiz race rack raft rage raid rail rain rake ramp rang rank rant rare rash rate rave rays read real ream reap rear reed reef reel rein rely rend rent rest rice rich ride rift rime rind ring riot rise risk road roam roar robe rock rode role roll roof room root rope rose rosy rote rout rove rude ruin rule rump rune rung rush rust sack safe saga sage said sail sake sale salt same sand sane sang sank sash save scan scar seal seam seat sect seed seek seem seen self sell send sent shed shin ship shop shot show shut sick side sift sigh sign silk silt sing sink site size skit slab slag slam slap slat sled slew slid slim slit slob slot slow slug slum smog snap snip snow snub snug soak soap soar sock soda sofa soft soil sold sole some song soon soot sore sort soul sour span spar sped spin spit spot spur stab star stay stem step stew stir stop stub stud stun such suit sulk sung sunk sure surf swan swap sway swim tabs tack tact tail take tale talk tall tame tang tank tape taps tart task taxi teak teal team tear teen tell tend tens tent term test text than that them then they thin this thud thug thus tick tide tidy tied tier tile till tilt time tine tiny tire toad toil told toll tomb tone took tool tops tore torn toss tour town trap tray tree trek trim trio trip trod trot true tube tuck tuft tuna tune turf turn tusk twin type ugly undo unit unto upon urge used user vale vane vary vase vast veil vein vent verb very vest veto vial vice view vine void volt vote wade wage wail wait wake walk wall wand want ward warm warn warp wart wash wasp wave wavy waxy weak wean wear weed week well welt went wept were west what when whim whip whom wick wide wife wild will wilt wily wind wine wing wink wipe wire wise wish wisp with wits woke wolf womb wood wool word wore work worm worn wove wrap wren writ yank yard yarn year yell yoga yoke yolk your zeal zero zinc zone zoom").split(" ");
+
+/* ── Passphrase Strength Assessment (Real Mode) ───────── */
+function assessPassphrase(pass){
+  if(!pass)return{level:0,label:"Enter passphrase",strong:false};
+  var len=pass.length;
+  /* Rule 1: 10+ space-separated words, each >= 2 chars */
+  var words=pass.trim().split(/\s+/);
+  var allWords=true;
+  for(var i=0;i<words.length;i++){if(words[i].length<2){allWords=false;break}}
+  if(words.length>=10&&allWords){
+    return{level:3,label:"Strong (diceware, ~"+Math.floor(words.length*10)+" bits)",strong:true};
+  }
+  /* Rule 2: 16+ alphanumeric chars with letters AND digits */
+  if(len>=16&&/[A-Za-z]/.test(pass)&&/[0-9]/.test(pass)&&/^[A-Za-z0-9]+$/.test(pass)){
+    return{level:3,label:"Strong (alphanumeric, ~"+Math.floor(len*5.95)+" bits)",strong:true};
+  }
+  /* Rule 3: 32+ chars with letters + digits + symbols */
+  var hasLetters=/[A-Za-z]/.test(pass);
+  var hasDigits=/[0-9]/.test(pass);
+  var hasSymbols=/[^A-Za-z0-9\s]/.test(pass);
+  if(len>=32&&hasLetters&&hasDigits&&hasSymbols){
+    return{level:3,label:"Strong (long mixed, 32+ chars)",strong:true};
+  }
+  /* Intermediate gradations */
+  if(words.length>=7&&allWords)return{level:2,label:"Moderate \u2014 need 10+ words for strong",strong:false};
+  if(len>=20&&hasLetters&&hasDigits)return{level:2,label:"Moderate \u2014 need more length or variety",strong:false};
+  if(len>=10)return{level:1,label:"Weak \u2014 needs more length or variety",strong:false};
+  if(len>=4)return{level:1,label:"Too short",strong:false};
+  return{level:0,label:"Too short",strong:false};
+}
+
+var STRENGTH_COLORS=["#ff2d95","#ff6a00","#ffe14d","#39ff14"];
+var STRENGTH_WIDTHS=["8%","30%","60%","100%"];
+
+function updateEncStrength(){
+  var pass=document.getElementById("encPass").value;
+  var result=assessPassphrase(pass);
+  var bar=document.getElementById("encStrBar");
+  var label=document.getElementById("encStrLabel");
+  var block=document.getElementById("encStrBlock");
+  var btn=document.getElementById("encBtn");
+  bar.style.width=STRENGTH_WIDTHS[result.level];
+  bar.style.background=STRENGTH_COLORS[result.level];
+  label.textContent=result.label;
+  label.style.color=STRENGTH_COLORS[result.level];
+  if(!pass){
+    block.style.display="none";btn.disabled=true;
+  }else if(!result.strong){
+    block.style.display="";block.className="strength-block";
+    block.textContent="Passphrase too weak for offline attack resistance.";
+    btn.disabled=true;
   }else{
-    var ta=document.createElement("textarea");
-    ta.value=text;ta.style.position="fixed";ta.style.opacity="0";
-    document.body.appendChild(ta);ta.select();
-    try{document.execCommand("copy");
-      var orig=btn.textContent;
-      btn.textContent="COPIED!";btn.classList.add("copied");
-      setTimeout(function(){btn.textContent=orig;btn.classList.remove("copied")},2000);
-    }catch(e){/* fallback failed */}
-    document.body.removeChild(ta);
+    block.style.display="";block.className="strength-block strong";
+    block.textContent="Passphrase meets strength threshold.";
+    btn.disabled=!state.unlocked||!isTTLActive();
   }
 }
 
-/* ── Tile Parsing (enhanced: accepts 2-5, 2 5, 2,5, (2,5)) ── */
-function parseSingleTile(str){
-  var s=(str||"").trim().replace(/[()]/g,"");
-  if(!s)return{ok:false,error:"empty"};
-  var parts=s.split(/[\s,\-]+/);
-  if(parts.length!==2)return{ok:false,error:"Enter two numbers, e.g. 3-4"};
-  var a=parseInt(parts[0],10);
-  var b=parseInt(parts[1],10);
-  if(isNaN(a)||isNaN(b))return{ok:false,error:"Use numbers 0\u20136"};
-  if(a<0||a>6||b<0||b>6)return{ok:false,error:"Each side must be 0\u20136"};
-  return{ok:true,a:a,b:b};
+/* ── Passphrase Generators ───────────────────────────── */
+var _generatedPass="";
+
+function generateDiceware(){
+  var words=[];
+  var arr=new Uint32Array(10);
+  window.crypto.getRandomValues(arr);
+  for(var i=0;i<10;i++){words.push(DICEWARE[arr[i]%DICEWARE.length])}
+  _generatedPass=words.join(" ");
+  showGenerated();
 }
 
-/* ── Wizard Navigation ──────────────────────────────────── */
-function goToStep(n){
-  if(n===state.currentStep||n<1||n>4)return;
+function generateRandom32(){
+  var charset="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%&*-_=+";
+  var arr=new Uint8Array(32);
+  window.crypto.getRandomValues(arr);
+  var result="";
+  for(var i=0;i<32;i++){result+=charset[arr[i]%charset.length]}
+  _generatedPass=result;
+  showGenerated();
+}
 
-  /* Going backward */
+function showGenerated(){
+  var el=document.getElementById("genOutput");
+  el.style.display="";el.textContent=_generatedPass;el.className="gen-output";
+  document.getElementById("genCopyBtn").style.display="";
+  document.getElementById("genUseBtn").style.display="";
+}
+
+function copyGenerated(btn){
+  if(!_generatedPass)return;
+  copyToClipboard(_generatedPass,btn,"COPY");
+}
+
+function useGenerated(){
+  if(!_generatedPass)return;
+  var inp=document.getElementById("encPass");
+  inp.value=_generatedPass;inp.type="text";
+  document.getElementById("encShowBtn").textContent="HIDE";
+  updateEncStrength();
+}
+
+function togglePassVis(inputId,btnId){
+  var inp=document.getElementById(inputId);
+  var btn=document.getElementById(btnId);
+  if(inp.type==="password"){inp.type="text";btn.textContent="HIDE"}
+  else{inp.type="password";btn.textContent="SHOW"}
+}
+
+/* ── Self-Test (Real Mode gate) ──────────────────────── */
+function runSelfTest(){
+  var results=[];var allPass=true;
+  /* GF(256) mul: 5 known-answer */
+  var mulTests=[[0x53,0xCA,0x01],[0x01,0xFF,0xFF],[0x00,0xFF,0x00],[0x03,0x03,0x05],[0x02,0x80,0x1b]];
+  for(var i=0;i<mulTests.length;i++){
+    var mt=mulTests[i];var r=gfMul(mt[0],mt[1])===mt[2];
+    results.push({pass:r,label:"GF256 mul(0x"+mt[0].toString(16)+",0x"+mt[1].toString(16)+")=0x"+mt[2].toString(16)});
+    if(!r)allPass=false;
+  }
+  /* GF(256) inv: 10 random nonzero */
+  var invPass=true;
+  for(var i=0;i<10;i++){
+    var arr=new Uint8Array(1);
+    do{window.crypto.getRandomValues(arr)}while(arr[0]===0);
+    if(gfMul(arr[0],gfInv(arr[0]))!==1){invPass=false;break}
+  }
+  results.push({pass:invPass,label:"GF256 inv (10 random nonzero)"});
+  if(!invPass)allPass=false;
+  /* Shamir roundtrip: split 7/t=4, reconstruct [1,3,5,7] */
+  var testSecret=new Uint8Array(32);
+  window.crypto.getRandomValues(testSecret);
+  var shares=sssSplit(testSecret,7,4);
+  var subset=[shares[0],shares[2],shares[4],shares[6]];
+  var recovered=sssCombine(subset);
+  var sssPass=true;
+  for(var i=0;i<32;i++){if(recovered[i]!==testSecret[i]){sssPass=false;break}}
+  results.push({pass:sssPass,label:"Shamir roundtrip (7/4, subset [1,3,5,7])"});
+  if(!sssPass)allPass=false;
+  /* Base64 roundtrip: 33 bytes */
+  var testB=new Uint8Array(33);
+  window.crypto.getRandomValues(testB);
+  var enc=b64Encode(testB);var dec=b64Decode(enc);
+  var b64Pass=dec.length===33;
+  if(b64Pass){for(var i=0;i<33;i++){if(dec[i]!==testB[i]){b64Pass=false;break}}}
+  results.push({pass:b64Pass,label:"Base64 roundtrip (33 bytes)"});
+  if(!b64Pass)allPass=false;
+  /* Cleanup */
+  testSecret.fill(0);
+  for(var i=0;i<shares.length;i++)shares[i].fill(0);
+  /* UI update */
+  state.selfTestPassed=allPass;
+  var container=document.getElementById("testResults");
+  container.style.display="";container.innerHTML="";
+  for(var i=0;i<results.length;i++){
+    var line=document.createElement("div");
+    line.className="test-line "+(results[i].pass?"t-pass":"t-fail");
+    line.textContent=(results[i].pass?"\u2713":"\u2717")+" "+results[i].label;
+    container.appendChild(line);
+  }
+  var gate=document.getElementById("testGate");
+  var toStep2=document.getElementById("toStep2Btn");
+  if(allPass){
+    gate.className="test-gate-pass";
+    gate.textContent="\u2713 All self-tests passed. Ready to proceed.";
+    toStep2.disabled=false;
+    setStatus("Self-test passed. Proceed to chain ceremony.","ok");
+  }else{
+    gate.className="test-gate-fail";
+    gate.textContent="\u2717 Self-test failed. Cannot generate keywords.";
+    toStep2.disabled=true;
+    setStatus("Self-test failed.","err");
+  }
+}
+
+/* ── Participant Management ────────────────────────────── */
+function renderParticipants(){
+  var container=document.getElementById("participantList");
+  container.innerHTML="";
+  for(var i=0;i<state.participants.length;i++){
+    var p=state.participants[i];
+    var row=document.createElement("div");
+    row.className="p-row";row.id="p-row-"+i;
+    var num=document.createElement("span");
+    num.className="p-num";num.textContent=String(i+1);
+    var role=document.createElement("input");
+    role.type="text";role.className="p-role";
+    role.placeholder=i===0?"e.g. Authority":"e.g. Delegate";
+    role.value=p.role;role.setAttribute("data-idx",String(i));
+    var tileWrap=document.createElement("div");
+    tileWrap.className="tile-input-wrap";
+    var tile=document.createElement("input");
+    tile.type="text";tile.className="p-tile-input";
+    tile.placeholder="3-4";tile.value=p.tile;
+    tile.title="Two numbers 0-6: e.g. 3-4 or 2,5";
+    tile.setAttribute("data-idx",String(i));
+    var preview=document.createElement("span");
+    preview.className="tile-preview";
+    if(p.parsed){preview.textContent=p.a+"|"+p.b}
+    else{preview.style.display="none"}
+    tileWrap.appendChild(tile);tileWrap.appendChild(preview);
+    var flip=document.createElement("button");
+    flip.className="p-flip";flip.textContent="\u21c4";flip.title="Flip tile";
+    flip.setAttribute("data-idx",String(i));flip.setAttribute("data-action","flip");
+    row.appendChild(num);row.appendChild(role);row.appendChild(tileWrap);
+    row.appendChild(flip);
+    container.appendChild(row);
+  }
+  renderTilePalette();
+}
+
+function syncParticipantInput(idx){
+  var row=document.getElementById("p-row-"+idx);
+  if(!row)return;
+  var p=state.participants[idx];
+  p.tile=row.querySelector(".p-tile-input").value;
+  p.role=row.querySelector(".p-role").value;
+  var result=parseSingleTile(p.tile);
+  if(result.ok){p.a=result.a;p.b=result.b;p.parsed=true}
+  else{p.a=-1;p.b=-1;p.parsed=false}
+  var preview=row.querySelector(".tile-preview");
+  if(!preview)return;
+  if(p.parsed){
+    preview.textContent=p.a+"|"+p.b;
+    preview.className="tile-preview";preview.style.display="";
+  }else if(p.tile.trim()){
+    preview.textContent=result.error;
+    preview.className="tile-preview tile-err";preview.style.display="";
+  }else{
+    preview.textContent="";preview.style.display="none";
+  }
+  state.sealed=false;
+  renderTilePalette();
+  refreshViz();
+}
+
+function syncAllInputs(){
+  for(var i=0;i<state.participants.length;i++){syncParticipantInput(i)}
+}
+
+function flipTile(idx){
+  var p=state.participants[idx];
+  if(!p.parsed)return;
+  var tmp=p.a;p.a=p.b;p.b=tmp;
+  p.tile=p.a+"-"+p.b;
+  renderParticipants();clearSeal();refreshViz();
+}
+
+/* ── Tile Palette ──────────────────────────────────────── */
+function getUsedTiles(){
+  var used={};
+  for(var i=0;i<state.participants.length;i++){
+    var p=state.participants[i];
+    if(!p.parsed)continue;
+    var lo=Math.min(p.a,p.b),hi=Math.max(p.a,p.b);
+    used[lo+"-"+hi]=i;
+  }
+  return used;
+}
+
+function renderTilePalette(){
+  var pal=document.getElementById("tilePalette");
+  if(!pal)return;
+  pal.innerHTML="";
+  var used=getUsedTiles();
+  var avail=28-Object.keys(used).length;
+  for(var t=0;t<DOMINO_TABLE.length;t++){
+    var pair=DOMINO_TABLE[t];var a=pair[0],b=pair[1];
+    var key=a+"-"+b;
+    var el=document.createElement("div");
+    var taken=used[key]!==undefined;
+    el.className="pal-tile"+(taken?" pal-used":"");
+    el.title=tileName(a,b)+(taken?" (participant "+(used[key]+1)+")":"");
+    el.setAttribute("data-tile-a",String(a));
+    el.setAttribute("data-tile-b",String(b));
+    var s1=document.createElement("span");s1.textContent=String(a);
+    var sep=document.createElement("span");sep.className="pal-sep";
+    var s2=document.createElement("span");s2.textContent=String(b);
+    el.appendChild(s1);el.appendChild(sep);el.appendChild(s2);
+    pal.appendChild(el);
+  }
+  var ct=document.getElementById("palCount");
+  if(ct)ct.textContent=avail+" of 28 available";
+}
+
+function pickTile(a,b){
+  var idx=-1;
+  for(var i=0;i<state.participants.length;i++){
+    if(!state.participants[i].parsed){idx=i;break}
+  }
+  if(idx===-1){setStatus("All participants already have tiles.","warn");return}
+  state.participants[idx].tile=a+"-"+b;
+  state.participants[idx].a=a;state.participants[idx].b=b;
+  state.participants[idx].parsed=true;
+  renderParticipants();
+  setStatus("Assigned "+a+"|"+b+" ("+tileName(a,b)+") to participant "+(idx+1)+".","ok");
+  state.sealed=false;refreshViz();
+}
+
+/* ── Chain Visualization ──────────────────────────────── */
+function renderChainViz(check){
+  var viz=document.getElementById("chainViz");
+  viz.innerHTML="";
+  for(var i=0;i<state.participants.length;i++){
+    var p=state.participants[i];
+    if(!p.parsed)continue;
+    if(i>0){
+      var arrow=document.createElement("div");
+      arrow.className="chain-arrow";
+      var connected=state.participants[i-1].b===p.a;
+      arrow.classList.add(connected?"a-ok":"a-fail");
+      arrow.textContent=connected?"\u2192":"\u2717";
+      viz.appendChild(arrow);
+    }
+    var tileDiv=document.createElement("div");
+    tileDiv.className="domino-tile";
+    var face=document.createElement("div");
+    face.className="tile-face";
+    var leftOk=i===0||state.participants[i-1].b===p.a;
+    var rightOk=i===state.participants.length-1||!state.participants[i+1]||!state.participants[i+1].parsed||p.b===state.participants[i+1].a;
+    face.classList.add(leftOk&&rightOk?"t-ok":"t-broken");
+    face.appendChild(buildPipHalf(p.a));face.appendChild(buildPipHalf(p.b));
+    tileDiv.appendChild(face);
+    var label=document.createElement("div");
+    label.className="tile-label";label.textContent=tileName(p.a,p.b);
+    tileDiv.appendChild(label);
+    var roleLabel=document.createElement("div");
+    roleLabel.className="tile-label";roleLabel.style.color="var(--neon-purple)";
+    roleLabel.textContent=p.role||(i===0?"Authority":"Delegate L"+i);
+    tileDiv.appendChild(roleLabel);
+    viz.appendChild(tileDiv);
+  }
+  var cs=document.getElementById("chainStatus");
+  cs.textContent=check.reason;
+  cs.className="status-bar status-"+(check.valid?"ok":"err");
+  /* Fix suggestion */
+  var fixBox=document.getElementById("fixSuggestion");
+  fixBox.innerHTML="";
+  if(!check.valid&&check.breakAt>0){
+    var fix=getFixSuggestion(check.breakAt);
+    if(fix){
+      var div=document.createElement("div");div.className="fix-box";
+      var span=document.createElement("span");span.textContent="Tip: "+fix.msg;
+      var btn=document.createElement("button");
+      btn.className="btn btn-primary btn-sm";
+      btn.textContent="Flip Tile "+(fix.idx+1);
+      btn.setAttribute("data-fix-idx",String(fix.idx));
+      div.appendChild(span);div.appendChild(btn);fixBox.appendChild(div);
+    }
+  }
+  updateToStep3Btn();
+}
+
+function refreshViz(){
+  var c=checkChain();
+  state.valid=c.valid;
+  renderChainViz(c);
+}
+
+function allParsed(){
+  for(var i=0;i<state.participants.length;i++){
+    if(!state.participants[i].parsed)return false;
+  }
+  return true;
+}
+
+function clearSeal(){
+  state.sealed=false;state.chainHashBytes=null;state.chainFingerprint="";
+  state.chainHashHex="";state.dominoFP="";state.chainString="";state.valid=false;
+}
+
+function updateToStep3Btn(){
+  var btn=document.getElementById("toStep3Btn");
+  if(btn)btn.disabled=!state.valid;
+}
+
+/* ── Seal Computation ──────────────────────────────────── */
+function computeSeal(cb){
+  if(state.sealed){renderSealRecord();if(cb)cb();return}
+  state.chainString=buildChainString();
+  sha256Bytes(encoder.encode(state.chainString)).then(function(h){
+    state.chainHashBytes=h;
+    state.chainHashHex=bytesToHex(h);
+    state.chainFingerprint=state.chainHashHex.substring(0,16);
+    state.dominoFP=dominoFingerprint(state.chainHashHex);
+    state.sealed=true;
+    renderSealRecord();
+    setStatus("Chain sealed. Quick ID: "+state.chainFingerprint+" \u2022 "+state.dominoFP,"ok");
+    if(cb)cb();
+  });
+}
+
+function renderSealRecord(){
+  setOut("chainFP",state.chainFingerprint,false);
+  setOut("chainDominoFP",state.dominoFP,false);
+  setOut("sessionIdDisplay",state.sessionId||"\u2014",!state.sessionId);
+  setOut("chainStr",state.chainString,false);
+  setOut("chainHash",state.chainHashHex,false);
+  var record=buildCeremonyRecord();
+  setOut("ceremonyJSON",JSON.stringify(record,null,2),false);
+  /* Enable generate keywords if self-test passed */
+  var genBtn=document.getElementById("genKeywordsBtn");
+  if(genBtn)genBtn.disabled=!state.selfTestPassed;
+}
+
+function buildCeremonyRecord(){
+  var record={
+    ceremony_type:"delegation_chain",
+    chain:state.chainString,
+    chain_hash:state.chainHashHex,
+    chain_fingerprint:state.chainFingerprint,
+    domino_fingerprint:state.dominoFP,
+    participants:state.participants.map(function(p,i){
+      return{position:i+1,role:p.role||(i===0?"Authority":"Delegate L"+i),tile:p.a+"-"+p.b};
+    }),
+    majority_model:"SSS_GF256",
+    n:N_SHARES,
+    t:THRESHOLD,
+    timestamp:new Date().toISOString(),
+    valid:true
+  };
+  if(state.createdAt){
+    record.created_at=state.createdAt.toISOString();
+    record.expires_at=state.expiresAt.toISOString();
+  }
+  if(state.sessionId)record.session_id=state.sessionId;
+  if(Object.keys(state.kwFingerprints).length>0){
+    record.keyword_fingerprints=state.kwFingerprints;
+  }
+  return record;
+}
+
+/* ── Keyword Generation ────────────────────────────────── */
+function generateKeywords(){
+  if(!state.sealed){setStatus("Seal the chain first.","warn");return}
+  if(!state.selfTestPassed){setStatus("Run self-test first.","warn");return}
+  /* Generate random 32-byte secret S */
+  var S=new Uint8Array(32);
+  window.crypto.getRandomValues(S);
+  state.sessionSecret=S;
+  /* Session ID = first 16 hex of SHA-256(S) */
+  sha256Bytes(S).then(function(sHash){
+    state.sessionId=bytesToHex(sHash).substring(0,16);
+    /* Split S into 7 shares with threshold 4 */
+    var shares=sssSplit(S,N_SHARES,THRESHOLD);
+    state.kwShares=shares;
+    /* Compute keyword fingerprints */
+    var fpPromises=[];
+    for(var i=0;i<shares.length;i++){
+      fpPromises.push(kwFingerprint(shares[i]));
+    }
+    return Promise.all(fpPromises);
+  }).then(function(fps){
+    state.kwFingerprints={};
+    for(var i=0;i<fps.length;i++){
+      state.kwFingerprints[String(i+1)]=fps[i];
+    }
+    /* Start TTL */
+    state.createdAt=new Date();
+    state.expiresAt=new Date(state.createdAt.getTime()+TTL_MS);
+    state.kwGenerated=true;
+    startTTL();
+    /* Render */
+    renderKeywordCards();
+    renderSealRecord();
+    document.getElementById("kwCardsContainer").style.display="";
+    document.getElementById("kwActions").style.display="";
+    document.getElementById("ttlDisplay").style.display="";
+    document.getElementById("ceremonyDetails").style.display="";
+    document.getElementById("toStep4Btn").disabled=false;
+    setStatus("Generated "+N_SHARES+" keywords (threshold "+THRESHOLD+"). Session: "+state.sessionId,"ok");
+  });
+}
+
+function renderKeywordCards(){
+  var container=document.getElementById("kwCardsContainer");
+  container.innerHTML="";
+  for(var i=0;i<state.kwShares.length;i++){
+    var share=state.kwShares[i];
+    var b64=b64Encode(share);
+    var fp=state.kwFingerprints[String(i+1)]||"computing...";
+    var card=document.createElement("div");
+    card.className="kw-card";card.setAttribute("data-kw-idx",String(i));
+    var header=document.createElement("div");header.className="kw-card-header";
+    var title=document.createElement("span");title.className="kw-card-title";
+    title.textContent="Keyword #"+(i+1)+" (x="+(i+1)+")";
+    var fpEl=document.createElement("span");fpEl.className="kw-card-fp";
+    fpEl.textContent="FP: "+fp;
+    header.appendChild(title);header.appendChild(fpEl);
+    var body=document.createElement("div");
+    body.className="kw-card-body kw-hidden";body.id="kwBody-"+i;
+    body.textContent="\u2022\u2022\u2022\u2022 hidden \u2022\u2022\u2022\u2022";
+    body.setAttribute("data-kw",b64);
+    var actions=document.createElement("div");actions.className="kw-card-actions";
+    /* Press-and-hold reveal button */
+    var revealBtn=document.createElement("button");
+    revealBtn.className="btn btn-sm btn-primary kw-reveal-btn";
+    revealBtn.textContent="Hold to Reveal";
+    revealBtn.setAttribute("data-kw-idx",String(i));
+    /* Copy confirm input */
+    var copyInput=document.createElement("input");
+    copyInput.type="text";copyInput.className="kw-copy-input";
+    copyInput.placeholder='Type COPY';
+    copyInput.setAttribute("data-kw-idx",String(i));
+    /* Overwrite clipboard button */
+    var overwriteBtn=document.createElement("button");
+    overwriteBtn.className="btn btn-sm btn-danger kw-overwrite-btn";
+    overwriteBtn.textContent="Overwrite Clipboard";
+    overwriteBtn.setAttribute("data-kw-idx",String(i));
+    /* Copy warning */
+    var warn=document.createElement("div");
+    warn.className="kw-copy-warn";warn.id="kwWarn-"+i;
+    warn.textContent="Keyword copied. Overwrite clipboard when done.";
+    actions.appendChild(revealBtn);actions.appendChild(copyInput);
+    actions.appendChild(overwriteBtn);actions.appendChild(warn);
+    card.appendChild(header);card.appendChild(body);card.appendChild(actions);
+    container.appendChild(card);
+  }
+}
+
+function clearKeywords(){
+  if(state.sessionSecret&&state.sessionSecret.fill)state.sessionSecret.fill(0);
+  state.sessionSecret=null;
+  for(var i=0;i<state.kwShares.length;i++){
+    if(state.kwShares[i]&&state.kwShares[i].fill)state.kwShares[i].fill(0);
+  }
+  state.kwShares=[];
+  document.getElementById("kwCardsContainer").innerHTML="";
+  document.getElementById("kwCardsContainer").style.display="none";
+  document.getElementById("kwActions").style.display="none";
+  setStatus("Keywords cleared from memory. Fingerprints retained in ceremony record.","ok");
+}
+
+/* ── TTL Management ────────────────────────────────────── */
+function isTTLActive(){
+  if(!state.expiresAt)return false;
+  return new Date()<state.expiresAt;
+}
+
+function startTTL(){
+  if(state.ttlTimer)clearInterval(state.ttlTimer);
+  state.ttlTimer=setInterval(updateTTLDisplay,1000);
+  updateTTLDisplay();
+}
+
+function updateTTLDisplay(){
+  if(!state.expiresAt){return}
+  var now=new Date();
+  var remaining=state.expiresAt.getTime()-now.getTime();
+  if(remaining<=0){
+    expireTTL();return;
+  }
+  var mins=Math.floor(remaining/60000);
+  var secs=Math.floor((remaining%60000)/1000);
+  var str=String(mins)+":"+(secs<10?"0":"")+String(secs);
+  var cls=remaining<300000?"ttl-warning":"ttl-active";
+  var displays=["ttlCountdown","ttlUnlockCountdown"];
+  for(var i=0;i<displays.length;i++){
+    var el=document.getElementById(displays[i]);
+    if(el)el.textContent=str;
+  }
+  var bars=["ttlDisplay","ttlUnlockDisplay"];
+  for(var i=0;i<bars.length;i++){
+    var el=document.getElementById(bars[i]);
+    if(el&&el.style.display!=="none"){
+      el.className="ttl-bar "+cls;
+    }
+  }
+}
+
+function expireTTL(){
+  if(state.ttlTimer){clearInterval(state.ttlTimer);state.ttlTimer=null}
+  state.unlocked=false;
+  if(state.reconstructed&&state.reconstructed.fill)state.reconstructed.fill(0);
+  state.reconstructed=null;
+  updateUnlockBanner(false);
+  var displays=["ttlCountdown","ttlUnlockCountdown"];
+  for(var i=0;i<displays.length;i++){
+    var el=document.getElementById(displays[i]);
+    if(el)el.textContent="EXPIRED";
+  }
+  var bars=["ttlDisplay","ttlUnlockDisplay"];
+  for(var i=0;i<bars.length;i++){
+    var el=document.getElementById(bars[i]);
+    if(el){el.className="ttl-bar ttl-expired";el.style.display=""}
+  }
+  var encBtn=document.getElementById("encBtn");
+  if(encBtn)encBtn.disabled=true;
+  var toStep5=document.getElementById("toStep5Btn");
+  if(toStep5)toStep5.disabled=true;
+  setStatus("Time-to-live expired. Keywords are no longer valid.","err");
+}
+
+/* ── Unlock Slots ──────────────────────────────────────── */
+function renderUnlockSlots(){
+  var container=document.getElementById("unlockSlots");
+  container.innerHTML="";
+  for(var i=0;i<state.unlockSlotCount;i++){
+    var slot=document.createElement("div");slot.className="unlock-slot";
+    var label=document.createElement("label");
+    label.textContent="Keyword "+(i+1)+":";
+    label.style.minWidth="80px";label.style.margin="0";
+    var input=document.createElement("input");
+    input.type="text";input.className="unlock-kw-input";
+    input.id="unlockKw-"+i;input.placeholder="Paste base64 keyword here...";
+    input.setAttribute("data-slot",String(i));
+    var status=document.createElement("span");
+    status.className="slot-status slot-empty";status.id="unlockStatus-"+i;
+    status.textContent="\u25CB";
+    slot.appendChild(label);slot.appendChild(input);slot.appendChild(status);
+    container.appendChild(slot);
+  }
+  document.getElementById("unlockProgress").textContent="0 of "+THRESHOLD+" valid keywords entered";
+  document.getElementById("ttlUnlockDisplay").style.display=state.expiresAt?"":"none";
+}
+
+function addUnlockSlot(){
+  if(state.unlockSlotCount>=N_SHARES)return;
+  state.unlockSlotCount++;
+  renderUnlockSlots();
+}
+
+function validateUnlockSlots(){
+  var validShares=[];var validCount=0;var seenX={};
+  /* Load ceremony for fingerprint verification */
+  var ceremonyFPs=null;
+  var ceremonyInput=document.getElementById("unlockCeremonyInput").value.trim();
+  if(ceremonyInput){
+    try{
+      var cRecord=JSON.parse(ceremonyInput);
+      if(cRecord.keyword_fingerprints)ceremonyFPs=cRecord.keyword_fingerprints;
+    }catch(e){/* ignore parse errors */}
+  }
+  for(var i=0;i<state.unlockSlotCount;i++){
+    var input=document.getElementById("unlockKw-"+i);
+    var statusEl=document.getElementById("unlockStatus-"+i);
+    var val=input.value.trim();
+    if(!val){
+      statusEl.className="slot-status slot-empty";statusEl.textContent="\u25CB";continue;
+    }
+    var bytes;
+    try{bytes=b64Decode(val)}catch(e){
+      statusEl.className="slot-status slot-err";statusEl.textContent="\u2717";continue;
+    }
+    if(bytes.length!==33){
+      statusEl.className="slot-status slot-err";statusEl.textContent="\u2717";continue;
+    }
+    var x=bytes[0];
+    if(x===0||x>N_SHARES){
+      statusEl.className="slot-status slot-err";statusEl.textContent="\u2717";continue;
+    }
+    if(seenX[x]){
+      statusEl.className="slot-status slot-err";statusEl.textContent="dup";continue;
+    }
+    seenX[x]=true;
+    statusEl.className="slot-status slot-ok";statusEl.textContent="\u2713";
+    validShares.push(bytes);validCount++;
+  }
+  document.getElementById("unlockProgress").textContent=validCount+" of "+THRESHOLD+" valid keywords entered";
+  if(validCount>=THRESHOLD&&isTTLActive()){
+    try{
+      var reconstructed=sssCombine(validShares);
+      /* Verify fingerprints against ceremony if available */
+      if(ceremonyFPs){
+        var fpChecks=[];
+        for(var i=0;i<validShares.length;i++){
+          fpChecks.push((function(share,xVal){
+            return kwFingerprint(share).then(function(computedFP){
+              var expectedFP=ceremonyFPs[String(xVal)];
+              return{x:xVal,match:computedFP===expectedFP,computed:computedFP,expected:expectedFP};
+            });
+          })(validShares[i],validShares[i][0]));
+        }
+        Promise.all(fpChecks).then(function(results){
+          var allMatch=true;
+          var fpStatus=document.getElementById("unlockFpStatus");
+          fpStatus.style.display="";fpStatus.innerHTML="";
+          for(var i=0;i<results.length;i++){
+            var div=document.createElement("div");
+            div.className="verify-check "+(results[i].match?"check-pass":"check-fail");
+            div.textContent=(results[i].match?"\u2713":"\u2717")+" Keyword "+results[i].x+" fingerprint "+(results[i].match?"verified":"mismatch");
+            fpStatus.appendChild(div);
+            if(!results[i].match)allMatch=false;
+          }
+          if(allMatch){
+            state.reconstructed=reconstructed;state.unlocked=true;
+            updateUnlockBanner(true);updateEncBtnState();
+            document.getElementById("toStep5Btn").disabled=false;
+            setStatus("Majority reached! "+validCount+" keywords verified. Encryption unlocked.","ok");
+          }else{
+            state.unlocked=false;state.reconstructed=null;
+            updateUnlockBanner(false);updateEncBtnState();
+            setStatus("Keyword fingerprint mismatch. Check ceremony record.","err");
+          }
+        });
+        return;
+      }
+      /* No ceremony provided: accept reconstruction without FP check */
+      state.reconstructed=reconstructed;state.unlocked=true;
+      updateUnlockBanner(true);updateEncBtnState();
+      document.getElementById("toStep5Btn").disabled=false;
+      setStatus("Majority reached! "+validCount+" keywords accepted (no ceremony for FP verification).","ok");
+    }catch(e){
+      state.unlocked=false;state.reconstructed=null;
+      updateUnlockBanner(false);updateEncBtnState();
+      setStatus("Reconstruction failed: "+e.message,"err");
+    }
+  }else if(validCount>=THRESHOLD&&!isTTLActive()){
+    state.unlocked=false;state.reconstructed=null;
+    updateUnlockBanner(false);updateEncBtnState();
+    setStatus("Time-to-live expired. Keywords are no longer valid.","err");
+  }else{
+    state.unlocked=false;state.reconstructed=null;
+    updateUnlockBanner(false);updateEncBtnState();
+  }
+}
+
+function updateUnlockBanner(unlocked){
+  var banner=document.getElementById("unlockBanner");
+  if(unlocked){
+    banner.className="unlock-banner unlocked";
+    banner.textContent="\u2713 UNLOCKED \u2014 majority reached";
+  }else{
+    banner.className="unlock-banner locked";
+    banner.textContent="LOCKED \u2014 enter keywords below to unlock";
+  }
+}
+
+function updateEncBtnState(){
+  var btn=document.getElementById("encBtn");
+  if(!btn)return;
+  var pass=document.getElementById("encPass").value;
+  var strength=assessPassphrase(pass);
+  btn.disabled=!strength.strong||!state.unlocked||!isTTLActive();
+}
+
+/* ── Encrypt / Decrypt ─────────────────────────────────── */
+function encryptPayload(){
+  if(!state.unlocked||!state.reconstructed){
+    setStatus("Majority unlock required.","warn");return;
+  }
+  if(!isTTLActive()){setStatus("Time-to-live expired.","err");return}
+  var pass=document.getElementById("encPass").value;
+  if(!pass){setStatus("Enter a passphrase.","warn");return}
+  var strength=assessPassphrase(pass);
+  if(!strength.strong){setStatus("Passphrase too weak.","warn");return}
+  var plain=document.getElementById("encPlain").value;
+  if(!plain){setStatus("Enter a message to lock.","warn");return}
+  var iv=window.crypto.getRandomValues(new Uint8Array(12));
+  var plainBytes=encoder.encode(plain);
+  hkdfAesKeyFromSecretAndPassphrase(state.reconstructed,pass).then(function(key){
+    return window.crypto.subtle.encrypt({name:"AES-GCM",iv:iv},key,plainBytes);
+  }).then(function(cipherBuf){
+    var cipher=new Uint8Array(cipherBuf);
+    var combined=new Uint8Array(iv.length+cipher.length);
+    combined.set(iv,0);combined.set(cipher,iv.length);
+    setOut("encOutput",b64Encode(combined),false);
+    setStatus("Message locked. Session: "+state.sessionId,"ok");
+  }).catch(function(e){
+    setStatus("Lock error: "+e.message,"err");
+  });
+}
+
+function decryptPayload(){
+  if(!state.unlocked||!state.reconstructed){
+    setStatus("Majority unlock required.","warn");return;
+  }
+  if(!isTTLActive()){setStatus("Time-to-live expired.","err");return}
+  var pass=document.getElementById("decPass").value;
+  if(!pass){setStatus("Enter the passphrase.","warn");return}
+  var b64=document.getElementById("decCipher").value.trim();
+  if(!b64){setStatus("Paste the locked text.","warn");return}
+  var combined;
+  try{combined=b64Decode(b64)}catch(e){
+    setStatus("Invalid base64 input.","err");return;
+  }
+  if(combined.length<29){setStatus("Locked text too short.","err");return}
+  var iv=combined.slice(0,12);var cipher=combined.slice(12);
+  hkdfAesKeyFromSecretAndPassphrase(state.reconstructed,pass).then(function(key){
+    return window.crypto.subtle.decrypt({name:"AES-GCM",iv:iv},key,cipher);
+  }).then(function(plainBuf){
+    setOut("decOutput",new TextDecoder().decode(plainBuf),false);
+    setStatus("Message unlocked successfully.","ok");
+  }).catch(function(){
+    setOut("decOutput","Decryption failed",true);
+    setStatus("Could not unlock \u2014 wrong keywords or passphrase.","err");
+  });
+}
+
+/* ── Verify Record ─────────────────────────────────────── */
+function verifyRecord(){
+  var input=document.getElementById("verifyInput").value.trim();
+  var banner=document.getElementById("verifyBanner");
+  var details=document.getElementById("verifyDetails");
+  if(!input){
+    banner.style.display="none";details.innerHTML="";
+    setStatus("Paste or load a ceremony record first.","warn");return;
+  }
+  var record;
+  try{record=JSON.parse(input)}catch(e){
+    banner.style.display="";banner.className="verify-banner vb-fail";
+    banner.textContent="\u2717 INVALID JSON";
+    details.innerHTML="<div class='verify-check check-fail'><span>\u2717</span> "+e.message+"</div>";
+    setStatus("Verification failed: invalid JSON.","err");return;
+  }
+  if(!record.chain||!record.chain_hash){
+    banner.style.display="";banner.className="verify-banner vb-fail";
+    banner.textContent="\u2717 INCOMPLETE";
+    details.innerHTML="<div class='verify-check check-fail'><span>\u2717</span> Missing required fields: chain, chain_hash</div>";
+    setStatus("Verification failed: missing fields.","err");return;
+  }
+  var tiles=record.chain.split(" \u2192 ").map(function(t){
+    var parts=t.trim().split("-");
+    return{a:parseInt(parts[0],10),b:parseInt(parts[1],10)};
+  });
+  var chainValid=true;var breakIdx=-1;
+  for(var i=1;i<tiles.length;i++){
+    if(tiles[i-1].b!==tiles[i].a){chainValid=false;breakIdx=i;break}
+  }
+  sha256Bytes(encoder.encode(record.chain)).then(function(hash){
+    var computedHash=bytesToHex(hash);
+    var hashMatch=computedHash===record.chain_hash;
+    var checks=[];
+    checks.push({pass:hashMatch,label:"Seal integrity",
+      detail:hashMatch?"Computed seal matches":"Seal mismatch (computed "+computedHash.substring(0,16)+"\u2026)"});
+    checks.push({pass:chainValid,label:"Chain connectivity",
+      detail:chainValid?"All tiles connect":"Break at position "+(breakIdx+1)});
+    if(record.chain_fingerprint){
+      var fpMatch=computedHash.substring(0,16)===record.chain_fingerprint;
+      checks.push({pass:fpMatch,label:"Quick ID",detail:fpMatch?"Matches":"Mismatch"});
+    }
+    if(record.domino_fingerprint){
+      var domFP=dominoFingerprint(computedHash);
+      checks.push({pass:domFP===record.domino_fingerprint,label:"Domino name",
+        detail:domFP===record.domino_fingerprint?"Matches":"Mismatch"});
+    }
+    /* TTL check */
+    if(record.expires_at){
+      var expiry=new Date(record.expires_at);
+      var ttlActive=new Date()<expiry;
+      checks.push({pass:ttlActive,label:"Time-to-live",
+        detail:ttlActive?"Active (expires "+expiry.toLocaleTimeString()+")":"Expired at "+expiry.toLocaleTimeString()});
+    }
+    /* Session ID */
+    if(record.session_id){
+      checks.push({pass:true,label:"Session ID",detail:record.session_id});
+    }
+    /* Majority model */
+    if(record.majority_model){
+      checks.push({pass:record.majority_model==="SSS_GF256",label:"Majority model",
+        detail:record.majority_model==="SSS_GF256"?"SSS_GF256 (valid)":"Unknown: "+record.majority_model});
+    }
+    if(record.n&&record.t){
+      var tOk=record.n===N_SHARES&&record.t===THRESHOLD;
+      checks.push({pass:tOk,label:"Threshold",
+        detail:tOk?record.t+" of "+record.n+" (correct)":"Expected "+THRESHOLD+" of "+N_SHARES+", got "+record.t+" of "+record.n});
+    }
+    /* Keyword fingerprints */
+    if(record.keyword_fingerprints){
+      var fpKeys=Object.keys(record.keyword_fingerprints);
+      var fpOk=fpKeys.length===N_SHARES;
+      var fpDetail="";
+      for(var k=0;k<fpKeys.length;k++){
+        fpDetail+="kw"+fpKeys[k]+": "+record.keyword_fingerprints[fpKeys[k]];
+        if(k<fpKeys.length-1)fpDetail+=", ";
+      }
+      checks.push({pass:fpOk,label:"Keyword fingerprints ("+fpKeys.length+")",detail:fpDetail||"none"});
+    }
+    var allPass=hashMatch&&chainValid;
+    banner.style.display="";
+    banner.className="verify-banner "+(allPass?"vb-pass":"vb-fail");
+    banner.textContent=allPass?"\u2713 VERIFIED":"\u2717 FAILED";
+    var html="<div class='verify-checks'>";
+    for(var i=0;i<checks.length;i++){
+      html+="<div class='verify-check "+(checks[i].pass?"check-pass":"check-fail")+"'>"+
+        "<span>"+(checks[i].pass?"\u2713":"\u2717")+"</span> "+
+        "<strong>"+checks[i].label+"</strong> &mdash; "+checks[i].detail+"</div>";
+    }
+    html+="</div>";
+    details.innerHTML=html;
+    setStatus(allPass?"Verification passed":"Verification failed",allPass?"ok":"err");
+  });
+}
+
+function loadJSONFile(input){
+  if(!input.files||!input.files[0])return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    document.getElementById("verifyInput").value=e.target.result;
+    setStatus("JSON loaded into verifier. Click Verify to check.","ok");
+  };
+  reader.readAsText(input.files[0]);
+  input.value="";
+}
+
+/* ── Download / Copy JSON ──────────────────────────────── */
+function downloadJSON(){
+  if(!state.sealed){setStatus("Seal the chain first.","warn");return}
+  var record=buildCeremonyRecord();
+  var json=JSON.stringify(record,null,2);
+  var blob=new Blob([json],{type:"application/json"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");
+  a.href=url;a.download="ceremony-"+state.chainFingerprint+".json";
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
+  setStatus("Record downloaded.","ok");
+}
+
+function copyJSON(btn){
+  if(!state.sealed){setStatus("Seal the chain first.","warn");return}
+  var record=buildCeremonyRecord();
+  copyToClipboard(JSON.stringify(record,null,2),btn,"Copy JSON");
+  setStatus("JSON copied to clipboard.","ok");
+}
+
+/* ── Clear Secrets ────────────────────────────────────── */
+function clearSecrets(){
+  document.getElementById("encPass").value="";
+  document.getElementById("decPass").value="";
+  document.getElementById("encPass").type="password";
+  document.getElementById("decPass").type="password";
+  document.getElementById("encShowBtn").textContent="SHOW";
+  document.getElementById("decShowBtn").textContent="SHOW";
+  _generatedPass="";
+  var genEl=document.getElementById("genOutput");
+  genEl.textContent="";genEl.className="gen-output empty";genEl.style.display="none";
+  document.getElementById("genCopyBtn").style.display="none";
+  document.getElementById("genUseBtn").style.display="none";
+  document.getElementById("encPlain").value="";
+  document.getElementById("decCipher").value="";
+  setOut("encOutput","No output yet",true);
+  setOut("decOutput","No output yet",true);
+  document.getElementById("encStrBar").style.width="0";
+  document.getElementById("encStrLabel").textContent="Enter passphrase";
+  document.getElementById("encStrLabel").style.color="var(--txt-dim)";
+  document.getElementById("encStrBlock").style.display="none";
+  document.getElementById("encBtn").disabled=true;
+  document.getElementById("decWarn").style.display="none";
+  if(state.reconstructed&&state.reconstructed.fill)state.reconstructed.fill(0);
+  state.reconstructed=null;state.unlocked=false;
+  updateUnlockBanner(false);
+  setStatus("Secrets cleared. Re-enter keywords to unlock again.","ok");
+}
+
+/* ── Wizard Navigation ─────────────────────────────────── */
+function goToStep(n){
+  if(n===state.currentStep||n<1||n>5)return;
   if(n<state.currentStep){
     if(n===1){clearSeal()}
     showStep(n);
     if(n===2){refreshViz()}
     return;
   }
-
-  /* Going forward from step 1 */
+  /* Forward from step 1: self-test must have passed */
   if(state.currentStep===1){
-    syncAllInputs();
-    if(!allParsed()){setStatus("Enter a valid tile for every participant first.","warn");return}
-    var c=checkChain();
-    state.valid=c.valid;
-    renderChainViz(c);
-    updateSealBtn();
-    if(!c.valid){showStep(2);setStatus(c.reason,"err");return}
-    /* Valid chain: seal and advance */
-    computeSeal(function(){
-      showStep(n>3?3:n);
-      if(n>3){setTimeout(function(){goToStep(n)},50)}
-    });
-    return;
+    if(!state.selfTestPassed){setStatus("Run self-test first.","warn");return}
+    showStep(2);return;
   }
-
-  /* Going forward from step 2 */
+  /* Forward from step 2: validate chain and seal */
   if(state.currentStep===2){
-    if(!state.valid){setStatus("Fix the chain before continuing.","warn");return}
-    computeSeal(function(){
-      showStep(n);
-    });
+    syncAllInputs();
+    if(!allParsed()){setStatus("Enter a valid tile for every participant.","warn");return}
+    var c=checkChain();state.valid=c.valid;
+    renderChainViz(c);
+    if(!c.valid){setStatus(c.reason,"err");return}
+    computeSeal(function(){showStep(3)});
     return;
   }
-
-  /* Step 3 to 4: no validation */
-  showStep(n);
-}
-
-function progClick(n){
-  if(n<=state.currentStep||n===state.currentStep+1){
-    goToStep(n);
+  /* Forward from step 3: keywords must be generated */
+  if(state.currentStep===3){
+    if(!state.kwGenerated){setStatus("Generate keywords first.","warn");return}
+    renderUnlockSlots();showStep(4);return;
   }
+  /* Forward from step 4 */
+  if(state.currentStep===4){showStep(5);return}
+  showStep(n);
 }
 
 function showStep(n){
   state.currentStep=n;
-  for(var i=1;i<=4;i++){
+  for(var i=1;i<=5;i++){
     var el=document.getElementById("step"+i);
     if(el){el.classList.toggle("active",i===n)}
   }
@@ -882,427 +2204,6 @@ function updateProgressBar(){
   }
 }
 
-function updateSealBtn(){
-  var btn=document.getElementById("sealBtn");
-  if(btn)btn.disabled=!state.valid;
-}
-
-function allParsed(){
-  for(var i=0;i<state.participants.length;i++){
-    if(!state.participants[i].parsed)return false;
-  }
-  return true;
-}
-
-function clearSeal(){
-  state.sealed=false;state.chainHashBytes=null;state.chainFingerprint="";
-  state.chainHashHex="";state.dominoFP="";state.chainString="";state.valid=false;
-}
-
-function refreshViz(){
-  syncAllInputs();
-  var c=checkChain();
-  state.valid=c.valid;
-  renderChainViz(c);
-  updateSealBtn();
-}
-
-function computeSeal(cb){
-  if(state.sealed){renderSealRecord();if(cb)cb();return}
-  state.chainString=buildChainString();
-  sha256Bytes(encoder.encode(state.chainString)).then(function(h){
-    state.chainHashBytes=h;
-    state.chainHashHex=bytesToHex(h);
-    state.chainFingerprint=state.chainHashHex.substring(0,16);
-    state.dominoFP=dominoFingerprint(state.chainHashHex);
-    state.sealed=true;
-    renderSealRecord();
-    setStatus("Chain sealed. Quick ID: "+state.chainFingerprint+" \u2022 "+state.dominoFP,"ok");
-    if(cb)cb();
-  });
-}
-
-/* ── Load Example ────────────────────────────────────── */
-function loadExample(){
-  state.participants=[
-    {role:"Authority",tile:"3-4",a:3,b:4,parsed:true},
-    {role:"Regional Lead",tile:"4-1",a:4,b:1,parsed:true},
-    {role:"Field Operator",tile:"1-6",a:1,b:6,parsed:true}
-  ];
-  renderParticipants();
-  setStatus("Example loaded: 3 participants with a valid chain. Click Next to continue.","ok");
-}
-
-/* ── Participant Management ────────────────────────────── */
-function addParticipant(){
-  if(state.participants.length>=8){
-    setStatus("Maximum 8 participants.","warn");return;
-  }
-  state.participants.push({role:"",tile:"",a:-1,b:-1,parsed:false});
-  renderParticipants();
-}
-
-function removeParticipant(idx){
-  if(state.participants.length<=2){
-    setStatus("Minimum 2 participants required.","warn");return;
-  }
-  state.participants.splice(idx,1);
-  renderParticipants();
-  clearSeal();
-}
-
-function flipTile(idx){
-  var p=state.participants[idx];
-  if(!p.parsed)return;
-  var tmp=p.a;p.a=p.b;p.b=tmp;
-  p.tile=p.a+"-"+p.b;
-  renderParticipants();
-  clearSeal();
-}
-
-function syncAllInputs(){
-  for(var i=0;i<state.participants.length;i++){syncParticipantInput(i)}
-}
-
-function syncParticipantInput(idx){
-  var row=document.getElementById("p-row-"+idx);
-  if(!row)return;
-  var p=state.participants[idx];
-  p.tile=row.querySelector(".p-tile-input").value;
-  p.role=row.querySelector(".p-role").value;
-  var result=parseSingleTile(p.tile);
-  if(result.ok){p.a=result.a;p.b=result.b;p.parsed=true}
-  else{p.a=-1;p.b=-1;p.parsed=false}
-  /* Update inline preview/error */
-  var preview=row.querySelector(".tile-preview");
-  if(!preview)return;
-  if(p.parsed){
-    preview.textContent=p.a+"|"+p.b;
-    preview.className="tile-preview";
-    preview.style.display="";
-  }else if(p.tile.trim()){
-    preview.textContent=result.error;
-    preview.className="tile-preview tile-err";
-    preview.style.display="";
-  }else{
-    preview.textContent="";
-    preview.style.display="none";
-  }
-  state.sealed=false;
-  renderTilePalette();
-}
-
-function renderParticipants(){
-  var container=document.getElementById("participantList");
-  container.innerHTML="";
-  for(var i=0;i<state.participants.length;i++){
-    var p=state.participants[i];
-    var row=document.createElement("div");
-    row.className="p-row";row.id="p-row-"+i;
-
-    var num=document.createElement("span");
-    num.className="p-num";num.textContent=String(i+1);
-
-    var role=document.createElement("input");
-    role.type="text";role.className="p-role";
-    role.placeholder=i===0?"e.g. Authority":"e.g. Delegate";
-    role.value=p.role;
-    role.oninput=(function(idx){return function(){syncParticipantInput(idx)}})(i);
-
-    var tileWrap=document.createElement("div");
-    tileWrap.className="tile-input-wrap";
-
-    var tile=document.createElement("input");
-    tile.type="text";tile.className="p-tile-input";
-    tile.placeholder="3-4";tile.value=p.tile;
-    tile.title="Two numbers 0-6: e.g. 3-4 or 2,5 or (1 6)";
-    tile.oninput=(function(idx){return function(){syncParticipantInput(idx)}})(i);
-
-    var preview=document.createElement("span");
-    preview.className="tile-preview";
-    if(p.parsed){preview.textContent=p.a+"|"+p.b}
-    else{preview.style.display="none"}
-
-    tileWrap.appendChild(tile);
-    tileWrap.appendChild(preview);
-
-    var flip=document.createElement("button");
-    flip.className="p-flip";flip.textContent="\u21c4";flip.title="Flip tile orientation";
-    flip.onclick=(function(idx){return function(){flipTile(idx)}})(i);
-
-    var rem=document.createElement("button");
-    rem.className="p-remove";rem.textContent="\u2715";rem.title="Remove";
-    rem.onclick=(function(idx){return function(){removeParticipant(idx)}})(i);
-
-    row.appendChild(num);row.appendChild(role);row.appendChild(tileWrap);
-    row.appendChild(flip);row.appendChild(rem);
-    container.appendChild(row);
-  }
-  renderTilePalette();
-}
-
-/* ── Tile Palette (all 28 tiles in a double-six set) ───── */
-function getUsedTiles(){
-  var used={};
-  for(var i=0;i<state.participants.length;i++){
-    var p=state.participants[i];
-    if(!p.parsed)continue;
-    var lo=Math.min(p.a,p.b),hi=Math.max(p.a,p.b);
-    used[lo+"-"+hi]=i;
-  }
-  return used;
-}
-
-function renderTilePalette(){
-  var pal=document.getElementById("tilePalette");
-  if(!pal)return;
-  pal.innerHTML="";
-  var used=getUsedTiles();
-  var avail=28-Object.keys(used).length;
-  for(var t=0;t<DOMINO_TABLE.length;t++){
-    var pair=DOMINO_TABLE[t];
-    var a=pair[0],b=pair[1];
-    var key=a+"-"+b;
-    var el=document.createElement("div");
-    var taken=used[key]!==undefined;
-    el.className="pal-tile"+(taken?" pal-used":"");
-    el.title=tileName(a,b)+(taken?" (participant "+(used[key]+1)+")":"");
-    var s1=document.createElement("span");s1.textContent=String(a);
-    var sep=document.createElement("span");sep.className="pal-sep";
-    var s2=document.createElement("span");s2.textContent=String(b);
-    el.appendChild(s1);el.appendChild(sep);el.appendChild(s2);
-    if(!taken){
-      el.onclick=(function(aa,bb){return function(){pickTile(aa,bb)}})(a,b);
-    }
-    pal.appendChild(el);
-  }
-  var ct=document.getElementById("palCount");
-  if(ct)ct.textContent=avail+" of 28 available";
-}
-
-function pickTile(a,b){
-  /* Assign to the first participant without a valid tile */
-  var idx=-1;
-  for(var i=0;i<state.participants.length;i++){
-    if(!state.participants[i].parsed){idx=i;break}
-  }
-  if(idx===-1){
-    setStatus("All participants already have tiles. Add another person or clear one.","warn");return;
-  }
-  state.participants[idx].tile=a+"-"+b;
-  state.participants[idx].a=a;
-  state.participants[idx].b=b;
-  state.participants[idx].parsed=true;
-  renderParticipants();
-  setStatus("Assigned "+a+"|"+b+" ("+tileName(a,b)+") to participant "+(idx+1)+".","ok");
-  state.sealed=false;
-}
-
-/* ── Chain Validation ──────────────────────────────────── */
-function checkChain(){
-  for(var i=0;i<state.participants.length;i++){
-    if(!state.participants[i].parsed)return{valid:false,breakAt:-1,reason:"Not all tiles entered"};
-  }
-  /* Duplicate check: a physical set has only one of each tile (a-b === b-a) */
-  var seen={};
-  for(var i=0;i<state.participants.length;i++){
-    var p=state.participants[i];
-    var lo=Math.min(p.a,p.b),hi=Math.max(p.a,p.b);
-    var key=lo+"-"+hi;
-    if(seen[key]!==undefined){
-      return{valid:false,breakAt:-1,
-        reason:"Duplicate tile: participants "+(seen[key]+1)+" and "+(i+1)+" both drew "+lo+"-"+hi+". A set has only one of each tile."};
-    }
-    seen[key]=i;
-  }
-  for(var i=1;i<state.participants.length;i++){
-    if(state.participants[i-1].b!==state.participants[i].a){
-      return{valid:false,breakAt:i,reason:"Break at position "+(i+1)+": right("+state.participants[i-1].b+") \u2260 left("+state.participants[i].a+")"};
-    }
-  }
-  return{valid:true,breakAt:-1,reason:"Valid chain of "+state.participants.length};
-}
-
-function buildChainString(){
-  return state.participants.map(function(p){return p.a+"-"+p.b}).join(" \u2192 ");
-}
-
-function getFixSuggestion(breakAt){
-  if(breakAt<1)return null;
-  var prev=state.participants[breakAt-1];
-  var curr=state.participants[breakAt];
-  /* Would flipping curr fix the left connection? */
-  if(prev.b===curr.b){
-    return{
-      msg:"Tile "+(breakAt+1)+" shows "+curr.a+"|"+curr.b+" but needs "+prev.b+" on the left. Flipping it to "+curr.b+"|"+curr.a+" would connect.",
-      idx:breakAt
-    };
-  }
-  /* Would flipping prev fix it? */
-  if(prev.a===curr.a){
-    return{
-      msg:"Tile "+breakAt+" shows "+prev.a+"|"+prev.b+" but needs "+curr.a+" on the right. Flipping it to "+prev.b+"|"+prev.a+" would connect.",
-      idx:breakAt-1
-    };
-  }
-  return null;
-}
-
-/* ── Chain Visualization ──────────────────────────────── */
-function renderChainViz(check){
-  var viz=document.getElementById("chainViz");
-  viz.innerHTML="";
-
-  for(var i=0;i<state.participants.length;i++){
-    var p=state.participants[i];
-    if(!p.parsed)continue;
-
-    /* Arrow between tiles */
-    if(i>0){
-      var arrow=document.createElement("div");
-      arrow.className="chain-arrow";
-      var connected=state.participants[i-1].b===p.a;
-      arrow.classList.add(connected?"a-ok":"a-fail");
-      arrow.textContent=connected?"\u2192":"\u2717";
-      viz.appendChild(arrow);
-    }
-
-    /* Tile */
-    var tileDiv=document.createElement("div");
-    tileDiv.className="domino-tile";
-
-    var face=document.createElement("div");
-    face.className="tile-face";
-    var leftOk=i===0||state.participants[i-1].b===p.a;
-    var rightOk=i===state.participants.length-1||!state.participants[i+1]||!state.participants[i+1].parsed||p.b===state.participants[i+1].a;
-    face.classList.add(leftOk&&rightOk?"t-ok":"t-broken");
-
-    face.appendChild(buildPipHalf(p.a));
-    face.appendChild(buildPipHalf(p.b));
-    tileDiv.appendChild(face);
-
-    var label=document.createElement("div");
-    label.className="tile-label";
-    label.textContent=tileName(p.a,p.b);
-    tileDiv.appendChild(label);
-
-    var roleLabel=document.createElement("div");
-    roleLabel.className="tile-label";
-    roleLabel.style.color="var(--neon-purple)";
-    roleLabel.textContent=p.role||(i===0?"Authority":"Delegate L"+i);
-    tileDiv.appendChild(roleLabel);
-
-    viz.appendChild(tileDiv);
-  }
-
-  var cs=document.getElementById("chainStatus");
-  cs.textContent=check.reason;
-  cs.className="status-bar status-"+(check.valid?"ok":"err");
-
-  /* Fix suggestion */
-  var fixBox=document.getElementById("fixSuggestion");
-  fixBox.innerHTML="";
-  if(!check.valid&&check.breakAt>0){
-    var fix=getFixSuggestion(check.breakAt);
-    if(fix){
-      var div=document.createElement("div");
-      div.className="fix-box";
-      var span=document.createElement("span");
-      span.textContent="Tip: "+fix.msg;
-      var btn=document.createElement("button");
-      btn.className="btn btn-primary btn-sm";
-      btn.textContent="Flip Tile "+(fix.idx+1);
-      btn.onclick=(function(idx){return function(){applyFix(idx)}})(fix.idx);
-      div.appendChild(span);
-      div.appendChild(btn);
-      fixBox.appendChild(div);
-    }
-  }
-}
-
-function applyFix(idx){
-  flipTile(idx);
-  syncAllInputs();
-  var c=checkChain();
-  state.valid=c.valid;
-  renderChainViz(c);
-  updateSealBtn();
-  if(c.valid){
-    computeSeal(function(){
-      setStatus("Fixed! Valid chain of "+state.participants.length+". Ready to seal.","ok");
-    });
-  }
-}
-
-/* ── Seal Record ──────────────────────────────────────── */
-function renderSealRecord(){
-  setOut("chainFP",state.chainFingerprint,false);
-  setOut("chainDominoFP",state.dominoFP,false);
-  setOut("chainStr",state.chainString,false);
-  setOut("chainHash",state.chainHashHex,false);
-  var record=buildCeremonyRecord();
-  setOut("ceremonyJSON",JSON.stringify(record,null,2),false);
-}
-
-function buildCeremonyRecord(){
-  return{
-    ceremony_type:"delegation_chain",
-    chain:state.chainString,
-    chain_hash:state.chainHashHex,
-    chain_fingerprint:state.chainFingerprint,
-    domino_fingerprint:state.dominoFP,
-    participants:state.participants.map(function(p,i){
-      return{position:i+1,role:p.role||(i===0?"Authority":"Delegate L"+i),tile:p.a+"-"+p.b};
-    }),
-    timestamp:new Date().toISOString(),
-    valid:true
-  };
-}
-
-/* ── Download / Copy / Load JSON ──────────────────────── */
-function downloadJSON(){
-  if(!state.sealed){setStatus("Seal the chain first.","warn");return}
-  var record=buildCeremonyRecord();
-  var json=JSON.stringify(record,null,2);
-  var blob=new Blob([json],{type:"application/json"});
-  var url=URL.createObjectURL(blob);
-  var a=document.createElement("a");
-  a.href=url;
-  a.download="chain-record-"+state.chainFingerprint+".json";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  setStatus("Record downloaded.","ok");
-}
-
-function copyJSON(btn){
-  if(!state.sealed){setStatus("Seal the chain first.","warn");return}
-  var record=buildCeremonyRecord();
-  var json=JSON.stringify(record,null,2);
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(json).then(function(){
-      if(btn){
-        btn.textContent="COPIED!";btn.classList.add("copied");
-        setTimeout(function(){btn.textContent="COPY JSON";btn.classList.remove("copied")},2000);
-      }
-      setStatus("JSON copied to clipboard.","ok");
-    });
-  }
-}
-
-function loadJSONFile(input){
-  if(!input.files||!input.files[0])return;
-  var reader=new FileReader();
-  reader.onload=function(e){
-    document.getElementById("verifyInput").value=e.target.result;
-    setStatus("JSON loaded into verifier. Click Verify to check.","ok");
-  };
-  reader.readAsText(input.files[0]);
-  input.value="";
-}
-
-/* ── Tab Switching ────────────────────────────────────── */
 function switchTab(name){
   var tabs=document.querySelectorAll(".tab");
   var panels=document.querySelectorAll(".tab-panel");
@@ -1314,192 +2215,293 @@ function switchTab(name){
   }
 }
 
-/* ── Chain Verifier ────────────────────────────────────── */
-function verifyRecord(){
-  var input=document.getElementById("verifyInput").value.trim();
-  var banner=document.getElementById("verifyBanner");
-  var details=document.getElementById("verifyDetails");
-
-  if(!input){
-    banner.style.display="none";
-    details.innerHTML="";
-    setStatus("Paste or load a ceremony record first.","warn");
-    return;
-  }
-
-  var record;
-  try{record=JSON.parse(input)}catch(e){
-    banner.style.display="";
-    banner.className="verify-banner fail";
-    banner.textContent="\u2717 INVALID JSON";
-    details.innerHTML="<div class='verify-check check-fail'><span>\u2717</span> "+e.message+"</div>";
-    setStatus("Verification FAILED: invalid JSON.","err");
-    return;
-  }
-
-  if(!record.chain||!record.chain_hash){
-    banner.style.display="";
-    banner.className="verify-banner fail";
-    banner.textContent="\u2717 INCOMPLETE";
-    details.innerHTML="<div class='verify-check check-fail'><span>\u2717</span> Missing required fields: chain, chain_hash</div>";
-    setStatus("Verification FAILED: missing fields.","err");
-    return;
-  }
-
-  /* Re-validate chain connectivity */
-  var tiles=record.chain.split(" \u2192 ").map(function(t){
-    var parts=t.trim().split("-");
-    return{a:parseInt(parts[0],10),b:parseInt(parts[1],10)};
-  });
-
-  var chainValid=true;var breakIdx=-1;
-  for(var i=1;i<tiles.length;i++){
-    if(tiles[i-1].b!==tiles[i].a){chainValid=false;breakIdx=i;break}
-  }
-
-  /* Re-hash chain string */
-  sha256Bytes(encoder.encode(record.chain)).then(function(hash){
-    var computedHash=bytesToHex(hash);
-    var hashMatch=computedHash===record.chain_hash;
-
-    var checks=[];
-    checks.push({pass:hashMatch,label:"Seal integrity",
-      detail:hashMatch?"Computed seal matches recorded seal":"Seal mismatch (computed "+computedHash.substring(0,16)+"\u2026)"});
-    checks.push({pass:chainValid,label:"Chain connectivity",
-      detail:chainValid?"All tiles connect properly":"Break at position "+(breakIdx+1)});
-
-    if(record.chain_fingerprint){
-      var fpMatch=computedHash.substring(0,16)===record.chain_fingerprint;
-      checks.push({pass:fpMatch,label:"Quick ID",detail:fpMatch?"Matches":"Mismatch"});
-    }
-    if(record.domino_fingerprint){
-      var domFP=dominoFingerprint(computedHash);
-      checks.push({pass:domFP===record.domino_fingerprint,label:"Domino name",
-        detail:domFP===record.domino_fingerprint?"Matches":"Mismatch"});
-    }
-
-    var allPass=hashMatch&&chainValid;
-    banner.style.display="";
-    banner.className="verify-banner "+(allPass?"pass":"fail");
-    banner.textContent=allPass?"\u2713 VERIFIED":"\u2717 FAILED";
-
-    var html="<div class='verify-checks'>";
-    for(var i=0;i<checks.length;i++){
-      html+="<div class='verify-check "+(checks[i].pass?"check-pass":"check-fail")+"'>"+
-        "<span>"+(checks[i].pass?"\u2713":"\u2717")+"</span> "+
-        "<strong>"+checks[i].label+"</strong> &mdash; "+checks[i].detail+"</div>";
-    }
-    html+="</div>";
-    details.innerHTML=html;
-    setStatus(allPass?"Verification PASSED":"Verification FAILED",allPass?"ok":"err");
-  });
-}
-
-/* ── Encrypt / Decrypt ─────────────────────────────────── */
-function deriveChainKey(chainHashBytes,passphrase){
-  var passBytes=encoder.encode(passphrase);
-  return sha256Bytes(passBytes).then(function(saltBytes){
-    return hkdfSha256(chainHashBytes,saltBytes,encoder.encode("EDGE/CHAIN/ENC"),32);
-  }).then(function(keyBytes){
-    return window.crypto.subtle.importKey("raw",keyBytes,{name:"AES-GCM"},false,["encrypt","decrypt"]);
-  });
-}
-
-function encryptPayload(){
-  if(!state.chainHashBytes||!state.valid){
-    setStatus("Build and seal a valid chain first (steps 1\u20133).","warn");return;
-  }
-  var pass=document.getElementById("encPass").value;
-  if(!pass){setStatus("Enter a passphrase.","warn");return}
-  var plain=document.getElementById("encPlain").value;
-  if(!plain){setStatus("Enter a message to lock.","warn");return}
-
-  var iv=window.crypto.getRandomValues(new Uint8Array(12));
-  var plainBytes=encoder.encode(plain);
-
-  deriveChainKey(state.chainHashBytes,pass).then(function(key){
-    return window.crypto.subtle.encrypt({name:"AES-GCM",iv:iv},key,plainBytes);
-  }).then(function(cipherBuf){
-    var cipher=new Uint8Array(cipherBuf);
-    var combined=new Uint8Array(iv.length+cipher.length);
-    combined.set(iv,0);combined.set(cipher,iv.length);
-    var binary="";
-    for(var i=0;i<combined.length;i++)binary+=String.fromCharCode(combined[i]);
-    setOut("encOutput",btoa(binary),false);
-    setStatus("Message locked. Chain: "+state.chainFingerprint+" ("+state.dominoFP+")","ok");
-  }).catch(function(e){
-    setStatus("Lock error: "+e.message,"err");
-  });
-}
-
-function decryptPayload(){
-  if(!state.chainHashBytes||!state.valid){
-    setStatus("Build and seal a valid chain first (steps 1\u20133).","warn");return;
-  }
-  var pass=document.getElementById("decPass").value;
-  if(!pass){setStatus("Enter the passphrase.","warn");return}
-  var b64=document.getElementById("decCipher").value.trim();
-  if(!b64){setStatus("Paste the locked text.","warn");return}
-
-  var binary;
-  try{binary=atob(b64)}catch(e){
-    setStatus("Invalid base64 input.","err");return;
-  }
-
-  var combined=new Uint8Array(binary.length);
-  for(var i=0;i<binary.length;i++)combined[i]=binary.charCodeAt(i);
-  if(combined.length<29){
-    /* 12 IV + 16 GCM tag + at least 1 byte ciphertext */
-    setStatus("Locked text too short.","err");return;
-  }
-
-  var iv=combined.slice(0,12);
-  var cipher=combined.slice(12);
-
-  deriveChainKey(state.chainHashBytes,pass).then(function(key){
-    return window.crypto.subtle.decrypt({name:"AES-GCM",iv:iv},key,cipher);
-  }).then(function(plainBuf){
-    var plaintext=new TextDecoder().decode(plainBuf);
-    setOut("decOutput",plaintext,false);
-    setStatus("Message unlocked successfully.","ok");
-  }).catch(function(){
-    setOut("decOutput","Decryption failed",true);
-    setStatus("Could not unlock \u2014 wrong chain or passphrase.","err");
-  });
+/* ── Load Example ──────────────────────────────────────── */
+function loadExample(){
+  state.participants=[
+    {role:"Authority",tile:"3-4",a:3,b:4,parsed:true},
+    {role:"Regional Lead",tile:"4-1",a:4,b:1,parsed:true},
+    {role:"Field Commander",tile:"1-6",a:1,b:6,parsed:true},
+    {role:"Operations Chief",tile:"6-2",a:6,b:2,parsed:true},
+    {role:"Security Lead",tile:"2-5",a:2,b:5,parsed:true},
+    {role:"Logistics Lead",tile:"5-0",a:5,b:0,parsed:true},
+    {role:"Communications",tile:"0-3",a:0,b:3,parsed:true}
+  ];
+  renderParticipants();refreshViz();
+  setStatus("Example loaded: 7 participants with a valid chain. Click Seal & Continue.","ok");
 }
 
 /* ── Reset ─────────────────────────────────────────────── */
 function resetAll(){
-  state.participants=[
-    {role:"",tile:"",a:-1,b:-1,parsed:false},
-    {role:"",tile:"",a:-1,b:-1,parsed:false}
-  ];
+  /* Zero secrets */
+  if(state.sessionSecret&&state.sessionSecret.fill)state.sessionSecret.fill(0);
+  if(state.reconstructed&&state.reconstructed.fill)state.reconstructed.fill(0);
+  for(var i=0;i<state.kwShares.length;i++){
+    if(state.kwShares[i]&&state.kwShares[i].fill)state.kwShares[i].fill(0);
+  }
+  if(state.ttlTimer){clearInterval(state.ttlTimer);state.ttlTimer=null}
+  /* Reset state */
+  state.participants=[];
+  for(var i=0;i<N_PARTICIPANTS;i++){
+    state.participants.push({role:"",tile:"",a:-1,b:-1,parsed:false});
+  }
   clearSeal();
-
+  state.selfTestPassed=false;
+  state.sessionSecret=null;state.sessionId="";
+  state.kwShares=[];state.kwFingerprints={};state.kwGenerated=false;
+  state.createdAt=null;state.expiresAt=null;
+  state.unlocked=false;state.reconstructed=null;
+  state.unlockSlotCount=THRESHOLD;
+  /* Reset UI */
   var ids=["chainStr","chainHash","chainFP","chainDominoFP","ceremonyJSON"];
   for(var i=0;i<ids.length;i++)setOut(ids[i],"\u2014",true);
+  setOut("sessionIdDisplay","\u2014",true);
   setOut("encOutput","No output yet",true);
   setOut("decOutput","No output yet",true);
-
   document.getElementById("verifyInput").value="";
   document.getElementById("verifyBanner").style.display="none";
   document.getElementById("verifyDetails").innerHTML="";
-  document.getElementById("encPass").value="";
-  document.getElementById("encPlain").value="";
-  document.getElementById("decPass").value="";
-  document.getElementById("decCipher").value="";
-
+  document.getElementById("encPass").value="";document.getElementById("encPlain").value="";
+  document.getElementById("decPass").value="";document.getElementById("decCipher").value="";
+  document.getElementById("unlockCeremonyInput").value="";
+  _generatedPass="";
+  var genEl=document.getElementById("genOutput");
+  genEl.textContent="";genEl.className="gen-output empty";genEl.style.display="none";
+  document.getElementById("genCopyBtn").style.display="none";
+  document.getElementById("genUseBtn").style.display="none";
+  document.getElementById("encStrBar").style.width="0";
+  document.getElementById("encStrLabel").textContent="Enter passphrase";
+  document.getElementById("encStrLabel").style.color="var(--txt-dim)";
+  document.getElementById("encStrBlock").style.display="none";
+  document.getElementById("encBtn").disabled=true;
+  document.getElementById("decWarn").style.display="none";
+  document.getElementById("encPass").type="password";
+  document.getElementById("decPass").type="password";
+  document.getElementById("encShowBtn").textContent="SHOW";
+  document.getElementById("decShowBtn").textContent="SHOW";
+  document.getElementById("kwCardsContainer").innerHTML="";
+  document.getElementById("kwCardsContainer").style.display="none";
+  document.getElementById("kwActions").style.display="none";
+  document.getElementById("ttlDisplay").style.display="none";
+  document.getElementById("ttlUnlockDisplay").style.display="none";
+  document.getElementById("ceremonyDetails").style.display="none";
+  document.getElementById("genKeywordsBtn").disabled=true;
+  document.getElementById("toStep2Btn").disabled=true;
+  document.getElementById("toStep3Btn").disabled=true;
+  document.getElementById("toStep4Btn").disabled=true;
+  document.getElementById("toStep5Btn").disabled=true;
+  document.getElementById("testGate").className="test-gate-fail";
+  document.getElementById("testGate").textContent="Self-test required before keyword generation.";
+  document.getElementById("testResults").style.display="none";
+  document.getElementById("testResults").innerHTML="";
+  document.getElementById("unlockFpStatus").style.display="none";
+  document.getElementById("unlockFpStatus").innerHTML="";
   renderParticipants();
   showStep(1);
-  setStatus("Ready \u2014 add participants and enter domino tiles, or try an example.","idle");
+  setStatus("Ready \u2014 run the crypto self-test to begin.","idle");
+}
+
+/* ── Event Binding ─────────────────────────────────────── */
+function bindEvents(){
+  /* Simple button clicks */
+  var btnMap={
+    "runTestBtn":function(){runSelfTest()},
+    "toStep2Btn":function(){goToStep(2)},
+    "loadExampleBtn":function(){loadExample()},
+    "backToStep1Btn":function(){goToStep(1)},
+    "toStep3Btn":function(){goToStep(3)},
+    "backToStep2Btn":function(){goToStep(2)},
+    "genKeywordsBtn":function(){generateKeywords()},
+    "downloadRecordBtn":function(){downloadJSON()},
+    "clearKwBtn":function(){clearKeywords()},
+    "toStep4Btn":function(){goToStep(4)},
+    "backToStep3Btn":function(){goToStep(3)},
+    "addSlotBtn":function(){addUnlockSlot()},
+    "toStep5Btn":function(){goToStep(5)},
+    "backToStep4Btn":function(){goToStep(4)},
+    "resetBtn":function(){resetAll()},
+    "verifyBtn":function(){verifyRecord()},
+    "encBtn":function(){encryptPayload()},
+    "decryptBtn":function(){decryptPayload()},
+    "clearSecretsBtn":function(){clearSecrets()},
+    "clearSecretsBtn2":function(){clearSecrets()},
+    "genDiceBtn":function(){generateDiceware()},
+    "genRandBtn":function(){generateRandom32()},
+    "genUseBtn":function(){useGenerated()},
+    "encShowBtn":function(){togglePassVis("encPass","encShowBtn")},
+    "decShowBtn":function(){togglePassVis("decPass","decShowBtn")}
+  };
+  var keys=Object.keys(btnMap);
+  for(var i=0;i<keys.length;i++){
+    var el=document.getElementById(keys[i]);
+    if(el)el.addEventListener("click",btnMap[keys[i]]);
+  }
+  /* Copy buttons */
+  var copyBtnMap={
+    "copyRecordBtn":function(){copyJSON(document.getElementById("copyRecordBtn"))},
+    "copyChainStrBtn":function(){copyField("chainStr",document.getElementById("copyChainStrBtn"))},
+    "copyChainHashBtn":function(){copyField("chainHash",document.getElementById("copyChainHashBtn"))},
+    "copyCeremonyBtn":function(){copyField("ceremonyJSON",document.getElementById("copyCeremonyBtn"))},
+    "copyEncBtn":function(){copyField("encOutput",document.getElementById("copyEncBtn"))},
+    "copyDecBtn":function(){copyField("decOutput",document.getElementById("copyDecBtn"))},
+    "genCopyBtn":function(){copyGenerated(document.getElementById("genCopyBtn"))}
+  };
+  var ckeys=Object.keys(copyBtnMap);
+  for(var i=0;i<ckeys.length;i++){
+    var el=document.getElementById(ckeys[i]);
+    if(el)el.addEventListener("click",copyBtnMap[ckeys[i]]);
+  }
+  /* Input events */
+  document.getElementById("encPass").addEventListener("input",function(){
+    updateEncStrength();
+  });
+  document.getElementById("decPass").addEventListener("input",function(){
+    var pass=document.getElementById("decPass").value;
+    var result=assessPassphrase(pass);
+    var warn=document.getElementById("decWarn");
+    warn.style.display=(pass&&!result.strong)?"":"none";
+  });
+  /* File input */
+  document.getElementById("loadJsonInput").addEventListener("change",function(){
+    loadJSONFile(this);
+  });
+  /* Progress bar clicks */
+  document.getElementById("progBar").addEventListener("click",function(e){
+    var step=e.target.closest(".prog-step");
+    if(!step)return;
+    var n=parseInt(step.getAttribute("data-step"),10);
+    if(n<=state.currentStep||n===state.currentStep+1){goToStep(n)}
+  });
+  /* Tab bar clicks */
+  document.getElementById("tabBar").addEventListener("click",function(e){
+    var tab=e.target.closest(".tab");
+    if(!tab)return;
+    switchTab(tab.getAttribute("data-tab"));
+  });
+  /* Participant list: delegated events for input/flip */
+  document.getElementById("participantList").addEventListener("input",function(e){
+    var idx=e.target.getAttribute("data-idx");
+    if(idx!==null)syncParticipantInput(parseInt(idx,10));
+  });
+  document.getElementById("participantList").addEventListener("click",function(e){
+    var btn=e.target.closest("[data-action='flip']");
+    if(btn){
+      var idx=parseInt(btn.getAttribute("data-idx"),10);
+      flipTile(idx);
+    }
+  });
+  /* Tile palette: delegated click */
+  document.getElementById("tilePalette").addEventListener("click",function(e){
+    var tile=e.target.closest(".pal-tile");
+    if(!tile||tile.classList.contains("pal-used"))return;
+    var a=parseInt(tile.getAttribute("data-tile-a"),10);
+    var b=parseInt(tile.getAttribute("data-tile-b"),10);
+    pickTile(a,b);
+  });
+  /* Fix suggestion: delegated click */
+  document.getElementById("fixSuggestion").addEventListener("click",function(e){
+    var btn=e.target.closest("[data-fix-idx]");
+    if(!btn)return;
+    var idx=parseInt(btn.getAttribute("data-fix-idx"),10);
+    flipTile(idx);
+    syncAllInputs();
+    var c=checkChain();state.valid=c.valid;
+    renderChainViz(c);
+    if(c.valid){
+      computeSeal(function(){
+        setStatus("Fixed! Valid chain of "+state.participants.length+". Ready to seal.","ok");
+      });
+    }
+  });
+  /* Keyword cards: anti-leak UX (delegated) */
+  var kwContainer=document.getElementById("kwCardsContainer");
+  /* Press-and-hold to reveal */
+  function revealStart(e){
+    var btn=e.target.closest(".kw-reveal-btn");
+    if(!btn)return;
+    e.preventDefault();
+    var idx=parseInt(btn.getAttribute("data-kw-idx"),10);
+    var body=document.getElementById("kwBody-"+idx);
+    if(body){
+      body.textContent=body.getAttribute("data-kw");
+      body.classList.remove("kw-hidden");
+    }
+  }
+  function revealEnd(e){
+    var btn=e.target.closest(".kw-reveal-btn");
+    if(!btn)return;
+    var idx=parseInt(btn.getAttribute("data-kw-idx"),10);
+    var body=document.getElementById("kwBody-"+idx);
+    if(body){
+      body.textContent="\u2022\u2022\u2022\u2022 hidden \u2022\u2022\u2022\u2022";
+      body.classList.add("kw-hidden");
+    }
+  }
+  kwContainer.addEventListener("mousedown",revealStart);
+  kwContainer.addEventListener("mouseup",revealEnd);
+  kwContainer.addEventListener("mouseleave",revealEnd);
+  kwContainer.addEventListener("touchstart",revealStart);
+  kwContainer.addEventListener("touchend",revealEnd);
+  /* Type "COPY" to copy keyword */
+  kwContainer.addEventListener("input",function(e){
+    var input=e.target.closest(".kw-copy-input");
+    if(!input)return;
+    if(input.value==="COPY"){
+      var idx=parseInt(input.getAttribute("data-kw-idx"),10);
+      var body=document.getElementById("kwBody-"+idx);
+      if(body){
+        var kw=body.getAttribute("data-kw");
+        if(navigator.clipboard&&navigator.clipboard.writeText){
+          navigator.clipboard.writeText(kw).then(function(){
+            input.value="";input.placeholder="Copied!";
+            var warn=document.getElementById("kwWarn-"+idx);
+            if(warn)warn.style.display="";
+            /* Show overwrite button */
+            var card=input.closest(".kw-card");
+            if(card){
+              var owBtn=card.querySelector(".kw-overwrite-btn");
+              if(owBtn)owBtn.style.display="";
+            }
+            setTimeout(function(){input.placeholder='Type COPY'},2000);
+          });
+        }
+      }
+    }
+  });
+  /* Overwrite clipboard button */
+  kwContainer.addEventListener("click",function(e){
+    var btn=e.target.closest(".kw-overwrite-btn");
+    if(!btn)return;
+    var spaces="";for(var i=0;i<64;i++)spaces+=" ";
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(spaces).then(function(){
+        btn.textContent="Overwritten";btn.disabled=true;
+        setTimeout(function(){btn.textContent="Overwrite Clipboard";btn.disabled=false;btn.style.display="none"},2000);
+      });
+    }
+  });
+  /* Unlock slots: delegated input */
+  document.getElementById("unlockSlots").addEventListener("input",function(e){
+    if(e.target.closest(".unlock-kw-input")){
+      validateUnlockSlots();
+    }
+  });
 }
 
 /* ── Init ──────────────────────────────────────────────── */
-state.participants=[
-  {role:"",tile:"",a:-1,b:-1,parsed:false},
-  {role:"",tile:"",a:-1,b:-1,parsed:false}
-];
-renderParticipants();
+function init(){
+  /* Display build ID */
+  var buildEl=document.getElementById("buildIdDisplay");
+  if(buildEl)buildEl.textContent=EDGE_BUILD_ID;
+  /* Initialize 7 empty participants */
+  state.participants=[];
+  for(var i=0;i<N_PARTICIPANTS;i++){
+    state.participants.push({role:"",tile:"",a:-1,b:-1,parsed:false});
+  }
+  renderParticipants();
+  bindEvents();
+}
+
+document.addEventListener("DOMContentLoaded",init);
 </script>
 
 </body>
