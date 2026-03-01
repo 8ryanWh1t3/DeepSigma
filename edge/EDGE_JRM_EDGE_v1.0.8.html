@@ -541,9 +541,11 @@
  .cg-gauge-sub{font-size:10px;color:var(--muted);margin-top:2px}
  .cg-mode-label{font-size:10px;color:var(--muted);margin-top:8px;text-transform:uppercase;letter-spacing:.3px}
  .cg-output{margin-top:10px}
- .cg-ds-card{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px;margin:6px 0;font-size:11px}
+ .cg-ds-card{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px;margin:6px 0;font-size:11px;transition:border-color .15s}
+ .cg-ds-card[onclick]:hover{border-color:var(--warn)}
  .cg-ds-card .cg-ds-type{color:var(--warn);font-weight:700}
- .cg-patch-card{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px;margin:6px 0;font-size:11px}
+ .cg-patch-card{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px;margin:6px 0;font-size:11px;transition:border-color .15s}
+ .cg-patch-card:hover{border-color:var(--accent)}
  .cg-patch-card .cg-patch-type{color:var(--accent);font-weight:700;font-size:12px}
  .cg-patch-card .cg-patch-target{color:var(--muted);font-size:10px}
  .cg-claim-tbl{width:100%;border-collapse:collapse;font-size:10px;margin-top:6px}
@@ -4953,7 +4955,8 @@ function cgRenderDS(){
  if(S.cg.dsEvents.length===0){el.innerHTML='';return}
  el.innerHTML='<h4 style="color:var(--warn);margin:12px 0 6px">Drift Signals ('+S.cg.dsEvents.length+')</h4>'+
  S.cg.dsEvents.map(function(d){
- return'<div class="cg-ds-card"><span class="cg-ds-type">'+esc(d.type)+'</span> '+
+ return'<div class="cg-ds-card"'+(d.claim_key?' style="cursor:pointer" onclick="cgOpenClaimDrawer(\''+esc(d.claim_key)+'\')" data-tip="Click to inspect '+esc(d.claim_key)+'"':'')+
+ '><span class="cg-ds-type">'+esc(d.type)+'</span> '+
  '<span class="badge sev-'+(d.severity==="critical"?"critical":d.severity==="high"?"high":"medium")+'">'+d.severity.toUpperCase()+'</span> '+
  'Score: <strong>'+d.score+'</strong><div class="muted" style="margin-top:3px">'+esc(d.detail)+'</div>'+
  (d.claim_key?'<div class="mono small" style="margin-top:2px">Claim: '+esc(d.claim_key)+'</div>':'')+
@@ -4967,7 +4970,7 @@ function cgRenderPatches(){
  if(S.cg.patches.length===0){el.innerHTML='';if(sel)sel.innerHTML='<option value="">No patches yet</option>';return}
  el.innerHTML='<h4 style="color:var(--accent);margin:12px 0 6px">Patch Suggestions ('+S.cg.patches.length+')</h4>'+
  S.cg.patches.map(function(p){
- return'<div class="cg-patch-card"><span class="cg-patch-type">'+esc(p.type)+'</span> '+
+ return'<div class="cg-patch-card" style="cursor:pointer" onclick="cgOpenClaimDrawer(\''+esc(p.target)+'\')" data-tip="Click to inspect '+esc(p.target)+'"><span class="cg-patch-type">'+esc(p.type)+'</span> '+
  '<span class="cg-patch-target">target: '+esc(p.target)+'</span>'+
  '<div class="muted" style="margin-top:3px">'+esc(p.reason)+'</div>'+
  '<div class="mono small muted">'+esc(p.patch_id)+'</div></div>';
