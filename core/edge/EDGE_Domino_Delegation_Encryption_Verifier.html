@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'"/>
+<!-- EDGE_HARDENING_V1 BEGIN -->
+<script>
+(function(){
+"use strict";
+/* EDGE_HARDENING_V1 — Runtime capability lockdown v1.1 */
+
+var EDGE_BUILD_ID="EDGE_BUILD_ID:EDGE_Domino_Delegation_Encryption_Verifier";
+
+function _block(cap){
+  return function(){throw new Error("EDGE hardening: "+cap+" is blocked")};
+}
+
+/* ── Network ──────────────────────────────────────────── */
+window.fetch          = _block("fetch");
+window.XMLHttpRequest = _block("XMLHttpRequest");
+window.WebSocket      = _block("WebSocket");
+window.EventSource    = _block("EventSource");
+try{navigator.sendBeacon=_block("sendBeacon")}catch(_){}
+
+/* ── Dynamic execution ────────────────────────────────── */
+window.eval = _block("eval");
+try{window.Function=_block("Function constructor")}catch(_){}
+
+/* ── Navigation ───────────────────────────────────────── */
+window.open = _block("window.open");
+
+/* ── Communication channels ──────────────────────────── */
+window.RTCPeerConnection       = _block("RTCPeerConnection");
+window.webkitRTCPeerConnection = _block("RTCPeerConnection");
+window.BroadcastChannel        = _block("BroadcastChannel");
+window.SharedWorker            = _block("SharedWorker");
+window.Worker                  = _block("Worker");
+
+/* ── Persistence ──────────────────────────────────────── */
+try{Object.defineProperty(window,"localStorage",
+  {get:_block("localStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"sessionStorage",
+  {get:_block("sessionStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"indexedDB",
+  {get:_block("indexedDB"),configurable:false})}catch(_){}
+
+/* ── Data channels ───────────────────────────────────── */
+try{Object.defineProperty(window,"name",
+  {value:"",writable:false,configurable:false})}catch(_){}
+
+/* ── Build ID log ────────────────────────────────────── */
+if(typeof console!=="undefined")console.log("[EDGE] Hardening active: "+EDGE_BUILD_ID);
+
+/* ── Self-check: no external resources or injection ──── */
+document.addEventListener("DOMContentLoaded",function(){
+  var violations=[];
+  var ext=document.querySelectorAll("script[src],link[href]");
+  if(ext.length>0)violations.push("external resource ("+ext.length+" element(s))");
+  var handlers=document.querySelectorAll("[onclick],[onerror],[onload],[onmouseover],[onfocus],[onblur],[onsubmit],[onchange],[oninput]");
+  if(handlers.length>0)violations.push("inline event handler ("+handlers.length+" element(s))");
+  var bases=document.querySelectorAll("base[href]");
+  if(bases.length>0)violations.push("base href hijack ("+bases.length+" element(s))");
+  var refresh=document.querySelector("meta[http-equiv='refresh']");
+  if(refresh)violations.push("meta refresh redirect");
+  if(violations.length>0){
+    document.body.innerHTML=
+      "<h1 style='color:red;font-family:monospace;padding:40px'>" +
+      "EDGE VIOLATION: "+violations.join("; ")+"</h1>";
+  }
+});
+})();
+</script>
+<!-- EDGE_HARDENING_V1 END -->
+<!-- EDGE_POLICY_EXCEPTION: clipboard -->
+
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Deep Sigma EDGE — Domino Delegation Encryption — Verifier</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a1a;--bg2:#0f0f2a;--card:#12123a;--card-border:#2a1a5e;
+  --neon-pink:#ff2d95;--neon-cyan:#00f0ff;--neon-purple:#b44dff;
+  --neon-yellow:#ffe14d;--neon-orange:#ff6a00;--neon-green:#39ff14;
+  --txt:#e8e0f0;--txt-muted:#8a80a0;--txt-dim:#5a5070;
+  --font-body:'Segoe UI',system-ui,-apple-system,sans-serif;
+  --font-mono:'Courier New',Courier,monospace;
+  --glow-cyan:0 0 20px rgba(0,240,255,.3),0 0 60px rgba(0,240,255,.1);
+  --glow-pink:0 0 20px rgba(255,45,149,.3),0 0 60px rgba(255,45,149,.1);
+  --glow-purple:0 0 20px rgba(180,77,255,.3),0 0 60px rgba(180,77,255,.1);
+}
+html{font-size:clamp(14px,1.1vw,17px);scroll-behavior:smooth}
+body{font-family:var(--font-body);color:var(--txt);background:var(--bg);line-height:1.65;min-height:100vh}
+.wrap{max-width:900px;width:94%;margin:0 auto;padding:24px 0 60px}
+
+/* ── Header ──────────────────────────────────────────── */
+.header{
+  text-align:center;padding:30px 24px 22px;margin-bottom:20px;
+  border:1px solid var(--card-border);border-radius:12px;
+  background:linear-gradient(135deg,rgba(18,18,58,.9),rgba(10,10,26,.95));
+  box-shadow:var(--glow-purple);position:relative;
+}
+.header::before{
+  content:'';position:absolute;inset:-1px;border-radius:12px;z-index:-1;
+  background:linear-gradient(135deg,var(--neon-pink),var(--neon-purple),var(--neon-cyan));
+  opacity:.3;filter:blur(1px);
+}
+.header h1{
+  font-size:1.5rem;font-weight:800;letter-spacing:2px;
+  background:linear-gradient(90deg,var(--neon-pink),var(--neon-purple),var(--neon-cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.header .sub{color:var(--txt-muted);font-size:.78rem;margin-top:6px;letter-spacing:.3px}
+.badge-row{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.badge{
+  display:inline-block;padding:3px 10px;border-radius:4px;font-size:.65rem;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;font-family:var(--font-mono);
+}
+.badge-edge{background:rgba(255,45,149,.15);color:var(--neon-pink);border:1px solid rgba(255,45,149,.4)}
+.badge-ver{background:rgba(0,240,255,.1);color:var(--neon-cyan);border:1px solid rgba(0,240,255,.3)}
+.badge-offline{background:rgba(57,255,20,.1);color:var(--neon-green);border:1px solid rgba(57,255,20,.3)}
+.badge-core{background:rgba(255,225,77,.12);color:var(--neon-yellow);border:1px solid rgba(255,225,77,.35)}
+.build-id{font-family:var(--font-mono);font-size:.55rem;color:var(--txt-dim);margin-top:8px;letter-spacing:.5px}
+
+/* ── Cards ────────────────────────────────────────────── */
+.card{
+  background:var(--card);border:1px solid var(--card-border);border-radius:10px;
+  padding:20px;margin-bottom:16px;transition:border-color .2s,box-shadow .2s;
+}
+.card:hover{border-color:rgba(180,77,255,.35);box-shadow:0 0 14px rgba(180,77,255,.06)}
+.card h3{font-size:1rem;font-weight:700;margin-bottom:10px;color:var(--neon-cyan);letter-spacing:.5px}
+.card p{font-size:.85rem;color:var(--txt);line-height:1.7}
+.card-intro{font-size:.82rem;color:var(--txt-muted);margin-bottom:14px;line-height:1.6}
+
+/* ── Form Elements ────────────────────────────────────── */
+textarea{
+  width:100%;min-height:120px;padding:10px;border-radius:6px;border:1px solid var(--card-border);
+  background:rgba(0,0,0,.3);color:var(--neon-green);font-family:var(--font-mono);font-size:.78rem;
+  resize:vertical;line-height:1.6;
+}
+textarea:focus{outline:none;border-color:var(--neon-purple)}
+textarea::placeholder{color:var(--txt-dim)}
+label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3px;display:block;margin-bottom:4px}
+
+/* ── Buttons ──────────────────────────────────────────── */
+.btn{
+  padding:8px 16px;border-radius:6px;border:1px solid;cursor:pointer;
+  font-family:var(--font-mono);font-size:.72rem;font-weight:700;letter-spacing:.5px;
+  transition:all .2s;text-transform:uppercase;
+}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn-primary{background:rgba(180,77,255,.2);border-color:rgba(180,77,255,.5);color:#fff}
+.btn-primary:hover:not(:disabled){background:rgba(180,77,255,.35)}
+.btn-master{background:rgba(0,240,255,.15);border-color:rgba(0,240,255,.4);color:var(--neon-cyan)}
+.btn-master:hover:not(:disabled){background:rgba(0,240,255,.3)}
+.btn-sm{padding:5px 12px;font-size:.65rem}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.btn-copy{
+  padding:5px 14px;font-size:.65rem;min-width:60px;text-align:center;border-radius:4px;
+  background:rgba(180,77,255,.15);border:1px solid rgba(180,77,255,.3);color:var(--neon-purple);
+  cursor:pointer;font-family:var(--font-mono);font-weight:700;letter-spacing:.5px;transition:all .2s;
+}
+.btn-copy:hover{background:rgba(180,77,255,.3)}
+.btn-copy.copied{background:rgba(57,255,20,.2);border-color:rgba(57,255,20,.4);color:var(--neon-green)}
+
+/* ── Output Fields ────────────────────────────────────── */
+.out{
+  font-family:var(--font-mono);font-size:.72rem;padding:8px 10px;border-radius:6px;
+  background:rgba(0,0,0,.3);border:1px solid rgba(42,26,94,.4);color:var(--neon-green);
+  word-break:break-all;min-height:28px;line-height:1.5;margin:4px 0;
+}
+.out-row{display:flex;gap:6px;align-items:start;margin:4px 0}
+.out-row .out{flex:1}
+
+/* ── File Input ──────────────────────────────────────── */
+.file-label{display:inline-block;cursor:pointer}
+.file-label input[type="file"]{display:none}
+
+/* ── Verify Banner ───────────────────────────────────── */
+.verify-banner{
+  text-align:center;padding:24px;border-radius:10px;margin:12px 0;
+  font-size:1.4rem;font-weight:800;letter-spacing:2px;font-family:var(--font-mono);
+}
+.verify-banner.vb-pass{
+  background:rgba(57,255,20,.1);border:2px solid rgba(57,255,20,.4);
+  color:var(--neon-green);box-shadow:0 0 30px rgba(57,255,20,.15);
+}
+.verify-banner.vb-fail{
+  background:rgba(255,45,149,.1);border:2px solid rgba(255,45,149,.4);
+  color:var(--neon-pink);box-shadow:0 0 30px rgba(255,45,149,.15);
+}
+.verify-checks{margin-top:12px}
+.verify-check{
+  padding:8px 12px;margin:4px 0;border-radius:6px;font-size:.82rem;
+  display:flex;align-items:center;gap:8px;
+}
+.check-pass{background:rgba(57,255,20,.06);color:var(--neon-green)}
+.check-fail{background:rgba(255,45,149,.06);color:var(--neon-pink)}
+
+/* ── Copyable Fields ─────────────────────────────────── */
+.field-grid{display:grid;grid-template-columns:auto 1fr auto;gap:8px 12px;align-items:center;margin:12px 0}
+.field-label{font-size:.7rem;color:var(--txt-muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.field-value{font-family:var(--font-mono);font-size:.78rem;color:var(--neon-green);font-weight:700;word-break:break-all}
+
+/* ── Participants Table ──────────────────────────────── */
+.ptable{width:100%;border-collapse:collapse;margin:12px 0}
+.ptable th{font-size:.68rem;color:var(--txt-muted);text-transform:uppercase;letter-spacing:.5px;padding:6px 10px;text-align:left;border-bottom:1px solid var(--card-border)}
+.ptable td{font-size:.78rem;padding:6px 10px;font-family:var(--font-mono);border-bottom:1px solid rgba(42,26,94,.2)}
+.ptable tr:nth-child(even) td{background:rgba(0,0,0,.1)}
+
+/* ── Fingerprints ────────────────────────────────────── */
+.fp-grid{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:center;margin:10px 0}
+.fp-key{font-size:.7rem;color:var(--neon-cyan);font-weight:700;font-family:var(--font-mono)}
+.fp-val{font-size:.72rem;color:var(--neon-green);font-family:var(--font-mono);word-break:break-all}
+
+/* ── Responsive ───────────────────────────────────────── */
+@media(max-width:640px){
+  html{font-size:14px}
+  .header h1{font-size:1.2rem}
+  .field-grid{grid-template-columns:1fr;gap:4px}
+  .field-label{margin-top:8px}
+  .verify-banner{font-size:1.1rem;padding:16px}
+}
+</style>
+</head>
+<body>
+<!-- EDGE_ACTION_CONTRACT_V1 -->
+<div id="edgeActionContract" style="
+  margin:8px auto;max-width:900px;width:94%;padding:6px 14px;
+  border-radius:6px;border:1px solid rgba(57,255,20,.2);
+  background:rgba(57,255,20,.04);
+  font-family:'Courier New',Courier,monospace;font-size:.6rem;
+  color:#8a80a0;display:flex;flex-wrap:wrap;gap:12px;align-items:center;
+">
+  <span style="color:#39ff14;font-weight:700;letter-spacing:1px">ACTION CONTRACT</span>
+  <span>Network: LOCKED</span>
+  <span style="opacity:.5">|</span>
+  <span>Persistence: NONE</span>
+  <span style="opacity:.5">|</span>
+  <span>Side Effects: NONE</span>
+</div>
+
+<div class="wrap">
+
+<header class="header">
+  <h1>Deep Sigma EDGE</h1>
+  <div class="sub">Domino Delegation Encryption &mdash; Verifier (Read-Only)</div>
+  <div class="badge-row">
+    <span class="badge badge-edge">EDGE Module</span>
+    <span class="badge badge-core">Core / Verifier</span>
+    <span class="badge badge-ver">4-of-7</span>
+    <span class="badge badge-offline">Offline</span>
+  </div>
+  <div class="build-id" id="buildIdDisplay"></div>
+</header>
+
+<div class="card" style="border-color:rgba(255,225,77,.25)">
+  <h3 style="color:var(--neon-yellow)">Verify Ceremony Record</h3>
+  <p class="card-intro">
+    Load or paste a ceremony record JSON to verify the chain seal, connectivity,
+    time-to-live status, session identity, and keyword fingerprints.
+    This tool is read-only &mdash; it cannot generate keywords, unlock, or encrypt.
+  </p>
+  <div class="btn-row">
+    <label class="btn btn-primary btn-sm file-label" id="loadJsonLabel">
+      Load JSON File
+      <input type="file" accept=".json" id="loadJsonInput"/>
+    </label>
+  </div>
+  <label for="verifyInput">Ceremony Record JSON</label>
+  <textarea id="verifyInput" placeholder="Paste ceremony record JSON here..."></textarea>
+  <div style="margin-top:10px">
+    <button class="btn btn-master" id="verifyBtn">Verify Record</button>
+  </div>
+</div>
+
+<div id="verifyBanner" style="display:none"></div>
+
+<div id="verifyFields" style="display:none">
+  <div class="card">
+    <h3>Record Summary</h3>
+    <div class="field-grid" id="fieldGrid"></div>
+  </div>
+
+  <div class="card" id="participantsCard" style="display:none">
+    <h3>Participants</h3>
+    <table class="ptable">
+      <thead><tr><th>#</th><th>Role</th><th>Tile</th></tr></thead>
+      <tbody id="ptableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="card" id="fingerprintsCard" style="display:none">
+    <h3>Keyword Fingerprints</h3>
+    <div class="fp-grid" id="fpGrid"></div>
+  </div>
+</div>
+
+<div id="verifyChecks" class="verify-checks"></div>
+
+</div><!-- /.wrap -->
+
+<script>
+"use strict";
+
+var EDGE_BUILD_ID="EDGE_BUILD_ID:EDGE_Domino_Delegation_Encryption_Verifier";
+
+/* ── Helpers ─────────────────────────────────────────── */
+
+function hexFromBytes(buf){
+  return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,"0")}).join("");
+}
+
+async function sha256hex(str){
+  var enc=new TextEncoder();
+  var buf=await crypto.subtle.digest("SHA-256",enc.encode(str));
+  return hexFromBytes(buf);
+}
+
+/* Domino tile names from hash bytes */
+var DOMINO_NAMES=[
+  "blank","ace","deuce","trey","four","five","six",
+  "double-blank","double-ace","double-deuce","double-trey",
+  "double-four","double-five","double-six"
+];
+
+function dominoNameFromBytes(hashHex){
+  var parts=[];
+  for(var i=0;i<4&&i*2+1<hashHex.length;i++){
+    var b=parseInt(hashHex.substr(i*2,2),16);
+    parts.push(DOMINO_NAMES[b%DOMINO_NAMES.length]);
+  }
+  return parts.join(", ");
+}
+
+function copyToClipboard(text,btn){
+  navigator.clipboard.writeText(text).then(function(){
+    btn.textContent="COPIED";
+    btn.classList.add("copied");
+    setTimeout(function(){btn.textContent="COPY";btn.classList.remove("copied")},1500);
+  });
+}
+
+/* ── Verify ──────────────────────────────────────────── */
+
+async function verifyRecord(){
+  var input=document.getElementById("verifyInput").value.trim();
+  if(!input){return}
+
+  var rec;
+  try{rec=JSON.parse(input)}catch(e){
+    showResult(false,"Invalid JSON: "+e.message,[]);
+    return;
+  }
+
+  var checks=[];
+  var allPass=true;
+
+  function pass(msg){checks.push({ok:true,msg:msg})}
+  function fail(msg){checks.push({ok:false,msg:msg});allPass=false}
+
+  /* 1. Chain present */
+  if(!rec.chain||typeof rec.chain!=="string"){
+    fail("Chain string missing");
+    showResult(false,"VERIFICATION FAILED",checks);
+    return;
+  }
+  pass("Chain string present");
+
+  /* 2. Chain connectivity */
+  var tiles=rec.chain.split(/\s*(?:→|->)\s*/);
+  var chainOk=true;
+  for(var i=0;i<tiles.length-1;i++){
+    var parts=tiles[i].split("-");
+    var next=tiles[i+1].split("-");
+    if(parts.length>=2&&next.length>=2){
+      if(parts[parts.length-1]!==next[0]){chainOk=false;break}
+    }
+  }
+  if(chainOk)pass("Chain connectivity valid ("+tiles.length+" tiles)");
+  else fail("Chain connectivity broken at tile "+(i+1));
+
+  /* 3. Seal recomputation */
+  var computedHash=await sha256hex(rec.chain);
+  if(rec.chain_hash){
+    if(computedHash===rec.chain_hash)pass("Chain seal matches (SHA-256)");
+    else fail("Chain seal mismatch — expected: "+rec.chain_hash.substring(0,16)+"... got: "+computedHash.substring(0,16)+"...");
+  }else{
+    fail("chain_hash field missing");
+  }
+
+  /* 4. Quick ID */
+  if(rec.chain_fingerprint){
+    var expectedFP=computedHash.substring(0,16);
+    if(rec.chain_fingerprint===expectedFP)pass("Quick ID matches ("+expectedFP+")");
+    else fail("Quick ID mismatch — expected: "+expectedFP+" got: "+rec.chain_fingerprint);
+  }
+
+  /* 5. Domino name */
+  if(rec.domino_fingerprint){
+    var expectedDomino=dominoNameFromBytes(computedHash);
+    if(rec.domino_fingerprint===expectedDomino)pass("Domino name matches");
+    else fail("Domino name mismatch — expected: "+expectedDomino);
+  }
+
+  /* 6. Majority model */
+  if(rec.majority_model){
+    if(rec.majority_model==="SSS_GF256")pass("Majority model: SSS_GF256");
+    else fail("Unexpected majority model: "+rec.majority_model);
+  }
+
+  /* 7. Threshold */
+  if(rec.n&&rec.t){
+    pass("Threshold: "+rec.t+"-of-"+rec.n);
+  }
+
+  /* 8. TTL check */
+  if(rec.expires_at){
+    var exp=new Date(rec.expires_at);
+    var now=new Date();
+    if(exp>now){
+      var mins=Math.ceil((exp-now)/60000);
+      pass("TTL active — "+mins+" minute(s) remaining");
+    }else{
+      fail("TTL expired at "+rec.expires_at);
+    }
+  }else if(rec.created_at){
+    pass("Created: "+rec.created_at+" (no expiry set)");
+  }
+
+  /* 9. Session ID present */
+  if(rec.session_id){
+    pass("Session ID present: "+rec.session_id);
+  }
+
+  /* 10. Keyword fingerprints */
+  if(rec.keyword_fingerprints){
+    var keys=Object.keys(rec.keyword_fingerprints);
+    if(keys.length>0)pass("Keyword fingerprints: "+keys.length+" entries");
+    else fail("Keyword fingerprints object is empty");
+  }
+
+  /* 11. Participants */
+  if(rec.participants&&Array.isArray(rec.participants)){
+    pass("Participants: "+rec.participants.length);
+  }
+
+  showResult(allPass,allPass?"VERIFIED":"VERIFICATION FAILED",checks);
+  showFields(rec,computedHash);
+}
+
+function showResult(ok,title,checks){
+  var banner=document.getElementById("verifyBanner");
+  banner.style.display="block";
+  banner.className="verify-banner "+(ok?"vb-pass":"vb-fail");
+  banner.textContent=ok?"\u2714 "+title:"\u2718 "+title;
+
+  var container=document.getElementById("verifyChecks");
+  container.innerHTML="";
+  checks.forEach(function(c){
+    var div=document.createElement("div");
+    div.className="verify-check "+(c.ok?"check-pass":"check-fail");
+    div.textContent=(c.ok?"\u2714 ":"\u2718 ")+c.msg;
+    container.appendChild(div);
+  });
+}
+
+function showFields(rec,computedHash){
+  var panel=document.getElementById("verifyFields");
+  panel.style.display="block";
+
+  var grid=document.getElementById("fieldGrid");
+  grid.innerHTML="";
+
+  var fields=[
+    ["Ceremony Type",rec.ceremony_type||"—"],
+    ["Chain",rec.chain||"—"],
+    ["Quick ID",rec.chain_fingerprint||computedHash.substring(0,16)],
+    ["Domino Name",rec.domino_fingerprint||dominoNameFromBytes(computedHash)],
+    ["Full Seal",rec.chain_hash||computedHash],
+    ["Session ID",rec.session_id||"—"],
+    ["Created",rec.created_at||rec.timestamp||"—"],
+    ["Expires",rec.expires_at||"—"],
+    ["Model",rec.majority_model||"—"],
+    ["Threshold",(rec.t&&rec.n)?rec.t+"-of-"+rec.n:"—"],
+    ["Valid",rec.valid===true?"Yes":rec.valid===false?"No":"—"]
+  ];
+
+  fields.forEach(function(f){
+    var lbl=document.createElement("div");
+    lbl.className="field-label";
+    lbl.textContent=f[0];
+    grid.appendChild(lbl);
+
+    var val=document.createElement("div");
+    val.className="field-value";
+    val.textContent=f[1];
+    grid.appendChild(val);
+
+    var btn=document.createElement("button");
+    btn.className="btn-copy";
+    btn.textContent="COPY";
+    btn.addEventListener("click",function(){copyToClipboard(f[1],btn)});
+    grid.appendChild(btn);
+  });
+
+  /* Participants table */
+  if(rec.participants&&rec.participants.length>0){
+    document.getElementById("participantsCard").style.display="block";
+    var tbody=document.getElementById("ptableBody");
+    tbody.innerHTML="";
+    rec.participants.forEach(function(p){
+      var tr=document.createElement("tr");
+      tr.innerHTML="<td>"+(p.position||"—")+"</td><td>"+(p.role||"—")+"</td><td>"+(p.tile||"—")+"</td>";
+      tbody.appendChild(tr);
+    });
+  }
+
+  /* Keyword fingerprints */
+  if(rec.keyword_fingerprints){
+    var keys=Object.keys(rec.keyword_fingerprints).sort(function(a,b){return Number(a)-Number(b)});
+    if(keys.length>0){
+      document.getElementById("fingerprintsCard").style.display="block";
+      var fpGrid=document.getElementById("fpGrid");
+      fpGrid.innerHTML="";
+      keys.forEach(function(k){
+        var key=document.createElement("div");
+        key.className="fp-key";
+        key.textContent="Keyword "+k+":";
+        fpGrid.appendChild(key);
+
+        var val=document.createElement("div");
+        val.className="fp-val";
+        val.textContent=rec.keyword_fingerprints[k];
+        fpGrid.appendChild(val);
+      });
+    }
+  }
+}
+
+/* ── File Loader ─────────────────────────────────────── */
+
+function loadJSONFile(e){
+  var file=e.target.files[0];
+  if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    document.getElementById("verifyInput").value=ev.target.result;
+  };
+  reader.readAsText(file);
+}
+
+/* ── Init ────────────────────────────────────────────── */
+
+document.addEventListener("DOMContentLoaded",function(){
+  var buildEl=document.getElementById("buildIdDisplay");
+  if(buildEl)buildEl.textContent=EDGE_BUILD_ID;
+
+  document.getElementById("verifyBtn").addEventListener("click",verifyRecord);
+  document.getElementById("loadJsonInput").addEventListener("change",loadJSONFile);
+});
+</script>
+</body>
+</html>

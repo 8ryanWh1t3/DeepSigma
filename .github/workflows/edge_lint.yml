@@ -22,24 +22,37 @@ jobs:
       - name: Scan for EDGE files in unexpected locations
         run: |
           echo "Checking for EDGE_*.html outside expected directories..."
-          STRAY=$(find . -name "EDGE_*.html" -not -path "./.git/*" -not -path "./edge/*" -not -path "./EDGE_HARDENING_HEADER_SNIPPET.html" | head -20)
+          STRAY=$(find . -name "EDGE_*.html" \
+            -not -path "./.git/*" \
+            -not -path "./edge/*" \
+            -not -path "./enterprise/edge/*" \
+            -not -path "./core/edge/*" \
+            -not -path "./EDGE_HARDENING_HEADER_SNIPPET.html" | head -20)
           if [ -n "$STRAY" ]; then
-            echo "::warning::EDGE files found outside edge/ directory:"
+            echo "::warning::EDGE files found outside expected directories:"
             echo "$STRAY"
           fi
 
-      - name: Run EDGE hardening linter (repo root)
+      - name: Run EDGE hardening linter (all directories)
         run: python tools/edge_lint.py
 
-      - name: Run EDGE hardening linter (edge/ directory)
+      - name: Run EDGE hardening linter (edge/)
         run: python tools/edge_lint.py --path edge/
+
+      - name: Run EDGE hardening linter (enterprise/edge/)
+        run: python tools/edge_lint.py --path enterprise/edge/
+
+      - name: Run EDGE hardening linter (core/edge/)
+        run: python tools/edge_lint.py --path core/edge/
 
       - name: Generate JSON report
         if: always()
         run: |
           mkdir -p lint-reports
-          python tools/edge_lint.py --json > lint-reports/root.json 2>&1 || true
+          python tools/edge_lint.py --json > lint-reports/all.json 2>&1 || true
           python tools/edge_lint.py --json --path edge/ > lint-reports/edge.json 2>&1 || true
+          python tools/edge_lint.py --json --path enterprise/edge/ > lint-reports/enterprise.json 2>&1 || true
+          python tools/edge_lint.py --json --path core/edge/ > lint-reports/core.json 2>&1 || true
 
       - name: Upload lint report
         if: always()

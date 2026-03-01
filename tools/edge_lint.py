@@ -222,13 +222,23 @@ def lint_file(filepath, strict=False):
 # Main
 # ────────────────────────────────────────────────────────────────
 
+DEFAULT_SCAN_DIRS = ["edge", "enterprise/edge", "core/edge"]
+
+
+def _discover_edge_files(root):
+    """Discover EDGE_*.html files in a single directory."""
+    all_html = sorted(glob.glob(os.path.join(root, "*.html")))
+    edge_files = [f for f in all_html if os.path.basename(f).startswith("EDGE_")]
+    return all_html, edge_files
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="EDGE Hardening Linter — CI enforcement for EDGE HTML modules"
     )
     parser.add_argument(
         "--path", default=None,
-        help="Directory to scan (default: $GITHUB_WORKSPACE or cwd)"
+        help="Directory to scan (default: scans edge/, enterprise/edge/, core/edge/)"
     )
     parser.add_argument(
         "--json", action="store_true", dest="json_output",
@@ -239,28 +249,41 @@ def main():
         help="Treat warnings (e.g. BUILD_ID=SET_ME) as errors"
     )
     args = parser.parse_args()
-    root = args.path or os.environ.get("GITHUB_WORKSPACE", ".")
 
-    # Discover files
-    all_html = sorted(glob.glob(os.path.join(root, "*.html")))
-    edge_files = [f for f in all_html if os.path.basename(f).startswith("EDGE_")]
+    # Determine directories to scan
+    if args.path:
+        scan_dirs = [args.path]
+    else:
+        workspace = os.environ.get("GITHUB_WORKSPACE", ".")
+        scan_dirs = [os.path.join(workspace, d) for d in DEFAULT_SCAN_DIRS]
 
-    total_html = len(all_html)
-    total_edge = len(edge_files)
+    total_html = 0
+    total_edge = 0
     total_failures = 0
     total_warnings = 0
     total_exceptions = 0
     failed_files = []
     json_results = []
+    all_edge_files = []
+
+    # Collect files from all directories
+    for scan_dir in scan_dirs:
+        if not os.path.isdir(scan_dir):
+            continue
+        dir_html, dir_edge = _discover_edge_files(scan_dir)
+        total_html += len(dir_html)
+        total_edge += len(dir_edge)
+        all_edge_files.extend(dir_edge)
 
     if not args.json_output:
-        print("[EDGE Lint] directory: %s" % os.path.abspath(root))
+        dirs_str = ", ".join(os.path.abspath(d) for d in scan_dirs if os.path.isdir(d))
+        print("[EDGE Lint] directories: %s" % dirs_str)
         print()
 
     if total_edge == 0:
         if args.json_output:
             print(json.dumps({
-                "directory": os.path.abspath(root),
+                "directories": [os.path.abspath(d) for d in scan_dirs if os.path.isdir(d)],
                 "total_html": total_html,
                 "edge_files": 0,
                 "failures": 0,
@@ -279,8 +302,9 @@ def main():
     if not args.json_output:
         print("[EDGE Lint] Scanning %d EDGE file(s)...\n" % total_edge)
 
-    for filepath in edge_files:
-        fname = os.path.basename(filepath)
+    for filepath in all_edge_files:
+        # Show relative path for multi-dir scanning
+        fname = os.path.relpath(filepath)
         violations, warnings, exceptions = lint_file(filepath, strict=args.strict)
         total_exceptions += len(exceptions)
         total_warnings += len(warnings)
@@ -320,7 +344,7 @@ def main():
 
     if args.json_output:
         print(json.dumps({
-            "directory": os.path.abspath(root),
+            "directories": [os.path.abspath(d) for d in scan_dirs if os.path.isdir(d)],
             "total_html": total_html,
             "edge_files": total_edge,
             "failures": total_failures,
