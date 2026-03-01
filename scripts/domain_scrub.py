@@ -210,6 +210,12 @@ ALLOWED_ACRONYMS = {
     "PROOF", "DEMO", "COMPLETE", "TEST", "LAB", "ENGINE",
     # v1.0.7 — stream mode, policy panel, analyzer tokens
     "STREAM", "THAW", "FROZEN",
+    # RFP Co-Pilot EDGE — procurement, acquisition, proposal terms
+    "RFP", "LPTA", "FFP", "IDIQ", "BPA", "DFARS", "FAR", "NAICS",
+    "XLSX", "SOW", "PWS", "LOE", "SME", "BOE", "PII", "FOUO",
+    "COPY", "PAGE", "PROMPT", "SCRIPT", "EMAIL", "SPEC",
+    "BRIEF", "EXEC", "LAYOUT", "WIRED",
+    "TAB", "OCR", "FOOTER", "COPIED",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}

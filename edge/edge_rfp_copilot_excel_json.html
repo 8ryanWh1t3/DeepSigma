@@ -1,0 +1,1009 @@
+<!--
+  Deep Sigma EDGE — RFP Co-Pilot (Excel + JSON)
+  ============================================================
+  Single-file artifact: RFP docs → AI extraction → JSON → Excel Power Query → role-based execution.
+  70s retro infographic style. No external dependencies. Works offline.
+
+  Tabs:
+  [1] Overview  [2] Quick Start  [3] Co-Pilot Prompt  [4] JSON Spec
+  [5] Excel Power Query  [6] Share + Team  [7] Roles + Actions  [8] Troubleshooting
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Deep Sigma EDGE — RFP Co-Pilot</title>
+  <style>
+    :root {
+      --bg:#f5f0e8;--card:#fffdf7;--text:#2c2417;--muted:#7a6e5d;
+      --orange:#d4622b;--mustard:#c49a2a;--teal:#2a8a7a;--rust:#a0421a;
+      --line:#d9d0c0;--hover:#f0e8d8;--copy-ok:#2a8a7a;
+      --tab-bg:#ebe4d6;--tab-active:#fffdf7;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.6}
+    .mono{font-family:'Courier New',Courier,monospace}
+
+    /* ── Header ─────────────────────────────── */
+    header{background:linear-gradient(135deg,#2c2417 0%,#3d3225 100%);color:#f5f0e8;padding:20px 28px;border-bottom:4px solid var(--orange)}
+    .brand{font-size:22px;font-weight:700;letter-spacing:1px}
+    .brand small{display:block;font-size:12px;font-weight:400;color:#c4b89a;letter-spacing:.5px;margin-top:2px}
+    .hdr-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+    .hdr-badge{display:inline-block;padding:3px 12px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+    .hdr-badge.edge{background:var(--orange);color:#fff}
+    .hdr-badge.ver{background:rgba(255,255,255,.12);color:#c4b89a;border:1px solid rgba(255,255,255,.15)}
+
+    /* ── Tabs ────────────────────────────────── */
+    .tabs{display:flex;gap:0;border-bottom:2px solid var(--orange);background:var(--tab-bg);padding:0 20px;overflow-x:auto}
+    .ttab{padding:10px 16px;font-size:12px;font-weight:700;color:var(--muted);background:none;border:none;border-bottom:3px solid transparent;cursor:pointer;transition:all .15s;letter-spacing:.3px;white-space:nowrap;font-family:inherit}
+    .ttab:hover{color:var(--text);background:var(--hover)}
+    .ttab.active{color:var(--orange);border-bottom-color:var(--orange);background:var(--tab-active)}
+
+    /* ── Content ──────────────────────────────── */
+    .content{max-width:960px;margin:0 auto;padding:20px 24px}
+    section{display:none}
+    section.active{display:block}
+
+    /* ── Cards ─────────────────────────────────── */
+    .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(44,36,23,.06)}
+    .card h3{margin:0 0 8px;font-size:16px;color:var(--orange);letter-spacing:.3px}
+    .card h4{margin:10px 0 6px;font-size:14px;color:var(--rust)}
+    .card p{margin:4px 0 8px}
+
+    /* ── Accent Boxes ──────────────────────────── */
+    .accent-box{border-left:4px solid var(--mustard);background:rgba(196,154,42,.08);padding:10px 14px;border-radius:0 8px 8px 0;margin:10px 0;font-size:13px}
+    .accent-box.teal{border-left-color:var(--teal);background:rgba(42,138,122,.07)}
+    .accent-box.orange{border-left-color:var(--orange);background:rgba(212,98,43,.07)}
+    .accent-box.rust{border-left-color:var(--rust);background:rgba(160,66,26,.07)}
+
+    /* ── Refresh Loop ──────────────────────────── */
+    .refresh-loop{border:2px dashed var(--mustard);border-radius:10px;padding:14px 18px;margin:14px 0;background:rgba(196,154,42,.05);text-align:center}
+    .refresh-loop .loop-title{font-weight:700;color:var(--mustard);font-size:13px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+    .refresh-loop .loop-flow{font-size:14px;color:var(--text)}
+
+    /* ── Checklists ────────────────────────────── */
+    .checklist{list-style:none;padding:0;margin:8px 0;counter-reset:ck}
+    .checklist li{counter-increment:ck;padding:6px 0 6px 36px;position:relative;font-size:13px;border-bottom:1px solid rgba(217,208,192,.5)}
+    .checklist li::before{content:counter(ck);position:absolute;left:0;top:5px;width:24px;height:24px;border-radius:50%;background:var(--orange);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+    .checklist li:last-child{border-bottom:none}
+
+    /* ── Code / Pre ────────────────────────────── */
+    pre{background:#2c2417;color:#e8dcc8;border-radius:8px;padding:14px 16px;overflow-x:auto;font-size:12px;line-height:1.5;font-family:'Courier New',Courier,monospace;position:relative;margin:8px 0}
+    code{font-family:'Courier New',Courier,monospace;font-size:12px}
+    .inline-code{background:rgba(44,36,23,.08);padding:1px 6px;border-radius:4px;font-size:12px}
+
+    /* ── Copy Button ───────────────────────────── */
+    .copy-btn{position:absolute;top:8px;right:8px;background:var(--orange);color:#fff;border:none;border-radius:6px;padding:4px 12px;font-size:10px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:all .15s;font-family:inherit}
+    .copy-btn:hover{background:var(--rust)}
+    .copy-btn.copied{background:var(--copy-ok)}
+    .copy-wrap{position:relative}
+
+    /* ── Inline Copy Button (non-positioned) ───── */
+    .icopy{display:inline-block;background:var(--orange);color:#fff;border:none;border-radius:6px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.4px;transition:all .15s;font-family:inherit;margin:4px 0}
+    .icopy:hover{background:var(--rust)}
+    .icopy.copied{background:var(--copy-ok)}
+
+    /* ── Tables ────────────────────────────────── */
+    table{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0}
+    th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:rgba(44,36,23,.03)}
+
+    /* ── Role Cards ────────────────────────────── */
+    .role-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media(max-width:700px){.role-grid{grid-template-columns:1fr}}
+    .role-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;border-top:3px solid var(--teal)}
+    .role-card h4{margin:0 0 6px;font-size:14px;color:var(--teal)}
+    .role-card ul{margin:4px 0 0;padding:0 0 0 18px;font-size:12px}
+    .role-card ul li{padding:2px 0}
+
+    /* ── Flow Diagram ──────────────────────────── */
+    .flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:12px 0;font-size:13px}
+    .flow-step{padding:6px 14px;border-radius:8px;font-weight:700;font-size:12px;letter-spacing:.3px}
+    .flow-step.doc{background:rgba(212,98,43,.12);color:var(--orange);border:1px solid rgba(212,98,43,.25)}
+    .flow-step.ai{background:rgba(196,154,42,.12);color:var(--mustard);border:1px solid rgba(196,154,42,.25)}
+    .flow-step.json{background:rgba(42,138,122,.12);color:var(--teal);border:1px solid rgba(42,138,122,.25)}
+    .flow-step.xl{background:rgba(44,36,23,.08);color:var(--text);border:1px solid var(--line)}
+    .flow-step.team{background:rgba(160,66,26,.1);color:var(--rust);border:1px solid rgba(160,66,26,.2)}
+    .flow-arrow{color:var(--muted);font-size:16px}
+
+    /* ── Warn / Info Badges ────────────────────── */
+    .badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.3px}
+    .badge.warn{background:rgba(196,154,42,.15);color:var(--mustard);border:1px solid rgba(196,154,42,.3)}
+    .badge.ok{background:rgba(42,138,122,.12);color:var(--teal);border:1px solid rgba(42,138,122,.25)}
+    .badge.err{background:rgba(160,66,26,.12);color:var(--rust);border:1px solid rgba(160,66,26,.25)}
+
+    /* ── Footer ────────────────────────────────── */
+    footer{text-align:center;padding:20px;font-size:11px;color:var(--muted);border-top:1px solid var(--line);margin-top:20px}
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header>
+  <div class="hdr-row">
+    <div class="brand">
+      Deep Sigma EDGE — RFP Co-Pilot
+      <small>Parse Once. Execute Everywhere. Stay Aligned.</small>
+    </div>
+    <div>
+      <span class="hdr-badge edge">EDGE</span>
+      <span class="hdr-badge ver">v1.0.0</span>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════ TABS ═══════════════ -->
+<div class="tabs" id="tabBar">
+  <button class="ttab active" data-tab="overview">Overview</button>
+  <button class="ttab" data-tab="quickstart">Quick Start</button>
+  <button class="ttab" data-tab="prompt">Co-Pilot Prompt</button>
+  <button class="ttab" data-tab="json">JSON Spec</button>
+  <button class="ttab" data-tab="pquery">Excel Power Query</button>
+  <button class="ttab" data-tab="share">Share + Team</button>
+  <button class="ttab" data-tab="roles">Roles + Actions</button>
+  <button class="ttab" data-tab="troubleshoot">Troubleshooting</button>
+</div>
+
+<!-- ═══════════════ CONTENT ═══════════════ -->
+<div class="content">
+
+<!-- ── TAB 1: Overview ────────────────────────────────────────────── -->
+<section id="tab-overview" class="active">
+  <div class="card">
+    <h3>What This Is</h3>
+    <p>A repeatable, AI-assisted workflow that turns any government RFP into structured data your entire team can use — without re-reading 200 pages.</p>
+    <div class="flow">
+      <span class="flow-step doc">RFP Docs</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step ai">Co-Pilot AI</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step json">{} JSON</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step xl">Excel Tables</span>
+      <span class="flow-arrow">&rarr;</span>
+      <span class="flow-step team">Team Executes</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>The Problem</h3>
+    <p>Every role on a proposal team re-reads the same RFP, highlights different things, and maintains their own notes. When an amendment drops, everyone scrambles independently. Drift happens. Things get missed.</p>
+  </div>
+
+  <div class="card">
+    <h3>The Solution</h3>
+    <ol class="checklist">
+      <li><strong>Parse once</strong> — feed the RFP to Co-Pilot with a structured extraction prompt</li>
+      <li><strong>Get JSON</strong> — Co-Pilot returns a single, structured JSON file with citations</li>
+      <li><strong>Load into Excel</strong> — Power Query turns JSON into live tables: dates, requirements, attachments, risks</li>
+      <li><strong>Team pulls what they need</strong> — each role has a pre-defined action packet, no re-parsing</li>
+      <li><strong>Amendment arrives? Rerun.</strong> — overwrite JSON, Refresh All in Excel, team stays aligned</li>
+    </ol>
+  </div>
+
+  <div class="refresh-loop">
+    <div class="loop-title">The Refresh Loop</div>
+    <div class="loop-flow">Amendment arrives &rarr; Rerun prompt &rarr; Overwrite JSON &rarr; Excel <strong>Refresh All</strong> &rarr; Team stays aligned.</div>
+  </div>
+
+  <div class="accent-box teal">
+    <strong>Bottom line:</strong> One person parses. The whole team benefits. Amendments don't break the workflow — they feed it.
+  </div>
+</section>
+
+<!-- ── TAB 2: Quick Start (George) ────────────────────────────────── -->
+<section id="tab-quickstart">
+  <div class="card">
+    <h3>George Quick Start &mdash; 3 Minutes to Structured Data</h3>
+    <p>This is the fastest path. You need: the RFP PDF, Microsoft Co-Pilot (or any LLM), and Excel.</p>
+  </div>
+
+  <div class="card">
+    <h4>Step 1: Copy the Prompt (30 seconds)</h4>
+    <ol class="checklist">
+      <li>Go to the <strong>Co-Pilot Prompt</strong> tab</li>
+      <li>Click <strong>Copy Prompt</strong></li>
+      <li>Open Co-Pilot (or ChatGPT, Claude, etc.)</li>
+      <li>Paste the prompt, then attach or paste the RFP document</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h4>Step 2: Save the JSON (30 seconds)</h4>
+    <ol class="checklist">
+      <li>Co-Pilot returns a JSON block — copy it all</li>
+      <li>Open Notepad (or any text editor)</li>
+      <li>Paste and save as <span class="inline-code mono">rfp_extract.json</span> on your desktop or shared drive</li>
+      <li>Verify: file should start with <span class="inline-code mono">{ "solicitation":</span></li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h4>Step 3: Load into Excel (2 minutes)</h4>
+    <ol class="checklist">
+      <li>Open a new Excel workbook</li>
+      <li>Go to <strong>Data &rarr; Get Data &rarr; From File &rarr; From JSON</strong></li>
+      <li>Select your <span class="inline-code mono">rfp_extract.json</span></li>
+      <li>Power Query opens — expand the <span class="inline-code mono">solicitation</span> record</li>
+      <li>Click <strong>Close &amp; Load</strong> to create the table</li>
+      <li><em>Or</em> paste the Power Query M script from the <strong>Excel Power Query</strong> tab for pre-built tables</li>
+    </ol>
+    <div class="accent-box">
+      <strong>Pro tip:</strong> Save the workbook. Next amendment? Overwrite the JSON file, then click <strong>Data &rarr; Refresh All</strong>. Tables update instantly.
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>Step 4: Share with the Team</h4>
+    <ol class="checklist">
+      <li>Drop the JSON file in a shared folder (Teams, SharePoint, network drive)</li>
+      <li>Send a one-liner email: <em>"RFP extracted — JSON is at [path]. Pull what you need."</em></li>
+      <li>Each role pulls their action items from the <strong>Roles + Actions</strong> tab</li>
+    </ol>
+  </div>
+
+  <div class="refresh-loop">
+    <div class="loop-title">Done. Three minutes. Whole team aligned.</div>
+    <div class="loop-flow">Next time an amendment drops, repeat steps 1-2, then Refresh All in Excel.</div>
+  </div>
+</section>
+
+<!-- ── TAB 3: Co-Pilot Prompt ─────────────────────────────────────── -->
+<section id="tab-prompt">
+  <div class="card">
+    <h3>What This Is</h3>
+    <p>A structured extraction prompt that tells Co-Pilot (or any LLM) exactly what to pull from the RFP and how to format the output as JSON. Outputs sections A through E with page/section citations.</p>
+  </div>
+
+  <div class="card">
+    <h4>Instructions</h4>
+    <ol class="checklist">
+      <li>Click <strong>Copy Prompt</strong> below</li>
+      <li>Open your LLM (Co-Pilot, ChatGPT, Claude, etc.)</li>
+      <li>Paste the prompt</li>
+      <li>Attach or paste the full RFP document</li>
+      <li>Review the JSON output, then save as <span class="inline-code mono">rfp_extract.json</span></li>
+    </ol>
+  </div>
+
+  <div class="copy-wrap">
+    <button class="copy-btn" onclick="copyBlock('promptBlock',this)">COPY PROMPT</button>
+    <pre id="promptBlock">You are an RFP extraction assistant. Read the attached solicitation document
+and produce a single JSON object with the following structure. For every
+extracted value, include a citation noting the source page number or
+section reference.
+
+Return ONLY valid JSON — no markdown fences, no commentary.
+
+{
+  "solicitation": {
+    "title": "Full solicitation title from cover page",
+    "solicitation_number": "e.g. 75FCMC25R0042",
+    "agency": "Issuing agency / contracting office",
+    "naics": "NAICS code and size standard",
+    "set_aside": "Set-aside type or Full and Open",
+    "contract_type": "e.g. FFP, T&amp;M, IDIQ, BPA",
+    "period_of_performance": "Base + option years",
+    "place_of_performance": "Location(s)",
+
+    "key_dates": [
+      { "event": "Questions due",  "date": "YYYY-MM-DD", "citation": "Section/Page" },
+      { "event": "Proposals due",  "date": "YYYY-MM-DD", "citation": "Section/Page" },
+      { "event": "Award (est.)",   "date": "YYYY-MM-DD", "citation": "Section/Page" }
+    ],
+
+    "submission": {
+      "volumes": ["Volume I: Technical", "Volume II: Cost", "..."],
+      "page_limits": { "technical": "e.g. 50 pages", "cost": "no limit" },
+      "format": "Page size, font, margins, electronic/physical",
+      "delivery_method": "e.g. email to CO, SAM.gov, portal upload",
+      "citation": "Section/Page"
+    },
+
+    "evaluation": {
+      "factors": [
+        { "name": "Technical Approach", "weight_or_rank": "Most important", "citation": "Section/Page" },
+        { "name": "Past Performance",   "weight_or_rank": "Second",         "citation": "Section/Page" },
+        { "name": "Price/Cost",         "weight_or_rank": "Third",          "citation": "Section/Page" }
+      ],
+      "method": "Best value / LPTA / trade-off",
+      "citation": "Section/Page"
+    },
+
+    "scope": {
+      "summary": "2-3 sentence scope summary",
+      "key_requirements": ["Req 1", "Req 2", "Req 3"],
+      "deliverables": ["Deliverable 1", "Deliverable 2"],
+      "citation": "Section/Page"
+    },
+
+    "attachments_inventory": [
+      { "label": "Attachment A", "title": "Statement of Work", "pages": "pp. 45-72", "citation": "Section/Page" }
+    ],
+
+    "amendments": [
+      { "number": "0001", "date": "YYYY-MM-DD", "summary": "Extended due date by 7 days", "citation": "Amendment doc" }
+    ]
+  },
+
+  "compliance_matrix": [
+    {
+      "req_id": "L.1",
+      "requirement": "Offeror shall provide...",
+      "volume": "Technical",
+      "section": "Section L",
+      "citation": "L.1 / p.30"
+    }
+  ],
+
+  "role_action_packets": {
+    "proposal_manager": {
+      "focus": "Timelines, volumes, page limits, submission logistics",
+      "immediate_actions": ["Build proposal calendar", "Assign volume leads", "Set up review gates"]
+    },
+    "compliance": {
+      "focus": "Section L/M requirements, compliance matrix, mandatory forms",
+      "immediate_actions": ["Map L/M requirements to outline", "Flag mandatory certs", "Build checklist"]
+    },
+    "technical": {
+      "focus": "SOW/PWS scope, deliverables, technical evaluation factors",
+      "immediate_actions": ["Draft technical approach", "Map to eval factors", "Identify staffing needs"]
+    },
+    "cost": {
+      "focus": "Pricing structure, cost eval method, labor categories",
+      "immediate_actions": ["Build cost model", "Map labor cats to LOE", "Identify fee structure"]
+    },
+    "contracts": {
+      "focus": "Contract type, terms, clauses, reps and certs",
+      "immediate_actions": ["Review FAR/DFARS clauses", "Flag non-standard terms", "Prepare certs"]
+    },
+    "staffing": {
+      "focus": "Labor categories, clearance reqs, key personnel, PoP locations",
+      "immediate_actions": ["Map labor cats to resumes", "Verify clearances", "Identify gaps"]
+    }
+  },
+
+  "risks": [
+    { "risk": "Short turnaround — 14 days to proposal due", "severity": "HIGH", "citation": "Section/Page" },
+    { "risk": "Incumbent advantage noted in past performance", "severity": "MEDIUM", "citation": "Section/Page" }
+  ],
+
+  "open_items": [
+    { "item": "Unclear whether subcontracting plan required for small business set-aside", "citation": "Section/Page" }
+  ],
+
+  "citations": [
+    { "field": "solicitation.title", "source": "Cover page, p.1" },
+    { "field": "solicitation.key_dates[0]", "source": "Section L.3, p.28" }
+  ]
+}</pre>
+  </div>
+
+  <div class="accent-box teal">
+    <strong>Tip:</strong> If the RFP is very long (&gt;100 pages), you may need to feed it in parts. Start with the cover page + Section L + Section M, then add the SOW/PWS in a follow-up.
+  </div>
+</section>
+
+<!-- ── TAB 4: JSON Spec ───────────────────────────────────────────── -->
+<section id="tab-json">
+  <div class="card">
+    <h3>What This Is</h3>
+    <p>The JSON schema that the Co-Pilot prompt produces. This is what gets saved as <span class="inline-code mono">rfp_extract.json</span> and loaded into Excel. Below is a minimal working example.</p>
+  </div>
+
+  <div class="card">
+    <h4>Top-Level Keys</h4>
+    <table>
+      <thead><tr><th>Key</th><th>Type</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>solicitation</code></td><td>Object</td><td>Core solicitation metadata: title, number, dates, submission, evaluation, scope, attachments, amendments</td></tr>
+        <tr><td><code>compliance_matrix</code></td><td>Array</td><td>Section L/M requirements mapped to volumes (optional — may be empty)</td></tr>
+        <tr><td><code>role_action_packets</code></td><td>Object</td><td>Per-role focus areas and immediate actions: proposal_manager, compliance, technical, cost, contracts, staffing</td></tr>
+        <tr><td><code>risks</code></td><td>Array</td><td>Identified risks with severity and citation</td></tr>
+        <tr><td><code>open_items</code></td><td>Array</td><td>Unresolved questions or ambiguities</td></tr>
+        <tr><td><code>citations</code></td><td>Array</td><td>Field-to-source traceability for audit</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h4>Minimal Working Example</h4>
+    <div class="copy-wrap">
+      <button class="copy-btn" onclick="copyBlock('jsonExample',this)">COPY JSON</button>
+      <pre id="jsonExample">{
+  "solicitation": {
+    "title": "Enterprise Cloud Migration Support Services",
+    "solicitation_number": "75FCMC25R0042",
+    "agency": "GSA Federal Acquisition Service",
+    "naics": "541512 — Computer Systems Design Services ($34M)",
+    "set_aside": "Full and Open",
+    "contract_type": "IDIQ with FFP task orders",
+    "period_of_performance": "1 base year + 4 option years",
+    "place_of_performance": "Washington, DC metro area",
+
+    "key_dates": [
+      { "event": "Questions due",  "date": "2026-03-10", "citation": "Section L.2, p.27" },
+      { "event": "Proposals due",  "date": "2026-03-24", "citation": "Section L.3, p.28" },
+      { "event": "Award (est.)",   "date": "2026-06-01", "citation": "Section L.4, p.28" }
+    ],
+
+    "submission": {
+      "volumes": ["Volume I: Technical Approach", "Volume II: Past Performance", "Volume III: Cost/Price"],
+      "page_limits": { "technical": "50 pages", "past_performance": "20 pages", "cost": "No limit" },
+      "format": "8.5x11, 12pt Times New Roman, 1-inch margins, single-spaced",
+      "delivery_method": "Electronic submission via SAM.gov",
+      "citation": "Section L.5, p.29"
+    },
+
+    "evaluation": {
+      "factors": [
+        { "name": "Technical Approach",     "weight_or_rank": "Most important",  "citation": "Section M.1, p.34" },
+        { "name": "Past Performance",       "weight_or_rank": "Second",          "citation": "Section M.2, p.35" },
+        { "name": "Cost/Price",             "weight_or_rank": "Third",           "citation": "Section M.3, p.35" }
+      ],
+      "method": "Best value trade-off",
+      "citation": "Section M, p.34"
+    },
+
+    "scope": {
+      "summary": "Provide cloud migration planning, execution, and optimization support for 12 federal legacy systems transitioning to FedRAMP-authorized cloud platforms.",
+      "key_requirements": [
+        "Migrate 12 legacy systems to AWS GovCloud or Azure Government",
+        "Provide 24/7 NOC support during migration windows",
+        "Deliver ATO packages for each migrated system"
+      ],
+      "deliverables": [
+        "Cloud Migration Roadmap (within 30 days)",
+        "Monthly Migration Status Reports",
+        "Post-Migration Optimization Report"
+      ],
+      "citation": "Section C / SOW, pp.8-22"
+    },
+
+    "attachments_inventory": [
+      { "label": "Attachment A", "title": "Statement of Work",    "pages": "pp. 8-22",  "citation": "TOC, p.2" },
+      { "label": "Attachment B", "title": "Labor Category Matrix", "pages": "pp. 23-25", "citation": "TOC, p.2" },
+      { "label": "Attachment C", "title": "Past Performance Form", "pages": "pp. 26-27", "citation": "TOC, p.2" },
+      { "label": "Attachment D", "title": "Price Template (XLSX)", "pages": "1 file",    "citation": "Section L.8, p.31" }
+    ],
+
+    "amendments": [
+      { "number": "0001", "date": "2026-03-05", "summary": "Extended questions deadline to March 12; clarified clearance requirements", "citation": "Amendment 0001" }
+    ]
+  },
+
+  "compliance_matrix": [
+    { "req_id": "L.6.1", "requirement": "Offeror shall describe cloud migration methodology", "volume": "Technical", "section": "Section L.6", "citation": "L.6.1, p.30" },
+    { "req_id": "L.6.2", "requirement": "Offeror shall provide staffing plan with labor categories", "volume": "Technical", "section": "Section L.6", "citation": "L.6.2, p.30" },
+    { "req_id": "L.7.1", "requirement": "Offeror shall submit 3 past performance references",      "volume": "Past Perf", "section": "Section L.7", "citation": "L.7.1, p.31" }
+  ],
+
+  "role_action_packets": {
+    "proposal_manager": {
+      "focus": "Timelines, volumes, page limits, submission logistics",
+      "immediate_actions": ["Build proposal calendar from key_dates", "Assign volume leads", "Set up color team reviews"]
+    },
+    "compliance": {
+      "focus": "L/M requirements, compliance matrix, mandatory forms",
+      "immediate_actions": ["Map compliance_matrix to outline", "Flag mandatory certs/reps", "Build Section L checklist"]
+    },
+    "technical": {
+      "focus": "SOW scope, deliverables, technical eval factors",
+      "immediate_actions": ["Draft migration methodology narrative", "Map approach to eval factors", "Identify SME needs"]
+    },
+    "cost": {
+      "focus": "Pricing structure, labor categories, cost evaluation method",
+      "immediate_actions": ["Build cost model from Attachment B labor cats", "Map LOE to task orders", "Draft basis of estimate"]
+    },
+    "contracts": {
+      "focus": "Contract type, terms, FAR/DFARS clauses",
+      "immediate_actions": ["Review IDIQ terms", "Flag non-standard clauses", "Prepare reps and certs"]
+    },
+    "staffing": {
+      "focus": "Labor categories, clearance requirements, key personnel",
+      "immediate_actions": ["Map Attachment B cats to available resumes", "Verify clearance levels", "Identify hiring gaps"]
+    }
+  },
+
+  "risks": [
+    { "risk": "21-day turnaround from solicitation to proposal due date",  "severity": "HIGH",   "citation": "Section L.3, p.28" },
+    { "risk": "Clearance requirement (Secret) may limit staffing pool",    "severity": "MEDIUM", "citation": "Section C.4, p.14" },
+    { "risk": "Incumbent (Acme Corp) has 3 years of past performance",     "severity": "MEDIUM", "citation": "Section M.2, p.35" }
+  ],
+
+  "open_items": [
+    { "item": "Section C.7 references 'Attachment E' but no Attachment E in the solicitation package", "citation": "Section C.7, p.18" },
+    { "item": "Unclear whether oral presentations are required — Section M mentions 'may' request",     "citation": "Section M.4, p.36" }
+  ],
+
+  "citations": [
+    { "field": "solicitation.title",          "source": "Cover page, p.1" },
+    { "field": "solicitation.key_dates[0]",   "source": "Section L.2, p.27" },
+    { "field": "solicitation.key_dates[1]",   "source": "Section L.3, p.28" },
+    { "field": "solicitation.evaluation",     "source": "Section M, p.34" },
+    { "field": "solicitation.scope",          "source": "Section C / SOW, pp.8-22" },
+    { "field": "risks[0]",                   "source": "Section L.3, p.28" }
+  ]
+}</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ── TAB 5: Excel Power Query ───────────────────────────────────── -->
+<section id="tab-pquery">
+  <div class="card">
+    <h3>What This Is</h3>
+    <p>Pre-built Power Query (M) scripts you paste into Excel's Advanced Editor. Each script loads a specific section of the JSON into a clean table. One JSON file &rarr; multiple Excel tables &rarr; <strong>Refresh All</strong> when data changes.</p>
+  </div>
+
+  <div class="card">
+    <h4>Setup Instructions</h4>
+    <ol class="checklist">
+      <li>Save <span class="inline-code mono">rfp_extract.json</span> to a known path (e.g. <span class="inline-code mono">C:\RFP\rfp_extract.json</span>)</li>
+      <li>In Excel: <strong>Data &rarr; Get Data &rarr; From Other Sources &rarr; Blank Query</strong></li>
+      <li>In the formula bar, click <strong>Advanced Editor</strong></li>
+      <li>Paste one of the M scripts below, update the file path, click <strong>Done</strong></li>
+      <li>Click <strong>Close &amp; Load</strong> to create the table</li>
+      <li>Repeat for each table you want</li>
+    </ol>
+    <div class="accent-box">
+      <strong>Refresh All:</strong> When you overwrite the JSON file (after an amendment rerun), just press <strong>Ctrl+Alt+F5</strong> or <strong>Data &rarr; Refresh All</strong>. All tables update from the same file.
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>Pre-Wired XLSX Layout Spec</h4>
+    <table>
+      <thead><tr><th>Tab Name</th><th>Power Query Table</th><th>Source Path in JSON</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Solicitation</strong></td><td>tbl_Solicitation</td><td><code>solicitation.*</code> (flat fields)</td></tr>
+        <tr><td><strong>Key Dates</strong></td><td>tbl_KeyDates</td><td><code>solicitation.key_dates[]</code></td></tr>
+        <tr><td><strong>Attachments</strong></td><td>tbl_Attachments</td><td><code>solicitation.attachments_inventory[]</code></td></tr>
+        <tr><td><strong>Amendments</strong></td><td>tbl_Amendments</td><td><code>solicitation.amendments[]</code></td></tr>
+        <tr><td><strong>Risks</strong></td><td>tbl_Risks</td><td><code>risks[]</code></td></tr>
+        <tr><td><strong>Open Items</strong></td><td>tbl_OpenItems</td><td><code>open_items[]</code></td></tr>
+      </tbody>
+    </table>
+    <div class="accent-box teal">
+      <strong>Binding the JSON path:</strong> Each query references the same file path. Change it once in each query's first line. For team use, point all queries to a shared network path (e.g. <span class="inline-code mono">\\server\rfp\rfp_extract.json</span>) so everyone refreshes from the same source.
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>Query 1: Solicitation Overview</h4>
+    <div class="copy-wrap">
+      <button class="copy-btn" onclick="copyBlock('mSolicitation',this)">COPY M SCRIPT</button>
+      <pre id="mSolicitation">let
+    // UPDATE THIS PATH to your local or shared JSON file
+    FilePath = "C:\RFP\rfp_extract.json",
+
+    Source = Json.Document(File.Contents(FilePath)),
+    sol = Source[solicitation],
+
+    // Extract flat fields into a single-row record
+    Record = [
+        title                  = sol[title],
+        solicitation_number    = sol[solicitation_number],
+        agency                 = sol[agency],
+        naics                  = sol[naics],
+        set_aside              = sol[set_aside],
+        contract_type          = sol[contract_type],
+        period_of_performance  = sol[period_of_performance],
+        place_of_performance   = sol[place_of_performance],
+        eval_method            = sol[evaluation][method],
+        submission_format      = sol[submission][format],
+        delivery_method        = sol[submission][delivery_method]
+    ],
+
+    AsTable = Record.ToTable(Record),
+    Transposed = Table.Transpose(AsTable),
+    Headers = Table.PromoteHeaders(Transposed, [PromoteAllScalars=true])
+in
+    Headers</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>Query 2: Key Dates</h4>
+    <div class="copy-wrap">
+      <button class="copy-btn" onclick="copyBlock('mKeyDates',this)">COPY M SCRIPT</button>
+      <pre id="mKeyDates">let
+    FilePath = "C:\RFP\rfp_extract.json",
+    Source = Json.Document(File.Contents(FilePath)),
+    dates = Source[solicitation][key_dates],
+    AsTable = Table.FromList(dates, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    Expanded = Table.ExpandRecordColumn(AsTable, "Column1",
+        {"event", "date", "citation"},
+        {"Event", "Date", "Citation"})
+in
+    Expanded</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>Query 3: Attachments Inventory</h4>
+    <div class="copy-wrap">
+      <button class="copy-btn" onclick="copyBlock('mAttach',this)">COPY M SCRIPT</button>
+      <pre id="mAttach">let
+    FilePath = "C:\RFP\rfp_extract.json",
+    Source = Json.Document(File.Contents(FilePath)),
+    att = Source[solicitation][attachments_inventory],
+    AsTable = Table.FromList(att, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    Expanded = Table.ExpandRecordColumn(AsTable, "Column1",
+        {"label", "title", "pages", "citation"},
+        {"Label", "Title", "Pages", "Citation"})
+in
+    Expanded</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>Query 4: Amendments</h4>
+    <div class="copy-wrap">
+      <button class="copy-btn" onclick="copyBlock('mAmend',this)">COPY M SCRIPT</button>
+      <pre id="mAmend">let
+    FilePath = "C:\RFP\rfp_extract.json",
+    Source = Json.Document(File.Contents(FilePath)),
+    amend = Source[solicitation][amendments],
+    AsTable = Table.FromList(amend, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    Expanded = Table.ExpandRecordColumn(AsTable, "Column1",
+        {"number", "date", "summary", "citation"},
+        {"Number", "Date", "Summary", "Citation"})
+in
+    Expanded</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>Query 5: Risks</h4>
+    <div class="copy-wrap">
+      <button class="copy-btn" onclick="copyBlock('mRisks',this)">COPY M SCRIPT</button>
+      <pre id="mRisks">let
+    FilePath = "C:\RFP\rfp_extract.json",
+    Source = Json.Document(File.Contents(FilePath)),
+    risks = Source[risks],
+    AsTable = Table.FromList(risks, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    Expanded = Table.ExpandRecordColumn(AsTable, "Column1",
+        {"risk", "severity", "citation"},
+        {"Risk", "Severity", "Citation"})
+in
+    Expanded</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4>Query 6: Open Items</h4>
+    <div class="copy-wrap">
+      <button class="copy-btn" onclick="copyBlock('mOpenItems',this)">COPY M SCRIPT</button>
+      <pre id="mOpenItems">let
+    FilePath = "C:\RFP\rfp_extract.json",
+    Source = Json.Document(File.Contents(FilePath)),
+    items = Source[open_items],
+    AsTable = Table.FromList(items, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+    Expanded = Table.ExpandRecordColumn(AsTable, "Column1",
+        {"item", "citation"},
+        {"Open_Item", "Citation"})
+in
+    Expanded</pre>
+    </div>
+  </div>
+
+  <div class="refresh-loop">
+    <div class="loop-title">Refresh All Workflow</div>
+    <div class="loop-flow">Amendment drops &rarr; Rerun Co-Pilot prompt &rarr; Overwrite <span class="mono">rfp_extract.json</span> &rarr; Open Excel &rarr; <strong>Ctrl+Alt+F5</strong> &rarr; All 6 tables update.</div>
+  </div>
+</section>
+
+<!-- ── TAB 6: Share + Team Workflow ────────────────────────────────── -->
+<section id="tab-share">
+  <div class="card">
+    <h3>What This Is</h3>
+    <p>How to share the extracted JSON with your team so everyone pulls from the same source — and why it matters.</p>
+  </div>
+
+  <div class="card">
+    <h3>How to Share JSON with the Team</h3>
+    <ol class="checklist">
+      <li><strong>Pick a shared location</strong> — Teams channel, SharePoint folder, or network drive (e.g. <span class="inline-code mono">\\server\proposals\2026-0042\rfp_extract.json</span>)</li>
+      <li><strong>Drop the JSON file there</strong> — one copy, one location, one truth</li>
+      <li><strong>Point everyone's Excel queries to that path</strong> — update the <span class="inline-code mono">FilePath</span> variable in each Power Query</li>
+      <li><strong>Send a one-liner notification</strong> (copy the email snippet below)</li>
+      <li><strong>When an amendment arrives:</strong> rerun the prompt, overwrite the same file, tell the team to Refresh All</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h4>Email Snippet</h4>
+    <div class="copy-wrap">
+      <button class="copy-btn" onclick="copyBlock('emailSnippet',this)">COPY EMAIL</button>
+      <pre id="emailSnippet">Subject: RFP Extract Ready — [Solicitation Number]
+
+Team,
+
+The RFP extraction is complete and saved as JSON here:
+[INSERT SHARED PATH]
+
+To use it:
+1. Open the proposal workbook (or create a new one)
+2. Data > Get Data > From File > From JSON > select the file above
+3. Or paste the Power Query scripts from the EDGE tool
+
+When amendments arrive, I'll overwrite the JSON file and notify you.
+Just hit Ctrl+Alt+F5 (Refresh All) to update your tables.
+
+Your role-specific action items are in the EDGE tool under "Roles + Actions."
+
+— [Your Name]</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Why JSON Sharing Benefits the Team</h3>
+    <table>
+      <thead><tr><th>Benefit</th><th>What It Means</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Single source of truth</strong></td>
+          <td>One file, one location. No one has a stale copy of "their" RFP notes. Everyone reads from the same extraction.</td>
+        </tr>
+        <tr>
+          <td><strong>Less redundant parsing</strong></td>
+          <td>Six people don't independently re-read 200 pages. One person parses, everyone pulls what they need.</td>
+        </tr>
+        <tr>
+          <td><strong>Reduced drift across roles</strong></td>
+          <td>When Compliance reads a different due date than Cost, things break. JSON keeps everyone on the same numbers.</td>
+        </tr>
+        <tr>
+          <td><strong>Auto-refresh with amendments</strong></td>
+          <td>Overwrite the JSON, Refresh All. Tables update. No manual re-entry, no missed changes, no "which version is current?"</td>
+        </tr>
+        <tr>
+          <td><strong>Audit traceability (citations)</strong></td>
+          <td>Every extracted field carries a page/section citation. If someone questions a data point, trace it back to the source in seconds.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="accent-box orange">
+    <strong>The core principle:</strong> Parse once. Share the structured output. Let each role pull what they need. When the source changes, refresh — don't re-parse.
+  </div>
+
+  <div class="refresh-loop">
+    <div class="loop-title">The Refresh Loop</div>
+    <div class="loop-flow">Amendment arrives &rarr; Rerun prompt &rarr; Overwrite JSON &rarr; Notify team &rarr; <strong>Refresh All</strong> &rarr; Everyone aligned.</div>
+  </div>
+</section>
+
+<!-- ── TAB 7: Roles + Actions ─────────────────────────────────────── -->
+<section id="tab-roles">
+  <div class="card">
+    <h3>What This Is</h3>
+    <p>Pre-defined action packets for each proposal role. After the JSON is shared, each person pulls their section and executes — no full-RFP re-read required.</p>
+  </div>
+
+  <div class="role-grid">
+    <div class="role-card" style="border-top-color:var(--orange)">
+      <h4 style="color:var(--orange)">Proposal Manager</h4>
+      <p style="font-size:12px;color:var(--muted);margin:0 0 6px"><strong>Focus:</strong> Timelines, volumes, page limits, submission logistics</p>
+      <p style="font-size:12px;margin:0 0 4px"><strong>Pull from JSON:</strong> <code>key_dates</code>, <code>submission</code>, <code>evaluation.factors</code></p>
+      <ul>
+        <li>Build proposal calendar from <code>key_dates</code></li>
+        <li>Assign volume leads based on <code>submission.volumes</code></li>
+        <li>Set page limits per volume</li>
+        <li>Schedule color team reviews (Pink/Red/Gold)</li>
+        <li>Configure submission method and format</li>
+      </ul>
+    </div>
+
+    <div class="role-card" style="border-top-color:var(--mustard)">
+      <h4 style="color:var(--mustard)">Compliance Lead</h4>
+      <p style="font-size:12px;color:var(--muted);margin:0 0 6px"><strong>Focus:</strong> Section L/M requirements, compliance matrix, mandatory forms</p>
+      <p style="font-size:12px;margin:0 0 4px"><strong>Pull from JSON:</strong> <code>compliance_matrix</code>, <code>evaluation</code>, <code>attachments_inventory</code></p>
+      <ul>
+        <li>Map <code>compliance_matrix</code> requirements to proposal outline</li>
+        <li>Flag mandatory certifications and representations</li>
+        <li>Build Section L response checklist</li>
+        <li>Cross-reference eval factors with response sections</li>
+        <li>Track attachment completion status</li>
+      </ul>
+    </div>
+
+    <div class="role-card">
+      <h4>Technical Lead</h4>
+      <p style="font-size:12px;color:var(--muted);margin:0 0 6px"><strong>Focus:</strong> SOW/PWS scope, deliverables, technical evaluation factors</p>
+      <p style="font-size:12px;margin:0 0 4px"><strong>Pull from JSON:</strong> <code>scope</code>, <code>evaluation.factors</code>, <code>compliance_matrix</code> (technical reqs)</p>
+      <ul>
+        <li>Draft technical approach aligned to <code>scope.key_requirements</code></li>
+        <li>Map approach to evaluation factors (highest-weight first)</li>
+        <li>Identify deliverables and milestone schedule</li>
+        <li>Determine staffing and SME needs</li>
+        <li>Flag technical risks from <code>risks</code> array</li>
+      </ul>
+    </div>
+
+    <div class="role-card" style="border-top-color:var(--rust)">
+      <h4 style="color:var(--rust)">Cost / Pricing Lead</h4>
+      <p style="font-size:12px;color:var(--muted);margin:0 0 6px"><strong>Focus:</strong> Pricing structure, labor categories, cost evaluation method</p>
+      <p style="font-size:12px;margin:0 0 4px"><strong>Pull from JSON:</strong> <code>evaluation.factors</code> (cost weight), <code>scope</code>, <code>attachments_inventory</code> (price template)</p>
+      <ul>
+        <li>Build cost model from labor category matrix (Attachment B)</li>
+        <li>Map LOE estimates to task order structure</li>
+        <li>Determine fee/profit structure per contract type</li>
+        <li>Draft basis of estimate (BOE) narrative</li>
+        <li>Cross-check cost eval method (LPTA vs. trade-off)</li>
+      </ul>
+    </div>
+
+    <div class="role-card" style="border-top-color:#6a5acd">
+      <h4 style="color:#6a5acd">Contracts Lead</h4>
+      <p style="font-size:12px;color:var(--muted);margin:0 0 6px"><strong>Focus:</strong> Contract type, terms and conditions, FAR/DFARS clauses</p>
+      <p style="font-size:12px;margin:0 0 4px"><strong>Pull from JSON:</strong> <code>solicitation.contract_type</code>, <code>solicitation.set_aside</code>, <code>open_items</code></p>
+      <ul>
+        <li>Review contract type implications (IDIQ, FFP, T&amp;M)</li>
+        <li>Flag non-standard FAR/DFARS clauses</li>
+        <li>Prepare reps, certs, and required forms</li>
+        <li>Review set-aside and subcontracting requirements</li>
+        <li>Resolve <code>open_items</code> with Contracting Officer</li>
+      </ul>
+    </div>
+
+    <div class="role-card" style="border-top-color:#e67e22">
+      <h4 style="color:#e67e22">Staffing / HR Lead</h4>
+      <p style="font-size:12px;color:var(--muted);margin:0 0 6px"><strong>Focus:</strong> Labor categories, clearance requirements, key personnel, PoP locations</p>
+      <p style="font-size:12px;margin:0 0 4px"><strong>Pull from JSON:</strong> <code>scope</code>, <code>attachments_inventory</code> (labor cat matrix), <code>risks</code> (staffing risks)</p>
+      <ul>
+        <li>Map labor categories to available resumes</li>
+        <li>Verify clearance levels (Secret, TS/SCI, etc.)</li>
+        <li>Identify key personnel requirements and candidates</li>
+        <li>Flag staffing gaps — initiate recruiting if needed</li>
+        <li>Confirm place of performance and remote/onsite mix</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="accent-box teal" style="margin-top:16px">
+    <strong>Team Pull Model:</strong> Nobody re-reads the full RFP. Each role pulls their JSON keys, gets their action items, and executes. The proposal manager orchestrates; the data source stays consistent.
+  </div>
+</section>
+
+<!-- ── TAB 8: Troubleshooting ─────────────────────────────────────── -->
+<section id="tab-troubleshoot">
+  <div class="card">
+    <h3>What This Is</h3>
+    <p>Common problems you'll hit and how to fix them. Most issues are JSON formatting or PDF quality problems.</p>
+  </div>
+
+  <div class="card">
+    <h4>JSON Malformed</h4>
+    <p><span class="badge err">ERROR</span> Excel or a JSON validator says the file is invalid.</p>
+    <table>
+      <thead><tr><th>Cause</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td>Co-Pilot wrapped output in markdown fences (<code>```json ... ```</code>)</td><td>Remove the <code>```json</code> and <code>```</code> lines. File must start with <code>{</code> and end with <code>}</code></td></tr>
+        <tr><td>Trailing comma after last array/object item</td><td>Delete the trailing comma. Use <a href="https://jsonlint.com" style="color:var(--teal)">jsonlint.com</a> to find the exact line</td></tr>
+        <tr><td>Smart quotes ("") instead of straight quotes ("")</td><td>Paste into a plain text editor first (Notepad), then save. Avoid Word/Outlook paste.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h4>Missing 'solicitation' Root Key</h4>
+    <p><span class="badge warn">WARN</span> Power Query can't find the <code>solicitation</code> field.</p>
+    <table>
+      <thead><tr><th>Cause</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td>Co-Pilot returned a flat structure without nesting</td><td>Re-run the prompt. Emphasize: "Return a single JSON object with <code>solicitation</code> as the top-level key."</td></tr>
+        <tr><td>Co-Pilot returned multiple JSON blocks</td><td>Keep only the first complete <code>{ ... }</code> block. Discard commentary.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h4>Excel Can't Parse Nested Arrays</h4>
+    <p><span class="badge warn">WARN</span> Power Query shows "List" or "Record" instead of values.</p>
+    <table>
+      <thead><tr><th>Cause</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td>You loaded the root JSON without expanding</td><td>In Power Query, click the expand icon (double arrow) on columns showing "List" or "Record"</td></tr>
+        <tr><td>Deeply nested arrays (e.g. arrays inside arrays)</td><td>Use the specific M scripts from the <strong>Excel Power Query</strong> tab — they handle expansion automatically</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h4>Amendments Conflicting</h4>
+    <p><span class="badge warn">WARN</span> Amendment changes a date or requirement that contradicts the base solicitation.</p>
+    <table>
+      <thead><tr><th>Cause</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td>Amendment supersedes original dates/terms</td><td>Re-run the prompt with the base solicitation + all amendments attached. The prompt asks Co-Pilot to incorporate amendments into the base data.</td></tr>
+        <tr><td>Multiple amendments with conflicting info</td><td>Feed amendments in order (0001, 0002, ...). Tell Co-Pilot: "Latest amendment takes precedence."</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h4>Scanned PDF — Not Machine Readable</h4>
+    <p><span class="badge err">ERROR</span> Co-Pilot returns empty or garbled output.</p>
+    <table>
+      <thead><tr><th>Cause</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td>PDF is a scanned image, not searchable text</td><td>Run OCR first: Adobe Acrobat &rarr; Scan &amp; OCR &rarr; Recognize Text. Then re-upload.</td></tr>
+        <tr><td>PDF has copy protection</td><td>Print to PDF (removes restrictions), then upload the new copy.</td></tr>
+        <tr><td>Tables are images, not text tables</td><td>Extract tables manually or use a table-extraction tool (Tabula, Camelot) before feeding to Co-Pilot.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h4 style="color:var(--rust)">Security: Protect Proprietary Information</h4>
+    <p><span class="badge err">CRITICAL</span> Do not paste internal notes, pricing data, competitive intelligence, or proprietary strategies into any external AI tool.</p>
+    <div class="accent-box rust">
+      <strong>Safe to paste:</strong> The government-issued RFP document (it's public after release).<br>
+      <strong>Do NOT paste:</strong> Internal pricing models, win themes, competitive analysis, teammate proprietary data, personnel PII, draft proposal content, or anything marked CUI/FOUO.<br>
+      <strong>If using Co-Pilot in Microsoft 365:</strong> Data stays within your tenant boundary. Check with your IT/security team for policy confirmation.
+    </div>
+  </div>
+</section>
+
+</div>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  Deep Sigma EDGE &mdash; RFP Co-Pilot v1.0.0 &mdash; Parse Once. Execute Everywhere. &mdash; Works Offline. No External Dependencies.
+</footer>
+
+<!-- ═══════════════ SCRIPT ═══════════════ -->
+<script>
+"use strict";
+
+/* ── Tab Switching ─────────────────────────────────────────────────── */
+document.querySelectorAll(".ttab").forEach(function(btn){
+  btn.addEventListener("click",function(){
+    var tab=btn.dataset.tab;
+    document.querySelectorAll(".ttab").forEach(function(b){b.classList.toggle("active",b.dataset.tab===tab)});
+    document.querySelectorAll(".content > section").forEach(function(s){
+      s.classList.toggle("active",s.id==="tab-"+tab);
+    });
+  });
+});
+
+/* ── Copy to Clipboard ─────────────────────────────────────────────── */
+function copyBlock(id,btn){
+  var el=document.getElementById(id);
+  if(!el)return;
+  var text=el.textContent||el.innerText;
+  navigator.clipboard.writeText(text).then(function(){
+    var orig=btn.textContent;
+    btn.textContent="COPIED!";
+    btn.classList.add("copied");
+    setTimeout(function(){btn.textContent=orig;btn.classList.remove("copied")},1800);
+  }).catch(function(){
+    // Fallback for older browsers
+    var ta=document.createElement("textarea");
+    ta.value=text;ta.style.position="fixed";ta.style.opacity="0";
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");
+      var orig2=btn.textContent;btn.textContent="COPIED!";btn.classList.add("copied");
+      setTimeout(function(){btn.textContent=orig2;btn.classList.remove("copied")},1800);
+    }catch(_){}
+    document.body.removeChild(ta);
+  });
+}
+
+/* ── Hash Routing (optional) ───────────────────────────────────────── */
+var validTabs=["overview","quickstart","prompt","json","pquery","share","roles","troubleshoot"];
+var hash=location.hash.slice(1);
+if(hash&&validTabs.indexOf(hash)>=0){
+  document.querySelectorAll(".ttab").forEach(function(b){b.classList.toggle("active",b.dataset.tab===hash)});
+  document.querySelectorAll(".content > section").forEach(function(s){s.classList.toggle("active",s.id==="tab-"+hash)});
+}
+document.querySelectorAll(".ttab").forEach(function(btn){
+  btn.addEventListener("click",function(){try{location.hash="#"+btn.dataset.tab}catch(_){}});
+});
+</script>
+</body>
+</html>

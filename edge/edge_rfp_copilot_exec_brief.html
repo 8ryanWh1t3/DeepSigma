@@ -1,0 +1,165 @@
+<!--
+  Deep Sigma EDGE — RFP Co-Pilot Exec Brief (1-page)
+  ============================================================
+  Single-page executive summary of the RFP Co-Pilot workflow.
+  70s retro infographic style. No external dependencies. Works offline.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>RFP Co-Pilot — Exec Brief</title>
+  <style>
+    :root{--bg:#f5f0e8;--card:#fffdf7;--text:#2c2417;--muted:#7a6e5d;--orange:#d4622b;--mustard:#c49a2a;--teal:#2a8a7a;--rust:#a0421a;--line:#d9d0c0}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(--text);font-size:13px;line-height:1.55}
+    @media print{body{font-size:11px} .no-print{display:none!important}}
+
+    header{background:linear-gradient(135deg,#2c2417,#3d3225);color:#f5f0e8;padding:16px 24px;border-bottom:4px solid var(--orange);display:flex;justify-content:space-between;align-items:center}
+    .brand{font-size:18px;font-weight:700;letter-spacing:.8px}
+    .brand small{display:block;font-size:11px;font-weight:400;color:#c4b89a;letter-spacing:.3px;margin-top:1px}
+    .hdr-badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:var(--orange);color:#fff}
+
+    .page{max-width:900px;margin:0 auto;padding:16px 20px}
+    .cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media(max-width:650px){.cols{grid-template-columns:1fr}}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:12px}
+    .card h3{margin:0 0 6px;font-size:14px;color:var(--orange);letter-spacing:.2px}
+    .card h4{margin:8px 0 4px;font-size:12px;color:var(--rust)}
+    .card p{margin:2px 0 6px}
+
+    .flow{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:8px 0;font-size:12px}
+    .flow-step{padding:4px 10px;border-radius:6px;font-weight:700;font-size:11px;letter-spacing:.2px}
+    .flow-step.doc{background:rgba(212,98,43,.12);color:var(--orange);border:1px solid rgba(212,98,43,.2)}
+    .flow-step.ai{background:rgba(196,154,42,.12);color:var(--mustard);border:1px solid rgba(196,154,42,.2)}
+    .flow-step.json{background:rgba(42,138,122,.12);color:var(--teal);border:1px solid rgba(42,138,122,.2)}
+    .flow-step.xl{background:rgba(44,36,23,.06);color:var(--text);border:1px solid var(--line)}
+    .flow-step.team{background:rgba(160,66,26,.1);color:var(--rust);border:1px solid rgba(160,66,26,.15)}
+    .flow-arrow{color:var(--muted);font-size:14px}
+
+    .loop{border:2px dashed var(--mustard);border-radius:8px;padding:10px 14px;margin:10px 0;background:rgba(196,154,42,.05);text-align:center;font-size:12px}
+    .loop strong{color:var(--mustard)}
+
+    .checklist{list-style:none;padding:0;margin:4px 0;counter-reset:ck}
+    .checklist li{counter-increment:ck;padding:4px 0 4px 30px;position:relative;font-size:12px;border-bottom:1px solid rgba(217,208,192,.4)}
+    .checklist li::before{content:counter(ck);position:absolute;left:0;top:3px;width:20px;height:20px;border-radius:50%;background:var(--orange);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+    .checklist li:last-child{border-bottom:none}
+
+    table{width:100%;border-collapse:collapse;font-size:11px;margin:6px 0}
+    th,td{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left}
+    th{color:var(--muted);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+
+    .accent{border-left:3px solid var(--teal);background:rgba(42,138,122,.06);padding:8px 12px;border-radius:0 6px 6px 0;margin:8px 0;font-size:12px}
+    .roles-mini{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0}
+    .role-chip{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-size:11px;border-top:2px solid var(--teal)}
+    .role-chip strong{display:block;font-size:11px;color:var(--teal);margin-bottom:2px}
+
+    footer{text-align:center;padding:12px;font-size:10px;color:var(--muted);border-top:1px solid var(--line);margin-top:12px}
+    .print-btn{background:var(--orange);color:#fff;border:none;border-radius:6px;padding:6px 16px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.3px}
+    .print-btn:hover{background:var(--rust)}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    RFP Co-Pilot — Executive Brief
+    <small>Deep Sigma EDGE | Parse Once. Execute Everywhere.</small>
+  </div>
+  <div>
+    <span class="hdr-badge">1-PAGE</span>
+    <button class="print-btn no-print" onclick="window.print()" style="margin-left:8px">Print / PDF</button>
+  </div>
+</header>
+
+<div class="page">
+
+  <div class="card">
+    <h3>The Problem</h3>
+    <p>Every proposal role re-reads the same RFP independently. Notes drift. Amendments create scrambles. Things get missed.</p>
+    <h3>The Solution</h3>
+    <div class="flow">
+      <span class="flow-step doc">RFP Docs</span><span class="flow-arrow">&rarr;</span>
+      <span class="flow-step ai">AI Extraction</span><span class="flow-arrow">&rarr;</span>
+      <span class="flow-step json">{} JSON</span><span class="flow-arrow">&rarr;</span>
+      <span class="flow-step xl">Excel Tables</span><span class="flow-arrow">&rarr;</span>
+      <span class="flow-step team">Team Executes</span>
+    </div>
+    <p>One person parses the RFP with a structured AI prompt. Output is a single JSON file. Excel Power Query turns it into live tables. Each role pulls what they need. Amendments? Rerun and refresh.</p>
+  </div>
+
+  <div class="cols">
+    <div class="card">
+      <h3>Quick Start (3 min)</h3>
+      <ol class="checklist">
+        <li>Copy the extraction prompt into Co-Pilot</li>
+        <li>Attach the RFP document</li>
+        <li>Save the JSON output as <code style="font-size:11px">rfp_extract.json</code></li>
+        <li>Load into Excel via Power Query</li>
+        <li>Share JSON file + notify the team</li>
+      </ol>
+    </div>
+    <div class="card">
+      <h3>What You Get</h3>
+      <table>
+        <thead><tr><th>Excel Table</th><th>Source</th></tr></thead>
+        <tbody>
+          <tr><td>Solicitation Overview</td><td>Title, agency, NAICS, contract type</td></tr>
+          <tr><td>Key Dates</td><td>Questions, proposals, award</td></tr>
+          <tr><td>Attachments</td><td>SOW, labor cats, forms</td></tr>
+          <tr><td>Amendments</td><td>Changes with dates</td></tr>
+          <tr><td>Risks</td><td>Severity + citations</td></tr>
+          <tr><td>Open Items</td><td>Unresolved questions</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="loop">
+    <strong>The Refresh Loop:</strong> Amendment arrives &rarr; Rerun prompt &rarr; Overwrite JSON &rarr; <strong>Refresh All</strong> in Excel &rarr; Team stays aligned.
+  </div>
+
+  <div class="card">
+    <h3>Team Role Pull</h3>
+    <p>Each role pulls their keys from the shared JSON. No one re-reads the full RFP.</p>
+    <div class="roles-mini">
+      <div class="role-chip" style="border-top-color:var(--orange)"><strong style="color:var(--orange)">Proposal Mgr</strong>Dates, volumes, page limits, submission</div>
+      <div class="role-chip" style="border-top-color:var(--mustard)"><strong style="color:var(--mustard)">Compliance</strong>L/M matrix, eval factors, forms</div>
+      <div class="role-chip"><strong>Technical</strong>SOW scope, deliverables, eval factors</div>
+      <div class="role-chip" style="border-top-color:var(--rust)"><strong style="color:var(--rust)">Cost / Pricing</strong>Labor cats, pricing structure, BOE</div>
+      <div class="role-chip" style="border-top-color:#6a5acd"><strong style="color:#6a5acd">Contracts</strong>FAR clauses, terms, reps/certs</div>
+      <div class="role-chip" style="border-top-color:#e67e22"><strong style="color:#e67e22">Staffing</strong>Labor cats, clearances, key personnel</div>
+    </div>
+  </div>
+
+  <div class="cols">
+    <div class="card">
+      <h3>Why JSON?</h3>
+      <ul style="margin:0;padding:0 0 0 16px;font-size:12px">
+        <li><strong>Single source of truth</strong> — one file, one location</li>
+        <li><strong>No redundant parsing</strong> — parse once, pull many</li>
+        <li><strong>Reduced drift</strong> — everyone reads the same data</li>
+        <li><strong>Auto-refresh</strong> — Ctrl+Alt+F5 updates all tables</li>
+        <li><strong>Audit trail</strong> — every field has a page citation</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Security Reminder</h3>
+      <div class="accent" style="border-left-color:var(--rust);background:rgba(160,66,26,.06)">
+        <strong style="color:var(--rust)">Safe:</strong> Government-issued RFP (public after release).<br>
+        <strong style="color:var(--rust)">Do NOT paste:</strong> Internal pricing, win themes, competitive intel, PII, CUI/FOUO, or draft proposal content into external AI tools.
+      </div>
+    </div>
+  </div>
+
+  <div class="accent">
+    <strong>Full tool with prompts, JSON examples, Power Query scripts, and role action packets:</strong> Open <code style="font-size:11px">edge_rfp_copilot_excel_json.html</code> in any browser. Works offline. No dependencies.
+  </div>
+
+</div>
+
+<footer>Deep Sigma EDGE &mdash; RFP Co-Pilot Exec Brief v1.0.0 &mdash; Works Offline. No External Dependencies.</footer>
+
+</body>
+</html>
