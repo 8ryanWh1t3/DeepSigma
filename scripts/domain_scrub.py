@@ -211,7 +211,7 @@ ALLOWED_ACRONYMS = {
     # v1.0.7 — stream mode, policy panel, analyzer tokens
     "STREAM", "THAW", "FROZEN",
     # v1.0.8 — Consistency Gate (Sheaf-Residue Engine) tokens
-    "CRS", "CGDS", "CGP",
+    "CRS", "CGDS", "CGP", "VULN", "LOWER",
     # RFP Co-Pilot EDGE — procurement, acquisition, proposal terms
     "RFP", "LPTA", "FFP", "IDIQ", "BPA", "DFARS", "FAR", "NAICS",
     "XLSX", "SOW", "PWS", "LOE", "SME", "BOE", "PII", "FOUO",
