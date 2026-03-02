@@ -134,6 +134,26 @@ For the full-platform docs and architecture map, use parked docs directly:
 - `enterprise/docs/security/`
 - `enterprise/docs/mermaid/`
 
+<!-- REPO_STATS_START -->
+**Repo Snapshot** (auto-generated 2026-03-02 01:48 UTC)
+
+- **1,686** files | **296,484** lines of code
+- **41** CI workflows | **160** test files | **5** pyproject.toml
+- **21** EDGE modules
+
+LOC by extension:
+  `.py` 100,180
+  `.html` 59,722
+  `.md` 45,524
+  `.json` 41,467
+  `.svg` 28,054
+  `.jsonl` 5,962
+  `.tsx` 2,942
+  `.ttl` 2,090
+  `.patch` 1,438
+  `.ts` 1,244
+<!-- REPO_STATS_END -->
+
 ## Repo Intent
 
 - Keep root focused on a reliable first proof.
