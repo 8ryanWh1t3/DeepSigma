@@ -36,6 +36,8 @@ See: [docs/release/RELEASE_NOTES_v2.1.0.md](docs/release/RELEASE_NOTES_v2.1.0.md
 - Roadmap forecast: [release_kpis/roadmap_forecast.md](release_kpis/roadmap_forecast.md)
 - Roadmap timeline: [release_kpis/roadmap_timeline.svg](release_kpis/roadmap_timeline.svg)
 - Roadmap scope gate: [release_kpis/ROADMAP_SCOPE_GATE_REPORT.md](release_kpis/ROADMAP_SCOPE_GATE_REPORT.md)
+- Security gate: [release_kpis/SECURITY_GATE_REPORT.md](release_kpis/SECURITY_GATE_REPORT.md)
+- Health summary: [release_kpis/health/HEALTH_SUMMARY.md](release_kpis/health/HEALTH_SUMMARY.md)
 - Nonlinear stability report: [release_kpis/nonlinear_stability_report.md](release_kpis/nonlinear_stability_report.md)
 - SSI artifact (current release): [release_kpis/stability_v2.1.0.json](release_kpis/stability_v2.1.0.json)
 - Authority evidence: [release_kpis/authority_evidence.json](release_kpis/authority_evidence.json)
@@ -71,7 +73,7 @@ See: [docs/release/RELEASE_NOTES_v2.1.0.md](docs/release/RELEASE_NOTES_v2.1.0.md
 - Event Contracts — routing table mapping 36 functions + 39 events
 - Money Demo v2 — 10-step end-to-end pipeline (`make demo-money`)
 - JRM — log-agnostic refinement engine: 3 adapters, 5-stage pipeline, JRM-X packet builder, enterprise federation
-- 105 JRM tests, 207 domain mode tests, 686 total passing
+- 105 JRM tests, 207 domain mode tests, 2150+ total passing
 
 ### EDGE Modules
 
@@ -81,7 +83,7 @@ Exportable single-file HTML apps — zero dependencies, work offline, governance
 |--------|---------|-------------|
 | EDGE Unified | v1.0.0 | 8-tab suite: Suite, Hiring, Bid, Compliance, BOE, IRIS, Delegation, Utility |
 | Coherence Dashboard | v2.0.0 | 4-tab coherence overview with claims, drift, and analysis |
-| JRM EDGE | v1.0.7 | 9-stage JRM pipeline explorer: events table, packets, health ring, test lab, stream mode, So What panel, policy drawer |
+| JRM EDGE | v1.0.8 | 9-stage JRM pipeline explorer: events table, packets, health ring, test lab, stream mode, So What panel, policy drawer, Consistency Gate (sheaf-residue engine) |
 | RFP Co-Pilot | v1.0.0 | 8-tab RFP extraction workflow: Co-Pilot prompt, JSON spec, Power Query M scripts, role action packets |
 | RFP Co-Pilot Exec Brief | v1.0.0 | 1-page executive summary with Print/PDF |
 | Hiring UI | v1.0.0 | Staffing intake |
@@ -92,8 +94,10 @@ Exportable single-file HTML apps — zero dependencies, work offline, governance
 | Suite ReadOnly | v1.0.0 | Telemetry + rollup |
 | Domino Delegation Encryption | v1.0.0 | 4-of-7 Shamir threshold encryption ceremony with domino chain co-presence proof, TTL-gated keywords, AES-256-GCM |
 | Domino Delegation Verifier | v1.0.0 | Read-only ceremony record verification (core edition) |
+| Coherence Ops | v1.0.0 | 7-tab human-friendly guide: Overview, How It Works, The 3 Domains, The 4 Artifacts, Drift → Patch, Quick Start, FAQ |
+| SplitKey MaxStrength | v2 | Maximum-strength Shamir split-key ceremony with enhanced entropy and validation |
 
-JRM EDGE v1.0.7 features: So What panel (per-stage what/why/next analysis), Analyzer vs Deep Sigma view toggle, packet chain timeline + diff, live stream mode + Freeze & Seal, policy drawer (guarded) + regression rerun.
+JRM EDGE v1.0.8 features: Consistency Gate module (graph-based coherence scoring, basic + sheaf modes), CRS gauge, edge builder, DS auto-emission on threshold breach, patch suggestions (EXPIRE_CLAIM, REQUEST_EVIDENCE, DOWNWEIGHT_AUTHORITY, SUPERSEDE_CANON, SPLIT_CLAIM), Test Lab full harness (6 fixtures + 5 property tests). Prior: So What panel, Analyzer vs Deep Sigma toggle, packet chain timeline + diff, live stream mode + Freeze & Seal, policy drawer (guarded) + regression rerun.
 
 RFP Co-Pilot: Parse Once. Execute Everywhere. — AI-assisted RFP extraction into structured JSON, loaded via Excel Power Query, with role-based action packets for 6 proposal team roles.
 
@@ -245,6 +249,7 @@ python src/tools/reconstruct/verify_pack.py --pack /tmp/pack --key "$KEY"
 | **Cascade Engine** | Cross-domain event propagation with 7 declarative rules and depth-limited cascading | [src/core/modes/cascade.py](src/core/modes/cascade.py) |
 | **Event Contracts** | Routing table: 36 functions + 39 events mapped to FEEDS topics, subtypes, and handlers | [src/core/feeds/contracts/](src/core/feeds/contracts/) |
 | **Money Demo v2** | 10-step pipeline exercising all 3 domain modes with drift, retcon, and cascade | [src/demos/money_demo/](src/demos/money_demo/) |
+| **FEEDS Event Surface** | 9-module pub/sub event backbone: envelope + schemas, file-bus + DLQ, manifest-first ingest, authority gate, evidence check, drift triage, canon store, claim validator, MG writer | [src/core/feeds/](src/core/feeds/) |
 | **JRM Pipeline** | Log-agnostic Judgment Refinement Module — 3 adapters (Suricata, Snort, Copilot), 5-stage coherence pipeline, JRM-X packet zips | [src/core/jrm/](src/core/jrm/) |
 | **JRM Federation** | Cross-environment gate, hub, advisory engine, HMAC-SHA256 packet signing | [enterprise/src/deepsigma/jrm_ext/](src/deepsigma/jrm_ext/) |
 
@@ -307,7 +312,7 @@ DeepSigma/
 │   ├── demos/           #   Golden Path, Excel-first Money Demo
 │   ├── mdpt/            #   MDPT tools + Power App starter kit
 │   └── ...              #   credibility_engine, services, mesh, governance, tenancy, verifiers, tools
-├── tests/               # 1250+ tests, fixtures, datasets
+├── tests/               # 2150+ tests, fixtures, datasets
 ├── docs/                # Documentation + examples (canonical, mermaid, lattices, etc.)
 ├── dashboard/           # React dashboard + API server
 ├── schemas/             # JSON schemas (core engine + Prompt OS)
