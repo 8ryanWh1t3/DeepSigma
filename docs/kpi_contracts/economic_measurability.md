@@ -64,7 +64,8 @@ Every release.
 | DORA | N/A |
 | ISO/IEC 25010 | Maintainability (Analysability), Functional Suitability (Appropriateness) |
 | OTel | N/A |
-| SMART | S:PASS · M:PASS · A:PASS · R:PASS · T:PASS · Net: PASS |
+| SMART | S:PASS · M:PASS · A:PASS · R:PASS\* · T:PASS · Net: PASS\* |
+| SMART note | R passes via documented formula; TEC cost model involves manual assumptions |
 
 ## Change History
 
