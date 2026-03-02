@@ -188,6 +188,8 @@ ALLOWED_ACRONYMS = {
     "MAJOR", "MINOR",
     # Authority / governance terms
     "REFUSE", "REFUSAL", "REFUSED", "REF",
+    # KPI Standards Overlay — framework names and assessment tokens
+    "DORA", "SMART", "PASS", "HEUR", "OTEL", "IEC", "NNN",
     # Fixture / test data terms
     "VALUE", "TIER", "SOURCE", "SUM", "PRJ", "TSK", "PMP",
     "APR", "YOU", "ARE",
