@@ -2,20 +2,20 @@
   "schema": "tec_ctec_v2_tier",
   "source": "enterprise/scripts/tec_ctec.py",
   "tier": "executive",
-  "generated_at": "2026-02-28T02:31:40Z",
+  "generated_at": "2026-03-02T01:34:56Z",
   "mode": "report_only",
   "core": {
     "inventory": {
-      "files": 266,
-      "directories": 22,
-      "loc": 17138,
-      "packages": 8,
-      "configs": 45,
-      "tests": 20,
+      "files": 386,
+      "directories": 40,
+      "loc": 25645,
+      "packages": 16,
+      "configs": 52,
+      "tests": 34,
       "run_surfaces": 4,
       "artifacts": 21
     },
-    "tec": 347.0,
+    "tec": 520.4,
     "controls": {
       "required": 6,
       "passed": 6,
@@ -29,22 +29,22 @@
         "docs_path_to_run": true
       }
     },
-    "control_coverage": 0.595,
-    "ctec": 206.47,
-    "r_tec": 665.0
+    "control_coverage": 0.7,
+    "ctec": 364.28,
+    "r_tec": 520.4
   },
   "enterprise": {
     "inventory": {
-      "files": 1144,
-      "directories": 186,
-      "loc": 95121,
-      "packages": 32,
-      "configs": 172,
-      "tests": 1,
-      "run_surfaces": 121,
-      "artifacts": 268
+      "files": 1202,
+      "directories": 199,
+      "loc": 101781,
+      "packages": 38,
+      "configs": 177,
+      "tests": 5,
+      "run_surfaces": 122,
+      "artifacts": 272
     },
-    "tec": 1518.4,
+    "tec": 1605.4,
     "controls": {
       "required": 6,
       "passed": 6,
@@ -58,51 +58,51 @@
         "secret_scan": true
       }
     },
-    "control_coverage": 0.595,
-    "ctec": 903.45,
-    "r_tec": 1836.4
+    "control_coverage": 0.7,
+    "ctec": 1123.78,
+    "r_tec": 1605.4
   },
   "total": {
     "inventory": {
-      "files": 17346,
-      "directories": 3188,
-      "loc": 232564,
-      "packages": 43,
-      "configs": 1951,
-      "tests": 131,
-      "run_surfaces": 149,
-      "artifacts": 276
+      "files": 17557,
+      "directories": 3227,
+      "loc": 249479,
+      "packages": 57,
+      "configs": 1965,
+      "tests": 149,
+      "run_surfaces": 156,
+      "artifacts": 280
     },
-    "tec": 18425.2,
+    "tec": 18731.0,
     "controls": {
       "required": 12,
       "passed": 12,
       "kpi_coverage": 1.0,
       "checks_scope": "composite(core+enterprise)"
     },
-    "control_coverage": 0.595,
-    "ctec": 10962.99,
-    "r_tec": 18743.2
+    "control_coverage": 0.7,
+    "ctec": 13111.7,
+    "r_tec": 18731.0
   },
   "factors": {
-    "rcf": 0.85,
-    "icr_status": "YELLOW",
-    "rl_open": 159,
+    "rcf": 1.0,
+    "icr_status": "GREEN",
+    "rl_open": 0,
     "ccf": 0.7,
-    "cl14": 687,
+    "cl14": 678,
     "load_bucket": "extreme"
   },
   "rate_hourly": 225.0,
   "low": {
-    "hours": 8770.4,
-    "cost": 1973338.0
+    "hours": 10489.4,
+    "cost": 2360106.0
   },
   "base": {
-    "hours": 10963.0,
-    "cost": 2466673.0
+    "hours": 13111.7,
+    "cost": 2950132.0
   },
   "high": {
-    "hours": 14800.0,
-    "cost": 3330008.0
+    "hours": 17700.8,
+    "cost": 3982679.0
   }
 }

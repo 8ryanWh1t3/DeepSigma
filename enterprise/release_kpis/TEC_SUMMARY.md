@@ -1,29 +1,29 @@
 # TEC Summary (C-TEC v2)
 
 ## Latest Factors
-- ICR: **YELLOW** (RCF=0.85, RL_open=159)
-- PCR: **extreme** (CCF=0.7, CL14=687)
+- ICR: **GREEN** (RCF=1.0, RL_open=0)
+- PCR: **extreme** (CCF=0.7, CL14=678)
 
 ## Edition Metrics
-- CORE: TEC=347.0 | C-TEC=206.47 | KPI=1.0
-- ENTERPRISE: TEC=1518.4 | C-TEC=903.45 | KPI=1.0
-- TOTAL: TEC=18425.2 | C-TEC=10962.99 | KPI=1.0
+- CORE: TEC=520.4 | C-TEC=364.28 | KPI=1.0
+- ENTERPRISE: TEC=1605.4 | C-TEC=1123.78 | KPI=1.0
+- TOTAL: TEC=18731.0 | C-TEC=13111.7 | KPI=1.0
 
 ## Tiers (from TOTAL C-TEC)
 ### Internal @ $150/hr
-- Low:  8770.4 hrs | $1315559
-- Base: 10963.0 hrs | $1644448
-- High: 14800.0 hrs | $2220005
+- Low:  10489.4 hrs | $1573404
+- Base: 13111.7 hrs | $1966755
+- High: 17700.8 hrs | $2655119
 
 ### Executive @ $225/hr
-- Low:  8770.4 hrs | $1973338
-- Base: 10963.0 hrs | $2466673
-- High: 14800.0 hrs | $3330008
+- Low:  10489.4 hrs | $2360106
+- Base: 13111.7 hrs | $2950132
+- High: 17700.8 hrs | $3982679
 
 ### Public Sector Fully Burdened @ $275/hr
-- Low:  8770.4 hrs | $2411858
-- Base: 10963.0 hrs | $3014822
-- High: 14800.0 hrs | $4070010
+- Low:  10489.4 hrs | $2884574
+- Base: 13111.7 hrs | $3605718
+- High: 17700.8 hrs | $4867719
 
 ## Why This Is More Accurate
 - Uses edition-scoped inventory plus full-repo `total` scope, so complexity is measured across actual shipped surfaces.

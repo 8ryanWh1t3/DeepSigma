@@ -2,8 +2,8 @@
 
 | Metric | Previous | Latest | Status |
 |--------|----------|--------|--------|
-| Throughput (rps) | 761,687 | 3,722,818 | PASS |
-| Wall clock (s) | 0.001 | 0.027 | — |
+| Throughput (rps) | 3,861,911 | 3,784,999 | PASS |
+| Wall clock (s) | 0.026 | 0.026 | — |
 | Evidence level | — | real_workload | PASS |
 
 **Gate: PASS**

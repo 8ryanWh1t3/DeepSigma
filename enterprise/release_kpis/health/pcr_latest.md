@@ -1,8 +1,8 @@
 # PCR Health (Latest)
 
-- CL14: **687**
+- CL14: **678**
 - Load bucket: **extreme**
-- PRs in last 14 days: **225**
+- PRs in last 14 days: **222**
 
 ## PCR distribution
 - PCR-1: **57**

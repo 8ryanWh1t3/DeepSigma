@@ -36,9 +36,9 @@
 - KPI bands: `release_kpis/kpi_bands_v2.1.0.json`
 
 **TEC (ROM):**
-- Internal: 4556.2 hrs | $683,431
-- Executive: 4556.2 hrs | $1,025,146
-- Public Sector: 4556.2 hrs | $1,252,957
+- Internal: 4616.5 hrs | $692,474
+- Executive: 4616.5 hrs | $1,038,711
+- Public Sector: 4616.5 hrs | $1,269,535
 - Full detail: `release_kpis/TEC_SUMMARY.md`
 
 **Notes:**

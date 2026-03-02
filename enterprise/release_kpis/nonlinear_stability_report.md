@@ -25,20 +25,20 @@ Where each component is normalized to `0..100` (higher is more stable):
 
 ## C) Forecasted Radar Movement (Stability-Adjusted)
 
-### v2.1.0 (active)
-- Factors: roadmap_confidence=0.69, drift_factor=0.727
+### v2.1.0 (released)
+- Factors: roadmap_confidence=0.32, drift_factor=0.727
 | KPI | Adjusted Delta |
 |---|---:|
-| technical_completeness | 0.12 |
-| automation_depth | 0.60 |
-| authority_modeling | 0.15 |
-| enterprise_readiness | 0.00 |
+| technical_completeness | 0.10 |
+| automation_depth | 0.28 |
+| authority_modeling | 0.21 |
+| enterprise_readiness | 0.06 |
 | scalability | 0.00 |
-| data_integration | 0.00 |
-| economic_measurability | 0.60 |
-| operational_maturity | 0.60 |
+| data_integration | 0.11 |
+| economic_measurability | 0.28 |
+| operational_maturity | 0.28 |
 
-### v2.1.1 (dormant)
+### v2.2.0 (dormant)
 - Factors: roadmap_confidence=0.41, drift_factor=0.727
 | KPI | Adjusted Delta |
 |---|---:|

@@ -16,7 +16,7 @@
 ### Contract Fingerprint
 - Present: True
 - Manifest match: True
-- Fingerprint: sha256:6a0c479e7a0fcaeb
+- Fingerprint: sha256:53581ea223795478
 
 ### Seal Chain Integrity
 - Present: False
