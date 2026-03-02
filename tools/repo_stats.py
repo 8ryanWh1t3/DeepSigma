@@ -4,6 +4,7 @@
 Also generates:
 - docs/telemetry.json  (full telemetry payload)
 - docs/badges/*.json   (shields.io endpoint badges)
+- docs/kpi_overlay_summary.json  (KPI overlay SMART/experimental counts)
 """
 from __future__ import annotations
 
@@ -213,6 +214,38 @@ def write_telemetry(path: Path, stats: dict) -> None:
     print(f"Wrote: {path}")
 
 
+def write_kpi_overlay_summary(path: Path) -> None:
+    """Write KPI overlay summary JSON from contract files."""
+    contracts_dir = path.parent / "kpi_contracts"
+    total_kpis = 0
+    smart_pass = 0
+    experimental = 0
+
+    if contracts_dir.is_dir():
+        for f in sorted(contracts_dir.iterdir()):
+            if f.suffix != ".md" or f.name.startswith("_"):
+                continue
+            total_kpis += 1
+            text = f.read_text(encoding="utf-8")
+            if "Net: PASS" in text:
+                smart_pass += 1
+            for line in text.splitlines():
+                if "Status" in line and "Experimental" in line:
+                    experimental += 1
+                    break
+
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    summary = {
+        "total_kpis": total_kpis,
+        "smart_pass_count": smart_pass,
+        "experimental_count": experimental,
+        "generated_utc": ts,
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+    print(f"Wrote: {path}")
+
+
 def write_badges(badges_dir: Path, stats: dict) -> None:
     """Write shields.io endpoint badge JSON files."""
     badges_dir.mkdir(parents=True, exist_ok=True)
@@ -271,6 +304,11 @@ def main() -> None:
         help="Directory to write shields.io badge JSONs (e.g. docs/badges)",
     )
     parser.add_argument(
+        "--write-kpi-overlay",
+        metavar="PATH",
+        help="Path to write KPI overlay summary JSON (e.g. docs/kpi_overlay_summary.json)",
+    )
+    parser.add_argument(
         "--root",
         metavar="DIR",
         default=".",
@@ -304,6 +342,12 @@ def main() -> None:
         if not bdir.is_absolute():
             bdir = root / bdir
         write_badges(bdir, stats)
+
+    if args.write_kpi_overlay:
+        kpath = Path(args.write_kpi_overlay)
+        if not kpath.is_absolute():
+            kpath = root / kpath
+        write_kpi_overlay_summary(kpath)
 
 
 if __name__ == "__main__":
