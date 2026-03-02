@@ -2,20 +2,20 @@
   "schema": "tec_ctec_v3_tier",
   "source": "enterprise/scripts/tec_ctec.py",
   "tier": "internal",
-  "generated_at": "2026-03-02T03:39:54Z",
+  "generated_at": "2026-03-02T14:09:02Z",
   "mode": "report_only",
   "core": {
     "inventory": {
-      "files": 386,
-      "directories": 40,
+      "files": 183,
+      "directories": 24,
       "loc": 25645,
       "packages": 16,
       "configs": 52,
       "tests": 34,
       "run_surfaces": 4,
-      "artifacts": 21
+      "artifacts": 20
     },
-    "tec": 533.22,
+    "tec": 330.22,
     "controls": {
       "required": 6,
       "passed": 6,
@@ -30,21 +30,21 @@
       }
     },
     "control_coverage": 0.5589,
-    "ctec": 298.04,
-    "r_tec": 533.22
+    "ctec": 184.58,
+    "r_tec": 330.22
   },
   "enterprise": {
     "inventory": {
-      "files": 1202,
-      "directories": 199,
-      "loc": 102155,
+      "files": 1011,
+      "directories": 155,
+      "loc": 105036,
       "packages": 38,
       "configs": 177,
       "tests": 5,
       "run_surfaces": 122,
-      "artifacts": 272
+      "artifacts": 274
     },
-    "tec": 1656.48,
+    "tec": 1466.92,
     "controls": {
       "required": 6,
       "passed": 6,
@@ -59,21 +59,21 @@
       }
     },
     "control_coverage": 0.5589,
-    "ctec": 925.89,
-    "r_tec": 1656.48
+    "ctec": 819.93,
+    "r_tec": 1466.92
   },
   "total": {
     "inventory": {
-      "files": 17577,
-      "directories": 3229,
-      "loc": 251097,
+      "files": 1743,
+      "directories": 287,
+      "loc": 169558,
       "packages": 57,
-      "configs": 1973,
+      "configs": 396,
       "tests": 149,
       "run_surfaces": 157,
-      "artifacts": 280
+      "artifacts": 282
     },
-    "tec": 18880.15,
+    "tec": 2689.98,
     "controls": {
       "required": 12,
       "passed": 12,
@@ -81,8 +81,8 @@
       "checks_scope": "composite(core+enterprise)"
     },
     "control_coverage": 0.5589,
-    "ctec": 10553.06,
-    "r_tec": 18880.15
+    "ctec": 1503.56,
+    "r_tec": 2689.98
   },
   "factors": {
     "formula_version": "v3",
@@ -90,7 +90,7 @@
     "icr_status": "GREEN",
     "rl_open": 0,
     "ccf": 0.7,
-    "cl14": 678,
+    "cl14": 699,
     "load_bucket": "extreme",
     "qf": 1.0,
     "qf_weighted_mean": 10.0,
@@ -100,15 +100,15 @@
   },
   "rate_hourly": 150.0,
   "low": {
-    "hours": 8442.4,
-    "cost": 1266367.0
+    "hours": 1202.8,
+    "cost": 180427.0
   },
   "base": {
-    "hours": 10553.1,
-    "cost": 1582959.0
+    "hours": 1503.6,
+    "cost": 225534.0
   },
   "high": {
-    "hours": 14246.6,
-    "cost": 2136995.0
+    "hours": 2029.8,
+    "cost": 304471.0
   }
 }
