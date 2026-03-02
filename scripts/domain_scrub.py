@@ -170,7 +170,7 @@ ALLOWED_ACRONYMS = {
     "BRYAN", "DAVID", "WHITE", "MERGED", "EDEDED", "NEEDS",
     # Infrastructure / runtime terms
     "WASM", "PREFIX", "ROOT", "TENANT", "REPO", "HOT", "WARM",
-    "COLD", "TOTAL", "PNG", "MESH", "HEALTH", "ASCII", "NIST",
+    "COLD", "TOTAL", "PNG", "MESH", "HEALTH", "ASCII", "NIST", "LOC",
     "CSF", "DOCKER", "NONCE", "MOCK", "ARGS", "ARG", "HEAD",
     "AUTO", "PERF", "OAUTH", "BENCH", "TESTDB", "TODO", "TBD",
     "DONE", "NONE", "PARENT", "PACKET", "USER", "OWNER", "OUT",
