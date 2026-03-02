@@ -7,6 +7,8 @@
 [![Drift Density](https://img.shields.io/badge/drift_density-0.0000-brightgreen)](./enterprise/release_kpis/KPI_GATE_REPORT.md)
 [![Memory Coverage](https://img.shields.io/badge/memory_coverage-1.0-brightgreen)](./enterprise/release_kpis/KPI_GATE_REPORT.md)
 
+**[Feature Catalog](./enterprise/docs/FEATURE_CATALOG.md)**
+
 # DeepSigma
 
 **DeepSigma prevents decision amnesia in AI systems.**
