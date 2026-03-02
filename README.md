@@ -12,7 +12,7 @@
 [![EDGE](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/8ryanWh1t3/DeepSigma/main/docs/badges/edge.json)](./edge/)
 [![workflows](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/8ryanWh1t3/DeepSigma/main/docs/badges/workflows.json)](./.github/workflows/)
 
-**[Feature Catalog](./enterprise/docs/FEATURE_CATALOG.md)**
+**[Feature Catalog](./enterprise/docs/FEATURE_CATALOG.md)** | **[TEC Summary](./enterprise/release_kpis/TEC_SUMMARY.md)**
 
 # DeepSigma
 
