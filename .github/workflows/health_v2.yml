@@ -65,7 +65,7 @@ jobs:
 
       - name: Upload health artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: health-v2-artifacts
           path: |
