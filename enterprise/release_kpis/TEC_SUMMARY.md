@@ -1,29 +1,32 @@
-# TEC Summary (C-TEC v2)
+# TEC Summary (C-TEC v3)
 
 ## Latest Factors
+- Formula: **v3**
 - ICR: **GREEN** (RCF=1.0, RL_open=0)
 - PCR: **extreme** (CCF=0.7, CL14=678)
+- Quality Factor: **1.0** (confidence-weighted KPI mean=10.0, n=8)
+- Stability Factor: **0.7985** (SSI=59.7)
 
 ## Edition Metrics
-- CORE: TEC=520.4 | C-TEC=364.28 | KPI=1.0
-- ENTERPRISE: TEC=1605.4 | C-TEC=1123.78 | KPI=1.0
-- TOTAL: TEC=18754.6 | C-TEC=13128.22 | KPI=1.0
+- CORE: TEC=533.22 | C-TEC=298.04 | CC=0.5589
+- ENTERPRISE: TEC=1656.48 | C-TEC=925.89 | CC=0.5589
+- TOTAL: TEC=18880.15 | C-TEC=10553.06 | CC=0.5589
 
 ## Tiers (from TOTAL C-TEC)
 ### Internal @ $150/hr
-- Low:  10502.6 hrs | $1575386
-- Base: 13128.2 hrs | $1969233
-- High: 17723.1 hrs | $2658465
+- Low:  8442.4 hrs | $1266367
+- Base: 10553.1 hrs | $1582959
+- High: 14246.6 hrs | $2136995
 
 ### Executive @ $225/hr
-- Low:  10502.6 hrs | $2363080
-- Base: 13128.2 hrs | $2953850
-- High: 17723.1 hrs | $3987697
+- Low:  8442.4 hrs | $1899551
+- Base: 10553.1 hrs | $2374438
+- High: 14246.6 hrs | $3205492
 
 ### Public Sector Fully Burdened @ $275/hr
-- Low:  10502.6 hrs | $2888208
-- Base: 13128.2 hrs | $3610260
-- High: 17723.1 hrs | $4873852
+- Low:  8442.4 hrs | $2321673
+- Base: 10553.1 hrs | $2902092
+- High: 14246.6 hrs | $3917824
 
 ## Release KPI Scores
 
@@ -91,5 +94,8 @@
 ## Why This Is More Accurate
 - Uses edition-scoped inventory plus full-repo `total` scope, so complexity is measured across actual shipped surfaces.
 - Applies live governance factors (`RCF` from issue risk health, `CCF` from 14-day PR change load) instead of static effort-only multipliers.
-- Computes C-TEC as control-adjusted complexity (`TEC x KPI_Coverage x RCF x CCF`), which reflects execution discipline, not just size.
+- **v3 Quality Factor (QF):** Replaces binary file-existence checks with confidence-weighted KPI scores. Evidence level (simulated vs production) directly affects weight via eligibility confidence.
+- **v3 Stability Factor (SF):** SSI (System Stability Index) feeds into C-TEC. Unstable systems get a lower control multiplier, reflecting higher real-world effort.
+- **v3 LOC in TEC:** Lines of code now contribute to the TEC formula, so complexity reflects actual code volume — not just file counts.
+- Computes C-TEC as `TEC × QF × SF × RCF × CCF` = `TEC × 0.5589`.
 - Produces deterministic daily snapshots (`ICR/PCR/TEC`) so trend direction is measurable and auditable over time.

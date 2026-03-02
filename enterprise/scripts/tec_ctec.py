@@ -150,12 +150,14 @@ def tec_score(inventory: Inventory, policy: dict[str, Any]) -> float:
     c = float(formula.get("C", 0.2))
     r = float(formula.get("R", 2.0))
     t = float(formula.get("T", 2.0))
+    loc_w = float(formula.get("L", 0.0))
     return (
         f * inventory.files
         + p * inventory.packages
         + c * inventory.configs
         + r * inventory.run_surfaces
         + t * inventory.tests
+        + loc_w * (inventory.loc / 1000.0)
     )
 
 
@@ -214,8 +216,59 @@ def rcf_from_icr(policy: dict[str, Any], icr: dict[str, Any] | None) -> tuple[fl
     return rcf, status, rl_open
 
 
+def quality_factor(policy: dict[str, Any]) -> tuple[float, float, int]:
+    """Compute QF from confidence-weighted KPI scores.
+
+    Returns (qf, weighted_mean, kpi_count).
+    """
+    qf_cfg = policy.get("quality_factor", {})
+    floor = float(qf_cfg.get("qf_floor", 0.3))
+
+    merged = _load_latest_kpi_merged()
+    if not merged:
+        return floor, 0.0, 0
+
+    values = merged.get("values", {})
+    eligibility = merged.get("eligibility", {}).get("kpis", {})
+    if not values:
+        return floor, 0.0, 0
+
+    weighted_sum = 0.0
+    weight_total = 0.0
+    for key, score in values.items():
+        conf = float(eligibility.get(key, {}).get("confidence", 0.5))
+        weighted_sum += float(score) * conf
+        weight_total += conf
+
+    if weight_total < 1e-9:
+        return floor, 0.0, len(values)
+
+    weighted_mean = weighted_sum / weight_total
+    qf = floor + (1.0 - floor) * (weighted_mean / 10.0)
+    return round(min(qf, 1.0), 4), round(weighted_mean, 4), len(values)
+
+
+def stability_factor(policy: dict[str, Any]) -> tuple[float, float | None]:
+    """Compute SF from SSI.
+
+    Returns (sf, ssi_value_or_None).
+    """
+    sf_cfg = policy.get("stability_factor", {})
+    floor = float(sf_cfg.get("sf_floor", 0.5))
+    default = float(sf_cfg.get("sf_default", 0.75))
+
+    ssi_data = _parse_ssi_from_report()
+    if not ssi_data:
+        return default, None
+
+    ssi = float(ssi_data["ssi"])
+    sf = floor + (1.0 - floor) * (ssi / 100.0)
+    return round(min(sf, 1.0), 4), ssi
+
+
 def compute(snapshot: bool) -> dict[str, Any]:
     policy = json.loads(POLICY_PATH.read_text(encoding="utf-8"))
+    formula_ver = str(policy.get("formula_version", "v3"))
     icr = load_json(HEALTH_ROOT / "icr_latest.json")
     pcr = load_json(HEALTH_ROOT / "pcr_latest.json")
 
@@ -227,23 +280,53 @@ def compute(snapshot: bool) -> dict[str, Any]:
     tec_ent = tec_score(inv_ent, policy)
     tec_total = tec_score(inv_total, policy)
 
+    # Diagnostic: keep binary checks for audit trail
     core_cov = control_coverage_core()
     ent_cov = control_coverage_enterprise()
 
     rcf, icr_status, rl_open = rcf_from_icr(policy, icr)
     ccf, load_bucket, cl14 = ccf_from_pcr(policy, pcr)
 
-    control_core = core_cov["kpi_coverage"] * rcf * ccf
-    control_ent = ent_cov["kpi_coverage"] * rcf * ccf
+    if formula_ver == "v3":
+        # v3: QF from scored KPIs, SF from SSI
+        qf, qf_mean, qf_kpi_count = quality_factor(policy)
+        sf, ssi_value = stability_factor(policy)
+
+        control_core = qf * sf * rcf * ccf
+        control_ent = qf * sf * rcf * ccf
+        control_total = qf * sf * rcf * ccf
+    else:
+        # v2 fallback: binary file-existence checks
+        qf, qf_mean, qf_kpi_count = 0.0, 0.0, 0
+        sf, ssi_value = 0.0, None
+
+        control_core = core_cov["kpi_coverage"] * rcf * ccf
+        control_ent = ent_cov["kpi_coverage"] * rcf * ccf
+        kpi_cov_avg = round((core_cov["kpi_coverage"] + ent_cov["kpi_coverage"]) / 2.0, 4)
+        control_total = kpi_cov_avg * rcf * ccf
 
     ctec_core = tec_core * control_core
     ctec_ent = tec_ent * control_ent
-    kpi_cov_total = round((core_cov["kpi_coverage"] + ent_cov["kpi_coverage"]) / 2.0, 4)
-    control_total = kpi_cov_total * rcf * ccf
     ctec_total = tec_total * control_total
 
+    factors: dict[str, Any] = {
+        "formula_version": formula_ver,
+        "rcf": round(rcf, 4),
+        "icr_status": icr_status,
+        "rl_open": rl_open,
+        "ccf": round(ccf, 4),
+        "cl14": cl14,
+        "load_bucket": load_bucket,
+    }
+    if formula_ver == "v3":
+        factors["qf"] = qf
+        factors["qf_weighted_mean"] = qf_mean
+        factors["qf_kpi_count"] = qf_kpi_count
+        factors["sf"] = sf
+        factors["ssi"] = ssi_value
+
     payload: dict[str, Any] = {
-        "schema": "tec_ctec_v2",
+        "schema": "tec_ctec_v3" if formula_ver == "v3" else "tec_ctec_v2",
         "mode": str(policy.get("mode", "report_only")),
         "generated_at": dt.datetime.now(dt.UTC).isoformat(timespec="seconds").replace("+00:00", "Z"),
         "inputs": {
@@ -251,14 +334,7 @@ def compute(snapshot: bool) -> dict[str, Any]:
             "icr_latest_present": icr is not None,
             "pcr_latest_present": pcr is not None,
         },
-        "factors": {
-            "rcf": round(rcf, 4),
-            "icr_status": icr_status,
-            "rl_open": rl_open,
-            "ccf": round(ccf, 4),
-            "cl14": cl14,
-            "load_bucket": load_bucket,
-        },
+        "factors": factors,
         "core": {
             "inventory": inv_core.__dict__,
             "tec": round(tec_core, 2),
@@ -281,7 +357,9 @@ def compute(snapshot: bool) -> dict[str, Any]:
             "controls": {
                 "required": core_cov["required"] + ent_cov["required"],
                 "passed": core_cov["passed"] + ent_cov["passed"],
-                "kpi_coverage": kpi_cov_total,
+                "legacy_kpi_coverage": round(
+                    (core_cov["kpi_coverage"] + ent_cov["kpi_coverage"]) / 2.0, 4
+                ),
                 "checks_scope": "composite(core+enterprise)",
             },
             "control_coverage": round(control_total, 4),
@@ -299,54 +377,67 @@ def compute(snapshot: bool) -> dict[str, Any]:
 
     latest_json.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
+    # --- Latest markdown ---
     lines = [
         "# TEC / C-TEC (Latest)",
         "",
         f"- Mode: **{payload['mode']}**",
-        f"- ICR: **{icr_status}** (RCF={payload['factors']['rcf']}, RL_open={rl_open})",
-        f"- PCR: **{load_bucket}** (CCF={payload['factors']['ccf']}, CL14={cl14})",
+        f"- Formula: **{formula_ver}**",
+        f"- ICR: **{icr_status}** (RCF={factors['rcf']}, RL_open={rl_open})",
+        f"- PCR: **{load_bucket}** (CCF={factors['ccf']}, CL14={cl14})",
+    ]
+    if formula_ver == "v3":
+        lines.append(f"- Quality Factor: **{qf}** (KPI mean={qf_mean}, n={qf_kpi_count})")
+        ssi_display = f"{ssi_value}" if ssi_value is not None else "N/A"
+        lines.append(f"- Stability Factor: **{sf}** (SSI={ssi_display})")
+    lines.extend([
         "",
         "## CORE",
         f"- TEC: **{payload['core']['tec']}**",
-        f"- KPI coverage: **{payload['core']['controls']['kpi_coverage']}**",
         f"- Control coverage: **{payload['core']['control_coverage']}**",
         f"- C-TEC: **{payload['core']['ctec']}**",
         f"- R-TEC: **{payload['core']['r_tec']}**",
         "",
         "## ENTERPRISE",
         f"- TEC: **{payload['enterprise']['tec']}**",
-        f"- KPI coverage: **{payload['enterprise']['controls']['kpi_coverage']}**",
         f"- Control coverage: **{payload['enterprise']['control_coverage']}**",
         f"- C-TEC: **{payload['enterprise']['ctec']}**",
         f"- R-TEC: **{payload['enterprise']['r_tec']}**",
         "",
         "## TOTAL",
         f"- TEC: **{payload['total']['tec']}**",
-        f"- KPI coverage: **{payload['total']['controls']['kpi_coverage']}**",
         f"- Control coverage: **{payload['total']['control_coverage']}**",
         f"- C-TEC: **{payload['total']['ctec']}**",
         f"- R-TEC: **{payload['total']['r_tec']}**",
         "",
-    ]
+    ])
     latest_md.write_text("\n".join(lines), encoding="utf-8")
 
+    # --- XRAY health block ---
     xray_lines = [
         "# XRAY Health Block",
         "",
+    ]
+    if formula_ver == "v3":
+        xray_lines.append(f"FACTORS: QF={qf} | SF={sf} | RCF={factors['rcf']} | CCF={factors['ccf']}")
+    xray_lines.extend([
         (
-            f"CORE: TEC={payload['core']['tec']} | KPI={payload['core']['controls']['kpi_coverage']} "
-            f"| ICR={icr_status} | CL14={cl14} | C-TEC={payload['core']['ctec']}"
+            f"CORE: TEC={payload['core']['tec']}"
+            f" | CC={payload['core']['control_coverage']}"
+            f" | C-TEC={payload['core']['ctec']}"
         ),
         (
-            f"ENT: TEC={payload['enterprise']['tec']} | KPI={payload['enterprise']['controls']['kpi_coverage']} "
-            f"| ICR={icr_status} | CL14={cl14} | C-TEC={payload['enterprise']['ctec']}"
+            f"ENT: TEC={payload['enterprise']['tec']}"
+            f" | CC={payload['enterprise']['control_coverage']}"
+            f" | C-TEC={payload['enterprise']['ctec']}"
         ),
         (
-            f"TOTAL: TEC={payload['total']['tec']} | KPI={payload['total']['controls']['kpi_coverage']} "
-            f"| ICR={icr_status} | CL14={cl14} | C-TEC={payload['total']['ctec']}"
+            f"TOTAL: TEC={payload['total']['tec']}"
+            f" | CC={payload['total']['control_coverage']}"
+            f" | C-TEC={payload['total']['ctec']}"
         ),
         "",
-    ]
+    ])
     xray_md.write_text("\n".join(xray_lines), encoding="utf-8")
 
     if snapshot:
@@ -532,7 +623,7 @@ def write_release_kpi_outputs(payload: dict[str, Any]) -> None:
 
     for tier, data in tier_data.items():
         out = {
-            "schema": "tec_ctec_v2_tier",
+            "schema": "tec_ctec_v3_tier" if payload.get("schema", "").endswith("v3") else "tec_ctec_v2_tier",
             "source": "enterprise/scripts/tec_ctec.py",
             "tier": tier,
             "generated_at": payload["generated_at"],
@@ -545,18 +636,35 @@ def write_release_kpi_outputs(payload: dict[str, Any]) -> None:
         }
         (RK_ROOT / f"tec_{tier}.json").write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
 
+    fv = payload["factors"].get("formula_version", "v2")
     md = [
-        "# TEC Summary (C-TEC v2)",
+        f"# TEC Summary (C-TEC {fv})",
         "",
         "## Latest Factors",
+        f"- Formula: **{fv}**",
         f"- ICR: **{payload['factors']['icr_status']}** (RCF={payload['factors']['rcf']}, RL_open={payload['factors']['rl_open']})",
         f"- PCR: **{payload['factors']['load_bucket']}** (CCF={payload['factors']['ccf']}, CL14={payload['factors']['cl14']})",
+    ]
+    if fv == "v3":
+        qf_val = payload["factors"].get("qf", "?")
+        qf_mean_val = payload["factors"].get("qf_weighted_mean", "?")
+        qf_n = payload["factors"].get("qf_kpi_count", 0)
+        sf_val = payload["factors"].get("sf", "?")
+        ssi_val = payload["factors"].get("ssi")
+        ssi_display = f"{ssi_val}" if ssi_val is not None else "N/A"
+        md.extend([
+            f"- Quality Factor: **{qf_val}** (confidence-weighted KPI mean={qf_mean_val}, n={qf_n})",
+            f"- Stability Factor: **{sf_val}** (SSI={ssi_display})",
+        ])
+    md.extend([
         "",
         "## Edition Metrics",
-        f"- CORE: TEC={payload['core']['tec']} | C-TEC={payload['core']['ctec']} | KPI={payload['core']['controls']['kpi_coverage']}",
-        f"- ENTERPRISE: TEC={payload['enterprise']['tec']} | C-TEC={payload['enterprise']['ctec']} | KPI={payload['enterprise']['controls']['kpi_coverage']}",
-        f"- TOTAL: TEC={payload['total']['tec']} | C-TEC={payload['total']['ctec']} | KPI={payload['total']['controls']['kpi_coverage']}",
+        f"- CORE: TEC={payload['core']['tec']} | C-TEC={payload['core']['ctec']} | CC={payload['core']['control_coverage']}",
+        f"- ENTERPRISE: TEC={payload['enterprise']['tec']} | C-TEC={payload['enterprise']['ctec']} | CC={payload['enterprise']['control_coverage']}",
+        f"- TOTAL: TEC={payload['total']['tec']} | C-TEC={payload['total']['ctec']} | CC={payload['total']['control_coverage']}",
         "",
+    ])
+    md.extend([
         "## Tiers (from TOTAL C-TEC)",
         "### Internal @ $150/hr",
         f"- Low:  {tier_data['internal']['low']['hours']} hrs | ${int(tier_data['internal']['low']['cost'])}",
@@ -573,7 +681,7 @@ def write_release_kpi_outputs(payload: dict[str, Any]) -> None:
         f"- Base: {tier_data['public_sector']['base']['hours']} hrs | ${int(tier_data['public_sector']['base']['cost'])}",
         f"- High: {tier_data['public_sector']['high']['hours']} hrs | ${int(tier_data['public_sector']['high']['cost'])}",
         "",
-    ]
+    ])
 
     # Append all KPI results
     md.extend(_build_kpi_results_md())
@@ -582,7 +690,17 @@ def write_release_kpi_outputs(payload: dict[str, Any]) -> None:
         "## Why This Is More Accurate",
         "- Uses edition-scoped inventory plus full-repo `total` scope, so complexity is measured across actual shipped surfaces.",
         "- Applies live governance factors (`RCF` from issue risk health, `CCF` from 14-day PR change load) instead of static effort-only multipliers.",
-        "- Computes C-TEC as control-adjusted complexity (`TEC x KPI_Coverage x RCF x CCF`), which reflects execution discipline, not just size.",
+    ])
+    if fv == "v3":
+        md.extend([
+            "- **v3 Quality Factor (QF):** Replaces binary file-existence checks with confidence-weighted KPI scores. Evidence level (simulated vs production) directly affects weight via eligibility confidence.",
+            "- **v3 Stability Factor (SF):** SSI (System Stability Index) feeds into C-TEC. Unstable systems get a lower control multiplier, reflecting higher real-world effort.",
+            "- **v3 LOC in TEC:** Lines of code now contribute to the TEC formula, so complexity reflects actual code volume — not just file counts.",
+            f"- Computes C-TEC as `TEC × QF × SF × RCF × CCF` = `TEC × {payload['total']['control_coverage']}`.",
+        ])
+    else:
+        md.append("- Computes C-TEC as control-adjusted complexity (`TEC x KPI_Coverage x RCF x CCF`), which reflects execution discipline, not just size.")
+    md.extend([
         "- Produces deterministic daily snapshots (`ICR/PCR/TEC`) so trend direction is measurable and auditable over time.",
         "",
     ])
