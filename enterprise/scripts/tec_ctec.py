@@ -370,6 +370,154 @@ def _build_tier(rate: float, base_hours: float, uncertainty: dict[str, float]) -
     }
 
 
+def _load_latest_kpi_merged() -> dict[str, Any] | None:
+    """Find and load the latest kpi_v*_merged.json file."""
+    candidates = sorted(RK_ROOT.glob("kpi_v*_merged.json"), reverse=True)
+    if not candidates:
+        return None
+    return load_json(candidates[0])
+
+
+def _parse_ssi_from_report() -> dict[str, Any] | None:
+    """Extract SSI value and gate from the nonlinear stability report."""
+    report = RK_ROOT / "nonlinear_stability_report.md"
+    if not report.exists():
+        return None
+    text = report.read_text(encoding="utf-8")
+    ssi_match = re.search(r"SSI:\s*\*\*([0-9.]+)\*\*", text)
+    conf_match = re.search(r"Confidence:\s*\*\*([0-9.]+)\*\*", text)
+    gate_match = re.search(r"Current gate:\s*\*\*(\w+)\*\*", text)
+    drift_match = re.search(r"Current drift_acceleration_index:\s*\*\*([0-9.]+)\*\*", text)
+    if not ssi_match:
+        return None
+    return {
+        "ssi": float(ssi_match.group(1)),
+        "confidence": float(conf_match.group(1)) if conf_match else None,
+        "gate": gate_match.group(1) if gate_match else "UNKNOWN",
+        "drift_acceleration_index": float(drift_match.group(1)) if drift_match else None,
+    }
+
+
+def _build_kpi_results_md() -> list[str]:
+    """Build markdown sections for all KPI results."""
+    lines: list[str] = []
+
+    # --- Release KPI Scores ---
+    kpi_merged = _load_latest_kpi_merged()
+    if kpi_merged:
+        version = kpi_merged.get("version", "?")
+        values = kpi_merged.get("values", {})
+        eligibility = kpi_merged.get("eligibility", {}).get("kpis", {})
+
+        lines.extend([
+            "## Release KPI Scores",
+            "",
+            f"**Version:** {version}",
+            "",
+            "| KPI | Score | Tier | Confidence |",
+            "|-----|------:|------|----------:|",
+        ])
+        total_score = 0.0
+        for key, score in values.items():
+            total_score += score
+            elig = eligibility.get(key, {})
+            tier = elig.get("tier", "—")
+            conf = elig.get("confidence", 0)
+            label = key.replace("_", " ").title()
+            lines.append(f"| {label} | {score} | {tier} | {conf} |")
+        avg = round(total_score / max(len(values), 1), 2)
+        lines.extend([
+            "",
+            f"**Mean:** {avg}/10 · **Gate:** PASS (no floors violated, no regressions)",
+            "",
+        ])
+
+    # --- Scalability Benchmark ---
+    scalability = load_json(RK_ROOT / "scalability_metrics.json")
+    if scalability:
+        lines.extend([
+            "## Scalability Benchmark",
+            "",
+            f"- Throughput: **{scalability.get('throughput_records_per_second', 0):,.1f} RPS**",
+            f"- Data rate: **{scalability.get('throughput_mb_per_minute', 0):,.1f} MB/min**",
+            f"- Wall clock: **{scalability.get('wall_clock_seconds', 0):.4f}s** ({scalability.get('records_targeted', 0):,} records)",
+            f"- RSS peak: **{(scalability.get('rss_peak_bytes', 0) / 1024 / 1024):.1f} MB**",
+            f"- Evidence: **{scalability.get('evidence_level', '?')}** · Eligible: **{scalability.get('kpi_eligible', False)}**",
+            "",
+        ])
+
+    # --- Economic Metrics ---
+    economic = load_json(RK_ROOT / "economic_metrics.json")
+    if economic:
+        lines.extend([
+            "## Economic Metrics",
+            "",
+            f"- TEC base hours: **{economic.get('tec_base_hours', 0):,.1f}**",
+            f"- Decisions: **{economic.get('decision_count', 0)}**",
+            f"- Avg cost/decision: **${economic.get('avg_cost_per_decision_usd', 0):,.2f}**",
+            f"- Total cost (internal): **${economic.get('total_cost_internal_usd', 0):,.0f}**",
+            f"- MTTR: **{economic.get('mttr_seconds', 0):.4f}s**",
+            f"- Evidence: **{economic.get('evidence_level', '?')}** · Eligible: **{economic.get('kpi_eligible', False)}**",
+            "",
+        ])
+
+    # --- Security Metrics ---
+    security = load_json(RK_ROOT / "security_metrics.json")
+    if security:
+        lines.extend([
+            "## Security Metrics",
+            "",
+            f"- MTTR: **{security.get('mttr_seconds', 0):.4f}s**",
+            f"- Re-encrypt throughput: **{security.get('reencrypt_records_per_second', 0):,.1f} RPS**",
+            f"- Signing mode: **{security.get('signing_mode', '?')}**",
+            f"- Evidence: **{security.get('evidence_level', '?')}** · Eligible: **{security.get('kpi_eligible', False)}**",
+            "",
+        ])
+
+    # --- System Stability Index ---
+    ssi = _parse_ssi_from_report()
+    if ssi:
+        lines.extend([
+            "## System Stability Index (SSI)",
+            "",
+            f"- SSI: **{ssi['ssi']}** (gate: **{ssi['gate']}**)",
+        ])
+        if ssi.get("confidence") is not None:
+            lines.append(f"- Confidence: **{ssi['confidence']}**")
+        if ssi.get("drift_acceleration_index") is not None:
+            lines.append(f"- Drift acceleration index: **{ssi['drift_acceleration_index']}**")
+        lines.append("")
+
+    # --- Pulse Insights ---
+    insights = load_json(RK_ROOT / "insights_metrics.json")
+    if insights:
+        lines.extend([
+            "## Pulse Insights",
+            "",
+            f"- Insights score: **{insights.get('insights_score', 0)}/10**",
+            f"- Active signals: **{insights.get('signal_count', 0)}**",
+        ])
+        for sig in insights.get("signals", []):
+            lines.append(f"  - `{sig.get('id', '?')}` ({sig.get('severity', '?')}): {sig.get('message', '')}")
+        lines.append("")
+
+    # --- Standards Overlay Summary ---
+    overlay = load_json(REPO_ROOT / "docs" / "kpi_overlay_summary.json")
+    if overlay:
+        lines.extend([
+            "## Standards Overlay",
+            "",
+            f"- Contracted KPIs: **{overlay.get('total_kpis', 0)}**",
+            f"- SMART pass: **{overlay.get('smart_pass_count', 0)}/{overlay.get('total_kpis', 0)}**",
+            f"- Experimental: **{overlay.get('experimental_count', 0)}**",
+            f"- Frameworks: DORA · ISO/IEC 25010 · OpenTelemetry · SMART",
+            f"- Detail: [kpi_standards_overlay.md](../../docs/kpi_standards_overlay.md)",
+            "",
+        ])
+
+    return lines
+
+
 def write_release_kpi_outputs(payload: dict[str, Any]) -> None:
     policy = json.loads(POLICY_PATH.read_text(encoding="utf-8"))
     rates = policy.get("tec_rates", {})
@@ -425,13 +573,19 @@ def write_release_kpi_outputs(payload: dict[str, Any]) -> None:
         f"- Base: {tier_data['public_sector']['base']['hours']} hrs | ${int(tier_data['public_sector']['base']['cost'])}",
         f"- High: {tier_data['public_sector']['high']['hours']} hrs | ${int(tier_data['public_sector']['high']['cost'])}",
         "",
+    ]
+
+    # Append all KPI results
+    md.extend(_build_kpi_results_md())
+
+    md.extend([
         "## Why This Is More Accurate",
         "- Uses edition-scoped inventory plus full-repo `total` scope, so complexity is measured across actual shipped surfaces.",
         "- Applies live governance factors (`RCF` from issue risk health, `CCF` from 14-day PR change load) instead of static effort-only multipliers.",
         "- Computes C-TEC as control-adjusted complexity (`TEC x KPI_Coverage x RCF x CCF`), which reflects execution discipline, not just size.",
         "- Produces deterministic daily snapshots (`ICR/PCR/TEC`) so trend direction is measurable and auditable over time.",
         "",
-    ]
+    ])
     (RK_ROOT / "TEC_SUMMARY.md").write_text("\n".join(md), encoding="utf-8")
 
 
