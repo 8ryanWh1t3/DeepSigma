@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
-"""Compute repo snapshot stats and inject them into README.md."""
+"""Compute repo snapshot stats and inject them into README.md.
+
+Also generates:
+- docs/telemetry.json  (full telemetry payload)
+- docs/badges/*.json   (shields.io endpoint badges)
+"""
 from __future__ import annotations
 
 import argparse
+import json
 import os
+import re
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -53,12 +60,23 @@ def is_test_file(path: Path) -> bool:
     return name.startswith("test_") and name.endswith(".py") or name.endswith("_test.py")
 
 
+def read_version(root: Path) -> str:
+    """Read version from root pyproject.toml."""
+    pyproject = root / "pyproject.toml"
+    if not pyproject.exists():
+        return "0.0.0"
+    text = pyproject.read_text(encoding="utf-8")
+    m = re.search(r'^version\s*=\s*"([^"]+)"', text, re.MULTILINE)
+    return m.group(1) if m else "0.0.0"
+
+
 def compute_stats(root: Path) -> dict:
     files = walk_repo(root)
     total_files = len(files)
     total_loc = 0
     loc_by_ext: dict[str, int] = defaultdict(int)
     test_files = 0
+    python_tests = 0
     workflow_count = 0
     edge_html_count = 0
     pyproject_count = 0
@@ -75,6 +93,8 @@ def compute_stats(root: Path) -> dict:
 
         if is_test_file(fp):
             test_files += 1
+            if fp.suffix == ".py":
+                python_tests += 1
 
         if fp.name == "pyproject.toml":
             pyproject_count += 1
@@ -92,11 +112,13 @@ def compute_stats(root: Path) -> dict:
     top_exts = sorted(loc_by_ext.items(), key=lambda kv: (-kv[1], kv[0]))[:10]
 
     return {
+        "version": read_version(root),
         "total_files": total_files,
         "total_loc": total_loc,
         "top_extensions": top_exts,
         "workflow_count": workflow_count,
         "test_files": test_files,
+        "python_tests": python_tests,
         "pyproject_count": pyproject_count,
         "edge_html_count": edge_html_count,
     }
@@ -104,6 +126,15 @@ def compute_stats(root: Path) -> dict:
 
 def format_number(n: int) -> str:
     return f"{n:,}"
+
+
+def compact_number(n: int) -> str:
+    """Format number compactly for badges: 296484 -> '296k'."""
+    if n >= 1_000_000:
+        return f"{n / 1_000_000:.1f}M"
+    if n >= 1_000:
+        return f"{n // 1_000}k"
+    return str(n)
 
 
 def render_block(stats: dict) -> str:
@@ -129,10 +160,12 @@ def render_block(stats: dict) -> str:
 
 def print_summary(stats: dict) -> None:
     print("=== Repo Snapshot Stats ===")
+    print(f"  Version:      {stats['version']}")
     print(f"  Files:        {format_number(stats['total_files'])}")
     print(f"  LOC:          {format_number(stats['total_loc'])}")
     print(f"  Workflows:    {stats['workflow_count']}")
     print(f"  Test files:   {stats['test_files']}")
+    print(f"  Python tests: {stats['python_tests']}")
     print(f"  pyproject:    {stats['pyproject_count']}")
     print(f"  EDGE modules: {stats['edge_html_count']}")
     print("  Top extensions:")
@@ -163,12 +196,79 @@ def inject_readme(readme_path: Path, block: str) -> bool:
     return True
 
 
+def write_telemetry(path: Path, stats: dict) -> None:
+    """Write full telemetry JSON."""
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    payload = {
+        "version": stats["version"],
+        "total_text_loc": stats["total_loc"],
+        "tests": stats["test_files"],
+        "python_tests": stats["python_tests"],
+        "workflows": stats["workflow_count"],
+        "edge_html": stats["edge_html_count"],
+        "generated_utc": ts,
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    print(f"Wrote: {path}")
+
+
+def write_badges(badges_dir: Path, stats: dict) -> None:
+    """Write shields.io endpoint badge JSON files."""
+    badges_dir.mkdir(parents=True, exist_ok=True)
+
+    badges = {
+        "version": {
+            "label": "version",
+            "message": f"v{stats['version']}",
+            "color": "blue",
+        },
+        "loc": {
+            "label": "LOC",
+            "message": compact_number(stats["total_loc"]),
+            "color": "informational",
+        },
+        "tests": {
+            "label": "test files",
+            "message": str(stats["test_files"]),
+            "color": "brightgreen",
+        },
+        "edge": {
+            "label": "EDGE modules",
+            "message": str(stats["edge_html_count"]),
+            "color": "orange",
+        },
+        "workflows": {
+            "label": "workflows",
+            "message": str(stats["workflow_count"]),
+            "color": "blueviolet",
+        },
+    }
+
+    for name, badge in badges.items():
+        payload = {"schemaVersion": 1, **badge}
+        out = badges_dir / f"{name}.json"
+        out.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+    print(f"Wrote: {len(badges)} badges to {badges_dir}/")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Compute and inject repo stats")
     parser.add_argument(
         "--write-readme",
         metavar="PATH",
         help="Path to README.md to inject stats into",
+    )
+    parser.add_argument(
+        "--write-telemetry",
+        metavar="PATH",
+        help="Path to write telemetry JSON (e.g. docs/telemetry.json)",
+    )
+    parser.add_argument(
+        "--write-badges",
+        metavar="DIR",
+        help="Directory to write shields.io badge JSONs (e.g. docs/badges)",
     )
     parser.add_argument(
         "--root",
@@ -192,6 +292,18 @@ def main() -> None:
             print(f"\nUpdated {readme}")
         else:
             print(f"\n{readme} already up to date")
+
+    if args.write_telemetry:
+        tpath = Path(args.write_telemetry)
+        if not tpath.is_absolute():
+            tpath = root / tpath
+        write_telemetry(tpath, stats)
+
+    if args.write_badges:
+        bdir = Path(args.write_badges)
+        if not bdir.is_absolute():
+            bdir = root / bdir
+        write_badges(bdir, stats)
 
 
 if __name__ == "__main__":

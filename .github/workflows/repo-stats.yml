@@ -23,13 +23,17 @@ jobs:
           python-version: "3.12"
 
       - name: Generate repo stats
-        run: python tools/repo_stats.py --write-readme README.md
+        run: |
+          python tools/repo_stats.py \
+            --write-readme README.md \
+            --write-telemetry docs/telemetry.json \
+            --write-badges docs/badges
 
       - name: Commit if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git diff --quiet README.md && echo "No changes" && exit 0
-          git add README.md
+          git add README.md docs/telemetry.json docs/badges/
+          git diff --cached --quiet && echo "No changes" && exit 0
           git commit -m "chore: update repo telemetry stats (auto)"
           git push origin main

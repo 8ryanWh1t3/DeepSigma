@@ -6,6 +6,11 @@
 [![Authority Coverage](https://img.shields.io/badge/authority_coverage-100%25-brightgreen)](./enterprise/release_kpis/authority_evidence.json)
 [![Drift Density](https://img.shields.io/badge/drift_density-0.0000-brightgreen)](./enterprise/release_kpis/KPI_GATE_REPORT.md)
 [![Memory Coverage](https://img.shields.io/badge/memory_coverage-1.0-brightgreen)](./enterprise/release_kpis/KPI_GATE_REPORT.md)
+[![version](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/8ryanWh1t3/DeepSigma/main/docs/badges/version.json)](https://github.com/8ryanWh1t3/DeepSigma)
+[![LOC](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/8ryanWh1t3/DeepSigma/main/docs/badges/loc.json)](./docs/telemetry.json)
+[![tests](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/8ryanWh1t3/DeepSigma/main/docs/badges/tests.json)](./tests/)
+[![EDGE](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/8ryanWh1t3/DeepSigma/main/docs/badges/edge.json)](./edge/)
+[![workflows](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/8ryanWh1t3/DeepSigma/main/docs/badges/workflows.json)](./.github/workflows/)
 
 **[Feature Catalog](./enterprise/docs/FEATURE_CATALOG.md)**
 
@@ -135,16 +140,16 @@ For the full-platform docs and architecture map, use parked docs directly:
 - `enterprise/docs/mermaid/`
 
 <!-- REPO_STATS_START -->
-**Repo Snapshot** (auto-generated 2026-03-02 01:48 UTC)
+**Repo Snapshot** (auto-generated 2026-03-02 01:51 UTC)
 
-- **1,686** files | **296,484** lines of code
+- **1,686** files | **296,618** lines of code
 - **41** CI workflows | **160** test files | **5** pyproject.toml
 - **21** EDGE modules
 
 LOC by extension:
-  `.py` 100,180
+  `.py` 100,292
   `.html` 59,722
-  `.md` 45,524
+  `.md` 45,546
   `.json` 41,467
   `.svg` 28,054
   `.jsonl` 5,962
