@@ -574,7 +574,7 @@ body::after{
       <div class="gauge-value" id="gaugeValue" style="color:var(--neon-green)">85</div>
       <div class="gauge-status" id="gaugeStatus" style="color:var(--neon-green)">EXCELLENT</div>
       <label for="gaugeSlider" class="gauge-label" style="margin-top:8px">Adjust Coherence</label>
-      <input type="range" min="0" max="100" value="85" class="gauge-slider" id="gaugeSlider" title="Coherence index slider" oninput="updateGauge(this.value)"/>
+      <input type="range" min="0" max="100" value="85" class="gauge-slider" id="gaugeSlider" title="Coherence index slider"/>
       <div id="gaugeExplain" style="text-align:left;margin-top:14px;padding:12px;background:rgba(0,0,0,.25);border:1px solid rgba(57,255,20,.2);border-radius:8px;font-size:.82rem;line-height:1.7;color:var(--txt)">
         <strong style="color:var(--neon-green)">80&ndash;100: EXCELLENT</strong><br/>
         Truth, Reasoning, and Memory are tightly aligned. Decisions are recorded, assumptions are fresh, and drift signals are being patched quickly. No action needed &mdash; keep doing what you&rsquo;re doing.
@@ -709,7 +709,7 @@ body::after{
   </div>
 
   <!-- DLR -->
-  <div class="artifact-row" onclick="toggleArtifact(this)">
+  <div class="artifact-row">
     <span class="artifact-code dlr">DLR</span>
     <span class="artifact-name">Decision Ledger Record</span>
     <span class="artifact-arrow">&#9654;</span>
@@ -726,7 +726,7 @@ body::after{
   </div>
 
   <!-- RS -->
-  <div class="artifact-row" onclick="toggleArtifact(this)">
+  <div class="artifact-row">
     <span class="artifact-code rs">RS</span>
     <span class="artifact-name">Reasoning Snapshot <span class="muted small">&mdash; how we were thinking</span></span>
     <span class="artifact-arrow">&#9654;</span>
@@ -743,7 +743,7 @@ body::after{
   </div>
 
   <!-- DS -->
-  <div class="artifact-row" onclick="toggleArtifact(this)">
+  <div class="artifact-row">
     <span class="artifact-code ds">DS</span>
     <span class="artifact-name">Drift Signal</span>
     <span class="artifact-arrow">&#9654;</span>
@@ -760,7 +760,7 @@ body::after{
   </div>
 
   <!-- MG -->
-  <div class="artifact-row" onclick="toggleArtifact(this)">
+  <div class="artifact-row">
     <span class="artifact-code mg">MG</span>
     <span class="artifact-name">Memory Graph</span>
     <span class="artifact-arrow">&#9654;</span>
@@ -824,7 +824,7 @@ body::after{
     <h3>Drift Report Template</h3>
     <p class="muted small mb">Use this when you spot drift. Copy and fill in the blanks.</p>
     <div class="copy-block">
-      <button type="button" class="copy-btn" onclick="copyBlock(this)">COPY</button>
+      <button type="button" class="copy-btn">COPY</button>
       <pre id="drift-template">DRIFT REPORT
 ============
 Date:           [today's date]
@@ -856,7 +856,7 @@ Notes:
     <h3>Patch Note Template</h3>
     <p class="muted small mb">Use this when applying a patch to a sealed decision.</p>
     <div class="copy-block">
-      <button type="button" class="copy-btn" onclick="copyBlock(this)">COPY</button>
+      <button type="button" class="copy-btn">COPY</button>
       <pre id="patch-template">PATCH NOTE
 ==========
 Patch ID:       [e.g., DLR-2026-0042-P1]
@@ -899,7 +899,7 @@ Supersedes:     [e.g., v1 sealed on 2026-01-15]</pre>
     <h4>Step 2: Capture It with the Starter Prompt</h4>
     <p>Paste the prompt below into any LLM. Answer the questions. You&rsquo;ll get a structured decision record in about 90 seconds.</p>
     <div class="copy-block">
-      <button type="button" class="copy-btn" onclick="copyBlock(this)">COPY</button>
+      <button type="button" class="copy-btn">COPY</button>
       <pre id="starter-prompt">You are a Decision Episode Recorder. I will describe a decision
 my team made. Return ONLY the structured record below as JSON-like text —
 no essay, no commentary. Keep each field concise.
@@ -959,42 +959,42 @@ Why (one sentence):
     <p class="muted small">Click any question to expand the answer.</p>
   </div>
 
-  <div class="faq-item" onclick="toggleFaq(this)">
+  <div class="faq-item">
     <div class="faq-q"><span>Is this extra work?</span><span class="arrow">&#9654;</span></div>
     <div class="faq-a">Less than you think. Capturing a decision episode takes about 2 minutes with the Starter Prompt. The payoff is enormous: you stop spending hours re-explaining past decisions, and you catch problems before they snowball. Most teams report it saves more time than it costs within the first two weeks.</div>
   </div>
 
-  <div class="faq-item" onclick="toggleFaq(this)">
+  <div class="faq-item">
     <div class="faq-q"><span>What if we&rsquo;re wrong about a decision?</span><span class="arrow">&#9654;</span></div>
     <div class="faq-a">That&rsquo;s exactly what the patch system is for. Being wrong is normal. The system doesn&rsquo;t punish wrong decisions &mdash; it makes them easy to correct. When you discover a decision was wrong, you issue a patch. The original record stays (so you can learn from it), and the new version becomes the active canon.</div>
   </div>
 
-  <div class="faq-item" onclick="toggleFaq(this)">
+  <div class="faq-item">
     <div class="faq-q"><span>Who owns patches?</span><span class="arrow">&#9654;</span></div>
     <div class="faq-a">The decision owner. Every DLR has an owner field. When drift is detected, the owner is responsible for evaluating it and deciding whether to patch. If the owner has moved on, the team lead inherits ownership. The point is: every decision always has exactly one accountable person.</div>
   </div>
 
-  <div class="faq-item" onclick="toggleFaq(this)">
+  <div class="faq-item">
     <div class="faq-q"><span>How do we avoid this becoming political?</span><span class="arrow">&#9654;</span></div>
     <div class="faq-a">By focusing on information, not blame. The system tracks what was known at the time, not who made a &ldquo;bad call.&rdquo; Confidence scores are honest: a 0.55 confidence decision isn&rsquo;t a bad decision &mdash; it&rsquo;s an honest acknowledgment of uncertainty. That honesty is what prevents politics.</div>
   </div>
 
-  <div class="faq-item" onclick="toggleFaq(this)">
+  <div class="faq-item">
     <div class="faq-q"><span>How does AI fit in?</span><span class="arrow">&#9654;</span></div>
     <div class="faq-a">AI handles the heavy lifting: indexing records for fast retrieval, watching assumption expiry dates, matching new evidence against existing decisions, and surfacing drift signals. Humans stay in control of all decisions and patches. AI assists; humans decide.</div>
   </div>
 
-  <div class="faq-item" onclick="toggleFaq(this)">
+  <div class="faq-item">
     <div class="faq-q"><span>Do we need special tools to start?</span><span class="arrow">&#9654;</span></div>
     <div class="faq-a">No. You can start with a shared document and the templates on the Quick Start tab. The Starter Prompt works with any LLM. As your practice matures, Deep Sigma can automate the monitoring and retrieval &mdash; but the methodology works even on paper.</div>
   </div>
 
-  <div class="faq-item" onclick="toggleFaq(this)">
+  <div class="faq-item">
     <div class="faq-q"><span>What does &ldquo;why-retrieval in 60 seconds&rdquo; actually mean?</span><span class="arrow">&#9654;</span></div>
     <div class="faq-a">It means that when anyone asks &ldquo;why did we decide X?&rdquo; you can pull up the full reasoning chain &mdash; the decision, the evidence, the rejected options, the assumptions, and any patches &mdash; in under a minute. No digging through Slack. No scheduling a meeting with the person who &ldquo;might remember.&rdquo;</div>
   </div>
 
-  <div class="faq-item" onclick="toggleFaq(this)">
+  <div class="faq-item">
     <div class="faq-q"><span>How is this different from just keeping meeting notes?</span><span class="arrow">&#9654;</span></div>
     <div class="faq-a">Meeting notes capture what was said. Coherence Ops captures what was decided, why, what assumptions it depends on, and when those assumptions expire. It&rsquo;s structured, searchable, versioned, and monitored. Meeting notes go stale in a drawer; decision records stay alive and trigger alerts when the world changes.</div>
   </div>
@@ -1004,7 +1004,7 @@ Why (one sentence):
 </div><!-- /.wrap -->
 
 <!-- ═══════════════ PRINT BUTTON ═══════════════ -->
-<button type="button" class="print-btn" onclick="window.print()">&#9113; Print / PDF</button>
+<button type="button" class="print-btn">&#9113; Print / PDF</button>
 
 <!-- ═══════════════ JAVASCRIPT ═══════════════ -->
 <script>
@@ -1114,6 +1114,17 @@ document.querySelector(".tab-bar").addEventListener("keydown",function(e){
   else if(e.key==="Home"){next=0}
   else if(e.key==="End"){next=tabs.length-1}
   if(next>=0){e.preventDefault();activateTab(tabs[next])}
+});
+
+/* ── Delegated handlers (replaces inline event handlers) ── */
+document.addEventListener("click",function(e){
+  var ar=e.target.closest(".artifact-row");if(ar){toggleArtifact(ar);return}
+  var cb=e.target.closest(".copy-btn");if(cb){copyBlock(cb);return}
+  var fq=e.target.closest(".faq-item");if(fq){toggleFaq(fq);return}
+  var pb=e.target.closest(".print-btn");if(pb){window.print();return}
+});
+document.addEventListener("input",function(e){
+  if(e.target.id==="gaugeSlider")updateGauge(e.target.value);
 });
 </script>
 

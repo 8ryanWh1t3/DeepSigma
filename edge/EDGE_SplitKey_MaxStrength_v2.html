@@ -296,32 +296,32 @@ label.field-label{font-size:.68rem;color:var(--txt-muted);font-weight:600;letter
   <!-- Operator A -->
   <div class="card op-a">
     <h3>Operator A</h3>
-    <button class="btn btn-gen" onclick="generateShare('A')">Generate Share A (32 bytes)</button>
+    <button class="btn btn-gen" data-action="generateShare" data-arg="A">Generate Share A (32 bytes)</button>
     <h4><span class="pill pill-cyan">Fingerprint A</span> (always visible)</h4>
     <div class="fp-row">
       <div id="fpA" class="out empty" style="flex:1">Not generated</div>
-      <button class="btn-copy" onclick="copyField('fpA',this)">COPY</button>
+      <button class="btn-copy" data-action="copyField" data-arg="fpA">COPY</button>
     </div>
-    <h4><span class="pill pill-cyan">Share A</span> (64 hex) <button class="btn-toggle" id="togA" onclick="toggleVis('A')">SHOW</button></h4>
+    <h4><span class="pill pill-cyan">Share A</span> (64 hex) <button class="btn-toggle" id="togA" data-action="toggleVis" data-arg="A">SHOW</button></h4>
     <div class="out-row">
       <div id="shareA" class="out empty">Not generated</div>
-      <button class="btn-copy" id="copyShareA" onclick="copySecretField('shareA','visA',this)" disabled>COPY</button>
+      <button class="btn-copy" id="copyShareA" data-action="copySecretField" data-arg="shareA" data-arg2="visA" disabled>COPY</button>
     </div>
   </div>
 
   <!-- Operator B -->
   <div class="card op-b">
     <h3>Operator B</h3>
-    <button class="btn btn-gen-b" onclick="generateShare('B')">Generate Share B (32 bytes)</button>
+    <button class="btn btn-gen-b" data-action="generateShare" data-arg="B">Generate Share B (32 bytes)</button>
     <h4><span class="pill pill-pink">Fingerprint B</span> (always visible)</h4>
     <div class="fp-row">
       <div id="fpB" class="out empty" style="flex:1">Not generated</div>
-      <button class="btn-copy" onclick="copyField('fpB',this)">COPY</button>
+      <button class="btn-copy" data-action="copyField" data-arg="fpB">COPY</button>
     </div>
-    <h4><span class="pill pill-pink">Share B</span> (64 hex) <button class="btn-toggle" id="togB" onclick="toggleVis('B')">SHOW</button></h4>
+    <h4><span class="pill pill-pink">Share B</span> (64 hex) <button class="btn-toggle" id="togB" data-action="toggleVis" data-arg="B">SHOW</button></h4>
     <div class="out-row">
       <div id="shareB" class="out empty">Not generated</div>
-      <button class="btn-copy" id="copyShareB" onclick="copySecretField('shareB','visB',this)" disabled>COPY</button>
+      <button class="btn-copy" id="copyShareB" data-action="copySecretField" data-arg="shareB" data-arg2="visB" disabled>COPY</button>
     </div>
   </div>
 
@@ -348,19 +348,19 @@ label.field-label{font-size:.68rem;color:var(--txt-muted);font-weight:600;letter
 <div class="card" style="border-color:rgba(180,77,255,.4);box-shadow:var(--glow-purple)">
   <h3 style="color:var(--neon-purple)">Master Key</h3>
   <p style="font-size:.75rem;color:var(--txt-muted);margin-bottom:10px">master = SHA-256( shareA_bytes || shareB_bytes )</p>
-  <button class="btn btn-master" id="btnMaster" onclick="computeMaster()" disabled>Compute Master</button>
+  <button class="btn btn-master" id="btnMaster" data-action="computeMaster" disabled>Compute Master</button>
 
   <h4><span class="pill pill-purple">Master Fingerprint</span> (always visible)</h4>
   <div class="fp-row">
     <div id="fpMaster" class="out empty" style="flex:1">Not computed</div>
     <div id="witDisplay" style="display:none"></div>
-    <button class="btn-copy" onclick="copyField('fpMaster',this)">COPY</button>
+    <button class="btn-copy" data-action="copyField" data-arg="fpMaster">COPY</button>
   </div>
 
-  <h4><span class="pill pill-purple">Master</span> (64 hex) <button class="btn-toggle" id="togM" onclick="toggleVisMaster()">SHOW</button></h4>
+  <h4><span class="pill pill-purple">Master</span> (64 hex) <button class="btn-toggle" id="togM" data-action="toggleVisMaster">SHOW</button></h4>
   <div class="out-row">
     <div id="masterHex" class="out empty">Not computed</div>
-    <button class="btn-copy" id="copyMaster" onclick="copySecretField('masterHex','visM',this)" disabled>COPY</button>
+    <button class="btn-copy" id="copyMaster" data-action="copySecretField" data-arg="masterHex" data-arg2="visM" disabled>COPY</button>
   </div>
 </div>
 
@@ -374,32 +374,32 @@ label.field-label{font-size:.68rem;color:var(--txt-muted);font-weight:600;letter
       <input type="text" class="salt-input" id="hkdfSalt" placeholder="Optional salt string"/>
     </div>
     <div style="flex:1">
-      <button class="btn btn-hkdf" id="btnHkdf" onclick="deriveHkdf()" disabled>Derive Keys</button>
+      <button class="btn btn-hkdf" id="btnHkdf" data-action="deriveHkdf" disabled>Derive Keys</button>
     </div>
   </div>
 
-  <h4><span class="pill pill-green">encKey</span> info=EDGE/SPLITKEY/ENC <button class="btn-toggle" id="togEnc" onclick="toggleVisKey('enc')">SHOW</button></h4>
+  <h4><span class="pill pill-green">encKey</span> info=EDGE/SPLITKEY/ENC <button class="btn-toggle" id="togEnc" data-action="toggleVisKey" data-arg="enc">SHOW</button></h4>
   <div class="out-row">
     <div id="encKey" class="out empty">Not derived</div>
-    <button class="btn-copy" id="copyEnc" onclick="copySecretField('encKey','visEnc',this)" disabled>COPY</button>
+    <button class="btn-copy" id="copyEnc" data-action="copySecretField" data-arg="encKey" data-arg2="visEnc" disabled>COPY</button>
   </div>
 
-  <h4><span class="pill pill-green">signKey</span> info=EDGE/SPLITKEY/SIGN <button class="btn-toggle" id="togSign" onclick="toggleVisKey('sign')">SHOW</button></h4>
+  <h4><span class="pill pill-green">signKey</span> info=EDGE/SPLITKEY/SIGN <button class="btn-toggle" id="togSign" data-action="toggleVisKey" data-arg="sign">SHOW</button></h4>
   <div class="out-row">
     <div id="signKey" class="out empty">Not derived</div>
-    <button class="btn-copy" id="copySign" onclick="copySecretField('signKey','visSign',this)" disabled>COPY</button>
+    <button class="btn-copy" id="copySign" data-action="copySecretField" data-arg="signKey" data-arg2="visSign" disabled>COPY</button>
   </div>
 
-  <h4><span class="pill pill-green">recoveryKey</span> info=EDGE/SPLITKEY/RECOVERY <button class="btn-toggle" id="togRecov" onclick="toggleVisKey('recov')">SHOW</button></h4>
+  <h4><span class="pill pill-green">recoveryKey</span> info=EDGE/SPLITKEY/RECOVERY <button class="btn-toggle" id="togRecov" data-action="toggleVisKey" data-arg="recov">SHOW</button></h4>
   <div class="out-row">
     <div id="recoveryKey" class="out empty">Not derived</div>
-    <button class="btn-copy" id="copyRecov" onclick="copySecretField('recoveryKey','visRecov',this)" disabled>COPY</button>
+    <button class="btn-copy" id="copyRecov" data-action="copySecretField" data-arg="recoveryKey" data-arg2="visRecov" disabled>COPY</button>
   </div>
 </div>
 
 <!-- ═══════════════ RESET ═══════════════ -->
 <div style="text-align:center;margin:16px 0">
-  <button class="btn btn-reset" onclick="resetAll()">Reset All</button>
+  <button class="btn btn-reset" data-action="resetAll">Reset All</button>
 </div>
 
 <!-- ═══════════════ CEREMONY CHECKLIST ═══════════════ -->
@@ -728,6 +728,22 @@ function resetAll(){
   updateButtons();
   setStatus("Reset complete. All state cleared.","idle");
 }
+
+/* ── Delegated click handler ───────────────────────── */
+document.addEventListener("click",function(e){
+  var t=e.target.closest("[data-action]");
+  if(!t)return;
+  var a=t.dataset.action,arg=t.dataset.arg,arg2=t.dataset.arg2;
+  if(a==="generateShare")generateShare(arg);
+  else if(a==="copyField")copyField(arg,t);
+  else if(a==="copySecretField")copySecretField(arg,arg2,t);
+  else if(a==="toggleVis")toggleVis(arg);
+  else if(a==="toggleVisMaster")toggleVisMaster();
+  else if(a==="toggleVisKey")toggleVisKey(arg);
+  else if(a==="computeMaster")computeMaster();
+  else if(a==="deriveHkdf")deriveHkdf();
+  else if(a==="resetAll")resetAll();
+});
 </script>
 
 </body>

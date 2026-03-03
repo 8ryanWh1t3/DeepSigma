@@ -293,7 +293,7 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
         <select id="countA"><option value="8" selected>8 tiles</option><option value="9">9 tiles</option><option value="10">10 tiles</option></select>
       </div>
       <div>
-        <button class="btn btn-primary" onclick="parseOperator('A')">Parse &amp; Encode A</button>
+        <button class="btn btn-primary" data-action="parseOperator" data-arg="A">Parse &amp; Encode A</button>
       </div>
     </div>
     <label for="tilesA">Tiles (one per line: 5-2, 5,2, or 5 2)</label>
@@ -307,7 +307,7 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
     <h4><span class="pill pill-cyan">Seed A</span> (SHA-256)</h4>
     <div class="out-row">
       <div id="seedA" class="out empty">Not computed yet</div>
-      <button class="btn-copy" onclick="copyField('seedA',this)">COPY</button>
+      <button class="btn-copy" data-action="copyField" data-arg="seedA">COPY</button>
     </div>
   </div>
 
@@ -320,7 +320,7 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
         <select id="countB"><option value="8" selected>8 tiles</option><option value="9">9 tiles</option><option value="10">10 tiles</option></select>
       </div>
       <div>
-        <button class="btn btn-primary" onclick="parseOperator('B')">Parse &amp; Encode B</button>
+        <button class="btn btn-primary" data-action="parseOperator" data-arg="B">Parse &amp; Encode B</button>
       </div>
     </div>
     <label for="tilesB">Tiles (one per line: 5-2, 5,2, or 5 2)</label>
@@ -334,7 +334,7 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
     <h4><span class="pill pill-pink">Seed B</span> (SHA-256)</h4>
     <div class="out-row">
       <div id="seedB" class="out empty">Not computed yet</div>
-      <button class="btn-copy" onclick="copyField('seedB',this)">COPY</button>
+      <button class="btn-copy" data-action="copyField" data-arg="seedB">COPY</button>
     </div>
   </div>
 
@@ -344,16 +344,16 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
 <div class="card" style="border-color:rgba(180,77,255,.4);box-shadow:var(--glow-purple)">
   <h3 style="color:var(--neon-purple)">Master Key</h3>
   <p style="font-size:.78rem;color:var(--txt-muted);margin-bottom:10px">master = SHA-256( seedA_bytes || seedB_bytes )</p>
-  <button class="btn btn-master" id="btnMaster" onclick="computeMaster()">Compute Master</button>
+  <button class="btn btn-master" id="btnMaster" data-action="computeMaster">Compute Master</button>
   <h4><span class="pill pill-purple">Master</span> (64 hex)</h4>
   <div class="out-row">
     <div id="masterHex" class="out empty">Not computed yet</div>
-    <button class="btn-copy" onclick="copyField('masterHex',this)">COPY</button>
+    <button class="btn-copy" data-action="copyField" data-arg="masterHex">COPY</button>
   </div>
   <h4><span class="pill pill-purple">Fingerprint</span> (first 16 hex of SHA-256(master))</h4>
   <div class="out-row">
     <div id="fingerprint" class="out empty">Not computed yet</div>
-    <button class="btn-copy" onclick="copyField('fingerprint',this)">COPY</button>
+    <button class="btn-copy" data-action="copyField" data-arg="fingerprint">COPY</button>
   </div>
 </div>
 
@@ -367,29 +367,29 @@ label{font-size:.72rem;color:var(--txt-muted);font-weight:600;letter-spacing:.3p
       <input type="text" id="hkdfSalt" placeholder="Optional salt string"/>
     </div>
     <div style="flex:1">
-      <button class="btn btn-hkdf" id="btnHkdf" onclick="deriveHkdf()">Derive HKDF Keys</button>
+      <button class="btn btn-hkdf" id="btnHkdf" data-action="deriveHkdf">Derive HKDF Keys</button>
     </div>
   </div>
   <h4><span class="pill pill-green">encKey</span> info=EDGE/DOMINO/ENC (32 bytes)</h4>
   <div class="out-row">
     <div id="encKey" class="out empty">Not derived yet</div>
-    <button class="btn-copy" onclick="copyField('encKey',this)">COPY</button>
+    <button class="btn-copy" data-action="copyField" data-arg="encKey">COPY</button>
   </div>
   <h4><span class="pill pill-green">signKey</span> info=EDGE/DOMINO/SIGN (32 bytes)</h4>
   <div class="out-row">
     <div id="signKey" class="out empty">Not derived yet</div>
-    <button class="btn-copy" onclick="copyField('signKey',this)">COPY</button>
+    <button class="btn-copy" data-action="copyField" data-arg="signKey">COPY</button>
   </div>
   <h4><span class="pill pill-green">recoveryKey</span> info=EDGE/DOMINO/RECOVERY (32 bytes)</h4>
   <div class="out-row">
     <div id="recoveryKey" class="out empty">Not derived yet</div>
-    <button class="btn-copy" onclick="copyField('recoveryKey',this)">COPY</button>
+    <button class="btn-copy" data-action="copyField" data-arg="recoveryKey">COPY</button>
   </div>
 </div>
 
 <!-- ═══════════════ RESET ═══════════════ -->
 <div style="text-align:center;margin:16px 0">
-  <button class="btn btn-reset" onclick="resetAll()">Reset All Fields</button>
+  <button class="btn btn-reset" data-action="resetAll">Reset All Fields</button>
 </div>
 
 <!-- ═══════════════ CEREMONY CHECKLIST ═══════════════ -->
@@ -679,6 +679,18 @@ function resetAll(){
   }
   setStatus("Ready. Enter domino tiles for each operator.","idle");
 }
+
+/* ── Delegated click handler ───────────────────────── */
+document.addEventListener("click",function(e){
+  var t=e.target.closest("[data-action]");
+  if(!t)return;
+  var a=t.dataset.action,arg=t.dataset.arg,arg2=t.dataset.arg2;
+  if(a==="parseOperator")parseOperator(arg);
+  else if(a==="copyField")copyField(arg,t);
+  else if(a==="computeMaster")computeMaster();
+  else if(a==="deriveHkdf")deriveHkdf();
+  else if(a==="resetAll")resetAll();
+});
 </script>
 
 </body>

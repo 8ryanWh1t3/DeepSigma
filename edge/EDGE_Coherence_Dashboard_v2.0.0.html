@@ -3072,7 +3072,7 @@ document.addEventListener("DOMContentLoaded",function(){
                         <p>Coherence Ops</p>
                     </div>
                 </div>
-                <button class="collapse-btn" onclick="toggleSidebar()" title="Toggle Sidebar">◀</button>
+                <button class="collapse-btn" data-action="toggleSidebar" title="Toggle Sidebar">◀</button>
             </div>
 
             <div class="search-container">
@@ -3164,15 +3164,15 @@ document.addEventListener("DOMContentLoaded",function(){
                         LIVE
                     </div>
                     <div class="timestamp" id="timestamp">--:--:--</div>
-                    <button class="btn btn-secondary" onclick="openIRIS()" title="IRIS Query (⌘K)" style="font-weight:700;letter-spacing:0.5px;">
+                    <button class="btn btn-secondary" data-action="openIRIS" title="IRIS Query (⌘K)" style="font-weight:700;letter-spacing:0.5px;">
                         <span>🔮</span> IRIS
                     </button>
-                    <button class="btn btn-secondary btn-icon" onclick="openCommandPalette()" title="Commands (⌘K)">⌘</button>
-                    <button class="btn btn-secondary btn-icon" onclick="toggleFullscreen()" title="Fullscreen (F11)">⛶</button>
-                    <button class="btn btn-secondary" onclick="exportData()" title="Export">
+                    <button class="btn btn-secondary btn-icon" data-action="openCommandPalette" title="Commands (⌘K)">⌘</button>
+                    <button class="btn btn-secondary btn-icon" data-action="toggleFullscreen" title="Fullscreen (F11)">⛶</button>
+                    <button class="btn btn-secondary" data-action="exportData" title="Export">
                         <span>📥</span> Export
                     </button>
-                    <button class="btn btn-primary" onclick="refreshDashboard()">
+                    <button class="btn btn-primary" data-action="refreshDashboard">
                         <span id="refreshIcon">⟳</span> Refresh
                     </button>
                 </div>
@@ -3329,8 +3329,8 @@ document.addEventListener("DOMContentLoaded",function(){
                         <div class="card-header">
                             <span class="card-title">All Claims</span>
                             <div style="display: flex; gap: 8px; align-items: center;">
-                                <input type="text" class="search-input" id="tableSearch" placeholder="Search claims..." style="width: 180px;" oninput="filterClaimsTable()">
-                                <select class="search-input" style="width: auto; padding-left: 10px;" id="typeFilter" onchange="filterClaimsTable()">
+                                <input type="text" class="search-input" id="tableSearch" placeholder="Search claims..." style="width: 180px;" data-action="filterClaimsTable">
+                                <select class="search-input" style="width: auto; padding-left: 10px;" id="typeFilter" data-action="filterClaimsTable">
                                     <option value="">All Types</option>
                                     <option value="observation">Observation</option>
                                     <option value="inference">Inference</option>
@@ -3339,13 +3339,13 @@ document.addEventListener("DOMContentLoaded",function(){
                                     <option value="norm">Norm</option>
                                     <option value="constraint">Constraint</option>
                                 </select>
-                                <select class="search-input" style="width: auto; padding-left: 10px;" id="statusFilter" onchange="filterClaimsTable()">
+                                <select class="search-input" style="width: auto; padding-left: 10px;" id="statusFilter" data-action="filterClaimsTable">
                                     <option value="">All Lights</option>
                                     <option value="green">Green</option>
                                     <option value="yellow">Yellow</option>
                                     <option value="red">Red</option>
                                 </select>
-                                <button class="btn btn-primary" onclick="switchTab('newclaim')">+ New Claim</button>
+                                <button class="btn btn-primary" data-action="switchTab" data-arg="newclaim">+ New Claim</button>
                             </div>
                         </div>
                         <!-- Bulk Action Bar -->
@@ -3354,22 +3354,22 @@ document.addEventListener("DOMContentLoaded",function(){
                                 <span class="bulk-count" id="bulkCount">0</span> claims selected
                             </div>
                             <div class="bulk-actions">
-                                <button class="btn btn-secondary" onclick="bulkAction('extend')">📅 Extend 30d</button>
-                                <button class="btn btn-secondary" onclick="bulkAction('export')">📥 Export</button>
-                                <button class="btn btn-secondary" onclick="bulkAction('archive')" style="color: var(--danger);">🗑️ Archive</button>
-                                <button class="bulk-clear" onclick="clearBulkSelection()">✕ Clear</button>
+                                <button class="btn btn-secondary" data-action="bulkAction" data-arg="extend">📅 Extend 30d</button>
+                                <button class="btn btn-secondary" data-action="bulkAction" data-arg="export">📥 Export</button>
+                                <button class="btn btn-secondary" data-action="bulkAction" data-arg="archive" style="color: var(--danger);">🗑️ Archive</button>
+                                <button class="bulk-clear" data-action="clearBulkSelection">✕ Clear</button>
                             </div>
                         </div>
                         <div class="table-wrapper">
                             <table class="claims-table" id="claimsTableEl">
                                 <thead>
                                     <tr>
-                                        <th class="th-checkbox"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
-                                        <th class="sortable" data-sort="claimId" onclick="sortTable('claimId')">Claim ID <span class="sort-icon">↕</span></th>
-                                        <th class="sortable" data-sort="truthType" onclick="sortTable('truthType')">Truth Type <span class="sort-icon">↕</span></th>
+                                        <th class="th-checkbox"><input type="checkbox" id="selectAll" data-action="toggleSelectAll"></th>
+                                        <th class="sortable" data-sort="claimId" data-action="sortTable" data-arg="claimId">Claim ID <span class="sort-icon">↕</span></th>
+                                        <th class="sortable" data-sort="truthType" data-action="sortTable" data-arg="truthType">Truth Type <span class="sort-icon">↕</span></th>
                                         <th>Statement</th>
-                                        <th class="sortable" data-sort="owner" onclick="sortTable('owner')">Owner <span class="sort-icon">↕</span></th>
-                                        <th class="sortable" data-sort="statusLight" onclick="sortTable('statusLight')">Light <span class="sort-icon">↕</span></th>
+                                        <th class="sortable" data-sort="owner" data-action="sortTable" data-arg="owner">Owner <span class="sort-icon">↕</span></th>
+                                        <th class="sortable" data-sort="statusLight" data-action="sortTable" data-arg="statusLight">Light <span class="sort-icon">↕</span></th>
                                         <th>Confidence</th>
                                         <th>Half-Life</th>
                                         <th>Actions</th>
@@ -3555,7 +3555,7 @@ document.addEventListener("DOMContentLoaded",function(){
                                     <!-- Row 1: Truth Type & Auto ID -->
                                     <div class="form-group">
                                         <label class="form-label">Truth Type *</label>
-                                        <select class="form-select" id="newClaimType" required onchange="generateClaimId()">
+                                        <select class="form-select" id="newClaimType" required data-action="generateClaimId">
                                             <option value="">Select type...</option>
                                             <option value="observation">Observation - Directly observed fact</option>
                                             <option value="inference">Inference - Derived from reasoning</option>
@@ -3577,7 +3577,7 @@ document.addEventListener("DOMContentLoaded",function(){
                                         <label class="form-label">Claim Statement *</label>
                                         <textarea class="form-textarea" id="newClaimStatement" rows="3" required
                                             placeholder="Enter the atomic claim. Be specific and unambiguous."
-                                            oninput="updateClaimPreview()"></textarea>
+                                            data-action="updateClaimPreview"></textarea>
                                         <span class="form-hint">The core assertion. Should be verifiable and self-contained.</span>
                                     </div>
 
@@ -3586,7 +3586,7 @@ document.addEventListener("DOMContentLoaded",function(){
                                         <label class="form-label">Confidence Score *</label>
                                         <div class="confidence-control">
                                             <input type="range" class="form-range" id="newClaimConfidence"
-                                                min="0" max="100" value="75" step="1" oninput="updateConfidenceDisplay()">
+                                                min="0" max="100" value="75" step="1" data-action="updateConfidenceDisplay">
                                             <div class="confidence-display">
                                                 <span class="confidence-label">0.00</span>
                                                 <span class="confidence-value" id="confidenceValue">0.75</span>
@@ -3599,7 +3599,7 @@ document.addEventListener("DOMContentLoaded",function(){
                                         <label class="form-label">Confidence Explanation</label>
                                         <textarea class="form-textarea" id="newClaimConfExplain" rows="2"
                                             placeholder="Why this confidence level?"
-                                            oninput="updateClaimPreview()"></textarea>
+                                            data-action="updateClaimPreview"></textarea>
                                         <span class="form-hint">Evidence basis for the confidence score</span>
                                     </div>
 
@@ -3615,14 +3615,14 @@ document.addEventListener("DOMContentLoaded",function(){
                                         <label class="form-label">Scope: Where *</label>
                                         <input type="text" class="form-input" id="newClaimScopeWhere" required
                                             placeholder="e.g., Installation, Zone B, Gate 4"
-                                            oninput="updateClaimPreview()">
+                                            data-action="updateClaimPreview">
                                         <span class="form-hint">Geographic or organizational scope</span>
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">Scope: When *</label>
                                         <input type="text" class="form-input" id="newClaimScopeWhen" required
                                             placeholder="e.g., FY25, Q1 2025, Ongoing"
-                                            oninput="updateClaimPreview()">
+                                            data-action="updateClaimPreview">
                                         <span class="form-hint">Temporal scope of validity</span>
                                     </div>
 
@@ -3637,12 +3637,12 @@ document.addEventListener("DOMContentLoaded",function(){
                                     <div class="form-group">
                                         <label class="form-label">Half-Life Value *</label>
                                         <input type="number" class="form-input" id="newClaimHLValue" min="1" value="30"
-                                            oninput="updateClaimPreview()">
+                                            data-action="updateClaimPreview">
                                         <span class="form-hint">Time until confidence halves</span>
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">Half-Life Unit *</label>
-                                        <select class="form-select" id="newClaimHLUnit" onchange="updateClaimPreview()">
+                                        <select class="form-select" id="newClaimHLUnit" data-action="updateClaimPreview">
                                             <option value="days" selected>Days</option>
                                             <option value="hours">Hours</option>
                                             <option value="ms">Milliseconds</option>
@@ -3651,7 +3651,7 @@ document.addEventListener("DOMContentLoaded",function(){
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">Refresh Trigger</label>
-                                        <select class="form-select" id="newClaimHLTrigger" onchange="updateClaimPreview()">
+                                        <select class="form-select" id="newClaimHLTrigger" data-action="updateClaimPreview">
                                             <option value="expiry" selected>Expiry</option>
                                             <option value="contradiction">Contradiction</option>
                                             <option value="new_source">New Source</option>
@@ -3661,7 +3661,7 @@ document.addEventListener("DOMContentLoaded",function(){
                                     </div>
                                     <div class="form-group">
                                         <label class="form-label">Classification</label>
-                                        <select class="form-select" id="newClaimClassification" onchange="updateClaimPreview()">
+                                        <select class="form-select" id="newClaimClassification" data-action="updateClaimPreview">
                                             <option value="internal" selected>Internal</option>
                                             <option value="public">Public</option>
                                             <option value="restricted">Restricted</option>
@@ -3679,7 +3679,7 @@ document.addEventListener("DOMContentLoaded",function(){
 
                                     <div class="form-group">
                                         <label class="form-label">Claim Owner *</label>
-                                        <select class="form-select" id="newClaimOwner" required onchange="updateClaimPreview()">
+                                        <select class="form-select" id="newClaimOwner" required data-action="updateClaimPreview">
                                             <option value="">Select owner...</option>
                                             <option value="CPT Rodriguez">CPT Rodriguez - Physical Security</option>
                                             <option value="MAJ Thompson">MAJ Thompson - Access Control</option>
@@ -3719,13 +3719,13 @@ document.addEventListener("DOMContentLoaded",function(){
 
                                 <!-- Form Actions -->
                                 <div class="form-actions">
-                                    <button type="button" class="btn btn-secondary" onclick="resetNewClaimForm()">
+                                    <button type="button" class="btn btn-secondary" data-action="resetNewClaimForm">
                                         🔄 Reset
                                     </button>
-                                    <button type="button" class="btn btn-secondary" onclick="saveClaimDraft()">
+                                    <button type="button" class="btn btn-secondary" data-action="saveClaimDraft">
                                         💾 Save Draft
                                     </button>
-                                    <button type="button" class="btn btn-primary" onclick="submitNewClaim()">
+                                    <button type="button" class="btn btn-primary" data-action="submitNewClaim">
                                         ✅ Create Claim
                                     </button>
                                 </div>
@@ -3793,11 +3793,11 @@ document.addEventListener("DOMContentLoaded",function(){
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- Modal -->
-    <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
-        <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-overlay" id="modalOverlay" data-action="closeModal">
+        <div class="modal" data-action="stopProp">
             <div class="modal-header">
                 <div class="modal-title" id="modalTitle">Modal</div>
-                <button class="modal-close" onclick="closeModal()">×</button>
+                <button class="modal-close" data-action="closeModal">×</button>
             </div>
             <div class="modal-body" id="modalBody"></div>
             <div class="modal-footer" id="modalFooter"></div>
@@ -3805,7 +3805,7 @@ document.addEventListener("DOMContentLoaded",function(){
     </div>
 
     <!-- V5: Command Palette -->
-    <div class="cmd-overlay" id="cmdOverlay" onclick="if(event.target === this) closeCommandPalette()">
+    <div class="cmd-overlay" id="cmdOverlay" data-action="closeCmdOverlay">
         <div class="cmd-palette">
             <div class="cmd-input-wrapper">
                 <span class="cmd-input-icon">🔍</span>
@@ -3823,25 +3823,25 @@ document.addEventListener("DOMContentLoaded",function(){
 
     <!-- V5: Context Menu -->
     <div class="context-menu" id="contextMenu">
-        <div class="ctx-item" onclick="ctxAction('view')">👁️ View Details</div>
-        <div class="ctx-item" onclick="ctxAction('extend')">📅 Extend 30 Days</div>
-        <div class="ctx-item" onclick="ctxAction('compare')">⚖️ Add to Compare</div>
+        <div class="ctx-item" data-action="ctxAction" data-arg="view">👁️ View Details</div>
+        <div class="ctx-item" data-action="ctxAction" data-arg="extend">📅 Extend 30 Days</div>
+        <div class="ctx-item" data-action="ctxAction" data-arg="compare">⚖️ Add to Compare</div>
         <div class="ctx-divider"></div>
-        <div class="ctx-item" onclick="ctxAction('challenge')">⚠️ Challenge Claim</div>
-        <div class="ctx-item danger" onclick="ctxAction('archive')">🗑️ Archive</div>
+        <div class="ctx-item" data-action="ctxAction" data-arg="challenge">⚠️ Challenge Claim</div>
+        <div class="ctx-item danger" data-action="ctxAction" data-arg="archive">🗑️ Archive</div>
     </div>
 
     <!-- V5: Compare Bar -->
     <div class="compare-bar" id="compareBar">
         <span class="compare-bar-text">Selected: <span class="compare-bar-count" id="compareCount">0</span>/2</span>
-        <button class="compare-bar-btn" id="compareBtn" disabled onclick="goToCompare()">Compare Claims</button>
-        <button class="compare-bar-clear" onclick="clearCompareSelection()" title="Clear">×</button>
+        <button class="compare-bar-btn" id="compareBtn" disabled data-action="goToCompare">Compare Claims</button>
+        <button class="compare-bar-clear" data-action="clearCompareSelection" title="Clear">×</button>
     </div>
 
     <!-- V5: Undo Bar -->
     <div class="undo-bar" id="undoBar">
         <span class="undo-text" id="undoText">Action completed</span>
-        <button class="undo-btn" onclick="undoLastAction()">Undo</button>
+        <button class="undo-btn" data-action="undoLastAction">Undo</button>
         <div class="undo-timer" id="undoTimer">5</div>
     </div>
 
@@ -3860,7 +3860,7 @@ document.addEventListener("DOMContentLoaded",function(){
                 <span class="mobile-nav-icon">💥</span>
                 <span>Blast</span>
             </div>
-            <div class="mobile-nav-item" onclick="openCommandPalette()">
+            <div class="mobile-nav-item" data-action="openCommandPalette">
                 <span class="mobile-nav-icon">🔍</span>
                 <span>Search</span>
             </div>
@@ -6342,6 +6342,61 @@ document.addEventListener("DOMContentLoaded",function(){
 
         // Add command for new claim
         commandItems.push({ icon: '➕', text: 'Create New Claim', key: 'N', action: function() { switchTab('newclaim'); } });
+
+        // Delegated action handlers (replaces inline event handlers)
+        document.addEventListener("click", function(e) {
+          var el = e.target.closest("[data-action]");
+          if (!el) return;
+          var action = el.dataset.action;
+          var arg = el.dataset.arg;
+          var map = {
+            toggleSidebar: function(){toggleSidebar()},
+            openIRIS: function(){openIRIS()},
+            openCommandPalette: function(){openCommandPalette()},
+            toggleFullscreen: function(){toggleFullscreen()},
+            exportData: function(){exportData()},
+            refreshDashboard: function(){refreshDashboard()},
+            switchTab: function(){switchTab(arg)},
+            bulkAction: function(){bulkAction(arg)},
+            clearBulkSelection: function(){clearBulkSelection()},
+            sortTable: function(){sortTable(arg)},
+            resetNewClaimForm: function(){resetNewClaimForm()},
+            saveClaimDraft: function(){saveClaimDraft()},
+            submitNewClaim: function(){submitNewClaim()},
+            closeModal: function(){closeModal(e)},
+            stopProp: function(){e.stopPropagation()},
+            closeCmdOverlay: function(){if(e.target===el)closeCommandPalette()},
+            ctxAction: function(){ctxAction(arg)},
+            goToCompare: function(){goToCompare()},
+            clearCompareSelection: function(){clearCompareSelection()},
+            undoLastAction: function(){undoLastAction()}
+          };
+          if (map[action]) map[action]();
+        });
+        document.addEventListener("change", function(e) {
+          var el = e.target.closest("[data-action]");
+          if (!el) return;
+          var action = el.dataset.action;
+          var map = {
+            filterClaimsTable: function(){filterClaimsTable()},
+            toggleSelectAll: function(){toggleSelectAll()},
+            generateClaimId: function(){generateClaimId()},
+            updateClaimPreview: function(){updateClaimPreview()}
+          };
+          if (map[action]) map[action]();
+        });
+        document.addEventListener("input", function(e) {
+          var el = e.target.closest("[data-action]");
+          if (!el) return;
+          var action = el.dataset.action;
+          var map = {
+            filterClaimsTable: function(){filterClaimsTable()},
+            updateClaimPreview: function(){updateClaimPreview()},
+            updateConfidenceDisplay: function(){updateConfidenceDisplay()},
+            updateGauge: function(){updateGauge(el.value)}
+          };
+          if (map[action]) map[action]();
+        });
 
         // Init
         document.addEventListener('DOMContentLoaded', init);
