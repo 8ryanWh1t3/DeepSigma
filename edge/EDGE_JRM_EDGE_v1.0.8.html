@@ -894,7 +894,7 @@ document.addEventListener("DOMContentLoaded",function(){
  </table>
  </div>
  <div class="row-hint" id="rowHint" style="display:none">Click any row to open the trace drawer &nbsp;|&nbsp; <kbd style="font-size:10px;padding:1px 4px;border-radius:3px;background:rgba(125,249,255,.08);border:1px solid rgba(125,249,255,.15);color:var(--accent)">J</kbd> <kbd style="font-size:10px;padding:1px 4px;border-radius:3px;background:rgba(125,249,255,.08);border:1px solid rgba(125,249,255,.15);color:var(--accent)">K</kbd> to navigate</div>
- <div id="runEmpty" class="muted" style="text-align:center;padding:30px">No data loaded yet. <button onclick="setTab('ingest')" style="background:none;border:none;color:var(--accent);cursor:pointer;text-decoration:underline;font-size:inherit">Go to Ingest</button> to load events, then press <strong>Start</strong>.</div>
+ <div id="runEmpty" class="muted" style="text-align:center;padding:30px">No data loaded yet. <button data-nav-tab="ingest" style="background:none;border:none;color:var(--accent);cursor:pointer;text-decoration:underline;font-size:inherit">Go to Ingest</button> to load events, then press <strong>Start</strong>.</div>
  <div class="load-more-wrap hidden" id="loadMoreWrap">
  <button id="btnLoadMore">Load More Rows</button>
  <div class="row-cap-msg" id="loadMoreMsg"></div>
@@ -918,7 +918,7 @@ document.addEventListener("DOMContentLoaded",function(){
 
  <!-- ── Trace Tab (full-width) ── -->
  <section id="tab-trace" class="hidden">
- <div id="traceFullView" class="muted" style="text-align:center;padding:30px">Run the pipeline on the <button onclick="setTab('run')" style="background:none;border:none;color:var(--accent);cursor:pointer;text-decoration:underline;font-size:inherit">Run</button> tab, then click any event row to view its full 9-stage trace here.</div>
+ <div id="traceFullView" class="muted" style="text-align:center;padding:30px">Run the pipeline on the <button data-nav-tab="run" style="background:none;border:none;color:var(--accent);cursor:pointer;text-decoration:underline;font-size:inherit">Run</button> tab, then click any event row to view its full 9-stage trace here.</div>
  </section>
 
  <!-- ── Packet Viewer Tab ── -->
@@ -929,7 +929,7 @@ document.addEventListener("DOMContentLoaded",function(){
  <div class="pkt-timeline" id="pktTimeline"></div>
  <div class="pkt-split">
  <div class="pkt-list" id="pktList">
- <div class="muted" style="padding:10px">No packets loaded. <button onclick="setTab('ingest')" style="background:none;border:none;color:var(--accent);cursor:pointer;text-decoration:underline;font-size:inherit">Load JRM-X packets</button> from the Ingest tab.</div>
+ <div class="muted" style="padding:10px">No packets loaded. <button data-nav-tab="ingest" style="background:none;border:none;color:var(--accent);cursor:pointer;text-decoration:underline;font-size:inherit">Load JRM-X packets</button> from the Ingest tab.</div>
  </div>
  <div class="pkt-detail" id="pktDetail">
  <div class="muted" style="padding:10px">Select a packet part to view its contents.</div>
@@ -5810,6 +5810,8 @@ window.addEventListener("DOMContentLoaded",()=>{
 
  // Tab switching
  document.querySelectorAll(".ttab").forEach(b=>b.addEventListener("click",()=>setTab(b.dataset.tab)));
+ // Inline-handler-free tab nav (data-nav-tab buttons)
+ document.addEventListener("click",e=>{var t=e.target.closest("[data-nav-tab]");if(t)setTab(t.dataset.navTab)});
 
  // Sub-score dropdown
  document.getElementById("subToggle").addEventListener("click",()=>{
