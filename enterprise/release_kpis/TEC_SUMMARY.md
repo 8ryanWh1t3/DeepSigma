@@ -3,30 +3,30 @@
 ## Latest Factors
 - Formula: **v3**
 - ICR: **GREEN** (RCF=1.0, RL_open=0)
-- PCR: **extreme** (CCF=0.7, CL14=699)
+- PCR: **extreme** (CCF=0.7, CL14=698)
 - Quality Factor: **1.0** (confidence-weighted KPI mean=10.0, n=8)
 - Stability Factor: **0.7985** (SSI=59.7)
 
 ## Edition Metrics
 - CORE: TEC=330.22 | C-TEC=184.58 | CC=0.5589
-- ENTERPRISE: TEC=1466.92 | C-TEC=819.93 | CC=0.5589
-- TOTAL: TEC=2689.98 | C-TEC=1503.56 | CC=0.5589
+- ENTERPRISE: TEC=1472.16 | C-TEC=822.86 | CC=0.5589
+- TOTAL: TEC=2695.22 | C-TEC=1506.49 | CC=0.5589
 
 ## Tiers (from TOTAL C-TEC)
 ### Internal @ $150/hr
-- Low:  1202.8 hrs | $180427
-- Base: 1503.6 hrs | $225534
-- High: 2029.8 hrs | $304471
+- Low:  1205.2 hrs | $180779
+- Base: 1506.5 hrs | $225974
+- High: 2033.8 hrs | $305064
 
 ### Executive @ $225/hr
-- Low:  1202.8 hrs | $270641
-- Base: 1503.6 hrs | $338301
-- High: 2029.8 hrs | $456706
+- Low:  1205.2 hrs | $271168
+- Base: 1506.5 hrs | $338960
+- High: 2033.8 hrs | $457596
 
 ### Public Sector Fully Burdened @ $275/hr
-- Low:  1202.8 hrs | $330783
-- Base: 1503.6 hrs | $413479
-- High: 2029.8 hrs | $558197
+- Low:  1205.2 hrs | $331428
+- Base: 1506.5 hrs | $414285
+- High: 2033.8 hrs | $559284
 
 ## Release KPI Scores
 
