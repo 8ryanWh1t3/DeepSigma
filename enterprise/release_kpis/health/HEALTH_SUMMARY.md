@@ -1,15 +1,15 @@
 # Health Summary (v2)
 
-- Generated: 2026-03-03T14:06:32Z
+- Generated: 2026-03-04T14:04:34Z
 - Source: `enterprise/release_kpis/health`
 
 ## Latest
 
 - CORE: TEC=330.22 | C-TEC=184.58 | KPI=1.0
-- ENTERPRISE: TEC=1472.16 | C-TEC=822.86 | KPI=1.0
-- TOTAL: TEC=2695.22 | C-TEC=1506.49 | KPI=-
+- ENTERPRISE: TEC=1477.32 | C-TEC=825.75 | KPI=1.0
+- TOTAL: TEC=2700.39 | C-TEC=1509.38 | KPI=-
 - ICR: GREEN | RL_open=0
-- PCR: extreme | CL14=698
+- PCR: extreme | CL14=679
 
 ## 7-Day Trend
 
@@ -21,6 +21,7 @@
 | 2026-03-01 | 364.28 | 1123.78 | 13111.7 | GREEN | 0 | 678 |
 | 2026-03-02 | 184.58 | 819.93 | 1503.56 | GREEN | 0 | 699 |
 | 2026-03-03 | 184.58 | 822.86 | 1506.49 | GREEN | 0 | 698 |
+| 2026-03-04 | 184.58 | 825.75 | 1509.38 | GREEN | 0 | 679 |
 
 ## Enforcement Signal
 
