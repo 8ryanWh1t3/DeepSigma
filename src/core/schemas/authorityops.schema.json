@@ -1,0 +1,260 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/authorityops.schema.json",
+  "title": "AuthorityOps Governance Schema",
+  "description": "Schema for AuthorityOps policy evaluation objects — authority, action, rationale, expiry, and audit.",
+  "$defs": {
+    "Actor": {
+      "type": "object",
+      "required": ["actorId", "actorType", "roles"],
+      "additionalProperties": false,
+      "properties": {
+        "actorId": { "type": "string", "minLength": 1 },
+        "actorType": { "type": "string", "enum": ["agent", "human", "system", "service"] },
+        "roles": { "type": "array", "items": { "$ref": "#/$defs/Role" } },
+        "delegatedFrom": { "type": ["string", "null"] },
+        "resolvedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Role": {
+      "type": "object",
+      "required": ["roleId", "roleName", "scope"],
+      "additionalProperties": false,
+      "properties": {
+        "roleId": { "type": "string", "minLength": 1 },
+        "roleName": { "type": "string", "minLength": 1 },
+        "scope": { "type": "string", "minLength": 1 },
+        "grantedAt": { "type": "string", "format": "date-time" },
+        "expiresAt": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
+    "Authority": {
+      "type": "object",
+      "required": ["authorityId", "sourceType", "scope", "effectiveAt"],
+      "additionalProperties": false,
+      "properties": {
+        "authorityId": { "type": "string", "pattern": "^AUTH-[a-f0-9]{8,}$" },
+        "sourceType": { "type": "string", "enum": ["policy", "delegation", "role_binding", "emergency"] },
+        "scope": { "type": "string" },
+        "effectiveAt": { "type": "string", "format": "date-time" },
+        "expiresAt": { "type": ["string", "null"], "format": "date-time" },
+        "constraints": { "type": "array", "items": { "$ref": "#/$defs/Constraint" } }
+      }
+    },
+    "Delegation": {
+      "type": "object",
+      "required": ["delegationId", "fromActorId", "toActorId", "scope", "effectiveAt"],
+      "additionalProperties": false,
+      "properties": {
+        "delegationId": { "type": "string", "minLength": 1 },
+        "fromActorId": { "type": "string", "minLength": 1 },
+        "toActorId": { "type": "string", "minLength": 1 },
+        "scope": { "type": "string" },
+        "maxDepth": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "effectiveAt": { "type": "string", "format": "date-time" },
+        "expiresAt": { "type": ["string", "null"], "format": "date-time" },
+        "revokedAt": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
+    "Action": {
+      "type": "object",
+      "required": ["actionId", "actionType", "resourceRef"],
+      "additionalProperties": false,
+      "properties": {
+        "actionId": { "type": "string", "minLength": 1 },
+        "actionType": { "type": "string", "minLength": 1 },
+        "resourceRef": { "type": "string", "minLength": 1 },
+        "blastRadiusTier": { "type": "string", "enum": ["tiny", "small", "medium", "large"] },
+        "idempotencyKey": { "type": "string" },
+        "episodeId": { "type": "string" }
+      }
+    },
+    "Resource": {
+      "type": "object",
+      "required": ["resourceId", "resourceType"],
+      "additionalProperties": false,
+      "properties": {
+        "resourceId": { "type": "string", "minLength": 1 },
+        "resourceType": { "type": "string", "minLength": 1 },
+        "owner": { "type": "string" },
+        "classification": { "type": "string" },
+        "constraints": { "type": "array", "items": { "$ref": "#/$defs/Constraint" } }
+      }
+    },
+    "Constraint": {
+      "type": "object",
+      "required": ["constraintId", "constraintType", "expression"],
+      "additionalProperties": false,
+      "properties": {
+        "constraintId": { "type": "string", "minLength": 1 },
+        "constraintType": {
+          "type": "string",
+          "enum": [
+            "time_window",
+            "blast_radius_max",
+            "requires_approval",
+            "requires_dlr",
+            "requires_reasoning",
+            "scope_limit",
+            "rate_limit"
+          ]
+        },
+        "expression": { "type": "string" },
+        "parameters": { "type": "object" }
+      }
+    },
+    "DecisionGate": {
+      "type": "object",
+      "required": ["gateId", "verdict", "evaluatedAt"],
+      "additionalProperties": false,
+      "properties": {
+        "gateId": { "type": "string", "minLength": 1 },
+        "verdict": {
+          "type": "string",
+          "enum": ["ALLOW", "BLOCK", "ESCALATE", "EXPIRED", "MISSING_REASONING", "KILL_SWITCH_ACTIVE"]
+        },
+        "evaluatedAt": { "type": "string", "format": "date-time" },
+        "policyRef": { "type": "string" },
+        "failedChecks": { "type": "array", "items": { "type": "string" } },
+        "passedChecks": { "type": "array", "items": { "type": "string" } },
+        "escalationTarget": { "type": ["string", "null"] }
+      }
+    },
+    "ApprovalPath": {
+      "type": "object",
+      "required": ["pathId", "requiredApprovers", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "pathId": { "type": "string", "minLength": 1 },
+        "requiredApprovers": { "type": "array", "items": { "type": "string" } },
+        "currentApprovals": { "type": "array", "items": { "type": "string" } },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected", "expired"] },
+        "deadline": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
+    "ReasoningRequirement": {
+      "type": "object",
+      "required": ["requirementId", "requiresDlr", "minimumClaims"],
+      "additionalProperties": false,
+      "properties": {
+        "requirementId": { "type": "string", "minLength": 1 },
+        "requiresDlr": { "type": "boolean" },
+        "minimumClaims": { "type": "integer", "minimum": 0 },
+        "requiredTruthTypes": { "type": "array", "items": { "type": "string" } },
+        "minimumConfidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "maxAssumptionAge": {
+          "type": "string",
+          "description": "ISO 8601 duration, e.g. PT24H"
+        }
+      }
+    },
+    "ExpiryCondition": {
+      "type": "object",
+      "required": ["conditionId", "conditionType"],
+      "additionalProperties": false,
+      "properties": {
+        "conditionId": { "type": "string", "minLength": 1 },
+        "conditionType": {
+          "type": "string",
+          "enum": ["time_absolute", "time_relative", "claim_half_life", "delegation_expiry", "external_event"]
+        },
+        "expiresAt": { "type": ["string", "null"], "format": "date-time" },
+        "halfLifeRef": { "type": ["string", "null"] },
+        "isExpired": { "type": "boolean" }
+      }
+    },
+    "RevocationEvent": {
+      "type": "object",
+      "required": ["revocationId", "targetType", "targetId", "revokedAt", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "revocationId": { "type": "string", "minLength": 1 },
+        "targetType": { "type": "string", "enum": ["authority", "delegation", "role", "policy"] },
+        "targetId": { "type": "string", "minLength": 1 },
+        "revokedAt": { "type": "string", "format": "date-time" },
+        "revokedBy": { "type": "string" },
+        "reason": { "type": "string" }
+      }
+    },
+    "GovernanceArtifact": {
+      "type": "object",
+      "required": ["artifactId", "artifactType", "createdAt"],
+      "additionalProperties": false,
+      "properties": {
+        "artifactId": { "type": "string", "minLength": 1 },
+        "artifactType": {
+          "type": "string",
+          "enum": ["policy_evaluation", "delegation_proof", "approval_record", "audit_trail"]
+        },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "episodeId": { "type": "string" },
+        "dlrRef": { "type": "string" },
+        "seal": {
+          "type": "object",
+          "required": ["hash", "sealedAt", "version"],
+          "additionalProperties": false,
+          "properties": {
+            "hash": { "type": "string" },
+            "sealedAt": { "type": "string", "format": "date-time" },
+            "version": { "type": "integer", "minimum": 1 },
+            "patchLog": { "type": "array", "items": { "type": "object" } }
+          }
+        }
+      }
+    },
+    "AuditRecord": {
+      "type": "object",
+      "required": ["auditId", "actionId", "actorId", "verdict", "evaluatedAt"],
+      "additionalProperties": false,
+      "properties": {
+        "auditId": { "type": "string", "pattern": "^AUDIT-[a-f0-9]{8,}$" },
+        "actionId": { "type": "string", "minLength": 1 },
+        "actorId": { "type": "string", "minLength": 1 },
+        "resourceId": { "type": "string" },
+        "verdict": {
+          "type": "string",
+          "enum": ["ALLOW", "BLOCK", "ESCALATE", "EXPIRED", "MISSING_REASONING", "KILL_SWITCH_ACTIVE"]
+        },
+        "evaluatedAt": { "type": "string", "format": "date-time" },
+        "policyRef": { "type": "string" },
+        "dlrRef": { "type": ["string", "null"] },
+        "assumptionSnapshot": { "type": "object" },
+        "expiryState": { "type": "object" },
+        "failedChecks": { "type": "array", "items": { "type": "string" } },
+        "passedChecks": { "type": "array", "items": { "type": "string" } },
+        "escalationPath": { "type": ["string", "null"] },
+        "chainHash": { "type": "string" },
+        "prevChainHash": { "type": ["string", "null"] },
+        "policyHash": { "type": "string" }
+      }
+    },
+    "PolicyEvaluation": {
+      "type": "object",
+      "required": ["evaluationId", "policyId", "steps", "verdict"],
+      "additionalProperties": false,
+      "properties": {
+        "evaluationId": { "type": "string", "minLength": 1 },
+        "policyId": { "type": "string", "minLength": 1 },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["stepName", "result"],
+            "additionalProperties": false,
+            "properties": {
+              "stepName": { "type": "string", "minLength": 1 },
+              "result": { "type": "string", "enum": ["pass", "fail", "skip", "error"] },
+              "detail": { "type": "string" },
+              "elapsedMs": { "type": "number" }
+            }
+          }
+        },
+        "verdict": {
+          "type": "string",
+          "enum": ["ALLOW", "BLOCK", "ESCALATE", "EXPIRED", "MISSING_REASONING", "KILL_SWITCH_ACTIVE"]
+        },
+        "evaluatedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

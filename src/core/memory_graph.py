@@ -32,6 +32,9 @@ class NodeKind(str, Enum):
     AUTHORITY_SLICE = "authority_slice"
     CANON_ENTRY = "canon_entry"
     PACKET_INDEX = "packet_index"
+    GOVERNANCE_ARTIFACT = "governance_artifact"
+    AUDIT_RECORD = "audit_record"
+    POLICY_EVALUATION = "policy_evaluation"
 
 
 class EdgeKind(str, Enum):
@@ -54,6 +57,14 @@ class EdgeKind(str, Enum):
     DETECTED_FROM = "detected_from"          # drift signal -> evidence ref
     CE_RESOLVES = "ce_resolves"              # canon entry -> claim
     ALS_AUTHORIZES = "als_authorizes"        # authority slice -> claim
+    CAN_ACT_ON = "can_act_on"              # actor -> resource
+    DELEGATED_TO = "delegated_to"          # actor -> actor
+    REQUIRES_DLR = "requires_dlr"          # gate -> reasoning_requirement
+    VALID_IF = "valid_if"                  # authority -> constraint
+    EXPIRES_WITH = "expires_with"          # authority -> expiry_condition
+    BLOCKED_BY = "blocked_by"              # action -> constraint
+    AUDITED_AS = "audited_as"              # gate -> audit_record
+    ESCALATES_TO = "escalates_to"          # gate -> approval_path
 
 
 @dataclass
@@ -356,6 +367,8 @@ class MemoryGraph:
             return self._query_claims(episode_id)
         if question == "stats":
             return self._query_stats()
+        if question == "authority":
+            return self._query_authority(episode_id)
         return {"error": f"Unknown question: {question}"}
 
     def _query_why(self, episode_id: str) -> Dict[str, Any]:
@@ -465,6 +478,118 @@ class MemoryGraph:
             "nodes_by_kind": kind_counts,
             "edges_by_kind": edge_counts,
         }
+
+    def _query_authority(self, episode_id: str) -> Dict[str, Any]:
+        """Governance artifacts and audit records linked to an episode."""
+        artifact_ids = [
+            e.target_id for e in self._edges
+            if e.source_id == episode_id
+            and e.kind == EdgeKind.PRODUCED
+            and e.target_id in self._nodes
+            and self._nodes[e.target_id].kind == NodeKind.GOVERNANCE_ARTIFACT
+        ]
+        artifact_nodes = [
+            asdict(self._nodes[a]) for a in artifact_ids if a in self._nodes
+        ]
+        audit_ids = [
+            nid for nid, node in self._nodes.items()
+            if node.kind == NodeKind.AUDIT_RECORD
+            and node.properties.get("action_id", "")
+            and any(
+                e.target_id == nid
+                for e in self._edges
+                if e.source_id in artifact_ids
+                and e.kind == EdgeKind.AUDITED_AS
+            )
+        ]
+        # Also include audit records linked to the episode directly
+        for nid, node in self._nodes.items():
+            if (
+                node.kind == NodeKind.AUDIT_RECORD
+                and nid not in audit_ids
+            ):
+                # Check if any property references this episode
+                props = node.properties
+                if props.get("episode_id") == episode_id:
+                    audit_ids.append(nid)
+        audit_nodes = [
+            asdict(self._nodes[a]) for a in audit_ids if a in self._nodes
+        ]
+        return {
+            "episode_id": episode_id,
+            "governance_artifacts": artifact_nodes,
+            "audit_records": audit_nodes,
+        }
+
+    # ------------------------------------------------------------------
+    # AuthorityOps ingest methods
+    # ------------------------------------------------------------------
+
+    def add_governance_artifact(self, artifact: Dict[str, Any]) -> str:
+        """Add a governance artifact node and link to episode/DLR."""
+        artifact = normalize_keys(artifact, style="snake")
+        artifact_id = artifact.get("artifact_id", "")
+        self._add_node(GraphNode(
+            node_id=artifact_id,
+            kind=NodeKind.GOVERNANCE_ARTIFACT,
+            label=artifact.get("artifact_type", ""),
+            timestamp=artifact.get("created_at"),
+            properties={
+                "episode_id": artifact.get("episode_id"),
+                "dlr_ref": artifact.get("dlr_ref"),
+                "seal_hash": artifact.get("seal_hash"),
+            },
+        ))
+        episode_id = artifact.get("episode_id", "")
+        if episode_id and episode_id in self._nodes:
+            self._add_edge(GraphEdge(
+                source_id=episode_id,
+                target_id=artifact_id,
+                kind=EdgeKind.PRODUCED,
+            ))
+        logger.debug("Added governance artifact node %s", artifact_id)
+        return artifact_id
+
+    def add_audit_record(self, record: Dict[str, Any]) -> str:
+        """Add an audit record node and link to governance artifact."""
+        record = normalize_keys(record, style="snake")
+        audit_id = record.get("audit_id", "")
+        self._add_node(GraphNode(
+            node_id=audit_id,
+            kind=NodeKind.AUDIT_RECORD,
+            label=record.get("verdict", ""),
+            timestamp=record.get("evaluated_at"),
+            properties={
+                "actor_id": record.get("actor_id"),
+                "action_id": record.get("action_id"),
+                "resource_id": record.get("resource_id"),
+                "verdict": record.get("verdict"),
+                "policy_ref": record.get("policy_ref"),
+                "dlr_ref": record.get("dlr_ref"),
+                "chain_hash": record.get("chain_hash"),
+                "failed_checks": record.get("failed_checks", []),
+            },
+        ))
+        logger.debug("Added audit record node %s", audit_id)
+        return audit_id
+
+    def add_policy_evaluation(self, evaluation: Dict[str, Any]) -> str:
+        """Add a policy evaluation node with step details."""
+        evaluation = normalize_keys(evaluation, style="snake")
+        eval_id = evaluation.get("evaluation_id", "")
+        self._add_node(GraphNode(
+            node_id=eval_id,
+            kind=NodeKind.POLICY_EVALUATION,
+            label=evaluation.get("verdict", ""),
+            timestamp=evaluation.get("evaluated_at"),
+            properties={
+                "policy_id": evaluation.get("policy_id"),
+                "verdict": evaluation.get("verdict"),
+                "step_count": len(evaluation.get("steps", [])),
+            },
+        ))
+        logger.debug("Added policy evaluation node %s", eval_id)
+        return eval_id
 
     def to_json(self, indent: int = 2) -> str:
         """Serialise the full graph to JSON."""

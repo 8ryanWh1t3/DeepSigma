@@ -38,12 +38,25 @@
     "RE-F09": {"testFile": "tests/test_reops.py", "testClass": "TestCoherenceCheck"},
     "RE-F10": {"testFile": "tests/test_reops.py", "testClass": "TestReflectionIngest"},
     "RE-F11": {"testFile": "tests/test_reops.py", "testClass": "TestIRISResolve"},
-    "RE-F12": {"testFile": "tests/test_reops.py", "testClass": "TestEpisodeReplay"}
+    "RE-F12": {"testFile": "tests/test_reops.py", "testClass": "TestEpisodeReplay"},
+    "AUTH-F01": {"testFile": "tests/test_authorityops.py", "testClass": "TestAuthF01ActionIntake"},
+    "AUTH-F02": {"testFile": "tests/test_authorityops.py", "testClass": "TestAuthF02ActorResolve"},
+    "AUTH-F03": {"testFile": "tests/test_authorityops.py", "testClass": "TestAuthF03ResourceResolve"},
+    "AUTH-F04": {"testFile": "tests/test_authorityops.py", "testClass": "TestAuthF04PolicyLoad"},
+    "AUTH-F05": {"testFile": "tests/test_authorityops.py", "testClass": "TestAuthF05DlrPresence"},
+    "AUTH-F06": {"testFile": "tests/test_authorityops.py", "testClass": "TestAuthF06AssumptionValidate"},
+    "AUTH-F07": {"testFile": "tests/test_authorityops.py", "testClass": "TestAuthF07HalfLifeCheck"},
+    "AUTH-F08": {"testFile": "tests/test_authorityops.py", "testClass": "TestAuthF08BlastRadius"},
+    "AUTH-F09": {"testFile": "tests/test_authorityops.py", "testClass": "TestAuthF09KillSwitch"},
+    "AUTH-F10": {"testFile": "tests/test_authorityops.py", "testClass": "TestAuthF10DecisionGate"},
+    "AUTH-F11": {"testFile": "tests/test_authorityops.py", "testClass": "TestAuthF11AuditEmit"},
+    "AUTH-F12": {"testFile": "tests/test_authorityops.py", "testClass": "TestAuthF12DelegationChain"}
   },
   "integration": {
     "intelops": {"testFile": "tests/test_intelops.py", "testClass": "TestAtomicLoop"},
     "franops": {"testFile": "tests/test_franops.py", "testClass": "TestCanonLifecycle"},
     "reflectionops": {"testFile": "tests/test_reops.py", "testClass": "TestEpisodeLifecycle"},
-    "cascade": {"testFile": "tests/test_cascade.py", "testClass": "TestMultiStepCascade"}
+    "cascade": {"testFile": "tests/test_cascade.py", "testClass": "TestMultiStepCascade"},
+    "authorityops": {"testFile": "tests/test_authorityops.py", "testClass": "TestAuthorityOpsIntegration"}
   }
 }

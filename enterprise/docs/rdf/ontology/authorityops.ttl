@@ -1,0 +1,234 @@
+@prefix ds:    <https://deepsigma.ai/ns/coherence#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+
+ds: a owl:Ontology ;
+  rdfs:label "AuthorityOps Ontology" .
+
+# =============================================================================
+# CLASSES (14)
+# =============================================================================
+
+ds:Actor              a owl:Class ; rdfs:label "Actor" ;
+  rdfs:comment "An entity (agent, human, system, service) requesting authority to act." .
+
+ds:Role               a owl:Class ; rdfs:label "Role" ;
+  rdfs:comment "A scoped role binding for an actor." .
+
+ds:Authority          a owl:Class ; rdfs:label "Authority" ;
+  rdfs:comment "A resolved authority grant for a specific scope." .
+
+ds:Delegation         a owl:Class ; rdfs:label "Delegation" ;
+  rdfs:comment "A delegation of authority from one actor to another." .
+
+ds:Action             a owl:Class ; rdfs:label "Action" ;
+  rdfs:comment "A generic action within the coherence system." .
+
+ds:AuthoritativeAction a owl:Class ; rdfs:label "Authoritative Action" ;
+  rdfs:subClassOf ds:Action ;
+  rdfs:comment "An action subject to authority evaluation." .
+
+ds:GovernedResource   a owl:Class ; rdfs:label "Governed Resource" ;
+  rdfs:comment "A resource targeted by an authoritative action." .
+
+ds:PolicyConstraint   a owl:Class ; rdfs:label "Policy Constraint" ;
+  rdfs:comment "A single evaluable policy constraint." .
+
+ds:DecisionGate       a owl:Class ; rdfs:label "Decision Gate" ;
+  rdfs:comment "The terminal evaluation point producing ALLOW/BLOCK/ESCALATE." .
+
+ds:ApprovalPath       a owl:Class ; rdfs:label "Approval Path" ;
+  rdfs:comment "An escalation/approval workflow path." .
+
+ds:ReasoningRequirement a owl:Class ; rdfs:label "Reasoning Requirement" ;
+  rdfs:comment "Requirements for reasoning sufficiency (DLR, claims, confidence)." .
+
+ds:ExpiryCondition    a owl:Class ; rdfs:label "Expiry Condition" ;
+  rdfs:comment "A condition that can expire an authority grant." .
+
+ds:RevocationEvent    a owl:Class ; rdfs:label "Revocation Event" ;
+  rdfs:comment "An event revoking authority, delegation, or policy." .
+
+ds:GovernanceArtifact a owl:Class ; rdfs:label "Governance Artifact" ;
+  rdfs:comment "A sealed governance artifact produced by AuthorityOps." .
+
+ds:AuditRecord        a owl:Class ; rdfs:label "Audit Record" ;
+  rdfs:comment "An immutable audit record for an authority evaluation." .
+
+# =============================================================================
+# OBJECT PROPERTIES (8)
+# =============================================================================
+
+ds:canActOn       a owl:ObjectProperty ; rdfs:label "can act on" ;
+  rdfs:domain ds:Actor ; rdfs:range ds:GovernedResource .
+
+ds:delegatedTo    a owl:ObjectProperty ; rdfs:label "delegated to" ;
+  rdfs:domain ds:Actor ; rdfs:range ds:Actor .
+
+ds:requiresDlr    a owl:ObjectProperty ; rdfs:label "requires DLR" ;
+  rdfs:domain ds:DecisionGate ; rdfs:range ds:ReasoningRequirement .
+
+ds:validIf        a owl:ObjectProperty ; rdfs:label "valid if" ;
+  rdfs:domain ds:Authority ; rdfs:range ds:PolicyConstraint .
+
+ds:expiresWith    a owl:ObjectProperty ; rdfs:label "expires with" ;
+  rdfs:domain ds:Authority ; rdfs:range ds:ExpiryCondition .
+
+ds:blockedBy      a owl:ObjectProperty ; rdfs:label "blocked by" ;
+  rdfs:domain ds:AuthoritativeAction ; rdfs:range ds:PolicyConstraint .
+
+ds:auditedAs      a owl:ObjectProperty ; rdfs:label "audited as" ;
+  rdfs:domain ds:DecisionGate ; rdfs:range ds:AuditRecord .
+
+ds:escalatesTo    a owl:ObjectProperty ; rdfs:label "escalates to" ;
+  rdfs:domain ds:DecisionGate ; rdfs:range ds:ApprovalPath .
+
+# =============================================================================
+# DATATYPE PROPERTIES
+# =============================================================================
+
+### Actor
+ds:actorId          a owl:DatatypeProperty ; rdfs:label "actor ID" ;
+  rdfs:domain ds:Actor ; rdfs:range xsd:string .
+
+ds:actorType        a owl:DatatypeProperty ; rdfs:label "actor type" ;
+  rdfs:domain ds:Actor ; rdfs:range xsd:string .
+
+### Role
+ds:roleId           a owl:DatatypeProperty ; rdfs:label "role ID" ;
+  rdfs:domain ds:Role ; rdfs:range xsd:string .
+
+ds:roleName         a owl:DatatypeProperty ; rdfs:label "role name" ;
+  rdfs:domain ds:Role ; rdfs:range xsd:string .
+
+ds:roleScope        a owl:DatatypeProperty ; rdfs:label "role scope" ;
+  rdfs:domain ds:Role ; rdfs:range xsd:string .
+
+### Authority
+ds:authorityId      a owl:DatatypeProperty ; rdfs:label "authority ID" ;
+  rdfs:domain ds:Authority ; rdfs:range xsd:string .
+
+ds:grantedAt        a owl:DatatypeProperty ; rdfs:label "granted at" ;
+  rdfs:domain ds:Authority ; rdfs:range xsd:dateTime .
+
+ds:authorityScope   a owl:DatatypeProperty ; rdfs:label "authority scope" ;
+  rdfs:domain ds:Authority ; rdfs:range xsd:string .
+
+### Delegation
+ds:delegationId     a owl:DatatypeProperty ; rdfs:label "delegation ID" ;
+  rdfs:domain ds:Delegation ; rdfs:range xsd:string .
+
+ds:delegatedAt      a owl:DatatypeProperty ; rdfs:label "delegated at" ;
+  rdfs:domain ds:Delegation ; rdfs:range xsd:dateTime .
+
+ds:delegationReason a owl:DatatypeProperty ; rdfs:label "delegation reason" ;
+  rdfs:domain ds:Delegation ; rdfs:range xsd:string .
+
+### AuthoritativeAction
+ds:actionId         a owl:DatatypeProperty ; rdfs:label "action ID" ;
+  rdfs:domain ds:AuthoritativeAction ; rdfs:range xsd:string .
+
+ds:actionType       a owl:DatatypeProperty ; rdfs:label "action type" ;
+  rdfs:domain ds:AuthoritativeAction ; rdfs:range xsd:string .
+
+ds:requestedAt      a owl:DatatypeProperty ; rdfs:label "requested at" ;
+  rdfs:domain ds:AuthoritativeAction ; rdfs:range xsd:dateTime .
+
+### GovernedResource
+ds:resourceId       a owl:DatatypeProperty ; rdfs:label "resource ID" ;
+  rdfs:domain ds:GovernedResource ; rdfs:range xsd:string .
+
+ds:resourceType     a owl:DatatypeProperty ; rdfs:label "resource type" ;
+  rdfs:domain ds:GovernedResource ; rdfs:range xsd:string .
+
+### PolicyConstraint
+ds:constraintId     a owl:DatatypeProperty ; rdfs:label "constraint ID" ;
+  rdfs:domain ds:PolicyConstraint ; rdfs:range xsd:string .
+
+ds:constraintExpr   a owl:DatatypeProperty ; rdfs:label "constraint expression" ;
+  rdfs:domain ds:PolicyConstraint ; rdfs:range xsd:string .
+
+ds:constraintSeverity a owl:DatatypeProperty ; rdfs:label "constraint severity" ;
+  rdfs:domain ds:PolicyConstraint ; rdfs:range xsd:string .
+
+### DecisionGate
+ds:gateId           a owl:DatatypeProperty ; rdfs:label "gate ID" ;
+  rdfs:domain ds:DecisionGate ; rdfs:range xsd:string .
+
+ds:verdict          a owl:DatatypeProperty ; rdfs:label "verdict" ;
+  rdfs:domain ds:DecisionGate ; rdfs:range xsd:string .
+
+ds:evaluatedAt      a owl:DatatypeProperty ; rdfs:label "evaluated at" ;
+  rdfs:domain ds:DecisionGate ; rdfs:range xsd:dateTime .
+
+### ApprovalPath
+ds:approvalPathId   a owl:DatatypeProperty ; rdfs:label "approval path ID" ;
+  rdfs:domain ds:ApprovalPath ; rdfs:range xsd:string .
+
+ds:approverChain    a owl:DatatypeProperty ; rdfs:label "approver chain" ;
+  rdfs:domain ds:ApprovalPath ; rdfs:range xsd:string .
+
+ds:escalationLevel  a owl:DatatypeProperty ; rdfs:label "escalation level" ;
+  rdfs:domain ds:ApprovalPath ; rdfs:range xsd:integer .
+
+### ReasoningRequirement
+ds:minConfidence    a owl:DatatypeProperty ; rdfs:label "minimum confidence" ;
+  rdfs:domain ds:ReasoningRequirement ; rdfs:range xsd:decimal .
+
+ds:requiredClaimCount a owl:DatatypeProperty ; rdfs:label "required claim count" ;
+  rdfs:domain ds:ReasoningRequirement ; rdfs:range xsd:integer .
+
+ds:dlrThreshold     a owl:DatatypeProperty ; rdfs:label "DLR threshold" ;
+  rdfs:domain ds:ReasoningRequirement ; rdfs:range xsd:decimal .
+
+### ExpiryCondition
+ds:expiryType       a owl:DatatypeProperty ; rdfs:label "expiry type" ;
+  rdfs:domain ds:ExpiryCondition ; rdfs:range xsd:string .
+
+ds:expiresAt        a owl:DatatypeProperty ; rdfs:label "expires at" ;
+  rdfs:domain ds:ExpiryCondition ; rdfs:range xsd:dateTime .
+
+ds:ttlSeconds       a owl:DatatypeProperty ; rdfs:label "TTL seconds" ;
+  rdfs:domain ds:ExpiryCondition ; rdfs:range xsd:integer .
+
+### RevocationEvent
+ds:revocationId     a owl:DatatypeProperty ; rdfs:label "revocation ID" ;
+  rdfs:domain ds:RevocationEvent ; rdfs:range xsd:string .
+
+ds:revokedAt        a owl:DatatypeProperty ; rdfs:label "revoked at" ;
+  rdfs:domain ds:RevocationEvent ; rdfs:range xsd:dateTime .
+
+ds:revocationReason a owl:DatatypeProperty ; rdfs:label "revocation reason" ;
+  rdfs:domain ds:RevocationEvent ; rdfs:range xsd:string .
+
+ds:revokedTarget    a owl:DatatypeProperty ; rdfs:label "revoked target" ;
+  rdfs:domain ds:RevocationEvent ; rdfs:range xsd:string .
+
+### GovernanceArtifact
+ds:artifactId       a owl:DatatypeProperty ; rdfs:label "artifact ID" ;
+  rdfs:domain ds:GovernanceArtifact ; rdfs:range xsd:string .
+
+ds:artifactHash     a owl:DatatypeProperty ; rdfs:label "artifact hash" ;
+  rdfs:domain ds:GovernanceArtifact ; rdfs:range xsd:string .
+
+ds:sealedAt         a owl:DatatypeProperty ; rdfs:label "sealed at" ;
+  rdfs:domain ds:GovernanceArtifact ; rdfs:range xsd:dateTime .
+
+ds:artifactType     a owl:DatatypeProperty ; rdfs:label "artifact type" ;
+  rdfs:domain ds:GovernanceArtifact ; rdfs:range xsd:string .
+
+### AuditRecord
+ds:auditId          a owl:DatatypeProperty ; rdfs:label "audit ID" ;
+  rdfs:domain ds:AuditRecord ; rdfs:range xsd:string .
+
+ds:auditTimestamp   a owl:DatatypeProperty ; rdfs:label "audit timestamp" ;
+  rdfs:domain ds:AuditRecord ; rdfs:range xsd:dateTime .
+
+ds:auditVerdict     a owl:DatatypeProperty ; rdfs:label "audit verdict" ;
+  rdfs:domain ds:AuditRecord ; rdfs:range xsd:string .
+
+ds:auditRationale   a owl:DatatypeProperty ; rdfs:label "audit rationale" ;
+  rdfs:domain ds:AuditRecord ; rdfs:range xsd:string .

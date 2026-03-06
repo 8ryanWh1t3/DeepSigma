@@ -200,6 +200,40 @@ def minimal_authority_entry():
 
 
 @pytest.fixture
+def minimal_action_request():
+    """Factory fixture producing minimal valid action request dicts."""
+    def _make(action_id="ACT-TEST-001", actor_id="agent-001", **overrides):
+        r = {
+            "actionId": action_id,
+            "actionType": "quarantine",
+            "actorId": actor_id,
+            "resourceRef": "resource-001",
+            "episodeId": "EP-TEST-001",
+            "blastRadiusTier": "small",
+        }
+        r.update(overrides)
+        return r
+    return _make
+
+
+@pytest.fixture
+def minimal_policy_pack():
+    """Factory fixture producing minimal valid policy pack dicts."""
+    def _make(**overrides):
+        p = {
+            "policyPackId": "PP-TEST-001",
+            "version": "1.0.0",
+            "constraints": [],
+            "requiresDlr": True,
+            "maxBlastRadius": "medium",
+            "minimumConfidence": 0.7,
+        }
+        p.update(overrides)
+        return p
+    return _make
+
+
+@pytest.fixture
 def minimal_feed_envelope():
     """Factory fixture producing minimal valid FEEDS envelope dicts."""
     from core.feeds import build_envelope, FeedTopic

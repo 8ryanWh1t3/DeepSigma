@@ -1,0 +1,480 @@
+@prefix ds:   <https://deepsigma.ai/ns/coherence#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# =============================================================================
+# AUTHORITYOPS — SHACL Validation Shapes
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Actor shape
+# -----------------------------------------------------------------------------
+
+ds:ActorShape
+    a sh:NodeShape ;
+    sh:targetClass ds:Actor ;
+    rdfs:label "Actor Shape"@en ;
+    rdfs:comment "Validates an Actor instance."@en ;
+
+    sh:property [
+              sh:path ds:actorId ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:minLength 1 ;
+                              sh:message "actorId is required (unique string identifier)." ;
+                          ] ;
+    sh:property [
+              sh:path ds:actorType ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:in ( "agent" "human" "system" "service" ) ;
+                              sh:message "actorType is required and must be one of: agent, human, system, service." ;
+                          ] .
+
+# -----------------------------------------------------------------------------
+# Role shape
+# -----------------------------------------------------------------------------
+
+ds:RoleShape
+    a sh:NodeShape ;
+    sh:targetClass ds:Role ;
+    rdfs:label "Role Shape"@en ;
+    rdfs:comment "Validates a Role instance."@en ;
+
+    sh:property [
+              sh:path ds:roleId ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:minLength 1 ;
+                              sh:message "roleId is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:roleName ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:minLength 1 ;
+                              sh:message "roleName is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:roleScope ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:message "roleScope is required." ;
+                          ] .
+
+# -----------------------------------------------------------------------------
+# Authority shape
+# -----------------------------------------------------------------------------
+
+ds:AuthorityShape
+    a sh:NodeShape ;
+    sh:targetClass ds:Authority ;
+    rdfs:label "Authority Shape"@en ;
+    rdfs:comment "Validates an Authority grant instance."@en ;
+
+    sh:property [
+              sh:path ds:authorityId ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:minLength 1 ;
+                              sh:message "authorityId is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:grantedAt ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:dateTime ;
+                              sh:message "grantedAt is required (xsd:dateTime)." ;
+                          ] ;
+    sh:property [
+              sh:path ds:authorityScope ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:message "authorityScope is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:validIf ;
+                              sh:minCount 1 ;
+                              sh:class ds:PolicyConstraint ;
+                              sh:message "Authority must have at least one PolicyConstraint (ds:validIf)." ;
+                          ] .
+
+# -----------------------------------------------------------------------------
+# Delegation shape
+# -----------------------------------------------------------------------------
+
+ds:DelegationShape
+    a sh:NodeShape ;
+    sh:targetClass ds:Delegation ;
+    rdfs:label "Delegation Shape"@en ;
+    rdfs:comment "Validates a Delegation instance."@en ;
+
+    sh:property [
+              sh:path ds:delegationId ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:minLength 1 ;
+                              sh:message "delegationId is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:delegatedAt ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:dateTime ;
+                              sh:message "delegatedAt is required (xsd:dateTime)." ;
+                          ] ;
+    sh:property [
+              sh:path ds:delegatedTo ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:class ds:Actor ;
+                              sh:message "delegatedTo must reference exactly one target Actor." ;
+                          ] ;
+    sh:property [
+              sh:path ds:delegationReason ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:message "delegationReason is required." ;
+                          ] .
+
+# -----------------------------------------------------------------------------
+# AuthoritativeAction shape
+# -----------------------------------------------------------------------------
+
+ds:AuthoritativeActionShape
+    a sh:NodeShape ;
+    sh:targetClass ds:AuthoritativeAction ;
+    rdfs:label "Authoritative Action Shape"@en ;
+    rdfs:comment "Validates an AuthoritativeAction instance."@en ;
+
+    sh:property [
+              sh:path ds:actionId ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:minLength 1 ;
+                              sh:message "actionId is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:actionType ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:message "actionType is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:requestedAt ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:dateTime ;
+                              sh:message "requestedAt is required (xsd:dateTime)." ;
+                          ] .
+
+# -----------------------------------------------------------------------------
+# GovernedResource shape
+# -----------------------------------------------------------------------------
+
+ds:GovernedResourceShape
+    a sh:NodeShape ;
+    sh:targetClass ds:GovernedResource ;
+    rdfs:label "Governed Resource Shape"@en ;
+    rdfs:comment "Validates a GovernedResource instance."@en ;
+
+    sh:property [
+              sh:path ds:resourceId ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:minLength 1 ;
+                              sh:message "resourceId is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:resourceType ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:message "resourceType is required." ;
+                          ] .
+
+# -----------------------------------------------------------------------------
+# PolicyConstraint shape
+# -----------------------------------------------------------------------------
+
+ds:PolicyConstraintShape
+    a sh:NodeShape ;
+    sh:targetClass ds:PolicyConstraint ;
+    rdfs:label "Policy Constraint Shape"@en ;
+    rdfs:comment "Validates a PolicyConstraint instance."@en ;
+
+    sh:property [
+              sh:path ds:constraintId ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:minLength 1 ;
+                              sh:message "constraintId is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:constraintExpr ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:minLength 1 ;
+                              sh:message "constraintExpr is required (evaluable expression)." ;
+                          ] ;
+    sh:property [
+              sh:path ds:constraintSeverity ;
+                              sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:in ( "BLOCK" "WARN" "INFO" ) ;
+                              sh:message "constraintSeverity must be one of: BLOCK, WARN, INFO." ;
+                          ] .
+
+# -----------------------------------------------------------------------------
+# DecisionGate shape
+# -----------------------------------------------------------------------------
+
+ds:DecisionGateShape
+    a sh:NodeShape ;
+    sh:targetClass ds:DecisionGate ;
+    rdfs:label "Decision Gate Shape"@en ;
+    rdfs:comment "Validates a DecisionGate instance."@en ;
+
+    sh:property [
+              sh:path ds:gateId ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:minLength 1 ;
+                              sh:message "gateId is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:verdict ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:in ( "ALLOW" "BLOCK" "ESCALATE" ) ;
+                              sh:message "verdict is required and must be one of: ALLOW, BLOCK, ESCALATE." ;
+                          ] ;
+    sh:property [
+              sh:path ds:evaluatedAt ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:dateTime ;
+                              sh:message "evaluatedAt is required (xsd:dateTime)." ;
+                          ] ;
+    sh:property [
+              sh:path ds:requiresDlr ;
+                              sh:class ds:ReasoningRequirement ;
+                              sh:message "requiresDlr must reference a ReasoningRequirement." ;
+                          ] ;
+    sh:property [
+              sh:path ds:auditedAs ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:class ds:AuditRecord ;
+                              sh:message "Every DecisionGate must produce an AuditRecord (ds:auditedAs)." ;
+                          ] ;
+    sh:property [
+              sh:path ds:escalatesTo ;
+                              sh:class ds:ApprovalPath ;
+                              sh:message "escalatesTo must reference an ApprovalPath if present." ;
+                          ] .
+
+# -----------------------------------------------------------------------------
+# ApprovalPath shape
+# -----------------------------------------------------------------------------
+
+ds:ApprovalPathShape
+    a sh:NodeShape ;
+    sh:targetClass ds:ApprovalPath ;
+    rdfs:label "Approval Path Shape"@en ;
+    rdfs:comment "Validates an ApprovalPath instance."@en ;
+
+    sh:property [
+              sh:path ds:approvalPathId ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:minLength 1 ;
+                              sh:message "approvalPathId is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:approverChain ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:message "approverChain is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:escalationLevel ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:integer ;
+                              sh:minInclusive 1 ;
+                              sh:message "escalationLevel is required (integer >= 1)." ;
+                          ] .
+
+# -----------------------------------------------------------------------------
+# ReasoningRequirement shape
+# -----------------------------------------------------------------------------
+
+ds:ReasoningRequirementShape
+    a sh:NodeShape ;
+    sh:targetClass ds:ReasoningRequirement ;
+    rdfs:label "Reasoning Requirement Shape"@en ;
+    rdfs:comment "Validates a ReasoningRequirement instance."@en ;
+
+    sh:property [
+              sh:path ds:minConfidence ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:decimal ;
+                              sh:minInclusive 0.00 ;
+                              sh:maxInclusive 1.00 ;
+                              sh:message "minConfidence is required (0.00-1.00)." ;
+                          ] ;
+    sh:property [
+              sh:path ds:requiredClaimCount ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:integer ;
+                              sh:minInclusive 0 ;
+                              sh:message "requiredClaimCount is required (integer >= 0)." ;
+                          ] ;
+    sh:property [
+              sh:path ds:dlrThreshold ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:decimal ;
+                              sh:minInclusive 0.00 ;
+                              sh:maxInclusive 1.00 ;
+                              sh:message "dlrThreshold is required (0.00-1.00)." ;
+                          ] .
+
+# -----------------------------------------------------------------------------
+# ExpiryCondition shape
+# -----------------------------------------------------------------------------
+
+ds:ExpiryConditionShape
+    a sh:NodeShape ;
+    sh:targetClass ds:ExpiryCondition ;
+    rdfs:label "Expiry Condition Shape"@en ;
+    rdfs:comment "Validates an ExpiryCondition instance."@en ;
+
+    sh:property [
+              sh:path ds:expiryType ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:in ( "absolute" "ttl" "event-driven" ) ;
+                              sh:message "expiryType is required and must be one of: absolute, ttl, event-driven." ;
+                          ] ;
+    sh:property [
+              sh:path ds:expiresAt ;
+                              sh:maxCount 1 ;
+                              sh:datatype xsd:dateTime ;
+                              sh:message "expiresAt must be xsd:dateTime if present." ;
+                          ] ;
+    sh:property [
+              sh:path ds:ttlSeconds ;
+                              sh:maxCount 1 ;
+                              sh:datatype xsd:integer ;
+                              sh:minInclusive 1 ;
+                              sh:message "ttlSeconds must be a positive integer if present." ;
+                          ] .
+
+# -----------------------------------------------------------------------------
+# RevocationEvent shape
+# -----------------------------------------------------------------------------
+
+ds:RevocationEventShape
+    a sh:NodeShape ;
+    sh:targetClass ds:RevocationEvent ;
+    rdfs:label "Revocation Event Shape"@en ;
+    rdfs:comment "Validates a RevocationEvent instance."@en ;
+
+    sh:property [
+              sh:path ds:revocationId ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:minLength 1 ;
+                              sh:message "revocationId is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:revokedAt ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:dateTime ;
+                              sh:message "revokedAt is required (xsd:dateTime)." ;
+                          ] ;
+    sh:property [
+              sh:path ds:revocationReason ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:message "revocationReason is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:revokedTarget ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:message "revokedTarget is required (ID of revoked authority, delegation, or policy)." ;
+                          ] .
+
+# -----------------------------------------------------------------------------
+# GovernanceArtifact shape
+# -----------------------------------------------------------------------------
+
+ds:GovernanceArtifactShape
+    a sh:NodeShape ;
+    sh:targetClass ds:GovernanceArtifact ;
+    rdfs:label "Governance Artifact Shape"@en ;
+    rdfs:comment "Validates a GovernanceArtifact instance."@en ;
+
+    sh:property [
+              sh:path ds:artifactId ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:minLength 1 ;
+                              sh:message "artifactId is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:artifactHash ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:minLength 1 ;
+                              sh:message "artifactHash is required (sealed integrity hash)." ;
+                          ] ;
+    sh:property [
+              sh:path ds:sealedAt ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:dateTime ;
+                              sh:message "sealedAt is required (xsd:dateTime)." ;
+                          ] ;
+    sh:property [
+              sh:path ds:artifactType ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:message "artifactType is required." ;
+                          ] .
+
+# -----------------------------------------------------------------------------
+# AuditRecord shape
+# -----------------------------------------------------------------------------
+
+ds:AuditRecordShape
+    a sh:NodeShape ;
+    sh:targetClass ds:AuditRecord ;
+    rdfs:label "Audit Record Shape"@en ;
+    rdfs:comment "Validates an AuditRecord instance."@en ;
+
+    sh:property [
+              sh:path ds:auditId ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:minLength 1 ;
+                              sh:message "auditId is required." ;
+                          ] ;
+    sh:property [
+              sh:path ds:auditTimestamp ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:dateTime ;
+                              sh:message "auditTimestamp is required (xsd:dateTime)." ;
+                          ] ;
+    sh:property [
+              sh:path ds:auditVerdict ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:in ( "ALLOW" "BLOCK" "ESCALATE" ) ;
+                              sh:message "auditVerdict is required and must be one of: ALLOW, BLOCK, ESCALATE." ;
+                          ] ;
+    sh:property [
+              sh:path ds:auditRationale ;
+                              sh:minCount 1 ; sh:maxCount 1 ;
+                              sh:datatype xsd:string ;
+                              sh:minLength 1 ;
+                              sh:message "auditRationale is required." ;
+                          ] .
+
+# =============================================================================
+# END OF AUTHORITYOPS SHACL SHAPES
+# =============================================================================

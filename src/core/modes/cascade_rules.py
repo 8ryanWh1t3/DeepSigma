@@ -103,6 +103,75 @@ RULES: List[CascadeRule] = [
         description="Any red-severity drift signal triggers centralized severity scoring.",
         severity_filter="red",
     ),
+
+    # ── AuthorityOps cascade rules ──────────────────────────────
+
+    # ReOps -> AuthorityOps
+    CascadeRule(
+        rule_id="CASCADE-R08",
+        name="sealed_episode_triggers_authority",
+        source_domain="reflectionops",
+        source_subtype="episode_sealed",
+        target_domain="authorityops",
+        target_function_id="AUTH-F01",
+        description="Sealed episode triggers authority evaluation for pending actions.",
+    ),
+
+    # AuthorityOps -> FranOps
+    CascadeRule(
+        rule_id="CASCADE-R09",
+        name="authority_block_triggers_enforce",
+        source_domain="authorityops",
+        source_subtype="authority_block",
+        target_domain="franops",
+        target_function_id="FRAN-F03",
+        description="Authority block triggers canon enforcement review.",
+    ),
+
+    # AuthorityOps -> ReOps
+    CascadeRule(
+        rule_id="CASCADE-R10",
+        name="authority_escalation_triggers_episode",
+        source_domain="authorityops",
+        source_subtype="authority_escalate",
+        target_domain="reflectionops",
+        target_function_id="RE-F01",
+        description="Authority escalation creates a new review episode.",
+    ),
+
+    # IntelOps -> AuthorityOps
+    CascadeRule(
+        rule_id="CASCADE-R11",
+        name="authority_mismatch_triggers_delegation",
+        source_domain="intelops",
+        source_subtype="authority_mismatch",
+        target_domain="authorityops",
+        target_function_id="AUTH-F12",
+        description="Authority mismatch in IntelOps triggers delegation chain validation.",
+    ),
+
+    # AuthorityOps -> IntelOps
+    CascadeRule(
+        rule_id="CASCADE-R12",
+        name="stale_assumptions_trigger_recalc",
+        source_domain="authorityops",
+        source_subtype="assumptions_stale",
+        target_domain="intelops",
+        target_function_id="INTEL-F12",
+        description="Stale assumptions in authority check trigger confidence recalculation.",
+    ),
+
+    # AuthorityOps kill-switch passthrough
+    CascadeRule(
+        rule_id="CASCADE-R13",
+        name="killswitch_blocks_authority",
+        source_domain="authorityops",
+        source_subtype="killswitch_active",
+        target_domain="reflectionops",
+        target_function_id="RE-F06",
+        description="Kill-switch active in authority check propagates to ReOps freeze.",
+        severity_filter="red",
+    ),
 ]
 
 
