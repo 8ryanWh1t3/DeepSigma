@@ -1,12 +1,12 @@
 # Constitution Gate Report
 
-**Generated:** 2026-02-28T04:50:26.019783+00:00
+**Generated:** 2026-03-06T03:39:20.768048+00:00
 **Result:** PASS
 
 
 ## Schema Fingerprints: PASS
 
-28 schemas match manifest. Fingerprint: sha256:53581ea223795478
+Manifest regenerated. 29 schemas locked. Fingerprint: sha256:0d644818569cd5e0
 
 ## Version Parity: PASS
 
