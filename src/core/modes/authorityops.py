@@ -301,7 +301,7 @@ class AuthorityOps(DomainMode):
         claims = ctx.get("claims", payload.get("claims", []))
         now = ctx.get("now", datetime.now(timezone.utc))
         if isinstance(now, str):
-            now = datetime.fromisoformat(now)
+            now = datetime.fromisoformat(now.replace("Z", "+00:00"))
         events: List[Dict[str, Any]] = []
         drift_signals: List[Dict[str, Any]] = []
 
@@ -311,7 +311,7 @@ class AuthorityOps(DomainMode):
             expires_at = half_life.get("expiresAt", half_life.get("expires_at"))
             if expires_at:
                 try:
-                    exp = datetime.fromisoformat(expires_at)
+                    exp = datetime.fromisoformat(expires_at.replace("Z", "+00:00"))
                     if exp.tzinfo is None:
                         exp = exp.replace(tzinfo=timezone.utc)
                     if now >= exp:

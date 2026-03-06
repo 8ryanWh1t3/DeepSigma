@@ -12,6 +12,11 @@ from typing import Any, Dict, List, Optional, Tuple
 logger = logging.getLogger(__name__)
 
 
+def _parse_iso(s: str) -> datetime:
+    """Parse ISO-8601 with Z suffix (Python 3.10 compat)."""
+    return datetime.fromisoformat(s.replace("Z", "+00:00"))
+
+
 def check_dlr_presence(
     dlr_ref: Optional[str],
     context: Dict[str, Any],
@@ -67,7 +72,7 @@ def check_assumption_freshness(
 
         if expires_at:
             try:
-                exp = datetime.fromisoformat(expires_at)
+                exp = _parse_iso(expires_at)
                 if exp.tzinfo is None:
                     exp = exp.replace(tzinfo=timezone.utc)
                 if now >= exp:

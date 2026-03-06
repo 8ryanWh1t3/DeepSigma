@@ -21,6 +21,12 @@ from .models import (
 
 logger = logging.getLogger(__name__)
 
+
+def _parse_iso(s: str) -> datetime:
+    """Parse ISO-8601 with Z suffix (Python 3.10 compat)."""
+    return datetime.fromisoformat(s.replace("Z", "+00:00"))
+
+
 # Blast radius tier ordering for comparison
 _BLAST_RADIUS_ORDER = {"tiny": 0, "small": 1, "medium": 2, "large": 3}
 
@@ -43,7 +49,7 @@ def evaluate(
     """
     now = context.get("now", datetime.now(timezone.utc))
     if isinstance(now, str):
-        now = datetime.fromisoformat(now)
+        now = _parse_iso(now)
 
     gate_id = f"GATE-{uuid.uuid4().hex[:12]}"
     steps: List[PolicyEvaluationStep] = []
@@ -223,7 +229,7 @@ def _step_half_life_check(
         expires_at = half_life.get("expiresAt", half_life.get("expires_at"))
         if expires_at:
             try:
-                exp = datetime.fromisoformat(expires_at)
+                exp = _parse_iso(expires_at)
                 if exp.tzinfo is None:
                     exp = exp.replace(tzinfo=timezone.utc)
                 if now >= exp:

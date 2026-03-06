@@ -15,6 +15,11 @@ from .models import Actor, Delegation
 logger = logging.getLogger(__name__)
 
 
+def _parse_iso(s: str) -> datetime:
+    """Parse ISO-8601 with Z suffix (Python 3.10 compat)."""
+    return datetime.fromisoformat(s.replace("Z", "+00:00"))
+
+
 def validate_chain(
     delegations: List[Delegation],
     actor: Actor,
@@ -92,7 +97,7 @@ def check_expiry(
         return True  # No expiry set
 
     try:
-        expires = datetime.fromisoformat(delegation.expires_at)
+        expires = _parse_iso(delegation.expires_at)
         if expires.tzinfo is None:
             expires = expires.replace(tzinfo=timezone.utc)
         return now < expires
