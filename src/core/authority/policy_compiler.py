@@ -21,6 +21,7 @@ from .models import (
     PolicyEvaluationStep,
     ReasoningRequirement,
 )
+from .policy_source import PolicySource
 from .seal_and_hash import canonical_json as _canonical_json, compute_hash
 
 logger = logging.getLogger(__name__)
@@ -145,7 +146,7 @@ def extract_constraints(
     return result
 
 
-def compile_from_source(source: "PolicySource") -> CompiledPolicy:
+def compile_from_source(source: PolicySource) -> CompiledPolicy:
     """Compile a PolicySource into a CompiledPolicy (OpenPQL pipeline entry).
 
     Uses existing ``extract_constraints`` and ``extract_reasoning_requirements``

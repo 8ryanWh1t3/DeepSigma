@@ -457,7 +457,7 @@ class AuthorityOps(DomainMode):
                 "evaluation_id": result.gate_id,
                 "verdict": verdict,
                 "evaluated_at": result.evaluated_at,
-                "policy_id": result.policy_ref,
+                "policy_id": getattr(result, "policy_ref", getattr(result, "artifact_id", "")),
                 "steps": [],
             })
             if eval_id:
