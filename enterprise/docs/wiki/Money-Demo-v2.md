@@ -1,10 +1,10 @@
 # Money Demo v2 — End-to-End Domain Mode Exercise
 
-> One command. Ten steps. Three domains. Full governance loop with before/after metrics.
+> One command. Ten steps. Four domains. Full governance loop with before/after metrics.
 
 ## Overview
 
-The Money Demo v2 is a 10-step pipeline that exercises all three domain modes (IntelOps, FranOps, ReflectionOps) plus the cascade engine. It ingests baseline claims, introduces a contradicting delta, detects drift, executes a retcon, propagates cascades, runs coherence checks, and seals the episode.
+The Money Demo v2 is a 10-step pipeline that exercises all four domain modes (IntelOps, FranOps, ReflectionOps, AuthorityOps) plus the cascade engine. It ingests baseline claims, introduces a contradicting delta, detects drift, executes a retcon, propagates cascades, runs coherence checks, and seals the episode.
 
 **Run it**: `make demo-money` or `python -m enterprise.src.demos.money_demo`
 
@@ -58,8 +58,8 @@ This triggers contradiction detection, drift signals, and a retcon of CLAIM-MONE
 ## Infrastructure Initialized
 
 The pipeline creates:
-- `IntelOps`, `FranOps`, `ReflectionOps` domain mode instances
-- `CascadeEngine` with all three domains registered
+- `IntelOps`, `FranOps`, `ReflectionOps`, `AuthorityOps` domain mode instances
+- `CascadeEngine` with all four domains registered
 - `MemoryGraph` for claim/drift/patch nodes
 - `DriftSignalCollector` for drift ingestion
 - `EpisodeTracker` for episode state management
@@ -84,5 +84,6 @@ Every handler call returns a `FunctionResult` with a `replay_hash` (SHA-256 of d
 - [IntelOps](IntelOps) — claim lifecycle domain
 - [FranOps](FranOps) — canon enforcement domain
 - [ReflectionOps](ReflectionOps) — gate enforcement domain
+- [AuthorityOps](AuthorityOps) — authority enforcement domain
 - [Cascade Engine](Cascade-Engine) — cross-domain propagation
 - [Event Contracts](Event-Contracts) — routing table

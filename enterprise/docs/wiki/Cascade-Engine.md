@@ -21,6 +21,12 @@ The Cascade Engine subscribes to all domain event streams, matches declarative r
 | CASCADE-R05 | `freeze_stales_claims` | ReflectionOps | `episodes_frozen` | IntelOps | INTEL-F11 | Half-life check on related claims |
 | CASCADE-R06 | `killswitch_freezes_all` | ReflectionOps | `killswitch_activated` (red) | ReflectionOps | RE-F06 | All domains freeze |
 | CASCADE-R07 | `red_drift_triggers_severity` | Any (`*`) | Any (`*`) with red severity | ReflectionOps | RE-F08 | Centralized severity scoring |
+| CASCADE-R08 | `sealed_episode_triggers_authority` | ReflectionOps | `episode_sealed` | AuthorityOps | AUTH-F01 | Sealed episode triggers authority evaluation |
+| CASCADE-R09 | `authority_block_triggers_enforce` | AuthorityOps | `authority_block` | FranOps | FRAN-F03 | Authority block triggers canon enforcement |
+| CASCADE-R10 | `authority_escalate_triggers_episode` | AuthorityOps | `authority_escalate` | ReflectionOps | RE-F01 | Escalation creates review episode |
+| CASCADE-R11 | `authority_mismatch_triggers_delegation` | IntelOps | `authority_mismatch` | AuthorityOps | AUTH-F12 | Mismatch triggers delegation check |
+| CASCADE-R12 | `stale_assumptions_trigger_recalc` | AuthorityOps | `assumptions_stale` | IntelOps | INTEL-F12 | Stale assumptions trigger confidence recalc |
+| CASCADE-R13 | `killswitch_propagates_to_authority` | AuthorityOps | `killswitch_active` | ReflectionOps | RE-F06 | Kill-switch propagates to ReOps freeze |
 
 ## How It Works
 
@@ -29,6 +35,7 @@ engine = CascadeEngine()
 engine.register_domain(intel)
 engine.register_domain(fran)
 engine.register_domain(reops)
+engine.register_domain(authops)
 
 result = engine.propagate(
     source_domain="franops",
@@ -70,13 +77,19 @@ Default `max_depth=3`. Each recursive call decrements by 1. At depth 0, no furth
 See [Diagram 24 — Domain Modes & Cascade](../mermaid/24-domain-modes-cascade.md) for the full visual.
 
 ```
-IntelOps ──[contradiction]──> FranOps (R01)
-IntelOps ──[supersede]─────> FranOps (R02)
-FranOps  ──[retcon]────────> ReflectionOps (R03)
-FranOps  ──[retcon cascade]─> IntelOps (R04)
-ReOps    ──[freeze]────────> IntelOps (R05)
-ReOps    ──[killswitch]────> ReOps (R06)
-Any      ──[red drift]────> ReOps (R07)
+IntelOps      ──[contradiction]──────> FranOps (R01)
+IntelOps      ──[supersede]──────────> FranOps (R02)
+FranOps       ──[retcon]─────────────> ReflectionOps (R03)
+FranOps       ──[retcon cascade]─────> IntelOps (R04)
+ReOps         ──[freeze]─────────────> IntelOps (R05)
+ReOps         ──[killswitch]─────────> ReOps (R06)
+Any           ──[red drift]──────────> ReOps (R07)
+ReOps         ──[episode sealed]─────> AuthorityOps (R08)
+AuthorityOps  ──[authority block]────> FranOps (R09)
+AuthorityOps  ──[escalate]───────────> ReOps (R10)
+IntelOps      ──[authority mismatch]─> AuthorityOps (R11)
+AuthorityOps  ──[stale assumptions]──> IntelOps (R12)
+AuthorityOps  ──[killswitch active]──> ReOps (R13)
 ```
 
 ## Related Pages
@@ -84,5 +97,6 @@ Any      ──[red drift]────> ReOps (R07)
 - [IntelOps](IntelOps) — claim lifecycle domain
 - [FranOps](FranOps) — canon enforcement domain
 - [ReflectionOps](ReflectionOps) — gate enforcement domain
+- [AuthorityOps](AuthorityOps) — authority enforcement domain
 - [Event Contracts](Event-Contracts) — routing table
 - [Drift to Patch](Drift-to-Patch) — drift lifecycle

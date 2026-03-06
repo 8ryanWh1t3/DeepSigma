@@ -4,7 +4,7 @@
 
 ## Overview
 
-IntelOps is the first of three executable domain modes. It wraps existing FEEDS consumers (ClaimValidator, ClaimTriggerPipeline, AuthorityGateConsumer, EvidenceCheckConsumer, TriageStore) into 12 function handlers keyed by `INTEL-F01` through `INTEL-F12`.
+IntelOps is the first of four executable domain modes. It wraps existing FEEDS consumers (ClaimValidator, ClaimTriggerPipeline, AuthorityGateConsumer, EvidenceCheckConsumer, TriageStore) into 12 function handlers keyed by `INTEL-F01` through `INTEL-F12`.
 
 **Module**: `src/core/modes/intelops.py`
 

@@ -157,21 +157,22 @@ DeepSigma uses a hybrid approach: external fairness tools (AIF360, Fairlearn, or
 
 ## What are domain modes?
 
-Three executable domain mode modules that wire existing building blocks (FEEDS, Memory Graph, claim validator, canon store, drift detection) into automated pipelines with deterministic replay:
+Four executable domain mode modules that wire existing building blocks (FEEDS, Memory Graph, claim validator, canon store, drift detection) into automated pipelines with deterministic replay:
 
 - **IntelOps** — 12 function handlers (INTEL-F01–F12) for claim lifecycle automation: ingest, validate, drift detect, patch recommend, MG update, canon promote, authority check, evidence verify, triage, supersede, half-life check, confidence recalc.
 - **FranOps** — 12 function handlers (FRAN-F01–F12) for canon enforcement: propose, bless, enforce, retcon assess/execute/propagate, inflation monitor, expire, supersede, scope check, drift detect, rollback.
 - **ReflectionOps** — 12 function handlers (RE-F01–F12) for gate enforcement: episode begin/seal/archive, gate evaluate/degrade/killswitch, non-coercion audit, severity score, coherence check, reflection ingest, IRIS resolve, episode replay.
+- **AuthorityOps** — 12 function handlers (AUTH-F01–F12) for reasoning-bound authority enforcement: action intake, actor/resource resolve, policy load, DLR presence check, assumption validate, half-life check, blast radius threshold, kill-switch check, decision gate, audit emit, delegation chain validate.
 
 Every handler returns a `FunctionResult` with `replay_hash` (SHA-256) for deterministic verification. See `src/core/modes/`.
 
 ## What is the cascade engine?
 
-Cross-domain event propagation with 7 declarative rules. When an event in one domain matches a rule, the cascade engine invokes the target domain's handler. Rules include: claim contradiction → canon review, canon retcon → episode flag, killswitch → all domains freeze. Depth-limited to prevent infinite loops. See `src/core/modes/cascade.py`.
+Cross-domain event propagation with 13 declarative rules. When an event in one domain matches a rule, the cascade engine invokes the target domain's handler. Rules include: claim contradiction → canon review, canon retcon → episode flag, killswitch → all domains freeze, sealed episode → authority evaluation, authority block → canon enforcement. Depth-limited to prevent infinite loops. See `src/core/modes/cascade.py`.
 
 ## What are event contracts?
 
-A declarative routing table (`src/core/feeds/contracts/routing_table.json`) mapping all 36 function handlers + 39 events to their FEEDS topics, subtypes, handler paths, required payload fields, and emitted events. Contract validation occurs at publish time. Query the table via `RoutingTable.get_function()` and `get_event()`.
+A declarative routing table (`src/core/feeds/contracts/routing_table.json`) mapping all 48 function handlers + 51 events to their FEEDS topics, subtypes, handler paths, required payload fields, and emitted events. Contract validation occurs at publish time. Query the table via `RoutingTable.get_function()` and `get_event()`.
 
 ## What is the canon workflow state machine?
 
@@ -191,7 +192,7 @@ An emergency halt mechanism: freezes all ACTIVE episodes, emits a sealed halt pr
 
 ## What is the Money Demo v2?
 
-A 10-step end-to-end pipeline exercising all 3 domain modes: LOAD → INTELOPS INGEST → VALIDATE → DELTA → FRANOPS PROPOSE → RETCON → REOPS EPISODE → CASCADE → COHERENCE → SEAL. Uses fixture data (3 baseline claims + 1 contradiction) to demonstrate drift detection, retcon execution, cascade propagation, and coherence scoring. Run via `make demo-money` or `python -m demos.money_demo`.
+A 10-step end-to-end pipeline exercising all 4 domain modes: LOAD → INTELOPS INGEST → VALIDATE → DELTA → FRANOPS PROPOSE → RETCON → REOPS EPISODE → CASCADE → COHERENCE → SEAL. Uses fixture data (3 baseline claims + 1 contradiction) to demonstrate drift detection, retcon execution, cascade propagation, and coherence scoring. Run via `make demo-money` or `python -m demos.money_demo`.
 
 ## What is JRM?
 

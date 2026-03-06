@@ -84,6 +84,7 @@ Canonical wiki structure for Sigma OVERWATCH / DeepSigma docs.
 - [IntelOps](IntelOps)
 - [FranOps](FranOps)
 - [ReflectionOps](ReflectionOps)
+- [AuthorityOps](AuthorityOps)
 - [Cascade Engine](Cascade-Engine)
 - [Event Contracts](Event-Contracts)
 - [Money Demo v2](Money-Demo-v2)

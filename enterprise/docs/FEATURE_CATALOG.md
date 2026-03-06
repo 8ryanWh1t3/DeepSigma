@@ -549,7 +549,7 @@ Docker images for coherence, exhaust, MCP, tools, and OTEL workloads with CI val
   - KPI axes: Enterprise_Readiness, Scalability
 
 ### Domain Modes & Cascade Engine
-Three executable domain mode modules (IntelOps, FranOps, ReflectionOps) with 36 function handlers, cross-domain cascade propagation, event contracts, and deterministic replay.
+Four executable domain mode modules (IntelOps, FranOps, ReflectionOps, AuthorityOps) with 48 function handlers, cross-domain cascade propagation, event contracts, and deterministic replay.
 
 - **IntelOps Domain Mode** (`INTELOPS`)
   - Claim lifecycle automation: ingest, validate, drift detect, patch recommend, MG update, canon promote, authority check, evidence verify, triage, supersede, half-life check, confidence recalc. 12 function handlers (INTEL-F01 through INTEL-F12).
@@ -566,13 +566,18 @@ Three executable domain mode modules (IntelOps, FranOps, ReflectionOps) with 36 
   - Artifacts: src/core/modes/reflectionops.py, src/core/episode_state.py, src/core/severity.py, src/core/audit_log.py, src/core/killswitch.py
   - Enforcement: tests/test_reops.py, make test-reops
   - KPI axes: Technical_Completeness, Operational_Maturity
+- **AuthorityOps Domain Mode** (`AUTHORITYOPS`)
+  - Reasoning-bound authority enforcement: action intake, actor/resource resolve, policy load, DLR presence check, assumption validate, half-life check, blast radius threshold, kill-switch check, decision gate, audit emit, delegation chain validate. 12 function handlers (AUTH-F01 through AUTH-F12). 6 verdict statuses: ALLOW, BLOCK, ESCALATE, EXPIRED, MISSING_REASONING, KILL_SWITCH_ACTIVE.
+  - Artifacts: src/core/modes/authorityops.py, src/core/authority/policy_runtime.py, src/core/authority/models.py, src/core/authority/authority_audit.py
+  - Enforcement: tests/test_authorityops.py, tests/test_authority_modules.py
+  - KPI axes: Authority_Modeling, Technical_Completeness
 - **Cascade Engine** (`CASCADE_ENGINE`)
-  - Cross-domain event propagation with 7 declarative rules: claim contradiction → canon review, claim supersede → canon update, canon retcon → episode flag, canon retcon → dependent claim invalidation, episode freeze → stale claims, killswitch → all domains freeze, red drift → auto-degrade. Depth-limited to prevent infinite loops.
+  - Cross-domain event propagation with 13 declarative rules: 7 core rules (claim contradiction → canon review, claim supersede → canon update, canon retcon → episode flag, canon retcon → dependent claim invalidation, episode freeze → stale claims, killswitch → all domains freeze, red drift → auto-degrade) + 6 AuthorityOps rules (sealed episode → authority evaluation, authority block → canon enforcement, authority escalate → review episode, authority mismatch → delegation check, stale assumptions → confidence recalc, killswitch active → ReOps freeze). Depth-limited to prevent infinite loops.
   - Artifacts: src/core/modes/cascade.py, src/core/modes/cascade_rules.py
   - Enforcement: tests/test_cascade.py, make test-cascade
   - KPI axes: Technical_Completeness, Automation_Depth
 - **Event Contracts & Routing Table** (`EVENT_CONTRACTS`)
-  - Declarative routing table mapping 36 functions + 39 events to FEEDS topics, subtypes, handler paths, required payload fields, and emitted events. Contract validation at publish time.
+  - Declarative routing table mapping 48 functions + 51 events to FEEDS topics, subtypes, handler paths, required payload fields, and emitted events. Contract validation at publish time.
   - Artifacts: src/core/feeds/contracts/routing_table.json, src/core/feeds/contracts/loader.py, src/core/feeds/contracts/validator.py
   - Enforcement: tests/test_feeds_contracts.py, make validate-contracts
   - KPI axes: Technical_Completeness, Automation_Depth
@@ -612,12 +617,12 @@ Three executable domain mode modules (IntelOps, FranOps, ReflectionOps) with 36 
   - Enforcement: tests/test_franops.py
   - KPI axes: Operational_Maturity, Authority_Modeling
 - **Money Demo v2** (`MONEY_DEMO_V2`)
-  - 10-step end-to-end pipeline: LOAD → INTELOPS INGEST → VALIDATE → DELTA → FRANOPS PROPOSE → RETCON → REOPS EPISODE → CASCADE → COHERENCE → SEAL. Exercises all 3 domain modes with drift detection, retcon execution, and cascade propagation.
+  - 10-step end-to-end pipeline: LOAD → INTELOPS INGEST → VALIDATE → DELTA → FRANOPS PROPOSE → RETCON → REOPS EPISODE → CASCADE → COHERENCE → SEAL. Exercises all 4 domain modes with drift detection, retcon execution, and cascade propagation.
   - Artifacts: enterprise/src/demos/money_demo/pipeline.py, enterprise/src/demos/money_demo/fixtures/
   - Enforcement: tests/test_money_demo_v2.py, make test-money-v2
   - KPI axes: Operational_Maturity, Technical_Completeness
 - **Coverage Gate** (`COVERAGE_GATE`)
-  - CI gate enforcing test coverage for all 36 function handlers. Coverage matrix maps every Function ID to its test file and class.
+  - CI gate enforcing test coverage for all 48 function handlers. Coverage matrix maps every Function ID to its test file and class.
   - Artifacts: tests/coverage_matrix.json, tests/test_coverage_gate.py
   - Enforcement: make validate-coverage
   - KPI axes: Automation_Depth, Technical_Completeness

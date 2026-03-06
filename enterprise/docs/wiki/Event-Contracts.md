@@ -4,7 +4,7 @@
 
 ## Overview
 
-Event Contracts define the declarative routing table that maps all 36 domain function handlers and 39 events to their FEEDS topics, subtypes, handler paths, required payload fields, and emitted events.
+Event Contracts define the declarative routing table that maps all 48 domain function handlers and 51 events to their FEEDS topics, subtypes, handler paths, required payload fields, and emitted events.
 
 **Modules**:
 - `src/core/feeds/contracts/routing_table.json` — the manifest
@@ -39,7 +39,7 @@ Each function entry in the routing table:
 }
 ```
 
-## Function Registry (36 Functions)
+## Function Registry (48 Functions)
 
 ### IntelOps (12)
 
@@ -91,6 +91,23 @@ Each function entry in the routing table:
 | RE-F10 | `reflection_ingest` | decision_lineage | episode_sealed |
 | RE-F11 | `iris_resolve` | decision_lineage | iris_query |
 | RE-F12 | `episode_replay` | decision_lineage | episode_replay |
+
+### AuthorityOps (12)
+
+| ID | Name | Input Topic | Input Subtype |
+|----|------|-------------|---------------|
+| AUTH-F01 | `action_request_intake` | authority_slice | action_request |
+| AUTH-F02 | `actor_resolve` | authority_slice | actor_resolve |
+| AUTH-F03 | `resource_resolve` | authority_slice | resource_resolve |
+| AUTH-F04 | `policy_load` | authority_slice | policy_load |
+| AUTH-F05 | `dlr_presence_check` | decision_lineage | dlr_check |
+| AUTH-F06 | `assumption_validate` | truth_snapshot | assumption_check |
+| AUTH-F07 | `half_life_check` | truth_snapshot | half_life_check |
+| AUTH-F08 | `blast_radius_threshold` | authority_slice | blast_radius_check |
+| AUTH-F09 | `kill_switch_check` | drift_signal | killswitch_check |
+| AUTH-F10 | `decision_gate` | authority_slice | decision_gate |
+| AUTH-F11 | `audit_record_emit` | authority_slice | audit_emit |
+| AUTH-F12 | `delegation_chain_validate` | authority_slice | delegation_check |
 
 ## Querying the Routing Table
 
@@ -165,14 +182,15 @@ The Domino Delegation Encryption module (EDGE) defines 9 events across 3 domains
 
 ## FEEDS Topic Mapping
 
-All 36 functions route through the existing 6 FEEDS topics:
+All 48 functions route through the existing 6 FEEDS topics plus `authority_slice`:
 
 | Topic | Functions |
 |-------|-----------|
-| `truth_snapshot` | INTEL-F01 |
+| `truth_snapshot` | INTEL-F01; AUTH-F06, F07 |
 | `canon_entry` | INTEL-F02, F05, F06, F10; FRAN-F01–F06, F08–F10, F12 |
-| `drift_signal` | INTEL-F03, F04, F07–F09, F11, F12; FRAN-F07, F11; RE-F04–F06, F08, F09 |
-| `decision_lineage` | INTEL-F07, F08; RE-F01–F03, F07, F10–F12 |
+| `drift_signal` | INTEL-F03, F04, F07–F09, F11, F12; FRAN-F07, F11; RE-F04–F06, F08, F09; AUTH-F09 |
+| `decision_lineage` | INTEL-F07, F08; RE-F01–F03, F07, F10–F12; AUTH-F05 |
+| `authority_slice` | AUTH-F01–F04, F08, F10–F12 |
 | `mg_update` | INTEL-F05 |
 | `coherence_report` | RE-F09 |
 
@@ -212,6 +230,7 @@ The Judgment Refinement Module extends the routing table with a 5-stage coherenc
 - [IntelOps](IntelOps) — claim lifecycle domain
 - [FranOps](FranOps) — canon enforcement domain
 - [ReflectionOps](ReflectionOps) — gate enforcement domain
+- [AuthorityOps](AuthorityOps) — authority enforcement domain
 - [Cascade Engine](Cascade-Engine) — cross-domain propagation
 - [FEEDS Pipeline](FEEDS-Pipeline) — event-driven pub/sub
 - [JRM Pipeline](JRM-Pipeline) — log-agnostic refinement engine

@@ -23,7 +23,7 @@ Eighteen diagrams define the visual language of Sigma OVERWATCH. Everything else
 | 21 | [Scalability Benchmark Pipeline](21-scalability-benchmark-pipeline.md) | Flowchart | CI-eligible benchmark, regression gate, trend visualization, KPI integration (v2.0.8) |
 | 22 | [Authority + Economic Evidence](22-authority-economic-evidence.md) | Flowchart | Authority custody, refusal contracts, evidence export, economic metrics uncapping (v2.0.9) |
 | 23 | [Competitive Gap Closure](23-competitive-gap-closure.md) | Graph | RuntimeGate, OTel span tracing, connector instrumentation, encryption-at-rest, fairness adapter (v2.1.0) |
-| 24 | [Domain Modes & Cascade](24-domain-modes-cascade.md) | Graph | IntelOps/FranOps/ReflectionOps (36 handlers), cascade engine (7 rules), event contracts (v2.1.0) |
+| 24 | [Domain Modes & Cascade](24-domain-modes-cascade.md) | Graph | IntelOps/FranOps/ReflectionOps/AuthorityOps (48 handlers), cascade engine (13 rules), event contracts (v2.1.0) |
 | 25 | [JRM Pipeline & Federation](25-jrm-pipeline.md) | Graph | 3 adapters, 5-stage pipeline, JRM-X packets, enterprise gate/hub/advisory/signing |
 
 ## Archive

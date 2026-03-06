@@ -14,12 +14,12 @@ Agent Frameworks (LangChain/LangGraph/etc)
    │  - Verification                │
    │  - Sealing + Drift→Patch       │
    │  ┌───────────────────────────┐ │
-   │  │  Domain Modes (36 funcs)  │ │
-   │  │  IntelOps → FranOps       │ │
+   │  │  Domain Modes (48 funcs)  │ │
+   │  │  IntelOps → ReOps →      │ │
+   │  │  AuthorityOps → FranOps  │ │
    │  │      ↕ Cascade ↕          │ │
-   │  │  ReflectionOps            │ │
    │  └───────────────────────────┘ │
-   │  - Event Contracts (39 events) │
+   │  - Event Contracts (51 events) │
    │  - FEEDS pub/sub routing       │
    └───────────────────────────────┘
           |

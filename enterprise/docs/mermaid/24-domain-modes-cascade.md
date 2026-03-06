@@ -1,6 +1,6 @@
 # 24 — Domain Modes & Cascade Engine
 
-Three executable domain modes (36 function handlers) with cross-domain cascade propagation, event contracts, and deterministic replay.
+Four executable domain modes (48 function handlers) with cross-domain cascade propagation, event contracts, and deterministic replay.
 
 ```mermaid
 graph TB
@@ -46,7 +46,21 @@ graph TB
         RF02 --> RF12[RE-F12 episode_replay]
     end
 
-    subgraph "Cascade Engine (7 rules)"
+    subgraph "AuthorityOps (12 handlers)"
+        AF01[AUTH-F01 action_request_intake] --> AF02[AUTH-F02 actor_resolve]
+        AF02 --> AF03[AUTH-F03 resource_resolve]
+        AF03 --> AF04[AUTH-F04 policy_load]
+        AF04 --> AF05[AUTH-F05 dlr_presence_check]
+        AF05 --> AF06[AUTH-F06 assumption_validate]
+        AF06 --> AF07[AUTH-F07 half_life_check]
+        AF07 --> AF08[AUTH-F08 blast_radius_threshold]
+        AF08 --> AF09[AUTH-F09 kill_switch_check]
+        AF09 --> AF10[AUTH-F10 decision_gate]
+        AF10 --> AF11[AUTH-F11 audit_record_emit]
+        AF01 --> AF12[AUTH-F12 delegation_chain_validate]
+    end
+
+    subgraph "Cascade Engine (13 rules)"
         C1[Claim contradiction] -->|canon review| FF04
         C2[Claim supersede] -->|canon update| FF09
         C3[Canon retcon] -->|episode flag| RF01
@@ -54,14 +68,21 @@ graph TB
         C5[Episode freeze] -->|stale claims| IF11
         C6[Kill-switch] -->|freeze all| RF06
         C7[Red drift] -->|auto-degrade| RF05
+        C8[Episode sealed] -->|authority eval| AF01
+        C9[Authority block] -->|canon enforce| FF03
+        C10[Authority escalate] -->|review episode| RF01
+        C11[Authority mismatch] -->|delegation check| AF12
+        C12[Stale assumptions] -->|confidence recalc| IF12
+        C13[Killswitch active] -->|freeze| RF06
     end
 
     subgraph "Event Contracts"
-        RT[routing_table.json] --> |36 functions| FEEDS[FEEDS pub/sub]
-        RT --> |39 events| FEEDS
+        RT[routing_table.json] --> |48 functions| FEEDS[FEEDS pub/sub]
+        RT --> |51 events| FEEDS
         FEEDS --> IF01
         FEEDS --> FF01
         FEEDS --> RF01
+        FEEDS --> AF01
     end
 
     IF03 -.->|drift signal| C1
@@ -71,6 +92,12 @@ graph TB
     RF06 -.->|freeze event| C5
     RF06 -.->|killswitch| C6
     IF03 -.->|red drift| C7
+    RF02 -.->|episode sealed| C8
+    AF10 -.->|authority block| C9
+    AF10 -.->|escalate| C10
+    IF07 -.->|authority mismatch| C11
+    AF06 -.->|stale assumptions| C12
+    AF09 -.->|killswitch active| C13
 ```
 
 ## Support Modules
@@ -85,4 +112,7 @@ graph TB
 | Severity Scorer | Centralized drift severity | `src/core/severity.py` |
 | Audit Log | Hash-chained NDJSON | `src/core/audit_log.py` |
 | Killswitch | Emergency freeze + halt proof | `src/core/killswitch.py` |
-| Cascade Rules | 7 declarative CascadeRule objects | `src/core/modes/cascade_rules.py` |
+| Cascade Rules | 13 declarative CascadeRule objects | `src/core/modes/cascade_rules.py` |
+| Authority Models | AuthorityOps dataclasses + verdicts | `src/core/authority/models.py` |
+| Policy Runtime | 11-step authority evaluation pipeline | `src/core/authority/policy_runtime.py` |
+| Authority Audit | Hash-chained authority audit log | `src/core/authority/authority_audit.py` |
