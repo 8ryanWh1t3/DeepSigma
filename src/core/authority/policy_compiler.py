@@ -8,26 +8,22 @@ effects, fully testable.
 from __future__ import annotations
 
 import hashlib
-import json
 import logging
 import uuid
 from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 from .models import (
+    CompiledPolicy,
     GovernanceArtifact,
     PolicyConstraint,
     PolicyEvaluation,
     PolicyEvaluationStep,
     ReasoningRequirement,
 )
+from .seal_and_hash import canonical_json as _canonical_json, compute_hash
 
 logger = logging.getLogger(__name__)
-
-
-def _canonical_json(payload: dict) -> str:
-    """Deterministic JSON for hashing."""
-    return json.dumps(payload, sort_keys=True, separators=(",", ":"))
 
 
 def compile_policy(
@@ -147,3 +143,64 @@ def extract_constraints(
         ))
 
     return result
+
+
+def compile_from_source(source: "PolicySource") -> CompiledPolicy:
+    """Compile a PolicySource into a CompiledPolicy (OpenPQL pipeline entry).
+
+    Uses existing ``extract_constraints`` and ``extract_reasoning_requirements``
+    to build rules, then seals the result.
+
+    Args:
+        source: A validated PolicySource object.
+
+    Returns:
+        CompiledPolicy with deterministic policy_hash and seal.
+    """
+    from .policy_source import PolicySource  # noqa: F811 (type hint)
+
+    dlr = source.dlr
+    policy_pack = source.policy_pack
+    dlr_id = dlr.get("dlrId", dlr.get("dlr_id", ""))
+    episode_id = dlr.get("episodeId", dlr.get("episode_id", ""))
+    action_type = dlr.get("actionType", dlr.get("action_type", ""))
+    policy_pack_id = policy_pack.get("policyPackId", policy_pack.get("policy_pack_id", ""))
+
+    now = datetime.now(timezone.utc).isoformat()
+    artifact_id = f"GOV-{uuid.uuid4().hex[:12]}"
+
+    rules = extract_constraints(policy_pack, action_type)
+    reasoning = extract_reasoning_requirements(dlr, policy_pack)
+
+    # Deterministic policy hash over rules + reasoning
+    rules_payload = [
+        {"id": r.constraint_id, "type": r.constraint_type, "expr": r.expression}
+        for r in rules
+    ]
+    reasoning_payload = {
+        "requires_dlr": reasoning.requires_dlr,
+        "minimum_claims": reasoning.minimum_claims,
+        "minimum_confidence": reasoning.minimum_confidence,
+    }
+    policy_hash = compute_hash({"rules": rules_payload, "reasoning": reasoning_payload})
+
+    seal_hash = compute_hash({
+        "artifact_id": artifact_id,
+        "source_id": source.source_id,
+        "policy_hash": policy_hash,
+        "compiled_at": now,
+    })
+
+    return CompiledPolicy(
+        artifact_id=artifact_id,
+        source_id=source.source_id,
+        dlr_ref=dlr_id,
+        episode_id=episode_id,
+        policy_pack_id=policy_pack_id,
+        rules=rules,
+        reasoning_requirements=reasoning,
+        created_at=now,
+        policy_hash=policy_hash,
+        seal_hash=seal_hash,
+        seal_version=1,
+    )

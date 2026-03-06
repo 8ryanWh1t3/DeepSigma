@@ -190,11 +190,41 @@ Policies are loaded during step 4 (policy_load) of the evaluation pipeline:
 
 Policy packs are passed into the evaluation context by the caller. The runtime does not manage a policy registry or cache layer -- that responsibility belongs to the domain mode or the orchestration layer above. This keeps the runtime pure: same inputs, same outputs, no hidden state.
 
+## The 7 OpenPQL Primitives
+
+The full OpenPQL pipeline is implemented as 7 distinct modules in `src/core/authority/`:
+
+```
+ReOps Decision Packet → Policy Source → Compiler → Artifact → Runtime Gate → Evidence Chain → Audit Retrieval
+                                                                    ↑
+                                                          Seal & Hash (foundation)
+```
+
+| # | Primitive | Module | Purpose |
+|---|-----------|--------|---------|
+| 1 | **Policy Source** | `policy_source.py` | Validated, hashable input wrapping DLR + PolicyPack |
+| 2 | **Compiler** | `policy_compiler.py` | `compile_from_source()` → `CompiledPolicy` with deterministic policy hash |
+| 3 | **Executable Artifacts** | `artifact_builder.py` | Serialize to inspectable JSON, write/load/verify on disk |
+| 4 | **Runtime Gate** | `runtime_gate.py` | Artifact-aware facade over the 11-step pipeline |
+| 5 | **Evidence Chain** | `evidence_chain.py` | Append-only JSONL hash-chained evidence log |
+| 6 | **Audit Retrieval** | `audit_retrieval.py` | Forensic queries: why_allowed, why_blocked, which_rule_fired |
+| 7 | **Seal & Hash** | `seal_and_hash.py` | `canonical_json`, `compute_hash`, `seal`, `verify_seal`, `verify_chain` |
+
+### Pipeline Demo
+
+Run the full pipeline end-to-end:
+
+```bash
+python -m core.examples.openpql_pipeline_demo
+```
+
 ## Seal and Hash Integrity
 
 Every governance artifact produced by the compiler includes a SHA-256 seal hash computed from the canonical JSON of the DLR ID, policy pack ID, and compilation timestamp. This hash is deterministic and verifiable.
 
 Audit records produced by the evaluation pipeline are hash-chained: each record's `chain_hash` is computed from its content, and `prev_chain_hash` links to the previous record. The chain is append-only and verifiable with `AuthorityAuditLog.verify_chain()`.
+
+The Evidence Chain (`evidence_chain.py`) provides a richer alternative: JSONL-based, append-only, with artifact references, policy hashes, and assumption snapshots in every entry. Verified with `EvidenceChain.verify()`.
 
 The chain answers two questions:
 - Has any record been tampered with? (hash mismatch)

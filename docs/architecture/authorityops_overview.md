@@ -152,15 +152,21 @@ All source files live in `src/core/authority/`.
 | File | Class / Functions | Purpose |
 |------|-------------------|---------|
 | `__init__.py` | Re-exports `AuthorityLedger`, `AuthorityEntry` | Package entry point |
-| `models.py` | 14 dataclasses, 7 enums | All AuthorityOps typed models |
+| `models.py` | 15 dataclasses, 7 enums | All AuthorityOps typed models (incl. CompiledPolicy) |
 | `ledger.py` | `AuthorityLedger`, `AuthorityEntry` | Hash-chained authority ledger with JSON persistence |
 | `authority_graph.py` | `resolve_actor()`, `resolve_resource()`, `find_authority()` | Actor/resource resolution and authority lookup |
 | `delegation_chain.py` | `validate_chain()`, `check_expiry()`, `compute_effective_scope()` | Delegation chain validation with depth and expiry checks |
 | `reasoning_gate.py` | `check_dlr_presence()`, `check_assumption_freshness()`, `check_minimum_confidence()`, `check_required_truth_types()` | DLR presence, assumption freshness, confidence gate |
-| `policy_compiler.py` | `compile_policy()`, `extract_reasoning_requirements()`, `extract_constraints()` | DLR to governance artifact compilation (OpenPQL step) |
+| `policy_compiler.py` | `compile_policy()`, `compile_from_source()`, `extract_reasoning_requirements()`, `extract_constraints()` | DLR to governance artifact compilation (OpenPQL step) |
 | `policy_runtime.py` | `evaluate()` + 11 pipeline step functions | 11-step authority evaluation pipeline |
 | `decision_authority_resolver.py` | `resolve()`, `check_scope_overlap()` | Effective authority intersection (actor x resource x policy) |
 | `authority_audit.py` | `AuthorityAuditLog` | Hash-chained append-only audit log with query methods |
+| `seal_and_hash.py` | `canonical_json()`, `compute_hash()`, `seal()`, `verify_seal()`, `verify_chain()` | Primitive 7: Cryptographic immutability foundation |
+| `policy_source.py` | `PolicySource`, `build_policy_source()`, `validate_policy_source()` | Primitive 1: Validated, hashable pipeline input |
+| `artifact_builder.py` | `build_artifact()`, `write_artifact()`, `load_artifact()`, `verify_artifact()` | Primitive 3: Serialize compiled policies to inspectable JSON |
+| `runtime_gate.py` | `RuntimeGate`, `GateDecision` | Primitive 4: Artifact-aware evaluation gateway |
+| `evidence_chain.py` | `EvidenceChain`, `EvidenceEntry` | Primitive 5: Append-only JSONL hash-chained evidence log |
+| `audit_retrieval.py` | `AuditRetrieval`, `AuditAnswer` | Primitive 6: Forensic query interface over evidence chain |
 
 ### Related Files
 

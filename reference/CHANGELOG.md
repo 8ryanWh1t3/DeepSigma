@@ -2,6 +2,18 @@
 
 All contract surface changes are logged here with compatibility annotations.
 
+## [2.1.1] — OpenPQL 7-Primitive Upgrade
+
+`COMPATIBLE:` AuthorityOps OpenPQL primitives surfaced as 6 first-class modules. PolicySource, CompiledPolicy, ArtifactBuilder, RuntimeGate, EvidenceChain, and AuditRetrieval. Seal & Hash deduplicated as shared foundation. 40 new tests (786 total). Demo script. 4 spec docs. All additive — zero breaking changes.
+
+### Migration
+
+**Affected schemas**: None (new CompiledPolicy dataclass in models.py, no schema changes)
+**Consumer action**: None — all existing APIs preserved.
+**Rollback**: Yes — new modules are additive only.
+
+---
+
 ## [2.1.0] — Decision Infrastructure Hardening
 
 `COMPATIBLE:` v2.1.0 milestone release. All 8 KPIs >= 7.0 and SSI >= 55. 23 issues closed across 7 intermediate stability releases (v2.0.10–v2.0.16). Automation closure, enterprise hardening, schema determinism, DISR architecture, evidence binding, economic ledger, intent safety, and stability governance — all validated and CI-gated.

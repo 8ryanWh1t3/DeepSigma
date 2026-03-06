@@ -6,7 +6,6 @@ Every authority evaluation is recorded with a tamper-evident chain.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import logging
 import uuid
@@ -16,21 +15,9 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from .models import AuditRecord
+from .seal_and_hash import compute_hash as _compute_hash
 
 logger = logging.getLogger(__name__)
-
-
-def _canonical_json(payload: dict) -> str:
-    """Deterministic JSON for hashing."""
-    return json.dumps(payload, sort_keys=True, separators=(",", ":"))
-
-
-def _compute_hash(payload: dict) -> str:
-    """SHA-256 of canonical JSON. Returns ``sha256:<hex>``."""
-    digest = hashlib.sha256(
-        _canonical_json(payload).encode("utf-8")
-    ).hexdigest()
-    return f"sha256:{digest}"
 
 
 class AuthorityAuditLog:

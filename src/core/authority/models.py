@@ -258,6 +258,23 @@ class GovernanceArtifact:
 
 
 @dataclass
+class CompiledPolicy:
+    """A compiled, sealed policy artifact produced by the OpenPQL pipeline."""
+
+    artifact_id: str
+    source_id: str  # back-reference to PolicySource
+    dlr_ref: str
+    episode_id: str
+    policy_pack_id: str
+    rules: List[PolicyConstraint] = field(default_factory=list)
+    reasoning_requirements: Optional[ReasoningRequirement] = None
+    created_at: str = ""
+    policy_hash: str = ""  # deterministic hash over rules + requirements
+    seal_hash: str = ""
+    seal_version: int = 1
+
+
+@dataclass
 class AuditRecord:
     """An immutable audit record for an authority evaluation."""
 

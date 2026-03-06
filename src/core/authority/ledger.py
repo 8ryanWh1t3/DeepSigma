@@ -7,7 +7,6 @@ agent decision logging use case.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import logging
 import uuid
@@ -16,22 +15,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from .seal_and_hash import compute_hash as _compute_hash
+
 logger = logging.getLogger(__name__)
 
 LEDGER_SCHEMA_VERSION = "authority-ledger-core-v1"
-
-
-def _canonical_json(payload: dict) -> str:
-    """Deterministic JSON for hashing (matches enterprise pattern)."""
-    return json.dumps(payload, sort_keys=True, separators=(",", ":"))
-
-
-def _compute_hash(payload: dict) -> str:
-    """SHA-256 of canonical JSON. Returns ``sha256:<hex>`` string."""
-    digest = hashlib.sha256(
-        _canonical_json(payload).encode("utf-8")
-    ).hexdigest()
-    return f"sha256:{digest}"
 
 
 @dataclass

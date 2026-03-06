@@ -203,6 +203,13 @@ class AuthorityOps(DomainMode):
                 "constraintCount": len(constraints),
             })
 
+            # OpenPQL: if a PolicySource is provided, compile it
+            policy_source = ctx.get("policy_source")
+            if policy_source is not None:
+                from ..authority.policy_compiler import compile_from_source
+                compiled = compile_from_source(policy_source)
+                ctx["_compiled"] = compiled
+
         return FunctionResult(
             function_id="AUTH-F04",
             success=True,
@@ -408,14 +415,22 @@ class AuthorityOps(DomainMode):
         self, event: Dict[str, Any], ctx: Dict[str, Any],
     ) -> FunctionResult:
         """Aggregate all checks and compute final verdict."""
-        from ..authority.policy_runtime import evaluate
-
         payload = event.get("payload", event)
         events: List[Dict[str, Any]] = []
         mg_updates: List[str] = []
 
-        result = evaluate(payload, ctx)
-        verdict = result.verdict
+        # OpenPQL: use RuntimeGate if a compiled artifact exists
+        compiled = ctx.get("_compiled")
+        if compiled is not None:
+            from ..authority.runtime_gate import RuntimeGate
+            gate = RuntimeGate()
+            decision = gate.evaluate(compiled, payload, ctx)
+            verdict = decision.verdict
+            result = decision
+        else:
+            from ..authority.policy_runtime import evaluate
+            result = evaluate(payload, ctx)
+            verdict = result.verdict
 
         subtype_map = {
             "ALLOW": "authority_allow",
@@ -494,6 +509,27 @@ class AuthorityOps(DomainMode):
             "chainHash": chain_hash,
             "verdict": record.verdict,
         })
+
+        # OpenPQL: also append to evidence chain if present
+        evidence_chain = ctx.get("evidence_chain")
+        if evidence_chain is not None:
+            from ..authority.evidence_chain import EvidenceEntry
+            compiled = ctx.get("_compiled")
+            ev_entry = EvidenceEntry(
+                evidence_id="",
+                gate_id=payload.get("gateId", ""),
+                action_id=record.action_id,
+                actor_id=record.actor_id,
+                resource_id=record.resource_id,
+                verdict=record.verdict,
+                evaluated_at=record.evaluated_at,
+                artifact_id=compiled.artifact_id if compiled else "",
+                policy_hash=compiled.policy_hash if compiled else "",
+                dlr_ref=record.dlr_ref or "",
+                failed_checks=record.failed_checks,
+                passed_checks=record.passed_checks,
+            )
+            evidence_chain.append(ev_entry)
 
         # Write to MG
         mg = ctx.get("memory_graph")

@@ -1,6 +1,6 @@
 # Constitution Gate Report
 
-**Generated:** 2026-03-06T03:39:20.768048+00:00
+**Generated:** 2026-03-06T04:07:42.904796+00:00
 **Result:** PASS
 
 
@@ -10,7 +10,7 @@ Manifest regenerated. 29 schemas locked. Fingerprint: sha256:0d644818569cd5e0
 
 ## Version Parity: PASS
 
-pyproject=2.1.0 policy=GOV-2.1.0
+pyproject=2.1.1 policy=GOV-2.1.1
 
 ## GPE Sub-Scan: PASS
 
@@ -18,7 +18,7 @@ pyproject=2.1.0 policy=GOV-2.1.0
 
 ## VERSION File: PASS
 
-Written: 2.1.0
+Written: 2.1.1
 
 ## CHANGELOG Annotation: PASS
 

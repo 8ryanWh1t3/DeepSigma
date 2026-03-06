@@ -188,8 +188,8 @@ ALLOWED_ACRONYMS = {
     "MAJOR", "MINOR",
     # Authority / governance terms
     "REFUSE", "REFUSAL", "REFUSED", "REF",
-    # AuthorityOps — models, audit IDs, positioning doc terms
-    "IAM", "AGENT", "TINY", "SMALL", "LARGE", "AUDIT", "ACT",
+    # AuthorityOps — models, audit IDs, positioning doc terms, OpenPQL prefixes
+    "IAM", "AGENT", "TINY", "SMALL", "LARGE", "AUDIT", "ACT", "PSRC", "RGATE",
     # KPI Standards Overlay — framework names and assessment tokens
     "DORA", "SMART", "PASS", "HEUR", "OTEL", "IEC", "NNN",
     # Fixture / test data terms

@@ -1,6 +1,6 @@
 ---
 title: "Docs De-Duplication Map"
-version: "2.1.0"
+version: "2.1.1"
 status: "Living Document"
 last_updated: "2026-02-28"
 ---
