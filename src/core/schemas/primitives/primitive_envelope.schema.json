@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "primitive_envelope.schema.json",
+  "title": "Primitive Envelope",
+  "description": "Canonical wrapper for the five primitive types in the governance framework.",
+  "type": "object",
+  "required": [
+    "envelopeId",
+    "primitiveType",
+    "version",
+    "payload",
+    "createdAt",
+    "source"
+  ],
+  "properties": {
+    "envelopeId": {
+      "type": "string",
+      "pattern": "^ENV-[a-f0-9]{12}$",
+      "description": "Unique envelope identifier."
+    },
+    "primitiveType": {
+      "type": "string",
+      "enum": ["claim", "event", "review", "patch", "apply"],
+      "description": "One of the five canonical primitive types."
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Envelope version; incremented on supersede."
+    },
+    "payload": {
+      "type": "object",
+      "description": "The actual primitive data."
+    },
+    "createdAt": {
+      "type": "string",
+      "description": "ISO-8601 creation timestamp."
+    },
+    "source": {
+      "type": "string",
+      "description": "Originating adapter or module."
+    },
+    "parentEnvelopeId": {
+      "type": "string",
+      "description": "Parent envelope for supersede chains."
+    },
+    "sealed": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this envelope has been sealed."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata."
+    }
+  },
+  "additionalProperties": false
+}

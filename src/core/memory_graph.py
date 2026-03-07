@@ -36,6 +36,8 @@ class NodeKind(str, Enum):
     AUDIT_RECORD = "audit_record"
     POLICY_EVALUATION = "policy_evaluation"
     TENSION_SET = "tension_set"
+    REVIEW = "review"
+    APPLY = "apply"
 
 
 class EdgeKind(str, Enum):
@@ -66,6 +68,8 @@ class EdgeKind(str, Enum):
     BLOCKED_BY = "blocked_by"              # action -> constraint
     AUDITED_AS = "audited_as"              # gate -> audit_record
     ESCALATES_TO = "escalates_to"          # gate -> approval_path
+    DERIVED_FROM = "derived_from"          # envelope -> superseded envelope
+    PRECEDED_BY = "preceded_by"            # step -> previous step
 
 
 @dataclass

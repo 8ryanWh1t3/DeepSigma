@@ -93,6 +93,8 @@ ALLOWED_ACRONYMS = {
     "APEX", "GGUF", "OAI", "CLD", "SNRT", "EVIDENCE", "MODEL", "EXCHANGE",
     "ENGINE", "CMD", "LATENCY", "RATE", "UPTIME",
     "RONIN", "DLC", "DRI", "BOE", "SLO", "CMS", "MVP",
+    "ENVELOPE", "COHERENCE", "LOOP", "PRIMITIVE", "PRECEDED", "DERIVED",
+    "SUPERSEDE", "STEP", "GUARD",
     # Standards / formats / compliance
     "SHACL", "SPARQL", "SPDX", "SBOM", "RDF", "OWL",
     "OTEL", "MCP", "NDJSON", "JSONL", "JSONB", "SVG",

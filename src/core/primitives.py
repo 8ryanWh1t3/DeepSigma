@@ -20,6 +20,27 @@ from typing import Any, Dict, List, Optional
 from .normalize import normalize_keys
 
 
+# ── Five Primitive Types ────────────────────────────────────────
+
+
+class PrimitiveType(str, Enum):
+    """The five — and only five — canonical primitive types.
+
+    Every object in the system is one of these five types, a subtype,
+    metadata, a derived view, or orchestration.  No sixth primitive
+    may be introduced.
+    """
+
+    CLAIM = "claim"
+    EVENT = "event"
+    REVIEW = "review"
+    PATCH = "patch"
+    APPLY = "apply"
+
+
+ALLOWED_PRIMITIVE_TYPES: frozenset = frozenset(p.value for p in PrimitiveType)
+
+
 # ── Status / severity enums ─────────────────────────────────────
 
 

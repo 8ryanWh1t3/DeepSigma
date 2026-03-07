@@ -61,6 +61,13 @@ from .iris import (
     ResolutionStatus,
 )
 from .normalize import normalize_keys
+from .primitives import PrimitiveType, ALLOWED_PRIMITIVE_TYPES
+from .primitive_envelope import (
+    PrimitiveEnvelope,
+    wrap_primitive,
+    validate_envelope,
+    supersede_envelope,
+)
 from .coherence_gate import CoherenceGate, GateConfig, GateResult, Signal
 from .agent import AgentSession
 from .authority import AuthorityLedger, AuthorityEntry
@@ -117,4 +124,10 @@ __all__ = [
     "MetricsCollector",
     "MetricsReport",
     "MetricPoint",
+    "PrimitiveType",
+    "ALLOWED_PRIMITIVE_TYPES",
+    "PrimitiveEnvelope",
+    "wrap_primitive",
+    "validate_envelope",
+    "supersede_envelope",
 ]

@@ -14,6 +14,7 @@ if str(_SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(_SRC_ROOT))
 
 from core.primitives import (  # noqa: E402
+    ALLOWED_PRIMITIVE_TYPES,
     AtomicClaim,
     ClaimLifecycle,
     DecisionEpisode,
@@ -23,6 +24,7 @@ from core.primitives import (  # noqa: E402
     EpisodeStatus,
     Patch,
     PatchStatus,
+    PrimitiveType,
     validate_claim,
     validate_drift,
     validate_episode,
@@ -114,6 +116,18 @@ class TestEnums:
     def test_patch_status_values(self) -> None:
         assert PatchStatus.APPLIED.value == "applied"
         assert isinstance(PatchStatus.SUPERSEDED, str)
+
+    def test_primitive_type_has_five_members(self) -> None:
+        assert len(PrimitiveType) == 5
+
+    def test_primitive_type_values(self) -> None:
+        assert {p.value for p in PrimitiveType} == {
+            "claim", "event", "review", "patch", "apply",
+        }
+
+    def test_allowed_primitive_types_is_frozenset(self) -> None:
+        assert isinstance(ALLOWED_PRIMITIVE_TYPES, frozenset)
+        assert len(ALLOWED_PRIMITIVE_TYPES) == 5
 
 
 # ── AtomicClaim tests ────────────────────────────────────────────
