@@ -155,6 +155,62 @@
           "artifacts": ["src/core/metrics.py"],
           "enforcement": ["CI: ci.yml", "tests/test_site_content.py"],
           "kpi_axes": ["Operational_Maturity", "Technical_Completeness"]
+        },
+        {
+          "id": "AUDIT_LOG",
+          "name": "Audit Log",
+          "description": "Hash-chained append-only audit log with AuditEntry dataclass, SHA-256 chain integrity, tamper detection, and verification.",
+          "artifacts": ["src/core/audit_log.py"],
+          "enforcement": ["CI: ci.yml"],
+          "kpi_axes": ["Authority_Modeling", "Operational_Maturity"]
+        },
+        {
+          "id": "EPISODE_STATE",
+          "name": "Episode State Tracker",
+          "description": "EpisodeState enum (OPEN, SEALED, DEGRADED, PATCHED, ARCHIVED) and EpisodeTracker for lifecycle management with valid transition enforcement and freeze-all capability.",
+          "artifacts": ["src/core/episode_state.py"],
+          "enforcement": ["CI: ci.yml"],
+          "kpi_axes": ["Technical_Completeness", "Operational_Maturity"]
+        },
+        {
+          "id": "KILLSWITCH",
+          "name": "Killswitch",
+          "description": "Emergency halt function that freezes active episodes, seals with SHA-256 halt proof, and logs to audit trail.",
+          "artifacts": ["src/core/killswitch.py"],
+          "enforcement": ["CI: ci.yml"],
+          "kpi_axes": ["Authority_Modeling", "Operational_Maturity"]
+        },
+        {
+          "id": "PRIMITIVES",
+          "name": "Canonical Core Primitives",
+          "description": "Four archival primitives — AtomicClaim, DecisionEpisode, DriftSignal, Patch — with JSON Schema validation, provenance tracking, and round-trip serialization.",
+          "artifacts": ["src/core/primitives.py"],
+          "enforcement": ["CI: ci.yml"],
+          "kpi_axes": ["Technical_Completeness", "Data_Integration"]
+        },
+        {
+          "id": "SCHEMA_VALIDATOR",
+          "name": "Schema Validator",
+          "description": "JSON Schema validation for core data structures (episodes, drift signals) with LRU-cached schema loading, environment-variable toggling, and structured error reporting.",
+          "artifacts": ["src/core/schema_validator.py"],
+          "enforcement": ["CI: ci.yml"],
+          "kpi_axes": ["Technical_Completeness", "Data_Integration"]
+        },
+        {
+          "id": "SEVERITY",
+          "name": "Severity Scorer",
+          "description": "Computes severity scores from drift type weights, severity multipliers, and recurrence boost; classifies into red/yellow/green bands; aggregates across multiple signals.",
+          "artifacts": ["src/core/severity.py"],
+          "enforcement": ["CI: ci.yml"],
+          "kpi_axes": ["Technical_Completeness", "Operational_Maturity"]
+        },
+        {
+          "id": "STORAGE",
+          "name": "Storage Layer",
+          "description": "SQLite-backed persistence for episodes, DLR entries, and drift signals with CRUD operations, pagination, upsert semantics, and schema auto-migration.",
+          "artifacts": ["src/core/storage.py"],
+          "enforcement": ["CI: ci.yml"],
+          "kpi_axes": ["Technical_Completeness", "Data_Integration"]
         }
       ]
     },

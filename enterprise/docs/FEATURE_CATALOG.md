@@ -70,6 +70,41 @@ Machine source of truth: `release_kpis/feature_catalog.json`
   - Artifacts: src/core/cerpa/types.py, src/core/cerpa/models.py, src/core/cerpa/engine.py, src/core/cerpa/mappers.py
   - Enforcement: CI: ci.yml
   - KPI axes: Technical_Completeness, Operational_Maturity
+- **Audit Log** (`AUDIT_LOG`)
+  - Hash-chained append-only audit log with AuditEntry dataclass, SHA-256 chain integrity, tamper detection, and verification.
+  - Artifacts: src/core/audit_log.py
+  - Enforcement: CI: ci.yml
+  - KPI axes: Authority_Modeling, Operational_Maturity
+- **Episode State Tracker** (`EPISODE_STATE`)
+  - EpisodeState enum (OPEN, SEALED, DEGRADED, PATCHED, ARCHIVED) and EpisodeTracker for lifecycle management with valid transition enforcement and freeze-all capability.
+  - Artifacts: src/core/episode_state.py
+  - Enforcement: CI: ci.yml
+  - KPI axes: Technical_Completeness, Operational_Maturity
+- **Killswitch** (`KILLSWITCH`)
+  - Emergency halt function that freezes active episodes, seals with SHA-256 halt proof, and logs to audit trail.
+  - Artifacts: src/core/killswitch.py
+  - Enforcement: CI: ci.yml
+  - KPI axes: Authority_Modeling, Operational_Maturity
+- **Canonical Core Primitives** (`PRIMITIVES`)
+  - Four archival primitives — AtomicClaim, DecisionEpisode, DriftSignal, Patch — with JSON Schema validation, provenance tracking, and round-trip serialization.
+  - Artifacts: src/core/primitives.py
+  - Enforcement: CI: ci.yml
+  - KPI axes: Technical_Completeness, Data_Integration
+- **Schema Validator** (`SCHEMA_VALIDATOR`)
+  - JSON Schema validation for core data structures (episodes, drift signals) with LRU-cached schema loading, environment-variable toggling, and structured error reporting.
+  - Artifacts: src/core/schema_validator.py
+  - Enforcement: CI: ci.yml
+  - KPI axes: Technical_Completeness, Data_Integration
+- **Severity Scorer** (`SEVERITY`)
+  - Computes severity scores from drift type weights, severity multipliers, and recurrence boost; classifies into red/yellow/green bands; aggregates across multiple signals.
+  - Artifacts: src/core/severity.py
+  - Enforcement: CI: ci.yml
+  - KPI axes: Technical_Completeness, Operational_Maturity
+- **Storage Layer** (`STORAGE`)
+  - SQLite-backed persistence for episodes, DLR entries, and drift signals with CRUD operations, pagination, upsert semantics, and schema auto-migration.
+  - Artifacts: src/core/storage.py
+  - Enforcement: CI: ci.yml
+  - KPI axes: Technical_Completeness, Data_Integration
 
 ### FEEDS Event Surface
 Federated Event Envelope Distribution Surface — event-driven pub/sub connecting governance primitives (TS, ALS, DLR, DS, CE) via file-based bus with manifest-first ingest, deterministic drift detection, authority validation, triage state machine, and canon versioning.

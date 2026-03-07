@@ -239,3 +239,52 @@ class TestSchemaCreation:
         for expected in ["events", "episodes", "drifts", "dlrs", "schema_version"]:
             assert expected in tables
         conn.close()
+
+
+# -- Additional edge-case tests (Phase 3 gap closure) --
+
+
+class TestSQLiteDriftListOps:
+    def test_list_drifts_pagination(self, tmp_path):
+        b = SQLiteStorageBackend(tmp_path / "test.db")
+        for i in range(5):
+            b.append_drift({**SAMPLE_DRIFT, "driftId": f"drift-{i}"})
+        page = b.list_drifts(limit=2)
+        assert len(page) == 2
+
+    def test_list_drifts_offset(self, tmp_path):
+        b = SQLiteStorageBackend(tmp_path / "test.db")
+        for i in range(5):
+            b.append_drift({**SAMPLE_DRIFT, "driftId": f"drift-{i}"})
+        page = b.list_drifts(limit=10, offset=3)
+        assert len(page) == 2
+
+    def test_list_drifts_empty(self, tmp_path):
+        b = SQLiteStorageBackend(tmp_path / "test.db")
+        assert b.list_drifts() == []
+
+
+class TestSQLiteDLRListOps:
+    def test_list_dlrs_pagination(self, tmp_path):
+        b = SQLiteStorageBackend(tmp_path / "test.db")
+        for i in range(5):
+            b.save_dlr({**SAMPLE_DLR, "dlrId": f"DLR-{i}", "recordedAt": f"2026-02-19T0{i}:00:00Z"})
+        page = b.list_dlrs(limit=3)
+        assert len(page) == 3
+
+    def test_list_dlrs_empty(self, tmp_path):
+        b = SQLiteStorageBackend(tmp_path / "test.db")
+        assert b.list_dlrs() == []
+
+
+class TestSQLiteEpisodeListOps:
+    def test_list_episodes_pagination(self, tmp_path):
+        b = SQLiteStorageBackend(tmp_path / "test.db")
+        for i in range(5):
+            b.save_episode({**SAMPLE_EPISODE, "episodeId": f"ep-{i}", "sealedAt": f"2026-02-19T0{i}:00:00Z"})
+        page = b.list_episodes(limit=2)
+        assert len(page) == 2
+
+    def test_list_episodes_empty(self, tmp_path):
+        b = SQLiteStorageBackend(tmp_path / "test.db")
+        assert b.list_episodes() == []

@@ -1,6 +1,6 @@
 """Drift Signal Collector (DS) — collect and structure runtime drift.
 
-The DS layer ingests raw DriftEvent records emitted by RAL and
+The DS layer ingests raw DriftEvent records emitted by the runtime and
 organises them by type, severity, fingerprint, and recurrence.
 It feeds the audit loop and scoring engine with structured drift
 intelligence.

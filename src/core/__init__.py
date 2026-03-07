@@ -1,7 +1,7 @@
 """Coherence Ops — governance framework for agentic AI.
 
 Implements the four canonical artifacts (DLR / RS / DS / MG),
-the coherence audit loop that connects RAL / Sigma OVERWATCH
+the coherence audit loop that connects Sigma OVERWATCH
 runtime exhaust to structured governance, learning, and memory,
 and the Unified Atomic Claims layer, and the Money Demo (v0.3.0).
 

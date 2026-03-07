@@ -162,3 +162,88 @@ class TestMemoryGraph:
         mg.add_episode(_episode())
         assert mg.node_count > 0
         assert mg.edge_count > 0
+
+
+# -- Additional MG tests (Phase 3 gap closure) --
+
+
+class TestMemoryGraphClaims:
+    """Tests for claim-aware Memory Graph operations."""
+
+    def test_add_claim_node(self):
+        mg = MemoryGraph()
+        mg.add_episode(_episode())
+        mg.add_claim({
+            "claimId": "CLAIM-001",
+            "statement": "System is within SLA",
+            "episodeId": "ep-1",
+        })
+        stats = mg.query("stats")
+        assert stats["nodes_by_kind"].get("claim", 0) >= 1
+
+    def test_claim_linked_to_episode(self):
+        mg = MemoryGraph()
+        mg.add_episode(_episode())
+        mg.add_claim({
+            "claimId": "CLAIM-001",
+            "statement": "Test claim",
+            "episodeId": "ep-1",
+        })
+        stats = mg.query("stats")
+        assert stats["total_edges"] > 0
+
+    def test_multiple_claims(self):
+        mg = MemoryGraph()
+        mg.add_episode(_episode())
+        mg.add_claim({"claimId": "C1", "statement": "A", "episodeId": "ep-1"})
+        mg.add_claim({"claimId": "C2", "statement": "B", "episodeId": "ep-1"})
+        stats = mg.query("stats")
+        assert stats["nodes_by_kind"].get("claim", 0) >= 2
+
+
+class TestMemoryGraphMultiEpisode:
+    """Tests for multi-episode graph building."""
+
+    def test_two_episodes(self):
+        mg = MemoryGraph()
+        mg.add_episode(_episode(episode_id="ep-1"))
+        mg.add_episode(_episode(episode_id="ep-2"))
+        stats = mg.query("stats")
+        assert stats["nodes_by_kind"].get("episode", 0) >= 2
+
+    def test_drift_across_episodes(self):
+        mg = MemoryGraph()
+        mg.add_episode(_episode(episode_id="ep-1"))
+        mg.add_episode(_episode(episode_id="ep-2"))
+        mg.add_drift(_drift_event(drift_id="d1", episode_id="ep-1"))
+        mg.add_drift(_drift_event(drift_id="d2", episode_id="ep-2"))
+        stats = mg.query("stats")
+        assert stats["nodes_by_kind"].get("drift", 0) == 2
+
+    def test_query_why_specific_episode(self):
+        mg = MemoryGraph()
+        mg.add_episode(_episode(episode_id="ep-1"))
+        mg.add_episode(_episode(episode_id="ep-2"))
+        result = mg.query("why", episode_id="ep-2")
+        assert result["episode_id"] == "ep-2"
+
+    def test_query_drift_empty(self):
+        mg = MemoryGraph()
+        mg.add_episode(_episode())
+        result = mg.query("drift", episode_id="ep-1")
+        assert result["drift_events"] == []
+
+    def test_query_patches_empty(self):
+        mg = MemoryGraph()
+        mg.add_episode(_episode())
+        result = mg.query("patches", episode_id="ep-1")
+        assert result["patches"] == []
+
+    def test_to_json_with_drift_and_patch(self):
+        mg = MemoryGraph()
+        mg.add_episode(_episode())
+        mg.add_drift(_drift_event())
+        mg.add_patch(_patch())
+        data = json.loads(mg.to_json())
+        assert len(data["nodes"]) >= 4  # episode + action + evidence + drift + patch
+        assert len(data["edges"]) >= 3
