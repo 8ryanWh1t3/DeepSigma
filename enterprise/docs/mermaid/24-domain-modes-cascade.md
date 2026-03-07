@@ -1,6 +1,6 @@
-# 24 — Domain Modes & Cascade Engine
+# 24 — Domain Modes, Cascade Engine & DecisionSurface
 
-Four executable domain modes (48 function handlers) with cross-domain cascade propagation, event contracts, and deterministic replay.
+Five executable domain modes (67 function handlers) with cross-domain cascade propagation, event contracts, deterministic replay, and portable DecisionSurface runtime.
 
 ```mermaid
 graph TB
@@ -46,7 +46,7 @@ graph TB
         RF02 --> RF12[RE-F12 episode_replay]
     end
 
-    subgraph "AuthorityOps (12 handlers)"
+    subgraph "AuthorityOps (19 handlers)"
         AF01[AUTH-F01 action_request_intake] --> AF02[AUTH-F02 actor_resolve]
         AF02 --> AF03[AUTH-F03 resource_resolve]
         AF03 --> AF04[AUTH-F04 policy_load]
@@ -58,6 +58,28 @@ graph TB
         AF09 --> AF10[AUTH-F10 decision_gate]
         AF10 --> AF11[AUTH-F11 audit_record_emit]
         AF01 --> AF12[AUTH-F12 delegation_chain_validate]
+        AF10 --> AF13[AUTH-F13 authority_drift_detect]
+        AF08 --> AF14[AUTH-F14 blast_radius_simulate]
+        AF14 --> AF15[AUTH-F15 blast_radius_propagate]
+        AF15 --> AF16[AUTH-F16 blast_radius_seal]
+        AF13 --> AF17[AUTH-F17 drift_history_query]
+        AF06 --> AF18[AUTH-F18 assumption_sweep]
+        AF13 --> AF19[AUTH-F19 cross_domain_drift_correlate]
+    end
+
+    subgraph "ParadoxOps (12 handlers)"
+        PF01[PDX-F01 tension_set_create] --> PF03[PDX-F03 dimension_attach]
+        PF01 --> PF02[PDX-F02 pole_manage]
+        PF03 --> PF04[PDX-F04 dimension_shift]
+        PF04 --> PF05[PDX-F05 pressure_compute]
+        PF04 --> PF06[PDX-F06 imbalance_compute]
+        PF05 --> PF07[PDX-F07 threshold_evaluate]
+        PF07 --> PF08[PDX-F08 drift_promote]
+        PF07 --> PF09[PDX-F09 interdimensional_drift]
+        PF08 --> PF10[PDX-F10 seal_snapshot]
+        PF09 --> PF11[PDX-F11 patch_issue]
+        PF10 --> PF12[PDX-F12 lifecycle_transition]
+        PF11 --> PF12
     end
 
     subgraph "Cascade Engine (13 rules)"
@@ -77,12 +99,13 @@ graph TB
     end
 
     subgraph "Event Contracts"
-        RT[routing_table.json] --> |48 functions| FEEDS[FEEDS pub/sub]
-        RT --> |51 events| FEEDS
+        RT[routing_table.json] --> |67 functions| FEEDS[FEEDS pub/sub]
+        RT --> |79 events| FEEDS
         FEEDS --> IF01
         FEEDS --> FF01
         FEEDS --> RF01
         FEEDS --> AF01
+        FEEDS --> PF01
     end
 
     IF03 -.->|drift signal| C1
@@ -98,6 +121,64 @@ graph TB
     IF07 -.->|authority mismatch| C11
     AF06 -.->|stale assumptions| C12
     AF09 -.->|killswitch active| C13
+```
+
+## DecisionSurface Runtime
+
+Portable Coherence Ops runtime — sits above domain modes, no function IDs or routing table entries.
+
+```mermaid
+graph TB
+    subgraph "DecisionSurface Runtime"
+        DS[DecisionSurface] --> CEE[claim_event_engine]
+        CEE --> MATCH[match_events_to_claims]
+        CEE --> CONTRA[detect_contradictions]
+        CEE --> EXPIRE[detect_expired_assumptions]
+        CEE --> BLAST[compute_blast_radius]
+        CEE --> PATCH[build_patch_recommendation]
+        CEE --> MG[build_memory_graph_update]
+    end
+
+    subgraph "Surface Adapters"
+        SA[SurfaceAdapter ABC]
+        NB[NotebookAdapter] -.->|implements| SA
+        CLI[CLIAdapter] -.->|implements| SA
+        VA[VantageAdapter stub] -.->|implements| SA
+    end
+
+    subgraph "Core Reuse"
+        SEV[core.severity]
+        SEAL[core.seal_and_hash]
+        MGR[core.memory_graph]
+    end
+
+    DS --> SA
+    DS --> SEAL
+    CEE --> SEV
+    MG --> MGR
+```
+
+## ParadoxOps Lifecycle
+
+Tension set lifecycle state machine with pressure-driven promotion.
+
+```mermaid
+stateDiagram-v2
+    [*] --> detected
+    detected --> active
+    active --> elevated : pressure >= 0.7
+    active --> sealed
+    active --> archived
+    elevated --> promoted_to_drift : drift promote
+    elevated --> sealed
+    elevated --> active : de-escalation
+    promoted_to_drift --> sealed
+    sealed --> patched : patch issued
+    sealed --> archived
+    patched --> rebalanced
+    patched --> archived
+    rebalanced --> archived
+    archived --> [*]
 ```
 
 ## Support Modules
@@ -116,3 +197,8 @@ graph TB
 | Authority Models | AuthorityOps dataclasses + verdicts | `src/core/authority/models.py` |
 | Policy Runtime | 11-step authority evaluation pipeline | `src/core/authority/policy_runtime.py` |
 | Authority Audit | Hash-chained authority audit log | `src/core/authority/authority_audit.py` |
+| ParadoxOps Models | Tension set, pole, dimension dataclasses | `src/core/paradox_ops/models.py` |
+| Dimension Registry | 6 common + 10 uncommon dimensions | `src/core/paradox_ops/dimensions.py` |
+| Tension Lifecycle | 8-state machine for tension sets | `src/core/paradox_ops/lifecycle.py` |
+| DecisionSurface | Portable runtime with adapter ABC | `src/core/decision_surface/runtime.py` |
+| Claim-Event Engine | Shared evaluation logic (7 functions) | `src/core/decision_surface/claim_event_engine.py` |

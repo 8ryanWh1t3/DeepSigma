@@ -4,7 +4,7 @@
 
 ## Overview
 
-Event Contracts define the declarative routing table that maps all 48 domain function handlers and 51 events to their FEEDS topics, subtypes, handler paths, required payload fields, and emitted events.
+Event Contracts define the declarative routing table that maps all 67 domain function handlers and 79 events to their FEEDS topics, subtypes, handler paths, required payload fields, and emitted events.
 
 **Modules**:
 - `src/core/feeds/contracts/routing_table.json` — the manifest
@@ -39,7 +39,7 @@ Each function entry in the routing table:
 }
 ```
 
-## Function Registry (48 Functions)
+## Function Registry (67 Functions)
 
 ### IntelOps (12)
 
@@ -108,6 +108,23 @@ Each function entry in the routing table:
 | AUTH-F10 | `decision_gate` | authority_slice | decision_gate |
 | AUTH-F11 | `audit_record_emit` | authority_slice | audit_emit |
 | AUTH-F12 | `delegation_chain_validate` | authority_slice | delegation_check |
+
+### ParadoxOps (12)
+
+| ID | Name | Input Topic | Input Subtype |
+|----|------|-------------|---------------|
+| PDX-F01 | `tension_set_create` | drift_signal | pts_create |
+| PDX-F02 | `pole_manage` | drift_signal | pts_pole_manage |
+| PDX-F03 | `dimension_attach` | drift_signal | pts_dimension_attach |
+| PDX-F04 | `dimension_shift` | drift_signal | pts_dimension_shift |
+| PDX-F05 | `pressure_compute` | drift_signal | pts_pressure_compute |
+| PDX-F06 | `imbalance_compute` | drift_signal | pts_imbalance_compute |
+| PDX-F07 | `threshold_evaluate` | drift_signal | pts_threshold_evaluate |
+| PDX-F08 | `drift_promote` | drift_signal | pts_drift_promote |
+| PDX-F09 | `interdimensional_drift_detect` | drift_signal | pts_id_drift_detect |
+| PDX-F10 | `seal_snapshot` | drift_signal | pts_seal |
+| PDX-F11 | `patch_issue` | drift_signal | pts_patch_issue |
+| PDX-F12 | `lifecycle_transition` | drift_signal | pts_lifecycle_transition |
 
 ## Querying the Routing Table
 
@@ -182,13 +199,13 @@ The Domino Delegation Encryption module (EDGE) defines 9 events across 3 domains
 
 ## FEEDS Topic Mapping
 
-All 48 functions route through the existing 6 FEEDS topics plus `authority_slice`:
+All 67 functions route through the existing 6 FEEDS topics plus `authority_slice`:
 
 | Topic | Functions |
 |-------|-----------|
 | `truth_snapshot` | INTEL-F01; AUTH-F06, F07 |
 | `canon_entry` | INTEL-F02, F05, F06, F10; FRAN-F01–F06, F08–F10, F12 |
-| `drift_signal` | INTEL-F03, F04, F07–F09, F11, F12; FRAN-F07, F11; RE-F04–F06, F08, F09; AUTH-F09 |
+| `drift_signal` | INTEL-F03, F04, F07–F09, F11, F12; FRAN-F07, F11; RE-F04–F06, F08, F09; AUTH-F09; PDX-F01–F12 |
 | `decision_lineage` | INTEL-F07, F08; RE-F01–F03, F07, F10–F12; AUTH-F05 |
 | `authority_slice` | AUTH-F01–F04, F08, F10–F12 |
 | `mg_update` | INTEL-F05 |
@@ -231,6 +248,8 @@ The Judgment Refinement Module extends the routing table with a 5-stage coherenc
 - [FranOps](FranOps) — canon enforcement domain
 - [ReflectionOps](ReflectionOps) — gate enforcement domain
 - [AuthorityOps](AuthorityOps) — authority enforcement domain
+- [ParadoxOps](ParadoxOps) — paradox tension detection domain
+- [DecisionSurface](DecisionSurface) — portable Coherence Ops runtime
 - [Cascade Engine](Cascade-Engine) — cross-domain propagation
 - [FEEDS Pipeline](FEEDS-Pipeline) — event-driven pub/sub
 - [JRM Pipeline](JRM-Pipeline) — log-agnostic refinement engine
