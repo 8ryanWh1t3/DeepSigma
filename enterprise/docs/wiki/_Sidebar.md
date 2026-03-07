@@ -70,6 +70,8 @@
   - [FranOps](FranOps)
   - [ReflectionOps](ReflectionOps)
   - [AuthorityOps](AuthorityOps)
+  - [ParadoxOps](ParadoxOps)
+  - [DecisionSurface](DecisionSurface)
   - [Cascade Engine](Cascade-Engine)
   - [Event Contracts](Event-Contracts)
   - [Money Demo v2](Money-Demo-v2)

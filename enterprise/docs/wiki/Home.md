@@ -63,17 +63,19 @@ The runtime enforces four contracts on every decision before it is sealed.
 
 ## Domain Modes & Cascade Engine
 
-Four executable domain mode modules (48 function handlers total) with cross-domain cascade propagation, event contracts, and deterministic replay.
+Five executable domain mode modules (67 function handlers total) with cross-domain cascade propagation, event contracts, deterministic replay, and portable DecisionSurface runtime.
 
 | Page | What it covers |
 |------|---------------|
 | [IntelOps](IntelOps) | 12 handlers (INTEL-F01–F12): claim ingest → validate → drift → patch → MG update → canon promote |
 | [FranOps](FranOps) | 12 handlers (FRAN-F01–F12): canon propose/bless/enforce, retcon assess/execute/propagate, inflation |
 | [ReflectionOps](ReflectionOps) | 12 handlers (RE-F01–F12): episodes, gates, killswitch, severity, audit, coherence, IRIS, replay |
-| [AuthorityOps](AuthorityOps) | 12 handlers (AUTH-F01–F12): action intake, actor/resource resolve, policy, DLR presence, assumption validate, blast radius, kill-switch, decision gate, audit, delegation |
+| [AuthorityOps](AuthorityOps) | 19 handlers (AUTH-F01–F19): action intake, actor/resource resolve, policy, DLR presence, assumption validate, blast radius + simulation + propagation + seal, kill-switch, decision gate, audit, delegation, authority drift + history + cross-domain correlation, assumption sweep |
+| [ParadoxOps](ParadoxOps) | 12 handlers (PDX-F01–F12): tension set create, pole manage, dimension attach/shift, pressure/imbalance compute, threshold evaluate, drift promote, inter-dimensional drift, seal, patch, lifecycle |
+| [DecisionSurface](DecisionSurface) | Portable Coherence Ops runtime — adapter ABC, claim-event engine, notebook/CLI/Vantage adapters |
 | [Cascade Engine](Cascade-Engine) | 13 cross-domain rules with depth-limited propagation |
-| [Event Contracts](Event-Contracts) | Routing table: 48 functions + 51 events → FEEDS topics/subtypes/handlers |
-| [Money Demo v2](Money-Demo-v2) | 10-step end-to-end pipeline exercising all 4 domain modes |
+| [Event Contracts](Event-Contracts) | Routing table: 67 functions + 79 events → FEEDS topics/subtypes/handlers |
+| [Money Demo v2](Money-Demo-v2) | 10-step end-to-end pipeline exercising all 5 domain modes |
 
 ---
 
