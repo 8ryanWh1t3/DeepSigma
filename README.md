@@ -157,17 +157,17 @@ For the full-platform docs and architecture map, use parked docs directly:
 - `enterprise/docs/mermaid/`
 
 <!-- REPO_STATS_START -->
-**Repo Snapshot** (auto-generated 2026-03-07 04:23 UTC)
+**Repo Snapshot** (auto-generated 2026-03-07 17:40 UTC)
 
-- **1,732** files | **318,085** lines of code
-- **41** CI workflows | **163** test files | **5** pyproject.toml
+- **1,799** files | **331,813** lines of code
+- **41** CI workflows | **178** test files | **5** pyproject.toml
 - **21** EDGE modules
 
 LOC by extension:
-  `.py` 105,380
+  `.py` 116,372
   `.html` 59,838
-  `.json` 56,166
-  `.md` 47,787
+  `.json` 57,437
+  `.md` 49,252
   `.svg` 28,054
   `.jsonl` 5,278
   `.tsx` 2,942
