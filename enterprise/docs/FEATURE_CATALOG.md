@@ -65,6 +65,11 @@ Machine source of truth: `release_kpis/feature_catalog.json`
   - Artifacts: src/core/audit.py
   - Enforcement: CI: ci.yml
   - KPI axes: Operational_Maturity, Technical_Completeness
+- **CERPA Adaptation Loop** (`CERPA`)
+  - Foundational Claim -> Event -> Review -> Patch -> Apply cycle. Every domain mode runs the same loop with domain-specific claims, events, and review logic. Bidirectional mappers bridge to AtomicClaim, DriftSignal, and canonical Patch.
+  - Artifacts: src/core/cerpa/types.py, src/core/cerpa/models.py, src/core/cerpa/engine.py, src/core/cerpa/mappers.py
+  - Enforcement: CI: ci.yml
+  - KPI axes: Technical_Completeness, Operational_Maturity
 
 ### FEEDS Event Surface
 Federated Event Envelope Distribution Surface — event-driven pub/sub connecting governance primitives (TS, ALS, DLR, DS, CE) via file-based bus with manifest-first ingest, deterministic drift detection, authority validation, triage state machine, and canon versioning.

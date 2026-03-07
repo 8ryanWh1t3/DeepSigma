@@ -29,6 +29,7 @@ graph TB
         AUTH[AuthorityOps · 19<br/>Authority Enforcement]
         PDX[ParadoxOps · 12<br/>Tension Detection]
         CASCADE[Cascade Engine<br/>13 Cross-Domain Rules]
+        CERPA["CERPA Cycle<br/>Claim → Event → Review → Patch → Apply"]
     end
 
     subgraph DSurface["DecisionSurface Runtime"]
@@ -92,6 +93,11 @@ graph TB
 
     %% Core to Domain Modes
     SESSION -->|dispatch| Modes
+    INTEL -.->|cycle| CERPA
+    FRAN -.->|cycle| CERPA
+    REOPS -.->|cycle| CERPA
+    AUTH -.->|cycle| CERPA
+    PDX -.->|cycle| CERPA
     INTEL -.->|events| CASCADE
     FRAN -.->|events| CASCADE
     REOPS -.->|events| CASCADE
@@ -146,4 +152,5 @@ graph TB
     style JRM fill:#1a1a2e,stroke:#0f3460,stroke-width:1px,color:#fff
     style Data fill:#0f3460,stroke:#533483,stroke-width:1px,color:#fff
     style Observe fill:#1a1a2e,stroke:#e94560,stroke-width:1px,color:#fff
+    style CERPA fill:#2d1b4e,stroke:#e94560,stroke-width:2px,color:#fff
 ```

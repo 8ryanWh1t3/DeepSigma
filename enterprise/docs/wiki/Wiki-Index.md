@@ -15,6 +15,7 @@ Canonical wiki structure for Sigma OVERWATCH / DeepSigma docs.
 - [Contracts](Contracts)
 - [Runtime Flow](Runtime-Flow)
 - [Sealing & Episodes](Sealing-and-Episodes)
+- [CERPA](CERPA)
 - [Drift -> Patch](Drift-to-Patch)
 - [Coherence Ops Mapping](Coherence-Ops-Mapping)
 - [IRIS](IRIS)

@@ -76,6 +76,7 @@
   - [Event Contracts](Event-Contracts)
   - [Money Demo v2](Money-Demo-v2)
 - **Governance**
+  - [CERPA](CERPA)
   - [Coherence Ops Mapping](Coherence-Ops-Mapping)
   - [IRIS](IRIS)
   - [Unified Atomic Claims](Unified-Atomic-Claims)

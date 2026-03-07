@@ -41,6 +41,7 @@ The runtime enforces four contracts on every decision before it is sealed.
 
 | Page | What it covers |
 |------|---------------|
+| [CERPA](CERPA) | Foundational adaptation loop: Claim → Event → Review → Patch → Apply |
 | [Drift → Patch](Drift-to-Patch) | How drift signals become structured Patch Packets |
 | [Drift Schema](Drift-Schema) | 10 drift types, 3 severity levels, fingerprint dedup |
 | [Coherence Ops Mapping](Coherence-Ops-Mapping) | DLR / RS / DS / MG — the four governance artifacts |
