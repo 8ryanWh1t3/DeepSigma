@@ -134,6 +134,21 @@ python -m src.core.examples.cerpa_contract_demo
 python -m src.core.examples.cerpa_agent_supervision_demo
 ```
 
+## Model Exchange Engine
+
+Deep Sigma is the reactor, boundary, and memory system. Models are interchangeable cognitive thrusters. Models produce exhaust. Deep Sigma produces judgment.
+
+The **Model Exchange Engine (MEE)** standardises how external or local models plug into Deep Sigma. Adapters can draft, reason, summarise, and disagree — but they cannot commit canon, approve themselves, or bypass AuthorityOps.
+
+```bash
+python -m core.cli mee demo          # Run all adapters
+python -m core.cli mee health        # Check adapter health
+```
+
+Available adapters: APEX (Cognis-APEX-3.2), Mock, OpenAI, Claude, GGUF.
+
+See [docs/architecture/model_exchange_engine.md](docs/architecture/model_exchange_engine.md) for full details.
+
 ## Release Artifacts
 
 Build both edition artifacts from one version line:

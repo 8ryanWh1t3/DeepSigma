@@ -89,7 +89,9 @@ ALLOWED_ACRONYMS = {
     "DRT", "DEC", "CLM", "MDPT", "EDGE", "DRIFT", "PATCH",
     "SIGNAL", "RECALL", "CLAIM", "GATE", "SYNC", "CORE",
     "FEEDS", "ALS", "DLQ", "PUB", "SUB", "ACK", "INBOX", "OTHER", "POSIX", "ASGI", "WSGI",
-    "BEACON", "SKEW", "BOOT", "RETCON", "PEGI", "CERO", "ESRB",
+    "BEACON", "SKEW", "BOOT", "RETCON", "PEGI", "CERO", "ESRB", "MEE",
+    "APEX", "GGUF", "OAI", "CLD", "SNRT", "EVIDENCE", "MODEL", "EXCHANGE",
+    "ENGINE", "CMD", "LATENCY", "RATE", "UPTIME",
     "RONIN", "DLC", "DRI", "BOE", "SLO", "CMS", "MVP",
     # Standards / formats / compliance
     "SHACL", "SPARQL", "SPDX", "SBOM", "RDF", "OWL",

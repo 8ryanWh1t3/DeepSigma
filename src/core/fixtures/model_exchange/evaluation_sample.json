@@ -1,0 +1,60 @@
+{
+  "requestId": "REQ-MEE-2026-001",
+  "adapterResults": [
+    {
+      "requestId": "REQ-MEE-2026-001",
+      "adapterName": "apex",
+      "claims": [
+        {
+          "claimId": "APEX-C-001",
+          "text": "Deployment is within SLA targets",
+          "claimType": "inference",
+          "confidence": 0.88,
+          "citations": ["EVIDENCE-LATENCY-P99-2026-Q1"]
+        }
+      ],
+      "reasoning": [],
+      "confidence": 0.90,
+      "citations": ["EVIDENCE-LATENCY-P99-2026-Q1"],
+      "contradictions": [],
+      "modelMeta": {
+        "provider": "local",
+        "model": "Cognis-APEX-3.2",
+        "adapterName": "apex",
+        "version": "3.2",
+        "runtime": "mock"
+      }
+    },
+    {
+      "requestId": "REQ-MEE-2026-001",
+      "adapterName": "mock",
+      "claims": [
+        {
+          "claimId": "MOCK-C-001",
+          "text": "SLA targets appear to be met based on evidence",
+          "claimType": "inference",
+          "confidence": 0.82,
+          "citations": ["EVIDENCE-LATENCY-P99-2026-Q1"]
+        }
+      ],
+      "reasoning": [],
+      "confidence": 0.85,
+      "citations": ["EVIDENCE-LATENCY-P99-2026-Q1"],
+      "contradictions": [],
+      "modelMeta": {
+        "provider": "local",
+        "model": "mock-deterministic-v1",
+        "adapterName": "mock",
+        "version": "1.0.0",
+        "runtime": "in-process"
+      }
+    }
+  ],
+  "agreementScore": 0.72,
+  "contradictionScore": 0.0,
+  "noveltyScore": 0.5,
+  "evidenceCoverageScore": 1.0,
+  "driftLikelihood": 0.093,
+  "recommendedEscalation": "accept-for-drafting",
+  "notes": []
+}

@@ -1,0 +1,51 @@
+{
+  "requestId": "REQ-MEE-2026-001",
+  "adapterName": "apex",
+  "claims": [
+    {
+      "claimId": "APEX-C-a1b2c3d4-1",
+      "text": "APEX analysis: 'Is the current deployment within SLA targets' — supported by evidence",
+      "claimType": "inference",
+      "confidence": 0.88,
+      "citations": ["EVIDENCE-LATENCY-P99-2026-Q1", "EVIDENCE-ERROR-RATE-2026-Q1"],
+      "ttlSeconds": 3600
+    },
+    {
+      "claimId": "APEX-C-a1b2c3d4-2",
+      "text": "Operational context for 'SLA Compliance Review' is nominal",
+      "claimType": "fact",
+      "confidence": 0.93,
+      "citations": ["EVIDENCE-LATENCY-P99-2026-Q1"],
+      "ttlSeconds": 3600
+    }
+  ],
+  "reasoning": [
+    {
+      "stepId": "APEX-S-a1b2c3d4-1",
+      "kind": "observation",
+      "text": "Ingesting evidence set (3 items) for topic 'SLA Compliance Review'",
+      "evidenceRefs": ["EVIDENCE-LATENCY-P99-2026-Q1", "EVIDENCE-ERROR-RATE-2026-Q1", "EVIDENCE-UPTIME-SLA-2026-Q1"]
+    },
+    {
+      "stepId": "APEX-S-a1b2c3d4-2",
+      "kind": "comparison",
+      "text": "Cross-referencing claims against baseline operational parameters"
+    },
+    {
+      "stepId": "APEX-S-a1b2c3d4-3",
+      "kind": "inference",
+      "text": "Concluding on question: Is the current deployment within SLA targets for latency and error rate?"
+    }
+  ],
+  "confidence": 0.90,
+  "citations": ["EVIDENCE-LATENCY-P99-2026-Q1", "EVIDENCE-ERROR-RATE-2026-Q1", "EVIDENCE-UPTIME-SLA-2026-Q1"],
+  "contradictions": [],
+  "modelMeta": {
+    "provider": "local",
+    "model": "Cognis-APEX-3.2",
+    "adapterName": "apex",
+    "version": "3.2",
+    "runtime": "mock"
+  },
+  "ttl": "3600"
+}

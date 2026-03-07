@@ -1,0 +1,24 @@
+{
+  "request_id": "REQ-MEE-2026-001",
+  "topic": "SLA Compliance Review",
+  "question": "Is the current deployment within SLA targets for latency and error rate?",
+  "evidence": [
+    "EVIDENCE-LATENCY-P99-2026-Q1",
+    "EVIDENCE-ERROR-RATE-2026-Q1",
+    "EVIDENCE-UPTIME-SLA-2026-Q1"
+  ],
+  "claims": [
+    {
+      "claimId": "CLAIM-SLA-001",
+      "statement": "P99 latency is under 200ms threshold",
+      "confidence": 0.95
+    }
+  ],
+  "ttl": 3600,
+  "context": {
+    "environment": "production",
+    "region": "us-east-1",
+    "service": "decision-engine",
+    "reviewCycle": "quarterly"
+  }
+}

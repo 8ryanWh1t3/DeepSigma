@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/model_exchange_result.schema.json",
+  "title": "Model Exchange Reasoning Result",
+  "description": "Validated output from a single model adapter invocation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "requestId",
+    "adapterName",
+    "claims",
+    "reasoning",
+    "confidence",
+    "citations",
+    "contradictions",
+    "modelMeta"
+  ],
+  "properties": {
+    "requestId": { "type": "string", "minLength": 1 },
+    "adapterName": { "type": "string", "minLength": 1 },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["claimId", "text", "claimType", "confidence"],
+        "properties": {
+          "claimId": { "type": "string", "minLength": 1 },
+          "text": { "type": "string", "minLength": 1 },
+          "claimType": {
+            "type": "string",
+            "enum": ["fact", "inference", "recommendation", "risk", "warning", "observation"]
+          },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+          "citations": { "type": "array", "items": { "type": "string" } },
+          "contradictionIds": { "type": "array", "items": { "type": "string" } },
+          "ttlSeconds": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    "reasoning": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["stepId", "kind", "text"],
+        "properties": {
+          "stepId": { "type": "string", "minLength": 1 },
+          "kind": {
+            "type": "string",
+            "enum": ["observation", "inference", "comparison", "warning"]
+          },
+          "text": { "type": "string", "minLength": 1 },
+          "evidenceRefs": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "citations": { "type": "array", "items": { "type": "string" } },
+    "contradictions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["contradictionId", "severity", "leftRef", "rightRef", "note"],
+        "properties": {
+          "contradictionId": { "type": "string", "minLength": 1 },
+          "severity": { "type": "string", "enum": ["low", "medium", "high"] },
+          "leftRef": { "type": "string", "minLength": 1 },
+          "rightRef": { "type": "string", "minLength": 1 },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "modelMeta": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["provider", "model", "adapterName"],
+      "properties": {
+        "provider": { "type": "string", "minLength": 1 },
+        "model": { "type": "string", "minLength": 1 },
+        "adapterName": { "type": "string", "minLength": 1 },
+        "version": { "type": "string" },
+        "runtime": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "extra": { "type": "object" }
+      }
+    },
+    "ttl": { "type": "string" },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "rawText": { "type": "string" },
+    "rawJson": { "type": "object" }
+  }
+}

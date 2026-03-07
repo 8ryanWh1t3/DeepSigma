@@ -712,6 +712,71 @@ def cmd_feeds_claim_submit(args: argparse.Namespace) -> None:
     sys.exit(0 if result.rejected == 0 else 1)
 
 
+def cmd_mee_demo(args: argparse.Namespace) -> None:
+    """Run the Model Exchange Engine demo with all adapters."""
+    from .model_exchange import ModelExchangeEngine
+    from .model_exchange.adapters import (
+        ApexAdapter,
+        ClaudeAdapter,
+        GGUFAdapter,
+        MockAdapter,
+        OpenAIAdapter,
+    )
+
+    engine = ModelExchangeEngine()
+    engine.registry.register("apex", ApexAdapter())
+    engine.registry.register("mock", MockAdapter())
+    engine.registry.register("openai", OpenAIAdapter())
+    engine.registry.register("claude", ClaudeAdapter())
+    engine.registry.register("gguf", GGUFAdapter())
+
+    packet = {
+        "request_id": "REQ-CLI-001",
+        "topic": "SLA Compliance Review",
+        "question": "Is the current deployment within SLA targets?",
+        "evidence": ["EVIDENCE-LATENCY-P99", "EVIDENCE-ERROR-RATE"],
+        "ttl": 3600,
+    }
+
+    evaluation = engine.run(packet, engine.registry.list_adapters())
+
+    if getattr(args, "json", False):
+        print(json.dumps(evaluation.to_dict(), indent=2))
+    else:
+        print("Model Exchange Engine — Demo")
+        print("Models produce exhaust. Deep Sigma produces judgment.")
+        print()
+        for r in evaluation.adapter_results:
+            print(f"  [{r.adapter_name}] confidence={r.confidence:.2f}  claims={len(r.claims)}")
+        print()
+        print(f"  Agreement:    {evaluation.agreement_score:.4f}")
+        print(f"  Contradiction:{evaluation.contradiction_score:.4f}")
+        print(f"  Drift Risk:   {evaluation.drift_likelihood:.4f}")
+        print(f"  Escalation:   {evaluation.recommended_escalation}")
+
+
+def cmd_mee_health(args: argparse.Namespace) -> None:
+    """Check Model Exchange Engine adapter health."""
+    from .model_exchange import ModelExchangeEngine
+    from .model_exchange.adapters import (
+        ApexAdapter,
+        ClaudeAdapter,
+        GGUFAdapter,
+        MockAdapter,
+        OpenAIAdapter,
+    )
+
+    engine = ModelExchangeEngine()
+    engine.registry.register("apex", ApexAdapter())
+    engine.registry.register("mock", MockAdapter())
+    engine.registry.register("openai", OpenAIAdapter())
+    engine.registry.register("claude", ClaudeAdapter())
+    engine.registry.register("gguf", GGUFAdapter())
+
+    health = engine.health()
+    print(json.dumps(health, indent=2))
+
+
 def cmd_demo(args: argparse.Namespace) -> None:
     """Run the deterministic drift-patch demo using bundled sample data.
 
@@ -1335,6 +1400,17 @@ def main() -> None:
     p_demo.add_argument("--artifacts", default=None, metavar="DIR",
                         help="Write artifact files to directory")
     p_demo.set_defaults(func=cmd_demo)
+
+    # ── mee (Model Exchange Engine) ──────────────────────────────
+    p_mee = subparsers.add_parser("mee", help="Model Exchange Engine")
+    mee_sub = p_mee.add_subparsers(dest="mee_command", required=True)
+
+    p_mee_demo = mee_sub.add_parser("demo", help="Run MEE demo with all adapters")
+    p_mee_demo.add_argument("--json", action="store_true", help="Output JSON")
+    p_mee_demo.set_defaults(func=cmd_mee_demo)
+
+    p_mee_health = mee_sub.add_parser("health", help="Check MEE adapter health")
+    p_mee_health.set_defaults(func=cmd_mee_health)
 
     args = parser.parse_args()
 

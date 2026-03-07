@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/model_exchange_evaluation.schema.json",
+  "title": "Model Exchange Evaluation Result",
+  "description": "Aggregated evaluation across one or more adapter reasoning results.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "requestId",
+    "adapterResults",
+    "agreementScore",
+    "contradictionScore",
+    "noveltyScore",
+    "evidenceCoverageScore",
+    "driftLikelihood",
+    "recommendedEscalation"
+  ],
+  "properties": {
+    "requestId": { "type": "string", "minLength": 1 },
+    "adapterResults": {
+      "type": "array",
+      "items": { "$ref": "model_exchange_result.schema.json" }
+    },
+    "agreementScore": { "type": "number", "minimum": 0, "maximum": 1 },
+    "contradictionScore": { "type": "number", "minimum": 0, "maximum": 1 },
+    "noveltyScore": { "type": "number", "minimum": 0, "maximum": 1 },
+    "evidenceCoverageScore": { "type": "number", "minimum": 0, "maximum": 1 },
+    "driftLikelihood": { "type": "number", "minimum": 0, "maximum": 1 },
+    "recommendedEscalation": {
+      "type": "string",
+      "enum": ["accept-for-drafting", "human-review", "authority-review", "reject"]
+    },
+    "notes": { "type": "array", "items": { "type": "string" } }
+  }
+}
