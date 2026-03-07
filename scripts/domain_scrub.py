@@ -245,6 +245,8 @@ ALLOWED_ACRONYMS = {
     "PTS", "PDX", "POLE", "POLES", "DIM", "COMMON", "UNCOMMON",
     # DecisionSurface — claim/event engine, assumption, evaluation tokens
     "ASMP", "EVAL", "ART",
+    # CERPA — adaptation loop primitives and demo tokens
+    "CERPA", "ADJUST", "APPLY", "CYCLE",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}

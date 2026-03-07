@@ -117,6 +117,23 @@ make enterprise-demo
 make test-enterprise
 ```
 
+## Primitive Loop: CERPA
+
+**Claim -> Event -> Review -> Patch -> Apply**
+
+CERPA is the foundational adaptation loop for the platform. Every governance flow — across IntelOps, ReOps, FranOps, AuthorityOps, and ActionOps — follows this cycle:
+
+1. **Claim** — an asserted truth or commitment
+2. **Event** — an observable occurrence
+3. **Review** — evaluate the claim against the event
+4. **Patch** — corrective action if drift is detected
+5. **Apply** — execute the patch and update state
+
+```bash
+python -m src.core.examples.cerpa_contract_demo
+python -m src.core.examples.cerpa_agent_supervision_demo
+```
+
 ## Release Artifacts
 
 Build both edition artifacts from one version line:
