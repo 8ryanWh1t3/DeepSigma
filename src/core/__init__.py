@@ -24,6 +24,7 @@ IRISResponse       — structured response with provenance chain
 QueryType          — WHY | WHAT_CHANGED | WHAT_DRIFTED | RECALL | STATUS
 IRISConfig         — configuration for the IRIS engine
 ResolutionStatus   — OK | PARTIAL | NOT_FOUND | ERROR
+run_coherence_loop — orchestrate CLAIM→EVENT→REVIEW→PATCH→APPLY
 """
 from __future__ import annotations
 
@@ -77,6 +78,12 @@ from .primitive_records import (
     PatchRecord,
     ApplyRecord,
     RECORD_TYPE_MAP,
+)
+from .coherence_loop import (
+    run_coherence_loop,
+    CoherenceLoopResult,
+    CoherenceStep,
+    StepRecord,
 )
 from .coherence_gate import CoherenceGate, GateConfig, GateResult, Signal
 from .agent import AgentSession
@@ -147,4 +154,8 @@ __all__ = [
     "PatchRecord",
     "ApplyRecord",
     "RECORD_TYPE_MAP",
+    "run_coherence_loop",
+    "CoherenceLoopResult",
+    "CoherenceStep",
+    "StepRecord",
 ]

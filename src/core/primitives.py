@@ -126,10 +126,12 @@ def _snake_to_camel(key: str) -> str:
 
 @dataclass
 class AtomicClaim:
-    """The universal lowest-level primitive.
+    """Archival-layer implementation of PrimitiveType.CLAIM.
 
-    Every higher-order structure (DecisionEpisode, DriftSignal, Patch)
-    is composed of or references AtomicClaims.
+    The indivisible unit of asserted truth.  Every higher-order structure
+    (DecisionEpisode, DriftSignal, Patch) is composed of or references
+    AtomicClaims.  This is a domain dataclass — the canonical type is
+    ``PrimitiveType.CLAIM``.
     """
 
     claim_id: str
@@ -215,10 +217,11 @@ class AtomicClaim:
 
 @dataclass
 class DecisionEpisode:
-    """The orchestration container.
+    """Archival-layer implementation of PrimitiveType.EVENT (orchestration container).
 
-    Composed from claims and decision metadata, capturing the full
-    lifecycle from goal through outcome.
+    Captures the full decision lifecycle from goal through outcome,
+    composed from claims and decision metadata.  This is a domain
+    dataclass — the canonical type is ``PrimitiveType.EVENT``.
     """
 
     decision_id: str
@@ -303,9 +306,12 @@ class DecisionEpisode:
 
 @dataclass
 class DriftSignal:
-    """Divergence between expected and observed state.
+    """Archival-layer implementation of PrimitiveType.EVENT (drift detection).
 
+    Represents divergence between expected and observed state.
     Links a DecisionEpisode to the corrective action that follows.
+    This is a domain dataclass — the canonical type is
+    ``PrimitiveType.EVENT``.
     """
 
     drift_id: str
@@ -366,10 +372,12 @@ class DriftSignal:
 
 @dataclass
 class Patch:
-    """Append-only correction resolving a drift signal.
+    """Archival-layer implementation of PrimitiveType.PATCH.
 
-    Patches never overwrite prior state — they supersede, creating
-    an immutable lineage chain.
+    Append-only correction resolving a drift signal.  Patches never
+    overwrite prior state — they supersede, creating an immutable
+    lineage chain.  This is a domain dataclass — the canonical type
+    is ``PrimitiveType.PATCH``.
     """
 
     patch_id: str

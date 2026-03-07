@@ -14,7 +14,7 @@ See [five-primitive-rule.md](five-primitive-rule.md) for enforcement details, CI
 | Explicit record types per primitive | `src/core/primitive_records.py` |
 | Coherence loop orchestrator | `src/core/coherence_loop.py` |
 | Memory Graph mapping | `src/core/primitive_mg.py` |
-| CI guard (10 checks) | `scripts/validate_five_primitives.py` |
+| CI guard (7 groups, 18 assertions) | `scripts/validate_five_primitives.py` |
 | JSON Schema | `src/core/schemas/primitives/primitive_envelope.schema.json` |
 
 ## Design Principles
@@ -25,9 +25,11 @@ See [five-primitive-rule.md](five-primitive-rule.md) for enforcement details, CI
 4. **Deterministic sealing** — SHA-256 hashing for tamper detection
 5. **No sixth type** — CI guard enforces exactly five primitives
 
-## Domain-Specific Implementations
+## Archival Layer — Domain Dataclasses
 
-Four archival dataclasses implement domain-specific aspects of the five-primitive model:
+Four archival dataclasses provide domain-specific structure within the five-primitive model.
+These are **implementations**, not peers of the five primitives. The canonical types are
+defined solely by `PrimitiveType` (CLAIM, EVENT, REVIEW, PATCH, APPLY).
 
 ### AtomicClaim → CLAIM
 
@@ -106,6 +108,20 @@ These canonical primitives are reference definitions. Existing domain-specific m
 | Patch | `PatchRecommendation` | `decision_surface/models.py` | Surface layer — recommendation only |
 | Patch | `TensionPatch` | `paradox_ops/models.py` | Paradox-specific — tension remediation |
 
+## Contributor Guardrails
+
+1. **No sixth type.** If you need a new category, use the `metadata` field on
+   `PrimitiveEnvelope` or create a subtype. Do not add a sixth `PrimitiveType` member.
+2. **Domain models are archival implementations.** `AtomicClaim`, `DecisionEpisode`,
+   `DriftSignal`, and `Patch` implement specific aspects of the five primitives.
+   They are not peers — they sit one layer below `PrimitiveType`.
+3. **Use the coherence loop for writes.** `run_coherence_loop()` is the canonical
+   write path. It sequences CLAIM->EVENT->REVIEW->PATCH->APPLY, wraps each step
+   in a `PrimitiveEnvelope`, and captures timing automatically.
+4. **CI enforces the boundary.** The Five-Primitive Guard
+   (`scripts/validate_five_primitives.py`) runs 18 assertions on every push.
+   Any new primitive-type-bearing dataclass must be registered in `KNOWN_CLASSES`.
+
 ## File Layout
 
 | File | Purpose |
@@ -117,7 +133,7 @@ These canonical primitives are reference definitions. Existing domain-specific m
 | `src/core/primitive_mg.py` | Memory Graph node/edge mapping |
 | `src/core/schemas/primitives/*.schema.json` | JSON Schema contracts (5 files) |
 | `src/core/fixtures/primitives/*.json` | Example payloads (4 files) |
-| `scripts/validate_five_primitives.py` | CI guard (10 checks) |
+| `scripts/validate_five_primitives.py` | CI guard (7 groups, 18 assertions) |
 | `tests/test_primitives.py` | Unit and lifecycle tests |
 | `tests/test_primitive_envelope.py` | Envelope wrapping tests |
 | `tests/test_primitive_records.py` | Record type tests |

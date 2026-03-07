@@ -159,6 +159,16 @@ The `demo` command prints:
          print(response.summary)
          for link in response.provenance_chain:
              print(f"  [{link.artifact}] {link.ref_id} ({link.role})")
+
+         # 7. Run the coherence loop (canonical write path)
+         from core import run_coherence_loop
+
+         result = run_coherence_loop(
+             claim_payload={"id": "CLM-001", "text": "System is healthy", "domain": "ops", "source": "monitor"},
+             event_payload={"id": "EVT-001", "text": "Latency spike detected", "domain": "ops", "source": "apm"},
+             source="quick-start",
+         )
+         print(f"Loop {result.loop_id}: {len(result.steps)} steps, completed={result.completed}")
          ```
 
          ## Examples
