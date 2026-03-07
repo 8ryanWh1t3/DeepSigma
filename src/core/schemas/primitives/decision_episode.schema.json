@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/decision_episode.schema.json",
+  "title": "DecisionEpisode — Canonical Core Primitive",
+  "description": "The orchestration container. Composed from claims and decision metadata, capturing the full lifecycle from goal through outcome.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "decisionId",
+    "title",
+    "owner",
+    "createdAt",
+    "goal",
+    "status"
+  ],
+  "properties": {
+    "decisionId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique decision identifier."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable title describing the decision."
+    },
+    "owner": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Accountable role or function."
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this decision episode was created."
+    },
+    "goal": {
+      "type": "string",
+      "description": "What this decision aims to achieve."
+    },
+    "claimsUsed": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Claim IDs referenced in this decision."
+    },
+    "options": {
+      "type": "array",
+      "items": { "type": "object" },
+      "description": "Available decision options evaluated."
+    },
+    "selectedOption": {
+      "type": "string",
+      "description": "The option chosen for execution."
+    },
+    "rejectedOptions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Option IDs explicitly rejected."
+    },
+    "assumptions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Assumptions underpinning this decision."
+    },
+    "evidence": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Evidence references supporting this decision."
+    },
+    "blastRadius": {
+      "type": "string",
+      "description": "Scope of potential impact (e.g., service, org, global)."
+    },
+    "killSwitches": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Named kill switches that can halt execution."
+    },
+    "outcome": {
+      "type": ["object", "null"],
+      "description": "Result of executing the decision."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "active", "sealed", "archived", "frozen"],
+      "description": "Lifecycle status of this episode."
+    },
+    "lineage": {
+      "type": "object",
+      "description": "Parent/child decision references and triggered-by links."
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "patchId": "PATCH-2026-0100",
+  "decisionId": "DEC-2026-0100",
+  "driftId": "DRIFT-2026-0100",
+  "issuedAt": "2026-03-02T10:15:00Z",
+  "description": "Increase auto-scaling max replicas from 5 to 10 and lower CPU threshold to 60%",
+  "claimsUpdated": ["CLAIM-2026-0100"],
+  "supersedes": [],
+  "status": "applied",
+  "rationale": "Claim expired due to traffic spike exceeding original scaling parameters",
+  "lineage": {"parentPatch": null, "driftRef": "DRIFT-2026-0100", "rev": 1}
+}

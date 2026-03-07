@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/drift_signal_primitive.schema.json",
+  "title": "DriftSignal — Canonical Core Primitive",
+  "description": "Represents divergence between expected and observed state. Links a decision episode to the drift that triggered corrective action.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "driftId",
+    "decisionId",
+    "trigger",
+    "detectedAt",
+    "severity",
+    "status"
+  ],
+  "properties": {
+    "driftId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique drift signal identifier."
+    },
+    "decisionId": {
+      "type": "string",
+      "description": "Decision episode that produced this drift."
+    },
+    "relatedClaims": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Claim IDs affected by this drift."
+    },
+    "trigger": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What caused the drift (e.g., half_life_expiry, contradiction, policy_change)."
+    },
+    "detectedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this drift was detected."
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["green", "yellow", "red"],
+      "description": "Traffic-light severity classification."
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of the drift."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["detected", "acknowledged", "resolved", "escalated", "suppressed"],
+      "description": "Lifecycle status of this drift signal."
+    },
+    "telemetryRefs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "References to telemetry data supporting detection."
+    },
+    "expectedState": {
+      "type": "string",
+      "description": "What was expected based on the decision."
+    },
+    "observedState": {
+      "type": "string",
+      "description": "What was actually observed."
+    }
+  }
+}

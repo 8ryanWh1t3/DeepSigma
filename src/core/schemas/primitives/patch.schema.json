@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/patch.schema.json",
+  "title": "Patch — Canonical Core Primitive",
+  "description": "Append-only correction. Patches never overwrite prior state — they supersede, creating an immutable lineage chain.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "patchId",
+    "decisionId",
+    "driftId",
+    "issuedAt",
+    "description",
+    "status"
+  ],
+  "properties": {
+    "patchId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique patch identifier."
+    },
+    "decisionId": {
+      "type": "string",
+      "description": "Decision episode this patch corrects."
+    },
+    "driftId": {
+      "type": "string",
+      "description": "Drift signal this patch resolves."
+    },
+    "issuedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this patch was issued."
+    },
+    "description": {
+      "type": "string",
+      "description": "What this patch does."
+    },
+    "claimsUpdated": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Claim IDs updated by this patch."
+    },
+    "supersedes": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Patch IDs this patch replaces. Append-only — never overwrite."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["proposed", "approved", "applied", "rejected", "superseded"],
+      "description": "Lifecycle status of this patch."
+    },
+    "rationale": {
+      "type": "string",
+      "description": "Why this patch was issued."
+    },
+    "lineage": {
+      "type": "object",
+      "description": "Lineage metadata (parent patch, drift ref, revision number)."
+    }
+  }
+}

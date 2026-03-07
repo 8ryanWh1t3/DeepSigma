@@ -1,0 +1,22 @@
+{
+  "decisionId": "DEC-2026-0100",
+  "title": "Scale payments service horizontally to meet SLA",
+  "owner": "platform-ops",
+  "createdAt": "2026-03-01T10:30:00Z",
+  "goal": "Maintain p99 latency under 200ms during peak traffic",
+  "claimsUsed": ["CLAIM-2026-0100"],
+  "options": [
+    {"id": "opt-1", "description": "Add 3 replicas to us-east-1"},
+    {"id": "opt-2", "description": "Enable auto-scaling with 70% CPU threshold"},
+    {"id": "opt-3", "description": "Do nothing and monitor"}
+  ],
+  "selectedOption": "opt-2",
+  "rejectedOptions": ["opt-1", "opt-3"],
+  "assumptions": ["Current traffic pattern continues for 48 hours"],
+  "evidence": ["evd-apm-2026-0100", "evd-traffic-2026-0100"],
+  "blastRadius": "service",
+  "killSwitches": ["disable-autoscaling-payments"],
+  "outcome": {"code": "success", "reason": "Auto-scaling activated, p99 stable at 150ms"},
+  "status": "sealed",
+  "lineage": {"parent": null, "triggeredBy": "CLAIM-2026-0100"}
+}

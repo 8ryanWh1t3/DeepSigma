@@ -71,6 +71,10 @@ def _get_validator(schema_name: str) -> Optional[Draft202012Validator]:
         schema_file = SPECS_DIR / "feeds" / f"{schema_name}.schema.json"
 
     if not schema_file.exists():
+        # Fallback: check schemas/primitives/ subdirectory
+        schema_file = SPECS_DIR / "primitives" / f"{schema_name}.schema.json"
+
+    if not schema_file.exists():
         logger.warning("Schema not found: %s", schema_file)
         return None
 
@@ -103,6 +107,14 @@ def _build_registry() -> Registry:
     feeds_dir = SPECS_DIR / "feeds"
     if feeds_dir.is_dir():
         for schema_file in feeds_dir.glob("*.schema.json"):
+            content = json.loads(schema_file.read_text(encoding="utf-8"))
+            uri = f"{_REF_PREFIX}{schema_file.name}"
+            resources.append((uri, Resource.from_contents(content)))
+
+    # Also scan schemas/primitives/ subdirectory for $ref resolution
+    primitives_dir = SPECS_DIR / "primitives"
+    if primitives_dir.is_dir():
+        for schema_file in primitives_dir.glob("*.schema.json"):
             content = json.loads(schema_file.read_text(encoding="utf-8"))
             uri = f"{_REF_PREFIX}{schema_file.name}"
             resources.append((uri, Resource.from_contents(content)))

@@ -1,0 +1,13 @@
+{
+  "driftId": "DRIFT-2026-0100",
+  "decisionId": "DEC-2026-0100",
+  "relatedClaims": ["CLAIM-2026-0100"],
+  "trigger": "half_life_expiry",
+  "detectedAt": "2026-03-02T10:05:00Z",
+  "severity": "yellow",
+  "description": "Claim CLAIM-2026-0100 half-life expired; p99 latency now 280ms, exceeding 200ms SLA",
+  "status": "detected",
+  "telemetryRefs": ["tel-apm-2026-0100-002"],
+  "expectedState": "p99 < 200ms",
+  "observedState": "p99 = 280ms"
+}

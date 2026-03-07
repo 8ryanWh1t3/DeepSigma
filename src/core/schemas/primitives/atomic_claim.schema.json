@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/atomic_claim.schema.json",
+  "title": "AtomicClaim — Canonical Core Primitive",
+  "description": "The universal lowest-level primitive. Every higher-order structure (DecisionEpisode, DriftSignal, Patch) is composed of or references AtomicClaims.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "claimId",
+    "claimType",
+    "statement",
+    "source",
+    "confidence",
+    "createdAt",
+    "status"
+  ],
+  "properties": {
+    "claimId": {
+      "type": "string",
+      "pattern": "^CLAIM-[0-9]{4}-[0-9]{4,}$",
+      "description": "Stable domain-level identifier. Format: CLAIM-YYYY-NNNN. Never reused."
+    },
+    "claimType": {
+      "type": "string",
+      "enum": ["observation", "inference", "assumption", "forecast", "norm", "constraint"],
+      "description": "Epistemic category of the claim."
+    },
+    "statement": {
+      "type": "string",
+      "minLength": 10,
+      "description": "One sentence, testable assertion."
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Primary source reference (URL, doc ID, sensor ID, etc.)."
+    },
+    "provenance": {
+      "type": "array",
+      "description": "Ordered provenance chain for full trust lineage.",
+      "items": {
+        "type": "object",
+        "required": ["type", "ref"],
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["claim", "evidence", "source"],
+            "description": "Kind of provenance link."
+          },
+          "ref": {
+            "type": "string",
+            "description": "Pointer to the linked artifact."
+          },
+          "role": {
+            "type": "string",
+            "description": "Role in the chain (e.g., root_assertion, primary_evidence)."
+          }
+        }
+      }
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Machine-comparable confidence score (0.00-1.00)."
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this claim was first asserted."
+    },
+    "expiresAt": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Computed expiry timestamp. Null if perpetual."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "expired", "superseded", "disputed", "retracted"],
+      "description": "Lifecycle status of this claim."
+    },
+    "supports": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Claim IDs this claim provides evidence for."
+    },
+    "contradicts": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Claim IDs in active conflict with this claim."
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Free-form tags for search, filtering, and domain grouping."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Extensible properties for domain-specific data."
+    }
+  }
+}
