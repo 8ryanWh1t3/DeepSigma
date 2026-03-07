@@ -62,6 +62,7 @@ class RuntimeGate:
 
         from .policy_runtime import evaluate
 
+        context["_compiled"] = compiled
         result = evaluate(request, context)
 
         return GateDecision(

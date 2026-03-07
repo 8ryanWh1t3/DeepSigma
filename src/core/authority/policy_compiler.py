@@ -15,6 +15,7 @@ from typing import Any, Dict, List
 
 from .models import (
     CompiledPolicy,
+    ExpiryCondition,
     GovernanceArtifact,
     PolicyConstraint,
     PolicyEvaluation,
@@ -146,6 +147,29 @@ def extract_constraints(
     return result
 
 
+def extract_expiry_conditions(
+    policy_pack: Dict[str, Any],
+) -> List[ExpiryCondition]:
+    """Extract expiry conditions from a policy pack.
+
+    Args:
+        policy_pack: Policy configuration dict.
+
+    Returns:
+        List of ExpiryCondition objects.
+    """
+    raw = policy_pack.get("expiryConditions", policy_pack.get("expiry_conditions", []))
+    result: List[ExpiryCondition] = []
+    for ec in raw:
+        result.append(ExpiryCondition(
+            condition_id=ec.get("conditionId", ec.get("condition_id", f"EC-{uuid.uuid4().hex[:8]}")),
+            condition_type=ec.get("conditionType", ec.get("condition_type", "")),
+            expires_at=ec.get("expiresAt", ec.get("expires_at")),
+            half_life_ref=ec.get("halfLifeRef", ec.get("half_life_ref")),
+        ))
+    return result
+
+
 def compile_from_source(source: PolicySource) -> CompiledPolicy:
     """Compile a PolicySource into a CompiledPolicy (OpenPQL pipeline entry).
 
@@ -172,6 +196,7 @@ def compile_from_source(source: PolicySource) -> CompiledPolicy:
 
     rules = extract_constraints(policy_pack, action_type)
     reasoning = extract_reasoning_requirements(dlr, policy_pack)
+    expiry_conds = extract_expiry_conditions(policy_pack)
 
     # Deterministic policy hash over rules + reasoning
     rules_payload = [
@@ -204,4 +229,5 @@ def compile_from_source(source: PolicySource) -> CompiledPolicy:
         policy_hash=policy_hash,
         seal_hash=seal_hash,
         seal_version=1,
+        expiry_conditions=expiry_conds,
     )

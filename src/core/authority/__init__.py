@@ -10,6 +10,11 @@ from __future__ import annotations
 
 from .artifact_builder import build_artifact, load_artifact, write_artifact
 from .audit_retrieval import AuditRetrieval
+from .constraint_executor import (
+    evaluate_expiry_conditions,
+    execute_constraints,
+    reset_rate_counters,
+)
 from .evidence_chain import EvidenceChain, EvidenceEntry
 from .ledger import AuthorityEntry, AuthorityLedger
 from .policy_source import PolicySource, build_policy_source
@@ -40,4 +45,8 @@ __all__ = [
     "canonical_json",
     "seal",
     "verify_seal",
+    # Constraint Executor
+    "execute_constraints",
+    "evaluate_expiry_conditions",
+    "reset_rate_counters",
 ]

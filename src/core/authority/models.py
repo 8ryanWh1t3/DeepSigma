@@ -116,6 +116,17 @@ class PolicyConstraint:
 
 
 @dataclass
+class ConstraintResult:
+    """Result of evaluating a single PolicyConstraint."""
+
+    constraint_id: str
+    constraint_type: str
+    passed: bool
+    detail: str = ""
+    verdict: str = ""
+
+
+@dataclass
 class AuthorityGrant:
     """A resolved authority grant for a specific scope."""
 
@@ -272,6 +283,7 @@ class CompiledPolicy:
     policy_hash: str = ""  # deterministic hash over rules + requirements
     seal_hash: str = ""
     seal_version: int = 1
+    expiry_conditions: List[ExpiryCondition] = field(default_factory=list)
 
 
 @dataclass

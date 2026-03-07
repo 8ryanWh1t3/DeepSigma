@@ -67,6 +67,7 @@ def evaluate(
         ("assumption_validate", _step_assumption_validate),
         ("half_life_check", _step_half_life_check),
         ("blast_radius_threshold", _step_blast_radius_threshold),
+        ("constraint_evaluate", _step_constraint_evaluate),
         ("decision_gate", _step_decision_gate),
         ("audit_emit", _step_audit_emit),
     ]
@@ -270,6 +271,20 @@ def _step_kill_switch_check(
     if context.get("kill_switch_active", False):
         return False, "kill_switch_is_active", AuthorityVerdict.KILL_SWITCH_ACTIVE
     return True, "kill_switch_clear", None
+
+
+def _step_constraint_evaluate(
+    request: Dict[str, Any],
+    context: Dict[str, Any],
+    now: datetime,
+) -> tuple:
+    """Evaluate compiled policy constraints."""
+    compiled = context.get("_compiled")
+    if compiled is None or not getattr(compiled, "rules", None):
+        return True, "no_compiled_constraints", None
+    from .constraint_executor import execute_constraints
+
+    return execute_constraints(compiled.rules, request, context, now)
 
 
 def _step_decision_gate(
