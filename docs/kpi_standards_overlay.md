@@ -3,7 +3,7 @@
 > **Purpose:** Same KPIs, additional interpretation layer. This document maps every DeepSigma KPI to four external standards frameworks — DORA, ISO/IEC 25010, OpenTelemetry, and SMART metric hygiene — without changing any formula, threshold, or score.
 
 **Overlay version:** 1.1
-**Applicable repo version:** v2.1.1
+**Applicable repo version:** v2.1.2
 **Last updated:** 2026-03-01
 **Governance:** [kpi_governance.md](./kpi_governance.md)
 **Contract files:** [kpi_contracts/](./kpi_contracts/)

@@ -1,5 +1,11 @@
 # Enterprise Changelog
 
+## [2.1.2] — Python 3.10 Compat & Type Safety
+
+`COMPATIBLE:` Fix ISO-8601 `Z` suffix parsing for Python 3.10. Fix pyright type errors. Zero functional changes.
+
+---
+
 ## [2.1.1] — OpenPQL 7-Primitive Upgrade
 
 `COMPATIBLE:` AuthorityOps OpenPQL primitives surfaced as 6 first-class modules. 40 new tests. All additive — zero breaking changes.

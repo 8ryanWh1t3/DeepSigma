@@ -1,6 +1,6 @@
 ---
 title: "ABOUT — Reality Await Layer (RAL)"
-version: "2.1.1"
+version: "2.1.2"
 status: "Canonical"
 last_updated: "2026-03-05"
 spec_id: "ABOUT-RAL-001"

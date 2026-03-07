@@ -1,6 +1,6 @@
 ---
 title: "Release Readiness Checklist — v1"
-version: "2.1.1"
+version: "2.1.2"
 status: "Living Document"
 last_updated: "2026-02-28"
 ---

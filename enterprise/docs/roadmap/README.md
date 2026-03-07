@@ -1,6 +1,6 @@
 ---
 title: "Public Roadmap"
-version: "2.1.1"
+version: "2.1.2"
 status: "Archived — see wiki/Roadmap.md for current roadmap"
 last_updated: "2026-02-28"
 ---

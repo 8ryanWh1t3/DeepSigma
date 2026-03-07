@@ -2,6 +2,18 @@
 
 All contract surface changes are logged here with compatibility annotations.
 
+## [2.1.2] — Python 3.10 Compat & Type Safety
+
+`COMPATIBLE:` Fix ISO-8601 `Z` suffix parsing for Python 3.10 (delegation chain, assumption freshness, half-life checks). Fix pyright errors (PolicySource import, GateDecision attribute access). Zero functional changes — same 786 tests passing.
+
+### Migration
+
+**Affected schemas**: None
+**Consumer action**: None — fixes CI-only regressions from v2.1.1.
+**Rollback**: Yes — pure bugfix.
+
+---
+
 ## [2.1.1] — OpenPQL 7-Primitive Upgrade
 
 `COMPATIBLE:` AuthorityOps OpenPQL primitives surfaced as 6 first-class modules. PolicySource, CompiledPolicy, ArtifactBuilder, RuntimeGate, EvidenceChain, and AuditRetrieval. Seal & Hash deduplicated as shared foundation. 40 new tests (786 total). Demo script. 4 spec docs. All additive — zero breaking changes.

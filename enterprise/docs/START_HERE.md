@@ -1,6 +1,6 @@
 ---
 title: "Start Here — Institutional Decision Infrastructure"
-version: "2.1.1"
+version: "2.1.2"
 status: "Canonical"
 last_updated: "2026-03-05"
 ---
