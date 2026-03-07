@@ -131,8 +131,8 @@ These canonical primitives are reference definitions. Existing domain-specific m
 | `src/core/primitive_records.py` | Explicit record types (ClaimRecord, EventRecord, etc.) |
 | `src/core/coherence_loop.py` | Coherence loop orchestrator wrapping CERPA |
 | `src/core/primitive_mg.py` | Memory Graph node/edge mapping |
-| `src/core/schemas/primitives/*.schema.json` | JSON Schema contracts (5 files) |
-| `src/core/fixtures/primitives/*.json` | Example payloads (4 files) |
+| `src/core/schemas/primitives/*.schema.json` | JSON Schema contracts (6 files) |
+| `src/core/fixtures/primitives/*.json` | Example payloads (5 files) |
 | `scripts/validate_five_primitives.py` | CI guard (7 groups, 18 assertions) |
 | `tests/test_primitives.py` | Unit and lifecycle tests |
 | `tests/test_primitive_envelope.py` | Envelope wrapping tests |

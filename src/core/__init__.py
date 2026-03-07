@@ -78,6 +78,7 @@ from .primitive_records import (
     PatchRecord,
     ApplyRecord,
     RECORD_TYPE_MAP,
+    record_from_cerpa,
 )
 from .coherence_loop import (
     run_coherence_loop,
@@ -154,6 +155,7 @@ __all__ = [
     "PatchRecord",
     "ApplyRecord",
     "RECORD_TYPE_MAP",
+    "record_from_cerpa",
     "run_coherence_loop",
     "CoherenceLoopResult",
     "CoherenceStep",

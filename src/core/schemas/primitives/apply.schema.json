@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/apply.schema.json",
+  "title": "Apply — Canonical Core Primitive",
+  "description": "Outcome of applying a Patch. Records whether the corrective action succeeded and captures the resulting system state.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "applyId",
+    "patchId",
+    "domain",
+    "timestamp",
+    "success"
+  ],
+  "properties": {
+    "applyId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Unique apply result identifier."
+    },
+    "patchId": {
+      "type": "string",
+      "description": "Patch that was applied."
+    },
+    "domain": {
+      "type": "string",
+      "description": "Operational domain this apply belongs to."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the patch was applied."
+    },
+    "success": {
+      "type": "boolean",
+      "description": "Whether the patch application succeeded."
+    },
+    "newState": {
+      "type": "object",
+      "description": "Resulting system state after applying the patch."
+    },
+    "updatedClaims": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Claim IDs updated as a result of applying the patch."
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Extensible metadata properties."
+    }
+  }
+}

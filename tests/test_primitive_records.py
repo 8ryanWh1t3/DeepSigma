@@ -279,3 +279,29 @@ class TestWrapRecord:
         rec = EventRecord.from_cerpa(_cerpa_event())
         env = wrap_record(rec, source="test", metadata={"tag": "ci"})
         assert env.metadata == {"tag": "ci"}
+
+
+# ── Schema validation ────────────────────────────────────────────
+
+
+class TestApplySchemaFixture:
+    """Validate apply_example.json against apply.schema.json."""
+
+    def test_fixture_validates_against_schema(self):
+        import json
+        import jsonschema
+
+        schema_path = _SRC_ROOT / "core" / "schemas" / "primitives" / "apply.schema.json"
+        fixture_path = _SRC_ROOT / "core" / "fixtures" / "primitives" / "apply_example.json"
+        schema = json.loads(schema_path.read_text())
+        fixture = json.loads(fixture_path.read_text())
+        jsonschema.validate(fixture, schema)
+
+    def test_apply_record_to_dict_validates(self):
+        import json
+        import jsonschema
+
+        schema_path = _SRC_ROOT / "core" / "schemas" / "primitives" / "apply.schema.json"
+        schema = json.loads(schema_path.read_text())
+        rec = ApplyRecord.from_cerpa(_cerpa_apply())
+        jsonschema.validate(rec.to_dict(), schema)

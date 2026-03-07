@@ -1,0 +1,16 @@
+{
+  "applyId": "APPLY-2026-0100",
+  "patchId": "PATCH-2026-0100",
+  "domain": "infra",
+  "timestamp": "2026-03-02T10:20:00Z",
+  "success": true,
+  "newState": {
+    "replicas": 10,
+    "cpuThreshold": "60%"
+  },
+  "updatedClaims": ["CLAIM-2026-0100"],
+  "metadata": {
+    "elapsedMs": 1200,
+    "executor": "auto-scaler"
+  }
+}
