@@ -22,6 +22,7 @@ It applies pre-execution authority gates, policy-bound execution contracts, and 
 ## Core Runtime
 
 The runtime enforces four contracts on every decision before it is sealed.
+After sealing, outcomes flow through the [CERPA](CERPA) adaptation loop (Claim → Event → Review → Patch → Apply).
 
 | Page | What it covers |
 |------|---------------|

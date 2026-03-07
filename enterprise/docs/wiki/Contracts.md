@@ -90,6 +90,16 @@ Policy Pack
 
 ---
 
+## Contracts vs. CERPA Primitives
+
+The four contracts above govern decisions **before** they are sealed. After sealing, the outcome enters the **CERPA adaptation loop** — five primitives that detect drift and apply corrections:
+
+**Claim → Event → Review → Patch → Apply**
+
+Contracts constrain execution; CERPA adapts from outcomes. See [CERPA](CERPA) for the full lifecycle.
+
+---
+
 ## Related Pages
 
 - [DTE Schema](DTE-Schema) — full DTE field reference

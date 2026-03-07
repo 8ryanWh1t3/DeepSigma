@@ -1,5 +1,7 @@
 # Coherence Ops Pipeline
 
+CERPA primitives (Claim → Event → Review → Patch → Apply) produce the sealed episodes and drift events that feed this pipeline.
+
 Data flow through the four canonical artifacts and the governance loop.
 
 ```mermaid
