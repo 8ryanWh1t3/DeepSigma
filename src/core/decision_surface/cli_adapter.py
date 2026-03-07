@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import asdict
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from .models import (
     Claim,
@@ -60,7 +60,7 @@ class CLIAdapter(SurfaceAdapter):
 
     def to_json(self) -> str:
         """Serialize current state to JSON for CLI output."""
-        data = {
+        data: dict[str, Any] = {
             "claims": [asdict(c) for c in self._claims],
             "events": [asdict(e) for e in self._events],
             "evidence": [asdict(e) for e in self._evidence],
