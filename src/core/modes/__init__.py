@@ -1,9 +1,10 @@
-"""Domain modes — IntelOps, FranOps, ReflectionOps, AuthorityOps.
+"""Domain modes — IntelOps, FranOps, ReflectionOps, AuthorityOps, ParadoxOps, ActionOps.
 
-Each domain mode wraps existing FEEDS consumers, validators, and state stores
-into a composable handler interface keyed by Function ID.
+Six domain modes (79 handlers) wrapping FEEDS consumers, validators, and
+state stores into a composable handler interface keyed by Function ID.
 
-AuthorityOps sits at: IntelOps → ReOps → AuthorityOps → Execution → FranOps
+Pipeline: IntelOps → ReOps → AuthorityOps → ActionOps → FranOps
+Cross-cutting: ParadoxOps (tension detection across all domains)
 """
 
 from __future__ import annotations

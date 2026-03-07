@@ -172,6 +172,52 @@ RULES: List[CascadeRule] = [
         description="Kill-switch active in authority check propagates to ReOps freeze.",
         severity_filter="red",
     ),
+
+    # ── ActionOps cascade rules ──────────────────────────────────
+
+    # AuthorityOps -> ActionOps
+    CascadeRule(
+        rule_id="CASCADE-R14",
+        name="authority_approval_activates_commitment",
+        source_domain="authorityops",
+        source_subtype="authority_approved",
+        target_domain="actionops",
+        target_function_id="ACTION-F01",
+        description="Authority approval triggers commitment registration.",
+    ),
+
+    # ActionOps -> ReflectionOps
+    CascadeRule(
+        rule_id="CASCADE-R15",
+        name="commitment_breach_triggers_severity",
+        source_domain="actionops",
+        source_subtype="commitment_breached",
+        target_domain="reflectionops",
+        target_function_id="RE-F08",
+        description="Commitment breach triggers centralized severity scoring.",
+    ),
+
+    # ActionOps -> IntelOps
+    CascadeRule(
+        rule_id="CASCADE-R16",
+        name="commitment_complete_updates_claims",
+        source_domain="actionops",
+        source_subtype="commitment_completed",
+        target_domain="intelops",
+        target_function_id="INTEL-F12",
+        description="Commitment completion triggers confidence recalc on related claims.",
+    ),
+
+    # ActionOps -> FranOps
+    CascadeRule(
+        rule_id="CASCADE-R17",
+        name="commitment_breach_triggers_canon_review",
+        source_domain="actionops",
+        source_subtype="commitment_escalated",
+        target_domain="franops",
+        target_function_id="FRAN-F03",
+        description="Escalated commitment triggers canon enforcement review.",
+    ),
 ]
 
 

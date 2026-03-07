@@ -95,6 +95,7 @@ ALLOWED_ACRONYMS = {
     "RONIN", "DLC", "DRI", "BOE", "SLO", "CMS", "MVP",
     "ENVELOPE", "COHERENCE", "LOOP", "PRIMITIVE", "PRECEDED", "DERIVED",
     "SUPERSEDE", "STEP", "GUARD", "RECORD", "RECORDS",
+    "CMT", "CHK", "DLV",  # ActionOps ID prefixes
     # Standards / formats / compliance
     "SHACL", "SPARQL", "SPDX", "SBOM", "RDF", "OWL",
     "OTEL", "MCP", "NDJSON", "JSONL", "JSONB", "SVG",

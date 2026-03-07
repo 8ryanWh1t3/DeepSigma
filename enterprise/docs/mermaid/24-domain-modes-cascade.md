@@ -1,6 +1,6 @@
 # 24 — Domain Modes, Cascade Engine & DecisionSurface
 
-Five executable domain modes (67 function handlers) with cross-domain cascade propagation, event contracts, deterministic replay, and portable DecisionSurface runtime.
+Six executable domain modes (79 function handlers) with cross-domain cascade propagation, event contracts, deterministic replay, and portable DecisionSurface runtime.
 
 ```mermaid
 graph TB
@@ -82,7 +82,21 @@ graph TB
         PF11 --> PF12
     end
 
-    subgraph "Cascade Engine (13 rules)"
+    subgraph "ActionOps (12 handlers)"
+        XF01[ACTION-F01 commitment_intake] --> XF02[ACTION-F02 commitment_validate]
+        XF02 --> XF03[ACTION-F03 deliverable_track]
+        XF02 --> XF04[ACTION-F04 deadline_check]
+        XF02 --> XF05[ACTION-F05 compliance_evaluate]
+        XF04 --> XF06[ACTION-F06 risk_assess]
+        XF06 --> XF07[ACTION-F07 breach_detect]
+        XF07 --> XF08[ACTION-F08 escalation_trigger]
+        XF07 --> XF09[ACTION-F09 remediation_recommend]
+        XF09 --> XF10[ACTION-F10 commitment_adjust]
+        XF03 --> XF11[ACTION-F11 commitment_complete]
+        XF02 --> XF12[ACTION-F12 commitment_report]
+    end
+
+    subgraph "Cascade Engine (17 rules)"
         C1[Claim contradiction] -->|canon review| FF04
         C2[Claim supersede] -->|canon update| FF09
         C3[Canon retcon] -->|episode flag| RF01
@@ -96,16 +110,21 @@ graph TB
         C11[Authority mismatch] -->|delegation check| AF12
         C12[Stale assumptions] -->|confidence recalc| IF12
         C13[Killswitch active] -->|freeze| RF06
+        C14[Authority approved] -->|commitment intake| XF01
+        C15[Commitment breached] -->|severity score| RF08
+        C16[Commitment completed] -->|confidence recalc| IF12
+        C17[Commitment escalated] -->|canon enforce| FF03
     end
 
     subgraph "Event Contracts"
-        RT[routing_table.json] --> |67 functions| FEEDS[FEEDS pub/sub]
-        RT --> |79 events| FEEDS
+        RT[routing_table.json] --> |79 functions| FEEDS[FEEDS pub/sub]
+        RT --> |91 events| FEEDS
         FEEDS --> IF01
         FEEDS --> FF01
         FEEDS --> RF01
         FEEDS --> AF01
         FEEDS --> PF01
+        FEEDS --> XF01
     end
 
     IF03 -.->|drift signal| C1
@@ -121,6 +140,10 @@ graph TB
     IF07 -.->|authority mismatch| C11
     AF06 -.->|stale assumptions| C12
     AF09 -.->|killswitch active| C13
+    AF10 -.->|authority approved| C14
+    XF07 -.->|commitment breached| C15
+    XF11 -.->|commitment completed| C16
+    XF08 -.->|commitment escalated| C17
 ```
 
 ## DecisionSurface Runtime
@@ -193,12 +216,15 @@ stateDiagram-v2
 | Severity Scorer | Centralized drift severity | `src/core/severity.py` |
 | Audit Log | Hash-chained NDJSON | `src/core/audit_log.py` |
 | Killswitch | Emergency freeze + halt proof | `src/core/killswitch.py` |
-| Cascade Rules | 13 declarative CascadeRule objects | `src/core/modes/cascade_rules.py` |
+| Cascade Rules | 17 declarative CascadeRule objects | `src/core/modes/cascade_rules.py` |
 | Authority Models | AuthorityOps dataclasses + verdicts | `src/core/authority/models.py` |
 | Policy Runtime | 11-step authority evaluation pipeline | `src/core/authority/policy_runtime.py` |
 | Authority Audit | Hash-chained authority audit log | `src/core/authority/authority_audit.py` |
 | ParadoxOps Models | Tension set, pole, dimension dataclasses | `src/core/paradox_ops/models.py` |
 | Dimension Registry | 6 common + 10 uncommon dimensions | `src/core/paradox_ops/dimensions.py` |
 | Tension Lifecycle | 8-state machine for tension sets | `src/core/paradox_ops/lifecycle.py` |
+| ActionOps Models | Commitment, deliverable, compliance dataclasses | `src/core/action_ops/models.py` |
+| Commitment Registry | In-memory commitment store | `src/core/action_ops/registry.py` |
+| Commitment Lifecycle | 8-state machine for commitments | `src/core/action_ops/lifecycle.py` |
 | DecisionSurface | Portable runtime with adapter ABC | `src/core/decision_surface/runtime.py` |
 | Claim-Event Engine | Shared evaluation logic (7 functions) | `src/core/decision_surface/claim_event_engine.py` |
