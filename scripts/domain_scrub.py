@@ -243,6 +243,8 @@ ALLOWED_ACRONYMS = {
     "SIM", "BFS",
     # ParadoxOps — tension set IDs, pole labels, dimension tokens
     "PTS", "PDX", "POLE", "POLES", "DIM", "COMMON", "UNCOMMON",
+    # DecisionSurface — claim/event engine, assumption, evaluation tokens
+    "ASMP", "EVAL", "ART",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}

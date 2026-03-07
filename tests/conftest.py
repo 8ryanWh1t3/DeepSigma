@@ -270,6 +270,54 @@ def paradox_context():
     }
 
 
+# ── DecisionSurface fixtures ─────────────────────────────────────
+
+
+@pytest.fixture
+def sample_surface_claims():
+    """Factory fixture producing sample DecisionSurface claims."""
+    from core.decision_surface.models import Claim
+
+    return [
+        Claim(claim_id="SC-001", statement="System is within SLA",
+              confidence=0.9, evidence_refs=["ev-1"]),
+        Claim(claim_id="SC-002", statement="No unauthorized access detected",
+              confidence=0.95, evidence_refs=["ev-1", "ev-2"]),
+        Claim(claim_id="SC-003", statement="Data pipeline is current",
+              confidence=0.4, assumptions=["asmp-1"]),
+    ]
+
+
+@pytest.fixture
+def sample_surface_events():
+    """Factory fixture producing sample DecisionSurface events."""
+    from core.decision_surface.models import Event
+
+    return [
+        Event(event_id="SE-001", event_type="approved", source="monitor",
+              claim_refs=["SC-001"]),
+        Event(event_id="SE-002", event_type="confirmed", source="audit",
+              claim_refs=["SC-002"]),
+        Event(event_id="SE-003", event_type="delayed", source="pipeline",
+              claim_refs=["SC-003"]),
+    ]
+
+
+@pytest.fixture
+def sample_surface_assumptions():
+    """Factory fixture producing sample DecisionSurface assumptions."""
+    from core.decision_surface.models import Assumption
+
+    return [
+        Assumption(assumption_id="asmp-1", statement="Pipeline SLA is 1 hour",
+                   expires_at="2025-01-01T00:00:00Z",
+                   linked_claim_ids=["SC-003"]),
+        Assumption(assumption_id="asmp-2", statement="No planned maintenance",
+                   expires_at="2099-12-31T23:59:59Z",
+                   linked_claim_ids=["SC-001"]),
+    ]
+
+
 @pytest.fixture
 def minimal_feed_envelope():
     """Factory fixture producing minimal valid FEEDS envelope dicts."""

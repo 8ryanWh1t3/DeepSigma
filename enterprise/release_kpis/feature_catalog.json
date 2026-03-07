@@ -798,6 +798,70 @@
       ]
     }
   ],
+    {
+      "id": "DECISION_SURFACE",
+      "name": "DecisionSurface Runtime",
+      "summary": "Portable Coherence Ops runtime — generic adapter layer for executing claim/event evaluation, drift detection, and patching across external environments (notebook, CLI, Vantage/Foundry).",
+      "features": [
+        {
+          "id": "DS_MODELS",
+          "name": "Surface-Layer Data Models",
+          "description": "9 dataclasses (Claim, Event, Evidence, Assumption, DriftSignal, PatchRecommendation, DecisionArtifact, MemoryGraphUpdate, EvaluationResult) and ClaimStatus enum for portable surface-layer data.",
+          "artifacts": ["src/core/decision_surface/models.py"],
+          "enforcement": ["tests/test_decision_surface_runtime.py"],
+          "kpi_axes": ["Technical_Completeness", "Data_Integration"]
+        },
+        {
+          "id": "DS_ADAPTER_ABC",
+          "name": "SurfaceAdapter Abstract Base Class",
+          "description": "Abstract base class defining 8 methods (ingest/get claims and events, store drift signals, patches, and evaluation results) that every environment adapter must implement.",
+          "artifacts": ["src/core/decision_surface/surface_adapter.py"],
+          "enforcement": ["tests/test_vantage_adapter_contract.py"],
+          "kpi_axes": ["Technical_Completeness", "Data_Integration"]
+        },
+        {
+          "id": "DS_CLAIM_EVENT_ENGINE",
+          "name": "Claim-Event Evaluation Engine",
+          "description": "Shared evaluation logic (7 functions): match events to claims, detect contradictions, detect expired assumptions, compute blast radius, build patch recommendations, build memory graph updates, and orchestrate full evaluation.",
+          "artifacts": ["src/core/decision_surface/claim_event_engine.py"],
+          "enforcement": ["tests/test_decision_surface_runtime.py"],
+          "kpi_axes": ["Technical_Completeness", "Operational_Maturity"]
+        },
+        {
+          "id": "DS_NOTEBOOK_ADAPTER",
+          "name": "Notebook Reference Adapter",
+          "description": "In-memory reference implementation of SurfaceAdapter for notebooks and interactive use, demonstrating full lifecycle.",
+          "artifacts": ["src/core/decision_surface/notebook_adapter.py"],
+          "enforcement": ["tests/test_notebook_adapter.py"],
+          "kpi_axes": ["Operational_Maturity", "Data_Integration"]
+        },
+        {
+          "id": "DS_CLI_ADAPTER",
+          "name": "CLI Adapter",
+          "description": "In-memory adapter with JSON serialization (to_json) for command-line tooling output.",
+          "artifacts": ["src/core/decision_surface/cli_adapter.py"],
+          "enforcement": ["tests/test_notebook_adapter.py"],
+          "kpi_axes": ["Operational_Maturity", "Automation_Depth"]
+        },
+        {
+          "id": "DS_VANTAGE_STUB",
+          "name": "Vantage/Foundry Stub Adapter",
+          "description": "Honest stub for Army Vantage / Palantir Foundry integration — all methods raise NotImplementedError with roadmap reference.",
+          "artifacts": ["src/core/decision_surface/vantage_adapter.py"],
+          "enforcement": ["tests/test_vantage_adapter_contract.py"],
+          "kpi_axes": ["Enterprise_Readiness", "Data_Integration"]
+        },
+        {
+          "id": "DS_RUNTIME",
+          "name": "DecisionSurface Orchestration Runtime",
+          "description": "High-level orchestration class with factory method (from_surface), ingest/evaluate/seal pipeline, and adapter wiring.",
+          "artifacts": ["src/core/decision_surface/runtime.py"],
+          "enforcement": ["tests/test_decision_surface_runtime.py"],
+          "kpi_axes": ["Technical_Completeness", "Operational_Maturity"]
+        }
+      ]
+    }
+  ],
   "outer_edge_boundaries": [
     "Not claiming full jurisdictional policy packs (EU AI Act article-by-article enforcement) yet",
     "Not claiming full cryptographic attestation across all pipelines and connectors yet",
