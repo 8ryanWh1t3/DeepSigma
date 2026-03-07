@@ -6,7 +6,7 @@ Eighteen diagrams define the visual language of Sigma OVERWATCH. Everything else
 
 | # | Diagram | Type | Purpose |
 |---|---------|------|---------|
-| 01 | [System Architecture](01-system-architecture.md) | Graph | Where RAL sits between agents, data planes, observability, and Coherence Ops |
+| 01 | [System Architecture](01-system-architecture.md) | Graph | Full system map — OVERWATCH core, 5 domain modes, FEEDS, JRM, DecisionSurface, EDGE, Coherence Ops |
 | 05 | [Drift to Patch](05-drift-to-patch.md) | Flowchart | 8 drift types → severity → fingerprint → 7 patch recommendations |
 | 06 | [Coherence Ops Pipeline](06-coherence-ops-pipeline.md) | Graph + Pie | DLR / RS / DS / MG data flow through AgentSession, audit, scoring, PRIME gate, CoherenceGate, IRIS, and MetricsCollector |
 | 10 | [Integration Map](10-integration-map.md) | Graph | Connectors, surfaces, SDK packages, and runtime integrations (MCP, LangChain, OTel, Foundry, Power Platform) |
@@ -23,7 +23,7 @@ Eighteen diagrams define the visual language of Sigma OVERWATCH. Everything else
 | 21 | [Scalability Benchmark Pipeline](21-scalability-benchmark-pipeline.md) | Flowchart | CI-eligible benchmark, regression gate, trend visualization, KPI integration (v2.0.8) |
 | 22 | [Authority + Economic Evidence](22-authority-economic-evidence.md) | Flowchart | Authority custody, refusal contracts, evidence export, economic metrics uncapping (v2.0.9) |
 | 23 | [Competitive Gap Closure](23-competitive-gap-closure.md) | Graph | RuntimeGate, OTel span tracing, connector instrumentation, encryption-at-rest, fairness adapter (v2.1.0) |
-| 24 | [Domain Modes & Cascade](24-domain-modes-cascade.md) | Graph | IntelOps/FranOps/ReflectionOps/AuthorityOps (48 handlers), cascade engine (13 rules), event contracts (v2.1.0) |
+| 24 | [Domain Modes & Cascade](24-domain-modes-cascade.md) | Graph | Five domain modes (67 handlers), cascade engine (13 rules), event contracts (67/79), DecisionSurface runtime (v2.1.2) |
 | 25 | [JRM Pipeline & Federation](25-jrm-pipeline.md) | Graph | 3 adapters, 5-stage pipeline, JRM-X packets, enterprise gate/hub/advisory/signing |
 
 ## Archive
