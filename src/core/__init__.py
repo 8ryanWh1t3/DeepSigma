@@ -1,6 +1,7 @@
 """Coherence Ops — governance framework for agentic AI.
 
-Implements the four canonical artifacts (DLR / RS / DS / MG),
+Implements Coherence Ops artifacts (DLR / RS / DS / MG) and the
+five-primitive enforcement model (CLAIM / EVENT / REVIEW / PATCH / APPLY),
 the coherence audit loop that connects Sigma OVERWATCH
 runtime exhaust to structured governance, learning, and memory,
 and the Unified Atomic Claims layer, and the Money Demo (v0.3.0).
@@ -65,8 +66,17 @@ from .primitives import PrimitiveType, ALLOWED_PRIMITIVE_TYPES
 from .primitive_envelope import (
     PrimitiveEnvelope,
     wrap_primitive,
+    wrap_record,
     validate_envelope,
     supersede_envelope,
+)
+from .primitive_records import (
+    ClaimRecord,
+    EventRecord,
+    ReviewRecord,
+    PatchRecord,
+    ApplyRecord,
+    RECORD_TYPE_MAP,
 )
 from .coherence_gate import CoherenceGate, GateConfig, GateResult, Signal
 from .agent import AgentSession
@@ -128,6 +138,13 @@ __all__ = [
     "ALLOWED_PRIMITIVE_TYPES",
     "PrimitiveEnvelope",
     "wrap_primitive",
+    "wrap_record",
     "validate_envelope",
     "supersede_envelope",
+    "ClaimRecord",
+    "EventRecord",
+    "ReviewRecord",
+    "PatchRecord",
+    "ApplyRecord",
+    "RECORD_TYPE_MAP",
 ]

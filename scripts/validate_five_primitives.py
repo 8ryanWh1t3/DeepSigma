@@ -9,6 +9,9 @@ Checks:
   2. primitive_envelope.schema.json enum matches PrimitiveType values.
   3. No sixth primitive type in src/core/ source files.
   4. CERPA coverage — each PrimitiveType maps to a CERPA model class.
+  5. wrap_primitive() call-site scan — only 5 allowed types.
+  6. NodeKind alignment — PRIMITIVE_TO_NODE_KIND covers all 5 types.
+  7. No rogue primitive-like dataclasses in core/*.py.
 
 Usage:
     python scripts/validate_five_primitives.py
@@ -129,6 +132,78 @@ for ptype in EXPECTED_TYPES:
         cls is not None,
         f"No CERPA model class for {ptype}" if cls is None else "",
     )
+
+
+# ── Check 5: wrap_primitive() call-site scan ─────────────────────
+
+WRAP_PATTERN = re.compile(r"""wrap_primitive\(\s*["'](\w+)["']""")
+WRAP_REF_PATTERN = re.compile(r"""wrap_primitive\(\s*PrimitiveType\.(\w+)\.value""")
+
+bad_calls = []
+for py_file in CORE_DIR.rglob("*.py"):
+    text = py_file.read_text()
+    for match in WRAP_PATTERN.finditer(text):
+        value = match.group(1)
+        if value not in EXPECTED_TYPES:
+            bad_calls.append(f"{py_file.relative_to(REPO_ROOT)}:{value}")
+    # Also accept PrimitiveType.CLAIM.value style (always valid by definition)
+
+check(
+    "wrap_primitive() call sites use allowed types only",
+    len(bad_calls) == 0,
+    f"Unrecognised types: {bad_calls}" if bad_calls else "",
+)
+
+
+# ── Check 6: NodeKind alignment ─────────────────────────────────
+
+from core.primitive_mg import PRIMITIVE_TO_NODE_KIND  # noqa: E402
+from core.memory_graph import NodeKind  # noqa: E402
+
+mg_mapped = set(PRIMITIVE_TO_NODE_KIND.keys())
+mg_expected = set(PrimitiveType)
+check(
+    "PRIMITIVE_TO_NODE_KIND maps all 5 types",
+    mg_mapped == mg_expected,
+    f"Mapped: {[p.value for p in mg_mapped]}, expected: {[p.value for p in mg_expected]}",
+)
+
+for ptype, nkind in PRIMITIVE_TO_NODE_KIND.items():
+    check(
+        f"NodeKind.{nkind.name} exists for {ptype.value}",
+        nkind in NodeKind,
+        f"NodeKind.{nkind.name} not found",
+    )
+
+
+# ── Check 7: No rogue primitive-like dataclasses ────────────────
+
+PRIMITIVE_TYPE_FIELD = re.compile(r"primitive_type\s*[:=]")
+DATACLASS_PATTERN = re.compile(r"@dataclass")
+KNOWN_CLASSES = {
+    "PrimitiveEnvelope",
+    "ClaimRecord",
+    "EventRecord",
+    "ReviewRecord",
+    "PatchRecord",
+    "ApplyRecord",
+}
+
+rogue = []
+for py_file in CORE_DIR.glob("*.py"):  # top-level only, not subpackages
+    text = py_file.read_text()
+    if DATACLASS_PATTERN.search(text) and PRIMITIVE_TYPE_FIELD.search(text):
+        # Extract class names
+        for cm in re.finditer(r"\bclass\s+(\w+)", text):
+            cls_name = cm.group(1)
+            if cls_name not in KNOWN_CLASSES:
+                rogue.append(f"{py_file.name}:{cls_name}")
+
+check(
+    "No rogue primitive-type dataclasses in core/",
+    len(rogue) == 0,
+    f"Found: {rogue}. Register in KNOWN_CLASSES if intentional." if rogue else "",
+)
 
 
 # ── Summary ─────────────────────────────────────────────────────

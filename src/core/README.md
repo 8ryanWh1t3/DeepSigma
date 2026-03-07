@@ -52,7 +52,21 @@ Sealed Episodes + Drift Events (from RAL)
 | `iris.py` | `IRISEngine` | Operator query resolution engine — WHY / WHAT_CHANGED / WHAT_DRIFTED / RECALL / STATUS |
 | `cli.py` | — | CLI entrypoint: `audit`, `score`, `mg export`, `iris query`, `demo` |
 
-## The Four Canonical Artifacts
+## The Five Canonical Primitives
+
+Every object in the system is one of five types, a subtype, metadata, a derived view, or orchestration.
+
+| Primitive | Description | Enforcement |
+|---|---|---|
+| **CLAIM** | Asserted truth or commitment | `PrimitiveType.CLAIM` |
+| **EVENT** | Observable occurrence affecting a claim | `PrimitiveType.EVENT` |
+| **REVIEW** | Evaluation of claim against event | `PrimitiveType.REVIEW` |
+| **PATCH** | Corrective action from a review | `PrimitiveType.PATCH` |
+| **APPLY** | Outcome of applying a patch | `PrimitiveType.APPLY` |
+
+Enforced by `PrimitiveType` enum, `PrimitiveEnvelope` wrapper, and CI guard (`scripts/validate_five_primitives.py`). See `docs/architecture/five-primitive-rule.md`.
+
+## The Coherence Ops Artifacts
 
 | Artifact | Full Name | Question It Answers |
 |---|---|---|

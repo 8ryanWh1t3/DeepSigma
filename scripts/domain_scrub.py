@@ -94,7 +94,7 @@ ALLOWED_ACRONYMS = {
     "ENGINE", "CMD", "LATENCY", "RATE", "UPTIME",
     "RONIN", "DLC", "DRI", "BOE", "SLO", "CMS", "MVP",
     "ENVELOPE", "COHERENCE", "LOOP", "PRIMITIVE", "PRECEDED", "DERIVED",
-    "SUPERSEDE", "STEP", "GUARD",
+    "SUPERSEDE", "STEP", "GUARD", "RECORD", "RECORDS",
     # Standards / formats / compliance
     "SHACL", "SPARQL", "SPDX", "SBOM", "RDF", "OWL",
     "OTEL", "MCP", "NDJSON", "JSONL", "JSONB", "SVG",

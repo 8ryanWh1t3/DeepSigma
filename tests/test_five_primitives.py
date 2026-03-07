@@ -53,6 +53,58 @@ class TestCerpaCoverage:
             assert mapping[ptype] is not None
 
 
+class TestCallSiteScan:
+    """Check 5: wrap_primitive() call-site scan."""
+
+    def test_all_call_sites_use_allowed_types(self):
+        import re
+        core_dir = _SRC_ROOT / "core"
+        pattern = re.compile(r"""wrap_primitive\(\s*["'](\w+)["']""")
+        bad = []
+        for py_file in core_dir.rglob("*.py"):
+            for match in pattern.finditer(py_file.read_text()):
+                if match.group(1) not in EXPECTED:
+                    bad.append(f"{py_file.name}:{match.group(1)}")
+        assert bad == [], f"Unexpected wrap_primitive types: {bad}"
+
+
+class TestNodeKindAlignment:
+    """Check 6: PRIMITIVE_TO_NODE_KIND maps all 5 types."""
+
+    def test_all_types_mapped(self):
+        from core.primitive_mg import PRIMITIVE_TO_NODE_KIND
+        assert set(PRIMITIVE_TO_NODE_KIND.keys()) == set(PrimitiveType)
+
+    def test_node_kinds_exist(self):
+        from core.primitive_mg import PRIMITIVE_TO_NODE_KIND
+        from core.memory_graph import NodeKind
+        for ptype, nkind in PRIMITIVE_TO_NODE_KIND.items():
+            assert nkind in NodeKind, f"NodeKind.{nkind.name} missing for {ptype.value}"
+
+
+class TestNoRogueDataclasses:
+    """Check 7: no rogue primitive-type dataclasses in core/."""
+
+    def test_no_unregistered_primitive_type_classes(self):
+        import re
+        core_dir = _SRC_ROOT / "core"
+        known = {
+            "PrimitiveEnvelope",
+            "ClaimRecord", "EventRecord", "ReviewRecord",
+            "PatchRecord", "ApplyRecord",
+        }
+        ptype_field = re.compile(r"primitive_type\s*[:=]")
+        dc_pattern = re.compile(r"@dataclass")
+        rogue = []
+        for py_file in core_dir.glob("*.py"):
+            text = py_file.read_text()
+            if dc_pattern.search(text) and ptype_field.search(text):
+                for cm in re.finditer(r"\bclass\s+(\w+)", text):
+                    if cm.group(1) not in known:
+                        rogue.append(f"{py_file.name}:{cm.group(1)}")
+        assert rogue == [], f"Rogue dataclasses: {rogue}"
+
+
 class TestValidatorScript:
     def test_validator_exits_zero(self):
         import subprocess

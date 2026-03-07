@@ -1,10 +1,13 @@
-"""Canonical core primitives — AtomicClaim, DecisionEpisode, DriftSignal, Patch.
+"""Canonical core primitives — five-primitive enforcement model.
 
-Cross-cutting reference definitions for the four fundamental objects in the
-OVERWATCH governance framework.  These are additive — they do not replace
-existing domain-specific models in decision_surface, JRM, or paradox_ops.
+Defines PrimitiveType (the five canonical types: CLAIM, EVENT, REVIEW, PATCH,
+APPLY) and the domain-specific reference dataclasses (AtomicClaim,
+DecisionEpisode, DriftSignal, Patch) that implement the archival layer.
+These are additive — they do not replace existing domain-specific models
+in decision_surface, JRM, or paradox_ops.
 
 Usage:
+    from core.primitives import PrimitiveType, ALLOWED_PRIMITIVE_TYPES
     from core.primitives import AtomicClaim, DecisionEpisode, DriftSignal, Patch
 """
 

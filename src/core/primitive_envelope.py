@@ -112,6 +112,29 @@ def validate_envelope(envelope: PrimitiveEnvelope) -> None:
         )
 
 
+def wrap_record(
+    record: Any,
+    source: str,
+    *,
+    metadata: Optional[Dict[str, Any]] = None,
+    parent_envelope_id: Optional[str] = None,
+    version: int = 1,
+) -> PrimitiveEnvelope:
+    """Wrap a typed record (ClaimRecord, EventRecord, etc.) in an envelope.
+
+    The record must have a ``PRIMITIVE_TYPE`` attribute and a ``to_dict()``
+    method.
+    """
+    return wrap_primitive(
+        record.PRIMITIVE_TYPE.value,
+        record.to_dict(),
+        source,
+        metadata=metadata,
+        parent_envelope_id=parent_envelope_id,
+        version=version,
+    )
+
+
 def supersede_envelope(
     old: PrimitiveEnvelope,
     new_payload: Dict[str, Any],

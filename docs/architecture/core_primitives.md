@@ -1,6 +1,21 @@
 # Core Primitives — Architecture Overview
 
-Four canonical, cross-cutting data types underpin all OVERWATCH governance flows.
+Deep Sigma enforces a **five-primitive model**: CLAIM, EVENT, REVIEW, PATCH, APPLY. Every object in the system is one of these five types, a subtype, metadata, a derived view, or orchestration. No sixth primitive may be introduced.
+
+See [five-primitive-rule.md](five-primitive-rule.md) for enforcement details, CI guard, and envelope wrapping.
+
+## Five-Primitive Enforcement
+
+| Enforcement Layer | Module |
+|---|---|
+| `PrimitiveType` enum (exactly 5 members) | `src/core/primitives.py` |
+| `ALLOWED_PRIMITIVE_TYPES` frozenset | `src/core/primitives.py` |
+| `PrimitiveEnvelope` canonical wrapper | `src/core/primitive_envelope.py` |
+| Explicit record types per primitive | `src/core/primitive_records.py` |
+| Coherence loop orchestrator | `src/core/coherence_loop.py` |
+| Memory Graph mapping | `src/core/primitive_mg.py` |
+| CI guard (10 checks) | `scripts/validate_five_primitives.py` |
+| JSON Schema | `src/core/schemas/primitives/primitive_envelope.schema.json` |
 
 ## Design Principles
 
@@ -8,13 +23,15 @@ Four canonical, cross-cutting data types underpin all OVERWATCH governance flows
 2. **Schema-first** — JSON schemas define the contract; Python dataclasses implement
 3. **Never overwrite** — patches supersede; claims are retracted, not deleted
 4. **Deterministic sealing** — SHA-256 hashing for tamper detection
+5. **No sixth type** — CI guard enforces exactly five primitives
 
-## Primitives
+## Domain-Specific Implementations
 
-### AtomicClaim
+Four archival dataclasses implement domain-specific aspects of the five-primitive model:
 
-The indivisible unit of asserted truth.  Every higher-order structure
-(DecisionEpisode, DriftSignal, Patch) is composed of or references claims.
+### AtomicClaim → CLAIM
+
+The indivisible unit of asserted truth. Every higher-order structure is composed of or references claims.
 
 - **ID pattern**: `CLAIM-YYYY-NNNN`
 - **Epistemic types**: observation, inference, assumption, forecast, norm, constraint
@@ -22,10 +39,9 @@ The indivisible unit of asserted truth.  Every higher-order structure
 - **Confidence**: 0.00–1.00 machine-comparable score
 - **Expiry**: optional `expires_at` timestamp; `is_expired()` helper
 
-### DecisionEpisode
+### DecisionEpisode → EVENT (orchestration container)
 
-The orchestration container.  Captures the full decision lifecycle from goal
-through outcome, referencing the claims that informed it.
+Captures the full decision lifecycle from goal through outcome, referencing claims.
 
 - **Lifecycle**: pending → active → sealed → archived (or frozen)
 - **Options**: available choices with selected/rejected tracking
@@ -33,20 +49,18 @@ through outcome, referencing the claims that informed it.
 - **Kill switches**: named stops that can halt execution
 - **Lineage**: parent/child decision references
 
-### DriftSignal
+### DriftSignal → EVENT (drift detection)
 
-Divergence between expected and observed state.  Links a DecisionEpisode to
-the corrective action that follows.
+Divergence between expected and observed state. Links a DecisionEpisode to the corrective action that follows.
 
 - **Trigger**: what caused the drift (half_life_expiry, contradiction, etc.)
 - **Severity**: green / yellow / red (traffic-light model)
 - **Lifecycle**: detected → acknowledged → resolved | escalated | suppressed
 - **State comparison**: `expected_state` vs `observed_state`
 
-### Patch
+### Patch → PATCH
 
-Append-only correction resolving a drift signal.  Patches never overwrite
-prior state — they supersede, creating an immutable lineage chain.
+Append-only correction resolving a drift signal. Patches never overwrite prior state — they supersede, creating an immutable lineage chain.
 
 - **Lifecycle**: proposed → approved → applied (or rejected | superseded)
 - **Supersedes**: list of prior patch IDs this one replaces
@@ -75,8 +89,7 @@ Patch updates lineage and does not overwrite prior state.
 
 ## Coexistence with Existing Models
 
-These canonical primitives are reference definitions.  Existing domain-specific
-models remain in place and are not replaced.
+These canonical primitives are reference definitions. Existing domain-specific models remain in place and are not replaced.
 
 | Canonical Primitive | Existing Domain Model | Module | Relationship |
 |---|---|---|---|
@@ -93,31 +106,23 @@ models remain in place and are not replaced.
 | Patch | `PatchRecommendation` | `decision_surface/models.py` | Surface layer — recommendation only |
 | Patch | `TensionPatch` | `paradox_ops/models.py` | Paradox-specific — tension remediation |
 
-## Future Integration Points
-
-These are documented convergence points, not runtime changes.
-
-- **Memory Graph** (`memory_graph.py`): `add_claim()`, `add_episode()`, `add_drift()`,
-  `add_patch()` already accept dict payloads.  Canonical primitives can feed these
-  via `to_dict()` with no adapter needed.
-
-- **FEEDS Event Bus** (`feeds/`): canonical primitives can be wrapped in FEEDS
-  envelopes using `build_envelope()`.  Topic mapping: AtomicClaim → `TRUTH_SNAPSHOT`,
-  DecisionEpisode → `DECISION_LINEAGE`, DriftSignal → `DRIFT_SIGNAL`.
-
-- **Coherence Scoring** (`scoring.py`): canonical primitives provide structured
-  inputs for the CoherenceScorer pipeline (DLR + RS + DS + MG → score).
-
-- **AuthorityOps** (`authority/`): DecisionEpisode maps naturally to authority
-  decision gates.  Blast radius and kill switches align with existing policy
-  evaluation.
-
 ## File Layout
 
 | File | Purpose |
 |---|---|
-| `src/core/primitives.py` | Python dataclasses and enums |
-| `src/core/schemas/primitives/*.schema.json` | JSON Schema contracts (4 files) |
+| `src/core/primitives.py` | PrimitiveType enum, archival dataclasses, status enums |
+| `src/core/primitive_envelope.py` | PrimitiveEnvelope wrapper, wrap/validate/supersede |
+| `src/core/primitive_records.py` | Explicit record types (ClaimRecord, EventRecord, etc.) |
+| `src/core/coherence_loop.py` | Coherence loop orchestrator wrapping CERPA |
+| `src/core/primitive_mg.py` | Memory Graph node/edge mapping |
+| `src/core/schemas/primitives/*.schema.json` | JSON Schema contracts (5 files) |
 | `src/core/fixtures/primitives/*.json` | Example payloads (4 files) |
+| `scripts/validate_five_primitives.py` | CI guard (10 checks) |
 | `tests/test_primitives.py` | Unit and lifecycle tests |
+| `tests/test_primitive_envelope.py` | Envelope wrapping tests |
+| `tests/test_primitive_records.py` | Record type tests |
+| `tests/test_coherence_loop.py` | Coherence loop tests |
+| `tests/test_primitive_mg.py` | MG mapping tests |
+| `tests/test_five_primitives.py` | CI guard tests |
 | `docs/architecture/core_primitives.md` | This document |
+| `docs/architecture/five-primitive-rule.md` | Enforcement rule details |
