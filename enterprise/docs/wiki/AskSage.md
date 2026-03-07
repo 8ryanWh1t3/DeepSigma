@@ -4,7 +4,7 @@ Integration with [AskSage](https://asksage.ai) for CustomerOrg/IC-grade LLM quer
 
 ## Overview
 
-AskSage provides a multi-model gateway with IL5/IL6 compliance. The RAL adapter wraps every AskSage API call in DTE-gated, budget-tracked episodes and routes exhaust through the standard Exhaust Inbox pipeline.
+AskSage provides a multi-model gateway with IL5/IL6 compliance. The OVERWATCH adapter wraps every AskSage API call in DTE-gated, budget-tracked episodes and routes exhaust through the standard Exhaust Inbox pipeline.
 
 ## API Endpoints
 

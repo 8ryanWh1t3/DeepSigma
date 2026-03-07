@@ -1,13 +1,13 @@
 # Concepts
 
-## What problem does RAL solve?
+## What problem does Coherence Ops solve?
 Agents fail in production when they act on:
 - **late** decisions (deadline misses, tail latency)
 - **stale** context (TTL/TOCTOU)
 - **unsafe** actions (no idempotency/rollback/auth)
 - **unverified** outcomes (no postconditions)
 
-RAL adds the missing runtime layer: **“await for reality.”**
+OVERWATCH adds the missing governance layer: **enforce coherence before, during, and after execution.**
 
 ## Core primitives
 - **DTE (Decision Timing Envelope)**: time budgets and limits
@@ -18,17 +18,19 @@ RAL adds the missing runtime layer: **“await for reality.”**
 - **Drift → Patch**: structured learning loop
 
 ## Domain Modes
-Four executable domain modules wire core primitives into automated pipelines:
+Five executable domain modules wire core primitives into automated pipelines:
 - **IntelOps** (12 handlers): claim lifecycle — ingest → validate → drift → patch → MG update
 - **FranOps** (12 handlers): canon enforcement — propose → bless → enforce → retcon → propagate
 - **ReflectionOps** (12 handlers): gate enforcement — episodes → gates → severity → audit → killswitch
-- **AuthorityOps** (12 handlers): authority enforcement — action intake → actor/resource resolve → policy → DLR → assumptions → blast radius → decision gate → audit
+- **AuthorityOps** (19 handlers): authority enforcement — action intake → actor/resource resolve → policy → DLR → assumptions → blast radius + simulation → decision gate → audit → drift detection
+- **ParadoxOps** (12 handlers): paradox tension detection — tension sets → dimensions → pressure → drift promote → lifecycle
+- **DecisionSurface**: portable Coherence Ops runtime with pluggable adapters (notebook, CLI, Vantage)
 - **Cascade Engine**: 13 cross-domain rules with depth-limited propagation
-- **Event Contracts**: routing table mapping 48 functions + 51 events to FEEDS topics
+- **Event Contracts**: routing table mapping 67 functions + 79 events to FEEDS topics
 
 Every handler returns a `FunctionResult` with a deterministic `replay_hash` (SHA-256).
 
-## What RAL is not
+## What OVERWATCH is not
 - Not a workflow engine
 - Not a data platform
 - Not an agent framework

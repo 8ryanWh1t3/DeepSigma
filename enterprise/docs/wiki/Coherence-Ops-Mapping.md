@@ -1,6 +1,6 @@
 # Coherence Ops Mapping
 
-RAL is an optional execution add-on that feeds Coherence Ops artifacts.
+OVERWATCH is the execution-governance platform that produces Coherence Ops artifacts.
 
 - DTE + action contract → **DLR**
 - sealed episodes → **MG**

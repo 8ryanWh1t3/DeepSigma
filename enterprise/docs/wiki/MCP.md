@@ -1,7 +1,7 @@
 # MCP
 
 MCP is the transport standard for tool calling.
-RAL uses MCP in two modes:
+OVERWATCH uses MCP in two modes:
 
 ## A) OVERWATCH as MCP server (recommended)
 Expose Overwatch primitives as MCP tools.

@@ -1,7 +1,7 @@
 # LangChain
 
 Integration pattern:
-- wrap tools with RAL governance
+- wrap tools with Coherence Ops governance
 - capture spans/telemetry via callback handler
 - stamp episodes automatically
 

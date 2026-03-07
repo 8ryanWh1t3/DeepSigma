@@ -13,7 +13,7 @@ It applies pre-execution authority gates, policy-bound execution contracts, and 
 |------|---------|
 | [Wiki Index](Wiki-Index) | Canonical wiki structure and navigation |
 | [Quickstart](Quickstart) | Get a supervised agent running in minutes |
-| [Concepts](Concepts) | The four problems RAL solves and the primitives that solve them |
+| [Concepts](Concepts) | The problems Coherence Ops solves and the primitives that solve them |
 | [Architecture](Architecture) | System diagram and component map |
 | [FAQ](FAQ) | Common questions |
 

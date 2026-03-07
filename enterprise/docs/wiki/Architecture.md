@@ -1,27 +1,30 @@
 # Architecture
 
-RAL sits between **agent frameworks** and **data/action planes**.
+OVERWATCH sits between **agent frameworks** and **data/action planes**.
 
 ```text
 Agent Frameworks (LangChain/LangGraph/etc)
           |
           v
-   ┌───────────────────────────────┐
-   │  RAL / Σ OVERWATCH (Control)   │
-   │  - DTE deadlines & budgets     │
-   │  - TTL / TOCTOU freshness      │
-   │  - Safe Action Contract        │
-   │  - Verification                │
-   │  - Sealing + Drift→Patch       │
-   │  ┌───────────────────────────┐ │
-   │  │  Domain Modes (48 funcs)  │ │
-   │  │  IntelOps → ReOps →      │ │
-   │  │  AuthorityOps → FranOps  │ │
-   │  │      ↕ Cascade ↕          │ │
-   │  └───────────────────────────┘ │
-   │  - Event Contracts (51 events) │
-   │  - FEEDS pub/sub routing       │
-   └───────────────────────────────┘
+   ┌─────────────────────────────────┐
+   │  Σ OVERWATCH (Coherence Ops)     │
+   │  - DTE deadlines & budgets       │
+   │  - TTL / TOCTOU freshness        │
+   │  - Safe Action Contract          │
+   │  - Verification                  │
+   │  - Sealing + Drift→Patch         │
+   │  ┌─────────────────────────────┐ │
+   │  │  Domain Modes (67 funcs)    │ │
+   │  │  IntelOps → ReOps →        │ │
+   │  │  AuthorityOps → FranOps →  │ │
+   │  │  ParadoxOps ↕ Cascade ↕    │ │
+   │  └─────────────────────────────┘ │
+   │  ┌─────────────────────────────┐ │
+   │  │  DecisionSurface Runtime    │ │
+   │  └─────────────────────────────┘ │
+   │  - Event Contracts (79 events)   │
+   │  - FEEDS pub/sub routing         │
+   └─────────────────────────────────┘
           |
           v
 Data / Action Planes (Foundry, APIs, Power Platform, etc)

@@ -1,6 +1,6 @@
 # Integrations
 
-RAL is designed to be **tooling-agnostic**.
+OVERWATCH is designed to be **tooling-agnostic**.
 
 Primary targets:
 

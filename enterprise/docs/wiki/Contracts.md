@@ -1,6 +1,6 @@
 # Contracts
 
-RAL governance is expressed through four contract types. Each contract is a structured, versioned artifact that travels with the decision from planning through sealing.
+Coherence Ops governance is expressed through four contract types. Each contract is a structured, versioned artifact that travels with the decision from planning through sealing.
 
 ---
 

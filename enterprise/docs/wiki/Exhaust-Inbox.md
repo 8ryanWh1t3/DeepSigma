@@ -221,7 +221,7 @@ Four Mermaid diagrams cover the full Exhaust Inbox architecture:
 
 ## Related Pages
 
-- [Architecture](Architecture) — Where RAL sits in the stack
+- [Architecture](Architecture) — Where OVERWATCH sits in the stack
 - [Drift → Patch](Drift-to-Patch) — Drift detection and remediation lifecycle
 - [Sealing & Episodes](Sealing-and-Episodes) — Episode sealing and immutability
 - [Coherence Ops Mapping](Coherence-Ops-Mapping) — DLR/RS/DS/MG pipeline

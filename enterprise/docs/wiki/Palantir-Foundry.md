@@ -1,6 +1,6 @@
 # Palantir Foundry Integration
 
-> Foundry remains Foundry; RAL governs calls into it. The VantageAdapter is one adapter — not the core.
+> Foundry remains Foundry; OVERWATCH governs calls into it. The VantageAdapter is one adapter — not the core.
 
 ## Overview
 
@@ -19,7 +19,7 @@ Notebook    CLI       VantageAdapter
 (in-memory) (+ JSON)   (Foundry/Vantage)
 ```
 
-**Key principle:** Foundry maintains its own autonomy. RAL governs the calls into it — not the other way around.
+**Key principle:** Foundry maintains its own autonomy. OVERWATCH governs the calls into it — not the other way around.
 
 ## Current Status
 
@@ -117,7 +117,7 @@ Foundry records carry strong provenance through dataset lineage:
 
 ## Integration Patterns
 
-Three core patterns govern how RAL interacts with Foundry:
+Three core patterns govern how OVERWATCH interacts with Foundry:
 
 1. **Feature fetch wrapper** — returns `{value, capturedAt, sourceRef}` so every read has provenance
 2. **Action adapter** — requires a Safe Action Contract before any Foundry write

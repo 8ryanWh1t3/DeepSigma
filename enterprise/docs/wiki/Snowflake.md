@@ -4,7 +4,7 @@ Dual-mode connector for Snowflake: **Cortex AI** for LLM completions and embeddi
 
 ## Overview
 
-Snowflake serves two roles in the RAL stack:
+Snowflake serves two roles in the OVERWATCH stack:
 
 1. **Cortex AI** -- LLM completions (`cortex.complete`) and embedding generation (`cortex.embed`) via the Cortex REST API.
 2. **Warehouse** -- SQL query execution (`snowflake.query`), table listing (`snowflake.tables`), and bidirectional table sync (`snowflake.sync`).

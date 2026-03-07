@@ -1,6 +1,6 @@
 # Security
 
-Threats RAL is designed to mitigate:
+Threats OVERWATCH is designed to mitigate:
 - stale context (TOCTOU)
 - unsafe tool actions (missing idempotency/rollback)
 - prompt/tool injection (reduce blast radius with allowlists + HITL)

@@ -1,6 +1,6 @@
 # LLM Data Model
 
-To support RAL, your data must be agent-safe:
+To support Coherence Ops, your data must be agent-safe:
 - `capturedAt` timestamps
 - TTL / maxFeatureAge fields
 - provenance (`sourceRef` / evidence refs)
