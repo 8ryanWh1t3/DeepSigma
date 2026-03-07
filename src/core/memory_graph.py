@@ -38,6 +38,7 @@ class NodeKind(str, Enum):
     TENSION_SET = "tension_set"
     REVIEW = "review"
     APPLY = "apply"
+    COMMITMENT = "commitment"
 
 
 class EdgeKind(str, Enum):
