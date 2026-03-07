@@ -47,8 +47,8 @@ class TestRoutingTableLoader:
         assert table.contract_fingerprint.startswith("sha256:")
 
     def test_function_count(self, table: RoutingTable) -> None:
-        """55 functions: 12 INTEL + 12 FRAN + 12 RE + 19 AUTH."""
-        assert len(table.functions) == 55
+        """67 functions: 12 INTEL + 12 FRAN + 12 RE + 19 AUTH + 12 PDX."""
+        assert len(table.functions) == 67
 
     def test_event_count(self, table: RoutingTable) -> None:
         """38 events: 14 INTEL + 13 FRAN + 12 RE (one is shared)."""
@@ -57,13 +57,13 @@ class TestRoutingTableLoader:
 
     def test_all_function_ids_well_formed(self, table: RoutingTable) -> None:
         import re
-        pattern = re.compile(r"^(INTEL|FRAN|RE|AUTH)-F\d{2}$")
+        pattern = re.compile(r"^(INTEL|FRAN|RE|AUTH|PDX)-F\d{2}$")
         for fid in table.function_ids:
             assert pattern.match(fid), f"Malformed function ID: {fid}"
 
     def test_all_event_ids_well_formed(self, table: RoutingTable) -> None:
         import re
-        pattern = re.compile(r"^(INTEL|FRAN|RE|CASCADE|AUTH)-E\d{2}$")
+        pattern = re.compile(r"^(INTEL|FRAN|RE|CASCADE|AUTH|PDX)-E\d{2}$")
         for eid in table.event_ids:
             assert pattern.match(eid), f"Malformed event ID: {eid}"
 
@@ -253,4 +253,4 @@ class TestTopicsCoverage:
 
     def test_all_domains_covered(self, table: RoutingTable) -> None:
         domains = {fn.domain for fn in table.functions.values()}
-        assert domains == {"intelops", "franops", "reflectionops", "authorityops"}
+        assert domains == {"intelops", "franops", "reflectionops", "authorityops", "paradoxops"}

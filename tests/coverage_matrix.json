@@ -57,13 +57,26 @@
     "AUTH-F16": {"testFile": "tests/test_authority_drift.py", "testClass": "TestAuthF16IntegrityCheck"},
     "AUTH-F17": {"testFile": "tests/test_authority_blast_radius.py", "testClass": "TestAuthF17BlastRadiusSimulate"},
     "AUTH-F18": {"testFile": "tests/test_authority_blast_radius.py", "testClass": "TestAuthF18TrustImpact"},
-    "AUTH-F19": {"testFile": "tests/test_authority_blast_radius.py", "testClass": "TestAuthF19DependencyMap"}
+    "AUTH-F19": {"testFile": "tests/test_authority_blast_radius.py", "testClass": "TestAuthF19DependencyMap"},
+    "PDX-F01": {"testFile": "tests/test_paradox_lifecycle.py", "testClass": "TestPdxF01TensionSetCreate"},
+    "PDX-F02": {"testFile": "tests/test_paradox_lifecycle.py", "testClass": "TestPdxF02PoleManage"},
+    "PDX-F03": {"testFile": "tests/test_paradox_lifecycle.py", "testClass": "TestPdxF03DimensionAttach"},
+    "PDX-F04": {"testFile": "tests/test_paradox_lifecycle.py", "testClass": "TestPdxF04DimensionShift"},
+    "PDX-F05": {"testFile": "tests/test_paradox_scoring.py", "testClass": "TestPdxF05PressureCompute"},
+    "PDX-F06": {"testFile": "tests/test_paradox_scoring.py", "testClass": "TestPdxF06ImbalanceCompute"},
+    "PDX-F07": {"testFile": "tests/test_paradox_scoring.py", "testClass": "TestPdxF07ThresholdEvaluate"},
+    "PDX-F08": {"testFile": "tests/test_paradox_lifecycle.py", "testClass": "TestPdxF08DriftPromote"},
+    "PDX-F09": {"testFile": "tests/test_interdimensional_drift.py", "testClass": "TestPdxF09Handler"},
+    "PDX-F10": {"testFile": "tests/test_paradox_lifecycle.py", "testClass": "TestPdxF10SealSnapshot"},
+    "PDX-F11": {"testFile": "tests/test_paradox_lifecycle.py", "testClass": "TestPdxF11PatchIssue"},
+    "PDX-F12": {"testFile": "tests/test_paradox_lifecycle.py", "testClass": "TestPdxF12LifecycleTransition"}
   },
   "integration": {
     "intelops": {"testFile": "tests/test_intelops.py", "testClass": "TestAtomicLoop"},
     "franops": {"testFile": "tests/test_franops.py", "testClass": "TestCanonLifecycle"},
     "reflectionops": {"testFile": "tests/test_reops.py", "testClass": "TestEpisodeLifecycle"},
     "cascade": {"testFile": "tests/test_cascade.py", "testClass": "TestMultiStepCascade"},
-    "authorityops": {"testFile": "tests/test_authorityops.py", "testClass": "TestAuthorityOpsIntegration"}
+    "authorityops": {"testFile": "tests/test_authorityops.py", "testClass": "TestAuthorityOpsIntegration"},
+    "paradoxops": {"testFile": "tests/test_paradox_lifecycle.py", "testClass": "TestParadoxOpsIntegration"}
   }
 }

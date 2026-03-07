@@ -241,6 +241,8 @@ ALLOWED_ACRONYMS = {
     "MISSING", "INVALID", "ALLOWED", "MARKERS", "GATE",
     # Authority Drift + Blast Radius — simulation IDs, graph traversal
     "SIM", "BFS",
+    # ParadoxOps — tension set IDs, pole labels, dimension tokens
+    "PTS", "PDX", "POLE", "POLES", "DIM", "COMMON", "UNCOMMON",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/tension_patch.schema.json",
+  "title": "Tension Patch",
+  "description": "A patch recommendation for remediating a Paradox Tension Set.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["patchId", "tensionId", "recommendedActions", "issuedAt"],
+  "properties": {
+    "patchId": { "type": "string" },
+    "tensionId": { "type": "string" },
+    "recommendedActions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "increase_control_friction",
+          "clarify_authority",
+          "add_review_gate",
+          "split_by_layer",
+          "reduce_irreversibility",
+          "elevate_visibility",
+          "expire_stale_assumption",
+          "promote_to_policy_band"
+        ]
+      },
+      "minItems": 1
+    },
+    "rationale": { "type": "string" },
+    "issuedAt": { "type": "string", "format": "date-time" },
+    "appliedAt": { "type": ["string", "null"], "format": "date-time" }
+  }
+}

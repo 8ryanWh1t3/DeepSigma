@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/paradox_tension_set.schema.json",
+  "title": "Paradox Tension Set",
+  "description": "A set of competing truths (poles) in the same operational space, tracked through lifecycle states with pressure scoring and inter-dimensional drift detection.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["tensionId", "subtype", "poles", "lifecycleState", "createdAt"],
+  "$defs": {
+    "TensionPole": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["poleId", "label"],
+      "properties": {
+        "poleId": { "type": "string" },
+        "label": { "type": "string" },
+        "weight": { "type": "number", "minimum": 0, "default": 1.0 },
+        "evidenceRefs": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "TensionDimension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dimensionId", "name", "kind"],
+      "properties": {
+        "dimensionId": { "type": "string" },
+        "name": { "type": "string" },
+        "kind": { "type": "string", "enum": ["common", "uncommon"] },
+        "currentValue": { "type": "number", "default": 0.0 },
+        "previousValue": { "type": "number", "default": 0.0 },
+        "shiftedAt": { "type": ["string", "null"], "format": "date-time" },
+        "isGovernanceRelevant": { "type": "boolean", "default": false },
+        "threshold": { "type": "number", "minimum": 0, "default": 0.5 }
+      }
+    }
+  },
+  "properties": {
+    "tensionId": {
+      "type": "string",
+      "pattern": "^PTS-"
+    },
+    "subtype": {
+      "type": "string",
+      "enum": ["tension_pair", "tension_triple", "higher_order"]
+    },
+    "poles": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/TensionPole" },
+      "minItems": 2
+    },
+    "dimensions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/TensionDimension" }
+    },
+    "lifecycleState": {
+      "type": "string",
+      "enum": ["detected", "active", "elevated", "promoted_to_drift", "sealed", "patched", "rebalanced", "archived"]
+    },
+    "pressureScore": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "imbalanceVector": {
+      "type": "array",
+      "items": { "type": "number" }
+    },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "sealedAt": { "type": ["string", "null"], "format": "date-time" },
+    "sealHash": { "type": "string" },
+    "sealVersion": { "type": "integer", "minimum": 1 },
+    "episodeId": { "type": "string" },
+    "promotedDriftId": { "type": ["string", "null"] },
+    "patchId": { "type": ["string", "null"] },
+    "version": { "type": "string" }
+  }
+}

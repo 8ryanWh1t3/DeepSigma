@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/inter_dimensional_drift.schema.json",
+  "title": "Inter-Dimensional Drift",
+  "description": "A drift signal emitted when dimensions shift unevenly — some move materially while governance-relevant dimensions remain stale.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["driftId", "tensionId", "shiftedDimensions", "staleDimensions", "severity", "detectedAt"],
+  "properties": {
+    "driftId": {
+      "type": "string",
+      "pattern": "^DS-pdx-"
+    },
+    "tensionId": { "type": "string" },
+    "driftType": {
+      "type": "string",
+      "const": "interdimensional_drift"
+    },
+    "shiftedDimensions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 2
+    },
+    "staleDimensions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["green", "yellow", "orange", "red"]
+    },
+    "detectedAt": { "type": "string", "format": "date-time" },
+    "evidenceRefs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "fingerprint": {
+      "type": "object",
+      "properties": {
+        "key": { "type": "string" },
+        "version": { "type": "string" }
+      }
+    },
+    "targetType": { "type": "string" },
+    "targetId": { "type": "string" },
+    "notes": { "type": "string" }
+  }
+}

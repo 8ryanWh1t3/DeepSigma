@@ -24,6 +24,10 @@ DRIFT_TYPE_WEIGHTS: Dict[str, float] = {
     "fallback": 0.4,
     "verify": 0.7,
     "outcome": 0.6,
+    "tension_pressure": 0.65,
+    "tension_imbalance": 0.55,
+    "interdimensional_drift": 0.80,
+    "tension_threshold_breach": 0.75,
 }
 
 

@@ -234,6 +234,43 @@ def minimal_policy_pack():
 
 
 @pytest.fixture
+def minimal_tension_set():
+    """Factory fixture producing minimal valid ParadoxTensionSet dicts."""
+    def _make(tension_id="PTS-TEST-001", subtype="tension_pair", **overrides):
+        ts = {
+            "tensionId": tension_id,
+            "subtype": subtype,
+            "poles": [
+                {"poleId": "POLE-A", "label": "Speed", "weight": 1.0},
+                {"poleId": "POLE-B", "label": "Control", "weight": 1.0},
+            ],
+            "lifecycleState": "detected",
+            "pressureScore": 0.0,
+            "imbalanceVector": [],
+            "createdAt": "2026-03-01T00:00:00Z",
+            "updatedAt": "2026-03-01T00:00:00Z",
+            "episodeId": "EP-TEST-001",
+            "version": "1.0.0",
+        }
+        ts.update(overrides)
+        return ts
+    return _make
+
+
+@pytest.fixture
+def paradox_context():
+    """Minimal context dict for ParadoxOps handler calls."""
+    from core.paradox_ops import ParadoxRegistry, TensionLifecycle, DimensionRegistry
+    return {
+        "paradox_registry": ParadoxRegistry(),
+        "tension_lifecycle": TensionLifecycle(),
+        "dimension_registry": DimensionRegistry(),
+        "memory_graph": None,
+        "now": "2026-03-01T00:00:00Z",
+    }
+
+
+@pytest.fixture
 def minimal_feed_envelope():
     """Factory fixture producing minimal valid FEEDS envelope dicts."""
     from core.feeds import build_envelope, FeedTopic

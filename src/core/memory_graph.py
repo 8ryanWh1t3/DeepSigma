@@ -35,6 +35,7 @@ class NodeKind(str, Enum):
     GOVERNANCE_ARTIFACT = "governance_artifact"
     AUDIT_RECORD = "audit_record"
     POLICY_EVALUATION = "policy_evaluation"
+    TENSION_SET = "tension_set"
 
 
 class EdgeKind(str, Enum):

@@ -58,12 +58,14 @@ class TestCoverageGate:
         from core.modes.franops import FranOps
         from core.modes.reflectionops import ReflectionOps
         from core.modes.authorityops import AuthorityOps
+        from core.modes.paradoxops import ParadoxOps
 
         modes = {
             "intelops": IntelOps(),
             "franops": FranOps(),
             "reflectionops": ReflectionOps(),
             "authorityops": AuthorityOps(),
+            "paradoxops": ParadoxOps(),
         }
 
         rt = _load_routing_table()
@@ -73,16 +75,16 @@ class TestCoverageGate:
             assert mode is not None, f"No mode for domain '{domain}' (function {fid})"
             assert mode.has_handler(fid), f"Handler missing for {fid} in {domain}"
 
-    def test_55_functions_covered(self):
-        """55 functions must be covered (12 per 3 domains + 19 AuthorityOps)."""
+    def test_67_functions_covered(self):
+        """67 functions must be covered (12 INTEL + 12 FRAN + 12 RE + 19 AUTH + 12 PDX)."""
         matrix = _load_matrix()
-        assert len(matrix["functions"]) == 55
+        assert len(matrix["functions"]) == 67
 
-    def test_5_integration_suites(self):
-        """Must have integration suites for all 4 domains + cascade."""
+    def test_6_integration_suites(self):
+        """Must have integration suites for all 5 domains + cascade."""
         matrix = _load_matrix()
-        assert len(matrix["integration"]) == 5
-        for key in ("intelops", "franops", "reflectionops", "authorityops", "cascade"):
+        assert len(matrix["integration"]) == 6
+        for key in ("intelops", "franops", "reflectionops", "authorityops", "cascade", "paradoxops"):
             assert key in matrix["integration"]
 
 

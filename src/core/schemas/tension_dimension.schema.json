@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/tension_dimension.schema.json",
+  "title": "Tension Dimension",
+  "description": "A dimension attached to a Paradox Tension Set, tracking current and previous values against a threshold.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["dimensionId", "name", "kind"],
+  "properties": {
+    "dimensionId": { "type": "string" },
+    "name": { "type": "string" },
+    "kind": { "type": "string", "enum": ["common", "uncommon"] },
+    "currentValue": { "type": "number", "default": 0.0 },
+    "previousValue": { "type": "number", "default": 0.0 },
+    "shiftedAt": { "type": ["string", "null"], "format": "date-time" },
+    "isGovernanceRelevant": { "type": "boolean", "default": false },
+    "threshold": { "type": "number", "minimum": 0, "default": 0.5 }
+  }
+}
