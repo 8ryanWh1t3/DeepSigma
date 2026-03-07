@@ -2,6 +2,18 @@
 
 All contract surface changes are logged here with compatibility annotations.
 
+## [2.1.3] — Primitive Surface
+
+`COMPATIBLE:` CERPA adaptation loop (Claim -> Event -> Review -> Patch -> Apply) ships as explicit primitive layer with models, engine, bidirectional mappers, and demos. ParadoxOps (12 handlers), DecisionSurface portable runtime, AuthorityOps extension (AUTH-F13–F19), constraint executor, and canonical core primitives (AtomicClaim, DecisionEpisode, DriftSignal, Patch) all land. RAL terminology retired across 17 wiki pages in favor of Coherence Ops / OVERWATCH. 446 new tests (1,232 total). Edition guard fix for relative imports.
+
+### Migration
+
+**Affected schemas**: None (all changes additive)
+**Consumer action**: None — all existing APIs preserved.
+**Rollback**: Yes — new modules are additive only.
+
+---
+
 ## [2.1.2] — Python 3.10 Compat & Type Safety
 
 `COMPATIBLE:` Fix ISO-8601 `Z` suffix parsing for Python 3.10 (delegation chain, assumption freshness, half-life checks). Fix pyright errors (PolicySource import, GateDecision attribute access). Zero functional changes — same 786 tests passing.

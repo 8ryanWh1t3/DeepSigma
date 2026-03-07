@@ -1,7 +1,7 @@
 # DeepSigma Feature Catalog
 
-**Version:** 2.1.0
-**Last updated:** 2026-02-28
+**Version:** 2.1.3
+**Last updated:** 2026-03-07
 
 Machine source of truth: `release_kpis/feature_catalog.json`
 
