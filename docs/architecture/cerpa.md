@@ -168,5 +168,5 @@ flowchart LR
 | `tests/test_cerpa_models.py` | Model construction tests |
 | `tests/test_cerpa_engine.py` | Engine and cycle tests |
 | `tests/test_cerpa_mappers.py` | Mapper round-trip tests |
-| `tests/test_cerpa_opmg_demo.py` | Demo validation tests |
+| `tests/test_cerpa_contract_demo.py` | Demo validation tests |
 | `docs/architecture/cerpa.md` | This document |

@@ -43,7 +43,7 @@ for p in pathlib.Path("src/core").rglob("*.py"):
                         f"  {p}:{node.lineno}  import {alias.name}"
                     )
         elif isinstance(node, ast.ImportFrom):
-            if node.module:
+            if node.module and node.level == 0:
                 top = node.module.split(".")[0]
                 if top in ENTERPRISE_PACKAGES:
                     violations.append(
