@@ -15,6 +15,7 @@ SEVERITY_ORDER = {"red": 3, "yellow": 2, "green": 1}
 # Base severity scores per drift type
 DRIFT_TYPE_WEIGHTS: Dict[str, float] = {
     "authority_mismatch": 0.9,
+    "authority_drift": 0.85,
     "freshness": 0.6,
     "process_gap": 0.5,
     "confidence_decay": 0.4,

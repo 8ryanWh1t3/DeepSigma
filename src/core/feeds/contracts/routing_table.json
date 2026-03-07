@@ -722,6 +722,111 @@
       "stateWrites": ["memory_graph"],
       "preconditions": ["actorId provided"],
       "postconditions": ["delegation chain validated"]
+    },
+    "AUTH-F13": {
+      "name": "authority_drift_scan",
+      "domain": "authorityops",
+      "description": "Master drift scan across all authority state.",
+      "inputTopic": "authority_slice",
+      "inputSubtype": "drift_scan_request",
+      "outputTopics": ["drift_signal"],
+      "outputSubtypes": ["authority_drift_signal"],
+      "handler": "core.modes.authorityops.authority_drift_scan",
+      "requiredPayloadFields": [],
+      "emitsEvents": ["AUTH-E13", "AUTH-E14", "AUTH-E15", "AUTH-E16", "AUTH-E17", "AUTH-E18"],
+      "stateWrites": ["memory_graph"],
+      "preconditions": [],
+      "postconditions": ["drift signals emitted for any detected anomalies"]
+    },
+    "AUTH-F14": {
+      "name": "delegation_health_monitor",
+      "domain": "authorityops",
+      "description": "Focused delegation chain health check.",
+      "inputTopic": "authority_slice",
+      "inputSubtype": "delegation_health_request",
+      "outputTopics": ["drift_signal"],
+      "outputSubtypes": ["delegation_health_checked"],
+      "handler": "core.modes.authorityops.delegation_health_monitor",
+      "requiredPayloadFields": [],
+      "emitsEvents": ["AUTH-E13", "AUTH-E14"],
+      "stateWrites": ["memory_graph"],
+      "preconditions": [],
+      "postconditions": ["delegation health assessed"]
+    },
+    "AUTH-F15": {
+      "name": "privilege_expiry_scan",
+      "domain": "authorityops",
+      "description": "Scan grants and delegations for expired or near-expiry privileges.",
+      "inputTopic": "authority_slice",
+      "inputSubtype": "privilege_expiry_request",
+      "outputTopics": ["drift_signal"],
+      "outputSubtypes": ["privilege_expiry_scanned"],
+      "handler": "core.modes.authorityops.privilege_expiry_scan",
+      "requiredPayloadFields": [],
+      "emitsEvents": ["AUTH-E15"],
+      "stateWrites": ["memory_graph"],
+      "preconditions": [],
+      "postconditions": ["privilege expiry state assessed"]
+    },
+    "AUTH-F16": {
+      "name": "authority_integrity_check",
+      "domain": "authorityops",
+      "description": "Verify seal/hash/chain integrity.",
+      "inputTopic": "authority_slice",
+      "inputSubtype": "integrity_check_request",
+      "outputTopics": ["drift_signal"],
+      "outputSubtypes": ["authority_integrity_checked"],
+      "handler": "core.modes.authorityops.authority_integrity_check",
+      "requiredPayloadFields": [],
+      "emitsEvents": ["AUTH-E14", "AUTH-E16", "AUTH-E17"],
+      "stateWrites": ["memory_graph"],
+      "preconditions": [],
+      "postconditions": ["integrity state verified"]
+    },
+    "AUTH-F17": {
+      "name": "blast_radius_simulate",
+      "domain": "authorityops",
+      "description": "Simulate blast radius for an authority entity change.",
+      "inputTopic": "authority_slice",
+      "inputSubtype": "blast_radius_request",
+      "outputTopics": ["authority_slice", "drift_signal"],
+      "outputSubtypes": ["authority_risk_propagated", "authority_revocation_cascade", "authority_lockdown_recommended"],
+      "handler": "core.modes.authorityops.blast_radius_simulate",
+      "requiredPayloadFields": ["targetType", "targetId"],
+      "emitsEvents": ["AUTH-E19", "AUTH-E20", "AUTH-E22"],
+      "stateWrites": [],
+      "preconditions": ["target entity identified"],
+      "postconditions": ["blast radius simulation completed"]
+    },
+    "AUTH-F18": {
+      "name": "trust_impact_calculate",
+      "domain": "authorityops",
+      "description": "Compute severity from impact counts.",
+      "inputTopic": "authority_slice",
+      "inputSubtype": "impact_calculate_request",
+      "outputTopics": ["authority_slice"],
+      "outputSubtypes": ["trust_surface_degraded", "authority_risk_propagated"],
+      "handler": "core.modes.authorityops.trust_impact_calculate",
+      "requiredPayloadFields": [],
+      "emitsEvents": ["AUTH-E21"],
+      "stateWrites": [],
+      "preconditions": ["impact counts available"],
+      "postconditions": ["severity computed"]
+    },
+    "AUTH-F19": {
+      "name": "dependency_map",
+      "domain": "authorityops",
+      "description": "Walk memory graph to map authority dependencies.",
+      "inputTopic": "authority_slice",
+      "inputSubtype": "dependency_map_request",
+      "outputTopics": ["authority_slice"],
+      "outputSubtypes": ["authority_risk_propagated"],
+      "handler": "core.modes.authorityops.dependency_map",
+      "requiredPayloadFields": ["targetId"],
+      "emitsEvents": ["AUTH-E19"],
+      "stateWrites": [],
+      "preconditions": ["target entity identified"],
+      "postconditions": ["dependency map computed"]
     }
   },
   "events": {
@@ -1190,6 +1295,96 @@
       "subtype": "delegation_valid",
       "producedBy": ["AUTH-F12"],
       "consumedBy": ["AUTH-F10"]
+    },
+    "AUTH-E13": {
+      "name": "delegation_scope_violated",
+      "domain": "authorityops",
+      "description": "Grant scope exceeds delegation scope.",
+      "topic": "drift_signal",
+      "subtype": "delegation_scope_violated",
+      "producedBy": ["AUTH-F13", "AUTH-F14"],
+      "consumedBy": ["AUTH-F17"]
+    },
+    "AUTH-E14": {
+      "name": "authority_chain_broken",
+      "domain": "authorityops",
+      "description": "Authority chain integrity violation.",
+      "topic": "drift_signal",
+      "subtype": "authority_chain_broken",
+      "producedBy": ["AUTH-F13", "AUTH-F16"],
+      "consumedBy": ["AUTH-F17"]
+    },
+    "AUTH-E15": {
+      "name": "privilege_orphaned",
+      "domain": "authorityops",
+      "description": "Grant depends on expired or revoked delegation.",
+      "topic": "drift_signal",
+      "subtype": "privilege_orphaned",
+      "producedBy": ["AUTH-F13", "AUTH-F15"],
+      "consumedBy": ["AUTH-F17"]
+    },
+    "AUTH-E16": {
+      "name": "policy_drift_detected",
+      "domain": "authorityops",
+      "description": "Policy hash does not match expected value.",
+      "topic": "drift_signal",
+      "subtype": "policy_drift_detected",
+      "producedBy": ["AUTH-F13", "AUTH-F16"],
+      "consumedBy": ["AUTH-F17"]
+    },
+    "AUTH-E17": {
+      "name": "signature_custody_mismatch",
+      "domain": "authorityops",
+      "description": "Policy seal hash verification failed.",
+      "topic": "drift_signal",
+      "subtype": "signature_custody_mismatch",
+      "producedBy": ["AUTH-F13", "AUTH-F16"],
+      "consumedBy": ["AUTH-F17"]
+    },
+    "AUTH-E18": {
+      "name": "authority_drift_signal",
+      "domain": "authorityops",
+      "description": "Composite authority drift signal from master scan.",
+      "topic": "drift_signal",
+      "subtype": "authority_drift_signal",
+      "producedBy": ["AUTH-F13"],
+      "consumedBy": ["AUTH-F17"]
+    },
+    "AUTH-E19": {
+      "name": "authority_risk_propagated",
+      "domain": "authorityops",
+      "description": "Blast radius simulation result.",
+      "topic": "authority_slice",
+      "subtype": "authority_risk_propagated",
+      "producedBy": ["AUTH-F17", "AUTH-F19"],
+      "consumedBy": []
+    },
+    "AUTH-E20": {
+      "name": "authority_revocation_cascade",
+      "domain": "authorityops",
+      "description": "Revocation would cascade across multiple artifacts.",
+      "topic": "drift_signal",
+      "subtype": "authority_revocation_cascade",
+      "producedBy": ["AUTH-F17"],
+      "consumedBy": []
+    },
+    "AUTH-E21": {
+      "name": "trust_surface_degraded",
+      "domain": "authorityops",
+      "description": "Trust surface has been weakened by authority changes.",
+      "topic": "authority_slice",
+      "subtype": "trust_surface_degraded",
+      "producedBy": ["AUTH-F18"],
+      "consumedBy": []
+    },
+    "AUTH-E22": {
+      "name": "authority_lockdown_recommended",
+      "domain": "authorityops",
+      "description": "Cross-domain trust break detected, lockdown recommended.",
+      "topic": "drift_signal",
+      "subtype": "authority_lockdown_recommended",
+      "producedBy": ["AUTH-F17"],
+      "consumedBy": []
     }
   }
 }

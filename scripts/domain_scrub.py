@@ -239,6 +239,8 @@ ALLOWED_ACRONYMS = {
     "CLIPBOARD", "WITH", "META", "TAG", "BLOCKED", "PASTE",
     "EXTERNAL", "DYNAMIC", "EXEC", "PERSISTENCE", "REMOTE",
     "MISSING", "INVALID", "ALLOWED", "MARKERS", "GATE",
+    # Authority Drift + Blast Radius — simulation IDs, graph traversal
+    "SIM", "BFS",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}

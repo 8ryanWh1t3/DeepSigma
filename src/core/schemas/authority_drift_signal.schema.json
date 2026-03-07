@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/authority_drift_signal.schema.json",
+  "title": "Authority Drift Signal",
+  "description": "A drift signal emitted when authority state becomes untrustworthy.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["driftId", "driftType", "severity", "detectedAt", "evidenceRefs", "fingerprint"],
+  "properties": {
+    "driftId": {
+      "type": "string",
+      "pattern": "^DS-"
+    },
+    "driftType": {
+      "type": "string",
+      "enum": [
+        "delegation_scope_violated",
+        "authority_chain_broken",
+        "privilege_orphaned",
+        "policy_drift_detected",
+        "signature_custody_mismatch",
+        "authority_drift_signal",
+        "revoked_role_active",
+        "actor_role_inconsistency",
+        "delegation_near_expiry",
+        "grant_expired"
+      ]
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["green", "yellow", "orange", "red"]
+    },
+    "detectedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "evidenceRefs": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "fingerprint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "version"],
+      "properties": {
+        "key": { "type": "string" },
+        "version": { "type": "string" }
+      }
+    },
+    "targetType": {
+      "type": "string",
+      "enum": ["actor", "delegation", "role", "authority", "policy"]
+    },
+    "targetId": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

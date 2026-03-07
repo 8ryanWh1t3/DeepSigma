@@ -73,10 +73,10 @@ class TestCoverageGate:
             assert mode is not None, f"No mode for domain '{domain}' (function {fid})"
             assert mode.has_handler(fid), f"Handler missing for {fid} in {domain}"
 
-    def test_48_functions_covered(self):
-        """Exactly 48 functions must be covered (12 per domain x 4 domains)."""
+    def test_55_functions_covered(self):
+        """55 functions must be covered (12 per 3 domains + 19 AuthorityOps)."""
         matrix = _load_matrix()
-        assert len(matrix["functions"]) == 48
+        assert len(matrix["functions"]) == 55
 
     def test_5_integration_suites(self):
         """Must have integration suites for all 4 domains + cascade."""

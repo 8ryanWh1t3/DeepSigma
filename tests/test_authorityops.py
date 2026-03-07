@@ -75,14 +75,14 @@ class TestAuthorityOpsRegistration:
     def test_domain_name(self, authops):
         assert authops.domain == "authorityops"
 
-    def test_all_12_handlers_registered(self, authops):
-        assert len(authops.function_ids) == 12
+    def test_all_19_handlers_registered(self, authops):
+        assert len(authops.function_ids) == 19
 
     def test_function_ids_well_formed(self, authops):
         for fid in authops.function_ids:
             assert fid.startswith("AUTH-F")
             num = int(fid.split("AUTH-F")[1])
-            assert 1 <= num <= 12
+            assert 1 <= num <= 19
 
     def test_has_handler(self, authops):
         assert authops.has_handler("AUTH-F01")

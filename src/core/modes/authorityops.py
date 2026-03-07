@@ -1,13 +1,15 @@
 """AuthorityOps domain mode — authority, policy, and governance enforcement.
 
 Wraps authority graph, policy compiler, policy runtime, reasoning gate,
-delegation chain, and audit into 12 function handlers keyed by AUTH-F01
-through AUTH-F12.
+delegation chain, audit, drift detection, and blast radius simulation into
+19 function handlers keyed by AUTH-F01 through AUTH-F19.
 
 The governance loop: intake → resolve → policy → evaluate → audit.
+The drift loop: scan → detect → simulate impact → recommend action.
 
 AuthorityOps is the cross-cutting governance layer that binds authority,
 action, rationale, expiry, and audit into a single evaluable control plane.
+It detects when those permissions themselves become unstable.
 """
 
 from __future__ import annotations
@@ -41,6 +43,15 @@ class AuthorityOps(DomainMode):
             "AUTH-F10": self._decision_gate,
             "AUTH-F11": self._audit_record_emit,
             "AUTH-F12": self._delegation_chain_validate,
+            # Capability: Authority Drift Detection
+            "AUTH-F13": self._authority_drift_scan,
+            "AUTH-F14": self._delegation_health_monitor,
+            "AUTH-F15": self._privilege_expiry_scan,
+            "AUTH-F16": self._authority_integrity_check,
+            # Capability: Authority Blast Radius Simulation
+            "AUTH-F17": self._blast_radius_simulate,
+            "AUTH-F18": self._trust_impact_calculate,
+            "AUTH-F19": self._dependency_map,
         }
 
     # ── AUTH-F01: Action Request Intake ──────────────────────────
@@ -609,4 +620,309 @@ class AuthorityOps(DomainMode):
             events_emitted=events,
             drift_signals=drift_signals,
             mg_updates=mg_updates,
+        )
+
+    # ── AUTH-F13: Authority Drift Scan ────────────────────────────
+
+    def _authority_drift_scan(
+        self, event: Dict[str, Any], ctx: Dict[str, Any],
+    ) -> FunctionResult:
+        """Master drift scan across all authority state."""
+        from ..authority.authority_drift import scan_authority_drift
+        from ..authority.authority_health import build_health_summary
+
+        payload = event.get("payload", event)
+        now = ctx.get("now", datetime.now(timezone.utc))
+        if isinstance(now, str):
+            now = datetime.fromisoformat(now.replace("Z", "+00:00"))
+        events: List[Dict[str, Any]] = []
+        drift_signals: List[Dict[str, Any]] = []
+        mg_updates: List[str] = []
+
+        signals = scan_authority_drift(
+            actors=payload.get("actors", ctx.get("actors", [])),
+            delegations=payload.get("delegations", ctx.get("delegations", [])),
+            grants=payload.get("grants", ctx.get("grants", [])),
+            revocations=payload.get("revocations", ctx.get("revocations", [])),
+            policies=payload.get("policies", ctx.get("policies", [])),
+            now=now,
+        )
+        drift_signals.extend(signals)
+
+        summary = build_health_summary(signals)
+        events.append({
+            "topic": "drift_signal",
+            "subtype": "authority_drift_signal",
+            "signalCount": summary["signalCount"],
+            "overallSeverity": summary["overallSeverity"],
+        })
+
+        mg = ctx.get("memory_graph")
+        if mg is not None:
+            for sig in signals:
+                node_id = mg.add_drift(sig)
+                if node_id:
+                    mg_updates.append(node_id)
+
+        return FunctionResult(
+            function_id="AUTH-F13",
+            success=True,
+            events_emitted=events,
+            drift_signals=drift_signals,
+            mg_updates=mg_updates,
+        )
+
+    # ── AUTH-F14: Delegation Health Monitor ───────────────────────
+
+    def _delegation_health_monitor(
+        self, event: Dict[str, Any], ctx: Dict[str, Any],
+    ) -> FunctionResult:
+        """Focused delegation chain health check."""
+        from ..authority.authority_drift import check_delegation_health
+
+        payload = event.get("payload", event)
+        now = ctx.get("now", datetime.now(timezone.utc))
+        if isinstance(now, str):
+            now = datetime.fromisoformat(now.replace("Z", "+00:00"))
+        events: List[Dict[str, Any]] = []
+        drift_signals: List[Dict[str, Any]] = []
+        mg_updates: List[str] = []
+
+        signals = check_delegation_health(
+            delegations=payload.get("delegations", ctx.get("delegations", [])),
+            actors=payload.get("actors", ctx.get("actors", [])),
+            now=now,
+        )
+        drift_signals.extend(signals)
+
+        events.append({
+            "topic": "drift_signal",
+            "subtype": "delegation_health_checked",
+            "signalCount": len(signals),
+        })
+
+        mg = ctx.get("memory_graph")
+        if mg is not None:
+            for sig in signals:
+                node_id = mg.add_drift(sig)
+                if node_id:
+                    mg_updates.append(node_id)
+
+        return FunctionResult(
+            function_id="AUTH-F14",
+            success=True,
+            events_emitted=events,
+            drift_signals=drift_signals,
+            mg_updates=mg_updates,
+        )
+
+    # ── AUTH-F15: Privilege Expiry Scanner ────────────────────────
+
+    def _privilege_expiry_scan(
+        self, event: Dict[str, Any], ctx: Dict[str, Any],
+    ) -> FunctionResult:
+        """Scan grants and delegations for expired or near-expiry privileges."""
+        from ..authority.authority_drift import check_privilege_expiry
+
+        payload = event.get("payload", event)
+        now = ctx.get("now", datetime.now(timezone.utc))
+        if isinstance(now, str):
+            now = datetime.fromisoformat(now.replace("Z", "+00:00"))
+        events: List[Dict[str, Any]] = []
+        drift_signals: List[Dict[str, Any]] = []
+        mg_updates: List[str] = []
+
+        signals = check_privilege_expiry(
+            grants=payload.get("grants", ctx.get("grants", [])),
+            delegations=payload.get("delegations", ctx.get("delegations", [])),
+            now=now,
+        )
+        drift_signals.extend(signals)
+
+        events.append({
+            "topic": "drift_signal",
+            "subtype": "privilege_expiry_scanned",
+            "signalCount": len(signals),
+        })
+
+        mg = ctx.get("memory_graph")
+        if mg is not None:
+            for sig in signals:
+                node_id = mg.add_drift(sig)
+                if node_id:
+                    mg_updates.append(node_id)
+
+        return FunctionResult(
+            function_id="AUTH-F15",
+            success=True,
+            events_emitted=events,
+            drift_signals=drift_signals,
+            mg_updates=mg_updates,
+        )
+
+    # ── AUTH-F16: Authority Integrity Check ──────────────────────
+
+    def _authority_integrity_check(
+        self, event: Dict[str, Any], ctx: Dict[str, Any],
+    ) -> FunctionResult:
+        """Verify seal/hash/chain integrity."""
+        from ..authority.authority_drift import check_authority_integrity
+
+        payload = event.get("payload", event)
+        events: List[Dict[str, Any]] = []
+        drift_signals: List[Dict[str, Any]] = []
+        mg_updates: List[str] = []
+
+        signals = check_authority_integrity(
+            ledger_snapshot=payload.get("ledgerSnapshot", ctx.get("ledger_snapshot", {})),
+            grants=payload.get("grants", ctx.get("grants", [])),
+            policies=payload.get("policies", ctx.get("policies", [])),
+        )
+        drift_signals.extend(signals)
+
+        events.append({
+            "topic": "drift_signal",
+            "subtype": "authority_integrity_checked",
+            "signalCount": len(signals),
+        })
+
+        mg = ctx.get("memory_graph")
+        if mg is not None:
+            for sig in signals:
+                node_id = mg.add_drift(sig)
+                if node_id:
+                    mg_updates.append(node_id)
+
+        return FunctionResult(
+            function_id="AUTH-F16",
+            success=True,
+            events_emitted=events,
+            drift_signals=drift_signals,
+            mg_updates=mg_updates,
+        )
+
+    # ── AUTH-F17: Blast Radius Simulator ─────────────────────────
+
+    def _blast_radius_simulate(
+        self, event: Dict[str, Any], ctx: Dict[str, Any],
+    ) -> FunctionResult:
+        """Simulate blast radius for an authority entity change."""
+        from ..authority.authority_blast_radius import simulate_blast_radius
+
+        payload = event.get("payload", event)
+        events: List[Dict[str, Any]] = []
+        drift_signals: List[Dict[str, Any]] = []
+        mg_updates: List[str] = []
+
+        target_type = payload.get("targetType", "")
+        target_id = payload.get("targetId", "")
+        mg = ctx.get("memory_graph")
+
+        result = simulate_blast_radius(target_type, target_id, mg, ctx)
+
+        events.append({
+            "topic": "authority_slice",
+            "subtype": "authority_risk_propagated",
+            "severity": result["severity"],
+            "affectedClaimsCount": result["affectedClaimsCount"],
+            "affectedDecisionsCount": result["affectedDecisionsCount"],
+            "affectedAgentsCount": result["affectedAgentsCount"],
+            "recommendedAction": result["recommendedAction"],
+        })
+
+        if result["severity"] in ("SEV-1", "SEV-2"):
+            drift_signals.append({
+                "topic": "drift_signal",
+                "subtype": "authority_revocation_cascade",
+                "severity": "red" if result["severity"] == "SEV-1" else "orange",
+                "driftType": "authority_mismatch",
+                "targetType": target_type,
+                "targetId": target_id,
+            })
+
+        if result["severity"] == "SEV-1":
+            events.append({
+                "topic": "drift_signal",
+                "subtype": "authority_lockdown_recommended",
+                "targetId": target_id,
+                "severity": "red",
+            })
+
+        return FunctionResult(
+            function_id="AUTH-F17",
+            success=True,
+            events_emitted=events,
+            drift_signals=drift_signals,
+            mg_updates=mg_updates,
+        )
+
+    # ── AUTH-F18: Trust Impact Calculator ────────────────────────
+
+    def _trust_impact_calculate(
+        self, event: Dict[str, Any], ctx: Dict[str, Any],
+    ) -> FunctionResult:
+        """Compute severity from impact counts."""
+        from ..authority.authority_blast_radius import (
+            build_recommended_action,
+            compute_impact_severity,
+        )
+
+        payload = event.get("payload", event)
+        counts = {
+            "claims": payload.get("affectedClaimsCount", 0),
+            "episodes": payload.get("affectedDecisionsCount", 0),
+            "canon_entries": payload.get("affectedCanonArtifactsCount", 0),
+            "patches": payload.get("affectedPatchObjectsCount", 0),
+            "actors": payload.get("affectedAgentsCount", 0),
+        }
+        severity = compute_impact_severity(
+            affected_claims=counts["claims"],
+            affected_decisions=counts["episodes"],
+            affected_canon=counts["canon_entries"],
+            affected_patches=counts["patches"],
+            affected_agents=counts["actors"],
+        )
+        recommended = build_recommended_action(severity, counts)
+
+        subtype = "trust_surface_degraded" if severity != "SEV-3" else "authority_risk_propagated"
+
+        return FunctionResult(
+            function_id="AUTH-F18",
+            success=True,
+            events_emitted=[{
+                "topic": "authority_slice",
+                "subtype": subtype,
+                "severity": severity,
+                "recommendedAction": recommended,
+            }],
+        )
+
+    # ── AUTH-F19: Dependency Mapper ───────────────────────────────
+
+    def _dependency_map(
+        self, event: Dict[str, Any], ctx: Dict[str, Any],
+    ) -> FunctionResult:
+        """Walk memory graph to map authority dependencies."""
+        from ..authority.dependency_map import (
+            count_affected_by_kind,
+            walk_authority_dependencies,
+        )
+
+        payload = event.get("payload", event)
+        target_id = payload.get("targetId", "")
+        mg = ctx.get("memory_graph")
+
+        deps = walk_authority_dependencies(target_id, mg)
+        counts = count_affected_by_kind(deps)
+
+        return FunctionResult(
+            function_id="AUTH-F19",
+            success=True,
+            events_emitted=[{
+                "topic": "authority_slice",
+                "subtype": "authority_risk_propagated",
+                "targetId": target_id,
+                "dependencyCounts": counts,
+                "totalAffected": sum(counts.values()),
+            }],
         )

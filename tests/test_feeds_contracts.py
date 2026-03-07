@@ -47,8 +47,8 @@ class TestRoutingTableLoader:
         assert table.contract_fingerprint.startswith("sha256:")
 
     def test_function_count(self, table: RoutingTable) -> None:
-        """48 functions: 12 INTEL + 12 FRAN + 12 RE + 12 AUTH."""
-        assert len(table.functions) == 48
+        """55 functions: 12 INTEL + 12 FRAN + 12 RE + 19 AUTH."""
+        assert len(table.functions) == 55
 
     def test_event_count(self, table: RoutingTable) -> None:
         """38 events: 14 INTEL + 13 FRAN + 12 RE (one is shared)."""

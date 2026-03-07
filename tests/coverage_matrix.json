@@ -50,7 +50,14 @@
     "AUTH-F09": {"testFile": "tests/test_authorityops.py", "testClass": "TestAuthF09KillSwitch"},
     "AUTH-F10": {"testFile": "tests/test_authorityops.py", "testClass": "TestAuthF10DecisionGate"},
     "AUTH-F11": {"testFile": "tests/test_authorityops.py", "testClass": "TestAuthF11AuditEmit"},
-    "AUTH-F12": {"testFile": "tests/test_authorityops.py", "testClass": "TestAuthF12DelegationChain"}
+    "AUTH-F12": {"testFile": "tests/test_authorityops.py", "testClass": "TestAuthF12DelegationChain"},
+    "AUTH-F13": {"testFile": "tests/test_authority_drift.py", "testClass": "TestAuthF13DriftScan"},
+    "AUTH-F14": {"testFile": "tests/test_authority_drift.py", "testClass": "TestAuthF14DelegationHealth"},
+    "AUTH-F15": {"testFile": "tests/test_authority_drift.py", "testClass": "TestAuthF15PrivilegeExpiry"},
+    "AUTH-F16": {"testFile": "tests/test_authority_drift.py", "testClass": "TestAuthF16IntegrityCheck"},
+    "AUTH-F17": {"testFile": "tests/test_authority_blast_radius.py", "testClass": "TestAuthF17BlastRadiusSimulate"},
+    "AUTH-F18": {"testFile": "tests/test_authority_blast_radius.py", "testClass": "TestAuthF18TrustImpact"},
+    "AUTH-F19": {"testFile": "tests/test_authority_blast_radius.py", "testClass": "TestAuthF19DependencyMap"}
   },
   "integration": {
     "intelops": {"testFile": "tests/test_intelops.py", "testClass": "TestAtomicLoop"},

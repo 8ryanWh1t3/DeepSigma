@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sigma-overwatch.dev/schemas/authority_blast_radius.schema.json",
+  "title": "Authority Blast Radius Simulation",
+  "description": "Result of simulating authority revocation or expiry impact.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["simulationId", "targetType", "targetId", "severity", "simulatedAt"],
+  "properties": {
+    "simulationId": {
+      "type": "string",
+      "pattern": "^SIM-"
+    },
+    "targetType": {
+      "type": "string",
+      "enum": ["actor", "delegation", "role", "authority", "policy"]
+    },
+    "targetId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "affectedClaimsCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "affectedDecisionsCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "affectedCanonArtifactsCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "affectedPatchObjectsCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "affectedAgentsCount": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["SEV-1", "SEV-2", "SEV-3"]
+    },
+    "recommendedAction": {
+      "type": "string"
+    },
+    "simulatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "affectedArtifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "nodeId": { "type": "string" },
+          "nodeKind": { "type": "string" },
+          "label": { "type": "string" }
+        }
+      }
+    }
+  }
+}
