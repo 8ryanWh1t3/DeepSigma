@@ -4,7 +4,7 @@
 
 ## Overview
 
-ReflectionOps is the gate enforcement domain. It wraps RuntimeGate, CoherenceGate, ReflectionSession, IRISEngine, degrade ladder, episode state machine, audit log, and kill-switch into 12 function handlers keyed by `RE-F01` through `RE-F12`.
+ReflectionOps is the gate enforcement domain. It wraps RuntimeGate, CoherenceGate, ReflectionSession, IRISEngine, degrade ladder, episode state machine, audit log, and kill-switch into 19 function handlers keyed by `RE-F01` through `RE-F19`. Handlers RE-F13–F19 extend the domain with institutional memory: precedent extraction, pattern fingerprinting, precedent matching, knowledge consolidation, temporal recall, knowledge decay, and IRIS precedent resolution.
 
 **Module**: `src/core/modes/reflectionops.py`
 
@@ -24,6 +24,13 @@ ReflectionOps is the gate enforcement domain. It wraps RuntimeGate, CoherenceGat
 | RE-F10 | `reflection_ingest` | Ingest a sealed episode into the reflection session |
 | RE-F11 | `iris_resolve` | Resolve an IRIS query (WHY, WHAT_CHANGED, STATUS) |
 | RE-F12 | `episode_replay` | Deterministically replay a sealed episode and verify hash match |
+| RE-F13 | `precedent_ingest` | Persist reflection takeaways as Precedent nodes in MG |
+| RE-F14 | `pattern_fingerprint` | Compute structural fingerprint from episodes (outcome/drift/degrade patterns) |
+| RE-F15 | `precedent_match` | Search MG for similar precedents given a new episode context |
+| RE-F16 | `knowledge_consolidate` | Merge related precedents into consolidated KnowledgeEntry nodes |
+| RE-F17 | `temporal_recall` | Time-windowed recall ("what did we learn last month?") |
+| RE-F18 | `knowledge_decay` | Apply half-life decay, demote low-relevance entries |
+| RE-F19 | `iris_precedent_resolve` | Extend IRIS with PRECEDENT query type |
 
 ## Episode State Machine
 

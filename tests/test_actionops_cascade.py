@@ -19,9 +19,9 @@ from core.modes.cascade_rules import RULES, get_rules_for_event
 
 
 class TestActionOpsCascadeRules:
-    def test_four_actionops_rules_registered(self):
+    def test_actionops_rules_registered(self):
         action_rules = [r for r in RULES if r.target_domain == "actionops" or r.source_domain == "actionops"]
-        assert len(action_rules) == 4
+        assert len(action_rules) == 9  # R14-R17 (original) + R23-R27 (decision accounting)
 
     def test_r14_authority_to_actionops(self):
         rules = get_rules_for_event("authorityops", "authority_approved")
@@ -52,7 +52,7 @@ class TestActionOpsCascadeRules:
         assert r17.target_function_id == "FRAN-F03"
 
     def test_total_rule_count(self):
-        assert len(RULES) == 17
+        assert len(RULES) == 27  # 17 original + 10 new (R18-R27)
 
     def test_rule_ids_unique(self):
         ids = [r.rule_id for r in RULES]

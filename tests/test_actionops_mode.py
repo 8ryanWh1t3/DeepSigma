@@ -1,4 +1,4 @@
-"""Tests for ActionOps domain mode — 12 function handlers."""
+"""Tests for ActionOps domain mode — 19 function handlers."""
 
 from __future__ import annotations
 
@@ -428,9 +428,9 @@ class TestFullLifecycle:
 
 
 class TestHandlerRegistration:
-    def test_12_handlers_registered(self):
+    def test_19_handlers_registered(self):
         mode = ActionOps()
-        assert len(mode.function_ids) == 12
+        assert len(mode.function_ids) == 19
 
     def test_function_id_prefix(self):
         mode = ActionOps()

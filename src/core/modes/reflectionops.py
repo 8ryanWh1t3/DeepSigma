@@ -1,8 +1,12 @@
 """ReflectionOps domain mode — gate enforcement and episode completeness.
 
 Wraps RuntimeGate, CoherenceGate, ReflectionSession, IRISEngine, degrade
-ladder, episode state machine, audit log, and kill-switch into 12 function
-handlers keyed by RE-F01 through RE-F12.
+ladder, episode state machine, audit log, and kill-switch into 19 function
+handlers keyed by RE-F01 through RE-F19.
+
+RE-F13 through RE-F19 implement Institutional Memory: precedent extraction,
+pattern fingerprinting, precedent matching, knowledge consolidation,
+temporal recall, knowledge decay, and IRIS PRECEDENT query resolution.
 """
 
 from __future__ import annotations
@@ -35,6 +39,14 @@ class ReflectionOps(DomainMode):
             "RE-F10": self._reflection_ingest,
             "RE-F11": self._iris_resolve,
             "RE-F12": self._episode_replay,
+            # Module E: Institutional Memory
+            "RE-F13": self._precedent_ingest,
+            "RE-F14": self._pattern_fingerprint,
+            "RE-F15": self._precedent_match,
+            "RE-F16": self._knowledge_consolidate,
+            "RE-F17": self._temporal_recall,
+            "RE-F18": self._knowledge_decay,
+            "RE-F19": self._iris_precedent_resolve,
         }
 
     # ── RE-F01: Episode Begin ────────────────────────────────────
@@ -547,4 +559,440 @@ class ReflectionOps(DomainMode):
                 "matched": matched,
             }],
             drift_signals=drift_signals,
+        )
+
+    # ── RE-F13: Precedent Ingest ──────────────────────────────
+
+    def _precedent_ingest(
+        self, event: Dict[str, Any], ctx: Dict[str, Any],
+    ) -> FunctionResult:
+        """Extract and persist precedents from reflection session takeaways.
+
+        -- RE-F13: precedent_ingest --
+        """
+        from core.institutional_memory import (
+            Precedent, PrecedentRegistry, validate_precedent,
+        )
+
+        payload = event.get("payload", event)
+        events: List[Dict[str, Any]] = []
+        mg_updates: List[str] = []
+
+        session_id = payload.get("sessionId", "")
+        takeaways = payload.get("takeaways", [])
+        episode_ids = payload.get("episodeIds", [])
+        category = payload.get("category", "outcome_anomaly")
+
+        registry: PrecedentRegistry = ctx.get("precedent_registry")  # type: ignore[assignment]
+        if registry is None:
+            registry = PrecedentRegistry()
+
+        now = ctx.get("now", datetime.now(timezone.utc))
+        now_iso = now.isoformat() if hasattr(now, "isoformat") else str(now)
+        stored_ids: List[str] = []
+
+        for takeaway in takeaways:
+            precedent_id = f"PREC-{uuid.uuid4().hex[:8]}"
+            precedent = Precedent(
+                precedent_id=precedent_id,
+                source_session_id=session_id,
+                source_episode_ids=list(episode_ids),
+                takeaway=takeaway if isinstance(takeaway, str) else str(takeaway),
+                category=category,
+                confidence=payload.get("confidence", 0.5),
+                created_at=now_iso,
+            )
+            registry.add(precedent)
+            stored_ids.append(precedent_id)
+
+            mg = ctx.get("memory_graph")
+            if mg is not None:
+                from core.memory_graph import EdgeKind, GraphEdge, GraphNode, NodeKind
+                mg._add_node(GraphNode(
+                    node_id=precedent_id,
+                    kind=NodeKind.PRECEDENT,
+                    label=precedent.takeaway[:80],
+                    timestamp=now_iso,
+                    properties={"category": category, "session_id": session_id},
+                ))
+                mg_updates.append(precedent_id)
+                for ep_id in episode_ids:
+                    mg._add_edge(GraphEdge(
+                        source_id=precedent_id,
+                        target_id=ep_id,
+                        kind=EdgeKind.LEARNED_FROM,
+                        label="learned from episode",
+                    ))
+
+        events.append({
+            "topic": "decision_lineage",
+            "subtype": "precedent_stored",
+            "sessionId": session_id,
+            "precedentIds": stored_ids,
+            "count": len(stored_ids),
+        })
+
+        return FunctionResult(
+            function_id="RE-F13", success=True,
+            events_emitted=events,
+            mg_updates=mg_updates,
+        )
+
+    # ── RE-F14: Pattern Fingerprint ───────────────────────────
+
+    def _pattern_fingerprint(
+        self, event: Dict[str, Any], ctx: Dict[str, Any],
+    ) -> FunctionResult:
+        """Compute structural fingerprint for a precedent.
+
+        -- RE-F14: pattern_fingerprint --
+        """
+        from core.institutional_memory import compute_fingerprint
+
+        payload = event.get("payload", event)
+        events: List[Dict[str, Any]] = []
+        mg_updates: List[str] = []
+
+        precedent_id = payload.get("precedentId", "")
+        episodes = payload.get("episodes", [])
+
+        fingerprint = compute_fingerprint(precedent_id, episodes)
+
+        mg = ctx.get("memory_graph")
+        if mg is not None:
+            from core.memory_graph import EdgeKind, GraphEdge, GraphNode, NodeKind
+            mg._add_node(GraphNode(
+                node_id=fingerprint.fingerprint_id,
+                kind=NodeKind.PATTERN_FINGERPRINT,
+                label=f"fingerprint:{precedent_id}",
+                timestamp=fingerprint.computed_at,
+                properties={
+                    "outcome_vector": fingerprint.outcome_vector,
+                    "drift_signature": fingerprint.drift_signature,
+                    "degrade_frequency": fingerprint.degrade_frequency,
+                },
+            ))
+            mg_updates.append(fingerprint.fingerprint_id)
+            mg._add_edge(GraphEdge(
+                source_id=fingerprint.fingerprint_id,
+                target_id=precedent_id,
+                kind=EdgeKind.PATTERN_OF,
+                label="pattern of precedent",
+            ))
+
+        events.append({
+            "topic": "decision_lineage",
+            "subtype": "fingerprint_computed",
+            "precedentId": precedent_id,
+            "fingerprintId": fingerprint.fingerprint_id,
+            "episodeCount": fingerprint.episode_count,
+        })
+
+        return FunctionResult(
+            function_id="RE-F14", success=True,
+            events_emitted=events,
+            mg_updates=mg_updates,
+        )
+
+    # ── RE-F15: Precedent Match ───────────────────────────────
+
+    def _precedent_match(
+        self, event: Dict[str, Any], ctx: Dict[str, Any],
+    ) -> FunctionResult:
+        """Search for similar precedents given new episode context.
+
+        -- RE-F15: precedent_match --
+        """
+        from core.institutional_memory import PrecedentRegistry
+
+        payload = event.get("payload", event)
+        events: List[Dict[str, Any]] = []
+        mg_updates: List[str] = []
+
+        threshold = payload.get("threshold", 0.5)
+
+        registry: PrecedentRegistry = ctx.get("precedent_registry")  # type: ignore[assignment]
+        if registry is None:
+            return FunctionResult(
+                function_id="RE-F15", success=True,
+                events_emitted=[{
+                    "topic": "decision_lineage",
+                    "subtype": "precedent_matches",
+                    "matches": [],
+                    "count": 0,
+                }],
+            )
+
+        matches = registry.search_by_similarity("", threshold=threshold)
+        match_data = [
+            {
+                "precedentId": m.precedent_id,
+                "takeaway": m.takeaway,
+                "category": m.category,
+                "relevanceScore": m.relevance_score,
+            }
+            for m in matches
+        ]
+
+        # Add SIMILAR_TO edges in MG for high-relevance matches
+        mg = ctx.get("memory_graph")
+        if mg is not None and len(matches) >= 2:
+            from core.memory_graph import EdgeKind, GraphEdge
+            for i in range(len(matches) - 1):
+                mg._add_edge(GraphEdge(
+                    source_id=matches[i].precedent_id,
+                    target_id=matches[i + 1].precedent_id,
+                    kind=EdgeKind.SIMILAR_TO,
+                    label="similar precedent",
+                ))
+
+        events.append({
+            "topic": "decision_lineage",
+            "subtype": "precedent_matches",
+            "matches": match_data,
+            "count": len(matches),
+        })
+
+        return FunctionResult(
+            function_id="RE-F15", success=True,
+            events_emitted=events,
+            mg_updates=mg_updates,
+        )
+
+    # ── RE-F16: Knowledge Consolidate ─────────────────────────
+
+    def _knowledge_consolidate(
+        self, event: Dict[str, Any], ctx: Dict[str, Any],
+    ) -> FunctionResult:
+        """Merge related precedents into consolidated KnowledgeEntry nodes.
+
+        -- RE-F16: knowledge_consolidate --
+        """
+        from core.institutional_memory import (
+            PrecedentRegistry, merge_precedents,
+        )
+
+        payload = event.get("payload", event)
+        events: List[Dict[str, Any]] = []
+        mg_updates: List[str] = []
+
+        threshold = payload.get("similarityThreshold", 0.5)
+
+        registry: PrecedentRegistry = ctx.get("precedent_registry")  # type: ignore[assignment]
+        if registry is None:
+            return FunctionResult(
+                function_id="RE-F16", success=False,
+                error="No precedent_registry in context",
+            )
+
+        all_precedents = registry.list_all()
+        entries, report = merge_precedents(all_precedents, threshold)
+
+        # Store entries in registry and MG
+        mg = ctx.get("memory_graph")
+        for entry in entries:
+            registry.add_knowledge_entry(entry)
+            if mg is not None:
+                from core.memory_graph import EdgeKind, GraphEdge, GraphNode, NodeKind
+                mg._add_node(GraphNode(
+                    node_id=entry.entry_id,
+                    kind=NodeKind.KNOWLEDGE_ENTRY,
+                    label=entry.title[:80],
+                    timestamp=entry.created_at,
+                    properties={"summary": entry.summary[:200]},
+                ))
+                mg_updates.append(entry.entry_id)
+                for pid in entry.source_precedent_ids:
+                    mg._add_edge(GraphEdge(
+                        source_id=entry.entry_id,
+                        target_id=pid,
+                        kind=EdgeKind.CONSOLIDATES,
+                        label="consolidates precedent",
+                    ))
+
+        events.append({
+            "topic": "decision_lineage",
+            "subtype": "knowledge_consolidated",
+            "entriesCreated": report.entries_created,
+            "precedentsMerged": report.precedents_merged,
+            "reportId": report.report_id,
+        })
+
+        return FunctionResult(
+            function_id="RE-F16", success=True,
+            events_emitted=events,
+            mg_updates=mg_updates,
+        )
+
+    # ── RE-F17: Temporal Recall ───────────────────────────────
+
+    def _temporal_recall(
+        self, event: Dict[str, Any], ctx: Dict[str, Any],
+    ) -> FunctionResult:
+        """Time-windowed recall: 'what did we learn in the last N hours?'
+
+        -- RE-F17: temporal_recall --
+        """
+        from core.institutional_memory import PrecedentRegistry, filter_by_window
+
+        payload = event.get("payload", event)
+        events: List[Dict[str, Any]] = []
+
+        window_hours = payload.get("windowHours", 24)
+
+        registry: PrecedentRegistry = ctx.get("precedent_registry")  # type: ignore[assignment]
+        if registry is None:
+            return FunctionResult(
+                function_id="RE-F17", success=True,
+                events_emitted=[{
+                    "topic": "decision_lineage",
+                    "subtype": "temporal_recall_result",
+                    "windowHours": window_hours,
+                    "totalMatches": 0,
+                }],
+            )
+
+        now = ctx.get("now", datetime.now(timezone.utc))
+        result = filter_by_window(registry.list_all(), window_hours, now)
+
+        recall_data = [
+            {
+                "precedentId": p.precedent_id,
+                "takeaway": p.takeaway,
+                "category": p.category,
+                "relevanceScore": p.relevance_score,
+            }
+            for p in result.precedents
+        ]
+
+        events.append({
+            "topic": "decision_lineage",
+            "subtype": "temporal_recall_result",
+            "windowHours": window_hours,
+            "totalMatches": result.total_matches,
+            "precedents": recall_data,
+        })
+
+        return FunctionResult(
+            function_id="RE-F17", success=True,
+            events_emitted=events,
+        )
+
+    # ── RE-F18: Knowledge Decay ───────────────────────────────
+
+    def _knowledge_decay(
+        self, event: Dict[str, Any], ctx: Dict[str, Any],
+    ) -> FunctionResult:
+        """Apply half-life decay and demote low-relevance entries.
+
+        -- RE-F18: knowledge_decay --
+        """
+        from core.institutional_memory import PrecedentRegistry, apply_decay
+
+        payload = event.get("payload", event)
+        events: List[Dict[str, Any]] = []
+        drift_signals: List[Dict[str, Any]] = []
+
+        demote_threshold = payload.get("demoteThreshold", 0.1)
+
+        registry: PrecedentRegistry = ctx.get("precedent_registry")  # type: ignore[assignment]
+        if registry is None:
+            return FunctionResult(
+                function_id="RE-F18", success=False,
+                error="No precedent_registry in context",
+            )
+
+        now = ctx.get("now", datetime.now(timezone.utc))
+        all_precedents = registry.list_all()
+        apply_decay(all_precedents, reference_time=now)
+
+        # Update registry and count demoted
+        demoted_count = 0
+        for p in all_precedents:
+            registry.update(p)
+            if p.relevance_score < demote_threshold:
+                demoted_count += 1
+
+        events.append({
+            "topic": "decision_lineage",
+            "subtype": "knowledge_decayed",
+            "totalPrecedents": len(all_precedents),
+            "demotedCount": demoted_count,
+        })
+
+        return FunctionResult(
+            function_id="RE-F18", success=True,
+            events_emitted=events,
+            drift_signals=drift_signals,
+        )
+
+    # ── RE-F19: IRIS Precedent Resolve ────────────────────────
+
+    def _iris_precedent_resolve(
+        self, event: Dict[str, Any], ctx: Dict[str, Any],
+    ) -> FunctionResult:
+        """Resolve IRIS PRECEDENT queries from institutional memory.
+
+        -- RE-F19: iris_precedent_resolve --
+        """
+        from core.institutional_memory import PrecedentRegistry
+
+        payload = event.get("payload", event)
+        events: List[Dict[str, Any]] = []
+
+        query_text = payload.get("text", "")
+        category = payload.get("category", "")
+        limit = payload.get("limit", 10)
+
+        registry: PrecedentRegistry = ctx.get("precedent_registry")  # type: ignore[assignment]
+        if registry is None:
+            events.append({
+                "topic": "decision_lineage",
+                "subtype": "iris_precedent_response",
+                "status": "not_found",
+                "summary": "No precedent registry configured.",
+                "results": [],
+            })
+            return FunctionResult(
+                function_id="RE-F19", success=True,
+                events_emitted=events,
+            )
+
+        if category:
+            matches = registry.list_by_category(category)
+        else:
+            matches = registry.list_all()
+
+        # Sort by relevance and limit
+        matches.sort(key=lambda p: p.relevance_score, reverse=True)
+        matches = matches[:limit]
+
+        result_data = [
+            {
+                "precedentId": m.precedent_id,
+                "takeaway": m.takeaway,
+                "category": m.category,
+                "relevanceScore": m.relevance_score,
+                "sourceSessionId": m.source_session_id,
+            }
+            for m in matches
+        ]
+
+        status = "resolved" if matches else "not_found"
+        summary = f"{len(matches)} precedent(s) found"
+        if category:
+            summary += f" in category '{category}'"
+
+        events.append({
+            "topic": "decision_lineage",
+            "subtype": "iris_precedent_response",
+            "status": status,
+            "summary": summary,
+            "results": result_data,
+            "confidence": min(1.0, len(matches) * 0.2),
+        })
+
+        return FunctionResult(
+            function_id="RE-F19", success=True,
+            events_emitted=events,
         )

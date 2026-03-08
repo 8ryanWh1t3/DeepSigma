@@ -68,15 +68,17 @@ See: [docs/release/RELEASE_NOTES_v2.1.0.md](docs/release/RELEASE_NOTES_v2.1.0.md
 
 - IntelOps — 12 function handlers: claim ingest, validate, drift detect, patch, MG update, canon promote, authority/evidence check, triage, supersede, half-life, confidence recalc
 - FranOps — 12 function handlers: canon propose/bless/enforce, retcon assess/execute/propagate, inflation monitor, expire, supersede, scope check, drift detect, rollback
-- ReflectionOps — 12 function handlers: episode begin/seal/archive, gate evaluate/degrade/killswitch, audit non-coercion, severity score, coherence check, reflection ingest, IRIS resolve, replay
+- ReflectionOps — 19 function handlers: episode begin/seal/archive, gate evaluate/degrade/killswitch, audit non-coercion, severity score, coherence check, reflection ingest, IRIS resolve, replay + institutional memory (precedent ingest, pattern fingerprint, precedent match, knowledge consolidate, temporal recall, knowledge decay, IRIS precedent resolve)
 - AuthorityOps — 19 function handlers: action intake, actor/resource resolve, policy load, DLR presence, assumption validate, half-life check, blast radius threshold, kill-switch, decision gate, audit emit, delegation chain validate, authority drift detect, blast radius simulate/propagate/seal, drift history query, assumption sweep, cross-domain drift correlate
 - ParadoxOps — 12 function handlers: tension set create, pole manage, dimension attach/shift, pressure compute, imbalance compute, threshold evaluate, drift promote, interdimensional drift detect, seal snapshot, patch issue, lifecycle transition
-- Cascade Engine — 13 cross-domain rules with depth-limited propagation
-- Event Contracts — routing table mapping 67 functions + 79 events
+- ActionOps — 19 function handlers: commitment intake/validate, deliverable track, deadline check, compliance evaluate, risk assess, breach detect, escalation, remediation, adjust, complete, report + decision accounting (cost record, time-to-decision, value assess, debt detect, ROI compute, budget enforce, accounting report)
+- Cascade Engine — 27 cross-domain rules with depth-limited propagation
+- Event Contracts — routing table mapping 79 functions + 91 events
 - Money Demo v2 — 10-step end-to-end pipeline (`make demo-money`)
 - JRM — log-agnostic refinement engine: 3 adapters, 5-stage pipeline, JRM-X packet builder, enterprise federation
+- Drift Radar — cross-domain drift intelligence surface: correlation, trending, forecasting, remediation prioritization
 - DecisionSurface — portable Coherence Ops runtime with 3 adapters (Notebook, CLI, Vantage stub), shared claim-event engine, 54 tests
-- 105 JRM tests, 1146+ total passing
+- 1861+ total tests passing
 
 ### EDGE Modules
 
@@ -248,12 +250,15 @@ python src/tools/reconstruct/verify_pack.py --pack /tmp/pack --key "$KEY"
 | **OTel Span Tracing** | Tool-call + LLM completion spans, connector auto-instrumentation, W3C context propagation | [src/adapters/otel/](src/adapters/otel/) |
 | **Compliance Export** | SOC 2 evidence packages with encryption-at-rest + scheduled auto-export | [CLI: compliance export](src/deepsigma/cli/compliance_export.py) |
 | **Fairness Adapter** | Hybrid fairness monitoring — ingest AIF360/Fairlearn reports as drift signals | [src/adapters/fairness/](src/adapters/fairness/) |
-| **Domain Modes** | IntelOps (12), FranOps (12), ReflectionOps (12), AuthorityOps (19), ParadoxOps (12) — 67 function handlers with deterministic replay | [src/core/modes/](src/core/modes/) |
+| **Domain Modes** | IntelOps (12), FranOps (12), ReflectionOps (19), AuthorityOps (19), ParadoxOps (12), ActionOps (19) — 93 function handlers with deterministic replay | [src/core/modes/](src/core/modes/) |
 | **ParadoxOps** | Paradox tension sets — pair/triple/higher-order pole detection, multi-dimensional scoring, inter-dimensional drift, full lifecycle | [src/core/paradox_ops/](src/core/paradox_ops/) |
 | **DecisionSurface** | Portable Coherence Ops runtime — generic adapter layer for claim/event evaluation across environments (Notebook, CLI, Vantage) | [src/core/decision_surface/](src/core/decision_surface/) |
-| **Cascade Engine** | Cross-domain event propagation with 13 declarative rules and depth-limited cascading | [src/core/modes/cascade.py](src/core/modes/cascade.py) |
-| **Event Contracts** | Routing table: 67 functions + 79 events mapped to FEEDS topics, subtypes, and handlers | [src/core/feeds/contracts/](src/core/feeds/contracts/) |
-| **Money Demo v2** | 10-step pipeline exercising all 5 domain modes with drift, retcon, and cascade | [src/demos/money_demo/](src/demos/money_demo/) |
+| **Cascade Engine** | Cross-domain event propagation with 27 declarative rules and depth-limited cascading | [src/core/modes/cascade.py](src/core/modes/cascade.py) |
+| **Event Contracts** | Routing table: 79 functions + 91 events mapped to FEEDS topics, subtypes, and handlers | [src/core/feeds/contracts/](src/core/feeds/contracts/) |
+| **Money Demo v2** | 10-step pipeline exercising all 6 domain modes with drift, retcon, and cascade | [src/demos/money_demo/](src/demos/money_demo/) |
+| **Institutional Memory** | Precedent registry, pattern fingerprinting, knowledge consolidation, temporal decay — RE-F13→F19 | [src/core/institutional_memory/](src/core/institutional_memory/) |
+| **Drift Radar** | Cross-domain drift correlation, trending, forecasting, remediation prioritization | [src/core/drift_radar/](src/core/drift_radar/) |
+| **Decision Accounting** | Cost tracking, value scoring, debt engine, ROI computation, budget enforcement — ACTION-F13→F19 | [src/core/decision_accounting/](src/core/decision_accounting/) |
 | **FEEDS Event Surface** | 9-module pub/sub event backbone: envelope + schemas, file-bus + DLQ, manifest-first ingest, authority gate, evidence check, drift triage, canon store, claim validator, MG writer | [src/core/feeds/](src/core/feeds/) |
 | **JRM Pipeline** | Log-agnostic Judgment Refinement Module — 3 adapters (Suricata, Snort, Copilot), 5-stage coherence pipeline, JRM-X packet zips | [src/core/jrm/](src/core/jrm/) |
 | **JRM Federation** | Cross-environment gate, hub, advisory engine, HMAC-SHA256 packet signing | [enterprise/src/deepsigma/jrm_ext/](src/deepsigma/jrm_ext/) |

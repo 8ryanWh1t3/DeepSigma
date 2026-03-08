@@ -75,7 +75,7 @@ Each function entry in the routing table:
 | FRAN-F11 | `canon_drift_detect` | drift_signal | canon_drift |
 | FRAN-F12 | `canon_rollback` | canon_entry | canon_rollback |
 
-### ReflectionOps (12)
+### ReflectionOps (19)
 
 | ID | Name | Input Topic | Input Subtype |
 |----|------|-------------|---------------|
@@ -91,8 +91,15 @@ Each function entry in the routing table:
 | RE-F10 | `reflection_ingest` | decision_lineage | episode_sealed |
 | RE-F11 | `iris_resolve` | decision_lineage | iris_query |
 | RE-F12 | `episode_replay` | decision_lineage | episode_replay |
+| RE-F13 | `precedent_ingest` | decision_lineage | reflection_ingested |
+| RE-F14 | `pattern_fingerprint` | decision_lineage | precedent_stored |
+| RE-F15 | `precedent_match` | decision_lineage | precedent_query |
+| RE-F16 | `knowledge_consolidate` | decision_lineage | consolidation_request |
+| RE-F17 | `temporal_recall` | decision_lineage | temporal_recall |
+| RE-F18 | `knowledge_decay` | decision_lineage | decay_request |
+| RE-F19 | `iris_precedent_resolve` | decision_lineage | iris_precedent_query |
 
-### AuthorityOps (12)
+### AuthorityOps (19)
 
 | ID | Name | Input Topic | Input Subtype |
 |----|------|-------------|---------------|
@@ -199,7 +206,7 @@ The Domino Delegation Encryption module (EDGE) defines 9 events across 3 domains
 
 ## FEEDS Topic Mapping
 
-All 67 functions route through the existing 6 FEEDS topics plus `authority_slice`:
+All 79 functions route through the existing 6 FEEDS topics plus `authority_slice`:
 
 | Topic | Functions |
 |-------|-----------|

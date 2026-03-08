@@ -1,10 +1,14 @@
 """ActionOps domain mode -- execution governance and commitment tracking.
 
-12 function handlers keyed by ACTION-F01 through ACTION-F12.
+19 function handlers keyed by ACTION-F01 through ACTION-F19.
 
 The commitment loop: intake -> validate -> track -> deadline check ->
 compliance -> risk -> breach -> escalate -> remediate -> adjust ->
 complete -> report.
+
+ACTION-F13 through ACTION-F19 implement Decision Accounting: cost tracking,
+time-to-decision, value assessment, debt detection, ROI computation,
+budget enforcement, and accounting reports.
 """
 
 from __future__ import annotations
@@ -40,6 +44,14 @@ class ActionOps(DomainMode):
             "ACTION-F10": self._commitment_adjust,
             "ACTION-F11": self._commitment_complete,
             "ACTION-F12": self._commitment_report,
+            # Module A: Decision Accounting
+            "ACTION-F13": self._cost_record,
+            "ACTION-F14": self._time_to_decision,
+            "ACTION-F15": self._value_assess,
+            "ACTION-F16": self._debt_detect,
+            "ACTION-F17": self._roi_compute,
+            "ACTION-F18": self._budget_enforce,
+            "ACTION-F19": self._accounting_report,
         }
 
     # ── ACTION-F01: Commitment Intake ─────────────────────────────
@@ -780,5 +792,474 @@ class ActionOps(DomainMode):
 
         return FunctionResult(
             function_id="ACTION-F12", success=True,
+            events_emitted=events,
+        )
+
+    # ── ACTION-F13: Cost Record ───────────────────────────────
+
+    def _cost_record(
+        self, event: Dict[str, Any], ctx: Dict[str, Any],
+    ) -> FunctionResult:
+        """Record a cost event against a commitment.
+
+        -- ACTION-F13: cost_record --
+        """
+        from core.decision_accounting import (
+            AccountingRegistry, record_handler_cost, validate_cost_record,
+        )
+
+        payload = event.get("payload", event)
+        events: List[Dict[str, Any]] = []
+        mg_updates: List[str] = []
+
+        errors = validate_cost_record(payload)
+        if errors:
+            return FunctionResult(
+                function_id="ACTION-F13", success=False,
+                error="; ".join(errors),
+            )
+
+        commitment_id = payload.get("commitmentId", payload.get("commitment_id", ""))
+        category = payload.get("category", "time")
+        amount = payload.get("amount", 0.0)
+        handler_id = payload.get("handlerId")
+
+        registry: AccountingRegistry = ctx.get("accounting_registry")  # type: ignore[assignment]
+        if registry is None:
+            registry = AccountingRegistry()
+
+        cost = record_handler_cost(registry, commitment_id, category, amount, handler_id)
+
+        mg = ctx.get("memory_graph")
+        if mg is not None:
+            from core.memory_graph import EdgeKind, GraphEdge, GraphNode, NodeKind
+            mg._add_node(GraphNode(
+                node_id=cost.cost_id,
+                kind=NodeKind.COST_RECORD,
+                label=f"{category}:{amount}",
+                timestamp=cost.recorded_at,
+                properties={"category": category, "amount": amount},
+            ))
+            mg._add_edge(GraphEdge(
+                source_id=cost.cost_id,
+                target_id=commitment_id,
+                kind=EdgeKind.COST_OF,
+                label="cost of commitment",
+            ))
+            mg_updates.append(cost.cost_id)
+
+        events.append({
+            "topic": "action_event",
+            "subtype": "cost_recorded",
+            "commitmentId": commitment_id,
+            "costId": cost.cost_id,
+            "category": category,
+            "amount": amount,
+        })
+
+        return FunctionResult(
+            function_id="ACTION-F13", success=True,
+            events_emitted=events,
+            mg_updates=mg_updates,
+        )
+
+    # ── ACTION-F14: Time to Decision ──────────────────────────
+
+    def _time_to_decision(
+        self, event: Dict[str, Any], ctx: Dict[str, Any],
+    ) -> FunctionResult:
+        """Compute elapsed time from episode begin to commitment complete.
+
+        -- ACTION-F14: time_to_decision --
+        """
+        from core.decision_accounting import TimeToDecision
+
+        payload = event.get("payload", event)
+        events: List[Dict[str, Any]] = []
+
+        commitment_id = payload.get("commitmentId", "")
+        episode_id = payload.get("episodeId", "")
+        elapsed_ms = payload.get("elapsedMs", 0.0)
+        handler_chain_ms = payload.get("handlerChainMs", {})
+
+        now = ctx.get("now", datetime.now(timezone.utc))
+        now_iso = now.isoformat() if hasattr(now, "isoformat") else str(now)
+
+        ttd = TimeToDecision(
+            commitment_id=commitment_id,
+            episode_id=episode_id,
+            elapsed_ms=elapsed_ms,
+            handler_chain_ms=handler_chain_ms,
+            measured_at=now_iso,
+        )
+
+        events.append({
+            "topic": "action_event",
+            "subtype": "time_to_decision_measured",
+            "commitmentId": commitment_id,
+            "episodeId": episode_id,
+            "elapsedMs": elapsed_ms,
+        })
+
+        return FunctionResult(
+            function_id="ACTION-F14", success=True,
+            events_emitted=events,
+        )
+
+    # ── ACTION-F15: Value Assess ──────────────────────────────
+
+    def _value_assess(
+        self, event: Dict[str, Any], ctx: Dict[str, Any],
+    ) -> FunctionResult:
+        """Assess delivered value for a commitment.
+
+        -- ACTION-F15: value_assess --
+        """
+        from core.action_ops import CommitmentRegistry
+        from core.decision_accounting import (
+            AccountingRegistry, ValueAssessment,
+            compute_composite_value, compute_outcome_quality,
+        )
+
+        payload = event.get("payload", event)
+        events: List[Dict[str, Any]] = []
+        mg_updates: List[str] = []
+
+        commitment_id = payload.get("commitmentId", "")
+
+        commit_registry: CommitmentRegistry = ctx.get("commitment_registry")  # type: ignore[assignment]
+        commitment = commit_registry.get(commitment_id) if commit_registry else None
+
+        if commitment is None:
+            return FunctionResult(
+                function_id="ACTION-F15", success=False,
+                error=f"Commitment not found: {commitment_id}",
+            )
+
+        statuses = [d.status for d in commitment.deliverables]
+        outcome_quality = compute_outcome_quality(statuses)
+        total = len(statuses) or 1
+        delivered = sum(1 for s in statuses if s == "delivered")
+        deliverable_completion = round(delivered / total, 4)
+        composite = compute_composite_value(outcome_quality, deliverable_completion)
+
+        now = ctx.get("now", datetime.now(timezone.utc))
+        now_iso = now.isoformat() if hasattr(now, "isoformat") else str(now)
+
+        assessment_id = f"VA-{uuid.uuid4().hex[:8]}"
+        assessment = ValueAssessment(
+            assessment_id=assessment_id,
+            commitment_id=commitment_id,
+            outcome_quality=outcome_quality,
+            deliverable_completion=deliverable_completion,
+            composite_value=composite,
+            assessed_at=now_iso,
+        )
+
+        acct_registry: AccountingRegistry = ctx.get("accounting_registry")  # type: ignore[assignment]
+        if acct_registry is not None:
+            acct_registry.set_assessment(assessment)
+
+        mg = ctx.get("memory_graph")
+        if mg is not None:
+            from core.memory_graph import EdgeKind, GraphEdge, GraphNode, NodeKind
+            mg._add_node(GraphNode(
+                node_id=assessment_id,
+                kind=NodeKind.VALUE_ASSESSMENT,
+                label=f"value:{composite:.2f}",
+                timestamp=now_iso,
+                properties={
+                    "outcome_quality": outcome_quality,
+                    "deliverable_completion": deliverable_completion,
+                    "composite_value": composite,
+                },
+            ))
+            mg._add_edge(GraphEdge(
+                source_id=assessment_id,
+                target_id=commitment_id,
+                kind=EdgeKind.VALUE_OF,
+                label="value of commitment",
+            ))
+            mg_updates.append(assessment_id)
+
+        events.append({
+            "topic": "action_event",
+            "subtype": "value_assessed",
+            "commitmentId": commitment_id,
+            "assessmentId": assessment_id,
+            "outcomeQuality": outcome_quality,
+            "compositeValue": composite,
+        })
+
+        return FunctionResult(
+            function_id="ACTION-F15", success=True,
+            events_emitted=events,
+            mg_updates=mg_updates,
+        )
+
+    # ── ACTION-F16: Debt Detect ───────────────────────────────
+
+    def _debt_detect(
+        self, event: Dict[str, Any], ctx: Dict[str, Any],
+    ) -> FunctionResult:
+        """Detect decision debt (rework, scope reduction, quality shortfall).
+
+        -- ACTION-F16: debt_detect --
+        """
+        from core.action_ops import CommitmentRegistry
+        from core.decision_accounting import (
+            AccountingRegistry, detect_debt,
+        )
+
+        payload = event.get("payload", event)
+        events: List[Dict[str, Any]] = []
+        drift_signals: List[Dict[str, Any]] = []
+        mg_updates: List[str] = []
+
+        commitment_id = payload.get("commitmentId", "")
+        rework_count = payload.get("reworkCount", 0)
+
+        commit_registry: CommitmentRegistry = ctx.get("commitment_registry")  # type: ignore[assignment]
+        commitment = commit_registry.get(commitment_id) if commit_registry else None
+
+        if commitment is None:
+            return FunctionResult(
+                function_id="ACTION-F16", success=False,
+                error=f"Commitment not found: {commitment_id}",
+            )
+
+        statuses = [d.status for d in commitment.deliverables]
+        debts = detect_debt(commitment_id, statuses, commitment.risk_score, rework_count)
+
+        acct_registry: AccountingRegistry = ctx.get("accounting_registry")  # type: ignore[assignment]
+        mg = ctx.get("memory_graph")
+
+        debt_ids: List[str] = []
+        for debt in debts:
+            if acct_registry is not None:
+                acct_registry.add_debt(debt)
+            debt_ids.append(debt.debt_id)
+
+            if mg is not None:
+                from core.memory_graph import EdgeKind, GraphEdge, GraphNode, NodeKind
+                mg._add_node(GraphNode(
+                    node_id=debt.debt_id,
+                    kind=NodeKind.DECISION_DEBT,
+                    label=f"{debt.debt_type}:{debt.estimated_cost}",
+                    timestamp=debt.detected_at,
+                    properties={
+                        "debt_type": debt.debt_type,
+                        "estimated_cost": debt.estimated_cost,
+                    },
+                ))
+                mg._add_edge(GraphEdge(
+                    source_id=debt.debt_id,
+                    target_id=commitment_id,
+                    kind=EdgeKind.DEBT_FROM,
+                    label="debt from commitment",
+                ))
+                mg_updates.append(debt.debt_id)
+
+        if debts:
+            drift_signals.append({
+                "driftType": "decision_debt",
+                "severity": "yellow",
+                "commitmentId": commitment_id,
+                "debtCount": len(debts),
+                "debtTypes": [d.debt_type for d in debts],
+            })
+
+        events.append({
+            "topic": "action_event",
+            "subtype": "decision_debt_detected",
+            "commitmentId": commitment_id,
+            "debtIds": debt_ids,
+            "debtCount": len(debts),
+        })
+
+        return FunctionResult(
+            function_id="ACTION-F16", success=True,
+            events_emitted=events,
+            drift_signals=drift_signals,
+            mg_updates=mg_updates,
+        )
+
+    # ── ACTION-F17: ROI Compute ───────────────────────────────
+
+    def _roi_compute(
+        self, event: Dict[str, Any], ctx: Dict[str, Any],
+    ) -> FunctionResult:
+        """Compute ROI: (value - cost) / cost.
+
+        -- ACTION-F17: roi_compute --
+        """
+        from core.decision_accounting import AccountingRegistry, compute_roi
+
+        payload = event.get("payload", event)
+        events: List[Dict[str, Any]] = []
+
+        commitment_id = payload.get("commitmentId", "")
+
+        acct_registry: AccountingRegistry = ctx.get("accounting_registry")  # type: ignore[assignment]
+        if acct_registry is None:
+            return FunctionResult(
+                function_id="ACTION-F17", success=False,
+                error="No accounting_registry in context",
+            )
+
+        report = compute_roi(acct_registry, commitment_id)
+
+        events.append({
+            "topic": "action_event",
+            "subtype": "roi_computed",
+            "commitmentId": commitment_id,
+            "reportId": report.report_id,
+            "totalCost": report.total_cost,
+            "totalValue": report.total_value,
+            "roi": report.roi,
+            "debtOutstanding": report.debt_outstanding,
+        })
+
+        return FunctionResult(
+            function_id="ACTION-F17", success=True,
+            events_emitted=events,
+        )
+
+    # ── ACTION-F18: Budget Enforce ────────────────────────────
+
+    def _budget_enforce(
+        self, event: Dict[str, Any], ctx: Dict[str, Any],
+    ) -> FunctionResult:
+        """Check cost vs. budget thresholds, emit drift on overrun.
+
+        -- ACTION-F18: budget_enforce --
+        """
+        from core.decision_accounting import (
+            AccountingRegistry, CostBudget,
+            compute_budget_status, detect_overrun,
+        )
+
+        payload = event.get("payload", event)
+        events: List[Dict[str, Any]] = []
+        drift_signals: List[Dict[str, Any]] = []
+
+        commitment_id = payload.get("commitmentId", "")
+        max_amount = payload.get("maxAmount")
+
+        acct_registry: AccountingRegistry = ctx.get("accounting_registry")  # type: ignore[assignment]
+        if acct_registry is None:
+            return FunctionResult(
+                function_id="ACTION-F18", success=False,
+                error="No accounting_registry in context",
+            )
+
+        # Set budget if provided
+        if max_amount is not None:
+            budget = CostBudget(
+                budget_id=f"BUD-{uuid.uuid4().hex[:8]}",
+                commitment_id=commitment_id,
+                max_amount=float(max_amount),
+            )
+            acct_registry.set_budget(budget)
+
+        status = compute_budget_status(acct_registry, commitment_id)
+
+        if status.get("overrun"):
+            drift_signals.append({
+                "driftType": "budget_overrun",
+                "severity": "red",
+                "commitmentId": commitment_id,
+                "utilization": status.get("utilization", 0),
+                "totalCost": status.get("total_cost", 0),
+                "maxAmount": status.get("max_amount", 0),
+            })
+
+            events.append({
+                "topic": "action_event",
+                "subtype": "budget_overrun",
+                "commitmentId": commitment_id,
+                "utilization": status.get("utilization", 0),
+            })
+        else:
+            events.append({
+                "topic": "action_event",
+                "subtype": "budget_checked",
+                "commitmentId": commitment_id,
+                "utilization": status.get("utilization", 0),
+                "overrun": False,
+            })
+
+        return FunctionResult(
+            function_id="ACTION-F18", success=True,
+            events_emitted=events,
+            drift_signals=drift_signals,
+        )
+
+    # ── ACTION-F19: Accounting Report ─────────────────────────
+
+    def _accounting_report(
+        self, event: Dict[str, Any], ctx: Dict[str, Any],
+    ) -> FunctionResult:
+        """Generate full accounting report (cost breakdown, value, debt, ROI).
+
+        -- ACTION-F19: accounting_report --
+        """
+        from core.decision_accounting import (
+            AccountingRegistry, compute_budget_status, compute_roi,
+        )
+
+        payload = event.get("payload", event)
+        events: List[Dict[str, Any]] = []
+
+        commitment_id = payload.get("commitmentId", "")
+
+        acct_registry: AccountingRegistry = ctx.get("accounting_registry")  # type: ignore[assignment]
+        if acct_registry is None:
+            return FunctionResult(
+                function_id="ACTION-F19", success=False,
+                error="No accounting_registry in context",
+            )
+
+        costs = acct_registry.get_costs(commitment_id)
+        cost_breakdown = {}
+        for c in costs:
+            cost_breakdown[c.category] = cost_breakdown.get(c.category, 0) + c.amount
+
+        assessment = acct_registry.get_assessment(commitment_id)
+        debts = acct_registry.get_debts(commitment_id)
+        budget_status = compute_budget_status(acct_registry, commitment_id)
+        roi_report = compute_roi(acct_registry, commitment_id)
+
+        report = {
+            "commitmentId": commitment_id,
+            "costBreakdown": cost_breakdown,
+            "totalCost": roi_report.total_cost,
+            "value": {
+                "outcomeQuality": assessment.outcome_quality if assessment else 0.0,
+                "compositeValue": assessment.composite_value if assessment else 0.0,
+            },
+            "debts": [
+                {
+                    "debtId": d.debt_id,
+                    "type": d.debt_type,
+                    "estimatedCost": d.estimated_cost,
+                    "resolved": d.resolved,
+                }
+                for d in debts
+            ],
+            "budget": budget_status,
+            "roi": roi_report.roi,
+            "debtOutstanding": roi_report.debt_outstanding,
+        }
+
+        events.append({
+            "topic": "action_event",
+            "subtype": "accounting_report_generated",
+            "commitmentId": commitment_id,
+            "report": report,
+        })
+
+        return FunctionResult(
+            function_id="ACTION-F19", success=True,
             events_emitted=events,
         )

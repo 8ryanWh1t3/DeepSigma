@@ -218,6 +218,123 @@ RULES: List[CascadeRule] = [
         target_function_id="FRAN-F03",
         description="Escalated commitment triggers canon enforcement review.",
     ),
+
+    # ── Module E: Institutional Memory cascade rules ─────────
+
+    # ReflectionOps -> ReflectionOps (precedent extraction)
+    CascadeRule(
+        rule_id="CASCADE-R18",
+        name="reflection_triggers_precedent",
+        source_domain="reflectionops",
+        source_subtype="reflection_ingested",
+        target_domain="reflectionops",
+        target_function_id="RE-F13",
+        description="Reflection ingestion triggers precedent extraction.",
+    ),
+
+    # ReflectionOps -> ReflectionOps (fingerprint computation)
+    CascadeRule(
+        rule_id="CASCADE-R19",
+        name="precedent_triggers_fingerprint",
+        source_domain="reflectionops",
+        source_subtype="precedent_stored",
+        target_domain="reflectionops",
+        target_function_id="RE-F14",
+        description="Precedent storage triggers fingerprint computation.",
+    ),
+
+    # ReflectionOps -> IntelOps (decay triggers half-life re-evaluation)
+    CascadeRule(
+        rule_id="CASCADE-R20",
+        name="decay_triggers_halflife",
+        source_domain="reflectionops",
+        source_subtype="knowledge_decayed",
+        target_domain="intelops",
+        target_function_id="INTEL-F11",
+        description="Knowledge decay triggers half-life re-evaluation on linked claims.",
+    ),
+
+    # ── Module D: Drift Radar cascade rules ──────────────────
+
+    # Drift Radar -> ReflectionOps (amplified severity)
+    CascadeRule(
+        rule_id="CASCADE-R21",
+        name="amplified_red_triggers_severity",
+        source_domain="drift_radar",
+        source_subtype="severity_amplified",
+        target_domain="reflectionops",
+        target_function_id="RE-F08",
+        description="Amplified red severity triggers centralized severity re-scoring.",
+        severity_filter="red",
+    ),
+
+    # Drift Radar -> AuthorityOps (cross-domain correlation)
+    CascadeRule(
+        rule_id="CASCADE-R22",
+        name="correlation_triggers_authority",
+        source_domain="drift_radar",
+        source_subtype="cross_domain_correlation",
+        target_domain="authorityops",
+        target_function_id="AUTH-F01",
+        description="Cross-domain drift correlation triggers authority evaluation.",
+    ),
+
+    # ── Module A: Decision Accounting cascade rules ──────────
+
+    # ActionOps -> ActionOps (completion triggers time-to-decision)
+    CascadeRule(
+        rule_id="CASCADE-R23",
+        name="completion_triggers_ttd",
+        source_domain="actionops",
+        source_subtype="commitment_completed",
+        target_domain="actionops",
+        target_function_id="ACTION-F14",
+        description="Commitment completion triggers time-to-decision measurement.",
+    ),
+
+    # ActionOps -> ActionOps (time measured triggers value assessment)
+    CascadeRule(
+        rule_id="CASCADE-R24",
+        name="ttd_triggers_value",
+        source_domain="actionops",
+        source_subtype="time_to_decision_measured",
+        target_domain="actionops",
+        target_function_id="ACTION-F15",
+        description="Time-to-decision measurement triggers value assessment.",
+    ),
+
+    # ActionOps -> ActionOps (value assessed triggers debt detection)
+    CascadeRule(
+        rule_id="CASCADE-R25",
+        name="value_triggers_debt",
+        source_domain="actionops",
+        source_subtype="value_assessed",
+        target_domain="actionops",
+        target_function_id="ACTION-F16",
+        description="Value assessment triggers decision debt detection.",
+    ),
+
+    # ActionOps -> ReflectionOps (budget overrun triggers severity)
+    CascadeRule(
+        rule_id="CASCADE-R26",
+        name="overrun_triggers_severity",
+        source_domain="actionops",
+        source_subtype="budget_overrun",
+        target_domain="reflectionops",
+        target_function_id="RE-F08",
+        description="Budget overrun triggers centralized severity scoring.",
+    ),
+
+    # ActionOps -> ReflectionOps (debt detected triggers precedent storage)
+    CascadeRule(
+        rule_id="CASCADE-R27",
+        name="debt_triggers_precedent",
+        source_domain="actionops",
+        source_subtype="decision_debt_detected",
+        target_domain="reflectionops",
+        target_function_id="RE-F13",
+        description="Decision debt triggers precedent storage (learn from costly decisions).",
+    ),
 ]
 
 

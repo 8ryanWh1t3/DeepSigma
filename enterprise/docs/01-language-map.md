@@ -59,11 +59,15 @@ LinkedIn content primarily uses "Coherence Ops" and "Deep Sigma" language. This 
 | IRIS (operator interface) | `core/iris.py`, `specs/iris_query.schema.json`, `docs/18-iris.md` | ✅ Implemented — claim-graph queries |
 | FranOPS (franchise operations mode) | `core/modes/franops.py` | ✅ Implemented — 12 handlers (canon lifecycle, retcon engine, inflation monitor) |
 | IntelOps (intelligence operations mode) | `core/modes/intelops.py` | ✅ Implemented — 12 handlers (claim ingest→validate→drift→patch→MG update) |
-| ReflectionOps (reflection operations mode) | `core/modes/reflectionops.py` | ✅ Implemented — 12 handlers (episodes, gates, severity, audit, killswitch) |
-| AuthorityOps (authority operations mode) | `core/modes/authorityops.py` | ✅ Implemented — 12 handlers (action intake, actor/resource resolve, policy load, DLR presence, assumption validate, half-life, blast radius, kill-switch, decision gate, audit, delegation chain) |
+| ReflectionOps (reflection operations mode) | `core/modes/reflectionops.py` | ✅ Implemented — 19 handlers (episodes, gates, severity, audit, killswitch + institutional memory) |
+| AuthorityOps (authority operations mode) | `core/modes/authorityops.py` | ✅ Implemented — 19 handlers (action intake, actor/resource resolve, policy, DLR, assumptions, blast radius + simulation, decision gate, audit, delegation, drift detection) |
+| ActionOps (action operations mode) | `core/modes/actionops.py` | ✅ Implemented — 19 handlers (commitment tracking + decision accounting) |
 | Domain Mode Base | `core/modes/base.py` | ✅ Implemented — DomainMode + FunctionResult + deterministic replay |
-| Cascade Engine | `core/modes/cascade.py` | ✅ Implemented — 13 cross-domain cascade rules with depth-limited propagation |
-| Event Contracts / Routing Table | `core/feeds/contracts/routing_table.json` | ✅ Implemented — 48 functions + 51 events with full contracts |
+| Cascade Engine | `core/modes/cascade.py` | ✅ Implemented — 27 cross-domain cascade rules with depth-limited propagation |
+| Institutional Memory | `core/institutional_memory/` | ✅ Implemented — precedent registry, fingerprinting, consolidation, temporal decay |
+| Drift Radar | `core/drift_radar/` | ✅ Implemented — cross-domain drift correlation, trending, forecasting, prioritization |
+| Decision Accounting | `core/decision_accounting/` | ✅ Implemented — cost tracking, value scoring, debt engine, ROI computation |
+| Event Contracts / Routing Table | `core/feeds/contracts/routing_table.json` | ✅ Implemented — 79 functions + 91 events with full contracts |
 | Canon Workflow State Machine | `core/feeds/canon/workflow.py` | ✅ Implemented — PROPOSED→BLESSED→ACTIVE→SUPERSEDED/RETCONNED/EXPIRED |
 | Episode State Machine | `core/episode_state.py` | ✅ Implemented — PENDING→ACTIVE→SEALED→ARCHIVED + FROZEN |
 | Non-Coercion Audit Log | `core/audit_log.py` | ✅ Implemented — append-only, hash-chained NDJSON |

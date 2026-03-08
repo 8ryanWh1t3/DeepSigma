@@ -18,15 +18,17 @@ OVERWATCH adds the missing governance layer: **enforce coherence before, during,
 - **Drift → Patch**: structured learning loop
 
 ## Domain Modes
-Five executable domain modules wire core primitives into automated pipelines:
+Six executable domain modules wire core primitives into automated pipelines:
 - **IntelOps** (12 handlers): claim lifecycle — ingest → validate → drift → patch → MG update
 - **FranOps** (12 handlers): canon enforcement — propose → bless → enforce → retcon → propagate
-- **ReflectionOps** (12 handlers): gate enforcement — episodes → gates → severity → audit → killswitch
+- **ReflectionOps** (19 handlers): gate enforcement — episodes → gates → severity → audit → killswitch + institutional memory (precedent, fingerprint, knowledge consolidation, temporal recall, decay)
 - **AuthorityOps** (19 handlers): authority enforcement — action intake → actor/resource resolve → policy → DLR → assumptions → blast radius + simulation → decision gate → audit → drift detection
 - **ParadoxOps** (12 handlers): paradox tension detection — tension sets → dimensions → pressure → drift promote → lifecycle
+- **ActionOps** (19 handlers): commitment tracking — intake → validate → deliverables → deadlines → risk → breach → escalation → remediation + decision accounting (cost, value, debt, ROI, budget)
 - **DecisionSurface**: portable Coherence Ops runtime with pluggable adapters (notebook, CLI, Vantage)
-- **Cascade Engine**: 13 cross-domain rules with depth-limited propagation
-- **Event Contracts**: routing table mapping 67 functions + 79 events to FEEDS topics
+- **Drift Radar**: cross-domain drift intelligence surface — correlation, trending, forecasting, remediation prioritization
+- **Cascade Engine**: 27 cross-domain rules with depth-limited propagation
+- **Event Contracts**: routing table mapping 79 functions + 91 events to FEEDS topics
 
 Every handler returns a `FunctionResult` with a deterministic `replay_hash` (SHA-256).
 

@@ -602,7 +602,7 @@ Four executable domain mode modules (IntelOps, FranOps, ReflectionOps, Authority
   - Enforcement: tests/test_franops.py, make test-franops
   - KPI axes: Technical_Completeness, Authority_Modeling
 - **ReflectionOps Domain Mode** (`REFLECTIONOPS`)
-  - Gate enforcement and episode lifecycle: episode begin/seal/archive, gate evaluate/degrade/killswitch, non-coercion audit, severity scoring, coherence check, reflection ingest, IRIS resolve, episode replay. 12 function handlers (RE-F01 through RE-F12).
+  - Gate enforcement and episode lifecycle: episode begin/seal/archive, gate evaluate/degrade/killswitch, non-coercion audit, severity scoring, coherence check, reflection ingest, IRIS resolve, episode replay + institutional memory (precedent ingest, pattern fingerprint, precedent match, knowledge consolidate, temporal recall, knowledge decay, IRIS precedent resolve). 19 function handlers (RE-F01 through RE-F19).
   - Artifacts: src/core/modes/reflectionops.py, src/core/episode_state.py, src/core/severity.py, src/core/audit_log.py, src/core/killswitch.py
   - Enforcement: tests/test_reops.py, make test-reops
   - KPI axes: Technical_Completeness, Operational_Maturity
@@ -612,7 +612,7 @@ Four executable domain mode modules (IntelOps, FranOps, ReflectionOps, Authority
   - Enforcement: tests/test_authorityops.py, tests/test_authority_modules.py
   - KPI axes: Authority_Modeling, Technical_Completeness
 - **Cascade Engine** (`CASCADE_ENGINE`)
-  - Cross-domain event propagation with 13 declarative rules: 7 core rules (claim contradiction → canon review, claim supersede → canon update, canon retcon → episode flag, canon retcon → dependent claim invalidation, episode freeze → stale claims, killswitch → all domains freeze, red drift → auto-degrade) + 6 AuthorityOps rules (sealed episode → authority evaluation, authority block → canon enforcement, authority escalate → review episode, authority mismatch → delegation check, stale assumptions → confidence recalc, killswitch active → ReOps freeze). Depth-limited to prevent infinite loops.
+  - Cross-domain event propagation with 27 declarative rules: 7 core rules + 6 AuthorityOps rules + 4 ActionOps rules + 3 Institutional Memory rules + 2 Drift Radar rules + 5 Decision Accounting rules. Depth-limited to prevent infinite loops.
   - Artifacts: src/core/modes/cascade.py, src/core/modes/cascade_rules.py
   - Enforcement: tests/test_cascade.py, make test-cascade
   - KPI axes: Technical_Completeness, Automation_Depth

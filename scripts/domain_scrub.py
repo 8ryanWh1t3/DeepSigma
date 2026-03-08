@@ -252,6 +252,8 @@ ALLOWED_ACRONYMS = {
     "ASMP", "EVAL", "ART",
     # CERPA — adaptation loop primitives and demo tokens
     "CERPA", "ADJUST", "APPLY", "CYCLE",
+    # Decision Accounting — cost/value/debt ID prefixes, category enums
+    "COST", "DEBT", "TIME", "REWORK", "SNAP", "PREC", "BUD", "ETA",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}

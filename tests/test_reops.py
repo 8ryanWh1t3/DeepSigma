@@ -77,8 +77,8 @@ class TestReflectionOpsRegistration:
     def test_domain_name(self, reops):
         assert reops.domain == "reflectionops"
 
-    def test_all_12_handlers_registered(self, reops):
-        assert len(reops.function_ids) == 12
+    def test_all_19_handlers_registered(self, reops):
+        assert len(reops.function_ids) == 19
 
     def test_function_ids_well_formed(self, reops):
         for fid in reops.function_ids:

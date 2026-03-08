@@ -39,6 +39,17 @@ class NodeKind(str, Enum):
     REVIEW = "review"
     APPLY = "apply"
     COMMITMENT = "commitment"
+    # Module E: Institutional Memory
+    PRECEDENT = "precedent"
+    PATTERN_FINGERPRINT = "pattern_fingerprint"
+    KNOWLEDGE_ENTRY = "knowledge_entry"
+    # Module D: Drift Radar
+    RADAR_SNAPSHOT = "radar_snapshot"
+    DRIFT_CORRELATION = "drift_correlation"
+    # Module A: Decision Accounting
+    COST_RECORD = "cost_record"
+    VALUE_ASSESSMENT = "value_assessment"
+    DECISION_DEBT = "decision_debt"
 
 
 class EdgeKind(str, Enum):
@@ -71,6 +82,21 @@ class EdgeKind(str, Enum):
     ESCALATES_TO = "escalates_to"          # gate -> approval_path
     DERIVED_FROM = "derived_from"          # envelope -> superseded envelope
     PRECEDED_BY = "preceded_by"            # step -> previous step
+    # Module E: Institutional Memory
+    LEARNED_FROM = "learned_from"          # precedent -> episode
+    SIMILAR_TO = "similar_to"              # precedent <-> precedent
+    CONSOLIDATES = "consolidates"          # knowledge_entry -> precedent
+    PATTERN_OF = "pattern_of"              # fingerprint -> precedent
+    SUPERSEDED_KNOWLEDGE = "superseded_knowledge"  # knowledge_entry -> knowledge_entry
+    # Module D: Drift Radar
+    CORRELATES_WITH = "correlates_with"    # drift -> drift (cross-domain)
+    SNAPSHOT_CONTAINS = "snapshot_contains" # snapshot -> domain_view
+    AMPLIFIED_BY = "amplified_by"          # drift -> correlation
+    # Module A: Decision Accounting
+    COST_OF = "cost_of"                    # cost_record -> commitment
+    VALUE_OF = "value_of"                  # value_assessment -> commitment
+    DEBT_FROM = "debt_from"                # decision_debt -> commitment
+    REWORK_OF = "rework_of"                # cost_record -> deliverable
 
 
 @dataclass

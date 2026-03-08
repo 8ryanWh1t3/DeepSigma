@@ -65,18 +65,19 @@ After sealing, outcomes flow through the [CERPA](CERPA) adaptation loop (Claim �
 
 ## Domain Modes & Cascade Engine
 
-Six executable domain mode modules (79 function handlers total) with cross-domain cascade propagation, event contracts, deterministic replay, and portable DecisionSurface runtime.
+Six executable domain mode modules (93 function handlers total) with cross-domain cascade propagation, event contracts, deterministic replay, portable DecisionSurface runtime, and Drift Radar operational surface.
 
 | Page | What it covers |
 |------|---------------|
 | [IntelOps](IntelOps) | 12 handlers (INTEL-F01–F12): claim ingest → validate → drift → patch → MG update → canon promote |
 | [FranOps](FranOps) | 12 handlers (FRAN-F01–F12): canon propose/bless/enforce, retcon assess/execute/propagate, inflation |
-| [ReflectionOps](ReflectionOps) | 12 handlers (RE-F01–F12): episodes, gates, killswitch, severity, audit, coherence, IRIS, replay |
+| [ReflectionOps](ReflectionOps) | 19 handlers (RE-F01–F19): episodes, gates, killswitch, severity, audit, coherence, IRIS, replay + institutional memory (precedent, fingerprint, knowledge consolidation, temporal recall, decay) |
 | [AuthorityOps](AuthorityOps) | 19 handlers (AUTH-F01–F19): action intake, actor/resource resolve, policy, DLR presence, assumption validate, blast radius + simulation + propagation + seal, kill-switch, decision gate, audit, delegation, authority drift + history + cross-domain correlation, assumption sweep |
 | [ParadoxOps](ParadoxOps) | 12 handlers (PDX-F01–F12): tension set create, pole manage, dimension attach/shift, pressure/imbalance compute, threshold evaluate, drift promote, inter-dimensional drift, seal, patch, lifecycle |
-| [ActionOps](ActionOps) | 12 handlers (ACTION-F01–F12): commitment intake/validate, deliverable track, deadline check, compliance evaluate, risk assess, breach detect, escalation, remediation, adjust, complete, report |
+| [ActionOps](ActionOps) | 19 handlers (ACTION-F01–F19): commitment intake/validate, deliverable track, deadline check, compliance evaluate, risk assess, breach detect, escalation, remediation, adjust, complete, report + decision accounting (cost, time-to-decision, value, debt, ROI, budget) |
 | [DecisionSurface](DecisionSurface) | Portable Coherence Ops runtime — adapter ABC, claim-event engine, notebook/CLI/Vantage adapters |
-| [Cascade Engine](Cascade-Engine) | 17 cross-domain rules with depth-limited propagation |
+| Drift Radar | Cross-domain drift intelligence surface — correlation, trending, forecasting, remediation prioritization |
+| [Cascade Engine](Cascade-Engine) | 27 cross-domain rules with depth-limited propagation |
 | [Event Contracts](Event-Contracts) | Routing table: 79 functions + 91 events → FEEDS topics/subtypes/handlers |
 | [Money Demo v2](Money-Demo-v2) | 10-step end-to-end pipeline exercising all 6 domain modes |
 

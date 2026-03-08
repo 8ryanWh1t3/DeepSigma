@@ -157,23 +157,24 @@ DeepSigma uses a hybrid approach: external fairness tools (AIF360, Fairlearn, or
 
 ## What are domain modes?
 
-Five executable domain mode modules that wire existing building blocks (FEEDS, Memory Graph, claim validator, canon store, drift detection) into automated pipelines with deterministic replay:
+Six executable domain mode modules that wire existing building blocks (FEEDS, Memory Graph, claim validator, canon store, drift detection) into automated pipelines with deterministic replay:
 
 - **IntelOps** — 12 function handlers (INTEL-F01–F12) for claim lifecycle automation: ingest, validate, drift detect, patch recommend, MG update, canon promote, authority check, evidence verify, triage, supersede, half-life check, confidence recalc.
 - **FranOps** — 12 function handlers (FRAN-F01–F12) for canon enforcement: propose, bless, enforce, retcon assess/execute/propagate, inflation monitor, expire, supersede, scope check, drift detect, rollback.
-- **ReflectionOps** — 12 function handlers (RE-F01–F12) for gate enforcement: episode begin/seal/archive, gate evaluate/degrade/killswitch, non-coercion audit, severity score, coherence check, reflection ingest, IRIS resolve, episode replay.
+- **ReflectionOps** — 19 function handlers (RE-F01–F19) for gate enforcement: episode begin/seal/archive, gate evaluate/degrade/killswitch, non-coercion audit, severity score, coherence check, reflection ingest, IRIS resolve, episode replay + institutional memory (precedent ingest, pattern fingerprint, precedent match, knowledge consolidate, temporal recall, knowledge decay, IRIS precedent resolve).
 - **AuthorityOps** — 19 function handlers (AUTH-F01–F19) for reasoning-bound authority enforcement: action intake, actor/resource resolve, policy load, DLR presence check, assumption validate, half-life check, blast radius threshold + simulation + propagation + seal, kill-switch check, decision gate, audit emit, delegation chain validate, authority drift detect + history + cross-domain correlation, assumption sweep.
 - **ParadoxOps** — 12 function handlers (PDX-F01–F12) for paradox tension detection: tension set create, pole manage, dimension attach/shift, pressure/imbalance compute, threshold evaluate, drift promote, inter-dimensional drift detect, seal snapshot, patch issue, lifecycle transition.
+- **ActionOps** — 19 function handlers (ACTION-F01–F19) for commitment tracking: intake, validate, deliverable track, deadline check, compliance evaluate, risk assess, breach detect, escalation, remediation, adjust, complete, report + decision accounting (cost record, time-to-decision, value assess, debt detect, ROI compute, budget enforce, accounting report).
 
 Every handler returns a `FunctionResult` with `replay_hash` (SHA-256) for deterministic verification. See `src/core/modes/`.
 
 ## What is the cascade engine?
 
-Cross-domain event propagation with 13 declarative rules. When an event in one domain matches a rule, the cascade engine invokes the target domain's handler. Rules include: claim contradiction → canon review, canon retcon → episode flag, killswitch → all domains freeze, sealed episode → authority evaluation, authority block → canon enforcement. Depth-limited to prevent infinite loops. See `src/core/modes/cascade.py`.
+Cross-domain event propagation with 27 declarative rules. When an event in one domain matches a rule, the cascade engine invokes the target domain's handler. Rules include: claim contradiction → canon review, canon retcon → episode flag, killswitch → all domains freeze, sealed episode → authority evaluation, authority block → canon enforcement, commitment completion → time-to-decision → value assessment → debt detection, budget overrun → severity scoring, decision debt → precedent storage, drift radar severity amplification → severity re-scoring. Depth-limited to prevent infinite loops. See `src/core/modes/cascade.py`.
 
 ## What are event contracts?
 
-A declarative routing table (`src/core/feeds/contracts/routing_table.json`) mapping all 67 function handlers + 79 events to their FEEDS topics, subtypes, handler paths, required payload fields, and emitted events. Contract validation occurs at publish time. Query the table via `RoutingTable.get_function()` and `get_event()`.
+A declarative routing table (`src/core/feeds/contracts/routing_table.json`) mapping all 79 function handlers + 91 events to their FEEDS topics, subtypes, handler paths, required payload fields, and emitted events. Contract validation occurs at publish time. Query the table via `RoutingTable.get_function()` and `get_event()`.
 
 ## What is the canon workflow state machine?
 

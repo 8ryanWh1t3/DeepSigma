@@ -1,8 +1,8 @@
 """IRIS — Operator Query Resolution Engine (Phase 2).
 
 IRIS resolves operator queries (WHY, WHAT_CHANGED, WHAT_DRIFTED,
-RECALL, STATUS) by walking the MemoryGraph's claim topology and
-DLR rationale graph.
+RECALL, STATUS, PRECEDENT) by walking the MemoryGraph's claim topology
+and DLR rationale graph.
 
 Target: sub-60-second response for any supported query type.
 """
@@ -25,7 +25,8 @@ class QueryType:
     WHAT_DRIFTED = "WHAT_DRIFTED"
     RECALL = "RECALL"
     STATUS = "STATUS"
-    ALL = [WHY, WHAT_CHANGED, WHAT_DRIFTED, RECALL, STATUS]
+    PRECEDENT = "PRECEDENT"
+    ALL = [WHY, WHAT_CHANGED, WHAT_DRIFTED, RECALL, STATUS, PRECEDENT]
 
 
 class ResolutionStatus:
@@ -170,6 +171,8 @@ class IRISEngine:
             response = self._resolve_recall(query, query_id, warnings)
         elif query.query_type == QueryType.STATUS:
             response = self._resolve_status(query, query_id, warnings)
+        elif query.query_type == QueryType.PRECEDENT:
+            response = self._resolve_precedent(query, query_id, warnings)
         else:
             response = IRISResponse(
                 query_id=query_id,
@@ -643,6 +646,81 @@ class IRISEngine:
             query_type=QueryType.STATUS,
             status=self._status(confidence),
             summary=f"Coherence: {score}/100 ({grade}). Drift signals: {drift_total}.",
+            data=data,
+            provenance=provenance,
+            confidence=confidence,
+            warnings=warnings,
+        )
+
+    def _resolve_precedent(self, query: IRISQuery, query_id: str,
+                            warnings: List[str]) -> IRISResponse:
+        """PRECEDENT: search institutional memory for relevant precedents.
+
+        Confidence contributions:
+            MG precedent nodes: 0.60
+            MG knowledge entries: 0.40
+        """
+        confidence = 0.0
+        provenance: List[Dict[str, Any]] = []
+        data: Dict[str, Any] = {}
+
+        from .memory_graph import NodeKind
+
+        # Search for PRECEDENT nodes in MG
+        precedent_nodes = [
+            n for n in self._mg._nodes.values()
+            if n.kind == NodeKind.PRECEDENT
+        ]
+        if precedent_nodes:
+            confidence += 0.60
+            data["precedents"] = [
+                {
+                    "node_id": n.node_id,
+                    "label": n.label,
+                    "category": n.properties.get("category", ""),
+                    "session_id": n.properties.get("session_id", ""),
+                }
+                for n in precedent_nodes[:10]
+            ]
+            provenance.append(self._prov("MG", "precedent-search", "source",
+                                         f"{len(precedent_nodes)} precedent nodes found"))
+
+        # Search for KNOWLEDGE_ENTRY nodes
+        ke_nodes = [
+            n for n in self._mg._nodes.values()
+            if n.kind == NodeKind.KNOWLEDGE_ENTRY
+        ]
+        if ke_nodes:
+            confidence += 0.40
+            data["knowledge_entries"] = [
+                {
+                    "node_id": n.node_id,
+                    "label": n.label,
+                    "summary": n.properties.get("summary", ""),
+                }
+                for n in ke_nodes[:10]
+            ]
+            provenance.append(self._prov("MG", "knowledge-search", "evidence",
+                                         f"{len(ke_nodes)} knowledge entries found"))
+
+        if confidence == 0.0:
+            return IRISResponse(
+                query_id=query_id,
+                query_type=QueryType.PRECEDENT,
+                status=ResolutionStatus.NOT_FOUND,
+                summary="No precedents found in institutional memory.",
+                data=data,
+                provenance=provenance,
+                confidence=0.0,
+                warnings=warnings,
+            )
+
+        return IRISResponse(
+            query_id=query_id,
+            query_type=QueryType.PRECEDENT,
+            status=self._status(confidence),
+            summary=(f"{len(precedent_nodes)} precedent(s), "
+                     f"{len(ke_nodes)} knowledge entry/ies in memory."),
             data=data,
             provenance=provenance,
             confidence=confidence,

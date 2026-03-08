@@ -1,6 +1,6 @@
 # 24 — Domain Modes, Cascade Engine & DecisionSurface
 
-Six executable domain modes (79 function handlers) with cross-domain cascade propagation, event contracts, deterministic replay, and portable DecisionSurface runtime.
+Six executable domain modes (93 function handlers) with cross-domain cascade propagation, event contracts, deterministic replay, portable DecisionSurface runtime, and Drift Radar operational surface.
 
 ```mermaid
 graph TB
@@ -32,7 +32,7 @@ graph TB
         FF05 --> FF12[FRAN-F12 canon_rollback]
     end
 
-    subgraph "ReflectionOps (12 handlers)"
+    subgraph "ReflectionOps (19 handlers)"
         RF01[RE-F01 episode_begin] --> RF02[RE-F02 episode_seal]
         RF02 --> RF03[RE-F03 episode_archive]
         RF01 --> RF04[RE-F04 gate_evaluate]
@@ -44,6 +44,13 @@ graph TB
         RF01 --> RF10[RE-F10 reflection_ingest]
         RF01 --> RF11[RE-F11 iris_resolve]
         RF02 --> RF12[RE-F12 episode_replay]
+        RF10 --> RF13[RE-F13 precedent_ingest]
+        RF13 --> RF14[RE-F14 pattern_fingerprint]
+        RF13 --> RF15[RE-F15 precedent_match]
+        RF13 --> RF16[RE-F16 knowledge_consolidate]
+        RF13 --> RF17[RE-F17 temporal_recall]
+        RF16 --> RF18[RE-F18 knowledge_decay]
+        RF11 --> RF19[RE-F19 iris_precedent_resolve]
     end
 
     subgraph "AuthorityOps (19 handlers)"
@@ -82,7 +89,7 @@ graph TB
         PF11 --> PF12
     end
 
-    subgraph "ActionOps (12 handlers)"
+    subgraph "ActionOps (19 handlers)"
         XF01[ACTION-F01 commitment_intake] --> XF02[ACTION-F02 commitment_validate]
         XF02 --> XF03[ACTION-F03 deliverable_track]
         XF02 --> XF04[ACTION-F04 deadline_check]
@@ -94,9 +101,16 @@ graph TB
         XF09 --> XF10[ACTION-F10 commitment_adjust]
         XF03 --> XF11[ACTION-F11 commitment_complete]
         XF02 --> XF12[ACTION-F12 commitment_report]
+        XF11 --> XF13[ACTION-F13 cost_record]
+        XF11 --> XF14[ACTION-F14 time_to_decision]
+        XF14 --> XF15[ACTION-F15 value_assess]
+        XF15 --> XF16[ACTION-F16 debt_detect]
+        XF15 --> XF17[ACTION-F17 roi_compute]
+        XF13 --> XF18[ACTION-F18 budget_enforce]
+        XF17 --> XF19[ACTION-F19 accounting_report]
     end
 
-    subgraph "Cascade Engine (17 rules)"
+    subgraph "Cascade Engine (27 rules)"
         C1[Claim contradiction] -->|canon review| FF04
         C2[Claim supersede] -->|canon update| FF09
         C3[Canon retcon] -->|episode flag| RF01
@@ -114,6 +128,16 @@ graph TB
         C15[Commitment breached] -->|severity score| RF08
         C16[Commitment completed] -->|confidence recalc| IF12
         C17[Commitment escalated] -->|canon enforce| FF03
+        C18[Reflection ingested] -->|precedent extract| RF13
+        C19[Precedent stored] -->|fingerprint compute| RF14
+        C20[Knowledge decayed] -->|half-life reeval| IF11
+        C21[Severity amplified] -->|severity rescore| RF08
+        C22[Cross-domain correlation] -->|authority eval| AF01
+        C23[Commitment completed] -->|time-to-decision| XF14
+        C24[Time measured] -->|value assess| XF15
+        C25[Value assessed] -->|debt detect| XF16
+        C26[Budget overrun] -->|severity score| RF08
+        C27[Debt detected] -->|precedent store| RF13
     end
 
     subgraph "Event Contracts"
@@ -144,6 +168,16 @@ graph TB
     XF07 -.->|commitment breached| C15
     XF11 -.->|commitment completed| C16
     XF08 -.->|commitment escalated| C17
+    RF10 -.->|reflection ingested| C18
+    RF13 -.->|precedent stored| C19
+    RF18 -.->|knowledge decayed| C20
+    DR_AMP[Drift Radar] -.->|severity amplified| C21
+    DR_AMP -.->|cross-domain corr| C22
+    XF11 -.->|commitment completed| C23
+    XF14 -.->|time measured| C24
+    XF15 -.->|value assessed| C25
+    XF18 -.->|budget overrun| C26
+    XF16 -.->|debt detected| C27
 ```
 
 ## DecisionSurface Runtime
@@ -216,7 +250,7 @@ stateDiagram-v2
 | Severity Scorer | Centralized drift severity | `src/core/severity.py` |
 | Audit Log | Hash-chained NDJSON | `src/core/audit_log.py` |
 | Killswitch | Emergency freeze + halt proof | `src/core/killswitch.py` |
-| Cascade Rules | 17 declarative CascadeRule objects | `src/core/modes/cascade_rules.py` |
+| Cascade Rules | 27 declarative CascadeRule objects | `src/core/modes/cascade_rules.py` |
 | Authority Models | AuthorityOps dataclasses + verdicts | `src/core/authority/models.py` |
 | Policy Runtime | 11-step authority evaluation pipeline | `src/core/authority/policy_runtime.py` |
 | Authority Audit | Hash-chained authority audit log | `src/core/authority/authority_audit.py` |
@@ -228,3 +262,6 @@ stateDiagram-v2
 | Commitment Lifecycle | 8-state machine for commitments | `src/core/action_ops/lifecycle.py` |
 | DecisionSurface | Portable runtime with adapter ABC | `src/core/decision_surface/runtime.py` |
 | Claim-Event Engine | Shared evaluation logic (7 functions) | `src/core/decision_surface/claim_event_engine.py` |
+| Institutional Memory | Precedent registry, fingerprinting, consolidation, temporal decay | `src/core/institutional_memory/` |
+| Drift Radar | Cross-domain drift correlation, trending, forecasting, prioritization | `src/core/drift_radar/` |
+| Decision Accounting | Cost tracking, value scoring, debt engine, ROI computation | `src/core/decision_accounting/` |
