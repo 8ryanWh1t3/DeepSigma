@@ -24,6 +24,7 @@ class FunctionResult:
     elapsed_ms: float = 0.0
     replay_hash: str = ""
     error: Optional[str] = None
+    context_snapshot: Optional[Dict[str, Any]] = None  # ambient, excluded from replay hash
 
     def compute_replay_hash(self) -> str:
         """Compute SHA-256 of deterministic output fields."""

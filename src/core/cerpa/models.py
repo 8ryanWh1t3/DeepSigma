@@ -9,7 +9,10 @@ Use cerpa.mappers to bridge between CERPA and existing structures.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
+
+if TYPE_CHECKING:
+    from ..context.models import ContextEnvelope
 
 
 @dataclass
@@ -213,6 +216,7 @@ class CerpaCycle:
     status: str = "aligned"
     started_at: str = ""
     completed_at: str = ""
+    context: Optional["ContextEnvelope"] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -232,6 +236,8 @@ class CerpaCycle:
             d["started_at"] = self.started_at
         if self.completed_at:
             d["completed_at"] = self.completed_at
+        if self.context is not None:
+            d["context"] = self.context.to_dict()
         if self.metadata:
             d["metadata"] = self.metadata
         return d

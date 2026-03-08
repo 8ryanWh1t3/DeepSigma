@@ -251,7 +251,9 @@ ALLOWED_ACRONYMS = {
     # DecisionSurface — claim/event engine, assumption, evaluation tokens
     "ASMP", "EVAL", "ART",
     # CERPA — adaptation loop primitives and demo tokens
-    "CERPA", "ADJUST", "APPLY", "CYCLE",
+    "CERPA", "ADJUST", "APPLY", "CYCLE", "CTX",
+    # Context Envelope dimension names
+    "WHEN", "WHERE",
     # Decision Accounting — cost/value/debt ID prefixes, category enums
     "COST", "DEBT", "TIME", "REWORK", "SNAP", "PREC", "BUD", "ETA",
 }

@@ -35,6 +35,7 @@ After sealing, outcomes flow through the [CERPA](CERPA) adaptation loop (Claim �
 | [Runtime Flow](Runtime-Flow) | Step-by-step request lifecycle |
 | [Policy Packs](Policy-Packs) | Versioned bundles of DTE + Action constraints |
 | [Authority Boundary Primitive](Authority-Boundary-Primitive) | Pre-runtime governance declaration — what's allowed/denied/required before enforcement |
+| [Context Envelope](Context-Envelope) | Ambient context (WHO/WHEN/WHERE/WHY/CONSTRAINTS/SCOPE) wrapping CERPA cycles — NOT a primitive |
 
 ---
 

@@ -93,6 +93,19 @@ class CascadeEngine:
                 )
                 continue
 
+            # Inherit context for cross-domain propagation
+            child_context = dict(context)
+            ctx_env = context.get("context_envelope")
+            if ctx_env is not None:
+                try:
+                    from ..context.propagation import inherit_context
+                    child_env = inherit_context(
+                        ctx_env, new_domain=rule.target_domain,
+                    )
+                    child_context = {**context, "context_envelope": child_env}
+                except Exception:
+                    pass  # graceful fallback if context module unavailable
+
             # Build cascade event
             cascade_event = {
                 "payload": event.get("payload", event),
@@ -101,7 +114,7 @@ class CascadeEngine:
             }
 
             handler_result = target_mode.handle(
-                rule.target_function_id, cascade_event, context
+                rule.target_function_id, cascade_event, child_context
             )
 
             result.triggered_rules.append(rule.rule_id)
@@ -118,7 +131,7 @@ class CascadeEngine:
                 sub_result = self.propagate(
                     source_domain=rule.target_domain,
                     event=emitted,
-                    context=context,
+                    context=child_context,
                     max_depth=max_depth - 1,
                 )
                 result.triggered_rules.extend(sub_result.triggered_rules)

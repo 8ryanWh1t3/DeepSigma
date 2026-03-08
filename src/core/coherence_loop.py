@@ -93,6 +93,7 @@ def run_coherence_loop(
     claim_payload: Dict[str, Any],
     event_payload: Dict[str, Any],
     source: str = "coherence-loop",
+    context: Optional[Any] = None,
 ) -> CoherenceLoopResult:
     """Run a complete coherence loop through CERPA.
 
@@ -187,8 +188,15 @@ def run_coherence_loop(
                 notes=[f"success={apply_obj.success}"],
             ))
 
+    metadata: Dict[str, Any] = {}
+    if context is not None:
+        ctx_id = getattr(context, "context_id", None)
+        if ctx_id:
+            metadata["context_id"] = ctx_id
+
     return CoherenceLoopResult(
         loop_id=loop_id,
         steps=steps,
         completed=True,
+        metadata=metadata,
     )

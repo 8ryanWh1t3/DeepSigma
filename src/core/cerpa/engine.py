@@ -167,17 +167,33 @@ def apply_patch(patch: Patch, claim: Claim) -> ApplyResult:
 # ── Full Cycle ──────────────────────────────────────────────────
 
 
-def run_cerpa_cycle(claim: Claim, event: Event) -> CerpaCycle:
-    """Run a complete CERPA cycle: Claim + Event -> Review -> Patch -> Apply."""
+def run_cerpa_cycle(
+    claim: Claim,
+    event: Event,
+    context: Optional[Any] = None,
+) -> CerpaCycle:
+    """Run a complete CERPA cycle: Claim + Event -> Review -> Patch -> Apply.
+
+    Args:
+        claim: The claim to evaluate.
+        event: The event to compare against.
+        context: Optional ContextEnvelope to attach to the cycle.
+    """
     started_at = _now_iso()
 
     review = review_claim_against_event(claim, event)
+    if context is not None:
+        review.metadata["context_ref"] = getattr(context, "context_id", None)
 
     patch = generate_patch_from_review(review)
+    if patch is not None and context is not None:
+        patch.metadata["context_ref"] = getattr(context, "context_id", None)
 
     apply_result = None
     if patch is not None:
         apply_result = apply_patch(patch, claim)
+        if apply_result is not None and context is not None:
+            apply_result.metadata["context_ref"] = getattr(context, "context_id", None)
 
     if apply_result is not None:
         status = CerpaStatus.APPLIED
@@ -199,6 +215,7 @@ def run_cerpa_cycle(claim: Claim, event: Event) -> CerpaCycle:
         status=status,
         started_at=started_at,
         completed_at=_now_iso(),
+        context=context,
     )
 
 

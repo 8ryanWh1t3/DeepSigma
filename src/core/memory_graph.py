@@ -50,6 +50,8 @@ class NodeKind(str, Enum):
     COST_RECORD = "cost_record"
     VALUE_ASSESSMENT = "value_assessment"
     DECISION_DEBT = "decision_debt"
+    # Context Envelope
+    CONTEXT_SNAPSHOT = "context_snapshot"
 
 
 class EdgeKind(str, Enum):
@@ -97,6 +99,8 @@ class EdgeKind(str, Enum):
     VALUE_OF = "value_of"                  # value_assessment -> commitment
     DEBT_FROM = "debt_from"                # decision_debt -> commitment
     REWORK_OF = "rework_of"                # cost_record -> deliverable
+    # Context Envelope
+    CONTEXTUALIZED_BY = "contextualized_by"  # node -> context_snapshot
 
 
 @dataclass
@@ -622,6 +626,45 @@ class MemoryGraph:
         ))
         logger.debug("Added policy evaluation node %s", eval_id)
         return eval_id
+
+    # ------------------------------------------------------------------
+    # Context Envelope
+    # ------------------------------------------------------------------
+
+    def add_context_snapshot(
+        self,
+        snapshot: Any,
+        linked_node_ids: Optional[List[str]] = None,
+    ) -> str:
+        """Add a ContextSnapshot node and link to related nodes.
+
+        Args:
+            snapshot: A ContextSnapshot (from core.context.models).
+            linked_node_ids: Node IDs to connect via CONTEXTUALIZED_BY edges.
+
+        Returns:
+            The snapshot_id of the added node.
+        """
+        snap_id = snapshot.snapshot_id
+        self._add_node(GraphNode(
+            node_id=snap_id,
+            kind=NodeKind.CONTEXT_SNAPSHOT,
+            label=snapshot.trigger,
+            timestamp=snapshot.captured_at,
+            properties={
+                "context_id": snapshot.context_id,
+                "trigger": snapshot.trigger,
+            },
+        ))
+        for nid in (linked_node_ids or []):
+            if nid in self._nodes:
+                self._add_edge(GraphEdge(
+                    source_id=nid,
+                    target_id=snap_id,
+                    kind=EdgeKind.CONTEXTUALIZED_BY,
+                ))
+        logger.debug("Added context snapshot node %s", snap_id)
+        return snap_id
 
     def to_json(self, indent: int = 2) -> str:
         """Serialise the full graph to JSON."""

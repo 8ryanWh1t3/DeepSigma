@@ -1,6 +1,6 @@
 # Mermaid Diagrams (Canonical)
 
-Eighteen diagrams define the visual language of Sigma OVERWATCH. Everything else is archived to reduce drift.
+Nineteen diagrams define the visual language of Sigma OVERWATCH. Everything else is archived to reduce drift.
 
 ## Canonical Set
 
@@ -25,6 +25,7 @@ Eighteen diagrams define the visual language of Sigma OVERWATCH. Everything else
 | 23 | [Competitive Gap Closure](23-competitive-gap-closure.md) | Graph | RuntimeGate, OTel span tracing, connector instrumentation, encryption-at-rest, fairness adapter (v2.1.0) |
 | 24 | [Domain Modes & Cascade](24-domain-modes-cascade.md) | Graph | Five domain modes (67 handlers), cascade engine (13 rules), event contracts (67/79), DecisionSurface runtime (v2.1.2) |
 | 25 | [JRM Pipeline & Federation](25-jrm-pipeline.md) | Graph | 3 adapters, 5-stage pipeline, JRM-X packets, enterprise gate/hub/advisory/signing |
+| 26 | [CERPA Cognitive Engine](26-cerpa-cognitive-engine.md) | Graph | Context Envelope (6 dimensions), CERPA wrapping, propagation semantics, MG integration |
 
 ## Archive
 
@@ -53,5 +54,6 @@ New diagrams require justification and must map to one of these canonical purpos
 16. **Competitive gap closure** — runtime gates, OTel span tracing, connector instrumentation, compliance encryption, fairness adapter
 17. **Domain modes & cascade** — executable domain mode handlers, cross-domain cascade rules, event contract routing
 18. **JRM pipeline & federation** — log-agnostic adapters, 5-stage coherence pipeline, JRM-X packets, enterprise gate/hub/advisory/signing
+19. **CERPA cognitive engine** — Context Envelope wrapping CERPA, 6-dimension ambient context, propagation semantics, MG snapshots
 
 To add a diagram, update this index and ensure `tools/mermaid_audit.py` passes.
