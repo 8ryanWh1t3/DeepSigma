@@ -63,7 +63,7 @@ from .iris import (
     ResolutionStatus,
 )
 from .normalize import normalize_keys
-from .primitives import PrimitiveType, ALLOWED_PRIMITIVE_TYPES
+from .primitives import PrimitiveType, ALLOWED_PRIMITIVE_TYPES, Claim, Episode, Event
 from .primitive_envelope import (
     PrimitiveEnvelope,
     wrap_primitive,
@@ -144,6 +144,9 @@ __all__ = [
     "MetricPoint",
     "PrimitiveType",
     "ALLOWED_PRIMITIVE_TYPES",
+    "Claim",
+    "Episode",
+    "Event",
     "PrimitiveEnvelope",
     "wrap_primitive",
     "wrap_record",

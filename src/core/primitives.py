@@ -8,7 +8,9 @@ in decision_surface, JRM, or paradox_ops.
 
 Usage:
     from core.primitives import PrimitiveType, ALLOWED_PRIMITIVE_TYPES
-    from core.primitives import AtomicClaim, DecisionEpisode, DriftSignal, Patch
+    from core.primitives import Claim, Episode, Event, Patch
+    # Legacy names still work:
+    from core.primitives import AtomicClaim, DecisionEpisode, DriftSignal
 """
 
 from __future__ import annotations
@@ -427,6 +429,20 @@ class Patch:
             rationale=d.get("rationale", ""),
             lineage=d.get("lineage", {}),
         )
+
+
+# ── Validation wrappers ─────────────────────────────────────────
+
+
+# ── CERPA-aligned aliases ──────────────────────────────────────
+#
+# Preferred names for new code.  The original class names (AtomicClaim,
+# DecisionEpisode, DriftSignal) remain canonical and are not deprecated —
+# both forms are first-class.
+
+Claim = AtomicClaim
+Episode = DecisionEpisode
+Event = DriftSignal
 
 
 # ── Validation wrappers ─────────────────────────────────────────
