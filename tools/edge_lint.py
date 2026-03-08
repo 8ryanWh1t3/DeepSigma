@@ -222,7 +222,7 @@ def lint_file(filepath, strict=False):
 # Main
 # ────────────────────────────────────────────────────────────────
 
-DEFAULT_SCAN_DIRS = ["edge", "enterprise/edge", "core/edge"]
+DEFAULT_SCAN_DIRS = ["edge", "enterprise/edge"]
 
 
 def _discover_edge_files(root):
@@ -238,7 +238,7 @@ def main():
     )
     parser.add_argument(
         "--path", default=None,
-        help="Directory to scan (default: scans edge/, enterprise/edge/, core/edge/)"
+        help="Directory to scan (default: scans edge/, enterprise/edge/)"
     )
     parser.add_argument(
         "--json", action="store_true", dest="json_output",

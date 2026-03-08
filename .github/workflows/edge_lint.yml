@@ -26,7 +26,6 @@ jobs:
             -not -path "./.git/*" \
             -not -path "./edge/*" \
             -not -path "./enterprise/edge/*" \
-            -not -path "./core/edge/*" \
             -not -path "./EDGE_HARDENING_HEADER_SNIPPET.html" | head -20)
           if [ -n "$STRAY" ]; then
             echo "::warning::EDGE files found outside expected directories:"
@@ -42,9 +41,6 @@ jobs:
       - name: Run EDGE hardening linter (enterprise/edge/)
         run: python tools/edge_lint.py --path enterprise/edge/
 
-      - name: Run EDGE hardening linter (core/edge/)
-        run: python tools/edge_lint.py --path core/edge/
-
       - name: Generate JSON report
         if: always()
         run: |
@@ -52,7 +48,6 @@ jobs:
           python tools/edge_lint.py --json > lint-reports/all.json 2>&1 || true
           python tools/edge_lint.py --json --path edge/ > lint-reports/edge.json 2>&1 || true
           python tools/edge_lint.py --json --path enterprise/edge/ > lint-reports/enterprise.json 2>&1 || true
-          python tools/edge_lint.py --json --path core/edge/ > lint-reports/core.json 2>&1 || true
 
       - name: Upload lint report
         if: always()

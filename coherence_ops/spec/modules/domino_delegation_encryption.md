@@ -72,4 +72,4 @@ Provides a verifiable, threshold-based encryption ceremony for high-stakes custo
 | Edition | File | Capabilities |
 |---|---|---|
 | Enterprise | `enterprise/edge/EDGE_Domino_Delegation_Encryption.html` | Full ceremony + encrypt/decrypt |
-| Core | `core/edge/EDGE_Domino_Delegation_Encryption_Verifier.html` | Verification only (read-only) |
+| Core | `edge/EDGE_Domino_Delegation_Encryption_Verifier.html` | Verification only (read-only) |

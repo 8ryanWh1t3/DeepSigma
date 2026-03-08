@@ -1,6 +1,6 @@
 # EDGE Security Policy
 
-> Applies to all `EDGE_*.html` files in `edge/`, `enterprise/edge/`, and `core/edge/`.
+> Applies to all `EDGE_*.html` files in `edge/` and `enterprise/edge/`.
 
 ## Core Principles
 
@@ -53,7 +53,7 @@ Any other exception tag causes CI failure.
 
 The linter (`tools/edge_lint.py`) runs on every push to `main` and every pull request via `.github/workflows/edge_lint.yml`.
 
-**Scanned directories:** `edge/`, `enterprise/edge/`, `core/edge/`
+**Scanned directories:** `edge/`, `enterprise/edge/`
 
 **What it checks:**
 - All forbidden patterns (network, dynamic exec, persistence, communication, HTML injection)

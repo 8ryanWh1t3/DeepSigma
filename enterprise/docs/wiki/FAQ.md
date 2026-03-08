@@ -273,7 +273,7 @@ Amendment arrives → rerun the extraction prompt with the updated RFP → overw
 
 ## What is Domino Delegation Encryption?
 
-A 4-of-7 Shamir threshold encryption ceremony using physical domino tiles as co-presence proof. Seven participants each draw a domino tile, chain them together, generate Shamir keyword shares, and can encrypt/decrypt sensitive text via AES-256-GCM. Keywords are TTL-gated (1 hour) and distributed one at a time in person only. Enterprise edition: `enterprise/edge/EDGE_Domino_Delegation_Encryption.html`. Core verifier: `core/edge/EDGE_Domino_Delegation_Encryption_Verifier.html`.
+A 4-of-7 Shamir threshold encryption ceremony using physical domino tiles as co-presence proof. Seven participants each draw a domino tile, chain them together, generate Shamir keyword shares, and can encrypt/decrypt sensitive text via AES-256-GCM. Keywords are TTL-gated (1 hour) and distributed one at a time in person only. Enterprise edition: `enterprise/edge/EDGE_Domino_Delegation_Encryption.html`. Core verifier: `edge/EDGE_Domino_Delegation_Encryption_Verifier.html`.
 
 ## How does the Domino ceremony work?
 
@@ -289,4 +289,4 @@ Keywords are valid for 1 hour from generation. After TTL expires, the tool revok
 
 ## What is the Domino Delegation Verifier?
 
-A read-only EDGE tool (`core/edge/EDGE_Domino_Delegation_Encryption_Verifier.html`) that loads a ceremony JSON and verifies: chain connectivity, chain seal recomputation (SHA-256), TTL status (active/expired), session ID, and keyword fingerprints. It cannot generate keywords, accept keywords, or encrypt/decrypt. Useful for independent audit of ceremony records.
+A read-only EDGE tool (`edge/EDGE_Domino_Delegation_Encryption_Verifier.html`) that loads a ceremony JSON and verifies: chain connectivity, chain seal recomputation (SHA-256), TTL status (active/expired), session ID, and keyword fingerprints. It cannot generate keywords, accept keywords, or encrypt/decrypt. Useful for independent audit of ceremony records.
