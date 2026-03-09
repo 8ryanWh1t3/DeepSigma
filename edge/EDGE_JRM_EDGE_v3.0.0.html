@@ -6927,10 +6927,12 @@ function generateMockEvents(cfg){
   var thr=cpThreads[t];
   for(var n=0;n<interPerThread&&cpIdx<cpCount;n++){
    var intId="INT-"+thr.id.split("-").slice(1,3).join("-")+"-"+String(n+1).padStart(2,"0");
+   var turnId="TURN-"+thr.id.split("-").slice(1,3).join("-")+"-"+String(n+1).padStart(2,"0");
    var actor=cpActors[(t+n)%cpActors.length];
    for(var turn=0;turn<turnsPerInter&&cpIdx<cpCount;turn++){
     var tOff=220+cpIdx*2;
     var evtBase={timestamp:ts(180,tOff),_scenario:"COPILOT",
+     turn_id:turnId,
      context:{interaction_id:intId,turn:turn},
      thread:{thread_id:thr.id,topic:thr.topic},
      actor:{user:actor},
@@ -6940,7 +6942,8 @@ function generateMockEvents(cfg){
      evtBase.content={prompt_text:cpPrompts[(t*interPerThread+n)%cpPrompts.length]};
     }else if(turn===1){
      evtBase.event_type="copilot_proposed";
-     evtBase.content={proposal_text:cpProposals[(t*interPerThread+n)%cpProposals.length]};
+     var propText=cpProposals[(t*interPerThread+n)%cpProposals.length];
+     evtBase.content={proposal_text:propText,result_text:propText};
     }else if(turn===2){
      evtBase.event_type="copilot_signal";
      evtBase.content={signal_type:cpSignals[(t*interPerThread+n)%cpSignals.length],edit_distance:Math.floor(seededRand()*30)};
