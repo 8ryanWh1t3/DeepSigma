@@ -260,6 +260,8 @@ ALLOWED_ACRONYMS = {
     "WHEN", "WHERE",
     # Decision Accounting — cost/value/debt ID prefixes, category enums
     "COST", "DEBT", "TIME", "REWORK", "SNAP", "PREC", "BUD", "ETA",
+    # JRM EDGE v3 Graph tab — thread IDs, protocol/security terms
+    "THR", "SMB", "RDP", "APT", "INT",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}

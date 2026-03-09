@@ -980,9 +980,10 @@ document.addEventListener("DOMContentLoaded",function(){
  <div class="mixer-row"><label><span class="scenario-badge scen-high">V.HARD</span> Chaos Mix</label><input type="range" min="0" max="60" value="30" data-scen="CHAOS"/><span class="mixer-val">30</span></div>
  <div class="mixer-row"><label><span class="scenario-badge scen-expert">EXPERT</span> Edge Cases</label><input type="range" min="0" max="30" value="15" data-scen="EDGE"/><span class="mixer-val">15</span></div>
  <div class="mixer-row"><label><span class="scenario-badge scen-medium">MED</span> Tissue (Fill)</label><input type="range" min="0" max="100" value="30" data-scen="TISSUE"/><span class="mixer-val">30</span></div>
+ <div class="mixer-row"><label><span class="scenario-badge scen-medium">MED</span> Copilot (5C)</label><input type="range" min="0" max="80" value="48" data-scen="COPILOT"/><span class="mixer-val">48</span></div>
  </div>
  <div class="mixer-total">
- Total: <strong id="mixerTotal">250</strong> events
+ Total: <strong id="mixerTotal">298</strong> events
  <button class="ok" id="btnMixerReset" style="font-size:10px;padding:2px 8px">Reset Defaults</button>
  </div>
  </div>
@@ -6680,7 +6681,7 @@ function resetPipelineState(){
  10 scenario tiers demonstrate pipeline difficulty levels.
  ═══════════════════════════════════════════════════════════════════════ */
 function generateMockEvents(cfg){
- cfg=cfg||{FP_SPIKE:25,STALE_LOGIC:15,LATERAL:20,DNS_EXFIL:20,MULTI_PROTO:5,CRITICAL:10,AGENTIC:30,BENIGN:40,CHAOS:30,EDGE:15,TISSUE:30};
+ cfg=cfg||{FP_SPIKE:25,STALE_LOGIC:15,LATERAL:20,DNS_EXFIL:20,MULTI_PROTO:5,CRITICAL:10,AGENTIC:30,BENIGN:40,CHAOS:30,EDGE:15,TISSUE:30,COPILOT:48};
  var ev=[];
  var fid=1000;
  var pick=function(a){return a[Math.floor(seededRand()*a.length)]};
@@ -6881,6 +6882,78 @@ function generateMockEvents(cfg){
  ev.push(mkAlert(tSig.id,tSig.rev,tSig.sig,tSig.cat,tSig.sev,"TISSUE",185+i));
  }
 
+ // ── Scenario 11: Copilot conversations (Graph tab 5C) ── threads, interactions, actors
+ var cpThreads=[
+  {id:"THR-soc-triage-001",topic:"SOC Triage — lateral movement from 10.99.0.77"},
+  {id:"THR-patch-mgmt-002",topic:"Patch Management — CVE-2026-1234 rollout"},
+  {id:"THR-drift-review-003",topic:"Drift Review — recurring FP_SPIKE fingerprint"},
+  {id:"THR-incident-resp-004",topic:"Incident Response — Cobalt Strike beacon containment"}
+ ];
+ var cpActors=["analyst-chen","engineer-santos","lead-kwon","reviewer-nash"];
+ var cpPrompts=[
+  "Summarize lateral movement indicators from the last 4 hours",
+  "Which hosts are still unpatched for CVE-2026-1234?",
+  "Explain the recurring FP_SPIKE drift pattern and recommend fix",
+  "Draft containment plan for Cobalt Strike beacon on 192.168.1.1",
+  "Cross-reference DNS exfiltration domains with threat intel feeds",
+  "Estimate blast radius if attacker pivots from 10.99.0.77 to DC",
+  "Generate compliance evidence for the SOC triage decisions made today",
+  "Rank the top 5 unresolved alerts by confidence-weighted severity",
+  "What guardrail violations occurred during automated patch deployment?",
+  "Build a timeline linking the DNS queries to the HTTP C2 callbacks",
+  "Assess whether the coherence score drop warrants ABP reassessment",
+  "Propose policy update to reduce false positive rate on sig 2010935"
+ ];
+ var cpProposals=[
+  "10.99.0.77 accessed 10 hosts via SMB/RDP in 20s — recommend immediate isolation",
+  "3 production hosts remain unpatched: 10.0.0.5, 10.0.0.25, 192.168.1.10 — schedule maintenance window",
+  "FP_SPIKE fingerprint repeated 5 times in 14 days — meets DRT-001 threshold for delegation review",
+  "Containment: isolate 192.168.1.1, block C2 domain at firewall, snapshot memory for forensics",
+  "4 domains resolve to known APT infrastructure — confidence 0.94",
+  "Blast radius: 12 hosts reachable, 3 are domain controllers — critical escalation recommended",
+  "Evidence pack ready: 42 alerts, 8 sealed decisions, authority chain verified",
+  "Top 5: Cobalt Strike (0.98), RCE attempt (0.95), lateral scan (0.91), DNS exfil (0.88), ransomware checkin (0.85)",
+  "2 guardrail violations: production_change without approval, rate_limit_exceeded on patch_manager",
+  "Timeline: DNS at T+60s → HTTP fetch at T+81s → C2 beacon at T+82s — 3 correlated chains",
+  "Coherence dropped to 58 for 3 consecutive runs — meets DRT-003 critical threshold",
+  "Proposed: raise confidence floor to 0.7 for sig 2010935, add 24h cooldown after 5 consecutive fires"
+ ];
+ var cpSignals=["accepted","rejected","modified","accepted","accepted","modified","accepted","accepted","rejected","accepted","modified","accepted"];
+ var cpCount=cfg.COPILOT||48;
+ var interPerThread=3; // 3 interactions per thread
+ var turnsPerInter=4;  // 4 turns per interaction: prompt→proposed→signal→telemetry
+ var cpIdx=0;
+ for(var t=0;t<cpThreads.length&&cpIdx<cpCount;t++){
+  var thr=cpThreads[t];
+  for(var n=0;n<interPerThread&&cpIdx<cpCount;n++){
+   var intId="INT-"+thr.id.split("-").slice(1,3).join("-")+"-"+String(n+1).padStart(2,"0");
+   var actor=cpActors[(t+n)%cpActors.length];
+   for(var turn=0;turn<turnsPerInter&&cpIdx<cpCount;turn++){
+    var tOff=220+cpIdx*2;
+    var evtBase={timestamp:ts(180,tOff),_scenario:"COPILOT",
+     context:{interaction_id:intId,turn:turn},
+     thread:{thread_id:thr.id,topic:thr.topic},
+     actor:{user:actor},
+     confidence:Math.round((0.7+seededRand()*0.28)*100)/100};
+    if(turn===0){
+     evtBase.event_type="copilot_prompt";
+     evtBase.content={prompt_text:cpPrompts[(t*interPerThread+n)%cpPrompts.length]};
+    }else if(turn===1){
+     evtBase.event_type="copilot_proposed";
+     evtBase.content={proposal_text:cpProposals[(t*interPerThread+n)%cpProposals.length]};
+    }else if(turn===2){
+     evtBase.event_type="copilot_signal";
+     evtBase.content={signal_type:cpSignals[(t*interPerThread+n)%cpSignals.length],edit_distance:Math.floor(seededRand()*30)};
+    }else{
+     evtBase.event_type="copilot_telemetry";
+     evtBase.content={latency_ms:Math.floor(200+seededRand()*1800),tokens_out:Math.floor(50+seededRand()*450)};
+    }
+    ev.push(evtBase);
+    cpIdx++;
+   }
+  }
+ }
+
  return ev;
 }
 
@@ -6907,8 +6980,8 @@ function loadDemoEvents(){
  _seed=20260228; // reset seed for deterministic generation
  var info=readMixerConfig();
  var raw=generateMockEvents(info.cfg);
- var eveRaw=raw.filter(function(e){return e&&!e.type}); // Suricata-format (has event_type, no .type)
- var copilotRaw=raw.filter(function(e){return e&&e.type}); // Copilot-format (has .type)
+ var eveRaw=raw.filter(function(e){return e&&!e.type&&!(typeof e.event_type==="string"&&e.event_type.indexOf("copilot_")===0)}); // Suricata-format
+ var copilotRaw=raw.filter(function(e){return e&&(e.type||(typeof e.event_type==="string"&&e.event_type.indexOf("copilot_")===0))}); // Copilot-format
  var malformedLines="this is a malformed line\ncorrupted data {invalid json\n\x00binary garbage";
  var eveLines=eveRaw.map(function(e){return JSON.stringify(e)}).join("\n")+"\n"+malformedLines;
  var copilotLines=copilotRaw.map(function(e){return JSON.stringify(e)}).join("\n");
@@ -8231,7 +8304,7 @@ window.addEventListener("DOMContentLoaded",()=>{
  // Mixer reset
  var mixReset=document.getElementById("btnMixerReset");
  if(mixReset)mixReset.addEventListener("click",makeSafeHandler("btnMixerReset",function(){
- var defaults={FP_SPIKE:25,STALE_LOGIC:15,LATERAL:20,DNS_EXFIL:20,MULTI_PROTO:5,CRITICAL:10,AGENTIC:30,BENIGN:40,CHAOS:30,EDGE:15,TISSUE:30};
+ var defaults={FP_SPIKE:25,STALE_LOGIC:15,LATERAL:20,DNS_EXFIL:20,MULTI_PROTO:5,CRITICAL:10,AGENTIC:30,BENIGN:40,CHAOS:30,EDGE:15,TISSUE:30,COPILOT:48};
  document.querySelectorAll("#scenarioMixer input[type=range]").forEach(function(sl){
  var key=sl.getAttribute("data-scen");
  sl.value=defaults[key]||0;
