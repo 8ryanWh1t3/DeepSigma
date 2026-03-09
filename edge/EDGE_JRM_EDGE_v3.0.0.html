@@ -9991,16 +9991,25 @@ KG.prototype.step = function(){
 KG.prototype.run = function(){
   if(this.running) return;
   this.running=true;
+  // Settle layout with a burst of iterations, then stop
+  for(let k=0;k<120;k++) this.step();
+  this.running=false;
+  this.draw();
+};
+KG.prototype.runAnimated = function(){
+  // Only used during drag — animate until stopped
+  if(this._animating) return;
+  this._animating=true;
   const loop = ()=>{
-    if(!this.running) return;
-    // a few steps per frame
-    for(let k=0;k<1;k++) this.step();
+    if(!this._animating) return;
+    this.step();
     this.draw();
     requestAnimationFrame(loop);
   };
   requestAnimationFrame(loop);
 };
-KG.prototype.pause = function(){ this.running=false; };
+KG.prototype.stopAnimated = function(){ this._animating=false; };
+KG.prototype.pause = function(){ this.running=false; this._animating=false; };
 KG.prototype.pickNode = function(px,py){
   // px/py are in CSS pixels
   const x = (px - this.cssW/2 - this.panX)/this.zoom;
@@ -10017,19 +10026,36 @@ KG.prototype.pickNode = function(px,py){
 };
 KG.prototype.attach = function(onPick){
   const c=this.canvas;
+  let dragNode=null;
   c.addEventListener("mousedown",(ev)=>{
-    this.dragging=true; this.lastX=ev.clientX; this.lastY=ev.clientY;
+    const rect=c.getBoundingClientRect();
+    const n=this.pickNode(ev.clientX-rect.left, ev.clientY-rect.top);
+    if(n){
+      dragNode=n;
+      this.runAnimated();
+    } else {
+      dragNode=null;
+      this.dragging=true;
+    }
+    this.lastX=ev.clientX; this.lastY=ev.clientY;
   });
   window.addEventListener("mouseup",()=>{
+    if(dragNode){ dragNode.vx=0; dragNode.vy=0; this.stopAnimated(); this.draw(); }
+    dragNode=null;
     this.dragging=false;
   });
   window.addEventListener("mousemove",(ev)=>{
-    if(!this.dragging) return;
     const dx=ev.clientX-this.lastX, dy=ev.clientY-this.lastY;
     this.lastX=ev.clientX; this.lastY=ev.clientY;
-    this.panX += dx;
-    this.panY += dy;
-    this.draw();
+    if(dragNode){
+      dragNode.x += dx/(this.zoom);
+      dragNode.y += dy/(this.zoom);
+      dragNode.vx=0; dragNode.vy=0;
+    } else if(this.dragging){
+      this.panX += dx;
+      this.panY += dy;
+      this.draw();
+    }
   });
   c.addEventListener("wheel",(ev)=>{
     ev.preventDefault();
