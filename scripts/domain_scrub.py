@@ -221,6 +221,10 @@ ALLOWED_ACRONYMS = {
     "STREAM", "THAW", "FROZEN",
     # v1.0.8 — Consistency Gate (Sheaf-Residue Engine) tokens
     "CRS", "CGDS", "CGP", "VULN", "LOWER", "PAD", "GRAPH", "CLAIM",
+    # v3.0.0 — Graph tab, OPMG pipeline, debug panel, org coherence tokens
+    "ACTLOG", "OCI", "TURN", "DRILL", "CLICK", "INSIDE",
+    "DEBUG", "DBG", "DPI", "HINT", "MODAL", "FALLBACK",
+    "STRICT", "EARLY", "APP", "BASED", "CLEAR", "DOWN",
     # Coherence Ops EDGE — generic UI / content tokens
     "VHS", "OPS", "TAB", "BAR", "HOW", "WORKS", "THE", "QUICK", "START",
     "GAUGE", "PRINT", "GOOD", "DEEP", "SIGMA", "COHERE", "BUTTON",

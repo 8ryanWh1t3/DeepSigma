@@ -7,7 +7,7 @@
  [x] ABP v1 embedded (Authority Boundary Primitive governance block)
  [x] Debug panel (v26) — fixed-position error/state inspector
  [x] Copy fallback modal (v37) — manual clipboard workaround
- [x] localStorage graceful degradation to in-memory fallback under hardening
+ [x] In-memory-only storage (EDGE hardening compliant, no persistence)
 
  Prior v1.0.9c: one-click regression check, guarded bindings, safe handler wrappers
  Prior v1.0.9b: safe event wrappers, contract verification, regression summary
@@ -1852,40 +1852,16 @@ function fmtNum(n,dec,na){
   if(dec===null||dec===undefined) return String(x);
   return x.toFixed(dec);
 }
-var __storageOkCache=null;
-function storageOk(){
- if(__storageOkCache!==null)return __storageOkCache;
- try{
-  var k="__ds_test__"+Math.random();
-  localStorage.setItem(k,"1");
-  localStorage.removeItem(k);
-  __storageOkCache=true;
-  return true;
- }catch(_){
-  __storageOkCache=false;
-  return false;
- }
-}
+/* Storage: in-memory only (EDGE hardening blocks persistence) */
+function storageOk(){return false}
 function safeJsonParse(raw,fallback){
  try{return JSON.parse(raw)}catch(_){return fallback===undefined?null:fallback}
 }
 function getStore(k){
- try{
-  if(storageOk()){
-   var raw=localStorage.getItem(k);
-   return raw?safeJsonParse(raw,null):null;
-  }
- }catch(_){}
  window.__mem=window.__mem||{};
  return window.__mem[k]||null;
 }
 function setStore(k,v){
- try{
-  if(storageOk()){
-   localStorage.setItem(k,JSON.stringify(v));
-   return;
-  }
- }catch(_){}
  window.__mem=window.__mem||{};
  window.__mem[k]=v;
 }
@@ -2424,12 +2400,12 @@ function parseCopilot(text){
         if(!j.raw_pointer) j.raw_pointer = `line:${i+1}`;
 
         
-        // ── OPMG v2 STRICT adaptation ──
+        // ── ACTLOG v2 STRICT adaptation ──
         // Some UI surfaces (Team Mesh) expect copilot_prompt with content.prompt_text.
-        // For strict OPMG actions, mirror prompt into content so it survives later normalization.
+        // For strict ACTLOG actions, mirror prompt into content so it survives later normalization.
         try{
           const et = String((j.event_type||j.type||"")).toLowerCase();
-          if(et==="opmg_action" || et==="opmg-action" || et==="opmgaction"){
+          if(et==="actlog_action" || et==="actlog-action" || et==="actlogaction"){
             j.content = j.content || {};
             if(!j.content.prompt_text && j.inputs && j.inputs.prompt_text) j.content.prompt_text = j.inputs.prompt_text;
             if(!j.content.result_text && j.outputs && j.outputs.result_text) j.content.result_text = j.outputs.result_text;
@@ -2488,9 +2464,9 @@ function parseAuto(text){
    try{
      const j = JSON.parse(line);
 
-     // OPMG v2 STRICT / OPMG streams
+     // ACTLOG v2 STRICT / ACTLOG streams
      const et = (typeof j.event_type==="string") ? j.event_type.toLowerCase() : (typeof j.type==="string" ? j.type.toLowerCase() : "");
-     if(et.startsWith("opmg_") || et.startsWith("opmg-") || et.startsWith("opmgaction") || et.startsWith("opmg_action")){
+     if(et.startsWith("actlog_") || et.startsWith("actlog-") || et.startsWith("actlogaction") || et.startsWith("actlog_action")){
        return parseCopilot(text);
      }
 
@@ -2533,7 +2509,7 @@ function buildPairsIndex(events){
   const safe = (v)=> (v==null?"":String(v));
   const isOpmgAction = (e)=>{
     const t = safe(e && (e.event_type||e.type)).toLowerCase();
-    return t==="opmg_action" || t==="opmg-action" || t==="opmgaction";
+    return t==="actlog_action" || t==="actlog-action" || t==="actlogaction";
   };
   const getTurn = (e)=> safe((e && e.join && (e.join.turn_id||e.join.turn)) || (e && e.turn_id) || "").trim();
   const getThread = (e)=> safe((e && e.thread && (e.thread.thread_id||e.thread.id)) || (e && e.join && e.join.thread_id) || "").trim();
@@ -2579,7 +2555,7 @@ function buildPairsIndex(events){
       if(pt && !p.prompt_text) p.prompt_text = pt;
       if(rt && !p.result_text) p.result_text = rt;
 
-      // OPMG actions carry actor/thread, prompt, and result in one record.
+      // ACTLOG actions carry actor/thread, prompt, and result in one record.
       // Force them to be the authoritative pair event so graph people/topics render.
       if(isOpmgAction(e)){
         p.prompt_evt = e;
@@ -2624,7 +2600,7 @@ function buildOpmgIndexes(events){
   for(let i=0;i<events.length;i++){
     const e=events[i]||{};
     const et=String(e.event_type||e.type||"").toLowerCase();
-    if(et==="opmg_action"||et==="opmg-action"||et==="opmgaction"){
+    if(et==="actlog_action"||et==="actlog-action"||et==="actlogaction"){
       const aid=String(e.action_id||"").trim();
       const tid=String(e.turn_id||e._turn_id||"").trim();
       if(aid) actionsById[aid]=e;
@@ -2636,7 +2612,7 @@ function buildOpmgIndexes(events){
   for(let i=0;i<events.length;i++){
     const e=events[i]||{};
     const et=String(e.event_type||e.type||"").toLowerCase();
-    if(et!=="opmg_link") continue;
+    if(et!=="actlog_link") continue;
     const fa=String(e.from_action_id||"").trim();
     const ta=String(e.to_action_id||"").trim();
     if(fa){
@@ -2666,11 +2642,11 @@ function buildOpmgIndexes(events){
       total:ls.length,conflicts:conflicts,supports:supports,depends:depends,handoffs:handoffs,duplicates:dups
     };
   });
-  window.S._opmgActionsById=actionsById;
-  window.S._opmgActionByTurn=actionByTurn;
-  window.S._opmgTurnByAction=turnByAction;
-  window.S._opmgLinksByAction=linksByAction;
-  window.S._opmgConflictByTurn=conflictByTurn;
+  window.S._actlogActionsById=actionsById;
+  window.S._actlogActionByTurn=actionByTurn;
+  window.S._actlogTurnByAction=turnByAction;
+  window.S._actlogLinksByAction=linksByAction;
+  window.S._actlogConflictByTurn=conflictByTurn;
 }
 
 function parseZip(buf){
@@ -4101,11 +4077,11 @@ function renderHealthTab(){
  var reasons=[];
  var etLower=String(e.event_type||e.type||"").toLowerCase();
  var srcLower=String(e.source_system||"").toLowerCase();
- var isOpmg=(etLower.indexOf("opmg_")===0)||(etLower.indexOf("opmg-")===0)||(srcLower.indexOf("opmg")>=0);
+ var isOpmg=(etLower.indexOf("actlog_")===0)||(etLower.indexOf("actlog-")===0)||(srcLower.indexOf("actlog")>=0);
  if(e.confidence<QCONF&&(e.severity==="critical"||e.severity==="high"))reasons.push("Low confidence + high severity");
  if(e._drift&&e._drift.length>=2)reasons.push(e._drift.length+" drift signals");
  if(e._driftScore>=3)reasons.push("Drift heat "+e._driftScore);
- // JOIN failure is actionable for sensor pipelines, but often non-applicable for OPMG action logs.
+ // JOIN failure is actionable for sensor pipelines, but often non-applicable for ACTLOG action logs.
  if(e._join&&e._join.status==="failed"&&!isOpmg)reasons.push("JOIN failure ("+(e._join.reason||"unknown")+")");
  if(e.event_type==="malformed"&&e._dlr)reasons.push("Malformed event received lane");
  if(reasons.length>0)questionable.push({idx:(S.events||[]).indexOf(e),evt:e,reasons:reasons});
@@ -8801,11 +8777,11 @@ function buildInteractionIndex(){
     let id=c && c.interaction_id ? c.interaction_id : null;
     let turn=Number(c && c.turn!=null ? c.turn : 0);
 
-    // OPMG v2 STRICT: use turn_id (preferred) or action_id
+    // ACTLOG v2 STRICT: use turn_id (preferred) or action_id
     if(!id){
       try{
         const et = String((e && (e.event_type||e.type||""))).toLowerCase();
-        if(et.indexOf("opmg_")===0){
+        if(et.indexOf("actlog_")===0){
           id = e.turn_id || e.action_id || null;
           turn = 0;
         }
@@ -9005,7 +8981,7 @@ function renderPeopleWorkSimilarity(thread, simThr){
   const work=evs
     .filter(e=>{
       const t=String((e.event_type||e.type||"")).toLowerCase();
-      return t==="opmg_action" || t==="copilot_prompt" || t==="copilot_result";
+      return t==="actlog_action" || t==="copilot_prompt" || t==="copilot_result";
     })
     .map(e=>({
       e:e,
@@ -9132,9 +9108,9 @@ function renderBlockedQueue(thread){
     if(topicSel) topicSel.innerHTML='<option value="">(no topics)</option>';
     return;
   }
-  const actionByTurn=(window.S&&window.S._opmgActionByTurn)?window.S._opmgActionByTurn:{};
-  const linksByAction=(window.S&&window.S._opmgLinksByAction)?window.S._opmgLinksByAction:{};
-  const turnByAction=(window.S&&window.S._opmgTurnByAction)?window.S._opmgTurnByAction:{};
+  const actionByTurn=(window.S&&window.S._actlogActionByTurn)?window.S._actlogActionByTurn:{};
+  const linksByAction=(window.S&&window.S._actlogLinksByAction)?window.S._actlogLinksByAction:{};
+  const turnByAction=(window.S&&window.S._actlogTurnByAction)?window.S._actlogTurnByAction:{};
   const ii=(typeof buildInteractionIndex==="function")?buildInteractionIndex():new Map();
   const seenTurn=new Set();
   const rows=[];
@@ -9142,7 +9118,7 @@ function renderBlockedQueue(thread){
     const e=x&&x.e?x.e:null;
     if(!e) return;
     const et=String(e.event_type||e.type||"").toLowerCase();
-    if(et!=="opmg_action") return;
+    if(et!=="actlog_action") return;
     const tid=String(e.turn_id||e._turn_id||"").trim();
     if(!tid || seenTurn.has(tid)) return;
     seenTurn.add(tid);
@@ -9185,7 +9161,7 @@ function renderBlockedQueue(thread){
   const topicFilter = (S._blockedTopicFilter && S._blockedTopicFilter!=="__ALL__") ? S._blockedTopicFilter : "";
   const res=_getConflictRes();
   const summary='<div class="item" style="cursor:default"><div><b>Blocked:</b> '+blocked.length+' &nbsp; <b>At Risk:</b> '+atRisk.length+' &nbsp; <b>Total actions:</b> '+rows.length+'</div><div class="muted small">Click Open, then canonicalize in one pass.</div></div>';
-  if(!rows.length){ el.innerHTML=summary+'<div class="muted">No OPMG actions found in this thread.</div>'; return; }
+  if(!rows.length){ el.innerHTML=summary+'<div class="muted">No ACTLOG actions found in this thread.</div>'; return; }
   const sourceList=(blocked.length?blocked:rows.filter(function(r){return r.level!=="GREEN";}));
   const topicFiltered = topicFilter ? sourceList.filter(function(r){return (r.topic||"")===topicFilter;}) : sourceList;
   const list=topicFiltered.slice(0,120);
@@ -9288,9 +9264,9 @@ function renderExecutionPaths(thread){
     if(topicSel) topicSel.innerHTML='<option value="">(no topics)</option>';
     return;
   }
-  const actionByTurn=(window.S&&window.S._opmgActionByTurn)?window.S._opmgActionByTurn:{};
-  const linksByAction=(window.S&&window.S._opmgLinksByAction)?window.S._opmgLinksByAction:{};
-  const turnByAction=(window.S&&window.S._opmgTurnByAction)?window.S._opmgTurnByAction:{};
+  const actionByTurn=(window.S&&window.S._actlogActionByTurn)?window.S._actlogActionByTurn:{};
+  const linksByAction=(window.S&&window.S._actlogLinksByAction)?window.S._actlogLinksByAction:{};
+  const turnByAction=(window.S&&window.S._actlogTurnByAction)?window.S._actlogTurnByAction:{};
   const ii=(typeof buildInteractionIndex==="function")?buildInteractionIndex():new Map();
   const seenTurn=new Set();
   const rows=[];
@@ -9298,7 +9274,7 @@ function renderExecutionPaths(thread){
     const e=x&&x.e?x.e:null;
     if(!e) return;
     const et=String(e.event_type||e.type||"").toLowerCase();
-    if(et!=="opmg_action") return;
+    if(et!=="actlog_action") return;
     const tid=String(e.turn_id||e._turn_id||"").trim();
     if(!tid || seenTurn.has(tid)) return;
     seenTurn.add(tid);
@@ -9450,7 +9426,7 @@ function renderGraphTab(){
       renderPeopleWorkSimilarity(thread, simThr);
       renderBlockedQueue(thread);
       renderExecutionPaths(thread);
-      const prompts = thread.events.filter(x=>x.e && (String((x.e.event_type||x.e.type||"")).toLowerCase()==="copilot_prompt" || String((x.e.event_type||x.e.type||"")).toLowerCase()==="opmg_action")).map(x=>x);
+      const prompts = thread.events.filter(x=>x.e && (String((x.e.event_type||x.e.type||"")).toLowerCase()==="copilot_prompt" || String((x.e.event_type||x.e.type||"")).toLowerCase()==="actlog_action")).map(x=>x);
       if(prompts.length===0){
         mesh.innerHTML=`<div class="muted">No prompts in this thread.</div><div class="muted small" style="margin-top:6px">thread.events=${thread.events.length} • sampleTypes=${thread.events.slice(0,5).map(x=>String((x.e&&(x.e.event_type||x.e.type||"")))).join(",")}</div>`;
         if(meshSel) meshSel.innerHTML='<option value="">(no mesh items)</option>';
@@ -9539,7 +9515,7 @@ function renderGraphTab(){
 // Knowledge Graph (People ↔ Topics ↔ Keywords) — Canvas force layout
 // ─────────────────────────────────────────────────────────────────────────────
 function _kgStopwords(){
-  return new Set(("a,an,and,are,as,at,be,been,being,but,by,can,could,did,do,does,doing,down,for,from,had,has,have,he,her,here,hers,him,his,how,i,if,in,into,is,it,its,just,let,like,may,me,might,more,most,my,not,of,on,or,our,out,over,per,shall,should,so,some,such,than,that,the,their,them,then,there,these,they,this,those,through,to,under,up,us,use,used,using,very,was,we,were,what,when,where,which,who,why,will,with,within,would,you,your,vs,via,also,include,includes,including,provide,provided,provide,ensure,identify,generate,draft,create,extract,summarize,propose,plan,steps,requirements,deliverables,metrics,metric,statement,statements,produced,produce,generated,generate,drafted,draft,provided,provide,provides,checklist,plan,steps,requirements,deliverables,acceptance,criteria,verification,verify,extracted,extract,summary,summarized,action,actions,owners,milestones,closure,reporting,blurb,leadership,team,flow,proposal,proposed,target,artifact,document,docs,section,page,pages,ref,refs,opmg,rfp").split(","));
+  return new Set(("a,an,and,are,as,at,be,been,being,but,by,can,could,did,do,does,doing,down,for,from,had,has,have,he,her,here,hers,him,his,how,i,if,in,into,is,it,its,just,let,like,may,me,might,more,most,my,not,of,on,or,our,out,over,per,shall,should,so,some,such,than,that,the,their,them,then,there,these,they,this,those,through,to,under,up,us,use,used,using,very,was,we,were,what,when,where,which,who,why,will,with,within,would,you,your,vs,via,also,include,includes,including,provide,provided,provide,ensure,identify,generate,draft,create,extract,summarize,propose,plan,steps,requirements,deliverables,metrics,metric,statement,statements,produced,produce,generated,generate,drafted,draft,provided,provide,provides,checklist,plan,steps,requirements,deliverables,acceptance,criteria,verification,verify,extracted,extract,summary,summarized,action,actions,owners,milestones,closure,reporting,blurb,leadership,team,flow,proposal,proposed,target,artifact,document,docs,section,page,pages,ref,refs,actlog,rfp").split(","));
 }
 function _kgTokens(text){
   text = (text==null?"":String(text));
@@ -10295,7 +10271,7 @@ function populateDrawerWithKGNode(node){
                 const pRow = arr.find(r=>{
                   const e=r.e||{};
                   const t=String(e.event_type||e.type||"").toLowerCase();
-                  return t==="copilot_prompt" || t==="opmg_action";
+                  return t==="copilot_prompt" || t==="actlog_action";
                 }) || arr[0];
                 const rRow = arr.find(r=>{
                   const e=r.e||{};
@@ -10315,8 +10291,8 @@ function populateDrawerWithKGNode(node){
                   if(e._drift && e._drift.length) driftCount += e._drift.length;
                 });
                 lane = Object.keys(lanes).sort((a,b)=>lanes[b]-lanes[a])[0] || lane;
-                // OPMG conflict posture (by turn)
-                const cMap=(window.S && window.S._opmgConflictByTurn)?window.S._opmgConflictByTurn:null;
+                // ACTLOG conflict posture (by turn)
+                const cMap=(window.S && window.S._actlogConflictByTurn)?window.S._actlogConflictByTurn:null;
                 if(cMap && cMap[tid]) conflict=cMap[tid];
               }
             }
@@ -10342,8 +10318,8 @@ function populateDrawerWithKGNode(node){
                 if(!resultSnippet) resultSnippet = String(pair.result_text || "").slice(0,140);
               }
             }
-            // OPMG actions by action_id
-            const A = (window.S && window.S._opmgActionsById) ? window.S._opmgActionsById : null;
+            // ACTLOG actions by action_id
+            const A = (window.S && window.S._actlogActionsById) ? window.S._actlogActionsById : null;
             if(A && A[tid]){
               const a = A[tid];
               actionId = String(a.action_id||"");
@@ -10352,7 +10328,7 @@ function populateDrawerWithKGNode(node){
               role = ((a.actor||{}).role)||role;
               promptSnippet = String(((a.inputs||{}).prompt_text)||"").slice(0,120) || promptSnippet;
               resultSnippet = String(((a.outputs||{}).result_text)||"").slice(0,140) || resultSnippet;
-              const lMap=(window.S && window.S._opmgLinksByAction)?window.S._opmgLinksByAction:null;
+              const lMap=(window.S && window.S._actlogLinksByAction)?window.S._actlogLinksByAction:null;
               if(lMap && a.action_id) conflictLinks=(lMap[a.action_id]||[]);
             }
           }catch(e){ console.warn(e); }
@@ -10401,7 +10377,7 @@ function populateDrawerWithKGNode(node){
             : "";
           let blockedTurnsHtml = "";
           if(userState==="BLOCKED"){
-            const turnByAction=(window.S && window.S._opmgTurnByAction)?window.S._opmgTurnByAction:{};
+            const turnByAction=(window.S && window.S._actlogTurnByAction)?window.S._actlogTurnByAction:{};
             const peers = Array.from(new Set((conflictPeers||[]).concat(conflictOnly.map(function(l){
               const fa=String(l.from_action_id||"");
               const ta=String(l.to_action_id||"");
@@ -10685,8 +10661,8 @@ function renderKnowledgeGraph(){
       const tVal = selT && selT.value ? selT.value : "";
       const evsNow = (window.S && Array.isArray(window.S.events)) ? window.S.events : [];
       const evCount = evsNow.length;
-      const hasOPMGNow = !!(evsNow.find ? evsNow.find((e)=>{ try{ const t=String((e&&(e.event_type||e.type||""))).toLowerCase(); return t.startsWith("opmg_")||t.startsWith("opmg"); }catch(_){return false;} }) : false);
-      kgLog(`params focus=${focus} lens=${lensNow} min=${minFreq} topK=${topK} edgeMin=${edgeMin} simThr=${simThr==null?"n/a":simThr} interaction=${iVal||"(none)"} thread=${tVal||"(none)"} events=${evCount} hasOPMG=${hasOPMGNow}`);
+      const hasACTLOGNow = !!(evsNow.find ? evsNow.find((e)=>{ try{ const t=String((e&&(e.event_type||e.type||""))).toLowerCase(); return t.startsWith("actlog_")||t.startsWith("actlog"); }catch(_){return false;} }) : false);
+      kgLog(`params focus=${focus} lens=${lensNow} min=${minFreq} topK=${topK} edgeMin=${edgeMin} simThr=${simThr==null?"n/a":simThr} interaction=${iVal||"(none)"} thread=${tVal||"(none)"} events=${evCount} hasACTLOG=${hasACTLOGNow}`);
     }catch(e){ console.warn(e); }
 
   }catch(e){ console.warn(e); }
