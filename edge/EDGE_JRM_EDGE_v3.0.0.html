@@ -9829,11 +9829,11 @@ KG.prototype.setHighlightForNode = function(nodeId){
 
 KG.prototype.typeStyle = function(t){
   // use subtle stroke widths; color via rgba without depending on theme vars
-  if(t==="person") return {r:10, stroke:"rgba(255,255,255,.75)", fill:"rgba(80,200,255,.20)"};
-  if(t==="topic") return {r:9, stroke:"rgba(255,255,255,.75)", fill:"rgba(255,180,80,.18)"};
-  if(t==="keyword") return {r:7, stroke:"rgba(255,255,255,.55)", fill:"rgba(180,120,255,.16)"};
-  if(t==="result_keyword") return {r:7, stroke:"rgba(255,255,255,.55)", fill:"rgba(120,255,180,.14)"};
-  return {r:7, stroke:"rgba(255,255,255,.55)", fill:"rgba(255,255,255,.10)"};
+  if(t==="person") return {r:18, stroke:"rgba(80,200,255,.85)", fill:"rgba(80,200,255,.30)"};
+  if(t==="topic") return {r:16, stroke:"rgba(255,180,80,.85)", fill:"rgba(255,180,80,.25)"};
+  if(t==="keyword") return {r:12, stroke:"rgba(180,120,255,.75)", fill:"rgba(180,120,255,.22)"};
+  if(t==="result_keyword") return {r:12, stroke:"rgba(120,255,180,.75)", fill:"rgba(120,255,180,.20)"};
+  return {r:12, stroke:"rgba(255,255,255,.65)", fill:"rgba(255,255,255,.15)"};
 };
 KG.prototype.draw = function(){
   const ctx=this.ctx, c=this.canvas;
@@ -10027,12 +10027,16 @@ KG.prototype.pickNode = function(px,py){
 KG.prototype.attach = function(onPick){
   const c=this.canvas;
   let dragNode=null;
+  let dragStarted=false; // true once mouse moved past dead zone
+  let downX=0, downY=0;
+  const DEAD=5; // pixels before drag activates
   c.addEventListener("mousedown",(ev)=>{
     const rect=c.getBoundingClientRect();
     const n=this.pickNode(ev.clientX-rect.left, ev.clientY-rect.top);
+    dragStarted=false;
+    downX=ev.clientX; downY=ev.clientY;
     if(n){
       dragNode=n;
-      this.runAnimated();
     } else {
       dragNode=null;
       this.dragging=true;
@@ -10040,14 +10044,23 @@ KG.prototype.attach = function(onPick){
     this.lastX=ev.clientX; this.lastY=ev.clientY;
   });
   window.addEventListener("mouseup",()=>{
-    if(dragNode){ dragNode.vx=0; dragNode.vy=0; this.stopAnimated(); this.draw(); }
+    if(dragNode && dragStarted){ dragNode.vx=0; dragNode.vy=0; this.stopAnimated(); this.draw(); }
+    if(dragNode && !dragStarted){ this.stopAnimated(); }
     dragNode=null;
+    dragStarted=false;
     this.dragging=false;
   });
   window.addEventListener("mousemove",(ev)=>{
     const dx=ev.clientX-this.lastX, dy=ev.clientY-this.lastY;
     this.lastX=ev.clientX; this.lastY=ev.clientY;
     if(dragNode){
+      // Check dead zone
+      if(!dragStarted){
+        const totalDx=ev.clientX-downX, totalDy=ev.clientY-downY;
+        if(totalDx*totalDx+totalDy*totalDy < DEAD*DEAD) return;
+        dragStarted=true;
+        this.runAnimated();
+      }
       dragNode.x += dx/(this.zoom);
       dragNode.y += dy/(this.zoom);
       dragNode.vx=0; dragNode.vy=0;
