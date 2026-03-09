@@ -10807,6 +10807,7 @@ function renderKnowledgeGraph(){
       kgLog(`built graph base nodes=${(data&&data.nodes)?data.nodes.length:0} edges=${(data&&data.edges)?data.edges.length:0} | view nodes=${(viewData&&viewData.nodes)?viewData.nodes.length:0} edges=${(viewData&&viewData.edges)?viewData.edges.length:0}`);
     }catch(e){ console.warn(e); }
     kgState.lastSig = sig;
+    kgState.inst.run();
     }catch(err){
       kgSetState('error (build)', true);
       kgLog('ERROR build: ' + (err && err.message ? err.message : String(err)));
@@ -10823,6 +10824,7 @@ function renderKnowledgeGraph(){
       const edged = kgFilterByEdgeWeight(kgState.baseData||{nodes:[],edges:[]}, edgeMinNow);
       const viewData = kgFilterByFocus(edged, focusMode);
       kgState.inst.setData(viewData);
+      kgState.inst.run();
       kgSetStatus("kgStatusNodes", `nodes:${(viewData && viewData.nodes)?viewData.nodes.length:0}`);
       kgSetStatus("kgStatusEdges", `edges:${(viewData && viewData.edges)?viewData.edges.length:0}`);
       kgSetState("ready (focus)", false);
@@ -10831,10 +10833,8 @@ function renderKnowledgeGraph(){
     }catch(e){ console.warn(e); }
   }
 
-
-  // Run if not running
-  if(!kgState.inst.running) kgState.inst.run();
-  else kgState.inst.draw();
+  // draw once (layout already settled in run())
+  if(kgState.inst) kgState.inst.draw();
   try{ openDrawerSafe(); }catch(_){}
 }
 
@@ -10896,8 +10896,8 @@ function hookGraphTab(){
   if(kgTop) kgTop.addEventListener("change", ()=>{ try{ if(window.S&&window.S._kg) window.S._kg.lastSig=""; }catch(_){} renderKnowledgeGraph();
       try{ openDrawerSafe(); }catch(_){} });
 
-  if(kgP) kgP.addEventListener("click", ()=>{ try{ if(window.S&&window.S._kg&&window.S._kg.inst) window.S._kg.inst.pause(); }catch(_){} });
-  if(kgR) kgR.addEventListener("click", ()=>{ try{ if(window.S&&window.S._kg&&window.S._kg.inst) window.S._kg.inst.run(); }catch(_){} });
+  if(kgP) kgP.addEventListener("click", ()=>{ try{ if(window.S&&window.S._kg&&window.S._kg.inst){ window.S._kg.inst.pause(); window.S._kg.inst.draw(); } }catch(_){} });
+  if(kgR) kgR.addEventListener("click", ()=>{ try{ if(window.S&&window.S._kg&&window.S._kg.inst){ window.S._kg.inst.run(); window.S._kg.inst.draw(); } }catch(_){} });
 
   const kgC=document.getElementById("kgClear");
   if(kgC) kgC.addEventListener("click", ()=>{
