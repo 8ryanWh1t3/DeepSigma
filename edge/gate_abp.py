@@ -34,6 +34,7 @@ FILE_MODULE_MAP: dict[str, str] = {
     "EDGE_Coherence_Dashboard": "coherence",
     "EDGE_Suite_ReadOnly": "suite_readonly",
     "EDGE_Unified": "unified",
+    "EDGE_JRM_EDGE": "jrm",
 }
 
 # Regex to extract embedded ABP JSON from HTML

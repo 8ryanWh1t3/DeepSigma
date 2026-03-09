@@ -52,7 +52,7 @@ flowchart TD
         AWD["Award Staffing"]
         COH["Coherence Dashboard"]
         SRO["Suite ReadOnly"]
-        JRM["JRM EDGE\n(v1.0.0 – v1.0.8)"]
+        JRM["JRM EDGE\n(v1.0.0 – v3.0.0)"]
         COPS["Coherence Ops\n(interactive guide)"]
         RFP["RFP Co-Pilot"]
         RFPX["RFP Co-Pilot\nExec Brief"]
@@ -125,6 +125,7 @@ flowchart TD
 | `EDGE_JRM_EDGE_v1.0.6.html` | 1.0.6 | `jrm` | Test Lab tab — drift 0-100 scale, baseline capture, patch simulator |
 | `EDGE_JRM_EDGE_v1.0.7.html` | 1.0.7 | `jrm` | So What panel, Analyzer toggle, timeline visualization, stream mode, policy drawer |
 | `EDGE_JRM_EDGE_v1.0.8.html` | 1.0.8 | `jrm` | Consistency Gate — Sheaf-Residue Engine, claim graph, CRS scoring, force-directed visualization, claim drawer with "How to Fix", fixable claims panel |
+| `EDGE_JRM_EDGE_v3.0.0.html` | 3.0.0 | `jrm` | Graph tab (5C), EDGE_HARDENING_V1 + ABP embedded, debug panel, copy fallback modal, localStorage→memory degradation |
 | `EDGE_Coherence_Ops_v1.0.0.html` | 1.0.0 | `coherence_ops` | Interactive Coherence Ops guide — 7 tabs (Overview, How It Works, 3 Domains, 4 Artifacts, Drift→Patch, Quick Start, FAQ), 80s synthwave styling, copy-ready templates |
 | `edge_rfp_copilot_excel_json.html` | — | `rfp_copilot` | RFP Co-Pilot — AI-assisted extraction to Excel/JSON workflow |
 | `edge_rfp_copilot_exec_brief.html` | — | `rfp_copilot` | RFP Co-Pilot Exec Brief — executive summary generator for RFP responses |
