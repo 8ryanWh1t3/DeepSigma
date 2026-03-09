@@ -1177,15 +1177,13 @@ document.addEventListener("DOMContentLoaded",function(){
 
 <!-- ── Graph Tab ───────────────────────────────────────────────────── -->
 <section id="tab-graph" class="hidden">
-  <div class="explain-banner">
-    <strong>What:</strong> Linear conversation spine (Prompt → Proposed → Signal → Telemetry) + team mesh (similar prompts).
-    <strong>Why:</strong> Automatically feeds Coherence Ops TRM scoring weighted by confidence.
-  </div>
+  <!-- Always-visible overview -->
+  <div id="graphOverview" class="card" style="margin-bottom:14px"></div>
 
   <div class="grid3">
     <div class="card">
       <h4>Spine</h4>
-      <div class="muted small">Select an interaction_id to view the linear chain.</div>
+      <div class="muted small">Interaction turn chain: Prompt → Proposed → Signal → Telemetry</div>
       <div style="margin-top:10px">
         <select id="graphInteractionSel" style="width:100%"></select>
       </div>
@@ -1194,17 +1192,16 @@ document.addEventListener("DOMContentLoaded",function(){
 
     <div class="card">
       <h4>Team Mesh</h4>
-      <div class="muted small">Select a thread_id to view similar prompts across teammates.</div>
+      <div class="muted small">Similar prompts across teammates in the selected thread.</div>
       <div style="margin-top:10px">
         <select id="graphThreadSel" style="width:100%"></select>
       </div>
       <div style="display:flex;gap:10px;align-items:center;margin-top:10px">
-        <div class="muted small">Similarity threshold</div>
+        <div class="muted small">Similarity</div>
         <input id="graphSim" type="range" min="0" max="1" step="0.05" value="0.45" style="flex:1">
         <div id="graphSimVal" class="muted small" style="width:50px;text-align:right">0.45</div>
       </div>
       <div style="margin-top:10px">
-        <label class="muted small" for="graphMeshSel">Mesh Item</label>
         <select id="graphMeshSel" style="width:100%;margin-top:4px"></select>
       </div>
       <div id="graphMesh" class="list" style="margin-top:10px"></div>
@@ -1212,37 +1209,33 @@ document.addEventListener("DOMContentLoaded",function(){
 
     <div class="card">
       <h4>Coherence Ops Feed</h4>
-      <div class="muted small">Thread-level TRM scores (confidence-weighted) + Knowledge Gap drift.</div>
+      <div class="muted small">Thread-level TRM (Truth / Reasoning / Memory) + Knowledge Gap.</div>
       <div id="graphCoherence" style="margin-top:10px"></div>
-      <div class="muted small" style="margin-top:10px">Click any node in Spine/Mesh to open the drawer.</div>
     </div>
   </div>
 
-  <div class="card" style="margin-top:14px">
-    <h4>People Work Similarity</h4>
-    <div class="muted small">Separate section below Team Mesh. Clusters similar work by prompt intent and shows who handled it and what outcome they produced.</div>
-    <div id="graphSimilarWork" class="list" style="margin-top:10px"></div>
-  </div>
-
-  <div class="card" style="margin-top:14px">
-    <h4>Blocked Queue</h4>
-    <div class="muted small">Fast conflict triage for the selected thread. Resolve from here without opening every node.</div>
-    <div style="margin-top:8px">
-      <label class="muted small" for="graphBlockedTopicSel">Topic Filter</label>
-      <select id="graphBlockedTopicSel" style="width:100%;margin-top:4px"></select>
+  <!-- Collapsible detail sections -->
+  <details style="margin-top:14px">
+    <summary style="cursor:pointer;font-weight:700;padding:8px 0">Detail Panels (People Similarity, Blocked Queue, Execution Paths)</summary>
+    <div class="card" style="margin-top:8px">
+      <h4>People Work Similarity</h4>
+      <div id="graphSimilarWork" class="list" style="margin-top:10px"></div>
     </div>
-    <div id="graphBlockedQueue" class="list" style="margin-top:10px"></div>
-  </div>
-
-  <div class="card" style="margin-top:14px">
-    <h4>Execution Paths</h4>
-    <div class="muted small">Visual branch view by topic. Green = clear, Yellow = at risk, Red = blocked. Use this to see where execution paths collide.</div>
-    <div style="margin-top:8px">
-      <label class="muted small" for="graphPathTopicSel">Topic Filter</label>
-      <select id="graphPathTopicSel" style="width:100%;margin-top:4px"></select>
+    <div class="card" style="margin-top:8px">
+      <h4>Blocked Queue</h4>
+      <div style="margin-top:8px">
+        <select id="graphBlockedTopicSel" style="width:100%"></select>
+      </div>
+      <div id="graphBlockedQueue" class="list" style="margin-top:10px"></div>
     </div>
-    <div id="graphExecutionPaths" class="list" style="margin-top:10px"></div>
-  </div>
+    <div class="card" style="margin-top:8px">
+      <h4>Execution Paths</h4>
+      <div style="margin-top:8px">
+        <select id="graphPathTopicSel" style="width:100%"></select>
+      </div>
+      <div id="graphExecutionPaths" class="list" style="margin-top:10px"></div>
+    </div>
+  </details>
 
   <div class="card" style="margin-top:14px">
     <h4>Knowledge Graph</h4>
@@ -8279,9 +8272,11 @@ window.addEventListener("DOMContentLoaded",()=>{
  S.packets=MOCK_PACKETS.slice();
  resetPipelineState();
  S.events=loadDemoEvents();
+ buildPairsIndex(S.events);
  renderPacketList();renderIngestSummary();
+ try{ ensureGraphSelectors(); }catch(_){}
  var mixInfo=readMixerConfig();
- showToast("Demo data loaded \u2014 "+mixInfo.total+" events + 4 packets (10 scenarios)","info");
+ showToast("Demo data loaded \u2014 "+mixInfo.total+" events + 4 packets (11 scenarios)","info");
  setTab("run");
  });
 
@@ -9445,30 +9440,111 @@ function renderExecutionPaths(thread){
   }catch(_){}
 }
 
+function _graphScanEvents(){
+  // Direct scan of S.events — always works regardless of index state
+  const evts = (S && S.events) || [];
+  const actors = new Set();
+  const threads = new Map(); // id -> {topic, count}
+  const interactions = new Map(); // id -> [{e,i}]
+  const typeCounts = Object.create(null);
+  let copilotCount = 0;
+  for(let i=0;i<evts.length;i++){
+    const e = evts[i];
+    if(!e) continue;
+    const et = String(e.event_type||e.type||"").toLowerCase();
+    typeCounts[et] = (typeCounts[et]||0) + 1;
+    if(e.actor && e.actor.user) actors.add(e.actor.user);
+    if(e.thread && (e.thread.thread_id||e.thread.id)){
+      const tid = e.thread.thread_id||e.thread.id;
+      if(!threads.has(tid)) threads.set(tid, {topic:e.thread.topic||"(untitled)",count:0});
+      threads.get(tid).count++;
+    }
+    const iid = (e.context && e.context.interaction_id) || e.turn_id || null;
+    if(iid){
+      if(!interactions.has(iid)) interactions.set(iid, []);
+      interactions.get(iid).push({e:e,i:i,turn:Number((e.context&&e.context.turn)||0)});
+    }
+    if(et.startsWith("copilot_")) copilotCount++;
+  }
+  interactions.forEach(arr=>arr.sort((a,b)=>a.turn-b.turn));
+  return {evts,actors,threads,interactions,typeCounts,copilotCount,total:evts.length};
+}
+
 function renderGraphTab(){
-  ensureGraphSelectors();
+  const scan = _graphScanEvents();
+  const ov = document.getElementById("graphOverview");
+
+  // ── Always-visible overview ──
+  if(ov){
+    if(scan.total===0){
+      ov.innerHTML='<div style="text-align:center;padding:20px"><div style="font-size:18px;font-weight:700">Graph Tab</div><div class="muted" style="margin-top:8px">No data loaded. Go to <b>Ingest</b> and click <b>Use Embedded Demo Data</b>, then <b>Run</b> the pipeline.</div></div>';
+    } else {
+      const actorList = [...scan.actors].slice(0,8).map(a=>`<span class="mono" style="background:rgba(255,255,255,.08);padding:2px 6px;border-radius:6px">${escapeHtml(a)}</span>`).join(" ");
+      const threadList = [...scan.threads.entries()].map(([id,v])=>`<span class="mono" style="background:rgba(255,255,255,.08);padding:2px 6px;border-radius:6px">${escapeHtml(v.topic)} (${v.count})</span>`).join(" ");
+      const topTypes = Object.entries(scan.typeCounts).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([k,v])=>`${k}: ${v}`).join(" · ");
+      ov.innerHTML=`<div style="display:flex;flex-wrap:wrap;gap:20px;align-items:baseline">
+        <div><span style="font-size:28px;font-weight:800">${scan.total}</span> <span class="muted">events</span></div>
+        <div><span style="font-size:28px;font-weight:800">${scan.copilotCount}</span> <span class="muted">copilot</span></div>
+        <div><span style="font-size:28px;font-weight:800">${scan.interactions.size}</span> <span class="muted">interactions</span></div>
+        <div><span style="font-size:28px;font-weight:800">${scan.threads.size}</span> <span class="muted">threads</span></div>
+        <div><span style="font-size:28px;font-weight:800">${scan.actors.size}</span> <span class="muted">actors</span></div>
+      </div>
+      <div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">${actorList||'<span class="muted">—</span>'}</div>
+      <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">${threadList||'<span class="muted">—</span>'}</div>
+      <div class="muted small" style="margin-top:8px">${topTypes}</div>`;
+    }
+  }
+
+  // Bail early if nothing loaded — overview already shows guidance
+  if(scan.total===0){
+    const spine=document.getElementById("graphSpine"); if(spine) spine.innerHTML='';
+    const mesh=document.getElementById("graphMesh"); if(mesh) mesh.innerHTML='';
+    const coh=document.getElementById("graphCoherence"); if(coh) coh.innerHTML='';
+    return;
+  }
+
+  // ── Populate selectors from direct scan (fallback-safe) ──
+  const selI=document.getElementById("graphInteractionSel");
+  const selT=document.getElementById("graphThreadSel");
+  if(selI && scan.interactions.size>0){
+    const curI=selI.value;
+    const ids=[...scan.interactions.keys()].sort();
+    selI.innerHTML=ids.map(id=>{
+      const sample=scan.interactions.get(id)[0].e;
+      const who=(sample&&sample.actor&&sample.actor.user)?sample.actor.user:"?";
+      const topic=(sample&&sample.thread&&sample.thread.topic)?sample.thread.topic:"";
+      return `<option value="${escapeHtml(id)}">${escapeHtml(id)} — ${escapeHtml(who)} — ${escapeHtml(topic)}</option>`;
+    }).join("");
+    if(curI && ids.includes(curI)) selI.value=curI;
+  } else if(selI){
+    selI.innerHTML='<option value="">(no interactions)</option>';
+  }
+  if(selT && scan.threads.size>0){
+    const curT=selT.value;
+    const tids=[...scan.threads.keys()].sort((a,b)=>(scan.threads.get(a).topic).localeCompare(scan.threads.get(b).topic));
+    selT.innerHTML=tids.map(id=>{
+      const v=scan.threads.get(id);
+      return `<option value="${escapeHtml(id)}">${escapeHtml(v.topic)} — ${escapeHtml(id)}</option>`;
+    }).join("");
+    if(curT && tids.includes(curT)) selT.value=curT;
+  } else if(selT){
+    selT.innerHTML='<option value="">(no threads)</option>';
+  }
+
   const simEl=document.getElementById("graphSim");
   const simVal=document.getElementById("graphSimVal");
   const simThr = simEl ? Number(simEl.value||0.45) : 0.45;
   if(simVal) simVal.textContent = simThr.toFixed(2);
 
+  // ── Spine ──
   const spine=document.getElementById("graphSpine");
-  const mesh=document.getElementById("graphMesh");
-  const meshSel=document.getElementById("graphMeshSel");
-  const coh=document.getElementById("graphCoherence");
-  const selI=document.getElementById("graphInteractionSel");
-  const selT=document.getElementById("graphThreadSel");
-  const ii=buildInteractionIndex();
-  const ti=buildThreadIndexForGraph();
-
-  // spine
   if(spine){
     spine.innerHTML="";
-    const id = selI && selI.value ? selI.value : ([...ii.keys()][0]||"");
-    if(!id || !ii.has(id)){
-      spine.innerHTML='<div class="muted">No interaction selected.</div>';
-    }else{
-      const arr=ii.get(id);
+    const id = selI && selI.value ? selI.value : ([...scan.interactions.keys()][0]||"");
+    const arr = id ? (scan.interactions.get(id)||[]) : [];
+    if(arr.length===0){
+      spine.innerHTML='<div class="muted small">Select an interaction above.</div>';
+    } else {
       arr.forEach(x=>{
         const e=x.e;
         const row=document.createElement("div");
@@ -9478,37 +9554,46 @@ function renderGraphTab(){
                      e.event_type==="copilot_proposed" ? ((e.content||{}).proposal_text||"") :
                      e.event_type==="copilot_signal" ? (`${(e.content||{}).signal_type||"signal"} (edit=${(e.content||{}).edit_distance||0})`) :
                      e.event_type==="copilot_telemetry" ? (`lat=${(e.content||{}).latency_ms||0}ms tokens=${(e.content||{}).tokens_out||0}`) :
-                     "";
+                     JSON.stringify((e.content||{})).slice(0,120);
         row.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px">
           <div><b>${label}</b> <span class="muted small">${e.actor&&e.actor.user?e.actor.user:""}</span></div>
           <div class="muted small">${String(e.timestamp||e.ts||"").slice(11,19)}</div>
         </div><div class="muted small" style="margin-top:4px">${escapeHtml(main).slice(0,180)}</div>`;
-        row.addEventListener("click", ()=>openDrawer(x.i));
+        row.addEventListener("click", ()=>{ try{openDrawer(x.i);}catch(_){} });
         spine.appendChild(row);
       });
     }
   }
 
-  // mesh
+  // ── Mesh ──
+  const mesh=document.getElementById("graphMesh");
+  const meshSel=document.getElementById("graphMeshSel");
+  const coh=document.getElementById("graphCoherence");
   if(mesh){
     mesh.innerHTML="";
     if(meshSel) meshSel.innerHTML="";
-    const tid = selT && selT.value ? selT.value : ([...ti.keys()][0]||"");
-    if(!tid || !ti.has(tid)){
-      mesh.innerHTML='<div class="muted">No thread selected.</div>';
-      if(meshSel) meshSel.innerHTML='<option value="">(no mesh items)</option>';
-    }else{
-      const thread=ti.get(tid);
-      renderPeopleWorkSimilarity(thread, simThr);
-      renderBlockedQueue(thread);
-      renderExecutionPaths(thread);
-      const prompts = thread.events.filter(x=>x.e && (String((x.e.event_type||x.e.type||"")).toLowerCase()==="copilot_prompt" || String((x.e.event_type||x.e.type||"")).toLowerCase()==="actlog_action")).map(x=>x);
+    const tid = selT && selT.value ? selT.value : ([...scan.threads.keys()][0]||"");
+    // Build thread event list from direct scan
+    const threadEvts = [];
+    for(let i=0;i<scan.evts.length;i++){
+      const e=scan.evts[i]; if(!e) continue;
+      const eid = (e.thread&&(e.thread.thread_id||e.thread.id))||(e.join&&e.join.thread_id)||e.thread_id||null;
+      if(eid===tid) threadEvts.push({e:e,i:i});
+    }
+    const thread = tid ? {thread_id:tid, topic:(scan.threads.get(tid)||{}).topic||"", events:threadEvts} : null;
+    if(!thread || threadEvts.length===0){
+      mesh.innerHTML='<div class="muted small">Select a thread above.</div>';
+      if(meshSel) meshSel.innerHTML='<option value="">—</option>';
+      S._graphMeshCtx={tid:"",items:[],simThr:simThr};
+      try{ renderPeopleWorkSimilarity(null, simThr); renderBlockedQueue(null); renderExecutionPaths(null); }catch(_){}
+    } else {
+      try{ renderPeopleWorkSimilarity(thread, simThr); renderBlockedQueue(thread); renderExecutionPaths(thread); }catch(_){}
+      const prompts = threadEvts.filter(x=>x.e && (String((x.e.event_type||x.e.type||"")).toLowerCase()==="copilot_prompt" || String((x.e.event_type||x.e.type||"")).toLowerCase()==="actlog_action"));
       if(prompts.length===0){
-        mesh.innerHTML=`<div class="muted">No prompts in this thread.</div><div class="muted small" style="margin-top:6px">thread.events=${thread.events.length} • sampleTypes=${thread.events.slice(0,5).map(x=>String((x.e&&(x.e.event_type||x.e.type||"")))).join(",")}</div>`;
-        if(meshSel) meshSel.innerHTML='<option value="">(no mesh items)</option>';
+        mesh.innerHTML=`<div class="muted small">${threadEvts.length} events in thread, no prompts found.</div>`;
+        if(meshSel) meshSel.innerHTML='<option value="">—</option>';
         S._graphMeshCtx={tid:tid,items:[],simThr:simThr};
-      }else{
-        // Build mesh options + single selected detail
+      } else {
         const items = prompts.map((px,idx)=>{
           const a=((px.e.content||{}).prompt_text)||((px.e.inputs||{}).prompt_text)||"";
           let best=-1, bestScore=0;
@@ -9526,7 +9611,6 @@ function renderGraphTab(){
         if(meshSel){
           const key = String(tid||"");
           const mem = (S._meshSelByThread && S._meshSelByThread[key]!=null) ? String(S._meshSelByThread[key]) : "";
-          // User's current dropdown choice must win over remembered value.
           const cur = (meshSel.value!==undefined && meshSel.value!=="") ? String(meshSel.value) : mem;
           meshSel.innerHTML = items.map(function(it,ix){
             const txt = `#${ix+1} ${it.who} ${it.when} • match ${(it.bestScore).toFixed(2)} with ${it.bestWho}`;
@@ -9542,30 +9626,17 @@ function renderGraphTab(){
       }
       // coherence feed
       if(coh){
-        const m=computeTRMWeighted(thread, simThr);
-        coh.innerHTML = `
-          <div class="grid2">
-            <div class="card" style="margin:0">
-              <div class="muted small">Truth</div>
-              <div style="font-size:28px;font-weight:800">${m.truth}</div>
+        try{
+          const m=computeTRMWeighted(thread, simThr);
+          coh.innerHTML = `
+            <div class="grid2">
+              <div class="card" style="margin:0"><div class="muted small">Truth</div><div style="font-size:28px;font-weight:800">${m.truth}</div></div>
+              <div class="card" style="margin:0"><div class="muted small">Reasoning</div><div style="font-size:28px;font-weight:800">${m.reason}</div></div>
+              <div class="card" style="margin:0"><div class="muted small">Memory</div><div style="font-size:28px;font-weight:800">${m.memory}</div></div>
+              <div class="card" style="margin:0"><div class="muted small">Coherence Index</div><div style="font-size:28px;font-weight:800">${m.ci}</div></div>
             </div>
-            <div class="card" style="margin:0">
-              <div class="muted small">Reasoning</div>
-              <div style="font-size:28px;font-weight:800">${m.reason}</div>
-            </div>
-            <div class="card" style="margin:0">
-              <div class="muted small">Memory</div>
-              <div style="font-size:28px;font-weight:800">${m.memory}</div>
-            </div>
-            <div class="card" style="margin:0">
-              <div class="muted small">Coherence Index</div>
-              <div style="font-size:28px;font-weight:800">${m.ci}</div>
-            </div>
-          </div>
-          <div style="margin-top:10px" class="muted small">
-            Residue=${m.residue} • KnowledgeGap=${m.knowledgeGap? "YES":"NO"} • clusterMax=${m.clusterMax}
-          </div>
-        `;
+            <div style="margin-top:10px" class="muted small">Residue=${m.residue} • KnowledgeGap=${m.knowledgeGap?"YES":"NO"} • clusterMax=${m.clusterMax}</div>`;
+        }catch(_){ coh.innerHTML='<div class="muted small">TRM unavailable.</div>'; }
       }
       if(mesh){
         mesh.onclick = function(ev){
@@ -9578,10 +9649,6 @@ function renderGraphTab(){
         };
       }
     }
-  }
-  if(mesh){
-    const tid = selT && selT.value ? selT.value : ([...ti.keys()][0]||"");
-    if(!tid || !ti.has(tid)){ renderPeopleWorkSimilarity(null, simThr); renderBlockedQueue(null); renderExecutionPaths(null); }
   }
   try{ const le=document.getElementById("kgLens"); kgApplyFocusOptions(le?le.value:"workstream"); }catch(_){}
 }
