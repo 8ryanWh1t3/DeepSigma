@@ -1193,74 +1193,50 @@ document.addEventListener("DOMContentLoaded",function(){
   <select id="graphPathTopicSel" style="display:none"></select>
   <div id="graphExecutionPaths" style="display:none"></div>
 
-  <div class="card">
-    <h4>Knowledge Graph</h4>
-    <div class="muted small">People ↔ Topics ↔ Keywords — built from copilot conversation pairs.</div>
+  <!-- Hidden stubs for removed controls -->
+  <input id="kgMin" type="hidden" value="1">
+  <div id="kgMinVal" style="display:none">1</div>
+  <input id="kgEdgeMin" type="hidden" value="1">
+  <div id="kgEdgeMinVal" style="display:none">1</div>
+  <input id="kgTop" type="hidden" value="80">
+  <button id="kgPause" style="display:none"></button>
+  <button id="kgResume" style="display:none"></button>
+  <div id="kgDebugPanel" style="display:none"><textarea id="kgDebugText"></textarea></div>
+  <button id="kgDbgToggle" style="display:none"></button>
+  <button id="kgDbgClear" style="display:none"></button>
 
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px">
-      <label class="muted small">Focus</label>
-      <select id="kgMode" style="min-width:140px">
-        <option value="all">All nodes</option>
-        <option value="people">People only</option>
-        <option value="topics">Topics only</option>
-        <option value="keywords">Keywords only</option>
-      </select>
-
-      <label class="muted small">Lens</label>
-      <select id="kgLens" style="min-width:130px">
-        <option value="workstream">Workstream</option>
-        <option value="concepts">Concept clusters</option>
-      </select>
-
-      <label class="muted small">Min freq</label>
-      <input id="kgMin" type="range" min="1" max="20" step="1" value="2" style="width:120px">
-      <div id="kgMinVal" class="muted small" style="width:24px;text-align:right">2</div>
-
-      <label class="muted small">Edge min</label>
-      <input id="kgEdgeMin" type="range" min="1" max="20" step="1" value="1" style="width:120px">
-      <div id="kgEdgeMinVal" class="muted small" style="width:24px;text-align:right">1</div>
-
-      <label class="muted small">Top kw</label>
-      <input id="kgTop" type="number" min="10" max="250" step="10" value="80" style="width:70px">
-
-      <button id="kgRebuild" class="btn">Rebuild</button>
-      <button id="kgPause" class="btn">Pause</button>
-      <button id="kgResume" class="btn">Resume</button>
-      <button id="kgClear" class="btn">Clear Filter</button>
-    </div>
-
-    <div id="kgStatusBar" class="muted small" style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;
-         padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)">
-      <span><b>KG</b></span>
-      <span id="kgStatusMode">mode: —</span>
-      <span id="kgStatusEvents">events: —</span>
+  <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
+    <h4 style="margin:0">Knowledge Graph</h4>
+    <select id="kgMode" style="min-width:130px">
+      <option value="all">All nodes</option>
+      <option value="people">People only</option>
+      <option value="topics">Topics only</option>
+      <option value="keywords">Keywords only</option>
+    </select>
+    <select id="kgLens" style="min-width:120px">
+      <option value="workstream">Workstream</option>
+      <option value="concepts">Concept clusters</option>
+    </select>
+    <button id="kgRebuild" class="btn">Rebuild</button>
+    <button id="kgClear" class="btn">Clear Filter</button>
+    <div id="kgStatusBar" class="muted small" style="display:flex;gap:8px;align-items:center;margin-left:auto">
       <span id="kgStatusNodes">nodes: —</span>
       <span id="kgStatusEdges">edges: —</span>
-      <span id="kgStatusTime">build: —</span>
-      <span id="kgStatusParams">sel: —</span>
-      <span id="kgStatusState" style="margin-left:auto">state: idle</span>
-      <button id="kgDbgToggle" class="btn" style="padding:5px 10px">Debug</button>
-      <button id="kgDbgClear" class="btn" style="padding:5px 10px">Clear</button>
-    </div>
-
-    <div id="kgDebugPanel" style="display:none;margin-top:10px;padding:10px 10px;border-radius:14px;
-         background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.10)">
-      <div class="muted small" style="margin-bottom:8px">Knowledge Graph Debug</div>
-      <textarea id="kgDebugText" spellcheck="false" style="width:100%;min-height:160px;resize:vertical;
-        background:rgba(0,0,0,.30);color:rgba(255,255,255,.86);border:1px solid rgba(255,255,255,.10);
-        border-radius:12px;padding:10px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;white-space:pre"></textarea>
-    </div>
-
-    <div style="margin-top:10px;border:1px solid rgba(255,255,255,.10);border-radius:14px;overflow:hidden">
-      <div style="position:relative">
-        <canvas id="kgCanvas" width="1200" height="520" style="width:100%;height:520px;display:block;background:rgba(0,0,0,.25);cursor:pointer"></canvas>
-        <div id="kgOverlay" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,.45);backdrop-filter:blur(2px)"><div class="card" style="margin:0;padding:10px 12px;min-width:240px;text-align:center"><div style="font-weight:800">Building graph…</div><div id="kgOverlaySub" class="muted small" style="margin-top:4px">please wait</div></div></div>
-      </div>
-    </div>
-    <div id="kgLegend" class="muted small" style="margin-top:10px">
-      Click a node to inspect. Drag to pan. Mousewheel to zoom.
+      <span id="kgStatusState">idle</span>
+      <span id="kgStatusMode" style="display:none"></span>
+      <span id="kgStatusEvents" style="display:none"></span>
+      <span id="kgStatusTime" style="display:none"></span>
+      <span id="kgStatusParams" style="display:none"></span>
     </div>
   </div>
+
+  <div style="border:1px solid rgba(255,255,255,.10);border-radius:14px;overflow:hidden;flex:1;min-height:0">
+    <div style="position:relative;height:calc(100vh - 180px)">
+      <canvas id="kgCanvas" width="1200" height="800" style="width:100%;height:100%;display:block;background:rgba(0,0,0,.25);cursor:pointer"></canvas>
+      <div id="kgOverlay" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,.45);backdrop-filter:blur(2px)"><div class="card" style="margin:0;padding:10px 12px;min-width:240px;text-align:center"><div style="font-weight:800">Building graph…</div><div id="kgOverlaySub" class="muted small" style="margin-top:4px">please wait</div></div></div>
+    </div>
+  </div>
+  <div id="kgLegend" class="muted small" style="margin-top:6px">Click node to inspect. Drag to pan. Scroll to zoom.</div>
 
 </section>
 
@@ -9814,7 +9790,7 @@ function KG(canvas){
   this.hlEdges = new Set();
   this.dpr = (window.devicePixelRatio || 1);
   this.cssW = 1200;
-  this.cssH = 520;
+  this.cssH = 800;
   this.resize();
 }
 
@@ -9825,7 +9801,7 @@ KG.prototype.resize = function(){
   const dpr = (window.devicePixelRatio || 1);
   this.dpr = dpr;
   this.cssW = Math.max(300, rect.width || 1200);
-  this.cssH = Math.max(200, rect.height || 520);
+  this.cssH = Math.max(200, rect.height || 800);
   const w = Math.floor(this.cssW * dpr);
   const h = Math.floor(this.cssH * dpr);
   if(c.width !== w) c.width = w;
