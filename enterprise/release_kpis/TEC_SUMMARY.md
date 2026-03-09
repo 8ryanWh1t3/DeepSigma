@@ -1,52 +1,98 @@
-# TEC Summary (ROM)
+# TEC Summary (C-TEC v3)
 
-## Counts
-- issues_total: **247**
-- prs_merged: **236**
-- workflows: **41**
-- test_files: **160**
-- doc_files: **362**
-- security_issues_tagged: **4**
-- committee_cycles_est: **0**
-- issues_with_pr_link_est: **117**
+## Latest Factors
+- Formula: **v3**
+- ICR: **GREEN** (RCF=1.0, RL_open=0)
+- PCR: **extreme** (CCF=0.7, CL14=199)
+- Quality Factor: **1.0** (confidence-weighted KPI mean=10.0, n=8)
+- Stability Factor: **0.828** (SSI=65.6)
 
-## Effort (Base hours breakdown)
-- issues_weighted: **2475.1**
-- issues_complexity_weighted: **3157.5**
-- pr_overhead: **354.0**
-- workflows: **205.0**
-- tests: **320.0**
-- docs: **543.0**
-- committee: **0.0**
-- total_base: **3897.1**
-- total_ctec: **4396.3**
-- total_ctec_unadjusted: **4579.5**
-- insights_adjustment_hours: **-183.2**
+## Edition Metrics
+- CORE: TEC=664.32 | C-TEC=385.04 | CC=0.5796
+- ENTERPRISE: TEC=1524.1 | C-TEC=883.37 | CC=0.5796
+- TOTAL: TEC=3098.26 | C-TEC=1795.75 | CC=0.5796
 
-## Complexity (C-TEC v1.0)
-- avg_index: **1.265**
-- max_index: **2.275**
-- signals: PR diff size, changed files, cross-subsystem touch, issue duration, dependency refs
-
-## Pulse Insights Adjustment
-- insights_present: **True**
-- insights_score: **7.0**
-- signal_count: **0**
-- adjustment_factor: **0.96x**
-- adjustment_hours: **-183.2**
-
-## Tiers (Low / Base / High)
+## Tiers (from TOTAL C-TEC)
 ### Internal @ $150/hr
-- Low:  3517.1 hrs | $527558.0
-- Base: 4396.3 hrs | $659448.0
-- High: 5935.0 hrs | $890255.0
+- Low:  1436.6 hrs | $215490
+- Base: 1795.8 hrs | $269362
+- High: 2424.3 hrs | $363639
 
 ### Executive @ $225/hr
-- Low:  3517.1 hrs | $791338.0
-- Base: 4396.3 hrs | $989172.0
-- High: 5935.0 hrs | $1335382.0
+- Low:  1436.6 hrs | $323235
+- Base: 1795.8 hrs | $404044
+- High: 2424.3 hrs | $545459
 
 ### Public Sector Fully Burdened @ $275/hr
-- Low:  3517.1 hrs | $967190.0
-- Base: 4396.3 hrs | $1208988.0
-- High: 5935.0 hrs | $1632134.0
+- Low:  1436.6 hrs | $395065
+- Base: 1795.8 hrs | $493831
+- High: 2424.3 hrs | $666672
+
+## Release KPI Scores
+
+**Version:** v2.1.3
+
+| KPI | Score | Tier | Confidence |
+|-----|------:|------|----------:|
+| Technical Completeness | 10.0 | production | 0.9 |
+| Automation Depth | 10.0 | production | 0.9 |
+| Authority Modeling | 10.0 | production | 0.9 |
+| Enterprise Readiness | 10.0 | production | 0.9 |
+| Scalability | 10.0 | production | 0.9 |
+| Data Integration | 10.0 | production | 0.9 |
+| Economic Measurability | 10.0 | production | 0.9 |
+| Operational Maturity | 10.0 | production | 0.9 |
+
+**Mean:** 10.0/10 · **Gate:** PASS (no floors violated, no regressions)
+
+## Scalability Benchmark
+
+- Throughput: **3,232,593.1 RPS**
+- Data rate: **35,329.4 MB/min**
+- Wall clock: **0.0309s** (100,000 records)
+- RSS peak: **84.1 MB**
+- Evidence: **real_workload** · Eligible: **True**
+
+## Economic Metrics
+
+- TEC base hours: **4,396.3**
+- Decisions: **247**
+- Avg cost/decision: **$2,669.83**
+- Total cost (internal): **$659,448**
+- MTTR: **0.0309s**
+- Evidence: **real_workload** · Eligible: **True**
+
+## Security Metrics
+
+- MTTR: **0.0309s**
+- Re-encrypt throughput: **3,232,593.1 RPS**
+- Signing mode: **hmac**
+- Evidence: **simulated** · Eligible: **False**
+
+## System Stability Index (SSI)
+
+- SSI: **65.6** (gate: **WARN**)
+- Confidence: **0.89**
+- Drift acceleration index: **0.5641**
+
+## Pulse Insights
+
+- Insights score: **7.0/10**
+- Active signals: **0**
+
+## Standards Overlay
+
+- Contracted KPIs: **8**
+- SMART pass: **8/8**
+- Experimental: **0**
+- Frameworks: DORA · ISO/IEC 25010 · OpenTelemetry · SMART
+- Detail: [kpi_standards_overlay.md](../../docs/kpi_standards_overlay.md)
+
+## Why This Is More Accurate
+- Uses edition-scoped inventory plus full-repo `total` scope, so complexity is measured across actual shipped surfaces.
+- Applies live governance factors (`RCF` from issue risk health, `CCF` from 14-day PR change load) instead of static effort-only multipliers.
+- **v3 Quality Factor (QF):** Replaces binary file-existence checks with confidence-weighted KPI scores. Evidence level (simulated vs production) directly affects weight via eligibility confidence.
+- **v3 Stability Factor (SF):** SSI (System Stability Index) feeds into C-TEC. Unstable systems get a lower control multiplier, reflecting higher real-world effort.
+- **v3 LOC in TEC:** Lines of code now contribute to the TEC formula, so complexity reflects actual code volume — not just file counts.
+- Computes C-TEC as `TEC × QF × SF × RCF × CCF` = `TEC × 0.5796`.
+- Produces deterministic daily snapshots (`ICR/PCR/TEC`) so trend direction is measurable and auditable over time.
