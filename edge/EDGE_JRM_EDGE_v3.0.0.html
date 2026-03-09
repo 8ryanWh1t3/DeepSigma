@@ -1042,7 +1042,7 @@ document.addEventListener("DOMContentLoaded",function(){
  </table>
  </div>
  <div class="row-hint" id="rowHint" style="display:none">Click any row to open the trace drawer &nbsp;|&nbsp; <kbd style="font-size:10px;padding:1px 4px;border-radius:3px;background:rgba(125,249,255,.08);border:1px solid rgba(125,249,255,.15);color:var(--accent)">J</kbd> <kbd style="font-size:10px;padding:1px 4px;border-radius:3px;background:rgba(125,249,255,.08);border:1px solid rgba(125,249,255,.15);color:var(--accent)">K</kbd> to navigate</div>
- <div id="runEmpty" class="muted" style="text-align:center;padding:30px">No data loaded yet. <button onclick="setTab('ingest')" style="background:none;border:none;color:var(--accent);cursor:pointer;text-decoration:underline;font-size:inherit">Go to Ingest</button> to load events, then press <strong>Start</strong>.</div>
+ <div id="runEmpty" class="muted" style="text-align:center;padding:30px">No data loaded yet. <button id="runEmptyGoIngest" style="background:none;border:none;color:var(--accent);cursor:pointer;text-decoration:underline;font-size:inherit">Go to Ingest</button> to load events, then press <strong>Start</strong>.</div>
  <div class="load-more-wrap hidden" id="loadMoreWrap">
  <button id="btnLoadMore">Load More Rows</button>
  <div class="row-cap-msg" id="loadMoreMsg"></div>
@@ -1077,7 +1077,7 @@ document.addEventListener("DOMContentLoaded",function(){
  </div>
  <div id="traceStats" class="muted small" style="margin-top:6px">No events loaded.</div>
  </div>
- <div id="traceFullView" class="muted" style="text-align:center;padding:30px">Run the pipeline on the <button onclick="setTab('run')" style="background:none;border:none;color:var(--accent);cursor:pointer;text-decoration:underline;font-size:inherit">Run</button> tab, then click any event row to view its full 9-stage trace here.</div>
+ <div id="traceFullView" class="muted" style="text-align:center;padding:30px">Run the pipeline on the <button id="traceGoRun" style="background:none;border:none;color:var(--accent);cursor:pointer;text-decoration:underline;font-size:inherit">Run</button> tab, then click any event row to view its full 9-stage trace here.</div>
  </section>
 
  <!-- ── Packet Viewer Tab ── -->
@@ -1088,7 +1088,7 @@ document.addEventListener("DOMContentLoaded",function(){
  <div class="pkt-timeline" id="pktTimeline"></div>
  <div class="pkt-split">
  <div class="pkt-list" id="pktList">
- <div class="muted" style="padding:10px">No packets loaded. <button onclick="setTab('ingest')" style="background:none;border:none;color:var(--accent);cursor:pointer;text-decoration:underline;font-size:inherit">Load JRM-X packets</button> from the Ingest tab.</div>
+ <div class="muted" style="padding:10px">No packets loaded. <button id="pktGoIngest" style="background:none;border:none;color:var(--accent);cursor:pointer;text-decoration:underline;font-size:inherit">Load JRM-X packets</button> from the Ingest tab.</div>
  </div>
  <div class="pkt-detail" id="pktDetail">
  <div class="muted" style="padding:10px">Select a packet part to view its contents.</div>
@@ -1409,12 +1409,12 @@ document.addEventListener("DOMContentLoaded",function(){
  <div class="card" style="margin:0">
  <h3 style="font-size:13px">Executive Mode Report</h3>
  <div id="orgExecutiveReport" class="muted">Run the pipeline to generate executive summary.</div>
- <div class="row" style="margin-top:8px"><button onclick="exportExecutiveReport()">Export Executive JSON</button></div>
+ <div class="row" style="margin-top:8px"><button id="btnExportExecReport">Export Executive JSON</button></div>
  </div>
  <div class="card" style="margin:0">
  <h3 style="font-size:13px">Remote Sync Snapshot</h3>
  <div id="orgRemoteSync" class="muted">Run the pipeline to generate sync snapshot.</div>
- <div class="row" style="margin-top:8px"><button onclick="exportOrgSyncSnapshot()">Export Sync Snapshot</button></div>
+ <div class="row" style="margin-top:8px"><button id="btnExportSyncSnapshot">Export Sync Snapshot</button></div>
  </div>
  </div>
  </div>
@@ -1701,7 +1701,7 @@ document.addEventListener("DOMContentLoaded",function(){
  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
   <strong>View Mode Debug</strong>
   <span class="muted small" id="viewDebugTs"></span>
-  <button style="margin-left:auto;padding:2px 8px" onclick="toggleViewDebug(false)">Close</button>
+  <button id="btnCloseViewDebug" style="margin-left:auto;padding:2px 8px">Close</button>
  </div>
  <div id="viewDebugBody" class="mono small muted">No debug snapshot yet.</div>
 </div>
@@ -8564,6 +8564,14 @@ window.addEventListener("DOMContentLoaded",()=>{
  bindEvt("cgExportProof","click","cgExportProof",cgExportProof);
  // Simulate patch
  bindEvt("cgRunSim","click","cgRunSim",cgSimulatePatch);
+
+ // Inline-handler replacements (EDGE hardening compliance)
+ bindEvt("runEmptyGoIngest","click","runEmptyGoIngest",function(){setTab("ingest")});
+ bindEvt("traceGoRun","click","traceGoRun",function(){setTab("run")});
+ bindEvt("pktGoIngest","click","pktGoIngest",function(){setTab("ingest")});
+ bindEvt("btnExportExecReport","click","btnExportExecReport",function(){exportExecutiveReport()});
+ bindEvt("btnExportSyncSnapshot","click","btnExportSyncSnapshot",function(){exportOrgSyncSnapshot()});
+ bindEvt("btnCloseViewDebug","click","btnCloseViewDebug",function(){toggleViewDebug(false)});
 
  // Init CTA state
  updateCtaState();updateLiveCounters();
