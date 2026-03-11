@@ -2,7 +2,7 @@
   "schema": "tec_ctec_v3_tier",
   "source": "enterprise/scripts/tec_ctec.py",
   "tier": "executive",
-  "generated_at": "2026-03-10T14:09:18Z",
+  "generated_at": "2026-03-11T14:13:16Z",
   "mode": "report_only",
   "core": {
     "inventory": {
@@ -29,22 +29,22 @@
         "docs_path_to_run": true
       }
     },
-    "control_coverage": 0.6624,
-    "ctec": 440.05,
+    "control_coverage": 0.7452,
+    "ctec": 495.05,
     "r_tec": 664.32
   },
   "enterprise": {
     "inventory": {
-      "files": 1056,
+      "files": 1059,
       "directories": 156,
-      "loc": 119452,
+      "loc": 119668,
       "packages": 39,
-      "configs": 205,
+      "configs": 208,
       "tests": 5,
       "run_surfaces": 122,
-      "artifacts": 308
+      "artifacts": 311
     },
-    "tec": 1527.73,
+    "tec": 1531.43,
     "controls": {
       "required": 6,
       "passed": 6,
@@ -58,40 +58,40 @@
         "secret_scan": true
       }
     },
-    "control_coverage": 0.6624,
-    "ctec": 1011.97,
-    "r_tec": 1527.73
+    "control_coverage": 0.7452,
+    "ctec": 1141.22,
+    "r_tec": 1531.43
   },
   "total": {
     "inventory": {
-      "files": 1984,
+      "files": 1987,
       "directories": 304,
-      "loc": 212590,
+      "loc": 212806,
       "packages": 69,
-      "configs": 448,
+      "configs": 451,
       "tests": 197,
       "run_surfaces": 161,
-      "artifacts": 316
+      "artifacts": 319
     },
-    "tec": 3102.89,
+    "tec": 3106.6,
     "controls": {
       "required": 12,
       "passed": 12,
       "legacy_kpi_coverage": 1.0,
       "checks_scope": "composite(core+enterprise)"
     },
-    "control_coverage": 0.6624,
-    "ctec": 2055.36,
-    "r_tec": 3102.89
+    "control_coverage": 0.7452,
+    "ctec": 2315.04,
+    "r_tec": 3106.6
   },
   "factors": {
     "formula_version": "v3",
     "rcf": 1.0,
     "icr_status": "GREEN",
     "rl_open": 0,
-    "ccf": 0.8,
-    "cl14": 77,
-    "load_bucket": "high",
+    "ccf": 0.9,
+    "cl14": 52,
+    "load_bucket": "medium",
     "qf": 1.0,
     "qf_weighted_mean": 10.0,
     "qf_kpi_count": 8,
@@ -100,15 +100,15 @@
   },
   "rate_hourly": 225.0,
   "low": {
-    "hours": 1644.3,
-    "cost": 369965.0
+    "hours": 1852.0,
+    "cost": 416707.0
   },
   "base": {
-    "hours": 2055.4,
-    "cost": 462456.0
+    "hours": 2315.0,
+    "cost": 520884.0
   },
   "high": {
-    "hours": 2774.7,
-    "cost": 624316.0
+    "hours": 3125.3,
+    "cost": 703193.0
   }
 }

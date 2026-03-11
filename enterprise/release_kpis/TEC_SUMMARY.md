@@ -3,30 +3,30 @@
 ## Latest Factors
 - Formula: **v3**
 - ICR: **GREEN** (RCF=1.0, RL_open=0)
-- PCR: **high** (CCF=0.8, CL14=77)
+- PCR: **medium** (CCF=0.9, CL14=52)
 - Quality Factor: **1.0** (confidence-weighted KPI mean=10.0, n=8)
 - Stability Factor: **0.828** (SSI=65.6)
 
 ## Edition Metrics
-- CORE: TEC=664.32 | C-TEC=440.05 | CC=0.6624
-- ENTERPRISE: TEC=1527.73 | C-TEC=1011.97 | CC=0.6624
-- TOTAL: TEC=3102.89 | C-TEC=2055.36 | CC=0.6624
+- CORE: TEC=664.32 | C-TEC=495.05 | CC=0.7452
+- ENTERPRISE: TEC=1531.43 | C-TEC=1141.22 | CC=0.7452
+- TOTAL: TEC=3106.6 | C-TEC=2315.04 | CC=0.7452
 
 ## Tiers (from TOTAL C-TEC)
 ### Internal @ $150/hr
-- Low:  1644.3 hrs | $246643
-- Base: 2055.4 hrs | $308304
-- High: 2774.7 hrs | $416210
+- Low:  1852.0 hrs | $277805
+- Base: 2315.0 hrs | $347256
+- High: 3125.3 hrs | $468796
 
 ### Executive @ $225/hr
-- Low:  1644.3 hrs | $369965
-- Base: 2055.4 hrs | $462456
-- High: 2774.7 hrs | $624316
+- Low:  1852.0 hrs | $416707
+- Base: 2315.0 hrs | $520884
+- High: 3125.3 hrs | $703193
 
 ### Public Sector Fully Burdened @ $275/hr
-- Low:  1644.3 hrs | $452179
-- Base: 2055.4 hrs | $565224
-- High: 2774.7 hrs | $763052
+- Low:  1852.0 hrs | $509309
+- Base: 2315.0 hrs | $636636
+- High: 3125.3 hrs | $859459
 
 ## Release KPI Scores
 
@@ -94,5 +94,5 @@
 - **v3 Quality Factor (QF):** Replaces binary file-existence checks with confidence-weighted KPI scores. Evidence level (simulated vs production) directly affects weight via eligibility confidence.
 - **v3 Stability Factor (SF):** SSI (System Stability Index) feeds into C-TEC. Unstable systems get a lower control multiplier, reflecting higher real-world effort.
 - **v3 LOC in TEC:** Lines of code now contribute to the TEC formula, so complexity reflects actual code volume — not just file counts.
-- Computes C-TEC as `TEC × QF × SF × RCF × CCF` = `TEC × 0.6624`.
+- Computes C-TEC as `TEC × QF × SF × RCF × CCF` = `TEC × 0.7452`.
 - Produces deterministic daily snapshots (`ICR/PCR/TEC`) so trend direction is measurable and auditable over time.
