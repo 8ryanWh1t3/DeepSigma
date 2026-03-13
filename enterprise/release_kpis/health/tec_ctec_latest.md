@@ -3,7 +3,7 @@
 - Mode: **report_only**
 - Formula: **v3**
 - ICR: **GREEN** (RCF=1.0, RL_open=0)
-- PCR: **medium** (CCF=0.9, CL14=48)
+- PCR: **medium** (CCF=0.9, CL14=40)
 - Quality Factor: **1.0** (KPI mean=10.0, n=8)
 - Stability Factor: **0.828** (SSI=65.6)
 
@@ -14,13 +14,13 @@
 - R-TEC: **664.32**
 
 ## ENTERPRISE
-- TEC: **1535.21**
+- TEC: **1538.97**
 - Control coverage: **0.7452**
-- C-TEC: **1144.04**
-- R-TEC: **1535.21**
+- C-TEC: **1146.84**
+- R-TEC: **1538.97**
 
 ## TOTAL
-- TEC: **3113.38**
+- TEC: **3117.14**
 - Control coverage: **0.7452**
-- C-TEC: **2320.09**
-- R-TEC: **3113.38**
+- C-TEC: **2322.89**
+- R-TEC: **3117.14**
