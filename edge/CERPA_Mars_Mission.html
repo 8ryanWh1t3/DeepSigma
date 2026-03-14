@@ -1,0 +1,365 @@
+<!--
+ CERPA Mars Mission EDGE v1.0.0
+ ============================================================
+ Deep Sigma Decision Governance Platform
+ Interactive Mars mission simulation
+ Rover navigation, ISRU oxygen production, dust storms,
+ radiation events, multi-agent fleet coordination
+ 20-minute comms delay: AI must self-govern
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"/>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>CERPA Mars Mission — Deep Sigma EDGE</title>
+<style>
+:root{--bg:#0a0610;--card:#120d1e;--card2:#0e091a;--muted:#7a6b99;--txt:#e0d8f0;--accent:#f97316;--mars:#dc6843;--rover:#22d3ee;--isru:#10b981;--rad:#ef4444;--line:#1e1530;--ok:#5dff93;--warn:#ffcc66;--bad:#ff6b6b;--dust:#d4a574}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--txt);font-size:13px;overflow-x:hidden}
+header{padding:10px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;background:rgba(10,6,16,.96)}
+header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent) 20%,var(--mars) 50%,var(--accent) 80%,transparent)}
+.brand{font-weight:700;font-size:15px;color:var(--accent)}.brand small{display:block;color:var(--muted);font-size:10px;font-weight:400}
+.main{height:calc(100vh - 56px);overflow-y:auto;padding:16px 20px;max-width:1300px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+.card h3{margin:0 0 10px;font-size:13px;color:#d4c8e8;letter-spacing:.4px;text-transform:uppercase}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.wire{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px}
+.wire h4{margin:0 0 6px;font-size:10px;letter-spacing:.4px;text-transform:uppercase;color:var(--accent)}
+.wr{display:flex;justify-content:space-between;padding:3px 0;font-size:11px;border-bottom:1px solid #1a1228;gap:8px}
+.wr:last-child{border:none}.wr .wl{color:var(--muted);min-width:90px;flex-shrink:0}.wr .wv{font-weight:500;text-align:right;flex:1}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center}
+.kpi .kv{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1;transition:all .4s}
+.kpi .kl{font-size:7.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-top:2px}
+.gauge{position:relative;width:130px;height:130px;margin:0 auto}
+.gauge svg{width:130px;height:130px;transform:rotate(-90deg)}
+.gauge-bg{fill:none;stroke:var(--line);stroke-width:11;stroke-linecap:round}
+.gauge-fill{fill:none;stroke-width:11;stroke-linecap:round;transition:stroke-dashoffset .6s,stroke .3s}
+.gauge-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.gauge-val{font-size:28px;font-weight:700;transition:color .3s}.gauge-sub{font-size:9px;color:var(--muted)}
+.cycle-vis{display:flex;gap:3px;margin:8px 0;align-items:center;flex-wrap:wrap}
+.cyc-s{flex:1;min-width:70px;padding:6px;border-radius:8px;text-align:center;font-size:9px;font-weight:700;border:2px solid var(--line);background:var(--card2);transition:all .4s}
+.cyc-s.active{border-color:var(--accent);box-shadow:0 0 10px rgba(249,115,22,.25)}
+.cyc-s.done{border-color:var(--ok);opacity:.7}
+.cyc-s small{display:block;font-weight:400;font-size:7px;margin-top:1px;color:var(--muted)}
+.cyc-arr{color:#2a1e3e;font-size:11px}
+.ep-log{max-height:300px;overflow-y:auto;font-size:10px}
+.ep-entry{padding:4px 8px;border-bottom:1px solid #1a1228;animation:fadeIn .3s}
+.ep-entry .ep-time{font-size:8px;color:#4a3a6e}.ep-entry .ep-stage{font-weight:700;margin:0 4px}
+.ep-claim .ep-stage{color:var(--rover)}.ep-event .ep-stage{color:var(--mars)}
+.ep-review .ep-stage{color:var(--accent)}.ep-patch .ep-stage{color:var(--bad)}.ep-apply .ep-stage{color:var(--ok)}
+@keyframes fadeIn{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
+button{padding:6px 12px;border-radius:6px;font-size:9px;font-weight:600;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--txt);transition:all .15s}
+button:hover{border-color:rgba(249,115,22,.3)}
+button.dust{border-color:rgba(212,165,116,.4);color:var(--dust);background:rgba(212,165,116,.06)}
+button.rad{border-color:rgba(239,68,68,.4);color:var(--rad);background:rgba(239,68,68,.06)}
+button.rover-b{border-color:rgba(34,211,238,.4);color:var(--rover);background:rgba(34,211,238,.06)}
+button.isru-b{border-color:rgba(16,185,129,.4);color:var(--isru);background:rgba(16,185,129,.06)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.dom-card{border-radius:8px;padding:10px;border:1px solid var(--line);background:var(--card2);transition:all .4s}
+.dom-card h5{font-size:10px;margin:0 0 6px;letter-spacing:.3px;text-transform:uppercase}
+.dom-stat{display:flex;justify-content:space-between;font-size:10px;padding:2px 0;border-bottom:1px solid #1a1228}
+.dom-stat:last-child{border:none}
+.dom-stat .ds-v{font-weight:600;font-variant-numeric:tabular-nums}
+.ms-status{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;transition:all .4s}
+.ms-ok{background:rgba(93,255,147,.04);border:1px solid rgba(93,255,147,.15);color:var(--ok)}
+.ms-warn{background:rgba(255,204,102,.04);border:1px solid rgba(255,204,102,.15);color:var(--warn)}
+.ms-crit{background:rgba(255,107,107,.04);border:1px solid rgba(255,107,107,.15);color:var(--bad)}
+.ms-dot{width:8px;height:8px;border-radius:50%;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+/* Comms delay bar */
+.comms{padding:4px 10px;border-radius:6px;font-size:9px;font-weight:600;background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.2);color:var(--accent);margin-left:8px}
+footer{padding:6px 16px;border-top:1px solid var(--line);font-size:8px;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">CERPA MARS OPS<small>Deep Sigma — Mars Mission Governance Simulation v1.0.0</small></div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
+    <div class="comms" id="commsDelay">COMMS DELAY: 14m 22s</div>
+    <div class="ms-status ms-ok" id="msStatus"><span class="ms-dot" style="background:var(--ok)" id="msDot"></span><span id="msText">MISSION NOMINAL</span></div>
+  </div>
+</header>
+<div class="main">
+  <div class="card">
+    <h3>Mars Event Injection</h3>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+      <button class="dust" id="btnDust">Dust Storm — Visibility Zero</button>
+      <button class="rad" id="btnRad">Solar Particle Event — Radiation Spike</button>
+      <button class="rover-b" id="btnCrater">Unexpected Crater — Path Blocked</button>
+      <button class="isru-b" id="btnISRU">ISRU Anomaly — O2 Production Drift</button>
+      <button class="rad" id="btnFleet">Fleet Coordination — Multi-Agent Drift</button>
+      <button id="btnReset" style="margin-left:auto">Reset Mission</button>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div>
+      <div class="card" style="text-align:center">
+        <h3>Mission Coherence Score (CIS)</h3>
+        <div class="gauge">
+          <svg viewBox="0 0 130 130"><circle class="gauge-bg" cx="65" cy="65" r="54" stroke-dasharray="339" stroke-dashoffset="85"/>
+            <circle class="gauge-fill" id="gFill" cx="65" cy="65" r="54" stroke="var(--ok)" stroke-dasharray="339" stroke-dashoffset="51"/></svg>
+          <div class="gauge-label"><div class="gauge-val" id="gVal" style="color:var(--ok)">95.0</div><div class="gauge-sub">CIS</div></div>
+        </div>
+        <div style="font-size:9px;color:var(--muted);margin-top:4px">CIS > 85 required for autonomous operations. Below 70 = Earth intervention requested.</div>
+      </div>
+
+      <div class="grid2">
+        <div class="dom-card"><h5 style="color:var(--rover)">Rover / Navigation</h5>
+          <div class="dom-stat"><span>Bearing</span><span class="ds-v" id="dBearing">045°</span></div>
+          <div class="dom-stat"><span>Speed</span><span class="ds-v" id="dSpeed">0.14 km/h</span></div>
+          <div class="dom-stat"><span>Visibility</span><span class="ds-v" id="dVis" style="color:var(--ok)">12 km</span></div>
+          <div class="dom-stat"><span>Terrain</span><span class="ds-v" id="dTerrain">Nominal</span></div>
+        </div>
+        <div class="dom-card"><h5 style="color:var(--isru)">ISRU / Life Support</h5>
+          <div class="dom-stat"><span>O2 Rate</span><span class="ds-v" id="dO2">6.2 g/hr</span></div>
+          <div class="dom-stat"><span>MOXIE Status</span><span class="ds-v" id="dMOXIE" style="color:var(--ok)">Nominal</span></div>
+          <div class="dom-stat"><span>Water Ice</span><span class="ds-v" id="dWater">Surveying</span></div>
+          <div class="dom-stat"><span>Power</span><span class="ds-v" id="dPower">94%</span></div>
+        </div>
+        <div class="dom-card"><h5 style="color:var(--rad)">Radiation / Environment</h5>
+          <div class="dom-stat"><span>Radiation</span><span class="ds-v" id="dRad" style="color:var(--ok)">0.24 mSv/hr</span></div>
+          <div class="dom-stat"><span>Dust Opacity</span><span class="ds-v" id="dDust">0.4 tau</span></div>
+          <div class="dom-stat"><span>Temp</span><span class="ds-v" id="dTemp">-62°C</span></div>
+          <div class="dom-stat"><span>Wind</span><span class="ds-v" id="dWind">12 km/h</span></div>
+        </div>
+        <div class="dom-card"><h5 style="color:var(--accent)">Fleet / Comms</h5>
+          <div class="dom-stat"><span>Active Units</span><span class="ds-v" id="dUnits">5</span></div>
+          <div class="dom-stat"><span>Comms Delay</span><span class="ds-v" id="dComms">14m 22s</span></div>
+          <div class="dom-stat"><span>Fleet Coherence</span><span class="ds-v" id="dFleet" style="color:var(--ok)">0.96</span></div>
+          <div class="dom-stat"><span>Auth Level</span><span class="ds-v" id="dAuth">L3 Autonomous</span></div>
+        </div>
+      </div>
+
+      <div class="grid5" style="margin-top:14px">
+        <div class="kpi"><div class="kv" id="kvPAR" style="color:var(--ok)">99%</div><div class="kl">Mission PAR</div></div>
+        <div class="kpi"><div class="kv" id="kvDEG" style="color:var(--ok)">—</div><div class="kl">DEG (sec)</div></div>
+        <div class="kpi"><div class="kv" id="kvDrift" style="color:var(--ok)">0</div><div class="kl">Drift Events</div></div>
+        <div class="kpi"><div class="kv" id="kvEp" style="color:var(--accent)">0</div><div class="kl">Episodes</div></div>
+        <div class="kpi"><div class="kv" id="kvAuto" style="color:var(--ok)">100%</div><div class="kl">Autonomous</div></div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <h3>CERPA Cycle — Autonomous</h3>
+        <div class="cycle-vis">
+          <div class="cyc-s" id="csClaim">CLAIM<small>Path / resource pred</small></div><span class="cyc-arr">→</span>
+          <div class="cyc-s" id="csEvent">EVENT<small>Sensor / LIDAR</small></div><span class="cyc-arr">→</span>
+          <div class="cyc-s" id="csReview">REVIEW<small>Drift analysis</small></div><span class="cyc-arr">→</span>
+          <div class="cyc-s" id="csPatch">PATCH<small>Trajectory / ISRU fix</small></div><span class="cyc-arr">→</span>
+          <div class="cyc-s" id="csApply">APPLY<small>Execute + seal</small></div>
+        </div>
+        <div style="font-size:9px;color:var(--accent);text-align:center;margin-top:4px">⚠ 20-minute comms delay: all CERPA cycles execute autonomously. Earth reviews sealed episodes post-hoc.</div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h3>Mission Episode Log — Hash-Chained</h3>
+        <div class="ep-log" id="epLog"><div style="text-align:center;color:var(--muted);padding:30px;font-size:11px">Inject a Mars event to start autonomous CERPA cycle →</div></div>
+      </div>
+      <div class="card">
+        <h3>Drift Detection History</h3>
+        <div id="driftHist" style="font-size:10px;color:var(--muted);text-align:center;padding:16px">No drift events yet.</div>
+      </div>
+      <div class="card">
+        <h3>AuthorityOps — Mars Governance Rules</h3>
+        <div class="wire"><h4>Autonomous Authority (L3)</h4>
+          <div class="wr"><span class="wl" style="color:var(--bad)">Rule 1</span><span class="wv">No path deviation > 30° without Earth notification (async)</span></div>
+          <div class="wr"><span class="wl" style="color:var(--bad)">Rule 2</span><span class="wv">No ISRU shutdown without 72hr O2 reserve confirmed</span></div>
+          <div class="wr"><span class="wl" style="color:var(--bad)">Rule 3</span><span class="wv">Radiation > 1.0 mSv/hr: auto-shelter. No override.</span></div>
+          <div class="wr"><span class="wl" style="color:var(--bad)">Rule 4</span><span class="wv">Fleet unit separation > 2km triggers regroup protocol</span></div>
+          <div class="wr"><span class="wl" style="color:var(--bad)">Rule 5</span><span class="wv">CIS < 70: pause autonomous ops, request Earth guidance</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Compliance / Mission Standards</h3>
+        <div class="wire">
+          <div class="wr"><span class="wl">NASA NPR 7120</span><span class="wv" style="color:var(--ok)">Mission assurance</span></div>
+          <div class="wr"><span class="wl">NIST AI RMF</span><span class="wv" style="color:var(--ok)">99.1% — AI governance</span></div>
+          <div class="wr"><span class="wl">DoD 3000.09</span><span class="wv" style="color:var(--ok)">Autonomous systems</span></div>
+          <div class="wr"><span class="wl">Outer Space Treaty</span><span class="wv" style="color:var(--ok)">Planetary protection</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<footer>Deep Sigma EDGE — CERPA Mars Mission Governance v1.0.0 — Sol 1 — Claim | Event | Review | Patch | Apply</footer>
+
+<script>
+(function(){"use strict";
+var S={cis:95,par:99,driftCount:0,episodes:0,degStart:null,lastDEG:null,running:false,autoRate:100,
+  nav:{bearing:45,speed:0.14,vis:12,terrain:"Nominal"},
+  isru:{o2:6.2,moxie:"Nominal",water:"Surveying",power:94},
+  env:{rad:0.24,dust:0.4,temp:-62,wind:12},
+  fleet:{units:5,comms:"14m 22s",coherence:0.96,auth:"L3 Autonomous"}};
+var epLog=document.getElementById("epLog"),driftHist=document.getElementById("driftHist"),driftEntries=[],epHashes=[];
+function ts(){var d=new Date();return"Sol1/"+(d.getHours()<10?"0":"")+d.getHours()+":"+(d.getMinutes()<10?"0":"")+d.getMinutes()+":"+(d.getSeconds()<10?"0":"")+d.getSeconds()}
+function hash(){return"0x"+Math.random().toString(16).substring(2,10)+Math.random().toString(16).substring(2,10)}
+function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v))}
+
+function updateUI(){
+  document.getElementById("dBearing").textContent=S.nav.bearing.toString().padStart(3,"0")+"°";
+  document.getElementById("dSpeed").textContent=S.nav.speed.toFixed(2)+" km/h";
+  var vl=document.getElementById("dVis");vl.textContent=S.nav.vis+" km";vl.style.color=S.nav.vis>=8?"var(--ok)":S.nav.vis>=3?"var(--warn)":"var(--bad)";
+  document.getElementById("dTerrain").textContent=S.nav.terrain;
+  document.getElementById("dO2").textContent=S.isru.o2.toFixed(1)+" g/hr";
+  var mx=document.getElementById("dMOXIE");mx.textContent=S.isru.moxie;mx.style.color=S.isru.moxie==="Nominal"?"var(--ok)":"var(--warn)";
+  document.getElementById("dWater").textContent=S.isru.water;
+  document.getElementById("dPower").textContent=S.isru.power+"%";
+  var rd=document.getElementById("dRad");rd.textContent=S.env.rad.toFixed(2)+" mSv/hr";rd.style.color=S.env.rad<=0.5?"var(--ok)":S.env.rad<=1.0?"var(--warn)":"var(--bad)";
+  document.getElementById("dDust").textContent=S.env.dust.toFixed(1)+" tau";
+  document.getElementById("dTemp").textContent=S.env.temp+"°C";
+  document.getElementById("dWind").textContent=S.env.wind+" km/h";
+  document.getElementById("dUnits").textContent=S.fleet.units;
+  document.getElementById("dComms").textContent=S.fleet.comms;
+  var fl=document.getElementById("dFleet");fl.textContent=S.fleet.coherence.toFixed(2);fl.style.color=S.fleet.coherence>=0.90?"var(--ok)":S.fleet.coherence>=0.75?"var(--warn)":"var(--bad)";
+  document.getElementById("dAuth").textContent=S.fleet.auth;
+  document.getElementById("kvPAR").textContent=S.par+"%";document.getElementById("kvDrift").textContent=S.driftCount;
+  document.getElementById("kvEp").textContent=S.episodes;document.getElementById("kvAuto").textContent=S.autoRate+"%";
+  if(S.lastDEG!==null)document.getElementById("kvDEG").textContent=S.lastDEG+"s";
+  document.getElementById("kvPAR").style.color=S.par>=95?"var(--ok)":S.par>=85?"var(--warn)":"var(--bad)";
+  document.getElementById("kvDrift").style.color=S.driftCount>3?"var(--bad)":S.driftCount>0?"var(--warn)":"var(--ok)";
+  document.getElementById("kvAuto").style.color=S.autoRate>=90?"var(--ok)":S.autoRate>=70?"var(--warn)":"var(--bad)";
+  var pct=S.cis/100,circ=339,off=circ*(1-pct*0.75);
+  var gf=document.getElementById("gFill");gf.setAttribute("stroke-dashoffset",off);
+  gf.setAttribute("stroke",S.cis>=85?"var(--ok)":S.cis>=70?"var(--warn)":"var(--bad)");
+  var gv=document.getElementById("gVal");gv.textContent=S.cis.toFixed(1);gv.style.color=S.cis>=85?"var(--ok)":S.cis>=70?"var(--warn)":"var(--bad)";
+  var ms=document.getElementById("msStatus"),md=document.getElementById("msDot"),mt=document.getElementById("msText");
+  if(S.cis<70){ms.className="ms-status ms-crit";md.style.background="var(--bad)";mt.textContent="MISSION DEGRADED — EARTH ASSIST"}
+  else if(S.cis<85){ms.className="ms-status ms-warn";md.style.background="var(--warn)";mt.textContent="CAUTION — AUTONOMOUS CONSTRAINED"}
+  else{ms.className="ms-status ms-ok";md.style.background="var(--ok)";mt.textContent="MISSION NOMINAL"}
+}
+function logE(stage,msg,cls){
+  if(epLog.querySelector("div[style]")&&S.episodes<=1)epLog.innerHTML="";
+  var d=document.createElement("div");d.className="ep-entry ep-"+cls;
+  d.innerHTML='<span class="ep-time">'+ts()+'</span><span class="ep-stage">['+stage+']</span>'+msg;
+  epLog.insertBefore(d,epLog.firstChild);if(epLog.children.length>60)epLog.removeChild(epLog.lastChild);
+}
+function highlightStep(id){
+  document.querySelectorAll(".cyc-s").forEach(function(s){s.classList.remove("active","done")});
+  var el=document.getElementById(id);if(el)el.classList.add("active");
+  var steps=["csClaim","csEvent","csReview","csPatch","csApply"],idx=steps.indexOf(id);
+  for(var i=0;i<idx;i++){var p=document.getElementById(steps[i]);if(p){p.classList.remove("active");p.classList.add("done")}}
+}
+function renderDrift(){
+  if(!driftEntries.length){driftHist.innerHTML='<div style="text-align:center;color:var(--muted);padding:16px">No drift events yet.</div>';return}
+  var h='<table style="width:100%;font-size:10px;border-collapse:collapse"><thead><tr><th style="text-align:left;color:var(--muted);font-size:8px;padding:3px;border-bottom:1px solid #1e1530">Sol/Time</th><th style="text-align:left;color:var(--muted);font-size:8px;padding:3px;border-bottom:1px solid #1e1530">System</th><th style="text-align:left;color:var(--muted);font-size:8px;padding:3px;border-bottom:1px solid #1e1530">Type</th><th style="text-align:center;color:var(--muted);font-size:8px;padding:3px;border-bottom:1px solid #1e1530">CIS</th></tr></thead><tbody>';
+  for(var i=driftEntries.length-1;i>=0;i--){var d=driftEntries[i],cc=d.cis>=85?"var(--ok)":d.cis>=70?"var(--warn)":"var(--bad)";
+    h+='<tr><td style="padding:2px;border-bottom:1px solid #1a1228;font-size:9px;color:var(--muted)">'+d.time+'</td><td style="padding:2px;border-bottom:1px solid #1a1228;color:'+d.color+'">'+d.system+'</td><td style="padding:2px;border-bottom:1px solid #1a1228">'+d.type+'</td><td style="padding:2px;border-bottom:1px solid #1a1228;text-align:center;color:'+cc+';font-weight:700">'+d.cis.toFixed(1)+'</td></tr>';}
+  h+='</tbody></table>';driftHist.innerHTML=h;
+}
+
+function runCERPA(system,sysColor,type,claimMsg,eventMsg,reviewMsg,patchMsg,applyMsg,cisHit,stateChanges){
+  if(S.running)return;S.running=true;S.episodes++;
+  var prevH=epHashes.length?epHashes[epHashes.length-1]:"GENESIS",epH=hash();epHashes.push(epH);
+  highlightStep("csClaim");logE("CLAIM","["+system+"] "+claimMsg,"claim");
+  logE("CLAIM","⚠ Comms delay: "+S.fleet.comms+" — executing AUTONOMOUSLY","claim");
+  setTimeout(function(){
+    highlightStep("csEvent");stateChanges.event();S.degStart=Date.now();
+    logE("EVENT","["+system+"] "+eventMsg,"event");updateUI();
+    setTimeout(function(){
+      highlightStep("csReview");S.cis=clamp(S.cis-cisHit,20,100);S.cis=Math.round(S.cis*10)/10;S.driftCount++;
+      logE("REVIEW","["+system+"] "+reviewMsg+" | CIS: "+S.cis.toFixed(1),"review");
+      if(S.cis<70){logE("REVIEW","AuthorityOps Rule 5 TRIGGERED: CIS < 70. Pause autonomous ops. Earth guidance requested.","review");S.autoRate=70;S.fleet.auth="L2 Earth-Assisted"}
+      driftEntries.push({time:ts(),system:system,color:sysColor,type:type,cis:S.cis});renderDrift();updateUI();
+      setTimeout(function(){
+        highlightStep("csPatch");stateChanges.patch();S.cis=clamp(S.cis+(cisHit*0.45),20,100);S.cis=Math.round(S.cis*10)/10;
+        logE("PATCH","["+system+"] "+patchMsg+" | CIS recovering: "+S.cis.toFixed(1),"patch");updateUI();
+        setTimeout(function(){
+          highlightStep("csApply");var deg=S.degStart?Math.round((Date.now()-S.degStart)/1000):0;S.lastDEG=deg;
+          S.par=clamp(S.par-1,80,100);
+          logE("APPLY","["+system+"] "+applyMsg,"apply");
+          logE("APPLY","Episode sealed: "+epH+" | Prev: "+prevH+" | DEG: "+deg+"s | PAR: "+S.par+"% | Queued for Earth review (delay: "+S.fleet.comms+")","apply");
+          updateUI();
+          setTimeout(function(){
+            document.querySelectorAll(".cyc-s").forEach(function(s){s.classList.remove("active");s.classList.add("done")});
+            setTimeout(function(){S.running=false},1200);
+          },1000);
+        },700);
+      },700);
+    },700);
+  },500);
+}
+
+// EVENTS
+document.getElementById("btnDust").addEventListener("click",function(){
+  runCERPA("Navigation","var(--rover)","Dust Storm — Visibility Zero",
+    "Rover path: bearing 045°, speed 0.14 km/h, visibility 12 km. Terrain: nominal.",
+    "DUST STORM: Visibility drops to 0.3 km. Wind: 95 km/h. Solar power dropping. LIDAR degraded. Speed unsafe.",
+    "DRIFT DETECTED — Environmental: dust storm. Visibility -97%. Solar power -40%. Navigation model compromised.",
+    "RETCON — Full stop. Deploy dust shields. Switch to inertial nav. Shelter-in-place protocol. ISRU paused to conserve power.",
+    "Dust storm pattern indexed in Memory Graph. Shelter protocol validated. Resume criteria: visibility > 3 km.",
+    12,{event:function(){S.nav.vis=0.3;S.nav.speed=0;S.nav.terrain="Hazardous";S.env.dust=5.8;S.env.wind=95;S.isru.power=56},
+        patch:function(){S.nav.speed=0;S.nav.terrain="Sheltered";S.isru.moxie="Paused";S.isru.power=62}});
+});
+
+document.getElementById("btnRad").addEventListener("click",function(){
+  runCERPA("Environment","var(--rad)","Solar Particle Event — Radiation Spike",
+    "Radiation baseline: 0.24 mSv/hr. All systems nominal. Crew-equivalent exposure within limits.",
+    "SOLAR PARTICLE EVENT: Radiation spikes to 2.8 mSv/hr. AuthorityOps Rule 3 AUTO-TRIGGERED: immediate shelter.",
+    "DRIFT DETECTED — Radiation: extreme solar event. 12x baseline. Electronics at risk. NO OVERRIDE — hard law.",
+    "RETCON — Auto-shelter activated (Rule 3: non-overridable). Electronics in safe mode. Radiation-hardened systems only. Estimated duration: 4-8 hours.",
+    "SPE pattern indexed. Radiation decay curve logged. Electronics recovery protocol queued. Earth notified (async).",
+    14,{event:function(){S.env.rad=2.8;S.nav.speed=0;S.nav.terrain="Sheltered"},
+        patch:function(){S.env.rad=1.2;S.nav.terrain="Sheltered-Recovering";S.isru.power=78}});
+});
+
+document.getElementById("btnCrater").addEventListener("click",function(){
+  runCERPA("Navigation","var(--rover)","Unexpected Crater — Path Blocked",
+    "Planned path: bearing 045°. Terrain scanned to 200m. Route clear per orbital imagery.",
+    "LIDAR detects 15m crater at 80m range — not in orbital map. Bearing 045° blocked. Rim unstable.",
+    "DRIFT DETECTED — Context drift: orbital imagery outdated (recent impact or collapse). Path planning model invalid for this sector.",
+    "RETCON — Bearing adjusted to 078° (33° deviation). AuthorityOps Rule 1: deviation > 30° → Earth notification queued. New terrain scan initiated.",
+    "Crater location indexed. Orbital map flagged for update. Deviation pattern logged. Earth review queued (async, +14min).",
+    8,{event:function(){S.nav.terrain="Crater Ahead";S.nav.speed=0.02},
+       patch:function(){S.nav.bearing=78;S.nav.speed=0.08;S.nav.terrain="Rerouting"}});
+});
+
+document.getElementById("btnISRU").addEventListener("click",function(){
+  runCERPA("ISRU","var(--isru)","ISRU Anomaly — O2 Production Drift",
+    "MOXIE: 6.2 g/hr O2 production. Nominal. 94% power. CO2 intake stable.",
+    "O2 output drops to 3.8 g/hr (−39%). CO2 intake normal. Thermal profile shifted. Possible catalyst degradation.",
+    "DRIFT DETECTED — Data drift: MOXIE output deviation. Root cause candidate: catalyst thermal stress from dust accumulation.",
+    "RETCON — Thermal cycling protocol initiated (heat-cool to clear dust). Backup electrolysis unit primed. AuthorityOps Rule 2: 72hr O2 reserve confirmed (184g available).",
+    "Catalyst degradation pattern indexed. Thermal cycling effectiveness logged. Next dust event: pre-emptive cycling scheduled.",
+    9,{event:function(){S.isru.o2=3.8;S.isru.moxie="Degraded"},
+       patch:function(){S.isru.o2=5.4;S.isru.moxie="Recovering"}});
+});
+
+document.getElementById("btnFleet").addEventListener("click",function(){
+  runCERPA("Fleet","var(--accent)","Multi-Agent Coordination Drift",
+    "5 units active. Fleet coherence 0.96. All within 500m. Coordinated survey pattern.",
+    "Unit 3 (scout rover) diverges 2.4 km from formation. Comms intermittent. AuthorityOps Rule 4 TRIGGERED: separation > 2km.",
+    "DRIFT DETECTED — Authority drift: Unit 3 operating outside coordination boundary. Fleet coherence drops 0.96 to 0.72.",
+    "RETCON — Regroup protocol: Units 2+4 converge on Unit 3 last-known. Unit 3 autonomy reduced to L1 (advisory). Fleet formation reset.",
+    "Fleet separation pattern indexed. Unit 3 nav model flagged for review. Regroup protocol validated. Earth briefing queued.",
+    11,{event:function(){S.fleet.coherence=0.72;S.fleet.units=4},
+        patch:function(){S.fleet.coherence=0.84;S.fleet.units=5;S.fleet.auth="L2 Constrained"}});
+});
+
+document.getElementById("btnReset").addEventListener("click",function(){
+  S={cis:95,par:99,driftCount:0,episodes:0,degStart:null,lastDEG:null,running:false,autoRate:100,
+    nav:{bearing:45,speed:0.14,vis:12,terrain:"Nominal"},isru:{o2:6.2,moxie:"Nominal",water:"Surveying",power:94},
+    env:{rad:0.24,dust:0.4,temp:-62,wind:12},fleet:{units:5,comms:"14m 22s",coherence:0.96,auth:"L3 Autonomous"}};
+  driftEntries=[];epHashes=[];
+  epLog.innerHTML='<div style="text-align:center;color:var(--muted);padding:30px;font-size:11px">Inject a Mars event to start autonomous CERPA cycle →</div>';
+  renderDrift();document.querySelectorAll(".cyc-s").forEach(function(s){s.classList.remove("active","done")});
+  document.getElementById("kvDEG").textContent="—";updateUI();
+});
+
+// Comms delay ticker
+setInterval(function(){
+  var m=14+Math.floor(Math.random()*2),s=Math.floor(Math.random()*60);
+  var str=m+"m "+(s<10?"0":"")+s+"s";
+  S.fleet.comms=str;document.getElementById("commsDelay").textContent="COMMS DELAY: "+str;
+  document.getElementById("dComms").textContent=str;
+},5000);
+
+updateUI();
+})();
+</script>
+</body>
+</html>
