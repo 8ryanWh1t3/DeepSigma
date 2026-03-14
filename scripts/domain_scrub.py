@@ -265,6 +265,11 @@ ALLOWED_ACRONYMS = {
     "BADGES", "BELOW", "CELL", "DRAG", "FEED", "HVAC", "IDS", "NODE",
     # CERPA APPA BuildSpec — Power Platform, DAX, schema tokens
     "APPS", "BUILD", "DAX", "DIVIDE", "FALSE", "FILTER", "IDX", "POWER", "XXXX",
+    # CERPA Grid / Industry / AuthorityOps / PowerPlatform EDGE tokens
+    "ABCDE", "ARMY", "CIP", "CMMC", "CSRD", "ENERGY", "EPA", "FDA",
+    "GAAP", "GRID", "LEFT", "LOG", "NERC", "OCC", "PAS", "RENDER",
+    "RIGHT", "RMF", "SCADA", "SEC", "SSL", "STABLE", "STACK", "STATE",
+    "SUPPLY", "TPAT", "UTILS",
     # Context Envelope dimension names
     "WHEN", "WHERE",
     # Decision Accounting — cost/value/debt ID prefixes, category enums
