@@ -1,0 +1,1449 @@
+<!--
+ CERPA APPA EDGE v1.2.0
+ ============================================================
+ Army Protection Program (APP) Assessment — CERPA Operational UI
+ Composite Enterprise Risk Posture Assessment (CERPA)
+ Claim → Event → Review → Patch → Apply
+ on the Truth | Reasoning | Memory substrate
+ Deep Sigma EDGE format: single-file, zero-dependency, hardened
+
+ v1.2.0 Changes:
+ [x] Universal drawer for all action buttons
+ [x] All 6 finding rows clickable with dynamic detail
+ [x] New Finding intake form
+ [x] Action drawers: Request Closure, Send to Review, Link Related, Export Packet
+ [x] Review Board filters functional
+ [x] Board decision drawers + Export Brief/Audit drawers
+ [x] Toast notifications for confirmations
+ [x] Memory search animation
+
+ Prior v1.2.0 Changes:
+ [x] Role-native landing pages (each role opens to its own surface)
+ [x] Premium EDGE styling (neon hierarchy, hero, synthwave accents)
+ [x] Progressive disclosure (collapsed detail, click to expand)
+ [x] Dedicated "6 Roles" launcher tab
+ [x] Acronyms spelled out on first use throughout
+ [x] Standardized to "APP" (Army Protection Program) naming
+ [x] DOM self-check scoped to top-frame only (no false-positive in iframe)
+
+ Tabs: Roles | Dashboard | Findings | Review Board | Trends | Memory | Admin | Audit
+ Roles: Executive/Commander | Program Manager | Reviewer | Analyst | Admin | Auditor
+ Lead-6 KPIs: CIS, PAR, DES, DEG, BRQ, CG
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'"/>
+<script>
+(function(){"use strict";
+var B="EDGE_BUILD_ID:CERPA_APPA_EDGE_v1.2.0";
+function _b(c){return function(){throw new Error("EDGE hardening: "+c+" blocked")}}
+window.fetch=_b("fetch");window.XMLHttpRequest=_b("XHR");window.WebSocket=_b("WS");
+window.EventSource=_b("ES");try{navigator.sendBeacon=_b("beacon")}catch(_){}
+window.eval=_b("eval");try{window.Function=_b("Function")}catch(_){}
+window.open=_b("window.open");window.RTCPeerConnection=_b("RTC");
+window.BroadcastChannel=_b("BC");window.SharedWorker=_b("SW");window.Worker=_b("W");
+try{Object.defineProperty(window,"localStorage",{get:_b("localStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"sessionStorage",{get:_b("sessionStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"indexedDB",{get:_b("indexedDB"),configurable:false})}catch(_){}
+if(typeof console!=="undefined")console.log("[EDGE] "+B);
+/* DOM self-check: only in top frame to avoid iframe false-positive */
+if(window.self===window.top){document.addEventListener("DOMContentLoaded",function(){
+  var v=[];
+  if(document.querySelectorAll("script[src],link[href]").length>0)v.push("external resource");
+  if(document.querySelectorAll("[onclick],[onerror],[onload]").length>0)v.push("inline handler");
+  if(v.length>0)document.body.innerHTML="<h1 style='color:red;font-family:monospace;padding:40px'>EDGE VIOLATION: "+v.join("; ")+"</h1>";
+});}
+})();
+</script>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Deep Sigma EDGE — CERPA APP v1.2.0</title>
+<style>
+:root{--bg:#0b0f14;--card:#111824;--card2:#0d1520;--muted:#8aa0b5;--txt:#e7eef7;--accent:#7df9ff;--warn:#ffcc66;--bad:#ff6b6b;--ok:#5dff93;--ribbon:#1a2638;--line:#1b2a3a;--glow:rgba(125,249,255,.08);--mag:#ff6bff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt);font-size:13px;overflow-x:hidden}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hidden{display:none!important}
+
+/* ── Header ── */
+header{padding:10px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;min-height:54px;background:rgba(8,12,20,.96);position:relative;z-index:100}
+header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(125,249,255,.2) 15%,rgba(255,107,255,.12) 50%,rgba(125,249,255,.2) 85%,transparent)}
+.brand{white-space:nowrap;font-weight:700;letter-spacing:.5px;font-size:15px;background:linear-gradient(135deg,var(--accent),var(--mag));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.brand small{display:block;-webkit-text-fill-color:var(--muted);font-size:10px;font-weight:400;letter-spacing:.3px}
+.cerpa-ribbon{display:flex;align-items:center;gap:0;margin:0 auto}
+.cp{padding:3px 10px;border-radius:5px;font-size:9px;font-weight:700;letter-spacing:.5px;transition:all .2s}
+.cp-c{color:#00b4d8;background:rgba(0,180,216,.1)}.cp-e{color:#f59e0b;background:rgba(245,158,11,.1)}
+.cp-r{color:#8b5cf6;background:rgba(139,92,246,.1)}.cp-p{color:#ef4444;background:rgba(239,68,68,.1)}
+.cp-a{color:#10b981;background:rgba(16,185,129,.1)}
+.cp-arrow{color:#2a3a4e;font-size:8px;margin:0 2px}
+.cmd-status{padding:3px 10px;border-radius:999px;font-size:9px;font-weight:700;letter-spacing:.4px}
+.cmd-amber{color:#ffcc66;border:1px solid rgba(255,204,102,.4);background:rgba(255,204,102,.08)}
+.role-bar{display:flex;align-items:center;gap:6px}
+.role-bar label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.role-bar select{background:var(--card2);color:var(--accent);border:1px solid rgba(125,249,255,.25);border-radius:6px;padding:4px 8px;font-size:10px;font-weight:600}
+
+/* ── Tabs ── */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);padding:0 16px;background:rgba(11,15,20,.92)}
+.ttab{padding:9px 14px;font-size:10.5px;font-weight:600;color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;letter-spacing:.3px;text-transform:uppercase}
+.ttab:hover{color:var(--txt)}.ttab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ── Main ── */
+.main{height:calc(100vh - 134px);overflow-y:auto;padding:16px 20px}
+.main section{display:none;max-width:1440px;margin:0 auto}
+.main section.active{display:block}
+
+/* ── Cards ── */
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px;transition:border-color .2s}
+.card:hover{border-color:rgba(125,249,255,.12)}
+.card h3{margin:0 0 10px;font-size:13px;color:#cfe2f7;letter-spacing:.4px;text-transform:uppercase}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+
+/* ── KPI ── */
+.kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 8px;text-align:center;position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi.kpi-green::before{background:var(--ok)}.kpi.kpi-amber::before{background:var(--warn)}.kpi.kpi-red::before{background:var(--bad)}.kpi.kpi-cyan::before{background:var(--accent)}
+.kpi .kv{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi .kl{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:2px}
+.kpi .kfull{font-size:7px;color:#4a5a6a;margin-top:1px}
+.kv-green{color:var(--ok)}.kv-amber{color:var(--warn)}.kv-red{color:var(--bad)}.kv-cyan{color:var(--accent)}
+
+/* ── Tables ── */
+table{width:100%;border-collapse:collapse;font-size:11.5px}
+th,td{padding:7px 8px;border-bottom:1px solid #141e2d;text-align:left;vertical-align:top}
+th{color:#6b8099;font-weight:700;font-size:9px;text-transform:uppercase;letter-spacing:.5px}
+tbody tr{transition:background .1s;cursor:default}tbody tr:hover{background:rgba(125,249,255,.03)}
+
+/* ── Badges ── */
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:9px;font-weight:700;letter-spacing:.3px;border:1px solid}
+.sev-high{color:#ff6b6b;border-color:rgba(255,107,107,.35);background:rgba(255,107,107,.06)}
+.sev-med{color:#ffcc66;border-color:rgba(255,204,102,.35);background:rgba(255,204,102,.06)}
+.sev-low{color:#7df9ff;border-color:rgba(125,249,255,.25);background:rgba(125,249,255,.05)}
+.st-new{color:#7df9ff;border-color:rgba(125,249,255,.25);background:rgba(125,249,255,.05)}
+.st-assigned{color:#a78bfa;border-color:rgba(167,139,250,.25);background:rgba(167,139,250,.05)}
+.st-review{color:#fbbf24;border-color:rgba(251,191,36,.25);background:rgba(251,191,36,.05)}
+.st-patched{color:#f97316;border-color:rgba(249,115,22,.25);background:rgba(249,115,22,.05)}
+.st-closed{color:#5dff93;border-color:rgba(93,255,147,.25);background:rgba(93,255,147,.05)}
+.st-reopened{color:#ff6b6b;border-color:rgba(255,107,107,.35);background:rgba(255,107,107,.06)}
+.recur{display:inline-block;padding:2px 6px;border-radius:4px;font-size:8px;font-weight:700;color:#ff9f43;border:1px solid rgba(255,159,67,.25);background:rgba(255,159,67,.05)}
+
+/* ── Buttons ── */
+button{background:#182235;color:var(--txt);border:1px solid #243449;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:10.5px;transition:all .15s;font-weight:500}
+button:hover{border-color:#2f4765}
+button.primary{border-color:rgba(125,249,255,.35);color:var(--accent)}
+button.primary:hover{background:rgba(125,249,255,.06)}
+button.ok{border-color:rgba(93,255,147,.35);color:var(--ok)}
+button.danger{border-color:rgba(255,107,107,.35);color:var(--bad)}
+
+/* ── Wire panels ── */
+.wire{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:10px}
+.wire h4{margin:0 0 8px;font-size:11px;color:var(--accent);letter-spacing:.4px;text-transform:uppercase}
+.wr{display:flex;justify-content:space-between;padding:4px 0;font-size:11px;border-bottom:1px solid #141e2d}
+.wr:last-child{border:none}
+.wr .wl{color:var(--muted);min-width:80px}.wr .wv{font-weight:600;font-variant-numeric:tabular-nums;text-align:right;flex:1}
+
+/* ── Timeline ── */
+.tl{display:flex;gap:0;margin:12px 0;overflow-x:auto}
+.tl-s{flex:1;text-align:center;position:relative;min-width:70px}
+.tl-dot{width:10px;height:10px;border-radius:50%;margin:0 auto 3px;border:2px solid var(--line)}
+.tl-dot.done{background:var(--ok);border-color:var(--ok)}.tl-dot.now{background:var(--accent);border-color:var(--accent);box-shadow:0 0 10px rgba(125,249,255,.5)}.tl-dot.wait{background:transparent}
+.tl-s::after{content:'';position:absolute;top:5px;left:50%;width:100%;height:1px;background:var(--line)}.tl-s:last-child::after{display:none}
+.tl-lb{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.tl-dt{font-size:7px;color:#3a4a5e}
+
+/* ── Evidence ── */
+.ev{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid #141e2d;font-size:11px}
+.ev:last-child{border:none}
+.ev-ok{color:var(--ok);font-size:13px}.ev-miss{color:var(--bad);font-size:13px}
+
+/* ── AI Panel ── */
+.ai{background:rgba(125,249,255,.02);border:1px solid rgba(125,249,255,.1);border-radius:8px;padding:10px;margin-top:10px}
+.ai h4{margin:0 0 6px;font-size:10px;color:var(--accent);letter-spacing:.4px;text-transform:uppercase}
+.ai-r{font-size:10px;padding:2px 0;color:var(--muted)}
+.ai-note{font-size:8px;color:#3a4a5e;font-style:italic;margin-top:6px}
+
+/* ── Role Cards ── */
+.role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.role-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;position:relative;overflow:hidden;transition:all .25s;cursor:pointer}
+.role-card:hover{border-color:rgba(125,249,255,.3);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.role-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.rc-exec::before{background:linear-gradient(90deg,var(--accent),var(--mag))}.rc-pm::before{background:var(--ok)}
+.rc-rev::before{background:var(--warn)}.rc-ana::before{background:#a78bfa}
+.rc-adm::before{background:var(--bad)}.rc-aud::before{background:#6b8099}
+.role-card .rc-icon{font-size:28px;margin-bottom:6px}
+.role-card .rc-title{font-size:14px;font-weight:700;margin-bottom:2px}
+.role-card .rc-tag{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+.role-card .rc-purpose{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:10px}
+.role-card .rc-screens{font-size:10px;color:var(--accent)}
+.role-card .rc-badge{position:absolute;top:14px;right:14px;font-size:8px;padding:2px 8px;border-radius:999px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+.rb-cmd{color:var(--accent);border:1px solid rgba(125,249,255,.25);background:rgba(125,249,255,.06)}
+.rb-ops{color:var(--ok);border:1px solid rgba(93,255,147,.25);background:rgba(93,255,147,.06)}
+.rb-gov{color:var(--bad);border:1px solid rgba(255,107,107,.25);background:rgba(255,107,107,.06)}
+
+/* ── Filters ── */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.filters select,.filters input{background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:6px;padding:5px 8px;font-size:10.5px}
+
+/* ── Policy pills ── */
+.pp{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.pp span{padding:4px 10px;border-radius:6px;font-size:9px;font-weight:700;letter-spacing:.2px;border:1px solid}
+.pp-r{color:var(--bad);border-color:rgba(255,107,107,.25);background:rgba(255,107,107,.04)}
+.pp-c{color:var(--accent);border-color:rgba(125,249,255,.18);background:rgba(125,249,255,.03)}
+
+/* ── Permission matrix ── */
+.pm-y{color:var(--ok);font-weight:600}.pm-n{color:#2a3a4e}.pm-r{color:var(--accent)}.pm-s{color:#a78bfa}.pm-l{color:var(--warn)}
+
+/* ── Collapsible ── */
+.coll-head{cursor:pointer;display:flex;align-items:center;gap:6px;user-select:none}
+.coll-head .coll-arr{color:var(--accent);font-size:10px;transition:transform .2s}
+.coll-head .coll-arr.shut{transform:rotate(-90deg)}
+.coll-body{overflow:hidden;transition:max-height .3s ease}
+.coll-body.shut{max-height:0!important}
+
+/* ── Footer ── */
+footer{padding:8px 16px;border-top:1px solid var(--line);font-size:9px;color:var(--muted);text-align:center;background:rgba(8,12,20,.96);letter-spacing:.3px}
+footer strong{color:var(--accent);font-weight:600}
+
+/* ── Drawer ── */
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;opacity:0;pointer-events:none;transition:opacity .25s}
+.drawer-overlay.open{opacity:1;pointer-events:auto}
+.drawer-panel{position:fixed;top:0;right:0;width:480px;max-width:92vw;height:100vh;background:var(--card);border-left:1px solid var(--line);z-index:510;transform:translateX(100%);transition:transform .3s ease;overflow-y:auto;display:flex;flex-direction:column}
+.drawer-panel.open{transform:translateX(0)}
+.drawer-hdr{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:var(--card);z-index:10}
+.drawer-hdr h3{margin:0;font-size:14px;color:var(--accent);flex:1}
+.drawer-hdr .dx{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:2px 6px}
+.drawer-body{padding:16px;flex:1;overflow-y:auto}
+.drawer-foot{padding:10px 16px;border-top:1px solid var(--line);display:flex;gap:6px;background:var(--card)}
+
+/* ── Toast ── */
+.toast-wrap{position:fixed;top:70px;right:20px;z-index:600;display:flex;flex-direction:column;gap:8px}
+.toast{padding:10px 16px;border-radius:8px;font-size:11px;font-weight:600;animation:toastIn .3s ease;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.toast-ok{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);color:var(--ok)}
+.toast-warn{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);color:var(--warn)}
+.toast-info{background:rgba(125,249,255,.1);border:1px solid rgba(125,249,255,.3);color:var(--accent)}
+@keyframes toastIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Form fields in drawer ── */
+.df{margin-bottom:10px}
+.df label{display:block;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.df input,.df select,.df textarea{width:100%;background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:6px;padding:7px 10px;font-size:11px}
+.df textarea{height:60px;resize:vertical}
+.df input:focus,.df select:focus,.df textarea:focus{border-color:rgba(125,249,255,.4);outline:none}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#243449;border-radius:3px}
+/* ── Graph edge animation (#7) ── */
+@keyframes edgePulse{0%{stroke-dashoffset:0}100%{stroke-dashoffset:20}}
+.mg-edge-anim{animation:edgePulse 2s linear infinite}
+
+/* ── Graph dimming (#2) ── */
+.mg-dimmed{opacity:0.12!important;transition:opacity .2s}
+.mg-bright{opacity:1!important;transition:opacity .2s}
+
+/* ── Shortcut bar (#8) ── */
+.shortcut-bar{position:fixed;bottom:0;left:0;right:0;z-index:150;background:rgba(11,15,20,.94);border-top:1px solid var(--line);padding:4px 16px;display:flex;align-items:center;gap:14px;font-size:9px;color:var(--muted);backdrop-filter:blur(6px)}
+.shortcut-bar kbd{display:inline-block;padding:1px 5px;border-radius:3px;background:rgba(125,249,255,.08);border:1px solid rgba(125,249,255,.15);font-family:inherit;font-size:9px;color:var(--accent);margin:0 1px}
+
+/* ── Board timer (#10) ── */
+.board-timer{font-size:11px;color:var(--accent);font-variant-numeric:tabular-nums;font-weight:600;margin-left:auto;display:flex;align-items:center;gap:4px}
+.board-timer .bt-dot{width:6px;height:6px;border-radius:50%;background:var(--ok);animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── Upload btn (#9) ── */
+.ev-upload{font-size:8px;padding:2px 8px;border-radius:4px;border:1px solid rgba(125,249,255,.25);background:rgba(125,249,255,.05);color:var(--accent);cursor:pointer;margin-left:6px;transition:all .15s}
+.ev-upload:hover{background:rgba(125,249,255,.12)}
+
+/* ── KPI clickable (#4) ── */
+.kpi.clickable{cursor:pointer;transition:all .2s}
+.kpi.clickable:hover{border-color:rgba(125,249,255,.3);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.3)}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">DEEP SIGMA EDGE<small>Composite Enterprise Risk Posture Assessment (CERPA)</small></div>
+  <div class="cerpa-ribbon">
+    <span class="cp cp-c">CLAIM</span><span class="cp-arrow">▸</span>
+    <span class="cp cp-e">EVENT</span><span class="cp-arrow">▸</span>
+    <span class="cp cp-r">REVIEW</span><span class="cp-arrow">▸</span>
+    <span class="cp cp-p">PATCH</span><span class="cp-arrow">▸</span>
+    <span class="cp cp-a">APPLY</span>
+  </div>
+  <span class="cmd-status cmd-amber">Q2 FY26 · AMBER</span>
+  <div class="role-bar">
+    <label>Active Role</label>
+    <select id="roleSel">
+      <option value="executive">Executive / Commander</option>
+      <option value="pm">Program Manager / Owner</option>
+      <option value="reviewer">Reviewer / Board Member</option>
+      <option value="analyst">Analyst / Assessment Lead</option>
+      <option value="admin">Governance Admin</option>
+      <option value="auditor">Auditor / Inspector</option>
+    </select>
+  </div>
+</header>
+
+<div class="tabs" id="tabBar">
+  <button class="ttab active" data-t="roles">Roles</button>
+  <button class="ttab" data-t="dash">Dashboard</button>
+  <button class="ttab" data-t="find">Findings</button>
+  <button class="ttab" data-t="board">Review Board</button>
+  <button class="ttab" data-t="trends">Trends</button>
+  <button class="ttab" data-t="mem">Memory</button>
+  <button class="ttab" data-t="admin">Admin</button>
+  <button class="ttab" data-t="audit">Audit</button>
+</div>
+
+<div class="main" id="mainArea">
+
+<!-- ════════════ ROLES TAB ════════════ -->
+<section id="s-roles" class="active">
+  <div style="text-align:center;margin-bottom:20px">
+    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Army Protection Program (APP) Assessment</div>
+    <div style="font-size:22px;font-weight:700;letter-spacing:.5px">CERPA — 6 Roles, 3 Surfaces, 1 Data Model</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px">Claim → Event → Review → Patch → Apply on the Truth | Reasoning | Memory substrate</div>
+  </div>
+
+  <div style="display:flex;gap:10px;justify-content:center;margin-bottom:20px">
+    <span style="font-size:10px;padding:4px 14px;border-radius:6px;font-weight:700;color:var(--accent);border:1px solid rgba(125,249,255,.25);background:rgba(125,249,255,.05);letter-spacing:.4px">COMMAND UI — Decision Surface</span>
+    <span style="font-size:10px;padding:4px 14px;border-radius:6px;font-weight:700;color:var(--ok);border:1px solid rgba(93,255,147,.25);background:rgba(93,255,147,.05);letter-spacing:.4px">OPS UI — Execution Surface</span>
+    <span style="font-size:10px;padding:4px 14px;border-radius:6px;font-weight:700;color:var(--bad);border:1px solid rgba(255,107,107,.25);background:rgba(255,107,107,.05);letter-spacing:.4px">GOVERNANCE UI — Assurance Surface</span>
+  </div>
+
+  <div class="role-grid">
+    <div class="role-card rc-exec" data-role="executive">
+      <span class="rc-badge rb-cmd">Command UI</span>
+      <div class="rc-icon">⬡</div>
+      <div class="rc-title">Executive / Commander</div>
+      <div class="rc-tag">See command health fast. Decide where attention goes.</div>
+      <div class="rc-purpose">Views Closure Integrity Score (CIS), Command Closure Confidence Index (CCCI), Patch Adhesion Rate (PAR), Deficiency Echo Score (DES). Approves, escalates, requests review. Does not edit operational evidence.</div>
+      <div class="rc-screens">Dashboard · Review Summary · Trends · Brief Export</div>
+    </div>
+    <div class="role-card rc-pm" data-role="pm">
+      <span class="rc-badge rb-ops">Ops UI</span>
+      <div class="rc-icon">◈</div>
+      <div class="rc-title">Program Manager / Owner</div>
+      <div class="rc-tag">Move findings from assignment to durable closure.</div>
+      <div class="rc-purpose">Drives findings through the CERPA cycle. Creates patches, uploads evidence, tracks Observation-to-Ownership Lag (OOL) and Decision-to-Evidence Gap (DEG). Requests closure but cannot self-certify.</div>
+      <div class="rc-screens">My Queue · Finding Detail · Patch Builder · Evidence Panel</div>
+    </div>
+    <div class="role-card rc-rev" data-role="reviewer">
+      <span class="rc-badge rb-cmd">Command + Ops</span>
+      <div class="rc-icon">◎</div>
+      <div class="rc-title">Reviewer / Board Member</div>
+      <div class="rc-tag">Judge whether closure is real.</div>
+      <div class="rc-purpose">Evaluates Board Readiness Quotient (BRQ), Closure Gravity (CG), False Closure Rate (FCR). Approves, rejects, sends back. Scores readiness. Cannot rewrite raw observation history.</div>
+      <div class="rc-screens">Review Board · Finding Detail · Evidence View · Recurrence History</div>
+    </div>
+    <div class="role-card rc-ana" data-role="analyst">
+      <span class="rc-badge rb-ops">Ops UI</span>
+      <div class="rc-icon">◇</div>
+      <div class="rc-title">Analyst / Assessment Lead</div>
+      <div class="rc-tag">Turn observations into structured truth.</div>
+      <div class="rc-purpose">Captures claims and events. Detects recurrence via Deficiency Echo Score (DES). Tracks Command Memory Retention (CMR). Prepares trend outputs. Cannot approve closure.</div>
+      <div class="rc-screens">Intake Workspace · Findings List · Trend Explorer · Memory Lookup</div>
+    </div>
+    <div class="role-card rc-adm" data-role="admin">
+      <span class="rc-badge rb-gov">Governance UI</span>
+      <div class="rc-icon">⚙</div>
+      <div class="rc-title">Governance Admin / System Admin</div>
+      <div class="rc-tag">Control roles, thresholds, workflow rules, and policy integrity.</div>
+      <div class="rc-purpose">Manages users, permissions, KPI threshold configuration, workflow locks, taxonomy. Views audit logs. Cannot alter historical closure records or rewrite canon.</div>
+      <div class="rc-screens">Admin Console · Role Matrix · Threshold Config · Audit Logs</div>
+    </div>
+    <div class="role-card rc-aud" data-role="auditor">
+      <span class="rc-badge rb-gov">Governance UI</span>
+      <div class="rc-icon">⊘</div>
+      <div class="rc-title">Auditor / Inspector / Oversight</div>
+      <div class="rc-tag">Verify truth without changing canon.</div>
+      <div class="rc-purpose">Read-only access to findings, evidence chains, decision provenance. Exports audit packages. Traces closure integrity. Never modifies any operational record.</div>
+      <div class="rc-screens">Audit Workspace · Evidence Chain · Export Center · Trace Viewer</div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:20px;font-size:11px;color:var(--muted)">
+    Design navigation around the lifecycle, not menus: <strong style="color:var(--txt)">Observe → Assign → Review → Patch → Prove → Close → Remember</strong>
+  </div>
+  <div style="text-align:center;margin-top:6px;font-size:10px;color:#4a5a6a">
+    Same data model. Different authority surfaces. Click a role card to enter that surface.
+  </div>
+</section>
+
+<!-- ════════════ DASHBOARD ════════════ -->
+<section id="s-dash">
+  <div class="kpi-row" id="dashKpis">
+    <div class="kpi kpi-amber clickable" data-kpi="ccci"><div class="kv kv-amber">78.4</div><div class="kl">CCCI</div><div class="kfull">Command Closure Confidence Index</div></div>
+    <div class="kpi kpi-green clickable" data-kpi="cis"><div class="kv kv-green">81</div><div class="kl">CIS</div><div class="kfull">Closure Integrity Score</div></div>
+    <div class="kpi kpi-green clickable" data-kpi="par"><div class="kv kv-green">88%</div><div class="kl">PAR</div><div class="kfull">Patch Adhesion Rate</div></div>
+    <div class="kpi kpi-amber clickable" data-kpi="des"><div class="kv kv-amber">22</div><div class="kl">DES</div><div class="kfull">Deficiency Echo Score</div></div>
+    <div class="kpi kpi-cyan clickable" data-kpi="open"><div class="kv kv-cyan">47</div><div class="kl">Open</div><div class="kfull">Open Findings</div></div>
+    <div class="kpi kpi-green clickable" data-kpi="closed"><div class="kv kv-green">31</div><div class="kl">Closed</div><div class="kfull">Verified Closures</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h3>Closure Trend</h3>
+      <div class="wr"><span class="wl">Q1 FY26</span><span class="wv">CCCI 71.2</span></div>
+      <div class="wr"><span class="wl">Q2 FY26</span><span class="wv" style="color:var(--warn)">CCCI 78.4</span></div>
+      <div class="wr"><span class="wl">Target</span><span class="wv" style="color:var(--ok)">85.0</span></div>
+    </div>
+    <div class="card">
+      <h3>Top Recurring Deficiencies</h3>
+      <table><thead><tr><th>#</th><th>Deficiency</th><th>Count</th><th>Trend</th></tr></thead><tbody>
+        <tr><td>1</td><td>Physical security training</td><td>7</td><td style="color:var(--bad)">↑</td></tr>
+        <tr><td>2</td><td>Access control documentation</td><td>5</td><td style="color:var(--warn)">→</td></tr>
+        <tr><td>3</td><td>Incident reporting lag</td><td>4</td><td style="color:var(--ok)">↓</td></tr>
+        <tr><td>4</td><td>Inspection evidence gaps</td><td>4</td><td style="color:var(--bad)">↑</td></tr>
+        <tr><td>5</td><td>Patch owner turnover</td><td>3</td><td style="color:var(--warn)">→</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h3>Board-Ready Queue</h3>
+      <table><thead><tr><th>Finding</th><th>BRQ</th><th>Severity</th><th>Action</th></tr></thead><tbody>
+        <tr><td class="mono" style="color:var(--accent)">F-184</td><td style="color:var(--ok)">0.91</td><td><span class="badge sev-high">HIGH</span></td><td>Approve Patch</td></tr>
+        <tr><td class="mono" style="color:var(--accent)">F-201</td><td style="color:var(--ok)">0.88</td><td><span class="badge sev-med">MED</span></td><td>Close</td></tr>
+        <tr><td class="mono" style="color:var(--accent)">F-155</td><td style="color:var(--bad)">0.63</td><td><span class="badge sev-high">HIGH</span></td><td>Send Back</td></tr>
+      </tbody></table>
+    </div>
+    <div class="card">
+      <h3>Command Attention</h3>
+      <div class="wr"><span class="wl" style="color:var(--bad)">●</span><span class="wv">9 findings exceed 21-day Decision-to-Evidence Gap (DEG)</span></div>
+      <div class="wr"><span class="wl" style="color:var(--warn)">●</span><span class="wv">6 findings reopened this quarter</span></div>
+      <div class="wr"><span class="wl" style="color:var(--bad)">●</span><span class="wv">3 recurring deficiencies trending up</span></div>
+      <div style="margin-top:10px;display:flex;gap:6px">
+        <button class="primary" data-nav="board">Open Review Board</button>
+        <button data-nav="trends">View Trends</button>
+        <button>Export Brief</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ FINDINGS ════════════ -->
+<section id="s-find">
+  <div class="filters">
+    <select><option>All Status</option><option>New</option><option>Assigned</option><option>In Review</option><option>Patch Approved</option><option>Closed</option><option>Reopened</option></select>
+    <select><option>All Severity</option><option>HIGH</option><option>MEDIUM</option><option>LOW</option></select>
+    <select><option>All Functions</option><option>Protection</option><option>Access Control</option><option>Training</option></select>
+    <input type="text" placeholder="Search findings..." style="width:200px"/>
+    <button class="primary" id="btnNew">+ New Finding</button>
+  </div>
+  <div class="card">
+    <table><thead><tr><th>ID</th><th>Title</th><th>Status</th><th>Sev</th><th>Owner</th><th>BRQ</th><th>CG</th><th>DEG</th><th>Due</th></tr></thead>
+    <tbody id="findTbody">
+      <tr style="cursor:pointer" data-fid="184"><td class="mono" style="color:var(--accent)">F-184</td><td>Physical Security SOP not aligned</td><td><span class="badge st-review">In Review</span></td><td><span class="badge sev-high">HIGH</span></td><td>J. Smith</td><td>0.91</td><td>22</td><td>8d</td><td>Apr 18</td></tr>
+      <tr style="cursor:pointer" data-fid="201"><td class="mono" style="color:var(--accent)">F-201</td><td>Badge reader maintenance overdue</td><td><span class="badge st-patched">Patch Approved</span></td><td><span class="badge sev-med">MED</span></td><td>K. Lee</td><td>0.88</td><td>18</td><td>4d</td><td>Apr 22</td></tr>
+      <tr style="cursor:pointer" data-fid="155"><td class="mono" style="color:var(--accent)">F-155</td><td>CCTV coverage gap Building 7</td><td><span class="badge st-review">In Review</span></td><td><span class="badge sev-high">HIGH</span></td><td>R. Chen</td><td>0.63</td><td>47</td><td>15d</td><td>Apr 10</td></tr>
+      <tr style="cursor:pointer" data-fid="210"><td class="mono" style="color:var(--accent)">F-210</td><td>Training records incomplete Q1</td><td><span class="badge st-assigned">Assigned</span></td><td><span class="badge sev-med">MED</span></td><td>M. Davis</td><td>0.42</td><td>8</td><td>—</td><td>May 01</td></tr>
+      <tr style="cursor:pointer" data-fid="195"><td class="mono" style="color:var(--accent)">F-195</td><td>Incident reporting SLA missed</td><td><span class="badge st-closed">Closed</span></td><td><span class="badge sev-low">LOW</span></td><td>A. Park</td><td>0.95</td><td>14</td><td>3d</td><td>—</td></tr>
+      <tr style="cursor:pointer" data-fid="160"><td class="mono" style="color:var(--accent)">F-160</td><td>Perimeter fence inspection lapse</td><td><span class="badge st-reopened">Reopened</span></td><td><span class="badge sev-high">HIGH</span></td><td>J. Smith</td><td>0.55</td><td>62</td><td>22d</td><td>Apr 25</td></tr>
+    </tbody></table>
+  </div>
+
+  <!-- Finding Detail (dynamically rendered) -->
+  <div class="card hidden" id="fDetail"></div>
+</section>
+
+<!-- ════════════ REVIEW BOARD ════════════ -->
+<section id="s-board">
+  <div style="display:flex;align-items:center;margin-bottom:8px">
+    <span style="font-size:16px;font-weight:700">Review Board</span>
+    <span style="font-size:11px;color:var(--muted);font-weight:400;margin-left:8px">Session: Q2-APR-BOARD</span>
+    <div class="board-timer"><span class="bt-dot"></span> Session: <span id="boardClock">00:00</span></div>
+  </div>
+  <div class="filters">
+    <button class="primary">Board Ready</button><button>High Severity</button><button>Recurring</button><button>Low Evidence</button><button>Overdue</button>
+  </div>
+  <div class="card">
+    <table><thead><tr><th>Finding</th><th>Sev</th><th>BRQ</th><th>DEG</th><th>CG</th><th>Recur</th><th>Recommendation</th><th>Action</th></tr></thead><tbody id="boardTbody">
+      <tr style="cursor:pointer" data-fid="184"><td class="mono" style="color:var(--accent)">F-184</td><td><span class="badge sev-high">HIGH</span></td><td style="color:var(--ok)">0.91</td><td>8d</td><td>22</td><td><span class="recur">×3</span></td><td>Approve Patch</td><td><button class="ok" style="font-size:9px">Approve</button></td></tr>
+      <tr style="cursor:pointer" data-fid="201"><td class="mono" style="color:var(--accent)">F-201</td><td><span class="badge sev-med">MED</span></td><td style="color:var(--ok)">0.88</td><td>4d</td><td>18</td><td>—</td><td>Close</td><td><button class="ok" style="font-size:9px">Close</button></td></tr>
+      <tr style="cursor:pointer" data-fid="155"><td class="mono" style="color:var(--accent)">F-155</td><td><span class="badge sev-high">HIGH</span></td><td style="color:var(--bad)">0.63</td><td style="color:var(--bad)">15d</td><td style="color:var(--bad)">47</td><td><span class="recur">×2</span></td><td>Send Back</td><td><button class="danger" style="font-size:9px">Send Back</button></td></tr>
+    </tbody></table>
+  </div>
+  <div class="grid3" id="boardDetail">
+    <div class="card" id="bdRisk"><h3>Finding / Risk</h3></div>
+    <div class="card" id="bdPatch"><h3>Patch / Evidence</h3></div>
+    <div class="card" id="bdHist"><h3>Recurrence / History</h3></div>
+  </div>
+  <div class="card">
+    <h3>Reviewer Decision</h3>
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+      <button class="ok">Approve</button><button class="danger">Reject</button><button>Send Back</button><button>Escalate</button>
+      <span style="font-size:10px;color:var(--muted);margin-left:10px">Severity:</span>
+      <select style="width:80px"><option>HIGH</option><option>MED</option><option>LOW</option></select>
+    </div>
+    <div style="margin-top:8px"><textarea style="width:100%;height:44px;background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:6px;padding:6px;font-size:10px;resize:vertical" placeholder="Board notes..."></textarea></div>
+    <div style="margin-top:6px;display:flex;gap:6px"><button class="primary">Record Decision</button><button>Export Packet</button></div>
+  </div>
+</section>
+
+<!-- ════════════ TRENDS ════════════ -->
+<section id="s-trends">
+  <div class="kpi-row" style="grid-template-columns:repeat(4,1fr)">
+    <div class="kpi kpi-green"><div class="kv kv-green">0.32</div><div class="kl">RDEV</div><div class="kfull">Recurring Deficiency Escape Velocity</div></div>
+    <div class="kpi kpi-green"><div class="kv kv-green">1.8×</div><div class="kl">RCR</div><div class="kfull">Review Compression Ratio</div></div>
+    <div class="kpi kpi-amber"><div class="kv kv-amber">4.8d</div><div class="kl">Avg OOL</div><div class="kfull">Observation-to-Ownership Lag</div></div>
+    <div class="kpi kpi-red"><div class="kv kv-red">12d</div><div class="kl">Avg DEG</div><div class="kfull">Decision-to-Evidence Gap</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>Deficiency Echo Score (DES) Trend</h3>
+      <table><thead><tr><th>Pattern</th><th>Q1</th><th>Q2</th><th>Dir</th></tr></thead><tbody>
+        <tr><td>Physical security training</td><td>5</td><td>7</td><td style="color:var(--bad)">↑</td></tr>
+        <tr><td>Access control documentation</td><td>4</td><td>5</td><td style="color:var(--warn)">→</td></tr>
+        <tr><td>Incident reporting lag</td><td>6</td><td>4</td><td style="color:var(--ok)">↓</td></tr>
+        <tr><td>Inspection evidence gaps</td><td>2</td><td>4</td><td style="color:var(--bad)">↑</td></tr>
+      </tbody></table>
+    </div>
+    <div class="card"><h3>Closure Integrity Score (CIS) Components</h3>
+      <table><thead><tr><th>Component</th><th>Q1</th><th>Q2</th><th>Weight</th></tr></thead><tbody>
+        <tr><td>PAR — Patch Adhesion Rate</td><td>0.79</td><td style="color:var(--ok)">0.88</td><td>0.25</td></tr>
+        <tr><td>EDI_norm — Evidence Density (normalized)</td><td>0.68</td><td style="color:var(--ok)">0.74</td><td>0.20</td></tr>
+        <tr><td>1 - FCR — Closure Durability (inverse False Closure Rate)</td><td>0.84</td><td style="color:var(--ok)">0.90</td><td>0.25</td></tr>
+        <tr><td>1 - DEG_norm — Proof Speed (inverse Decision-to-Evidence Gap)</td><td>0.61</td><td style="color:var(--warn)">0.65</td><td>0.15</td></tr>
+        <tr><td>PPI — Patch Precision Index</td><td>0.72</td><td style="color:var(--ok)">0.78</td><td>0.15</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ MEMORY ════════════ -->
+<section id="s-mem">
+  <div class="card">
+    <h3>Memory Graph Lookup</h3>
+    <div style="font-size:10px;color:var(--muted);margin-bottom:8px">Search prior findings, patches, closures, and reusable patterns from the Memory Graph (MG). Click any node to inspect.</div>
+    <div class="filters">
+      <input type="text" placeholder="Search memory..." style="width:400px" value="Physical Security SOP" id="memSearch"/>
+      <button class="primary" id="memSearchBtn">Search Memory</button>
+      <span style="font-size:9px;color:var(--muted);margin-left:8px">Showing: Physical Security cluster</span>
+    </div>
+  </div>
+
+  <!-- MEMORY GRAPH VISUAL -->
+  <div class="card" id="mgCard">
+    <h3>Memory Graph — Relationship View</h3>
+    <div style="position:relative;background:var(--card2);border-radius:8px;border:1px solid var(--line);overflow:hidden" id="mgWrap">
+      <svg id="mgSvg" viewBox="0 0 900 520" style="width:100%;height:auto;display:block"></svg>
+      <!-- Tooltip -->
+      <div id="mgTip" style="position:absolute;display:none;background:rgba(13,21,32,.96);border:1px solid var(--accent);border-radius:8px;padding:10px 14px;font-size:11px;max-width:280px;pointer-events:none;z-index:20;box-shadow:0 6px 20px rgba(0,0,0,.6)">
+        <div id="mgTipTitle" style="font-weight:700;color:var(--accent);margin-bottom:4px"></div>
+        <div id="mgTipBody" style="color:var(--muted);line-height:1.5"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:14px;margin-top:8px;font-size:9px;color:var(--muted);flex-wrap:wrap">
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#00b4d8;vertical-align:middle;margin-right:3px"></span>Finding</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#8b5cf6;vertical-align:middle;margin-right:3px"></span>Memory Pattern</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#10b981;vertical-align:middle;margin-right:3px"></span>Patch</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#f59e0b;vertical-align:middle;margin-right:3px"></span>Root Cause</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#ef4444;vertical-align:middle;margin-right:3px"></span>Reopened / Failed</span>
+      <span style="margin-left:auto">Edges: <span style="color:var(--accent)">RELATES_TO</span> · <span style="color:#f59e0b">CAUSED_BY</span> · <span style="color:#10b981">PATCHED_BY</span> · <span style="color:#8b5cf6">REUSES</span></span>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Search Results</h3>
+      <div class="wire" id="memResults">
+        <div class="wr" style="cursor:pointer" data-fid="184"><span class="wl mono" style="color:var(--accent)">F-184</span><span class="wv">SOP not aligned. In Review. BRQ 0.91. Recurring ×3.</span></div>
+        <div class="wr" style="cursor:pointer" data-fid="155"><span class="wl mono" style="color:var(--accent)">F-155</span><span class="wv">CCTV gap Building 7. In Review. CG: 47.</span></div>
+        <div class="wr" style="cursor:pointer" data-fid="160"><span class="wl mono" style="color:var(--bad)">F-160</span><span class="wv">Perimeter fence lapse. Reopened. Patch failed.</span></div>
+        <div class="wr" style="cursor:pointer" data-fid="195"><span class="wl mono" style="color:var(--ok)">F-195</span><span class="wv">Incident reporting SLA. Closed. PAR: held.</span></div>
+        <div class="wr"><span class="wl mono" style="color:#a78bfa">MG-77</span><span class="wv">Root cause: SOP custodian role not assigned at unit level.</span></div>
+        <div class="wr"><span class="wl mono" style="color:#a78bfa">MG-91</span><span class="wv">Reusable patch: custodian assignment + version control + retrain.</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Graph Statistics</h3>
+      <div class="wire">
+        <div class="wr"><span class="wl">Total Nodes</span><span class="wv" style="color:var(--accent)">14</span></div>
+        <div class="wr"><span class="wl">Total Edges</span><span class="wv" style="color:var(--accent)">18</span></div>
+        <div class="wr"><span class="wl">Finding Nodes</span><span class="wv">6</span></div>
+        <div class="wr"><span class="wl">Memory Patterns</span><span class="wv">2</span></div>
+        <div class="wr"><span class="wl">Patch Nodes</span><span class="wv">4</span></div>
+        <div class="wr"><span class="wl">Root Cause Nodes</span><span class="wv">2</span></div>
+        <div class="wr"><span class="wl">Cluster Density</span><span class="wv" style="color:var(--warn)">0.68 (interconnected)</span></div>
+      </div>
+      <div style="margin-top:8px;font-size:10px;color:var(--muted)">
+        CMR (Command Memory Retention): <strong style="color:var(--ok)">0.64</strong><br/>
+        64% of new findings have reusable prior patch history available in the Memory Graph.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ ADMIN ════════════ -->
+<section id="s-admin">
+  <div class="grid2">
+    <div class="card"><h3>Role Mappings</h3>
+      <table><thead><tr><th>Role</th><th>UI Surface</th><th>Users</th></tr></thead><tbody>
+        <tr><td>Executive / Commander</td><td>Command UI</td><td>4</td></tr>
+        <tr><td>Program Manager / Action Owner</td><td>Ops UI</td><td>12</td></tr>
+        <tr><td>Reviewer / Board Member</td><td>Command + Ops UI</td><td>6</td></tr>
+        <tr><td>Analyst / Assessment Lead</td><td>Ops UI</td><td>8</td></tr>
+        <tr><td>Governance Admin / System Admin</td><td>Governance UI</td><td>2</td></tr>
+        <tr><td>Auditor / Inspector / Oversight</td><td>Governance UI</td><td>3</td></tr>
+      </tbody></table>
+    </div>
+    <div class="card"><h3>Workflow Rules — Hard Law</h3>
+      <div class="wr"><span class="wl">Rule 1</span><span class="wv">No self-certification of closure</span></div>
+      <div class="wr"><span class="wl">Rule 2</span><span class="wv">No closure without owner + patch + evidence</span></div>
+      <div class="wr"><span class="wl">Rule 3</span><span class="wv">No overwrite of historical canon — append only, version only, reopen only</span></div>
+      <div class="wr"><span class="wl">Rule 4</span><span class="wv">Authority must be role-bound and state-bound</span></div>
+      <div class="wr"><span class="wl">Rule 5</span><span class="wv">No evidence editing after review lock</span></div>
+    </div>
+  </div>
+  <div class="card"><h3>Permission Matrix</h3>
+    <table><thead><tr><th>Action</th><th>Executive</th><th>PM / Owner</th><th>Reviewer</th><th>Analyst</th><th>Admin</th><th>Auditor</th></tr></thead><tbody>
+      <tr><td>View dashboard</td><td class="pm-y">Yes</td><td class="pm-y">Yes</td><td class="pm-y">Yes</td><td class="pm-y">Yes</td><td class="pm-y">Yes</td><td class="pm-y">Yes</td></tr>
+      <tr><td>Create finding</td><td class="pm-n">—</td><td class="pm-y">Yes</td><td class="pm-n">—</td><td class="pm-y">Yes</td><td class="pm-n">—</td><td class="pm-n">—</td></tr>
+      <tr><td>Edit finding</td><td class="pm-n">—</td><td class="pm-s">Scoped</td><td class="pm-s">Scoped</td><td class="pm-y">Yes</td><td class="pm-n">—</td><td class="pm-n">—</td></tr>
+      <tr><td>Approve / reject</td><td class="pm-l">Limited</td><td class="pm-n">—</td><td class="pm-y">Yes</td><td class="pm-n">—</td><td class="pm-n">—</td><td class="pm-n">—</td></tr>
+      <tr><td>Create patch</td><td class="pm-n">—</td><td class="pm-y">Yes</td><td class="pm-r">Read</td><td class="pm-r">Read</td><td class="pm-n">—</td><td class="pm-n">—</td></tr>
+      <tr><td>Upload evidence</td><td class="pm-n">—</td><td class="pm-y">Yes</td><td class="pm-n">—</td><td class="pm-y">Yes</td><td class="pm-n">—</td><td class="pm-n">—</td></tr>
+      <tr><td>Approve closure</td><td class="pm-l">Limited</td><td class="pm-n">—</td><td class="pm-y">Yes</td><td class="pm-n">—</td><td class="pm-n">—</td><td class="pm-n">—</td></tr>
+      <tr><td>Reopen finding</td><td class="pm-l">Limited</td><td class="pm-n">—</td><td class="pm-y">Yes</td><td class="pm-n">—</td><td class="pm-n">—</td><td class="pm-n">—</td></tr>
+      <tr><td>Manage roles / config</td><td class="pm-n">—</td><td class="pm-n">—</td><td class="pm-n">—</td><td class="pm-n">—</td><td class="pm-y">Yes</td><td class="pm-n">—</td></tr>
+      <tr><td>Audit export</td><td class="pm-l">Limited</td><td class="pm-n">—</td><td class="pm-l">Limited</td><td class="pm-n">—</td><td class="pm-y">Yes</td><td class="pm-y">Yes</td></tr>
+    </tbody></table>
+    <div class="pp">
+      <span class="pp-r">No self-certification of closure</span>
+      <span class="pp-r">No closure without owner + patch + evidence</span>
+      <span class="pp-c">No overwrite of historical canon</span>
+      <span class="pp-c">Authority = role-bound + state-bound</span>
+    </div>
+  </div>
+  <div class="card"><h3>KPI Threshold Configuration</h3>
+    <table><thead><tr><th>KPI (Full Name)</th><th style="color:var(--ok)">Green</th><th style="color:var(--warn)">Amber</th><th style="color:var(--bad)">Red</th></tr></thead><tbody>
+      <tr><td>CIS — Closure Integrity Score</td><td>≥ 0.75</td><td>0.50 – 0.74</td><td>&lt; 0.50</td></tr>
+      <tr><td>PAR — Patch Adhesion Rate</td><td>≥ 0.85</td><td>0.65 – 0.84</td><td>&lt; 0.65</td></tr>
+      <tr><td>BRQ — Board Readiness Quotient</td><td>≥ 0.80</td><td>0.60 – 0.79</td><td>&lt; 0.60</td></tr>
+      <tr><td>DEG — Decision-to-Evidence Gap</td><td>≤ 5 days</td><td>6 – 14 days</td><td>&gt; 14 days</td></tr>
+      <tr><td>CG — Closure Gravity</td><td>≤ 20</td><td>21 – 40</td><td>&gt; 40</td></tr>
+      <tr><td>RDEV — Recurring Deficiency Escape Velocity</td><td>≥ 0.50</td><td>0.25 – 0.49</td><td>&lt; 0.25</td></tr>
+    </tbody></table>
+  </div>
+</section>
+
+<!-- ════════════ AUDIT ════════════ -->
+<section id="s-audit">
+  <div class="card"><h3>Audit Workspace</h3>
+    <div class="filters">
+      <select><option>All Closures</option><option>Verified</option><option>Unverified</option><option>Reopened</option></select>
+      <select><option>All Periods</option><option>Q2 FY26</option><option>Q1 FY26</option></select>
+      <button class="primary">Export Audit Package</button>
+    </div>
+    <table><thead><tr><th>Finding</th><th>Closed</th><th>Verified</th><th>Evidence</th><th>Reopened</th><th>Decision By</th><th>Provenance Chain</th></tr></thead><tbody id="auditTbody">
+      <tr style="cursor:pointer" data-fid="195"><td class="mono" style="color:var(--accent)">F-195</td><td>2026-03-28</td><td style="color:var(--ok)">✓ Verified</td><td>4</td><td>No</td><td>Board Chair</td><td class="mono" style="font-size:8px;color:var(--muted)">CL-198 → R-287 → P-540</td></tr>
+      <tr style="cursor:pointer" data-fid="184"><td class="mono" style="color:var(--accent)">F-184</td><td>—</td><td style="color:var(--warn)">In Review</td><td>3</td><td>No</td><td>—</td><td class="mono" style="font-size:8px;color:var(--muted)">R-301 → P-555 (pending)</td></tr>
+      <tr style="cursor:pointer" data-fid="160"><td class="mono" style="color:var(--accent)">F-160</td><td>2026-02-20</td><td style="color:var(--bad)">✕ Reopened</td><td>2</td><td style="color:var(--bad)">Yes</td><td>Deputy</td><td class="mono" style="font-size:8px;color:var(--muted)">CL-172 → R-245 → P-495</td></tr>
+    </tbody></table>
+  </div>
+  <div class="card"><h3>Evidence Chain — F-195</h3>
+    <div class="wire">
+      <div class="wr"><span class="wl">Claim</span><span class="wv">C-410 · created 2026-03-05 by U-204 (Analyst)</span></div>
+      <div class="wr"><span class="wl">Event</span><span class="wv">E-970 · observed 2026-03-04 at Site Charlie</span></div>
+      <div class="wr"><span class="wl">Review</span><span class="wv">R-287 · started 2026-03-10 by Board Chair (Reviewer)</span></div>
+      <div class="wr"><span class="wl">Patch</span><span class="wv">P-540 · proposed 2026-03-12 by A. Park (Program Manager)</span></div>
+      <div class="wr"><span class="wl">Evidence</span><span class="wv">4 artifacts uploaded 2026-03-15–18 · all validated · locked</span></div>
+      <div class="wr"><span class="wl">Closure</span><span class="wv">CL-198 · approved 2026-03-28 by Board Chair</span></div>
+      <div class="wr"><span class="wl">Status</span><span class="wv" style="color:var(--ok)">Verified · Not reopened · Patch Adhesion Rate (PAR): held</span></div>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ════ DRAWER ════ -->
+<div class="drawer-overlay" id="dOverlay"></div>
+<div class="drawer-panel" id="dPanel">
+  <div class="drawer-hdr"><h3 id="dTitle">Detail</h3><button class="dx" id="dClose">✕</button></div>
+  <div class="drawer-body" id="dBody"></div>
+  <div class="drawer-foot" id="dFoot"></div>
+</div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<div class="shortcut-bar" id="shortcutBar">
+  <kbd>Esc</kbd> Close drawer &nbsp; <kbd>1</kbd>–<kbd>8</kbd> Switch tabs &nbsp; <kbd>N</kbd> New finding &nbsp; <kbd>?</kbd> Toggle shortcuts
+  <span style="margin-left:auto;cursor:pointer;padding:2px 6px;color:var(--muted);font-size:11px" id="shortcutClose">✕</span>
+</div>
+
+<footer>
+  <strong>Deep Sigma EDGE</strong> — CERPA (Composite Enterprise Risk Posture Assessment) · Army Protection Program (APP) Assessment · v1.2.0
+  <br/>Claim | Event | Review | Patch | Apply — on the Truth | Reasoning | Memory substrate — Same data model, different authority surfaces.
+</footer>
+
+<script>
+(function(){"use strict";
+
+/* ══════════ DEMO DATA ══════════ */
+var F={
+"184":{id:"F-184",title:"Physical Security SOP not aligned to latest inspection benchmark",status:"In Review",sev:"HIGH",owner:"J. Smith",brq:0.91,cg:22,deg:"8d",due:"Apr 18",func:"Protection",src:"APP Assessment",date:"2026-04-03",recurring:3,
+  claim:"SOP is outdated and does not satisfy current protection requirement",event:"Assessment identified gap in site procedure version and usage",risk:"Medium operational exposure / High recurrence potential",
+  rootCause:"Document update ownership gap",patch:"Assign SOP custodian + publish new version + retrain staff",patchDue:"2026-04-18",ppi:0.82,
+  evidence:[{name:"revised_SOP.pdf",ok:1},{name:"training_roster.xlsx",ok:1},{name:"command_memo.pdf",ok:1},{name:"validation_screenshot",ok:0}],
+  edi:2.4,timeline:["Apr 3","Apr 4","Apr 6","Apr 7","—","—","—"],tlState:[1,1,2,1,0,0,0]},
+"201":{id:"F-201",title:"Badge reader maintenance overdue at Building 2 entry",status:"Patch Approved",sev:"MED",owner:"K. Lee",brq:0.88,cg:18,deg:"4d",due:"Apr 22",func:"Access Control",src:"APP Assessment",date:"2026-04-05",recurring:0,
+  claim:"Badge reader maintenance schedule exceeded by 45 days",event:"Quarterly physical access audit flagged non-compliant readers",risk:"Low operational exposure / Medium access control risk",
+  rootCause:"Maintenance contract renewal gap",patch:"Emergency maintenance + contract renewal + spare parts order",patchDue:"2026-04-22",ppi:0.90,
+  evidence:[{name:"maintenance_order.pdf",ok:1},{name:"contract_renewal.pdf",ok:1},{name:"reader_test_results.xlsx",ok:1}],
+  edi:3.0,timeline:["Apr 5","Apr 6","Apr 8","Apr 10","Apr 12","—","—"],tlState:[1,1,1,1,1,0,0]},
+"155":{id:"F-155",title:"CCTV coverage gap at Building 7 perimeter northeast corner",status:"In Review",sev:"HIGH",owner:"R. Chen",brq:0.63,cg:47,deg:"15d",due:"Apr 10",func:"Protection",src:"APP Assessment",date:"2026-03-15",recurring:2,
+  claim:"CCTV dead zone allows unmonitored approach to restricted area",event:"Physical security walkdown identified blind spot during night assessment",risk:"High operational exposure / Active threat vector",
+  rootCause:"Camera positioning not updated after construction project",patch:"Reposition camera 7-NE + add supplemental unit + update monitoring SOP",patchDue:"2026-04-10",ppi:0.70,
+  evidence:[{name:"site_photo_deadzone.jpg",ok:1},{name:"camera_layout_updated.pdf",ok:0},{name:"monitoring_SOP_draft.docx",ok:0}],
+  edi:1.0,timeline:["Mar 15","Mar 18","Mar 25","Apr 2","—","—","—"],tlState:[1,1,2,1,0,0,0]},
+"210":{id:"F-210",title:"Training records incomplete for Q1 FY26 protection staff",status:"Assigned",sev:"MED",owner:"M. Davis",brq:0.42,cg:8,deg:"—",due:"May 01",func:"Training",src:"APP Assessment",date:"2026-04-08",recurring:0,
+  claim:"12 of 34 protection staff missing required annual training certification",event:"Quarterly training audit showed 35% non-compliance rate",risk:"Medium compliance exposure / Low operational risk",
+  rootCause:"Training scheduling tool not integrated with personnel roster",patch:"Complete missing certifications + integrate training tracker with HR system",patchDue:"2026-05-01",ppi:0.65,
+  evidence:[{name:"training_gap_analysis.xlsx",ok:1}],
+  edi:0.5,timeline:["Apr 8","Apr 9","—","—","—","—","—"],tlState:[1,1,0,0,0,0,0]},
+"195":{id:"F-195",title:"Incident reporting SLA missed — 3 events reported after 48-hour window",status:"Closed",sev:"LOW",owner:"A. Park",brq:0.95,cg:14,deg:"3d",due:"—",func:"Protection",src:"APP Assessment",date:"2026-03-05",recurring:0,
+  claim:"Three security incidents reported outside the 48-hour reporting SLA",event:"Audit of incident log timestamps vs occurrence timestamps",risk:"Low operational risk / Compliance documentation gap",
+  rootCause:"Shift supervisors unclear on reporting trigger criteria",patch:"Clarify reporting criteria in shift brief + add automated reminder at 24 hours",patchDue:"2026-03-20",ppi:0.88,
+  evidence:[{name:"updated_shift_brief.pdf",ok:1},{name:"auto_reminder_config.png",ok:1},{name:"incident_log_corrected.xlsx",ok:1},{name:"commander_memo.pdf",ok:1}],
+  edi:4.0,timeline:["Mar 5","Mar 6","Mar 10","Mar 12","Mar 15","Mar 28","Mar 28"],tlState:[1,1,1,1,1,1,1]},
+"160":{id:"F-160",title:"Perimeter fence inspection lapse — Zone 3 south boundary",status:"Reopened",sev:"HIGH",owner:"J. Smith",brq:0.55,cg:62,deg:"22d",due:"Apr 25",func:"Protection",src:"APP Assessment",date:"2026-02-10",recurring:3,
+  claim:"Fence inspection for Zone 3 not conducted for 90+ days",event:"Prior closure found insufficient — patch did not address root scheduling gap",risk:"High operational exposure / Demonstrated recurrence pattern",
+  rootCause:"Inspection schedule owned by rotating duty officer with no continuity",patch:"Assign permanent inspection coordinator + automated schedule + quarterly PMO audit",patchDue:"2026-04-25",ppi:0.55,
+  evidence:[{name:"inspection_schedule_draft.pdf",ok:1},{name:"coordinator_appointment.pdf",ok:0}],
+  edi:1.0,timeline:["Feb 10","Feb 14","Feb 20","Feb 28","Mar 5","Mar 15","—"],tlState:[1,1,1,1,1,3,0]}
+};
+var TL_LABELS=["Observe","Assign","Review","Patch","Prove","Close","Remember"];
+
+/* ══════════ DOM REFS ══════════ */
+var tabs=document.querySelectorAll(".ttab"),secs=document.querySelectorAll(".main section");
+var dOverlay=document.getElementById("dOverlay"),dPanel=document.getElementById("dPanel");
+var dTitle=document.getElementById("dTitle"),dBody=document.getElementById("dBody"),dFoot=document.getElementById("dFoot");
+var toastWrap=document.getElementById("toastWrap");
+
+/* ══════════ TABS ══════════ */
+function openTab(n){
+  tabs.forEach(function(t){t.classList.toggle("active",t.getAttribute("data-t")===n)});
+  secs.forEach(function(s){s.classList.toggle("active",s.id==="s-"+n)});
+}
+tabs.forEach(function(t){t.addEventListener("click",function(){openTab(t.getAttribute("data-t"))})});
+document.querySelectorAll("[data-nav]").forEach(function(b){
+  b.addEventListener("click",function(){openTab(b.getAttribute("data-nav"))});
+});
+
+/* ══════════ ROLES ══════════ */
+var roleVis={
+  executive:{roles:1,dash:1,find:1,board:1,trends:1,mem:1,admin:0,audit:0,land:"dash"},
+  pm:{roles:1,dash:1,find:1,board:0,trends:0,mem:1,admin:0,audit:0,land:"find"},
+  reviewer:{roles:1,dash:1,find:1,board:1,trends:1,mem:1,admin:0,audit:0,land:"board"},
+  analyst:{roles:1,dash:1,find:1,board:0,trends:1,mem:1,admin:0,audit:0,land:"find"},
+  admin:{roles:1,dash:1,find:1,board:0,trends:1,mem:1,admin:1,audit:1,land:"admin"},
+  auditor:{roles:1,dash:0,find:0,board:0,trends:1,mem:1,admin:0,audit:1,land:"audit"}
+};
+var roleSel=document.getElementById("roleSel");
+function applyRole(go){
+  var r=roleSel.value,v=roleVis[r];
+  tabs.forEach(function(t){t.classList.toggle("hidden",!v[t.getAttribute("data-t")])});
+  var bn=document.getElementById("btnNew");
+  if(bn)bn.style.display=(r==="pm"||r==="analyst")?"":"none";
+  if(go)openTab(v.land);
+}
+roleSel.addEventListener("change",function(){applyRole(true)});
+document.querySelectorAll(".role-card[data-role]").forEach(function(c){
+  c.addEventListener("click",function(){roleSel.value=c.getAttribute("data-role");applyRole(true)});
+});
+
+/* ══════════ DRAWER ══════════ */
+function openDrawer(title,bodyHtml,footHtml){
+  dTitle.textContent=title;
+  dBody.innerHTML=bodyHtml;
+  dFoot.innerHTML=footHtml||"";
+  dOverlay.classList.add("open");
+  dPanel.classList.add("open");
+  // Wire close buttons inside drawer
+  dBody.querySelectorAll("[data-dact]").forEach(function(b){
+    b.addEventListener("click",function(){
+      var act=b.getAttribute("data-dact");
+      closeDrawer();
+      if(act)toast(act,"ok");
+    });
+  });
+  dFoot.querySelectorAll("[data-dact]").forEach(function(b){
+    b.addEventListener("click",function(){
+      var act=b.getAttribute("data-dact");
+      closeDrawer();
+      if(act)toast(act,"ok");
+    });
+  });
+}
+function closeDrawer(){dOverlay.classList.remove("open");dPanel.classList.remove("open")}
+document.getElementById("dClose").addEventListener("click",closeDrawer);
+dOverlay.addEventListener("click",closeDrawer);
+
+/* ══════════ TOAST ══════════ */
+function toast(msg,type){
+  var t=document.createElement("div");
+  t.className="toast toast-"+(type||"info");
+  t.textContent=msg;
+  toastWrap.appendChild(t);
+  setTimeout(function(){t.style.opacity="0";t.style.transition="opacity .3s";setTimeout(function(){t.remove()},300)},2800);
+}
+
+/* ══════════ FINDING DETAIL ══════════ */
+var fDet=document.getElementById("fDetail");
+function sevBadge(s){return '<span class="badge sev-'+s.toLowerCase()+'">'+s+'</span>'}
+function stBadge(s){var m={"In Review":"review","Patch Approved":"patched",Assigned:"assigned",Closed:"closed",Reopened:"reopened",New:"new"};return '<span class="badge st-'+(m[s]||"new")+'">'+s+'</span>'}
+function tlDot(state){return state===1?"done":state===2?"now":state===3?"done":state===4?"done":"wait"}
+
+function showFinding(fid){
+  var f=F[fid];if(!f)return;
+  // Build timeline
+  var tlHtml='<div class="tl">';
+  for(var i=0;i<7;i++){
+    var ds=f.tlState[i];
+    var cls=ds===1?"done":ds===2?"now":ds===3?"done":"wait";
+    if(ds===3)cls="done"; // reopened-done
+    tlHtml+='<div class="tl-s"><div class="tl-dot '+cls+'"></div><div class="tl-lb">'+TL_LABELS[i]+'</div><div class="tl-dt">'+f.timeline[i]+'</div></div>';
+  }
+  tlHtml+='</div>';
+  // Evidence
+  var evHtml="";
+  f.evidence.forEach(function(e){
+    evHtml+='<div class="ev"><span class="'+(e.ok?'ev-ok':'ev-miss')+'">'+(e.ok?'✓':'○')+'</span> '+e.name+' <span style="margin-left:auto;font-size:8px;color:var(--'+(e.ok?'ok':'bad')+');">'+(e.ok?'validated · locked':'missing')+'</span>'+(e.ok?'':'<button class="ev-upload" data-fid="'+fid+'" data-ename="'+e.name+'">Upload</button>')+'</div>';
+  });
+  // Header
+  var hdr='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">';
+  hdr+='<span class="mono" style="font-size:16px;color:var(--accent);font-weight:700">'+f.id+'</span>';
+  hdr+=sevBadge(f.sev)+stBadge(f.status);
+  hdr+='<span style="font-size:10px;color:var(--muted)">Owner: <strong style="color:var(--txt)">'+f.owner+'</strong></span>';
+  hdr+='<span style="font-size:10px;color:var(--muted)">BRQ: <strong style="color:var(--'+(f.brq>=0.8?"ok":f.brq>=0.6?"warn":"bad")+')">'+f.brq+'</strong></span>';
+  if(f.recurring>0)hdr+='<span class="recur">RECURRING × '+f.recurring+'</span>';
+  hdr+='<button style="margin-left:auto;font-size:9px;color:var(--muted)" id="btnCloseD">✕ Close</button></div>';
+  hdr+='<div style="font-size:14px;font-weight:600;margin-bottom:3px">'+f.title+'</div>';
+  hdr+='<div style="font-size:10px;color:var(--muted);margin-bottom:12px">Source: '+f.src+' | '+f.date+' | Function: '+f.func+' | Command: HQDA OPMG</div>';
+  // Body
+  var body=hdr+tlHtml;
+  body+='<div class="grid2" style="margin-top:12px"><div>';
+  body+='<div class="wire"><h4>Claim / Event</h4>';
+  body+='<div class="wr"><span class="wl">Claim</span><span class="wv">'+f.claim+'</span></div>';
+  body+='<div class="wr"><span class="wl">Event</span><span class="wv">'+f.event+'</span></div>';
+  body+='<div class="wr"><span class="wl">Risk</span><span class="wv">'+f.risk+'</span></div></div>';
+  body+='<div class="wire"><h4>Review</h4>';
+  body+='<div class="wr"><span class="wl">Severity</span><span class="wv" style="color:var(--bad)">'+f.sev+'</span></div>';
+  if(f.recurring>0)body+='<div class="wr"><span class="wl">Recurring</span><span class="wv" style="color:#ff9f43">YES — '+f.recurring+' prior</span></div>';
+  body+='<div class="wr"><span class="wl">Root Cause</span><span class="wv">'+f.rootCause+'</span></div></div>';
+  body+='</div><div>';
+  body+='<div class="wire"><h4>Patch</h4>';
+  body+='<div class="wr"><span class="wl">Action</span><span class="wv">'+f.patch+'</span></div>';
+  body+='<div class="wr"><span class="wl">Due</span><span class="wv">'+f.patchDue+'</span></div>';
+  body+='<div class="wr"><span class="wl">PPI</span><span class="wv" style="color:var(--'+(f.ppi>=0.8?"ok":"warn")+')">'+f.ppi+' (Patch Precision Index)</span></div></div>';
+  body+='<div class="wire"><h4>Evidence</h4>'+evHtml;
+  body+='<div style="margin-top:6px;font-size:10px"><span style="color:var(--muted)">EDI:</span> <strong>'+f.edi+'</strong> &nbsp; <span style="color:var(--muted)">DEG:</span> <strong style="color:var(--warn)">'+f.deg+'</strong></div></div>';
+  body+='</div></div>';
+  // Actions
+  body+='<div style="margin-top:10px;display:flex;gap:6px">';
+  body+='<button class="primary" data-fact="closure" data-fid="'+fid+'">Request Closure</button>';
+  body+='<button data-fact="review" data-fid="'+fid+'">Send to Review</button>';
+  body+='<button data-fact="link" data-fid="'+fid+'">Link Related</button>';
+  body+='<button data-fact="export" data-fid="'+fid+'">Export Packet</button></div>';
+  // Render
+  fDet.innerHTML=body;
+  fDet.classList.remove("hidden");
+  fDet.scrollIntoView({behavior:"smooth",block:"start"});
+  // Wire close
+  var bc=document.getElementById("btnCloseD");
+  if(bc)bc.addEventListener("click",function(){fDet.classList.add("hidden")});
+  // Wire action buttons
+  fDet.querySelectorAll("[data-fact]").forEach(function(b){
+    b.addEventListener("click",function(){openActionDrawer(b.getAttribute("data-fact"),b.getAttribute("data-fid"))});
+  });
+}
+
+document.getElementById("findTbody").addEventListener("click",function(e){
+  var tr=e.target.closest("tr");
+  if(!tr)return;
+  var fid=tr.getAttribute("data-fid");
+  if(fid)showFinding(fid);
+});
+
+/* ══════════ ACTION DRAWERS ══════════ */
+function openActionDrawer(action,fid){
+  var f=F[fid];if(!f)return;
+  if(action==="closure"){
+    openDrawer("Request Closure — "+f.id,
+      '<div class="wire"><h4>Closure Checklist</h4>'+
+      '<div class="wr"><span class="wl">Owner</span><span class="wv" style="color:var(--ok)">'+f.owner+' ✓</span></div>'+
+      '<div class="wr"><span class="wl">Patch</span><span class="wv" style="color:var(--ok)">Proposed ✓</span></div>'+
+      '<div class="wr"><span class="wl">Evidence</span><span class="wv" style="color:var(--'+(f.evidence.every(function(e){return e.ok})?"ok":"bad")+')">'+f.evidence.filter(function(e){return e.ok}).length+' of '+f.evidence.length+' attached</span></div>'+
+      '<div class="wr"><span class="wl">BRQ</span><span class="wv" style="color:var(--'+(f.brq>=0.8?"ok":"warn")+')">'+f.brq+'</span></div>'+
+      '</div>'+
+      '<div style="margin-top:10px;font-size:11px;color:var(--muted)">Submitting closure request to Review Board. This finding will enter the approval queue.</div>'+
+      (f.evidence.some(function(e){return !e.ok})?'<div style="margin-top:8px;padding:8px;border-radius:6px;background:rgba(255,107,107,.06);border:1px solid rgba(255,107,107,.2);font-size:10px;color:var(--bad)">⚠ Missing evidence: '+f.evidence.filter(function(e){return !e.ok}).map(function(e){return e.name}).join(", ")+'</div>':""),
+      '<button class="primary" data-dact="Closure requested for '+f.id+'">Submit Closure Request</button><button class="dx" style="font-size:10px" data-dact="">Cancel</button>'
+    );
+  } else if(action==="review"){
+    openDrawer("Send to Review — "+f.id,
+      '<div class="wire"><h4>Review Routing</h4>'+
+      '<div class="wr"><span class="wl">Finding</span><span class="wv">'+f.id+' — '+f.sev+'</span></div>'+
+      '<div class="wr"><span class="wl">BRQ</span><span class="wv">'+f.brq+'</span></div>'+
+      '<div class="wr"><span class="wl">Board</span><span class="wv">Q2-APR-BOARD</span></div>'+
+      '</div>'+
+      '<div class="df"><label>Priority Note</label><textarea placeholder="Optional context for the review board..."></textarea></div>',
+      '<button class="primary" data-dact="'+f.id+' sent to Review Board">Send to Board</button>'
+    );
+  } else if(action==="link"){
+    openDrawer("Link Related Findings — "+f.id,
+      '<div style="font-size:11px;color:var(--muted);margin-bottom:10px">Search for related findings to create a linkage in the Memory Graph.</div>'+
+      '<div class="df"><label>Search</label><input type="text" placeholder="Search findings..." value="'+f.func+'"/></div>'+
+      '<div class="wire"><h4>Suggested Matches</h4>'+
+      Object.keys(F).filter(function(k){return k!==fid&&F[k].func===f.func}).map(function(k){
+        var r=F[k];return '<div class="wr" style="cursor:pointer"><span class="wl mono">'+r.id+'</span><span class="wv">'+r.title.substring(0,40)+'... ('+r.status+')</span></div>';
+      }).join("")+
+      '</div>',
+      '<button class="primary" data-dact="Linkage created for '+f.id+'">Create Link</button>'
+    );
+  } else if(action==="export"){
+    openDrawer("Export Packet — "+f.id,
+      '<div class="wire"><h4>Packet Contents</h4>'+
+      '<div class="wr"><span class="wl">Finding</span><span class="wv">'+f.id+' — '+f.title.substring(0,40)+'...</span></div>'+
+      '<div class="wr"><span class="wl">Claim</span><span class="wv">C-'+fid+'</span></div>'+
+      '<div class="wr"><span class="wl">Event</span><span class="wv">E-'+fid+'</span></div>'+
+      '<div class="wr"><span class="wl">Review</span><span class="wv">R-'+fid+'</span></div>'+
+      '<div class="wr"><span class="wl">Patch</span><span class="wv">P-'+fid+'</span></div>'+
+      '<div class="wr"><span class="wl">Evidence</span><span class="wv">'+f.evidence.length+' artifacts</span></div>'+
+      '<div class="wr"><span class="wl">Timeline</span><span class="wv">Full lifecycle events</span></div>'+
+      '</div>'+
+      '<div style="font-size:10px;color:var(--muted);margin-top:8px">Package includes provenance chain, decision history, and KPI snapshot.</div>',
+      '<button class="primary" data-dact="Packet exported for '+f.id+'">Export PDF</button><button data-dact="Packet copied for '+f.id+'">Copy JSON</button>'
+    );
+  }
+}
+
+/* ══════════ NEW FINDING ══════════ */
+document.getElementById("btnNew").addEventListener("click",function(){
+  openDrawer("New Finding — Intake Form",
+    '<div class="df"><label>Title</label><input type="text" placeholder="Short description of the finding..."/></div>'+
+    '<div class="grid2">'+
+    '<div class="df"><label>Severity</label><select><option>HIGH</option><option>MEDIUM</option><option>LOW</option></select></div>'+
+    '<div class="df"><label>Function Area</label><select><option>Protection</option><option>Access Control</option><option>Training</option><option>Physical Security</option></select></div></div>'+
+    '<div class="df"><label>Source</label><select><option>APP Assessment</option><option>Self-Assessment</option><option>Inspection</option><option>Incident Report</option></select></div>'+
+    '<div class="df"><label>Claim Statement</label><textarea placeholder="What is asserted, deficient, required, or at risk..."></textarea></div>'+
+    '<div class="df"><label>Event Summary</label><textarea placeholder="The observed fact, inspection result, or incident..."></textarea></div>'+
+    '<div class="grid2">'+
+    '<div class="df"><label>Assign To</label><input type="text" placeholder="Owner name..."/></div>'+
+    '<div class="df"><label>Due Date</label><input type="date"/></div></div>'+
+    '<div style="font-size:9px;color:var(--muted);margin-top:6px">This finding will enter the CERPA cycle at <strong style="color:#00b4d8">CLAIM</strong> stage and generate a Decision Logic Record (DLR).</div>',
+    '<button class="primary" data-dact="Finding created and assigned">Create Finding</button><button data-dact="">Cancel</button>'
+  );
+});
+
+/* ══════════ DASHBOARD EXPORT BRIEF ══════════ */
+document.querySelectorAll("#s-dash button").forEach(function(b){
+  if(b.textContent==="Export Brief"){
+    b.addEventListener("click",function(){
+      openDrawer("Export Command Brief — Q2 FY26",
+        '<div class="wire"><h4>Brief Contents</h4>'+
+        '<div class="wr"><span class="wl">Period</span><span class="wv">Q2 FY26</span></div>'+
+        '<div class="wr"><span class="wl">CCCI</span><span class="wv" style="color:var(--warn)">78.4 (AMBER)</span></div>'+
+        '<div class="wr"><span class="wl">CIS</span><span class="wv" style="color:var(--ok)">81</span></div>'+
+        '<div class="wr"><span class="wl">Open</span><span class="wv">47 findings</span></div>'+
+        '<div class="wr"><span class="wl">Closed</span><span class="wv">31 verified</span></div>'+
+        '<div class="wr"><span class="wl">Reopened</span><span class="wv" style="color:var(--bad)">6</span></div>'+
+        '<div class="wr"><span class="wl">Recurring</span><span class="wv" style="color:var(--warn)">3 trending up</span></div>'+
+        '</div>'+
+        '<div style="font-size:10px;color:var(--muted);margin-top:8px">Includes KPI dashboard, top 5 recurring deficiencies, board-ready queue, attention alerts, and closure trend.</div>',
+        '<button class="primary" data-dact="Command Brief exported for Q2 FY26">Export PDF</button><button data-dact="Brief data copied">Copy Summary</button>'
+      );
+    });
+  }
+});
+
+/* ══════════ REVIEW BOARD FILTERS ══════════ */
+var boardRows=document.querySelectorAll("#s-board tbody tr");
+document.querySelectorAll("#s-board .filters button").forEach(function(btn){
+  btn.addEventListener("click",function(){
+    // Toggle active state
+    var wasActive=btn.classList.contains("primary");
+    document.querySelectorAll("#s-board .filters button").forEach(function(b){b.classList.remove("primary")});
+    if(!wasActive)btn.classList.add("primary");
+    var filter=wasActive?"":btn.textContent;
+    boardRows.forEach(function(row){
+      if(!filter){row.style.display="";return}
+      var show=true;
+      var sev=row.querySelector(".badge")?.textContent||"";
+      var brq=parseFloat(row.cells[2]?.textContent)||0;
+      var recur=row.querySelector(".recur");
+      var deg=parseInt(row.cells[3]?.textContent)||0;
+      if(filter==="Board Ready")show=brq>=0.8;
+      else if(filter==="High Severity")show=sev==="HIGH";
+      else if(filter==="Recurring")show=!!recur;
+      else if(filter==="Low Evidence")show=brq<0.7;
+      else if(filter==="Overdue")show=deg>10;
+      row.style.display=show?"":"none";
+    });
+  });
+});
+
+/* ══════════ REVIEW BOARD ACTIONS ══════════ */
+document.querySelectorAll("#s-board tbody button").forEach(function(btn){
+  btn.addEventListener("click",function(e){
+    e.stopPropagation();
+    var tr=btn.closest("tr");
+    var fid=tr?.cells[0]?.textContent?.trim()||"Finding";
+    var act=btn.textContent.trim();
+    openDrawer(act+" — "+fid,
+      '<div class="wire"><h4>Confirm Action</h4>'+
+      '<div class="wr"><span class="wl">Finding</span><span class="wv">'+fid+'</span></div>'+
+      '<div class="wr"><span class="wl">Action</span><span class="wv" style="color:var(--accent)">'+act+'</span></div>'+
+      '</div>'+
+      '<div class="df"><label>Comments</label><textarea placeholder="Board notes..."></textarea></div>'+
+      '<div style="font-size:9px;color:var(--muted)">This action will be recorded in the Decision Logic Record (DLR) with your identity and timestamp.</div>',
+      '<button class="'+(act==="Send Back"?"danger":"ok")+'" data-dact="'+act+' recorded for '+fid+'">Confirm '+act+'</button><button data-dact="">Cancel</button>'
+    );
+  });
+});
+
+/* Board Record Decision button */
+document.querySelectorAll("#s-board button.primary").forEach(function(btn){
+  if(btn.textContent.trim()==="Record Decision"){
+    btn.addEventListener("click",function(){
+      toast("Decision recorded for F-184 — Review Board session updated","ok");
+    });
+  }
+  if(btn.textContent.trim()==="Export Packet"){
+    btn.addEventListener("click",function(){
+      openDrawer("Export Board Packet",
+        '<div class="wire"><h4>Board Session: Q2-APR-BOARD</h4>'+
+        '<div class="wr"><span class="wl">Findings</span><span class="wv">3 reviewed</span></div>'+
+        '<div class="wr"><span class="wl">Decisions</span><span class="wv">Approve / Close / Send Back</span></div>'+
+        '<div class="wr"><span class="wl">Chair</span><span class="wv">Board Chair</span></div>'+
+        '</div>',
+        '<button class="primary" data-dact="Board packet exported">Export PDF</button>'
+      );
+    });
+  }
+});
+
+/* ══════════ MEMORY SEARCH ══════════ */
+document.getElementById("memSearchBtn").addEventListener("click",function(){
+  var results=document.querySelector("#memResults");
+  if(results){
+    results.style.opacity="0.3";
+    setTimeout(function(){results.style.opacity="1";results.style.transition="opacity .4s";toast("Memory Graph searched — 6 results","info");renderMG()},400);
+  }
+});
+
+/* ══════════ MEMORY GRAPH VISUAL ══════════ */
+var MG_NODES=[
+  {id:"F-184",x:200,y:100,r:24,color:"#00b4d8",label:"F-184",type:"finding",tip:"Physical Security SOP not aligned\nStatus: In Review | BRQ: 0.91\nRecurring ×3 | Owner: J. Smith",fid:"184"},
+  {id:"F-155",x:440,y:80,r:22,color:"#00b4d8",label:"F-155",type:"finding",tip:"CCTV coverage gap Building 7\nStatus: In Review | CG: 47\nRecurring ×2 | Owner: R. Chen",fid:"155"},
+  {id:"F-160",x:680,y:120,r:22,color:"#ef4444",label:"F-160",type:"finding",tip:"Perimeter fence inspection lapse\nStatus: REOPENED | CG: 62\nRecurring ×3 | Patch failed",fid:"160"},
+  {id:"F-195",x:140,y:340,r:20,color:"#10b981",label:"F-195",type:"finding",tip:"Incident reporting SLA missed\nStatus: Closed | PAR: held\nEDI: 4.0 | Verified",fid:"195"},
+  {id:"F-201",x:700,y:340,r:18,color:"#00b4d8",label:"F-201",type:"finding",tip:"Badge reader maintenance overdue\nStatus: Patch Approved | BRQ: 0.88\nAccess Control function",fid:"201"},
+  {id:"F-210",x:500,y:420,r:16,color:"#00b4d8",label:"F-210",type:"finding",tip:"Training records incomplete Q1\nStatus: Assigned | BRQ: 0.42\nTraining function",fid:"210"},
+  {id:"MG-77",x:380,y:240,r:28,color:"#8b5cf6",label:"MG-77",type:"pattern",tip:"ROOT CAUSE PATTERN\nSOP custodian role not assigned at unit level\nConnected to 3 findings\nCluster: Protection function"},
+  {id:"MG-91",x:560,y:260,r:26,color:"#8b5cf6",label:"MG-91",type:"pattern",tip:"REUSABLE PATCH\nCustodian assignment + version control + retrain\nApplied to: F-184, F-195\nSuccess rate: 75%"},
+  {id:"P-555",x:260,y:200,r:14,color:"#10b981",label:"P-555",type:"patch",tip:"Patch for F-184\nAssign SOP custodian + publish + retrain\nPPI: 0.82 | Status: Proposed"},
+  {id:"P-495",x:720,y:220,r:14,color:"#ef4444",label:"P-495",type:"patch",tip:"Patch for F-160 (FAILED)\nRotating duty officer schedule\nPPI: 0.55 | Reopened"},
+  {id:"P-540",x:220,y:420,r:14,color:"#10b981",label:"P-540",type:"patch",tip:"Patch for F-195\nClarify reporting criteria + auto-reminder\nPPI: 0.88 | PAR: held"},
+  {id:"P-NE",x:580,y:160,r:14,color:"#f59e0b",label:"P-cam",type:"patch",tip:"Patch for F-155\nReposition camera + supplemental unit\nPPI: 0.70 | In progress"},
+  {id:"RC-1",x:340,y:380,r:18,color:"#f59e0b",label:"RC-1",type:"cause",tip:"ROOT CAUSE: Document ownership gap\nLinked to: F-184, F-155, F-160\nRecurrence driver for Protection function"},
+  {id:"RC-2",x:760,y:440,r:16,color:"#f59e0b",label:"RC-2",type:"cause",tip:"ROOT CAUSE: Scheduling continuity gap\nLinked to: F-160, F-210\nRotating ownership creates drift"}
+];
+
+var MG_EDGES=[
+  {from:"F-184",to:"MG-77",color:"#8b5cf6",label:"CAUSED_BY",dash:false},
+  {from:"F-155",to:"MG-77",color:"#8b5cf6",label:"CAUSED_BY",dash:false},
+  {from:"F-160",to:"MG-77",color:"#8b5cf6",label:"CAUSED_BY",dash:true},
+  {from:"F-184",to:"F-155",color:"rgba(125,249,255,.3)",label:"RELATES_TO",dash:true},
+  {from:"F-184",to:"F-160",color:"rgba(125,249,255,.3)",label:"RELATES_TO",dash:true},
+  {from:"F-155",to:"F-160",color:"rgba(125,249,255,.3)",label:"RELATES_TO",dash:true},
+  {from:"MG-91",to:"P-555",color:"#10b981",label:"REUSES",dash:false},
+  {from:"MG-91",to:"P-540",color:"#10b981",label:"REUSES",dash:false},
+  {from:"MG-77",to:"MG-91",color:"#a78bfa",label:"GENERATES",dash:false},
+  {from:"F-184",to:"P-555",color:"#10b981",label:"PATCHED_BY",dash:false},
+  {from:"F-160",to:"P-495",color:"#ef4444",label:"PATCHED_BY",dash:true},
+  {from:"F-195",to:"P-540",color:"#10b981",label:"PATCHED_BY",dash:false},
+  {from:"F-155",to:"P-NE",color:"#f59e0b",label:"PATCHED_BY",dash:false},
+  {from:"MG-77",to:"RC-1",color:"#f59e0b",label:"IDENTIFIES",dash:false},
+  {from:"F-160",to:"RC-2",color:"#f59e0b",label:"CAUSED_BY",dash:false},
+  {from:"F-210",to:"RC-2",color:"#f59e0b",label:"CAUSED_BY",dash:true},
+  {from:"F-201",to:"MG-91",color:"rgba(125,249,255,.15)",label:"CANDIDATE",dash:true},
+  {from:"RC-1",to:"RC-2",color:"rgba(245,158,11,.2)",label:"RELATED",dash:true}
+];
+
+function renderMG(){
+  var svg=document.getElementById("mgSvg");
+  if(!svg)return;
+  var ns="http://www.w3.org/2000/svg";
+  svg.innerHTML="";
+  // Background grid
+  var defs=document.createElementNS(ns,"defs");
+  var pat=document.createElementNS(ns,"pattern");
+  pat.setAttribute("id","mgGrid");pat.setAttribute("width","30");pat.setAttribute("height","30");pat.setAttribute("patternUnits","userSpaceOnUse");
+  var pline=document.createElementNS(ns,"path");pline.setAttribute("d","M 30 0 L 0 0 0 30");pline.setAttribute("fill","none");pline.setAttribute("stroke","rgba(27,42,58,.5)");pline.setAttribute("stroke-width","0.5");
+  pat.appendChild(pline);defs.appendChild(pat);svg.appendChild(defs);
+  var bg=document.createElementNS(ns,"rect");bg.setAttribute("width","900");bg.setAttribute("height","520");bg.setAttribute("fill","url(#mgGrid)");svg.appendChild(bg);
+
+  // (#1) Force-directed spring simulation — 80 iterations
+  var W=900,H=520,PAD=40;
+  var pos={};MG_NODES.forEach(function(n){pos[n.id]={x:n.x,y:n.y,vx:0,vy:0}});
+  for(var iter=0;iter<80;iter++){
+    var dt=0.3,repK=8000,sprK=0.008,sprL=120,damp=0.85;
+    // Repulsion between all pairs
+    for(var i=0;i<MG_NODES.length;i++){
+      for(var j=i+1;j<MG_NODES.length;j++){
+        var a=pos[MG_NODES[i].id],b=pos[MG_NODES[j].id];
+        var dx=b.x-a.x,dy=b.y-a.y,d=Math.sqrt(dx*dx+dy*dy)||1;
+        var f=repK/(d*d);
+        var fx=f*dx/d,fy=f*dy/d;
+        a.vx-=fx*dt;a.vy-=fy*dt;b.vx+=fx*dt;b.vy+=fy*dt;
+      }
+    }
+    // Spring attraction along edges
+    MG_EDGES.forEach(function(e){
+      var a=pos[e.from],b=pos[e.to];if(!a||!b)return;
+      var dx=b.x-a.x,dy=b.y-a.y,d=Math.sqrt(dx*dx+dy*dy)||1;
+      var f=sprK*(d-sprL);
+      var fx=f*dx/d,fy=f*dy/d;
+      a.vx+=fx*dt;a.vy+=fy*dt;b.vx-=fx*dt;b.vy-=fy*dt;
+    });
+    // Apply velocity + damping + boundary
+    MG_NODES.forEach(function(n){
+      var p=pos[n.id];
+      p.vx*=damp;p.vy*=damp;
+      p.x+=p.vx;p.y+=p.vy;
+      p.x=Math.max(PAD,Math.min(W-PAD,p.x));
+      p.y=Math.max(PAD,Math.min(H-PAD,p.y));
+    });
+  }
+  // Write back positions
+  MG_NODES.forEach(function(n){n.x=Math.round(pos[n.id].x);n.y=Math.round(pos[n.id].y)});
+
+  var nmap={};MG_NODES.forEach(function(n){nmap[n.id]=n});
+  // Build adjacency for hover propagation (#2)
+  var adj={};MG_NODES.forEach(function(n){adj[n.id]=[]});
+  MG_EDGES.forEach(function(e){
+    if(adj[e.from])adj[e.from].push(e.to);
+    if(adj[e.to])adj[e.to].push(e.from);
+  });
+  // Store SVG element refs for hover propagation
+  var nodeGroups={},edgeLines=[];
+
+  // Edges
+  MG_EDGES.forEach(function(e){
+    var a=nmap[e.from],b=nmap[e.to];if(!a||!b)return;
+    var line=document.createElementNS(ns,"line");
+    line.setAttribute("x1",a.x);line.setAttribute("y1",a.y);
+    line.setAttribute("x2",b.x);line.setAttribute("y2",b.y);
+    line.setAttribute("stroke",e.color);line.setAttribute("stroke-width","1.5");
+    line.setAttribute("opacity","0.7");
+    if(e.dash){line.setAttribute("stroke-dasharray","6,4");line.classList.add("mg-edge-anim")} // (#7)
+    line._from=e.from;line._to=e.to;
+    edgeLines.push(line);
+    svg.appendChild(line);
+    var mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+    var lbl=document.createElementNS(ns,"text");
+    lbl.setAttribute("x",mx);lbl.setAttribute("y",my-4);
+    lbl.setAttribute("text-anchor","middle");lbl.setAttribute("fill","rgba(138,160,181,.5)");
+    lbl.setAttribute("font-size","7");lbl.setAttribute("font-family","ui-monospace,monospace");
+    lbl.textContent=e.label;lbl._from=e.from;lbl._to=e.to;
+    edgeLines.push(lbl);
+    svg.appendChild(lbl);
+  });
+
+  // Nodes
+  MG_NODES.forEach(function(n){
+    var g=document.createElementNS(ns,"g");
+    g.setAttribute("style","cursor:pointer");
+    var glow=document.createElementNS(ns,"circle");
+    glow.setAttribute("cx",n.x);glow.setAttribute("cy",n.y);glow.setAttribute("r",n.r+6);
+    glow.setAttribute("fill","none");glow.setAttribute("stroke",n.color);glow.setAttribute("stroke-width","1");glow.setAttribute("opacity","0.15");
+    g.appendChild(glow);
+    var c=document.createElementNS(ns,"circle");
+    c.setAttribute("cx",n.x);c.setAttribute("cy",n.y);c.setAttribute("r",n.r);
+    c.setAttribute("fill",n.color);c.setAttribute("fill-opacity","0.15");c.setAttribute("stroke",n.color);c.setAttribute("stroke-width","2");
+    g.appendChild(c);
+    var t=document.createElementNS(ns,"text");
+    t.setAttribute("x",n.x);t.setAttribute("y",n.y+1);t.setAttribute("text-anchor","middle");t.setAttribute("dominant-baseline","central");
+    t.setAttribute("fill",n.color);t.setAttribute("font-size",n.r>20?"11":"9");t.setAttribute("font-weight","700");
+    t.setAttribute("font-family","ui-monospace,monospace");t.setAttribute("pointer-events","none");
+    t.textContent=n.label;g.appendChild(t);
+    var sub=document.createElementNS(ns,"text");
+    sub.setAttribute("x",n.x);sub.setAttribute("y",n.y+n.r+12);sub.setAttribute("text-anchor","middle");
+    sub.setAttribute("fill","rgba(138,160,181,.6)");sub.setAttribute("font-size","8");sub.setAttribute("font-family","system-ui,sans-serif");
+    sub.setAttribute("pointer-events","none");
+    var typeLabels={finding:"Finding",pattern:"Memory Pattern",patch:"Patch",cause:"Root Cause"};
+    sub.textContent=typeLabels[n.type]||n.type;g.appendChild(sub);
+    nodeGroups[n.id]=g;
+
+    (function(node,circle,glowEl){
+      // (#2) Hover propagation — dim non-neighbors
+      g.addEventListener("mouseenter",function(ev){
+        circle.setAttribute("stroke-width","3");circle.setAttribute("fill-opacity","0.3");glowEl.setAttribute("opacity","0.4");
+        var neighbors=adj[node.id]||[];
+        // Dim all non-neighbors
+        Object.keys(nodeGroups).forEach(function(id){
+          if(id!==node.id&&neighbors.indexOf(id)===-1)nodeGroups[id].classList.add("mg-dimmed");
+        });
+        edgeLines.forEach(function(el){
+          if(el._from!==node.id&&el._to!==node.id)el.classList.add("mg-dimmed");
+          else el.classList.add("mg-bright");
+        });
+        showMGTip(node,ev);
+      });
+      g.addEventListener("mouseleave",function(){
+        circle.setAttribute("stroke-width","2");circle.setAttribute("fill-opacity","0.15");glowEl.setAttribute("opacity","0.15");
+        // Restore all
+        Object.keys(nodeGroups).forEach(function(id){nodeGroups[id].classList.remove("mg-dimmed")});
+        edgeLines.forEach(function(el){el.classList.remove("mg-dimmed");el.classList.remove("mg-bright")});
+        hideMGTip();
+      });
+      g.addEventListener("click",function(){
+        hideMGTip();
+        if(node.fid){showFindingInDrawer(node.fid)}
+        else{
+          openDrawer("Memory Node — "+node.id,
+            '<div style="font-size:13px;font-weight:700;color:'+node.color+';margin-bottom:6px">'+node.id+'</div>'+
+            '<div style="font-size:11px;color:var(--muted);white-space:pre-line;line-height:1.6">'+node.tip+'</div>'+
+            '<div class="wire" style="margin-top:10px"><h4>Connected Nodes</h4>'+
+            MG_EDGES.filter(function(e){return e.from===node.id||e.to===node.id}).map(function(e){
+              var other=e.from===node.id?e.to:e.from;var on=nmap[other];
+              return '<div class="wr"><span class="wl mono" style="color:'+on.color+'">'+on.label+'</span><span class="wv">'+e.label+'</span></div>';
+            }).join("")+'</div>','');
+        }
+      });
+    })(n,c,glow);
+    svg.appendChild(g);
+  });
+}
+// Render on first view
+var mgRendered=false;
+var origOpenTab=openTab;
+openTab=function(n){origOpenTab(n);if(n==="mem"&&!mgRendered){renderMG();mgRendered=true}};
+
+function showMGTip(node,ev){
+  var tip=document.getElementById("mgTip");
+  var wrap=document.getElementById("mgWrap");
+  var rect=wrap.getBoundingClientRect();
+  var svgEl=document.getElementById("mgSvg");
+  var svgRect=svgEl.getBoundingClientRect();
+  var scaleX=svgRect.width/900;
+  var px=node.x*scaleX;
+  var py=node.y*(svgRect.height/520);
+  document.getElementById("mgTipTitle").textContent=node.id+" — "+(node.type==="finding"?"Finding":node.type==="pattern"?"Memory Pattern":node.type==="patch"?"Patch":"Root Cause");
+  document.getElementById("mgTipBody").textContent=node.tip;
+  tip.style.display="block";
+  tip.style.left=Math.min(px+20,wrap.offsetWidth-290)+"px";
+  tip.style.top=Math.max(py-20,0)+"px";
+}
+function hideMGTip(){document.getElementById("mgTip").style.display="none"}
+
+/* ══════════ AUDIT EXPORT ══════════ */
+document.querySelectorAll("#s-audit button.primary").forEach(function(btn){
+  if(btn.textContent.trim()==="Export Audit Package"){
+    btn.addEventListener("click",function(){
+      openDrawer("Export Audit Package",
+        '<div class="wire"><h4>Audit Package Contents</h4>'+
+        '<div class="wr"><span class="wl">Period</span><span class="wv">Q2 FY26</span></div>'+
+        '<div class="wr"><span class="wl">Closures</span><span class="wv">3 verified + 1 reopened</span></div>'+
+        '<div class="wr"><span class="wl">Evidence chains</span><span class="wv">4 complete provenance traces</span></div>'+
+        '<div class="wr"><span class="wl">Decision history</span><span class="wv">All board decisions with timestamps</span></div>'+
+        '</div>'+
+        '<div style="font-size:10px;color:var(--muted);margin-top:8px">Includes: finding records (read-only), evidence chains, decision provenance, closure verification status, and KPI audit trail. Export is tamper-evident with hash chain.</div>',
+        '<button class="primary" data-dact="Audit package exported — Q2 FY26">Export Full Package</button><button data-dact="Audit summary exported">Export Summary Only</button>'
+      );
+    });
+  }
+});
+
+/* ══════════ BOARD ROW CLICKS → DETAIL UPDATE (#5) ══════════ */
+function updateBoardDetail(fid){
+  var f=F[fid];if(!f)return;
+  var evOk=f.evidence.filter(function(e){return e.ok}).length;
+  document.getElementById("bdRisk").innerHTML='<h3>Finding / Risk</h3>'+
+    '<div class="wr"><span class="wl">Finding</span><span class="wv" style="color:var(--accent)">'+f.id+'</span></div>'+
+    '<div class="wr"><span class="wl">Claim</span><span class="wv">'+f.claim.substring(0,60)+'</span></div>'+
+    '<div class="wr"><span class="wl">Severity</span><span class="wv" style="color:var(--bad)">'+f.sev+'</span></div>'+
+    '<div class="wr"><span class="wl">Owner</span><span class="wv">'+f.owner+'</span></div>';
+  document.getElementById("bdPatch").innerHTML='<h3>Patch / Evidence</h3>'+
+    '<div class="wr"><span class="wl">Patch</span><span class="wv">'+f.patch.substring(0,55)+'</span></div>'+
+    '<div class="wr"><span class="wl">Due</span><span class="wv">'+f.patchDue+'</span></div>'+
+    '<div class="wr"><span class="wl">Evidence</span><span class="wv">'+evOk+' of '+f.evidence.length+'</span></div>'+
+    '<div class="wr"><span class="wl">PPI</span><span class="wv" style="color:var(--'+(f.ppi>=0.8?'ok':'warn')+')">'+f.ppi+'</span></div>';
+  document.getElementById("bdHist").innerHTML='<h3>Recurrence / History</h3>'+
+    '<div class="wr"><span class="wl">Recurring</span><span class="wv">'+(f.recurring>0?'YES ×'+f.recurring:'None')+'</span></div>'+
+    '<div class="wr"><span class="wl">Root Cause</span><span class="wv">'+f.rootCause+'</span></div>'+
+    '<div class="wr"><span class="wl">BRQ</span><span class="wv" style="color:var(--'+(f.brq>=0.8?'ok':f.brq>=0.6?'warn':'bad')+')">'+f.brq+'</span></div>'+
+    '<div class="wr"><span class="wl">Memory</span><span class="wv" style="color:var(--ok)">Pattern available</span></div>';
+}
+updateBoardDetail("184");
+document.getElementById("boardTbody").addEventListener("click",function(e){
+  if(e.target.closest("button"))return; // don't intercept action buttons
+  var tr=e.target.closest("tr");if(!tr)return;
+  var fid=tr.getAttribute("data-fid");if(!fid)return;
+  document.querySelectorAll("#boardTbody tr").forEach(function(r){r.style.background=""});
+  tr.style.background="rgba(125,249,255,.06)";
+  updateBoardDetail(fid);
+});
+
+/* ══════════ MEMORY ROW CLICKS → DRAWER ══════════ */
+document.getElementById("memResults").addEventListener("click",function(e){
+  var row=e.target.closest("[data-fid]");
+  if(!row)return;
+  var fid=row.getAttribute("data-fid");
+  if(fid)showFindingInDrawer(fid);
+});
+
+/* ══════════ AUDIT ROW CLICKS → DRAWER ══════════ */
+document.getElementById("auditTbody").addEventListener("click",function(e){
+  var tr=e.target.closest("tr");
+  if(!tr)return;
+  var fid=tr.getAttribute("data-fid");
+  if(fid)showFindingInDrawer(fid,"audit");
+});
+
+/* ══════════ SHARED: FINDING IN DRAWER ══════════ */
+function showFindingInDrawer(fid,mode){
+  var f=F[fid];if(!f)return;
+  // Timeline
+  var tlHtml='<div class="tl" style="margin:10px 0">';
+  for(var i=0;i<7;i++){
+    var ds=f.tlState[i],cls=ds===1?"done":ds===2?"now":ds===3?"done":"wait";
+    tlHtml+='<div class="tl-s"><div class="tl-dot '+cls+'"></div><div class="tl-lb">'+TL_LABELS[i]+'</div><div class="tl-dt">'+f.timeline[i]+'</div></div>';
+  }
+  tlHtml+='</div>';
+  // Evidence
+  var evHtml="";
+  f.evidence.forEach(function(e){
+    evHtml+='<div class="ev"><span class="'+(e.ok?'ev-ok':'ev-miss')+'">'+(e.ok?'✓':'○')+'</span> '+e.name+' <span style="margin-left:auto;font-size:8px;color:var(--'+(e.ok?'ok':'bad')+');">'+(e.ok?'validated':'missing')+'</span></div>';
+  });
+  var isAudit=mode==="audit";
+  var body='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">'+
+    sevBadge(f.sev)+stBadge(f.status)+
+    '<span style="font-size:10px;color:var(--muted)">Owner: <strong style="color:var(--txt)">'+f.owner+'</strong></span>'+
+    '<span style="font-size:10px;color:var(--muted)">BRQ: <strong>'+f.brq+'</strong></span>'+
+    (f.recurring>0?'<span class="recur">RECURRING × '+f.recurring+'</span>':'')+
+    '</div>';
+  body+='<div style="font-size:12px;font-weight:600;margin-bottom:3px">'+f.title+'</div>';
+  body+='<div style="font-size:9px;color:var(--muted);margin-bottom:8px">'+f.src+' | '+f.date+' | '+f.func+'</div>';
+  body+=tlHtml;
+  body+='<div class="wire"><h4>Claim / Event</h4>'+
+    '<div class="wr"><span class="wl">Claim</span><span class="wv">'+f.claim+'</span></div>'+
+    '<div class="wr"><span class="wl">Event</span><span class="wv">'+f.event+'</span></div>'+
+    '<div class="wr"><span class="wl">Risk</span><span class="wv">'+f.risk+'</span></div></div>';
+  body+='<div class="wire"><h4>Review</h4>'+
+    '<div class="wr"><span class="wl">Severity</span><span class="wv" style="color:var(--bad)">'+f.sev+'</span></div>'+
+    '<div class="wr"><span class="wl">Root Cause</span><span class="wv">'+f.rootCause+'</span></div>'+
+    (f.recurring>0?'<div class="wr"><span class="wl">Recurring</span><span class="wv" style="color:#ff9f43">'+f.recurring+' prior</span></div>':'')+
+    '</div>';
+  body+='<div class="wire"><h4>Patch</h4>'+
+    '<div class="wr"><span class="wl">Action</span><span class="wv">'+f.patch+'</span></div>'+
+    '<div class="wr"><span class="wl">Due</span><span class="wv">'+f.patchDue+'</span></div>'+
+    '<div class="wr"><span class="wl">PPI</span><span class="wv">'+f.ppi+'</span></div></div>';
+  body+='<div class="wire"><h4>Evidence</h4>'+evHtml+
+    '<div style="margin-top:6px;font-size:10px"><span style="color:var(--muted)">EDI:</span> <strong>'+f.edi+'</strong> &nbsp; <span style="color:var(--muted)">DEG:</span> <strong style="color:var(--warn)">'+f.deg+'</strong></div></div>';
+  if(isAudit){
+    body+='<div class="wire"><h4>Provenance Chain</h4>'+
+      '<div class="wr"><span class="wl">Claim</span><span class="wv">C-'+fid+' · '+f.date+' by Analyst</span></div>'+
+      '<div class="wr"><span class="wl">Review</span><span class="wv">R-'+fid+' · Board Chair</span></div>'+
+      '<div class="wr"><span class="wl">Patch</span><span class="wv">P-'+fid+' · '+f.owner+'</span></div>'+
+      '<div class="wr"><span class="wl">Evidence</span><span class="wv">'+f.evidence.length+' artifacts · '+f.evidence.filter(function(e){return e.ok}).length+' validated</span></div>'+
+      '</div>';
+    body+='<div style="font-size:9px;color:var(--muted);margin-top:8px;font-style:italic">Read-only audit view. No modifications permitted.</div>';
+  }
+  var foot=isAudit?'<button class="primary" data-dact="Audit trace exported for '+f.id+'">Export Trace</button>':
+    '<button class="primary" data-dact="">Open in Findings</button>';
+  openDrawer((isAudit?"Audit Trace — ":"Finding Detail — ")+f.id,body,foot);
+}
+
+/* ══════════ (#3) FINDINGS TABLE FILTERS ══════════ */
+var findSelects=document.querySelectorAll("#s-find .filters select");
+var findInput=document.querySelector("#s-find .filters input");
+function applyFindFilters(){
+  var status=findSelects[0]?findSelects[0].value:"";
+  var sev=findSelects[1]?findSelects[1].value:"";
+  var func=findSelects[2]?findSelects[2].value:"";
+  var search=findInput?findInput.value.toLowerCase():"";
+  document.querySelectorAll("#findTbody tr").forEach(function(tr){
+    var fid=tr.getAttribute("data-fid");var f=F[fid];if(!f){tr.style.display="";return}
+    var show=true;
+    if(status&&status!=="All Status"&&f.status.indexOf(status)===-1)show=false;
+    if(sev&&sev!=="All Severity"&&f.sev!==sev&&!(sev==="MEDIUM"&&f.sev==="MED"))show=false;
+    if(func&&func!=="All Functions"&&f.func!==func)show=false;
+    if(search&&f.title.toLowerCase().indexOf(search)===-1&&f.id.toLowerCase().indexOf(search)===-1)show=false;
+    tr.style.display=show?"":"none";
+  });
+}
+findSelects.forEach(function(s){s.addEventListener("change",applyFindFilters)});
+if(findInput)findInput.addEventListener("input",applyFindFilters);
+
+/* ══════════ (#4) DASHBOARD KPI CLICK-THROUGH ══════════ */
+var kpiData={
+  ccci:{title:"Command Closure Confidence Index (CCCI)",body:'<div class="wr"><span class="wl">Current</span><span class="wv" style="color:var(--warn)">78.4 (AMBER)</span></div><div class="wr"><span class="wl">Prior Quarter</span><span class="wv">71.2</span></div><div class="wr"><span class="wl">Target</span><span class="wv" style="color:var(--ok)">85.0</span></div><div class="wr"><span class="wl">Trend</span><span class="wv" style="color:var(--ok)">↑ Improving (+7.2)</span></div><div class="wr"><span class="wl">Components</span><span class="wv">CIS, PAR, DES, FCR weighted</span></div><div class="wr"><span class="wl">Threshold</span><span class="wv">GREEN ≥ 85 | AMBER 65-84 | RED &lt; 65</span></div>'},
+  cis:{title:"Closure Integrity Score (CIS)",body:'<div class="wr"><span class="wl">Current</span><span class="wv" style="color:var(--ok)">81</span></div><div class="wr"><span class="wl">Formula</span><span class="wv mono" style="font-size:9px">0.25 PAR + 0.20 EDI_norm + 0.25 (1-FCR) + 0.15 (1-DEG_norm) + 0.15 PPI</span></div><div class="wr"><span class="wl">PAR</span><span class="wv">0.88 × 0.25 = 0.220</span></div><div class="wr"><span class="wl">EDI_norm</span><span class="wv">0.74 × 0.20 = 0.148</span></div><div class="wr"><span class="wl">1-FCR</span><span class="wv">0.90 × 0.25 = 0.225</span></div><div class="wr"><span class="wl">1-DEG_norm</span><span class="wv">0.65 × 0.15 = 0.098</span></div><div class="wr"><span class="wl">PPI</span><span class="wv">0.78 × 0.15 = 0.117</span></div><div style="margin-top:6px;font-size:10px;color:var(--accent);font-weight:700">CIS &gt; 0.75 = governance loop is real</div>'},
+  par:{title:"Patch Adhesion Rate (PAR)",body:'<div class="wr"><span class="wl">Current</span><span class="wv" style="color:var(--ok)">88%</span></div><div class="wr"><span class="wl">Formula</span><span class="wv mono" style="font-size:9px">findings not reopened within 2 windows / total patched</span></div><div class="wr"><span class="wl">Patched</span><span class="wv">31 findings</span></div><div class="wr"><span class="wl">Held</span><span class="wv">27 (not reopened)</span></div><div class="wr"><span class="wl">Failed</span><span class="wv" style="color:var(--bad)">4 reopened</span></div><div class="wr"><span class="wl">Trend</span><span class="wv" style="color:var(--ok)">↑ from 79% Q1</span></div>'},
+  des:{title:"Deficiency Echo Score (DES)",body:'<div class="wr"><span class="wl">Current</span><span class="wv" style="color:var(--warn)">22</span></div><div class="wr"><span class="wl">Formula</span><span class="wv mono" style="font-size:9px">repeat occurrences × spread factor × severity weight</span></div><div class="wr"><span class="wl">Top Echo</span><span class="wv">Physical security training (7 instances, ↑)</span></div><div class="wr"><span class="wl">2nd</span><span class="wv">Access control documentation (5, →)</span></div><div class="wr"><span class="wl">3rd</span><span class="wv">Inspection evidence gaps (4, ↑)</span></div><div class="wr"><span class="wl">Improving</span><span class="wv" style="color:var(--ok)">Incident reporting lag (4, ↓)</span></div>'},
+  open:{title:"Open Findings",body:'<div class="wr"><span class="wl">Total Open</span><span class="wv" style="color:var(--accent)">47</span></div><div class="wr"><span class="wl">New</span><span class="wv">8</span></div><div class="wr"><span class="wl">Assigned</span><span class="wv">14</span></div><div class="wr"><span class="wl">In Review</span><span class="wv">12</span></div><div class="wr"><span class="wl">Patch Approved</span><span class="wv">7</span></div><div class="wr"><span class="wl">Reopened</span><span class="wv" style="color:var(--bad)">6</span></div>'},
+  closed:{title:"Verified Closures",body:'<div class="wr"><span class="wl">Total Closed</span><span class="wv" style="color:var(--ok)">31</span></div><div class="wr"><span class="wl">Verified</span><span class="wv">28</span></div><div class="wr"><span class="wl">Pending Verification</span><span class="wv">3</span></div><div class="wr"><span class="wl">Avg Time to Close</span><span class="wv">18 days</span></div><div class="wr"><span class="wl">Avg Evidence</span><span class="wv">3.2 artifacts per closure</span></div>'}
+};
+document.getElementById("dashKpis").addEventListener("click",function(e){
+  var kpi=e.target.closest("[data-kpi]");if(!kpi)return;
+  var k=kpi.getAttribute("data-kpi"),d=kpiData[k];if(!d)return;
+  openDrawer(d.title,'<div class="wire">'+d.body+'</div>','');
+});
+
+/* ══════════ (#9) EVIDENCE UPLOAD SIMULATION ══════════ */
+// Handled inside showFinding — upload buttons added to missing evidence items
+// Wire delegated click on fDetail for upload buttons
+document.getElementById("fDetail").addEventListener("click",function(e){
+  var btn=e.target.closest(".ev-upload");if(!btn)return;
+  var evDiv=btn.closest(".ev");if(!evDiv)return;
+  var fid=btn.getAttribute("data-fid"),ename=btn.getAttribute("data-ename");
+  // Update demo data
+  if(F[fid]){F[fid].evidence.forEach(function(ev){if(ev.name===ename)ev.ok=1})}
+  // Re-render the evidence item
+  evDiv.innerHTML='<span class="ev-ok">✓</span> '+ename+' <span style="margin-left:auto;font-size:8px;color:var(--ok)">validated · locked</span>';
+  toast("Evidence uploaded: "+ename,"ok");
+  // Update EDI display
+  if(F[fid]){
+    var newEdi=F[fid].evidence.filter(function(ev){return ev.ok}).length;
+    F[fid].edi=newEdi;
+  }
+});
+
+/* ══════════ (#8) KEYBOARD SHORTCUTS ══════════ */
+var shortcutBar=document.getElementById("shortcutBar");
+var shortcutVisible=true;
+document.getElementById("shortcutClose").addEventListener("click",function(){
+  shortcutBar.style.display="none";shortcutVisible=false;
+});
+document.addEventListener("keydown",function(e){
+  // Don't fire in input/textarea/select
+  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA"||e.target.tagName==="SELECT")return;
+  if(e.key==="Escape"){closeDrawer();return}
+  if(e.key==="?"){shortcutBar.style.display=shortcutVisible?"none":"flex";shortcutVisible=!shortcutVisible;return}
+  if(e.key==="n"||e.key==="N"){var bn=document.getElementById("btnNew");if(bn&&bn.style.display!=="none")bn.click();return}
+  var tabKeys=["1","2","3","4","5","6","7","8"];
+  var tabNames=["roles","dash","find","board","trends","mem","admin","audit"];
+  var idx=tabKeys.indexOf(e.key);
+  if(idx>=0){
+    var tab=document.querySelector('.ttab[data-t="'+tabNames[idx]+'"]');
+    if(tab&&!tab.classList.contains("hidden"))tab.click();
+  }
+});
+
+/* ══════════ (#10) BOARD SESSION TIMER ══════════ */
+var boardStart=Date.now();
+var boardClockEl=document.getElementById("boardClock");
+function updateBoardClock(){
+  var elapsed=Math.floor((Date.now()-boardStart)/1000);
+  var m=Math.floor(elapsed/60),s=elapsed%60;
+  if(boardClockEl)boardClockEl.textContent=(m<10?"0":"")+m+":"+(s<10?"0":"")+s;
+}
+setInterval(updateBoardClock,1000);
+
+/* ══════════ INIT ══════════ */
+applyRole(false);
+})();
+</script>
+</body>
+</html>
