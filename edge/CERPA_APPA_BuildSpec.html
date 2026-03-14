@@ -1,0 +1,742 @@
+<!--
+ CERPA Power Platform Build Spec EDGE v1.0.0
+ ============================================================
+ Army Protection Program (APP) Assessment
+ Composite Enterprise Risk Posture Assessment (CERPA)
+ Implementation Blueprint: SharePoint + Power Apps + Power Automate + Power BI
+
+ Tabs: Overview | SharePoint | Power Apps | Power Automate | Power BI | Build Order | Roles
+ Zero-dependency, EDGE-hardened, single-file
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'"/>
+<script>
+(function(){"use strict";
+var B="EDGE_BUILD_ID:CERPA_PP_BUILDSPEC_v1.0.0";
+function _b(c){return function(){throw new Error("EDGE: "+c+" blocked")}}
+window.fetch=_b("fetch");window.XMLHttpRequest=_b("XHR");window.WebSocket=_b("WS");window.EventSource=_b("ES");
+try{navigator.sendBeacon=_b("beacon")}catch(_){}
+window.eval=_b("eval");try{window.Function=_b("Function")}catch(_){}
+window.open=_b("open");window.RTCPeerConnection=_b("RTC");window.BroadcastChannel=_b("BC");
+window.SharedWorker=_b("SW");window.Worker=_b("W");
+try{Object.defineProperty(window,"localStorage",{get:_b("localStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"sessionStorage",{get:_b("sessionStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"indexedDB",{get:_b("indexedDB"),configurable:false})}catch(_){}
+if(typeof console!=="undefined")console.log("[EDGE] "+B);
+if(window.self===window.top){document.addEventListener("DOMContentLoaded",function(){
+  var v=[];
+  if(document.querySelectorAll("script[src],link[href]").length>0)v.push("external resource");
+  if(document.querySelectorAll("[onclick],[onerror],[onload]").length>0)v.push("inline handler");
+  if(v.length>0)document.body.innerHTML="<h1 style='color:red;font-family:monospace;padding:40px'>EDGE VIOLATION: "+v.join("; ")+"</h1>";
+});}
+})();
+</script>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Deep Sigma EDGE — CERPA Power Platform Build Spec</title>
+<style>
+:root{--bg:#0b0f14;--card:#111824;--card2:#0d1520;--muted:#8aa0b5;--txt:#e7eef7;--accent:#7df9ff;--warn:#ffcc66;--bad:#ff6b6b;--ok:#5dff93;--line:#1b2a3a;--mag:#ff6bff;--sp:#0078d4;--pa:#742774;--pbi:#f2c811;--auto:#0066ff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt);font-size:13px}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+
+header{padding:10px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;min-height:54px;background:rgba(8,12,20,.96);position:relative}
+header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(125,249,255,.2) 15%,rgba(255,107,255,.12) 50%,rgba(125,249,255,.2) 85%,transparent)}
+.brand{font-weight:700;letter-spacing:.5px;font-size:15px;background:linear-gradient(135deg,var(--accent),var(--mag));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap}
+.brand small{display:block;-webkit-text-fill-color:var(--muted);font-size:10px;font-weight:400}
+.stack-pills{display:flex;gap:4px;margin-left:auto}
+.stack-pill{padding:3px 10px;border-radius:5px;font-size:9px;font-weight:700;letter-spacing:.4px}
+.sp-sp{color:var(--sp);border:1px solid rgba(0,120,212,.3);background:rgba(0,120,212,.08)}
+.sp-pa{color:var(--pa);border:1px solid rgba(116,39,116,.3);background:rgba(116,39,116,.08)}
+.sp-auto{color:var(--auto);border:1px solid rgba(0,102,255,.3);background:rgba(0,102,255,.08)}
+.sp-pbi{color:var(--pbi);border:1px solid rgba(242,200,17,.3);background:rgba(242,200,17,.08)}
+
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);padding:0 16px;background:rgba(11,15,20,.92)}
+.ttab{padding:9px 14px;font-size:10px;font-weight:600;color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;letter-spacing:.3px;text-transform:uppercase}
+.ttab:hover{color:var(--txt)}.ttab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+.main{height:calc(100vh - 110px);overflow-y:auto;padding:16px 20px}
+.main section{display:none;max-width:1400px;margin:0 auto}
+.main section.active{display:block}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+.card h3{margin:0 0 10px;font-size:13px;color:#cfe2f7;letter-spacing:.4px;text-transform:uppercase}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+
+table{width:100%;border-collapse:collapse;font-size:11px}
+th,td{padding:6px 8px;border-bottom:1px solid #141e2d;text-align:left;vertical-align:top}
+th{color:#6b8099;font-weight:700;font-size:9px;text-transform:uppercase;letter-spacing:.5px}
+tbody tr:hover{background:rgba(125,249,255,.02)}
+
+.wire{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:10px}
+.wire h4{margin:0 0 8px;font-size:11px;letter-spacing:.4px;text-transform:uppercase}
+.wire h4.sp{color:var(--sp)}.wire h4.pa{color:var(--pa)}.wire h4.auto{color:var(--auto)}.wire h4.pbi{color:var(--pbi)}.wire h4.acc{color:var(--accent)}
+.wr{display:flex;justify-content:space-between;padding:4px 0;font-size:11px;border-bottom:1px solid #141e2d;gap:8px}
+.wr:last-child{border:none}
+.wr .wl{color:var(--muted);min-width:100px;flex-shrink:0}.wr .wv{font-weight:500;text-align:right;flex:1}
+
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:9px;font-weight:700;letter-spacing:.3px;border:1px solid}
+.b-sp{color:var(--sp);border-color:rgba(0,120,212,.3);background:rgba(0,120,212,.06)}
+.b-pa{color:var(--pa);border-color:rgba(116,39,116,.3);background:rgba(116,39,116,.06)}
+.b-auto{color:var(--auto);border-color:rgba(0,102,255,.3);background:rgba(0,102,255,.06)}
+.b-pbi{color:var(--pbi);border-color:rgba(242,200,17,.3);background:rgba(242,200,17,.06)}
+.b-req{color:var(--bad);border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.06)}
+.b-opt{color:var(--muted);border-color:rgba(138,160,181,.2);background:rgba(138,160,181,.04)}
+.b-idx{color:var(--warn);border-color:rgba(255,204,102,.3);background:rgba(255,204,102,.06)}
+
+.code{font-family:ui-monospace,monospace;font-size:10px;background:rgba(125,249,255,.04);border:1px solid rgba(125,249,255,.1);border-radius:6px;padding:8px 10px;margin:6px 0;line-height:1.6;overflow-x:auto;white-space:pre;color:var(--accent)}
+
+.phase-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;position:relative;overflow:hidden}
+.phase-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.ph-a::before{background:var(--sp)}.ph-b::before{background:var(--sp)}.ph-c::before{background:var(--pa)}
+.ph-d::before{background:var(--pa)}.ph-e::before{background:var(--pa)}.ph-f::before{background:var(--auto)}
+.ph-g::before{background:var(--auto)}.ph-h::before{background:var(--pbi)}
+.phase-num{font-size:28px;font-weight:700;color:rgba(125,249,255,.15);position:absolute;top:8px;right:14px}
+
+.flow-row{display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid #141e2d;font-size:11px}
+.flow-row:last-child{border:none}
+.flow-arrow{color:#2a3a4e;font-size:10px}
+.flow-step{padding:3px 8px;border-radius:5px;font-size:9px;font-weight:600}
+.fs-trigger{color:var(--accent);border:1px solid rgba(125,249,255,.2);background:rgba(125,249,255,.05)}
+.fs-action{color:var(--ok);border:1px solid rgba(93,255,147,.2);background:rgba(93,255,147,.05)}
+.fs-notify{color:var(--warn);border:1px solid rgba(255,204,102,.2);background:rgba(255,204,102,.05)}
+
+.measure-card{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px}
+.measure-card h5{margin:0 0 4px;font-size:11px;color:var(--pbi)}
+.measure-card .m-formula{font-family:ui-monospace,monospace;font-size:10px;color:var(--accent);padding:4px 8px;background:rgba(125,249,255,.03);border-radius:4px;margin:4px 0;white-space:pre-wrap}
+.measure-card .m-note{font-size:9px;color:var(--muted)}
+
+.pp{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.pp span{padding:3px 10px;border-radius:6px;font-size:9px;font-weight:700;border:1px solid}
+.pp-r{color:var(--bad);border-color:rgba(255,107,107,.25);background:rgba(255,107,107,.04)}
+.pp-c{color:var(--accent);border-color:rgba(125,249,255,.18);background:rgba(125,249,255,.03)}
+.pp-w{color:var(--warn);border-color:rgba(255,204,102,.2);background:rgba(255,204,102,.04)}
+
+footer{padding:8px 16px;border-top:1px solid var(--line);font-size:9px;color:var(--muted);text-align:center;background:rgba(8,12,20,.96)}
+footer strong{color:var(--accent)}
+
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#243449;border-radius:3px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">DEEP SIGMA EDGE<small>CERPA Power Platform Build Spec v1.0.0</small></div>
+  <div class="stack-pills">
+    <span class="stack-pill sp-sp">SharePoint</span>
+    <span class="stack-pill sp-pa">Power Apps</span>
+    <span class="stack-pill sp-auto">Power Automate</span>
+    <span class="stack-pill sp-pbi">Power BI</span>
+  </div>
+</header>
+
+<div class="tabs" id="tabBar">
+  <button class="ttab active" data-t="overview">Overview</button>
+  <button class="ttab" data-t="sp">SharePoint</button>
+  <button class="ttab" data-t="pa">Power Apps</button>
+  <button class="ttab" data-t="auto">Power Automate</button>
+  <button class="ttab" data-t="pbi">Power BI</button>
+  <button class="ttab" data-t="build">Build Order</button>
+  <button class="ttab" data-t="roles">Roles & Permissions</button>
+</div>
+
+<div class="main" id="mainArea">
+
+<!-- ════════════ OVERVIEW ════════════ -->
+<section id="s-overview" class="active">
+  <div style="text-align:center;margin-bottom:20px">
+    <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Army Protection Program (APP) Assessment</div>
+    <div style="font-size:22px;font-weight:700">CERPA Power Platform Build Specification</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px">Claim → Event → Review → Patch → Apply on Microsoft 365</div>
+  </div>
+
+  <div class="card">
+    <h3>Architecture</h3>
+    <div class="grid2">
+      <div class="wire">
+        <h4 class="acc">Stack</h4>
+        <div class="wr"><span class="wl">System of Record</span><span class="wv"><span class="badge b-sp">SharePoint Lists</span></span></div>
+        <div class="wr"><span class="wl">Workflow UI</span><span class="wv"><span class="badge b-pa">Power Apps Canvas</span></span></div>
+        <div class="wr"><span class="wl">Automation</span><span class="wv"><span class="badge b-auto">Power Automate</span></span></div>
+        <div class="wr"><span class="wl">Analytics</span><span class="wv"><span class="badge b-pbi">Power BI</span></span></div>
+        <div class="wr"><span class="wl">Evidence Storage</span><span class="wv"><span class="badge b-sp">SharePoint DocLib</span></span></div>
+        <div class="wr"><span class="wl">Identity / RBAC</span><span class="wv"><span class="badge b-sp">M365 Groups</span></span></div>
+      </div>
+      <div class="wire">
+        <h4 class="acc">Boundaries</h4>
+        <div class="wr"><span class="wl">Lists</span><span class="wv">6 SharePoint lists</span></div>
+        <div class="wr"><span class="wl">App Screens</span><span class="wv">5 Canvas screens</span></div>
+        <div class="wr"><span class="wl">Flows</span><span class="wv">7 Power Automate flows</span></div>
+        <div class="wr"><span class="wl">BI Pages</span><span class="wv">4 report pages</span></div>
+        <div class="wr"><span class="wl">M365 Groups</span><span class="wv">6 security groups</span></div>
+        <div class="wr"><span class="wl">KPI Measures</span><span class="wv">12 DAX measures</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Design Principles — Hard Law</h3>
+    <div class="pp">
+      <span class="pp-r">No self-certification of closure</span>
+      <span class="pp-r">No closure without owner + patch + evidence</span>
+      <span class="pp-r">No evidence editing after review lock</span>
+      <span class="pp-c">No overwrite of historical canon — append, version, reopen only</span>
+      <span class="pp-c">Authority must be role-bound and state-bound</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Platform Constraints</h3>
+    <div class="pp">
+      <span class="pp-w">Delegation: non-delegable queries limited to 500-2000 rows</span>
+      <span class="pp-w">Unique permissions: recommended limit 5,000 per list</span>
+      <span class="pp-w">Power BI refresh: shared capacity 2-hour limit</span>
+      <span class="pp-w">Use indexed columns for delegable filters</span>
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin-top:6px">Phase 3 decision: if lists get large or relationships get complex, move core objects to Dataverse.</div>
+  </div>
+</section>
+
+<!-- ════════════ SHAREPOINT ════════════ -->
+<section id="s-sp">
+  <div style="font-size:16px;font-weight:700;margin-bottom:12px"><span class="badge b-sp">SharePoint</span> System of Record — 6 Lists + 1 Document Library</div>
+
+  <div class="card">
+    <h3>1. Findings (Master Record)</h3>
+    <table>
+      <thead><tr><th>Column</th><th>Type</th><th>Index</th><th>Required</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">Title</td><td>Single line</td><td><span class="badge b-idx">IDX</span></td><td><span class="badge b-req">REQ</span></td><td>Auto-generated display name</td></tr>
+        <tr><td class="mono">FindingID</td><td>Single line</td><td><span class="badge b-idx">IDX</span></td><td><span class="badge b-req">REQ</span></td><td>F-XXXX canonical ID</td></tr>
+        <tr><td class="mono">Status</td><td>Choice</td><td><span class="badge b-idx">IDX</span></td><td><span class="badge b-req">REQ</span></td><td>New | Assigned | In Review | Patch Approved | Closure Pending | Closed | Reopened</td></tr>
+        <tr><td class="mono">Severity</td><td>Choice</td><td><span class="badge b-idx">IDX</span></td><td><span class="badge b-req">REQ</span></td><td>HIGH | MEDIUM | LOW</td></tr>
+        <tr><td class="mono">SourceType</td><td>Choice</td><td></td><td><span class="badge b-req">REQ</span></td><td>APP Assessment | Self-Assessment | Inspection | Incident Report</td></tr>
+        <tr><td class="mono">FunctionArea</td><td>Choice</td><td></td><td><span class="badge b-req">REQ</span></td><td>Protection | Access Control | Training | Physical Security</td></tr>
+        <tr><td class="mono">Command</td><td>Single line</td><td><span class="badge b-idx">IDX</span></td><td></td><td>HQDA OPMG, etc.</td></tr>
+        <tr><td class="mono">ClaimStatement</td><td>Multi-line</td><td></td><td><span class="badge b-req">REQ</span></td><td>What is asserted, deficient, required</td></tr>
+        <tr><td class="mono">EventSummary</td><td>Multi-line</td><td></td><td><span class="badge b-req">REQ</span></td><td>The observed fact or incident</td></tr>
+        <tr><td class="mono">EventDate</td><td>Date</td><td></td><td></td><td>When observation occurred</td></tr>
+        <tr><td class="mono">DataSource</td><td>Single line</td><td></td><td></td><td>Source system or document</td></tr>
+        <tr><td class="mono">DataSourceRecordID</td><td>Single line</td><td></td><td></td><td>External system record link</td></tr>
+        <tr><td class="mono">OwnerPerson</td><td>Person</td><td><span class="badge b-idx">IDX</span></td><td></td><td>Action owner</td></tr>
+        <tr><td class="mono">ReviewerPerson</td><td>Person</td><td><span class="badge b-idx">IDX</span></td><td></td><td>Board reviewer</td></tr>
+        <tr><td class="mono">DueDate</td><td>Date</td><td><span class="badge b-idx">IDX</span></td><td></td><td>Closure target</td></tr>
+        <tr><td class="mono">IsRecurring</td><td>Yes/No</td><td></td><td></td><td>Flagged by DES check</td></tr>
+        <tr><td class="mono">RelatedFindingCount</td><td>Number</td><td></td><td></td><td>Count of linked findings</td></tr>
+        <tr><td class="mono">BRQ</td><td>Number</td><td></td><td></td><td>Computed on read or async</td></tr>
+        <tr><td class="mono">CG</td><td>Number</td><td></td><td></td><td>Closure Gravity — computed</td></tr>
+        <tr><td class="mono">DES</td><td>Number</td><td></td><td></td><td>Deficiency Echo Score — computed</td></tr>
+        <tr><td class="mono">DEGDays</td><td>Number</td><td></td><td></td><td>Decision-to-Evidence Gap — computed</td></tr>
+        <tr><td class="mono">EDI</td><td>Number</td><td></td><td></td><td>Evidence Density Index — computed</td></tr>
+        <tr><td class="mono">PPI</td><td>Number</td><td></td><td></td><td>Patch Precision Index — computed</td></tr>
+        <tr><td class="mono">ClosureRequested</td><td>Yes/No</td><td></td><td></td><td></td></tr>
+        <tr><td class="mono">ClosureApproved</td><td>Yes/No</td><td></td><td></td><td></td></tr>
+        <tr><td class="mono">Reopened</td><td>Yes/No</td><td></td><td></td><td></td></tr>
+        <tr><td class="mono">CreatedBy</td><td>Person</td><td></td><td></td><td>Auto-populated</td></tr>
+        <tr><td class="mono">CreatedDate</td><td>Date</td><td></td><td></td><td>Auto-populated</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>2. Reviews</h3>
+      <table><thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td class="mono">ReviewID</td><td>Single line</td><td>R-XXXX</td></tr>
+        <tr><td class="mono">FindingLookup</td><td>Lookup</td><td>→ Findings list</td></tr>
+        <tr><td class="mono">ReviewerPerson</td><td>Person</td><td></td></tr>
+        <tr><td class="mono">ReviewStatus</td><td>Choice</td><td>Active | Complete | Sent Back</td></tr>
+        <tr><td class="mono">Validity</td><td>Choice</td><td>Confirmed | Disputed | Deferred</td></tr>
+        <tr><td class="mono">SeverityAssessed</td><td>Choice</td><td>HIGH | MEDIUM | LOW</td></tr>
+        <tr><td class="mono">OperationalImpact</td><td>Choice</td><td>High | Medium | Low</td></tr>
+        <tr><td class="mono">RootCauseCandidate</td><td>Multi-line</td><td></td></tr>
+        <tr><td class="mono">ReadinessScore</td><td>Number</td><td>0.0–1.0 (BRQ source)</td></tr>
+        <tr><td class="mono">ReviewNotes</td><td>Multi-line</td><td></td></tr>
+        <tr><td class="mono">Decision</td><td>Choice</td><td>Approve | Reject | Send Back | Escalate</td></tr>
+        <tr><td class="mono">ReviewStartedDate</td><td>Date</td><td></td></tr>
+        <tr><td class="mono">DecisionDate</td><td>Date</td><td></td></tr>
+      </tbody></table>
+    </div>
+    <div class="card">
+      <h3>3. Patches</h3>
+      <table><thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td class="mono">PatchID</td><td>Single line</td><td>P-XXXX</td></tr>
+        <tr><td class="mono">FindingLookup</td><td>Lookup</td><td>→ Findings list</td></tr>
+        <tr><td class="mono">PatchSummary</td><td>Multi-line</td><td>Corrective action description</td></tr>
+        <tr><td class="mono">RootCauseTargeted</td><td>Yes/No</td><td>PPI source field</td></tr>
+        <tr><td class="mono">ResourceNeed</td><td>Choice</td><td>Low | Medium | High</td></tr>
+        <tr><td class="mono">ApprovalAuthority</td><td>Single line</td><td></td></tr>
+        <tr><td class="mono">ProposedBy</td><td>Person</td><td></td></tr>
+        <tr><td class="mono">ProposedDate</td><td>Date</td><td></td></tr>
+        <tr><td class="mono">ApprovedDate</td><td>Date</td><td></td></tr>
+        <tr><td class="mono">DueDate</td><td>Date</td><td></td></tr>
+        <tr><td class="mono">PatchStatus</td><td>Choice</td><td>Proposed | Approved | Implemented | Failed</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>4. Evidence</h3>
+      <table><thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td class="mono">EvidenceID</td><td>Single line</td><td>EV-XXXX</td></tr>
+        <tr><td class="mono">FindingLookup</td><td>Lookup</td><td>→ Findings list</td></tr>
+        <tr><td class="mono">FileLink</td><td>Hyperlink</td><td>→ Evidence DocLib</td></tr>
+        <tr><td class="mono">EvidenceType</td><td>Choice</td><td>Document | Photo | Training Record | Inspection | Memo</td></tr>
+        <tr><td class="mono">UploadedBy</td><td>Person</td><td></td></tr>
+        <tr><td class="mono">UploadedDate</td><td>Date</td><td></td></tr>
+        <tr><td class="mono">Validated</td><td>Yes/No</td><td></td></tr>
+        <tr><td class="mono">Locked</td><td>Yes/No</td><td>Set true after review lock</td></tr>
+      </tbody></table>
+    </div>
+    <div class="card">
+      <h3>5. Board Decisions</h3>
+      <table><thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td class="mono">BoardDecisionID</td><td>Single line</td><td>BD-XXXX</td></tr>
+        <tr><td class="mono">FindingLookup</td><td>Lookup</td><td>→ Findings list</td></tr>
+        <tr><td class="mono">BoardSession</td><td>Single line</td><td>B-Q2-APR etc.</td></tr>
+        <tr><td class="mono">Decision</td><td>Choice</td><td>Approve | Reject | Send Back | Escalate</td></tr>
+        <tr><td class="mono">SeverityFinal</td><td>Choice</td><td>HIGH | MEDIUM | LOW</td></tr>
+        <tr><td class="mono">Comments</td><td>Multi-line</td><td></td></tr>
+        <tr><td class="mono">DecidedBy</td><td>Person</td><td></td></tr>
+        <tr><td class="mono">DecidedDate</td><td>Date</td><td></td></tr>
+      </tbody></table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>6. Reference Data</h3>
+    <table><thead><tr><th>Column</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+      <tr><td class="mono">RefType</td><td>Choice</td><td>Status | Severity | FunctionArea | KPIThreshold | Role</td></tr>
+      <tr><td class="mono">RefKey</td><td>Single line</td><td>Lookup key</td></tr>
+      <tr><td class="mono">RefValue</td><td>Single line</td><td>Display value or threshold number</td></tr>
+      <tr><td class="mono">SortOrder</td><td>Number</td><td></td></tr>
+      <tr><td class="mono">IsActive</td><td>Yes/No</td><td></td></tr>
+    </tbody></table>
+    <div style="font-size:10px;color:var(--muted);margin-top:6px">Use for: statuses, severity values, function areas, KPI thresholds, role names. Single source of truth for all controlled vocabularies.</div>
+  </div>
+
+  <div class="card">
+    <h3>Evidence Document Library</h3>
+    <div style="font-size:11px;color:var(--muted)">Store metadata in the Evidence list. Store actual files in a SharePoint document library. Link back via the FileLink column. This separates searchable metadata from binary storage.</div>
+  </div>
+</section>
+
+<!-- ════════════ POWER APPS ════════════ -->
+<section id="s-pa">
+  <div style="font-size:16px;font-weight:700;margin-bottom:12px"><span class="badge b-pa">Power Apps</span> Canvas App — 5 Screens</div>
+
+  <div class="card">
+    <h3>Screen 1: My Queue (Build First)</h3>
+    <div class="wire"><h4 class="pa">Purpose</h4>
+      <div class="wr"><span class="wl">Who</span><span class="wv">PM, Analyst, Reviewer</span></div>
+      <div class="wr"><span class="wl">Shows</span><span class="wv">My open findings, due soon, overdue, missing evidence, in review, reopened</span></div>
+      <div class="wr"><span class="wl">Why First</span><span class="wv">Proves the workflow works before building analytics</span></div>
+    </div>
+    <div class="wire"><h4 class="pa">Delegable Gallery Formula</h4>
+      <div class="code">Filter(
+    Findings,
+    Status.Value = "Assigned" &&
+    Lower(OwnerPerson.Email) = varUserEmail
+)</div>
+      <div style="font-size:9px;color:var(--muted)">Use delegable filters only. Non-delegable queries evaluate max 500–2,000 rows locally.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Screen 2: Finding Detail (Center of Gravity)</h3>
+    <div class="wire"><h4 class="pa">Tabs</h4>
+      <div class="wr"><span class="wl">Summary</span><span class="wv">Claim, event, risk, owner, status, BRQ</span></div>
+      <div class="wr"><span class="wl">Review</span><span class="wv">Severity, readiness, root cause, notes, decision state</span></div>
+      <div class="wr"><span class="wl">Patch</span><span class="wv">Corrective action, due date, authority, PPI</span></div>
+      <div class="wr"><span class="wl">Evidence</span><span class="wv">Attached, validated, locked checklist</span></div>
+      <div class="wr"><span class="wl">History</span><span class="wv">Timeline, reopenings, related findings</span></div>
+    </div>
+    <div class="wire"><h4 class="pa">Child Record Queries</h4>
+      <div class="code">// Reviews for this finding
+Filter(Reviews, FindingLookup.Id = varFinding.ID)
+
+// Patches for this finding
+Filter(Patches, FindingLookup.Id = varFinding.ID)
+
+// Evidence for this finding
+Filter(Evidence, FindingLookup.Id = varFinding.ID)</div>
+    </div>
+    <div class="wire"><h4 class="pa">Closure Button Guard</h4>
+      <div class="code">If(
+    IsBlank(DataCardValue_Owner.Selected) ||
+    IsBlank(txtPatchSummary.Text) ||
+    CountRows(
+        Filter(Evidence,
+            FindingLookup.Id = varFinding.ID &&
+            Validated = true)
+    ) = 0,
+    DisplayMode.Disabled,
+    DisplayMode.Edit
+)</div>
+      <div style="font-size:9px;color:var(--muted)">No closure without owner + patch + evidence. Enforced at the UI layer.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Screen 3: Review Board</h3>
+    <div class="wire"><h4 class="pa">Board Queue Formula</h4>
+      <div class="code">Filter(
+    Findings,
+    Status.Value = "In Review" &&
+    BRQ >= 0.6
+)</div>
+    </div>
+    <div class="wr"><span class="wl">Shows</span><span class="wv">Board-ready items, BRQ, DEG, CG, approve/reject/send back</span></div>
+    <div class="wr"><span class="wl">Three-panel layout</span><span class="wv">Finding/Risk | Patch/Evidence | Recurrence/History</span></div>
+  </div>
+
+  <div class="card">
+    <h3>Screen 4: Command Dashboard (Build Last)</h3>
+    <div class="wr"><span class="wl">Shows</span><span class="wv">CCCI, CIS, PAR, DES, open findings, recurring deficiencies, attention alerts</span></div>
+    <div class="wr"><span class="wl">Why Last</span><span class="wv">Dashboard without working workflow = governance theater</span></div>
+    <div style="font-size:10px;color:var(--muted);margin-top:6px">Consider using Power BI embedded for this screen instead of native Power Apps galleries. Power BI handles cross-list rollups better.</div>
+  </div>
+
+  <div class="card">
+    <h3>Screen 5: Admin</h3>
+    <div class="wr"><span class="wl">Shows</span><span class="wv">Role mappings, thresholds, statuses, severity values, function areas</span></div>
+    <div class="wr"><span class="wl">Source</span><span class="wv">ReferenceData list</span></div>
+  </div>
+
+  <div class="card">
+    <h3>App Startup — Role Detection</h3>
+    <div class="code">// OnStart
+Set(varUserEmail, Lower(User().Email));
+
+Set(
+    varRole,
+    If(
+        varUserEmail in colAdmins.Email, "Admin",
+        varUserEmail in colReviewers.Email, "Reviewer",
+        varUserEmail in colPMs.Email, "PM",
+        varUserEmail in colAnalysts.Email, "Analyst",
+        varUserEmail in colExecutives.Email, "Executive",
+        varUserEmail in colAuditors.Email, "Auditor",
+        "ReadOnly"
+    )
+);</div>
+    <div style="font-size:9px;color:var(--muted)">User() returns Email, FullName, and EntraObjectId for the signed-in Power Apps user. Load role collections from ReferenceData or a dedicated Roles list on startup.</div>
+  </div>
+
+  <div class="card">
+    <h3>Role-Based Visibility</h3>
+    <div class="code">// Show/hide screen elements
+Visible = varRole = "Reviewer" || varRole = "Admin"
+
+// Disable editing based on state
+DisplayMode = If(
+    varFinding.Status.Value = "Closed" ||
+    varRole = "Auditor",
+    DisplayMode.Disabled,
+    DisplayMode.Edit
+)</div>
+  </div>
+</section>
+
+<!-- ════════════ POWER AUTOMATE ════════════ -->
+<section id="s-auto">
+  <div style="font-size:16px;font-weight:700;margin-bottom:12px"><span class="badge b-auto">Power Automate</span> 7 Flows</div>
+
+  <div class="card">
+    <h3>Flow 1: Owner Assignment Notification</h3>
+    <div class="flow-row"><span class="flow-step fs-trigger">Trigger</span><span class="flow-arrow">→</span> Finding Status changes to "Assigned"</div>
+    <div class="flow-row"><span class="flow-step fs-action">Action</span><span class="flow-arrow">→</span> Send email to OwnerPerson with finding details + due date</div>
+    <div class="flow-row"><span class="flow-step fs-notify">Notify</span><span class="flow-arrow">→</span> Teams message to PM channel</div>
+  </div>
+
+  <div class="card">
+    <h3>Flow 2: Review Request</h3>
+    <div class="flow-row"><span class="flow-step fs-trigger">Trigger</span><span class="flow-arrow">→</span> Finding Status changes to "In Review"</div>
+    <div class="flow-row"><span class="flow-step fs-action">Action</span><span class="flow-arrow">→</span> Send email to ReviewerPerson with finding summary + BRQ</div>
+    <div class="flow-row"><span class="flow-step fs-action">Action</span><span class="flow-arrow">→</span> Create Review record in Reviews list</div>
+    <div class="flow-row"><span class="flow-step fs-notify">Notify</span><span class="flow-arrow">→</span> Teams message to Board channel</div>
+  </div>
+
+  <div class="card">
+    <h3>Flow 3: Closure Request Approval</h3>
+    <div class="flow-row"><span class="flow-step fs-trigger">Trigger</span><span class="flow-arrow">→</span> ClosureRequested = Yes</div>
+    <div class="flow-row"><span class="flow-step fs-action">Action</span><span class="flow-arrow">→</span> Start approval with ReviewerPerson</div>
+    <div class="flow-row"><span class="flow-step fs-action">Action</span><span class="flow-arrow">→</span> If approved: set Status = "Closed", ClosureApproved = Yes</div>
+    <div class="flow-row"><span class="flow-step fs-action">Action</span><span class="flow-arrow">→</span> If rejected: set Status = "In Review", add review note</div>
+    <div class="flow-row"><span class="flow-step fs-notify">Notify</span><span class="flow-arrow">→</span> Email owner with decision</div>
+  </div>
+
+  <div class="card">
+    <h3>Flow 4: Reopen Alert</h3>
+    <div class="flow-row"><span class="flow-step fs-trigger">Trigger</span><span class="flow-arrow">→</span> Reopened = Yes</div>
+    <div class="flow-row"><span class="flow-step fs-action">Action</span><span class="flow-arrow">→</span> Set Status = "Reopened"</div>
+    <div class="flow-row"><span class="flow-step fs-notify">Notify</span><span class="flow-arrow">→</span> Email owner + reviewer + executive channel</div>
+  </div>
+
+  <div class="card">
+    <h3>Flow 5: Weekly Board Digest</h3>
+    <div class="flow-row"><span class="flow-step fs-trigger">Trigger</span><span class="flow-arrow">→</span> Recurrence: Monday 0800</div>
+    <div class="flow-row"><span class="flow-step fs-action">Action</span><span class="flow-arrow">→</span> Query: findings where Status = "In Review" and BRQ >= 0.6</div>
+    <div class="flow-row"><span class="flow-step fs-notify">Notify</span><span class="flow-arrow">→</span> Email digest to Board members with finding count, top severity, overdue items</div>
+  </div>
+
+  <div class="card">
+    <h3>Flow 6: KPI Refresh / Rollup</h3>
+    <div class="flow-row"><span class="flow-step fs-trigger">Trigger</span><span class="flow-arrow">→</span> Recurrence: every 4 hours</div>
+    <div class="flow-row"><span class="flow-step fs-action">Action</span><span class="flow-arrow">→</span> Compute BRQ, CG, DES, DEG, EDI, PPI for each open finding</div>
+    <div class="flow-row"><span class="flow-step fs-action">Action</span><span class="flow-arrow">→</span> Write computed values back to Findings list</div>
+    <div style="font-size:10px;color:var(--muted);margin-top:6px">Keep the frontend clean: backend computes truth, frontend displays it. Do not compute KPIs inside Power Apps formulas.</div>
+  </div>
+
+  <div class="card">
+    <h3>Flow 7: Evidence Lock on Review Start</h3>
+    <div class="flow-row"><span class="flow-step fs-trigger">Trigger</span><span class="flow-arrow">→</span> Review record created (ReviewStatus = "Active")</div>
+    <div class="flow-row"><span class="flow-step fs-action">Action</span><span class="flow-arrow">→</span> Set Locked = Yes for all Evidence records linked to this finding</div>
+    <div style="font-size:10px;color:var(--muted);margin-top:6px">Enforces: no evidence editing after review lock. Hard governance rule.</div>
+  </div>
+</section>
+
+<!-- ════════════ POWER BI ════════════ -->
+<section id="s-pbi">
+  <div style="font-size:16px;font-weight:700;margin-bottom:12px"><span class="badge b-pbi">Power BI</span> Analytics Glass — 4 Report Pages + 12 DAX Measures</div>
+
+  <div class="card">
+    <h3>Data Model</h3>
+    <div class="wire"><h4 class="pbi">Sources (SharePoint List Connector)</h4>
+      <div class="wr"><span class="wl">Fact Table</span><span class="wv">Findings (master)</span></div>
+      <div class="wr"><span class="wl">Child Tables</span><span class="wv">Reviews, Patches, Evidence, BoardDecisions</span></div>
+      <div class="wr"><span class="wl">Dimension</span><span class="wv">ReferenceData + Date table (generated)</span></div>
+      <div class="wr"><span class="wl">Relationships</span><span class="wv">FindingID → child tables via FindingLookup</span></div>
+      <div class="wr"><span class="wl">Refresh</span><span class="wv">4–8x daily (import mode)</span></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Page 1: Command View</h3>
+      <div class="wr"><span class="wl">For</span><span class="wv">Executive / Commander</span></div>
+      <div class="wr"><span class="wl">KPI Cards</span><span class="wv">CCCI, CIS, PAR, DES</span></div>
+      <div class="wr"><span class="wl">Visuals</span><span class="wv">Closure trend line, recurring deficiency bar, severity by function, open by state, DEG aging buckets</span></div>
+    </div>
+    <div class="card">
+      <h3>Page 2: Board View</h3>
+      <div class="wr"><span class="wl">For</span><span class="wv">Reviewer / Board Chair</span></div>
+      <div class="wr"><span class="wl">Visuals</span><span class="wv">Board-ready table, BRQ histogram, reopen trend, evidence completeness, patch precision by owner, recurring finding matrix</span></div>
+    </div>
+    <div class="card">
+      <h3>Page 3: Ops View</h3>
+      <div class="wr"><span class="wl">For</span><span class="wv">PM / Analyst</span></div>
+      <div class="wr"><span class="wl">Visuals</span><span class="wv">Owner backlog, overdue queue, time-to-review, time-to-close, evidence upload lag, closure by command/function</span></div>
+    </div>
+    <div class="card">
+      <h3>Page 4: Audit View</h3>
+      <div class="wr"><span class="wl">For</span><span class="wv">Auditor / Inspector</span></div>
+      <div class="wr"><span class="wl">Visuals</span><span class="wv">Closure proof coverage, reopened closure list, decision history, evidence validation rate, audit completeness</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>DAX Measures — Lead-6 KPIs</h3>
+    <div class="measure-card">
+      <h5>PAR — Patch Adhesion Rate</h5>
+      <div class="m-formula">PAR = 
+    DIVIDE(
+        COUNTROWS(FILTER(Findings, Findings[Status] = "Closed" && Findings[Reopened] = FALSE())),
+        COUNTROWS(FILTER(Findings, Findings[Status] = "Closed")),
+        0
+    )</div>
+      <div class="m-note">Durable closures / total closures. Higher = patches holding.</div>
+    </div>
+    <div class="measure-card">
+      <h5>FCR — False Closure Rate</h5>
+      <div class="m-formula">FCR = 
+    DIVIDE(
+        COUNTROWS(FILTER(Findings, Findings[Reopened] = TRUE())),
+        COUNTROWS(FILTER(Findings, Findings[ClosureApproved] = TRUE())),
+        0
+    )</div>
+      <div class="m-note">Reopened / total closures. Lower = closures are real.</div>
+    </div>
+    <div class="measure-card">
+      <h5>BRQ Average — Board Readiness Quotient</h5>
+      <div class="m-formula">BRQ_Avg = 
+    AVERAGE(
+        FILTER(Findings, Findings[Status] = "In Review"),
+        Findings[BRQ]
+    )</div>
+      <div class="m-note">Average readiness score across in-review items.</div>
+    </div>
+    <div class="measure-card">
+      <h5>CIS — Closure Integrity Score</h5>
+      <div class="m-formula">CIS = 
+    0.25 * [PAR] + 
+    0.20 * [EDI_Norm] + 
+    0.25 * (1 - [FCR]) + 
+    0.15 * (1 - [DEG_Norm]) + 
+    0.15 * [PPI_Avg]</div>
+      <div class="m-note">Flagship composite. CIS > 0.75 = governance loop is real.</div>
+    </div>
+    <div class="measure-card">
+      <h5>Open Findings</h5>
+      <div class="m-formula">OpenFindings = 
+    COUNTROWS(
+        FILTER(Findings, 
+            Findings[Status] <> "Closed")
+    )</div>
+    </div>
+    <div class="measure-card">
+      <h5>Avg DEG — Decision-to-Evidence Gap</h5>
+      <div class="m-formula">AvgDEG = 
+    AVERAGEX(
+        FILTER(Findings, NOT(ISBLANK(Findings[DEGDays]))),
+        Findings[DEGDays]
+    )</div>
+      <div class="m-note">Average days between decision and evidence. Lower = faster proof.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Embedded Power Apps Visual</h3>
+    <div style="font-size:11px;color:var(--muted)">Use the Power Apps visual in Power BI to embed the Canvas app. This lets a leader see a red finding in Power BI, click into the embedded app, and take action without leaving the report context. The Power Apps visual passes context-aware data to the app.</div>
+  </div>
+</section>
+
+<!-- ════════════ BUILD ORDER ════════════ -->
+<section id="s-build">
+  <div style="font-size:16px;font-weight:700;margin-bottom:12px">Build Sequence — 8 Phases</div>
+  <div style="font-size:11px;color:var(--muted);margin-bottom:14px">Order matters. Build the record workflow before the dashboard. Build delegation-safe queries before complex rollups.</div>
+
+  <div class="grid2">
+    <div class="phase-card ph-a"><span class="phase-num">A</span>
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px"><span class="badge b-sp">SharePoint</span> Foundation</div>
+      <div style="font-size:10px;color:var(--muted)">Create 6 lists, all columns, choice values, indexed columns, M365 groups. Create Evidence document library. Set list-level permissions by group.</div>
+    </div>
+    <div class="phase-card ph-b"><span class="phase-num">B</span>
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px"><span class="badge b-pa">Power Apps</span> Shell</div>
+      <div style="font-size:10px;color:var(--muted)">Create Canvas App. Connect all 6 lists as data sources. Build navigation shell with 5 screens. Implement role detection on OnStart.</div>
+    </div>
+    <div class="phase-card ph-c"><span class="phase-num">C</span>
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px"><span class="badge b-pa">Power Apps</span> My Queue</div>
+      <div style="font-size:10px;color:var(--muted)">Build delegable gallery with owner filter. Show: my findings, due soon, overdue, missing evidence. Prove the workflow works.</div>
+    </div>
+    <div class="phase-card ph-d"><span class="phase-num">D</span>
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px"><span class="badge b-pa">Power Apps</span> Finding Detail</div>
+      <div style="font-size:10px;color:var(--muted)">Build center of gravity: summary, review, patch, evidence, history tabs. Wire child record queries. Add closure button guard.</div>
+    </div>
+    <div class="phase-card ph-e"><span class="phase-num">E</span>
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px"><span class="badge b-pa">Power Apps</span> Review Board + Admin</div>
+      <div style="font-size:10px;color:var(--muted)">Build board queue, three-panel detail, decision controls. Build admin screen for reference data management.</div>
+    </div>
+    <div class="phase-card ph-f"><span class="phase-num">F</span>
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px"><span class="badge b-auto">Power Automate</span> Core Flows</div>
+      <div style="font-size:10px;color:var(--muted)">Build flows 1–4: owner assigned, review requested, closure approval, reopen alert. These drive the state machine.</div>
+    </div>
+    <div class="phase-card ph-g"><span class="phase-num">G</span>
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px"><span class="badge b-auto">Power Automate</span> Support Flows</div>
+      <div style="font-size:10px;color:var(--muted)">Build flows 5–7: weekly digest, KPI rollup, evidence lock. These harden governance.</div>
+    </div>
+    <div class="phase-card ph-h"><span class="phase-num">H</span>
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px"><span class="badge b-pbi">Power BI</span> Analytics</div>
+      <div style="font-size:10px;color:var(--muted)">Build semantic model, DAX measures, 4 report pages. Only after workflow is stable. Embed Power Apps visual for action-from-analytics.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <h3>What to Postpone (Not in V1)</h3>
+    <div class="pp">
+      <span class="pp-w">Full memory graph visualization</span>
+      <span class="pp-w">Granular claim/event normalization</span>
+      <span class="pp-w">Item-level security everywhere</span>
+      <span class="pp-w">Complex cross-list rollup inside Power Apps</span>
+      <span class="pp-w">PDF packet generation inside the app</span>
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin-top:6px">Handle rollups with flows or a summary list. Move to Dataverse when SharePoint becomes the constraint.</div>
+  </div>
+</section>
+
+<!-- ════════════ ROLES ════════════ -->
+<section id="s-roles">
+  <div style="font-size:16px;font-weight:700;margin-bottom:12px">Roles, Permissions & Access Control</div>
+
+  <div class="card">
+    <h3>M365 Security Groups</h3>
+    <table><thead><tr><th>Group</th><th>UI Surface</th><th>Members</th><th>Landing Screen</th></tr></thead><tbody>
+      <tr><td class="mono">CERPA-Executives</td><td>Command UI</td><td>Commanders, Deputy Commanders</td><td>Dashboard</td></tr>
+      <tr><td class="mono">CERPA-PMs</td><td>Ops UI</td><td>Program Managers, Action Officers</td><td>My Queue</td></tr>
+      <tr><td class="mono">CERPA-Reviewers</td><td>Command + Ops</td><td>Board Members, Board Chair</td><td>Review Board</td></tr>
+      <tr><td class="mono">CERPA-Analysts</td><td>Ops UI</td><td>Assessment Leads, Inspectors</td><td>My Queue</td></tr>
+      <tr><td class="mono">CERPA-Admins</td><td>Governance UI</td><td>System Administrators</td><td>Admin</td></tr>
+      <tr><td class="mono">CERPA-Auditors</td><td>Governance UI</td><td>Inspector General, External Oversight</td><td>Audit View</td></tr>
+    </tbody></table>
+  </div>
+
+  <div class="card">
+    <h3>Permission Matrix</h3>
+    <table>
+      <thead><tr><th>Action</th><th>Executive</th><th>PM</th><th>Reviewer</th><th>Analyst</th><th>Admin</th><th>Auditor</th></tr></thead>
+      <tbody>
+        <tr><td>View dashboard</td><td style="color:var(--ok)">Yes</td><td style="color:var(--ok)">Yes</td><td style="color:var(--ok)">Yes</td><td style="color:var(--ok)">Yes</td><td style="color:var(--ok)">Yes</td><td style="color:var(--ok)">Yes</td></tr>
+        <tr><td>Create finding</td><td style="color:#3a4a5e">—</td><td style="color:var(--ok)">Yes</td><td style="color:#3a4a5e">—</td><td style="color:var(--ok)">Yes</td><td style="color:#3a4a5e">—</td><td style="color:#3a4a5e">—</td></tr>
+        <tr><td>Edit finding</td><td style="color:#3a4a5e">—</td><td style="color:#a78bfa">Scoped</td><td style="color:#a78bfa">Scoped</td><td style="color:var(--ok)">Yes</td><td style="color:#3a4a5e">—</td><td style="color:#3a4a5e">—</td></tr>
+        <tr><td>Approve / reject</td><td style="color:var(--warn)">Limited</td><td style="color:#3a4a5e">—</td><td style="color:var(--ok)">Yes</td><td style="color:#3a4a5e">—</td><td style="color:#3a4a5e">—</td><td style="color:#3a4a5e">—</td></tr>
+        <tr><td>Create patch</td><td style="color:#3a4a5e">—</td><td style="color:var(--ok)">Yes</td><td style="color:var(--accent)">Read</td><td style="color:var(--accent)">Read</td><td style="color:#3a4a5e">—</td><td style="color:#3a4a5e">—</td></tr>
+        <tr><td>Upload evidence</td><td style="color:#3a4a5e">—</td><td style="color:var(--ok)">Yes</td><td style="color:#3a4a5e">—</td><td style="color:var(--ok)">Yes</td><td style="color:#3a4a5e">—</td><td style="color:#3a4a5e">—</td></tr>
+        <tr><td>Approve closure</td><td style="color:var(--warn)">Limited</td><td style="color:#3a4a5e">—</td><td style="color:var(--ok)">Yes</td><td style="color:#3a4a5e">—</td><td style="color:#3a4a5e">—</td><td style="color:#3a4a5e">—</td></tr>
+        <tr><td>Reopen finding</td><td style="color:var(--warn)">Limited</td><td style="color:#3a4a5e">—</td><td style="color:var(--ok)">Yes</td><td style="color:#3a4a5e">—</td><td style="color:#3a4a5e">—</td><td style="color:#3a4a5e">—</td></tr>
+        <tr><td>Manage roles / config</td><td style="color:#3a4a5e">—</td><td style="color:#3a4a5e">—</td><td style="color:#3a4a5e">—</td><td style="color:#3a4a5e">—</td><td style="color:var(--ok)">Yes</td><td style="color:#3a4a5e">—</td></tr>
+        <tr><td>Audit export</td><td style="color:var(--warn)">Limited</td><td style="color:#3a4a5e">—</td><td style="color:var(--warn)">Limited</td><td style="color:#3a4a5e">—</td><td style="color:var(--ok)">Yes</td><td style="color:var(--ok)">Yes</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>State-Based Edit Rules</h3>
+    <table>
+      <thead><tr><th>State</th><th>Analyst</th><th>PM</th><th>Reviewer</th><th>Executive</th><th>Admin</th><th>Auditor</th></tr></thead>
+      <tbody>
+        <tr><td>New</td><td>Create/Edit</td><td>Edit</td><td>View</td><td>View</td><td>Edit</td><td>View</td></tr>
+        <tr><td>Assigned</td><td>View</td><td>Edit</td><td>View</td><td>View</td><td>Edit</td><td>View</td></tr>
+        <tr><td>In Review</td><td>View</td><td>Comment</td><td>Edit/Decide</td><td>View/Approve</td><td>Edit</td><td>View</td></tr>
+        <tr><td>Patch Approved</td><td>View</td><td>Edit</td><td>View/Approve</td><td>View/Approve</td><td>Edit</td><td>View</td></tr>
+        <tr><td>Closed</td><td>View</td><td>View</td><td>View</td><td>View</td><td>View</td><td>View</td></tr>
+        <tr><td>Reopened</td><td>View</td><td>Edit</td><td>Edit/Decide</td><td>View/Approve</td><td>Edit</td><td>View</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:9px;color:var(--muted);margin-top:6px">Use SharePoint permissions for broad access boundaries. Use the app for workflow/state control. Do not rely on UI hiding alone.</div>
+  </div>
+
+  <div class="card">
+    <h3>Authority Rules — Hard Law</h3>
+    <div class="pp">
+      <span class="pp-r">Analyst can create truth objects, not approve closure</span>
+      <span class="pp-r">PM can drive action, not self-certify final closure</span>
+      <span class="pp-r">Reviewer can validate closure, not rewrite raw observation history</span>
+      <span class="pp-c">Executive can approve/escalate, not edit operational evidence</span>
+      <span class="pp-c">Auditor can inspect/export, never modify</span>
+      <span class="pp-c">Admin can manage system rules, not alter historical canon</span>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <strong>Deep Sigma EDGE</strong> — CERPA Power Platform Build Spec v1.0.0 — SharePoint + Power Apps + Power Automate + Power BI — Army Protection Program (APP)
+</footer>
+
+<script>
+(function(){"use strict";
+var tabs=document.querySelectorAll(".ttab"),secs=document.querySelectorAll(".main section");
+function openTab(n){
+  tabs.forEach(function(t){t.classList.toggle("active",t.getAttribute("data-t")===n)});
+  secs.forEach(function(s){s.classList.toggle("active",s.id==="s-"+n)});
+}
+tabs.forEach(function(t){t.addEventListener("click",function(){openTab(t.getAttribute("data-t"))})});
+})();
+</script>
+</body>
+</html>
