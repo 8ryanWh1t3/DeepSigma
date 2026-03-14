@@ -1,0 +1,366 @@
+<!--
+ CERPA Industry Vertical Deployment Scenarios EDGE v1.0.0
+ ============================================================
+ Deep Sigma Decision Governance Platform
+ 6 Domains: Defense | Healthcare | Finance | Climate/Energy | Supply Chain | Autonomous Systems
+ Each domain: CERPA cycle with domain vocabulary, KPIs, compliance anchors
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"/>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>CERPA Industry Verticals — Deep Sigma EDGE</title>
+<style>
+:root{--bg:#0b0f14;--card:#111824;--card2:#0d1520;--muted:#8aa0b5;--txt:#e7eef7;--accent:#7df9ff;--warn:#ffcc66;--bad:#ff6b6b;--ok:#5dff93;--line:#1b2a3a;--mag:#ff6bff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--txt);font-size:13px}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+header{padding:10px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;min-height:54px;background:rgba(8,12,20,.96)}
+header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(125,249,255,.2) 15%,rgba(255,107,255,.12) 50%,rgba(125,249,255,.2) 85%,transparent)}
+.brand{font-weight:700;letter-spacing:.5px;font-size:15px;background:linear-gradient(135deg,var(--accent),var(--mag));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.brand small{display:block;-webkit-text-fill-color:var(--muted);font-size:10px;font-weight:400}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);padding:0 16px;background:rgba(11,15,20,.92);flex-wrap:wrap}
+.ttab{padding:9px 12px;font-size:9px;font-weight:600;color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;letter-spacing:.3px;text-transform:uppercase}
+.ttab:hover{color:var(--txt)}.ttab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.main{height:calc(100vh - 100px);overflow-y:auto;padding:16px 20px}
+.main section{display:none;max-width:1200px;margin:0 auto}.main section.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+.card h3{margin:0 0 10px;font-size:13px;color:#cfe2f7;letter-spacing:.4px;text-transform:uppercase}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th,td{padding:6px 8px;border-bottom:1px solid #141e2d;text-align:left;vertical-align:top}
+th{color:#6b8099;font-weight:700;font-size:9px;text-transform:uppercase;letter-spacing:.5px}
+.wire{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:10px}
+.wire h4{margin:0 0 8px;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--accent)}
+.wr{display:flex;justify-content:space-between;padding:4px 0;font-size:11px;border-bottom:1px solid #141e2d;gap:8px}
+.wr:last-child{border:none}.wr .wl{color:var(--muted);min-width:90px;flex-shrink:0}.wr .wv{font-weight:500;text-align:right;flex:1}
+.cycle{display:flex;gap:4px;margin:14px 0;flex-wrap:wrap}
+.cyc-step{flex:1;min-width:100px;padding:10px;border-radius:8px;text-align:center;font-size:10px;font-weight:700;border:1px solid;position:relative}
+.cyc-step small{display:block;font-weight:400;font-size:8px;margin-top:3px;opacity:.8}
+.cyc-arr{display:flex;align-items:center;color:#2a3a4e;font-size:14px;padding:0 2px}
+.c-claim{color:#00b4d8;border-color:rgba(0,180,216,.3);background:rgba(0,180,216,.06)}
+.c-event{color:#f59e0b;border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.06)}
+.c-review{color:#a78bfa;border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.06)}
+.c-patch{color:#ef4444;border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.06)}
+.c-apply{color:#10b981;border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.06)}
+.domain-icon{font-size:28px;margin-bottom:6px}
+.domain-tag{display:inline-block;padding:3px 10px;border-radius:6px;font-size:9px;font-weight:700;letter-spacing:.4px;margin-bottom:8px}
+.kpi-row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.kpi-mini{padding:6px 10px;border-radius:6px;border:1px solid var(--line);background:rgba(125,249,255,.02);font-size:10px;flex:1;min-width:100px}
+.kpi-mini .kv{font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}.kpi-mini .kl{font-size:8px;color:var(--muted);margin-top:1px}
+.comp-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:8px;font-weight:600;margin:2px}
+.ct-green{color:var(--ok);border:1px solid rgba(93,255,147,.25);background:rgba(93,255,147,.04)}
+.ct-blue{color:var(--accent);border:1px solid rgba(125,249,255,.2);background:rgba(125,249,255,.03)}
+.ct-amber{color:var(--warn);border:1px solid rgba(255,204,102,.2);background:rgba(255,204,102,.04)}
+footer{padding:8px 16px;border-top:1px solid var(--line);font-size:9px;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">DEEP SIGMA EDGE<small>CERPA Industry Vertical Deployment Scenarios v1.0.0</small></div>
+</header>
+<div class="tabs">
+  <button class="ttab active" data-t="over">Overview</button>
+  <button class="ttab" data-t="def">Defense</button>
+  <button class="ttab" data-t="health">Healthcare</button>
+  <button class="ttab" data-t="fin">Finance</button>
+  <button class="ttab" data-t="energy">Climate / Energy</button>
+  <button class="ttab" data-t="supply">Supply Chain</button>
+  <button class="ttab" data-t="auto">Autonomous Systems</button>
+</div>
+<div class="main">
+
+<!-- ═══ OVERVIEW ═══ -->
+<section id="s-over" class="active">
+  <div style="text-align:center;margin-bottom:20px">
+    <div style="font-size:22px;font-weight:700">CERPA Across Industries</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px">Same five primitives. Same four artifacts. Same three substrates. Different vocabulary.</div>
+  </div>
+  <div class="card">
+    <h3>The Universal Cycle</h3>
+    <div class="cycle">
+      <div class="cyc-step c-claim">CLAIM<small>Assert risk</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-event">EVENT<small>Observe fact</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-review">REVIEW<small>Adjudicate</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-patch">PATCH<small>Correct</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-apply">APPLY<small>Prove & learn</small></div>
+    </div>
+    <div style="font-size:10px;color:var(--muted);text-align:center">The primitives are universal. The deployment context is what changes.</div>
+  </div>
+  <div class="grid3">
+    <div class="card" style="text-align:center;cursor:pointer" data-nav="def"><div class="domain-icon">🛡</div><div style="font-weight:700">Defense</div><div style="font-size:10px;color:var(--muted)">AR 525-2 · APP Assessment · OPMG</div></div>
+    <div class="card" style="text-align:center;cursor:pointer" data-nav="health"><div class="domain-icon">🏥</div><div style="font-weight:700">Healthcare</div><div style="font-size:10px;color:var(--muted)">Diagnostic Drift · FDA AI/ML · Patient Safety</div></div>
+    <div class="card" style="text-align:center;cursor:pointer" data-nav="fin"><div class="domain-icon">📊</div><div style="font-weight:700">Finance</div><div style="font-size:10px;color:var(--muted)">Model Risk · Algo Trading · Basel III/IV</div></div>
+    <div class="card" style="text-align:center;cursor:pointer" data-nav="energy"><div class="domain-icon">⚡</div><div style="font-weight:700">Climate / Energy</div><div style="font-size:10px;color:var(--muted)">Grid Optimization · Demand Drift · NERC CIP</div></div>
+    <div class="card" style="text-align:center;cursor:pointer" data-nav="supply"><div class="domain-icon">🔗</div><div style="font-weight:700">Supply Chain</div><div style="font-size:10px;color:var(--muted)">Disruption Governance · ISO 28000 · Resilience</div></div>
+    <div class="card" style="text-align:center;cursor:pointer" data-nav="auto"><div class="domain-icon">🤖</div><div style="font-weight:700">Autonomous Systems</div><div style="font-size:10px;color:var(--muted)">Agent Authority · DoD 3000.09 · Self-Healing</div></div>
+  </div>
+  <div class="card">
+    <h3>Cross-Industry Comparison</h3>
+    <table><thead><tr><th>Domain</th><th>Claim = </th><th>Event = </th><th>Review = </th><th>Patch = </th><th>Apply = </th><th>Primary KPI</th><th>Compliance</th></tr></thead><tbody>
+      <tr><td>Defense</td><td>Finding assertion</td><td>Inspection result</td><td>Board adjudication</td><td>Corrective action</td><td>Evidence + close</td><td>CIS</td><td>NIST AI RMF</td></tr>
+      <tr><td>Healthcare</td><td>Diagnostic hypothesis</td><td>Test result / vitals</td><td>Peer review</td><td>Treatment plan</td><td>Outcome + learn</td><td>Diagnostic PAR</td><td>FDA AI/ML</td></tr>
+      <tr><td>Finance</td><td>Risk assertion</td><td>Market event</td><td>Risk committee</td><td>Hedge / rebalance</td><td>Settlement + audit</td><td>Model CIS</td><td>Basel III/IV</td></tr>
+      <tr><td>Energy</td><td>Demand forecast</td><td>Sensor reading</td><td>Control room review</td><td>Load adjustment</td><td>Grid stability + log</td><td>Grid PAR</td><td>NERC CIP</td></tr>
+      <tr><td>Supply Chain</td><td>Disruption alert</td><td>Supplier event</td><td>Ops review</td><td>Sourcing change</td><td>Delivery + verify</td><td>Supply CIS</td><td>ISO 28000</td></tr>
+      <tr><td>Autonomous</td><td>Decision proposal</td><td>Sensor fusion</td><td>Authority gate</td><td>Trajectory update</td><td>Execute + record</td><td>Agent PAR</td><td>DoD 3000.09</td></tr>
+    </tbody></table>
+  </div>
+</section>
+
+<!-- ═══ DEFENSE ═══ -->
+<section id="s-def">
+  <div class="domain-tag" style="color:#00b4d8;border:1px solid rgba(0,180,216,.3);background:rgba(0,180,216,.06)">🛡 DEFENSE — ARMY PROTECTION PROGRAM</div>
+  <div class="card">
+    <h3>CERPA Cycle — AR 525-2 APP Assessment</h3>
+    <div class="cycle">
+      <div class="cyc-step c-claim">CLAIM<small>Finding assertion<br/>SOP gap identified</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-event">EVENT<small>Inspection result<br/>Assessment walkdown</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-review">REVIEW<small>Board adjudication<br/>BRQ ≥ 0.60 gate</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-patch">PATCH<small>Corrective action<br/>Root cause targeted</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-apply">APPLY<small>Evidence + closure<br/>Memory Graph update</small></div>
+    </div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi-mini"><div class="kv" style="color:var(--ok)">81</div><div class="kl">CIS — Closure Integrity Score</div></div>
+    <div class="kpi-mini"><div class="kv" style="color:var(--ok)">88%</div><div class="kl">PAR — Patch Adhesion Rate</div></div>
+    <div class="kpi-mini"><div class="kv" style="color:var(--warn)">22</div><div class="kl">DES — Deficiency Echo Score</div></div>
+    <div class="kpi-mini"><div class="kv" style="color:var(--bad)">12d</div><div class="kl">DEG — Decision-to-Evidence Gap</div></div>
+  </div>
+  <div class="grid2">
+    <div class="wire"><h4>Domain Vocabulary</h4>
+      <div class="wr"><span class="wl">Claim</span><span class="wv">Finding — assertion of deficiency or risk</span></div>
+      <div class="wr"><span class="wl">Event</span><span class="wv">Inspection / assessment / incident observation</span></div>
+      <div class="wr"><span class="wl">Review</span><span class="wv">Review Board session with severity adjudication</span></div>
+      <div class="wr"><span class="wl">Patch</span><span class="wv">Corrective action plan with PPI scoring</span></div>
+      <div class="wr"><span class="wl">Apply</span><span class="wv">Evidence upload + validation + closure + Memory Graph</span></div>
+    </div>
+    <div class="wire"><h4>Compliance Anchors</h4>
+      <div style="margin-bottom:6px"><span class="comp-tag ct-green">NIST AI RMF 99.1%</span><span class="comp-tag ct-green">AR 525-2</span><span class="comp-tag ct-green">CMMC 2.0</span><span class="comp-tag ct-blue">ISO 27001</span><span class="comp-tag ct-blue">FedRAMP</span></div>
+      <div class="wr"><span class="wl">Maturity</span><span class="wv" style="color:var(--ok)">Deployed — pilot-ready</span></div>
+      <div class="wr"><span class="wl">ROI</span><span class="wv">3:1 to 10:1 (single command)</span></div>
+      <div class="wr"><span class="wl">Platform</span><span class="wv">SharePoint + Power Apps + Power Automate + Power BI</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ HEALTHCARE ═══ -->
+<section id="s-health">
+  <div class="domain-tag" style="color:#10b981;border:1px solid rgba(16,185,129,.3);background:rgba(16,185,129,.06)">🏥 HEALTHCARE — DIAGNOSTIC AI GOVERNANCE</div>
+  <div class="card">
+    <h3>CERPA Cycle — Clinical Decision Governance</h3>
+    <div class="cycle">
+      <div class="cyc-step c-claim">CLAIM<small>Diagnostic hypothesis<br/>AI suggests condition X</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-event">EVENT<small>Lab result / imaging<br/>Vital sign anomaly</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-review">REVIEW<small>Peer review / M&M<br/>Diagnostic accuracy audit</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-patch">PATCH<small>Treatment adjustment<br/>Model recalibration</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-apply">APPLY<small>Outcome + learn<br/>Protocol update</small></div>
+    </div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi-mini"><div class="kv" style="color:var(--ok)">92%</div><div class="kl">Diagnostic PAR — Accuracy holds post-correction</div></div>
+    <div class="kpi-mini"><div class="kv" style="color:var(--warn)">0.04</div><div class="kl">FCR — False negative closure rate</div></div>
+    <div class="kpi-mini"><div class="kv" style="color:var(--ok)">2.1d</div><div class="kl">DEG — Lab-to-treatment lag</div></div>
+    <div class="kpi-mini"><div class="kv" style="color:var(--ok)">0.78</div><div class="kl">CMR — Clinical protocol retention</div></div>
+  </div>
+  <div class="grid2">
+    <div class="wire"><h4>Domain Vocabulary</h4>
+      <div class="wr"><span class="wl">Claim</span><span class="wv">AI diagnostic output — suggested diagnosis or risk flag</span></div>
+      <div class="wr"><span class="wl">Event</span><span class="wv">Lab result, imaging finding, vital sign anomaly, patient symptom</span></div>
+      <div class="wr"><span class="wl">Review</span><span class="wv">Physician peer review, M&M conference, diagnostic accuracy audit</span></div>
+      <div class="wr"><span class="wl">Patch</span><span class="wv">Treatment plan adjustment, model threshold recalibration, protocol update</span></div>
+      <div class="wr"><span class="wl">Apply</span><span class="wv">Patient outcome recorded, protocol updated, clinical memory retained</span></div>
+    </div>
+    <div class="wire"><h4>Compliance Anchors</h4>
+      <div style="margin-bottom:6px"><span class="comp-tag ct-amber">FDA AI/ML SaMD</span><span class="comp-tag ct-amber">HIPAA</span><span class="comp-tag ct-green">NIST AI RMF</span><span class="comp-tag ct-blue">ISO 14971</span></div>
+      <div class="wr"><span class="wl">Key Risk</span><span class="wv">Diagnostic drift: model accuracy degrades over population shifts</span></div>
+      <div class="wr"><span class="wl">CERPA Fix</span><span class="wv">DS auto-emits on accuracy threshold breach; Review triggers recalibration</span></div>
+      <div class="wr"><span class="wl">Impact</span><span class="wv">Reduced misdiagnosis rate, auditable clinical AI decisions</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Worked Example: Radiology AI Drift</h3>
+    <div class="wire"><h4>Scenario</h4>
+      <div class="wr"><span class="wl">Claim</span><span class="wv">Chest X-ray AI flags pneumonia in 23% of scans (baseline: 12%)</span></div>
+      <div class="wr"><span class="wl">Event</span><span class="wv">QA audit shows false positive rate increased from 3% to 11% over 6 months</span></div>
+      <div class="wr"><span class="wl">Review</span><span class="wv">Radiology M&M: training data distribution shift identified (new scanner model)</span></div>
+      <div class="wr"><span class="wl">Patch</span><span class="wv">Retrain model with scanner-specific calibration data; PPI: 0.90 (root cause targeted)</span></div>
+      <div class="wr"><span class="wl">Apply</span><span class="wv">Validation: FP rate returns to 3.2%. Protocol updated. Memory Graph indexes scanner-drift pattern.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FINANCE ═══ -->
+<section id="s-fin">
+  <div class="domain-tag" style="color:#f59e0b;border:1px solid rgba(245,158,11,.3);background:rgba(245,158,11,.06)">📊 FINANCE — MODEL RISK GOVERNANCE</div>
+  <div class="card">
+    <h3>CERPA Cycle — Algorithmic Trading & Model Risk</h3>
+    <div class="cycle">
+      <div class="cyc-step c-claim">CLAIM<small>Risk assertion<br/>VaR threshold breach</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-event">EVENT<small>Market event<br/>Volatility spike / flash crash</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-review">REVIEW<small>Risk committee<br/>Model validation board</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-patch">PATCH<small>Hedge / rebalance<br/>Model parameter update</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-apply">APPLY<small>Settlement + audit<br/>Regulatory filing</small></div>
+    </div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi-mini"><div class="kv" style="color:var(--ok)">0.85</div><div class="kl">Model CIS — Model governance integrity</div></div>
+    <div class="kpi-mini"><div class="kv" style="color:var(--ok)">94%</div><div class="kl">PAR — Hedge effectiveness holds</div></div>
+    <div class="kpi-mini"><div class="kv" style="color:var(--warn)">15</div><div class="kl">DES — Recurring model failures</div></div>
+    <div class="kpi-mini"><div class="kv" style="color:var(--ok)">0.3d</div><div class="kl">DEG — Trade-to-audit lag</div></div>
+  </div>
+  <div class="grid2">
+    <div class="wire"><h4>Domain Vocabulary</h4>
+      <div class="wr"><span class="wl">Claim</span><span class="wv">VaR breach, risk limit violation, model accuracy degradation alert</span></div>
+      <div class="wr"><span class="wl">Event</span><span class="wv">Market move, flash crash, liquidity event, counterparty default</span></div>
+      <div class="wr"><span class="wl">Review</span><span class="wv">Model validation board, risk committee, compliance review</span></div>
+      <div class="wr"><span class="wl">Patch</span><span class="wv">Portfolio rebalance, parameter update, strategy adjustment, limit revision</span></div>
+      <div class="wr"><span class="wl">Apply</span><span class="wv">Trade settlement, regulatory filing, audit trail sealed, model registry updated</span></div>
+    </div>
+    <div class="wire"><h4>Compliance Anchors</h4>
+      <div style="margin-bottom:6px"><span class="comp-tag ct-amber">Basel III/IV</span><span class="comp-tag ct-amber">SEC Rule 15c3-5</span><span class="comp-tag ct-green">NIST AI RMF</span><span class="comp-tag ct-blue">SR 11-7 (OCC)</span></div>
+      <div class="wr"><span class="wl">Key Risk</span><span class="wv">Algorithmic trading drift → flash crash → systemic contagion</span></div>
+      <div class="wr"><span class="wl">CERPA Fix</span><span class="wv">Real-time DS on model performance; Authority gate prevents unauthorized trades</span></div>
+      <div class="wr"><span class="wl">Impact</span><span class="wv">Prevent trading meltdowns, satisfy model risk management requirements</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ENERGY ═══ -->
+<section id="s-energy">
+  <div class="domain-tag" style="color:#06b6d4;border:1px solid rgba(6,182,212,.3);background:rgba(6,182,212,.06)">⚡ CLIMATE / ENERGY — GRID OPTIMIZATION GOVERNANCE</div>
+  <div class="card">
+    <h3>CERPA Cycle — Smart Grid & Renewable Integration</h3>
+    <div class="cycle">
+      <div class="cyc-step c-claim">CLAIM<small>Demand forecast<br/>Renewable output prediction</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-event">EVENT<small>Sensor reading<br/>Weather shift / demand spike</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-review">REVIEW<small>Control room review<br/>Forecast accuracy audit</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-patch">PATCH<small>Load adjustment<br/>Storage dispatch / curtail</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-apply">APPLY<small>Grid stability + log<br/>Forecast model retrained</small></div>
+    </div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi-mini"><div class="kv" style="color:var(--ok)">96%</div><div class="kl">Grid PAR — Load adjustment effectiveness</div></div>
+    <div class="kpi-mini"><div class="kv" style="color:var(--ok)">0.02</div><div class="kl">FCR — False stability closures</div></div>
+    <div class="kpi-mini"><div class="kv" style="color:var(--ok)">45s</div><div class="kl">DEG — Event-to-correction speed</div></div>
+    <div class="kpi-mini"><div class="kv" style="color:var(--ok)">0.82</div><div class="kl">CMR — Seasonal pattern retention</div></div>
+  </div>
+  <div class="grid2">
+    <div class="wire"><h4>Domain Vocabulary</h4>
+      <div class="wr"><span class="wl">Claim</span><span class="wv">Demand forecast, renewable generation prediction, grid stability assertion</span></div>
+      <div class="wr"><span class="wl">Event</span><span class="wv">Weather change, demand spike, solar/wind variability, equipment failure</span></div>
+      <div class="wr"><span class="wl">Review</span><span class="wv">Control room assessment, forecast accuracy review, reliability audit</span></div>
+      <div class="wr"><span class="wl">Patch</span><span class="wv">Load balancing, storage dispatch, curtailment, demand response activation</span></div>
+      <div class="wr"><span class="wl">Apply</span><span class="wv">Grid stabilized, forecast model retrained, seasonal pattern indexed</span></div>
+    </div>
+    <div class="wire"><h4>Compliance Anchors</h4>
+      <div style="margin-bottom:6px"><span class="comp-tag ct-green">NERC CIP</span><span class="comp-tag ct-blue">ISO 50001</span><span class="comp-tag ct-green">NIST AI RMF</span><span class="comp-tag ct-amber">EPA Clean Power</span></div>
+      <div class="wr"><span class="wl">Key Risk</span><span class="wv">Forecast drift → grid instability → blackouts → emissions spikes</span></div>
+      <div class="wr"><span class="wl">CERPA Fix</span><span class="wv">Real-time DS on forecast accuracy; automated Patch dispatch within seconds</span></div>
+      <div class="wr"><span class="wl">Impact</span><span class="wv">20-30% reduction in waste/emissions through governed self-correction</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SUPPLY CHAIN ═══ -->
+<section id="s-supply">
+  <div class="domain-tag" style="color:#8b5cf6;border:1px solid rgba(139,92,246,.3);background:rgba(139,92,246,.06)">🔗 SUPPLY CHAIN — DISRUPTION GOVERNANCE</div>
+  <div class="card">
+    <h3>CERPA Cycle — Supply Chain Resilience</h3>
+    <div class="cycle">
+      <div class="cyc-step c-claim">CLAIM<small>Disruption alert<br/>Supplier risk flag</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-event">EVENT<small>Supplier event<br/>Port closure / shortage</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-review">REVIEW<small>Ops review<br/>Impact assessment</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-patch">PATCH<small>Sourcing change<br/>Reroute / substitute</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-apply">APPLY<small>Delivery verified<br/>Resilience pattern indexed</small></div>
+    </div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi-mini"><div class="kv" style="color:var(--ok)">87%</div><div class="kl">Supply CIS — Resolution integrity</div></div>
+    <div class="kpi-mini"><div class="kv" style="color:var(--ok)">91%</div><div class="kl">PAR — Sourcing changes hold</div></div>
+    <div class="kpi-mini"><div class="kv" style="color:var(--warn)">18</div><div class="kl">DES — Recurring disruption patterns</div></div>
+    <div class="kpi-mini"><div class="kv" style="color:var(--warn)">3.5d</div><div class="kl">DEG — Alert-to-resolution lag</div></div>
+  </div>
+  <div class="grid2">
+    <div class="wire"><h4>Domain Vocabulary</h4>
+      <div class="wr"><span class="wl">Claim</span><span class="wv">Disruption alert, supplier risk score breach, lead time violation</span></div>
+      <div class="wr"><span class="wl">Event</span><span class="wv">Port closure, raw material shortage, logistics failure, geopolitical event</span></div>
+      <div class="wr"><span class="wl">Review</span><span class="wv">Procurement review board, impact severity assessment, alternative sourcing analysis</span></div>
+      <div class="wr"><span class="wl">Patch</span><span class="wv">Supplier switch, route change, buffer stock activation, demand shaping</span></div>
+      <div class="wr"><span class="wl">Apply</span><span class="wv">Delivery confirmed, cost delta recorded, resilience pattern indexed in Memory Graph</span></div>
+    </div>
+    <div class="wire"><h4>Compliance Anchors</h4>
+      <div style="margin-bottom:6px"><span class="comp-tag ct-blue">ISO 28000</span><span class="comp-tag ct-blue">C-TPAT</span><span class="comp-tag ct-green">NIST AI RMF</span><span class="comp-tag ct-amber">EU CSRD</span></div>
+      <div class="wr"><span class="wl">Key Risk</span><span class="wv">Undetected supplier drift → cascading shortages → production halt</span></div>
+      <div class="wr"><span class="wl">CERPA Fix</span><span class="wv">DES detects recurring supplier failure patterns; Memory Graph enables proactive mitigation</span></div>
+      <div class="wr"><span class="wl">Impact</span><span class="wv">40-60% faster disruption resolution; 25% reduction in recurring supply failures</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ AUTONOMOUS SYSTEMS ═══ -->
+<section id="s-auto">
+  <div class="domain-tag" style="color:#ef4444;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.06)">🤖 AUTONOMOUS SYSTEMS — AGENT AUTHORITY GOVERNANCE</div>
+  <div class="card">
+    <h3>CERPA Cycle — Autonomous Agent Governance</h3>
+    <div class="cycle">
+      <div class="cyc-step c-claim">CLAIM<small>Decision proposal<br/>Agent recommends action</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-event">EVENT<small>Sensor fusion<br/>Environmental state</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-review">REVIEW<small>Authority gate<br/>Human-on-the-loop</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-patch">PATCH<small>Trajectory update<br/>Parameter adjustment</small></div><div class="cyc-arr">→</div>
+      <div class="cyc-step c-apply">APPLY<small>Execute + record<br/>Episode sealed</small></div>
+    </div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi-mini"><div class="kv" style="color:var(--ok)">99.2%</div><div class="kl">Agent PAR — Corrections hold in next cycle</div></div>
+    <div class="kpi-mini"><div class="kv" style="color:var(--ok)">0.001</div><div class="kl">FCR — False safe-state assertions</div></div>
+    <div class="kpi-mini"><div class="kv" style="color:var(--ok)">12ms</div><div class="kl">DEG — Decision-to-execution latency</div></div>
+    <div class="kpi-mini"><div class="kv" style="color:var(--ok)">0.95</div><div class="kl">CIS — Agent governance integrity</div></div>
+  </div>
+  <div class="grid2">
+    <div class="wire"><h4>Domain Vocabulary</h4>
+      <div class="wr"><span class="wl">Claim</span><span class="wv">Agent decision proposal — recommended action with confidence score</span></div>
+      <div class="wr"><span class="wl">Event</span><span class="wv">Sensor fusion output, environmental state vector, obstacle detection</span></div>
+      <div class="wr"><span class="wl">Review</span><span class="wv">Authority gate — human-on-the-loop or automated policy check</span></div>
+      <div class="wr"><span class="wl">Patch</span><span class="wv">Trajectory correction, parameter update, strategy modification, safe-state fallback</span></div>
+      <div class="wr"><span class="wl">Apply</span><span class="wv">Action executed, episode sealed with hash-chain, outcome recorded, coherence scored</span></div>
+    </div>
+    <div class="wire"><h4>Compliance Anchors</h4>
+      <div style="margin-bottom:6px"><span class="comp-tag ct-green">DoD 3000.09</span><span class="comp-tag ct-green">NIST AI RMF</span><span class="comp-tag ct-amber">EU AI Act (High-Risk)</span><span class="comp-tag ct-blue">ISO/PAS 8800</span></div>
+      <div class="wr"><span class="wl">Key Risk</span><span class="wv">Ungoverned autonomous action → harm to humans, assets, or mission</span></div>
+      <div class="wr"><span class="wl">CERPA Fix</span><span class="wv">AuthorityOps enforces role-bound gates; RETCON patches enable governed retroactive correction</span></div>
+      <div class="wr"><span class="wl">Impact</span><span class="wv">Level-5 autonomy with level-5 governance: self-correcting, auditable, recoverable</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>AuthorityOps: The Trust Boundary</h3>
+    <div class="wire"><h4>Authority Levels for Autonomous Systems</h4>
+      <div class="wr"><span class="wl">Level 0</span><span class="wv">Human decides, machine executes (manual)</span></div>
+      <div class="wr"><span class="wl">Level 1</span><span class="wv">Machine proposes, human approves (advisory)</span></div>
+      <div class="wr"><span class="wl">Level 2</span><span class="wv">Machine decides within policy bounds, human monitors (supervised)</span></div>
+      <div class="wr"><span class="wl">Level 3</span><span class="wv">Machine decides and executes, human reviews post-hoc (autonomous with audit)</span></div>
+      <div class="wr"><span class="wl">Level 4</span><span class="wv">Machine decides, executes, and self-corrects within sealed episodes (governed autonomy)</span></div>
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin-top:6px">CERPA enables Level 4: every decision is a sealed episode with cryptographic provenance. AuthorityOps enforces which level applies per context. The Context Envelope captures AUTHORITY boundaries. No agent can self-promote its authority level.</div>
+  </div>
+</section>
+
+</div>
+<footer>Deep Sigma EDGE — CERPA Industry Vertical Deployment Scenarios v1.0.0 — Claim | Event | Review | Patch | Apply</footer>
+<script>
+(function(){"use strict";
+var tabs=document.querySelectorAll(".ttab"),secs=document.querySelectorAll(".main section");
+function openTab(n){
+  tabs.forEach(function(t){t.classList.toggle("active",t.getAttribute("data-t")===n)});
+  secs.forEach(function(s){s.classList.toggle("active",s.id==="s-"+n)});
+}
+tabs.forEach(function(t){t.addEventListener("click",function(){openTab(t.getAttribute("data-t"))})});
+document.querySelectorAll("[data-nav]").forEach(function(c){
+  c.addEventListener("click",function(){openTab(c.getAttribute("data-nav"))});
+});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,458 @@
+<!--
+ CERPA Grid Operations EDGE v1.0.0
+ ============================================================
+ Deep Sigma Decision Governance Platform
+ Interactive renewable energy grid simulation
+ Solar output prediction → weather drift → CERPA cycle → grid rebalance
+ Live coherence gauge, episode log, battery dispatch, KPI updates
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"/>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>CERPA Grid Operations — Deep Sigma EDGE</title>
+<style>
+:root{--bg:#060a12;--card:#0d1520;--card2:#0a0f1a;--muted:#6b8099;--txt:#d8e4f0;--accent:#06b6d4;--mag:#ff6bff;--warn:#ffcc66;--bad:#ff6b6b;--ok:#5dff93;--line:#162030;--solar:#f59e0b;--wind:#38bdf8;--batt:#a78bfa;--grid:#10b981}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--txt);font-size:13px;overflow-x:hidden}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+header{padding:10px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;background:rgba(6,10,18,.96)}
+header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent) 20%,var(--solar) 50%,var(--accent) 80%,transparent)}
+.brand{font-weight:700;font-size:15px;color:var(--accent)}.brand small{display:block;color:var(--muted);font-size:10px;font-weight:400}
+.main{height:calc(100vh - 56px);overflow-y:auto;padding:16px 20px;max-width:1300px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+.card h3{margin:0 0 10px;font-size:13px;color:#cfe2f7;letter-spacing:.4px;text-transform:uppercase}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.wire{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px}
+.wire h4{margin:0 0 6px;font-size:10px;letter-spacing:.4px;text-transform:uppercase;color:var(--accent)}
+.wr{display:flex;justify-content:space-between;padding:3px 0;font-size:11px;border-bottom:1px solid #0f1825;gap:8px}
+.wr:last-child{border:none}.wr .wl{color:var(--muted);min-width:80px;flex-shrink:0}.wr .wv{font-weight:500;text-align:right;flex:1}
+
+/* KPI cards */
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center}
+.kpi .kv{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1;transition:all .4s}
+.kpi .kl{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+
+/* Gauge */
+.gauge{position:relative;width:140px;height:140px;margin:0 auto}
+.gauge svg{width:140px;height:140px;transform:rotate(-90deg)}
+.gauge-bg{fill:none;stroke:var(--line);stroke-width:12;stroke-linecap:round}
+.gauge-fill{fill:none;stroke-width:12;stroke-linecap:round;transition:stroke-dashoffset .6s,stroke .3s}
+.gauge-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.gauge-val{font-size:32px;font-weight:700;transition:color .3s}.gauge-sub{font-size:9px;color:var(--muted)}
+
+/* Cycle steps */
+.cycle-vis{display:flex;gap:4px;margin:10px 0;align-items:center;flex-wrap:wrap}
+.cyc-s{flex:1;min-width:80px;padding:8px;border-radius:8px;text-align:center;font-size:10px;font-weight:700;border:2px solid var(--line);background:var(--card2);transition:all .4s;position:relative}
+.cyc-s.active{border-color:var(--accent);box-shadow:0 0 12px rgba(6,182,212,.2)}
+.cyc-s.done{border-color:var(--ok);opacity:.7}
+.cyc-s small{display:block;font-weight:400;font-size:8px;margin-top:2px;color:var(--muted)}
+.cyc-arr{color:#2a3a4e;font-size:12px}
+
+/* Episode log */
+.ep-log{max-height:280px;overflow-y:auto;font-size:10px}
+.ep-entry{padding:6px 8px;border-bottom:1px solid #0f1825;animation:fadeIn .3s}
+.ep-entry .ep-time{font-size:8px;color:#3a4a5e;font-variant-numeric:tabular-nums}
+.ep-entry .ep-stage{font-weight:700;margin:0 4px}
+.ep-claim .ep-stage{color:var(--accent)}.ep-event .ep-stage{color:var(--solar)}
+.ep-review .ep-stage{color:#a78bfa}.ep-patch .ep-stage{color:var(--bad)}.ep-apply .ep-stage{color:var(--ok)}
+@keyframes fadeIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)}}
+
+/* Buttons */
+button{padding:6px 14px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--txt);transition:all .15s}
+button:hover{border-color:rgba(6,182,212,.3)}
+button.primary{border-color:rgba(6,182,212,.4);color:var(--accent);background:rgba(6,182,212,.06)}
+button.danger{border-color:rgba(255,107,107,.4);color:var(--bad);background:rgba(255,107,107,.06)}
+button.solar{border-color:rgba(245,158,11,.4);color:var(--solar);background:rgba(245,158,11,.06)}
+button.wind{border-color:rgba(56,189,248,.4);color:var(--wind);background:rgba(56,189,248,.06)}
+button:disabled{opacity:.4;cursor:not-allowed}
+
+/* Bar chart */
+.bar-row{display:flex;align-items:center;gap:6px;margin:4px 0;font-size:10px}
+.bar-label{width:60px;color:var(--muted);text-align:right;font-size:9px}
+.bar-track{flex:1;height:16px;background:var(--card2);border-radius:4px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:4px;transition:width .6s ease}
+.bar-val{position:absolute;right:4px;top:50%;transform:translateY(-50%);font-size:8px;font-weight:700;color:var(--txt)}
+
+/* Grid status */
+.grid-status{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;transition:all .4s}
+.gs-stable{background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);color:var(--ok)}
+.gs-stressed{background:rgba(255,204,102,.06);border:1px solid rgba(255,204,102,.2);color:var(--warn)}
+.gs-critical{background:rgba(255,107,107,.06);border:1px solid rgba(255,107,107,.2);color:var(--bad)}
+.gs-dot{width:8px;height:8px;border-radius:50%;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+footer{padding:6px 16px;border-top:1px solid var(--line);font-size:8px;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">CERPA GRID OPS<small>Deep Sigma — Renewable Energy Governance Simulation v1.0.0</small></div>
+  <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
+    <div class="grid-status gs-stable" id="gridStatus"><span class="gs-dot" style="background:var(--ok)" id="gsDot"></span><span id="gsText">GRID STABLE</span></div>
+  </div>
+</header>
+
+<div class="main">
+  <!-- CONTROLS -->
+  <div class="card">
+    <h3>Simulation Controls</h3>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <button class="danger" id="btnCloud">Inject Cloud Cover Event</button>
+      <button class="wind" id="btnWind">Inject Wind Drop</button>
+      <button class="solar" id="btnDemand">Inject Demand Spike</button>
+      <button class="primary" id="btnSensor">Inject Sensor Drift</button>
+      <button id="btnReset" style="margin-left:auto">Reset Simulation</button>
+      <span style="font-size:9px;color:var(--muted)" id="simClock">Episode: 0 | Time: 00:00</span>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <!-- LEFT: Gauge + KPIs + Cycle -->
+    <div>
+      <!-- Coherence Gauge -->
+      <div class="card" style="text-align:center">
+        <h3>Grid Coherence Score (CIS)</h3>
+        <div class="gauge">
+          <svg viewBox="0 0 140 140">
+            <circle class="gauge-bg" cx="70" cy="70" r="58" stroke-dasharray="364" stroke-dashoffset="91"/>
+            <circle class="gauge-fill" id="gaugeFill" cx="70" cy="70" r="58" stroke="var(--ok)" stroke-dasharray="364" stroke-dashoffset="55"/>
+          </svg>
+          <div class="gauge-label">
+            <div class="gauge-val" id="gaugeVal" style="color:var(--ok)">96.0</div>
+            <div class="gauge-sub">CIS</div>
+          </div>
+        </div>
+        <div style="font-size:9px;color:var(--muted);margin-top:4px">CIS > 75 = governance loop is real</div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="grid4">
+        <div class="kpi"><div class="kv" id="kvSolar" style="color:var(--solar)">500</div><div class="kl">Solar MW</div></div>
+        <div class="kpi"><div class="kv" id="kvWind" style="color:var(--wind)">320</div><div class="kl">Wind MW</div></div>
+        <div class="kpi"><div class="kv" id="kvDemand" style="color:var(--txt)">780</div><div class="kl">Demand MW</div></div>
+        <div class="kpi"><div class="kv" id="kvBatt" style="color:var(--batt)">0</div><div class="kl">Battery MW</div></div>
+      </div>
+      <div class="grid4" style="margin-top:10px">
+        <div class="kpi"><div class="kv" id="kvPAR" style="color:var(--ok)">98%</div><div class="kl">Grid PAR</div></div>
+        <div class="kpi"><div class="kv" id="kvDEG" style="color:var(--ok)">—</div><div class="kl">DEG (sec)</div></div>
+        <div class="kpi"><div class="kv" id="kvDrift" style="color:var(--ok)">0</div><div class="kl">Drift Events</div></div>
+        <div class="kpi"><div class="kv" id="kvEpisodes" style="color:var(--accent)">0</div><div class="kl">Episodes</div></div>
+      </div>
+
+      <!-- CERPA Cycle Visual -->
+      <div class="card" style="margin-top:14px">
+        <h3>CERPA Cycle — Live</h3>
+        <div class="cycle-vis">
+          <div class="cyc-s" id="csClaim">CLAIM<small>Forecast assertion</small></div>
+          <span class="cyc-arr">→</span>
+          <div class="cyc-s" id="csEvent">EVENT<small>Sensor reading</small></div>
+          <span class="cyc-arr">→</span>
+          <div class="cyc-s" id="csReview">REVIEW<small>Drift check</small></div>
+          <span class="cyc-arr">→</span>
+          <div class="cyc-s" id="csPatch">PATCH<small>Recalibrate</small></div>
+          <span class="cyc-arr">→</span>
+          <div class="cyc-s" id="csApply">APPLY<small>Dispatch + seal</small></div>
+        </div>
+      </div>
+
+      <!-- Energy Mix Bar -->
+      <div class="card">
+        <h3>Energy Mix — Real Time</h3>
+        <div class="bar-row"><span class="bar-label">Solar</span><div class="bar-track"><div class="bar-fill" id="barSolar" style="width:61%;background:var(--solar)"></div><span class="bar-val" id="barSolarVal">500 MW</span></div></div>
+        <div class="bar-row"><span class="bar-label">Wind</span><div class="bar-track"><div class="bar-fill" id="barWind" style="width:39%;background:var(--wind)"></div><span class="bar-val" id="barWindVal">320 MW</span></div></div>
+        <div class="bar-row"><span class="bar-label">Battery</span><div class="bar-track"><div class="bar-fill" id="barBatt" style="width:0%;background:var(--batt)"></div><span class="bar-val" id="barBattVal">0 MW</span></div></div>
+        <div class="bar-row"><span class="bar-label">Demand</span><div class="bar-track"><div class="bar-fill" id="barDemand" style="width:95%;background:rgba(255,255,255,.15)"></div><span class="bar-val" id="barDemandVal">780 MW</span></div></div>
+        <div style="font-size:9px;color:var(--muted);margin-top:4px">Supply: <span id="supplyTotal">820</span> MW | Demand: <span id="demandTotal">780</span> MW | Surplus: <span id="surplusVal" style="color:var(--ok)">+40 MW</span></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Episode Log + Drift History -->
+    <div>
+      <div class="card">
+        <h3>Episode Log — Hash-Chained</h3>
+        <div class="ep-log" id="epLog">
+          <div style="text-align:center;color:var(--muted);padding:40px;font-size:11px">Inject an event to start the CERPA cycle →</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Drift Detection History</h3>
+        <div id="driftHist" style="font-size:10px;color:var(--muted);text-align:center;padding:20px">No drift events detected yet.</div>
+      </div>
+
+      <div class="card">
+        <h3>AuthorityOps — Governance Rules</h3>
+        <div class="wire"><h4>Active Rules</h4>
+          <div class="wr"><span class="wl" style="color:var(--bad)">Rule 1</span><span class="wv">No model self-approves dispatch changes</span></div>
+          <div class="wr"><span class="wl" style="color:var(--bad)">Rule 2</span><span class="wv">No correction without sensor evidence</span></div>
+          <div class="wr"><span class="wl" style="color:var(--bad)">Rule 3</span><span class="wv">No overwrite of sealed episodes</span></div>
+          <div class="wr"><span class="wl" style="color:var(--bad)">Rule 4</span><span class="wv">Battery dispatch > 100MW requires operator gate</span></div>
+          <div class="wr"><span class="wl" style="color:var(--bad)">Rule 5</span><span class="wv">All patches sealed with cryptographic hash</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Compliance Anchors</h3>
+        <div class="wire">
+          <div class="wr"><span class="wl">NERC CIP</span><span class="wv" style="color:var(--ok)">Audit trail + evidence lock</span></div>
+          <div class="wr"><span class="wl">EU AI Act</span><span class="wv" style="color:var(--ok)">High-risk AI governance</span></div>
+          <div class="wr"><span class="wl">NIST AI RMF</span><span class="wv" style="color:var(--ok)">99.1% coverage</span></div>
+          <div class="wr"><span class="wl">ISO 50001</span><span class="wv" style="color:var(--ok)">Energy management</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>Deep Sigma EDGE — CERPA Grid Operations Simulation v1.0.0 — Claim | Event | Review | Patch | Apply</footer>
+
+<script>
+(function(){"use strict";
+
+// ═══ STATE ═══
+var state = {
+  solar: 500, wind: 320, demand: 780, battery: 0,
+  cis: 96.0, par: 98, driftCount: 0, episodes: 0,
+  degStart: null, lastDEG: null,
+  running: false
+};
+var epLog = document.getElementById("epLog");
+var driftHist = document.getElementById("driftHist");
+var driftEntries = [];
+var episodeHashes = [];
+
+// ═══ UTILS ═══
+function ts(){var d=new Date();return (d.getHours()<10?"0":"")+d.getHours()+":"+(d.getMinutes()<10?"0":"")+d.getMinutes()+":"+(d.getSeconds()<10?"0":"")+d.getSeconds()}
+function hash(){return "0x"+Math.random().toString(16).substring(2,10)+Math.random().toString(16).substring(2,10)}
+function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v))}
+
+// ═══ UI UPDATE ═══
+function updateUI(){
+  document.getElementById("kvSolar").textContent = state.solar;
+  document.getElementById("kvWind").textContent = state.wind;
+  document.getElementById("kvDemand").textContent = state.demand;
+  document.getElementById("kvBatt").textContent = state.battery;
+  document.getElementById("kvPAR").textContent = state.par+"%";
+  document.getElementById("kvDrift").textContent = state.driftCount;
+  document.getElementById("kvEpisodes").textContent = state.episodes;
+  if(state.lastDEG !== null) document.getElementById("kvDEG").textContent = state.lastDEG+"s";
+
+  var supply = state.solar + state.wind + state.battery;
+  var surplus = supply - state.demand;
+  document.getElementById("supplyTotal").textContent = supply;
+  document.getElementById("demandTotal").textContent = state.demand;
+  var sv = document.getElementById("surplusVal");
+  sv.textContent = (surplus>=0?"+":"")+surplus+" MW";
+  sv.style.color = surplus>=0?"var(--ok)":"var(--bad)";
+
+  // Bars
+  var maxMW = 820;
+  document.getElementById("barSolar").style.width = (state.solar/maxMW*100)+"%";
+  document.getElementById("barSolarVal").textContent = state.solar+" MW";
+  document.getElementById("barWind").style.width = (state.wind/maxMW*100)+"%";
+  document.getElementById("barWindVal").textContent = state.wind+" MW";
+  document.getElementById("barBatt").style.width = (state.battery/maxMW*100)+"%";
+  document.getElementById("barBattVal").textContent = state.battery+" MW";
+  document.getElementById("barDemand").style.width = (state.demand/maxMW*100)+"%";
+  document.getElementById("barDemandVal").textContent = state.demand+" MW";
+
+  // Gauge
+  var cisPct = state.cis / 100;
+  var circumference = 364;
+  var offset = circumference * (1 - cisPct * 0.75);
+  var gf = document.getElementById("gaugeFill");
+  gf.setAttribute("stroke-dashoffset", offset);
+  gf.setAttribute("stroke", state.cis>=75?"var(--ok)":state.cis>=50?"var(--warn)":"var(--bad)");
+  var gv = document.getElementById("gaugeVal");
+  gv.textContent = state.cis.toFixed(1);
+  gv.style.color = state.cis>=75?"var(--ok)":state.cis>=50?"var(--warn)":"var(--bad)";
+
+  // Grid status
+  var gs = document.getElementById("gridStatus");
+  var gd = document.getElementById("gsDot");
+  var gt = document.getElementById("gsText");
+  if(surplus < -50){gs.className="grid-status gs-critical";gd.style.background="var(--bad)";gt.textContent="GRID CRITICAL"}
+  else if(surplus < 0){gs.className="grid-status gs-stressed";gd.style.background="var(--warn)";gt.textContent="GRID STRESSED"}
+  else{gs.className="grid-status gs-stable";gd.style.background="var(--ok)";gt.textContent="GRID STABLE"}
+
+  // KPI colors
+  document.getElementById("kvSolar").style.color = state.solar < 400?"var(--warn)":"var(--solar)";
+  document.getElementById("kvWind").style.color = state.wind < 200?"var(--warn)":"var(--wind)";
+  document.getElementById("kvBatt").style.color = state.battery > 0?"var(--batt)":"var(--muted)";
+  document.getElementById("kvPAR").style.color = state.par >= 90?"var(--ok)":state.par >= 75?"var(--warn)":"var(--bad)";
+  document.getElementById("kvDrift").style.color = state.driftCount > 3?"var(--bad)":state.driftCount > 0?"var(--warn)":"var(--ok)";
+
+  // Sim clock
+  document.getElementById("simClock").textContent = "Episode: "+state.episodes+" | Drift Events: "+state.driftCount;
+}
+
+// ═══ EPISODE LOG ═══
+function logEntry(stage, msg, cls){
+  if(epLog.querySelector("div[style]") && state.episodes <= 1) epLog.innerHTML = "";
+  var div = document.createElement("div");
+  div.className = "ep-entry ep-"+cls;
+  div.innerHTML = '<span class="ep-time">'+ts()+'</span><span class="ep-stage">['+stage+']</span>'+msg;
+  epLog.insertBefore(div, epLog.firstChild);
+  if(epLog.children.length > 50) epLog.removeChild(epLog.lastChild);
+}
+
+// ═══ CYCLE STEP HIGHLIGHT ═══
+function highlightStep(stepId, delay){
+  setTimeout(function(){
+    document.querySelectorAll(".cyc-s").forEach(function(s){s.classList.remove("active","done")});
+    var el = document.getElementById(stepId);
+    if(el) el.classList.add("active");
+    // Mark prior steps as done
+    var steps = ["csClaim","csEvent","csReview","csPatch","csApply"];
+    var idx = steps.indexOf(stepId);
+    for(var i=0;i<idx;i++){
+      var prev = document.getElementById(steps[i]);
+      if(prev){prev.classList.remove("active");prev.classList.add("done")}
+    }
+  }, delay);
+}
+
+// ═══ CERPA CYCLE ═══
+function runCERPA(eventType, eventDesc, solarDelta, windDelta, demandDelta){
+  if(state.running) return;
+  state.running = true;
+  state.episodes++;
+  var prevHash = episodeHashes.length > 0 ? episodeHashes[episodeHashes.length-1] : "GENESIS";
+  var epHash = hash();
+  episodeHashes.push(epHash);
+
+  // ── CLAIM ──
+  highlightStep("csClaim", 0);
+  var claimSolar = state.solar;
+  var claimWind = state.wind;
+  logEntry("CLAIM", "Forecast: Solar "+claimSolar+" MW, Wind "+claimWind+" MW, Demand "+state.demand+" MW", "claim");
+
+  // ── EVENT ──
+  setTimeout(function(){
+    highlightStep("csEvent", 0);
+    state.solar = clamp(state.solar + solarDelta, 50, 600);
+    state.wind = clamp(state.wind + windDelta, 30, 450);
+    state.demand = clamp(state.demand + demandDelta, 400, 1200);
+    logEntry("EVENT", eventDesc+" | Actual: Solar "+state.solar+" MW, Wind "+state.wind+" MW, Demand "+state.demand+" MW", "event");
+    state.degStart = Date.now();
+    updateUI();
+
+    // ── REVIEW ──
+    setTimeout(function(){
+      highlightStep("csReview", 0);
+      var supply = state.solar + state.wind;
+      var gap = state.demand - supply;
+      var driftMag = Math.abs(solarDelta) + Math.abs(windDelta) + Math.abs(demandDelta);
+      var driftDetected = driftMag > 40;
+      var newCIS = clamp(state.cis - (driftMag * 0.15) + (driftDetected ? 0 : 5), 20, 100);
+      state.cis = Math.round(newCIS * 10) / 10;
+
+      if(driftDetected){
+        state.driftCount++;
+        logEntry("REVIEW", "DRIFT DETECTED — Type: "+eventType+" | Magnitude: "+driftMag+" MW | CIS: "+state.cis.toFixed(1)+" | Gap: "+gap+" MW", "review");
+        // Add to drift history
+        driftEntries.push({time:ts(), type:eventType, mag:driftMag, cis:state.cis});
+        renderDriftHist();
+      } else {
+        logEntry("REVIEW", "No drift. Coherence stable at "+state.cis.toFixed(1)+" | Supply-demand balanced.", "review");
+      }
+      updateUI();
+
+      // ── PATCH ──
+      setTimeout(function(){
+        highlightStep("csPatch", 0);
+        if(driftDetected && gap > 0){
+          // Battery dispatch
+          var battDispatch = Math.min(gap + 20, 200);
+          state.battery = battDispatch;
+          state.cis = clamp(state.cis + (battDispatch * 0.05), 20, 100);
+          state.cis = Math.round(state.cis * 10) / 10;
+          logEntry("PATCH", "RETCON — Battery dispatch: +"+battDispatch+" MW | Forecast recalibrated | CIS recovering: "+state.cis.toFixed(1), "patch");
+
+          if(battDispatch > 100){
+            logEntry("PATCH", "AuthorityOps GATE: Battery >100 MW requires operator approval. Auto-approved in simulation.", "patch");
+          }
+        } else if(driftDetected){
+          logEntry("PATCH", "Minor drift — forecast adjusted. No battery dispatch needed.", "patch");
+          state.cis = clamp(state.cis + 3, 20, 100);
+          state.cis = Math.round(state.cis * 10) / 10;
+        } else {
+          logEntry("PATCH", "No patch required. System nominal.", "patch");
+        }
+        updateUI();
+
+        // ── APPLY ──
+        setTimeout(function(){
+          highlightStep("csApply", 0);
+          var deg = state.degStart ? Math.round((Date.now() - state.degStart) / 1000) : 0;
+          state.lastDEG = deg;
+          state.par = clamp(state.par + (driftDetected ? -1 : 1), 70, 100);
+          logEntry("APPLY", "Episode sealed. Hash: "+epHash+" | Prev: "+prevHash+" | DEG: "+deg+"s | PAR: "+state.par+"%", "apply");
+          logEntry("APPLY", "Memory Graph updated. Pattern indexed: "+eventType+" drift at "+ts(), "apply");
+          updateUI();
+
+          // Reset cycle visual after delay
+          setTimeout(function(){
+            document.querySelectorAll(".cyc-s").forEach(function(s){s.classList.remove("active");s.classList.add("done")});
+            // Decay battery over time
+            setTimeout(function(){
+              if(state.battery > 0){
+                state.battery = Math.max(0, state.battery - 50);
+                updateUI();
+              }
+              state.running = false;
+            }, 2000);
+          }, 1500);
+        }, 800);
+      }, 800);
+    }, 800);
+  }, 600);
+}
+
+// ═══ DRIFT HISTORY RENDER ═══
+function renderDriftHist(){
+  if(driftEntries.length === 0){driftHist.innerHTML='<div style="text-align:center;color:var(--muted);padding:20px">No drift events detected yet.</div>';return}
+  var html='<table style="width:100%;font-size:10px;border-collapse:collapse"><thead><tr><th style="text-align:left;color:var(--muted);font-size:8px;padding:4px;border-bottom:1px solid #1b2a3a">Time</th><th style="text-align:left;color:var(--muted);font-size:8px;padding:4px;border-bottom:1px solid #1b2a3a">Type</th><th style="text-align:center;color:var(--muted);font-size:8px;padding:4px;border-bottom:1px solid #1b2a3a">Mag</th><th style="text-align:center;color:var(--muted);font-size:8px;padding:4px;border-bottom:1px solid #1b2a3a">CIS After</th></tr></thead><tbody>';
+  for(var i=driftEntries.length-1;i>=0;i--){
+    var d=driftEntries[i];
+    var cc=d.cis>=75?"var(--ok)":d.cis>=50?"var(--warn)":"var(--bad)";
+    html+='<tr><td style="padding:3px 4px;border-bottom:1px solid #0f1825;font-size:9px;color:var(--muted)">'+d.time+'</td><td style="padding:3px 4px;border-bottom:1px solid #0f1825;color:var(--accent)">'+d.type+'</td><td style="padding:3px 4px;border-bottom:1px solid #0f1825;text-align:center">'+d.mag+'</td><td style="padding:3px 4px;border-bottom:1px solid #0f1825;text-align:center;color:'+cc+';font-weight:700">'+d.cis.toFixed(1)+'</td></tr>';
+  }
+  html+='</tbody></table>';
+  driftHist.innerHTML=html;
+}
+
+// ═══ EVENT BUTTONS ═══
+document.getElementById("btnCloud").addEventListener("click", function(){
+  runCERPA("Cloud Cover", "Sudden cloud cover over solar farm — output drops 80 MW", -80, 0, 0);
+});
+document.getElementById("btnWind").addEventListener("click", function(){
+  runCERPA("Wind Drop", "Wind speed drops below cut-in threshold — turbines throttle", 0, -120, 0);
+});
+document.getElementById("btnDemand").addEventListener("click", function(){
+  runCERPA("Demand Spike", "EV charging surge + data center ramp — demand increases 150 MW", 0, 0, 150);
+});
+document.getElementById("btnSensor").addEventListener("click", function(){
+  runCERPA("Sensor Drift", "SCADA sensor calibration drift — solar readings off by 60 MW", -60, -30, 20);
+});
+document.getElementById("btnReset").addEventListener("click", function(){
+  state = {solar:500, wind:320, demand:780, battery:0, cis:96.0, par:98, driftCount:0, episodes:0, degStart:null, lastDEG:null, running:false};
+  driftEntries = [];
+  episodeHashes = [];
+  epLog.innerHTML = '<div style="text-align:center;color:var(--muted);padding:40px;font-size:11px">Inject an event to start the CERPA cycle →</div>';
+  renderDriftHist();
+  document.querySelectorAll(".cyc-s").forEach(function(s){s.classList.remove("active","done")});
+  document.getElementById("kvDEG").textContent = "—";
+  updateUI();
+});
+
+// Init
+updateUI();
+})();
+</script>
+</body>
+</html>

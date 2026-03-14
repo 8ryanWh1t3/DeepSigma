@@ -1,0 +1,330 @@
+<!--
+ AuthorityOps Control Plane — Deep Sigma EDGE v1.0.0
+ ============================================================
+ The visual that shows DeepSigma as infrastructure:
+ CERPA (reactor) + AuthorityOps (boundary) + ReOps (memory) + MEE (interchange)
+ Interactive architecture diagram with drill-through
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"/>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>AuthorityOps Control Plane — Deep Sigma EDGE</title>
+<style>
+:root{--bg:#060a12;--card:#0d1320;--card2:#0a0f1a;--muted:#6b8099;--txt:#d8e4f0;--accent:#7df9ff;--mag:#ff6bff;--warn:#ffcc66;--bad:#ff6b6b;--ok:#5dff93;--line:#162030;--vl:#a78bfa}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--txt);font-size:13px;overflow-x:hidden}
+header{padding:12px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;background:rgba(6,10,18,.96)}
+header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent) 20%,var(--mag) 50%,var(--accent) 80%,transparent)}
+.brand{font-weight:700;font-size:16px;background:linear-gradient(135deg,var(--accent),var(--mag));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.brand small{display:block;-webkit-text-fill-color:var(--muted);font-size:10px;font-weight:400}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);padding:0 16px;background:rgba(6,10,18,.9)}
+.ttab{padding:10px 16px;font-size:10px;font-weight:600;color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;letter-spacing:.4px;text-transform:uppercase}
+.ttab:hover{color:var(--txt)}.ttab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.main{height:calc(100vh - 100px);overflow-y:auto;padding:20px}
+.main section{display:none;max-width:1200px;margin:0 auto}.main section.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+.card h3{margin:0 0 12px;font-size:14px;letter-spacing:.5px;text-transform:uppercase}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.wire{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:12px;margin-bottom:10px}
+.wire h4{margin:0 0 8px;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--accent)}
+.wr{display:flex;justify-content:space-between;padding:4px 0;font-size:11px;border-bottom:1px solid #0f1825;gap:8px}
+.wr:last-child{border:none}.wr .wl{color:var(--muted);min-width:100px;flex-shrink:0}.wr .wv{font-weight:500;text-align:right;flex:1}
+
+/* Architecture nodes */
+.arch-grid{display:grid;grid-template-columns:1fr;gap:0;position:relative}
+.layer{padding:20px;border:1px solid var(--line);position:relative;transition:all .3s}
+.layer:hover{border-color:rgba(125,249,255,.2);z-index:2}
+.layer-title{font-size:12px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.layer-desc{font-size:10px;color:var(--muted);line-height:1.6;max-width:800px}
+.layer-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:8px;font-weight:700;letter-spacing:.4px}
+.lt-reactor{color:#00b4d8;border:1px solid rgba(0,180,216,.3);background:rgba(0,180,216,.06)}
+.lt-boundary{color:#ef4444;border:1px solid rgba(239,68,68,.3);background:rgba(239,68,68,.06)}
+.lt-memory{color:#8b5cf6;border:1px solid rgba(139,92,246,.3);background:rgba(139,92,246,.06)}
+.lt-interchange{color:#10b981;border:1px solid rgba(16,185,129,.3);background:rgba(16,185,129,.06)}
+.lt-accounting{color:#f59e0b;border:1px solid rgba(245,158,11,.3);background:rgba(245,158,11,.06)}
+
+.l-reactor{background:rgba(0,180,216,.02);border-color:rgba(0,180,216,.15)}
+.l-boundary{background:rgba(239,68,68,.02);border-color:rgba(239,68,68,.12)}
+.l-memory{background:rgba(139,92,246,.02);border-color:rgba(139,92,246,.12)}
+.l-interchange{background:rgba(16,185,129,.02);border-color:rgba(16,185,129,.12)}
+.l-accounting{background:rgba(245,158,11,.02);border-color:rgba(245,158,11,.12)}
+
+.prims{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.prim{padding:6px 14px;border-radius:6px;font-size:10px;font-weight:700;border:1px solid;letter-spacing:.3px}
+.p-c{color:#00b4d8;border-color:rgba(0,180,216,.3);background:rgba(0,180,216,.06)}
+.p-e{color:#f59e0b;border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.06)}
+.p-r{color:#a78bfa;border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.06)}
+.p-p{color:#ef4444;border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.06)}
+.p-a{color:#10b981;border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.06)}
+
+.analogy{display:flex;align-items:center;gap:8px;margin-top:8px;padding:6px 10px;border-radius:6px;background:rgba(125,249,255,.02);border:1px solid rgba(125,249,255,.06);font-size:10px;color:var(--muted)}
+.analogy strong{color:var(--accent)}
+
+/* Drift types */
+.drift-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.drift-card{padding:8px;border-radius:6px;border:1px solid var(--line);background:var(--card2);font-size:9px;text-align:center}
+.drift-card .dname{font-weight:700;color:var(--accent);font-size:10px;margin-bottom:2px}
+
+/* Authority levels */
+.auth-level{display:flex;align-items:center;gap:10px;padding:8px;border-bottom:1px solid #0f1825;font-size:11px}
+.auth-level:last-child{border:none}
+.auth-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0}
+
+footer{padding:8px 16px;border-top:1px solid var(--line);font-size:9px;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">DEEP SIGMA<small>AuthorityOps Control Plane v1.0.0</small></div>
+</header>
+<div class="tabs">
+  <button class="ttab active" data-t="stack">The Stack</button>
+  <button class="ttab" data-t="reactor">CERPA Reactor</button>
+  <button class="ttab" data-t="auth">AuthorityOps</button>
+  <button class="ttab" data-t="reops">ReOps</button>
+  <button class="ttab" data-t="mee">MEE</button>
+  <button class="ttab" data-t="acct">Decision Accounting</button>
+</div>
+<div class="main">
+
+<!-- ═══ THE STACK ═══ -->
+<section id="s-stack" class="active">
+  <div style="text-align:center;margin-bottom:16px">
+    <div style="font-size:20px;font-weight:700">DeepSigma: The Decision Governance Stack</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px">Five layers. One purpose: make every AI decision provably trustworthy.</div>
+  </div>
+
+  <div class="arch-grid">
+    <div class="layer l-accounting" style="border-radius:12px 12px 0 0;cursor:pointer" data-nav="acct">
+      <div class="layer-title"><span class="layer-tag lt-accounting">DECISION ACCOUNTING</span> CERPA Metrics — 20 KPIs</div>
+      <div class="layer-desc">The measurement framework that proves governance is operational. CIS as the flagship composite. CIS > 0.75 = the governance loop is real. Every KPI traces to a compliance subcategory.</div>
+      <div class="analogy"><strong>Analogy: GAAP</strong> — Generally Accepted Accounting Principles made businesses auditable. Decision Accounting makes AI decisions auditable.</div>
+    </div>
+    <div class="layer l-interchange" style="cursor:pointer" data-nav="mee">
+      <div class="layer-title"><span class="layer-tag lt-interchange">MODEL INTERCHANGE</span> MEE — Model Exchange Engine</div>
+      <div class="layer-desc">Standardized governance across model families: OpenAI, Claude, GGUF, open-source. Swap models without losing decision history, governance context, or institutional memory. The governance envelope travels with the decision, not the model.</div>
+      <div class="analogy"><strong>Analogy: HTTP</strong> — HTTP standardized web communication across servers. MEE standardizes governance across AI models.</div>
+    </div>
+    <div class="layer l-memory" style="cursor:pointer" data-nav="reops">
+      <div class="layer-title"><span class="layer-tag lt-memory">MEMORY SYSTEM</span> ReOps — Reflection Operations</div>
+      <div class="layer-desc">Self-reflective private LLM data lake where conversations ARE the reflection system. User talks, structure emerges, memory accumulates. Not a database — a living institutional nervous system. ABCDE framework: Awareness → Belief → Commitment → Discipline → Evolution.</div>
+      <div class="analogy"><strong>Analogy: DNS</strong> — DNS gave the internet persistent naming and memory. ReOps gives decision governance persistent institutional memory.</div>
+    </div>
+    <div class="layer l-boundary" style="cursor:pointer" data-nav="auth">
+      <div class="layer-title"><span class="layer-tag lt-boundary">BOUNDARY ENFORCEMENT</span> AuthorityOps — Trust Boundary</div>
+      <div class="layer-desc">Role-bound, state-bound authority gates at every decision point. No self-certification. No closure without owner + patch + evidence. No overwrite of historical canon. Authority = role-bound + state-bound. The hard law of decision governance.</div>
+      <div class="analogy"><strong>Analogy: TLS/SSL</strong> — TLS made web communications trustworthy. AuthorityOps makes AI decisions trustworthy by enforcing authority boundaries.</div>
+    </div>
+    <div class="layer l-reactor" style="border-radius:0 0 12px 12px;cursor:pointer" data-nav="reactor">
+      <div class="layer-title"><span class="layer-tag lt-reactor">REACTOR CORE</span> CERPA — The Primitive Cycle</div>
+      <div class="layer-desc">Claim → Event → Review → Patch → Apply. Five operations that wrap every decision in a sealed, auditable, recoverable episode. The minimal governance algebra sufficient for any decision system.</div>
+      <div class="prims">
+        <span class="prim p-c">CLAIM</span>
+        <span style="color:#2a3a4e">→</span>
+        <span class="prim p-e">EVENT</span>
+        <span style="color:#2a3a4e">→</span>
+        <span class="prim p-r">REVIEW</span>
+        <span style="color:#2a3a4e">→</span>
+        <span class="prim p-p">PATCH</span>
+        <span style="color:#2a3a4e">→</span>
+        <span class="prim p-a">APPLY</span>
+      </div>
+      <div class="analogy"><strong>Analogy: TCP/IP</strong> — TCP/IP did not make the internet faster. It made it governable. CERPA does the same for AI decisions.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CERPA REACTOR ═══ -->
+<section id="s-reactor">
+  <div class="card">
+    <h3 style="color:#00b4d8">CERPA — The Reactor Core</h3>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:12px">The five-primitive cycle is the foundational layer. Everything else in the stack depends on it.</div>
+    <div class="prims" style="justify-content:center;margin-bottom:16px">
+      <span class="prim p-c">CLAIM<br/><small style="font-weight:400;font-size:8px">Assert risk</small></span>
+      <span style="color:#2a3a4e;font-size:18px;display:flex;align-items:center">→</span>
+      <span class="prim p-e">EVENT<br/><small style="font-weight:400;font-size:8px">Observe fact</small></span>
+      <span style="color:#2a3a4e;font-size:18px;display:flex;align-items:center">→</span>
+      <span class="prim p-r">REVIEW<br/><small style="font-weight:400;font-size:8px">Adjudicate</small></span>
+      <span style="color:#2a3a4e;font-size:18px;display:flex;align-items:center">→</span>
+      <span class="prim p-p">PATCH<br/><small style="font-weight:400;font-size:8px">Correct</small></span>
+      <span style="color:#2a3a4e;font-size:18px;display:flex;align-items:center">→</span>
+      <span class="prim p-a">APPLY<br/><small style="font-weight:400;font-size:8px">Prove & learn</small></span>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="wire"><h4>Canonical Artifacts</h4>
+      <div class="wr"><span class="wl" style="color:#00b4d8">DLR</span><span class="wv">Decision Logic Record — Claim + Event. The journal entry of Decision Accounting.</span></div>
+      <div class="wr"><span class="wl" style="color:#a78bfa">DS</span><span class="wv">Drift Signature — Review output. Auto-emits on coherence threshold breach.</span></div>
+      <div class="wr"><span class="wl" style="color:#ef4444">RS</span><span class="wv">Reflection Summary — Patch output. Corrective action with root cause targeting.</span></div>
+      <div class="wr"><span class="wl" style="color:#10b981">MG</span><span class="wv">Memory Graph — Apply output. Institutional knowledge that compounds across cycles.</span></div>
+    </div>
+    <div class="wire"><h4>Substrate Layers</h4>
+      <div class="wr"><span class="wl" style="color:#00b4d8">Truth</span><span class="wv">Observable facts with provenance. Makes risk assertions falsifiable.</span></div>
+      <div class="wr"><span class="wl" style="color:#a78bfa">Reasoning</span><span class="wv">Traceable decisions. Detectable drift. Documented adjudication.</span></div>
+      <div class="wr"><span class="wl" style="color:#10b981">Memory</span><span class="wv">Persistent lessons. Reusable patterns. Institutional knowledge compounding.</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="color:#00b4d8">Context Envelope (Hidden Layer)</h3>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <span class="prim" style="color:var(--accent);border-color:rgba(125,249,255,.2)">WHO</span>
+      <span class="prim" style="color:var(--accent);border-color:rgba(125,249,255,.2)">WHEN</span>
+      <span class="prim" style="color:var(--accent);border-color:rgba(125,249,255,.2)">WHERE</span>
+      <span class="prim" style="color:var(--accent);border-color:rgba(125,249,255,.2)">WHY</span>
+      <span class="prim" style="color:var(--accent);border-color:rgba(125,249,255,.2)">CONSTRAINTS</span>
+      <span class="prim" style="color:var(--accent);border-color:rgba(125,249,255,.2)">SCOPE</span>
+      <span class="prim" style="color:var(--accent);border-color:rgba(125,249,255,.2)">AUTHORITY</span>
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin-top:8px">Wraps all five primitives. Provides governance metadata. Every action is role-bound and state-bound by this envelope.</div>
+  </div>
+</section>
+
+<!-- ═══ AUTHORITYOPS ═══ -->
+<section id="s-auth">
+  <div class="card">
+    <h3 style="color:#ef4444">AuthorityOps — The Trust Boundary</h3>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:12px">AuthorityOps enforces who can do what, in what state, under what authority. It is the hard law layer — non-negotiable, non-configurable, non-bypassable.</div>
+  </div>
+  <div class="card">
+    <h3 style="color:#ef4444">The 5 Hard Laws</h3>
+    <div class="wire" style="border-color:rgba(239,68,68,.2)">
+      <div class="wr"><span class="wl" style="color:var(--bad)">Law 1</span><span class="wv">No self-certification of closure</span></div>
+      <div class="wr"><span class="wl" style="color:var(--bad)">Law 2</span><span class="wv">No closure without owner + patch + evidence</span></div>
+      <div class="wr"><span class="wl" style="color:var(--bad)">Law 3</span><span class="wv">No overwrite of historical canon — append, version, reopen only</span></div>
+      <div class="wr"><span class="wl" style="color:var(--bad)">Law 4</span><span class="wv">Authority must be role-bound and state-bound</span></div>
+      <div class="wr"><span class="wl" style="color:var(--bad)">Law 5</span><span class="wv">No agent can self-promote its authority level</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="color:#ef4444">Authority Levels</h3>
+    <div class="auth-level"><span class="auth-num" style="background:rgba(125,249,255,.06);border:1px solid rgba(125,249,255,.2);color:var(--accent)">0</span><div><strong>Manual</strong> — Human decides, machine executes. Full human control.</div></div>
+    <div class="auth-level"><span class="auth-num" style="background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);color:var(--ok)">1</span><div><strong>Advisory</strong> — Machine proposes, human approves. Human-in-the-loop.</div></div>
+    <div class="auth-level"><span class="auth-num" style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);color:var(--warn)">2</span><div><strong>Supervised</strong> — Machine decides within policy bounds, human monitors. Human-on-the-loop.</div></div>
+    <div class="auth-level"><span class="auth-num" style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.2);color:#a78bfa">3</span><div><strong>Autonomous + Audit</strong> — Machine decides and executes, human reviews post-hoc. Every episode sealed.</div></div>
+    <div class="auth-level"><span class="auth-num" style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);color:var(--bad)">4</span><div><strong>Governed Autonomy</strong> — Machine decides, executes, and self-corrects within sealed CERPA episodes. Full provenance. AuthorityOps enforces boundaries.</div></div>
+  </div>
+  <div class="card">
+    <h3 style="color:#ef4444">Drift Detection — 8 Types</h3>
+    <div class="drift-grid">
+      <div class="drift-card"><div class="dname">Value</div>Core belief shift</div>
+      <div class="drift-card"><div class="dname">Context</div>Environmental mismatch</div>
+      <div class="drift-card"><div class="dname">Scope</div>Authority boundary creep</div>
+      <div class="drift-card"><div class="dname">Authority</div>Role violation</div>
+      <div class="drift-card"><div class="dname">Temporal</div>Stale decision context</div>
+      <div class="drift-card"><div class="dname">Reasoning</div>Logic chain degradation</div>
+      <div class="drift-card"><div class="dname">Priority</div>Goal hierarchy shift</div>
+      <div class="drift-card"><div class="dname">Coherence</div>Internal consistency loss</div>
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin-top:8px">DS (Drift Signature) auto-emits when any drift type crosses configurable thresholds. AuthorityOps enforces that drift detection cannot be suppressed or bypassed.</div>
+  </div>
+</section>
+
+<!-- ═══ REOPS ═══ -->
+<section id="s-reops">
+  <div class="card">
+    <h3 style="color:#8b5cf6">ReOps — Reflection Operations</h3>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:12px">The self-reflective private LLM data lake where conversations ARE the reflection system. User talks, structure emerges, memory accumulates.</div>
+  </div>
+  <div class="grid2">
+    <div class="wire"><h4 style="color:#8b5cf6">ABCDE Framework</h4>
+      <div class="wr"><span class="wl" style="color:var(--accent)">A</span><span class="wv">Awareness — Recognize the decision context and current state</span></div>
+      <div class="wr"><span class="wl" style="color:var(--ok)">B</span><span class="wv">Belief — Form evidence-based assessment of the situation</span></div>
+      <div class="wr"><span class="wl" style="color:var(--warn)">C</span><span class="wv">Commitment — Decide and commit to a course of action</span></div>
+      <div class="wr"><span class="wl" style="color:var(--bad)">D</span><span class="wv">Discipline — Execute with fidelity to the commitment</span></div>
+      <div class="wr"><span class="wl" style="color:#a78bfa">E</span><span class="wv">Evolution — Learn from the outcome and update institutional memory</span></div>
+    </div>
+    <div class="wire"><h4 style="color:#8b5cf6">How It Works</h4>
+      <div class="wr"><span class="wl">Input</span><span class="wv">Natural language conversations with AI</span></div>
+      <div class="wr"><span class="wl">Processing</span><span class="wv">Structure emerges from conversation patterns</span></div>
+      <div class="wr"><span class="wl">Output</span><span class="wv">Indexed institutional knowledge in Memory Graph</span></div>
+      <div class="wr"><span class="wl">Feedback</span><span class="wv">Prior patterns surface during new conversations</span></div>
+      <div class="wr"><span class="wl">Metric</span><span class="wv">CMR (Command Memory Retention) measures knowledge persistence</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="color:#8b5cf6">ReOps → CERPA Integration</h3>
+    <div class="wire">
+      <div class="wr"><span class="wl">Claim</span><span class="wv">ReOps surfaces prior claims related to the current context</span></div>
+      <div class="wr"><span class="wl">Event</span><span class="wv">ReOps indexes events as searchable institutional observations</span></div>
+      <div class="wr"><span class="wl">Review</span><span class="wv">ReOps provides prior review decisions for pattern matching</span></div>
+      <div class="wr"><span class="wl">Patch</span><span class="wv">ReOps suggests reusable patches from successful prior corrections</span></div>
+      <div class="wr"><span class="wl">Apply</span><span class="wv">ReOps IS the Memory Graph — Apply writes directly to institutional memory</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ MEE ═══ -->
+<section id="s-mee">
+  <div class="card">
+    <h3 style="color:#10b981">MEE — Model Exchange Engine</h3>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:12px">Standardized governance across model families. Swap thrusters without losing institutional memory or decision history.</div>
+  </div>
+  <div class="grid2">
+    <div class="wire"><h4 style="color:#10b981">Supported Model Families</h4>
+      <div class="wr"><span class="wl">OpenAI</span><span class="wv">GPT-4, GPT-4o, o1, o3</span></div>
+      <div class="wr"><span class="wl">Anthropic</span><span class="wv">Claude Opus, Sonnet, Haiku</span></div>
+      <div class="wr"><span class="wl">GGUF</span><span class="wv">Llama, Mistral, Phi, Gemma (local)</span></div>
+      <div class="wr"><span class="wl">Open Source</span><span class="wv">Any model via standard API interface</span></div>
+    </div>
+    <div class="wire"><h4 style="color:#10b981">What Transfers</h4>
+      <div class="wr"><span class="wl">Decision History</span><span class="wv">All DLRs, DSs, RSs travel with the governance envelope</span></div>
+      <div class="wr"><span class="wl">Memory Graph</span><span class="wv">Institutional knowledge persists across model swaps</span></div>
+      <div class="wr"><span class="wl">Authority Context</span><span class="wv">Role bindings, state constraints, envelope metadata</span></div>
+      <div class="wr"><span class="wl">KPI Baselines</span><span class="wv">CIS, PAR, DES — all metrics continue tracking across models</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="color:#10b981">The Key Insight</h3>
+    <div style="font-size:11px;color:var(--muted)">The governance envelope is model-agnostic. It wraps the <em>decision</em>, not the <em>model</em>. When you swap from GPT-4 to Claude to a local GGUF model, the decisions, their provenance, their evidence, and their institutional memory persist. The model is a thruster. CERPA is the spacecraft.</div>
+  </div>
+</section>
+
+<!-- ═══ DECISION ACCOUNTING ═══ -->
+<section id="s-acct">
+  <div class="card">
+    <h3 style="color:#f59e0b">Decision Accounting — The Measurement Layer</h3>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:12px">GAAP made financial decisions auditable. Decision Accounting makes AI decisions auditable. ClaimID is the account number. DLR is the journal entry. CIS is the balance sheet.</div>
+  </div>
+  <div class="grid2">
+    <div class="wire"><h4 style="color:#f59e0b">The Accounting Parallel</h4>
+      <div class="wr"><span class="wl">ClaimID</span><span class="wv">Account Number — globally unique persistent identifier</span></div>
+      <div class="wr"><span class="wl">DLR</span><span class="wv">Journal Entry — records what happened and who decided</span></div>
+      <div class="wr"><span class="wl">DS</span><span class="wv">Audit Finding — drift detected, flagged, measured</span></div>
+      <div class="wr"><span class="wl">RS</span><span class="wv">Corrective Action — remediation with precision scoring</span></div>
+      <div class="wr"><span class="wl">MG</span><span class="wv">General Ledger — accumulated institutional knowledge</span></div>
+      <div class="wr"><span class="wl">CIS</span><span class="wv">Balance Sheet — composite governance health metric</span></div>
+    </div>
+    <div class="wire"><h4 style="color:#f59e0b">Lead-6 KPIs</h4>
+      <div class="wr"><span class="wl" style="color:var(--ok)">CIS</span><span class="wv">Closure Integrity Score — the governance loop is real</span></div>
+      <div class="wr"><span class="wl" style="color:var(--ok)">PAR</span><span class="wv">Patch Adhesion Rate — corrections hold</span></div>
+      <div class="wr"><span class="wl" style="color:var(--warn)">DES</span><span class="wv">Deficiency Echo Score — recurrence is declining</span></div>
+      <div class="wr"><span class="wl" style="color:var(--bad)">DEG</span><span class="wv">Decision-to-Evidence Gap — proof arrives fast</span></div>
+      <div class="wr"><span class="wl" style="color:var(--accent)">BRQ</span><span class="wv">Board Readiness Quotient — review quality sufficient</span></div>
+      <div class="wr"><span class="wl" style="color:#a78bfa">CG</span><span class="wv">Closure Gravity — resistance is measured and declining</span></div>
+    </div>
+  </div>
+  <div class="card" style="text-align:center">
+    <div style="font-size:14px;font-weight:700;color:var(--accent);margin-bottom:4px">CIS > 0.75 = the governance loop is real</div>
+    <div style="font-size:10px;color:var(--muted)">This is the single number that tells a leader, a regulator, or an auditor whether governance is operational or theatrical.</div>
+  </div>
+</section>
+
+</div>
+<footer>Deep Sigma — AuthorityOps Control Plane EDGE v1.0.0 — Claim | Event | Review | Patch | Apply</footer>
+<script>
+(function(){"use strict";
+var tabs=document.querySelectorAll(".ttab"),secs=document.querySelectorAll(".main section");
+function openTab(n){
+  tabs.forEach(function(t){t.classList.toggle("active",t.getAttribute("data-t")===n)});
+  secs.forEach(function(s){s.classList.toggle("active",s.id==="s-"+n)});
+}
+tabs.forEach(function(t){t.addEventListener("click",function(){openTab(t.getAttribute("data-t"))})});
+document.querySelectorAll("[data-nav]").forEach(function(c){
+  c.addEventListener("click",function(){openTab(c.getAttribute("data-nav"))});
+});
+})();
+</script>
+</body>
+</html>
