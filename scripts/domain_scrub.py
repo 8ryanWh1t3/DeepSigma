@@ -256,6 +256,12 @@ ALLOWED_ACRONYMS = {
     "ASMP", "EVAL", "ART",
     # CERPA — adaptation loop primitives and demo tokens
     "CERPA", "ADJUST", "APPLY", "CYCLE", "CTX",
+    # CERPA APPA EDGE — KPIs, UI sections, browser API shims
+    "APPA", "CCCI", "CIS", "PAR", "DES", "BRQ", "FCR", "CMR",
+    "RDEV", "RCR", "OOL", "PPI", "EDI", "CCTV", "PMO",
+    "XHR", "RTC", "ROW", "INIT", "CAUSE", "REUSES",
+    "DRAWER", "TOAST", "TRENDS", "REFS", "DETAIL", "VISUAL",
+    "ADMIN", "SEARCH", "CLICKS", "TIMER", "UPLOAD", "SHARED",
     # Context Envelope dimension names
     "WHEN", "WHERE",
     # Decision Accounting — cost/value/debt ID prefixes, category enums
