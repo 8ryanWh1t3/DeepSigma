@@ -262,6 +262,7 @@ ALLOWED_ACRONYMS = {
     "XHR", "RTC", "ROW", "INIT", "CAUSE", "REUSES",
     "DRAWER", "TOAST", "TRENDS", "REFS", "DETAIL", "VISUAL",
     "ADMIN", "SEARCH", "CLICKS", "TIMER", "UPLOAD", "SHARED",
+    "BADGES", "BELOW", "CELL", "DRAG", "FEED", "HVAC", "IDS", "NODE",
     # Context Envelope dimension names
     "WHEN", "WHERE",
     # Decision Accounting — cost/value/debt ID prefixes, category enums
