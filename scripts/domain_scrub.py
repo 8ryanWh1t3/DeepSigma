@@ -270,6 +270,9 @@ ALLOWED_ACRONYMS = {
     "GAAP", "GRID", "LEFT", "LOG", "NERC", "OCC", "PAS", "RENDER",
     "RIGHT", "RMF", "SCADA", "SEC", "SSL", "STABLE", "STACK", "STATE",
     "SUPPLY", "TPAT", "UTILS",
+    # CERPA EV Charging / Healthcare / Smart Cities / Industry Verticals EDGE
+    "AHA", "ALERT", "AQI", "CITY", "COBIT", "CROSS", "DEMAND", "DOMAIN",
+    "DTLA", "EMS", "EVENTS", "FPR", "LAX", "MRI", "MULTI", "NWS", "SDG",
     # Context Envelope dimension names
     "WHEN", "WHERE",
     # Decision Accounting — cost/value/debt ID prefixes, category enums
