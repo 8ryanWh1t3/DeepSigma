@@ -1,0 +1,342 @@
+<!--
+ CERPA EV Charging Network EDGE v1.0.0
+ ============================================================
+ Deep Sigma Decision Governance Platform
+ Interactive EV charging demand simulation
+ Demand prediction → drift events → CERPA cycle → load rebalance
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"/>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>CERPA EV Charging — Deep Sigma EDGE</title>
+<style>
+:root{--bg:#060a12;--card:#0d1520;--card2:#0a0f1a;--muted:#6b8099;--txt:#d8e4f0;--accent:#22d3ee;--ev:#10b981;--warn:#ffcc66;--bad:#ff6b6b;--ok:#5dff93;--line:#162030;--charge:#a78bfa;--v2g:#f59e0b;--grid:#38bdf8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--txt);font-size:13px;overflow-x:hidden}
+header{padding:10px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;background:rgba(6,10,18,.96)}
+header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--ev) 20%,var(--charge) 50%,var(--ev) 80%,transparent)}
+.brand{font-weight:700;font-size:15px;color:var(--ev)}.brand small{display:block;color:var(--muted);font-size:10px;font-weight:400}
+.main{height:calc(100vh - 56px);overflow-y:auto;padding:16px 20px;max-width:1300px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+.card h3{margin:0 0 10px;font-size:13px;color:#cfe2f7;letter-spacing:.4px;text-transform:uppercase}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.wire{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px}
+.wire h4{margin:0 0 6px;font-size:10px;letter-spacing:.4px;text-transform:uppercase;color:var(--accent)}
+.wr{display:flex;justify-content:space-between;padding:3px 0;font-size:11px;border-bottom:1px solid #0f1825;gap:8px}
+.wr:last-child{border:none}.wr .wl{color:var(--muted);min-width:80px;flex-shrink:0}.wr .wv{font-weight:500;text-align:right;flex:1}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center}
+.kpi .kv{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1;transition:all .4s}
+.kpi .kl{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+.gauge{position:relative;width:130px;height:130px;margin:0 auto}
+.gauge svg{width:130px;height:130px;transform:rotate(-90deg)}
+.gauge-bg{fill:none;stroke:var(--line);stroke-width:11;stroke-linecap:round}
+.gauge-fill{fill:none;stroke-width:11;stroke-linecap:round;transition:stroke-dashoffset .6s,stroke .3s}
+.gauge-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.gauge-val{font-size:28px;font-weight:700;transition:color .3s}.gauge-sub{font-size:9px;color:var(--muted)}
+.cycle-vis{display:flex;gap:4px;margin:10px 0;align-items:center;flex-wrap:wrap}
+.cyc-s{flex:1;min-width:75px;padding:7px;border-radius:8px;text-align:center;font-size:10px;font-weight:700;border:2px solid var(--line);background:var(--card2);transition:all .4s}
+.cyc-s.active{border-color:var(--accent);box-shadow:0 0 12px rgba(34,211,238,.2)}
+.cyc-s.done{border-color:var(--ok);opacity:.7}
+.cyc-s small{display:block;font-weight:400;font-size:8px;margin-top:2px;color:var(--muted)}
+.cyc-arr{color:#2a3a4e;font-size:12px}
+.ep-log{max-height:260px;overflow-y:auto;font-size:10px}
+.ep-entry{padding:5px 8px;border-bottom:1px solid #0f1825;animation:fadeIn .3s}
+.ep-entry .ep-time{font-size:8px;color:#3a4a5e}.ep-entry .ep-stage{font-weight:700;margin:0 4px}
+.ep-claim .ep-stage{color:var(--accent)}.ep-event .ep-stage{color:var(--v2g)}
+.ep-review .ep-stage{color:var(--charge)}.ep-patch .ep-stage{color:var(--bad)}.ep-apply .ep-stage{color:var(--ok)}
+@keyframes fadeIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)}}
+button{padding:6px 14px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--txt);transition:all .15s}
+button:hover{border-color:rgba(34,211,238,.3)}
+button.ev{border-color:rgba(16,185,129,.4);color:var(--ev);background:rgba(16,185,129,.06)}
+button.heat{border-color:rgba(255,107,107,.4);color:var(--bad);background:rgba(255,107,107,.06)}
+button.surge{border-color:rgba(167,139,250,.4);color:var(--charge);background:rgba(167,139,250,.06)}
+button.v2g{border-color:rgba(245,158,11,.4);color:var(--v2g);background:rgba(245,158,11,.06)}
+button:disabled{opacity:.4;cursor:not-allowed}
+/* Station grid */
+.station{border:1px solid var(--line);border-radius:6px;padding:8px;text-align:center;background:var(--card2);transition:all .4s;font-size:10px}
+.station .st-name{font-weight:700;font-size:9px;color:var(--accent);margin-bottom:4px}
+.station .st-bar{height:8px;background:#0f1825;border-radius:4px;margin:4px 0;overflow:hidden}
+.station .st-fill{height:100%;border-radius:4px;transition:width .6s}
+.station .st-info{font-size:8px;color:var(--muted)}
+.net-status{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;transition:all .4s}
+.ns-ok{background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);color:var(--ok)}
+.ns-warn{background:rgba(255,204,102,.06);border:1px solid rgba(255,204,102,.2);color:var(--warn)}
+.ns-crit{background:rgba(255,107,107,.06);border:1px solid rgba(255,107,107,.2);color:var(--bad)}
+.ns-dot{width:8px;height:8px;border-radius:50%;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+footer{padding:6px 16px;border-top:1px solid var(--line);font-size:8px;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">CERPA EV CHARGING<small>Deep Sigma — EV Network Governance Simulation v1.0.0</small></div>
+  <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
+    <div class="net-status ns-ok" id="netStatus"><span class="ns-dot" style="background:var(--ok)" id="nsDot"></span><span id="nsText">NETWORK NOMINAL</span></div>
+  </div>
+</header>
+<div class="main">
+  <!-- CONTROLS -->
+  <div class="card">
+    <h3>Event Injection</h3>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <button class="heat" id="btnHeat">Heatwave — Demand Drop</button>
+      <button class="surge" id="btnSurge">Commuter Surge +60 EVs</button>
+      <button class="v2g" id="btnV2G">V2G Discharge Request</button>
+      <button class="ev" id="btnPrice">Dynamic Pricing Drift</button>
+      <button id="btnReset" style="margin-left:auto">Reset</button>
+      <span style="font-size:9px;color:var(--muted)" id="simInfo">Episodes: 0 | Drift: 0</span>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <!-- LEFT -->
+    <div>
+      <div class="card" style="text-align:center">
+        <h3>Network Coherence (CIS)</h3>
+        <div class="gauge">
+          <svg viewBox="0 0 130 130"><circle class="gauge-bg" cx="65" cy="65" r="54" stroke-dasharray="339" stroke-dashoffset="85"/>
+            <circle class="gauge-fill" id="gFill" cx="65" cy="65" r="54" stroke="var(--ok)" stroke-dasharray="339" stroke-dashoffset="51"/></svg>
+          <div class="gauge-label"><div class="gauge-val" id="gVal" style="color:var(--ok)">94.0</div><div class="gauge-sub">CIS</div></div>
+        </div>
+      </div>
+
+      <div class="grid5">
+        <div class="kpi"><div class="kv" id="kvPred" style="color:var(--ev)">200</div><div class="kl">Predicted EVs</div></div>
+        <div class="kpi"><div class="kv" id="kvAct" style="color:var(--accent)">195</div><div class="kl">Actual EVs</div></div>
+        <div class="kpi"><div class="kv" id="kvLoad" style="color:var(--charge)">4.8</div><div class="kl">Load MW</div></div>
+        <div class="kpi"><div class="kv" id="kvV2G" style="color:var(--v2g)">0</div><div class="kl">V2G MW</div></div>
+        <div class="kpi"><div class="kv" id="kvEp" style="color:var(--accent)">0</div><div class="kl">Episodes</div></div>
+      </div>
+      <div class="grid4" style="margin-top:10px">
+        <div class="kpi"><div class="kv" id="kvPAR" style="color:var(--ok)">97%</div><div class="kl">Network PAR</div></div>
+        <div class="kpi"><div class="kv" id="kvDEG" style="color:var(--ok)">—</div><div class="kl">DEG (sec)</div></div>
+        <div class="kpi"><div class="kv" id="kvDrift" style="color:var(--ok)">0</div><div class="kl">Drift Events</div></div>
+        <div class="kpi"><div class="kv" id="kvWait" style="color:var(--ok)">8</div><div class="kl">Avg Wait min</div></div>
+      </div>
+
+      <!-- CERPA Cycle -->
+      <div class="card" style="margin-top:14px">
+        <h3>CERPA Cycle — Live</h3>
+        <div class="cycle-vis">
+          <div class="cyc-s" id="csClaim">CLAIM<small>Demand forecast</small></div><span class="cyc-arr">→</span>
+          <div class="cyc-s" id="csEvent">EVENT<small>Actual arrivals</small></div><span class="cyc-arr">→</span>
+          <div class="cyc-s" id="csReview">REVIEW<small>Drift check</small></div><span class="cyc-arr">→</span>
+          <div class="cyc-s" id="csPatch">PATCH<small>Rebalance</small></div><span class="cyc-arr">→</span>
+          <div class="cyc-s" id="csApply">APPLY<small>Seal + learn</small></div>
+        </div>
+      </div>
+
+      <!-- Stations -->
+      <div class="card">
+        <h3>Charging Stations — Live Occupancy</h3>
+        <div class="grid4" id="stationGrid"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div>
+      <div class="card">
+        <h3>Episode Log — Hash-Chained</h3>
+        <div class="ep-log" id="epLog"><div style="text-align:center;color:var(--muted);padding:30px;font-size:11px">Inject an event to start the CERPA cycle →</div></div>
+      </div>
+      <div class="card">
+        <h3>Drift Detection History</h3>
+        <div id="driftHist" style="font-size:10px;color:var(--muted);text-align:center;padding:16px">No drift events yet.</div>
+      </div>
+      <div class="card">
+        <h3>AuthorityOps — EV Network Rules</h3>
+        <div class="wire"><h4>Active Governance</h4>
+          <div class="wr"><span class="wl" style="color:var(--bad)">Rule 1</span><span class="wv">No AI self-approves pricing changes > 20%</span></div>
+          <div class="wr"><span class="wl" style="color:var(--bad)">Rule 2</span><span class="wv">V2G discharge > 0.5 MW requires fleet operator approval</span></div>
+          <div class="wr"><span class="wl" style="color:var(--bad)">Rule 3</span><span class="wv">No load redistribution without station capacity verification</span></div>
+          <div class="wr"><span class="wl" style="color:var(--bad)">Rule 4</span><span class="wv">All demand adjustments sealed with episode hash</span></div>
+          <div class="wr"><span class="wl" style="color:var(--bad)">Rule 5</span><span class="wv">Privacy: no individual EV driver data in governance records</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Compliance</h3>
+        <div class="wire">
+          <div class="wr"><span class="wl">NIST AI RMF</span><span class="wv" style="color:var(--ok)">99.1% — AI governance</span></div>
+          <div class="wr"><span class="wl">EU AI Act</span><span class="wv" style="color:var(--ok)">98.8% — High-risk AI</span></div>
+          <div class="wr"><span class="wl">NERC CIP</span><span class="wv" style="color:var(--ok)">Grid integration audit</span></div>
+          <div class="wr"><span class="wl">CCPA/GDPR</span><span class="wv" style="color:var(--ok)">Driver data privacy</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<footer>Deep Sigma EDGE — CERPA EV Charging Network Simulation v1.0.0 — Claim | Event | Review | Patch | Apply</footer>
+
+<script>
+(function(){"use strict";
+var S={predicted:200,actual:195,loadMW:4.8,v2g:0,cis:94.0,par:97,driftCount:0,episodes:0,degStart:null,lastDEG:null,running:false,avgWait:8};
+var stations=[
+  {name:"Downtown LA Hub",cap:40,occ:34,kw:150},{name:"Santa Monica Blvd",cap:24,occ:20,kw:150},
+  {name:"Hollywood & Vine",cap:16,occ:13,kw:50},{name:"Pasadena Central",cap:20,occ:16,kw:150},
+  {name:"LAX Terminal",cap:32,occ:28,kw:350},{name:"Long Beach Port",cap:28,occ:22,kw:150},
+  {name:"Burbank Studios",cap:12,occ:9,kw:50},{name:"Irvine Spectrum",cap:24,occ:18,kw:150}
+];
+var epLog=document.getElementById("epLog"),driftHist=document.getElementById("driftHist"),driftEntries=[],epHashes=[];
+function ts(){var d=new Date();return(d.getHours()<10?"0":"")+d.getHours()+":"+(d.getMinutes()<10?"0":"")+d.getMinutes()+":"+(d.getSeconds()<10?"0":"")+d.getSeconds()}
+function hash(){return"0x"+Math.random().toString(16).substring(2,10)+Math.random().toString(16).substring(2,10)}
+function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v))}
+
+function renderStations(){
+  var g=document.getElementById("stationGrid");g.innerHTML="";
+  for(var i=0;i<stations.length;i++){
+    var s=stations[i],pct=Math.round(s.occ/s.cap*100),c=pct>90?"var(--bad)":pct>70?"var(--warn)":"var(--ev)";
+    var d=document.createElement("div");d.className="station";
+    d.innerHTML='<div class="st-name">'+s.name+'</div><div class="st-bar"><div class="st-fill" style="width:'+pct+'%;background:'+c+'"></div></div><div class="st-info">'+s.occ+'/'+s.cap+' ('+s.kw+'kW)</div>';
+    g.appendChild(d);
+  }
+}
+
+function updateUI(){
+  document.getElementById("kvPred").textContent=S.predicted;
+  document.getElementById("kvAct").textContent=S.actual;
+  document.getElementById("kvLoad").textContent=S.loadMW.toFixed(1);
+  document.getElementById("kvV2G").textContent=S.v2g.toFixed(1);
+  document.getElementById("kvEp").textContent=S.episodes;
+  document.getElementById("kvPAR").textContent=S.par+"%";
+  document.getElementById("kvDrift").textContent=S.driftCount;
+  document.getElementById("kvWait").textContent=S.avgWait;
+  if(S.lastDEG!==null)document.getElementById("kvDEG").textContent=S.lastDEG+"s";
+  document.getElementById("simInfo").textContent="Episodes: "+S.episodes+" | Drift: "+S.driftCount;
+  // Gauge
+  var pct=S.cis/100,circ=339,off=circ*(1-pct*0.75);
+  var gf=document.getElementById("gFill");gf.setAttribute("stroke-dashoffset",off);
+  gf.setAttribute("stroke",S.cis>=75?"var(--ok)":S.cis>=50?"var(--warn)":"var(--bad)");
+  var gv=document.getElementById("gVal");gv.textContent=S.cis.toFixed(1);
+  gv.style.color=S.cis>=75?"var(--ok)":S.cis>=50?"var(--warn)":"var(--bad)";
+  // Net status
+  var ns=document.getElementById("netStatus"),nd=document.getElementById("nsDot"),nt=document.getElementById("nsText");
+  var gap=Math.abs(S.predicted-S.actual);
+  if(gap>60){ns.className="net-status ns-crit";nd.style.background="var(--bad)";nt.textContent="NETWORK STRESSED"}
+  else if(gap>25){ns.className="net-status ns-warn";nd.style.background="var(--warn)";nt.textContent="DEMAND DEVIATION"}
+  else{ns.className="net-status ns-ok";nd.style.background="var(--ok)";nt.textContent="NETWORK NOMINAL"}
+  // Colors
+  document.getElementById("kvPAR").style.color=S.par>=90?"var(--ok)":S.par>=75?"var(--warn)":"var(--bad)";
+  document.getElementById("kvDrift").style.color=S.driftCount>3?"var(--bad)":S.driftCount>0?"var(--warn)":"var(--ok)";
+  document.getElementById("kvWait").style.color=S.avgWait<=10?"var(--ok)":S.avgWait<=20?"var(--warn)":"var(--bad)";
+  renderStations();
+}
+
+function logE(stage,msg,cls){
+  if(epLog.querySelector("div[style]")&&S.episodes<=1)epLog.innerHTML="";
+  var d=document.createElement("div");d.className="ep-entry ep-"+cls;
+  d.innerHTML='<span class="ep-time">'+ts()+'</span><span class="ep-stage">['+stage+']</span>'+msg;
+  epLog.insertBefore(d,epLog.firstChild);if(epLog.children.length>50)epLog.removeChild(epLog.lastChild);
+}
+
+function highlightStep(id,delay){
+  setTimeout(function(){
+    document.querySelectorAll(".cyc-s").forEach(function(s){s.classList.remove("active","done")});
+    var el=document.getElementById(id);if(el)el.classList.add("active");
+    var steps=["csClaim","csEvent","csReview","csPatch","csApply"],idx=steps.indexOf(id);
+    for(var i=0;i<idx;i++){var p=document.getElementById(steps[i]);if(p){p.classList.remove("active");p.classList.add("done")}}
+  },delay);
+}
+
+function renderDrift(){
+  if(!driftEntries.length){driftHist.innerHTML='<div style="text-align:center;color:var(--muted);padding:16px">No drift events yet.</div>';return}
+  var h='<table style="width:100%;font-size:10px;border-collapse:collapse"><thead><tr><th style="text-align:left;color:var(--muted);font-size:8px;padding:3px;border-bottom:1px solid #1b2a3a">Time</th><th style="text-align:left;color:var(--muted);font-size:8px;padding:3px;border-bottom:1px solid #1b2a3a">Type</th><th style="text-align:center;color:var(--muted);font-size:8px;padding:3px;border-bottom:1px solid #1b2a3a">Delta</th><th style="text-align:center;color:var(--muted);font-size:8px;padding:3px;border-bottom:1px solid #1b2a3a">CIS</th></tr></thead><tbody>';
+  for(var i=driftEntries.length-1;i>=0;i--){var d=driftEntries[i],cc=d.cis>=75?"var(--ok)":d.cis>=50?"var(--warn)":"var(--bad)";
+    h+='<tr><td style="padding:2px 3px;border-bottom:1px solid #0f1825;font-size:9px;color:var(--muted)">'+d.time+'</td><td style="padding:2px 3px;border-bottom:1px solid #0f1825;color:var(--accent)">'+d.type+'</td><td style="padding:2px 3px;border-bottom:1px solid #0f1825;text-align:center">'+d.delta+'</td><td style="padding:2px 3px;border-bottom:1px solid #0f1825;text-align:center;color:'+cc+';font-weight:700">'+d.cis.toFixed(1)+'</td></tr>';}
+  h+='</tbody></table>';driftHist.innerHTML=h;
+}
+
+function runCERPA(type,desc,predDelta,actDelta,loadDelta,v2gDelta,waitDelta,stationChanges){
+  if(S.running)return;S.running=true;S.episodes++;
+  var prevH=epHashes.length?epHashes[epHashes.length-1]:"GENESIS",epH=hash();epHashes.push(epH);
+  var origPred=S.predicted;
+
+  highlightStep("csClaim",0);
+  logE("CLAIM","Forecast: "+S.predicted+" EVs arriving peak hour | Load: "+S.loadMW.toFixed(1)+" MW","claim");
+
+  setTimeout(function(){
+    highlightStep("csEvent",0);
+    S.predicted=clamp(S.predicted+predDelta,50,400);S.actual=clamp(S.actual+actDelta,30,400);
+    S.loadMW=clamp(S.loadMW+loadDelta,1,15);S.v2g=clamp(S.v2g+v2gDelta,0,5);
+    S.avgWait=clamp(S.avgWait+waitDelta,2,45);
+    if(stationChanges)for(var i=0;i<stations.length&&i<stationChanges.length;i++)stations[i].occ=clamp(stations[i].occ+stationChanges[i],0,stations[i].cap);
+    logE("EVENT",desc+" | Actual: "+S.actual+" EVs | Load: "+S.loadMW.toFixed(1)+" MW","event");
+    S.degStart=Date.now();updateUI();
+
+    setTimeout(function(){
+      highlightStep("csReview",0);
+      var gap=Math.abs(S.predicted-S.actual),driftMag=gap+Math.abs(loadDelta*10)+Math.abs(v2gDelta*10);
+      var driftDetected=gap>20||Math.abs(loadDelta)>0.5;
+      S.cis=clamp(S.cis-(driftMag*0.12)+(driftDetected?0:3),20,100);S.cis=Math.round(S.cis*10)/10;
+      if(driftDetected){
+        S.driftCount++;logE("REVIEW","DRIFT DETECTED — Type: "+type+" | Gap: "+gap+" EVs | CIS: "+S.cis.toFixed(1),"review");
+        driftEntries.push({time:ts(),type:type,delta:gap+" EVs",cis:S.cis});renderDrift();
+      }else{logE("REVIEW","No drift. Coherence stable at "+S.cis.toFixed(1),"review")}
+      updateUI();
+
+      setTimeout(function(){
+        highlightStep("csPatch",0);
+        if(driftDetected){
+          // Rebalance: adjust prediction, redistribute load, dispatch V2G if needed
+          var correction=Math.round((S.actual-S.predicted)*0.6);
+          S.predicted=clamp(S.predicted+correction,50,400);
+          S.loadMW=clamp(S.loadMW-(loadDelta*0.5),1,15);
+          S.avgWait=clamp(S.avgWait-Math.round(waitDelta*0.4),2,45);
+          S.cis=clamp(S.cis+Math.abs(correction)*0.08,20,100);S.cis=Math.round(S.cis*10)/10;
+          logE("PATCH","RETCON — Forecast adjusted to "+S.predicted+" EVs | Load rebalanced to "+S.loadMW.toFixed(1)+" MW | CIS recovering: "+S.cis.toFixed(1),"patch");
+          if(v2gDelta>0){logE("PATCH","AuthorityOps GATE: V2G discharge "+S.v2g.toFixed(1)+" MW — "+(S.v2g>0.5?"requires fleet operator approval (auto-approved in sim)":"within auto-authority bounds"),"patch")}
+          if(gap>40){logE("PATCH","Dynamic pricing adjustment: +15% at high-demand stations | Rerouting to underutilized stations","patch")}
+          // Redistribute station load
+          for(var i=0;i<stations.length;i++){
+            if(stations[i].occ>stations[i].cap*0.9)stations[i].occ=Math.max(0,stations[i].occ-3);
+            else if(stations[i].occ<stations[i].cap*0.5)stations[i].occ=Math.min(stations[i].cap,stations[i].occ+2);
+          }
+        }else{logE("PATCH","No patch required. Network nominal.","patch")}
+        updateUI();
+
+        setTimeout(function(){
+          highlightStep("csApply",0);
+          var deg=S.degStart?Math.round((Date.now()-S.degStart)/1000):0;S.lastDEG=deg;
+          S.par=clamp(S.par+(driftDetected?-1:1),70,100);
+          logE("APPLY","Episode sealed. Hash: "+epH+" | Prev: "+prevH+" | DEG: "+deg+"s | PAR: "+S.par+"%","apply");
+          logE("APPLY","Memory Graph: "+type+" pattern indexed. CMR updated.","apply");
+          updateUI();
+          setTimeout(function(){
+            document.querySelectorAll(".cyc-s").forEach(function(s){s.classList.remove("active");s.classList.add("done")});
+            setTimeout(function(){S.running=false},1500);
+          },1200);
+        },700);
+      },700);
+    },700);
+  },500);
+}
+
+// EVENTS
+document.getElementById("btnHeat").addEventListener("click",function(){
+  runCERPA("Heatwave Demand Drop","Heatwave: AC load surges, EV charging delayed — arrivals drop 40",0,-40,-0.8,0,6,[-4,-3,-2,-2,-5,-3,-1,-3]);
+});
+document.getElementById("btnSurge").addEventListener("click",function(){
+  runCERPA("Commuter Surge","5PM commuter surge: +60 EVs above forecast at peak stations",0,60,1.5,0,12,[6,5,4,3,8,4,2,5]);
+});
+document.getElementById("btnV2G").addEventListener("click",function(){
+  runCERPA("V2G Discharge","Grid requests V2G discharge from fleet EVs at LAX and Long Beach",0,-15,-0.3,1.2,-2,[-2,-1,0,-1,-8,-6,0,-2]);
+});
+document.getElementById("btnPrice").addEventListener("click",function(){
+  runCERPA("Pricing Model Drift","Dynamic pricing model drifts: $0.35/kWh recommended but market rate shifted to $0.28/kWh",-25,-30,-0.6,0,4,[-3,-2,-2,-1,-4,-2,-1,-2]);
+});
+document.getElementById("btnReset").addEventListener("click",function(){
+  S={predicted:200,actual:195,loadMW:4.8,v2g:0,cis:94.0,par:97,driftCount:0,episodes:0,degStart:null,lastDEG:null,running:false,avgWait:8};
+  stations=[{name:"Downtown LA Hub",cap:40,occ:34,kw:150},{name:"Santa Monica Blvd",cap:24,occ:20,kw:150},{name:"Hollywood & Vine",cap:16,occ:13,kw:50},{name:"Pasadena Central",cap:20,occ:16,kw:150},{name:"LAX Terminal",cap:32,occ:28,kw:350},{name:"Long Beach Port",cap:28,occ:22,kw:150},{name:"Burbank Studios",cap:12,occ:9,kw:50},{name:"Irvine Spectrum",cap:24,occ:18,kw:150}];
+  driftEntries=[];epHashes=[];epLog.innerHTML='<div style="text-align:center;color:var(--muted);padding:30px;font-size:11px">Inject an event to start the CERPA cycle →</div>';
+  renderDrift();document.querySelectorAll(".cyc-s").forEach(function(s){s.classList.remove("active","done")});
+  document.getElementById("kvDEG").textContent="—";updateUI();
+});
+
+updateUI();renderStations();
+})();
+</script>
+</body>
+</html>

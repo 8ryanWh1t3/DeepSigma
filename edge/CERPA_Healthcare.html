@@ -1,0 +1,344 @@
+<!--
+ CERPA Healthcare Governance EDGE v1.0.0
+ ============================================================
+ Deep Sigma Decision Governance Platform
+ Interactive healthcare simulation — clinical AI governance
+ Diagnostic drift, prior auth, bias detection, clinical memory
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'"/>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>CERPA Healthcare — Deep Sigma EDGE</title>
+<style>
+:root{--bg:#060a12;--card:#0d1520;--card2:#0a0f1a;--muted:#6b8099;--txt:#d8e4f0;--accent:#10b981;--diag:#06b6d4;--rx:#a78bfa;--auth:#f59e0b;--safety:#ef4444;--line:#162030;--ok:#5dff93;--warn:#ffcc66;--bad:#ff6b6b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--txt);font-size:13px;overflow-x:hidden}
+header{padding:10px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;background:rgba(6,10,18,.96)}
+header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent) 20%,var(--diag) 50%,var(--accent) 80%,transparent)}
+.brand{font-weight:700;font-size:15px;color:var(--accent)}.brand small{display:block;color:var(--muted);font-size:10px;font-weight:400}
+.main{height:calc(100vh - 56px);overflow-y:auto;padding:16px 20px;max-width:1300px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+.card h3{margin:0 0 10px;font-size:13px;color:#cfe2f7;letter-spacing:.4px;text-transform:uppercase}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.wire{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px}
+.wire h4{margin:0 0 6px;font-size:10px;letter-spacing:.4px;text-transform:uppercase;color:var(--accent)}
+.wr{display:flex;justify-content:space-between;padding:3px 0;font-size:11px;border-bottom:1px solid #0f1825;gap:8px}
+.wr:last-child{border:none}.wr .wl{color:var(--muted);min-width:90px;flex-shrink:0}.wr .wv{font-weight:500;text-align:right;flex:1}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center}
+.kpi .kv{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1;transition:all .4s}
+.kpi .kl{font-size:7.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-top:2px}
+.gauge{position:relative;width:130px;height:130px;margin:0 auto}
+.gauge svg{width:130px;height:130px;transform:rotate(-90deg)}
+.gauge-bg{fill:none;stroke:var(--line);stroke-width:11;stroke-linecap:round}
+.gauge-fill{fill:none;stroke-width:11;stroke-linecap:round;transition:stroke-dashoffset .6s,stroke .3s}
+.gauge-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.gauge-val{font-size:28px;font-weight:700;transition:color .3s}.gauge-sub{font-size:9px;color:var(--muted)}
+.cycle-vis{display:flex;gap:3px;margin:8px 0;align-items:center;flex-wrap:wrap}
+.cyc-s{flex:1;min-width:70px;padding:6px;border-radius:8px;text-align:center;font-size:9px;font-weight:700;border:2px solid var(--line);background:var(--card2);transition:all .4s}
+.cyc-s.active{border-color:var(--accent);box-shadow:0 0 10px rgba(16,185,129,.2)}
+.cyc-s.done{border-color:var(--ok);opacity:.7}
+.cyc-s small{display:block;font-weight:400;font-size:7px;margin-top:1px;color:var(--muted)}
+.cyc-arr{color:#2a3a4e;font-size:11px}
+.ep-log{max-height:300px;overflow-y:auto;font-size:10px}
+.ep-entry{padding:4px 8px;border-bottom:1px solid #0f1825;animation:fadeIn .3s}
+.ep-entry .ep-time{font-size:8px;color:#3a4a5e}.ep-entry .ep-stage{font-weight:700;margin:0 4px}
+.ep-claim .ep-stage{color:var(--diag)}.ep-event .ep-stage{color:var(--auth)}
+.ep-review .ep-stage{color:var(--rx)}.ep-patch .ep-stage{color:var(--safety)}.ep-apply .ep-stage{color:var(--ok)}
+@keyframes fadeIn{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
+button{padding:6px 12px;border-radius:6px;font-size:9px;font-weight:600;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--txt);transition:all .15s}
+button:hover{border-color:rgba(16,185,129,.3)}
+button.diag{border-color:rgba(6,182,212,.4);color:var(--diag);background:rgba(6,182,212,.06)}
+button.rx{border-color:rgba(167,139,250,.4);color:var(--rx);background:rgba(167,139,250,.06)}
+button.auth-b{border-color:rgba(245,158,11,.4);color:var(--auth);background:rgba(245,158,11,.06)}
+button.safety-b{border-color:rgba(239,68,68,.4);color:var(--safety);background:rgba(239,68,68,.06)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.dom-card{border-radius:8px;padding:10px;border:1px solid var(--line);background:var(--card2);transition:all .4s}
+.dom-card h5{font-size:10px;margin:0 0 6px;letter-spacing:.3px;text-transform:uppercase}
+.dom-stat{display:flex;justify-content:space-between;font-size:10px;padding:2px 0;border-bottom:1px solid #0f1825}
+.dom-stat:last-child{border:none}
+.dom-stat .ds-v{font-weight:600;font-variant-numeric:tabular-nums}
+.sys-status{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;transition:all .4s}
+.ss-ok{background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.15);color:var(--ok)}
+.ss-warn{background:rgba(255,204,102,.04);border:1px solid rgba(255,204,102,.15);color:var(--warn)}
+.ss-crit{background:rgba(255,107,107,.04);border:1px solid rgba(255,107,107,.15);color:var(--bad)}
+.ss-dot{width:8px;height:8px;border-radius:50%;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+footer{padding:6px 16px;border-top:1px solid var(--line);font-size:8px;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">CERPA HEALTHCARE<small>Deep Sigma — Clinical AI Governance Simulation v1.0.0</small></div>
+  <div style="margin-left:auto"><div class="sys-status ss-ok" id="sysStatus"><span class="ss-dot" style="background:var(--ok)" id="ssDot"></span><span id="ssText">CLINICAL SYSTEMS NOMINAL</span></div></div>
+</header>
+<div class="main">
+  <div class="card">
+    <h3>Clinical Event Injection</h3>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+      <button class="diag" id="btnImaging">Imaging AI Drift — Scanner Change</button>
+      <button class="rx" id="btnRx">Drug Interaction — Guideline Update</button>
+      <button class="auth-b" id="btnAuth">Prior Auth — AI Denial Override</button>
+      <button class="safety-b" id="btnBias">Demographic Bias — Risk Model</button>
+      <button class="diag" id="btnSepsis">Sepsis Alert — False Positive Spike</button>
+      <button id="btnReset" style="margin-left:auto">Reset</button>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div>
+      <div class="card" style="text-align:center">
+        <h3>Clinical Governance Score (CIS)</h3>
+        <div class="gauge">
+          <svg viewBox="0 0 130 130"><circle class="gauge-bg" cx="65" cy="65" r="54" stroke-dasharray="339" stroke-dashoffset="85"/>
+            <circle class="gauge-fill" id="gFill" cx="65" cy="65" r="54" stroke="var(--ok)" stroke-dasharray="339" stroke-dashoffset="51"/></svg>
+          <div class="gauge-label"><div class="gauge-val" id="gVal" style="color:var(--ok)">93.0</div><div class="gauge-sub">CIS</div></div>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="dom-card"><h5 style="color:var(--diag)">Diagnostics AI</h5>
+          <div class="dom-stat"><span>Imaging Accuracy</span><span class="ds-v" id="dImgAcc">96.8%</span></div>
+          <div class="dom-stat"><span>False Positive Rate</span><span class="ds-v" id="dFPR">3.1%</span></div>
+          <div class="dom-stat"><span>Model Version</span><span class="ds-v" id="dModelVer">v4.2.1</span></div>
+          <div class="dom-stat"><span>Last Calibration</span><span class="ds-v" id="dLastCal">14d ago</span></div>
+        </div>
+        <div class="dom-card"><h5 style="color:var(--rx)">Rx & Clinical Decision</h5>
+          <div class="dom-stat"><span>Active Protocols</span><span class="ds-v" id="dProto">847</span></div>
+          <div class="dom-stat"><span>Interaction Alerts</span><span class="ds-v" id="dInteract">12/day</span></div>
+          <div class="dom-stat"><span>Guideline Currency</span><span class="ds-v" id="dGuideline" style="color:var(--ok)">Current</span></div>
+          <div class="dom-stat"><span>Override Rate</span><span class="ds-v" id="dOverride">4.2%</span></div>
+        </div>
+        <div class="dom-card"><h5 style="color:var(--auth)">Prior Authorization</h5>
+          <div class="dom-stat"><span>AI Decisions/day</span><span class="ds-v" id="dAuthDecisions">340</span></div>
+          <div class="dom-stat"><span>Auto-Approve Rate</span><span class="ds-v" id="dAutoApprove">72%</span></div>
+          <div class="dom-stat"><span>Appeal Rate</span><span class="ds-v" id="dAppeal">8.5%</span></div>
+          <div class="dom-stat"><span>Compliance</span><span class="ds-v" id="dAuthComp" style="color:var(--ok)">Compliant</span></div>
+        </div>
+        <div class="dom-card"><h5 style="color:var(--safety)">Patient Safety</h5>
+          <div class="dom-stat"><span>Sepsis Alert Rate</span><span class="ds-v" id="dSepsisRate">2.1/hr</span></div>
+          <div class="dom-stat"><span>Alert Fatigue Index</span><span class="ds-v" id="dFatigue" style="color:var(--ok)">Low</span></div>
+          <div class="dom-stat"><span>Bias Score</span><span class="ds-v" id="dBias" style="color:var(--ok)">0.03</span></div>
+          <div class="dom-stat"><span>Equity Index</span><span class="ds-v" id="dEquity" style="color:var(--ok)">0.94</span></div>
+        </div>
+      </div>
+
+      <div class="grid4" style="margin-top:14px">
+        <div class="kpi"><div class="kv" id="kvPAR" style="color:var(--ok)">95%</div><div class="kl">Diagnostic PAR</div></div>
+        <div class="kpi"><div class="kv" id="kvDEG" style="color:var(--ok)">—</div><div class="kl">DEG (sec)</div></div>
+        <div class="kpi"><div class="kv" id="kvDrift" style="color:var(--ok)">0</div><div class="kl">Drift Events</div></div>
+        <div class="kpi"><div class="kv" id="kvEp" style="color:var(--accent)">0</div><div class="kl">Episodes</div></div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <h3>CERPA Cycle — Live</h3>
+        <div class="cycle-vis">
+          <div class="cyc-s" id="csClaim">CLAIM<small>Clinical assertion</small></div><span class="cyc-arr">→</span>
+          <div class="cyc-s" id="csEvent">EVENT<small>Clinical evidence</small></div><span class="cyc-arr">→</span>
+          <div class="cyc-s" id="csReview">REVIEW<small>Peer review</small></div><span class="cyc-arr">→</span>
+          <div class="cyc-s" id="csPatch">PATCH<small>Protocol update</small></div><span class="cyc-arr">→</span>
+          <div class="cyc-s" id="csApply">APPLY<small>Outcome + learn</small></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h3>Episode Log — HIPAA-Compliant Hash Chain</h3>
+        <div class="ep-log" id="epLog"><div style="text-align:center;color:var(--muted);padding:30px;font-size:11px">Inject a clinical event to start the CERPA cycle →</div></div>
+      </div>
+      <div class="card">
+        <h3>Clinical Drift History</h3>
+        <div id="driftHist" style="font-size:10px;color:var(--muted);text-align:center;padding:16px">No drift events yet.</div>
+      </div>
+      <div class="card">
+        <h3>AuthorityOps — Clinical Governance Rules</h3>
+        <div class="wire"><h4>Active Rules</h4>
+          <div class="wr"><span class="wl" style="color:var(--bad)">Rule 1</span><span class="wv">No AI self-approves treatment changes — physician gate required</span></div>
+          <div class="wr"><span class="wl" style="color:var(--bad)">Rule 2</span><span class="wv">No diagnostic model update without M&M committee review</span></div>
+          <div class="wr"><span class="wl" style="color:var(--bad)">Rule 3</span><span class="wv">No patient-identifiable data in governance records (HIPAA)</span></div>
+          <div class="wr"><span class="wl" style="color:var(--bad)">Rule 4</span><span class="wv">Prior auth AI denial requires human review within 24 hrs</span></div>
+          <div class="wr"><span class="wl" style="color:var(--bad)">Rule 5</span><span class="wv">Bias score > 0.10 triggers mandatory demographic audit</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Compliance</h3>
+        <div class="wire">
+          <div class="wr"><span class="wl">HIPAA</span><span class="wv" style="color:var(--ok)">97.4% — PHI governance</span></div>
+          <div class="wr"><span class="wl">FDA AI/ML</span><span class="wv" style="color:var(--ok)">SaMD governance</span></div>
+          <div class="wr"><span class="wl">NIST AI RMF</span><span class="wv" style="color:var(--ok)">99.1% — AI governance</span></div>
+          <div class="wr"><span class="wl">EU AI Act</span><span class="wv" style="color:var(--ok)">98.8% — High-risk AI</span></div>
+          <div class="wr"><span class="wl">CA SB-1120</span><span class="wv" style="color:var(--ok)">Prior auth transparency</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<footer>Deep Sigma EDGE — CERPA Healthcare Governance Simulation v1.0.0 — Claim | Event | Review | Patch | Apply</footer>
+
+<script>
+(function(){"use strict";
+var S={cis:93,par:95,driftCount:0,episodes:0,degStart:null,lastDEG:null,running:false,
+  diag:{imgAcc:96.8,fpr:3.1,modelVer:"v4.2.1",lastCal:"14d ago"},
+  rx:{proto:847,interact:12,guideline:"Current",override:4.2},
+  auth:{decisions:340,autoApprove:72,appeal:8.5,comp:"Compliant"},
+  safety:{sepsisRate:2.1,fatigue:"Low",bias:0.03,equity:0.94}};
+var epLog=document.getElementById("epLog"),driftHist=document.getElementById("driftHist"),driftEntries=[],epHashes=[];
+function ts(){var d=new Date();return(d.getHours()<10?"0":"")+d.getHours()+":"+(d.getMinutes()<10?"0":"")+d.getMinutes()+":"+(d.getSeconds()<10?"0":"")+d.getSeconds()}
+function hash(){return"0x"+Math.random().toString(16).substring(2,10)+Math.random().toString(16).substring(2,10)}
+function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v))}
+
+function updateUI(){
+  document.getElementById("dImgAcc").textContent=S.diag.imgAcc.toFixed(1)+"%";
+  document.getElementById("dFPR").textContent=S.diag.fpr.toFixed(1)+"%";
+  document.getElementById("dModelVer").textContent=S.diag.modelVer;
+  document.getElementById("dLastCal").textContent=S.diag.lastCal;
+  document.getElementById("dProto").textContent=S.rx.proto;
+  document.getElementById("dInteract").textContent=S.rx.interact+"/day";
+  var gl=document.getElementById("dGuideline");gl.textContent=S.rx.guideline;gl.style.color=S.rx.guideline==="Current"?"var(--ok)":"var(--warn)";
+  document.getElementById("dOverride").textContent=S.rx.override.toFixed(1)+"%";
+  document.getElementById("dAuthDecisions").textContent=S.auth.decisions;
+  document.getElementById("dAutoApprove").textContent=S.auth.autoApprove+"%";
+  document.getElementById("dAppeal").textContent=S.auth.appeal.toFixed(1)+"%";
+  var ac=document.getElementById("dAuthComp");ac.textContent=S.auth.comp;ac.style.color=S.auth.comp==="Compliant"?"var(--ok)":"var(--warn)";
+  document.getElementById("dSepsisRate").textContent=S.safety.sepsisRate.toFixed(1)+"/hr";
+  var af=document.getElementById("dFatigue");af.textContent=S.safety.fatigue;af.style.color=S.safety.fatigue==="Low"?"var(--ok)":S.safety.fatigue==="Moderate"?"var(--warn)":"var(--bad)";
+  var bs=document.getElementById("dBias");bs.textContent=S.safety.bias.toFixed(2);bs.style.color=S.safety.bias<=0.05?"var(--ok)":S.safety.bias<=0.10?"var(--warn)":"var(--bad)";
+  var eq=document.getElementById("dEquity");eq.textContent=S.safety.equity.toFixed(2);eq.style.color=S.safety.equity>=0.90?"var(--ok)":S.safety.equity>=0.80?"var(--warn)":"var(--bad)";
+  document.getElementById("kvPAR").textContent=S.par+"%";document.getElementById("kvDrift").textContent=S.driftCount;document.getElementById("kvEp").textContent=S.episodes;
+  if(S.lastDEG!==null)document.getElementById("kvDEG").textContent=S.lastDEG+"s";
+  document.getElementById("kvPAR").style.color=S.par>=90?"var(--ok)":S.par>=75?"var(--warn)":"var(--bad)";
+  document.getElementById("kvDrift").style.color=S.driftCount>3?"var(--bad)":S.driftCount>0?"var(--warn)":"var(--ok)";
+  var pct=S.cis/100,circ=339,off=circ*(1-pct*0.75);
+  var gf=document.getElementById("gFill");gf.setAttribute("stroke-dashoffset",off);
+  gf.setAttribute("stroke",S.cis>=75?"var(--ok)":S.cis>=50?"var(--warn)":"var(--bad)");
+  var gv=document.getElementById("gVal");gv.textContent=S.cis.toFixed(1);gv.style.color=S.cis>=75?"var(--ok)":S.cis>=50?"var(--warn)":"var(--bad)";
+  var ss=document.getElementById("sysStatus"),sd=document.getElementById("ssDot"),st=document.getElementById("ssText");
+  if(S.cis<65){ss.className="sys-status ss-crit";sd.style.background="var(--bad)";st.textContent="CLINICAL ALERT"}
+  else if(S.cis<80){ss.className="sys-status ss-warn";sd.style.background="var(--warn)";st.textContent="GOVERNANCE DEGRADED"}
+  else{ss.className="sys-status ss-ok";sd.style.background="var(--ok)";st.textContent="CLINICAL SYSTEMS NOMINAL"}
+}
+function logE(stage,msg,cls){
+  if(epLog.querySelector("div[style]")&&S.episodes<=1)epLog.innerHTML="";
+  var d=document.createElement("div");d.className="ep-entry ep-"+cls;
+  d.innerHTML='<span class="ep-time">'+ts()+'</span><span class="ep-stage">['+stage+']</span>'+msg;
+  epLog.insertBefore(d,epLog.firstChild);if(epLog.children.length>60)epLog.removeChild(epLog.lastChild);
+}
+function highlightStep(id){
+  document.querySelectorAll(".cyc-s").forEach(function(s){s.classList.remove("active","done")});
+  var el=document.getElementById(id);if(el)el.classList.add("active");
+  var steps=["csClaim","csEvent","csReview","csPatch","csApply"],idx=steps.indexOf(id);
+  for(var i=0;i<idx;i++){var p=document.getElementById(steps[i]);if(p){p.classList.remove("active");p.classList.add("done")}}
+}
+function renderDrift(){
+  if(!driftEntries.length){driftHist.innerHTML='<div style="text-align:center;color:var(--muted);padding:16px">No drift events yet.</div>';return}
+  var h='<table style="width:100%;font-size:10px;border-collapse:collapse"><thead><tr><th style="text-align:left;color:var(--muted);font-size:8px;padding:3px;border-bottom:1px solid #1b2a3a">Time</th><th style="text-align:left;color:var(--muted);font-size:8px;padding:3px;border-bottom:1px solid #1b2a3a">Domain</th><th style="text-align:left;color:var(--muted);font-size:8px;padding:3px;border-bottom:1px solid #1b2a3a">Type</th><th style="text-align:center;color:var(--muted);font-size:8px;padding:3px;border-bottom:1px solid #1b2a3a">CIS</th></tr></thead><tbody>';
+  for(var i=driftEntries.length-1;i>=0;i--){var d=driftEntries[i],cc=d.cis>=75?"var(--ok)":d.cis>=50?"var(--warn)":"var(--bad)";
+    h+='<tr><td style="padding:2px;border-bottom:1px solid #0f1825;font-size:9px;color:var(--muted)">'+d.time+'</td><td style="padding:2px;border-bottom:1px solid #0f1825;color:'+d.color+'">'+d.domain+'</td><td style="padding:2px;border-bottom:1px solid #0f1825">'+d.type+'</td><td style="padding:2px;border-bottom:1px solid #0f1825;text-align:center;color:'+cc+';font-weight:700">'+d.cis.toFixed(1)+'</td></tr>';}
+  h+='</tbody></table>';driftHist.innerHTML=h;
+}
+
+function runCERPA(domain,domColor,type,claimMsg,eventMsg,reviewMsg,patchMsg,applyMsg,cisHit,stateChanges){
+  if(S.running)return;S.running=true;S.episodes++;
+  var prevH=epHashes.length?epHashes[epHashes.length-1]:"GENESIS",epH=hash();epHashes.push(epH);
+  highlightStep("csClaim");logE("CLAIM","["+domain+"] "+claimMsg,"claim");
+  setTimeout(function(){
+    highlightStep("csEvent");stateChanges.event();S.degStart=Date.now();
+    logE("EVENT","["+domain+"] "+eventMsg,"event");updateUI();
+    setTimeout(function(){
+      highlightStep("csReview");S.cis=clamp(S.cis-cisHit,20,100);S.cis=Math.round(S.cis*10)/10;S.driftCount++;
+      logE("REVIEW","["+domain+"] "+reviewMsg+" | CIS: "+S.cis.toFixed(1),"review");
+      driftEntries.push({time:ts(),domain:domain,color:domColor,type:type,cis:S.cis});renderDrift();updateUI();
+      setTimeout(function(){
+        highlightStep("csPatch");stateChanges.patch();S.cis=clamp(S.cis+(cisHit*0.5),20,100);S.cis=Math.round(S.cis*10)/10;
+        logE("PATCH","["+domain+"] "+patchMsg+" | CIS recovering: "+S.cis.toFixed(1),"patch");updateUI();
+        setTimeout(function(){
+          highlightStep("csApply");var deg=S.degStart?Math.round((Date.now()-S.degStart)/1000):0;S.lastDEG=deg;
+          S.par=clamp(S.par-1,70,100);
+          logE("APPLY","["+domain+"] "+applyMsg+" | Hash: "+epH+" | DEG: "+deg+"s | PAR: "+S.par+"%","apply");
+          logE("APPLY","Clinical Memory: "+type+" pattern indexed. Protocol library updated.","apply");updateUI();
+          setTimeout(function(){
+            document.querySelectorAll(".cyc-s").forEach(function(s){s.classList.remove("active");s.classList.add("done")});
+            setTimeout(function(){S.running=false},1200);
+          },1000);
+        },600);
+      },600);
+    },600);
+  },500);
+}
+
+// ═══ EVENTS ═══
+document.getElementById("btnImaging").addEventListener("click",function(){
+  runCERPA("Diagnostics","var(--diag)","Imaging Scanner Drift",
+    "Chest X-ray AI: 96.8% accuracy, 3.1% FPR. Model v4.2.1 calibrated 14 days ago.",
+    "New scanner installed in ED. FPR spikes to 11.2% on new scanner images. 23% pneumonia flag rate (baseline: 12%).",
+    "DRIFT DETECTED — Data drift: new scanner calibration profile. FPR deviation: +8.1 points. Confidence: degraded.",
+    "RETCON — Scanner-specific recalibration initiated. Temporary: route new scanner images through v4.1 fallback. AuthorityOps: model update requires M&M review.",
+    "Episode sealed. Scanner-drift pattern indexed. Next new scanner: auto-detect calibration variance.",
+    9,{event:function(){S.diag.fpr=11.2;S.diag.imgAcc=89.1;S.diag.lastCal="NEW SCANNER"},
+       patch:function(){S.diag.fpr=4.8;S.diag.imgAcc=94.2;S.diag.lastCal="Recalibrating"}});
+});
+
+document.getElementById("btnRx").addEventListener("click",function(){
+  runCERPA("Rx/Clinical","var(--rx)","Guideline Update Drift",
+    "847 active protocols. Drug interaction engine current. Override rate 4.2%.",
+    "AHA updates heart failure guidelines — new contraindication for 3 medication combinations. AI still recommending old protocol.",
+    "DRIFT DETECTED — Reasoning drift: clinical guideline currency lapsed. 3 active protocols now outdated. Override rate spiking to 9.1%.",
+    "RETCON — 3 protocols flagged for update. Interaction engine patched with new AHA contraindications. PPI: 0.92 (root cause: guideline lag).",
+    "Episode sealed. Guideline-update pattern indexed. CMR: protocol currency now monitored weekly.",
+    7,{event:function(){S.rx.guideline="Outdated";S.rx.override=9.1;S.rx.interact=28},
+       patch:function(){S.rx.guideline="Updating";S.rx.override=5.8;S.rx.interact=18}});
+});
+
+document.getElementById("btnAuth").addEventListener("click",function(){
+  runCERPA("Prior Auth","var(--auth)","AI Denial Override Pattern",
+    "340 AI decisions/day. Auto-approve 72%. Appeal rate 8.5%. Compliant with CA SB-1120.",
+    "Appeal rate spikes to 18.3%. Pattern: AI denying MRI authorizations for back pain at 3x baseline. Payer algorithm updated without notification.",
+    "DRIFT DETECTED — Authority drift: payer model changed without governance notification. Denial pattern disproportionately affects Medicare patients.",
+    "RETCON — AuthorityOps Rule 4: AI denials require human review within 24 hrs. MRI denial threshold recalibrated. Bias audit triggered for Medicare population.",
+    "Episode sealed. Payer-algorithm-change pattern indexed. Prior auth model now monitors for unannounced payer updates.",
+    8,{event:function(){S.auth.appeal=18.3;S.auth.autoApprove=58;S.auth.comp="Under Review"},
+       patch:function(){S.auth.appeal=11.2;S.auth.autoApprove=67;S.auth.comp="Remediation"}});
+});
+
+document.getElementById("btnBias").addEventListener("click",function(){
+  runCERPA("Patient Safety","var(--safety)","Demographic Bias Detected",
+    "Sepsis risk model: bias score 0.03, equity index 0.94. All populations within normal variance.",
+    "QA audit: sepsis model under-predicts risk for Black patients by 14%. Model trained on historically biased data from 2019-2022 cohort.",
+    "DRIFT DETECTED — Bias drift: demographic disparity in sepsis prediction. Bias score: 0.03 -> 0.14. AuthorityOps Rule 5 TRIGGERED: mandatory demographic audit.",
+    "RETCON — Model stratified by demographic. Calibration correction applied for underrepresented populations. Equity index monitored hourly during correction.",
+    "Episode sealed. Demographic-bias pattern indexed. Memory Graph: all future risk models must include stratified validation.",
+    11,{event:function(){S.safety.bias=0.14;S.safety.equity=0.79;S.safety.fatigue="Moderate"},
+        patch:function(){S.safety.bias=0.06;S.safety.equity=0.88;S.safety.fatigue="Low"}});
+});
+
+document.getElementById("btnSepsis").addEventListener("click",function(){
+  runCERPA("Patient Safety","var(--safety)","Sepsis False Positive Spike",
+    "Sepsis alert rate: 2.1/hr. Alert fatigue: Low. Clinician trust: high.",
+    "New lab analyzer installed. Sepsis alerts spike to 8.4/hr. 73% are false positives. Clinicians start ignoring alerts. Alert fatigue: Critical.",
+    "DRIFT DETECTED — Data drift: lab analyzer calibration shift. Alert specificity collapsed. Patient safety risk: true positives buried in noise.",
+    "RETCON — Sepsis threshold recalibrated for new analyzer. Alert suppression for known FP patterns. Physician notification: trust-recovery protocol.",
+    "Episode sealed. Lab-analyzer-drift pattern indexed. Next new analyzer: auto-detect alert threshold shift.",
+    10,{event:function(){S.safety.sepsisRate=8.4;S.safety.fatigue="Critical"},
+        patch:function(){S.safety.sepsisRate=3.2;S.safety.fatigue="Moderate"}});
+});
+
+document.getElementById("btnReset").addEventListener("click",function(){
+  S={cis:93,par:95,driftCount:0,episodes:0,degStart:null,lastDEG:null,running:false,
+    diag:{imgAcc:96.8,fpr:3.1,modelVer:"v4.2.1",lastCal:"14d ago"},
+    rx:{proto:847,interact:12,guideline:"Current",override:4.2},
+    auth:{decisions:340,autoApprove:72,appeal:8.5,comp:"Compliant"},
+    safety:{sepsisRate:2.1,fatigue:"Low",bias:0.03,equity:0.94}};
+  driftEntries=[];epHashes=[];
+  epLog.innerHTML='<div style="text-align:center;color:var(--muted);padding:30px;font-size:11px">Inject a clinical event to start the CERPA cycle →</div>';
+  renderDrift();document.querySelectorAll(".cyc-s").forEach(function(s){s.classList.remove("active","done")});
+  document.getElementById("kvDEG").textContent="—";updateUI();
+});
+
+updateUI();
+})();
+</script>
+</body>
+</html>
