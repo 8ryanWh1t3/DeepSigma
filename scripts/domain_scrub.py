@@ -263,6 +263,8 @@ ALLOWED_ACRONYMS = {
     "DRAWER", "TOAST", "TRENDS", "REFS", "DETAIL", "VISUAL",
     "ADMIN", "SEARCH", "CLICKS", "TIMER", "UPLOAD", "SHARED",
     "BADGES", "BELOW", "CELL", "DRAG", "FEED", "HVAC", "IDS", "NODE",
+    # CERPA APPA BuildSpec — Power Platform, DAX, schema tokens
+    "APPS", "BUILD", "DAX", "DIVIDE", "FALSE", "FILTER", "IDX", "POWER", "XXXX",
     # Context Envelope dimension names
     "WHEN", "WHERE",
     # Decision Accounting — cost/value/debt ID prefixes, category enums
