@@ -1285,7 +1285,7 @@ function loadBundle(seed){
   for(var i=0;i<mKeys.length;i++){
     var val=String(b.manifest[mKeys[i]]);
     var isCopyable=mKeys[i]==="bundleId"||mKeys[i]==="createdAt";
-    mRows+="<tr><td class='mono' style='color:var(--neon-cyan)'>"+esc(mKeys[i])+"</td><td>"+esc(val)+"</td><td>"+(isCopyable?copyBtn(val):"")+"</td></tr>";
+    mRows+="<tr class='manifest-row' data-mkey='"+esc(mKeys[i])+"' style='cursor:pointer'><td class='mono' style='color:var(--neon-cyan)'>"+esc(mKeys[i])+"</td><td>"+esc(val)+"</td><td>"+(isCopyable?copyBtn(val):"")+"</td></tr>";
   }
   $("#manifestTable").innerHTML=mRows;
 
@@ -1320,7 +1320,7 @@ function loadBundle(seed){
   var rRows="";
   for(var k=0;k<b.replaySteps.length;k++){
     var s=b.replaySteps[k];
-    rRows+="<tr>"+
+    rRows+="<tr class='replay-row' data-sidx='"+k+"' style='cursor:pointer'>"+
       "<td>"+s.stepIndex+"</td>"+
       "<td><span class='badge badge-purple'>"+esc(s.action)+"</span></td>"+
       "<td class='mono' style='font-size:10px'>"+esc(s.inputRef||"-")+"</td>"+
@@ -3119,6 +3119,118 @@ document.addEventListener("DOMContentLoaded",function(){
     var bar=e.target.closest(".tl-bar");
     if(!bar)return;
     openDrawer(parseInt(bar.dataset.aidx));
+  });
+
+  /* v4.3: Manifest row click → open tray */
+  document.addEventListener("click",function(e){
+    var row=e.target.closest(".manifest-row");
+    if(!row||e.target.closest(".copy-btn"))return;
+    var key=row.getAttribute("data-mkey");
+    var b=STATE.bundle;if(!b||!b.manifest)return;
+    var val=String(b.manifest[key]||"");
+
+    var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">Manifest Field</h3>';
+    h+='<span class="badge badge-cyan">'+esc(key)+'</span></div>';
+
+    h+='<div class="drawer-section"><h4>Field Detail</h4>';
+    h+='<div class="drawer-kv"><span class="dk">Key</span><span class="dv mono" style="color:var(--neon-cyan)">'+esc(key)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Value</span><span class="dv" style="word-break:break-all">'+esc(val)+'</span></div>';
+    h+='</div>';
+
+    /* Context based on field */
+    h+='<div class="drawer-section"><h4>Context</h4>';
+    if(key==="bundleId"){
+      h+='<div style="font-size:11px;color:var(--muted);line-height:1.5">Unique identifier for this COG bundle. Used as the primary key for bundle retrieval, diff, and proof chain verification.</div>';
+    }else if(key==="version"){
+      h+='<div style="font-size:11px;color:var(--muted);line-height:1.5">Bundle schema version. Determines which fields are required and how the proof chain is constructed.</div>';
+    }else if(key==="createdAt"){
+      h+='<div style="font-size:11px;color:var(--muted);line-height:1.5">Timestamp of bundle creation. Used for half-life age calculations and replay ordering.</div>';
+    }else if(key==="source"){
+      h+='<div style="font-size:11px;color:var(--muted);line-height:1.5">Origin adapter that generated this bundle. Identifies the pipeline stage and version.</div>';
+    }else if(key==="artifactCount"){
+      h+='<div style="font-size:11px;color:var(--muted);line-height:1.5">Total artifacts sealed in this bundle. Must match the actual artifacts array length for admissibility.</div>';
+      h+='<div class="drawer-kv" style="margin-top:8px"><span class="dk">Actual Count</span><span class="dv">'+(b.artifacts||[]).length+'</span></div>';
+      var match=(b.artifacts||[]).length===parseInt(val,10);
+      h+='<div class="drawer-kv"><span class="dk">Match</span><span class="dv" style="color:'+(match?'var(--ok)':'var(--bad)')+'">'+(match?'Yes':'Mismatch!')+'</span></div>';
+    }else{
+      h+='<div style="font-size:11px;color:var(--muted);line-height:1.5">Manifest metadata field describing the bundle origin and configuration.</div>';
+    }
+    h+='</div>';
+
+    /* Full manifest snapshot */
+    h+='<div class="drawer-section"><h4>Full Manifest</h4>';
+    h+='<div class="schema-block mono" style="max-height:200px;overflow-y:auto;white-space:pre-wrap;font-size:10px">'+esc(JSON.stringify(b.manifest,null,2))+'</div></div>';
+
+    openTray(h);
+  });
+
+  /* v4.3: Replay step row click → open tray */
+  document.addEventListener("click",function(e){
+    var row=e.target.closest(".replay-row");
+    if(!row)return;
+    var sidx=parseInt(row.getAttribute("data-sidx"),10);
+    var b=STATE.bundle;if(!b)return;
+    var step=b.replaySteps[sidx];if(!step)return;
+
+    var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">Replay Step #'+step.stepIndex+'</h3>';
+    h+='<span class="badge badge-purple">'+esc(step.action)+'</span></div>';
+
+    h+='<div class="drawer-section"><h4>Step Detail</h4>';
+    h+='<div class="drawer-kv"><span class="dk">Index</span><span class="dv">'+step.stepIndex+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Action</span><span class="dv" style="color:var(--neon-cyan)">'+esc(step.action)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Timestamp</span><span class="dv" style="font-size:10px">'+esc(step.timestamp||"-")+'</span></div>';
+    h+='</div>';
+
+    h+='<div class="drawer-section"><h4>References</h4>';
+    h+='<div class="drawer-kv"><span class="dk">Input Ref</span><span class="dv mono" style="font-size:10px;color:var(--neon-cyan)">'+esc(step.inputRef||"none")+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Output Ref</span><span class="dv mono" style="font-size:10px;color:var(--neon-green)">'+esc(step.outputRef||"none")+'</span></div>';
+    h+='</div>';
+
+    /* Resolve referenced artifacts */
+    var arts=b.artifacts||[];
+    if(step.inputRef){
+      for(var ii=0;ii<arts.length;ii++){
+        if(arts[ii].refId===step.inputRef){
+          h+='<div class="drawer-section"><h4>Input Artifact</h4>';
+          h+='<div class="drawer-kv"><span class="dk">Type</span><span class="dv">'+esc(arts[ii].refType)+'</span></div>';
+          h+='<div class="drawer-kv"><span class="dk">Hash</span><span class="dv mono" style="font-size:9px">'+esc(arts[ii].contentHash.substring(0,32))+'&hellip;</span></div>';
+          if(arts[ii].payload){
+            h+='<div class="schema-block mono" style="max-height:120px;overflow-y:auto;white-space:pre-wrap;font-size:10px;margin-top:6px">'+esc(JSON.stringify(arts[ii].payload,null,2))+'</div>';
+          }
+          h+='</div>';
+          break;
+        }
+      }
+    }
+    if(step.outputRef){
+      for(var oi=0;oi<arts.length;oi++){
+        if(arts[oi].refId===step.outputRef){
+          h+='<div class="drawer-section"><h4>Output Artifact</h4>';
+          h+='<div class="drawer-kv"><span class="dk">Type</span><span class="dv">'+esc(arts[oi].refType)+'</span></div>';
+          h+='<div class="drawer-kv"><span class="dk">Hash</span><span class="dv mono" style="font-size:9px">'+esc(arts[oi].contentHash.substring(0,32))+'&hellip;</span></div>';
+          if(arts[oi].payload){
+            h+='<div class="schema-block mono" style="max-height:120px;overflow-y:auto;white-space:pre-wrap;font-size:10px;margin-top:6px">'+esc(JSON.stringify(arts[oi].payload,null,2))+'</div>';
+          }
+          h+='</div>';
+          break;
+        }
+      }
+    }
+
+    /* Sequence context */
+    h+='<div class="drawer-section"><h4>Sequence Context</h4>';
+    h+='<div class="drawer-kv"><span class="dk">Position</span><span class="dv">'+(sidx+1)+' of '+b.replaySteps.length+'</span></div>';
+    if(sidx>0){
+      var prev=b.replaySteps[sidx-1];
+      h+='<div class="drawer-kv"><span class="dk">Previous</span><span class="dv" style="font-size:10px">'+esc(prev.action)+'</span></div>';
+    }
+    if(sidx<b.replaySteps.length-1){
+      var next=b.replaySteps[sidx+1];
+      h+='<div class="drawer-kv"><span class="dk">Next</span><span class="dv" style="font-size:10px">'+esc(next.action)+'</span></div>';
+    }
+    h+='</div>';
+
+    openTray(h);
   });
 
   /* v3: Filter pills */
