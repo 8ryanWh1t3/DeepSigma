@@ -368,7 +368,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
 
 /* ── v4.3: Graph Tab ──────────────────────── */
 .graph-wrap{position:relative;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:rgba(0,0,0,.2)}
-.graph-wrap svg{display:block;width:100%;height:500px;cursor:grab}
+.graph-wrap svg{display:block;width:100%;height:calc(100vh - 220px);min-height:400px;cursor:grab}
 .graph-wrap.dragging svg{cursor:grabbing}
 .graph-controls{position:absolute;top:8px;right:8px;display:flex;gap:4px;z-index:5}
 .graph-controls button{width:28px;height:28px;font-size:14px;padding:0;display:flex;align-items:center;justify-content:center}
@@ -1493,7 +1493,7 @@ function renderGraph(){
 
   var graph=buildDependencyGraph(steps,arts);
   var svgNS="http://www.w3.org/2000/svg";
-  var W=800,H=500;
+  var W=1000,H=800;
   /* CMMC uses family IDs as refTypes — color by family */
   var typeColors={AC:"#4caf50",AT:"#2196f3",AU:"#9c27b0",CM:"#ff9800",IA:"#e91e63",IR:"#00bcd4",MA:"#8bc34a",MP:"#ff5722",PE:"#607d8b",PS:"#795548",RA:"#ffc107",CA:"#03a9f4",SC:"#673ab7",SI:"#f44336"};
 
