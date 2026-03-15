@@ -817,6 +817,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
    Utility
    ══════════════════════════════════════════════════════════ */
 function esc(s){var d=document.createElement("div");d.textContent=s;return d.innerHTML}
+function escHTML(v){var s=String(v==null?"":v);return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
 function $(sel){return document.querySelector(sel)}
 function $$(sel){return Array.prototype.slice.call(document.querySelectorAll(sel))}
 var _toastTimer;
@@ -1034,11 +1035,11 @@ function renderExecutive(){
   var pct=Math.round(((totalFull*1.0+totalStrong*0.9+totalPartial*0.5)/applicable)*1000)/10;
   updateGauge(pct);
   $("#execStats").innerHTML=
-    '<div class="stat-box"><div class="stat-val" style="color:var(--neon-green)">'+totalFull+'</div><div class="stat-label">Full Coverage</div></div>'+
-    '<div class="stat-box"><div class="stat-val" style="color:var(--neon-cyan)">'+totalStrong+'</div><div class="stat-label">Strong</div></div>'+
-    '<div class="stat-box"><div class="stat-val" style="color:var(--neon-amber)">'+totalPartial+'</div><div class="stat-label">Partial</div></div>'+
-    '<div class="stat-box"><div class="stat-val" style="color:var(--muted)">'+totalNA+'</div><div class="stat-label">N/A (Physical)</div></div>'+
-    '<div class="stat-box"><div class="stat-val" style="color:'+((STATE._contradictions||[]).length>0?'var(--bad)':'var(--ok)')+'">'+(STATE._contradictions||[]).length+'</div><div class="stat-label">Contradictions</div></div>';
+    '<div class="stat-box"><div class="stat-val" style="color:var(--neon-green)">'+escHTML(totalFull)+'</div><div class="stat-label">Full Coverage</div></div>'+
+    '<div class="stat-box"><div class="stat-val" style="color:var(--neon-cyan)">'+escHTML(totalStrong)+'</div><div class="stat-label">Strong</div></div>'+
+    '<div class="stat-box"><div class="stat-val" style="color:var(--neon-amber)">'+escHTML(totalPartial)+'</div><div class="stat-label">Partial</div></div>'+
+    '<div class="stat-box"><div class="stat-val" style="color:var(--muted)">'+escHTML(totalNA)+'</div><div class="stat-label">N/A (Physical)</div></div>'+
+    '<div class="stat-box"><div class="stat-val" style="color:'+((STATE._contradictions||[]).length>0?'var(--bad)':'var(--ok)')+'">'+escHTML((STATE._contradictions||[]).length)+'</div><div class="stat-label">Contradictions</div></div>';
   /* Scorecard — 14 families */
   var html="";
   for(var f=0;f<FAMILIES.length;f++){
@@ -1049,7 +1050,7 @@ function renderExecutive(){
     var partialDigitalCount=0;
     var pkList=PARTIAL_REF_KEYS[fam.id]||[];
     if(pkList.length>0)partialDigitalCount=Math.min(pkList.length,fam.na);
-    var pdBadge=partialDigitalCount>0?' <span class="badge badge-partial">'+partialDigitalCount+' partial-digital</span>':'';
+    var pdBadge=partialDigitalCount>0?' <span class="badge badge-partial">'+escHTML(partialDigitalCount)+' partial-digital</span>':'';
     var naDisplay=fam.na-partialDigitalCount;
     /* Phase 4C: tooltip content */
     var famApplicable=fam.total-fam.na;
@@ -1059,12 +1060,12 @@ function renderExecutive(){
     var cerpaInfo=CERPA_FAM[fam.id]||{stage:"?",lbl:"?"};
     var authLaws=AUTH_FAM[fam.id]||[];
     var tipHtml='<div class="exec-tooltip"><div style="font-weight:700;color:var(--neon-cyan);margin-bottom:6px">'+esc(fam.id)+' — '+esc(fam.name)+'</div>';
-    tipHtml+='<div style="margin-bottom:4px">Full: '+fam.full+' ('+fullPct+'%) | Strong: '+fam.strong+' ('+strongPct+'%) | Partial: '+fam.partial+' ('+partialPct+'%)'+(fam.na>0?' | N/A: '+fam.na:'')+'</div>';
-    tipHtml+='<div style="margin-bottom:4px;color:var(--muted)">Weighted: ('+fam.full+'×1.0 + '+fam.strong+'×0.9 + '+fam.partial+'×0.5) / '+famApplicable+' = '+famPct+'%</div>';
-    tipHtml+='<div style="margin-bottom:4px">CERPA Stage: <span class="cerpa-tag '+cerpaInfo.cls+'">'+cerpaInfo.lbl+'</span></div>';
+    tipHtml+='<div style="margin-bottom:4px">Full: '+escHTML(fam.full)+' ('+escHTML(fullPct)+'%) | Strong: '+escHTML(fam.strong)+' ('+escHTML(strongPct)+'%) | Partial: '+escHTML(fam.partial)+' ('+escHTML(partialPct)+'%)'+(fam.na>0?' | N/A: '+escHTML(fam.na):'')+'</div>';
+    tipHtml+='<div style="margin-bottom:4px;color:var(--muted)">Weighted: ('+escHTML(fam.full)+'×1.0 + '+escHTML(fam.strong)+'×0.9 + '+escHTML(fam.partial)+'×0.5) / '+escHTML(famApplicable)+' = '+escHTML(famPct)+'%</div>';
+    tipHtml+='<div style="margin-bottom:4px">CERPA Stage: <span class="cerpa-tag '+escHTML(cerpaInfo.cls)+'">'+escHTML(cerpaInfo.lbl)+'</span></div>';
     if(authLaws.length)tipHtml+='<div style="font-size:10px;color:var(--neon-amber)">AuthorityOps: '+esc(authLaws.join(", "))+'</div>';
     tipHtml+='</div>';
-    html+='<div class="exec-row" data-filter-type="'+esc(fam.id)+'" data-row-idx="'+f+'"><div class="score-ring '+cls+'">'+icon+'</div><div class="exec-detail"><h4>'+esc(fam.id)+' — '+esc(fam.name)+' ('+fam.total+' practices)</h4><p>Full: '+fam.full+' | Strong: '+fam.strong+' | Partial: '+fam.partial+(naDisplay>0?' | N/A: '+naDisplay:'')+(partialDigitalCount>0?' | partial-digital: '+partialDigitalCount:'')+'</p><div style="margin-top:4px"><span class="badge badge-'+cls+'">'+famPct+'% weighted coverage</span>'+pdBadge+(KPI_FAM[fam.id].length?' <span class="badge badge-cyan">KPIs: '+KPI_FAM[fam.id].join(", ")+'</span>':'')+'</div></div>'+tipHtml+'</div>';
+    html+='<div class="exec-row" data-filter-type="'+esc(fam.id)+'" data-row-idx="'+escHTML(f)+'"><div class="score-ring '+escHTML(cls)+'">'+icon+'</div><div class="exec-detail"><h4>'+esc(fam.id)+' — '+esc(fam.name)+' ('+escHTML(fam.total)+' practices)</h4><p>Full: '+escHTML(fam.full)+' | Strong: '+escHTML(fam.strong)+' | Partial: '+escHTML(fam.partial)+(naDisplay>0?' | N/A: '+escHTML(naDisplay):'')+(partialDigitalCount>0?' | partial-digital: '+escHTML(partialDigitalCount):'')+'</p><div style="margin-top:4px"><span class="badge badge-'+escHTML(cls)+'">'+escHTML(famPct)+'% weighted coverage</span>'+pdBadge+(KPI_FAM[fam.id].length?' <span class="badge badge-cyan">KPIs: '+escHTML(KPI_FAM[fam.id].join(", "))+'</span>':'')+'</div></div>'+tipHtml+'</div>';
   }
   $("#execScorecard").innerHTML=html;
   STATE._execFamilies=FAMILIES;
@@ -1073,7 +1074,7 @@ function renderExecutive(){
 function renderCommitBoundary(cb){
   if(!cb){$("#commitBoundary").innerHTML='<span class="badge badge-fail">No commit boundary</span>';return}
   var a=cb.authority,ad=cb.admissibility,c=cb.constraints;
-  $("#commitBoundary").innerHTML='<div class="boundary-grid"><div class="boundary-cell"><h5>Authority</h5><div class="boundary-val" style="color:var(--neon-cyan)">'+esc(a.sealAuthority)+'</div><div style="font-size:10px;color:var(--muted);margin-top:4px">Policy: '+esc(a.policyVersion)+' | Chain: '+a.authorityChainDepth+'</div><div class="chain-hash mono" style="margin-top:4px">ruleSeal: '+esc(a.ruleSeal.slice(0,40))+'...</div></div><div class="boundary-cell"><h5>Admissibility</h5><div class="boundary-val" style="color:var(--ok)">All checks passed</div><div style="font-size:10px;color:var(--muted);margin-top:4px">Schema: <span style="color:var(--ok)">valid</span> | Proof: <span style="color:var(--ok)">intact</span> | Replay: <span style="color:var(--ok)">sequenced</span></div></div><div class="boundary-cell"><h5>Constraints</h5><div style="font-size:11px;margin-top:2px"><div>NIST SP 800-171 Rev 2</div><div>110 practices / 14 families</div><div>Required: '+esc(c.requiredRefTypes.join(", "))+'</div><div style="font-size:10px;color:var(--muted);margin-top:4px">Enforced: '+esc(c.enforcedAt.slice(0,19))+'</div></div></div></div>';
+  $("#commitBoundary").innerHTML='<div class="boundary-grid"><div class="boundary-cell"><h5>Authority</h5><div class="boundary-val" style="color:var(--neon-cyan)">'+esc(a.sealAuthority)+'</div><div style="font-size:10px;color:var(--muted);margin-top:4px">Policy: '+esc(a.policyVersion)+' | Chain: '+escHTML(a.authorityChainDepth)+'</div><div class="chain-hash mono" style="margin-top:4px">ruleSeal: '+esc(a.ruleSeal.slice(0,40))+'...</div></div><div class="boundary-cell"><h5>Admissibility</h5><div class="boundary-val" style="color:var(--ok)">All checks passed</div><div style="font-size:10px;color:var(--muted);margin-top:4px">Schema: <span style="color:var(--ok)">valid</span> | Proof: <span style="color:var(--ok)">intact</span> | Replay: <span style="color:var(--ok)">sequenced</span></div></div><div class="boundary-cell"><h5>Constraints</h5><div style="font-size:11px;margin-top:2px"><div>NIST SP 800-171 Rev 2</div><div>110 practices / 14 families</div><div>Required: '+esc(c.requiredRefTypes.join(", "))+'</div><div style="font-size:10px;color:var(--muted);margin-top:4px">Enforced: '+esc(c.enforcedAt.slice(0,19))+'</div></div></div></div>';
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -1083,7 +1084,7 @@ function loadBundle(seed){
   var b=makeSampleBundle(seed);STATE.bundle=b;STATE.tampered=false;
   $("#explorerStats").innerHTML=
     '<div class="stat-box"><div class="stat-val" style="color:var(--neon-cyan)">'+esc(b.manifest.bundleId.slice(0,12))+'</div><div class="stat-label">Bundle ID '+copyBtn(b.manifest.bundleId)+'</div></div>'+
-    '<div class="stat-box"><div class="stat-val">'+b.artifacts.length+'</div><div class="stat-label">Practices</div></div>'+
+    '<div class="stat-box"><div class="stat-val">'+escHTML(b.artifacts.length)+'</div><div class="stat-label">Practices</div></div>'+
     '<div class="stat-box"><div class="stat-val">14</div><div class="stat-label">Families</div></div>'+
     '<div class="stat-box"><div class="stat-val" style="color:var(--neon-green)">93.9%</div><div class="stat-label">Coverage</div></div>';
   var mRows="";var mKeys=Object.keys(b.manifest);
@@ -2151,16 +2152,16 @@ function _renderGraphSvg(nodes,edges,W,H,typeColors,graph){
     for(var eid=0;eid<edges.length;eid++){if(edges[eid].target===idx)inDegree++}
     var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">Graph Node</h3>';
     h+='<span class="badge badge-cyan">'+esc(node.type)+'</span> ';
-    h+='<span class="badge badge-green">degree '+degree+'</span></div>';
+    h+='<span class="badge badge-green">degree '+escHTML(degree)+'</span></div>';
     h+='<div class="drawer-section"><h4>Node Identity</h4>';
     h+='<div class="drawer-kv"><span class="dk">Ref ID</span><span class="dv mono" style="color:var(--neon-cyan);font-size:10px">'+esc(node.id)+'</span></div>';
     h+='<div class="drawer-kv"><span class="dk">Family</span><span class="dv">'+esc(node.type)+'</span></div>';
-    h+='<div class="drawer-kv"><span class="dk">Out-Degree</span><span class="dv">'+degree+'</span></div>';
-    h+='<div class="drawer-kv"><span class="dk">In-Degree</span><span class="dv">'+inDegree+'</span></div>';
-    h+='<div class="drawer-kv"><span class="dk">Position</span><span class="dv">'+Math.round(node.x)+', '+Math.round(node.y)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Out-Degree</span><span class="dv">'+escHTML(degree)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">In-Degree</span><span class="dv">'+escHTML(inDegree)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Position</span><span class="dv">'+escHTML(Math.round(node.x))+', '+escHTML(Math.round(node.y))+'</span></div>';
     h+='</div>';
     if(connectedNodes.length>0){
-      h+='<div class="drawer-section"><h4>Connected Nodes ('+connectedNodes.length+')</h4>';
+      h+='<div class="drawer-section"><h4>Connected Nodes ('+escHTML(connectedNodes.length)+')</h4>';
       for(var ci=0;ci<connectedNodes.length;ci++){
         var cn2=nodes[connectedNodes[ci]];
         if(cn2){
@@ -2172,7 +2173,7 @@ function _renderGraphSvg(nodes,edges,W,H,typeColors,graph){
     }
     var outTargets=graph[node.id]||[];
     if(outTargets.length>0){
-      h+='<div class="drawer-section"><h4>Outgoing Edges ('+outTargets.length+')</h4>';
+      h+='<div class="drawer-section"><h4>Outgoing Edges ('+escHTML(outTargets.length)+')</h4>';
       for(var oi=0;oi<outTargets.length;oi++){
         h+='<div class="drawer-kv"><span class="dk">&rarr;</span><span class="dv mono" style="font-size:10px;color:var(--neon-cyan)">'+esc(outTargets[oi].substring(0,20))+'</span></div>';
       }
@@ -2193,7 +2194,7 @@ function _renderGraphSvg(nodes,edges,W,H,typeColors,graph){
     }
     if(node._cluster){
       h+='<div class="drawer-section"><h4>Cluster Actions</h4>';
-      h+='<button class="btn-primary" style="width:100%" data-expand-cluster="'+esc(node.type)+'">Expand '+node._memberCount+' Nodes</button>';
+      h+='<button class="btn-primary" style="width:100%" data-expand-cluster="'+esc(node.type)+'">Expand '+escHTML(node._memberCount)+' Nodes</button>';
       h+='</div>';
     }
     openTray(h);
@@ -2272,9 +2273,9 @@ function importBundle(){
     /* Re-render explorer stats */
     $("#explorerStats").innerHTML=
       '<div class="stat-box"><div class="stat-val" style="color:var(--neon-cyan)">'+esc(b.manifest.bundleId.slice(0,12))+'</div><div class="stat-label">Bundle ID '+copyBtn(b.manifest.bundleId)+'</div></div>'+
-      '<div class="stat-box"><div class="stat-val">'+b.artifacts.length+'</div><div class="stat-label">Practices</div></div>'+
-      '<div class="stat-box"><div class="stat-val">'+(b.manifest.familyCount||14)+'</div><div class="stat-label">Families</div></div>'+
-      '<div class="stat-box"><div class="stat-val" style="color:var(--neon-green)">'+(b.manifest.coverage||"—")+'</div><div class="stat-label">Coverage</div></div>';
+      '<div class="stat-box"><div class="stat-val">'+escHTML(b.artifacts.length)+'</div><div class="stat-label">Practices</div></div>'+
+      '<div class="stat-box"><div class="stat-val">'+escHTML(b.manifest.familyCount||14)+'</div><div class="stat-label">Families</div></div>'+
+      '<div class="stat-box"><div class="stat-val" style="color:var(--neon-green)">'+escHTML(b.manifest.coverage||"—")+'</div><div class="stat-label">Coverage</div></div>';
     /* Manifest table */
     var mKeys=Object.keys(b.manifest);var mRows="";
     for(var i=0;i<mKeys.length;i++){var val=String(b.manifest[mKeys[i]]);mRows+="<tr class='manifest-row' data-mkey='"+esc(mKeys[i])+"' style='cursor:pointer'><td class='mono' style='color:var(--neon-cyan)'>"+esc(mKeys[i])+"</td><td>"+esc(val)+"</td><td>"+copyBtn(val)+"</td></tr>"}
@@ -2573,7 +2574,7 @@ document.addEventListener("DOMContentLoaded",function(){
     var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">Replay Step #'+s.stepIndex+'</h3>';
     h+='<span class="badge badge-purple">'+esc(s.action)+'</span></div>';
     h+='<div class="drawer-section"><h4>Step Detail</h4>';
-    h+='<div class="drawer-kv"><span class="dk">Index</span><span class="dv">'+s.stepIndex+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Index</span><span class="dv">'+escHTML(s.stepIndex)+'</span></div>';
     h+='<div class="drawer-kv"><span class="dk">Action</span><span class="dv">'+esc(s.action)+'</span></div>';
     h+='<div class="drawer-kv"><span class="dk">Input Ref</span><span class="dv mono" style="font-size:10px">'+esc(s.inputRef||"—")+'</span></div>';
     h+='<div class="drawer-kv"><span class="dk">Output Ref</span><span class="dv mono" style="font-size:10px">'+esc(s.outputRef||"—")+'</span></div>';
@@ -2596,15 +2597,15 @@ document.addEventListener("DOMContentLoaded",function(){
     var authLaws=AUTH_FAM[fam.id]||[];
     var app=fam.total-fam.na;var pct=app>0?Math.round(((fam.full+fam.strong*0.9+fam.partial*0.5)/app)*1000)/10:0;
     var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">'+esc(fam.id)+' — '+esc(fam.name)+'</h3>';
-    h+='<span class="badge badge-cyan">'+fam.total+' practices</span> <span class="badge badge-green">'+pct+'%</span></div>';
+    h+='<span class="badge badge-cyan">'+escHTML(fam.total)+' practices</span> <span class="badge badge-green">'+escHTML(pct)+'%</span></div>';
     h+='<div class="drawer-section"><h4>Coverage Breakdown</h4>';
-    h+='<div class="drawer-kv"><span class="dk">Full</span><span class="dv" style="color:var(--neon-green)">'+fam.full+'</span></div>';
-    h+='<div class="drawer-kv"><span class="dk">Strong</span><span class="dv" style="color:var(--neon-cyan)">'+fam.strong+'</span></div>';
-    h+='<div class="drawer-kv"><span class="dk">Partial</span><span class="dv" style="color:var(--neon-amber)">'+fam.partial+'</span></div>';
-    h+='<div class="drawer-kv"><span class="dk">N/A</span><span class="dv">'+fam.na+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Full</span><span class="dv" style="color:var(--neon-green)">'+escHTML(fam.full)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Strong</span><span class="dv" style="color:var(--neon-cyan)">'+escHTML(fam.strong)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Partial</span><span class="dv" style="color:var(--neon-amber)">'+escHTML(fam.partial)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">N/A</span><span class="dv">'+escHTML(fam.na)+'</span></div>';
     h+='</div>';
     h+='<div class="drawer-section"><h4>CERPA Mapping</h4>';
-    h+='<div class="drawer-kv"><span class="dk">Stage</span><span class="dv"><span class="cerpa-tag '+cerpa.cls+'">'+cerpa.stage+'</span></span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Stage</span><span class="dv"><span class="cerpa-tag '+escHTML(cerpa.cls)+'">'+escHTML(cerpa.stage)+'</span></span></div>';
     h+='<div class="drawer-kv"><span class="dk">Label</span><span class="dv">'+esc(cerpa.lbl)+'</span></div>';
     h+='</div>';
     if(authLaws.length){
@@ -2659,9 +2660,9 @@ document.addEventListener("DOMContentLoaded",function(){
     var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">'+esc(fam.id)+' — '+esc(fam.name)+'</h3>';
     h+='<span class="badge badge-cyan">Timeline Bar</span></div>';
     h+='<div class="drawer-section"><h4>Family Overview</h4>';
-    h+='<div class="drawer-kv"><span class="dk">Full</span><span class="dv" style="color:var(--neon-green)">'+fam.full+'/'+fam.total+'</span></div>';
-    h+='<div class="drawer-kv"><span class="dk">Coverage</span><span class="dv" style="color:var(--neon-cyan)">'+pct+'%</span></div>';
-    h+='<div class="drawer-kv"><span class="dk">CERPA</span><span class="dv"><span class="cerpa-tag '+cerpa.cls+'">'+cerpa.stage+'</span></span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Full</span><span class="dv" style="color:var(--neon-green)">'+escHTML(fam.full)+'/'+escHTML(fam.total)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Coverage</span><span class="dv" style="color:var(--neon-cyan)">'+escHTML(pct)+'%</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">CERPA</span><span class="dv"><span class="cerpa-tag '+escHTML(cerpa.cls)+'">'+escHTML(cerpa.stage)+'</span></span></div>';
     h+='</div>';
     openTray(h);
   });

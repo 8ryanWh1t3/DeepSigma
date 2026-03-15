@@ -964,6 +964,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
    Utility
    ══════════════════════════════════════════════════════════ */
 function esc(s){var d=document.createElement("div");d.textContent=s;return d.innerHTML}
+function escHTML(v){var s=String(v==null?"":v);return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
 function $(sel){return document.querySelector(sel)}
 function $$(sel){return Array.prototype.slice.call(document.querySelectorAll(sel))}
 
@@ -1330,9 +1331,9 @@ document.addEventListener("DOMContentLoaded",function(){
       h+='</div>';
 
       h+='<div class="drawer-section"><h4>Diff Summary</h4>';
-      h+='<div class="drawer-kv"><span class="dk">Added</span><span class="dv" style="color:var(--ok)">'+diff.added.length+'</span></div>';
-      h+='<div class="drawer-kv"><span class="dk">Removed</span><span class="dv" style="color:var(--bad)">'+diff.removed.length+'</span></div>';
-      h+='<div class="drawer-kv"><span class="dk">Modified</span><span class="dv" style="color:var(--neon-amber)">'+diff.modified.length+'</span></div>';
+      h+='<div class="drawer-kv"><span class="dk">Added</span><span class="dv" style="color:var(--ok)">'+escHTML(diff.added.length)+'</span></div>';
+      h+='<div class="drawer-kv"><span class="dk">Removed</span><span class="dv" style="color:var(--bad)">'+escHTML(diff.removed.length)+'</span></div>';
+      h+='<div class="drawer-kv"><span class="dk">Modified</span><span class="dv" style="color:var(--neon-amber)">'+escHTML(diff.modified.length)+'</span></div>';
       h+='</div>';
     }
 
@@ -1434,7 +1435,7 @@ function renderCommitBoundary(cb){
     '<div class="boundary-cell">'+
       '<h5>Authority</h5>'+
       '<div class="boundary-val" style="color:var(--neon-cyan)">'+esc(a.sealAuthority)+'</div>'+
-      '<div style="font-size:10px;color:var(--muted);margin-top:4px">Policy: '+esc(a.policyVersion)+' | Chain depth: '+a.authorityChainDepth+'</div>'+
+      '<div style="font-size:10px;color:var(--muted);margin-top:4px">Policy: '+esc(a.policyVersion)+' | Chain depth: '+escHTML(a.authorityChainDepth)+'</div>'+
       '<div class="chain-hash mono" style="margin-top:4px">ruleSeal: '+esc(a.ruleSeal.slice(0,40))+'...'+copyBtn(a.ruleSeal)+'</div>'+
     '</div>'+
     '<div class="boundary-cell">'+
@@ -1447,15 +1448,15 @@ function renderCommitBoundary(cb){
       '</div>'+
       '<div style="font-size:10px;color:var(--muted);margin-top:2px">'+
         'Content hashes: '+(ad.contentHashesVerified?'<span style="color:var(--ok)">verified</span>':'<span style="color:var(--bad)">unverified</span>')+
-        ' | Unmapped: '+ad.unmappedArtifacts+
+        ' | Unmapped: '+escHTML(ad.unmappedArtifacts)+
       '</div>'+
     '</div>'+
     '<div class="boundary-cell">'+
       '<h5>Constraints</h5>'+
       '<div style="font-size:11px;margin-top:2px">'+
-        '<div>Max artifacts: <span style="color:var(--neon-amber)">'+c.maxArtifacts+'</span></div>'+
-        '<div>Max replay depth: <span style="color:var(--neon-amber)">'+c.maxReplayDepth+'</span></div>'+
-        '<div>Max chain length: <span style="color:var(--neon-amber)">'+c.maxChainLength+'</span></div>'+
+        '<div>Max artifacts: <span style="color:var(--neon-amber)">'+escHTML(c.maxArtifacts)+'</span></div>'+
+        '<div>Max replay depth: <span style="color:var(--neon-amber)">'+escHTML(c.maxReplayDepth)+'</span></div>'+
+        '<div>Max chain length: <span style="color:var(--neon-amber)">'+escHTML(c.maxChainLength)+'</span></div>'+
         '<div style="margin-top:4px;font-size:10px;color:var(--muted)">Required: '+esc(c.requiredRefTypes.join(", "))+'</div>'+
         '<div style="font-size:10px;color:var(--muted)">Enforced: '+esc(c.enforcedAt.slice(0,19))+'</div>'+
       '</div>'+
@@ -1840,7 +1841,7 @@ function _buildLineageSvg(container,sealEvents,driftEvents,patchEvents,totalSpan
       if(nearestP){
         h+='<div class="drawer-section"><h4>Correction Path</h4>';
         h+='<div class="drawer-kv"><span class="dk">Nearest Patch</span><span class="dv mono" style="font-size:10px;color:#e91e63">'+esc(nearestP.refId.substring(0,16))+'</span></div>';
-        h+='<div class="drawer-kv"><span class="dk">Distance</span><span class="dv">'+minD+' steps</span></div>';
+        h+='<div class="drawer-kv"><span class="dk">Distance</span><span class="dv">'+escHTML(minD)+' steps</span></div>';
         h+='</div>';
       }
     }
@@ -2046,10 +2047,10 @@ function renderHalfLife(){
   for(var k=0;k<rationales.length;k++){
     var r=rationales[k];
     var barColor=r.hl.status==="alive"?"var(--ok)":r.hl.status==="warning"?"var(--warn)":"var(--bad)";
-    html+='<div class="hl-row hl-'+r.hl.status+'" data-hl-idx="'+k+'" style="cursor:pointer">'+
-      '<div class="hl-label" title="'+r.art.refId+'">'+r.art.refId.substring(0,12)+'&hellip; <span style="color:var(--muted);font-size:10px">step '+r.hl.stepIdx+'</span></div>'+
-      '<div class="hl-bar-wrap"><div class="hl-bar-fill" style="width:'+r.hl.remaining+'%;background:'+barColor+'"></div></div>'+
-      '<div class="hl-pct" style="color:'+barColor+'">'+r.hl.remaining+'%</div>'+
+    html+='<div class="hl-row hl-'+escHTML(r.hl.status)+'" data-hl-idx="'+k+'" style="cursor:pointer">'+
+      '<div class="hl-label" title="'+escHTML(r.art.refId)+'">'+escHTML(r.art.refId.substring(0,12))+'&hellip; <span style="color:var(--muted);font-size:10px">step '+escHTML(r.hl.stepIdx)+'</span></div>'+
+      '<div class="hl-bar-wrap"><div class="hl-bar-fill" style="width:'+escHTML(r.hl.remaining)+'%;background:'+barColor+'"></div></div>'+
+      '<div class="hl-pct" style="color:'+barColor+'">'+escHTML(r.hl.remaining)+'%</div>'+
     '</div>';
   }
   listEl.innerHTML=html||'<p style="color:var(--muted);font-size:12px">No rationale artifacts in bundle</p>';
@@ -2208,8 +2209,8 @@ function renderBlastRadius(){
     var bd=blastData[m];
     var ringColor=bd.count>=3?"var(--bad)":bd.count>=1?"var(--warn)":"var(--ok)";
     html+='<div class="blast-row" data-idx="'+m+'">'+
-      '<div class="blast-count" style="background:'+ringColor+';color:#000">'+bd.count+'</div>'+
-      '<div class="blast-label" title="'+bd.art.refId+'">'+bd.art.refId.substring(0,16)+'&hellip; <span style="color:var(--muted);font-size:10px">['+bd.art.refType+']</span></div>'+
+      '<div class="blast-count" style="background:'+ringColor+';color:#000">'+escHTML(bd.count)+'</div>'+
+      '<div class="blast-label" title="'+escHTML(bd.art.refId)+'">'+escHTML(bd.art.refId.substring(0,16))+'&hellip; <span style="color:var(--muted);font-size:10px">['+escHTML(bd.art.refType)+']</span></div>'+
     '</div>';
   }
   listEl.innerHTML=html||'<p style="color:var(--muted);font-size:12px">No artifacts</p>';
@@ -2223,7 +2224,7 @@ function renderBlastRadius(){
       critEl.style.display="";
       var critHtml="";
       for(var t=0;t<top3.length;t++){
-        critHtml+='<div style="margin-bottom:6px"><strong>'+top3[t].art.refId.substring(0,16)+'</strong> ['+top3[t].art.refType+'] &rarr; <span style="color:var(--bad)">'+top3[t].count+' downstream</span></div>';
+        critHtml+='<div style="margin-bottom:6px"><strong>'+escHTML(top3[t].art.refId.substring(0,16))+'</strong> ['+escHTML(top3[t].art.refType)+'] &rarr; <span style="color:var(--bad)">'+escHTML(top3[t].count)+' downstream</span></div>';
       }
       critListEl.innerHTML=critHtml;
     }else{critEl.style.display="none"}
@@ -2691,7 +2692,7 @@ function renderSoWhat(reftype,stage){
   var stageKeys=Object.keys(stageIssues);
   if(stageKeys.length>0){
     var parts2=[];
-    for(var sk=0;sk<stageKeys.length;sk++)parts2.push(stageKeys[sk]+" ("+stageIssues[stageKeys[sk]]+" issues)");
+    for(var sk=0;sk<stageKeys.length;sk++)parts2.push(escHTML(stageKeys[sk])+" ("+escHTML(stageIssues[stageKeys[sk]])+" issues)");
     stageHtml=parts2.join(", ");
   }else{
     stageHtml='<span style="color:var(--ok)">All stages clean</span>';
@@ -2721,10 +2722,10 @@ function renderSoWhat(reftype,stage){
   else{priority="P4-Low";priorityClass="so-what-p4"}
 
   var h='<div class="so-what-title">So What?</div>';
-  h+='<div class="so-what-row"><span class="so-what-label">Impacted Primitives</span><span class="so-what-val">'+impacted.join(", ")+'</span></div>';
+  h+='<div class="so-what-row"><span class="so-what-label">Impacted Primitives</span><span class="so-what-val">'+escHTML(impacted.join(", "))+'</span></div>';
   h+='<div class="so-what-row"><span class="so-what-label">CERPA Stage Issues</span><span class="so-what-val">'+stageHtml+'</span></div>';
-  h+='<div class="so-what-row"><span class="so-what-label">Proof Integrity</span><span class="so-what-val"><span style="color:'+integrityColor+'">&#x25CF; '+integrityLabel+'</span> &mdash; '+esc(sealAuth)+' / '+esc(policyVer)+'</span></div>';
-  h+='<div class="so-what-row"><span class="so-what-label">Patch Priority</span><span class="so-what-val"><span class="'+priorityClass+'">'+priority+'</span> (expired:'+expiredCount+' drift:'+driftCount+' contradictions:'+cCount+')</span></div>';
+  h+='<div class="so-what-row"><span class="so-what-label">Proof Integrity</span><span class="so-what-val"><span style="color:'+escHTML(integrityColor)+'">&#x25CF; '+escHTML(integrityLabel)+'</span> &mdash; '+esc(sealAuth)+' / '+esc(policyVer)+'</span></div>';
+  h+='<div class="so-what-row"><span class="so-what-label">Patch Priority</span><span class="so-what-val"><span class="'+escHTML(priorityClass)+'">'+escHTML(priority)+'</span> (expired:'+escHTML(expiredCount)+' drift:'+escHTML(driftCount)+' contradictions:'+escHTML(cCount)+')</span></div>';
   box.innerHTML=h;
 }
 
@@ -4523,8 +4524,8 @@ function printBundleExport(){
   w.innerHTML='<h1 style="font-size:22px;margin-bottom:4px">COG Bundle — Compliance Summary</h1>'+
     '<div style="color:#666;font-size:12px;margin-bottom:20px">Generated: '+new Date().toISOString().slice(0,10)+' | Bundle: '+esc(b.manifest.bundleId)+'</div>'+
     '<div style="display:flex;gap:20px;margin-bottom:20px">'+
-      '<div style="text-align:center;padding:16px;border:2px solid #0891b2;border-radius:12px;min-width:120px"><div style="font-size:32px;font-weight:800;color:#0891b2">'+b.artifacts.length+'</div><div style="font-size:10px;color:#666">Artifacts</div></div>'+
-      '<div style="flex:1"><div style="margin-bottom:6px">Proof Chain: <strong>'+(hasProof?"Sealed ("+STATE.proofChain.length+" entries)":"No seal")+'</strong></div><div style="font-size:12px;color:#444">Replay: '+b.replaySteps.length+' steps | Version: '+b.manifest.version+'</div></div>'+
+      '<div style="text-align:center;padding:16px;border:2px solid #0891b2;border-radius:12px;min-width:120px"><div style="font-size:32px;font-weight:800;color:#0891b2">'+escHTML(b.artifacts.length)+'</div><div style="font-size:10px;color:#666">Artifacts</div></div>'+
+      '<div style="flex:1"><div style="margin-bottom:6px">Proof Chain: <strong>'+(hasProof?"Sealed ("+escHTML(STATE.proofChain.length)+" entries)":"No seal")+'</strong></div><div style="font-size:12px;color:#444">Replay: '+escHTML(b.replaySteps.length)+' steps | Version: '+escHTML(b.manifest.version)+'</div></div>'+
     '</div>'+
     '<h2 style="font-size:14px;margin:16px 0 8px;border-bottom:1px solid #ddd;padding-bottom:4px">Artifacts</h2>'+
     '<table style="width:100%;border-collapse:collapse;font-size:11px"><tr style="background:#f0f4f8"><th style="text-align:left;padding:4px 8px">Ref ID</th><th style="padding:4px">Type</th><th style="padding:4px">Hash</th></tr>';

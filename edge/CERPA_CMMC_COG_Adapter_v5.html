@@ -937,6 +937,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
    Utility
    ══════════════════════════════════════════════════════════ */
 function esc(s){var d=document.createElement("div");d.textContent=s;return d.innerHTML}
+function escHTML(s){var v=String(s==null?"":s);return v.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
 function $(sel){return document.querySelector(sel)}
 function $$(sel){return Array.prototype.slice.call(document.querySelectorAll(sel))}
 var _toastTimer;
@@ -1194,7 +1195,7 @@ function renderExecutive(){
 function renderCommitBoundary(cb){
   if(!cb){$("#commitBoundary").innerHTML='<span class="badge badge-fail">No commit boundary</span>';return}
   var a=cb.authority,ad=cb.admissibility,c=cb.constraints;
-  $("#commitBoundary").innerHTML='<div class="boundary-grid"><div class="boundary-cell"><h5>Authority</h5><div class="boundary-val" style="color:var(--neon-cyan)">'+esc(a.sealAuthority)+'</div><div style="font-size:10px;color:var(--muted);margin-top:4px">Policy: '+esc(a.policyVersion)+' | Chain: '+a.authorityChainDepth+'</div><div class="chain-hash mono" style="margin-top:4px">ruleSeal: '+esc(a.ruleSeal.slice(0,40))+'...</div></div><div class="boundary-cell"><h5>Admissibility</h5><div class="boundary-val" style="color:var(--ok)">All checks passed</div><div style="font-size:10px;color:var(--muted);margin-top:4px">Schema: <span style="color:var(--ok)">valid</span> | Proof: <span style="color:var(--ok)">intact</span> | Replay: <span style="color:var(--ok)">sequenced</span></div></div><div class="boundary-cell"><h5>Constraints</h5><div style="font-size:11px;margin-top:2px"><div>NIST SP 800-171 Rev 2</div><div>110 practices / 14 families</div><div>Required: '+esc(c.requiredRefTypes.join(", "))+'</div><div style="font-size:10px;color:var(--muted);margin-top:4px">Enforced: '+esc(c.enforcedAt.slice(0,19))+'</div></div></div></div>';
+  $("#commitBoundary").innerHTML='<div class="boundary-grid"><div class="boundary-cell"><h5>Authority</h5><div class="boundary-val" style="color:var(--neon-cyan)">'+esc(a.sealAuthority)+'</div><div style="font-size:10px;color:var(--muted);margin-top:4px">Policy: '+esc(a.policyVersion)+' | Chain: '+escHTML(a.authorityChainDepth)+'</div><div class="chain-hash mono" style="margin-top:4px">ruleSeal: '+esc(a.ruleSeal.slice(0,40))+'...</div></div><div class="boundary-cell"><h5>Admissibility</h5><div class="boundary-val" style="color:var(--ok)">All checks passed</div><div style="font-size:10px;color:var(--muted);margin-top:4px">Schema: <span style="color:var(--ok)">valid</span> | Proof: <span style="color:var(--ok)">intact</span> | Replay: <span style="color:var(--ok)">sequenced</span></div></div><div class="boundary-cell"><h5>Constraints</h5><div style="font-size:11px;margin-top:2px"><div>NIST SP 800-171 Rev 2</div><div>110 practices / 14 families</div><div>Required: '+esc(c.requiredRefTypes.join(", "))+'</div><div style="font-size:10px;color:var(--muted);margin-top:4px">Enforced: '+esc(c.enforcedAt.slice(0,19))+'</div></div></div></div>';
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -2393,9 +2394,9 @@ function importBundle(){
     /* Re-render explorer stats */
     $("#explorerStats").innerHTML=
       '<div class="stat-box"><div class="stat-val" style="color:var(--neon-cyan)">'+esc(b.manifest.bundleId.slice(0,12))+'</div><div class="stat-label">Bundle ID '+copyBtn(b.manifest.bundleId)+'</div></div>'+
-      '<div class="stat-box"><div class="stat-val">'+b.artifacts.length+'</div><div class="stat-label">Practices</div></div>'+
-      '<div class="stat-box"><div class="stat-val">'+(b.manifest.familyCount||14)+'</div><div class="stat-label">Families</div></div>'+
-      '<div class="stat-box"><div class="stat-val" style="color:var(--neon-green)">'+(b.manifest.coverage||"—")+'</div><div class="stat-label">Coverage</div></div>';
+      '<div class="stat-box"><div class="stat-val">'+escHTML(b.artifacts.length)+'</div><div class="stat-label">Practices</div></div>'+
+      '<div class="stat-box"><div class="stat-val">'+escHTML(b.manifest.familyCount||14)+'</div><div class="stat-label">Families</div></div>'+
+      '<div class="stat-box"><div class="stat-val" style="color:var(--neon-green)">'+escHTML(b.manifest.coverage||"—")+'</div><div class="stat-label">Coverage</div></div>';
     /* Manifest table */
     var mKeys=Object.keys(b.manifest);var mRows="";
     for(var i=0;i<mKeys.length;i++){var val=String(b.manifest[mKeys[i]]);mRows+="<tr class='manifest-row' data-mkey='"+esc(mKeys[i])+"' style='cursor:pointer'><td class='mono' style='color:var(--neon-cyan)'>"+esc(mKeys[i])+"</td><td>"+esc(val)+"</td><td>"+copyBtn(val)+"</td></tr>"}
@@ -2723,10 +2724,10 @@ document.addEventListener("DOMContentLoaded",function(){
     var sidx=parseInt(row.getAttribute("data-sidx"),10);
     var b=STATE.bundle;if(!b||!b.replaySteps[sidx])return;
     var s=b.replaySteps[sidx];
-    var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">Replay Step #'+s.stepIndex+'</h3>';
+    var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">Replay Step #'+escHTML(s.stepIndex)+'</h3>';
     h+='<span class="badge badge-purple">'+esc(s.action)+'</span></div>';
     h+='<div class="drawer-section"><h4>Step Detail</h4>';
-    h+='<div class="drawer-kv"><span class="dk">Index</span><span class="dv">'+s.stepIndex+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Index</span><span class="dv">'+escHTML(s.stepIndex)+'</span></div>';
     h+='<div class="drawer-kv"><span class="dk">Action</span><span class="dv">'+esc(s.action)+'</span></div>';
     h+='<div class="drawer-kv"><span class="dk">Input Ref</span><span class="dv mono" style="font-size:10px">'+esc(s.inputRef||"—")+'</span></div>';
     h+='<div class="drawer-kv"><span class="dk">Output Ref</span><span class="dv mono" style="font-size:10px">'+esc(s.outputRef||"—")+'</span></div>';
@@ -2885,20 +2886,20 @@ function openHeatmapTray(famIdx,covFilter){
   if(covFilter)h+='<span class="badge badge-cyan">Filtered: '+esc(covFilter)+'</span>';
   h+='</div>';
   h+='<div class="drawer-section"><h4>Coverage Breakdown</h4>';
-  h+='<div class="drawer-kv"><span class="dk">Total</span><span class="dv">'+f.total+' practices</span></div>';
-  h+='<div class="drawer-kv"><span class="dk">Full</span><span class="dv" style="color:var(--neon-green)">'+f.full+'</span></div>';
-  h+='<div class="drawer-kv"><span class="dk">Strong</span><span class="dv" style="color:var(--neon-cyan)">'+f.strong+'</span></div>';
-  h+='<div class="drawer-kv"><span class="dk">Partial</span><span class="dv" style="color:var(--neon-amber)">'+f.partial+'</span></div>';
-  h+='<div class="drawer-kv"><span class="dk">N/A</span><span class="dv" style="color:var(--muted)">'+f.na+'</span></div>';
+  h+='<div class="drawer-kv"><span class="dk">Total</span><span class="dv">'+escHTML(f.total)+' practices</span></div>';
+  h+='<div class="drawer-kv"><span class="dk">Full</span><span class="dv" style="color:var(--neon-green)">'+escHTML(f.full)+'</span></div>';
+  h+='<div class="drawer-kv"><span class="dk">Strong</span><span class="dv" style="color:var(--neon-cyan)">'+escHTML(f.strong)+'</span></div>';
+  h+='<div class="drawer-kv"><span class="dk">Partial</span><span class="dv" style="color:var(--neon-amber)">'+escHTML(f.partial)+'</span></div>';
+  h+='<div class="drawer-kv"><span class="dk">N/A</span><span class="dv" style="color:var(--muted)">'+escHTML(f.na)+'</span></div>';
   h+='</div>';
   h+='<div class="drawer-section"><h4>CERPA Mapping</h4>';
-  h+='<div class="drawer-kv"><span class="dk">Stage</span><span class="dv"><span class="cerpa-tag '+cm.cls+'">'+cm.lbl+' '+cm.stage+'</span></span></div>';
+  h+='<div class="drawer-kv"><span class="dk">Stage</span><span class="dv"><span class="cerpa-tag '+escHTML(cm.cls)+'">'+escHTML(cm.lbl)+' '+escHTML(cm.stage)+'</span></span></div>';
   h+='<div class="drawer-kv"><span class="dk">KPIs</span><span class="dv">'+(KPI_FAM[f.id].length?esc(KPI_FAM[f.id].join(", ")):"—")+'</span></div>';
   if(AUTH_FAM[f.id]&&AUTH_FAM[f.id].length)h+='<div class="drawer-kv"><span class="dk">AuthorityOps</span><span class="dv" style="color:var(--bad)">'+esc(AUTH_FAM[f.id].join("; "))+'</span></div>';
   h+='</div>';
   h+='<div class="drawer-section"><h4>Cross-Framework Impact</h4>';
   var hits=FRAMEWORKS.filter(function(fw){return fw.families.indexOf(f.id)>=0});
-  h+='<div class="drawer-kv"><span class="dk">Cascade</span><span class="dv" style="color:'+(hits.length>=7?"var(--bad)":"var(--neon-cyan)")+'">'+hits.length+'/10 frameworks</span></div>';
+  h+='<div class="drawer-kv"><span class="dk">Cascade</span><span class="dv" style="color:'+(hits.length>=7?"var(--bad)":"var(--neon-cyan)")+'">'+escHTML(hits.length)+'/10 frameworks</span></div>';
   for(var fi=0;fi<hits.length;fi++)h+='<div class="drawer-kv"><span class="dk" style="font-size:9px">'+esc(hits[fi].id)+'</span><span class="dv" style="font-size:9px">'+esc(hits[fi].cov)+'</span></div>';
   h+='</div>';
   openTray(h);
@@ -2929,16 +2930,16 @@ function openHalfLifeTray(famIdx,stability,halfLife){
   var riskLevel=stability>=90?"LOW":stability>=70?"MODERATE":stability>=50?"ELEVATED":"CRITICAL";
   var riskColor=stability>=90?"var(--neon-green)":stability>=70?"var(--neon-cyan)":stability>=50?"var(--neon-amber)":"var(--bad)";
   var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">'+esc(f.id)+' — Decay Analysis</h3>';
-  h+='<span class="badge" style="color:'+riskColor+';border:1px solid '+riskColor+';background:transparent">'+riskLevel+' RISK</span></div>';
+  h+='<span class="badge" style="color:'+riskColor+';border:1px solid '+riskColor+';background:transparent">'+escHTML(riskLevel)+' RISK</span></div>';
   h+='<div class="drawer-section"><h4>Decay Metrics</h4>';
-  h+='<div class="drawer-kv"><span class="dk">Stability</span><span class="dv" style="color:'+riskColor+';font-size:18px;font-weight:800">'+stability+'%</span></div>';
-  h+='<div class="drawer-kv"><span class="dk">Half-Life</span><span class="dv">'+(halfLife>=999?"Stable (no decay)":halfLife+" months")+'</span></div>';
-  h+='<div class="drawer-kv"><span class="dk">Partial</span><span class="dv" style="color:var(--neon-amber)">'+f.partial+' practices (fastest decay)</span></div>';
-  h+='<div class="drawer-kv"><span class="dk">Strong</span><span class="dv">'+f.strong+' practices (slow decay if unsupported)</span></div>';
+  h+='<div class="drawer-kv"><span class="dk">Stability</span><span class="dv" style="color:'+riskColor+';font-size:18px;font-weight:800">'+escHTML(stability)+'%</span></div>';
+  h+='<div class="drawer-kv"><span class="dk">Half-Life</span><span class="dv">'+(halfLife>=999?"Stable (no decay)":escHTML(halfLife)+" months")+'</span></div>';
+  h+='<div class="drawer-kv"><span class="dk">Partial</span><span class="dv" style="color:var(--neon-amber)">'+escHTML(f.partial)+' practices (fastest decay)</span></div>';
+  h+='<div class="drawer-kv"><span class="dk">Strong</span><span class="dv">'+escHTML(f.strong)+' practices (slow decay if unsupported)</span></div>';
   h+='</div>';
   h+='<div class="drawer-section"><h4>Decay Drivers</h4>';
-  if(f.partial>0)h+='<div style="font-size:10px;color:var(--neon-amber);margin-bottom:4px">⚠ '+f.partial+' partial practice(s) — infrastructure/physical gaps that require organizational remediation</div>';
-  if(f.na>0)h+='<div style="font-size:10px;color:var(--muted);margin-bottom:4px">'+f.na+' N/A practice(s) — outside CERPA scope, dependent on platform/physical controls</div>';
+  if(f.partial>0)h+='<div style="font-size:10px;color:var(--neon-amber);margin-bottom:4px">⚠ '+escHTML(f.partial)+' partial practice(s) — infrastructure/physical gaps that require organizational remediation</div>';
+  if(f.na>0)h+='<div style="font-size:10px;color:var(--muted);margin-bottom:4px">'+escHTML(f.na)+' N/A practice(s) — outside CERPA scope, dependent on platform/physical controls</div>';
   if(f.strong>f.full)h+='<div style="font-size:10px;color:var(--neon-cyan);margin-bottom:4px">Strong > Full ratio — coverage relies on organizational supplements that could lapse</div>';
   if(f.partial===0&&f.na===0)h+='<div style="font-size:10px;color:var(--neon-green)">No decay drivers. This family is architecturally stable.</div>';
   h+='</div>';
@@ -2986,7 +2987,7 @@ function renderBlast(){
   for(var k=0;k<Math.min(5,sorted.length);k++){
     var sf=sorted[k],sc=FRAMEWORKS.filter(function(fw){return fw.families.indexOf(sf.id)>=0}).length;
     var w=Math.round(sc/10*100);
-    vHtml+='<div class="hl-bar-row" data-blast-bar="'+FAMILIES.indexOf(sf)+'" style="cursor:pointer"><div class="hl-label">'+sf.id+'</div><div class="hl-track"><div class="hl-fill" style="width:'+w+'%;background:'+(sc>=7?"var(--bad)":sc>=4?"var(--neon-amber)":"var(--neon-green)")+'"></div></div><div class="hl-val" style="color:'+(sc>=7?"var(--bad)":"var(--neon-cyan)")+'">'+sc+'/10</div></div>';
+    vHtml+='<div class="hl-bar-row" data-blast-bar="'+FAMILIES.indexOf(sf)+'" style="cursor:pointer"><div class="hl-label">'+escHTML(sf.id)+'</div><div class="hl-track"><div class="hl-fill" style="width:'+w+'%;background:'+(sc>=7?"var(--bad)":sc>=4?"var(--neon-amber)":"var(--neon-green)")+'"></div></div><div class="hl-val" style="color:'+(sc>=7?"var(--bad)":"var(--neon-cyan)")+'">'+escHTML(sc)+'/10</div></div>';
   }
   vHtml+='</div>';
   var vEl=$("#blastVis");if(vEl)vEl.innerHTML=vHtml;
@@ -2996,20 +2997,20 @@ function openBlastTray(famIdx){
   var hits=FRAMEWORKS.filter(function(fw){return fw.families.indexOf(f.id)>=0});
   var misses=FRAMEWORKS.filter(function(fw){return fw.families.indexOf(f.id)<0});
   var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">'+esc(f.id)+' — Blast Radius</h3>';
-  h+='<span class="badge '+(hits.length>=7?"badge-fail":hits.length>=4?"badge-warn":"badge-pass")+'">Cascade: '+hits.length+'/10 frameworks</span></div>';
-  h+='<div class="drawer-section"><h4>Affected Frameworks ('+hits.length+')</h4>';
+  h+='<span class="badge '+(hits.length>=7?"badge-fail":hits.length>=4?"badge-warn":"badge-pass")+'">Cascade: '+escHTML(hits.length)+'/10 frameworks</span></div>';
+  h+='<div class="drawer-section"><h4>Affected Frameworks ('+escHTML(hits.length)+')</h4>';
   if(hits.length===0)h+='<div style="font-size:10px;color:var(--muted)">No cross-framework dependencies.</div>';
   for(var i=0;i<hits.length;i++){
-    h+='<div class="drawer-kv"><span class="dk" style="color:var(--neon-green)">'+esc(hits[i].id)+'</span><span class="dv">'+esc(hits[i].cov)+' — '+hits[i].families.length+' family overlap</span></div>';
+    h+='<div class="drawer-kv"><span class="dk" style="color:var(--neon-green)">'+esc(hits[i].id)+'</span><span class="dv">'+esc(hits[i].cov)+' — '+escHTML(hits[i].families.length)+' family overlap</span></div>';
   }
   h+='</div>';
   if(misses.length){
-    h+='<div class="drawer-section"><h4>Unaffected Frameworks ('+misses.length+')</h4>';
-    for(var j=0;j<misses.length;j++)h+='<div class="drawer-kv"><span class="dk" style="color:var(--muted)">'+esc(misses[j].id)+'</span><span class="dv" style="color:var(--muted)">No dependency on '+f.id+'</span></div>';
+    h+='<div class="drawer-section"><h4>Unaffected Frameworks ('+escHTML(misses.length)+')</h4>';
+    for(var j=0;j<misses.length;j++)h+='<div class="drawer-kv"><span class="dk" style="color:var(--muted)">'+esc(misses[j].id)+'</span><span class="dv" style="color:var(--muted)">No dependency on '+escHTML(f.id)+'</span></div>';
     h+='</div>';
   }
   h+='<div class="drawer-section"><h4>Risk Assessment</h4>';
-  h+='<div style="font-size:10px;color:var(--muted)">If '+f.id+' ('+f.name+') degrades from its current coverage ('+f.full+' Full / '+f.strong+' Strong / '+f.partial+' Partial), '+hits.length+' compliance framework claims are at risk. ';
+  h+='<div style="font-size:10px;color:var(--muted)">If '+escHTML(f.id)+' ('+escHTML(f.name)+') degrades from its current coverage ('+escHTML(f.full)+' Full / '+escHTML(f.strong)+' Strong / '+escHTML(f.partial)+' Partial), '+escHTML(hits.length)+' compliance framework claims are at risk. ';
   if(hits.length>=7)h+='<span style="color:var(--bad);font-weight:700">This is a critical cascade risk — degradation here ripples across most of the compliance surface.</span>';
   else if(hits.length>=4)h+='<span style="color:var(--neon-amber)">Moderate cascade risk — monitor partial practices closely.</span>';
   else h+='<span style="color:var(--neon-green)">Low cascade risk.</span>';
@@ -3040,7 +3041,7 @@ function renderPOAM(){
   var el=$("#poamList");if(el)el.innerHTML=html;
   var avgProgress=Math.round(POAM_ITEMS.reduce(function(s,p){return s+p.progress},0)/POAM_ITEMS.length);
   var completed=POAM_ITEMS.filter(function(p){return p.progress>=90}).length;
-  var sEl=$("#poamStats");if(sEl)sEl.innerHTML='<div class="stat-box"><div class="stat-val">7</div><div class="stat-label">Partial Practices</div></div><div class="stat-box"><div class="stat-val" style="color:var(--neon-green)">'+completed+'</div><div class="stat-label">Near Complete</div></div><div class="stat-box"><div class="stat-val" style="color:var(--neon-cyan)">'+avgProgress+'%</div><div class="stat-label">Avg Progress</div></div><div class="stat-box"><div class="stat-val" style="color:var(--neon-amber)">0</div><div class="stat-label">Overdue</div></div>';
+  var sEl=$("#poamStats");if(sEl)sEl.innerHTML='<div class="stat-box"><div class="stat-val">7</div><div class="stat-label">Partial Practices</div></div><div class="stat-box"><div class="stat-val" style="color:var(--neon-green)">'+escHTML(completed)+'</div><div class="stat-label">Near Complete</div></div><div class="stat-box"><div class="stat-val" style="color:var(--neon-cyan)">'+escHTML(avgProgress)+'%</div><div class="stat-label">Avg Progress</div></div><div class="stat-box"><div class="stat-val" style="color:var(--neon-amber)">0</div><div class="stat-label">Overdue</div></div>';
 }
 function openPOAMTray(idx){
   var p=POAM_ITEMS[idx];if(!p)return;
@@ -3051,7 +3052,7 @@ function openPOAMTray(idx){
   h+='<div class="drawer-kv"><span class="dk">Title</span><span class="dv">'+esc(p.title)+'</span></div>';
   h+='<div class="drawer-kv"><span class="dk">Owner</span><span class="dv">'+esc(p.owner)+'</span></div>';
   h+='<div class="drawer-kv"><span class="dk">Target Date</span><span class="dv">'+esc(p.target)+'</span></div>';
-  h+='<div class="drawer-kv"><span class="dk">Progress</span><span class="dv" style="color:'+sc+';font-size:18px;font-weight:800">'+p.progress+'%</span></div>';
+  h+='<div class="drawer-kv"><span class="dk">Progress</span><span class="dv" style="color:'+sc+';font-size:18px;font-weight:800">'+escHTML(p.progress)+'%</span></div>';
   h+='</div>';
   h+='<div class="drawer-section"><h4>Remediation Plan</h4>';
   h+='<div style="font-size:11px;color:var(--neon-amber);padding:8px;background:rgba(255,204,102,.04);border:1px solid rgba(255,204,102,.15);border-radius:6px">'+esc(p.remedy)+'</div></div>';
@@ -3061,7 +3062,7 @@ function openPOAMTray(idx){
   h+='<div style="font-size:11px;color:var(--bad);padding:8px;background:rgba(255,107,107,.04);border:1px solid rgba(255,107,107,.15);border-radius:6px">'+esc(p.risk)+'</div></div>';
   h+='<div class="drawer-section"><h4>CERPA Mapping</h4>';
   var cm=CERPA_FAM[p.family];
-  h+='<div class="drawer-kv"><span class="dk">Stage</span><span class="dv"><span class="cerpa-tag '+(cm?cm.cls:"ct-claim")+'">'+(cm?cm.lbl+" "+cm.stage:"—")+'</span></span></div>';
+  h+='<div class="drawer-kv"><span class="dk">Stage</span><span class="dv"><span class="cerpa-tag '+(cm?escHTML(cm.cls):"ct-claim")+'">'+(cm?escHTML(cm.lbl)+" "+escHTML(cm.stage):"—")+'</span></span></div>';
   h+='<div class="drawer-kv"><span class="dk">Gap Type</span><span class="dv">Infrastructure / Physical — not CERPA architectural</span></div>';
   h+='</div>';
   openTray(h);
@@ -3072,11 +3073,11 @@ function openPOAMTray(idx){
    ══════════════════════════════════════════════════════════ */
 function renderCrosswalk(){
   var html='<div style="overflow-x:auto"><table style="font-size:9px"><thead><tr><th style="min-width:80px">CMMC Family</th>';
-  for(var h=0;h<FRAMEWORKS.length;h++)html+='<th style="min-width:60px;font-size:8px;text-align:center">'+FRAMEWORKS[h].id+'</th>';
+  for(var h=0;h<FRAMEWORKS.length;h++)html+='<th style="min-width:60px;font-size:8px;text-align:center">'+escHTML(FRAMEWORKS[h].id)+'</th>';
   html+='</tr></thead><tbody>';
   for(var i=0;i<FAMILIES.length;i++){
     var f=FAMILIES[i];
-    html+='<tr class="cw-row-click" data-cw-fam="'+i+'" style="cursor:pointer"><td style="color:var(--neon-cyan);font-weight:700;white-space:nowrap">'+f.id+' ('+f.total+')</td>';
+    html+='<tr class="cw-row-click" data-cw-fam="'+i+'" style="cursor:pointer"><td style="color:var(--neon-cyan);font-weight:700;white-space:nowrap">'+escHTML(f.id)+' ('+escHTML(f.total)+')</td>';
     for(var j=0;j<FRAMEWORKS.length;j++){
       var hit=FRAMEWORKS[j].families.indexOf(f.id)>=0;
       var bg=hit?"rgba(57,255,20,.12)":"rgba(107,114,128,.05)";
@@ -3090,7 +3091,7 @@ function renderCrosswalk(){
   var sHtml='<div class="stats-bar">';
   for(var k=0;k<FRAMEWORKS.length;k++){
     var fw=FRAMEWORKS[k],overlap=fw.families.length;
-    sHtml+='<div class="stat-box" data-cw-fw-sum="'+k+'" style="min-width:100px;cursor:pointer"><div class="stat-val" style="font-size:16px;color:'+(overlap>=6?"var(--neon-green)":"var(--neon-cyan)")+'">'+overlap+'/14</div><div class="stat-label" style="font-size:7px">'+fw.id+'</div></div>';
+    sHtml+='<div class="stat-box" data-cw-fw-sum="'+k+'" style="min-width:100px;cursor:pointer"><div class="stat-val" style="font-size:16px;color:'+(overlap>=6?"var(--neon-green)":"var(--neon-cyan)")+'">'+escHTML(overlap)+'/14</div><div class="stat-label" style="font-size:7px">'+escHTML(fw.id)+'</div></div>';
   }
   sHtml+='</div>';
   var sEl=$("#crosswalkSummary");if(sEl)sEl.innerHTML=sHtml;
@@ -3109,11 +3110,11 @@ function openCrosswalkFamTray(famIdx){
 function openCrosswalkFwTray(fwIdx){
   var fw=FRAMEWORKS[fwIdx];
   var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-green);margin-bottom:4px">'+esc(fw.id)+'</h3>';
-  h+='<span class="badge badge-green">Coverage: '+esc(fw.cov)+'</span> <span class="badge badge-cyan">'+fw.families.length+'/14 CMMC families</span></div>';
+  h+='<span class="badge badge-green">Coverage: '+esc(fw.cov)+'</span> <span class="badge badge-cyan">'+escHTML(fw.families.length)+'/14 CMMC families</span></div>';
   h+='<div class="drawer-section"><h4>Mapped CMMC Families</h4>';
   for(var i=0;i<fw.families.length;i++){
     var fid=fw.families[i];var fam=FAMILIES.filter(function(ff){return ff.id===fid})[0];
-    h+='<div class="drawer-kv"><span class="dk" style="color:var(--neon-cyan)">'+esc(fid)+'</span><span class="dv">'+(fam?esc(fam.name)+' ('+fam.total+' practices)':'Unknown')+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk" style="color:var(--neon-cyan)">'+esc(fid)+'</span><span class="dv">'+(fam?esc(fam.name)+' ('+escHTML(fam.total)+' practices)':'Unknown')+'</span></div>';
   }
   h+='</div>';
   h+='<div class="drawer-section"><h4>Unmapped CMMC Families</h4>';
@@ -3133,21 +3134,21 @@ function printExport(){
   var w=document.createElement("div");
   w.style.cssText="font-family:system-ui,sans-serif;color:#111;padding:40px;max-width:800px;margin:0 auto";
   w.innerHTML='<h1 style="font-size:22px;margin-bottom:4px">CERPA × CMMC 2.0 Level 2 — Compliance Summary</h1>'+
-    '<div style="color:#666;font-size:12px;margin-bottom:20px">Generated: '+new Date().toISOString().slice(0,10)+' | Bundle: '+(b?b.manifest.bundleId:"—")+'</div>'+
+    '<div style="color:#666;font-size:12px;margin-bottom:20px">Generated: '+escHTML(new Date().toISOString().slice(0,10))+' | Bundle: '+escHTML(b?b.manifest.bundleId:"—")+'</div>'+
     '<div style="display:flex;gap:20px;margin-bottom:20px">'+
       '<div style="text-align:center;padding:16px;border:2px solid #059669;border-radius:12px;min-width:120px"><div style="font-size:32px;font-weight:800;color:#059669">93.9%</div><div style="font-size:10px;color:#666">Weighted Coverage</div></div>'+
-      '<div style="flex:1"><div style="margin-bottom:6px"><strong>110</strong> practices across <strong>14</strong> families (NIST SP 800-171 Rev 2)</div><div style="font-size:12px;color:#444">Full: <span style="color:#059669;font-weight:700">'+totalFull+'</span> | Strong: <span style="color:#0891b2;font-weight:700">'+totalStrong+'</span> | Partial: <span style="color:#d97706;font-weight:700">'+totalPartial+'</span> | N/A: <span style="color:#999">'+totalNA+'</span></div><div style="font-size:11px;color:#666;margin-top:8px">100% coverage: AU (Audit), IR (Incident Response), RA (Risk Assessment)</div></div>'+
+      '<div style="flex:1"><div style="margin-bottom:6px"><strong>110</strong> practices across <strong>14</strong> families (NIST SP 800-171 Rev 2)</div><div style="font-size:12px;color:#444">Full: <span style="color:#059669;font-weight:700">'+escHTML(totalFull)+'</span> | Strong: <span style="color:#0891b2;font-weight:700">'+escHTML(totalStrong)+'</span> | Partial: <span style="color:#d97706;font-weight:700">'+escHTML(totalPartial)+'</span> | N/A: <span style="color:#999">'+escHTML(totalNA)+'</span></div><div style="font-size:11px;color:#666;margin-top:8px">100% coverage: AU (Audit), IR (Incident Response), RA (Risk Assessment)</div></div>'+
     '</div>'+
     '<h2 style="font-size:14px;margin:16px 0 8px;border-bottom:1px solid #ddd;padding-bottom:4px">Family Coverage</h2>'+
     '<table style="width:100%;border-collapse:collapse;font-size:11px">';
   w.innerHTML+='<tr style="background:#f0f4f8"><th style="text-align:left;padding:4px 8px">Family</th><th style="padding:4px;text-align:center">Total</th><th style="padding:4px;text-align:center">Full</th><th style="padding:4px;text-align:center">Strong</th><th style="padding:4px;text-align:center">Partial</th><th style="padding:4px;text-align:center">N/A</th></tr>';
   for(var i=0;i<FAMILIES.length;i++){
     var f=FAMILIES[i];
-    w.innerHTML+='<tr style="border-bottom:1px solid #eee"><td style="padding:4px 8px;font-weight:600">'+f.id+' — '+f.name+'</td><td style="text-align:center;padding:4px">'+f.total+'</td><td style="text-align:center;padding:4px;color:#059669;font-weight:700">'+f.full+'</td><td style="text-align:center;padding:4px;color:#0891b2">'+f.strong+'</td><td style="text-align:center;padding:4px;color:#d97706">'+f.partial+'</td><td style="text-align:center;padding:4px;color:#999">'+f.na+'</td></tr>';
+    w.innerHTML+='<tr style="border-bottom:1px solid #eee"><td style="padding:4px 8px;font-weight:600">'+escHTML(f.id)+' — '+escHTML(f.name)+'</td><td style="text-align:center;padding:4px">'+escHTML(f.total)+'</td><td style="text-align:center;padding:4px;color:#059669;font-weight:700">'+escHTML(f.full)+'</td><td style="text-align:center;padding:4px;color:#0891b2">'+escHTML(f.strong)+'</td><td style="text-align:center;padding:4px;color:#d97706">'+escHTML(f.partial)+'</td><td style="text-align:center;padding:4px;color:#999">'+escHTML(f.na)+'</td></tr>';
   }
   w.innerHTML+='</table>';
   w.innerHTML+='<h2 style="font-size:14px;margin:16px 0 8px;border-bottom:1px solid #ddd;padding-bottom:4px">POA&M Summary (7 Partial Practices)</h2>';
-  for(var j=0;j<POAM_ITEMS.length;j++){var p=POAM_ITEMS[j];w.innerHTML+='<div style="font-size:10px;margin-bottom:4px;padding:3px 0;border-bottom:1px solid #f0f0f0"><strong>'+p.id+'</strong> — '+p.title+' ('+p.progress+'% | '+p.status+')</div>'}
+  for(var j=0;j<POAM_ITEMS.length;j++){var p=POAM_ITEMS[j];w.innerHTML+='<div style="font-size:10px;margin-bottom:4px;padding:3px 0;border-bottom:1px solid #f0f0f0"><strong>'+escHTML(p.id)+'</strong> — '+escHTML(p.title)+' ('+escHTML(p.progress)+'% | '+escHTML(p.status)+')</div>'}
   w.innerHTML+='<div style="margin-top:20px;font-size:10px;color:#999;text-align:center">Deep Sigma CERPA — CMMC 2.0 Level 2 Compliance — EDGE COG Adapter v5.0.0</div>';
   var blob=new Blob([w.outerHTML],{type:"text/html"});
   var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="CMMC_Compliance_Summary_"+new Date().toISOString().slice(0,10)+".html";a.click();
