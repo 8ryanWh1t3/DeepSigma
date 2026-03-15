@@ -381,6 +381,10 @@ tr:hover td{background:rgba(0,240,255,.03)}
 .graph-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .graph-selected{stroke:var(--neon-cyan);stroke-width:2}
 .graph-highlight-edge{stroke:var(--neon-cyan)!important;stroke-width:2!important;opacity:1!important}
+.highlight-flash{animation:hlFlash 1.5s ease-out}
+@keyframes hlFlash{0%{box-shadow:0 0 20px rgba(0,240,255,.5)}100%{box-shadow:none}}
+.nav-link-btn{display:inline-block;padding:3px 10px;border-radius:4px;font-size:10px;font-weight:600;border:1px solid rgba(0,240,255,.3);background:transparent;color:var(--neon-cyan);cursor:pointer;margin:2px;transition:all .15s}
+.nav-link-btn:hover{background:rgba(0,240,255,.08);border-color:var(--neon-cyan)}
 
 /* ── PDF Export via Print CSS ─────────────── */
 @media print {
@@ -481,7 +485,11 @@ tr:hover td{background:rgba(0,240,255,.03)}
     </div>
     <div class="card">
       <h3>Import Custom Bundle</h3>
-      <p style="color:var(--muted);font-size:11px;margin-bottom:8px">Paste a COG bundle JSON to analyze it live.</p>
+      <p style="color:var(--muted);font-size:11px;margin-bottom:8px">Load a JSON bundle file or paste JSON to analyze it live.</p>
+      <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center">
+        <label class="btn-primary" style="cursor:pointer;display:inline-block"><input type="file" id="fileInput" accept=".json,application/json" style="display:none"/>Choose JSON File</label>
+        <span id="fileLabel" style="font-size:10px;color:var(--muted)">No file selected</span>
+      </div>
       <textarea class="import-ta" id="importArea" placeholder='{"manifest":{"bundleId":"..."},"artifacts":[...]}'></textarea>
       <div style="margin-top:8px;display:flex;gap:8px">
         <button class="btn-primary" id="btnImportBundle">Import &amp; Analyze</button>
@@ -571,9 +579,13 @@ tr:hover td{background:rgba(0,240,255,.03)}
     </div>
     <div style="margin-top:12px;display:flex;gap:10px">
       <button class="btn-primary" id="btnVerifyChain">Verify Chain Integrity</button>
+      <select id="tamperType" style="padding:4px 8px;border-radius:4px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:10px"><option value="hash_tamper">Hash Tamper</option><option value="coverage_flip">Coverage Flip</option><option value="chain_break">Chain Break</option><option value="replay_gap">Replay Gap</option></select>
       <button id="btnTamperChain">Simulate Tamper</button>
+      <button id="btnUndoTamper" style="display:none">Undo Tamper</button>
       <button id="btnCopyChain">Copy Chain JSON</button>
+      <button id="btnChaosMode">Chaos Mode</button>
     </div>
+    <div id="chaosLog" class="hidden" style="margin-top:10px;max-height:150px;overflow-y:auto;font-size:10px;border:1px solid var(--line);border-radius:6px;padding:8px;background:rgba(0,0,0,.2)"></div>
     <div id="retconPanel" class="hidden"></div>
   </div>
 
@@ -810,7 +822,7 @@ var COV_BADGE={Full:"badge-green",Strong:"badge-cyan",Partial:"badge-amber","N/A
 var COV_COLOR={Full:"var(--neon-green)",Strong:"var(--neon-cyan)",Partial:"var(--neon-amber)","N/A":"var(--muted)"};
 var CERPA_FAM={AC:{stage:"All",cls:"ct-claim",lbl:"C+E+R+P+A"},AT:{stage:"Apply",cls:"ct-apply",lbl:"A"},AU:{stage:"All",cls:"ct-claim",lbl:"C+E+R+P+A"},CM:{stage:"Patch+Apply",cls:"ct-patch",lbl:"P+A"},IA:{stage:"Claim",cls:"ct-claim",lbl:"C"},IR:{stage:"Review+Patch",cls:"ct-review",lbl:"R+P"},MA:{stage:"Patch",cls:"ct-patch",lbl:"P"},MP:{stage:"Apply",cls:"ct-apply",lbl:"A"},PE:{stage:"Event",cls:"ct-claim",lbl:"E"},PS:{stage:"Claim",cls:"ct-claim",lbl:"C"},RA:{stage:"Review",cls:"ct-review",lbl:"R"},CA:{stage:"Review+Apply",cls:"ct-review",lbl:"R+A"},SC:{stage:"All",cls:"ct-claim",lbl:"C+E+R+P+A"},SI:{stage:"Review+Patch",cls:"ct-review",lbl:"R+P"}};
 var KPI_FAM={AC:["SCT","AUC","ELR"],AT:["CMR"],AU:["IAB","COD","CIS"],CM:[],IA:["AUC"],IR:["DES","CRV","DEG"],MA:[],MP:["ELR"],PE:[],PS:[],RA:["CIS","DES","PDH"],CA:["CIS","CTD"],SC:[],SI:["DEG","OAR","GSNR"]};
-var AUTH_FAM={AC:["Law 1: No self-cert","Law 4: Role-bound","Law 5: No self-promote"],AU:["Law 3: No canon overwrite"],IR:["Law 2: Owner+patch+evidence"],RA:[],SI:[]};
+var AUTH_FAM={AC:["Law 1: No self-cert","Law 4: Role-bound","Law 5: No self-promote"],AU:["Law 3: No canon overwrite"],IR:["Law 2: Owner+patch+evidence"],RA:["Law 2: Owner+patch+evidence"],SI:["Law 3: No canon overwrite","Law 1: No self-cert"],CM:["Law 4: Role-bound"],IA:["Law 5: No self-promote"]};
 
 /* Practice generator per family */
 var PRACTICE_TITLES={
@@ -919,7 +931,7 @@ var explorerFilter = "all";
 
 /* ── State ─── */
 var STATE={bundle:null,bundleB:null,proofChain:[],tampered:false,lastDiff:null};
-var _tamperSnapshot=null;
+var _tamperStack=[];
 var _liveSimInterval=null;
 var _liveSimActive=false;
 var _baselineFamilies=null;
@@ -938,6 +950,8 @@ document.addEventListener("DOMContentLoaded",function(){
   $("#btnRandomize").addEventListener("click",function(){loadBundle(Math.floor(Math.random()*100000))});
   $("#btnVerifyChain").addEventListener("click",function(){verifyChain()});
   $("#btnTamperChain").addEventListener("click",function(){simulateTamperRetcon()});
+  var undoTamperBtn=$("#btnUndoTamper");if(undoTamperBtn)undoTamperBtn.addEventListener("click",undoTamper);
+  var chaosBtn=$("#btnChaosMode");if(chaosBtn)chaosBtn.addEventListener("click",function(){_chaosInterval?stopChaosMode():startChaosMode()});
   $("#btnRunDiff").addEventListener("click",function(){runDiff()});
   $("#btnRunExport").addEventListener("click",function(){runExport()});
   $("#btnExecRefresh").addEventListener("click",function(){renderExecutive()});
@@ -949,8 +963,8 @@ document.addEventListener("DOMContentLoaded",function(){
     var exportData={_families:JSON.parse(JSON.stringify(FAMILIES))};
     if(STATE.bundle)exportData._bundle={bundleId:STATE.bundle.manifest.bundleId,artifactCount:STATE.bundle.artifacts.length};
     /* Phase 1B: include tamper state if active */
-    if(STATE.tampered&&_tamperSnapshot){
-      exportData._tamperState={active:true,corruptedIndex:_tamperSnapshot.corruptedIndex||0,affectedCount:_tamperSnapshot.affectedCount||STATE.proofChain.length};
+    if(STATE.tampered&&_tamperStack.length){
+      exportData._tamperState={active:true,stackDepth:_tamperStack.length,affectedCount:STATE.proofChain.length};
     }
     copyText(JSON.stringify(exportData));
     toast("Bundle copied for dashboard import");
@@ -1221,7 +1235,7 @@ function renderExplorerTable(){
     var partialInfo=partialKey?PARTIAL_MAP[partialKey]:null;
     if(cov==="N/A"&&partialInfo){covBadge="badge-partial";cov="partial-digital"}
     var globalIdx=b.artifacts.indexOf(a);
-    aRows+="<tr class='art-row' data-rt='"+esc(a.refType)+"' data-aidx='"+globalIdx+"'>"+
+    aRows+="<tr class='art-row' data-rt='"+esc(a.refType)+"' data-aidx='"+globalIdx+"' data-ref-id='"+esc(a.refId)+"'>"+
       "<td class='mono' style='font-size:10px'>"+esc(a.refId)+(partialKey?" <span style='font-size:8px;color:#ffa500'>("+esc(partialKey)+")</span>":"")+"</td>"+
       "<td><span class='badge badge-cyan'>"+esc(a.refType)+"</span></td>"+
       "<td><span class='cerpa-tag "+cm.cls+"'>"+cm.lbl+"</span></td>"+
@@ -1257,7 +1271,7 @@ function renderPageControls(id,page,totalPages,totalItems,target){
    Proof Chain (same as COG v3)
    ══════════════════════════════════════════════════════════ */
 function buildProofChain(artifacts){var chain=[];var promises=[];for(var i=0;i<artifacts.length;i++){(function(idx){var a=artifacts[idx];var entry={index:idx,refId:a.refId,contentHash:a.contentHash,type:"cmmc_practice",chainHash:"",prevChainHash:idx===0?null:""};chain.push(entry);var forHash=JSON.parse(JSON.stringify(entry));forHash.chainHash="";var canonical=JSON.stringify(forHash,Object.keys(forHash).sort(),0);promises.push(sha256(canonical).then(function(h){chain[idx].chainHash=h;if(idx+1<chain.length)chain[idx+1].prevChainHash=h}))})(i)}var seq=Promise.resolve();for(var j=0;j<promises.length;j++){(function(p){seq=seq.then(function(){return p})})(promises[j])}seq.then(function(){for(var k=1;k<chain.length;k++)chain[k].prevChainHash=chain[k-1].chainHash;STATE.proofChain=chain;renderProofChain()})}
-function renderProofChain(){var chain=STATE.proofChain;$("#proofStats").innerHTML='<div class="stat-box"><div class="stat-val">'+chain.length+'</div><div class="stat-label">Chain Entries</div></div><div class="stat-box"><div class="stat-val" style="color:var(--neon-green)">cmmc_practice</div><div class="stat-label">Entry Type</div></div><div class="stat-box"><div class="stat-val" style="color:'+(STATE.tampered?"var(--bad)":"var(--neon-cyan)")+'">'+(STATE.tampered?"Tampered":"Intact")+'</div><div class="stat-label">Status</div></div>';var totalPages=Math.max(1,Math.ceil(chain.length/proofPageSize));if(proofPage>=totalPages)proofPage=totalPages-1;if(proofPage<0)proofPage=0;var start=proofPage*proofPageSize;var end=Math.min(start+proofPageSize,chain.length);var html="";for(var i=start;i<end;i++){var c=chain[i];var isLast=i===end-1;html+='<div class="chain-node"><div class="chain-connector"><div class="chain-dot'+(i===0?" seal":"")+'"></div>'+(isLast?"":'<div class="chain-line"></div>')+'</div><div class="chain-body"><div class="chain-label">#'+c.index+" "+esc(c.type)+(i===0?" (genesis)":"")+'</div><div style="margin-bottom:4px"><span class="badge badge-cyan">'+esc(c.refId)+'</span></div><div class="chain-hash mono">chainHash: '+esc(c.chainHash.slice(0,48))+'...</div><div class="chain-hash mono">prevChainHash: '+(c.prevChainHash===null?"<em>null (genesis)</em>":esc(c.prevChainHash.slice(0,48))+"...")+'</div></div></div>'}$("#proofChainVis").innerHTML=html;renderPageControls("proofPageControls",proofPage,totalPages,chain.length,"proof");$("#proofVerifyResult").innerHTML=""}
+function renderProofChain(){var chain=STATE.proofChain;$("#proofStats").innerHTML='<div class="stat-box"><div class="stat-val">'+chain.length+'</div><div class="stat-label">Chain Entries</div></div><div class="stat-box"><div class="stat-val" style="color:var(--neon-green)">cmmc_practice</div><div class="stat-label">Entry Type</div></div><div class="stat-box"><div class="stat-val" style="color:'+(STATE.tampered?"var(--bad)":"var(--neon-cyan)")+'">'+(STATE.tampered?"Tampered":"Intact")+'</div><div class="stat-label">Status</div></div>';var totalPages=Math.max(1,Math.ceil(chain.length/proofPageSize));if(proofPage>=totalPages)proofPage=totalPages-1;if(proofPage<0)proofPage=0;var start=proofPage*proofPageSize;var end=Math.min(start+proofPageSize,chain.length);var html="";for(var i=start;i<end;i++){var c=chain[i];var isLast=i===end-1;html+='<div class="chain-node" data-ref-id="proof-'+esc(c.refId)+'"><div class="chain-connector"><div class="chain-dot'+(i===0?" seal":"")+'"></div>'+(isLast?"":'<div class="chain-line"></div>')+'</div><div class="chain-body"><div class="chain-label">#'+c.index+" "+esc(c.type)+(i===0?" (genesis)":"")+'</div><div style="margin-bottom:4px"><span class="badge badge-cyan">'+esc(c.refId)+'</span></div><div class="chain-hash mono">chainHash: '+(_tamperStack.length>0&&_tamperStack[0].chain[i]&&_tamperStack[0].chain[i].chainHash!==c.chainHash?'<span style="text-decoration:line-through;color:var(--ok)">'+esc(_tamperStack[0].chain[i].chainHash.slice(0,48))+'</span> <span style="color:var(--bad)">'+esc(c.chainHash.slice(0,48))+'</span>':esc(c.chainHash.slice(0,48)))+'...</div><div class="chain-hash mono">prevChainHash: '+(_tamperStack.length>0&&_tamperStack[0].chain[i]&&c.prevChainHash!==_tamperStack[0].chain[i].prevChainHash?'<span style="text-decoration:line-through;color:var(--ok)">'+((_tamperStack[0].chain[i].prevChainHash===null)?"null":esc(_tamperStack[0].chain[i].prevChainHash.slice(0,48)))+'</span> <span style="color:var(--bad)">'+(c.prevChainHash===null?"null":esc(c.prevChainHash.slice(0,48)))+'</span>':c.prevChainHash===null?"<em>null (genesis)</em>":esc(c.prevChainHash.slice(0,48))+"...")+'</div></div></div>'}$("#proofChainVis").innerHTML=html;renderPageControls("proofPageControls",proofPage,totalPages,chain.length,"proof");$("#proofVerifyResult").innerHTML=""}
 function verifyChain(){var chain=STATE.proofChain;if(!chain.length){$("#proofVerifyResult").innerHTML='<span class="badge badge-fail">No chain loaded</span>';return}var issues=[];for(var i=1;i<chain.length;i++){if(chain[i].prevChainHash!==chain[i-1].chainHash)issues.push("Entry #"+i+": prevChainHash mismatch")}var html='<div style="margin-bottom:10px"><span class="badge '+(issues.length===0?"badge-pass":"badge-fail")+'">'+(issues.length===0?chain.length+" entries verified — chain intact":"Chain invalid: "+issues.length+" issue(s)")+"</span></div>";if(issues.length>0){html+='<div style="color:var(--bad);font-size:11px">';for(var n=0;n<issues.length;n++)html+="<div>"+esc(issues[n])+"</div>";html+="</div>"}$("#proofVerifyResult").innerHTML=html}
 function renderChainSvg(chain){
   var container=document.getElementById("chainSvgContainer");
@@ -1352,46 +1366,182 @@ function _renderSvgNodes(svg,entries,startIdx,padX,padY,nodeW,nodeH,gapY,typeCol
   }
 }
 function tamperChain(){if(!STATE.proofChain.length)return;var idx=Math.min(15,STATE.proofChain.length-1);STATE.proofChain[idx].chainHash="sha256:"+rngHex(64);STATE.tampered=true;renderProofChain();verifyChain()}
+/* ══════════════════════════════════════════════════════════
+   v4.4: Chaos Mode — offline drift injection simulation
+   ══════════════════════════════════════════════════════════ */
+var CHAOS_EVENTS=[
+  {type:"coverage_flip",label:"Coverage Flip"},
+  {type:"hash_tamper",label:"Hash Tamper"},
+  {type:"chain_break",label:"Chain Break"},
+  {type:"replay_gap",label:"Replay Gap"}
+];
+var _chaosInterval=null;
+var _chaosSnapshot=null;
+var _chaosLog=[];
+
+function startChaosMode(){
+  if(!STATE.bundle||!STATE.proofChain.length){toast("Load bundle first");return}
+  _chaosSnapshot={bundle:JSON.parse(JSON.stringify(STATE.bundle)),chain:JSON.parse(JSON.stringify(STATE.proofChain)),families:JSON.parse(JSON.stringify(FAMILIES))};
+  _chaosLog=[];
+  var logEl=$("#chaosLog");
+  if(logEl){logEl.classList.remove("hidden");logEl.innerHTML="<div style='color:var(--neon-amber);font-weight:700'>Chaos mode active — injecting mutations...</div>"}
+  var btn=$("#btnChaosMode");
+  if(btn){btn.textContent="Stop Chaos";btn.style.color="var(--bad)";btn.style.borderColor="rgba(255,107,107,.5)"}
+  _chaosInterval=setInterval(function(){
+    var evt=CHAOS_EVENTS[Math.floor(Math.random()*CHAOS_EVENTS.length)];
+    var detail="";
+    var b=STATE.bundle;var chain=STATE.proofChain;
+    if(evt.type==="coverage_flip"&&b.artifacts.length>0){
+      var ai=Math.floor(Math.random()*b.artifacts.length);
+      var art=b.artifacts[ai];
+      var covLevels=["Full","Strong","Partial","N/A"];
+      var oldCov=art.payload.coverage;
+      var newCov=covLevels[Math.floor(Math.random()*covLevels.length)];
+      art.payload.coverage=newCov;art.coverage=newCov;
+      art.contentHash="sha256:"+rngHex(64);
+      /* Update FAMILIES counts */
+      var fam=null;for(var fi=0;fi<FAMILIES.length;fi++){if(FAMILIES[fi].id===art.refType){fam=FAMILIES[fi];break}}
+      if(fam){
+        if(oldCov==="Full")fam.full--;else if(oldCov==="Strong")fam.strong--;else if(oldCov==="Partial")fam.partial--;else fam.na--;
+        if(newCov==="Full")fam.full++;else if(newCov==="Strong")fam.strong++;else if(newCov==="Partial")fam.partial++;else fam.na++;
+      }
+      detail=art.refId+" "+oldCov+" \u2192 "+newCov;
+    }else if(evt.type==="hash_tamper"&&chain.length>0){
+      var ci=Math.floor(Math.random()*chain.length);
+      chain[ci].chainHash="sha256:"+rngHex(64);
+      detail="entry #"+ci+" hash corrupted";
+      STATE.tampered=true;
+    }else if(evt.type==="chain_break"&&chain.length>1){
+      var bi=1+Math.floor(Math.random()*(chain.length-1));
+      chain[bi].prevChainHash=null;
+      detail="entry #"+bi+" prevChainHash nulled";
+      STATE.tampered=true;
+    }else if(evt.type==="replay_gap"&&b.replaySteps&&b.replaySteps.length>1){
+      var ri=Math.floor(Math.random()*b.replaySteps.length);
+      var removed=b.replaySteps.splice(ri,1)[0];
+      detail="step #"+removed.stepIndex+" ("+removed.action+") removed";
+    }else{detail="no-op (empty data)"}
+    var logEntry={time:new Date().toLocaleTimeString(),type:evt.label,detail:detail};
+    _chaosLog.push(logEntry);
+    if(logEl){
+      var le=document.createElement("div");
+      le.style.cssText="padding:2px 0;border-bottom:1px solid rgba(255,255,255,.05)";
+      le.innerHTML="<span style='color:var(--muted)'>"+esc(logEntry.time)+"</span> <span style='color:var(--neon-amber)'>"+esc(logEntry.type)+"</span> "+esc(logEntry.detail);
+      logEl.appendChild(le);
+      logEl.scrollTop=logEl.scrollHeight;
+    }
+    renderProofChain();
+    if(evt.type==="coverage_flip"){renderExecutive();renderTrilogy()}
+  },2500+Math.floor(Math.random()*2500));
+  toast("Chaos mode started");
+}
+
+function stopChaosMode(){
+  if(_chaosInterval){clearInterval(_chaosInterval);_chaosInterval=null}
+  if(_chaosSnapshot){
+    STATE.bundle=_chaosSnapshot.bundle;
+    STATE.proofChain=_chaosSnapshot.chain;
+    for(var ri=0;ri<FAMILIES.length;ri++){
+      FAMILIES[ri].full=_chaosSnapshot.families[ri].full;
+      FAMILIES[ri].strong=_chaosSnapshot.families[ri].strong;
+      FAMILIES[ri].partial=_chaosSnapshot.families[ri].partial;
+      FAMILIES[ri].na=_chaosSnapshot.families[ri].na;
+    }
+    STATE.tampered=false;
+    _chaosSnapshot=null;
+  }
+  var btn=$("#btnChaosMode");
+  if(btn){btn.textContent="Chaos Mode";btn.style.color="";btn.style.borderColor=""}
+  renderProofChain();renderExecutive();renderTimeline();renderTrilogy();
+  var logEl=$("#chaosLog");
+  if(logEl){
+    var summary=document.createElement("div");
+    summary.style.cssText="color:var(--ok);font-weight:700;margin-top:4px";
+    summary.textContent="Chaos stopped — "+_chaosLog.length+" events injected, state restored.";
+    logEl.appendChild(summary);
+  }
+  toast("Chaos stopped — state restored");
+}
 function simulateTamperRetcon(){
   var btn=$("#btnTamperChain");
+  var undoBtn=$("#btnUndoTamper");
   var panel=$("#retconPanel");
   if(!STATE.proofChain.length){toast("Load bundle first");return}
-  /* Toggle off — restore snapshot */
-  if(_tamperSnapshot){
-    STATE.proofChain=_tamperSnapshot;_tamperSnapshot=null;
-    STATE.tampered=false;
-    renderProofChain();verifyChain();
-    if(btn){btn.textContent="Simulate Tamper";btn.classList.remove("tamper-active")}
-    if(panel){panel.innerHTML="";panel.classList.add("hidden")}
-    toast("Tamper cleared — chain restored");
-    return;
+  var tamperType=($("#tamperType")||{}).value||"hash_tamper";
+
+  /* Push snapshot onto stack */
+  _tamperStack.push({chain:JSON.parse(JSON.stringify(STATE.proofChain)),bundle:JSON.parse(JSON.stringify(STATE.bundle)),families:JSON.parse(JSON.stringify(FAMILIES))});
+
+  var b=STATE.bundle;var chain=STATE.proofChain;
+  var detail="";
+
+  if(tamperType==="hash_tamper"){
+    var idx=Math.min(15,chain.length-1);
+    var origHash=chain[idx].chainHash;
+    chain[idx].chainHash="sha256:"+rngHex(64);
+    detail="entry #"+idx+" hash corrupted";
+  }else if(tamperType==="coverage_flip"&&b.artifacts.length>0){
+    var ai=Math.floor(Math.random()*b.artifacts.length);
+    var art=b.artifacts[ai];
+    var covLevels=["Full","Strong","Partial","N/A"];
+    var oldCov=art.payload.coverage;
+    var newCov=covLevels[Math.floor(Math.random()*covLevels.length)];
+    art.payload.coverage=newCov;art.coverage=newCov;
+    art.contentHash="sha256:"+rngHex(64);
+    var fam=null;for(var fi=0;fi<FAMILIES.length;fi++){if(FAMILIES[fi].id===art.refType){fam=FAMILIES[fi];break}}
+    if(fam){
+      if(oldCov==="Full")fam.full--;else if(oldCov==="Strong")fam.strong--;else if(oldCov==="Partial")fam.partial--;else fam.na--;
+      if(newCov==="Full")fam.full++;else if(newCov==="Strong")fam.strong++;else if(newCov==="Partial")fam.partial++;else fam.na++;
+    }
+    detail=art.refId+" "+oldCov+" \u2192 "+newCov;
+  }else if(tamperType==="chain_break"&&chain.length>1){
+    var bi=1+Math.floor(Math.random()*(chain.length-1));
+    chain[bi].prevChainHash=null;
+    detail="entry #"+bi+" prevChainHash nulled";
+  }else if(tamperType==="replay_gap"&&b.replaySteps&&b.replaySteps.length>1){
+    var ri=Math.floor(Math.random()*b.replaySteps.length);
+    var removed=b.replaySteps.splice(ri,1)[0];
+    detail="step #"+removed.stepIndex+" removed";
   }
-  /* Toggle on — snapshot + corrupt */
-  _tamperSnapshot=JSON.parse(JSON.stringify(STATE.proofChain));
-  var idx=Math.min(15,STATE.proofChain.length-1);
-  _tamperSnapshot.corruptedIndex=idx;_tamperSnapshot.affectedCount=STATE.proofChain.length-idx;
-  var origHash=STATE.proofChain[idx].chainHash;
-  var corruptHash="sha256:"+rngHex(64);
-  STATE.proofChain[idx].chainHash=corruptHash;
+
   STATE.tampered=true;
+  if(undoBtn){undoBtn.style.display="";undoBtn.textContent="Undo ("+_tamperStack.length+")"}
+  if(btn)btn.classList.add("tamper-active");
   renderProofChain();verifyChain();
-  if(btn){btn.textContent="Clear Tamper";btn.classList.add("tamper-active")}
-  /* Build RETCON Pathway panel */
-  var affected=[];
-  for(var i=idx;i<STATE.proofChain.length;i++){affected.push(STATE.proofChain[i])}
-  var rhtml='<div class="retcon-panel"><h4>RETCON Pathway — Tamper Simulation Active</h4>';
-  rhtml+='<div class="retcon-entry"><strong>Tampered Entry:</strong> #'+idx+' ('+esc(STATE.proofChain[idx].refId)+')</div>';
-  rhtml+='<div class="retcon-entry"><strong>Original Hash:</strong> <span class="mono" style="font-size:10px;color:var(--ok)">'+esc(origHash.slice(0,48))+'...</span></div>';
-  rhtml+='<div class="retcon-entry"><strong>Tampered Hash:</strong> <span class="mono" style="font-size:10px;color:var(--bad)">'+esc(corruptHash.slice(0,48))+'...</span></div>';
-  rhtml+='<div class="retcon-entry"><strong>Affected Entries:</strong> '+affected.length+' (entries #'+idx+' through #'+(STATE.proofChain.length-1)+')</div>';
-  rhtml+='<div class="retcon-entry" style="border-color:rgba(0,240,255,.2)"><strong>Patch Guidance:</strong><ul style="margin:4px 0 0 16px;font-size:10px;color:var(--muted)">';
-  rhtml+='<li>Re-compute chainHash for entry #'+idx+' from canonical JSON</li>';
-  rhtml+='<li>Cascade prevChainHash updates to all '+affected.length+' downstream entries</li>';
-  rhtml+='<li>Re-seal bundle with updated commit boundary</li>';
-  rhtml+='<li>Authority re-attestation required (Law 3: No canon overwrite)</li></ul></div>';
-  rhtml+='</div>';
-  if(panel){panel.innerHTML=rhtml;panel.classList.remove("hidden")}
-  toast("Tamper simulated — RETCON pathway shown");
+  if(tamperType==="coverage_flip"){renderExecutive();renderTrilogy()}
+  if(panel){
+    var rhtml='<div class="retcon-panel"><h4>Tamper Active \u2014 '+esc(tamperType.replace(/_/g," "))+'</h4>';
+    rhtml+='<div class="retcon-entry">'+esc(detail)+'</div>';
+    rhtml+='<div class="retcon-entry" style="color:var(--muted)">Stack depth: '+_tamperStack.length+'</div></div>';
+    panel.innerHTML=rhtml;panel.classList.remove("hidden");
+  }
+  toast("Tamper: "+detail);
+}
+
+function undoTamper(){
+  if(!_tamperStack.length)return;
+  var snapshot=_tamperStack.pop();
+  STATE.proofChain=snapshot.chain;
+  STATE.bundle=snapshot.bundle;
+  for(var ri=0;ri<FAMILIES.length;ri++){
+    FAMILIES[ri].full=snapshot.families[ri].full;
+    FAMILIES[ri].strong=snapshot.families[ri].strong;
+    FAMILIES[ri].partial=snapshot.families[ri].partial;
+    FAMILIES[ri].na=snapshot.families[ri].na;
+  }
+  STATE.tampered=_tamperStack.length>0;
+  var undoBtn=$("#btnUndoTamper");
+  var btn=$("#btnTamperChain");
+  var panel=$("#retconPanel");
+  if(_tamperStack.length===0){
+    if(undoBtn)undoBtn.style.display="none";
+    if(btn)btn.classList.remove("tamper-active");
+    if(panel){panel.innerHTML="";panel.classList.add("hidden")}
+  }else{
+    if(undoBtn)undoBtn.textContent="Undo ("+_tamperStack.length+")";
+  }
+  renderProofChain();verifyChain();renderExecutive();renderTimeline();renderTrilogy();
+  toast("Tamper undone"+(~_tamperStack.length?" \u2014 "+_tamperStack.length+" remaining":""));
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -1423,6 +1573,21 @@ function updateGauge(score){var pct=score/100,circ=314,off=circ*(1-pct*0.75);var
 function renderTimeline(){var b=STATE.bundle;if(!b)return;var tl=$("#execTimeline");if(!tl)return;var famColors={AC:"var(--neon-cyan)",AU:"var(--neon-green)",IR:"var(--neon-pink)",RA:"var(--neon-amber)",SI:"var(--neon-purple)"};var html="";for(var i=0;i<FAMILIES.length;i++){var f=FAMILIES[i];var h=Math.round((f.full/f.total)*60)+10;var c=famColors[f.id]||"var(--neon-cyan)";html+='<div class="tl-bar" style="height:'+h+'px;background:'+c+'" data-aidx="'+i+'"><span class="tl-tip">'+esc(f.id)+": "+f.full+"/"+f.total+" Full</span></div>"}tl.innerHTML=html}
 function openDrawer(idx){var b=STATE.bundle;if(!b||!b.artifacts[idx])return;var a=b.artifacts[idx];var cm=CERPA_FAM[a.refType]||{stage:"?",cls:"ct-claim",lbl:"?"};var cov=a.payload.coverage;var covColor=COV_COLOR[cov]||"var(--muted)";var partialKey=PARTIAL_LOOKUP[a.refId];var partialInfo=partialKey?PARTIAL_MAP[partialKey]:null;var covBadgeClass=COV_BADGE[cov]||"badge-warn";var covLabel=cov;if(cov==="N/A"&&partialInfo){covBadgeClass="badge-partial";covLabel="partial-digital";covColor="#ffa500"}var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">'+esc(a.refId)+(partialKey?' <span style="font-size:11px;color:#ffa500">('+esc(partialKey)+')</span>':'')+'</h3><span class="badge badge-cyan">'+esc(a.refType)+" — "+esc(a.payload.familyName)+'</span> <span class="badge '+covBadgeClass+'">'+esc(covLabel)+'</span></div>';h+='<div class="drawer-section"><h4>Practice Detail</h4>';h+='<div class="drawer-kv"><span class="dk">Title</span><span class="dv">'+esc(a.payload.title)+'</span></div>';h+='<div class="drawer-kv"><span class="dk">Family</span><span class="dv">'+esc(a.payload.family)+" — "+esc(a.payload.familyName)+'</span></div>';h+='<div class="drawer-kv"><span class="dk">Coverage</span><span class="dv" style="color:'+covColor+'">'+esc(covLabel)+'</span></div>';h+='<div class="drawer-kv"><span class="dk">CERPA Stage</span><span class="dv"><span class="cerpa-tag '+cm.cls+'">'+cm.stage+'</span></span></div>';h+='<div class="drawer-kv"><span class="dk">KPIs</span><span class="dv">'+(a.payload.kpis.length?esc(a.payload.kpis.join(", ")):"—")+'</span></div>';if(a.payload.authorityOps&&a.payload.authorityOps.length){h+='<div class="drawer-kv"><span class="dk">AuthorityOps</span><span class="dv" style="color:var(--bad)">'+esc(a.payload.authorityOps.join("; "))+'</span></div>'}if(partialInfo){h+='<div class="drawer-kv"><span class="dk">Partial note</span><span class="dv" style="color:#ffa500">'+esc(partialInfo.note)+'</span></div>';h+='<div class="drawer-kv"><span class="dk">Digital stages</span><span class="dv">';for(var di=0;di<partialInfo.digital.length;di++){var dcls=partialInfo.digital[di]==="Claim"?"ct-claim":partialInfo.digital[di]==="Event"?"ct-claim":partialInfo.digital[di]==="Review"?"ct-review":"ct-patch";h+='<span class="cerpa-tag '+dcls+'" style="margin-right:3px">'+esc(partialInfo.digital[di])+'</span>'}h+='</span></div>'}h+='</div>';h+='<div class="drawer-section"><h4>Content Hash</h4><div class="mono" style="font-size:10px;word-break:break-all;color:var(--muted);padding:8px;background:#0d1320;border-radius:6px">'+esc(a.contentHash)+'</div></div>';h+='<div class="drawer-section"><h4>CERPA Cycle Position</h4><div style="display:flex;gap:3px">';var stages=[{l:"C",n:"Claim",c:"ct-claim"},{l:"E",n:"Event",c:"ct-claim"},{l:"R",n:"Review",c:"ct-review"},{l:"P",n:"Patch",c:"ct-patch"},{l:"A",n:"Apply",c:"ct-apply"}];for(var si=0;si<stages.length;si++){var s=stages[si],isAct=cm.stage.indexOf(s.n)>=0||cm.stage==="All";h+='<div style="flex:1;text-align:center;padding:8px 4px;border-radius:6px;font-size:10px;font-weight:700;border:2px solid '+(isAct?"rgba(0,240,255,.4)":"var(--line)")+";background:"+(isAct?"rgba(0,240,255,.06)":"var(--card)")+";color:"+(isAct?"var(--neon-cyan)":"var(--muted)")+'">'+s.l+'<br/><span style="font-size:7px;font-weight:400">'+s.n+"</span></div>"}h+="</div></div>";$("#drawerContent").innerHTML=h;$("#detailDrawer").classList.add("open");$("#drawerOverlay").classList.add("open")}
 function closeDrawer(){$("#detailDrawer").classList.remove("open");$("#drawerOverlay").classList.remove("open")}
+function navigateTo(tab,filter,highlightId){
+  var btn=document.querySelector('.tab-btn[data-tab="'+tab+'"]');
+  if(btn)btn.click();
+  closeDrawer();
+  if(filter){
+    var pill=document.querySelector('.filter-pill[data-ft="'+filter+'"]');
+    if(pill)pill.click();
+  }
+  if(highlightId){
+    setTimeout(function(){
+      var el=document.getElementById(highlightId)||document.querySelector('[data-ref-id="'+highlightId+'"]');
+      if(el){el.scrollIntoView({behavior:"smooth",block:"center"});el.classList.add("highlight-flash");setTimeout(function(){el.classList.remove("highlight-flash")},2000)}
+    },250);
+  }
+}
 function openTray(html){
   $("#drawerContent").innerHTML=html;
   $("#detailDrawer").classList.add("open");
@@ -1539,6 +1704,39 @@ function renderGraph(){
     }
   }
 
+  /* v4.4: Cluster nodes when > 50 */
+  var _skipCluster=_graphState&&_graphState._expanded;
+  if(nodes.length>50&&!_skipCluster){
+    var groups={};
+    for(var gi=0;gi<nodes.length;gi++){
+      var gkey=nodes[gi].type;
+      if(!groups[gkey])groups[gkey]={members:[],type:gkey};
+      groups[gkey].members.push(gi);
+    }
+    var clusterNodes2=[];var clusterEdges=[];var clusterMap={};
+    var gkeys=Object.keys(groups);
+    for(var ck=0;ck<gkeys.length;ck++){
+      var grp=groups[gkeys[ck]];
+      var cx=0,cy=0;
+      for(var cm=0;cm<grp.members.length;cm++){cx+=nodes[grp.members[cm]].x;cy+=nodes[grp.members[cm]].y}
+      cx/=grp.members.length;cy/=grp.members.length;
+      var cnode={id:"cluster:"+grp.type,type:grp.type,x:cx,y:cy,vx:0,vy:0,label:grp.type+" ("+grp.members.length+")",idx:-1,_cluster:true,_members:grp.members,_memberCount:grp.members.length};
+      clusterMap[grp.type]=clusterNodes2.length;
+      clusterNodes2.push(cnode);
+    }
+    var cEdgeSet={};
+    for(var ce=0;ce<edges.length;ce++){
+      var sType=nodes[edges[ce].source].type;
+      var tType=nodes[edges[ce].target].type;
+      if(sType!==tType){
+        var cKey=sType+">"+tType;
+        if(!cEdgeSet[cKey]){cEdgeSet[cKey]=true;clusterEdges.push({source:clusterMap[sType],target:clusterMap[tType]})}
+      }
+    }
+    nodes=clusterNodes2;edges=clusterEdges;
+    _graphState=_graphState||{};_graphState._clusters=groups;
+  }
+
   var statsEl=document.getElementById("graphStats");
   if(statsEl){
     var edgeCount=edges.length;
@@ -1631,16 +1829,56 @@ function _renderGraphSvg(nodes,edges,W,H,typeColors,graph){
     svg.appendChild(line);
   }
 
+  /* v4.4: Cluster boundary ellipses (when showing individual nodes) */
+  if(nodes.length>14&&!nodes[0]._cluster){
+    var famGroups={};
+    for(var bg=0;bg<nodes.length;bg++){
+      if(!famGroups[nodes[bg].type])famGroups[nodes[bg].type]=[];
+      famGroups[nodes[bg].type].push(bg);
+    }
+    for(var fk in famGroups){
+      if(!famGroups.hasOwnProperty(fk))continue;
+      var members=famGroups[fk];if(members.length<2)continue;
+      var minX=9999,minY=9999,maxX=0,maxY=0;
+      for(var bm=0;bm<members.length;bm++){
+        var mn=nodes[members[bm]];
+        if(mn.x<minX)minX=mn.x;if(mn.y<minY)minY=mn.y;
+        if(mn.x>maxX)maxX=mn.x;if(mn.y>maxY)maxY=mn.y;
+      }
+      var ecx=(minX+maxX)/2,ecy=(minY+maxY)/2;
+      var erx=Math.max(30,(maxX-minX)/2+20),ery=Math.max(30,(maxY-minY)/2+20);
+      var ellipse=document.createElementNS(svgNS,"ellipse");
+      ellipse.setAttribute("cx",ecx);ellipse.setAttribute("cy",ecy);
+      ellipse.setAttribute("rx",erx);ellipse.setAttribute("ry",ery);
+      ellipse.setAttribute("fill","none");
+      ellipse.setAttribute("stroke",typeColors[fk]||"rgba(255,255,255,.1)");
+      ellipse.setAttribute("stroke-width","1");
+      ellipse.setAttribute("stroke-dasharray","4,4");
+      ellipse.setAttribute("opacity","0.3");
+      svg.appendChild(ellipse);
+      /* Family label */
+      var flabel=document.createElementNS(svgNS,"text");
+      flabel.setAttribute("x",ecx);flabel.setAttribute("y",ecy-ery-5);
+      flabel.setAttribute("text-anchor","middle");
+      flabel.setAttribute("fill",typeColors[fk]||"var(--muted)");
+      flabel.setAttribute("font-size","10");
+      flabel.setAttribute("opacity","0.5");
+      flabel.textContent=fk;
+      svg.appendChild(flabel);
+    }
+  }
+
   for(var n=0;n<nodes.length;n++){
     var g=document.createElementNS(svgNS,"g");
     g.setAttribute("data-node-idx",n);
     var circle=document.createElementNS(svgNS,"circle");
     circle.setAttribute("cx",nodes[n].x);circle.setAttribute("cy",nodes[n].y);
-    circle.setAttribute("r",6);
+    circle.setAttribute("r",nodes[n]._cluster?15:6);
     circle.setAttribute("fill",typeColors[nodes[n].type]||"#888");
     circle.setAttribute("class","graph-node");
     var title=document.createElementNS(svgNS,"title");
-    title.textContent=nodes[n].id+" ["+nodes[n].type+"]";
+    var cerpaStage=CERPA_FAM[nodes[n].type]?CERPA_FAM[nodes[n].type].stage:"?";
+    title.textContent=nodes[n].id+" ["+nodes[n].type+"] "+cerpaStage;
     circle.appendChild(title);
     g.appendChild(circle);
     var label=document.createElementNS(svgNS,"text");
@@ -1707,9 +1945,19 @@ function _renderGraphSvg(nodes,edges,W,H,typeColors,graph){
       h+='<div class="drawer-section"><h4>Content Hash</h4>';
       h+='<div class="mono" style="font-size:10px;word-break:break-all;color:var(--muted);padding:8px;background:#0d1320;border-radius:6px">'+esc(art.contentHash)+'</div></div>';
     }
+    h+='<div class="drawer-section"><h4>Cross Links</h4>';
+    h+='<button class="nav-link-btn" data-nav-tab="proof" data-nav-id="proof-'+esc(node.id)+'">Proof Chain</button> ';
+    h+='<button class="nav-link-btn" data-nav-tab="explorer" data-nav-filter="'+esc(node.type)+'">Explorer</button> ';
+    h+='<button class="nav-link-btn" data-nav-tab="trilogy">Trilogy</button>';
+    h+='</div>';
     if(art&&art.payload){
       h+='<div class="drawer-section"><h4>Payload</h4>';
       h+='<div class="schema-block mono" style="max-height:200px;overflow-y:auto;white-space:pre-wrap;font-size:10px">'+esc(JSON.stringify(art.payload,null,2))+'</div></div>';
+    }
+    if(node._cluster){
+      h+='<div class="drawer-section"><h4>Cluster Actions</h4>';
+      h+='<button class="btn-primary" style="width:100%" data-expand-cluster="'+esc(node.type)+'">Expand '+node._memberCount+' Nodes</button>';
+      h+='</div>';
     }
     openTray(h);
   });
@@ -1736,6 +1984,106 @@ function _renderGraphSvg(nodes,edges,W,H,typeColors,graph){
   });
   svg.addEventListener("mouseup",function(){dragging=false;if(wrap)wrap.classList.remove("dragging")});
   svg.addEventListener("mouseleave",function(){dragging=false;if(wrap)wrap.classList.remove("dragging")});
+}
+
+function validateBundleSchema(parsed){
+  var errors=[];
+  if(!parsed||typeof parsed!=="object")errors.push("Not a valid JSON object");
+  else{
+    if(!parsed.manifest||typeof parsed.manifest!=="object")errors.push("Missing manifest object");
+    else if(!parsed.manifest.bundleId)errors.push("Missing manifest.bundleId");
+    if(!parsed.artifacts||!Array.isArray(parsed.artifacts))errors.push("Missing artifacts array");
+    else if(parsed.artifacts.length===0)errors.push("Artifacts array is empty");
+    else{
+      for(var i=0;i<Math.min(parsed.artifacts.length,5);i++){
+        var a=parsed.artifacts[i];
+        if(!a.refId)errors.push("Artifact["+i+"] missing refId");
+        if(!a.refType)errors.push("Artifact["+i+"] missing refType");
+      }
+    }
+  }
+  return{valid:errors.length===0,errors:errors};
+}
+
+function loadFileImport(fileInput){
+  if(!fileInput.files||!fileInput.files[0])return;
+  var file=fileInput.files[0];
+  var label=$("#fileLabel");
+  if(label)label.textContent=file.name;
+  if(file.size>5242880){toast("File too large (max 5MB)");return}
+  if(!file.name.match(/\.json$/i)){toast("Please select a JSON file");return}
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var ta=$("#importArea");
+    if(ta)ta.value=e.target.result;
+    importBundle();
+  };
+  reader.onerror=function(){toast("File read error")};
+  reader.readAsText(file);
+  fileInput.value="";
+}
+
+function importBundle(){
+  var raw=($("#importArea")||{}).value;
+  if(!raw||!raw.trim()){toast("Paste a CMMC bundle JSON first");return}
+  try{
+    var parsed=JSON.parse(raw.trim());
+    var validation=validateBundleSchema(parsed);
+    if(!validation.valid){toast(validation.errors[0]);return}
+    STATE.bundle=parsed;STATE.tampered=false;
+    var b=parsed;
+    /* Re-render explorer stats */
+    $("#explorerStats").innerHTML=
+      '<div class="stat-box"><div class="stat-val" style="color:var(--neon-cyan)">'+esc(b.manifest.bundleId.slice(0,12))+'</div><div class="stat-label">Bundle ID '+copyBtn(b.manifest.bundleId)+'</div></div>'+
+      '<div class="stat-box"><div class="stat-val">'+b.artifacts.length+'</div><div class="stat-label">Practices</div></div>'+
+      '<div class="stat-box"><div class="stat-val">'+(b.manifest.familyCount||14)+'</div><div class="stat-label">Families</div></div>'+
+      '<div class="stat-box"><div class="stat-val" style="color:var(--neon-green)">'+(b.manifest.coverage||"—")+'</div><div class="stat-label">Coverage</div></div>';
+    /* Manifest table */
+    var mKeys=Object.keys(b.manifest);var mRows="";
+    for(var i=0;i<mKeys.length;i++){var val=String(b.manifest[mKeys[i]]);mRows+="<tr class='manifest-row' data-mkey='"+esc(mKeys[i])+"' style='cursor:pointer'><td class='mono' style='color:var(--neon-cyan)'>"+esc(mKeys[i])+"</td><td>"+esc(val)+"</td><td>"+copyBtn(val)+"</td></tr>"}
+    $("#manifestTable").innerHTML=mRows;
+    /* Artifact table */
+    $("#artifactCount").textContent=b.artifacts.length;
+    explorerPage=0;explorerFilter="all";
+    renderExplorerTable();
+    /* Replay steps */
+    if(b.replaySteps){
+      $("#replayCount").textContent=b.replaySteps.length;
+      var rRows="";for(var k=0;k<b.replaySteps.length;k++){var s=b.replaySteps[k];rRows+="<tr class='replay-row' data-sidx='"+k+"' style='cursor:pointer'><td>"+s.stepIndex+"</td><td><span class='badge badge-purple'>"+esc(s.action)+"</span></td><td class='mono' style='font-size:10px'>"+esc(s.inputRef||"-")+"</td><td class='mono' style='font-size:10px'>"+esc(s.outputRef||"-")+"</td></tr>"}
+      $("#replayTable").innerHTML=rRows;
+    }
+    /* Metadata */
+    if(b.rawMetadata)$("#metadataBlock").textContent=JSON.stringify(b.rawMetadata,null,2);
+    /* Proof chain + downstream renders */
+    buildProofChain(b.artifacts);
+    /* Update FAMILIES from imported artifacts if possible */
+    var famMap={};
+    for(var fi=0;fi<FAMILIES.length;fi++)famMap[FAMILIES[fi].id]={full:0,strong:0,partial:0,na:0,total:FAMILIES[fi].total,name:FAMILIES[fi].name,id:FAMILIES[fi].id};
+    for(var ai=0;ai<b.artifacts.length;ai++){
+      var art=b.artifacts[ai];
+      var cov=art.coverage||art.payload&&art.payload.coverage;
+      var fid=art.refType;
+      if(famMap[fid]){
+        if(cov==="Full")famMap[fid].full++;
+        else if(cov==="Strong")famMap[fid].strong++;
+        else if(cov==="Partial")famMap[fid].partial++;
+        else famMap[fid].na++;
+        famMap[fid].total=famMap[fid].full+famMap[fid].strong+famMap[fid].partial+famMap[fid].na;
+      }
+    }
+    for(var ui=0;ui<FAMILIES.length;ui++){
+      if(famMap[FAMILIES[ui].id]){
+        FAMILIES[ui].full=famMap[FAMILIES[ui].id].full;
+        FAMILIES[ui].strong=famMap[FAMILIES[ui].id].strong;
+        FAMILIES[ui].partial=famMap[FAMILIES[ui].id].partial;
+        FAMILIES[ui].na=famMap[FAMILIES[ui].id].na;
+        FAMILIES[ui].total=famMap[FAMILIES[ui].id].total;
+      }
+    }
+    setTimeout(function(){renderExecutive();renderTimeline();renderTrilogy();renderGraph()},150);
+    toast("Imported: "+b.artifacts.length+" practices");
+    var btn=document.querySelector('.tab-btn[data-tab="explorer"]');if(btn)btn.click();
+  }catch(e){toast("JSON error: "+e.message)}
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -1777,8 +2125,9 @@ document.addEventListener("DOMContentLoaded",function(){
   document.addEventListener("click",function(e){var btn=e.target.closest(".page-prev");if(btn){var t=btn.dataset.target;if(t==="explorer"){explorerPage--;renderExplorerTable()}else if(t==="proof"){proofPage--;renderProofChain()}return}var btn2=e.target.closest(".page-next");if(btn2){var t2=btn2.dataset.target;if(t2==="explorer"){explorerPage++;renderExplorerTable()}else if(t2==="proof"){proofPage++;renderProofChain()}}});
   /* Pagination page-size selector */
   document.addEventListener("change",function(e){var sel=e.target;if(sel.tagName!=="SELECT"||!sel.dataset.target)return;var sz=parseInt(sel.value);if(sel.dataset.target==="explorer"){explorerPageSize=sz;explorerPage=0;renderExplorerTable()}else if(sel.dataset.target==="proof"){proofPageSize=sz;proofPage=0;renderProofChain()}});
-  var impBtn=$("#btnImportBundle");if(impBtn)impBtn.addEventListener("click",function(){toast("Import available for custom CMMC bundles")});
-  var sampBtn=$("#btnPasteSample");if(sampBtn)sampBtn.addEventListener("click",function(){var s=makeSampleBundle(777);var ta=$("#importArea");if(ta)ta.value=JSON.stringify(s,null,2);toast("CMMC sample pasted")});
+  var impBtn=$("#btnImportBundle");if(impBtn)impBtn.addEventListener("click",importBundle);
+  var sampBtn=$("#btnPasteSample");if(sampBtn)sampBtn.addEventListener("click",function(){var s=makeSampleBundle(777);var ta=$("#importArea");if(ta)ta.value=JSON.stringify(s,null,2);toast("CMMC sample pasted — click Import")});
+  var fileIn=$("#fileInput");if(fileIn)fileIn.addEventListener("change",function(){loadFileImport(this)});
 
   /* Clickable executive scorecard rows — switch to explorer with family filter */
   var execPanel=$("#panel-executive");
@@ -1952,6 +2301,13 @@ document.addEventListener("DOMContentLoaded",function(){
       h+='<div class="drawer-kv"><span class="dk">Level</span><span class="dv">'+esc(reftype)+'</span></div>';
       h+='</div>';
     }
+    if(famId){
+      h+='<div class="drawer-section"><h4>Cross Links</h4>';
+      h+='<button class="nav-link-btn" data-nav-tab="explorer" data-nav-filter="'+esc(famId)+'">Explorer</button> ';
+      h+='<button class="nav-link-btn" data-nav-tab="graph">Graph</button> ';
+      h+='<button class="nav-link-btn" data-nav-tab="mapping">Mapping</button>';
+      h+='</div>';
+    }
     openTray(h);
   });
 
@@ -2048,6 +2404,10 @@ document.addEventListener("DOMContentLoaded",function(){
       for(var al=0;al<authLaws.length;al++){h+='<div class="drawer-kv"><span class="dk" style="color:var(--bad)">'+esc(authLaws[al])+'</span><span class="dv"></span></div>'}
       h+='</div>';
     }
+    h+='<div class="drawer-section"><h4>Cross Links</h4>';
+    h+='<button class="nav-link-btn" data-nav-tab="explorer" data-nav-filter="'+esc(m.after.refType)+'">Explorer</button> ';
+    h+='<button class="nav-link-btn" data-nav-tab="proof">Proof Chain</button>';
+    h+='</div>';
     openTray(h);
   });
 
@@ -2078,6 +2438,25 @@ document.addEventListener("DOMContentLoaded",function(){
   });
   var relayoutBtn=document.getElementById("btnRelayout");
   if(relayoutBtn)relayoutBtn.addEventListener("click",function(){renderGraph()});
+
+  /* v4.4: Cross-tool navigation links */
+  document.addEventListener("click",function(e){
+    var navBtn=e.target.closest(".nav-link-btn[data-nav-tab]");
+    if(!navBtn)return;
+    e.stopPropagation();
+    navigateTo(navBtn.dataset.navTab,navBtn.dataset.navFilter||null,navBtn.dataset.navId||null);
+  });
+
+  /* v4.4: Expand graph cluster */
+  document.addEventListener("click",function(e){
+    var btn=e.target.closest("[data-expand-cluster]");
+    if(!btn)return;
+    closeDrawer();
+    _graphState=_graphState||{};
+    _graphState._expanded=true;
+    renderGraph();
+    toast("Cluster expanded — showing all nodes");
+  });
 
   document.addEventListener("keydown",function(e){if(e.target.tagName==="TEXTAREA"||e.target.tagName==="INPUT")return;var tk={"1":"executive","2":"explorer","3":"proof","4":"export","5":"diff","6":"mapping","7":"schema","8":"trilogy","9":"graph","g":"graph","G":"graph"};if(tk[e.key]){e.preventDefault();var b=document.querySelector('.tab-btn[data-tab="'+tk[e.key]+'"]');if(b)b.click()}if(e.key==="Escape")closeDrawer();if(e.key==="?")$("#shortcutBar").classList.toggle("vis");if(e.key==="r"||e.key==="R"){e.preventDefault();loadBundle(Math.floor(Math.random()*100000))}});
 });
