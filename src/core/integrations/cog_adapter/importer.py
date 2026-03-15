@@ -13,6 +13,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Tuple
 
+from .heuristics import suggest_cerpa_stage
 from .models import (
     CogArtifactRef,
     CogBundle,
@@ -68,7 +69,9 @@ def cog_to_deepsigma(bundle: CogBundle) -> DeepSigmaDecisionArtifact:
         elif rt == "patch":
             patch_refs.append(ref_dict)
         else:
-            # Unknown ref_type — preserve in metadata
+            # Unknown ref_type — suggest CERPA stage via heuristics
+            suggestion = suggest_cerpa_stage(artifact.payload, rt)
+            ref_dict["_suggestion"] = suggestion.to_dict()
             truth_claims.append(ref_dict)
 
     # Build receipt from proof metadata

@@ -601,3 +601,152 @@ class TestStreaming:
         manifest, proof = load_cog_bundle_metadata(str(SAMPLE_BUNDLE_PATH))
         assert manifest.bundle_id == "cog-bundle-demo-001"
         assert proof is not None
+
+
+# ── Heuristic suggestion tests ───────────────────────────────────
+
+
+class TestHeuristics:
+    """Test CERPA stage heuristic suggestions for unmapped refTypes."""
+
+    def test_suggest_patch_like(self):
+        """Payload with patch signals should suggest Apply stage."""
+        from core.integrations.cog_adapter.heuristics import suggest_cerpa_stage
+
+        payload = {"patchId": "p-1", "action": "adjust", "target": "policy-7"}
+        result = suggest_cerpa_stage(payload, "custom_fix")
+        assert result.suggested_ref_type == "patch"
+        assert result.suggested_cerpa_stage == "Apply"
+        assert result.confidence > 0.0
+        assert "action" in result.signals
+
+    def test_suggest_drift_like(self):
+        """Payload with drift signals should suggest Review stage."""
+        from core.integrations.cog_adapter.heuristics import suggest_cerpa_stage
+
+        payload = {"severity": "high", "observed_state": "degraded", "trigger": "alert"}
+        result = suggest_cerpa_stage(payload, "anomaly_report")
+        assert result.suggested_ref_type == "drift"
+        assert result.suggested_cerpa_stage == "Review"
+        assert result.confidence > 0.0
+
+    def test_suggest_memory_like(self):
+        """Payload with memory signals should suggest Apply stage."""
+        from core.integrations.cog_adapter.heuristics import suggest_cerpa_stage
+
+        payload = {"precedentId": "prec-42", "recall": "last quarter", "takeaway": "ok"}
+        result = suggest_cerpa_stage(payload, "historical_ref")
+        assert result.suggested_ref_type == "memory"
+        assert result.suggested_cerpa_stage == "Apply"
+        assert result.confidence > 0.0
+
+    def test_suggest_unknown_default(self):
+        """Payload with no matching signals defaults to evidence/Claim."""
+        from core.integrations.cog_adapter.heuristics import suggest_cerpa_stage
+
+        payload = {"foo": "bar", "baz": 42}
+        result = suggest_cerpa_stage(payload, "totally_unknown")
+        assert result.suggested_ref_type == "evidence"
+        assert result.suggested_cerpa_stage == "Claim"
+        assert result.confidence == 0.0
+        assert result.signals == []
+
+    def test_importer_attaches_suggestion(self):
+        """Unknown refType in import should have _suggestion metadata."""
+        from core.integrations.cog_adapter.importer import cog_to_deepsigma
+        from core.integrations.cog_adapter.models import (
+            CogArtifactRef, CogBundle, CogManifest,
+        )
+
+        bundle = CogBundle(
+            manifest=CogManifest(bundle_id="test-heur-001"),
+            artifacts=[
+                CogArtifactRef(
+                    ref_id="unk-001",
+                    ref_type="custom_audit",
+                    payload={"severity": "low", "trigger": "scan"},
+                ),
+            ],
+        )
+        ds = cog_to_deepsigma(bundle)
+        assert len(ds.truth_claims) == 1
+        suggestion = ds.truth_claims[0].get("_suggestion")
+        assert suggestion is not None
+        assert suggestion["suggestedRefType"] == "drift"
+
+
+# ── SBOM tests ───────────────────────────────────────────────────
+
+
+class TestSBOM:
+    """Test CycloneDX 1.5 and SPDX 2.3 SBOM generation from COG bundles."""
+
+    def test_sbom_cyclonedx_structure(self, minimal_ds_artifact):
+        """CycloneDX SBOM has correct format, version, and component count."""
+        from core.integrations.cog_adapter import deepsigma_to_cog
+        from core.integrations.cog_adapter.sbom import generate_cyclonedx_sbom
+
+        bundle = deepsigma_to_cog(minimal_ds_artifact)
+        sbom = generate_cyclonedx_sbom(bundle)
+
+        assert sbom["bomFormat"] == "CycloneDX"
+        assert sbom["specVersion"] == "1.5"
+        assert sbom["serialNumber"].startswith("urn:uuid:")
+        assert len(sbom["components"]) == len(bundle.artifacts)
+
+    def test_sbom_spdx_structure(self, minimal_ds_artifact):
+        """SPDX SBOM has correct version, license, and package count."""
+        from core.integrations.cog_adapter import deepsigma_to_cog
+        from core.integrations.cog_adapter.sbom import generate_spdx_sbom
+
+        bundle = deepsigma_to_cog(minimal_ds_artifact)
+        sbom = generate_spdx_sbom(bundle)
+
+        assert sbom["spdxVersion"] == "SPDX-2.3"
+        assert sbom["dataLicense"] == "CC0-1.0"
+        assert len(sbom["packages"]) == len(bundle.artifacts)
+        assert len(sbom["relationships"]) == len(bundle.artifacts)
+
+    def test_sbom_artifact_mapping(self, minimal_ds_artifact):
+        """Each artifact refType appears in CycloneDX properties and SPDX description."""
+        from core.integrations.cog_adapter import deepsigma_to_cog
+        from core.integrations.cog_adapter.sbom import (
+            generate_cyclonedx_sbom,
+            generate_spdx_sbom,
+        )
+
+        bundle = deepsigma_to_cog(minimal_ds_artifact)
+        cdx = generate_cyclonedx_sbom(bundle)
+        spdx = generate_spdx_sbom(bundle)
+
+        for i, artifact in enumerate(bundle.artifacts):
+            # CycloneDX: refType in properties
+            props = cdx["components"][i]["properties"]
+            ref_type_values = [p["value"] for p in props if p["name"] == "cog:refType"]
+            assert artifact.ref_type in ref_type_values
+
+            # SPDX: refType in description
+            assert artifact.ref_type in spdx["packages"][i]["description"]
+
+    def test_sbom_hash_integrity(self, minimal_ds_artifact):
+        """Content hashes in SBOMs match the original artifact hashes."""
+        from core.integrations.cog_adapter import deepsigma_to_cog
+        from core.integrations.cog_adapter.sbom import (
+            generate_cyclonedx_sbom,
+            generate_spdx_sbom,
+        )
+
+        bundle = deepsigma_to_cog(minimal_ds_artifact)
+        cdx = generate_cyclonedx_sbom(bundle)
+        spdx = generate_spdx_sbom(bundle)
+
+        for i, artifact in enumerate(bundle.artifacts):
+            expected = artifact.content_hash.replace("sha256:", "")
+
+            # CycloneDX hash
+            cdx_hash = cdx["components"][i]["hashes"][0]["content"]
+            assert cdx_hash == expected
+
+            # SPDX hash
+            spdx_hash = spdx["packages"][i]["checksums"][0]["checksumValue"]
+            assert spdx_hash == expected

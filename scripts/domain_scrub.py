@@ -97,7 +97,7 @@ ALLOWED_ACRONYMS = {
     "SUPERSEDE", "STEP", "GUARD", "RECORD", "RECORDS",
     "CMT", "CHK", "DLV",  # ActionOps ID prefixes
     # Standards / formats / compliance
-    "SHACL", "SPARQL", "SPDX", "SBOM", "RDF", "OWL",
+    "SHACL", "SPARQL", "SPDX", "SPDXID", "SBOM", "RDF", "OWL",
     "OTEL", "MCP", "NDJSON", "JSONL", "JSONB", "SVG",
     "MIT", "GDPR", "HIPAA", "NPPA", "PIPL", "ISO", "UTC",
     # Technical / CI terms

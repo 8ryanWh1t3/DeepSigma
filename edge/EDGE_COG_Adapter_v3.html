@@ -237,6 +237,8 @@ tr:hover td{background:rgba(0,240,255,.03)}
 .score-ring.fail{border:3px solid var(--bad);color:var(--bad);box-shadow:0 0 16px rgba(255,107,107,.2)}
 .exec-row{display:flex;align-items:center;gap:16px;padding:14px;border-bottom:1px solid var(--line)}
 .exec-row:last-child{border-bottom:none}
+.exec-row[data-filter-type]{cursor:pointer;transition:background .15s}
+.exec-row[data-filter-type]:hover{background:rgba(0,240,255,.04)}
 .exec-detail{flex:1}
 .exec-detail h4{font-size:13px;font-weight:700;margin-bottom:3px}
 .exec-detail p{font-size:11px;color:var(--muted);line-height:1.4}
@@ -318,9 +320,33 @@ tr:hover td{background:rgba(0,240,255,.03)}
 /* ── v3: Art row clickable ──────────────────── */
 .art-row{cursor:pointer;transition:background .15s}
 .art-row:hover td{background:rgba(0,240,255,.06)!important}
+
+/* ── v3.1: Proof chain pagination ─────────── */
+.proof-pager{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:12px}
+.proof-pager button{background:rgba(0,240,255,.08);border:1px solid rgba(0,240,255,.25);color:var(--neon-cyan);border-radius:6px;padding:5px 14px;font-size:11px;cursor:pointer;transition:all .15s}
+.proof-pager button:hover{background:rgba(0,240,255,.16);border-color:rgba(0,240,255,.4)}
+.proof-pager select{background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer}
+
+/* ── v3.1: Suggestion confidence colors ───── */
+.suggest-conf-high{color:var(--ok)}
+.suggest-conf-mid{color:var(--warn)}
+.suggest-conf-low{color:var(--bad)}
+
+@media print {
+  body { background: #fff !important; color: #000 !important; }
+  .tab-bar, .sidebar, .kbd-help, .toast, .drawer-overlay, .drawer-panel, .tabs, .shortcut-bar, #edgeActionContract { display: none !important; }
+  .tab-panel { display: block !important; page-break-inside: avoid; margin-bottom: 24px; border: 1px solid #ccc; padding: 16px; }
+  .tab-panel::before { content: attr(data-tab-title); display: block; font-size: 16px; font-weight: 700; margin-bottom: 12px; border-bottom: 2px solid #000; padding-bottom: 4px; }
+  .badge, .chain-dot, .pipe-step { border: 1px solid #666 !important; }
+  .card, .wire { border: 1px solid #ccc !important; background: #fff !important; }
+  @page { margin: 20mm; }
+  .print-header { display: block !important; text-align: center; font-size: 14px; font-weight: 700; margin-bottom: 16px; }
+  .print-footer { display: block !important; text-align: center; font-size: 10px; color: #666; margin-top: 16px; border-top: 1px solid #ccc; padding-top: 8px; }
+}
 </style>
 </head>
 <body>
+<div class="print-header" style="display:none">DeepSigma COG Adapter — Bundle Report</div>
 <!-- EDGE_ACTION_CONTRACT_V1 -->
 <div id="edgeActionContract" style="
   margin:8px auto;max-width:1400px;width:96%;padding:6px 14px;
@@ -368,7 +394,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
 <div class="content" id="content">
 
   <!-- ═══════════════ TAB 0: Executive Summary ═══════════════ -->
-  <div class="tab-panel active" id="panel-executive">
+  <div class="tab-panel active" id="panel-executive" data-tab-title="Executive Summary">
     <div class="card-grid">
       <div class="card" style="text-align:center">
         <h3>Bundle Integrity</h3>
@@ -410,11 +436,12 @@ tr:hover td{background:rgba(0,240,255,.03)}
     </div>
     <div style="margin-top:12px;display:flex;gap:10px">
       <button class="btn-primary" id="btnExecRefresh">Refresh Scorecard</button>
+      <button class="btn-primary" id="btnExportPdf">Export as printable page</button>
     </div>
   </div>
 
   <!-- ═══════════════ TAB 1: Bundle Explorer ═══════════════ -->
-  <div class="tab-panel" id="panel-explorer">
+  <div class="tab-panel" id="panel-explorer" data-tab-title="Bundle Explorer">
     <div class="stats-bar" id="explorerStats"></div>
 
     <div class="card">
@@ -463,7 +490,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
   </div>
 
   <!-- ═══════════════ TAB 2: Proof Chain ═══════════════ -->
-  <div class="tab-panel" id="panel-proof">
+  <div class="tab-panel" id="panel-proof" data-tab-title="Proof Chain">
     <div class="stats-bar" id="proofStats"></div>
     <div class="card">
       <h3>Per-Artifact Proof Chain</h3>
@@ -471,7 +498,22 @@ tr:hover td{background:rgba(0,240,255,.03)}
         Each artifact gets a chain entry with <code class="mono" style="color:var(--neon-cyan)">chainHash</code> computed via SHA-256 over
         the entry with the field zeroed, linked by <code class="mono" style="color:var(--neon-cyan)">prevChainHash</code>.
       </p>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <button id="chainListBtn" class="tab-btn active" style="font-size:10px;padding:4px 10px">List View</button>
+        <button id="chainSvgBtn" class="tab-btn" style="font-size:10px;padding:4px 10px">Chain View</button>
+      </div>
       <div id="proofChainVis"></div>
+      <div id="chainSvgContainer" style="display:none;overflow:auto;max-height:400px;border:1px solid var(--line);border-radius:8px;padding:8px"></div>
+      <div class="proof-pager" id="proofPager" style="display:none">
+        <button id="proofPrev">&#9664; Prev</button>
+        <span id="proofPageInfo" style="font-size:11px;color:var(--muted)">Page 1 of 1</span>
+        <select id="proofPageSizeSelect">
+          <option value="10">10</option>
+          <option value="25" selected>25</option>
+          <option value="50">50</option>
+        </select>
+        <button id="proofNext">Next &#9654;</button>
+      </div>
     </div>
     <div class="card">
       <h3>Chain Verification</h3>
@@ -485,7 +527,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
   </div>
 
   <!-- ═══════════════ TAB 3: Export ═══════════════ -->
-  <div class="tab-panel" id="panel-export">
+  <div class="tab-panel" id="panel-export" data-tab-title="Export">
     <div class="card">
       <h3>Export Pipeline: DeepSigma Artifact &rarr; COG Bundle</h3>
       <p style="color:var(--muted);font-size:11px;margin-bottom:14px">
@@ -508,10 +550,24 @@ tr:hover td{background:rgba(0,240,255,.03)}
     <div style="margin-top:12px">
       <button class="btn-primary" id="btnRunExport">Run Export Conversion</button>
     </div>
+    <div class="card" style="margin-top:16px">
+      <h3 style="margin:0 0 8px">Drift Score Simulation</h3>
+      <p style="font-size:10px;color:var(--muted);margin:0 0 12px">Slide to simulate drift severity and see how it affects the exported artifact.</p>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:10px;color:var(--ok)">Aligned</span>
+        <input type="range" id="driftSlider" min="0" max="100" value="20" style="flex:1;accent-color:var(--accent)">
+        <span style="font-size:10px;color:var(--bad)">Critical</span>
+      </div>
+      <div id="driftSimResult" style="margin-top:12px;padding:10px;border-radius:6px;font-size:11px;border:1px solid var(--line)">
+        <span id="driftSimScore" style="font-weight:700">20</span>/100 —
+        <span id="driftSimSeverity" style="color:var(--ok)">green</span> —
+        <span id="driftSimAction">No action required</span>
+      </div>
+    </div>
   </div>
 
   <!-- ═══════════════ TAB 4: Diff ═══════════════ -->
-  <div class="tab-panel" id="panel-diff">
+  <div class="tab-panel" id="panel-diff" data-tab-title="Diff">
     <div class="stats-bar" id="diffStats"></div>
     <div class="card">
       <h3>Bundle Comparison</h3>
@@ -528,7 +584,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
   </div>
 
   <!-- ═══════════════ TAB 5: Mapping ═══════════════ -->
-  <div class="tab-panel" id="panel-mapping">
+  <div class="tab-panel" id="panel-mapping" data-tab-title="Mapping">
     <div class="card">
       <h3>COG Artifact Types &rarr; DeepSigma Primitives</h3>
       <p style="color:var(--muted);font-size:11px;margin-bottom:14px">
@@ -577,7 +633,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
   </div>
 
   <!-- ═══════════════ TAB 6: Schema ═══════════════ -->
-  <div class="tab-panel" id="panel-schema">
+  <div class="tab-panel" id="panel-schema" data-tab-title="Schema">
     <div class="card">
       <h3>Schema Selector</h3>
       <div style="display:flex;gap:8px;margin-bottom:14px" id="schemaSelector">
@@ -797,6 +853,42 @@ function deepsigmaToBundle(artifact){
 
 /* ── State ─── */
 var STATE={bundle:null,bundleB:null,proofChain:[],tampered:false,lastDiff:null};
+var proofPage=0, proofPageSize=25;
+
+/* ══════════════════════════════════════════════════════════
+   v3.1: Auto-Suggest CERPA stage for unmapped refTypes
+   ══════════════════════════════════════════════════════════ */
+function suggestCerpaStage(payload, refType) {
+  var keys = payload ? Object.keys(payload) : [];
+  var signals = [
+    {keys: ["patchId","action","supersedes","target","correction"], type:"patch", stage:"Apply", weight:0.25},
+    {keys: ["severity","trigger","observed_state","expected_state","drift"], type:"drift", stage:"Review", weight:0.25},
+    {keys: ["precedentId","recall","takeaway","retention","context_snapshot"], type:"memory", stage:"Apply", weight:0.25},
+    {keys: ["decisionId","rationale","selectedOption","alternatives","justification"], type:"rationale", stage:"Review", weight:0.25}
+  ];
+  var best = {type:"evidence", stage:"Claim", confidence:0, matched:[]};
+  signals.forEach(function(s) {
+    var matched = keys.filter(function(k){return s.keys.indexOf(k)>=0});
+    var score = matched.length * s.weight;
+    if (score > best.confidence) {
+      best = {type:s.type, stage:s.stage, confidence:Math.min(score,1), matched:matched};
+    }
+  });
+  return best;
+}
+
+function suggestConfClass(confidence){
+  if(confidence>0.7)return "suggest-conf-high";
+  if(confidence>=0.4)return "suggest-conf-mid";
+  return "suggest-conf-low";
+}
+
+/* v3.1: Export as printable page */
+function exportPdf(){
+  var ts=document.getElementById("printTimestamp");
+  if(ts)ts.textContent=new Date().toISOString();
+  window.print();
+}
 
 /* ══════════════════════════════════════════════════════════
    Event Delegation — copy buttons
@@ -898,16 +990,16 @@ function renderExecutive(){
   /* Scorecard rows */
   var rows=[
     {label:"Bundle Integrity",desc:"Proof chain present with per-artifact hash entries and genesis seal.",
-     pass:hasProof,val:hasProof?"Chain intact ("+STATE.proofChain.length+" entries)":"No proof chain — bundle is unsigned"},
+     pass:hasProof,val:hasProof?"Chain intact ("+STATE.proofChain.length+" entries)":"No proof chain — bundle is unsigned",filterType:"evidence"},
     {label:"Replay Readiness",desc:"Replay steps are sequenced, indexed, and reference valid artifact refs.",
-     pass:hasReplay,val:hasReplay?b.replaySteps.length+" steps sequenced":"No replay steps — bundle cannot be replayed"},
+     pass:hasReplay,val:hasReplay?b.replaySteps.length+" steps sequenced":"No replay steps — bundle cannot be replayed",filterType:"rationale"},
     {label:"Mapping Coverage",desc:"All artifact refTypes map to known DeepSigma primitives without fallthrough.",
-     pass:allMapped,warn:!allMapped,val:allMapped?"All "+b.artifacts.length+" artifacts map to known primitives":"Some artifacts have unrecognized refTypes — review required"},
+     pass:allMapped,warn:!allMapped,val:allMapped?"All "+b.artifacts.length+" artifacts map to known primitives":"Some artifacts have unrecognized refTypes — review required",filterType:"memory"},
     {label:"Drift / Patch Presence",desc:"Evolution plane coverage: drift signals detected and patch corrections available.",
      pass:hasDrift&&hasPatch,warn:!(hasDrift&&hasPatch),
-     val:(hasDrift?"Drift: present":"Drift: absent")+" | "+(hasPatch?"Patch: present":"Patch: absent")},
+     val:(hasDrift?"Drift: present":"Drift: absent")+" | "+(hasPatch?"Patch: present":"Patch: absent"),filterType:"drift"},
     {label:"Commit Boundary",desc:"Authority, admissibility, and constraint metadata sealed at bundle creation.",
-     pass:!!b.commitBoundary,val:b.commitBoundary?"Authority chain depth: "+b.commitBoundary.authority.authorityChainDepth+", policy: "+b.commitBoundary.authority.policyVersion:"No commit boundary metadata"}
+     pass:!!b.commitBoundary,val:b.commitBoundary?"Authority chain depth: "+b.commitBoundary.authority.authorityChainDepth+", policy: "+b.commitBoundary.authority.policyVersion:"No commit boundary metadata",filterType:"patch"}
   ];
 
   var html="";
@@ -915,7 +1007,7 @@ function renderExecutive(){
     var row=rows[r];
     var cls=row.pass?"pass":(row.warn?"warn":"fail");
     var icon=row.pass?"&#10003;":(row.warn?"&#33;":"&#10007;");
-    html+='<div class="exec-row">'+
+    html+='<div class="exec-row" data-filter-type="'+esc(row.filterType)+'">'+
       '<div class="score-ring '+cls+'">'+icon+'</div>'+
       '<div class="exec-detail">'+
         '<h4>'+esc(row.label)+'</h4>'+
@@ -1004,9 +1096,15 @@ function loadBundle(seed){
     var planeClass={memory:"cyan",behavior:"pink",evolution:"amber"}[plane]||"cyan";
     var isUnmapped=REF_TYPES.indexOf(a.refType)<0;
     var cm=CERPA_MAP[a.refType]||{stage:"?",cls:"ct-claim",lbl:"?"};
+    var unmappedBadge="";
+    if(isUnmapped){
+      var sug=suggestCerpaStage(a.payload,a.refType);
+      var confCls=suggestConfClass(sug.confidence);
+      unmappedBadge=" <span class='badge badge-warn'>unmapped &rarr; "+esc(sug.stage)+"</span> <span class='"+confCls+"' style='font-size:9px' title='confidence: "+Math.round(sug.confidence*100)+"%'>("+Math.round(sug.confidence*100)+"%)</span>";
+    }
     aRows+="<tr class='art-row' data-rt='"+esc(a.refType)+"' data-aidx='"+j+"'>"+
       "<td class='mono'>"+esc(a.refId)+copyBtn(a.refId)+"</td>"+
-      "<td><span class='badge badge-"+planeClass+"'>"+esc(a.refType)+"</span>"+(isUnmapped?" <span class='badge badge-warn'>unmapped</span>":"")+"</td>"+
+      "<td><span class='badge badge-"+planeClass+"'>"+esc(a.refType)+"</span>"+unmappedBadge+"</td>"+
       "<td><span class='cerpa-tag "+cm.cls+"'>"+cm.lbl+" "+cm.stage+"</span></td>"+
       "<td class='mono' style='font-size:10px;color:var(--muted)'>"+esc(a.contentHash.slice(0,28))+"..."+copyBtn(a.contentHash)+"</td>"+
       "<td><span class='badge badge-"+planeClass+"'>"+esc(plane)+"</span></td>"+
@@ -1092,17 +1190,24 @@ function renderProofChain(){
     '<div class="stat-box"><div class="stat-val" style="color:'+(STATE.tampered?"var(--bad)":"var(--neon-cyan)")+'">'+
       (STATE.tampered?"Tampered":"Intact")+'</div><div class="stat-label">Status</div></div>';
 
+  /* Pagination */
+  var totalPages=Math.max(1,Math.ceil(chain.length/proofPageSize));
+  if(proofPage>=totalPages)proofPage=totalPages-1;
+  var startIdx=proofPage*proofPageSize;
+  var endIdx=Math.min(startIdx+proofPageSize,chain.length);
+  var pageSlice=chain.slice(startIdx,endIdx);
+
   var html="";
-  for(var i=0;i<chain.length;i++){
-    var c=chain[i];
-    var isLast=i===chain.length-1;
+  for(var i=0;i<pageSlice.length;i++){
+    var c=pageSlice[i];
+    var isLast=i===pageSlice.length-1&&endIdx===chain.length;
     html+='<div class="chain-node">'+
       '<div class="chain-connector">'+
-        '<div class="chain-dot'+(i===0?" seal":"")+'"></div>'+
+        '<div class="chain-dot'+(c.index===0?" seal":"")+'"></div>'+
         (isLast?"":'<div class="chain-line"></div>')+
       '</div>'+
       '<div class="chain-body">'+
-        '<div class="chain-label">#'+c.index+" "+esc(c.type)+(i===0?" (genesis)":"")+'</div>'+
+        '<div class="chain-label">#'+c.index+" "+esc(c.type)+(c.index===0?" (genesis)":"")+'</div>'+
         '<div style="margin-bottom:4px"><span class="badge badge-cyan">'+esc(c.refId)+'</span>'+copyBtn(c.refId)+'</div>'+
         '<div class="chain-hash mono">chainHash: '+esc(c.chainHash)+copyBtn(c.chainHash)+'</div>'+
         '<div class="chain-hash mono">prevChainHash: '+(c.prevChainHash===null?"<em>null (genesis)</em>":esc(c.prevChainHash)+copyBtn(c.prevChainHash))+'</div>'+
@@ -1111,7 +1216,91 @@ function renderProofChain(){
     '</div>';
   }
   $("#proofChainVis").innerHTML=html;
+
+  /* Update pager */
+  var pager=$("#proofPager");
+  if(pager)pager.style.display=chain.length>0?"flex":"none";
+  var info=$("#proofPageInfo");
+  if(info)info.textContent="Page "+(proofPage+1)+" of "+totalPages+" ("+chain.length+" entries)";
+
   $("#proofVerifyResult").innerHTML="";
+}
+
+function renderChainSvg(chain){
+  var container=document.getElementById("chainSvgContainer");
+  if(!container)return;
+  container.textContent="";
+  if(!chain||!chain.length){container.innerHTML='<span class="badge badge-fail">No chain loaded</span>';return}
+
+  var nodeW=160,nodeH=50,gapY=20,padX=20,padY=20;
+  var displayChain=chain.length>50?chain.slice(0,50):chain;
+  var totalH=padY*2+displayChain.length*(nodeH+gapY)-gapY;
+  var totalW=nodeW+padX*2;
+
+  var svgNS="http://www.w3.org/2000/svg";
+  var svg=document.createElementNS(svgNS,"svg");
+  svg.setAttribute("viewBox","0 0 "+totalW+" "+totalH);
+  svg.setAttribute("width","100%");
+  svg.style.maxWidth=totalW+"px";
+
+  var typeColors={evidence:"#00e5ff",rationale:"#ab47bc",memory:"#66bb6a",drift:"#ff7043",patch:"#fdd835"};
+
+  displayChain.forEach(function(entry,i){
+    var y=padY+i*(nodeH+gapY);
+    var color=typeColors[entry.type]||"var(--accent,#00e5ff)";
+
+    if(i>0){
+      var line=document.createElementNS(svgNS,"line");
+      line.setAttribute("x1",padX+nodeW/2);
+      line.setAttribute("y1",y-gapY);
+      line.setAttribute("x2",padX+nodeW/2);
+      line.setAttribute("y2",y);
+      line.setAttribute("stroke","var(--muted,#555)");
+      line.setAttribute("stroke-width","2");
+      svg.appendChild(line);
+    }
+
+    var rect=document.createElementNS(svgNS,"rect");
+    rect.setAttribute("x",padX);
+    rect.setAttribute("y",y);
+    rect.setAttribute("width",nodeW);
+    rect.setAttribute("height",nodeH);
+    rect.setAttribute("rx","6");
+    rect.setAttribute("fill","var(--card-bg,#0d1320)");
+    rect.setAttribute("stroke",color);
+    rect.setAttribute("stroke-width","2");
+    svg.appendChild(rect);
+
+    var text=document.createElementNS(svgNS,"text");
+    text.setAttribute("x",padX+8);
+    text.setAttribute("y",y+18);
+    text.setAttribute("fill",color);
+    text.setAttribute("font-size","10");
+    text.setAttribute("font-family","monospace");
+    text.textContent="#"+entry.index+" "+(entry.refId||"").substring(0,18);
+    svg.appendChild(text);
+
+    var hash=document.createElementNS(svgNS,"text");
+    hash.setAttribute("x",padX+8);
+    hash.setAttribute("y",y+34);
+    hash.setAttribute("fill","var(--muted,#555)");
+    hash.setAttribute("font-size","8");
+    hash.setAttribute("font-family","monospace");
+    hash.textContent=(entry.chainHash||"").substring(0,30)+"...";
+    svg.appendChild(hash);
+  });
+
+  if(chain.length>50){
+    var summaryText=document.createElementNS(svgNS,"text");
+    summaryText.setAttribute("x",padX);
+    summaryText.setAttribute("y",totalH-10);
+    summaryText.setAttribute("fill","var(--warn,#ffcc66)");
+    summaryText.setAttribute("font-size","11");
+    summaryText.textContent="... and "+(chain.length-50)+" more entries (showing first 50)";
+    svg.appendChild(summaryText);
+  }
+
+  container.appendChild(svg);
 }
 
 function verifyChain(){
@@ -1457,7 +1646,7 @@ function renderTimeline(){
   for(var i=0;i<b.artifacts.length;i++){
     var a=b.artifacts[i],h=25+Math.round((a.payload&&a.payload.score||0.5)*40);
     var c=colors[a.refType]||"var(--neon-cyan)";
-    html+='<div class="tl-bar" style="height:'+h+'px;background:'+c+'" data-aidx="'+i+'"><span class="tl-tip">'+esc(a.refType)+": "+esc(a.refId.slice(0,10))+"</span></div>";
+    html+='<div class="tl-bar" style="height:'+h+'px;background:'+c+'" data-aidx="'+i+'" data-filter-type="'+esc(a.refType)+'"><span class="tl-tip">'+esc(a.refType)+": "+esc(a.refId.slice(0,10))+"</span></div>";
   }
   tl.innerHTML=html;
 }
@@ -1482,6 +1671,17 @@ function openDrawer(idx){
   h+='<div class="drawer-kv"><span class="dk">COG Plane</span><span class="dv">'+esc(plane)+'</span></div>';
   h+='<div class="drawer-kv"><span class="dk">DS Primitive</span><span class="dv">'+esc(dsType)+'</span></div>';
   h+='<div class="drawer-kv"><span class="dk">CERPA Stage</span><span class="dv"><span class="cerpa-tag '+cm.cls+'">'+cm.stage+'</span></span></div>';
+  var isArtUnmapped=REF_TYPES.indexOf(a.refType)<0;
+  if(isArtUnmapped){
+    var drawerSug=suggestCerpaStage(a.payload,a.refType);
+    var drawerConfCls=suggestConfClass(drawerSug.confidence);
+    h+='<div class="drawer-kv"><span class="dk">Suggested Type</span><span class="dv '+drawerConfCls+'">'+esc(drawerSug.type)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Suggested Stage</span><span class="dv '+drawerConfCls+'">'+esc(drawerSug.stage)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Confidence</span><span class="dv '+drawerConfCls+'">'+Math.round(drawerSug.confidence*100)+'%</span></div>';
+    if(drawerSug.matched.length>0){
+      h+='<div class="drawer-kv"><span class="dk">Matched Keys</span><span class="dv" style="font-size:10px">'+esc(drawerSug.matched.join(", "))+'</span></div>';
+    }
+  }
   h+='</div>';
 
   h+='<div class="drawer-section"><h4>Content Hash</h4>';
@@ -1547,9 +1747,15 @@ function importBundle(){
       var planeClass={memory:"cyan",behavior:"pink",evolution:"amber"}[plane]||"cyan";
       var isUnmapped=REF_TYPES.indexOf(a.refType)<0;
       var cm2=CERPA_MAP[a.refType]||{stage:"?",cls:"ct-claim",lbl:"?"};
+      var unmBadge2="";
+      if(isUnmapped){
+        var sug2=suggestCerpaStage(a.payload,a.refType);
+        var cc2=suggestConfClass(sug2.confidence);
+        unmBadge2=" <span class='badge badge-warn'>unmapped &rarr; "+esc(sug2.stage)+"</span> <span class='"+cc2+"' style='font-size:9px'>("+Math.round(sug2.confidence*100)+"%)</span>";
+      }
       aRows+="<tr class='art-row' data-rt='"+esc(a.refType)+"' data-aidx='"+j+"'>"+
         "<td class='mono'>"+esc(a.refId)+"</td>"+
-        "<td><span class='badge badge-"+planeClass+"'>"+esc(a.refType)+"</span>"+(isUnmapped?" <span class='badge badge-warn'>unmapped</span>":"")+"</td>"+
+        "<td><span class='badge badge-"+planeClass+"'>"+esc(a.refType)+"</span>"+unmBadge2+"</td>"+
         "<td><span class='cerpa-tag "+cm2.cls+"'>"+cm2.lbl+" "+cm2.stage+"</span></td>"+
         "<td class='mono' style='font-size:10px;color:var(--muted)'>"+esc((a.contentHash||"").slice(0,28))+"...</td>"+
         "<td><span class='badge badge-"+planeClass+"'>"+esc(plane)+"</span></td><td></td></tr>";
@@ -1602,6 +1808,77 @@ document.addEventListener("DOMContentLoaded",function(){
     toast("Sample pasted — click Import");
   });
 
+  /* v3.2: Chain view toggle (list vs SVG) */
+  var chainListBtn=$("#chainListBtn");
+  var chainSvgBtn=$("#chainSvgBtn");
+  var chainListContainer=$("#proofChainVis");
+  var chainSvgContainer=$("#chainSvgContainer");
+  if(chainListBtn&&chainSvgBtn){
+    chainListBtn.addEventListener("click",function(){
+      chainListBtn.classList.add("active");
+      chainSvgBtn.classList.remove("active");
+      if(chainListContainer)chainListContainer.style.display="";
+      if(chainSvgContainer)chainSvgContainer.style.display="none";
+      var pager=$("#proofPager");
+      if(pager)pager.style.display=STATE.proofChain.length>0?"flex":"none";
+    });
+    chainSvgBtn.addEventListener("click",function(){
+      chainSvgBtn.classList.add("active");
+      chainListBtn.classList.remove("active");
+      if(chainListContainer)chainListContainer.style.display="none";
+      if(chainSvgContainer)chainSvgContainer.style.display="";
+      var pager=$("#proofPager");
+      if(pager)pager.style.display="none";
+      renderChainSvg(STATE.proofChain||[]);
+    });
+  }
+
+  /* v3.1: Proof chain pagination */
+  var pprev=$("#proofPrev");if(pprev)pprev.addEventListener("click",function(){proofPage=Math.max(0,proofPage-1);renderProofChain()});
+  var pnext=$("#proofNext");if(pnext)pnext.addEventListener("click",function(){var total=Math.max(1,Math.ceil(STATE.proofChain.length/proofPageSize));proofPage=Math.min(total-1,proofPage+1);renderProofChain()});
+  var psel=$("#proofPageSizeSelect");if(psel)psel.addEventListener("change",function(){proofPageSize=+this.value;proofPage=0;renderProofChain()});
+
+  /* v3.1: Export as printable page */
+  var pdfBtn=$("#btnExportPdf");if(pdfBtn)pdfBtn.addEventListener("click",function(){exportPdf()});
+
+  /* Drift score simulation slider */
+  var driftSlider=document.getElementById('driftSlider');
+  if(driftSlider){
+    driftSlider.addEventListener('input',function(){
+      var score=+this.value;
+      var scoreEl=document.getElementById('driftSimScore');
+      var sevEl=document.getElementById('driftSimSeverity');
+      var actEl=document.getElementById('driftSimAction');
+      if(scoreEl)scoreEl.textContent=score;
+      if(score>80){
+        if(sevEl){sevEl.textContent='red';sevEl.style.color='var(--bad)';}
+        if(actEl)actEl.textContent='Auto-suggest Patch \u2014 escalation required';
+      }else if(score>40){
+        if(sevEl){sevEl.textContent='yellow';sevEl.style.color='var(--warn)';}
+        if(actEl)actEl.textContent='Advisory \u2014 review recommended';
+      }else{
+        if(sevEl){sevEl.textContent='green';sevEl.style.color='var(--ok)';}
+        if(actEl)actEl.textContent='No action required';
+      }
+      var resEl=document.getElementById('driftSimResult');
+      if(resEl){resEl.style.borderColor=score>80?'var(--bad)':score>40?'var(--warn)':'var(--ok)';}
+    });
+  }
+
+  /* v3.2: Clickable executive bars — switch to explorer with filter */
+  var execPanel=$("#panel-executive");
+  if(execPanel){
+    execPanel.addEventListener("click",function(e){
+      var target=e.target.closest("[data-filter-type]");
+      if(!target)return;
+      var filterType=target.getAttribute("data-filter-type");
+      var explorerBtn=document.querySelector('.tab-btn[data-tab="explorer"]');
+      if(explorerBtn)explorerBtn.click();
+      var pill=document.querySelector('.filter-pill[data-ft="'+filterType+'"]');
+      if(pill)pill.click();
+    });
+  }
+
   /* v3: Keyboard shortcuts */
   document.addEventListener("keydown",function(e){
     if(e.target.tagName==="TEXTAREA"||e.target.tagName==="INPUT")return;
@@ -1615,5 +1892,6 @@ document.addEventListener("DOMContentLoaded",function(){
 
 })();
 </script>
+<div class="print-footer" style="display:none">Generated by DeepSigma COG Adapter · <span id="printTimestamp"></span></div>
 </body>
 </html>

@@ -658,6 +658,63 @@
           "artifacts": {"type": "array"}
         }
       }
+    },
+    {
+      "name": "cog.export_sbom",
+      "description": "Generate a CycloneDX 1.5 or SPDX 2.3 SBOM from a COG bundle.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["path"],
+        "properties": {
+          "path": {"type": "string", "description": "Path to COG bundle JSON file"},
+          "format": {"type": "string", "enum": ["cyclonedx", "spdx"], "description": "SBOM format (default: cyclonedx)"}
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "bomFormat": {"type": "string"},
+          "components": {"type": "array"},
+          "metadata": {"type": "object"}
+        }
+      }
+    },
+    {
+      "name": "webhook.register",
+      "description": "Register a webhook URL to receive bundle update notifications.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["url"],
+        "properties": {
+          "url": {"type": "string", "description": "Callback URL for POST notifications"},
+          "event_type": {"type": "string", "description": "Event type to subscribe to (default: bundleUpdated)"}
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "registered": {"type": "string"},
+          "event_type": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "webhook.unregister",
+      "description": "Remove a previously registered webhook URL.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["url"],
+        "properties": {
+          "url": {"type": "string", "description": "Callback URL to unregister"},
+          "event_type": {"type": "string", "description": "Event type to unsubscribe from (default: bundleUpdated)"}
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "unregistered": {"type": "string"}
+        }
+      }
     }
   ]
 }

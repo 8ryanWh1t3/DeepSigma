@@ -193,6 +193,39 @@ class CogBundle:
         )
 
 
+# ── Heuristic suggestion model ────────────────────────────────────
+
+
+@dataclass
+class CogMappingSuggestion:
+    """Heuristic suggestion for mapping an unmapped refType to a CERPA stage."""
+
+    original_ref_type: str
+    suggested_ref_type: str = ""
+    suggested_cerpa_stage: str = ""
+    confidence: float = 0.0
+    signals: List[str] = field(default_factory=list)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "originalRefType": self.original_ref_type,
+            "suggestedRefType": self.suggested_ref_type,
+            "suggestedCerpaStage": self.suggested_cerpa_stage,
+            "confidence": self.confidence,
+            "signals": self.signals,
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> CogMappingSuggestion:
+        return cls(
+            original_ref_type=data.get("originalRefType", data.get("original_ref_type", "")),
+            suggested_ref_type=data.get("suggestedRefType", data.get("suggested_ref_type", "")),
+            suggested_cerpa_stage=data.get("suggestedCerpaStage", data.get("suggested_cerpa_stage", "")),
+            confidence=data.get("confidence", 0.0),
+            signals=data.get("signals", []),
+        )
+
+
 # ── DeepSigma mapping models ──────────────────────────────────────
 
 

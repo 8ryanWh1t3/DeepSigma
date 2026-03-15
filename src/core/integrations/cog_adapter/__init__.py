@@ -27,6 +27,8 @@ Public API::
         # Batch
         BatchImportResult, batch_import_cog_bundles,
         batch_export_deepsigma, filter_artifacts, merge_bundles,
+        # SBOM
+        generate_cyclonedx_sbom, generate_spdx_sbom,
     )
 """
 
@@ -34,12 +36,14 @@ from .models import (
     CogArtifactRef,
     CogBundle,
     CogManifest,
+    CogMappingSuggestion,
     CogProof,
     CogReplayStep,
     DeepSigmaDecisionArtifact,
     DeepSigmaReceipt,
     DeepSigmaReplayRecord,
 )
+from .heuristics import suggest_cerpa_stage
 from .importer import (
     cog_to_deepsigma,
     load_cog_bundle,
@@ -58,10 +62,12 @@ from .batch import (
     filter_artifacts,
     merge_bundles,
 )
+from .sbom import generate_cyclonedx_sbom, generate_spdx_sbom
 
 __all__ = [
     "BatchImportResult",
     "CogArtifactRef",
+    "CogMappingSuggestion",
     "CogBundle",
     "CogBundleDiff",
     "CogManifest",
@@ -78,10 +84,13 @@ __all__ = [
     "diff_cog_bundles",
     "extract_replay_sequence",
     "filter_artifacts",
+    "generate_cyclonedx_sbom",
+    "generate_spdx_sbom",
     "load_cog_bundle",
     "load_cog_bundle_metadata",
     "merge_bundles",
     "stream_cog_artifacts",
+    "suggest_cerpa_stage",
     "to_deepsigma_replay_record",
     "verify_cog_bundle",
     "verify_proof_chain",

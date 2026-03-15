@@ -526,6 +526,44 @@ def handle_tools_call(_id: Any, params: Dict[str, Any]) -> Dict[str, Any]:
             "artifacts": [a.to_dict() for a in arts],
         })
 
+    # -- COG SBOM export --
+    if name == "cog.export_sbom":
+        path = arguments.get("path", "")
+        if not path:
+            return rpc_error(_id, -32602, "Missing params.arguments.path")
+        fmt = arguments.get("format", "cyclonedx")
+        from core.integrations.cog_adapter import load_cog_bundle
+        bundle = load_cog_bundle(path)
+        if fmt == "spdx":
+            from core.integrations.cog_adapter.sbom import generate_spdx_sbom
+            return rpc_result(_id, generate_spdx_sbom(bundle))
+        else:
+            from core.integrations.cog_adapter.sbom import generate_cyclonedx_sbom
+            return rpc_result(_id, generate_cyclonedx_sbom(bundle))
+
+    # -- Webhook tools --
+    if name == "webhook.register":
+        url = arguments.get("url", "")
+        if not url:
+            return rpc_error(_id, -32602, "Missing params.arguments.url")
+        event_type = arguments.get("event_type", "bundleUpdated")
+        # Lazy-init webhook bridge
+        if not hasattr(handle_tool_call, "_webhook_bridge"):
+            from adapters.mcp.webhook_bridge import WebhookBridge
+            handle_tool_call._webhook_bridge = WebhookBridge()
+            handle_tool_call._webhook_bridge.start()
+        handle_tool_call._webhook_bridge.registry.register(url, event_type)
+        return rpc_result(_id, {"registered": url, "event_type": event_type})
+
+    if name == "webhook.unregister":
+        url = arguments.get("url", "")
+        if not url:
+            return rpc_error(_id, -32602, "Missing params.arguments.url")
+        event_type = arguments.get("event_type", "bundleUpdated")
+        if hasattr(handle_tool_call, "_webhook_bridge"):
+            handle_tool_call._webhook_bridge.registry.unregister(url, event_type)
+        return rpc_result(_id, {"unregistered": url})
+
     return rpc_error(_id, -32601, f"Unknown tool: {name}")
 
 # ── Resources ───────────────────────────────────────────────────
