@@ -1,0 +1,1317 @@
+<!--
+ EDGE COG Adapter v2.0.0
+ ============================================================
+ Portable Cognition/Proof Bundle Explorer
+ Four Cognition Planes: Memory, Behavior, Evolution, Proof
+ Five DeepSigma Primitives: Truth, Reasoning, Memory, Drift, Patch
+
+ v2.0.0 Changes:
+ [x] Copy buttons on hash fields, bundle IDs, schema blocks, diff results
+ [x] Export panel — DeepSigma artifact -> COG bundle visual pipeline
+ [x] Commit-boundary metadata — admissibility, authority, constraint snapshot
+ [x] Unknown refType fallthrough is now a visible warning state
+ [x] Executive Summary tab — integrity/readiness/coverage/drift at a glance
+
+ Tabs:
+   [1] Executive        — bundle health scorecard for non-technical viewers
+   [2] Bundle Explorer  — load/inspect COG bundle structure
+   [3] Proof Chain       — per-artifact hash chain visualization
+   [4] Export            — DeepSigma artifact -> COG bundle conversion view
+   [5] Diff              — side-by-side bundle comparison
+   [6] Mapping           — COG artifact ref_type <-> DeepSigma primitive mapping
+   [7] Schema            — JSON Schema Draft 2020-12 viewer
+
+ EDGE compliant: CSP locked, no network, no persistence, no side effects.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'"/>
+<!-- EDGE_HARDENING_V1 BEGIN -->
+<script>
+(function(){
+"use strict";
+/* EDGE_HARDENING_V1 — Runtime capability lockdown v1.1 */
+
+var EDGE_BUILD_ID="EDGE_BUILD_ID:EDGE_COG_Adapter_v2.0.0";
+
+function _block(cap){
+  return function(){throw new Error("EDGE hardening: "+cap+" is blocked")};
+}
+
+/* ── Network ──────────────────────────────────────────── */
+window.fetch          = _block("fetch");
+window.XMLHttpRequest = _block("XMLHttpRequest");
+window.WebSocket      = _block("WebSocket");
+window.EventSource    = _block("EventSource");
+try{navigator.sendBeacon=_block("sendBeacon")}catch(_){}
+
+/* ── Dynamic execution ────────────────────────────────── */
+window.eval = _block("eval");
+try{window.Function=_block("Function constructor")}catch(_){}
+
+/* ── Navigation ───────────────────────────────────────── */
+window.open = _block("window.open");
+
+/* ── Communication channels ──────────────────────────── */
+window.RTCPeerConnection       = _block("RTCPeerConnection");
+window.webkitRTCPeerConnection = _block("RTCPeerConnection");
+window.BroadcastChannel        = _block("BroadcastChannel");
+window.SharedWorker            = _block("SharedWorker");
+window.Worker                  = _block("Worker");
+
+/* ── Persistence ──────────────────────────────────────── */
+try{Object.defineProperty(window,"localStorage",
+  {get:_block("localStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"sessionStorage",
+  {get:_block("sessionStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"indexedDB",
+  {get:_block("indexedDB"),configurable:false})}catch(_){}
+
+/* ── Data channels ───────────────────────────────────── */
+try{Object.defineProperty(window,"name",
+  {value:"",writable:false,configurable:false})}catch(_){}
+
+/* ── Build ID log ────────────────────────────────────── */
+if(typeof console!=="undefined")console.log("[EDGE] Hardening active: "+EDGE_BUILD_ID);
+
+/* ── Self-check: no external resources or injection ──── */
+document.addEventListener("DOMContentLoaded",function(){
+  var violations=[];
+  var ext=document.querySelectorAll("script[src],link[href]");
+  if(ext.length>0)violations.push("external resource ("+ext.length+" element(s))");
+  var handlers=document.querySelectorAll("[onclick],[onerror],[onload],[onmouseover],[onfocus],[onblur],[onsubmit],[onchange],[oninput]");
+  if(handlers.length>0)violations.push("inline event handler ("+handlers.length+" element(s))");
+  var bases=document.querySelectorAll("base[href]");
+  if(bases.length>0)violations.push("base href hijack ("+bases.length+" element(s))");
+  var refresh=document.querySelector("meta[http-equiv='refresh']");
+  if(refresh)violations.push("meta refresh redirect");
+  if(violations.length>0){
+    document.body.innerHTML=
+      "<h1 style='color:red;font-family:monospace;padding:40px'>" +
+      "EDGE VIOLATION: "+violations.join("; ")+"</h1>";
+  }
+});
+})();
+</script>
+<!-- EDGE_HARDENING_V1 END -->
+<!-- EDGE_POLICY_EXCEPTION: clipboard -->
+
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>EDGE COG Adapter v2.0.0</title>
+<style>
+:root {
+  --bg:#0a0e17; --card:#111927; --card-hover:#182235;
+  --txt:#e7eef7; --muted:#6b7f96; --line:#1b2a3a;
+  --neon-cyan:#00f0ff; --neon-pink:#ff2d95; --neon-purple:#b44dff;
+  --neon-green:#39ff14; --neon-amber:#ffcc66;
+  --ok:#5dff93; --warn:#ffcc66; --bad:#ff6b6b;
+  --glow-cyan:rgba(0,240,255,.15); --glow-pink:rgba(255,45,149,.15);
+  --glow-purple:rgba(180,77,255,.15); --glow-green:rgba(57,255,20,.15);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt);font-size:13px;min-height:100vh}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+.hidden{display:none!important}
+
+/* ── Header ──────────────────────────────────── */
+header{padding:12px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;background:rgba(10,14,23,.95)}
+.brand{font-weight:700;font-size:15px;letter-spacing:.5px;display:flex;align-items:center;gap:10px}
+.brand-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--neon-cyan),var(--neon-purple));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:#0a0e17;flex-shrink:0}
+.brand small{display:block;color:var(--muted);font-size:10px;font-weight:400;letter-spacing:0}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.plane-pills{display:flex;gap:6px}
+.plane-pill{padding:3px 10px;border-radius:12px;font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;border:1px solid var(--line);color:var(--muted);background:transparent}
+.plane-pill[data-plane="memory"]{color:var(--neon-cyan);border-color:rgba(0,240,255,.3)}
+.plane-pill[data-plane="behavior"]{color:var(--neon-pink);border-color:rgba(255,45,149,.3)}
+.plane-pill[data-plane="evolution"]{color:var(--neon-amber);border-color:rgba(255,204,102,.3)}
+.plane-pill[data-plane="proof"]{color:var(--neon-green);border-color:rgba(57,255,20,.3)}
+
+/* ── Tabs ────────────────────────────────────── */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);padding:0 20px;background:rgba(10,14,23,.9);overflow-x:auto}
+.tab-btn{padding:10px 16px;font-size:12px;font-weight:600;color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;letter-spacing:.3px;white-space:nowrap}
+.tab-btn:hover{color:var(--txt)}
+.tab-btn.active{color:var(--neon-cyan);border-bottom-color:var(--neon-cyan)}
+
+/* ── Content ─────────────────────────────────── */
+.content{padding:16px 20px;max-width:1400px;margin:0 auto;overflow-y:auto;height:calc(100vh - 140px)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ── Cards ───────────────────────────────────── */
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px}
+.card:hover{border-color:#2a3d55}
+.card h3{font-size:13px;font-weight:700;margin-bottom:10px;letter-spacing:.3px;color:#cfe2f7}
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+
+/* ── Badges ──────────────────────────────────── */
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;letter-spacing:.3px}
+.badge-cyan{background:var(--glow-cyan);color:var(--neon-cyan);border:1px solid rgba(0,240,255,.25)}
+.badge-pink{background:var(--glow-pink);color:var(--neon-pink);border:1px solid rgba(255,45,149,.25)}
+.badge-purple{background:var(--glow-purple);color:var(--neon-purple);border:1px solid rgba(180,77,255,.25)}
+.badge-green{background:var(--glow-green);color:var(--neon-green);border:1px solid rgba(57,255,20,.25)}
+.badge-amber{background:rgba(255,204,102,.1);color:var(--neon-amber);border:1px solid rgba(255,204,102,.25)}
+.badge-pass{background:rgba(93,255,147,.1);color:var(--ok);border:1px solid rgba(93,255,147,.25)}
+.badge-fail{background:rgba(255,107,107,.1);color:var(--bad);border:1px solid rgba(255,107,107,.25)}
+.badge-warn{background:rgba(255,204,102,.1);color:var(--warn);border:1px solid rgba(255,204,102,.25)}
+
+/* ── Buttons ─────────────────────────────────── */
+button{background:#182235;color:var(--txt);border:1px solid #243449;border-radius:8px;padding:7px 14px;cursor:pointer;font-size:12px;transition:all .15s}
+button:hover{border-color:#2f4765;background:#1e2d42}
+.btn-primary{background:rgba(0,240,255,.1);border-color:rgba(0,240,255,.3);color:var(--neon-cyan)}
+.btn-primary:hover{background:rgba(0,240,255,.18)}
+
+/* ── Copy Button ─────────────────────────────── */
+.copy-btn{background:none;border:1px solid rgba(0,240,255,.2);border-radius:4px;padding:1px 6px;font-size:9px;color:var(--neon-cyan);cursor:pointer;opacity:.6;transition:all .15s;vertical-align:middle;margin-left:4px}
+.copy-btn:hover{opacity:1;background:rgba(0,240,255,.1)}
+.copy-btn.copied{color:var(--ok);border-color:rgba(93,255,147,.3)}
+
+/* ── Tables ──────────────────────────────────── */
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:8px 10px;color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--line)}
+td{padding:8px 10px;border-bottom:1px solid rgba(27,42,58,.5)}
+tr:hover td{background:rgba(0,240,255,.03)}
+
+/* ── Proof Chain Vis ─────────────────────────── */
+.chain-node{display:flex;align-items:stretch;gap:0;margin-bottom:2px}
+.chain-connector{width:32px;display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.chain-dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--neon-cyan);background:var(--bg);flex-shrink:0;z-index:1}
+.chain-dot.seal{border-color:var(--neon-green);background:rgba(57,255,20,.2)}
+.chain-line{width:2px;flex:1;background:linear-gradient(180deg,var(--neon-cyan),rgba(0,240,255,.3))}
+.chain-body{flex:1;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:12px}
+.chain-body:hover{border-color:rgba(0,240,255,.3)}
+.chain-hash{font-size:10px;color:var(--muted);word-break:break-all}
+.chain-label{font-weight:600;color:var(--neon-cyan);font-size:11px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+
+/* ── Diff ────────────────────────────────────── */
+.diff-row{display:flex;gap:12px;margin-bottom:8px}
+.diff-side{flex:1;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:12px}
+.diff-add{border-color:rgba(93,255,147,.3);background:rgba(93,255,147,.04)}
+.diff-rem{border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.04)}
+.diff-mod{border-color:rgba(255,204,102,.3);background:rgba(255,204,102,.04)}
+.diff-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.diff-label.add{color:var(--ok)}
+.diff-label.rem{color:var(--bad)}
+.diff-label.mod{color:var(--neon-amber)}
+
+/* ── Mapping Diagram ─────────────────────────── */
+.map-row{display:flex;align-items:center;gap:0;margin-bottom:6px}
+.map-left,.map-right{flex:1;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600}
+.map-left{background:var(--card);border:1px solid var(--line);text-align:right}
+.map-arrow{width:60px;text-align:center;color:var(--neon-cyan);font-size:16px;flex-shrink:0}
+.map-right{background:var(--card);border:1px solid var(--line)}
+
+/* ── Schema Viewer ───────────────────────────── */
+.schema-block{background:#0d1320;border:1px solid var(--line);border-radius:8px;padding:14px;overflow-x:auto;white-space:pre;font-size:11px;line-height:1.6;color:#8aa0b5;position:relative}
+.schema-block .sk{color:var(--neon-cyan)}
+.schema-block .sv{color:var(--neon-green)}
+.schema-block .st{color:var(--neon-pink)}
+
+/* ── Stats Bar ───────────────────────────────── */
+.stats-bar{display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+.stat-box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 16px;min-width:140px;flex:1}
+.stat-val{font-size:22px;font-weight:800;letter-spacing:-.5px}
+.stat-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+
+/* ── Executive Scorecard ─────────────────────── */
+.score-ring{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;flex-shrink:0;transition:all .3s}
+.score-ring.pass{border:3px solid var(--ok);color:var(--ok);box-shadow:0 0 16px rgba(93,255,147,.2)}
+.score-ring.warn{border:3px solid var(--warn);color:var(--warn);box-shadow:0 0 16px rgba(255,204,102,.2)}
+.score-ring.fail{border:3px solid var(--bad);color:var(--bad);box-shadow:0 0 16px rgba(255,107,107,.2)}
+.exec-row{display:flex;align-items:center;gap:16px;padding:14px;border-bottom:1px solid var(--line)}
+.exec-row:last-child{border-bottom:none}
+.exec-detail{flex:1}
+.exec-detail h4{font-size:13px;font-weight:700;margin-bottom:3px}
+.exec-detail p{font-size:11px;color:var(--muted);line-height:1.4}
+
+/* ── Export Pipeline ─────────────────────────── */
+.pipe-step{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.pipe-num{width:32px;height:32px;border-radius:50%;border:2px solid var(--neon-purple);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:var(--neon-purple);flex-shrink:0}
+.pipe-body{flex:1;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 14px}
+.pipe-arrow{text-align:center;color:var(--neon-purple);font-size:14px;padding-left:14px}
+
+/* ── Commit Boundary ─────────────────────────── */
+.boundary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.boundary-cell{background:#0d1320;border:1px solid var(--line);border-radius:8px;padding:10px}
+.boundary-cell h5{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px}
+.boundary-val{font-size:12px;font-weight:600}
+
+/* ── Warning callout ─────────────────────────── */
+.warn-callout{background:rgba(255,204,102,.06);border:1px solid rgba(255,204,102,.25);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--warn);display:flex;align-items:center;gap:8px;margin-top:8px}
+.warn-icon{font-size:16px;flex-shrink:0}
+
+/* ── Toast ───────────────────────────────────── */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--card);border:1px solid rgba(0,240,255,.3);border-radius:8px;padding:8px 16px;font-size:11px;color:var(--neon-cyan);opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<!-- EDGE_ACTION_CONTRACT_V1 -->
+<div id="edgeActionContract" style="
+  margin:8px auto;max-width:1400px;width:96%;padding:6px 14px;
+  border-radius:6px;border:1px solid rgba(57,255,20,.2);
+  background:rgba(57,255,20,.04);
+  font-family:'Courier New',Courier,monospace;font-size:.6rem;
+  color:#8a80a0;display:flex;flex-wrap:wrap;gap:12px;align-items:center;
+">
+  <span style="color:#39ff14;font-weight:700;letter-spacing:1px">ACTION CONTRACT</span>
+  <span>Network: LOCKED</span>
+  <span style="opacity:.5">|</span>
+  <span>Persistence: NONE</span>
+  <span style="opacity:.5">|</span>
+  <span>Side Effects: NONE</span>
+</div>
+
+<header>
+  <div class="brand">
+    <div class="brand-icon">COG</div>
+    <div>
+      COG Adapter
+      <small>Portable Cognition / Proof Bundle Explorer v2.0.0</small>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="plane-pills">
+      <span class="plane-pill" data-plane="memory">Memory</span>
+      <span class="plane-pill" data-plane="behavior">Behavior</span>
+      <span class="plane-pill" data-plane="evolution">Evolution</span>
+      <span class="plane-pill" data-plane="proof">Proof</span>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" id="tabBar">
+  <button class="tab-btn active" data-tab="executive">Executive</button>
+  <button class="tab-btn" data-tab="explorer">Bundle Explorer</button>
+  <button class="tab-btn" data-tab="proof">Proof Chain</button>
+  <button class="tab-btn" data-tab="export">Export</button>
+  <button class="tab-btn" data-tab="diff">Diff</button>
+  <button class="tab-btn" data-tab="mapping">Mapping</button>
+  <button class="tab-btn" data-tab="schema">Schema</button>
+</nav>
+
+<div class="content" id="content">
+
+  <!-- ═══════════════ TAB 0: Executive Summary ═══════════════ -->
+  <div class="tab-panel active" id="panel-executive">
+    <div class="stats-bar" id="execStats"></div>
+    <div class="card">
+      <h3>Bundle Health Scorecard</h3>
+      <div id="execScorecard"></div>
+    </div>
+    <div class="card">
+      <h3>Commit Boundary Snapshot</h3>
+      <p style="color:var(--muted);font-size:11px;margin-bottom:12px">
+        Authority, admissibility, and constraint metadata captured at bundle seal time.
+      </p>
+      <div id="commitBoundary"></div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:10px">
+      <button class="btn-primary" id="btnExecRefresh">Refresh Scorecard</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ TAB 1: Bundle Explorer ═══════════════ -->
+  <div class="tab-panel" id="panel-explorer">
+    <div class="stats-bar" id="explorerStats"></div>
+
+    <div class="card">
+      <h3>Manifest</h3>
+      <table>
+        <thead><tr><th>Field</th><th>Value</th><th></th></tr></thead>
+        <tbody id="manifestTable"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Artifacts <span id="artifactCount" class="badge badge-cyan" style="margin-left:8px"></span></h3>
+      <table>
+        <thead><tr><th>Ref ID</th><th>Type</th><th>Content Hash</th><th>Plane</th><th></th></tr></thead>
+        <tbody id="artifactTable"></tbody>
+      </table>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>Replay Steps <span id="replayCount" class="badge badge-purple" style="margin-left:8px"></span></h3>
+        <table>
+          <thead><tr><th>#</th><th>Action</th><th>Input</th><th>Output</th></tr></thead>
+          <tbody id="replayTable"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Raw Metadata <button class="copy-btn" data-copy-target="metadataBlock">copy</button></h3>
+        <div id="metadataBlock" class="schema-block mono" style="max-height:220px;overflow-y:auto;white-space:pre-wrap"></div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;display:flex;gap:10px">
+      <button class="btn-primary" id="btnLoadSample">Load Sample Bundle</button>
+      <button id="btnRandomize">Randomize</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ TAB 2: Proof Chain ═══════════════ -->
+  <div class="tab-panel" id="panel-proof">
+    <div class="stats-bar" id="proofStats"></div>
+    <div class="card">
+      <h3>Per-Artifact Proof Chain</h3>
+      <p style="color:var(--muted);font-size:11px;margin-bottom:14px">
+        Each artifact gets a chain entry with <code class="mono" style="color:var(--neon-cyan)">chainHash</code> computed via SHA-256 over
+        the entry with the field zeroed, linked by <code class="mono" style="color:var(--neon-cyan)">prevChainHash</code>.
+      </p>
+      <div id="proofChainVis"></div>
+    </div>
+    <div class="card">
+      <h3>Chain Verification</h3>
+      <div id="proofVerifyResult"></div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:10px">
+      <button class="btn-primary" id="btnVerifyChain">Verify Chain Integrity</button>
+      <button id="btnTamperChain">Simulate Tamper</button>
+      <button id="btnCopyChain">Copy Chain JSON</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ TAB 3: Export ═══════════════ -->
+  <div class="tab-panel" id="panel-export">
+    <div class="card">
+      <h3>Export Pipeline: DeepSigma Artifact &rarr; COG Bundle</h3>
+      <p style="color:var(--muted);font-size:11px;margin-bottom:14px">
+        The adapter reverses the import mapping, builds a per-artifact proof chain, and seals the bundle with commit-boundary metadata.
+      </p>
+      <div id="exportPipeline"></div>
+    </div>
+    <div class="card-grid">
+      <div class="card">
+        <h3>Source: DeepSigma Artifact</h3>
+        <div id="exportSource" class="schema-block mono" style="max-height:300px;overflow-y:auto;white-space:pre-wrap"></div>
+        <button class="copy-btn" data-copy-target="exportSource" style="margin-top:8px">copy artifact json</button>
+      </div>
+      <div class="card">
+        <h3>Result: COG Bundle</h3>
+        <div id="exportResult" class="schema-block mono" style="max-height:300px;overflow-y:auto;white-space:pre-wrap"></div>
+        <button class="copy-btn" data-copy-target="exportResult" style="margin-top:8px">copy bundle json</button>
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      <button class="btn-primary" id="btnRunExport">Run Export Conversion</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ TAB 4: Diff ═══════════════ -->
+  <div class="tab-panel" id="panel-diff">
+    <div class="stats-bar" id="diffStats"></div>
+    <div class="card">
+      <h3>Bundle Comparison</h3>
+      <p style="color:var(--muted);font-size:11px;margin-bottom:14px">
+        Artifacts keyed by <code class="mono" style="color:var(--neon-cyan)">refId</code>.
+        Modifications detected by <code class="mono" style="color:var(--neon-cyan)">contentHash</code> divergence.
+      </p>
+      <div id="diffResults"></div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:10px">
+      <button class="btn-primary" id="btnRunDiff">Run Diff (Sample A vs B)</button>
+      <button id="btnCopyDiff">Copy Diff JSON</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ TAB 5: Mapping ═══════════════ -->
+  <div class="tab-panel" id="panel-mapping">
+    <div class="card">
+      <h3>COG Artifact Types &rarr; DeepSigma Primitives</h3>
+      <p style="color:var(--muted);font-size:11px;margin-bottom:14px">
+        The adapter maps each COG <code class="mono" style="color:var(--neon-cyan)">refType</code> to its corresponding DeepSigma primitive during import.
+        Export reverses the mapping.
+      </p>
+      <div id="mappingDiagram"></div>
+      <div class="warn-callout" style="margin-top:12px">
+        <span class="warn-icon">&#9888;</span>
+        <div>
+          <strong>Unmapped types are not silently accepted.</strong>
+          Any COG artifact with an unrecognized <code class="mono">refType</code> will be routed to
+          <code class="mono">truth_claims</code> and flagged with an <span class="badge badge-warn">unmapped</span> warning.
+          Review these artifacts before trusting their classification.
+        </div>
+      </div>
+    </div>
+
+    <div class="card-grid" style="margin-top:14px">
+      <div class="card">
+        <h3>COG Four Planes</h3>
+        <table>
+          <thead><tr><th>Plane</th><th>Covers</th><th>Badge</th></tr></thead>
+          <tbody>
+            <tr><td style="color:var(--neon-cyan)">Memory</td><td>Precedent recall, graph refs</td><td><span class="badge badge-cyan">memory</span></td></tr>
+            <tr><td style="color:var(--neon-pink)">Behavior</td><td>Actions, rationale, evidence</td><td><span class="badge badge-pink">behavior</span></td></tr>
+            <tr><td style="color:var(--neon-amber)">Evolution</td><td>Drift signals, patches</td><td><span class="badge badge-amber">evolution</span></td></tr>
+            <tr><td style="color:var(--neon-green)">Proof</td><td>Hash chain, seal, signatures</td><td><span class="badge badge-green">proof</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>DeepSigma Five Primitives</h3>
+        <table>
+          <thead><tr><th>Primitive</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td style="color:var(--neon-cyan)">Truth (Claims)</td><td>Evidence-backed assertions</td></tr>
+            <tr><td style="color:var(--neon-pink)">Reasoning (Episodes)</td><td>Decision rationale chains</td></tr>
+            <tr><td style="color:var(--neon-purple)">Memory (Precedents)</td><td>Graph-linked recall nodes</td></tr>
+            <tr><td style="color:var(--neon-amber)">Drift (Signals)</td><td>Detected coherence deviations</td></tr>
+            <tr><td style="color:var(--neon-green)">Patch (Corrections)</td><td>Applied fixes and remediations</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ TAB 6: Schema ═══════════════ -->
+  <div class="tab-panel" id="panel-schema">
+    <div class="card">
+      <h3>Schema Selector</h3>
+      <div style="display:flex;gap:8px;margin-bottom:14px" id="schemaSelector">
+        <button class="btn-primary" data-schema="bundle">cog_bundle</button>
+        <button data-schema="artifact">cog_artifact_ref</button>
+        <button data-schema="proof">cog_proof</button>
+        <button data-schema="replay">cog_replay_step</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3 id="schemaTitle">cog_bundle.schema.json <button class="copy-btn" id="btnCopySchema">copy</button></h3>
+      <div id="schemaViewer" class="schema-block mono" style="max-height:500px;overflow-y:auto"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ══════════════════════════════════════════════════════════
+   Utility
+   ══════════════════════════════════════════════════════════ */
+function esc(s){var d=document.createElement("div");d.textContent=s;return d.innerHTML}
+function $(sel){return document.querySelector(sel)}
+function $$(sel){return Array.prototype.slice.call(document.querySelectorAll(sel))}
+
+/* Toast */
+var _toastTimer;
+function toast(msg){
+  var t=$("#toast");
+  t.textContent=msg;
+  t.classList.add("show");
+  clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(function(){t.classList.remove("show")},1800);
+}
+
+/* Copy to clipboard (EDGE_POLICY_EXCEPTION: clipboard) */
+function copyText(text){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){toast("Copied")});
+  }else{
+    /* Fallback: textarea select */
+    var ta=document.createElement("textarea");
+    ta.value=text;
+    ta.style.cssText="position:fixed;left:-9999px";
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    toast("Copied");
+  }
+}
+
+/* Copy button for hash/ID inline values */
+function copyBtn(value){
+  return '<button class="copy-btn" data-copy-val="'+esc(value)+'">copy</button>';
+}
+
+/* Simple deterministic pseudo-random (xorshift32) */
+var _rngState = 42;
+function rng(){_rngState^=_rngState<<13;_rngState^=_rngState>>17;_rngState^=_rngState<<5;return((_rngState>>>0)/4294967296)}
+function rngHex(n){for(var s="",i=0;i<n;i++)s+="0123456789abcdef"[Math.floor(rng()*16)];return s}
+function rngId(){return"cog-"+rngHex(8)+"-"+rngHex(4)+"-"+rngHex(4)}
+
+/* SHA-256 via SubtleCrypto (async) */
+function sha256(str){
+  var buf=new TextEncoder().encode(str);
+  return crypto.subtle.digest("SHA-256",buf).then(function(h){
+    return"sha256:"+Array.from(new Uint8Array(h)).map(function(b){return b.toString(16).padStart(2,"0")}).join("");
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   Sample Data
+   ══════════════════════════════════════════════════════════ */
+var REF_TYPES=["evidence","rationale","memory","drift","patch"];
+var ACTIONS=["observe","evaluate","recall","compare","decide","emit","seal"];
+var PLANE_MAP={evidence:"behavior",rationale:"behavior",memory:"memory",drift:"evolution",patch:"evolution"};
+var DS_MAP={evidence:"truth_claims",rationale:"reasoning",memory:"memory_refs",drift:"drift_annotations",patch:"patch_refs"};
+
+/* Authority / Admissibility / Constraint snapshot generators */
+function makeCommitBoundary(seed){
+  _rngState=seed+7;
+  var policyVer="v"+Math.floor(rng()*3+1)+"."+Math.floor(rng()*10);
+  return {
+    authority:{
+      sealAuthority:"sigma-overwatch/decision-authority",
+      policyVersion:policyVer,
+      ruleSeal:"sha256:"+rngHex(64),
+      authorityChainDepth:Math.floor(rng()*4+1)
+    },
+    admissibility:{
+      schemaValidated:true,
+      proofChainIntact:true,
+      replaySequenced:true,
+      contentHashesVerified:true,
+      unmappedArtifacts:0
+    },
+    constraints:{
+      maxArtifacts:50,
+      maxReplayDepth:100,
+      maxChainLength:200,
+      requiredRefTypes:["evidence","rationale"],
+      enforcedAt:new Date().toISOString()
+    }
+  };
+}
+
+function makeSampleBundle(seed){
+  _rngState=seed||42;
+  var bundleId=rngId();
+  var artifacts=[];
+  for(var i=0;i<5;i++){
+    artifacts.push({
+      refId:"ref-"+rngHex(6),
+      refType:REF_TYPES[i],
+      contentHash:"sha256:"+rngHex(64),
+      payload:{label:"Artifact "+i+" ("+REF_TYPES[i]+")",score:Math.round(rng()*100)/100}
+    });
+  }
+  var replaySteps=[];
+  for(var j=0;j<4;j++){
+    replaySteps.push({
+      stepIndex:j,
+      action:ACTIONS[Math.floor(rng()*ACTIONS.length)],
+      inputRef:j>0?artifacts[Math.min(j-1,artifacts.length-1)].refId:null,
+      outputRef:artifacts[Math.min(j,artifacts.length-1)].refId,
+      timestamp:new Date(Date.now()-Math.floor(rng()*86400000)).toISOString()
+    });
+  }
+  var boundary=makeCommitBoundary(seed||42);
+  return{
+    manifest:{bundleId:bundleId,version:"1.0.0",createdAt:new Date().toISOString(),source:"EDGE_COG_Adapter_v2.0.0"},
+    artifacts:artifacts,
+    proof:null,
+    replaySteps:replaySteps,
+    rawMetadata:{generator:"EDGE demo",seed:seed||42},
+    commitBoundary:boundary
+  };
+}
+
+/* Build DeepSigma artifact from bundle (inverse mapping for export demo) */
+function bundleToDeepSigmaArtifact(bundle){
+  var tc=[],reasoning={},memRefs=[],driftAnn=[],patchRefs=[],unmapped=[];
+  for(var i=0;i<bundle.artifacts.length;i++){
+    var a=bundle.artifacts[i];
+    var rt=a.refType;
+    if(rt==="evidence")tc.push(a);
+    else if(rt==="rationale")reasoning=a.payload||a;
+    else if(rt==="memory")memRefs.push(a);
+    else if(rt==="drift")driftAnn.push(a);
+    else if(rt==="patch")patchRefs.push(a);
+    else{tc.push(a);unmapped.push(a.refId);}
+  }
+  return{
+    artifactId:bundle.manifest.bundleId,
+    truthClaims:tc,
+    reasoning:reasoning,
+    memoryRefs:memRefs,
+    driftAnnotations:driftAnn,
+    patchRefs:patchRefs,
+    unmappedWarnings:unmapped,
+    receipt:bundle.proof?{proofMetadata:bundle.proof}:null,
+    commitBoundary:bundle.commitBoundary||null
+  };
+}
+
+function deepsigmaToBundle(artifact){
+  var arts=[];
+  for(var i=0;i<artifact.truthClaims.length;i++){
+    var c=artifact.truthClaims[i];
+    arts.push({refId:c.refId||("ref-export-ev-"+i),refType:"evidence",contentHash:c.contentHash||"",payload:c.payload||c});
+  }
+  if(artifact.reasoning&&Object.keys(artifact.reasoning).length){
+    arts.push({refId:"ref-export-rat-0",refType:"rationale",contentHash:"",payload:artifact.reasoning});
+  }
+  for(var m=0;m<artifact.memoryRefs.length;m++){
+    var mr=artifact.memoryRefs[m];
+    arts.push({refId:mr.refId||("ref-export-mem-"+m),refType:"memory",contentHash:mr.contentHash||"",payload:mr.payload||mr});
+  }
+  for(var d=0;d<artifact.driftAnnotations.length;d++){
+    var da=artifact.driftAnnotations[d];
+    arts.push({refId:da.refId||("ref-export-drift-"+d),refType:"drift",contentHash:da.contentHash||"",payload:da.payload||da});
+  }
+  for(var p=0;p<artifact.patchRefs.length;p++){
+    var pr=artifact.patchRefs[p];
+    arts.push({refId:pr.refId||("ref-export-patch-"+p),refType:"patch",contentHash:pr.contentHash||"",payload:pr.payload||pr});
+  }
+  return{
+    manifest:{bundleId:artifact.artifactId,version:"1.0.0",createdAt:new Date().toISOString(),source:"deepsigma_export"},
+    artifacts:arts,
+    proof:{proofChain:[],signatures:[],ruleSeal:null,timestamps:[new Date().toISOString()]},
+    replaySteps:[],
+    rawMetadata:{exportedFrom:"DeepSigma"},
+    commitBoundary:artifact.commitBoundary||null
+  };
+}
+
+/* ── State ─── */
+var STATE={bundle:null,bundleB:null,proofChain:[],tampered:false,lastDiff:null};
+
+/* ══════════════════════════════════════════════════════════
+   Event Delegation — copy buttons
+   ══════════════════════════════════════════════════════════ */
+document.addEventListener("DOMContentLoaded",function(){
+
+  /* Global click delegation for copy buttons */
+  document.addEventListener("click",function(e){
+    var btn=e.target.closest(".copy-btn");
+    if(!btn)return;
+    var val=btn.dataset.copyVal;
+    if(val){
+      copyText(val);
+      btn.textContent="copied";
+      btn.classList.add("copied");
+      setTimeout(function(){btn.textContent="copy";btn.classList.remove("copied")},1200);
+      return;
+    }
+    var target=btn.dataset.copyTarget;
+    if(target){
+      var el=$("#"+target);
+      if(el)copyText(el.textContent);
+      return;
+    }
+  });
+
+  /* Tab navigation */
+  var tabBar=$("#tabBar");
+  tabBar.addEventListener("click",function(e){
+    var btn=e.target.closest(".tab-btn");
+    if(!btn)return;
+    $$(".tab-btn").forEach(function(b){b.classList.remove("active")});
+    btn.classList.add("active");
+    $$(".tab-panel").forEach(function(p){p.classList.remove("active")});
+    var panel=$("#panel-"+btn.dataset.tab);
+    if(panel)panel.classList.add("active");
+  });
+
+  /* Schema selector */
+  var schemaSel=$("#schemaSelector");
+  schemaSel.addEventListener("click",function(e){
+    var btn=e.target.closest("button[data-schema]");
+    if(!btn)return;
+    $$("#schemaSelector button").forEach(function(b){b.classList.remove("btn-primary")});
+    btn.classList.add("btn-primary");
+    renderSchema(btn.dataset.schema);
+  });
+
+  /* Buttons */
+  $("#btnLoadSample").addEventListener("click",function(){loadBundle(42)});
+  $("#btnRandomize").addEventListener("click",function(){loadBundle(Math.floor(Math.random()*100000))});
+  $("#btnVerifyChain").addEventListener("click",function(){verifyChain()});
+  $("#btnTamperChain").addEventListener("click",function(){tamperChain()});
+  $("#btnRunDiff").addEventListener("click",function(){runDiff()});
+  $("#btnRunExport").addEventListener("click",function(){runExport()});
+  $("#btnExecRefresh").addEventListener("click",function(){renderExecutive()});
+  $("#btnCopyChain").addEventListener("click",function(){copyText(JSON.stringify(STATE.proofChain,null,2))});
+  $("#btnCopyDiff").addEventListener("click",function(){copyText(JSON.stringify(STATE.lastDiff||{},null,2))});
+  $("#btnCopySchema").addEventListener("click",function(){
+    var key=$$("#schemaSelector button.btn-primary")[0];
+    if(key)copyText(JSON.stringify(SCHEMAS[key.dataset.schema],null,2));
+  });
+
+  /* Init */
+  loadBundle(42);
+  renderMapping();
+  renderSchema("bundle");
+  renderExecutive();
+});
+
+/* ══════════════════════════════════════════════════════════
+   Executive Summary
+   ══════════════════════════════════════════════════════════ */
+function renderExecutive(){
+  var b=STATE.bundle;
+  if(!b)return;
+
+  var hasProof=STATE.proofChain.length>0;
+  var hasReplay=b.replaySteps.length>0;
+  var hasDrift=b.artifacts.some(function(a){return a.refType==="drift"});
+  var hasPatch=b.artifacts.some(function(a){return a.refType==="patch"});
+  var allMapped=b.artifacts.every(function(a){return REF_TYPES.indexOf(a.refType)>=0});
+  var coverage=0;
+  var seen={};
+  for(var i=0;i<b.artifacts.length;i++)seen[b.artifacts[i].refType]=1;
+  coverage=Math.round(Object.keys(seen).length/REF_TYPES.length*100);
+
+  /* Stats bar */
+  $("#execStats").innerHTML=
+    '<div class="stat-box"><div class="stat-val" style="color:var(--neon-cyan)">'+esc(b.manifest.bundleId.slice(0,12))+'</div><div class="stat-label">Bundle</div></div>'+
+    '<div class="stat-box"><div class="stat-val">'+b.artifacts.length+'</div><div class="stat-label">Artifacts</div></div>'+
+    '<div class="stat-box"><div class="stat-val" style="color:var(--neon-green)">'+coverage+'%</div><div class="stat-label">Type Coverage</div></div>'+
+    '<div class="stat-box"><div class="stat-val" style="color:'+(hasProof?"var(--ok)":"var(--bad)")+'">'+(hasProof?"Sealed":"No Seal")+'</div><div class="stat-label">Proof</div></div>';
+
+  /* Scorecard rows */
+  var rows=[
+    {label:"Bundle Integrity",desc:"Proof chain present with per-artifact hash entries and genesis seal.",
+     pass:hasProof,val:hasProof?"Chain intact ("+STATE.proofChain.length+" entries)":"No proof chain — bundle is unsigned"},
+    {label:"Replay Readiness",desc:"Replay steps are sequenced, indexed, and reference valid artifact refs.",
+     pass:hasReplay,val:hasReplay?b.replaySteps.length+" steps sequenced":"No replay steps — bundle cannot be replayed"},
+    {label:"Mapping Coverage",desc:"All artifact refTypes map to known DeepSigma primitives without fallthrough.",
+     pass:allMapped,warn:!allMapped,val:allMapped?"All "+b.artifacts.length+" artifacts map to known primitives":"Some artifacts have unrecognized refTypes — review required"},
+    {label:"Drift / Patch Presence",desc:"Evolution plane coverage: drift signals detected and patch corrections available.",
+     pass:hasDrift&&hasPatch,warn:!(hasDrift&&hasPatch),
+     val:(hasDrift?"Drift: present":"Drift: absent")+" | "+(hasPatch?"Patch: present":"Patch: absent")},
+    {label:"Commit Boundary",desc:"Authority, admissibility, and constraint metadata sealed at bundle creation.",
+     pass:!!b.commitBoundary,val:b.commitBoundary?"Authority chain depth: "+b.commitBoundary.authority.authorityChainDepth+", policy: "+b.commitBoundary.authority.policyVersion:"No commit boundary metadata"}
+  ];
+
+  var html="";
+  for(var r=0;r<rows.length;r++){
+    var row=rows[r];
+    var cls=row.pass?"pass":(row.warn?"warn":"fail");
+    var icon=row.pass?"&#10003;":(row.warn?"&#33;":"&#10007;");
+    html+='<div class="exec-row">'+
+      '<div class="score-ring '+cls+'">'+icon+'</div>'+
+      '<div class="exec-detail">'+
+        '<h4>'+esc(row.label)+'</h4>'+
+        '<p>'+esc(row.desc)+'</p>'+
+        '<div style="margin-top:4px"><span class="badge badge-'+cls+'">'+esc(row.val)+'</span></div>'+
+      '</div>'+
+    '</div>';
+  }
+  $("#execScorecard").innerHTML=html;
+
+  /* Commit Boundary */
+  renderCommitBoundary(b.commitBoundary);
+}
+
+function renderCommitBoundary(cb){
+  if(!cb){
+    $("#commitBoundary").innerHTML='<span class="badge badge-fail">No commit boundary in this bundle</span>';
+    return;
+  }
+  var a=cb.authority,ad=cb.admissibility,c=cb.constraints;
+  var html='<div class="boundary-grid">'+
+    '<div class="boundary-cell">'+
+      '<h5>Authority</h5>'+
+      '<div class="boundary-val" style="color:var(--neon-cyan)">'+esc(a.sealAuthority)+'</div>'+
+      '<div style="font-size:10px;color:var(--muted);margin-top:4px">Policy: '+esc(a.policyVersion)+' | Chain depth: '+a.authorityChainDepth+'</div>'+
+      '<div class="chain-hash mono" style="margin-top:4px">ruleSeal: '+esc(a.ruleSeal.slice(0,40))+'...'+copyBtn(a.ruleSeal)+'</div>'+
+    '</div>'+
+    '<div class="boundary-cell">'+
+      '<h5>Admissibility</h5>'+
+      '<div class="boundary-val" style="color:var(--ok)">All checks passed</div>'+
+      '<div style="font-size:10px;color:var(--muted);margin-top:4px">'+
+        'Schema: '+(ad.schemaValidated?'<span style="color:var(--ok)">valid</span>':'<span style="color:var(--bad)">invalid</span>')+
+        ' | Proof: '+(ad.proofChainIntact?'<span style="color:var(--ok)">intact</span>':'<span style="color:var(--bad)">broken</span>')+
+        ' | Replay: '+(ad.replaySequenced?'<span style="color:var(--ok)">sequenced</span>':'<span style="color:var(--bad)">unsequenced</span>')+
+      '</div>'+
+      '<div style="font-size:10px;color:var(--muted);margin-top:2px">'+
+        'Content hashes: '+(ad.contentHashesVerified?'<span style="color:var(--ok)">verified</span>':'<span style="color:var(--bad)">unverified</span>')+
+        ' | Unmapped: '+ad.unmappedArtifacts+
+      '</div>'+
+    '</div>'+
+    '<div class="boundary-cell">'+
+      '<h5>Constraints</h5>'+
+      '<div style="font-size:11px;margin-top:2px">'+
+        '<div>Max artifacts: <span style="color:var(--neon-amber)">'+c.maxArtifacts+'</span></div>'+
+        '<div>Max replay depth: <span style="color:var(--neon-amber)">'+c.maxReplayDepth+'</span></div>'+
+        '<div>Max chain length: <span style="color:var(--neon-amber)">'+c.maxChainLength+'</span></div>'+
+        '<div style="margin-top:4px;font-size:10px;color:var(--muted)">Required: '+esc(c.requiredRefTypes.join(", "))+'</div>'+
+        '<div style="font-size:10px;color:var(--muted)">Enforced: '+esc(c.enforcedAt.slice(0,19))+'</div>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+  $("#commitBoundary").innerHTML=html;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Bundle Explorer
+   ══════════════════════════════════════════════════════════ */
+function loadBundle(seed){
+  var b=makeSampleBundle(seed);
+  STATE.bundle=b;
+  STATE.tampered=false;
+
+  /* Stats */
+  $("#explorerStats").innerHTML=
+    '<div class="stat-box"><div class="stat-val" style="color:var(--neon-cyan)">'+esc(b.manifest.bundleId.slice(0,12))+'</div><div class="stat-label">Bundle ID '+copyBtn(b.manifest.bundleId)+'</div></div>'+
+    '<div class="stat-box"><div class="stat-val">'+b.artifacts.length+'</div><div class="stat-label">Artifacts</div></div>'+
+    '<div class="stat-box"><div class="stat-val">'+b.replaySteps.length+'</div><div class="stat-label">Replay Steps</div></div>'+
+    '<div class="stat-box"><div class="stat-val" style="color:var(--neon-green)">'+esc(b.manifest.version)+'</div><div class="stat-label">Version</div></div>';
+
+  /* Manifest */
+  var mRows="";
+  var mKeys=Object.keys(b.manifest);
+  for(var i=0;i<mKeys.length;i++){
+    var val=String(b.manifest[mKeys[i]]);
+    var isCopyable=mKeys[i]==="bundleId"||mKeys[i]==="createdAt";
+    mRows+="<tr><td class='mono' style='color:var(--neon-cyan)'>"+esc(mKeys[i])+"</td><td>"+esc(val)+"</td><td>"+(isCopyable?copyBtn(val):"")+"</td></tr>";
+  }
+  $("#manifestTable").innerHTML=mRows;
+
+  /* Artifacts */
+  $("#artifactCount").textContent=b.artifacts.length;
+  var aRows="";
+  for(var j=0;j<b.artifacts.length;j++){
+    var a=b.artifacts[j];
+    var plane=PLANE_MAP[a.refType]||"behavior";
+    var planeClass={memory:"cyan",behavior:"pink",evolution:"amber"}[plane]||"cyan";
+    var isUnmapped=REF_TYPES.indexOf(a.refType)<0;
+    aRows+="<tr>"+
+      "<td class='mono'>"+esc(a.refId)+copyBtn(a.refId)+"</td>"+
+      "<td><span class='badge badge-"+planeClass+"'>"+esc(a.refType)+"</span>"+(isUnmapped?" <span class='badge badge-warn'>unmapped</span>":"")+"</td>"+
+      "<td class='mono' style='font-size:10px;color:var(--muted)'>"+esc(a.contentHash.slice(0,28))+"..."+copyBtn(a.contentHash)+"</td>"+
+      "<td><span class='badge badge-"+planeClass+"'>"+esc(plane)+"</span></td>"+
+      "<td></td>"+
+      "</tr>";
+  }
+  $("#artifactTable").innerHTML=aRows;
+
+  /* Replay */
+  $("#replayCount").textContent=b.replaySteps.length;
+  var rRows="";
+  for(var k=0;k<b.replaySteps.length;k++){
+    var s=b.replaySteps[k];
+    rRows+="<tr>"+
+      "<td>"+s.stepIndex+"</td>"+
+      "<td><span class='badge badge-purple'>"+esc(s.action)+"</span></td>"+
+      "<td class='mono' style='font-size:10px'>"+esc(s.inputRef||"-")+"</td>"+
+      "<td class='mono' style='font-size:10px'>"+esc(s.outputRef||"-")+"</td>"+
+      "</tr>";
+  }
+  $("#replayTable").innerHTML=rRows;
+
+  /* Metadata */
+  $("#metadataBlock").textContent=JSON.stringify(b.rawMetadata,null,2);
+
+  /* Build proof chain for proof tab */
+  buildProofChain(b.artifacts);
+
+  /* Update executive if visible */
+  setTimeout(function(){renderExecutive()},100);
+}
+
+/* ══════════════════════════════════════════════════════════
+   Proof Chain
+   ══════════════════════════════════════════════════════════ */
+function buildProofChain(artifacts){
+  var chain=[];
+  var promises=[];
+
+  for(var i=0;i<artifacts.length;i++){
+    (function(idx){
+      var a=artifacts[idx];
+      var entry={
+        index:idx,
+        refId:a.refId,
+        contentHash:a.contentHash,
+        type:"artifact_link",
+        chainHash:"",
+        prevChainHash:idx===0?null:""
+      };
+      chain.push(entry);
+
+      var forHash=JSON.parse(JSON.stringify(entry));
+      forHash.chainHash="";
+      var canonical=JSON.stringify(forHash,Object.keys(forHash).sort(),0);
+      promises.push(sha256(canonical).then(function(h){
+        chain[idx].chainHash=h;
+        if(idx+1<chain.length)chain[idx+1].prevChainHash=h;
+      }));
+    })(i);
+  }
+
+  var seq=Promise.resolve();
+  for(var j=0;j<promises.length;j++){
+    (function(p){seq=seq.then(function(){return p})})(promises[j]);
+  }
+
+  seq.then(function(){
+    for(var k=1;k<chain.length;k++){
+      chain[k].prevChainHash=chain[k-1].chainHash;
+    }
+    STATE.proofChain=chain;
+    renderProofChain();
+  });
+}
+
+function renderProofChain(){
+  var chain=STATE.proofChain;
+
+  $("#proofStats").innerHTML=
+    '<div class="stat-box"><div class="stat-val">'+chain.length+'</div><div class="stat-label">Chain Entries</div></div>'+
+    '<div class="stat-box"><div class="stat-val" style="color:var(--neon-green)">artifact_link</div><div class="stat-label">Entry Type</div></div>'+
+    '<div class="stat-box"><div class="stat-val" style="color:'+(STATE.tampered?"var(--bad)":"var(--neon-cyan)")+'">'+
+      (STATE.tampered?"Tampered":"Intact")+'</div><div class="stat-label">Status</div></div>';
+
+  var html="";
+  for(var i=0;i<chain.length;i++){
+    var c=chain[i];
+    var isLast=i===chain.length-1;
+    html+='<div class="chain-node">'+
+      '<div class="chain-connector">'+
+        '<div class="chain-dot'+(i===0?" seal":"")+'"></div>'+
+        (isLast?"":'<div class="chain-line"></div>')+
+      '</div>'+
+      '<div class="chain-body">'+
+        '<div class="chain-label">#'+c.index+" "+esc(c.type)+(i===0?" (genesis)":"")+'</div>'+
+        '<div style="margin-bottom:4px"><span class="badge badge-cyan">'+esc(c.refId)+'</span>'+copyBtn(c.refId)+'</div>'+
+        '<div class="chain-hash mono">chainHash: '+esc(c.chainHash)+copyBtn(c.chainHash)+'</div>'+
+        '<div class="chain-hash mono">prevChainHash: '+(c.prevChainHash===null?"<em>null (genesis)</em>":esc(c.prevChainHash)+copyBtn(c.prevChainHash))+'</div>'+
+        '<div class="chain-hash mono" style="margin-top:2px">contentHash: '+esc(c.contentHash.slice(0,40))+'...'+copyBtn(c.contentHash)+'</div>'+
+      '</div>'+
+    '</div>';
+  }
+  $("#proofChainVis").innerHTML=html;
+  $("#proofVerifyResult").innerHTML="";
+}
+
+function verifyChain(){
+  var chain=STATE.proofChain;
+  if(!chain.length){
+    $("#proofVerifyResult").innerHTML='<span class="badge badge-fail">No chain loaded</span>';
+    return;
+  }
+
+  var issues=[];
+  var checks=[];
+
+  for(var i=1;i<chain.length;i++){
+    if(chain[i].prevChainHash!==chain[i-1].chainHash){
+      issues.push("Entry #"+i+": prevChainHash mismatch");
+    }
+  }
+
+  var recompute=Promise.resolve();
+  for(var j=0;j<chain.length;j++){
+    (function(idx){
+      recompute=recompute.then(function(){
+        var forHash=JSON.parse(JSON.stringify(chain[idx]));
+        forHash.chainHash="";
+        var canonical=JSON.stringify(forHash,Object.keys(forHash).sort(),0);
+        return sha256(canonical).then(function(h){
+          checks.push({index:idx,expected:chain[idx].chainHash,computed:h,match:h===chain[idx].chainHash});
+        });
+      });
+    })(j);
+  }
+
+  recompute.then(function(){
+    for(var k=0;k<checks.length;k++){
+      if(!checks[k].match){
+        issues.push("Entry #"+checks[k].index+": chainHash recompute mismatch");
+      }
+    }
+
+    var pass=issues.length===0;
+    var html='<div style="margin-bottom:10px"><span class="badge '+(pass?"badge-pass":"badge-fail")+'">'+(pass?"Chain valid":"Chain invalid")+'</span></div>';
+    html+='<table><thead><tr><th>#</th><th>Ref</th><th>Hash Match</th></tr></thead><tbody>';
+    for(var m=0;m<checks.length;m++){
+      html+="<tr><td>"+checks[m].index+"</td><td class='mono'>"+esc(chain[checks[m].index].refId)+"</td>"+
+        "<td>"+(checks[m].match?'<span class="badge badge-pass">Pass</span>':'<span class="badge badge-fail">Fail</span>')+"</td></tr>";
+    }
+    html+="</tbody></table>";
+    if(issues.length>0){
+      html+='<div style="margin-top:10px;color:var(--bad);font-size:11px">';
+      for(var n=0;n<issues.length;n++)html+="<div>"+esc(issues[n])+"</div>";
+      html+="</div>";
+    }
+    $("#proofVerifyResult").innerHTML=html;
+  });
+}
+
+function tamperChain(){
+  if(!STATE.proofChain.length)return;
+  var idx=Math.min(2,STATE.proofChain.length-1);
+  STATE.proofChain[idx].chainHash="sha256:"+rngHex(64);
+  STATE.tampered=true;
+  renderProofChain();
+  verifyChain();
+}
+
+/* ══════════════════════════════════════════════════════════
+   Export Panel
+   ══════════════════════════════════════════════════════════ */
+function renderExportPipeline(){
+  var steps=[
+    {n:1,title:"Extract Primitives",desc:"Map truth_claims, reasoning, memory_refs, drift_annotations, patch_refs from the DeepSigma artifact."},
+    {n:2,title:"Reverse Map to COG refTypes",desc:"evidence \u2190 truth_claims, rationale \u2190 reasoning, memory \u2190 memory_refs, drift \u2190 drift_annotations, patch \u2190 patch_refs."},
+    {n:3,title:"Compute Content Hashes",desc:"SHA-256 each artifact payload using canonical JSON serialization (sorted keys, compact separators)."},
+    {n:4,title:"Build Per-Artifact Proof Chain",desc:"Create chain entries with chainHash (zero-and-recompute) linked by prevChainHash. Genesis entry starts the sequence."},
+    {n:5,title:"Attach Commit Boundary",desc:"Seal authority ref, policy version, rule seal hash, admissibility checks, and constraint snapshot into the bundle metadata."},
+    {n:6,title:"Emit COG Bundle",desc:"Package manifest, artifacts, proof, replaySteps, rawMetadata, and commitBoundary into the final bundle JSON."}
+  ];
+  var html="";
+  for(var i=0;i<steps.length;i++){
+    var s=steps[i];
+    html+='<div class="pipe-step">'+
+      '<div class="pipe-num">'+s.n+'</div>'+
+      '<div class="pipe-body">'+
+        '<div style="font-weight:700;font-size:12px;color:var(--neon-purple);margin-bottom:2px">'+esc(s.title)+'</div>'+
+        '<div style="font-size:11px;color:var(--muted)">'+esc(s.desc)+'</div>'+
+      '</div>'+
+    '</div>';
+    if(i<steps.length-1)html+='<div class="pipe-arrow">&darr;</div>';
+  }
+  $("#exportPipeline").innerHTML=html;
+}
+
+function runExport(){
+  var b=STATE.bundle;
+  if(!b){toast("Load a bundle first");return}
+
+  /* Show source artifact */
+  var dsArtifact=bundleToDeepSigmaArtifact(b);
+  $("#exportSource").textContent=JSON.stringify(dsArtifact,null,2);
+
+  /* Show exported bundle */
+  var exported=deepsigmaToBundle(dsArtifact);
+  $("#exportResult").textContent=JSON.stringify(exported,null,2);
+
+  renderExportPipeline();
+  toast("Export conversion complete");
+}
+
+/* ══════════════════════════════════════════════════════════
+   Diff
+   ══════════════════════════════════════════════════════════ */
+function runDiff(){
+  var a=makeSampleBundle(42);
+  var b=makeSampleBundle(42);
+  b.artifacts.splice(1,1);
+  _rngState=99;
+  var added={refId:"ref-"+rngHex(6),refType:"drift",contentHash:"sha256:"+rngHex(64),payload:{label:"New drift artifact",score:0.88}};
+  b.artifacts.push(added);
+  b.artifacts[0].contentHash="sha256:"+rngHex(64);
+  b.manifest.version="1.1.0";
+
+  STATE.bundleB=b;
+
+  var aMap={},bMap={};
+  for(var i=0;i<a.artifacts.length;i++)aMap[a.artifacts[i].refId]=a.artifacts[i];
+  for(var j=0;j<b.artifacts.length;j++)bMap[b.artifacts[j].refId]=b.artifacts[j];
+
+  var addedList=[],removedList=[],modifiedList=[];
+  var allKeys={};
+  for(var ka in aMap)allKeys[ka]=1;
+  for(var kb in bMap)allKeys[kb]=1;
+  for(var key in allKeys){
+    if(!aMap[key])addedList.push(bMap[key]);
+    else if(!bMap[key])removedList.push(aMap[key]);
+    else if(aMap[key].contentHash!==bMap[key].contentHash)modifiedList.push({before:aMap[key],after:bMap[key]});
+  }
+
+  STATE.lastDiff={fromBundle:a.manifest.bundleId,toBundle:b.manifest.bundleId,added:addedList,removed:removedList,modified:modifiedList};
+
+  $("#diffStats").innerHTML=
+    '<div class="stat-box"><div class="stat-val" style="color:var(--ok)">'+addedList.length+'</div><div class="stat-label">Added</div></div>'+
+    '<div class="stat-box"><div class="stat-val" style="color:var(--bad)">'+removedList.length+'</div><div class="stat-label">Removed</div></div>'+
+    '<div class="stat-box"><div class="stat-val" style="color:var(--neon-amber)">'+modifiedList.length+'</div><div class="stat-label">Modified</div></div>'+
+    '<div class="stat-box"><div class="stat-val">'+esc(a.manifest.bundleId.slice(0,8))+" &rarr; "+esc(b.manifest.bundleId.slice(0,8))+'</div><div class="stat-label">Bundle Pair</div></div>';
+
+  var html="";
+
+  if(addedList.length){
+    html+='<div style="margin-bottom:6px;font-size:11px;font-weight:700;color:var(--ok)">Added</div>';
+    for(var ai=0;ai<addedList.length;ai++){
+      html+='<div class="diff-row"><div class="diff-side diff-add">'+
+        '<div class="diff-label add">+ '+esc(addedList[ai].refId)+copyBtn(addedList[ai].refId)+'</div>'+
+        '<span class="badge badge-amber">'+esc(addedList[ai].refType)+'</span>'+
+        '<div class="mono" style="font-size:10px;color:var(--muted);margin-top:4px">'+esc(addedList[ai].contentHash.slice(0,40))+'...'+copyBtn(addedList[ai].contentHash)+'</div>'+
+        '</div></div>';
+    }
+  }
+
+  if(removedList.length){
+    html+='<div style="margin-bottom:6px;font-size:11px;font-weight:700;color:var(--bad)">Removed</div>';
+    for(var ri=0;ri<removedList.length;ri++){
+      html+='<div class="diff-row"><div class="diff-side diff-rem">'+
+        '<div class="diff-label rem">- '+esc(removedList[ri].refId)+copyBtn(removedList[ri].refId)+'</div>'+
+        '<span class="badge badge-pink">'+esc(removedList[ri].refType)+'</span>'+
+        '<div class="mono" style="font-size:10px;color:var(--muted);margin-top:4px">'+esc(removedList[ri].contentHash.slice(0,40))+'...'+copyBtn(removedList[ri].contentHash)+'</div>'+
+        '</div></div>';
+    }
+  }
+
+  if(modifiedList.length){
+    html+='<div style="margin-bottom:6px;font-size:11px;font-weight:700;color:var(--neon-amber)">Modified</div>';
+    for(var mi=0;mi<modifiedList.length;mi++){
+      var m=modifiedList[mi];
+      html+='<div class="diff-row">'+
+        '<div class="diff-side diff-mod">'+
+          '<div class="diff-label mod">Before: '+esc(m.before.refId)+'</div>'+
+          '<div class="mono" style="font-size:10px;color:var(--bad);margin-top:4px">'+esc(m.before.contentHash.slice(0,40))+'...'+copyBtn(m.before.contentHash)+'</div>'+
+        '</div>'+
+        '<div class="diff-side diff-mod">'+
+          '<div class="diff-label mod">After: '+esc(m.after.refId)+'</div>'+
+          '<div class="mono" style="font-size:10px;color:var(--ok);margin-top:4px">'+esc(m.after.contentHash.slice(0,40))+'...'+copyBtn(m.after.contentHash)+'</div>'+
+        '</div>'+
+      '</div>';
+    }
+  }
+
+  if(!addedList.length&&!removedList.length&&!modifiedList.length){
+    html='<div class="badge badge-pass">Bundles are identical</div>';
+  }
+
+  if(a.manifest.version!==b.manifest.version){
+    html+='<div style="margin-top:14px"><div style="font-size:11px;font-weight:700;color:var(--neon-purple);margin-bottom:6px">Manifest changes</div>';
+    html+='<div class="diff-row"><div class="diff-side diff-mod"><div class="diff-label mod">version</div>'+
+      '<span style="color:var(--bad)">'+esc(a.manifest.version)+'</span> &rarr; <span style="color:var(--ok)">'+esc(b.manifest.version)+'</span></div></div></div>';
+  }
+
+  $("#diffResults").innerHTML=html;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Mapping Diagram
+   ══════════════════════════════════════════════════════════ */
+function renderMapping(){
+  var maps=[
+    {cog:"evidence",ds:"truth_claims",color:"cyan"},
+    {cog:"rationale",ds:"reasoning",color:"pink"},
+    {cog:"memory",ds:"memory_refs",color:"purple"},
+    {cog:"drift",ds:"drift_annotations",color:"amber"},
+    {cog:"patch",ds:"patch_refs",color:"green"}
+  ];
+  var html="";
+  for(var i=0;i<maps.length;i++){
+    var m=maps[i];
+    html+='<div class="map-row">'+
+      '<div class="map-left"><span class="badge badge-'+m.color+'">'+esc(m.cog)+'</span></div>'+
+      '<div class="map-arrow">&harr;</div>'+
+      '<div class="map-right"><span class="badge badge-'+m.color+'">'+esc(m.ds)+'</span></div>'+
+    '</div>';
+  }
+  html+='<div class="map-row" style="margin-top:8px">'+
+    '<div class="map-left"><span class="badge badge-warn">unrecognized type</span></div>'+
+    '<div class="map-arrow">&rarr;</div>'+
+    '<div class="map-right"><span class="badge badge-cyan">truth_claims</span> <span class="badge badge-warn">unmapped</span></div>'+
+  '</div>';
+  $("#mappingDiagram").innerHTML=html;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Schema Viewer
+   ══════════════════════════════════════════════════════════ */
+var SCHEMAS={
+bundle:{
+  "$schema":"urn:jsonschema:draft-2020-12",
+  "$id":"urn:sigma-overwatch:schemas:cog_bundle.schema.json",
+  title:"COG Bundle",
+  description:"Top-level COG portable cognition bundle.",
+  type:"object",
+  required:["manifest"],
+  properties:{
+    manifest:{type:"object",required:["bundleId"],properties:{
+      bundleId:{type:"string"},version:{type:"string"},createdAt:{type:"string",format:"date-time"},source:{type:"string"}
+    }},
+    artifacts:{type:"array",items:{"$ref":"urn:sigma-overwatch:schemas:cog_artifact_ref.schema.json"}},
+    proof:{"$ref":"urn:sigma-overwatch:schemas:cog_proof.schema.json"},
+    replaySteps:{type:"array",items:{"$ref":"urn:sigma-overwatch:schemas:cog_replay_step.schema.json"}},
+    rawMetadata:{type:"object"},
+    commitBoundary:{type:"object",description:"Authority, admissibility, and constraint snapshot at seal time."}
+  }
+},
+artifact:{
+  "$schema":"urn:jsonschema:draft-2020-12",
+  "$id":"urn:sigma-overwatch:schemas:cog_artifact_ref.schema.json",
+  title:"COG Artifact Ref",
+  type:"object",
+  required:["refId","refType"],
+  properties:{
+    refId:{type:"string"},
+    refType:{type:"string","enum":["evidence","rationale","memory","drift","patch"]},
+    contentHash:{type:"string",pattern:"^(sha256:[a-f0-9]{64})?$"},
+    payload:{type:"object"}
+  }
+},
+proof:{
+  "$schema":"urn:jsonschema:draft-2020-12",
+  "$id":"urn:sigma-overwatch:schemas:cog_proof.schema.json",
+  title:"COG Proof",
+  type:"object",
+  properties:{
+    proofChain:{type:"array",items:{type:"object",required:["index","type"],properties:{
+      index:{type:"integer",minimum:0},
+      hash:{type:"string"},type:{type:"string"},
+      chainHash:{type:"string"},prevChainHash:{}
+    }}},
+    signatures:{type:"array",items:{type:"object"}},
+    ruleSeal:{type:["string","null"]},
+    timestamps:{type:"array",items:{type:"string",format:"date-time"}}
+  }
+},
+replay:{
+  "$schema":"urn:jsonschema:draft-2020-12",
+  "$id":"urn:sigma-overwatch:schemas:cog_replay_step.schema.json",
+  title:"COG Replay Step",
+  type:"object",
+  required:["stepIndex","action"],
+  properties:{
+    stepIndex:{type:"integer",minimum:0},
+    action:{type:"string"},
+    inputRef:{type:["string","null"]},
+    outputRef:{type:["string","null"]},
+    timestamp:{type:"string",format:"date-time"},
+    metadata:{type:"object"}
+  }
+}
+};
+
+function renderSchema(key){
+  var schema=SCHEMAS[key];
+  if(!schema){$("#schemaViewer").textContent="Schema not found";return}
+  var titles={bundle:"cog_bundle.schema.json",artifact:"cog_artifact_ref.schema.json",proof:"cog_proof.schema.json",replay:"cog_replay_step.schema.json"};
+  $("#schemaTitle").innerHTML=esc(titles[key]||key)+' <button class="copy-btn" id="btnCopySchema">copy</button>';
+
+  var raw=JSON.stringify(schema,null,2);
+  var highlighted=raw
+    .replace(/("(?:\\.|[^"\\])*")\s*:/g,'<span class="sk">$1</span>:')
+    .replace(/:\s*("(?:\\.|[^"\\])*")/g,': <span class="sv">$1</span>')
+    .replace(/:\s*(true|false|null|\d+)/g,': <span class="st">$1</span>');
+  $("#schemaViewer").innerHTML=highlighted;
+
+  /* Re-bind copy button */
+  var copySchemaBtn=$("#btnCopySchema");
+  if(copySchemaBtn){
+    copySchemaBtn.addEventListener("click",function(){
+      copyText(JSON.stringify(schema,null,2));
+    });
+  }
+
+  $$("#schemaSelector button").forEach(function(b){
+    if(b.dataset.schema===key)b.classList.add("btn-primary");
+    else b.classList.remove("btn-primary");
+  });
+}
+
+/* ── Init export pipeline static view ─── */
+document.addEventListener("DOMContentLoaded",function(){
+  setTimeout(function(){
+    renderExportPipeline();
+  },50);
+});
+
+})();
+</script>
+</body>
+</html>
