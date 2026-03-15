@@ -276,6 +276,8 @@ ALLOWED_ACRONYMS = {
     # CERPA Mars Mission EDGE — space ops, environment, comms tokens
     "ASSIST", "COMMS", "DELAY", "DUST", "EARTH", "ISRU", "LIDAR",
     "MARS", "MOXIE", "NASA", "NPR", "SOLAR", "SPE", "STORM",
+    # COG Adapter integration — bundle format and crypto terms
+    "COG", "PQC",
     # Context Envelope dimension names
     "WHEN", "WHERE",
     # Decision Accounting — cost/value/debt ID prefixes, category enums

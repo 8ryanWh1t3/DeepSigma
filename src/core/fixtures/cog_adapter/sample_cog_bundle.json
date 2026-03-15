@@ -1,0 +1,136 @@
+{
+  "manifest": {
+    "bundleId": "cog-bundle-demo-001",
+    "version": "1.0",
+    "createdAt": "2026-03-15T12:00:00Z",
+    "description": "Sample COG bundle for DeepSigma adapter testing",
+    "artifactRefs": [
+      "evidence-001",
+      "rationale-001",
+      "memory-001",
+      "drift-001",
+      "patch-001"
+    ],
+    "metadata": {
+      "source": "test-harness",
+      "domain": "governance"
+    }
+  },
+  "artifacts": [
+    {
+      "refId": "evidence-001",
+      "refType": "evidence",
+      "contentHash": "",
+      "payload": {
+        "claimId": "CLAIM-2026-0001",
+        "statement": "System latency is within SLA bounds",
+        "confidence": 0.92,
+        "source": "monitoring-agent",
+        "observedAt": "2026-03-15T11:55:00Z"
+      }
+    },
+    {
+      "refId": "rationale-001",
+      "refType": "rationale",
+      "contentHash": "",
+      "payload": {
+        "decisionId": "DEC-2026-0001",
+        "goal": "Determine whether to scale infrastructure",
+        "selectedOption": "maintain-current-capacity",
+        "reasoning": "Latency within bounds, no drift detected, cost optimization preferred"
+      }
+    },
+    {
+      "refId": "memory-001",
+      "refType": "memory",
+      "contentHash": "",
+      "payload": {
+        "precedentId": "PREC-2025-042",
+        "takeaway": "Previous scaling event was premature and caused budget overshoot",
+        "relevanceScore": 0.85
+      }
+    },
+    {
+      "refId": "drift-001",
+      "refType": "drift",
+      "contentHash": "",
+      "payload": {
+        "driftId": "DRIFT-2026-0001",
+        "trigger": "latency_spike",
+        "severity": "yellow",
+        "description": "Transient latency spike detected but self-resolved"
+      }
+    },
+    {
+      "refId": "patch-001",
+      "refType": "patch",
+      "contentHash": "",
+      "payload": {
+        "patchId": "PATCH-2026-0001",
+        "action": "adjust_alert_threshold",
+        "rationale": "Reduce false positives from transient spikes",
+        "status": "proposed"
+      }
+    }
+  ],
+  "proof": {
+    "proofChain": [
+      {
+        "index": 0,
+        "hash": "sha256:placeholder",
+        "type": "bundle_seal"
+      }
+    ],
+    "signatures": [],
+    "ruleSeal": null,
+    "timestamps": [
+      "2026-03-15T12:00:00Z"
+    ]
+  },
+  "replaySteps": [
+    {
+      "stepIndex": 0,
+      "action": "ingest_evidence",
+      "inputRef": "evidence-001",
+      "outputRef": "",
+      "timestamp": "2026-03-15T11:55:00Z",
+      "metadata": {"stage": "truth"}
+    },
+    {
+      "stepIndex": 1,
+      "action": "evaluate_claims",
+      "inputRef": "evidence-001",
+      "outputRef": "rationale-001",
+      "timestamp": "2026-03-15T11:56:00Z",
+      "metadata": {"stage": "reasoning"}
+    },
+    {
+      "stepIndex": 2,
+      "action": "check_memory",
+      "inputRef": "memory-001",
+      "outputRef": "",
+      "timestamp": "2026-03-15T11:57:00Z",
+      "metadata": {"stage": "memory"}
+    },
+    {
+      "stepIndex": 3,
+      "action": "detect_drift",
+      "inputRef": "",
+      "outputRef": "drift-001",
+      "timestamp": "2026-03-15T11:58:00Z",
+      "metadata": {"stage": "drift"}
+    },
+    {
+      "stepIndex": 4,
+      "action": "propose_patch",
+      "inputRef": "drift-001",
+      "outputRef": "patch-001",
+      "timestamp": "2026-03-15T11:59:00Z",
+      "metadata": {"stage": "patch"}
+    }
+  ],
+  "rawMetadata": {
+    "exportedBy": "test-harness",
+    "format": "cog-json-v1"
+  }
+}
