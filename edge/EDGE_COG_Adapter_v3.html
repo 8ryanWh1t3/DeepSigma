@@ -398,7 +398,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
 
 /* ── v4.3: Graph View ───────────────────── */
 .graph-wrap{position:relative;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:rgba(0,0,0,.2)}
-.graph-wrap svg{display:block;width:100%;height:450px;cursor:grab;overflow:hidden}
+.graph-wrap svg{display:block;width:100%;height:600px;cursor:grab;overflow:hidden}
 .graph-wrap.dragging svg{cursor:grabbing}
 .graph-controls{position:absolute;top:8px;right:8px;display:flex;gap:4px;z-index:5}
 .graph-controls button{width:28px;height:28px;font-size:14px;padding:0;display:flex;align-items:center;justify-content:center}
@@ -972,17 +972,18 @@ function makeSampleBundle(seed){
   _rngState=seed||42;
   var bundleId=rngId();
   var artifacts=[];
-  var LABELS=["Primary evidence claim","Causal rationale chain","Precedent memory node","Coherence drift signal","RETCON patch correction","Supplemental evidence","Temporal drift marker","Memory graph link"];
-  for(var i=0;i<8;i++){
+  var LABELS=["Primary evidence claim","Causal rationale chain","Precedent memory node","Coherence drift signal","RETCON patch correction","Supplemental evidence","Temporal drift marker","Memory graph link","Secondary evidence","Drift correlation","Patch verification","Evidence synthesis","Rationale branch","Memory consolidation","Drift propagation","Correction cascade","Evidence anchor","Causal bridge","Memory fork","Drift decay","Patch rollup","Evidence cluster","Rationale leaf","Memory merge","Drift resolution"];
+  var AUTHORITY_LAWS=["No silent failure","Traceable rationale","No canon overwrite","Sealed replay","Human override"];
+  for(var i=0;i<25;i++){
     artifacts.push({
       refId:"ref-"+rngHex(6),
       refType:REF_TYPES[i%REF_TYPES.length],
       contentHash:"sha256:"+rngHex(64),
-      payload:{label:LABELS[i],score:Math.round(rng()*100)/100,cerpaStage:CERPA_MAP[REF_TYPES[i%REF_TYPES.length]].stage,driftType:i%REF_TYPES.length===3?["value","context","scope"][Math.floor(rng()*3)]:null,authorityOps:i<3?["Law "+((i%5)+1)+": "+(["No silent failure","Traceable rationale","No canon overwrite","Sealed replay","Human override"][i%5])]:null}
+      payload:{label:LABELS[i],score:Math.round(rng()*100)/100,cerpaStage:CERPA_MAP[REF_TYPES[i%REF_TYPES.length]].stage,driftType:i%REF_TYPES.length===3?["value","context","scope"][Math.floor(rng()*3)]:null,authorityOps:i%3===0?["Law "+((i%5)+1)+": "+AUTHORITY_LAWS[i%5]]:null}
     });
   }
   var replaySteps=[];
-  for(var j=0;j<4;j++){
+  for(var j=0;j<10;j++){
     replaySteps.push({
       stepIndex:j,
       action:ACTIONS[Math.floor(rng()*ACTIONS.length)],
@@ -2202,7 +2203,7 @@ function renderGraph(){
   /* v4.4: Cluster nodes when > 50 */
   var _skipCluster=_graphState&&_graphState._expanded;
   var _clusters=null;
-  if(nodes.length>50&&!_skipCluster){
+  if(nodes.length>150&&!_skipCluster){
     var groups={};
     for(var gi=0;gi<nodes.length;gi++){
       var gkey=nodes[gi].type;
