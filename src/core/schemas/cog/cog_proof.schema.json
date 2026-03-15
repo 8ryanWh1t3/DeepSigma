@@ -1,0 +1,66 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://sigma-overwatch.dev/schemas/cog_proof.schema.json",
+    "title": "COG Proof",
+    "description": "Proof metadata for a COG bundle — hash chain, signatures, and timestamps.",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "proofChain": {
+            "type": "array",
+            "description": "Ordered hash chain entries for bundle integrity.",
+            "items": {
+                "type": "object",
+                "required": ["index", "type"],
+                "properties": {
+                    "index": {
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "hash": {
+                        "type": "string",
+                        "description": "SHA-256 hash for this chain entry."
+                    },
+                    "type": {
+                        "type": "string",
+                        "description": "Entry type (e.g., bundle_seal, artifact_link)."
+                    },
+                    "refId": {
+                        "type": "string",
+                        "description": "Artifact ref ID (for per-artifact chain entries)."
+                    },
+                    "contentHash": {
+                        "type": "string",
+                        "description": "Artifact content hash (for per-artifact chain entries)."
+                    },
+                    "chainHash": {
+                        "type": "string",
+                        "description": "Chain hash linking this entry to the sequence."
+                    },
+                    "prevChainHash": {
+                        "description": "Previous entry's chain hash (null for first entry)."
+                    }
+                }
+            }
+        },
+        "signatures": {
+            "type": "array",
+            "description": "Cryptographic signatures (reserved for future use).",
+            "items": {
+                "type": "object"
+            }
+        },
+        "ruleSeal": {
+            "description": "Optional policy rule seal hash.",
+            "type": ["string", "null"]
+        },
+        "timestamps": {
+            "type": "array",
+            "description": "ISO 8601 timestamps for chain events.",
+            "items": {
+                "type": "string",
+                "format": "date-time"
+            }
+        }
+    }
+}

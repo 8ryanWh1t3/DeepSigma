@@ -1,0 +1,38 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://sigma-overwatch.dev/schemas/cog_replay_step.schema.json",
+    "title": "COG Replay Step",
+    "description": "A single step in a COG bundle replay sequence.",
+    "type": "object",
+    "required": ["stepIndex", "action"],
+    "additionalProperties": false,
+    "properties": {
+        "stepIndex": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Zero-based position in the replay sequence."
+        },
+        "action": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Action performed in this step (e.g., ingest_evidence, evaluate_claims)."
+        },
+        "inputRef": {
+            "type": "string",
+            "description": "Artifact ref consumed by this step."
+        },
+        "outputRef": {
+            "type": "string",
+            "description": "Artifact ref produced by this step."
+        },
+        "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp of step execution."
+        },
+        "metadata": {
+            "type": "object",
+            "description": "Optional step-level metadata."
+        }
+    }
+}

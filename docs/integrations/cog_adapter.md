@@ -56,19 +56,40 @@ coherence cog export --artifact path/to/artifact.json output_bundle.json
 # Verify a COG bundle
 coherence cog verify path/to/bundle.json
 coherence cog verify path/to/bundle.json --json
+
+# Compare two bundles
+coherence cog diff bundle_v1.json bundle_v2.json
+coherence cog diff bundle_v1.json bundle_v2.json --json
+
+# Batch import all bundles from a directory
+coherence cog batch-import path/to/bundles/
+coherence cog batch-import path/to/bundles/ --json
+
+# Merge multiple bundles into one
+coherence cog merge bundle1.json bundle2.json -o merged.json
+coherence cog merge bundle1.json bundle2.json bundle3.json -o merged.json --json
 ```
 
 ## Python API
 
 ```python
 from core.integrations.cog_adapter import (
-    load_cog_bundle,
-    cog_to_deepsigma,
-    deepsigma_to_cog,
-    write_cog_bundle,
+    # Import
+    load_cog_bundle, cog_to_deepsigma,
+    stream_cog_artifacts, load_cog_bundle_metadata,
+    # Export
+    deepsigma_to_cog, write_cog_bundle,
+    # Verify
     verify_cog_bundle,
-    extract_replay_sequence,
-    to_deepsigma_replay_record,
+    # Replay
+    extract_replay_sequence, to_deepsigma_replay_record,
+    # Proof Chain
+    build_proof_chain, verify_proof_chain,
+    # Diff
+    diff_cog_bundles, CogBundleDiff,
+    # Batch
+    batch_import_cog_bundles, batch_export_deepsigma,
+    filter_artifacts, merge_bundles, BatchImportResult,
 )
 
 # Import
@@ -79,14 +100,82 @@ artifact = cog_to_deepsigma(bundle)
 bundle = deepsigma_to_cog(artifact)
 write_cog_bundle(bundle, "exported.json")
 
-# Verify
+# Verify (includes schema validation + proof chain verification)
 result = verify_cog_bundle(bundle)
 print(result["status"])  # "pass", "warn", or "fail"
+print(result["proof_chain_valid"])  # per-artifact chain integrity
+print(result["schema_valid"])  # JSON Schema validation
 
 # Replay
 steps = extract_replay_sequence(bundle)
 record = to_deepsigma_replay_record(bundle)
+
+# Proof Chain
+chain = build_proof_chain(bundle.artifacts)
+valid, errors = verify_proof_chain(chain)
+
+# Diff
+before = load_cog_bundle("v1.json")
+after = load_cog_bundle("v2.json")
+diff = diff_cog_bundles(before, after)
+print(f"Added: {len(diff.added_artifacts)}")
+print(f"Removed: {len(diff.removed_artifacts)}")
+print(f"Modified: {len(diff.modified_artifacts)}")
+
+# Streaming (iterator-based, pipeline-friendly)
+for artifact_ref in stream_cog_artifacts("large_bundle.json"):
+    print(artifact_ref.ref_id, artifact_ref.ref_type)
+
+# Metadata-only (skip artifact parsing)
+manifest, proof = load_cog_bundle_metadata("bundle.json")
+
+# Batch import
+result = batch_import_cog_bundles(["a.json", "b.json", "c.json"])
+print(f"{result.succeeded}/{result.total} imported")
+
+# Batch export
+result = batch_export_deepsigma([artifact1, artifact2], "output_dir/")
+
+# Filter
+evidence_only = filter_artifacts(bundle, {"evidence", "rationale"})
+
+# Merge
+merged = merge_bundles([bundle1, bundle2])
+write_cog_bundle(merged, "merged.json")
 ```
+
+## JSON Schema Validation
+
+COG bundles are validated against formal JSON Schemas at import time:
+
+- `src/core/schemas/cog/cog_bundle.schema.json` — top-level bundle structure
+- `src/core/schemas/cog/cog_artifact_ref.schema.json` — artifact ref with `refType` enum
+- `src/core/schemas/cog/cog_proof.schema.json` — proof chain and signatures
+- `src/core/schemas/cog/cog_replay_step.schema.json` — replay step structure
+
+Schemas follow Draft 2020-12 and integrate with the existing `schema_validator.py` infrastructure.
+
+## Per-Artifact Proof Chain
+
+The exporter generates a **per-artifact hash chain** following the
+`evidence_chain.py` pattern from `core.authority`:
+
+- Each artifact gets a chain entry with `chainHash` (SHA-256 over entry fields)
+  and `prevChainHash` (link to previous entry, `null` for first)
+- The verifier walks the chain, re-computing each hash and checking links
+- Legacy bundles with a single `bundle_seal` entry are still accepted
+
+## MCP Tools
+
+Five COG tools are registered in the MCP server scaffold:
+
+| Tool | Description |
+|---|---|
+| `cog.import_bundle` | Import a COG bundle and return the mapped Deep Sigma artifact |
+| `cog.export_artifact` | Export a Deep Sigma artifact as a COG bundle |
+| `cog.verify_bundle` | Verify bundle integrity, proof chain, and schema |
+| `cog.diff_bundles` | Compare two bundles for artifact-level differences |
+| `cog.list_artifacts` | List artifacts with optional `refType` filter |
 
 ## Known Limitations
 
@@ -94,12 +183,10 @@ record = to_deepsigma_replay_record(bundle)
 2. **No real cryptography** — uses SHA-256 content hashing only (no HMAC signatures, no PQC)
 3. **No COG scripting** — does not execute `.cogs` scripts or bytecode
 4. **No peer sync** — does not implement the COG wire protocol for mesh/gossip sync
-5. **Proof chain is shallow** — generates a single bundle-seal entry, not a full hash chain
 
 ## Future Improvements
 
 - Binary `.cog` format support (pack/unpack)
-- Full proof chain with per-artifact hash entries
+- PQC signature support (infrastructure ready — `PQC` in GPE allowlist)
 - COG wire protocol adapter for peer sync
-- MCP tool integration for live bundle exchange
-- Streaming import/export for large bundles
+- True streaming with `ijson` for very large bundles

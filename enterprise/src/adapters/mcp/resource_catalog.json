@@ -23,6 +23,12 @@
       "name": "Coherence Stats",
       "description": "Current coherence pipeline statistics including scores and memory graph counts.",
       "mimeType": "application/json"
+    },
+    {
+      "uriTemplate": "cog://{bundle_id}",
+      "name": "COG Bundle",
+      "description": "A COG portable cognition/proof bundle with artifacts, proof chain, and replay steps.",
+      "mimeType": "application/json"
     }
   ]
 }

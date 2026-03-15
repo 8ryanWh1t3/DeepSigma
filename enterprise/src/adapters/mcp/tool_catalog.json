@@ -551,6 +551,113 @@
           "outcome_code": {"type": "string"}
         }
       }
+    },
+    {
+      "name": "cog.import_bundle",
+      "description": "Import a COG bundle from a file path and return the mapped DeepSigma artifact.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["path"],
+        "properties": {
+          "path": {"type": "string", "description": "Path to COG bundle JSON file"}
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "artifactId": {"type": "string"},
+          "truthClaims": {"type": "array"},
+          "reasoning": {"type": "object"},
+          "memoryRefs": {"type": "array"},
+          "driftAnnotations": {"type": "array"},
+          "patchRefs": {"type": "array"}
+        }
+      }
+    },
+    {
+      "name": "cog.export_artifact",
+      "description": "Export a DeepSigma artifact as a COG bundle to a file path.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["artifact", "outputPath"],
+        "properties": {
+          "artifact": {"type": "object", "description": "DeepSigma artifact dict to export"},
+          "outputPath": {"type": "string", "description": "Output file path for the COG bundle"}
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "bundleId": {"type": "string"},
+          "artifactCount": {"type": "integer"},
+          "path": {"type": "string"}
+        }
+      }
+    },
+    {
+      "name": "cog.verify_bundle",
+      "description": "Verify a COG bundle for integrity, proof chain, and manifest consistency.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["path"],
+        "properties": {
+          "path": {"type": "string", "description": "Path to COG bundle JSON file"}
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "required": ["status"],
+        "properties": {
+          "status": {"type": "string", "enum": ["pass", "warn", "fail"]},
+          "schema_valid": {"type": "boolean"},
+          "content_hash_valid": {"type": "boolean"},
+          "proof_chain_valid": {"type": "boolean"},
+          "manifest_consistent": {"type": "boolean"},
+          "issues": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    },
+    {
+      "name": "cog.diff_bundles",
+      "description": "Compare two COG bundles and return artifact-level differences.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["path1", "path2"],
+        "properties": {
+          "path1": {"type": "string", "description": "Path to first bundle"},
+          "path2": {"type": "string", "description": "Path to second bundle"}
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "fromBundleId": {"type": "string"},
+          "toBundleId": {"type": "string"},
+          "addedArtifacts": {"type": "array"},
+          "removedArtifacts": {"type": "array"},
+          "modifiedArtifacts": {"type": "array"}
+        }
+      }
+    },
+    {
+      "name": "cog.list_artifacts",
+      "description": "List artifacts in a COG bundle with optional type filter.",
+      "inputSchema": {
+        "type": "object",
+        "required": ["path"],
+        "properties": {
+          "path": {"type": "string", "description": "Path to COG bundle JSON file"},
+          "refTypes": {"type": "array", "items": {"type": "string"}, "description": "Filter by ref types (e.g., evidence, rationale)"}
+        }
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "bundleId": {"type": "string"},
+          "total": {"type": "integer"},
+          "artifacts": {"type": "array"}
+        }
+      }
     }
   ]
 }

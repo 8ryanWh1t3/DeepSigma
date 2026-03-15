@@ -1,18 +1,23 @@
 """COG bundle importer — load and convert inbound bundles.
 
 Functions:
-    load_cog_bundle  — parse a JSON file into a CogBundle
-    cog_to_deepsigma — map a CogBundle into a DeepSigmaDecisionArtifact
+    load_cog_bundle          — parse a JSON file into a CogBundle
+    cog_to_deepsigma         — map a CogBundle into a DeepSigmaDecisionArtifact
+    stream_cog_artifacts     — yield artifacts one at a time (iterator)
+    load_cog_bundle_metadata — load only manifest + proof (skip artifacts)
 """
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 from .models import (
+    CogArtifactRef,
     CogBundle,
+    CogManifest,
+    CogProof,
     DeepSigmaDecisionArtifact,
     DeepSigmaReceipt,
     DeepSigmaReplayRecord,
@@ -96,3 +101,33 @@ def cog_to_deepsigma(bundle: CogBundle) -> DeepSigmaDecisionArtifact:
         replay=replay,
         metadata=bundle.raw_metadata,
     )
+
+
+def stream_cog_artifacts(path: str) -> Iterator[CogArtifactRef]:
+    """Yield artifacts from a COG bundle one at a time.
+
+    Loads the full JSON (no ``ijson`` dependency) but yields artifacts
+    lazily so downstream pipelines can process them without holding all
+    converted results in memory simultaneously.  A future version could
+    swap in ``ijson`` for true streaming on very large bundles.
+    """
+    p = Path(path)
+    data: Dict[str, Any] = json.loads(p.read_text(encoding="utf-8"))
+    for artifact_data in data.get("artifacts", []):
+        yield CogArtifactRef.from_dict(artifact_data)
+
+
+def load_cog_bundle_metadata(
+    path: str,
+) -> Tuple[CogManifest, Optional[CogProof]]:
+    """Load only the manifest and proof from a COG bundle.
+
+    Useful for batch listing or quick inspection without parsing all
+    artifacts.
+    """
+    p = Path(path)
+    data: Dict[str, Any] = json.loads(p.read_text(encoding="utf-8"))
+    manifest = CogManifest.from_dict(data.get("manifest", {}))
+    proof_data = data.get("proof")
+    proof = CogProof.from_dict(proof_data) if proof_data else None
+    return manifest, proof
