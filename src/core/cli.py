@@ -1391,6 +1391,10 @@ def main() -> None:
     from .jrm.cli import register_jrm_commands
     register_jrm_commands(subparsers)
 
+    # ── cog ──────────────────────────────────────────────────────
+    from .integrations.cog_adapter.cli import register_cog_commands
+    register_cog_commands(subparsers)
+
     # ── demo ─────────────────────────────────────────────────────
     p_demo = subparsers.add_parser(
         "demo",

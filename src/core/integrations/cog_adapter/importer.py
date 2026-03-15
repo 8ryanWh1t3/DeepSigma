@@ -1,0 +1,98 @@
+"""COG bundle importer — load and convert inbound bundles.
+
+Functions:
+    load_cog_bundle  — parse a JSON file into a CogBundle
+    cog_to_deepsigma — map a CogBundle into a DeepSigmaDecisionArtifact
+"""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any, Dict, List
+
+from .models import (
+    CogBundle,
+    DeepSigmaDecisionArtifact,
+    DeepSigmaReceipt,
+    DeepSigmaReplayRecord,
+)
+
+
+def load_cog_bundle(path: str) -> CogBundle:
+    """Load a COG-compatible JSON bundle from *path*.
+
+    Missing sections become None or empty — never invented.
+    """
+    p = Path(path)
+    text = p.read_text(encoding="utf-8")
+    data: Dict[str, Any] = json.loads(text)
+    return CogBundle.from_dict(data)
+
+
+def cog_to_deepsigma(bundle: CogBundle) -> DeepSigmaDecisionArtifact:
+    """Convert a CogBundle into a DeepSigmaDecisionArtifact.
+
+    Maps artifact refs by ref_type:
+        evidence  -> truth_claims
+        rationale -> reasoning
+        memory    -> memory_refs
+        drift     -> drift_annotations
+        patch     -> patch_refs
+
+    Missing fields are preserved as empty, never fabricated.
+    """
+    truth_claims: List[Dict[str, Any]] = []
+    reasoning: Dict[str, Any] = {}
+    memory_refs: List[Dict[str, Any]] = []
+    drift_annotations: List[Dict[str, Any]] = []
+    patch_refs: List[Dict[str, Any]] = []
+
+    for artifact in bundle.artifacts:
+        ref_dict = artifact.to_dict()
+        rt = artifact.ref_type.lower()
+
+        if rt == "evidence":
+            truth_claims.append(ref_dict)
+        elif rt == "rationale":
+            reasoning = ref_dict.get("payload", ref_dict)
+        elif rt == "memory":
+            memory_refs.append(ref_dict)
+        elif rt == "drift":
+            drift_annotations.append(ref_dict)
+        elif rt == "patch":
+            patch_refs.append(ref_dict)
+        else:
+            # Unknown ref_type — preserve in metadata
+            truth_claims.append(ref_dict)
+
+    # Build receipt from proof metadata
+    receipt = None
+    if bundle.proof is not None:
+        receipt = DeepSigmaReceipt(
+            artifact_id=bundle.manifest.bundle_id,
+            proof_metadata=bundle.proof.to_dict(),
+            source_bundle_id=bundle.manifest.bundle_id,
+        )
+
+    # Build replay record
+    replay = None
+    if bundle.replay_steps:
+        replay = DeepSigmaReplayRecord(
+            record_id=f"replay-{bundle.manifest.bundle_id}",
+            artifact_id=bundle.manifest.bundle_id,
+            steps=[s.to_dict() for s in bundle.replay_steps],
+            lineage={"sourceBundleId": bundle.manifest.bundle_id},
+        )
+
+    return DeepSigmaDecisionArtifact(
+        artifact_id=bundle.manifest.bundle_id,
+        truth_claims=truth_claims,
+        reasoning=reasoning,
+        memory_refs=memory_refs,
+        drift_annotations=drift_annotations,
+        patch_refs=patch_refs,
+        receipt=receipt,
+        replay=replay,
+        metadata=bundle.raw_metadata,
+    )
