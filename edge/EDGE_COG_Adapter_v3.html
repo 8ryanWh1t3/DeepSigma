@@ -2167,7 +2167,7 @@ function renderGraph(){
 
   var graph=buildDependencyGraph(steps,arts);
   var svgNS="http://www.w3.org/2000/svg";
-  var W=1400,H=900;
+  var W=1600,H=1000;
   var typeColors={evidence:"#4caf50",rationale:"#2196f3",memory:"#9c27b0",drift:"#ff9800",patch:"#e91e63"};
 
   /* Build nodes with initial positions (circle layout) */
@@ -2269,7 +2269,7 @@ function renderGraph(){
   }
 
   /* Run force simulation (simple: repulsion + spring + centering) */
-  _forceLayout(nodes,edges,W,H,120);
+  _forceLayout(nodes,edges,W,H,160);
 
   /* Render SVG */
   _renderGraphSvg(nodes,edges,W,H,typeColors,graph);
@@ -2277,7 +2277,7 @@ function renderGraph(){
 }
 
 function _forceLayout(nodes,edges,W,H,iterations){
-  var repulsion=5000,springLen=150,springK=0.02,damping=0.82,centerK=0.005;
+  var repulsion=8000,springLen=180,springK=0.015,damping=0.80,centerK=0.002;
 
   for(var iter=0;iter<iterations;iter++){
     /* Repulsion between all node pairs */

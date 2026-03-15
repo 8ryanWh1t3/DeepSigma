@@ -890,8 +890,12 @@ function makeSampleBundle(seed){
   }
   var replaySteps=[];
   var stages=["claim_assessment","event_collection","review_coverage","patch_gaps","apply_seal"];
-  for(var k=0;k<stages.length;k++){
-    replaySteps.push({stepIndex:k,action:stages[k],inputRef:k>0?artifacts[Math.min(k*20,artifacts.length-1)].refId:null,outputRef:artifacts[Math.min((k+1)*20,artifacts.length-1)].refId,timestamp:new Date(Date.now()-Math.floor(rng()*86400000)).toISOString()});
+  /* Generate 10 replay steps spanning more artifacts for richer graph connectivity */
+  for(var k=0;k<10;k++){
+    var stageIdx=k%stages.length;
+    var inIdx=Math.min(k*10,artifacts.length-1);
+    var outIdx=Math.min(k*10+Math.floor(rng()*15)+5,artifacts.length-1);
+    replaySteps.push({stepIndex:k,action:stages[stageIdx],inputRef:k>0?artifacts[inIdx].refId:null,outputRef:artifacts[outIdx].refId,timestamp:new Date(Date.now()-Math.floor(rng()*86400000)).toISOString()});
   }
   var boundary={
     authority:{sealAuthority:"sigma-overwatch/cmmc-assessor",policyVersion:"CMMC-2.0-L2",ruleSeal:"sha256:"+rngHex(64),authorityChainDepth:3},
@@ -1658,7 +1662,7 @@ function renderGraph(){
 
   var graph=buildDependencyGraph(steps,arts);
   var svgNS="http://www.w3.org/2000/svg";
-  var W=1400,H=900;
+  var W=1600,H=1000;
   /* CMMC uses family IDs as refTypes — color by family */
   var typeColors={AC:"#4caf50",AT:"#2196f3",AU:"#9c27b0",CM:"#ff9800",IA:"#e91e63",IR:"#00bcd4",MA:"#8bc34a",MP:"#ff5722",PE:"#607d8b",PS:"#795548",RA:"#ffc107",CA:"#03a9f4",SC:"#673ab7",SI:"#f44336"};
 
@@ -1672,13 +1676,14 @@ function renderGraph(){
     if(!famCounts[fid])famCounts[fid]=0;
     var fi3=famIdx[fid]!==undefined?famIdx[fid]:0;
     var clusterAngle=(2*Math.PI*fi3)/FAMILIES.length;
-    var clusterR=Math.min(W,H)*0.38;
+    var clusterR=Math.min(W,H)*0.42;
     var cx=W/2+clusterR*Math.cos(clusterAngle);
     var cy=H/2+clusterR*Math.sin(clusterAngle);
-    /* Spread practices within cluster */
-    var spread=45;
-    var localAngle=(2*Math.PI*famCounts[fid])/10;
-    var localR=spread*(0.5+famCounts[fid]*0.15);
+    /* Spread practices within cluster — spiral layout for large families */
+    var famTotal=FAMILIES[fi3]?FAMILIES[fi3].total:8;
+    var spread=Math.max(50,famTotal*3.5);
+    var localAngle=(2*Math.PI*famCounts[fid])/Math.max(6,famTotal);
+    var localR=spread*(0.3+famCounts[fid]*0.2);
     nodes.push({
       id:arts[i].refId,
       type:arts[i].refType,
@@ -1768,13 +1773,13 @@ function renderGraph(){
     legendEl.innerHTML=lhtml;
   }
 
-  _forceLayout(nodes,edges,W,H,120);
+  _forceLayout(nodes,edges,W,H,160);
   _renderGraphSvg(nodes,edges,W,H,typeColors,graph);
   _graphState={nodes:nodes,edges:edges,w:W,h:H,colors:typeColors,graph:graph};
 }
 
 function _forceLayout(nodes,edges,W,H,iterations){
-  var repulsion=5000,springLen=150,springK=0.02,damping=0.82,centerK=0.005;
+  var repulsion=8000,springLen=180,springK=0.015,damping=0.80,centerK=0.002;
   for(var iter=0;iter<iterations;iter++){
     for(var i=0;i<nodes.length;i++){
       for(var j=i+1;j<nodes.length;j++){
@@ -1873,7 +1878,7 @@ function _renderGraphSvg(nodes,edges,W,H,typeColors,graph){
     g.setAttribute("data-node-idx",n);
     var circle=document.createElementNS(svgNS,"circle");
     circle.setAttribute("cx",nodes[n].x);circle.setAttribute("cy",nodes[n].y);
-    circle.setAttribute("r",nodes[n]._cluster?15:6);
+    circle.setAttribute("r",nodes[n]._cluster?15:(nodes.length>50?4:6));
     circle.setAttribute("fill",typeColors[nodes[n].type]||"#888");
     circle.setAttribute("class","graph-node");
     var title=document.createElementNS(svgNS,"title");
@@ -1885,8 +1890,15 @@ function _renderGraphSvg(nodes,edges,W,H,typeColors,graph){
     label.setAttribute("x",nodes[n].x);label.setAttribute("y",nodes[n].y-10);
     label.setAttribute("class","graph-label");
     label.textContent=nodes[n].label;
+    if(nodes.length>50&&!nodes[n]._cluster)label.setAttribute("visibility","hidden");
     g.appendChild(label);
     svg.appendChild(g);
+  }
+
+  /* Show label on hover for dense graphs */
+  if(nodes.length>50){
+    svg.addEventListener("mouseover",function(ev){var ng=ev.target.closest("[data-node-idx]");if(ng){var lbl=ng.querySelector(".graph-label");if(lbl)lbl.setAttribute("visibility","visible")}});
+    svg.addEventListener("mouseout",function(ev){var ng=ev.target.closest("[data-node-idx]");if(ng){var lbl=ng.querySelector(".graph-label");if(lbl&&!ng.querySelector(".graph-selected"))lbl.setAttribute("visibility","hidden")}});
   }
 
   svg.addEventListener("click",function(ev){
