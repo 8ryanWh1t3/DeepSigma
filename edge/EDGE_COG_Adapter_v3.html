@@ -360,6 +360,58 @@ tr:hover td{background:rgba(0,240,255,.03)}
 .rsc-drifted{border-color:#ff7043!important;animation:driftFlash .6s ease-out}
 @keyframes driftFlash{0%{box-shadow:0 0 12px rgba(255,112,67,.5)}100%{box-shadow:none}}
 
+/* ── v4.3: Lineage Swimlanes ─────────────── */
+.lineage-wrap{overflow:auto;max-height:320px;border:1px solid var(--line);border-radius:8px;padding:8px;margin-top:10px}
+.lineage-wrap svg{min-width:100%}
+.lineage-lane-label{font-size:10px;font-weight:700;fill:var(--muted)}
+.lineage-event{cursor:pointer;transition:r .15s}
+.lineage-event:hover{r:7}
+.lineage-arrow{fill:none;stroke-width:1.5;opacity:.6}
+
+/* ── v4.3: Drift Heatmap ────────────────── */
+.hm-grid{display:grid;gap:2px;margin-top:10px}
+.hm-cell{width:32px;height:32px;border-radius:4px;cursor:pointer;transition:transform .15s;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#000}
+.hm-cell:hover{transform:scale(1.2);z-index:2}
+.hm-row-label{font-size:10px;color:var(--muted);display:flex;align-items:center;padding-right:6px;justify-content:flex-end;font-weight:600}
+.hm-col-label{font-size:9px;color:var(--muted);text-align:center}
+.hm-legend{display:flex;gap:4px;align-items:center;margin-top:10px;font-size:10px;color:var(--muted)}
+.hm-legend-swatch{width:20px;height:12px;border-radius:2px}
+
+/* ── v4.3: Assumption Half-Life ──────────── */
+.hl-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;border-left:4px solid var(--ok);background:var(--card)}
+.hl-row.hl-warning{border-left-color:var(--warn)}
+.hl-row.hl-expired{border-left-color:var(--bad);animation:driftFlash .6s ease-out}
+.hl-label{flex:1;font-size:12px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hl-bar-wrap{width:120px;height:12px;border-radius:6px;background:var(--line);overflow:hidden;flex-shrink:0}
+.hl-bar-fill{height:100%;border-radius:6px;transition:width .3s}
+.hl-pct{width:40px;text-align:right;font-size:11px;font-weight:700;flex-shrink:0}
+.hl-sort-pills{display:flex;gap:6px;margin-bottom:12px}
+.hl-sort-pills button{font-size:10px;padding:4px 10px}
+
+/* ── v4.3: Blast Radius ─────────────────── */
+.blast-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--line);border-radius:8px;margin-bottom:6px;cursor:pointer;background:var(--card);transition:border-color .2s}
+.blast-row:hover,.blast-row.blast-active{border-color:var(--neon-cyan)}
+.blast-count{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+.blast-label{flex:1;font-size:12px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.blast-dep{display:inline-block;font-size:9px;padding:2px 6px;border-radius:4px;background:var(--line);margin:2px}
+.blast-critical{border:1px solid var(--bad);border-radius:8px;padding:12px;margin-top:10px}
+
+/* ── v4.3: Graph View ───────────────────── */
+.graph-wrap{position:relative;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:rgba(0,0,0,.2)}
+.graph-wrap svg{display:block;width:100%;height:500px;cursor:grab}
+.graph-wrap.dragging svg{cursor:grabbing}
+.graph-controls{position:absolute;top:8px;right:8px;display:flex;gap:4px;z-index:5}
+.graph-controls button{width:28px;height:28px;font-size:14px;padding:0;display:flex;align-items:center;justify-content:center}
+.graph-node{cursor:pointer;transition:r .15s}
+.graph-node:hover{r:10}
+.graph-edge{stroke:rgba(255,255,255,.12);stroke-width:1}
+.graph-label{font-size:8px;fill:var(--muted);pointer-events:none;text-anchor:middle}
+.graph-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:10px;color:var(--muted)}
+.graph-legend-item{display:flex;align-items:center;gap:4px}
+.graph-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.graph-selected{stroke:var(--neon-cyan);stroke-width:2}
+.graph-highlight-edge{stroke:var(--neon-cyan)!important;stroke-width:2!important;opacity:1!important}
+
 @media print {
   body { background: #fff !important; color: #000 !important; }
   .tab-bar, .sidebar, .kbd-help, .toast, .drawer-overlay, .drawer-panel, .tabs, .shortcut-bar, #edgeActionContract { display: none !important; }
@@ -417,6 +469,10 @@ tr:hover td{background:rgba(0,240,255,.03)}
   <button class="tab-btn" data-tab="diff">Diff</button>
   <button class="tab-btn" data-tab="mapping">Mapping</button>
   <button class="tab-btn" data-tab="schema">Schema</button>
+  <button class="tab-btn" data-tab="heatmap">Drift Heatmap</button>
+  <button class="tab-btn" data-tab="halflife">Half-Life</button>
+  <button class="tab-btn" data-tab="blast">Blast Radius</button>
+  <button class="tab-btn" data-tab="graph">Graph</button>
 </nav>
 
 <div class="content" id="content">
@@ -586,6 +642,11 @@ tr:hover td{background:rgba(0,240,255,.03)}
       <button id="btnTamperChain">Simulate Tamper</button>
       <button id="btnCopyChain">Copy Chain JSON</button>
     </div>
+    <div class="card" id="lineageCard">
+      <h3>Seal &rarr; Patch Lineage</h3>
+      <p style="color:var(--muted);font-size:11px;margin-bottom:10px">Three swimlanes showing how seals, drift events, and patches relate over the bundle timeline.</p>
+      <div id="lineageSvgContainer" class="lineage-wrap"></div>
+    </div>
   </div>
 
   <!-- ═══════════════ TAB 3: Export ═══════════════ -->
@@ -711,6 +772,79 @@ tr:hover td{background:rgba(0,240,255,.03)}
     </div>
   </div>
 
+  <!-- ═══════════════ TAB 8: Drift Heatmap ═══════════════ -->
+  <div class="tab-panel" id="panel-heatmap" data-tab-title="Drift Heatmap">
+    <div class="stats-bar" id="heatmapStats"></div>
+    <div class="card">
+      <h3>Drift Concentration Grid</h3>
+      <p style="color:var(--muted);font-size:11px;margin-bottom:10px">Rows = artifact types, columns = time buckets. Color intensity shows drift concentration. Click a cell to filter the explorer.</p>
+      <div id="heatmapGrid"></div>
+      <div class="hm-legend" id="heatmapLegend">
+        <span>Low</span>
+        <div class="hm-legend-swatch" style="background:#4caf50"></div>
+        <div class="hm-legend-swatch" style="background:#8bc34a"></div>
+        <div class="hm-legend-swatch" style="background:#ffeb3b"></div>
+        <div class="hm-legend-swatch" style="background:#ff9800"></div>
+        <div class="hm-legend-swatch" style="background:#f44336"></div>
+        <span>High</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ TAB 9: Assumption Half-Life ═══════════════ -->
+  <div class="tab-panel" id="panel-halflife" data-tab-title="Assumption Half-Life">
+    <div class="stats-bar" id="halflifeStats"></div>
+    <div class="card">
+      <h3>Assumption Decay Tracker</h3>
+      <div class="hl-sort-pills" id="hlSortPills">
+        <button class="tab-btn active" data-sort="urgency">By Urgency</button>
+        <button class="tab-btn" data-sort="age">By Age</button>
+        <button class="tab-btn" data-sort="score">By Score</button>
+      </div>
+      <div id="halflifeList"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ TAB 10: Blast Radius ═══════════════ -->
+  <div class="tab-panel" id="panel-blast" data-tab-title="Blast Radius">
+    <div class="stats-bar" id="blastStats"></div>
+    <div class="card">
+      <h3>Impact Analysis</h3>
+      <p style="color:var(--muted);font-size:11px;margin-bottom:10px">Artifacts sorted by downstream impact. Click to see the full dependency tree.</p>
+      <div id="blastList"></div>
+    </div>
+    <div class="card blast-critical" id="blastCritical" style="display:none">
+      <h3>Critical Path</h3>
+      <div id="blastCriticalList"></div>
+    </div>
+    <div class="card" id="blastDetail" style="display:none">
+      <h3>Dependency Tree</h3>
+      <div id="blastDetailContent"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════ TAB 11: Graph ═══════════════ -->
+  <div class="tab-panel" id="panel-graph" data-tab-title="Graph">
+    <div class="stats-bar" id="graphStats"></div>
+    <div class="card">
+      <h3>Bundle Topology</h3>
+      <p style="color:var(--muted);font-size:11px;margin-bottom:10px">Force-directed graph of artifact dependencies from replay steps. Click a node to highlight its connections.</p>
+      <div class="graph-wrap" id="graphWrap">
+        <div class="graph-controls">
+          <button id="graphZoomIn" title="Zoom in">+</button>
+          <button id="graphZoomOut" title="Zoom out">&minus;</button>
+          <button id="graphZoomReset" title="Reset">&#8634;</button>
+        </div>
+        <svg id="graphSvg"></svg>
+      </div>
+      <div class="graph-legend" id="graphLegend"></div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:10px">
+      <button class="btn-primary" id="btnCopyGraph">Copy Graph JSON</button>
+      <button id="btnGraphRelayout">Re-layout</button>
+    </div>
+  </div>
+
 </div>
 
 <!-- v3: Drawer -->
@@ -721,7 +855,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
 </div>
 <!-- v3: Shortcut bar -->
 <div class="shortcut-bar" id="shortcutBar">
-  <span><kbd>1</kbd>-<kbd>7</kbd> Tabs</span>
+  <span><kbd>1</kbd>-<kbd>0</kbd> <kbd>G</kbd> Tabs</span>
   <span><kbd>Esc</kbd> Close drawer</span>
   <span><kbd>?</kbd> Toggle hints</span>
   <span><kbd>R</kbd> Randomize</span>
@@ -1199,7 +1333,7 @@ function loadBundle(seed){
   buildProofChain(b.artifacts);
 
   /* Update executive if visible */
-  setTimeout(function(){renderExecutive();renderTimeline()},100);
+  setTimeout(function(){renderExecutive();renderTimeline();renderHeatmap();renderHalfLife();renderBlastRadius();renderGraph()},100);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -1243,6 +1377,7 @@ function buildProofChain(artifacts){
     }
     STATE.proofChain=chain;
     renderProofChain();
+    renderLineage();
   });
 }
 
@@ -1289,6 +1424,636 @@ function renderProofChain(){
   if(info)info.textContent="Page "+(proofPage+1)+" of "+totalPages+" ("+chain.length+" entries)";
 
   $("#proofVerifyResult").innerHTML="";
+}
+
+/* ══════════════════════════════════════════════════════════
+   v4.3 Phase D: Seal → Patch Lineage
+   ══════════════════════════════════════════════════════════ */
+function renderLineage(){
+  var container=document.getElementById("lineageSvgContainer");
+  if(!container)return;
+  var b=STATE.bundle;if(!b)return;
+  var arts=b.artifacts||[];
+  var steps=b.replaySteps||[];
+  var chain=STATE.proofChain||[];
+
+  /* Collect events per lane */
+  var sealEvents=[];
+  if(chain.length>0)sealEvents.push({t:0,label:"genesis",refId:chain[0].refId});
+  for(var i=0;i<arts.length;i++){
+    if(arts[i].refType==="evidence"&&arts[i].contentHash)sealEvents.push({t:i,label:"seal-"+i,refId:arts[i].refId});
+  }
+  var driftEvents=[];var patchEvents=[];
+  for(var j=0;j<arts.length;j++){
+    var step=null;
+    for(var s=0;s<steps.length;s++){if(steps[s].outputRef===arts[j].refId){step=steps[s];break}}
+    var tPos=step?step.stepIndex:j;
+    if(arts[j].refType==="drift")driftEvents.push({t:tPos,label:arts[j].refId.substring(0,8),refId:arts[j].refId,idx:j});
+    if(arts[j].refType==="patch")patchEvents.push({t:tPos,label:arts[j].refId.substring(0,8),refId:arts[j].refId,idx:j});
+  }
+
+  _buildLineageSvg(container,sealEvents,driftEvents,patchEvents,Math.max(arts.length,steps.length,1));
+}
+
+function _buildLineageSvg(container,sealEvents,driftEvents,patchEvents,totalSpan){
+  var svgNS="http://www.w3.org/2000/svg";
+  var labelW=60,pad=20,dotR=5;
+  var laneH=40,headerH=20;
+  var w=labelW+pad*2+totalSpan*40+40;
+  var h=headerH+laneH*3+pad;
+
+  var svg=document.createElementNS(svgNS,"svg");
+  svg.setAttribute("viewBox","0 0 "+w+" "+h);
+  svg.setAttribute("width",w);
+  svg.setAttribute("height",h);
+
+  var lanes=[
+    {label:"Seal",events:sealEvents,color:"#4caf50",y:headerH},
+    {label:"Drift",events:driftEvents,color:"#ff9800",y:headerH+laneH},
+    {label:"Patch",events:patchEvents,color:"#e91e63",y:headerH+laneH*2}
+  ];
+
+  /* Lane backgrounds and labels */
+  for(var i=0;i<lanes.length;i++){
+    var rect=document.createElementNS(svgNS,"rect");
+    rect.setAttribute("x",labelW);rect.setAttribute("y",lanes[i].y);
+    rect.setAttribute("width",w-labelW);rect.setAttribute("height",laneH);
+    rect.setAttribute("fill",i%2===0?"rgba(255,255,255,.02)":"rgba(255,255,255,.04)");
+    svg.appendChild(rect);
+
+    var line=document.createElementNS(svgNS,"line");
+    line.setAttribute("x1",labelW);line.setAttribute("y1",lanes[i].y+laneH);
+    line.setAttribute("x2",w);line.setAttribute("y2",lanes[i].y+laneH);
+    line.setAttribute("stroke","rgba(255,255,255,.08)");
+    svg.appendChild(line);
+
+    var txt=document.createElementNS(svgNS,"text");
+    txt.setAttribute("x",labelW-6);txt.setAttribute("y",lanes[i].y+laneH/2+4);
+    txt.setAttribute("text-anchor","end");
+    txt.setAttribute("class","lineage-lane-label");
+    txt.textContent=lanes[i].label;
+    svg.appendChild(txt);
+  }
+
+  /* Helper: x position for a time value */
+  function tx(t){return labelW+pad+(t/Math.max(totalSpan-1,1))*(w-labelW-pad*2)}
+
+  /* Draw events */
+  for(var li=0;li<lanes.length;li++){
+    var lane=lanes[li];
+    var cy=lane.y+laneH/2;
+    for(var ei=0;ei<lane.events.length;ei++){
+      var ev=lane.events[ei];
+      var cx=tx(ev.t);
+      var circle=document.createElementNS(svgNS,"circle");
+      circle.setAttribute("cx",cx);circle.setAttribute("cy",cy);circle.setAttribute("r",dotR);
+      circle.setAttribute("fill",lane.color);circle.setAttribute("class","lineage-event");
+      var title=document.createElementNS(svgNS,"title");
+      title.textContent=lane.label+": "+ev.label;
+      circle.appendChild(title);
+      svg.appendChild(circle);
+    }
+  }
+
+  /* Draw bezier arrows from drift to nearest patch */
+  for(var di=0;di<driftEvents.length;di++){
+    var dEv=driftEvents[di];
+    var nearestPatch=null;var minDist=Infinity;
+    for(var pi=0;pi<patchEvents.length;pi++){
+      var dist=Math.abs(patchEvents[pi].t-dEv.t);
+      if(patchEvents[pi].t>=dEv.t&&dist<minDist){minDist=dist;nearestPatch=patchEvents[pi]}
+    }
+    if(!nearestPatch)continue;
+    var x1=tx(dEv.t),y1=lanes[1].y+laneH/2+dotR;
+    var x2=tx(nearestPatch.t),y2=lanes[2].y+laneH/2-dotR;
+    var midY=(y1+y2)/2;
+    var path=document.createElementNS(svgNS,"path");
+    path.setAttribute("d","M"+x1+" "+y1+" C"+x1+" "+midY+" "+x2+" "+midY+" "+x2+" "+y2);
+    path.setAttribute("stroke","#e91e63");path.setAttribute("class","lineage-arrow");
+    svg.appendChild(path);
+  }
+
+  container.innerHTML="";
+  container.appendChild(svg);
+}
+
+/* ══════════════════════════════════════════════════════════
+   v4.3 Phase A: Drift Heatmap
+   ══════════════════════════════════════════════════════════ */
+function buildTimeBuckets(steps,bucketCount){
+  if(!bucketCount)bucketCount=6;
+  var buckets=[];
+  for(var i=0;i<bucketCount;i++){
+    buckets.push({start:i,end:i+1,label:"T"+(i+1),count:0});
+  }
+  return buckets;
+}
+
+function computeHeatmapData(bundle,buckets){
+  var types=["evidence","rationale","memory","drift","patch"];
+  var arts=bundle.artifacts||[];
+  var steps=bundle.replaySteps||[];
+  var totalSteps=Math.max(steps.length,arts.length,1);
+  var grid=[];
+
+  for(var r=0;r<types.length;r++){
+    var row=[];
+    for(var c=0;c<buckets.length;c++)row.push(0);
+    var typeArts=[];
+    for(var a=0;a<arts.length;a++){if(arts[a].refType===types[r])typeArts.push(arts[a])}
+
+    for(var ti=0;ti<typeArts.length;ti++){
+      var art=typeArts[ti];
+      /* Find step index for this artifact */
+      var stepIdx=0;
+      for(var si=0;si<steps.length;si++){if(steps[si].outputRef===art.refId){stepIdx=steps[si].stepIndex;break}}
+      /* Check if drift-adjacent: has drift artifact within 1 step */
+      var isDriftAdjacent=false;
+      for(var da=0;da<arts.length;da++){
+        if(arts[da].refType==="drift"){
+          var dStepIdx=0;
+          for(var ds=0;ds<steps.length;ds++){if(steps[ds].outputRef===arts[da].refId){dStepIdx=steps[ds].stepIndex;break}}
+          if(Math.abs(dStepIdx-stepIdx)<=1){isDriftAdjacent=true;break}
+        }
+      }
+      if(isDriftAdjacent||art.refType==="drift"){
+        var bucketIdx=Math.min(Math.floor((stepIdx/totalSteps)*buckets.length),buckets.length-1);
+        row[bucketIdx]++;
+      }
+    }
+    grid.push(row);
+  }
+  return {types:types,grid:grid};
+}
+
+function renderHeatmap(){
+  var b=STATE.bundle;if(!b)return;
+  var buckets=buildTimeBuckets(b.replaySteps||[],6);
+  var data=computeHeatmapData(b,buckets);
+  var types=data.types;var grid=data.grid;
+  var colors=["#4caf50","#8bc34a","#ffeb3b","#ff9800","#f44336"];
+
+  /* Stats */
+  var totalDrift=0,totalArts=(b.artifacts||[]).length;
+  for(var i=0;i<(b.artifacts||[]).length;i++){if(b.artifacts[i].refType==="drift")totalDrift++}
+  var concentration=totalArts>0?Math.round(totalDrift/totalArts*100):0;
+  var statsEl=document.getElementById("heatmapStats");
+  if(statsEl)statsEl.innerHTML=
+    '<div class="stat-box"><div class="stat-val">'+totalArts+'</div><div class="stat-label">Total Artifacts</div></div>'+
+    '<div class="stat-box"><div class="stat-val">'+totalDrift+'</div><div class="stat-label">Drift Artifacts</div></div>'+
+    '<div class="stat-box"><div class="stat-val" style="color:'+(concentration>30?'var(--bad)':concentration>15?'var(--warn)':'var(--ok)')+'">'+concentration+'%</div><div class="stat-label">Drift Concentration</div></div>';
+
+  /* Grid */
+  var gridEl=document.getElementById("heatmapGrid");if(!gridEl)return;
+  var cols=buckets.length;
+  var html='<div class="hm-grid" style="grid-template-columns:80px repeat('+cols+',32px)">';
+  /* Column headers */
+  html+='<div></div>';
+  for(var c=0;c<cols;c++)html+='<div class="hm-col-label">'+buckets[c].label+'</div>';
+  /* Rows */
+  for(var r=0;r<types.length;r++){
+    html+='<div class="hm-row-label">'+types[r]+'</div>';
+    for(var ci=0;ci<cols;ci++){
+      var val=grid[r][ci];
+      var maxVal=1;
+      for(var mr=0;mr<grid.length;mr++)for(var mc=0;mc<grid[mr].length;mc++)if(grid[mr][mc]>maxVal)maxVal=grid[mr][mc];
+      var intensity=Math.min(Math.floor((val/maxVal)*4),4);
+      html+='<div class="hm-cell" style="background:'+colors[intensity]+'" data-type="'+types[r]+'" data-bucket="'+ci+'" title="'+types[r]+' T'+(ci+1)+': '+val+' drift-adjacent">'+val+'</div>';
+    }
+  }
+  html+='</div>';
+  gridEl.innerHTML=html;
+
+  /* Click handler: filter explorer */
+  gridEl.addEventListener("click",function(e){
+    var cell=e.target.closest(".hm-cell");if(!cell)return;
+    var type=cell.getAttribute("data-type");
+    var filterSel=document.getElementById("filterType");
+    if(filterSel){filterSel.value=type;filterSel.dispatchEvent(new Event("change"))}
+    var tabBtn=document.querySelector('.tab-btn[data-tab="explorer"]');
+    if(tabBtn)tabBtn.click();
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   v4.3 Phase B: Assumption Half-Life
+   ══════════════════════════════════════════════════════════ */
+var hlSortMode="urgency";
+
+function computeHalfLife(artifact,allArtifacts,replaySteps){
+  /* Age factor (40%): older = more decay */
+  var stepIdx=0;
+  for(var s=0;s<replaySteps.length;s++){if(replaySteps[s].outputRef===artifact.refId){stepIdx=replaySteps[s].stepIndex;break}}
+  var maxStep=Math.max(replaySteps.length,1);
+  var ageFactor=1-(stepIdx/maxStep);/* 1=newest, 0=oldest */
+
+  /* Confidence factor (30%): low score = faster decay */
+  var score=(artifact.payload&&artifact.payload.score!=null)?artifact.payload.score:0.7;
+  var confFactor=Math.max(0,Math.min(1,score));
+
+  /* Drift proximity (30%): count drift artifacts sharing step refs */
+  var driftCount=0;
+  for(var d=0;d<allArtifacts.length;d++){
+    if(allArtifacts[d].refType==="drift"){
+      var dStep=0;
+      for(var ds=0;ds<replaySteps.length;ds++){if(replaySteps[ds].outputRef===allArtifacts[d].refId){dStep=replaySteps[ds].stepIndex;break}}
+      if(Math.abs(dStep-stepIdx)<=2)driftCount++;
+    }
+  }
+  var driftFactor=Math.max(0,1-driftCount*0.3);
+
+  var remaining=Math.round((ageFactor*0.4+confFactor*0.3+driftFactor*0.3)*100);
+  remaining=Math.max(0,Math.min(100,remaining));
+  var status=remaining>50?"alive":remaining>20?"warning":"expired";
+  return {remaining:remaining,status:status,ageFactor:ageFactor,confFactor:confFactor,driftFactor:driftFactor,stepIdx:stepIdx,score:score};
+}
+
+function renderHalfLife(){
+  var b=STATE.bundle;if(!b)return;
+  var arts=b.artifacts||[];
+  var steps=b.replaySteps||[];
+  var rationales=[];
+  for(var i=0;i<arts.length;i++){
+    if(arts[i].refType==="rationale"){
+      var hl=computeHalfLife(arts[i],arts,steps);
+      rationales.push({art:arts[i],hl:hl,idx:i});
+    }
+  }
+
+  /* Sort */
+  if(hlSortMode==="urgency")rationales.sort(function(a,b){return a.hl.remaining-b.hl.remaining});
+  else if(hlSortMode==="age")rationales.sort(function(a,b){return a.hl.stepIdx-b.hl.stepIdx});
+  else rationales.sort(function(a,b){return a.hl.score-b.hl.score});
+
+  /* Stats */
+  var alive=0,warning=0,expired=0;
+  for(var j=0;j<rationales.length;j++){
+    if(rationales[j].hl.status==="alive")alive++;
+    else if(rationales[j].hl.status==="warning")warning++;
+    else expired++;
+  }
+  var statsEl=document.getElementById("halflifeStats");
+  if(statsEl)statsEl.innerHTML=
+    '<div class="stat-box"><div class="stat-val">'+rationales.length+'</div><div class="stat-label">Assumptions</div></div>'+
+    '<div class="stat-box"><div class="stat-val" style="color:var(--ok)">'+alive+'</div><div class="stat-label">Alive</div></div>'+
+    '<div class="stat-box"><div class="stat-val" style="color:var(--warn)">'+warning+'</div><div class="stat-label">Warning</div></div>'+
+    '<div class="stat-box"><div class="stat-val" style="color:var(--bad)">'+expired+'</div><div class="stat-label">Expired</div></div>';
+
+  /* List */
+  var listEl=document.getElementById("halflifeList");if(!listEl)return;
+  var html="";
+  for(var k=0;k<rationales.length;k++){
+    var r=rationales[k];
+    var barColor=r.hl.status==="alive"?"var(--ok)":r.hl.status==="warning"?"var(--warn)":"var(--bad)";
+    html+='<div class="hl-row hl-'+r.hl.status+'">'+
+      '<div class="hl-label" title="'+r.art.refId+'">'+r.art.refId.substring(0,12)+'&hellip; <span style="color:var(--muted);font-size:10px">step '+r.hl.stepIdx+'</span></div>'+
+      '<div class="hl-bar-wrap"><div class="hl-bar-fill" style="width:'+r.hl.remaining+'%;background:'+barColor+'"></div></div>'+
+      '<div class="hl-pct" style="color:'+barColor+'">'+r.hl.remaining+'%</div>'+
+    '</div>';
+  }
+  listEl.innerHTML=html||'<p style="color:var(--muted);font-size:12px">No rationale artifacts in bundle</p>';
+}
+
+/* ══════════════════════════════════════════════════════════
+   v4.3 Phase C: Blast Radius
+   ══════════════════════════════════════════════════════════ */
+function buildDependencyGraph(replaySteps,artifacts){
+  var graph={};
+  for(var i=0;i<artifacts.length;i++)graph[artifacts[i].refId]=[];
+  for(var s=0;s<replaySteps.length;s++){
+    var step=replaySteps[s];
+    if(step.inputRef&&step.outputRef&&graph[step.inputRef]){
+      if(graph[step.inputRef].indexOf(step.outputRef)===-1)graph[step.inputRef].push(step.outputRef);
+    }
+  }
+  /* Also link artifacts that share replay steps */
+  for(var s2=0;s2<replaySteps.length;s2++){
+    var st=replaySteps[s2];
+    if(st.outputRef){
+      for(var s3=s2+1;s3<replaySteps.length;s3++){
+        if(replaySteps[s3].inputRef===st.outputRef&&replaySteps[s3].outputRef){
+          if(!graph[st.outputRef])graph[st.outputRef]=[];
+          if(graph[st.outputRef].indexOf(replaySteps[s3].outputRef)===-1)graph[st.outputRef].push(replaySteps[s3].outputRef);
+        }
+      }
+    }
+  }
+  return graph;
+}
+
+function computeTransitiveDeps(graph,refId){
+  var visited={};var queue=[refId];var result=[];
+  while(queue.length>0){
+    var current=queue.shift();
+    if(visited[current])continue;
+    visited[current]=true;
+    if(current!==refId)result.push(current);
+    var deps=graph[current]||[];
+    for(var i=0;i<deps.length;i++){if(!visited[deps[i]])queue.push(deps[i])}
+  }
+  return result;
+}
+
+function renderBlastRadius(){
+  var b=STATE.bundle;if(!b)return;
+  var arts=b.artifacts||[];
+  var steps=b.replaySteps||[];
+  var graph=buildDependencyGraph(steps,arts);
+
+  /* Compute blast count per artifact */
+  var blastData=[];
+  for(var i=0;i<arts.length;i++){
+    var deps=computeTransitiveDeps(graph,arts[i].refId);
+    blastData.push({art:arts[i],deps:deps,count:deps.length,idx:i});
+  }
+  blastData.sort(function(a,b){return b.count-a.count});
+
+  /* Stats */
+  var maxBlast=blastData.length>0?blastData[0].count:0;
+  var totalBlast=0;
+  for(var j=0;j<blastData.length;j++)totalBlast+=blastData[j].count;
+  var avgBlast=blastData.length>0?Math.round(totalBlast/blastData.length*10)/10:0;
+  var critCount=0;
+  for(var k=0;k<blastData.length;k++){if(blastData[k].count>=3)critCount++}
+  var statsEl=document.getElementById("blastStats");
+  if(statsEl)statsEl.innerHTML=
+    '<div class="stat-box"><div class="stat-val">'+arts.length+'</div><div class="stat-label">Artifacts</div></div>'+
+    '<div class="stat-box"><div class="stat-val" style="color:var(--bad)">'+maxBlast+'</div><div class="stat-label">Max Blast</div></div>'+
+    '<div class="stat-box"><div class="stat-val">'+avgBlast+'</div><div class="stat-label">Avg Blast</div></div>'+
+    '<div class="stat-box"><div class="stat-val" style="color:'+(critCount>0?'var(--bad)':'var(--ok)')+'">'+critCount+'</div><div class="stat-label">Critical</div></div>';
+
+  /* List */
+  var listEl=document.getElementById("blastList");if(!listEl)return;
+  var html="";
+  for(var m=0;m<blastData.length;m++){
+    var bd=blastData[m];
+    var ringColor=bd.count>=3?"var(--bad)":bd.count>=1?"var(--warn)":"var(--ok)";
+    html+='<div class="blast-row" data-idx="'+m+'">'+
+      '<div class="blast-count" style="background:'+ringColor+';color:#000">'+bd.count+'</div>'+
+      '<div class="blast-label" title="'+bd.art.refId+'">'+bd.art.refId.substring(0,16)+'&hellip; <span style="color:var(--muted);font-size:10px">['+bd.art.refType+']</span></div>'+
+    '</div>';
+  }
+  listEl.innerHTML=html||'<p style="color:var(--muted);font-size:12px">No artifacts</p>';
+
+  /* Critical path */
+  var critEl=document.getElementById("blastCritical");
+  var critListEl=document.getElementById("blastCriticalList");
+  if(critEl&&critListEl){
+    var top3=blastData.slice(0,3).filter(function(d){return d.count>0});
+    if(top3.length>0){
+      critEl.style.display="";
+      var critHtml="";
+      for(var t=0;t<top3.length;t++){
+        critHtml+='<div style="margin-bottom:6px"><strong>'+top3[t].art.refId.substring(0,16)+'</strong> ['+top3[t].art.refType+'] &rarr; <span style="color:var(--bad)">'+top3[t].count+' downstream</span></div>';
+      }
+      critListEl.innerHTML=critHtml;
+    }else{critEl.style.display="none"}
+  }
+
+  /* Click handler for detail */
+  listEl.addEventListener("click",function(e){
+    var row=e.target.closest(".blast-row");if(!row)return;
+    var idx=parseInt(row.getAttribute("data-idx"),10);
+    var bd=blastData[idx];if(!bd)return;
+    /* Highlight */
+    var allRows=listEl.querySelectorAll(".blast-row");
+    for(var ar=0;ar<allRows.length;ar++)allRows[ar].classList.remove("blast-active");
+    row.classList.add("blast-active");
+    /* Show detail */
+    var detailEl=document.getElementById("blastDetail");
+    var detailContent=document.getElementById("blastDetailContent");
+    if(detailEl&&detailContent){
+      detailEl.style.display="";
+      var dHtml='<p style="margin-bottom:8px"><strong>'+bd.art.refId+'</strong> impacts:</p>';
+      if(bd.deps.length===0)dHtml+='<p style="color:var(--muted)">No downstream dependencies</p>';
+      else for(var di=0;di<bd.deps.length;di++)dHtml+='<span class="blast-dep">'+bd.deps[di].substring(0,12)+'</span>';
+      detailContent.innerHTML=dHtml;
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   v4.3: Graph View — force-directed artifact topology
+   ══════════════════════════════════════════════════════════ */
+var _graphState=null;
+
+function renderGraph(){
+  var b=STATE.bundle;if(!b)return;
+  var arts=b.artifacts||[];
+  var steps=b.replaySteps||[];
+  if(arts.length===0)return;
+
+  var graph=buildDependencyGraph(steps,arts);
+  var svgNS="http://www.w3.org/2000/svg";
+  var W=800,H=500;
+  var typeColors={evidence:"#4caf50",rationale:"#2196f3",memory:"#9c27b0",drift:"#ff9800",patch:"#e91e63"};
+
+  /* Build nodes with initial positions (circle layout) */
+  var nodes=[];
+  for(var i=0;i<arts.length;i++){
+    var angle=(2*Math.PI*i)/arts.length;
+    var r=Math.min(W,H)*0.35;
+    nodes.push({
+      id:arts[i].refId,
+      type:arts[i].refType,
+      x:W/2+r*Math.cos(angle),
+      y:H/2+r*Math.sin(angle),
+      vx:0,vy:0,
+      label:arts[i].refId.substring(0,6),
+      idx:i
+    });
+  }
+
+  /* Build edges from adjacency list */
+  var edges=[];
+  var nodeMap={};
+  for(var ni=0;ni<nodes.length;ni++)nodeMap[nodes[ni].id]=ni;
+  for(var srcId in graph){
+    if(!graph.hasOwnProperty(srcId))continue;
+    var targets=graph[srcId];
+    for(var ti=0;ti<targets.length;ti++){
+      if(nodeMap[srcId]!==undefined&&nodeMap[targets[ti]]!==undefined){
+        edges.push({source:nodeMap[srcId],target:nodeMap[targets[ti]]});
+      }
+    }
+  }
+
+  /* Stats */
+  var statsEl=document.getElementById("graphStats");
+  if(statsEl){
+    var edgeCount=edges.length;
+    var maxDeg=0;
+    for(var di=0;di<nodes.length;di++){
+      var deg=(graph[nodes[di].id]||[]).length;
+      if(deg>maxDeg)maxDeg=deg;
+    }
+    var isolatedCount=0;
+    for(var iso=0;iso<nodes.length;iso++){
+      var hasEdge=false;
+      for(var ei=0;ei<edges.length;ei++){if(edges[ei].source===iso||edges[ei].target===iso){hasEdge=true;break}}
+      if(!hasEdge)isolatedCount++;
+    }
+    statsEl.innerHTML=
+      '<div class="stat-box"><div class="stat-val">'+nodes.length+'</div><div class="stat-label">Nodes</div></div>'+
+      '<div class="stat-box"><div class="stat-val">'+edgeCount+'</div><div class="stat-label">Edges</div></div>'+
+      '<div class="stat-box"><div class="stat-val">'+maxDeg+'</div><div class="stat-label">Max Degree</div></div>'+
+      '<div class="stat-box"><div class="stat-val" style="color:'+(isolatedCount>0?'var(--warn)':'var(--ok)')+'">'+isolatedCount+'</div><div class="stat-label">Isolated</div></div>';
+  }
+
+  /* Legend */
+  var legendEl=document.getElementById("graphLegend");
+  if(legendEl){
+    var lhtml="";
+    for(var lt in typeColors){
+      if(!typeColors.hasOwnProperty(lt))continue;
+      lhtml+='<div class="graph-legend-item"><div class="graph-legend-dot" style="background:'+typeColors[lt]+'"></div>'+lt+'</div>';
+    }
+    legendEl.innerHTML=lhtml;
+  }
+
+  /* Run force simulation (simple: repulsion + spring + centering) */
+  _forceLayout(nodes,edges,W,H,60);
+
+  /* Render SVG */
+  _renderGraphSvg(nodes,edges,W,H,typeColors,graph);
+  _graphState={nodes:nodes,edges:edges,w:W,h:H,colors:typeColors,graph:graph};
+}
+
+function _forceLayout(nodes,edges,W,H,iterations){
+  var repulsion=800,springLen=60,springK=0.05,damping=0.85,centerK=0.01;
+
+  for(var iter=0;iter<iterations;iter++){
+    /* Repulsion between all node pairs */
+    for(var i=0;i<nodes.length;i++){
+      for(var j=i+1;j<nodes.length;j++){
+        var dx=nodes[j].x-nodes[i].x;
+        var dy=nodes[j].y-nodes[i].y;
+        var dist=Math.sqrt(dx*dx+dy*dy)||1;
+        var force=repulsion/(dist*dist);
+        var fx=force*dx/dist;
+        var fy=force*dy/dist;
+        nodes[i].vx-=fx;nodes[i].vy-=fy;
+        nodes[j].vx+=fx;nodes[j].vy+=fy;
+      }
+    }
+
+    /* Spring attraction along edges */
+    for(var e=0;e<edges.length;e++){
+      var a=nodes[edges[e].source],b=nodes[edges[e].target];
+      var edx=b.x-a.x,edy=b.y-a.y;
+      var eDist=Math.sqrt(edx*edx+edy*edy)||1;
+      var stretch=eDist-springLen;
+      var sf=springK*stretch;
+      var sfx=sf*edx/eDist,sfy=sf*edy/eDist;
+      a.vx+=sfx;a.vy+=sfy;
+      b.vx-=sfx;b.vy-=sfy;
+    }
+
+    /* Centering force */
+    for(var c=0;c<nodes.length;c++){
+      nodes[c].vx+=(W/2-nodes[c].x)*centerK;
+      nodes[c].vy+=(H/2-nodes[c].y)*centerK;
+    }
+
+    /* Apply velocity with damping and bounds */
+    for(var u=0;u<nodes.length;u++){
+      nodes[u].vx*=damping;nodes[u].vy*=damping;
+      nodes[u].x+=nodes[u].vx;nodes[u].y+=nodes[u].vy;
+      nodes[u].x=Math.max(20,Math.min(W-20,nodes[u].x));
+      nodes[u].y=Math.max(20,Math.min(H-20,nodes[u].y));
+    }
+  }
+}
+
+function _renderGraphSvg(nodes,edges,W,H,typeColors,graph){
+  var svgNS="http://www.w3.org/2000/svg";
+  var svg=document.getElementById("graphSvg");
+  if(!svg)return;
+  svg.innerHTML="";
+  svg.setAttribute("viewBox","0 0 "+W+" "+H);
+
+  /* Edges */
+  for(var e=0;e<edges.length;e++){
+    var a=nodes[edges[e].source],b=nodes[edges[e].target];
+    var line=document.createElementNS(svgNS,"line");
+    line.setAttribute("x1",a.x);line.setAttribute("y1",a.y);
+    line.setAttribute("x2",b.x);line.setAttribute("y2",b.y);
+    line.setAttribute("class","graph-edge");
+    line.setAttribute("data-src",edges[e].source);
+    line.setAttribute("data-tgt",edges[e].target);
+    svg.appendChild(line);
+  }
+
+  /* Nodes */
+  for(var n=0;n<nodes.length;n++){
+    var g=document.createElementNS(svgNS,"g");
+    g.setAttribute("data-node-idx",n);
+
+    var circle=document.createElementNS(svgNS,"circle");
+    circle.setAttribute("cx",nodes[n].x);circle.setAttribute("cy",nodes[n].y);
+    circle.setAttribute("r",6);
+    circle.setAttribute("fill",typeColors[nodes[n].type]||"#888");
+    circle.setAttribute("class","graph-node");
+    var title=document.createElementNS(svgNS,"title");
+    title.textContent=nodes[n].id+" ["+nodes[n].type+"]";
+    circle.appendChild(title);
+    g.appendChild(circle);
+
+    var label=document.createElementNS(svgNS,"text");
+    label.setAttribute("x",nodes[n].x);label.setAttribute("y",nodes[n].y-10);
+    label.setAttribute("class","graph-label");
+    label.textContent=nodes[n].label;
+    g.appendChild(label);
+
+    svg.appendChild(g);
+  }
+
+  /* Click handler: highlight node + its edges */
+  svg.addEventListener("click",function(ev){
+    var nodeG=ev.target.closest("[data-node-idx]");
+    /* Clear previous highlights */
+    var allNodes=svg.querySelectorAll(".graph-node");
+    for(var cn=0;cn<allNodes.length;cn++)allNodes[cn].classList.remove("graph-selected");
+    var allEdges=svg.querySelectorAll(".graph-edge");
+    for(var ce=0;ce<allEdges.length;ce++)allEdges[ce].classList.remove("graph-highlight-edge");
+
+    if(!nodeG)return;
+    var idx=parseInt(nodeG.getAttribute("data-node-idx"),10);
+    nodeG.querySelector(".graph-node").classList.add("graph-selected");
+
+    /* Highlight connected edges */
+    for(var he=0;he<allEdges.length;he++){
+      var src=parseInt(allEdges[he].getAttribute("data-src"),10);
+      var tgt=parseInt(allEdges[he].getAttribute("data-tgt"),10);
+      if(src===idx||tgt===idx)allEdges[he].classList.add("graph-highlight-edge");
+    }
+  });
+
+  /* Zoom/pan */
+  var zoom=1,panX=0,panY=0,dragging=false,lastMX=0,lastMY=0;
+  var wrap=document.getElementById("graphWrap");
+  function updateVB(){svg.setAttribute("viewBox",(panX)+" "+(panY)+" "+(W/zoom)+" "+(H/zoom))}
+
+  var zin=document.getElementById("graphZoomIn");
+  var zout=document.getElementById("graphZoomOut");
+  var zreset=document.getElementById("graphZoomReset");
+  if(zin)zin.addEventListener("click",function(){zoom=Math.min(5,zoom*1.3);updateVB()});
+  if(zout)zout.addEventListener("click",function(){zoom=Math.max(0.3,zoom/1.3);updateVB()});
+  if(zreset)zreset.addEventListener("click",function(){zoom=1;panX=0;panY=0;updateVB()});
+
+  svg.addEventListener("wheel",function(ev){
+    ev.preventDefault();
+    zoom=ev.deltaY<0?Math.min(5,zoom*1.15):Math.max(0.3,zoom/1.15);
+    updateVB();
+  });
+  svg.addEventListener("mousedown",function(ev){dragging=true;lastMX=ev.clientX;lastMY=ev.clientY;if(wrap)wrap.classList.add("dragging")});
+  svg.addEventListener("mousemove",function(ev){
+    if(!dragging)return;
+    var dx=(ev.clientX-lastMX)/zoom;var dy=(ev.clientY-lastMY)/zoom;
+    panX-=dx;panY-=dy;lastMX=ev.clientX;lastMY=ev.clientY;updateVB();
+  });
+  svg.addEventListener("mouseup",function(){dragging=false;if(wrap)wrap.classList.remove("dragging")});
+  svg.addEventListener("mouseleave",function(){dragging=false;if(wrap)wrap.classList.remove("dragging")});
 }
 
 function renderChainSvg(chain){
@@ -2218,12 +2983,42 @@ document.addEventListener("DOMContentLoaded",function(){
   /* v3: Keyboard shortcuts */
   document.addEventListener("keydown",function(e){
     if(e.target.tagName==="TEXTAREA"||e.target.tagName==="INPUT")return;
-    var tk={"1":"executive","2":"explorer","3":"proof","4":"export","5":"diff","6":"mapping","7":"schema"};
+    var tk={"1":"executive","2":"explorer","3":"proof","4":"export","5":"diff","6":"mapping","7":"schema","8":"heatmap","9":"halflife","0":"blast","g":"graph","G":"graph"};
     if(tk[e.key]){e.preventDefault();var b=document.querySelector('.tab-btn[data-tab="'+tk[e.key]+'"]');if(b)b.click()}
     if(e.key==="Escape")closeDrawer();
     if(e.key==="?")$("#shortcutBar").classList.toggle("vis");
     if(e.key==="r"||e.key==="R"){e.preventDefault();loadBundle(Math.floor(Math.random()*100000))}
   });
+
+  /* ══════════════════════════════════════════════════════════
+     v4.3: Half-Life sort pill wiring
+     ══════════════════════════════════════════════════════════ */
+  var hlPills=document.getElementById("hlSortPills");
+  if(hlPills)hlPills.addEventListener("click",function(e){
+    var btn=e.target.closest("[data-sort]");if(!btn)return;
+    var pills=hlPills.querySelectorAll(".tab-btn");
+    for(var p=0;p<pills.length;p++)pills[p].classList.remove("active");
+    btn.classList.add("active");
+    hlSortMode=btn.getAttribute("data-sort");
+    renderHalfLife();
+  });
+
+  /* v4.3: Graph button wiring */
+  var copyGraphBtn=document.getElementById("btnCopyGraph");
+  if(copyGraphBtn)copyGraphBtn.addEventListener("click",function(){
+    if(!_graphState)return;
+    var exportData={nodes:[],edges:[]};
+    for(var i=0;i<_graphState.nodes.length;i++){
+      var n=_graphState.nodes[i];
+      exportData.nodes.push({id:n.id,type:n.type,degree:(_graphState.graph[n.id]||[]).length});
+    }
+    for(var e=0;e<_graphState.edges.length;e++){
+      exportData.edges.push({source:_graphState.nodes[_graphState.edges[e].source].id,target:_graphState.nodes[_graphState.edges[e].target].id});
+    }
+    copyText(JSON.stringify(exportData,null,2));
+  });
+  var relayoutBtn=document.getElementById("btnGraphRelayout");
+  if(relayoutBtn)relayoutBtn.addEventListener("click",function(){renderGraph()});
 
   /* ══════════════════════════════════════════════════════════
      Phase 3B: Replay Simulator wiring
