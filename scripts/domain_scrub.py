@@ -78,7 +78,7 @@ ALLOWED_ACRONYMS = {
     "AI", "LLM", "API", "CLI", "CI", "CD", "CPU", "GPU",
     "JSON", "YAML", "HTML", "HTTP", "HTTPS", "URI", "UUID",
     "CSV", "PDF", "RFC", "SDK", "URL", "REST", "CSS",
-    "TLS", "SSH", "DNS", "TCP", "UDP", "SQL", "GRPC",
+    "TLS", "SSH", "DNS", "TCP", "UDP", "SQL", "GRPC", "VPN", "PKI",
     "RBAC", "OIDC", "JWT", "HMAC", "SHA", "RSA", "AES",
     "CBC", "GCM", "PEM", "CORS", "CSRF", "PII", "SSE", "SSO",
     "RPC", "CDN", "NTP", "OTLP", "NATS", "WAN", "HSM",
