@@ -678,6 +678,13 @@ footer strong{color:var(--accent);font-weight:600}
 <script>
 (function(){"use strict";
 
+/* ── safeHTML: sanitize innerHTML via DOMParser to prevent XSS ── */
+function safeHTML(el,html){
+  var doc=new DOMParser().parseFromString(html,'text/html');
+  el.textContent='';
+  while(doc.body.firstChild)el.appendChild(doc.body.adoptNode(doc.body.firstChild));
+}
+
 /* ══════════ DEMO DATA ══════════ */
 var F={
 "184":{id:"F-184",title:"Physical Security SOP not aligned to latest inspection benchmark",status:"In Review",sev:"HIGH",owner:"J. Smith",brq:0.91,cg:22,deg:"8d",due:"Apr 18",func:"Protection",src:"APP Assessment",date:"2026-04-03",recurring:3,
@@ -754,8 +761,8 @@ document.querySelectorAll(".role-card[data-role]").forEach(function(c){
 /* ══════════ DRAWER ══════════ */
 function openDrawer(title,bodyHtml,footHtml){
   dTitle.textContent=title;
-  dBody.innerHTML=bodyHtml;
-  dFoot.innerHTML=footHtml||"";
+  safeHTML(dBody,bodyHtml);
+  safeHTML(dFoot,footHtml||"");
   dOverlay.classList.add("open");
   dPanel.classList.add("open");
   // Wire close buttons inside drawer
@@ -845,7 +852,7 @@ function showFinding(fid){
   body+='<button data-fact="link" data-fid="'+fid+'">Link Related</button>';
   body+='<button data-fact="export" data-fid="'+fid+'">Export Packet</button></div>';
   // Render
-  fDet.innerHTML=body;
+  safeHTML(fDet,body);
   fDet.classList.remove("hidden");
   fDet.scrollIntoView({behavior:"smooth",block:"start"});
   // Wire close
@@ -1401,7 +1408,7 @@ document.getElementById("fDetail").addEventListener("click",function(e){
   // Update demo data
   if(F[fid]){F[fid].evidence.forEach(function(ev){if(ev.name===ename)ev.ok=1})}
   // Re-render the evidence item
-  evDiv.innerHTML='<span class="ev-ok">✓</span> '+ename+' <span style="margin-left:auto;font-size:8px;color:var(--ok)">validated · locked</span>';
+  safeHTML(evDiv,'<span class="ev-ok">✓</span> '+ename+' <span style="margin-left:auto;font-size:8px;color:var(--ok)">validated · locked</span>');
   toast("Evidence uploaded: "+ename,"ok");
   // Update EDI display
   if(F[fid]){

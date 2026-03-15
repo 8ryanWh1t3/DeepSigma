@@ -808,6 +808,13 @@ footer strong{color:var(--accent);font-weight:600}
 <script>
 (function(){"use strict";
 
+/* ── safeHTML: sanitize HTML before insertion (CodeQL js/xss-through-dom) ── */
+function safeHTML(el,html){
+  var doc=new DOMParser().parseFromString(html,'text/html');
+  el.textContent='';
+  while(doc.body.firstChild)el.appendChild(doc.body.adoptNode(doc.body.firstChild));
+}
+
 /* ══════════ DEMO DATA ══════════ */
 var F={
 "184":{id:"F-184",title:"Physical Security SOP not aligned to latest inspection benchmark",status:"In Review",sev:"HIGH",owner:"J. Smith",brq:0.91,cg:22,deg:"8d",due:"Apr 18",func:"Protection",src:"APP Assessment",date:"2026-04-03",recurring:3,
@@ -884,8 +891,8 @@ document.querySelectorAll(".role-card[data-role]").forEach(function(c){
 /* ══════════ DRAWER ══════════ */
 function openDrawer(title,bodyHtml,footHtml){
   dTitle.textContent=title;
-  dBody.innerHTML=bodyHtml;
-  dFoot.innerHTML=footHtml||"";
+  safeHTML(dBody,bodyHtml);
+  safeHTML(dFoot,footHtml||"");
   dOverlay.classList.add("open");
   dPanel.classList.add("open");
   // Wire close buttons inside drawer
@@ -975,7 +982,7 @@ function showFinding(fid){
   body+='<button data-fact="link" data-fid="'+fid+'">Link Related</button>';
   body+='<button data-fact="export" data-fid="'+fid+'">Export Packet</button></div>';
   // Render
-  fDet.innerHTML=body;
+  safeHTML(fDet,body);
   fDet.classList.remove("hidden");
   fDet.scrollIntoView({behavior:"smooth",block:"start"});
   // Wire close
@@ -1582,7 +1589,7 @@ document.getElementById("fDetail").addEventListener("click",function(e){
   // Update demo data
   if(F[fid]){F[fid].evidence.forEach(function(ev){if(ev.name===ename)ev.ok=1})}
   // Re-render the evidence item
-  evDiv.innerHTML='<span class="ev-ok">✓</span> '+ename+' <span style="margin-left:auto;font-size:8px;color:var(--ok)">validated · locked</span>';
+  safeHTML(evDiv,'<span class="ev-ok">✓</span> '+ename+' <span style="margin-left:auto;font-size:8px;color:var(--ok)">validated · locked</span>');
   toast("Evidence uploaded: "+ename,"ok");
   // Update EDI display
   if(F[fid]){
@@ -1705,7 +1712,7 @@ document.getElementById("heatmapGrid").addEventListener("click",function(e){
         f.evidence.forEach(function(ev){
           evHtml+='<div class="ev"><span class="'+(ev.ok?'ev-ok':'ev-miss')+'">'+(ev.ok?'✓':'○')+'</span> '+ev.name+' <span style="margin-left:auto;font-size:8px;color:var(--'+(ev.ok?'ok':'bad')+');">'+(ev.ok?'validated':'missing')+'</span></div>';
         });
-        detEl.innerHTML=
+        safeHTML(detEl,
           '<div style="border-top:1px solid var(--line);padding-top:12px">'+
           '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">'+
           '<span class="mono" style="font-size:14px;color:var(--accent);font-weight:700">'+f.id+'</span>'+
@@ -1732,14 +1739,14 @@ document.getElementById("heatmapGrid").addEventListener("click",function(e){
           '<div class="wr"><span class="wl">PPI</span><span class="wv" style="color:var(--'+(f.ppi>=0.8?'ok':'warn')+')">'+f.ppi+'</span></div></div>'+
           '<div class="wire"><h4>Evidence</h4>'+evHtml+
           '<div style="margin-top:4px;font-size:9px"><span style="color:var(--muted)">EDI:</span> <strong>'+f.edi+'</strong> &nbsp; <span style="color:var(--muted)">DEG:</span> <strong style="color:var(--warn)">'+f.deg+'</strong></div></div>'+
-          '</div>';
+          '</div>');
       } else {
         // Non-demo finding — summary card
         var cells=tr.querySelectorAll("td");
         var title=cells[1]?cells[1].textContent:"";
         var oolVal=cells[2]?cells[2].textContent:"";
         var st=cells[3]?cells[3].textContent:"";
-        detEl.innerHTML=
+        safeHTML(detEl,
           '<div style="border-top:1px solid var(--line);padding-top:12px">'+
           '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'+
           '<span class="mono" style="font-size:14px;color:var(--accent);font-weight:700">'+rawId+'</span>'+
@@ -1751,7 +1758,7 @@ document.getElementById("heatmapGrid").addEventListener("click",function(e){
           '<div class="wr"><span class="wl">Status</span><span class="wv">'+st+'</span></div>'+
           '<div class="wr"><span class="wl">Risk Bucket</span><span class="wv">'+sevLabel+' × '+oolLabel+'</span></div></div>'+
           '<div style="font-size:9px;color:var(--muted);margin-top:6px;font-style:italic">Full CERPA detail available when finding is loaded into the operational dataset.</div>'+
-          '</div>';
+          '</div>');
       }
       // Scroll detail into view inside drawer
       detEl.scrollIntoView({behavior:"smooth",block:"nearest"});
