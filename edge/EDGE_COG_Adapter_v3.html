@@ -1624,14 +1624,43 @@ function renderHeatmap(){
   html+='</div>';
   gridEl.innerHTML=html;
 
-  /* Click handler: filter explorer */
+  /* Click handler: open tray with cell detail */
   gridEl.addEventListener("click",function(e){
     var cell=e.target.closest(".hm-cell");if(!cell)return;
     var type=cell.getAttribute("data-type");
-    var filterSel=document.getElementById("filterType");
-    if(filterSel){filterSel.value=type;filterSel.dispatchEvent(new Event("change"))}
-    var tabBtn=document.querySelector('.tab-btn[data-tab="explorer"]');
-    if(tabBtn)tabBtn.click();
+    var bucket=parseInt(cell.getAttribute("data-bucket"),10);
+    var val=parseInt(cell.textContent,10);
+    var arts=STATE.bundle.artifacts||[];
+    var steps=STATE.bundle.replaySteps||[];
+    var totalSteps=Math.max(steps.length,arts.length,1);
+
+    var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">Drift Heatmap Cell</h3>';
+    h+='<span class="badge badge-cyan">'+esc(type)+'</span> ';
+    h+='<span class="badge badge-amber">T'+(bucket+1)+'</span></div>';
+
+    h+='<div class="drawer-section"><h4>Cell Summary</h4>';
+    h+='<div class="drawer-kv"><span class="dk">Artifact Type</span><span class="dv">'+esc(type)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Time Bucket</span><span class="dv">T'+(bucket+1)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Drift-Adjacent</span><span class="dv" style="color:'+(val>0?'var(--warn)':'var(--ok)')+'">'+val+'</span></div>';
+    h+='</div>';
+
+    /* List matching artifacts */
+    var matching=[];
+    for(var i=0;i<arts.length;i++){
+      if(arts[i].refType!==type)continue;
+      var si=0;
+      for(var s=0;s<steps.length;s++){if(steps[s].outputRef===arts[i].refId){si=steps[s].stepIndex;break}}
+      var bi=Math.min(Math.floor((si/totalSteps)*6),5);
+      if(bi===bucket)matching.push({art:arts[i],stepIdx:si});
+    }
+    if(matching.length>0){
+      h+='<div class="drawer-section"><h4>Artifacts in Cell ('+matching.length+')</h4>';
+      for(var m=0;m<matching.length;m++){
+        h+='<div class="drawer-kv"><span class="dk" style="font-size:10px">'+esc(matching[m].art.refId.substring(0,16))+'</span><span class="dv">step '+matching[m].stepIdx+'</span></div>';
+      }
+      h+='</div>';
+    }
+    openTray(h);
   });
 }
 
@@ -1705,13 +1734,51 @@ function renderHalfLife(){
   for(var k=0;k<rationales.length;k++){
     var r=rationales[k];
     var barColor=r.hl.status==="alive"?"var(--ok)":r.hl.status==="warning"?"var(--warn)":"var(--bad)";
-    html+='<div class="hl-row hl-'+r.hl.status+'">'+
+    html+='<div class="hl-row hl-'+r.hl.status+'" data-hl-idx="'+k+'" style="cursor:pointer">'+
       '<div class="hl-label" title="'+r.art.refId+'">'+r.art.refId.substring(0,12)+'&hellip; <span style="color:var(--muted);font-size:10px">step '+r.hl.stepIdx+'</span></div>'+
       '<div class="hl-bar-wrap"><div class="hl-bar-fill" style="width:'+r.hl.remaining+'%;background:'+barColor+'"></div></div>'+
       '<div class="hl-pct" style="color:'+barColor+'">'+r.hl.remaining+'%</div>'+
     '</div>';
   }
   listEl.innerHTML=html||'<p style="color:var(--muted);font-size:12px">No rationale artifacts in bundle</p>';
+
+  /* Store rationales for tray access */
+  listEl._hlData=rationales;
+
+  /* Click handler: open tray with assumption detail */
+  listEl.addEventListener("click",function(e){
+    var row=e.target.closest(".hl-row");if(!row)return;
+    var idx=parseInt(row.getAttribute("data-hl-idx"),10);
+    var data=listEl._hlData;if(!data||!data[idx])return;
+    var r=data[idx];
+    var statusColor=r.hl.status==="alive"?"var(--ok)":r.hl.status==="warning"?"var(--warn)":"var(--bad)";
+
+    var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">Assumption Detail</h3>';
+    h+='<span class="badge" style="border-color:'+statusColor+';color:'+statusColor+'">'+r.hl.status+'</span></div>';
+
+    h+='<div class="drawer-section"><h4>Identity</h4>';
+    h+='<div class="drawer-kv"><span class="dk">Ref ID</span><span class="dv mono" style="color:var(--neon-cyan);font-size:10px">'+esc(r.art.refId)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Type</span><span class="dv">'+esc(r.art.refType)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Replay Step</span><span class="dv">'+r.hl.stepIdx+'</span></div>';
+    h+='</div>';
+
+    h+='<div class="drawer-section"><h4>Half-Life Breakdown</h4>';
+    h+='<div class="drawer-kv"><span class="dk">Remaining</span><span class="dv" style="color:'+statusColor+';font-weight:700;font-size:16px">'+r.hl.remaining+'%</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Age Factor (40%)</span><span class="dv">'+Math.round(r.hl.ageFactor*100)+'%</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Confidence (30%)</span><span class="dv">'+Math.round(r.hl.confFactor*100)+'%</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Drift Proximity (30%)</span><span class="dv">'+Math.round(r.hl.driftFactor*100)+'%</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Payload Score</span><span class="dv">'+r.hl.score+'</span></div>';
+    h+='</div>';
+
+    h+='<div class="drawer-section"><h4>Content Hash</h4>';
+    h+='<div class="mono" style="font-size:10px;word-break:break-all;color:var(--muted);padding:8px;background:#0d1320;border-radius:6px">'+esc(r.art.contentHash)+'</div></div>';
+
+    if(r.art.payload){
+      h+='<div class="drawer-section"><h4>Payload</h4>';
+      h+='<div class="schema-block mono" style="max-height:200px;overflow-y:auto;white-space:pre-wrap;font-size:10px">'+esc(JSON.stringify(r.art.payload,null,2))+'</div></div>';
+    }
+    openTray(h);
+  });
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -1810,7 +1877,7 @@ function renderBlastRadius(){
     }else{critEl.style.display="none"}
   }
 
-  /* Click handler for detail */
+  /* Click handler: open tray with blast detail */
   listEl.addEventListener("click",function(e){
     var row=e.target.closest(".blast-row");if(!row)return;
     var idx=parseInt(row.getAttribute("data-idx"),10);
@@ -1819,16 +1886,38 @@ function renderBlastRadius(){
     var allRows=listEl.querySelectorAll(".blast-row");
     for(var ar=0;ar<allRows.length;ar++)allRows[ar].classList.remove("blast-active");
     row.classList.add("blast-active");
-    /* Show detail */
-    var detailEl=document.getElementById("blastDetail");
-    var detailContent=document.getElementById("blastDetailContent");
-    if(detailEl&&detailContent){
-      detailEl.style.display="";
-      var dHtml='<p style="margin-bottom:8px"><strong>'+bd.art.refId+'</strong> impacts:</p>';
-      if(bd.deps.length===0)dHtml+='<p style="color:var(--muted)">No downstream dependencies</p>';
-      else for(var di=0;di<bd.deps.length;di++)dHtml+='<span class="blast-dep">'+bd.deps[di].substring(0,12)+'</span>';
-      detailContent.innerHTML=dHtml;
+
+    var ringColor=bd.count>=3?"var(--bad)":bd.count>=1?"var(--warn)":"var(--ok)";
+    var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">Blast Radius Detail</h3>';
+    h+='<span class="badge badge-cyan">'+esc(bd.art.refType)+'</span> ';
+    h+='<span class="badge" style="border-color:'+ringColor+';color:'+ringColor+'">'+bd.count+' downstream</span></div>';
+
+    h+='<div class="drawer-section"><h4>Source Artifact</h4>';
+    h+='<div class="drawer-kv"><span class="dk">Ref ID</span><span class="dv mono" style="color:var(--neon-cyan);font-size:10px">'+esc(bd.art.refId)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Type</span><span class="dv">'+esc(bd.art.refType)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Blast Count</span><span class="dv" style="color:'+ringColor+';font-weight:700;font-size:16px">'+bd.count+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Content Hash</span><span class="dv mono" style="font-size:9px">'+esc(bd.art.contentHash.substring(0,32))+'&hellip;</span></div>';
+    h+='</div>';
+
+    if(bd.deps.length>0){
+      h+='<div class="drawer-section"><h4>Downstream Dependencies ('+bd.deps.length+')</h4>';
+      for(var di=0;di<bd.deps.length;di++){
+        /* Find the artifact for this dep */
+        var depArt=null;
+        var arts=STATE.bundle.artifacts||[];
+        for(var ai=0;ai<arts.length;ai++){if(arts[ai].refId===bd.deps[di]){depArt=arts[ai];break}}
+        h+='<div class="drawer-kv"><span class="dk mono" style="font-size:10px">'+esc(bd.deps[di].substring(0,16))+'</span><span class="dv">'+(depArt?esc(depArt.refType):'?')+'</span></div>';
+      }
+      h+='</div>';
+    }else{
+      h+='<div class="drawer-section"><h4>Dependencies</h4><p style="color:var(--muted);font-size:11px">No downstream artifacts affected</p></div>';
     }
+
+    if(bd.art.payload){
+      h+='<div class="drawer-section"><h4>Payload</h4>';
+      h+='<div class="schema-block mono" style="max-height:200px;overflow-y:auto;white-space:pre-wrap;font-size:10px">'+esc(JSON.stringify(bd.art.payload,null,2))+'</div></div>';
+    }
+    openTray(h);
   });
 }
 
@@ -2008,25 +2097,82 @@ function _renderGraphSvg(nodes,edges,W,H,typeColors,graph){
     svg.appendChild(g);
   }
 
-  /* Click handler: highlight node + its edges */
+  /* Click handler: highlight node + open tray */
   svg.addEventListener("click",function(ev){
     var nodeG=ev.target.closest("[data-node-idx]");
     /* Clear previous highlights */
     var allNodes=svg.querySelectorAll(".graph-node");
     for(var cn=0;cn<allNodes.length;cn++)allNodes[cn].classList.remove("graph-selected");
-    var allEdges=svg.querySelectorAll(".graph-edge");
-    for(var ce=0;ce<allEdges.length;ce++)allEdges[ce].classList.remove("graph-highlight-edge");
+    var allEdges2=svg.querySelectorAll(".graph-edge");
+    for(var ce=0;ce<allEdges2.length;ce++)allEdges2[ce].classList.remove("graph-highlight-edge");
 
     if(!nodeG)return;
     var idx=parseInt(nodeG.getAttribute("data-node-idx"),10);
+    var node=nodes[idx];if(!node)return;
     nodeG.querySelector(".graph-node").classList.add("graph-selected");
 
     /* Highlight connected edges */
-    for(var he=0;he<allEdges.length;he++){
-      var src=parseInt(allEdges[he].getAttribute("data-src"),10);
-      var tgt=parseInt(allEdges[he].getAttribute("data-tgt"),10);
-      if(src===idx||tgt===idx)allEdges[he].classList.add("graph-highlight-edge");
+    var connectedNodes=[];
+    for(var he=0;he<allEdges2.length;he++){
+      var src=parseInt(allEdges2[he].getAttribute("data-src"),10);
+      var tgt=parseInt(allEdges2[he].getAttribute("data-tgt"),10);
+      if(src===idx||tgt===idx){
+        allEdges2[he].classList.add("graph-highlight-edge");
+        connectedNodes.push(src===idx?tgt:src);
+      }
     }
+
+    /* Open tray with node detail */
+    var art=STATE.bundle.artifacts[node.idx];
+    var degree=(graph[node.id]||[]).length;
+    var inDegree=0;
+    for(var eid=0;eid<edges.length;eid++){if(edges[eid].target===idx)inDegree++}
+
+    var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">Graph Node</h3>';
+    h+='<span class="badge badge-cyan">'+esc(node.type)+'</span> ';
+    h+='<span class="badge badge-green">degree '+degree+'</span></div>';
+
+    h+='<div class="drawer-section"><h4>Node Identity</h4>';
+    h+='<div class="drawer-kv"><span class="dk">Ref ID</span><span class="dv mono" style="color:var(--neon-cyan);font-size:10px">'+esc(node.id)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Type</span><span class="dv">'+esc(node.type)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Out-Degree</span><span class="dv">'+degree+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">In-Degree</span><span class="dv">'+inDegree+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Position</span><span class="dv">'+Math.round(node.x)+', '+Math.round(node.y)+'</span></div>';
+    h+='</div>';
+
+    /* Connected nodes */
+    if(connectedNodes.length>0){
+      h+='<div class="drawer-section"><h4>Connected Nodes ('+connectedNodes.length+')</h4>';
+      for(var ci=0;ci<connectedNodes.length;ci++){
+        var cn2=nodes[connectedNodes[ci]];
+        if(cn2){
+          var cnColor=typeColors[cn2.type]||"#888";
+          h+='<div class="drawer-kv"><span class="dk mono" style="font-size:10px">'+esc(cn2.id.substring(0,16))+'</span><span class="dv" style="color:'+cnColor+'">'+esc(cn2.type)+'</span></div>';
+        }
+      }
+      h+='</div>';
+    }
+
+    /* Outgoing targets */
+    var outTargets=graph[node.id]||[];
+    if(outTargets.length>0){
+      h+='<div class="drawer-section"><h4>Outgoing Edges ('+outTargets.length+')</h4>';
+      for(var oi=0;oi<outTargets.length;oi++){
+        h+='<div class="drawer-kv"><span class="dk">&rarr;</span><span class="dv mono" style="font-size:10px;color:var(--neon-cyan)">'+esc(outTargets[oi].substring(0,20))+'</span></div>';
+      }
+      h+='</div>';
+    }
+
+    if(art&&art.contentHash){
+      h+='<div class="drawer-section"><h4>Content Hash</h4>';
+      h+='<div class="mono" style="font-size:10px;word-break:break-all;color:var(--muted);padding:8px;background:#0d1320;border-radius:6px">'+esc(art.contentHash)+'</div></div>';
+    }
+
+    if(art&&art.payload){
+      h+='<div class="drawer-section"><h4>Payload</h4>';
+      h+='<div class="schema-block mono" style="max-height:200px;overflow-y:auto;white-space:pre-wrap;font-size:10px">'+esc(JSON.stringify(art.payload,null,2))+'</div></div>';
+    }
+    openTray(h);
   });
 
   /* Zoom/pan */
@@ -2818,6 +2964,13 @@ function openDrawer(idx){
 function closeDrawer(){
   $("#detailDrawer").classList.remove("open");
   $("#drawerOverlay").classList.remove("open");
+}
+
+/* v4.3: Generic tray opener for governor tabs */
+function openTray(html){
+  $("#drawerContent").innerHTML=html;
+  $("#detailDrawer").classList.add("open");
+  $("#drawerOverlay").classList.add("open");
 }
 
 /* ══════════════════════════════════════════════════════════
