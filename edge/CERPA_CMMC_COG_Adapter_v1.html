@@ -1436,23 +1436,53 @@ var _graphState=null;
 function buildDependencyGraph(replaySteps,artifacts){
   var graph={};
   for(var i=0;i<artifacts.length;i++)graph[artifacts[i].refId]=[];
+
+  /* Replay step connections (sparse in CMMC bundles) */
   for(var s=0;s<replaySteps.length;s++){
     var step=replaySteps[s];
     if(step.inputRef&&step.outputRef&&graph[step.inputRef]){
       if(graph[step.inputRef].indexOf(step.outputRef)===-1)graph[step.inputRef].push(step.outputRef);
     }
   }
-  for(var s2=0;s2<replaySteps.length;s2++){
-    var st=replaySteps[s2];
-    if(st.outputRef){
-      for(var s3=s2+1;s3<replaySteps.length;s3++){
-        if(replaySteps[s3].inputRef===st.outputRef&&replaySteps[s3].outputRef){
-          if(!graph[st.outputRef])graph[st.outputRef]=[];
-          if(graph[st.outputRef].indexOf(replaySteps[s3].outputRef)===-1)graph[st.outputRef].push(replaySteps[s3].outputRef);
-        }
+
+  /* Intra-family chains: link sequential practices within each family */
+  var byFamily={};
+  for(var a=0;a<artifacts.length;a++){
+    var fam=artifacts[a].refType;
+    if(!byFamily[fam])byFamily[fam]=[];
+    byFamily[fam].push(artifacts[a].refId);
+  }
+  for(var fk in byFamily){
+    if(!byFamily.hasOwnProperty(fk))continue;
+    var members=byFamily[fk];
+    for(var m=0;m<members.length-1;m++){
+      if(graph[members[m]]&&graph[members[m]].indexOf(members[m+1])===-1)graph[members[m]].push(members[m+1]);
+    }
+  }
+
+  /* Cross-family via CERPA stage: connect first practice of families sharing stages */
+  var stageToFams={};
+  for(var cf=0;cf<FAMILIES.length;cf++){
+    var cerpa=CERPA_FAM[FAMILIES[cf].id];
+    if(!cerpa)continue;
+    var parts=cerpa.stage.split("+");
+    for(var cp=0;cp<parts.length;cp++){
+      var stg=parts[cp].trim();
+      if(stg==="All"){var allStages=["Claim","Event","Review","Patch","Apply"];for(var as=0;as<allStages.length;as++){if(!stageToFams[allStages[as]])stageToFams[allStages[as]]=[];stageToFams[allStages[as]].push(FAMILIES[cf].id)}}
+      else{if(!stageToFams[stg])stageToFams[stg]=[];stageToFams[stg].push(FAMILIES[cf].id)}
+    }
+  }
+  for(var sk in stageToFams){
+    if(!stageToFams.hasOwnProperty(sk))continue;
+    var fams=stageToFams[sk];
+    for(var f1=0;f1<fams.length-1;f1++){
+      var src=byFamily[fams[f1]];var tgt=byFamily[fams[f1+1]];
+      if(src&&src.length&&tgt&&tgt.length){
+        if(graph[src[0]]&&graph[src[0]].indexOf(tgt[0])===-1)graph[src[0]].push(tgt[0]);
       }
     }
   }
+
   return graph;
 }
 function renderGraph(){
@@ -1467,19 +1497,33 @@ function renderGraph(){
   /* CMMC uses family IDs as refTypes — color by family */
   var typeColors={AC:"#4caf50",AT:"#2196f3",AU:"#9c27b0",CM:"#ff9800",IA:"#e91e63",IR:"#00bcd4",MA:"#8bc34a",MP:"#ff5722",PE:"#607d8b",PS:"#795548",RA:"#ffc107",CA:"#03a9f4",SC:"#673ab7",SI:"#f44336"};
 
+  /* Cluster initial positions by family for better layout */
+  var famIdx={};var famCount=0;
+  for(var fi2=0;fi2<FAMILIES.length;fi2++)famIdx[FAMILIES[fi2].id]=fi2;
   var nodes=[];
+  var famCounts={};
   for(var i=0;i<arts.length;i++){
-    var angle=(2*Math.PI*i)/arts.length;
-    var r=Math.min(W,H)*0.35;
+    var fid=arts[i].refType;
+    if(!famCounts[fid])famCounts[fid]=0;
+    var fi3=famIdx[fid]!==undefined?famIdx[fid]:0;
+    var clusterAngle=(2*Math.PI*fi3)/FAMILIES.length;
+    var clusterR=Math.min(W,H)*0.3;
+    var cx=W/2+clusterR*Math.cos(clusterAngle);
+    var cy=H/2+clusterR*Math.sin(clusterAngle);
+    /* Spread practices within cluster */
+    var spread=30;
+    var localAngle=(2*Math.PI*famCounts[fid])/10;
+    var localR=spread*(0.5+famCounts[fid]*0.15);
     nodes.push({
       id:arts[i].refId,
       type:arts[i].refType,
-      x:W/2+r*Math.cos(angle),
-      y:H/2+r*Math.sin(angle),
+      x:cx+localR*Math.cos(localAngle),
+      y:cy+localR*Math.sin(localAngle),
       vx:0,vy:0,
       label:arts[i].refId.substring(0,8),
       idx:i
     });
+    famCounts[fid]++;
   }
 
   var edges=[];
