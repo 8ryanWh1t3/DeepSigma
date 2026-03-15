@@ -1143,6 +1143,104 @@ document.addEventListener("DOMContentLoaded",function(){
   $("#btnExecRefresh").addEventListener("click",function(){renderExecutive()});
   $("#btnCopyChain").addEventListener("click",function(){copyText(JSON.stringify(STATE.proofChain,null,2))});
   $("#btnCopyDiff").addEventListener("click",function(){copyText(JSON.stringify(STATE.lastDiff||{},null,2))});
+
+  /* v4.3: Diff row click → open tray */
+  document.getElementById("diffResults").addEventListener("click",function(e){
+    var row=e.target.closest(".diff-row[data-diff-type]");
+    if(!row||e.target.closest(".copy-btn"))return;
+    var dtype=row.getAttribute("data-diff-type");
+    var didx=parseInt(row.getAttribute("data-diff-idx"),10);
+    var diff=STATE.lastDiff;if(!diff)return;
+
+    var h="";
+
+    if(dtype==="added"){
+      var art=diff.added[didx];if(!art)return;
+      h+='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--ok);margin-bottom:4px">Added Artifact</h3>';
+      h+='<span class="badge badge-green">+ added</span> <span class="badge badge-amber">'+esc(art.refType)+'</span></div>';
+
+      h+='<div class="drawer-section"><h4>Identity</h4>';
+      h+='<div class="drawer-kv"><span class="dk">Ref ID</span><span class="dv mono" style="color:var(--neon-cyan);font-size:10px">'+esc(art.refId)+'</span></div>';
+      h+='<div class="drawer-kv"><span class="dk">Type</span><span class="dv">'+esc(art.refType)+'</span></div>';
+      h+='</div>';
+
+      h+='<div class="drawer-section"><h4>Content Hash</h4>';
+      h+='<div class="mono" style="font-size:10px;word-break:break-all;color:var(--muted);padding:8px;background:#0d1320;border-radius:6px">'+esc(art.contentHash)+'</div></div>';
+
+      if(art.payload){
+        h+='<div class="drawer-section"><h4>Payload</h4>';
+        h+='<div class="schema-block mono" style="max-height:250px;overflow-y:auto;white-space:pre-wrap;font-size:10px">'+esc(JSON.stringify(art.payload,null,2))+'</div></div>';
+      }
+
+    }else if(dtype==="removed"){
+      var art2=diff.removed[didx];if(!art2)return;
+      h+='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--bad);margin-bottom:4px">Removed Artifact</h3>';
+      h+='<span class="badge badge-fail">- removed</span> <span class="badge badge-pink">'+esc(art2.refType)+'</span></div>';
+
+      h+='<div class="drawer-section"><h4>Identity</h4>';
+      h+='<div class="drawer-kv"><span class="dk">Ref ID</span><span class="dv mono" style="color:var(--neon-cyan);font-size:10px">'+esc(art2.refId)+'</span></div>';
+      h+='<div class="drawer-kv"><span class="dk">Type</span><span class="dv">'+esc(art2.refType)+'</span></div>';
+      h+='</div>';
+
+      h+='<div class="drawer-section"><h4>Content Hash</h4>';
+      h+='<div class="mono" style="font-size:10px;word-break:break-all;color:var(--muted);padding:8px;background:#0d1320;border-radius:6px">'+esc(art2.contentHash)+'</div></div>';
+
+      if(art2.payload){
+        h+='<div class="drawer-section"><h4>Payload</h4>';
+        h+='<div class="schema-block mono" style="max-height:250px;overflow-y:auto;white-space:pre-wrap;font-size:10px">'+esc(JSON.stringify(art2.payload,null,2))+'</div></div>';
+      }
+
+    }else if(dtype==="modified"){
+      var mod=diff.modified[didx];if(!mod)return;
+      h+='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-amber);margin-bottom:4px">Modified Artifact</h3>';
+      h+='<span class="badge badge-warn">~ modified</span> <span class="badge badge-amber">'+esc(mod.before.refType)+'</span></div>';
+
+      h+='<div class="drawer-section"><h4>Identity</h4>';
+      h+='<div class="drawer-kv"><span class="dk">Ref ID</span><span class="dv mono" style="color:var(--neon-cyan);font-size:10px">'+esc(mod.before.refId)+'</span></div>';
+      h+='<div class="drawer-kv"><span class="dk">Type</span><span class="dv">'+esc(mod.before.refType)+'</span></div>';
+      h+='</div>';
+
+      h+='<div class="drawer-section"><h4>Hash Comparison</h4>';
+      h+='<div class="drawer-kv"><span class="dk">Before</span><span class="dv mono" style="font-size:9px;color:var(--bad)">'+esc(mod.before.contentHash.substring(0,40))+'&hellip;</span></div>';
+      h+='<div class="drawer-kv"><span class="dk">After</span><span class="dv mono" style="font-size:9px;color:var(--ok)">'+esc(mod.after.contentHash.substring(0,40))+'&hellip;</span></div>';
+      h+='</div>';
+
+      h+='<div class="drawer-section"><h4>Before Payload</h4>';
+      if(mod.before.payload){
+        h+='<div class="schema-block mono" style="max-height:180px;overflow-y:auto;white-space:pre-wrap;font-size:10px">'+esc(JSON.stringify(mod.before.payload,null,2))+'</div>';
+      }else{h+='<div style="color:var(--muted);font-size:11px">No payload</div>'}
+      h+='</div>';
+
+      h+='<div class="drawer-section"><h4>After Payload</h4>';
+      if(mod.after.payload){
+        h+='<div class="schema-block mono" style="max-height:180px;overflow-y:auto;white-space:pre-wrap;font-size:10px">'+esc(JSON.stringify(mod.after.payload,null,2))+'</div>';
+      }else{h+='<div style="color:var(--muted);font-size:11px">No payload</div>'}
+      h+='</div>';
+
+    }else if(dtype==="manifest"){
+      h+='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-amber);margin-bottom:4px">Manifest Change</h3>';
+      h+='<span class="badge badge-warn">~ version</span></div>';
+
+      h+='<div class="drawer-section"><h4>Version Change</h4>';
+      h+='<div class="drawer-kv"><span class="dk">Before</span><span class="dv" style="color:var(--bad)">'+esc(diff.fromBundle?STATE.bundle.manifest.version:"?")+'</span></div>';
+      h+='<div class="drawer-kv"><span class="dk">After</span><span class="dv" style="color:var(--ok)">'+esc(STATE.bundleB?STATE.bundleB.manifest.version:"?")+'</span></div>';
+      h+='</div>';
+
+      h+='<div class="drawer-section"><h4>Bundle Pair</h4>';
+      h+='<div class="drawer-kv"><span class="dk">From</span><span class="dv mono" style="font-size:10px">'+esc(diff.fromBundle)+'</span></div>';
+      h+='<div class="drawer-kv"><span class="dk">To</span><span class="dv mono" style="font-size:10px">'+esc(diff.toBundle)+'</span></div>';
+      h+='</div>';
+
+      h+='<div class="drawer-section"><h4>Diff Summary</h4>';
+      h+='<div class="drawer-kv"><span class="dk">Added</span><span class="dv" style="color:var(--ok)">'+diff.added.length+'</span></div>';
+      h+='<div class="drawer-kv"><span class="dk">Removed</span><span class="dv" style="color:var(--bad)">'+diff.removed.length+'</span></div>';
+      h+='<div class="drawer-kv"><span class="dk">Modified</span><span class="dv" style="color:var(--neon-amber)">'+diff.modified.length+'</span></div>';
+      h+='</div>';
+    }
+
+    if(h)openTray(h);
+  });
+
   $("#btnCopySchema").addEventListener("click",function(){
     var key=$$("#schemaSelector button.btn-primary")[0];
     if(key)copyText(JSON.stringify(SCHEMAS[key.dataset.schema],null,2));
@@ -2763,7 +2861,7 @@ function runDiff(){
   if(addedList.length){
     html+='<div style="margin-bottom:6px;font-size:11px;font-weight:700;color:var(--ok)">Added</div>';
     for(var ai=0;ai<addedList.length;ai++){
-      html+='<div class="diff-row"><div class="diff-side diff-add">'+
+      html+='<div class="diff-row" data-diff-type="added" data-diff-idx="'+ai+'" style="cursor:pointer"><div class="diff-side diff-add">'+
         '<div class="diff-label add">+ '+esc(addedList[ai].refId)+copyBtn(addedList[ai].refId)+'</div>'+
         '<span class="badge badge-amber">'+esc(addedList[ai].refType)+'</span>'+
         '<div class="mono" style="font-size:10px;color:var(--muted);margin-top:4px">'+esc(addedList[ai].contentHash.slice(0,40))+'...'+copyBtn(addedList[ai].contentHash)+'</div>'+
@@ -2774,7 +2872,7 @@ function runDiff(){
   if(removedList.length){
     html+='<div style="margin-bottom:6px;font-size:11px;font-weight:700;color:var(--bad)">Removed</div>';
     for(var ri=0;ri<removedList.length;ri++){
-      html+='<div class="diff-row"><div class="diff-side diff-rem">'+
+      html+='<div class="diff-row" data-diff-type="removed" data-diff-idx="'+ri+'" style="cursor:pointer"><div class="diff-side diff-rem">'+
         '<div class="diff-label rem">- '+esc(removedList[ri].refId)+copyBtn(removedList[ri].refId)+'</div>'+
         '<span class="badge badge-pink">'+esc(removedList[ri].refType)+'</span>'+
         '<div class="mono" style="font-size:10px;color:var(--muted);margin-top:4px">'+esc(removedList[ri].contentHash.slice(0,40))+'...'+copyBtn(removedList[ri].contentHash)+'</div>'+
@@ -2786,7 +2884,7 @@ function runDiff(){
     html+='<div style="margin-bottom:6px;font-size:11px;font-weight:700;color:var(--neon-amber)">Modified</div>';
     for(var mi=0;mi<modifiedList.length;mi++){
       var m=modifiedList[mi];
-      html+='<div class="diff-row">'+
+      html+='<div class="diff-row" data-diff-type="modified" data-diff-idx="'+mi+'" style="cursor:pointer">'+
         '<div class="diff-side diff-mod">'+
           '<div class="diff-label mod">Before: '+esc(m.before.refId)+'</div>'+
           '<div class="mono" style="font-size:10px;color:var(--bad);margin-top:4px">'+esc(m.before.contentHash.slice(0,40))+'...'+copyBtn(m.before.contentHash)+'</div>'+
@@ -2805,7 +2903,7 @@ function runDiff(){
 
   if(a.manifest.version!==b.manifest.version){
     html+='<div style="margin-top:14px"><div style="font-size:11px;font-weight:700;color:var(--neon-purple);margin-bottom:6px">Manifest changes</div>';
-    html+='<div class="diff-row"><div class="diff-side diff-mod"><div class="diff-label mod">version</div>'+
+    html+='<div class="diff-row" data-diff-type="manifest" style="cursor:pointer"><div class="diff-side diff-mod"><div class="diff-label mod">version</div>'+
       '<span style="color:var(--bad)">'+esc(a.manifest.version)+'</span> &rarr; <span style="color:var(--ok)">'+esc(b.manifest.version)+'</span></div></div></div>';
   }
 
