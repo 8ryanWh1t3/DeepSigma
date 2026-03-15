@@ -349,6 +349,17 @@ tr:hover td{background:rgba(0,240,255,.03)}
 .slider-row input[type=range]{flex:1;accent-color:var(--neon-cyan)}
 .slider-val{min-width:32px;text-align:right;font-weight:700;font-size:13px;color:var(--neon-cyan)}
 
+/* ── SVG Zoom/Pan ─────────────────────────── */
+.svg-zoom-wrap{position:relative;overflow:hidden}
+.svg-zoom-wrap svg{cursor:grab}
+.svg-zoom-wrap.dragging svg{cursor:grabbing}
+.svg-zoom-controls{position:absolute;top:8px;right:8px;display:flex;gap:4px;z-index:5}
+.svg-zoom-controls button{width:28px;height:28px;font-size:14px;padding:0;display:flex;align-items:center;justify-content:center}
+
+/* ── Replay drift injection ───────────────── */
+.rsc-drifted{border-color:#ff7043!important;animation:driftFlash .6s ease-out}
+@keyframes driftFlash{0%{box-shadow:0 0 12px rgba(255,112,67,.5)}100%{box-shadow:none}}
+
 @media print {
   body { background: #fff !important; color: #000 !important; }
   .tab-bar, .sidebar, .kbd-help, .toast, .drawer-overlay, .drawer-panel, .tabs, .shortcut-bar, #edgeActionContract { display: none !important; }
@@ -456,7 +467,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
       <p style="color:var(--muted);font-size:11px;margin-bottom:12px">Configure and generate a custom COG bundle for testing.</p>
       <div class="slider-row">
         <label>Artifacts</label>
-        <input type="range" id="sliderArtifacts" min="4" max="32" value="8" title="Number of artifacts">
+        <input type="range" id="sliderArtifacts" min="1" max="32" value="8" title="Number of artifacts">
         <span class="slider-val" id="sliderArtVal">8</span>
       </div>
       <div class="slider-row">
@@ -525,6 +536,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
         <div style="margin-top:10px;display:flex;gap:8px">
           <button id="btnReplayPrev">Prev</button>
           <button id="btnReplayNext" class="btn-primary">Next</button>
+          <button id="btnReplayDrift" style="background:rgba(255,112,67,.12);border-color:rgba(255,112,67,.4);color:#ff7043">Apply Random Drift</button>
         </div>
       </div>
       <div class="card">
@@ -1293,10 +1305,61 @@ function renderChainSvg(chain){
   /* State for lazy loading */
   var rendered=0;
 
+  /* Zoom/pan state */
+  var zoomLevel=1,panX=0,panY=0,isDragging=false,dragStartX=0,dragStartY=0;
+
+  var wrap=document.createElement("div");
+  wrap.className="svg-zoom-wrap";
+
   var svg=document.createElementNS(svgNS,"svg");
   svg.setAttribute("width","100%");
   svg.style.maxWidth=(nodeW+padX*2)+"px";
-  container.appendChild(svg);
+  wrap.appendChild(svg);
+
+  var zoomCtrl=document.createElement("div");
+  zoomCtrl.className="svg-zoom-controls";
+  var btnZoomIn=document.createElement("button");btnZoomIn.textContent="+";
+  var btnZoomOut=document.createElement("button");btnZoomOut.textContent="\u2212";
+  var btnZoomReset=document.createElement("button");btnZoomReset.textContent="\u21ba";
+  zoomCtrl.appendChild(btnZoomIn);zoomCtrl.appendChild(btnZoomOut);zoomCtrl.appendChild(btnZoomReset);
+  wrap.appendChild(zoomCtrl);
+  container.appendChild(wrap);
+
+  function updateViewBox(){
+    var totalW=nodeW+padX*2;
+    var totalH=padY*2+rendered*(nodeH+gapY)-gapY;
+    svg.setAttribute("viewBox",panX+" "+panY+" "+(totalW/zoomLevel)+" "+(totalH/zoomLevel));
+  }
+
+  btnZoomIn.addEventListener("click",function(){zoomLevel=Math.min(4.0,zoomLevel*1.25);updateViewBox()});
+  btnZoomOut.addEventListener("click",function(){zoomLevel=Math.max(0.25,zoomLevel/1.25);updateViewBox()});
+  btnZoomReset.addEventListener("click",function(){zoomLevel=1;panX=0;panY=0;updateViewBox()});
+
+  wrap.addEventListener("wheel",function(e){
+    e.preventDefault();
+    if(e.deltaY<0)zoomLevel=Math.min(4.0,zoomLevel*1.1);
+    else zoomLevel=Math.max(0.25,zoomLevel/1.1);
+    updateViewBox();
+  },{passive:false});
+
+  wrap.addEventListener("mousedown",function(e){
+    isDragging=true;dragStartX=e.clientX;dragStartY=e.clientY;
+    wrap.classList.add("dragging");
+  });
+  wrap.addEventListener("mousemove",function(e){
+    if(!isDragging)return;
+    var totalW=nodeW+padX*2;
+    var totalH=padY*2+rendered*(nodeH+gapY)-gapY;
+    var rect=svg.getBoundingClientRect();
+    var scaleX=(totalW/zoomLevel)/(rect.width||1);
+    var scaleY=(totalH/zoomLevel)/(rect.height||1);
+    panX-=(e.clientX-dragStartX)*scaleX;
+    panY-=(e.clientY-dragStartY)*scaleY;
+    dragStartX=e.clientX;dragStartY=e.clientY;
+    updateViewBox();
+  });
+  wrap.addEventListener("mouseup",function(){isDragging=false;wrap.classList.remove("dragging")});
+  wrap.addEventListener("mouseleave",function(){isDragging=false;wrap.classList.remove("dragging")});
 
   function appendNodes(start,count){
     var end=Math.min(start+count,chain.length);
@@ -1346,10 +1409,7 @@ function renderChainSvg(chain){
       svg.appendChild(hash);
     }
     rendered=end;
-    /* Resize viewBox */
-    var totalH=padY*2+rendered*(nodeH+gapY)-gapY;
-    var totalW=nodeW+padX*2;
-    svg.setAttribute("viewBox","0 0 "+totalW+" "+totalH);
+    updateViewBox();
   }
 
   /* Render initial batch */
@@ -1532,7 +1592,8 @@ function renderReplaySim(){
     var s=steps[i];
     var opacity=i<replaySimStep?0.4:(i===replaySimStep?1.0:0.25);
     var isCurrent=i===replaySimStep;
-    html+='<div class="replay-step-card'+(isCurrent?" rsc-current":"")+'" style="opacity:'+opacity+'">'+
+    var driftCls=s._driftApplied?" rsc-drifted":"";
+    html+='<div class="replay-step-card'+(isCurrent?" rsc-current":"")+driftCls+'" style="opacity:'+opacity+'">'+
       '<div style="display:flex;align-items:center;gap:8px">'+
       '<span class="badge badge-purple" style="min-width:24px;text-align:center">'+s.stepIndex+'</span>'+
       '<span style="font-weight:700;color:'+(isCurrent?'var(--neon-cyan)':'var(--txt)')+'">'+esc(s.action)+'</span>'+
@@ -1560,12 +1621,14 @@ function renderReplaySim(){
    Phase 4A: Custom Bundle Generator
    ══════════════════════════════════════════════════════════ */
 function makeCustomBundle(artCount, driftPct, patchCount){
+  if(artCount<1)return null;
   _rngState=Date.now()%100000;
   var bundleId=rngId();
   var artifacts=[];
   var driftCount=Math.max(0,Math.round(artCount*(driftPct/100)));
   var remainAfterDrift=artCount-driftCount-patchCount;
   if(remainAfterDrift<0){patchCount=Math.max(0,artCount-driftCount);remainAfterDrift=0}
+  if(remainAfterDrift===0&&driftCount+patchCount>=artCount){remainAfterDrift=1;if(driftCount>0)driftCount--;else patchCount--}
 
   /* Distribute remaining among evidence, rationale, memory */
   var baseTypes=["evidence","rationale","memory"];
@@ -2183,6 +2246,25 @@ document.addEventListener("DOMContentLoaded",function(){
     var steps=STATE.bundle?STATE.bundle.replaySteps:[];
     if(replaySimStep<steps.length-1){replaySimStep++;renderReplaySim()}
   });
+  var rdBtn=$("#btnReplayDrift");
+  if(rdBtn)rdBtn.addEventListener("click",function(){
+    var b=STATE.bundle;
+    if(!b||!b.replaySteps||!b.replaySteps.length){toast("No replay steps loaded");return}
+    var step=b.replaySteps[replaySimStep];
+    var target=null;
+    if(step.outputRef&&b.artifacts){
+      for(var i=0;i<b.artifacts.length;i++){
+        if(b.artifacts[i].refId===step.outputRef){target=b.artifacts[i];break}
+      }
+    }
+    if(target){
+      var h=target.contentHash;
+      target.contentHash=h.substring(0,h.length-8)+rngHex(8);
+    }
+    step._driftApplied=true;
+    renderReplaySim();
+    toast("Drift injected at step "+replaySimStep);
+  });
 
   /* ══════════════════════════════════════════════════════════
      Phase 4A: Custom Bundle Generator slider wiring
@@ -2199,6 +2281,7 @@ document.addEventListener("DOMContentLoaded",function(){
     var driftPct=+($("#sliderDrift")||{}).value||25;
     var patchCount=+($("#sliderPatches")||{}).value||1;
     var bundle=makeCustomBundle(artCount,driftPct,patchCount);
+    if(!bundle){toast("Invalid parameters");return}
     STATE.bundle=bundle;
     STATE.tampered=false;
     STATE.tamperSnapshot=null;

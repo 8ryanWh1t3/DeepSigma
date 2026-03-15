@@ -73,6 +73,29 @@ h3{font-size:13px;color:var(--accent);margin-bottom:10px}
 .gauge-label{font-size:11px;color:var(--muted)}
 .gauge-bar{flex:1;height:10px;background:var(--line);border-radius:5px;overflow:hidden}
 .gauge-fill{height:100%;border-radius:5px;transition:width .6s ease,background .6s ease}
+
+/* Drift threshold alert */
+#driftAlert{display:none;border-color:var(--bad);background:rgba(255,107,107,.08);color:var(--bad);font-size:12px;animation:driftPulse 2s infinite}
+@keyframes driftPulse{0%,100%{opacity:1}50%{opacity:.7}}
+
+/* ── Mobile responsive ───────────────────── */
+@media(max-width:768px){
+  body{padding:12px}
+  h1{font-size:16px}
+  .gauge-row{flex-direction:column;gap:8px}
+  .gauge-pct{font-size:28px;text-align:center;min-width:auto}
+  .score-grid{grid-template-columns:repeat(2,1fr)}
+  .event-log{max-height:200px}
+  .conn-row{flex-direction:column}
+  .conn-input{min-width:100%;width:100%}
+}
+@media(max-width:480px){
+  .score-grid{grid-template-columns:1fr}
+  .gauge-pct{font-size:24px}
+  h1{font-size:14px}
+  h2{font-size:12px}
+  .card{padding:10px}
+}
 </style>
 </head>
 <body>
@@ -94,6 +117,21 @@ h3{font-size:13px;color:var(--accent);margin-bottom:10px}
   </div>
 </div>
 
+<!-- Import from Adapter -->
+<div class="card" id="importPanel">
+  <h3>Import from Adapter</h3>
+  <div style="font-size:10px;color:var(--muted);margin-bottom:8px">Paste bundle JSON exported from CERPA CMMC COG Adapter ("Copy Bundle for Dashboard" button).</div>
+  <textarea id="importArea" style="width:100%;min-height:80px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px;color:var(--text);font-family:'SF Mono',Menlo,monospace;font-size:11px;resize:vertical" placeholder='Paste adapter bundle JSON here...'></textarea>
+  <div style="margin-top:8px;display:flex;gap:8px">
+    <button class="btn btn-primary" id="btnImportBundle">Import Bundle</button>
+  </div>
+  <div id="importResult" style="margin-top:8px;font-size:11px"></div>
+</div>
+
+<!-- Tamper alert (shown when imported bundle has tamper state) -->
+<div class="card" id="tamperAlert" style="display:none;border-color:var(--bad);background:rgba(255,107,107,.08);color:var(--bad);font-size:12px">
+</div>
+
 <!-- Overall compliance gauge -->
 <div class="card">
   <h3>Overall Compliance</h3>
@@ -104,6 +142,15 @@ h3{font-size:13px;color:var(--accent);margin-bottom:10px}
       <div class="gauge-label" style="margin-top:4px"><span id="overallGrade">Compliant</span> — <span id="overallDetail">110 practices assessed</span></div>
     </div>
   </div>
+  <div style="margin-top:8px;display:flex;align-items:center;gap:8px;font-size:11px">
+    <span style="color:var(--muted)">Alert threshold:</span>
+    <input type="number" id="driftThreshold" value="80" min="0" max="100" style="width:60px;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:4px 6px;color:var(--text);font-size:11px"/>
+    <span style="color:var(--muted)">%</span>
+  </div>
+</div>
+
+<div class="card" id="driftAlert">
+  Score has dropped below threshold — compliance drift detected
 </div>
 
 <!-- Family scorecard grid -->
@@ -201,6 +248,12 @@ function updateOverall(){
   if(fillEl){fillEl.style.width=pct+"%";fillEl.style.background=color}
   var gradeEl=$("#overallGrade");
   if(gradeEl)gradeEl.textContent=grade;
+  var threshold=parseFloat(($("#driftThreshold")||{}).value)||80;
+  var alertEl=$("#driftAlert");
+  if(alertEl){
+    if(pct<threshold){alertEl.style.display="block";alertEl.textContent="Compliance drift: score "+pct+"% is below "+threshold+"% threshold"}
+    else{alertEl.style.display="none"}
+  }
 }
 
 /* ── Add event to log ─── */
@@ -318,6 +371,47 @@ function disconnect(){
   logEvent("Disconnected from webhook bridge");
 }
 
+/* ── Import bundle from adapter ─── */
+function importBundle(){
+  var ta=$("#importArea");
+  var resultEl=$("#importResult");
+  if(!ta||!ta.value.trim()){
+    if(resultEl)resultEl.innerHTML='<span style="color:var(--bad)">Paste bundle JSON first</span>';
+    return;
+  }
+  try{
+    var data=JSON.parse(ta.value.trim());
+    /* Accept either {families:[...]} or {_families:[...], _bundle:{...}} */
+    var families=data._families||data.families||null;
+    if(families&&families.length===14){
+      for(var i=0;i<14;i++){
+        FAMILIES[i].full=families[i].full;
+        FAMILIES[i].strong=families[i].strong;
+        FAMILIES[i].partial=families[i].partial;
+        FAMILIES[i].na=families[i].na;
+      }
+    }
+    /* Check for tamper state (Phase 1B) */
+    var tamper=data._tamperState||null;
+    var tamperEl=$("#tamperAlert");
+    if(tamper&&tamper.active){
+      if(tamperEl){
+        tamperEl.style.display="block";
+        tamperEl.innerHTML='<span style="font-weight:700">TAMPER DETECTED</span> — Corrupted entry at index '+tamper.corruptedIndex+', '+tamper.affectedCount+' chain entries affected';
+      }
+      logEvent("TAMPER STATE imported: index "+tamper.corruptedIndex+", "+tamper.affectedCount+" affected","error");
+    }else{
+      if(tamperEl)tamperEl.style.display="none";
+    }
+    renderGrid();
+    updateOverall();
+    logEvent("Bundle imported from adapter"+(families?" (14 families updated)":""),"success");
+    if(resultEl)resultEl.innerHTML='<span style="color:var(--ok)">Bundle imported successfully</span>';
+  }catch(err){
+    if(resultEl)resultEl.innerHTML='<span style="color:var(--bad)">Invalid JSON: '+esc(err.message)+'</span>';
+  }
+}
+
 /* ── Init ─── */
 document.addEventListener("DOMContentLoaded",function(){
   renderGrid();
@@ -325,6 +419,7 @@ document.addEventListener("DOMContentLoaded",function(){
 
   $("#btnConnect").addEventListener("click",connect);
   $("#btnDisconnect").addEventListener("click",disconnect);
+  $("#btnImportBundle").addEventListener("click",importBundle);
 
   /* Enter key in URL input */
   $("#bridgeUrl").addEventListener("keydown",function(e){
