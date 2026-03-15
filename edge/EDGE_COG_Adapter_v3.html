@@ -1203,7 +1203,7 @@ function renderExecutive(){
     var row=rows[r];
     var cls=row.pass?"pass":(row.warn?"warn":"fail");
     var icon=row.pass?"&#10003;":(row.warn?"&#33;":"&#10007;");
-    html+='<div class="exec-row" data-filter-type="'+esc(row.filterType)+'">'+
+    html+='<div class="exec-row" data-filter-type="'+esc(row.filterType)+'" data-row-idx="'+r+'">'+
       '<div class="score-ring '+cls+'">'+icon+'</div>'+
       '<div class="exec-detail">'+
         '<h4>'+esc(row.label)+'</h4>'+
@@ -1213,6 +1213,9 @@ function renderExecutive(){
     '</div>';
   }
   $("#execScorecard").innerHTML=html;
+
+  /* Store rows for tray access */
+  STATE._execRows=rows;
 
   /* Commit Boundary */
   renderCommitBoundary(b.commitBoundary);
@@ -3197,13 +3200,59 @@ document.addEventListener("DOMContentLoaded",function(){
   var execPanel=$("#panel-executive");
   if(execPanel){
     execPanel.addEventListener("click",function(e){
-      var target=e.target.closest("[data-filter-type]");
+      var target=e.target.closest(".exec-row[data-row-idx]");
       if(!target)return;
-      var filterType=target.getAttribute("data-filter-type");
-      var explorerBtn=document.querySelector('.tab-btn[data-tab="explorer"]');
-      if(explorerBtn)explorerBtn.click();
-      var pill=document.querySelector('.filter-pill[data-ft="'+filterType+'"]');
-      if(pill)pill.click();
+      var ridx=parseInt(target.getAttribute("data-row-idx"),10);
+      var rows=STATE._execRows;
+      if(!rows||!rows[ridx])return;
+      var row=rows[ridx];
+      var b=STATE.bundle;if(!b)return;
+
+      var cls=row.pass?"pass":(row.warn?"warn":"fail");
+      var statusColor=row.pass?"var(--ok)":(row.warn?"var(--warn)":"var(--bad)");
+      var statusLabel=row.pass?"Passing":(row.warn?"Warning":"Failing");
+
+      var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">'+esc(row.label)+'</h3>';
+      h+='<span class="badge badge-'+cls+'">'+esc(statusLabel)+'</span></div>';
+
+      h+='<div class="drawer-section"><h4>Assessment</h4>';
+      h+='<div class="drawer-kv"><span class="dk">Status</span><span class="dv" style="color:'+statusColor+';font-weight:700">'+esc(statusLabel)+'</span></div>';
+      h+='<div class="drawer-kv"><span class="dk">Artifact Type</span><span class="dv">'+esc(row.filterType)+'</span></div>';
+      h+='<div style="margin-top:8px;font-size:11px;color:var(--muted);line-height:1.5">'+esc(row.desc)+'</div>';
+      h+='<div style="margin-top:8px"><span class="badge badge-'+cls+'">'+esc(row.val)+'</span></div>';
+      h+='</div>';
+
+      /* Show matching artifacts */
+      var matching=[];
+      for(var i=0;i<b.artifacts.length;i++){
+        if(b.artifacts[i].refType===row.filterType)matching.push(b.artifacts[i]);
+      }
+      if(matching.length>0){
+        h+='<div class="drawer-section"><h4>'+esc(row.filterType)+' Artifacts ('+matching.length+')</h4>';
+        for(var m=0;m<Math.min(matching.length,15);m++){
+          h+='<div class="drawer-kv"><span class="dk mono" style="font-size:10px">'+esc(matching[m].refId.substring(0,16))+'</span><span class="dv mono" style="font-size:9px">'+esc(matching[m].contentHash.substring(0,20))+'&hellip;</span></div>';
+        }
+        if(matching.length>15)h+='<div style="color:var(--muted);font-size:10px;margin-top:4px">+'+(matching.length-15)+' more</div>';
+        h+='</div>';
+      }
+
+      /* Row-specific deep detail */
+      if(row.filterType==="evidence"&&STATE.proofChain.length>0){
+        h+='<div class="drawer-section"><h4>Proof Chain</h4>';
+        h+='<div class="drawer-kv"><span class="dk">Entries</span><span class="dv">'+STATE.proofChain.length+'</span></div>';
+        h+='<div class="drawer-kv"><span class="dk">Genesis Hash</span><span class="dv mono" style="font-size:9px">'+esc(STATE.proofChain[0].chainHash.substring(0,32))+'&hellip;</span></div>';
+        h+='</div>';
+      }
+      if(row.filterType==="patch"&&b.commitBoundary){
+        var cb=b.commitBoundary;
+        h+='<div class="drawer-section"><h4>Commit Boundary</h4>';
+        h+='<div class="drawer-kv"><span class="dk">Authority</span><span class="dv" style="font-size:10px">'+esc(cb.authority.sealAuthority)+'</span></div>';
+        h+='<div class="drawer-kv"><span class="dk">Policy</span><span class="dv">'+esc(cb.authority.policyVersion)+'</span></div>';
+        h+='<div class="drawer-kv"><span class="dk">Chain Depth</span><span class="dv">'+cb.authority.authorityChainDepth+'</span></div>';
+        h+='</div>';
+      }
+
+      openTray(h);
     });
   }
 
