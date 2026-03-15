@@ -818,8 +818,8 @@ function renderMapping(){
    ══════════════════════════════════════════════════════════ */
 var SCHEMAS={
 bundle:{
-  "$schema":"https://json-schema.org/draft/2020-12/schema",
-  "$id":"https://sigma-overwatch.dev/schemas/cog_bundle.schema.json",
+  "$schema":"urn:jsonschema:draft-2020-12",
+  "$id":"urn:sigma-overwatch:schemas:cog_bundle.schema.json",
   title:"COG Bundle",
   description:"Top-level COG portable cognition bundle.",
   type:"object",
@@ -828,15 +828,15 @@ bundle:{
     manifest:{type:"object",required:["bundleId"],properties:{
       bundleId:{type:"string"},version:{type:"string"},createdAt:{type:"string",format:"date-time"},source:{type:"string"}
     }},
-    artifacts:{type:"array",items:{"$ref":"https://sigma-overwatch.dev/schemas/cog_artifact_ref.schema.json"}},
-    proof:{"$ref":"https://sigma-overwatch.dev/schemas/cog_proof.schema.json"},
-    replaySteps:{type:"array",items:{"$ref":"https://sigma-overwatch.dev/schemas/cog_replay_step.schema.json"}},
+    artifacts:{type:"array",items:{"$ref":"urn:sigma-overwatch:schemas:cog_artifact_ref.schema.json"}},
+    proof:{"$ref":"urn:sigma-overwatch:schemas:cog_proof.schema.json"},
+    replaySteps:{type:"array",items:{"$ref":"urn:sigma-overwatch:schemas:cog_replay_step.schema.json"}},
     rawMetadata:{type:"object"}
   }
 },
 artifact:{
-  "$schema":"https://json-schema.org/draft/2020-12/schema",
-  "$id":"https://sigma-overwatch.dev/schemas/cog_artifact_ref.schema.json",
+  "$schema":"urn:jsonschema:draft-2020-12",
+  "$id":"urn:sigma-overwatch:schemas:cog_artifact_ref.schema.json",
   title:"COG Artifact Ref",
   type:"object",
   required:["refId","refType"],
@@ -848,8 +848,8 @@ artifact:{
   }
 },
 proof:{
-  "$schema":"https://json-schema.org/draft/2020-12/schema",
-  "$id":"https://sigma-overwatch.dev/schemas/cog_proof.schema.json",
+  "$schema":"urn:jsonschema:draft-2020-12",
+  "$id":"urn:sigma-overwatch:schemas:cog_proof.schema.json",
   title:"COG Proof",
   type:"object",
   properties:{
@@ -864,8 +864,8 @@ proof:{
   }
 },
 replay:{
-  "$schema":"https://json-schema.org/draft/2020-12/schema",
-  "$id":"https://sigma-overwatch.dev/schemas/cog_replay_step.schema.json",
+  "$schema":"urn:jsonschema:draft-2020-12",
+  "$id":"urn:sigma-overwatch:schemas:cog_replay_step.schema.json",
   title:"COG Replay Step",
   type:"object",
   required:["stepIndex","action"],
