@@ -366,6 +366,22 @@ tr:hover td{background:rgba(0,240,255,.03)}
 .trilogy-flow span{padding:2px 6px;border-radius:4px;background:rgba(233,30,99,.15);color:#e91e63;font-weight:600}
 .trilogy-flow-arrow{color:var(--muted)}
 
+/* ── v4.3: Graph Tab ──────────────────────── */
+.graph-wrap{position:relative;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:rgba(0,0,0,.2)}
+.graph-wrap svg{display:block;width:100%;height:500px;cursor:grab}
+.graph-wrap.dragging svg{cursor:grabbing}
+.graph-controls{position:absolute;top:8px;right:8px;display:flex;gap:4px;z-index:5}
+.graph-controls button{width:28px;height:28px;font-size:14px;padding:0;display:flex;align-items:center;justify-content:center}
+.graph-node{cursor:pointer;transition:r .15s}
+.graph-node:hover{r:10}
+.graph-edge{stroke:rgba(255,255,255,.12);stroke-width:1}
+.graph-label{font-size:8px;fill:var(--muted);pointer-events:none;text-anchor:middle}
+.graph-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:10px;color:var(--muted)}
+.graph-legend-item{display:flex;align-items:center;gap:4px}
+.graph-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.graph-selected{stroke:var(--neon-cyan);stroke-width:2}
+.graph-highlight-edge{stroke:var(--neon-cyan)!important;stroke-width:2!important;opacity:1!important}
+
 /* ── PDF Export via Print CSS ─────────────── */
 @media print {
   body { background: #fff !important; color: #000 !important; }
@@ -424,6 +440,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
   <button class="tab-btn" data-tab="mapping">Mapping</button>
   <button class="tab-btn" data-tab="schema">Schema</button>
   <button class="tab-btn" data-tab="trilogy">Trilogy</button>
+  <button class="tab-btn" data-tab="graph">Graph</button>
 </nav>
 
 <div class="content" id="content">
@@ -710,6 +727,26 @@ tr:hover td{background:rgba(0,240,255,.03)}
     </div>
   </div>
 
+  <!-- ═══════════════ TAB 9: Graph ═══════════════ -->
+  <div class="tab-panel" id="panel-graph" data-tab-title="Graph">
+    <div class="stats-bar" id="graphStats"></div>
+    <div class="card" style="padding:12px">
+      <div class="graph-wrap" id="graphWrap">
+        <svg id="graphSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div class="graph-controls">
+          <button id="graphZoomIn" title="Zoom in">+</button>
+          <button id="graphZoomOut" title="Zoom out">&minus;</button>
+          <button id="graphZoomReset" title="Reset view">&#x21bb;</button>
+        </div>
+      </div>
+      <div class="graph-legend" id="graphLegend"></div>
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button class="copy-btn" id="btnCopyGraph">Copy Graph JSON</button>
+        <button class="copy-btn" id="btnRelayout">Re-layout</button>
+      </div>
+    </div>
+  </div>
+
   <div class="print-footer" id="printFooter"></div>
 
 </div>
@@ -722,7 +759,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
 </div>
 <!-- v3: Shortcut bar -->
 <div class="shortcut-bar" id="shortcutBar">
-  <span><kbd>1</kbd>-<kbd>8</kbd> Tabs</span>
+  <span><kbd>1</kbd>-<kbd>9</kbd> <kbd>G</kbd> Tabs</span>
   <span><kbd>Esc</kbd> Close drawer</span>
   <span><kbd>?</kbd> Toggle hints</span>
   <span><kbd>R</kbd> Randomize</span>
@@ -961,9 +998,10 @@ function renderExecutive(){
     tipHtml+='<div style="margin-bottom:4px">CERPA Stage: <span class="cerpa-tag '+cerpaInfo.cls+'">'+cerpaInfo.lbl+'</span></div>';
     if(authLaws.length)tipHtml+='<div style="font-size:10px;color:var(--neon-amber)">AuthorityOps: '+esc(authLaws.join(", "))+'</div>';
     tipHtml+='</div>';
-    html+='<div class="exec-row" data-filter-type="'+esc(fam.id)+'"><div class="score-ring '+cls+'">'+icon+'</div><div class="exec-detail"><h4>'+esc(fam.id)+' — '+esc(fam.name)+' ('+fam.total+' practices)</h4><p>Full: '+fam.full+' | Strong: '+fam.strong+' | Partial: '+fam.partial+(naDisplay>0?' | N/A: '+naDisplay:'')+(partialDigitalCount>0?' | partial-digital: '+partialDigitalCount:'')+'</p><div style="margin-top:4px"><span class="badge badge-'+cls+'">'+famPct+'% weighted coverage</span>'+pdBadge+(KPI_FAM[fam.id].length?' <span class="badge badge-cyan">KPIs: '+KPI_FAM[fam.id].join(", ")+'</span>':'')+'</div></div>'+tipHtml+'</div>';
+    html+='<div class="exec-row" data-filter-type="'+esc(fam.id)+'" data-row-idx="'+f+'"><div class="score-ring '+cls+'">'+icon+'</div><div class="exec-detail"><h4>'+esc(fam.id)+' — '+esc(fam.name)+' ('+fam.total+' practices)</h4><p>Full: '+fam.full+' | Strong: '+fam.strong+' | Partial: '+fam.partial+(naDisplay>0?' | N/A: '+naDisplay:'')+(partialDigitalCount>0?' | partial-digital: '+partialDigitalCount:'')+'</p><div style="margin-top:4px"><span class="badge badge-'+cls+'">'+famPct+'% weighted coverage</span>'+pdBadge+(KPI_FAM[fam.id].length?' <span class="badge badge-cyan">KPIs: '+KPI_FAM[fam.id].join(", ")+'</span>':'')+'</div></div>'+tipHtml+'</div>';
   }
   $("#execScorecard").innerHTML=html;
+  STATE._execFamilies=FAMILIES;
   renderCommitBoundary(b.commitBoundary);
 }
 function renderCommitBoundary(cb){
@@ -983,18 +1021,18 @@ function loadBundle(seed){
     '<div class="stat-box"><div class="stat-val">14</div><div class="stat-label">Families</div></div>'+
     '<div class="stat-box"><div class="stat-val" style="color:var(--neon-green)">93.9%</div><div class="stat-label">Coverage</div></div>';
   var mRows="";var mKeys=Object.keys(b.manifest);
-  for(var i=0;i<mKeys.length;i++){var val=String(b.manifest[mKeys[i]]);mRows+="<tr><td class='mono' style='color:var(--neon-cyan)'>"+esc(mKeys[i])+"</td><td>"+esc(val)+"</td><td>"+copyBtn(val)+"</td></tr>"}
+  for(var i=0;i<mKeys.length;i++){var val=String(b.manifest[mKeys[i]]);mRows+="<tr class='manifest-row' data-mkey='"+esc(mKeys[i])+"' style='cursor:pointer'><td class='mono' style='color:var(--neon-cyan)'>"+esc(mKeys[i])+"</td><td>"+esc(val)+"</td><td>"+copyBtn(val)+"</td></tr>"}
   $("#manifestTable").innerHTML=mRows;
   $("#artifactCount").textContent=b.artifacts.length;
   explorerPage=0;
   explorerFilter="all";
   renderExplorerTable();
   $("#replayCount").textContent=b.replaySteps.length;
-  var rRows="";for(var k=0;k<b.replaySteps.length;k++){var s=b.replaySteps[k];rRows+="<tr><td>"+s.stepIndex+"</td><td><span class='badge badge-purple'>"+esc(s.action)+"</span></td><td class='mono' style='font-size:10px'>"+esc(s.inputRef||"-")+"</td><td class='mono' style='font-size:10px'>"+esc(s.outputRef||"-")+"</td></tr>"}
+  var rRows="";for(var k=0;k<b.replaySteps.length;k++){var s=b.replaySteps[k];rRows+="<tr class='replay-row' data-sidx='"+k+"' style='cursor:pointer'><td>"+s.stepIndex+"</td><td><span class='badge badge-purple'>"+esc(s.action)+"</span></td><td class='mono' style='font-size:10px'>"+esc(s.inputRef||"-")+"</td><td class='mono' style='font-size:10px'>"+esc(s.outputRef||"-")+"</td></tr>"}
   $("#replayTable").innerHTML=rRows;
   $("#metadataBlock").textContent=JSON.stringify(b.rawMetadata,null,2);
   buildProofChain(b.artifacts);
-  setTimeout(function(){renderExecutive();renderTimeline();renderTrilogy()},100);
+  setTimeout(function(){renderExecutive();renderTimeline();renderTrilogy();renderGraph()},100);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -1365,7 +1403,7 @@ function renderExportPipeline(){var steps=[{n:1,title:"Collect 110 Practices",de
 /* ══════════════════════════════════════════════════════════
    Diff
    ══════════════════════════════════════════════════════════ */
-function runDiff(){var a=makeSampleBundle(42);var b=makeSampleBundle(42);/* Simulate a practice coverage upgrade */b.artifacts[13].payload.coverage="Full";b.artifacts[13].contentHash="sha256:"+rngHex(64);b.artifacts[50].payload.coverage="Strong";b.artifacts[50].contentHash="sha256:"+rngHex(64);b.manifest.version="1.1.0";STATE.bundleB=b;var modified=[];for(var i=0;i<a.artifacts.length;i++){if(a.artifacts[i].contentHash!==b.artifacts[i].contentHash)modified.push({before:a.artifacts[i],after:b.artifacts[i]})}STATE.lastDiff={fromVersion:a.manifest.version,toVersion:b.manifest.version,modified:modified};$("#diffStats").innerHTML='<div class="stat-box"><div class="stat-val" style="color:var(--neon-amber)">'+modified.length+'</div><div class="stat-label">Coverage Changes</div></div><div class="stat-box"><div class="stat-val">'+esc(a.manifest.version)+" → "+esc(b.manifest.version)+'</div><div class="stat-label">Version</div></div>';var html="";var authImpactFamilies={};for(var mi=0;mi<modified.length;mi++){var m=modified[mi];var refType=m.after.refType;var authLaws=AUTH_FAM[refType]||[];var hasAuth=authLaws.length>0;if(hasAuth){if(!authImpactFamilies[refType])authImpactFamilies[refType]=[];authImpactFamilies[refType]=authLaws}var rowCls=hasAuth?' diff-authority':'';html+='<div class="diff-row"><div class="diff-side diff-mod'+rowCls+'"><div class="diff-label mod">'+esc(m.before.refId)+(hasAuth?' <span class="badge badge-fail" style="margin-left:6px;font-size:8px">AuthorityOps Impact</span>':'')+'</div><span class="badge badge-amber">'+esc(m.before.payload.coverage)+'</span> → <span class="badge badge-green">'+esc(m.after.payload.coverage)+'</span><div class="mono" style="font-size:10px;color:var(--muted);margin-top:4px">'+esc(m.after.payload.title)+'</div></div></div>'}if(!modified.length)html='<div class="badge badge-pass">No coverage changes</div>';var authKeys=Object.keys(authImpactFamilies);if(authKeys.length>0){html+='<div class="card" style="margin-top:14px;border-color:rgba(255,107,107,.3)"><h3 style="color:var(--bad)">AuthorityOps Impact Summary</h3><p style="font-size:10px;color:var(--muted);margin-bottom:8px">The following families have AuthorityOps hard-law implications due to coverage changes:</p>';for(var ak=0;ak<authKeys.length;ak++){var afam=authKeys[ak];var afamName="";for(var fn=0;fn<FAMILIES.length;fn++){if(FAMILIES[fn].id===afam){afamName=FAMILIES[fn].name;break}}html+='<div style="margin-bottom:6px"><span class="badge badge-cyan">'+esc(afam)+'</span> <span style="font-size:11px;color:var(--muted)">'+esc(afamName)+'</span><div style="margin-top:3px">';var laws=authImpactFamilies[afam];for(var li=0;li<laws.length;li++){html+='<span class="badge badge-fail" style="margin-right:4px;font-size:9px">'+esc(laws[li])+'</span>'}html+='</div></div>'}html+='</div>'}$("#diffResults").innerHTML=html}
+function runDiff(){var a=makeSampleBundle(42);var b=makeSampleBundle(42);/* Simulate a practice coverage upgrade */b.artifacts[13].payload.coverage="Full";b.artifacts[13].contentHash="sha256:"+rngHex(64);b.artifacts[50].payload.coverage="Strong";b.artifacts[50].contentHash="sha256:"+rngHex(64);b.manifest.version="1.1.0";STATE.bundleB=b;var modified=[];for(var i=0;i<a.artifacts.length;i++){if(a.artifacts[i].contentHash!==b.artifacts[i].contentHash)modified.push({before:a.artifacts[i],after:b.artifacts[i]})}STATE.lastDiff={fromVersion:a.manifest.version,toVersion:b.manifest.version,modified:modified};$("#diffStats").innerHTML='<div class="stat-box"><div class="stat-val" style="color:var(--neon-amber)">'+modified.length+'</div><div class="stat-label">Coverage Changes</div></div><div class="stat-box"><div class="stat-val">'+esc(a.manifest.version)+" → "+esc(b.manifest.version)+'</div><div class="stat-label">Version</div></div>';var html="";var authImpactFamilies={};for(var mi=0;mi<modified.length;mi++){var m=modified[mi];var refType=m.after.refType;var authLaws=AUTH_FAM[refType]||[];var hasAuth=authLaws.length>0;if(hasAuth){if(!authImpactFamilies[refType])authImpactFamilies[refType]=[];authImpactFamilies[refType]=authLaws}var rowCls=hasAuth?' diff-authority':'';html+='<div class="diff-row" data-diff-type="modified" data-diff-idx="'+mi+'" style="cursor:pointer"><div class="diff-side diff-mod'+rowCls+'"><div class="diff-label mod">'+esc(m.before.refId)+(hasAuth?' <span class="badge badge-fail" style="margin-left:6px;font-size:8px">AuthorityOps Impact</span>':'')+'</div><span class="badge badge-amber">'+esc(m.before.payload.coverage)+'</span> → <span class="badge badge-green">'+esc(m.after.payload.coverage)+'</span><div class="mono" style="font-size:10px;color:var(--muted);margin-top:4px">'+esc(m.after.payload.title)+'</div></div></div>'}if(!modified.length)html='<div class="badge badge-pass">No coverage changes</div>';var authKeys=Object.keys(authImpactFamilies);if(authKeys.length>0){html+='<div class="card" style="margin-top:14px;border-color:rgba(255,107,107,.3)"><h3 style="color:var(--bad)">AuthorityOps Impact Summary</h3><p style="font-size:10px;color:var(--muted);margin-bottom:8px">The following families have AuthorityOps hard-law implications due to coverage changes:</p>';for(var ak=0;ak<authKeys.length;ak++){var afam=authKeys[ak];var afamName="";for(var fn=0;fn<FAMILIES.length;fn++){if(FAMILIES[fn].id===afam){afamName=FAMILIES[fn].name;break}}html+='<div style="margin-bottom:6px"><span class="badge badge-cyan">'+esc(afam)+'</span> <span style="font-size:11px;color:var(--muted)">'+esc(afamName)+'</span><div style="margin-top:3px">';var laws=authImpactFamilies[afam];for(var li=0;li<laws.length;li++){html+='<span class="badge badge-fail" style="margin-right:4px;font-size:9px">'+esc(laws[li])+'</span>'}html+='</div></div>'}html+='</div>'}$("#diffResults").innerHTML=html}
 
 /* ══════════════════════════════════════════════════════════
    Mapping — CMMC Families <-> CERPA
@@ -1385,6 +1423,276 @@ function updateGauge(score){var pct=score/100,circ=314,off=circ*(1-pct*0.75);var
 function renderTimeline(){var b=STATE.bundle;if(!b)return;var tl=$("#execTimeline");if(!tl)return;var famColors={AC:"var(--neon-cyan)",AU:"var(--neon-green)",IR:"var(--neon-pink)",RA:"var(--neon-amber)",SI:"var(--neon-purple)"};var html="";for(var i=0;i<FAMILIES.length;i++){var f=FAMILIES[i];var h=Math.round((f.full/f.total)*60)+10;var c=famColors[f.id]||"var(--neon-cyan)";html+='<div class="tl-bar" style="height:'+h+'px;background:'+c+'" data-aidx="'+i+'"><span class="tl-tip">'+esc(f.id)+": "+f.full+"/"+f.total+" Full</span></div>"}tl.innerHTML=html}
 function openDrawer(idx){var b=STATE.bundle;if(!b||!b.artifacts[idx])return;var a=b.artifacts[idx];var cm=CERPA_FAM[a.refType]||{stage:"?",cls:"ct-claim",lbl:"?"};var cov=a.payload.coverage;var covColor=COV_COLOR[cov]||"var(--muted)";var partialKey=PARTIAL_LOOKUP[a.refId];var partialInfo=partialKey?PARTIAL_MAP[partialKey]:null;var covBadgeClass=COV_BADGE[cov]||"badge-warn";var covLabel=cov;if(cov==="N/A"&&partialInfo){covBadgeClass="badge-partial";covLabel="partial-digital";covColor="#ffa500"}var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">'+esc(a.refId)+(partialKey?' <span style="font-size:11px;color:#ffa500">('+esc(partialKey)+')</span>':'')+'</h3><span class="badge badge-cyan">'+esc(a.refType)+" — "+esc(a.payload.familyName)+'</span> <span class="badge '+covBadgeClass+'">'+esc(covLabel)+'</span></div>';h+='<div class="drawer-section"><h4>Practice Detail</h4>';h+='<div class="drawer-kv"><span class="dk">Title</span><span class="dv">'+esc(a.payload.title)+'</span></div>';h+='<div class="drawer-kv"><span class="dk">Family</span><span class="dv">'+esc(a.payload.family)+" — "+esc(a.payload.familyName)+'</span></div>';h+='<div class="drawer-kv"><span class="dk">Coverage</span><span class="dv" style="color:'+covColor+'">'+esc(covLabel)+'</span></div>';h+='<div class="drawer-kv"><span class="dk">CERPA Stage</span><span class="dv"><span class="cerpa-tag '+cm.cls+'">'+cm.stage+'</span></span></div>';h+='<div class="drawer-kv"><span class="dk">KPIs</span><span class="dv">'+(a.payload.kpis.length?esc(a.payload.kpis.join(", ")):"—")+'</span></div>';if(a.payload.authorityOps&&a.payload.authorityOps.length){h+='<div class="drawer-kv"><span class="dk">AuthorityOps</span><span class="dv" style="color:var(--bad)">'+esc(a.payload.authorityOps.join("; "))+'</span></div>'}if(partialInfo){h+='<div class="drawer-kv"><span class="dk">Partial note</span><span class="dv" style="color:#ffa500">'+esc(partialInfo.note)+'</span></div>';h+='<div class="drawer-kv"><span class="dk">Digital stages</span><span class="dv">';for(var di=0;di<partialInfo.digital.length;di++){var dcls=partialInfo.digital[di]==="Claim"?"ct-claim":partialInfo.digital[di]==="Event"?"ct-claim":partialInfo.digital[di]==="Review"?"ct-review":"ct-patch";h+='<span class="cerpa-tag '+dcls+'" style="margin-right:3px">'+esc(partialInfo.digital[di])+'</span>'}h+='</span></div>'}h+='</div>';h+='<div class="drawer-section"><h4>Content Hash</h4><div class="mono" style="font-size:10px;word-break:break-all;color:var(--muted);padding:8px;background:#0d1320;border-radius:6px">'+esc(a.contentHash)+'</div></div>';h+='<div class="drawer-section"><h4>CERPA Cycle Position</h4><div style="display:flex;gap:3px">';var stages=[{l:"C",n:"Claim",c:"ct-claim"},{l:"E",n:"Event",c:"ct-claim"},{l:"R",n:"Review",c:"ct-review"},{l:"P",n:"Patch",c:"ct-patch"},{l:"A",n:"Apply",c:"ct-apply"}];for(var si=0;si<stages.length;si++){var s=stages[si],isAct=cm.stage.indexOf(s.n)>=0||cm.stage==="All";h+='<div style="flex:1;text-align:center;padding:8px 4px;border-radius:6px;font-size:10px;font-weight:700;border:2px solid '+(isAct?"rgba(0,240,255,.4)":"var(--line)")+";background:"+(isAct?"rgba(0,240,255,.06)":"var(--card)")+";color:"+(isAct?"var(--neon-cyan)":"var(--muted)")+'">'+s.l+'<br/><span style="font-size:7px;font-weight:400">'+s.n+"</span></div>"}h+="</div></div>";$("#drawerContent").innerHTML=h;$("#detailDrawer").classList.add("open");$("#drawerOverlay").classList.add("open")}
 function closeDrawer(){$("#detailDrawer").classList.remove("open");$("#drawerOverlay").classList.remove("open")}
+function openTray(html){
+  $("#drawerContent").innerHTML=html;
+  $("#detailDrawer").classList.add("open");
+  $("#drawerOverlay").classList.add("open");
+}
+
+/* ══════════════════════════════════════════════════════════
+   v4.3: Graph — dependency topology
+   ══════════════════════════════════════════════════════════ */
+var _graphState=null;
+function buildDependencyGraph(replaySteps,artifacts){
+  var graph={};
+  for(var i=0;i<artifacts.length;i++)graph[artifacts[i].refId]=[];
+  for(var s=0;s<replaySteps.length;s++){
+    var step=replaySteps[s];
+    if(step.inputRef&&step.outputRef&&graph[step.inputRef]){
+      if(graph[step.inputRef].indexOf(step.outputRef)===-1)graph[step.inputRef].push(step.outputRef);
+    }
+  }
+  for(var s2=0;s2<replaySteps.length;s2++){
+    var st=replaySteps[s2];
+    if(st.outputRef){
+      for(var s3=s2+1;s3<replaySteps.length;s3++){
+        if(replaySteps[s3].inputRef===st.outputRef&&replaySteps[s3].outputRef){
+          if(!graph[st.outputRef])graph[st.outputRef]=[];
+          if(graph[st.outputRef].indexOf(replaySteps[s3].outputRef)===-1)graph[st.outputRef].push(replaySteps[s3].outputRef);
+        }
+      }
+    }
+  }
+  return graph;
+}
+function renderGraph(){
+  var b=STATE.bundle;if(!b)return;
+  var arts=b.artifacts||[];
+  var steps=b.replaySteps||[];
+  if(arts.length===0)return;
+
+  var graph=buildDependencyGraph(steps,arts);
+  var svgNS="http://www.w3.org/2000/svg";
+  var W=800,H=500;
+  /* CMMC uses family IDs as refTypes — color by family */
+  var typeColors={AC:"#4caf50",AT:"#2196f3",AU:"#9c27b0",CM:"#ff9800",IA:"#e91e63",IR:"#00bcd4",MA:"#8bc34a",MP:"#ff5722",PE:"#607d8b",PS:"#795548",RA:"#ffc107",CA:"#03a9f4",SC:"#673ab7",SI:"#f44336"};
+
+  var nodes=[];
+  for(var i=0;i<arts.length;i++){
+    var angle=(2*Math.PI*i)/arts.length;
+    var r=Math.min(W,H)*0.35;
+    nodes.push({
+      id:arts[i].refId,
+      type:arts[i].refType,
+      x:W/2+r*Math.cos(angle),
+      y:H/2+r*Math.sin(angle),
+      vx:0,vy:0,
+      label:arts[i].refId.substring(0,8),
+      idx:i
+    });
+  }
+
+  var edges=[];
+  var nodeMap={};
+  for(var ni=0;ni<nodes.length;ni++)nodeMap[nodes[ni].id]=ni;
+  for(var srcId in graph){
+    if(!graph.hasOwnProperty(srcId))continue;
+    var targets=graph[srcId];
+    for(var ti=0;ti<targets.length;ti++){
+      if(nodeMap[srcId]!==undefined&&nodeMap[targets[ti]]!==undefined){
+        edges.push({source:nodeMap[srcId],target:nodeMap[targets[ti]]});
+      }
+    }
+  }
+
+  var statsEl=document.getElementById("graphStats");
+  if(statsEl){
+    var edgeCount=edges.length;
+    var maxDeg=0;
+    for(var di=0;di<nodes.length;di++){
+      var deg=(graph[nodes[di].id]||[]).length;
+      if(deg>maxDeg)maxDeg=deg;
+    }
+    var isolatedCount=0;
+    for(var iso=0;iso<nodes.length;iso++){
+      var hasEdge=false;
+      for(var ei=0;ei<edges.length;ei++){if(edges[ei].source===iso||edges[ei].target===iso){hasEdge=true;break}}
+      if(!hasEdge)isolatedCount++;
+    }
+    statsEl.innerHTML=
+      '<div class="stat-box"><div class="stat-val">'+nodes.length+'</div><div class="stat-label">Nodes</div></div>'+
+      '<div class="stat-box"><div class="stat-val">'+edgeCount+'</div><div class="stat-label">Edges</div></div>'+
+      '<div class="stat-box"><div class="stat-val">'+maxDeg+'</div><div class="stat-label">Max Degree</div></div>'+
+      '<div class="stat-box"><div class="stat-val" style="color:'+(isolatedCount>0?'var(--warn)':'var(--ok)')+'">'+isolatedCount+'</div><div class="stat-label">Isolated</div></div>';
+  }
+
+  var legendEl=document.getElementById("graphLegend");
+  if(legendEl){
+    var lhtml="";
+    for(var lt in typeColors){
+      if(!typeColors.hasOwnProperty(lt))continue;
+      lhtml+='<div class="graph-legend-item"><div class="graph-legend-dot" style="background:'+typeColors[lt]+'"></div>'+lt+'</div>';
+    }
+    legendEl.innerHTML=lhtml;
+  }
+
+  _forceLayout(nodes,edges,W,H,60);
+  _renderGraphSvg(nodes,edges,W,H,typeColors,graph);
+  _graphState={nodes:nodes,edges:edges,w:W,h:H,colors:typeColors,graph:graph};
+}
+
+function _forceLayout(nodes,edges,W,H,iterations){
+  var repulsion=800,springLen=60,springK=0.05,damping=0.85,centerK=0.01;
+  for(var iter=0;iter<iterations;iter++){
+    for(var i=0;i<nodes.length;i++){
+      for(var j=i+1;j<nodes.length;j++){
+        var dx=nodes[j].x-nodes[i].x;
+        var dy=nodes[j].y-nodes[i].y;
+        var dist=Math.sqrt(dx*dx+dy*dy)||1;
+        var force=repulsion/(dist*dist);
+        var fx=force*dx/dist;
+        var fy=force*dy/dist;
+        nodes[i].vx-=fx;nodes[i].vy-=fy;
+        nodes[j].vx+=fx;nodes[j].vy+=fy;
+      }
+    }
+    for(var e=0;e<edges.length;e++){
+      var a=nodes[edges[e].source],b2=nodes[edges[e].target];
+      var edx=b2.x-a.x,edy=b2.y-a.y;
+      var eDist=Math.sqrt(edx*edx+edy*edy)||1;
+      var stretch=eDist-springLen;
+      var sf=springK*stretch;
+      var sfx=sf*edx/eDist,sfy=sf*edy/eDist;
+      a.vx+=sfx;a.vy+=sfy;
+      b2.vx-=sfx;b2.vy-=sfy;
+    }
+    for(var c=0;c<nodes.length;c++){
+      nodes[c].vx+=(W/2-nodes[c].x)*centerK;
+      nodes[c].vy+=(H/2-nodes[c].y)*centerK;
+    }
+    for(var u=0;u<nodes.length;u++){
+      nodes[u].vx*=damping;nodes[u].vy*=damping;
+      nodes[u].x+=nodes[u].vx;nodes[u].y+=nodes[u].vy;
+      nodes[u].x=Math.max(20,Math.min(W-20,nodes[u].x));
+      nodes[u].y=Math.max(20,Math.min(H-20,nodes[u].y));
+    }
+  }
+}
+
+function _renderGraphSvg(nodes,edges,W,H,typeColors,graph){
+  var svgNS="http://www.w3.org/2000/svg";
+  var svg=document.getElementById("graphSvg");
+  if(!svg)return;
+  svg.innerHTML="";
+  svg.setAttribute("viewBox","0 0 "+W+" "+H);
+
+  for(var e=0;e<edges.length;e++){
+    var a=nodes[edges[e].source],b2=nodes[edges[e].target];
+    var line=document.createElementNS(svgNS,"line");
+    line.setAttribute("x1",a.x);line.setAttribute("y1",a.y);
+    line.setAttribute("x2",b2.x);line.setAttribute("y2",b2.y);
+    line.setAttribute("class","graph-edge");
+    line.setAttribute("data-src",edges[e].source);
+    line.setAttribute("data-tgt",edges[e].target);
+    svg.appendChild(line);
+  }
+
+  for(var n=0;n<nodes.length;n++){
+    var g=document.createElementNS(svgNS,"g");
+    g.setAttribute("data-node-idx",n);
+    var circle=document.createElementNS(svgNS,"circle");
+    circle.setAttribute("cx",nodes[n].x);circle.setAttribute("cy",nodes[n].y);
+    circle.setAttribute("r",6);
+    circle.setAttribute("fill",typeColors[nodes[n].type]||"#888");
+    circle.setAttribute("class","graph-node");
+    var title=document.createElementNS(svgNS,"title");
+    title.textContent=nodes[n].id+" ["+nodes[n].type+"]";
+    circle.appendChild(title);
+    g.appendChild(circle);
+    var label=document.createElementNS(svgNS,"text");
+    label.setAttribute("x",nodes[n].x);label.setAttribute("y",nodes[n].y-10);
+    label.setAttribute("class","graph-label");
+    label.textContent=nodes[n].label;
+    g.appendChild(label);
+    svg.appendChild(g);
+  }
+
+  svg.addEventListener("click",function(ev){
+    var nodeG=ev.target.closest("[data-node-idx]");
+    var allNodes=svg.querySelectorAll(".graph-node");
+    for(var cn=0;cn<allNodes.length;cn++)allNodes[cn].classList.remove("graph-selected");
+    var allEdges2=svg.querySelectorAll(".graph-edge");
+    for(var ce=0;ce<allEdges2.length;ce++)allEdges2[ce].classList.remove("graph-highlight-edge");
+    if(!nodeG)return;
+    var idx=parseInt(nodeG.getAttribute("data-node-idx"),10);
+    var node=nodes[idx];if(!node)return;
+    nodeG.querySelector(".graph-node").classList.add("graph-selected");
+    var connectedNodes=[];
+    for(var he=0;he<allEdges2.length;he++){
+      var src=parseInt(allEdges2[he].getAttribute("data-src"),10);
+      var tgt=parseInt(allEdges2[he].getAttribute("data-tgt"),10);
+      if(src===idx||tgt===idx){
+        allEdges2[he].classList.add("graph-highlight-edge");
+        connectedNodes.push(src===idx?tgt:src);
+      }
+    }
+    var art=STATE.bundle.artifacts[node.idx];
+    var degree=(graph[node.id]||[]).length;
+    var inDegree=0;
+    for(var eid=0;eid<edges.length;eid++){if(edges[eid].target===idx)inDegree++}
+    var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">Graph Node</h3>';
+    h+='<span class="badge badge-cyan">'+esc(node.type)+'</span> ';
+    h+='<span class="badge badge-green">degree '+degree+'</span></div>';
+    h+='<div class="drawer-section"><h4>Node Identity</h4>';
+    h+='<div class="drawer-kv"><span class="dk">Ref ID</span><span class="dv mono" style="color:var(--neon-cyan);font-size:10px">'+esc(node.id)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Family</span><span class="dv">'+esc(node.type)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Out-Degree</span><span class="dv">'+degree+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">In-Degree</span><span class="dv">'+inDegree+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Position</span><span class="dv">'+Math.round(node.x)+', '+Math.round(node.y)+'</span></div>';
+    h+='</div>';
+    if(connectedNodes.length>0){
+      h+='<div class="drawer-section"><h4>Connected Nodes ('+connectedNodes.length+')</h4>';
+      for(var ci=0;ci<connectedNodes.length;ci++){
+        var cn2=nodes[connectedNodes[ci]];
+        if(cn2){
+          var cnColor=typeColors[cn2.type]||"#888";
+          h+='<div class="drawer-kv"><span class="dk mono" style="font-size:10px">'+esc(cn2.id.substring(0,16))+'</span><span class="dv" style="color:'+cnColor+'">'+esc(cn2.type)+'</span></div>';
+        }
+      }
+      h+='</div>';
+    }
+    var outTargets=graph[node.id]||[];
+    if(outTargets.length>0){
+      h+='<div class="drawer-section"><h4>Outgoing Edges ('+outTargets.length+')</h4>';
+      for(var oi=0;oi<outTargets.length;oi++){
+        h+='<div class="drawer-kv"><span class="dk">&rarr;</span><span class="dv mono" style="font-size:10px;color:var(--neon-cyan)">'+esc(outTargets[oi].substring(0,20))+'</span></div>';
+      }
+      h+='</div>';
+    }
+    if(art&&art.contentHash){
+      h+='<div class="drawer-section"><h4>Content Hash</h4>';
+      h+='<div class="mono" style="font-size:10px;word-break:break-all;color:var(--muted);padding:8px;background:#0d1320;border-radius:6px">'+esc(art.contentHash)+'</div></div>';
+    }
+    if(art&&art.payload){
+      h+='<div class="drawer-section"><h4>Payload</h4>';
+      h+='<div class="schema-block mono" style="max-height:200px;overflow-y:auto;white-space:pre-wrap;font-size:10px">'+esc(JSON.stringify(art.payload,null,2))+'</div></div>';
+    }
+    openTray(h);
+  });
+
+  var zoom=1,panX=0,panY=0,dragging=false,lastMX=0,lastMY=0;
+  var wrap=document.getElementById("graphWrap");
+  function updateVB(){svg.setAttribute("viewBox",(panX)+" "+(panY)+" "+(W/zoom)+" "+(H/zoom))}
+  var zin=document.getElementById("graphZoomIn");
+  var zout=document.getElementById("graphZoomOut");
+  var zreset=document.getElementById("graphZoomReset");
+  if(zin)zin.addEventListener("click",function(){zoom=Math.min(5,zoom*1.3);updateVB()});
+  if(zout)zout.addEventListener("click",function(){zoom=Math.max(0.3,zoom/1.3);updateVB()});
+  if(zreset)zreset.addEventListener("click",function(){zoom=1;panX=0;panY=0;updateVB()});
+  svg.addEventListener("wheel",function(ev){
+    ev.preventDefault();
+    zoom=ev.deltaY<0?Math.min(5,zoom*1.15):Math.max(0.3,zoom/1.15);
+    updateVB();
+  });
+  svg.addEventListener("mousedown",function(ev){dragging=true;lastMX=ev.clientX;lastMY=ev.clientY;if(wrap)wrap.classList.add("dragging")});
+  svg.addEventListener("mousemove",function(ev){
+    if(!dragging)return;
+    var dx2=(ev.clientX-lastMX)/zoom;var dy2=(ev.clientY-lastMY)/zoom;
+    panX-=dx2;panY-=dy2;lastMX=ev.clientX;lastMY=ev.clientY;updateVB();
+  });
+  svg.addEventListener("mouseup",function(){dragging=false;if(wrap)wrap.classList.remove("dragging")});
+  svg.addEventListener("mouseleave",function(){dragging=false;if(wrap)wrap.classList.remove("dragging")});
+}
 
 /* ══════════════════════════════════════════════════════════
    Import + Init
@@ -1563,7 +1871,7 @@ document.addEventListener("DOMContentLoaded",function(){
       toast("Reset to baseline complete");
     });
   }
-  /* v4.3: Trilogy click handler wiring */
+  /* v4.3: Trilogy click handler wiring — open tray on click */
   var trilogyGrid=document.getElementById("trilogyGrid");
   if(trilogyGrid)trilogyGrid.addEventListener("click",function(e){
     var row=e.target.closest(".trilogy-row");if(!row)return;
@@ -1571,9 +1879,163 @@ document.addEventListener("DOMContentLoaded",function(){
     var stage=row.getAttribute("data-stage");
     var reftype=row.getAttribute("data-reftype");
     syncTrilogySelection(famId,stage,reftype);
+    /* Open tray with trilogy row detail */
+    var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">Trilogy Detail</h3></div>';
+    if(famId){
+      var fam=null;for(var fi=0;fi<FAMILIES.length;fi++){if(FAMILIES[fi].id===famId){fam=FAMILIES[fi];break}}
+      if(fam){
+        var cerpa=CERPA_FAM[famId]||{stage:"?",lbl:"?"};
+        var app=fam.total-fam.na;var pct=app>0?Math.round(((fam.full+fam.strong*0.9+fam.partial*0.5)/app)*1000)/10:0;
+        h+='<div class="drawer-section"><h4>CMMC Family</h4>';
+        h+='<div class="drawer-kv"><span class="dk">Family</span><span class="dv">'+esc(famId)+' — '+esc(fam.name)+'</span></div>';
+        h+='<div class="drawer-kv"><span class="dk">Practices</span><span class="dv">'+fam.total+'</span></div>';
+        h+='<div class="drawer-kv"><span class="dk">Coverage</span><span class="dv" style="color:var(--neon-cyan)">'+pct+'%</span></div>';
+        h+='<div class="drawer-kv"><span class="dk">Full</span><span class="dv" style="color:var(--neon-green)">'+fam.full+'</span></div>';
+        h+='<div class="drawer-kv"><span class="dk">Strong</span><span class="dv" style="color:var(--neon-cyan)">'+fam.strong+'</span></div>';
+        h+='<div class="drawer-kv"><span class="dk">Partial</span><span class="dv" style="color:var(--neon-amber)">'+fam.partial+'</span></div>';
+        h+='<div class="drawer-kv"><span class="dk">N/A</span><span class="dv">'+fam.na+'</span></div>';
+        h+='<div class="drawer-kv"><span class="dk">CERPA Stage</span><span class="dv"><span class="cerpa-tag '+cerpa.cls+'">'+cerpa.stage+'</span></span></div>';
+        h+='</div>';
+      }
+    }else if(stage){
+      h+='<div class="drawer-section"><h4>CERPA Stage</h4>';
+      h+='<div class="drawer-kv"><span class="dk">Stage</span><span class="dv" style="color:#e91e63;font-weight:700">'+esc(stage)+'</span></div>';
+      var mappedFams=[];for(var mf=0;mf<FAMILIES.length;mf++){var cf=CERPA_FAM[FAMILIES[mf].id];if(cf&&(cf.stage.indexOf(stage)>=0||cf.stage==="All"))mappedFams.push(FAMILIES[mf].id)}
+      h+='<div class="drawer-kv"><span class="dk">Families</span><span class="dv">'+esc(mappedFams.join(", "))+'</span></div>';
+      h+='</div>';
+    }else if(reftype){
+      h+='<div class="drawer-section"><h4>Coverage Level</h4>';
+      h+='<div class="drawer-kv"><span class="dk">Level</span><span class="dv">'+esc(reftype)+'</span></div>';
+      h+='</div>';
+    }
+    openTray(h);
   });
 
-  document.addEventListener("keydown",function(e){if(e.target.tagName==="TEXTAREA"||e.target.tagName==="INPUT")return;var tk={"1":"executive","2":"explorer","3":"proof","4":"export","5":"diff","6":"mapping","7":"schema","8":"trilogy"};if(tk[e.key]){e.preventDefault();var b=document.querySelector('.tab-btn[data-tab="'+tk[e.key]+'"]');if(b)b.click()}if(e.key==="Escape")closeDrawer();if(e.key==="?")$("#shortcutBar").classList.toggle("vis");if(e.key==="r"||e.key==="R"){e.preventDefault();loadBundle(Math.floor(Math.random()*100000))}});
+  /* v4.3: Manifest row tray click */
+  document.addEventListener("click",function(e){
+    var row=e.target.closest(".manifest-row");
+    if(!row||e.target.closest(".copy-btn"))return;
+    var mkey=row.getAttribute("data-mkey");
+    var b=STATE.bundle;if(!b)return;
+    var val=String(b.manifest[mkey]||"");
+    var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">Manifest Entry</h3></div>';
+    h+='<div class="drawer-section"><h4>Key / Value</h4>';
+    h+='<div class="drawer-kv"><span class="dk">Key</span><span class="dv mono" style="color:var(--neon-cyan)">'+esc(mkey)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Value</span><span class="dv" style="word-break:break-all">'+esc(val)+'</span></div>';
+    h+='</div>';
+    openTray(h);
+  });
+
+  /* v4.3: Replay row tray click */
+  document.addEventListener("click",function(e){
+    var row=e.target.closest(".replay-row");
+    if(!row)return;
+    var sidx=parseInt(row.getAttribute("data-sidx"),10);
+    var b=STATE.bundle;if(!b||!b.replaySteps[sidx])return;
+    var s=b.replaySteps[sidx];
+    var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">Replay Step #'+s.stepIndex+'</h3>';
+    h+='<span class="badge badge-purple">'+esc(s.action)+'</span></div>';
+    h+='<div class="drawer-section"><h4>Step Detail</h4>';
+    h+='<div class="drawer-kv"><span class="dk">Index</span><span class="dv">'+s.stepIndex+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Action</span><span class="dv">'+esc(s.action)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Input Ref</span><span class="dv mono" style="font-size:10px">'+esc(s.inputRef||"—")+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Output Ref</span><span class="dv mono" style="font-size:10px">'+esc(s.outputRef||"—")+'</span></div>';
+    if(s.timestamp)h+='<div class="drawer-kv"><span class="dk">Timestamp</span><span class="dv">'+esc(s.timestamp)+'</span></div>';
+    h+='</div>';
+    openTray(h);
+  });
+
+  /* v4.3: Exec scorecard row tray click (right-click detail, left-click still navigates) */
+  document.addEventListener("click",function(e){
+    var row=e.target.closest(".exec-row[data-row-idx]");
+    if(!row)return;
+    /* Only open tray if clicking the tooltip area or right side; the existing exec click handler navigates to explorer */
+    var tip=e.target.closest(".exec-tooltip");
+    if(!tip)return;
+    e.stopPropagation();
+    var ridx=parseInt(row.getAttribute("data-row-idx"),10);
+    var fam=FAMILIES[ridx];if(!fam)return;
+    var cerpa=CERPA_FAM[fam.id]||{stage:"?",cls:"ct-claim",lbl:"?"};
+    var authLaws=AUTH_FAM[fam.id]||[];
+    var app=fam.total-fam.na;var pct=app>0?Math.round(((fam.full+fam.strong*0.9+fam.partial*0.5)/app)*1000)/10:0;
+    var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">'+esc(fam.id)+' — '+esc(fam.name)+'</h3>';
+    h+='<span class="badge badge-cyan">'+fam.total+' practices</span> <span class="badge badge-green">'+pct+'%</span></div>';
+    h+='<div class="drawer-section"><h4>Coverage Breakdown</h4>';
+    h+='<div class="drawer-kv"><span class="dk">Full</span><span class="dv" style="color:var(--neon-green)">'+fam.full+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Strong</span><span class="dv" style="color:var(--neon-cyan)">'+fam.strong+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Partial</span><span class="dv" style="color:var(--neon-amber)">'+fam.partial+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">N/A</span><span class="dv">'+fam.na+'</span></div>';
+    h+='</div>';
+    h+='<div class="drawer-section"><h4>CERPA Mapping</h4>';
+    h+='<div class="drawer-kv"><span class="dk">Stage</span><span class="dv"><span class="cerpa-tag '+cerpa.cls+'">'+cerpa.stage+'</span></span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Label</span><span class="dv">'+esc(cerpa.lbl)+'</span></div>';
+    h+='</div>';
+    if(authLaws.length){
+      h+='<div class="drawer-section"><h4>AuthorityOps</h4>';
+      for(var al=0;al<authLaws.length;al++){h+='<div class="drawer-kv"><span class="dk" style="color:var(--bad)">'+esc(authLaws[al])+'</span><span class="dv"></span></div>'}
+      h+='</div>';
+    }
+    openTray(h);
+  });
+
+  /* v4.3: Diff row tray click */
+  document.addEventListener("click",function(e){
+    var row=e.target.closest(".diff-row[data-diff-idx]");
+    if(!row)return;
+    var didx=parseInt(row.getAttribute("data-diff-idx"),10);
+    var diff=STATE.lastDiff;if(!diff||!diff.modified[didx])return;
+    var m=diff.modified[didx];
+    var authLaws=AUTH_FAM[m.after.refType]||[];
+    var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">Diff Detail</h3>';
+    h+='<span class="badge badge-amber">'+esc(m.before.payload.coverage)+'</span> &rarr; <span class="badge badge-green">'+esc(m.after.payload.coverage)+'</span></div>';
+    h+='<div class="drawer-section"><h4>Practice</h4>';
+    h+='<div class="drawer-kv"><span class="dk">Ref ID</span><span class="dv mono" style="color:var(--neon-cyan);font-size:10px">'+esc(m.after.refId)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Family</span><span class="dv">'+esc(m.after.refType)+' — '+esc(m.after.payload.familyName)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Title</span><span class="dv">'+esc(m.after.payload.title)+'</span></div>';
+    h+='</div>';
+    h+='<div class="drawer-section"><h4>Coverage Change</h4>';
+    h+='<div class="drawer-kv"><span class="dk">Before</span><span class="dv" style="color:var(--neon-amber)">'+esc(m.before.payload.coverage)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">After</span><span class="dv" style="color:var(--neon-green)">'+esc(m.after.payload.coverage)+'</span></div>';
+    h+='</div>';
+    h+='<div class="drawer-section"><h4>Content Hash</h4>';
+    h+='<div class="mono" style="font-size:10px;word-break:break-all;color:var(--muted);padding:8px;background:#0d1320;border-radius:6px">'+esc(m.after.contentHash)+'</div></div>';
+    if(authLaws.length){
+      h+='<div class="drawer-section"><h4 style="color:var(--bad)">AuthorityOps Impact</h4>';
+      for(var al=0;al<authLaws.length;al++){h+='<div class="drawer-kv"><span class="dk" style="color:var(--bad)">'+esc(authLaws[al])+'</span><span class="dv"></span></div>'}
+      h+='</div>';
+    }
+    openTray(h);
+  });
+
+  /* v4.3: Timeline bar tray click */
+  document.addEventListener("click",function(e){
+    var bar=e.target.closest(".tl-bar");
+    if(!bar)return;
+    var aidx=parseInt(bar.getAttribute("data-aidx"),10);
+    var fam=FAMILIES[aidx];if(!fam)return;
+    var cerpa=CERPA_FAM[fam.id]||{stage:"?",cls:"ct-claim",lbl:"?"};
+    var app=fam.total-fam.na;var pct=app>0?Math.round(((fam.full+fam.strong*0.9+fam.partial*0.5)/app)*1000)/10:0;
+    var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">'+esc(fam.id)+' — '+esc(fam.name)+'</h3>';
+    h+='<span class="badge badge-cyan">Timeline Bar</span></div>';
+    h+='<div class="drawer-section"><h4>Family Overview</h4>';
+    h+='<div class="drawer-kv"><span class="dk">Full</span><span class="dv" style="color:var(--neon-green)">'+fam.full+'/'+fam.total+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Coverage</span><span class="dv" style="color:var(--neon-cyan)">'+pct+'%</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">CERPA</span><span class="dv"><span class="cerpa-tag '+cerpa.cls+'">'+cerpa.stage+'</span></span></div>';
+    h+='</div>';
+    openTray(h);
+  });
+
+  /* v4.3: Graph button handlers */
+  var copyGraphBtn=document.getElementById("btnCopyGraph");
+  if(copyGraphBtn)copyGraphBtn.addEventListener("click",function(){
+    if(!_graphState){toast("No graph rendered");return}
+    var data={nodes:_graphState.nodes.map(function(n){return{id:n.id,type:n.type,x:Math.round(n.x),y:Math.round(n.y)}}),edges:_graphState.edges.map(function(e2){return{source:_graphState.nodes[e2.source].id,target:_graphState.nodes[e2.target].id}})};
+    copyText(JSON.stringify(data,null,2));
+  });
+  var relayoutBtn=document.getElementById("btnRelayout");
+  if(relayoutBtn)relayoutBtn.addEventListener("click",function(){renderGraph()});
+
+  document.addEventListener("keydown",function(e){if(e.target.tagName==="TEXTAREA"||e.target.tagName==="INPUT")return;var tk={"1":"executive","2":"explorer","3":"proof","4":"export","5":"diff","6":"mapping","7":"schema","8":"trilogy","9":"graph","g":"graph","G":"graph"};if(tk[e.key]){e.preventDefault();var b=document.querySelector('.tab-btn[data-tab="'+tk[e.key]+'"]');if(b)b.click()}if(e.key==="Escape")closeDrawer();if(e.key==="?")$("#shortcutBar").classList.toggle("vis");if(e.key==="r"||e.key==="R"){e.preventDefault();loadBundle(Math.floor(Math.random()*100000))}});
 });
 
 })();
