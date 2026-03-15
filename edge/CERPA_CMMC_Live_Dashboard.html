@@ -226,12 +226,12 @@ function renderGrid(flashFamilyId){
     var pct=applicable>0?Math.round(((f.full+f.strong*0.9+f.partial*0.5)/applicable)*100):0;
     var color=pct>=90?"var(--ok)":pct>=70?"var(--warn)":"var(--bad)";
     var flashCls=(flashFamilyId&&flashFamilyId===f.id)?" flash":"";
-    html+='<div class="score-cell'+flashCls+'" id="cell-'+f.id+'">';
+    html+='<div class="score-cell'+flashCls+'" id="cell-'+esc(f.id)+'">';
     html+='<div class="cell-id">'+esc(f.id)+'</div>';
     html+='<div class="cell-name">'+esc(f.name)+'</div>';
-    html+='<div class="cell-bar"><div class="cell-fill" style="width:'+pct+'%;background:'+color+'"></div></div>';
-    html+='<div class="cell-pct" style="color:'+color+'">'+pct+'%</div>';
-    html+='<div class="cell-detail">'+f.full+' Full, '+f.strong+' Strong, '+f.partial+' Partial'+(f.na?' , '+f.na+' N/A':'')+'</div>';
+    html+='<div class="cell-bar"><div class="cell-fill" style="width:'+esc(String(pct))+'%;background:'+esc(color)+'"></div></div>';
+    html+='<div class="cell-pct" style="color:'+esc(color)+'">'+esc(String(pct))+'%</div>';
+    html+='<div class="cell-detail">'+esc(String(f.full))+' Full, '+esc(String(f.strong))+' Strong, '+esc(String(f.partial))+' Partial'+(f.na?' , '+esc(String(f.na))+' N/A':'')+'</div>';
     html+='</div>';
   }
   grid.innerHTML=html;
