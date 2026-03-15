@@ -313,6 +313,27 @@ tr:hover td{background:rgba(0,240,255,.03)}
 .page-controls select{background:#182235;color:var(--txt);border:1px solid #243449;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer}
 .page-controls select:focus{outline:none;border-color:rgba(0,240,255,.3)}
 
+/* ── Diff AuthorityOps ───────────────────────── */
+.diff-authority{border-left:3px solid var(--bad);background:rgba(255,107,107,.06)}
+
+/* ── KPI links in mapping ────────────────────── */
+.kpi-link{color:var(--neon-cyan);text-decoration:underline;cursor:pointer}
+.kpi-link:hover{color:var(--neon-green)}
+
+/* ── Tamper simulation panel ─────────────────── */
+.retcon-panel{background:var(--card);border:1px solid var(--bad);border-radius:8px;padding:14px;margin-top:12px}
+.retcon-panel h4{color:var(--bad);font-size:12px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.retcon-entry{font-size:11px;margin-bottom:6px;padding:6px 8px;border-radius:4px;background:rgba(255,107,107,.04);border:1px solid rgba(255,107,107,.15)}
+@keyframes tamperPulse{0%{box-shadow:0 0 0 0 rgba(255,107,107,.4)}70%{box-shadow:0 0 0 8px rgba(255,107,107,0)}100%{box-shadow:0 0 0 0 rgba(255,107,107,0)}}
+.tamper-active{animation:tamperPulse 1.5s infinite}
+
+/* ── Live compliance sim ─────────────────────── */
+.sim-toggle{transition:all .2s}
+.sim-toggle.sim-on{background:rgba(57,255,20,.15);border-color:rgba(57,255,20,.4);color:var(--neon-green)}
+
+/* ── Projected patch impact ──────────────────── */
+.proj-bar{height:8px;border-radius:4px;transition:width .4s}
+
 /* ── Print header/footer (hidden on screen) ── */
 .print-header,.print-footer{display:none}
 
@@ -423,6 +444,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
     <div style="margin-top:12px;display:flex;gap:10px">
       <button class="btn-primary" id="btnExecRefresh">Refresh Scorecard</button>
       <button class="btn-primary" id="btnExportPdf">Export as printable report</button>
+      <button class="btn-primary sim-toggle" id="btnSimLive">Simulate Live Updates</button>
     </div>
   </div>
 
@@ -503,6 +525,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
       <button id="btnTamperChain">Simulate Tamper</button>
       <button id="btnCopyChain">Copy Chain JSON</button>
     </div>
+    <div id="retconPanel" class="hidden"></div>
   </div>
 
   <!-- ═══════════════ TAB 3: Export ═══════════════ -->
@@ -541,6 +564,22 @@ tr:hover td{background:rgba(0,240,255,.03)}
         <span id="compSimScore" style="font-weight:700">94</span>% coverage —
         <span id="compSimGrade" style="color:var(--ok)">Compliant</span> —
         <span id="compSimAction">All controls satisfied</span>
+      </div>
+      <div id="compSimProjected" class="hidden" style="margin-top:10px;padding:10px;border-radius:6px;font-size:11px;border:1px solid var(--line);background:var(--card)">
+        <div style="font-weight:700;margin-bottom:6px">Projected Patch Impact</div>
+        <div style="display:flex;gap:4px;align-items:center;margin-bottom:6px">
+          <span style="font-size:10px;color:var(--muted);min-width:50px">Current</span>
+          <div style="flex:1;background:var(--line);border-radius:4px;height:8px;overflow:hidden">
+            <div id="projBarCurrent" class="proj-bar" style="background:var(--neon-cyan);width:0"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:4px;align-items:center;margin-bottom:6px">
+          <span style="font-size:10px;color:var(--muted);min-width:50px">Projected</span>
+          <div style="flex:1;background:var(--line);border-radius:4px;height:8px;overflow:hidden">
+            <div id="projBarProjected" class="proj-bar" style="background:rgba(57,255,20,.4);width:0"></div>
+          </div>
+        </div>
+        <div id="projDeltaText" style="font-size:10px;color:var(--neon-green)"></div>
       </div>
     </div>
   </div>
@@ -799,6 +838,9 @@ var explorerFilter = "all";
 
 /* ── State ─── */
 var STATE={bundle:null,bundleB:null,proofChain:[],tampered:false,lastDiff:null};
+var _tamperSnapshot=null;
+var _liveSimInterval=null;
+var _liveSimActive=false;
 var REF_TYPES=FAMILIES.map(function(f){return f.id});
 var PLANE_MAP={};var DS_MAP={};var CERPA_MAP={};
 for(var fi=0;fi<FAMILIES.length;fi++){var fam=FAMILIES[fi];PLANE_MAP[fam.id]="compliance";DS_MAP[fam.id]=CERPA_FAM[fam.id].stage.toLowerCase();CERPA_MAP[fam.id]=CERPA_FAM[fam.id]}
@@ -813,7 +855,7 @@ document.addEventListener("DOMContentLoaded",function(){
   $("#btnLoadSample").addEventListener("click",function(){loadBundle(42)});
   $("#btnRandomize").addEventListener("click",function(){loadBundle(Math.floor(Math.random()*100000))});
   $("#btnVerifyChain").addEventListener("click",function(){verifyChain()});
-  $("#btnTamperChain").addEventListener("click",function(){tamperChain()});
+  $("#btnTamperChain").addEventListener("click",function(){simulateTamperRetcon()});
   $("#btnRunDiff").addEventListener("click",function(){runDiff()});
   $("#btnRunExport").addEventListener("click",function(){runExport()});
   $("#btnExecRefresh").addEventListener("click",function(){renderExecutive()});
@@ -956,77 +998,106 @@ function renderChainSvg(chain){
   if(!chain||!chain.length){container.innerHTML='<span class="badge badge-fail">No chain loaded</span>';return}
 
   var nodeW=160,nodeH=50,gapY=20,padX=20,padY=20;
-  var displayChain=chain.length>50?chain.slice(0,50):chain;
-  var totalH=padY*2+displayChain.length*(nodeH+gapY)-gapY;
-  var totalW=nodeW+padX*2;
-
+  var BATCH=30;
   var svgNS="http://www.w3.org/2000/svg";
-  var svg=document.createElementNS(svgNS,"svg");
-  svg.setAttribute("viewBox","0 0 "+totalW+" "+totalH);
-  svg.setAttribute("width","100%");
-  svg.style.maxWidth=totalW+"px";
-
   var typeColors={AC:"#00e5ff",AU:"#66bb6a",IR:"#ab47bc",RA:"#ff7043",SI:"#fdd835",SC:"#00e5ff",IA:"#ab47bc",CM:"#66bb6a"};
+  var totalW=nodeW+padX*2;
+  var rendered=0;
 
-  displayChain.forEach(function(entry,i){
-    var y=padY+i*(nodeH+gapY);
-    var refFamily=(entry.refId||"").substring(0,2);
-    var color=typeColors[refFamily]||"var(--accent,#00e5ff)";
-
-    if(i>0){
-      var line=document.createElementNS(svgNS,"line");
-      line.setAttribute("x1",padX+nodeW/2);
-      line.setAttribute("y1",y-gapY);
-      line.setAttribute("x2",padX+nodeW/2);
-      line.setAttribute("y2",y);
-      line.setAttribute("stroke","var(--muted,#555)");
-      line.setAttribute("stroke-width","2");
-      svg.appendChild(line);
-    }
-
-    var rect=document.createElementNS(svgNS,"rect");
-    rect.setAttribute("x",padX);
-    rect.setAttribute("y",y);
-    rect.setAttribute("width",nodeW);
-    rect.setAttribute("height",nodeH);
-    rect.setAttribute("rx","6");
-    rect.setAttribute("fill","var(--card-bg,#0d1320)");
-    rect.setAttribute("stroke",color);
-    rect.setAttribute("stroke-width","2");
-    svg.appendChild(rect);
-
-    var text=document.createElementNS(svgNS,"text");
-    text.setAttribute("x",padX+8);
-    text.setAttribute("y",y+18);
-    text.setAttribute("fill",color);
-    text.setAttribute("font-size","10");
-    text.setAttribute("font-family","monospace");
-    text.textContent="#"+entry.index+" "+(entry.refId||"").substring(0,18);
-    svg.appendChild(text);
-
-    var hash=document.createElementNS(svgNS,"text");
-    hash.setAttribute("x",padX+8);
-    hash.setAttribute("y",y+34);
-    hash.setAttribute("fill","var(--muted,#555)");
-    hash.setAttribute("font-size","8");
-    hash.setAttribute("font-family","monospace");
-    hash.textContent=(entry.chainHash||"").substring(0,30)+"...";
-    svg.appendChild(hash);
-  });
-
-  if(chain.length>50){
-    var summaryText=document.createElementNS(svgNS,"text");
-    summaryText.setAttribute("x",padX);
-    summaryText.setAttribute("y",totalH-10);
-    summaryText.setAttribute("fill","var(--warn,#ffcc66)");
-    summaryText.setAttribute("font-size","11");
-    summaryText.textContent="... and "+(chain.length-50)+" more entries (showing first 50)";
-    svg.appendChild(summaryText);
+  /* Fallback: if no IntersectionObserver, truncate at 50 like before */
+  if(typeof IntersectionObserver==="undefined"){
+    var displayChain=chain.length>50?chain.slice(0,50):chain;
+    var totalH=padY*2+displayChain.length*(nodeH+gapY)-gapY;
+    var svg=document.createElementNS(svgNS,"svg");
+    svg.setAttribute("viewBox","0 0 "+totalW+" "+totalH);
+    svg.setAttribute("width","100%");svg.style.maxWidth=totalW+"px";
+    _renderSvgNodes(svg,displayChain,0,padX,padY,nodeW,nodeH,gapY,typeColors,svgNS);
+    if(chain.length>50){var st=document.createElementNS(svgNS,"text");st.setAttribute("x",padX);st.setAttribute("y",totalH-10);st.setAttribute("fill","var(--warn,#ffcc66)");st.setAttribute("font-size","11");st.textContent="... and "+(chain.length-50)+" more entries (showing first 50)";svg.appendChild(st)}
+    container.appendChild(svg);return;
   }
 
+  /* IntersectionObserver lazy-load path */
+  var initialCount=Math.min(BATCH,chain.length);
+  var initialH=padY*2+initialCount*(nodeH+gapY)-gapY;
+  var svg=document.createElementNS(svgNS,"svg");
+  svg.setAttribute("viewBox","0 0 "+totalW+" "+initialH);
+  svg.setAttribute("width","100%");svg.style.maxWidth=totalW+"px";
+  _renderSvgNodes(svg,chain.slice(0,initialCount),0,padX,padY,nodeW,nodeH,gapY,typeColors,svgNS);
+  rendered=initialCount;
   container.appendChild(svg);
+
+  if(rendered>=chain.length)return;
+
+  var sentinel=document.createElement("div");
+  sentinel.style.height="20px";sentinel.style.width="100%";
+  container.appendChild(sentinel);
+
+  var observer=new IntersectionObserver(function(entries){
+    if(!entries[0].isIntersecting)return;
+    if(rendered>=chain.length){observer.disconnect();if(sentinel.parentNode)sentinel.parentNode.removeChild(sentinel);return}
+    var nextBatch=chain.slice(rendered,rendered+BATCH);
+    _renderSvgNodes(svg,nextBatch,rendered,padX,padY,nodeW,nodeH,gapY,typeColors,svgNS);
+    rendered+=nextBatch.length;
+    var newH=padY*2+rendered*(nodeH+gapY)-gapY;
+    svg.setAttribute("viewBox","0 0 "+totalW+" "+newH);
+    if(rendered>=chain.length){observer.disconnect();if(sentinel.parentNode)sentinel.parentNode.removeChild(sentinel)}
+  },{root:container,rootMargin:"100px"});
+  observer.observe(sentinel);
+}
+function _renderSvgNodes(svg,entries,startIdx,padX,padY,nodeW,nodeH,gapY,typeColors,svgNS){
+  for(var i=0;i<entries.length;i++){
+    var globalIdx=startIdx+i;
+    var entry=entries[i];
+    var y=padY+globalIdx*(nodeH+gapY);
+    var refFamily=(entry.refId||"").substring(0,2);
+    var color=typeColors[refFamily]||"var(--accent,#00e5ff)";
+    if(globalIdx>0){var line=document.createElementNS(svgNS,"line");line.setAttribute("x1",padX+nodeW/2);line.setAttribute("y1",y-gapY);line.setAttribute("x2",padX+nodeW/2);line.setAttribute("y2",y);line.setAttribute("stroke","var(--muted,#555)");line.setAttribute("stroke-width","2");svg.appendChild(line)}
+    var rect=document.createElementNS(svgNS,"rect");rect.setAttribute("x",padX);rect.setAttribute("y",y);rect.setAttribute("width",nodeW);rect.setAttribute("height",nodeH);rect.setAttribute("rx","6");rect.setAttribute("fill","var(--card-bg,#0d1320)");rect.setAttribute("stroke",color);rect.setAttribute("stroke-width","2");svg.appendChild(rect);
+    var text=document.createElementNS(svgNS,"text");text.setAttribute("x",padX+8);text.setAttribute("y",y+18);text.setAttribute("fill",color);text.setAttribute("font-size","10");text.setAttribute("font-family","monospace");text.textContent="#"+entry.index+" "+(entry.refId||"").substring(0,18);svg.appendChild(text);
+    var hash=document.createElementNS(svgNS,"text");hash.setAttribute("x",padX+8);hash.setAttribute("y",y+34);hash.setAttribute("fill","var(--muted,#555)");hash.setAttribute("font-size","8");hash.setAttribute("font-family","monospace");hash.textContent=(entry.chainHash||"").substring(0,30)+"...";svg.appendChild(hash);
+  }
 }
 function tamperChain(){if(!STATE.proofChain.length)return;var idx=Math.min(15,STATE.proofChain.length-1);STATE.proofChain[idx].chainHash="sha256:"+rngHex(64);STATE.tampered=true;renderProofChain();verifyChain()}
+function simulateTamperRetcon(){
+  var btn=$("#btnTamperChain");
+  var panel=$("#retconPanel");
+  if(!STATE.proofChain.length){toast("Load bundle first");return}
+  /* Toggle off — restore snapshot */
+  if(_tamperSnapshot){
+    STATE.proofChain=_tamperSnapshot;_tamperSnapshot=null;
+    STATE.tampered=false;
+    renderProofChain();verifyChain();
+    if(btn){btn.textContent="Simulate Tamper";btn.classList.remove("tamper-active")}
+    if(panel){panel.innerHTML="";panel.classList.add("hidden")}
+    toast("Tamper cleared — chain restored");
+    return;
+  }
+  /* Toggle on — snapshot + corrupt */
+  _tamperSnapshot=JSON.parse(JSON.stringify(STATE.proofChain));
+  var idx=Math.min(15,STATE.proofChain.length-1);
+  var origHash=STATE.proofChain[idx].chainHash;
+  var corruptHash="sha256:"+rngHex(64);
+  STATE.proofChain[idx].chainHash=corruptHash;
+  STATE.tampered=true;
+  renderProofChain();verifyChain();
+  if(btn){btn.textContent="Clear Tamper";btn.classList.add("tamper-active")}
+  /* Build RETCON Pathway panel */
+  var affected=[];
+  for(var i=idx;i<STATE.proofChain.length;i++){affected.push(STATE.proofChain[i])}
+  var rhtml='<div class="retcon-panel"><h4>RETCON Pathway — Tamper Simulation Active</h4>';
+  rhtml+='<div class="retcon-entry"><strong>Tampered Entry:</strong> #'+idx+' ('+esc(STATE.proofChain[idx].refId)+')</div>';
+  rhtml+='<div class="retcon-entry"><strong>Original Hash:</strong> <span class="mono" style="font-size:10px;color:var(--ok)">'+esc(origHash.slice(0,48))+'...</span></div>';
+  rhtml+='<div class="retcon-entry"><strong>Tampered Hash:</strong> <span class="mono" style="font-size:10px;color:var(--bad)">'+esc(corruptHash.slice(0,48))+'...</span></div>';
+  rhtml+='<div class="retcon-entry"><strong>Affected Entries:</strong> '+affected.length+' (entries #'+idx+' through #'+(STATE.proofChain.length-1)+')</div>';
+  rhtml+='<div class="retcon-entry" style="border-color:rgba(0,240,255,.2)"><strong>Patch Guidance:</strong><ul style="margin:4px 0 0 16px;font-size:10px;color:var(--muted)">';
+  rhtml+='<li>Re-compute chainHash for entry #'+idx+' from canonical JSON</li>';
+  rhtml+='<li>Cascade prevChainHash updates to all '+affected.length+' downstream entries</li>';
+  rhtml+='<li>Re-seal bundle with updated commit boundary</li>';
+  rhtml+='<li>Authority re-attestation required (Law 3: No canon overwrite)</li></ul></div>';
+  rhtml+='</div>';
+  if(panel){panel.innerHTML=rhtml;panel.classList.remove("hidden")}
+  toast("Tamper simulated — RETCON pathway shown");
+}
 
 /* ══════════════════════════════════════════════════════════
    Export
@@ -1037,12 +1108,12 @@ function renderExportPipeline(){var steps=[{n:1,title:"Collect 110 Practices",de
 /* ══════════════════════════════════════════════════════════
    Diff
    ══════════════════════════════════════════════════════════ */
-function runDiff(){var a=makeSampleBundle(42);var b=makeSampleBundle(42);/* Simulate a practice coverage upgrade */b.artifacts[13].payload.coverage="Full";b.artifacts[13].contentHash="sha256:"+rngHex(64);b.artifacts[50].payload.coverage="Strong";b.artifacts[50].contentHash="sha256:"+rngHex(64);b.manifest.version="1.1.0";STATE.bundleB=b;var modified=[];for(var i=0;i<a.artifacts.length;i++){if(a.artifacts[i].contentHash!==b.artifacts[i].contentHash)modified.push({before:a.artifacts[i],after:b.artifacts[i]})}STATE.lastDiff={fromVersion:a.manifest.version,toVersion:b.manifest.version,modified:modified};$("#diffStats").innerHTML='<div class="stat-box"><div class="stat-val" style="color:var(--neon-amber)">'+modified.length+'</div><div class="stat-label">Coverage Changes</div></div><div class="stat-box"><div class="stat-val">'+esc(a.manifest.version)+" → "+esc(b.manifest.version)+'</div><div class="stat-label">Version</div></div>';var html="";for(var mi=0;mi<modified.length;mi++){var m=modified[mi];html+='<div class="diff-row"><div class="diff-side diff-mod"><div class="diff-label mod">'+esc(m.before.refId)+'</div><span class="badge badge-amber">'+esc(m.before.payload.coverage)+'</span> → <span class="badge badge-green">'+esc(m.after.payload.coverage)+'</span><div class="mono" style="font-size:10px;color:var(--muted);margin-top:4px">'+esc(m.after.payload.title)+'</div></div></div>'}if(!modified.length)html='<div class="badge badge-pass">No coverage changes</div>';$("#diffResults").innerHTML=html}
+function runDiff(){var a=makeSampleBundle(42);var b=makeSampleBundle(42);/* Simulate a practice coverage upgrade */b.artifacts[13].payload.coverage="Full";b.artifacts[13].contentHash="sha256:"+rngHex(64);b.artifacts[50].payload.coverage="Strong";b.artifacts[50].contentHash="sha256:"+rngHex(64);b.manifest.version="1.1.0";STATE.bundleB=b;var modified=[];for(var i=0;i<a.artifacts.length;i++){if(a.artifacts[i].contentHash!==b.artifacts[i].contentHash)modified.push({before:a.artifacts[i],after:b.artifacts[i]})}STATE.lastDiff={fromVersion:a.manifest.version,toVersion:b.manifest.version,modified:modified};$("#diffStats").innerHTML='<div class="stat-box"><div class="stat-val" style="color:var(--neon-amber)">'+modified.length+'</div><div class="stat-label">Coverage Changes</div></div><div class="stat-box"><div class="stat-val">'+esc(a.manifest.version)+" → "+esc(b.manifest.version)+'</div><div class="stat-label">Version</div></div>';var html="";var authImpactFamilies={};for(var mi=0;mi<modified.length;mi++){var m=modified[mi];var refType=m.after.refType;var authLaws=AUTH_FAM[refType]||[];var hasAuth=authLaws.length>0;if(hasAuth){if(!authImpactFamilies[refType])authImpactFamilies[refType]=[];authImpactFamilies[refType]=authLaws}var rowCls=hasAuth?' diff-authority':'';html+='<div class="diff-row"><div class="diff-side diff-mod'+rowCls+'"><div class="diff-label mod">'+esc(m.before.refId)+(hasAuth?' <span class="badge badge-fail" style="margin-left:6px;font-size:8px">AuthorityOps Impact</span>':'')+'</div><span class="badge badge-amber">'+esc(m.before.payload.coverage)+'</span> → <span class="badge badge-green">'+esc(m.after.payload.coverage)+'</span><div class="mono" style="font-size:10px;color:var(--muted);margin-top:4px">'+esc(m.after.payload.title)+'</div></div></div>'}if(!modified.length)html='<div class="badge badge-pass">No coverage changes</div>';var authKeys=Object.keys(authImpactFamilies);if(authKeys.length>0){html+='<div class="card" style="margin-top:14px;border-color:rgba(255,107,107,.3)"><h3 style="color:var(--bad)">AuthorityOps Impact Summary</h3><p style="font-size:10px;color:var(--muted);margin-bottom:8px">The following families have AuthorityOps hard-law implications due to coverage changes:</p>';for(var ak=0;ak<authKeys.length;ak++){var afam=authKeys[ak];var afamName="";for(var fn=0;fn<FAMILIES.length;fn++){if(FAMILIES[fn].id===afam){afamName=FAMILIES[fn].name;break}}html+='<div style="margin-bottom:6px"><span class="badge badge-cyan">'+esc(afam)+'</span> <span style="font-size:11px;color:var(--muted)">'+esc(afamName)+'</span><div style="margin-top:3px">';var laws=authImpactFamilies[afam];for(var li=0;li<laws.length;li++){html+='<span class="badge badge-fail" style="margin-right:4px;font-size:9px">'+esc(laws[li])+'</span>'}html+='</div></div>'}html+='</div>'}$("#diffResults").innerHTML=html}
 
 /* ══════════════════════════════════════════════════════════
    Mapping — CMMC Families <-> CERPA
    ══════════════════════════════════════════════════════════ */
-function renderMapping(){var html="";for(var i=0;i<FAMILIES.length;i++){var f=FAMILIES[i];var cm=CERPA_FAM[f.id];html+='<div class="map-row"><div class="map-left"><span class="badge badge-cyan">'+esc(f.id)+'</span> '+esc(f.name)+'</div><div class="map-arrow">&harr;</div><div class="map-right"><span class="cerpa-tag '+cm.cls+'">'+cm.lbl+' '+cm.stage+'</span>'+(KPI_FAM[f.id].length?' <span style="font-size:9px;color:var(--muted);margin-left:4px">KPIs: '+esc(KPI_FAM[f.id].join(", "))+'</span>':"")+'</div></div>'}$("#mappingDiagram").innerHTML=html}
+function renderMapping(){var html="";for(var i=0;i<FAMILIES.length;i++){var f=FAMILIES[i];var cm=CERPA_FAM[f.id];var kpiHtml="";if(KPI_FAM[f.id].length){kpiHtml=' <span style="font-size:9px;margin-left:4px">KPIs: ';for(var ki=0;ki<KPI_FAM[f.id].length;ki++){if(ki>0)kpiHtml+=", ";kpiHtml+='<span class="kpi-link" data-kpi-family="'+esc(f.id)+'">'+esc(KPI_FAM[f.id][ki])+'</span>'}kpiHtml+='</span>'}html+='<div class="map-row"><div class="map-left"><span class="badge badge-cyan">'+esc(f.id)+'</span> '+esc(f.name)+'</div><div class="map-arrow">&harr;</div><div class="map-right"><span class="cerpa-tag '+cm.cls+'">'+cm.lbl+' '+cm.stage+'</span>'+kpiHtml+'</div></div>'}$("#mappingDiagram").innerHTML=html}
 
 /* ══════════════════════════════════════════════════════════
    Schema
@@ -1114,7 +1185,7 @@ document.addEventListener("DOMContentLoaded",function(){
     });
   }
 
-  /* Compliance score simulation slider */
+  /* Compliance score simulation slider + Phase 4B projected patch impact */
   var compSlider=document.getElementById('complianceSlider');
   if(compSlider){
     compSlider.addEventListener('input',function(){
@@ -1135,6 +1206,79 @@ document.addEventListener("DOMContentLoaded",function(){
       }
       var resEl=document.getElementById('compSimResult');
       if(resEl){resEl.style.borderColor=score>=90?'var(--ok)':score>=70?'var(--warn)':'var(--bad)';}
+      /* Phase 4B: Projected patch impact */
+      var projPanel=document.getElementById('compSimProjected');
+      var b=STATE.bundle;
+      if(!b||!projPanel){if(projPanel)projPanel.classList.add("hidden");return}
+      projPanel.classList.remove("hidden");
+      var patchable=0,totalApplicable=0;
+      for(var pi=0;pi<b.artifacts.length;pi++){var cov=b.artifacts[pi].payload.coverage;if(cov!=="N/A")totalApplicable++;if(cov==="Partial"||cov==="N/A")patchable++}
+      var currentPct=score;
+      var projectedPct=totalApplicable>0?Math.round(((totalApplicable*1.0)/totalApplicable)*100):100;
+      var delta=projectedPct-currentPct;
+      var projBarCur=document.getElementById('projBarCurrent');
+      var projBarProj=document.getElementById('projBarProjected');
+      var projDelta=document.getElementById('projDeltaText');
+      if(projBarCur)projBarCur.style.width=currentPct+"%";
+      if(projBarProj)projBarProj.style.width=projectedPct+"%";
+      if(projDelta)projDelta.textContent="+"+Math.max(0,delta)+"% with "+patchable+" patches (Partial + N/A → Full)";
+    });
+  }
+
+  /* Phase 1B: KPI link click handler — switch to Explorer + activate family filter */
+  document.addEventListener("click",function(e){
+    var kpiLink=e.target.closest(".kpi-link");
+    if(!kpiLink)return;
+    var family=kpiLink.getAttribute("data-kpi-family");
+    if(!family)return;
+    var explorerBtn=document.querySelector('.tab-btn[data-tab="explorer"]');
+    if(explorerBtn)explorerBtn.click();
+    var pill=document.querySelector('.filter-pill[data-ft="'+family+'"]');
+    if(pill)pill.click();
+  });
+
+  /* Phase 3C-sim: Live Compliance Simulation (no network) */
+  var simBtn=document.getElementById("btnSimLive");
+  if(simBtn){
+    simBtn.addEventListener("click",function(){
+      if(_liveSimActive){
+        /* Turn off */
+        clearInterval(_liveSimInterval);_liveSimInterval=null;_liveSimActive=false;
+        simBtn.textContent="Simulate Live Updates";simBtn.classList.remove("sim-on");
+        toast("Live simulation stopped");
+        return;
+      }
+      /* Turn on */
+      if(!STATE.bundle){toast("Load bundle first");return}
+      _liveSimActive=true;
+      simBtn.textContent="Stop Simulation";simBtn.classList.add("sim-on");
+      toast("Live simulation started (3s interval)");
+      _liveSimInterval=setInterval(function(){
+        var b=STATE.bundle;if(!b)return;
+        /* Find a random practice that isn't Full and upgrade it one tier */
+        var candidates=[];
+        for(var ci=0;ci<b.artifacts.length;ci++){
+          var cov=b.artifacts[ci].payload.coverage;
+          if(cov!=="Full")candidates.push(ci);
+        }
+        if(!candidates.length){clearInterval(_liveSimInterval);_liveSimInterval=null;_liveSimActive=false;simBtn.textContent="Simulate Live Updates";simBtn.classList.remove("sim-on");toast("All practices at Full coverage");return}
+        var pick=candidates[Math.floor(Math.random()*candidates.length)];
+        var art=b.artifacts[pick];
+        var oldCov=art.payload.coverage;
+        var upgrades={"N/A":"Partial","Partial":"Strong","Strong":"Full"};
+        var newCov=upgrades[oldCov]||"Full";
+        art.payload.coverage=newCov;art.coverage=newCov;
+        /* Update FAMILIES counts */
+        var fam=null;
+        for(var fi=0;fi<FAMILIES.length;fi++){if(FAMILIES[fi].id===art.refType){fam=FAMILIES[fi];break}}
+        if(fam){
+          var oldKey=COV_MAP[oldCov];var newKey=COV_MAP[newCov];
+          if(oldKey&&fam[oldKey]>0)fam[oldKey]--;
+          if(newKey)fam[newKey]++;
+        }
+        renderExecutive();renderTimeline();
+        toast(art.refId+": "+oldCov+" \u2192 "+newCov);
+      },3000);
     });
   }
   document.addEventListener("keydown",function(e){if(e.target.tagName==="TEXTAREA"||e.target.tagName==="INPUT")return;var tk={"1":"executive","2":"explorer","3":"proof","4":"export","5":"diff","6":"mapping","7":"schema"};if(tk[e.key]){e.preventDefault();var b=document.querySelector('.tab-btn[data-tab="'+tk[e.key]+'"]');if(b)b.click()}if(e.key==="Escape")closeDrawer();if(e.key==="?")$("#shortcutBar").classList.toggle("vis");if(e.key==="r"||e.key==="R"){e.preventDefault();loadBundle(Math.floor(Math.random()*100000))}});

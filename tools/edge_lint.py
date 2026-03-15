@@ -183,6 +183,9 @@ def lint_file(filepath, strict=False):
     active.extend(CLIPBOARD_NEVER)  # always checked
 
     # ── 6. Line-by-line scan ────────────────────────────────
+    # W3C namespace URIs are required by DOM APIs (createElementNS) and are not remote refs
+    _W3C_NS_RE = re.compile(r"https?://www\.w3\.org/\d{4}/")
+
     for idx, line in enumerate(lines):
         if in_shim(idx):
             continue
@@ -191,6 +194,9 @@ def lint_file(filepath, strict=False):
         for pattern, label in active:
             flags = re.IGNORECASE if label.startswith("REMOTE_REF") else 0
             if re.search(pattern, line, flags):
+                # Whitelist W3C namespace URIs (SVG, XHTML, XLink, etc.)
+                if label.startswith("REMOTE_REF") and _W3C_NS_RE.search(line):
+                    continue
                 violations.append((idx + 1, label))
 
     # ── 7. Multiline scan (full content outside shim) ───────

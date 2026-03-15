@@ -1,0 +1,338 @@
+<!--
+ CERPA × CMMC 2.0 — Live Compliance Dashboard
+ ============================================================
+ Real-time compliance score updates via SSE from DeepSigma webhook bridge.
+ Connects to WebhookBridge at user-specified URL for bundleUpdated events.
+
+ NOT an EDGE file — network access is intentional for live SSE streaming.
+ For offline analysis, use CERPA_CMMC_COG_Adapter_v1.html (EDGE-hardened).
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src 'self' http://127.0.0.1:* http://localhost:*; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'"/>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>CERPA × CMMC 2.0 — Live Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e1a;--card:#111827;--line:#1e293b;--text:#e2e8f0;--muted:#64748b;
+  --ok:#5dff93;--warn:#ffcc66;--bad:#ff6b6b;
+  --neon-cyan:#00f0ff;--neon-green:#5dff93;--neon-amber:#ffcc66;--neon-pink:#ff6bde;--neon-purple:#ab47bc;
+  --accent:#00f0ff;
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:13px;line-height:1.5;padding:24px}
+h1{font-size:20px;color:var(--neon-cyan);margin-bottom:4px}
+h2{font-size:14px;color:var(--muted);font-weight:400;margin-bottom:20px}
+h3{font-size:13px;color:var(--accent);margin-bottom:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700}
+.badge-ok{background:rgba(93,255,147,.15);color:var(--ok)}
+.badge-warn{background:rgba(255,204,102,.15);color:var(--warn)}
+.badge-bad{background:rgba(255,107,107,.15);color:var(--bad)}
+.badge-cyan{background:rgba(0,240,255,.15);color:var(--neon-cyan)}
+.badge-muted{background:rgba(100,116,139,.15);color:var(--muted)}
+.mono{font-family:"SF Mono",Menlo,Monaco,monospace}
+
+/* Connection panel */
+.conn-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.conn-input{flex:1;min-width:200px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 12px;color:var(--text);font-size:12px;font-family:inherit}
+.conn-input:focus{outline:none;border-color:var(--accent)}
+.btn{padding:6px 16px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--text);cursor:pointer;font-size:12px;font-family:inherit}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn-primary{background:rgba(0,240,255,.1);border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:rgba(255,107,107,.1);border-color:var(--bad);color:var(--bad)}
+#connStatus{font-size:11px;font-weight:700}
+.status-disconnected{color:var(--muted)}
+.status-connecting{color:var(--warn)}
+.status-connected{color:var(--ok)}
+.status-error{color:var(--bad)}
+
+/* Scorecard grid */
+.score-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:12px}
+.score-cell{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:12px;transition:all .4s}
+.score-cell.flash{animation:flashUpdate .8s ease-out}
+@keyframes flashUpdate{0%{border-color:var(--neon-cyan);box-shadow:0 0 20px rgba(0,240,255,.3)}100%{border-color:var(--line);box-shadow:none}}
+.cell-id{font-size:14px;font-weight:700;color:var(--neon-cyan);margin-bottom:2px}
+.cell-name{font-size:10px;color:var(--muted);margin-bottom:8px}
+.cell-bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:4px}
+.cell-fill{height:100%;border-radius:3px;transition:width .6s ease}
+.cell-pct{font-size:18px;font-weight:700}
+.cell-detail{font-size:10px;color:var(--muted)}
+
+/* Event log */
+.event-log{max-height:300px;overflow-y:auto;font-size:11px}
+.event-entry{padding:6px 10px;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:baseline}
+.event-time{color:var(--muted);font-family:"SF Mono",Menlo,monospace;font-size:10px;white-space:nowrap}
+.event-msg{flex:1}
+
+/* Overall gauge */
+.gauge-row{display:flex;align-items:center;gap:20px;margin-bottom:12px}
+.gauge-pct{font-size:36px;font-weight:700;min-width:100px}
+.gauge-label{font-size:11px;color:var(--muted)}
+.gauge-bar{flex:1;height:10px;background:var(--line);border-radius:5px;overflow:hidden}
+.gauge-fill{height:100%;border-radius:5px;transition:width .6s ease,background .6s ease}
+</style>
+</head>
+<body>
+
+<h1>CERPA × CMMC 2.0 — Live Compliance Dashboard</h1>
+<h2>Real-time practice coverage via DeepSigma webhook bridge SSE</h2>
+
+<!-- Connection panel -->
+<div class="card" id="connPanel">
+  <h3>Webhook Bridge Connection</h3>
+  <div class="conn-row">
+    <input type="text" class="conn-input" id="bridgeUrl" placeholder="http://127.0.0.1:8790" value="http://127.0.0.1:8790"/>
+    <button class="btn btn-primary" id="btnConnect">Connect</button>
+    <button class="btn btn-danger" id="btnDisconnect" style="display:none">Disconnect</button>
+    <span id="connStatus" class="status-disconnected">Disconnected</span>
+  </div>
+  <div style="font-size:10px;color:var(--muted);margin-top:6px">
+    Connects to GET /events on the DeepSigma WebhookBridge for SSE streaming. Only localhost/127.0.0.1 URLs are allowed by CSP.
+  </div>
+</div>
+
+<!-- Overall compliance gauge -->
+<div class="card">
+  <h3>Overall Compliance</h3>
+  <div class="gauge-row">
+    <div class="gauge-pct" id="overallPct" style="color:var(--ok)">93.9%</div>
+    <div style="flex:1">
+      <div class="gauge-bar"><div class="gauge-fill" id="overallFill" style="width:93.9%;background:var(--ok)"></div></div>
+      <div class="gauge-label" style="margin-top:4px"><span id="overallGrade">Compliant</span> — <span id="overallDetail">110 practices assessed</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Family scorecard grid -->
+<div class="card">
+  <h3>Family Coverage</h3>
+  <div class="score-grid" id="scoreGrid"></div>
+</div>
+
+<!-- Event log -->
+<div class="card">
+  <h3>Event Log</h3>
+  <div class="event-log" id="eventLog">
+    <div class="event-entry"><span class="event-time">--:--:--</span><span class="event-msg" style="color:var(--muted)">Waiting for connection...</span></div>
+  </div>
+</div>
+
+<div style="margin-top:20px;font-size:10px;color:var(--muted);text-align:center">
+  DeepSigma × CERPA CMMC Live Dashboard — For offline analysis use the EDGE-hardened CERPA_CMMC_COG_Adapter_v1.html
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ── CMMC Families ─── */
+var FAMILIES=[
+  {id:"AC",name:"Access Control",total:22,full:20,strong:1,partial:1,na:0},
+  {id:"AT",name:"Awareness & Training",total:3,full:3,strong:0,partial:0,na:0},
+  {id:"AU",name:"Audit & Accountability",total:9,full:9,strong:0,partial:0,na:0},
+  {id:"CM",name:"Configuration Management",total:9,full:7,strong:1,partial:1,na:0},
+  {id:"IA",name:"Identification & Auth",total:11,full:10,strong:1,partial:0,na:0},
+  {id:"IR",name:"Incident Response",total:3,full:3,strong:0,partial:0,na:0},
+  {id:"MA",name:"Maintenance",total:6,full:3,strong:0,partial:0,na:3},
+  {id:"MP",name:"Media Protection",total:9,full:6,strong:1,partial:0,na:2},
+  {id:"PE",name:"Physical Protection",total:6,full:0,strong:1,partial:0,na:5},
+  {id:"PS",name:"Personnel Security",total:2,full:2,strong:0,partial:0,na:0},
+  {id:"RA",name:"Risk Assessment",total:3,full:3,strong:0,partial:0,na:0},
+  {id:"CA",name:"Security Assessment",total:4,full:3,strong:1,partial:0,na:0},
+  {id:"SC",name:"System & Comms Protection",total:16,full:14,strong:1,partial:1,na:0},
+  {id:"SI",name:"System & Info Integrity",total:7,full:6,strong:1,partial:0,na:0}
+];
+
+/* ── State ─── */
+var eventSource = null;
+var eventCount = 0;
+
+/* ── Helpers ─── */
+function $(sel){return document.querySelector(sel)}
+function esc(s){var d=document.createElement("div");d.textContent=s;return d.innerHTML}
+function timeStr(){var d=new Date();return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")+":"+String(d.getSeconds()).padStart(2,"0")}
+
+/* ── Compute overall score ─── */
+function computeOverall(){
+  var totalWeighted=0,totalApplicable=0;
+  for(var i=0;i<FAMILIES.length;i++){
+    var f=FAMILIES[i];
+    var applicable=f.total-f.na;
+    if(applicable>0){
+      totalWeighted+=f.full+f.strong*0.9+f.partial*0.5;
+      totalApplicable+=applicable;
+    }
+  }
+  return totalApplicable>0?Math.round((totalWeighted/totalApplicable)*1000)/10:0;
+}
+
+/* ── Render scorecard grid ─── */
+function renderGrid(flashFamilyId){
+  var grid=$("#scoreGrid");
+  var html="";
+  for(var i=0;i<FAMILIES.length;i++){
+    var f=FAMILIES[i];
+    var applicable=f.total-f.na;
+    var pct=applicable>0?Math.round(((f.full+f.strong*0.9+f.partial*0.5)/applicable)*100):0;
+    var color=pct>=90?"var(--ok)":pct>=70?"var(--warn)":"var(--bad)";
+    var flashCls=(flashFamilyId&&flashFamilyId===f.id)?" flash":"";
+    html+='<div class="score-cell'+flashCls+'" id="cell-'+f.id+'">';
+    html+='<div class="cell-id">'+esc(f.id)+'</div>';
+    html+='<div class="cell-name">'+esc(f.name)+'</div>';
+    html+='<div class="cell-bar"><div class="cell-fill" style="width:'+pct+'%;background:'+color+'"></div></div>';
+    html+='<div class="cell-pct" style="color:'+color+'">'+pct+'%</div>';
+    html+='<div class="cell-detail">'+f.full+' Full, '+f.strong+' Strong, '+f.partial+' Partial'+(f.na?' , '+f.na+' N/A':'')+'</div>';
+    html+='</div>';
+  }
+  grid.innerHTML=html;
+}
+
+/* ── Update overall gauge ─── */
+function updateOverall(){
+  var pct=computeOverall();
+  var color=pct>=90?"var(--ok)":pct>=70?"var(--warn)":"var(--bad)";
+  var grade=pct>=90?"Compliant":pct>=70?"Partial":"Non-compliant";
+  var pctEl=$("#overallPct");
+  if(pctEl){pctEl.textContent=pct+"%";pctEl.style.color=color}
+  var fillEl=$("#overallFill");
+  if(fillEl){fillEl.style.width=pct+"%";fillEl.style.background=color}
+  var gradeEl=$("#overallGrade");
+  if(gradeEl)gradeEl.textContent=grade;
+}
+
+/* ── Add event to log ─── */
+function logEvent(msg,type){
+  var log=$("#eventLog");
+  var cls=type==="error"?"color:var(--bad)":type==="success"?"color:var(--ok)":"color:var(--text)";
+  var entry=document.createElement("div");
+  entry.className="event-entry";
+  entry.innerHTML='<span class="event-time">'+timeStr()+'</span><span class="event-msg" style="'+cls+'">'+esc(msg)+'</span>';
+  if(log.children.length>0)log.insertBefore(entry,log.children[0]);
+  else log.appendChild(entry);
+  /* Cap at 100 entries */
+  while(log.children.length>100)log.removeChild(log.lastChild);
+}
+
+/* ── Handle SSE event ─── */
+function handleSSEEvent(data){
+  eventCount++;
+  try{
+    var evt=JSON.parse(data);
+    var bundleId=evt.data?evt.data.bundleId:(evt.bundleId||"unknown");
+    var detail=evt.data?evt.data.detail:(evt.detail||{});
+
+    /* Try to match a family update */
+    var familyId=detail.familyId||detail.family||null;
+    var newCoverage=detail.coverage||null;
+
+    if(familyId&&newCoverage){
+      /* Update the matching family */
+      for(var i=0;i<FAMILIES.length;i++){
+        if(FAMILIES[i].id===familyId){
+          var f=FAMILIES[i];
+          /* Simulate coverage improvement */
+          if(newCoverage==="Full"&&f.partial>0){f.partial--;f.full++}
+          else if(newCoverage==="Strong"&&f.partial>0){f.partial--;f.strong++}
+          else if(newCoverage==="Full"&&f.strong>0){f.strong--;f.full++}
+          else if(newCoverage==="Full"&&f.na>0){f.na--;f.full++}
+          break;
+        }
+      }
+      renderGrid(familyId);
+      updateOverall();
+      logEvent("Bundle "+bundleId+": "+familyId+" practice upgraded to "+newCoverage,"success");
+    } else {
+      /* Generic bundle update */
+      logEvent("Bundle update: "+bundleId+" (event #"+eventCount+")","success");
+    }
+  }catch(err){
+    logEvent("Received event #"+eventCount+" (parse error: "+err.message+")","error");
+  }
+}
+
+/* ── Validate URL ─── */
+function isValidUrl(url){
+  /* Only allow localhost / 127.0.0.1 */
+  try{
+    if(url.indexOf("http://127.0.0.1")===0)return true;
+    if(url.indexOf("http://localhost")===0)return true;
+    return false;
+  }catch(e){return false}
+}
+
+/* ── Connect SSE ─── */
+function connect(){
+  var url=$("#bridgeUrl").value.trim();
+  if(!isValidUrl(url)){
+    logEvent("Invalid URL — only http://127.0.0.1 or http://localhost allowed","error");
+    return;
+  }
+  var eventsUrl=url.replace(/\/+$/,"")+"/events";
+
+  var statusEl=$("#connStatus");
+  statusEl.textContent="Connecting...";
+  statusEl.className="status-connecting";
+  logEvent("Connecting to "+eventsUrl+"...");
+
+  eventSource=new EventSource(eventsUrl);
+
+  eventSource.onopen=function(){
+    statusEl.textContent="Connected";
+    statusEl.className="status-connected";
+    $("#btnConnect").style.display="none";
+    $("#btnDisconnect").style.display="";
+    logEvent("SSE connection established","success");
+  };
+
+  eventSource.onmessage=function(e){
+    handleSSEEvent(e.data);
+  };
+
+  eventSource.onerror=function(){
+    if(eventSource.readyState===EventSource.CLOSED){
+      statusEl.textContent="Disconnected";
+      statusEl.className="status-disconnected";
+      logEvent("SSE connection closed","error");
+    }else{
+      statusEl.textContent="Reconnecting...";
+      statusEl.className="status-connecting";
+      logEvent("SSE connection error — reconnecting...","error");
+    }
+  };
+}
+
+/* ── Disconnect SSE ─── */
+function disconnect(){
+  if(eventSource){
+    eventSource.close();
+    eventSource=null;
+  }
+  var statusEl=$("#connStatus");
+  statusEl.textContent="Disconnected";
+  statusEl.className="status-disconnected";
+  $("#btnConnect").style.display="";
+  $("#btnDisconnect").style.display="none";
+  logEvent("Disconnected from webhook bridge");
+}
+
+/* ── Init ─── */
+document.addEventListener("DOMContentLoaded",function(){
+  renderGrid();
+  updateOverall();
+
+  $("#btnConnect").addEventListener("click",connect);
+  $("#btnDisconnect").addEventListener("click",disconnect);
+
+  /* Enter key in URL input */
+  $("#bridgeUrl").addEventListener("keydown",function(e){
+    if(e.key==="Enter")connect();
+  });
+});
+
+})();
+</script>
+</body>
+</html>

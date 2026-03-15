@@ -332,6 +332,23 @@ tr:hover td{background:rgba(0,240,255,.03)}
 .suggest-conf-mid{color:var(--warn)}
 .suggest-conf-low{color:var(--bad)}
 
+/* ── v4: Tamper pulse ──────────────────────── */
+.tamper-active{animation:tamperPulse 2s infinite}
+@keyframes tamperPulse{0%,100%{border-color:var(--bad)}50%{border-color:rgba(255,107,107,.3)}}
+
+/* ── v4: Replay Simulator ─────────────────── */
+.replay-sim-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:14px}
+.replay-step-card{border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin-bottom:6px;background:var(--card);transition:all .3s}
+.replay-step-card.rsc-current{border-color:var(--neon-cyan);box-shadow:0 0 8px rgba(0,240,255,.15)}
+.replay-progress{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin:10px 0}
+.replay-progress-fill{height:100%;border-radius:3px;background:var(--neon-cyan);transition:width .3s}
+
+/* ── v4: Custom Bundle Generator ──────────── */
+.slider-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.slider-row label{min-width:80px;font-size:11px;color:var(--muted)}
+.slider-row input[type=range]{flex:1;accent-color:var(--neon-cyan)}
+.slider-val{min-width:32px;text-align:right;font-weight:700;font-size:13px;color:var(--neon-cyan)}
+
 @media print {
   body { background: #fff !important; color: #000 !important; }
   .tab-bar, .sidebar, .kbd-help, .toast, .drawer-overlay, .drawer-panel, .tabs, .shortcut-bar, #edgeActionContract { display: none !important; }
@@ -434,6 +451,28 @@ tr:hover td{background:rgba(0,240,255,.03)}
         <button id="btnPasteSample">Paste Sample</button>
       </div>
     </div>
+    <div class="card" style="margin-top:14px">
+      <h3>Custom Bundle Generator</h3>
+      <p style="color:var(--muted);font-size:11px;margin-bottom:12px">Configure and generate a custom COG bundle for testing.</p>
+      <div class="slider-row">
+        <label>Artifacts</label>
+        <input type="range" id="sliderArtifacts" min="4" max="32" value="8" title="Number of artifacts">
+        <span class="slider-val" id="sliderArtVal">8</span>
+      </div>
+      <div class="slider-row">
+        <label>Drift %</label>
+        <input type="range" id="sliderDrift" min="0" max="100" value="25" title="Drift percentage">
+        <span class="slider-val" id="sliderDriftVal">25</span>
+      </div>
+      <div class="slider-row">
+        <label>Patches</label>
+        <input type="range" id="sliderPatches" min="0" max="8" value="1" title="Number of patches">
+        <span class="slider-val" id="sliderPatchVal">1</span>
+      </div>
+      <div style="margin-top:10px">
+        <button class="btn-primary" id="btnGenCustom">Generate Custom Bundle</button>
+      </div>
+    </div>
     <div style="margin-top:12px;display:flex;gap:10px">
       <button class="btn-primary" id="btnExecRefresh">Refresh Scorecard</button>
       <button class="btn-primary" id="btnExportPdf">Export as printable page</button>
@@ -476,6 +515,17 @@ tr:hover td{background:rgba(0,240,255,.03)}
           <thead><tr><th>#</th><th>Action</th><th>Input</th><th>Output</th></tr></thead>
           <tbody id="replayTable"></tbody>
         </table>
+        <div style="margin-top:10px"><button id="btnOpenReplay" class="btn-primary" style="font-size:11px">Replay</button></div>
+      </div>
+      <div id="replaySimCard" class="replay-sim-card hidden">
+        <h3>Replay Simulator</h3>
+        <div class="replay-progress"><div class="replay-progress-fill" id="replayProgressFill" style="width:0%"></div></div>
+        <div id="replayStepVis"></div>
+        <div id="replayDetailPanel" style="margin-top:10px;padding:10px;background:#0d1320;border:1px solid var(--line);border-radius:8px;font-size:11px"></div>
+        <div style="margin-top:10px;display:flex;gap:8px">
+          <button id="btnReplayPrev">Prev</button>
+          <button id="btnReplayNext" class="btn-primary">Next</button>
+        </div>
       </div>
       <div class="card">
         <h3>Raw Metadata <button class="copy-btn" data-copy-target="metadataBlock">copy</button></h3>
@@ -852,7 +902,7 @@ function deepsigmaToBundle(artifact){
 }
 
 /* ── State ─── */
-var STATE={bundle:null,bundleB:null,proofChain:[],tampered:false,lastDiff:null};
+var STATE={bundle:null,bundleB:null,proofChain:[],tampered:false,tamperSnapshot:null,lastDiff:null};
 var proofPage=0, proofPageSize=25;
 
 /* ══════════════════════════════════════════════════════════
@@ -941,7 +991,7 @@ document.addEventListener("DOMContentLoaded",function(){
   $("#btnLoadSample").addEventListener("click",function(){loadBundle(42)});
   $("#btnRandomize").addEventListener("click",function(){loadBundle(Math.floor(Math.random()*100000))});
   $("#btnVerifyChain").addEventListener("click",function(){verifyChain()});
-  $("#btnTamperChain").addEventListener("click",function(){tamperChain()});
+  $("#btnTamperChain").addEventListener("click",function(){simulateTamperRetcon()});
   $("#btnRunDiff").addEventListener("click",function(){runDiff()});
   $("#btnRunExport").addEventListener("click",function(){runExport()});
   $("#btnExecRefresh").addEventListener("click",function(){renderExecutive()});
@@ -1069,6 +1119,9 @@ function loadBundle(seed){
   var b=makeSampleBundle(seed);
   STATE.bundle=b;
   STATE.tampered=false;
+  STATE.tamperSnapshot=null;
+  var tamperBtn=$("#btnTamperChain");
+  if(tamperBtn)tamperBtn.textContent="Simulate Tamper";
 
   /* Stats */
   $("#explorerStats").innerHTML=
@@ -1232,75 +1285,108 @@ function renderChainSvg(chain){
   container.textContent="";
   if(!chain||!chain.length){container.innerHTML='<span class="badge badge-fail">No chain loaded</span>';return}
 
+  var BATCH=30;
   var nodeW=160,nodeH=50,gapY=20,padX=20,padY=20;
-  var displayChain=chain.length>50?chain.slice(0,50):chain;
-  var totalH=padY*2+displayChain.length*(nodeH+gapY)-gapY;
-  var totalW=nodeW+padX*2;
-
   var svgNS="http://www.w3.org/2000/svg";
-  var svg=document.createElementNS(svgNS,"svg");
-  svg.setAttribute("viewBox","0 0 "+totalW+" "+totalH);
-  svg.setAttribute("width","100%");
-  svg.style.maxWidth=totalW+"px";
-
   var typeColors={evidence:"#00e5ff",rationale:"#ab47bc",memory:"#66bb6a",drift:"#ff7043",patch:"#fdd835"};
 
-  displayChain.forEach(function(entry,i){
-    var y=padY+i*(nodeH+gapY);
-    var color=typeColors[entry.type]||"var(--accent,#00e5ff)";
+  /* State for lazy loading */
+  var rendered=0;
 
-    if(i>0){
-      var line=document.createElementNS(svgNS,"line");
-      line.setAttribute("x1",padX+nodeW/2);
-      line.setAttribute("y1",y-gapY);
-      line.setAttribute("x2",padX+nodeW/2);
-      line.setAttribute("y2",y);
-      line.setAttribute("stroke","var(--muted,#555)");
-      line.setAttribute("stroke-width","2");
-      svg.appendChild(line);
+  var svg=document.createElementNS(svgNS,"svg");
+  svg.setAttribute("width","100%");
+  svg.style.maxWidth=(nodeW+padX*2)+"px";
+  container.appendChild(svg);
+
+  function appendNodes(start,count){
+    var end=Math.min(start+count,chain.length);
+    for(var i=start;i<end;i++){
+      var entry=chain[i];
+      var y=padY+i*(nodeH+gapY);
+      var color=typeColors[entry.type]||"var(--accent,#00e5ff)";
+
+      if(i>0){
+        var line=document.createElementNS(svgNS,"line");
+        line.setAttribute("x1",padX+nodeW/2);
+        line.setAttribute("y1",y-gapY);
+        line.setAttribute("x2",padX+nodeW/2);
+        line.setAttribute("y2",y);
+        line.setAttribute("stroke","var(--muted,#555)");
+        line.setAttribute("stroke-width","2");
+        svg.appendChild(line);
+      }
+
+      var rect=document.createElementNS(svgNS,"rect");
+      rect.setAttribute("x",padX);
+      rect.setAttribute("y",y);
+      rect.setAttribute("width",nodeW);
+      rect.setAttribute("height",nodeH);
+      rect.setAttribute("rx","6");
+      rect.setAttribute("fill","var(--card-bg,#0d1320)");
+      rect.setAttribute("stroke",color);
+      rect.setAttribute("stroke-width","2");
+      svg.appendChild(rect);
+
+      var text=document.createElementNS(svgNS,"text");
+      text.setAttribute("x",padX+8);
+      text.setAttribute("y",y+18);
+      text.setAttribute("fill",color);
+      text.setAttribute("font-size","10");
+      text.setAttribute("font-family","monospace");
+      text.textContent="#"+entry.index+" "+(entry.refId||"").substring(0,18);
+      svg.appendChild(text);
+
+      var hash=document.createElementNS(svgNS,"text");
+      hash.setAttribute("x",padX+8);
+      hash.setAttribute("y",y+34);
+      hash.setAttribute("fill","var(--muted,#555)");
+      hash.setAttribute("font-size","8");
+      hash.setAttribute("font-family","monospace");
+      hash.textContent=(entry.chainHash||"").substring(0,30)+"...";
+      svg.appendChild(hash);
     }
-
-    var rect=document.createElementNS(svgNS,"rect");
-    rect.setAttribute("x",padX);
-    rect.setAttribute("y",y);
-    rect.setAttribute("width",nodeW);
-    rect.setAttribute("height",nodeH);
-    rect.setAttribute("rx","6");
-    rect.setAttribute("fill","var(--card-bg,#0d1320)");
-    rect.setAttribute("stroke",color);
-    rect.setAttribute("stroke-width","2");
-    svg.appendChild(rect);
-
-    var text=document.createElementNS(svgNS,"text");
-    text.setAttribute("x",padX+8);
-    text.setAttribute("y",y+18);
-    text.setAttribute("fill",color);
-    text.setAttribute("font-size","10");
-    text.setAttribute("font-family","monospace");
-    text.textContent="#"+entry.index+" "+(entry.refId||"").substring(0,18);
-    svg.appendChild(text);
-
-    var hash=document.createElementNS(svgNS,"text");
-    hash.setAttribute("x",padX+8);
-    hash.setAttribute("y",y+34);
-    hash.setAttribute("fill","var(--muted,#555)");
-    hash.setAttribute("font-size","8");
-    hash.setAttribute("font-family","monospace");
-    hash.textContent=(entry.chainHash||"").substring(0,30)+"...";
-    svg.appendChild(hash);
-  });
-
-  if(chain.length>50){
-    var summaryText=document.createElementNS(svgNS,"text");
-    summaryText.setAttribute("x",padX);
-    summaryText.setAttribute("y",totalH-10);
-    summaryText.setAttribute("fill","var(--warn,#ffcc66)");
-    summaryText.setAttribute("font-size","11");
-    summaryText.textContent="... and "+(chain.length-50)+" more entries (showing first 50)";
-    svg.appendChild(summaryText);
+    rendered=end;
+    /* Resize viewBox */
+    var totalH=padY*2+rendered*(nodeH+gapY)-gapY;
+    var totalW=nodeW+padX*2;
+    svg.setAttribute("viewBox","0 0 "+totalW+" "+totalH);
   }
 
-  container.appendChild(svg);
+  /* Render initial batch */
+  appendNodes(0,BATCH);
+
+  /* IntersectionObserver-based lazy loading */
+  if(typeof IntersectionObserver!=="undefined"&&rendered<chain.length){
+    var sentinel=document.createElement("div");
+    sentinel.style.cssText="height:1px;width:100%";
+    container.appendChild(sentinel);
+
+    var observer=new IntersectionObserver(function(entries){
+      if(entries[0].isIntersecting&&rendered<chain.length){
+        appendNodes(rendered,BATCH);
+        if(rendered>=chain.length){
+          observer.disconnect();
+          if(sentinel.parentNode)sentinel.parentNode.removeChild(sentinel);
+        }
+      }
+    },{root:container,threshold:0});
+    observer.observe(sentinel);
+  }else if(rendered<chain.length){
+    /* Fallback: truncate at 50 like original */
+    var fallbackEnd=Math.min(50,chain.length);
+    if(rendered<fallbackEnd)appendNodes(rendered,fallbackEnd-rendered);
+    if(chain.length>fallbackEnd){
+      var summaryText=document.createElementNS(svgNS,"text");
+      var totalH2=padY*2+fallbackEnd*(nodeH+gapY)-gapY;
+      summaryText.setAttribute("x",padX);
+      summaryText.setAttribute("y",totalH2+20);
+      summaryText.setAttribute("fill","var(--warn,#ffcc66)");
+      summaryText.setAttribute("font-size","11");
+      summaryText.textContent="... and "+(chain.length-fallbackEnd)+" more entries (showing first "+fallbackEnd+")";
+      svg.appendChild(summaryText);
+      svg.setAttribute("viewBox","0 0 "+(nodeW+padX*2)+" "+(totalH2+30));
+    }
+  }
 }
 
 function verifyChain(){
@@ -1364,6 +1450,181 @@ function tamperChain(){
   STATE.tampered=true;
   renderProofChain();
   verifyChain();
+}
+
+/* ══════════════════════════════════════════════════════════
+   Phase 3A: Non-Destructive Tamper / RETCON Simulation
+   ══════════════════════════════════════════════════════════ */
+function simulateTamperRetcon(){
+  if(!STATE.proofChain.length)return;
+  var btn=$("#btnTamperChain");
+
+  if(STATE.tampered){
+    /* Restore from snapshot */
+    STATE.proofChain=JSON.parse(JSON.stringify(STATE.tamperSnapshot));
+    STATE.tamperSnapshot=null;
+    STATE.tampered=false;
+    if(btn)btn.textContent="Simulate Tamper";
+    renderProofChain();
+    verifyChain();
+    var pvr=$("#proofVerifyResult");
+    if(pvr){
+      /* Let verifyChain populate, then remove tamper-active */
+      setTimeout(function(){
+        var cards=pvr.querySelectorAll(".tamper-active");
+        for(var c=0;c<cards.length;c++)cards[c].classList.remove("tamper-active");
+      },300);
+    }
+    toast("Tamper cleared — chain restored");
+    return;
+  }
+
+  /* Snapshot and corrupt */
+  STATE.tamperSnapshot=JSON.parse(JSON.stringify(STATE.proofChain));
+  var idx=Math.min(2,STATE.proofChain.length-1);
+  var origHash=STATE.proofChain[idx].chainHash;
+  STATE.proofChain[idx].chainHash="sha256:"+rngHex(64);
+  STATE.tampered=true;
+  if(btn)btn.textContent="Clear Tamper";
+  renderProofChain();
+
+  /* Show RETCON Pathway panel */
+  var affectedCount=STATE.proofChain.length-idx;
+  var retconHtml='<div class="card tamper-active" style="margin-top:12px;border-color:var(--bad)">'+
+    '<h3 style="color:var(--bad)">RETCON Pathway Detected</h3>'+
+    '<table style="margin-top:8px">'+
+    '<tr><td style="color:var(--muted);width:140px">Tampered Entry</td><td>#'+idx+' ('+esc(STATE.proofChain[idx].refId)+')</td></tr>'+
+    '<tr><td style="color:var(--muted)">Original Hash</td><td class="mono" style="font-size:10px;color:var(--ok)">'+esc(origHash.slice(0,48))+'...</td></tr>'+
+    '<tr><td style="color:var(--muted)">Tampered Hash</td><td class="mono" style="font-size:10px;color:var(--bad)">'+esc(STATE.proofChain[idx].chainHash.slice(0,48))+'...</td></tr>'+
+    '<tr><td style="color:var(--muted)">Affected Entries</td><td><span class="badge badge-fail">'+affectedCount+' of '+STATE.proofChain.length+'</span></td></tr>'+
+    '</table>'+
+    '<div style="margin-top:10px;padding:8px;background:rgba(255,107,107,.06);border-radius:6px;font-size:11px;color:var(--warn)">'+
+    '<strong>Patch Guidance:</strong> Re-seal entries #'+idx+' through #'+(STATE.proofChain.length-1)+
+    '. Recompute chainHash for each affected entry sequentially, then re-verify the full chain.'+
+    '</div>'+
+    '</div>';
+  var pvr=$("#proofVerifyResult");
+  if(pvr)pvr.innerHTML=retconHtml;
+
+  verifyChain();
+  toast("Tamper simulated at entry #"+idx);
+}
+
+/* ══════════════════════════════════════════════════════════
+   Phase 3B: Replay Simulator
+   ══════════════════════════════════════════════════════════ */
+var replaySimStep=0;
+
+function renderReplaySim(){
+  var b=STATE.bundle;
+  if(!b||!b.replaySteps||!b.replaySteps.length)return;
+  var steps=b.replaySteps;
+  var total=steps.length;
+  var pct=Math.round(((replaySimStep+1)/total)*100);
+
+  /* Progress bar */
+  var fill=$("#replayProgressFill");
+  if(fill)fill.style.width=pct+"%";
+
+  /* Step cards */
+  var html="";
+  for(var i=0;i<steps.length;i++){
+    var s=steps[i];
+    var opacity=i<replaySimStep?0.4:(i===replaySimStep?1.0:0.25);
+    var isCurrent=i===replaySimStep;
+    html+='<div class="replay-step-card'+(isCurrent?" rsc-current":"")+'" style="opacity:'+opacity+'">'+
+      '<div style="display:flex;align-items:center;gap:8px">'+
+      '<span class="badge badge-purple" style="min-width:24px;text-align:center">'+s.stepIndex+'</span>'+
+      '<span style="font-weight:700;color:'+(isCurrent?'var(--neon-cyan)':'var(--txt)')+'">'+esc(s.action)+'</span>'+
+      (isCurrent?'<span style="margin-left:auto;font-size:9px;color:var(--neon-cyan)">CURRENT</span>':'')+
+      '</div></div>';
+  }
+  var vis=$("#replayStepVis");
+  if(vis)vis.innerHTML=html;
+
+  /* Detail panel */
+  var cur=steps[replaySimStep];
+  var detailHtml='<div style="color:var(--neon-cyan);font-weight:700;margin-bottom:6px">Step '+cur.stepIndex+' Details</div>'+
+    '<div style="display:grid;grid-template-columns:100px 1fr;gap:4px;font-size:11px">'+
+    '<span style="color:var(--muted)">Action</span><span class="mono">'+esc(cur.action)+'</span>'+
+    '<span style="color:var(--muted)">Input Ref</span><span class="mono">'+esc(cur.inputRef||"(none)")+'</span>'+
+    '<span style="color:var(--muted)">Output Ref</span><span class="mono">'+esc(cur.outputRef||"(none)")+'</span>'+
+    '<span style="color:var(--muted)">Timestamp</span><span class="mono">'+esc((cur.timestamp||"").slice(0,19))+'</span>'+
+    '</div>'+
+    '<div style="margin-top:6px;font-size:10px;color:var(--muted)">Step '+(replaySimStep+1)+' of '+total+'</div>';
+  var dp=$("#replayDetailPanel");
+  if(dp)dp.innerHTML=detailHtml;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Phase 4A: Custom Bundle Generator
+   ══════════════════════════════════════════════════════════ */
+function makeCustomBundle(artCount, driftPct, patchCount){
+  _rngState=Date.now()%100000;
+  var bundleId=rngId();
+  var artifacts=[];
+  var driftCount=Math.max(0,Math.round(artCount*(driftPct/100)));
+  var remainAfterDrift=artCount-driftCount-patchCount;
+  if(remainAfterDrift<0){patchCount=Math.max(0,artCount-driftCount);remainAfterDrift=0}
+
+  /* Distribute remaining among evidence, rationale, memory */
+  var baseTypes=["evidence","rationale","memory"];
+  var baseCount=remainAfterDrift;
+
+  for(var i=0;i<baseCount;i++){
+    var rt=baseTypes[i%baseTypes.length];
+    artifacts.push({
+      refId:"ref-"+rngHex(6),
+      refType:rt,
+      contentHash:"sha256:"+rngHex(64),
+      payload:{label:rt+" artifact #"+i,score:Math.round(rng()*100)/100,cerpaStage:CERPA_MAP[rt].stage}
+    });
+  }
+  for(var d=0;d<driftCount;d++){
+    var driftTypes=["value","context","scope"];
+    artifacts.push({
+      refId:"ref-"+rngHex(6),
+      refType:"drift",
+      contentHash:"sha256:"+rngHex(64),
+      payload:{label:"Drift signal #"+d,score:Math.round(rng()*100)/100,cerpaStage:"Review",driftType:driftTypes[Math.floor(rng()*3)]}
+    });
+  }
+  for(var p=0;p<patchCount;p++){
+    artifacts.push({
+      refId:"ref-"+rngHex(6),
+      refType:"patch",
+      contentHash:"sha256:"+rngHex(64),
+      payload:{label:"Patch correction #"+p,score:Math.round(rng()*100)/100,cerpaStage:"Patch"}
+    });
+  }
+
+  /* Shuffle artifacts deterministically */
+  for(var si=artifacts.length-1;si>0;si--){
+    var sj=Math.floor(rng()*(si+1));
+    var tmp=artifacts[si];artifacts[si]=artifacts[sj];artifacts[sj]=tmp;
+  }
+
+  var replaySteps=[];
+  var stepCount=Math.min(Math.max(2,Math.floor(artCount/2)),8);
+  for(var j=0;j<stepCount;j++){
+    replaySteps.push({
+      stepIndex:j,
+      action:ACTIONS[Math.floor(rng()*ACTIONS.length)],
+      inputRef:j>0?artifacts[Math.min(j-1,artifacts.length-1)].refId:null,
+      outputRef:artifacts[Math.min(j,artifacts.length-1)].refId,
+      timestamp:new Date(Date.now()-Math.floor(rng()*86400000)).toISOString()
+    });
+  }
+
+  var boundary=makeCommitBoundary(Math.floor(rng()*100000));
+  return{
+    manifest:{bundleId:bundleId,version:"1.0.0",createdAt:new Date().toISOString(),source:"EDGE_COG_Adapter_v3_custom"},
+    artifacts:artifacts,
+    proof:null,
+    replaySteps:replaySteps,
+    rawMetadata:{generator:"Custom bundle generator",artifactCount:artCount,driftPct:driftPct,patchCount:patchCount},
+    commitBoundary:boundary
+  };
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -1642,11 +1903,23 @@ function renderTimeline(){
   var b=STATE.bundle;if(!b)return;
   var tl=$("#execTimeline");if(!tl)return;
   var colors={evidence:"var(--neon-cyan)",rationale:"var(--neon-pink)",memory:"var(--neon-purple)",drift:"var(--neon-amber)",patch:"var(--neon-green)"};
+
+  /* Phase 2B: Group artifacts by refType for aggregate counts */
+  var typeCounts={};
+  for(var t=0;t<b.artifacts.length;t++){
+    var rt=b.artifacts[t].refType;
+    typeCounts[rt]=(typeCounts[rt]||0)+1;
+  }
+  var typeIndex={};
+
   var html="";
   for(var i=0;i<b.artifacts.length;i++){
     var a=b.artifacts[i],h=25+Math.round((a.payload&&a.payload.score||0.5)*40);
     var c=colors[a.refType]||"var(--neon-cyan)";
-    html+='<div class="tl-bar" style="height:'+h+'px;background:'+c+'" data-aidx="'+i+'" data-filter-type="'+esc(a.refType)+'"><span class="tl-tip">'+esc(a.refType)+": "+esc(a.refId.slice(0,10))+"</span></div>";
+    var art=a.refType;
+    typeIndex[art]=(typeIndex[art]||0)+1;
+    var tipText=art+": "+typeIndex[art]+"/"+typeCounts[art];
+    html+='<div class="tl-bar" style="height:'+h+'px;background:'+c+'" data-aidx="'+i+'" data-filter-type="'+esc(a.refType)+'"><span class="tl-tip">'+esc(tipText)+"</span></div>";
   }
   tl.innerHTML=html;
 }
@@ -1887,6 +2160,86 @@ document.addEventListener("DOMContentLoaded",function(){
     if(e.key==="Escape")closeDrawer();
     if(e.key==="?")$("#shortcutBar").classList.toggle("vis");
     if(e.key==="r"||e.key==="R"){e.preventDefault();loadBundle(Math.floor(Math.random()*100000))}
+  });
+
+  /* ══════════════════════════════════════════════════════════
+     Phase 3B: Replay Simulator wiring
+     ══════════════════════════════════════════════════════════ */
+  var openReplayBtn=$("#btnOpenReplay");
+  if(openReplayBtn)openReplayBtn.addEventListener("click",function(){
+    var card=$("#replaySimCard");
+    if(!card)return;
+    if(!STATE.bundle||!STATE.bundle.replaySteps||!STATE.bundle.replaySteps.length){toast("No replay steps loaded");return}
+    card.classList.remove("hidden");
+    replaySimStep=0;
+    renderReplaySim();
+  });
+  var rpBtn=$("#btnReplayPrev");
+  if(rpBtn)rpBtn.addEventListener("click",function(){
+    if(replaySimStep>0){replaySimStep--;renderReplaySim()}
+  });
+  var rnBtn=$("#btnReplayNext");
+  if(rnBtn)rnBtn.addEventListener("click",function(){
+    var steps=STATE.bundle?STATE.bundle.replaySteps:[];
+    if(replaySimStep<steps.length-1){replaySimStep++;renderReplaySim()}
+  });
+
+  /* ══════════════════════════════════════════════════════════
+     Phase 4A: Custom Bundle Generator slider wiring
+     ══════════════════════════════════════════════════════════ */
+  var slArt=$("#sliderArtifacts");
+  if(slArt)slArt.addEventListener("input",function(){var v=$("#sliderArtVal");if(v)v.textContent=this.value});
+  var slDrift=$("#sliderDrift");
+  if(slDrift)slDrift.addEventListener("input",function(){var v=$("#sliderDriftVal");if(v)v.textContent=this.value});
+  var slPatch=$("#sliderPatches");
+  if(slPatch)slPatch.addEventListener("input",function(){var v=$("#sliderPatchVal");if(v)v.textContent=this.value});
+  var genBtn=$("#btnGenCustom");
+  if(genBtn)genBtn.addEventListener("click",function(){
+    var artCount=+($("#sliderArtifacts")||{}).value||8;
+    var driftPct=+($("#sliderDrift")||{}).value||25;
+    var patchCount=+($("#sliderPatches")||{}).value||1;
+    var bundle=makeCustomBundle(artCount,driftPct,patchCount);
+    STATE.bundle=bundle;
+    STATE.tampered=false;
+    STATE.tamperSnapshot=null;
+    $("#btnTamperChain").textContent="Simulate Tamper";
+    /* Re-render explorer inline */
+    var b=bundle;
+    $("#explorerStats").innerHTML=
+      '<div class="stat-box"><div class="stat-val" style="color:var(--neon-cyan)">'+esc(b.manifest.bundleId.slice(0,12))+'</div><div class="stat-label">Bundle ID '+copyBtn(b.manifest.bundleId)+'</div></div>'+
+      '<div class="stat-box"><div class="stat-val">'+b.artifacts.length+'</div><div class="stat-label">Artifacts</div></div>'+
+      '<div class="stat-box"><div class="stat-val">'+b.replaySteps.length+'</div><div class="stat-label">Replay Steps</div></div>'+
+      '<div class="stat-box"><div class="stat-val" style="color:var(--neon-green)">'+esc(b.manifest.version)+'</div><div class="stat-label">Version</div></div>';
+    $("#artifactCount").textContent=b.artifacts.length;
+    var aRows="";
+    for(var j=0;j<b.artifacts.length;j++){
+      var a=b.artifacts[j];
+      var plane=PLANE_MAP[a.refType]||"behavior";
+      var planeClass={memory:"cyan",behavior:"pink",evolution:"amber"}[plane]||"cyan";
+      var cm=CERPA_MAP[a.refType]||{stage:"?",cls:"ct-claim",lbl:"?"};
+      aRows+="<tr class='art-row' data-rt='"+esc(a.refType)+"' data-aidx='"+j+"'>"+
+        "<td class='mono'>"+esc(a.refId)+copyBtn(a.refId)+"</td>"+
+        "<td><span class='badge badge-"+planeClass+"'>"+esc(a.refType)+"</span></td>"+
+        "<td><span class='cerpa-tag "+cm.cls+"'>"+cm.lbl+" "+cm.stage+"</span></td>"+
+        "<td class='mono' style='font-size:10px;color:var(--muted)'>"+esc(a.contentHash.slice(0,28))+"..."+copyBtn(a.contentHash)+"</td>"+
+        "<td><span class='badge badge-"+planeClass+"'>"+esc(plane)+"</span></td><td></td></tr>";
+    }
+    $("#artifactTable").innerHTML=aRows;
+    $("#replayCount").textContent=b.replaySteps.length;
+    var rRows="";
+    for(var k=0;k<b.replaySteps.length;k++){
+      var s=b.replaySteps[k];
+      rRows+="<tr><td>"+s.stepIndex+"</td><td><span class='badge badge-purple'>"+esc(s.action)+"</span></td>"+
+        "<td class='mono' style='font-size:10px'>"+esc(s.inputRef||"-")+"</td>"+
+        "<td class='mono' style='font-size:10px'>"+esc(s.outputRef||"-")+"</td></tr>";
+    }
+    $("#replayTable").innerHTML=rRows;
+    $("#metadataBlock").textContent=JSON.stringify(b.rawMetadata,null,2);
+    buildProofChain(b.artifacts);
+    setTimeout(function(){renderExecutive();renderTimeline()},100);
+    toast("Generated custom bundle: "+artCount+" artifacts");
+    var explorerBtn=document.querySelector('.tab-btn[data-tab="explorer"]');
+    if(explorerBtn)explorerBtn.click();
   });
 });
 
