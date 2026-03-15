@@ -1439,9 +1439,9 @@ function renderLineage(){
 
   /* Collect events per lane */
   var sealEvents=[];
-  if(chain.length>0)sealEvents.push({t:0,label:"genesis",refId:chain[0].refId});
+  if(chain.length>0)sealEvents.push({t:0,label:"genesis",refId:chain[0].refId,idx:0});
   for(var i=0;i<arts.length;i++){
-    if(arts[i].refType==="evidence"&&arts[i].contentHash)sealEvents.push({t:i,label:"seal-"+i,refId:arts[i].refId});
+    if(arts[i].refType==="evidence"&&arts[i].contentHash)sealEvents.push({t:i,label:"seal-"+i,refId:arts[i].refId,idx:i});
   }
   var driftEvents=[];var patchEvents=[];
   for(var j=0;j<arts.length;j++){
@@ -1508,6 +1508,11 @@ function _buildLineageSvg(container,sealEvents,driftEvents,patchEvents,totalSpan
       var circle=document.createElementNS(svgNS,"circle");
       circle.setAttribute("cx",cx);circle.setAttribute("cy",cy);circle.setAttribute("r",dotR);
       circle.setAttribute("fill",lane.color);circle.setAttribute("class","lineage-event");
+      circle.setAttribute("data-lane",lane.label);
+      circle.setAttribute("data-refid",ev.refId||"");
+      circle.setAttribute("data-label",ev.label);
+      circle.setAttribute("data-t",ev.t);
+      if(ev.idx!==undefined)circle.setAttribute("data-aidx",ev.idx);
       var title=document.createElementNS(svgNS,"title");
       title.textContent=lane.label+": "+ev.label;
       circle.appendChild(title);
@@ -1535,6 +1540,75 @@ function _buildLineageSvg(container,sealEvents,driftEvents,patchEvents,totalSpan
 
   container.innerHTML="";
   container.appendChild(svg);
+
+  /* Click handler: open tray with lineage event detail */
+  svg.addEventListener("click",function(ev){
+    var dot=ev.target.closest(".lineage-event");if(!dot)return;
+    var laneName=dot.getAttribute("data-lane");
+    var refId=dot.getAttribute("data-refid");
+    var label=dot.getAttribute("data-label");
+    var tVal=dot.getAttribute("data-t");
+    var aidx=dot.getAttribute("data-aidx");
+
+    var laneColors={"Seal":"#4caf50","Drift":"#ff9800","Patch":"#e91e63"};
+    var laneColor=laneColors[laneName]||"var(--neon-cyan)";
+
+    var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:'+laneColor+';margin-bottom:4px">'+esc(laneName)+' Event</h3>';
+    h+='<span class="badge" style="border-color:'+laneColor+';color:'+laneColor+'">'+esc(label)+'</span></div>';
+
+    h+='<div class="drawer-section"><h4>Event Detail</h4>';
+    h+='<div class="drawer-kv"><span class="dk">Lane</span><span class="dv" style="color:'+laneColor+'">'+esc(laneName)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Label</span><span class="dv">'+esc(label)+'</span></div>';
+    h+='<div class="drawer-kv"><span class="dk">Timeline Position</span><span class="dv">'+esc(tVal)+'</span></div>';
+    if(refId)h+='<div class="drawer-kv"><span class="dk">Ref ID</span><span class="dv mono" style="color:var(--neon-cyan);font-size:10px">'+esc(refId)+'</span></div>';
+    h+='</div>';
+
+    /* If we have an artifact index, show full artifact detail */
+    if(aidx!==null&&aidx!==""){
+      var artIdx=parseInt(aidx,10);
+      var art=STATE.bundle&&STATE.bundle.artifacts?STATE.bundle.artifacts[artIdx]:null;
+      if(art){
+        h+='<div class="drawer-section"><h4>Artifact</h4>';
+        h+='<div class="drawer-kv"><span class="dk">Type</span><span class="dv">'+esc(art.refType)+'</span></div>';
+        h+='<div class="drawer-kv"><span class="dk">Content Hash</span><span class="dv mono" style="font-size:9px">'+esc(art.contentHash.substring(0,32))+'&hellip;</span></div>';
+        h+='</div>';
+
+        if(art.payload){
+          h+='<div class="drawer-section"><h4>Payload</h4>';
+          h+='<div class="schema-block mono" style="max-height:200px;overflow-y:auto;white-space:pre-wrap;font-size:10px">'+esc(JSON.stringify(art.payload,null,2))+'</div></div>';
+        }
+
+        /* Proof chain entry */
+        if(STATE.proofChain[artIdx]){
+          h+='<div class="drawer-section"><h4>Proof Chain Entry</h4>';
+          h+='<div class="drawer-kv"><span class="dk">Index</span><span class="dv">#'+artIdx+'</span></div>';
+          h+='<div class="drawer-kv"><span class="dk">Chain Hash</span><span class="dv mono" style="font-size:9px">'+esc(STATE.proofChain[artIdx].chainHash.substring(0,36))+'&hellip;</span></div>';
+          h+='</div>';
+        }
+      }
+    }
+
+    /* Show related drift→patch connection if this is a drift event */
+    if(laneName==="Drift"){
+      var myT=parseInt(tVal,10);
+      var nearestP=null;var minD=Infinity;
+      var allPatches=STATE.bundle.artifacts||[];
+      for(var pi=0;pi<allPatches.length;pi++){
+        if(allPatches[pi].refType==="patch"){
+          var pDist=Math.abs(pi-myT);
+          if(pi>=myT&&pDist<minD){minD=pDist;nearestP=allPatches[pi]}
+        }
+      }
+      if(nearestP){
+        h+='<div class="drawer-section"><h4>Correction Path</h4>';
+        h+='<div class="drawer-kv"><span class="dk">Nearest Patch</span><span class="dv mono" style="font-size:10px;color:#e91e63">'+esc(nearestP.refId.substring(0,16))+'</span></div>';
+        h+='<div class="drawer-kv"><span class="dk">Distance</span><span class="dv">'+minD+' steps</span></div>';
+        h+='</div>';
+      }
+    }
+
+    openTray(h);
+  });
 }
 
 /* ══════════════════════════════════════════════════════════
