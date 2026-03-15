@@ -278,6 +278,9 @@ ALLOWED_ACRONYMS = {
     "MARS", "MOXIE", "NASA", "NPR", "SOLAR", "SPE", "STORM",
     # COG Adapter integration — bundle format and crypto terms
     "COG", "PQC",
+    # CERPA CMMC COG Adapter — KPI codes, compliance terms, JS tokens
+    "STRONG", "COD", "CRV", "CTD", "ELR", "GSNR", "IAB", "OAR",
+    "PDH", "SCT", "MFA", "FIPS", "LABELS",
     # Context Envelope dimension names
     "WHEN", "WHERE",
     # Decision Accounting — cost/value/debt ID prefixes, category enums
