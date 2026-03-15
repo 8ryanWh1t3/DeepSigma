@@ -1,9 +1,31 @@
 <!--
- EDGE COG Adapter v3.0.0
+ EDGE COG Adapter v4.5.0
  ============================================================
  Portable Cognition/Proof Bundle Explorer
  Four Cognition Planes: Memory, Behavior, Evolution, Proof
  Five DeepSigma Primitives: Truth, Reasoning, Memory, Drift, Patch
+
+ v4.5.0 Changes ("Product Narrative"):
+ [x] Unified version to v4.5.0
+ [x] Trilogy Mode — synchronized CERPA / COG / Proof lanes
+ [x] "So What" executive summary box in Trilogy
+ [x] Contradiction detection engine (5 types)
+ [x] One-click dashboard export via FileReader download
+
+ v4.4.0 Changes ("Level Up"):
+ [x] File import via FileReader (5MB cap, schema validation)
+ [x] Cross-tool tray linking with navigateTo()
+ [x] Chaos Mode — offline drift injection simulation
+ [x] Graph enhancements — cluster cap, boundary ellipses
+ [x] Multi-level tamper undo stack
+ [x] Tamper type selector + red diff visualization
+
+ v4.3.0 Changes ("Bundle Governor"):
+ [x] Assumption Half-Life tab
+ [x] Blast Radius tab
+ [x] Seal-Patch Lineage swimlanes
+ [x] Graph tab — force-directed dependency topology
+ [x] Detail tray on all interactive elements
 
  v3.0.0 Changes:
  [x] SVG integrity gauge — visual coherence ring on Executive tab
@@ -44,7 +66,7 @@
 "use strict";
 /* EDGE_HARDENING_V1 — Runtime capability lockdown v1.1 */
 
-var EDGE_BUILD_ID="EDGE_BUILD_ID:EDGE_COG_Adapter_v3.0.0";
+var EDGE_BUILD_ID="EDGE_BUILD_ID:EDGE_COG_Adapter_v4.5.0";
 
 function _block(cap){
   return function(){throw new Error("EDGE hardening: "+cap+" is blocked")};
@@ -111,10 +133,11 @@ document.addEventListener("DOMContentLoaded",function(){
 </script>
 <!-- EDGE_HARDENING_V1 END -->
 <!-- EDGE_POLICY_EXCEPTION: clipboard -->
+<!-- EDGE_POLICY_EXCEPTION: download -->
 
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>EDGE COG Adapter v3.0.0</title>
+<title>EDGE COG Adapter v4.5.0</title>
 <style>
 :root {
   --bg:#0a0e17; --card:#111927; --card-hover:#182235;
@@ -413,6 +436,37 @@ tr:hover td{background:rgba(0,240,255,.03)}
 .graph-highlight-edge{stroke:var(--neon-cyan)!important;stroke-width:2!important;opacity:1!important}
 .highlight-flash{animation:hlFlash 1.5s ease-out}
 @keyframes hlFlash{0%{box-shadow:0 0 20px rgba(0,240,255,.5)}100%{box-shadow:none}}
+/* ── v4.5: Trilogy Mode ─────────────────── */
+.trilogy-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;min-height:400px}
+.trilogy-lane{border-right:1px solid var(--line);overflow-y:auto;padding:12px}
+.trilogy-lane:last-child{border-right:none}
+.trilogy-header{font-size:13px;font-weight:700;padding:8px 0 10px;margin-bottom:10px;border-bottom:2px solid var(--line)}
+.trilogy-header.th-cerpa{border-bottom-color:#e91e63}
+.trilogy-header.th-cog{border-bottom-color:var(--neon-green)}
+.trilogy-header.th-proof{border-bottom-color:var(--neon-cyan)}
+.trilogy-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;font-size:11px;transition:background .15s}
+.trilogy-row:hover{background:rgba(255,255,255,.05)}
+.trilogy-highlight{background:rgba(0,240,255,.08)!important;box-shadow:inset 0 0 0 1px var(--neon-cyan)}
+.trilogy-bar{height:8px;border-radius:4px;background:var(--line);flex:1;overflow:hidden}
+.trilogy-bar-fill{height:100%;border-radius:4px}
+.trilogy-flow{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted);margin-top:8px;justify-content:center}
+.trilogy-flow span{padding:2px 6px;border-radius:4px;background:rgba(233,30,99,.15);color:#e91e63;font-weight:600}
+.trilogy-flow-arrow{color:var(--muted)}
+/* ── v4.5: So What Box ─────────────────── */
+.so-what-box{border-left:4px solid #e91e63;background:rgba(233,30,99,.04);padding:16px;margin-top:12px}
+.so-what-title{font-size:14px;font-weight:700;color:#e91e63;margin-bottom:12px}
+.so-what-row{display:flex;gap:12px;margin-bottom:8px;font-size:11px;align-items:flex-start}
+.so-what-label{min-width:140px;color:var(--muted);font-weight:600;flex-shrink:0}
+.so-what-val{flex:1}
+.so-what-p1{color:var(--bad);font-weight:700}
+.so-what-p2{color:var(--warn);font-weight:700}
+.so-what-p3{color:var(--neon-cyan);font-weight:600}
+.so-what-p4{color:var(--ok);font-weight:600}
+/* ── v4.5: Contradiction Panel ─────────── */
+.contradiction-row{border-left:3px solid var(--bad);padding:8px 12px;margin-bottom:6px;border-radius:0 6px 6px 0;background:rgba(244,67,54,.04);font-size:11px}
+.contradiction-badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:9px;font-weight:700;text-transform:uppercase;margin-right:6px}
+.contradiction-critical{background:rgba(244,67,54,.15);color:var(--bad)}
+.contradiction-warning{background:rgba(255,152,0,.15);color:var(--warn)}
 .nav-link-btn{display:inline-block;padding:3px 10px;border-radius:4px;font-size:10px;font-weight:600;border:1px solid rgba(0,240,255,.3);background:transparent;color:var(--neon-cyan);cursor:pointer;margin:2px;transition:all .15s}
 .nav-link-btn:hover{background:rgba(0,240,255,.08);border-color:var(--neon-cyan)}
 
@@ -452,7 +506,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
     <div class="brand-icon">COG</div>
     <div>
       COG Adapter
-      <small>Portable Cognition / Proof Bundle Explorer v3.0.0</small>
+      <small>Portable Cognition / Proof Bundle Explorer v4.5.0</small>
     </div>
   </div>
   <div class="header-right">
@@ -477,6 +531,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
   <button class="tab-btn" data-tab="halflife">Half-Life</button>
   <button class="tab-btn" data-tab="blast">Blast Radius</button>
   <button class="tab-btn" data-tab="graph">Graph</button>
+  <button class="tab-btn" data-tab="trilogy">Trilogy</button>
 </nav>
 
 <div class="content" id="content">
@@ -551,6 +606,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
     <div style="margin-top:12px;display:flex;gap:10px">
       <button class="btn-primary" id="btnExecRefresh">Refresh Scorecard</button>
       <button class="btn-primary" id="btnExportPdf">Export as printable page</button>
+      <button class="btn-primary" id="btnExportDashboard">Export for Dashboard</button>
     </div>
   </div>
 
@@ -857,6 +913,20 @@ tr:hover td{background:rgba(0,240,255,.03)}
     </div>
   </div>
 
+  <!-- ═══════════════ TAB 12: Trilogy Mode ═══════════════ -->
+  <div class="tab-panel" id="panel-trilogy" data-tab-title="Trilogy">
+    <div class="stats-bar" id="trilogyStats"></div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="trilogy-grid" id="trilogyGrid">
+        <div class="trilogy-lane" id="trilogyCerpa"></div>
+        <div class="trilogy-lane" id="trilogyCog"></div>
+        <div class="trilogy-lane" id="trilogyProof"></div>
+      </div>
+    </div>
+    <div class="card so-what-box" id="soWhatBox" style="display:none"></div>
+    <div class="card" id="contradictionPanel" style="display:none;border-left:4px solid var(--bad);margin-top:12px"></div>
+  </div>
+
 </div>
 
 <!-- v3: Drawer -->
@@ -994,7 +1064,7 @@ function makeSampleBundle(seed){
   }
   var boundary=makeCommitBoundary(seed||42);
   return{
-    manifest:{bundleId:bundleId,version:"1.0.0",createdAt:new Date().toISOString(),source:"EDGE_COG_Adapter_v3.0.0"},
+    manifest:{bundleId:bundleId,version:"1.0.0",createdAt:new Date().toISOString(),source:"EDGE_COG_Adapter_v4.5.0"},
     artifacts:artifacts,
     proof:null,
     replaySteps:replaySteps,
@@ -1300,7 +1370,8 @@ function renderExecutive(){
     '<div class="stat-box"><div class="stat-val" style="color:var(--neon-cyan)">'+esc(b.manifest.bundleId.slice(0,12))+'</div><div class="stat-label">Bundle</div></div>'+
     '<div class="stat-box"><div class="stat-val">'+b.artifacts.length+'</div><div class="stat-label">Artifacts</div></div>'+
     '<div class="stat-box"><div class="stat-val" style="color:var(--neon-green)">'+coverage+'%</div><div class="stat-label">Type Coverage</div></div>'+
-    '<div class="stat-box"><div class="stat-val" style="color:'+(hasProof?"var(--ok)":"var(--bad)")+'">'+(hasProof?"Sealed":"No Seal")+'</div><div class="stat-label">Proof</div></div>';
+    '<div class="stat-box"><div class="stat-val" style="color:'+(hasProof?"var(--ok)":"var(--bad)")+'">'+(hasProof?"Sealed":"No Seal")+'</div><div class="stat-label">Proof</div></div>'+
+    '<div class="stat-box"><div class="stat-val" style="color:'+((STATE._contradictions||[]).length>0?'var(--bad)':'var(--ok)')+'">'+(STATE._contradictions||[]).length+'</div><div class="stat-label">Contradictions</div></div>';
 
   /* Scorecard rows */
   var rows=[
@@ -1454,9 +1525,10 @@ function loadBundle(seed){
 
   /* Build proof chain for proof tab */
   buildProofChain(b.artifacts);
+  STATE._contradictions=detectContradictions();
 
   /* Update executive if visible */
-  setTimeout(function(){renderExecutive();renderTimeline();renderHeatmap();renderHalfLife();renderBlastRadius();renderGraph()},100);
+  setTimeout(function(){renderExecutive();renderTimeline();renderHeatmap();renderHalfLife();renderBlastRadius();renderGraph();renderTrilogyCOG()},100);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -2152,6 +2224,363 @@ function renderBlastRadius(){
 
     openTray(h);
   });
+}
+
+/* ══════════════════════════════════════════════════════════
+   v4.5: Trilogy Mode — CERPA / COG / Proof lanes
+   ══════════════════════════════════════════════════════════ */
+function renderTrilogyCOG(){
+  var b=STATE.bundle;
+  var cerpaLane=document.getElementById("trilogyCerpa");
+  var cogLane=document.getElementById("trilogyCog");
+  var proofLane=document.getElementById("trilogyProof");
+  var statsEl=document.getElementById("trilogyStats");
+  if(!cerpaLane||!cogLane||!proofLane)return;
+
+  /* CERPA lane — 5 stages with artifact counts */
+  var cerpaStages=["Claim","Event","Review","Patch","Apply"];
+  var stageArtCount={};
+  for(var cs=0;cs<cerpaStages.length;cs++)stageArtCount[cerpaStages[cs]]=0;
+  var arts=b?(b.artifacts||[]):[];
+  for(var ai=0;ai<arts.length;ai++){
+    var cm=CERPA_MAP[arts[ai].refType];
+    if(cm){
+      var parts=cm.stage.split("+");
+      for(var sp=0;sp<parts.length;sp++){
+        var stg=parts[sp].trim();
+        if(stageArtCount[stg]!==undefined)stageArtCount[stg]++;
+      }
+    }
+  }
+  var cerpaHtml='<div class="trilogy-header th-cerpa">CERPA</div>';
+  for(var ci=0;ci<cerpaStages.length;ci++){
+    cerpaHtml+='<div class="trilogy-row" data-stage="'+cerpaStages[ci]+'">'+
+      '<span style="width:60px;font-weight:600">'+cerpaStages[ci]+'</span>'+
+      '<span style="color:var(--neon-cyan);font-weight:700">'+stageArtCount[cerpaStages[ci]]+'</span>'+
+      '<span style="color:var(--muted);font-size:10px">artifacts</span>'+
+    '</div>';
+  }
+  cerpaHtml+='<div class="trilogy-flow"><span>C</span><span class="trilogy-flow-arrow">&rarr;</span><span>E</span><span class="trilogy-flow-arrow">&rarr;</span><span>R</span><span class="trilogy-flow-arrow">&rarr;</span><span>P</span><span class="trilogy-flow-arrow">&rarr;</span><span>A</span></div>';
+  cerpaLane.innerHTML=cerpaHtml;
+
+  /* COG lane — 5 primitives with artifact counts */
+  var refTypeColors={evidence:"#4caf50",rationale:"#2196f3",memory:"#9c27b0",drift:"#ff9800",patch:"#e91e63"};
+  var refTypeCounts={};
+  for(var ri=0;ri<REF_TYPES.length;ri++)refTypeCounts[REF_TYPES[ri]]=0;
+  for(var ai2=0;ai2<arts.length;ai2++){
+    if(refTypeCounts[arts[ai2].refType]!==undefined)refTypeCounts[arts[ai2].refType]++;
+  }
+  var cogHtml='<div class="trilogy-header th-cog">COG Primitives</div>';
+  for(var ri2=0;ri2<REF_TYPES.length;ri2++){
+    var rt=REF_TYPES[ri2];
+    var dsLabel=DS_MAP[rt]||rt;
+    var pct=arts.length>0?Math.round(refTypeCounts[rt]/arts.length*100):0;
+    cogHtml+='<div class="trilogy-row" data-reftype="'+rt+'">'+
+      '<span style="width:80px;font-weight:600;font-size:11px;color:'+refTypeColors[rt]+'">'+rt+'</span>'+
+      '<span style="width:28px;text-align:right;font-weight:700">'+refTypeCounts[rt]+'</span>'+
+      '<div class="trilogy-bar"><div class="trilogy-bar-fill" style="width:'+pct+'%;background:'+refTypeColors[rt]+'"></div></div>'+
+    '</div>';
+  }
+  /* DS primitive labels */
+  cogHtml+='<div style="margin-top:8px;font-size:9px;color:var(--muted);padding:0 8px">'+
+    REF_TYPES.map(function(rt){return rt+'='+DS_MAP[rt]}).join(' | ')+
+  '</div>';
+  cogLane.innerHTML=cogHtml;
+
+  /* Proof lane — seal, integrity, half-life summary, replay */
+  var proofHtml='<div class="trilogy-header th-proof">Proof State</div>';
+  if(b){
+    var cb=b.commitBoundary;
+    var sealOk=cb&&cb.authority&&cb.authority.ruleSeal;
+    var admOk=cb&&cb.admissibility&&cb.admissibility.proofChainIntact;
+    var steps=(b.replaySteps||[]).length;
+    /* Seal */
+    proofHtml+='<div class="trilogy-row">'+
+      '<span style="width:80px;font-size:11px">seal</span>'+
+      '<span style="color:'+(sealOk?'var(--ok)':'var(--bad)')+'">&#x25CF; '+(sealOk?'intact':'unsigned')+'</span>'+
+    '</div>';
+    /* Integrity */
+    proofHtml+='<div class="trilogy-row">'+
+      '<span style="width:80px;font-size:11px">integrity</span>'+
+      '<span style="color:'+(admOk&&!STATE.tampered?'var(--ok)':'var(--bad)')+';font-weight:700">'+(admOk&&!STATE.tampered?'100%':'degraded')+'</span>'+
+    '</div>';
+    /* Replay */
+    proofHtml+='<div class="trilogy-row">'+
+      '<span style="width:80px;font-size:11px">replay</span>'+
+      '<span style="color:var(--neon-cyan);font-weight:700">'+steps+' steps</span>'+
+    '</div>';
+    /* Half-life summary */
+    var hlAlive=0,hlWarn=0,hlExpired=0;
+    var steps2=b.replaySteps||[];
+    for(var hi=0;hi<arts.length;hi++){
+      var hl=computeHalfLife(arts[hi],arts,steps2);
+      if(hl.status==="expired")hlExpired++;
+      else if(hl.status==="warning")hlWarn++;
+      else hlAlive++;
+    }
+    proofHtml+='<div class="trilogy-row" style="margin-top:8px;border-top:1px solid var(--line);padding-top:8px">'+
+      '<span style="width:80px;font-size:11px">half-life</span>'+
+      '<span style="font-size:10px">'+
+        '<span style="color:var(--ok)">'+hlAlive+' alive</span> | '+
+        '<span style="color:var(--warn)">'+hlWarn+' warning</span> | '+
+        '<span style="color:var(--bad)">'+hlExpired+' expired</span>'+
+      '</span>'+
+    '</div>';
+    /* Tamper status */
+    proofHtml+='<div class="trilogy-row">'+
+      '<span style="width:80px;font-size:11px">tamper</span>'+
+      '<span style="color:'+(STATE.tampered?'var(--bad)':'var(--ok)')+'">'+
+        (STATE.tampered?'TAMPERED ('+STATE.tamperStack.length+')':'clean')+
+      '</span>'+
+    '</div>';
+    /* Artifact count */
+    proofHtml+='<div class="trilogy-row">'+
+      '<span style="width:80px;font-size:11px">artifacts</span>'+
+      '<span style="font-weight:700">'+arts.length+'</span>'+
+    '</div>';
+  }else{
+    proofHtml+='<div class="trilogy-row" style="color:var(--muted)">No bundle loaded</div>';
+  }
+  proofLane.innerHTML=proofHtml;
+
+  /* Stats bar */
+  if(statsEl){
+    var refTypeCount=0;var seen={};
+    for(var si=0;si<arts.length;si++){if(!seen[arts[si].refType]){seen[arts[si].refType]=true;refTypeCount++}}
+    statsEl.innerHTML=
+      '<div class="stat-box"><div class="stat-val">5</div><div class="stat-label">CERPA Stages</div></div>'+
+      '<div class="stat-box"><div class="stat-val">'+refTypeCount+'</div><div class="stat-label">COG Primitives</div></div>'+
+      '<div class="stat-box"><div class="stat-val">'+arts.length+'</div><div class="stat-label">Total Artifacts</div></div>'+
+      '<div class="stat-box"><div class="stat-val" style="color:'+(STATE.tampered?'var(--bad)':'var(--ok)')+'">'+
+        (STATE.tampered?'TAMPERED':'CLEAN')+'</div><div class="stat-label">Proof State</div></div>';
+  }
+
+  renderSoWhat();
+  renderContradictions();
+}
+
+function syncTrilogyCOGSelection(reftype,stage){
+  var allRows=document.querySelectorAll(".trilogy-row");
+  for(var i=0;i<allRows.length;i++)allRows[i].classList.remove("trilogy-highlight");
+
+  if(reftype){
+    /* Clicked a COG refType — highlight it + corresponding CERPA stage(s) */
+    var rtRow=document.querySelector('.trilogy-row[data-reftype="'+reftype+'"]');
+    if(rtRow)rtRow.classList.add("trilogy-highlight");
+    var cm=CERPA_MAP[reftype];
+    if(cm){
+      var parts=cm.stage.split("+");
+      for(var p=0;p<parts.length;p++){
+        var stg=parts[p].trim();
+        var stageRow=document.querySelector('.trilogy-row[data-stage="'+stg+'"]');
+        if(stageRow)stageRow.classList.add("trilogy-highlight");
+      }
+    }
+  }else if(stage){
+    /* Clicked a CERPA stage — highlight it + all refTypes mapped to that stage */
+    var stageRow2=document.querySelector('.trilogy-row[data-stage="'+stage+'"]');
+    if(stageRow2)stageRow2.classList.add("trilogy-highlight");
+    for(var ri=0;ri<REF_TYPES.length;ri++){
+      var cm2=CERPA_MAP[REF_TYPES[ri]];
+      if(cm2&&(cm2.stage.indexOf(stage)!==-1)){
+        var rr=document.querySelector('.trilogy-row[data-reftype="'+REF_TYPES[ri]+'"]');
+        if(rr)rr.classList.add("trilogy-highlight");
+      }
+    }
+  }
+
+  renderSoWhat(reftype,stage);
+}
+
+/* ══════════════════════════════════════════════════════════
+   v4.5 Phase 4: Contradiction Detection Engine
+   ══════════════════════════════════════════════════════════ */
+function detectContradictions(){
+  var b=STATE.bundle;if(!b)return[];
+  var arts=b.artifacts||[];
+  var steps=b.replaySteps||[];
+  var contradictions=[];
+  var artMap={};
+  for(var ai=0;ai<arts.length;ai++)artMap[arts[ai].refId]=arts[ai];
+
+  /* 1. Coverage-Drift: high-score artifact near a drift artifact */
+  for(var cd=0;cd<arts.length;cd++){
+    var a=arts[cd];
+    if(a.refType==="drift")continue;
+    var score=(a.payload&&a.payload.score!=null)?a.payload.score:0;
+    if(score<=0.8)continue;
+    var aStep=-1;
+    for(var s=0;s<steps.length;s++){if(steps[s].outputRef===a.refId){aStep=steps[s].stepIndex;break}}
+    for(var dd=0;dd<arts.length;dd++){
+      if(arts[dd].refType!=="drift")continue;
+      var dStep=-1;
+      for(var ds=0;ds<steps.length;ds++){if(steps[ds].outputRef===arts[dd].refId){dStep=steps[ds].stepIndex;break}}
+      if(aStep>=0&&dStep>=0&&Math.abs(aStep-dStep)<=2){
+        contradictions.push({type:"coverage-drift",severity:"warning",message:a.refId+" (score "+score+") has drift within 2 replay steps",artifacts:[a.refId,arts[dd].refId],lane:"cog"});
+        break;
+      }
+    }
+  }
+
+  /* 2. Seal-Tamper: proofChainIntact=true but STATE.tampered=true */
+  var cb=b.commitBoundary;
+  if(cb&&cb.admissibility&&cb.admissibility.proofChainIntact&&STATE.tampered){
+    contradictions.push({type:"seal-tamper",severity:"critical",message:"Proof chain claims intact but bundle has been tampered",artifacts:[],lane:"cog"});
+  }
+
+  /* 3. Expiry-Unpatched: half-life expired with no nearby patch */
+  for(var ep=0;ep<arts.length;ep++){
+    if(arts[ep].refType==="patch")continue;
+    var hl=computeHalfLife(arts[ep],arts,steps);
+    if(hl.status!=="expired")continue;
+    var epStep=hl.stepIdx;
+    var hasPatch=false;
+    for(var pp=0;pp<arts.length;pp++){
+      if(arts[pp].refType!=="patch")continue;
+      var pStep=0;
+      for(var ps=0;ps<steps.length;ps++){if(steps[ps].outputRef===arts[pp].refId){pStep=steps[ps].stepIndex;break}}
+      if(Math.abs(pStep-epStep)<=3){hasPatch=true;break}
+    }
+    if(!hasPatch){
+      contradictions.push({type:"expiry-unpatched",severity:"warning",message:arts[ep].refId+" half-life expired, no patch within 3 steps",artifacts:[arts[ep].refId],lane:"cog"});
+    }
+  }
+
+  /* 4. Duplicate-Conflict: same refType, scores differ by >0.5 */
+  var byType={};
+  for(var dc=0;dc<arts.length;dc++){
+    if(!byType[arts[dc].refType])byType[arts[dc].refType]=[];
+    byType[arts[dc].refType].push(arts[dc]);
+  }
+  for(var tk in byType){
+    if(!byType.hasOwnProperty(tk))continue;
+    var group=byType[tk];
+    for(var g1=0;g1<group.length;g1++){
+      var s1=(group[g1].payload&&group[g1].payload.score!=null)?group[g1].payload.score:0.5;
+      for(var g2=g1+1;g2<group.length;g2++){
+        var s2=(group[g2].payload&&group[g2].payload.score!=null)?group[g2].payload.score:0.5;
+        if(Math.abs(s1-s2)>0.5){
+          contradictions.push({type:"duplicate-conflict",severity:"warning",message:group[g1].refId+" ("+s1+") vs "+group[g2].refId+" ("+s2+") — score gap >0.5 in "+tk,artifacts:[group[g1].refId,group[g2].refId],lane:"cog"});
+        }
+      }
+    }
+  }
+
+  /* 5. Reference-Orphan: replay step refs non-existent artifact */
+  for(var ro=0;ro<steps.length;ro++){
+    var step=steps[ro];
+    if(step.inputRef&&!artMap[step.inputRef]){
+      contradictions.push({type:"reference-orphan",severity:"warning",message:"Replay step "+step.stepIndex+" references missing input: "+step.inputRef,artifacts:[step.inputRef],lane:"cog"});
+    }
+    if(step.outputRef&&!artMap[step.outputRef]){
+      contradictions.push({type:"reference-orphan",severity:"warning",message:"Replay step "+step.stepIndex+" references missing output: "+step.outputRef,artifacts:[step.outputRef],lane:"cog"});
+    }
+  }
+
+  return contradictions;
+}
+
+function renderContradictions(){
+  var panel=document.getElementById("contradictionPanel");
+  if(!panel)return;
+  var c=STATE._contradictions||[];
+  if(c.length===0){panel.style.display="none";return}
+  panel.style.display="block";
+  var h='<div style="padding:16px"><h3 style="font-size:14px;font-weight:700;color:var(--bad);margin-bottom:12px">Contradictions ('+c.length+')</h3>';
+  for(var i=0;i<c.length;i++){
+    var badgeClass=c[i].severity==="critical"?"contradiction-critical":"contradiction-warning";
+    h+='<div class="contradiction-row">'+
+      '<span class="contradiction-badge '+badgeClass+'">'+c[i].severity+'</span>'+
+      '<span class="contradiction-badge" style="background:rgba(255,255,255,.05);color:var(--muted)">'+c[i].type+'</span> '+
+      esc(c[i].message)+
+    '</div>';
+  }
+  h+='</div>';
+  panel.innerHTML=h;
+}
+
+/* ══════════════════════════════════════════════════════════
+   v4.5 Phase 3: "So What" Executive Summary Box
+   ══════════════════════════════════════════════════════════ */
+function renderSoWhat(reftype,stage){
+  var box=document.getElementById("soWhatBox");
+  if(!box)return;
+  var b=STATE.bundle;
+  if(!b){box.style.display="none";return}
+  box.style.display="block";
+  var arts=b.artifacts||[];
+  var steps=b.replaySteps||[];
+
+  /* 1. Impacted Primitives */
+  var impacted=[];
+  if(reftype){
+    var count=0;
+    for(var i=0;i<arts.length;i++){if(arts[i].refType===reftype)count++}
+    impacted.push(reftype+" ("+count+" artifacts)");
+  }else if(stage){
+    for(var ri=0;ri<REF_TYPES.length;ri++){
+      var cm=CERPA_MAP[REF_TYPES[ri]];
+      if(cm&&cm.stage.indexOf(stage)!==-1)impacted.push(REF_TYPES[ri]);
+    }
+  }else{
+    for(var ri2=0;ri2<REF_TYPES.length;ri2++)impacted.push(REF_TYPES[ri2]);
+  }
+
+  /* 2. Impacted CERPA Stages — those with expired half-life or drift */
+  var stageIssues={};
+  for(var ai=0;ai<arts.length;ai++){
+    var hl=computeHalfLife(arts[ai],arts,steps);
+    if(hl.status==="expired"||arts[ai].refType==="drift"){
+      var cm2=CERPA_MAP[arts[ai].refType];
+      if(cm2){
+        var parts=cm2.stage.split("+");
+        for(var p=0;p<parts.length;p++){
+          var stg=parts[p].trim();
+          if(!stageIssues[stg])stageIssues[stg]=0;
+          stageIssues[stg]++;
+        }
+      }
+    }
+  }
+  var stageHtml="";
+  var stageKeys=Object.keys(stageIssues);
+  if(stageKeys.length>0){
+    var parts2=[];
+    for(var sk=0;sk<stageKeys.length;sk++)parts2.push(stageKeys[sk]+" ("+stageIssues[stageKeys[sk]]+" issues)");
+    stageHtml=parts2.join(", ");
+  }else{
+    stageHtml='<span style="color:var(--ok)">All stages clean</span>';
+  }
+
+  /* 3. Proof Integrity Status */
+  var cb=b.commitBoundary;
+  var integrityColor="var(--ok)";var integrityLabel="Intact";
+  if(STATE.tampered){integrityColor="var(--bad)";integrityLabel="Compromised"}
+  else if(STATE.tamperStack&&STATE.tamperStack.length>0){integrityColor="var(--warn)";integrityLabel="Degraded"}
+  var sealAuth=cb&&cb.authority?cb.authority.sealAuthority:"unknown";
+  var policyVer=cb&&cb.authority?cb.authority.policyVersion:"unknown";
+
+  /* 4. Recommended Patch Priority */
+  var expiredCount=0,driftCount=0;
+  for(var pi=0;pi<arts.length;pi++){
+    var hl2=computeHalfLife(arts[pi],arts,steps);
+    if(hl2.status==="expired")expiredCount++;
+    if(arts[pi].refType==="drift")driftCount++;
+  }
+  var cCount=(STATE._contradictions||[]).length;
+  var pScore=expiredCount*3+driftCount*2+cCount*4;
+  var priority,priorityClass;
+  if(pScore>10){priority="P1-Critical";priorityClass="so-what-p1"}
+  else if(pScore>5){priority="P2-High";priorityClass="so-what-p2"}
+  else if(pScore>2){priority="P3-Medium";priorityClass="so-what-p3"}
+  else{priority="P4-Low";priorityClass="so-what-p4"}
+
+  var h='<div class="so-what-title">So What?</div>';
+  h+='<div class="so-what-row"><span class="so-what-label">Impacted Primitives</span><span class="so-what-val">'+impacted.join(", ")+'</span></div>';
+  h+='<div class="so-what-row"><span class="so-what-label">CERPA Stage Issues</span><span class="so-what-val">'+stageHtml+'</span></div>';
+  h+='<div class="so-what-row"><span class="so-what-label">Proof Integrity</span><span class="so-what-val"><span style="color:'+integrityColor+'">&#x25CF; '+integrityLabel+'</span> &mdash; '+esc(sealAuth)+' / '+esc(policyVer)+'</span></div>';
+  h+='<div class="so-what-row"><span class="so-what-label">Patch Priority</span><span class="so-what-val"><span class="'+priorityClass+'">'+priority+'</span> (expired:'+expiredCount+' drift:'+driftCount+' contradictions:'+cCount+')</span></div>';
+  box.innerHTML=h;
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -3629,6 +4058,33 @@ document.addEventListener("DOMContentLoaded",function(){
   /* v3.1: Export as printable page */
   var pdfBtn=$("#btnExportPdf");if(pdfBtn)pdfBtn.addEventListener("click",function(){exportPdf()});
 
+  /* v4.5: One-click dashboard export */
+  var dashExportBtn=$("#btnExportDashboard");
+  if(dashExportBtn)dashExportBtn.addEventListener("click",function(){
+    var b=STATE.bundle;if(!b){toast("No bundle loaded");return}
+    var exportData={
+      _bundle:{bundleId:b.manifest.bundleId,artifactCount:b.artifacts.length,version:b.manifest.version,source:"EDGE_COG_Adapter_v4.5.0"},
+      _tamperState:null,
+      _contradictions:(STATE._contradictions||[]).length,
+      _version:"4.5.0",
+      _source:"COG"
+    };
+    if(STATE.tampered&&STATE.tamperStack.length){
+      exportData._tamperState={active:true,stackDepth:STATE.tamperStack.length,affectedCount:STATE.proofChain.length};
+    }
+    /* Build COG-specific summary (no CMMC families) */
+    var refCounts={};
+    for(var i=0;i<b.artifacts.length;i++){var rt=b.artifacts[i].refType;if(!refCounts[rt])refCounts[rt]=0;refCounts[rt]++}
+    exportData._cogSummary=refCounts;
+    var blob=new Blob([JSON.stringify(exportData,null,2)],{type:"application/json"});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a");
+    a.href=url;a.download="deepsigma-cog-dashboard-"+Date.now()+".json";
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast("Dashboard bundle downloaded");
+  });
+
   /* Drift score simulation slider */
   var driftSlider=document.getElementById('driftSlider');
   if(driftSlider){
@@ -3737,7 +4193,7 @@ document.addEventListener("DOMContentLoaded",function(){
   /* v3: Keyboard shortcuts */
   document.addEventListener("keydown",function(e){
     if(e.target.tagName==="TEXTAREA"||e.target.tagName==="INPUT")return;
-    var tk={"1":"executive","2":"explorer","3":"proof","4":"export","5":"diff","6":"mapping","7":"schema","8":"heatmap","9":"halflife","0":"blast","g":"graph","G":"graph"};
+    var tk={"1":"executive","2":"explorer","3":"proof","4":"export","5":"diff","6":"mapping","7":"schema","8":"heatmap","9":"halflife","0":"blast","g":"graph","G":"graph","t":"trilogy","T":"trilogy"};
     if(tk[e.key]){e.preventDefault();var b=document.querySelector('.tab-btn[data-tab="'+tk[e.key]+'"]');if(b)b.click()}
     if(e.key==="Escape")closeDrawer();
     if(e.key==="?")$("#shortcutBar").classList.toggle("vis");
@@ -3773,6 +4229,40 @@ document.addEventListener("DOMContentLoaded",function(){
   });
   var relayoutBtn=document.getElementById("btnGraphRelayout");
   if(relayoutBtn)relayoutBtn.addEventListener("click",function(){renderGraph()});
+
+  /* v4.5: Trilogy click handler */
+  var trilogyGrid=document.getElementById("trilogyGrid");
+  if(trilogyGrid)trilogyGrid.addEventListener("click",function(e){
+    var row=e.target.closest(".trilogy-row");if(!row)return;
+    var reftype=row.getAttribute("data-reftype");
+    var stage=row.getAttribute("data-stage");
+    syncTrilogyCOGSelection(reftype,stage);
+    /* Open tray with trilogy detail */
+    var h='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">Trilogy Detail</h3></div>';
+    if(reftype){
+      var cm=CERPA_MAP[reftype];
+      h+='<div style="margin-bottom:8px"><span class="badge" style="background:rgba(0,240,255,.1);color:var(--neon-cyan)">'+reftype+'</span></div>';
+      h+='<div style="font-size:11px;margin-bottom:6px"><strong>DS Primitive:</strong> '+DS_MAP[reftype]+'</div>';
+      h+='<div style="font-size:11px;margin-bottom:6px"><strong>CERPA Stage:</strong> '+(cm?cm.stage:'?')+'</div>';
+      /* Count artifacts of this type */
+      var count=0;var b=STATE.bundle;
+      if(b)for(var i=0;i<b.artifacts.length;i++){if(b.artifacts[i].refType===reftype)count++}
+      h+='<div style="font-size:11px;margin-bottom:6px"><strong>Artifacts:</strong> '+count+'</div>';
+      h+='<button class="nav-link-btn" data-nav-tab="explorer" data-nav-filter="'+reftype+'">View in Explorer</button> ';
+      h+='<button class="nav-link-btn" data-nav-tab="graph">View in Graph</button>';
+    }else if(stage){
+      h+='<div style="margin-bottom:8px"><span class="badge" style="background:rgba(233,30,99,.15);color:#e91e63">'+stage+'</span></div>';
+      /* List refTypes mapped to this stage */
+      var mapped=[];
+      for(var ri=0;ri<REF_TYPES.length;ri++){
+        var cm2=CERPA_MAP[REF_TYPES[ri]];
+        if(cm2&&cm2.stage.indexOf(stage)!==-1)mapped.push(REF_TYPES[ri]);
+      }
+      h+='<div style="font-size:11px;margin-bottom:6px"><strong>COG Primitives:</strong> '+mapped.join(", ")+'</div>';
+      h+='<div style="font-size:11px;margin-bottom:6px"><strong>CERPA Flow:</strong> C &rarr; E &rarr; R &rarr; P &rarr; A</div>';
+    }
+    openTray(h);
+  });
 
   /* ══════════════════════════════════════════════════════════
      Phase 3B: Replay Simulator wiring

@@ -120,7 +120,14 @@ h3{font-size:13px;color:var(--accent);margin-bottom:10px}
 <!-- Import from Adapter -->
 <div class="card" id="importPanel">
   <h3>Import from Adapter</h3>
-  <div style="font-size:10px;color:var(--muted);margin-bottom:8px">Paste bundle JSON exported from CERPA CMMC COG Adapter ("Copy Bundle for Dashboard" button).</div>
+  <div style="font-size:10px;color:var(--muted);margin-bottom:8px">Import a dashboard bundle file from the adapter, or paste JSON below.</div>
+  <div style="margin-bottom:8px;display:flex;gap:8px;align-items:center">
+    <label class="btn btn-primary" style="cursor:pointer;margin:0">
+      <input type="file" id="fileImport" accept=".json,application/json" style="display:none"/>
+      Import File
+    </label>
+    <span id="fileLabel" style="font-size:10px;color:var(--muted)">or paste JSON below</span>
+  </div>
   <textarea id="importArea" style="width:100%;min-height:80px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px;color:var(--text);font-family:'SF Mono',Menlo,monospace;font-size:11px;resize:vertical" placeholder='Paste adapter bundle JSON here...'></textarea>
   <div style="margin-top:8px;display:flex;gap:8px">
     <button class="btn btn-primary" id="btnImportBundle">Import Bundle</button>
@@ -376,11 +383,13 @@ function importBundle(){
   var ta=$("#importArea");
   var resultEl=$("#importResult");
   if(!ta||!ta.value.trim()){
-    if(resultEl)resultEl.innerHTML='<span style="color:var(--bad)">Paste bundle JSON first</span>';
+    if(resultEl)resultEl.innerHTML='<span style="color:var(--bad)">Paste or import bundle JSON first</span>';
     return;
   }
   try{
     var data=JSON.parse(ta.value.trim());
+    var source=data._source||"unknown";
+    var version=data._version||"?";
     /* Accept either {families:[...]} or {_families:[...], _bundle:{...}} */
     var families=data._families||data.families||null;
     if(families&&families.length===14){
@@ -391,22 +400,30 @@ function importBundle(){
         FAMILIES[i].na=families[i].na;
       }
     }
-    /* Check for tamper state (Phase 1B) */
+    /* Check for tamper state */
     var tamper=data._tamperState||null;
     var tamperEl=$("#tamperAlert");
     if(tamper&&tamper.active){
       if(tamperEl){
         tamperEl.style.display="block";
-        tamperEl.innerHTML='<span style="font-weight:700">TAMPER DETECTED</span> — Corrupted entry at index '+tamper.corruptedIndex+', '+tamper.affectedCount+' chain entries affected';
+        tamperEl.innerHTML='<span style="font-weight:700">TAMPER DETECTED</span> — '+tamper.stackDepth+' tamper(s), '+tamper.affectedCount+' chain entries affected';
       }
-      logEvent("TAMPER STATE imported: index "+tamper.corruptedIndex+", "+tamper.affectedCount+" affected","error");
+      logEvent("TAMPER STATE imported: "+tamper.stackDepth+" tamper(s), "+tamper.affectedCount+" affected","error");
     }else{
       if(tamperEl)tamperEl.style.display="none";
     }
+    /* v4.5: contradiction count */
+    var cCount=data._contradictions||0;
+    if(cCount>0){
+      logEvent("Contradictions detected: "+cCount,"error");
+    }
     renderGrid();
     updateOverall();
-    logEvent("Bundle imported from adapter"+(families?" (14 families updated)":""),"success");
-    if(resultEl)resultEl.innerHTML='<span style="color:var(--ok)">Bundle imported successfully</span>';
+    var msg="Bundle imported from "+source+" adapter v"+version;
+    if(families)msg+=" (14 families updated)";
+    else if(data._bundle)msg+=" (metadata only — no family data)";
+    logEvent(msg,"success");
+    if(resultEl)resultEl.innerHTML='<span style="color:var(--ok)">'+esc(msg)+'</span>';
   }catch(err){
     if(resultEl)resultEl.innerHTML='<span style="color:var(--bad)">Invalid JSON: '+esc(err.message)+'</span>';
   }
@@ -420,6 +437,22 @@ document.addEventListener("DOMContentLoaded",function(){
   $("#btnConnect").addEventListener("click",connect);
   $("#btnDisconnect").addEventListener("click",disconnect);
   $("#btnImportBundle").addEventListener("click",importBundle);
+
+  /* v4.5: FileReader import */
+  var fileInput=document.getElementById("fileImport");
+  if(fileInput)fileInput.addEventListener("change",function(){
+    var file=this.files[0];if(!file)return;
+    if(file.size>5*1024*1024){logEvent("File too large (max 5MB)","error");return}
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      var ta=$("#importArea");
+      if(ta)ta.value=ev.target.result;
+      var label=document.getElementById("fileLabel");
+      if(label)label.textContent=file.name;
+      importBundle();
+    };
+    reader.readAsText(file);
+  });
 
   /* Enter key in URL input */
   $("#bridgeUrl").addEventListener("keydown",function(e){

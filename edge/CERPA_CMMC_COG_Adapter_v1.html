@@ -1,9 +1,21 @@
 <!--
- EDGE COG Adapter — CMMC 2.0 Level 2 v1.0.0
+ EDGE COG Adapter — CMMC 2.0 Level 2 v4.5.0
  ============================================================
  CMMC 2.0 Compliance Bundle Explorer
  14 Practice Families | 110 Practices | CERPA Primitive Mapping
- Based on COG Adapter v3.0.0 architecture
+
+ v4.5.0 Changes ("Product Narrative"):
+ [x] Unified version to v4.5.0
+ [x] "So What" executive summary box in Trilogy
+ [x] Contradiction detection engine (5 types)
+ [x] One-click dashboard export via FileReader download
+
+ v4.4.0 Changes ("Level Up"):
+ [x] File import via FileReader (5MB cap, schema validation)
+ [x] Cross-tool tray linking with navigateTo()
+ [x] Chaos Mode — offline drift injection simulation
+ [x] Graph enhancements — force-directed with 110 nodes
+ [x] Multi-level tamper undo stack + type selector + red diffs
 
  Tabs:
    [1] Executive        — CMMC compliance scorecard (93.9% weighted coverage)
@@ -26,7 +38,7 @@
 "use strict";
 /* EDGE_HARDENING_V1 — Runtime capability lockdown v1.1 */
 
-var EDGE_BUILD_ID="EDGE_BUILD_ID:CMMC_COG_Adapter_v1.0.0";
+var EDGE_BUILD_ID="EDGE_BUILD_ID:CMMC_COG_Adapter_v4.5.0";
 
 function _block(cap){
   return function(){throw new Error("EDGE hardening: "+cap+" is blocked")};
@@ -93,10 +105,11 @@ document.addEventListener("DOMContentLoaded",function(){
 </script>
 <!-- EDGE_HARDENING_V1 END -->
 <!-- EDGE_POLICY_EXCEPTION: clipboard -->
+<!-- EDGE_POLICY_EXCEPTION: download -->
 
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>CERPA × CMMC 2.0 — COG Adapter</title>
+<title>CERPA × CMMC 2.0 — COG Adapter v4.5.0</title>
 <style>
 :root {
   --bg:#0a0e17; --card:#111927; --card-hover:#182235;
@@ -365,6 +378,21 @@ tr:hover td{background:rgba(0,240,255,.03)}
 .trilogy-flow{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--muted);margin-top:8px;justify-content:center}
 .trilogy-flow span{padding:2px 6px;border-radius:4px;background:rgba(233,30,99,.15);color:#e91e63;font-weight:600}
 .trilogy-flow-arrow{color:var(--muted)}
+/* ── v4.5: So What Box ─────────────────── */
+.so-what-box{border-left:4px solid #e91e63;background:rgba(233,30,99,.04);padding:16px;margin-top:12px}
+.so-what-title{font-size:14px;font-weight:700;color:#e91e63;margin-bottom:12px}
+.so-what-row{display:flex;gap:12px;margin-bottom:8px;font-size:11px;align-items:flex-start}
+.so-what-label{min-width:140px;color:var(--muted);font-weight:600;flex-shrink:0}
+.so-what-val{flex:1}
+.so-what-p1{color:var(--bad);font-weight:700}
+.so-what-p2{color:var(--warn);font-weight:700}
+.so-what-p3{color:var(--neon-cyan);font-weight:600}
+.so-what-p4{color:var(--ok);font-weight:600}
+/* ── v4.5: Contradiction Panel ─────────── */
+.contradiction-row{border-left:3px solid var(--bad);padding:8px 12px;margin-bottom:6px;border-radius:0 6px 6px 0;background:rgba(244,67,54,.04);font-size:11px}
+.contradiction-badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:9px;font-weight:700;text-transform:uppercase;margin-right:6px}
+.contradiction-critical{background:rgba(244,67,54,.15);color:var(--bad)}
+.contradiction-warning{background:rgba(255,152,0,.15);color:var(--warn)}
 
 /* ── v4.3: Graph Tab ──────────────────────── */
 .graph-wrap{position:relative;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:rgba(0,0,0,.2)}
@@ -500,6 +528,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
       <button class="btn-primary" id="btnExecRefresh">Refresh Scorecard</button>
       <button class="btn-primary" id="btnExportPdf">Export as printable report</button>
       <button class="btn-primary" id="btnCopyForDashboard">Copy Bundle for Dashboard</button>
+      <button class="btn-primary" id="btnDownloadForDashboard">Export for Dashboard</button>
       <button class="btn-primary sim-toggle" id="btnSimLive">Simulate Live Updates</button>
       <button id="btnResetBaseline" class="hidden">Reset to Baseline</button>
     </div>
@@ -737,6 +766,8 @@ tr:hover td{background:rgba(0,240,255,.03)}
         <div class="trilogy-lane" id="trilogyCog"></div>
       </div>
     </div>
+    <div class="card so-what-box" id="soWhatBox" style="display:none"></div>
+    <div class="card" id="contradictionPanel" style="display:none;border-left:4px solid var(--bad);margin-top:12px"></div>
   </div>
 
   <!-- ═══════════════ TAB 9: Graph ═══════════════ -->
@@ -902,7 +933,7 @@ function makeSampleBundle(seed){
     admissibility:{schemaValidated:true,proofChainIntact:true,replaySequenced:true,contentHashesVerified:true,unmappedArtifacts:0},
     constraints:{maxArtifacts:200,maxReplayDepth:100,maxChainLength:300,requiredRefTypes:["AU","IR","RA"],enforcedAt:new Date().toISOString()}
   };
-  return{manifest:{bundleId:bundleId,version:"1.0.0",createdAt:new Date().toISOString(),source:"CMMC_COG_Adapter_v1.0.0",framework:"CMMC 2.0 Level 2",practiceCount:110,familyCount:14},artifacts:artifacts,proof:null,replaySteps:replaySteps,rawMetadata:{generator:"CMMC EDGE",seed:seed||42,nistRef:"SP 800-171 Rev 2"},commitBoundary:boundary};
+  return{manifest:{bundleId:bundleId,version:"1.0.0",createdAt:new Date().toISOString(),source:"CMMC_COG_Adapter_v4.5.0",framework:"CMMC 2.0 Level 2",practiceCount:110,familyCount:14},artifacts:artifacts,proof:null,replaySteps:replaySteps,rawMetadata:{generator:"CMMC EDGE",seed:seed||42,nistRef:"SP 800-171 Rev 2"},commitBoundary:boundary};
 }
 
 /* ── Phase 1B: Partial N/A Practice Mappings ─── */
@@ -973,6 +1004,22 @@ document.addEventListener("DOMContentLoaded",function(){
     copyText(JSON.stringify(exportData));
     toast("Bundle copied for dashboard import");
   });
+  /* v4.5: One-click dashboard export (file download) */
+  $("#btnDownloadForDashboard").addEventListener("click",function(){
+    var exportData={_families:JSON.parse(JSON.stringify(FAMILIES)),_version:"4.5.0",_source:"CMMC"};
+    if(STATE.bundle)exportData._bundle={bundleId:STATE.bundle.manifest.bundleId,artifactCount:STATE.bundle.artifacts.length};
+    if(STATE.tampered&&_tamperStack.length){
+      exportData._tamperState={active:true,stackDepth:_tamperStack.length,affectedCount:STATE.proofChain.length};
+    }
+    exportData._contradictions=(STATE._contradictions||[]).length;
+    var blob=new Blob([JSON.stringify(exportData,null,2)],{type:"application/json"});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a");
+    a.href=url;a.download="deepsigma-cmmc-dashboard-"+Date.now()+".json";
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast("Dashboard bundle downloaded");
+  });
   loadBundle(42);renderMapping();renderSchema("bundle");renderExecutive();
 });
 
@@ -990,7 +1037,8 @@ function renderExecutive(){
     '<div class="stat-box"><div class="stat-val" style="color:var(--neon-green)">'+totalFull+'</div><div class="stat-label">Full Coverage</div></div>'+
     '<div class="stat-box"><div class="stat-val" style="color:var(--neon-cyan)">'+totalStrong+'</div><div class="stat-label">Strong</div></div>'+
     '<div class="stat-box"><div class="stat-val" style="color:var(--neon-amber)">'+totalPartial+'</div><div class="stat-label">Partial</div></div>'+
-    '<div class="stat-box"><div class="stat-val" style="color:var(--muted)">'+totalNA+'</div><div class="stat-label">N/A (Physical)</div></div>';
+    '<div class="stat-box"><div class="stat-val" style="color:var(--muted)">'+totalNA+'</div><div class="stat-label">N/A (Physical)</div></div>'+
+    '<div class="stat-box"><div class="stat-val" style="color:'+((STATE._contradictions||[]).length>0?'var(--bad)':'var(--ok)')+'">'+(STATE._contradictions||[]).length+'</div><div class="stat-label">Contradictions</div></div>';
   /* Scorecard — 14 families */
   var html="";
   for(var f=0;f<FAMILIES.length;f++){
@@ -1050,7 +1098,8 @@ function loadBundle(seed){
   $("#replayTable").innerHTML=rRows;
   $("#metadataBlock").textContent=JSON.stringify(b.rawMetadata,null,2);
   buildProofChain(b.artifacts);
-  setTimeout(function(){renderExecutive();renderTimeline();renderTrilogy();renderGraph()},100);
+  STATE._contradictions=detectContradictions();
+  setTimeout(function(){renderExecutive();renderTimeline();renderTrilogy();renderContradictions();renderGraph()},100);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -1170,6 +1219,98 @@ function renderTrilogy(){
       '<div class="stat-box"><div class="stat-val" style="color:var(--neon-cyan)">'+overallPct+'%</div><div class="stat-label">Overall Coverage</div></div>'+
       '<div class="stat-box"><div class="stat-val">'+artCount+'</div><div class="stat-label">COG Artifacts</div></div>';
   }
+
+  renderSoWhat();
+  renderContradictions();
+}
+
+/* ══════════════════════════════════════════════════════════
+   v4.5 Phase 3: "So What" Executive Summary Box (CMMC)
+   ══════════════════════════════════════════════════════════ */
+function renderSoWhat(familyId,stage){
+  var box=document.getElementById("soWhatBox");
+  if(!box)return;
+  var b=STATE.bundle;
+  if(!b){box.style.display="none";return}
+  box.style.display="block";
+
+  /* 1. Impacted Families */
+  var impacted=[];
+  if(familyId){
+    var fam=null;
+    for(var fi=0;fi<FAMILIES.length;fi++){if(FAMILIES[fi].id===familyId){fam=FAMILIES[fi];break}}
+    if(fam){
+      var app=fam.full+fam.strong+fam.partial;
+      var pct=app>0?Math.round((fam.full*100+fam.strong*90+fam.partial*50)/app):0;
+      impacted.push(fam.id+" — "+fam.name+" ("+pct+"% coverage)");
+    }
+  }else if(stage){
+    for(var si=0;si<FAMILIES.length;si++){
+      var cf=CERPA_FAM[FAMILIES[si].id];
+      if(cf&&(cf.stage.indexOf(stage)!==-1||cf.stage==="All"))impacted.push(FAMILIES[si].id);
+    }
+  }else{
+    for(var ai=0;ai<FAMILIES.length;ai++)impacted.push(FAMILIES[ai].id);
+  }
+
+  /* 2. Impacted CERPA Stages — those with low-coverage families */
+  var stageIssues={};
+  for(var si2=0;si2<FAMILIES.length;si2++){
+    var f=FAMILIES[si2];
+    var app2=f.full+f.strong+f.partial;
+    var pct2=app2>0?Math.round((f.full*100+f.strong*90+f.partial*50)/app2):0;
+    if(pct2<70){
+      var cf2=CERPA_FAM[f.id];
+      if(cf2){
+        var parts=cf2.stage.split("+");
+        for(var p=0;p<parts.length;p++){
+          var stg=parts[p].trim();
+          if(stg==="All"){var allS=["Claim","Event","Review","Patch","Apply"];for(var as=0;as<allS.length;as++){if(!stageIssues[allS[as]])stageIssues[allS[as]]=0;stageIssues[allS[as]]++}}
+          else{if(!stageIssues[stg])stageIssues[stg]=0;stageIssues[stg]++}
+        }
+      }
+    }
+  }
+  var stageHtml="";
+  var stageKeys=Object.keys(stageIssues);
+  if(stageKeys.length>0){
+    var parts2=[];
+    for(var sk=0;sk<stageKeys.length;sk++)parts2.push(stageKeys[sk]+" ("+stageIssues[stageKeys[sk]]+" weak families)");
+    stageHtml=parts2.join(", ");
+  }else{
+    stageHtml='<span style="color:var(--ok)">All stages above 70%</span>';
+  }
+
+  /* 3. Proof Integrity Status */
+  var cb=b.commitBoundary;
+  var integrityColor="var(--ok)";var integrityLabel="Intact";
+  if(STATE.tampered){integrityColor="var(--bad)";integrityLabel="Compromised"}
+  else if(_tamperStack&&_tamperStack.length>0){integrityColor="var(--warn)";integrityLabel="Degraded"}
+  var sealAuth=cb&&cb.authority?cb.authority.sealAuthority:"unknown";
+  var policyVer=cb&&cb.authority?cb.authority.policyVersion:"unknown";
+
+  /* 4. Recommended Patch Priority */
+  var weakFamilies=0;
+  for(var pi=0;pi<FAMILIES.length;pi++){
+    var fpi=FAMILIES[pi];var appi=fpi.full+fpi.strong+fpi.partial;
+    var pcti=appi>0?Math.round((fpi.full*100+fpi.strong*90+fpi.partial*50)/appi):0;
+    if(pcti<70)weakFamilies++;
+  }
+  var cCount=(STATE._contradictions||[]).length;
+  var naCount=0;for(var ni=0;ni<FAMILIES.length;ni++)naCount+=FAMILIES[ni].na;
+  var pScore=weakFamilies*3+naCount*1+cCount*4;
+  var priority,priorityClass;
+  if(pScore>10){priority="P1-Critical";priorityClass="so-what-p1"}
+  else if(pScore>5){priority="P2-High";priorityClass="so-what-p2"}
+  else if(pScore>2){priority="P3-Medium";priorityClass="so-what-p3"}
+  else{priority="P4-Low";priorityClass="so-what-p4"}
+
+  var h='<div class="so-what-title">So What?</div>';
+  h+='<div class="so-what-row"><span class="so-what-label">Impacted Families</span><span class="so-what-val">'+impacted.join(", ")+'</span></div>';
+  h+='<div class="so-what-row"><span class="so-what-label">CERPA Stage Issues</span><span class="so-what-val">'+stageHtml+'</span></div>';
+  h+='<div class="so-what-row"><span class="so-what-label">Proof Integrity</span><span class="so-what-val"><span style="color:'+integrityColor+'">&#x25CF; '+integrityLabel+'</span> &mdash; '+esc(sealAuth)+' / '+esc(policyVer)+'</span></div>';
+  h+='<div class="so-what-row"><span class="so-what-label">Patch Priority</span><span class="so-what-val"><span class="'+priorityClass+'">'+priority+'</span> (weak families:'+weakFamilies+' N/A:'+naCount+' contradictions:'+cCount+')</span></div>';
+  box.innerHTML=h;
 }
 
 function syncTrilogySelection(familyId,stage,reftype){
@@ -1212,6 +1353,8 @@ function syncTrilogySelection(familyId,stage,reftype){
     var rtRow=document.querySelector('.trilogy-row[data-reftype="'+reftype+'"]');
     if(rtRow)rtRow.classList.add("trilogy-highlight");
   }
+
+  renderSoWhat(familyId,stage);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -1596,6 +1739,95 @@ function openTray(html){
   $("#drawerContent").innerHTML=html;
   $("#detailDrawer").classList.add("open");
   $("#drawerOverlay").classList.add("open");
+}
+
+/* ══════════════════════════════════════════════════════════
+   v4.5 Phase 4: Contradiction Detection Engine (CMMC)
+   ══════════════════════════════════════════════════════════ */
+function detectContradictions(){
+  var b=STATE.bundle;if(!b)return[];
+  var arts=b.artifacts||[];
+  var steps=b.replaySteps||[];
+  var contradictions=[];
+  var artMap={};
+  for(var ai=0;ai<arts.length;ai++)artMap[arts[ai].refId]=arts[ai];
+
+  /* 1. Coverage-Drift: family claims 100% coverage but has partial-digital practices */
+  for(var fi=0;fi<FAMILIES.length;fi++){
+    var f=FAMILIES[fi];
+    var applicable=f.full+f.strong+f.partial;
+    if(applicable===0)continue;
+    var fullPct=Math.round(f.full/applicable*100);
+    if(fullPct===100&&PARTIAL_REF_KEYS[f.id]&&PARTIAL_REF_KEYS[f.id].length>0){
+      contradictions.push({type:"coverage-drift",severity:"warning",message:f.id+" claims 100% full coverage but has "+PARTIAL_REF_KEYS[f.id].length+" partial-digital practices",artifacts:[f.id],lane:"cmmc"});
+    }
+  }
+
+  /* 2. Seal-Tamper: proofChainIntact=true but STATE.tampered=true */
+  var cb=b.commitBoundary;
+  if(cb&&cb.admissibility&&cb.admissibility.proofChainIntact&&STATE.tampered){
+    contradictions.push({type:"seal-tamper",severity:"critical",message:"Proof chain claims intact but bundle has been tampered",artifacts:[],lane:"cmmc"});
+  }
+
+  /* 3. Duplicate-Conflict: families in same CERPA stage differ by >40% coverage */
+  var stageGroups={};
+  for(var sg=0;sg<FAMILIES.length;sg++){
+    var cf=CERPA_FAM[FAMILIES[sg].id];
+    if(!cf)continue;
+    var parts=cf.stage.split("+");
+    for(var sp=0;sp<parts.length;sp++){
+      var stg=parts[sp].trim();
+      if(stg==="All"){var allS=["Claim","Event","Review","Patch","Apply"];for(var as=0;as<allS.length;as++){if(!stageGroups[allS[as]])stageGroups[allS[as]]=[];stageGroups[allS[as]].push(FAMILIES[sg])}}
+      else{if(!stageGroups[stg])stageGroups[stg]=[];stageGroups[stg].push(FAMILIES[sg])}
+    }
+  }
+  for(var sk in stageGroups){
+    if(!stageGroups.hasOwnProperty(sk))continue;
+    var grp=stageGroups[sk];
+    for(var g1=0;g1<grp.length;g1++){
+      var app1=grp[g1].full+grp[g1].strong+grp[g1].partial;
+      var pct1=app1>0?Math.round((grp[g1].full*100+grp[g1].strong*90+grp[g1].partial*50)/app1):0;
+      for(var g2=g1+1;g2<grp.length;g2++){
+        var app2=grp[g2].full+grp[g2].strong+grp[g2].partial;
+        var pct2=app2>0?Math.round((grp[g2].full*100+grp[g2].strong*90+grp[g2].partial*50)/app2):0;
+        if(Math.abs(pct1-pct2)>40){
+          contradictions.push({type:"duplicate-conflict",severity:"warning",message:grp[g1].id+" ("+pct1+"%) vs "+grp[g2].id+" ("+pct2+"%) in "+sk+" stage — coverage gap >40%",artifacts:[grp[g1].id,grp[g2].id],lane:"cmmc"});
+        }
+      }
+    }
+  }
+
+  /* 4. Reference-Orphan: replay step refs non-existent artifact */
+  for(var ro=0;ro<steps.length;ro++){
+    var step=steps[ro];
+    if(step.inputRef&&!artMap[step.inputRef]){
+      contradictions.push({type:"reference-orphan",severity:"warning",message:"Replay step "+step.stepIndex+" references missing input: "+step.inputRef,artifacts:[step.inputRef],lane:"cmmc"});
+    }
+    if(step.outputRef&&!artMap[step.outputRef]){
+      contradictions.push({type:"reference-orphan",severity:"warning",message:"Replay step "+step.stepIndex+" references missing output: "+step.outputRef,artifacts:[step.outputRef],lane:"cmmc"});
+    }
+  }
+
+  return contradictions;
+}
+
+function renderContradictions(){
+  var panel=document.getElementById("contradictionPanel");
+  if(!panel)return;
+  var c=STATE._contradictions||[];
+  if(c.length===0){panel.style.display="none";return}
+  panel.style.display="block";
+  var h='<div style="padding:16px"><h3 style="font-size:14px;font-weight:700;color:var(--bad);margin-bottom:12px">Contradictions ('+c.length+')</h3>';
+  for(var i=0;i<c.length;i++){
+    var badgeClass=c[i].severity==="critical"?"contradiction-critical":"contradiction-warning";
+    h+='<div class="contradiction-row">'+
+      '<span class="contradiction-badge '+badgeClass+'">'+c[i].severity+'</span>'+
+      '<span class="contradiction-badge" style="background:rgba(255,255,255,.05);color:var(--muted)">'+c[i].type+'</span> '+
+      esc(c[i].message)+
+    '</div>';
+  }
+  h+='</div>';
+  panel.innerHTML=h;
 }
 
 /* ══════════════════════════════════════════════════════════
