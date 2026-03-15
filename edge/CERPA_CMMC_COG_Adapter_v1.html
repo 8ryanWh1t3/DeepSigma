@@ -998,6 +998,150 @@ function loadBundle(seed){
 }
 
 /* ══════════════════════════════════════════════════════════
+   v4.3 Phase E: Trilogy Mode
+   ══════════════════════════════════════════════════════════ */
+function renderTrilogy(){
+  var b=STATE.bundle;
+  var cerpaLane=document.getElementById("trilogyCerpa");
+  var cmmcLane=document.getElementById("trilogyCmmc");
+  var cogLane=document.getElementById("trilogyCog");
+  var statsEl=document.getElementById("trilogyStats");
+  if(!cerpaLane||!cmmcLane||!cogLane)return;
+
+  /* CERPA lane — 5 stages */
+  var cerpaStages=["Claim","Event","Review","Patch","Apply"];
+  var stageFamCount={};
+  for(var cs=0;cs<cerpaStages.length;cs++)stageFamCount[cerpaStages[cs]]=0;
+  for(var fi=0;fi<FAMILIES.length;fi++){
+    var cf=CERPA_FAM[FAMILIES[fi].id];
+    if(cf){
+      var parts=cf.stage.split("+");
+      for(var sp=0;sp<parts.length;sp++){
+        var stg=parts[sp].trim();
+        if(stg==="All"){for(var sa=0;sa<cerpaStages.length;sa++)stageFamCount[cerpaStages[sa]]++}
+        else if(stageFamCount[stg]!==undefined)stageFamCount[stg]++;
+      }
+    }
+  }
+  var cerpaHtml='<div class="trilogy-header th-cerpa">CERPA</div>';
+  for(var ci=0;ci<cerpaStages.length;ci++){
+    cerpaHtml+='<div class="trilogy-row" data-stage="'+cerpaStages[ci]+'">'+
+      '<span style="width:60px;font-weight:600">'+cerpaStages[ci]+'</span>'+
+      '<span style="color:var(--neon-cyan);font-weight:700">'+stageFamCount[cerpaStages[ci]]+'</span>'+
+      '<span style="color:var(--muted);font-size:10px">families</span>'+
+    '</div>';
+  }
+  cerpaHtml+='<div class="trilogy-flow"><span>C</span><span class="trilogy-flow-arrow">&rarr;</span><span>E</span><span class="trilogy-flow-arrow">&rarr;</span><span>R</span><span class="trilogy-flow-arrow">&rarr;</span><span>P</span><span class="trilogy-flow-arrow">&rarr;</span><span>A</span></div>';
+  cerpaLane.innerHTML=cerpaHtml;
+
+  /* CMMC lane — 14 families compact scorecard */
+  var cmmcHtml='<div class="trilogy-header th-cmmc">CMMC</div>';
+  for(var mi=0;mi<FAMILIES.length;mi++){
+    var fam=FAMILIES[mi];
+    var total=fam.full+fam.strong+fam.partial+fam.na;
+    var applicable=total-fam.na;
+    var pct=applicable>0?Math.round(((fam.full*1+fam.strong*0.9+fam.partial*0.5)/applicable)*1000)/10:0;
+    var barColor=pct>=90?"var(--neon-green)":pct>=70?"var(--neon-cyan)":"var(--neon-amber)";
+    cmmcHtml+='<div class="trilogy-row" data-family="'+fam.id+'">'+
+      '<span style="width:28px;font-weight:700">'+fam.id+'</span>'+
+      '<span style="width:42px;text-align:right;font-size:11px;color:'+barColor+'">'+pct+'%</span>'+
+      '<div class="trilogy-bar"><div class="trilogy-bar-fill" style="width:'+pct+'%;background:'+barColor+'"></div></div>'+
+    '</div>';
+  }
+  cmmcLane.innerHTML=cmmcHtml;
+
+  /* COG lane — artifact type distribution + integrity */
+  var cogHtml='<div class="trilogy-header th-cog">COG</div>';
+  if(b){
+    var arts=b.artifacts||[];
+    var typeCounts={evidence:0,rationale:0,memory:0,drift:0,patch:0};
+    for(var ai=0;ai<arts.length;ai++){if(typeCounts[arts[ai].refType]!==undefined)typeCounts[arts[ai].refType]++}
+    var refTypes=["evidence","rationale","memory","drift","patch"];
+    for(var ri=0;ri<refTypes.length;ri++){
+      cogHtml+='<div class="trilogy-row" data-reftype="'+refTypes[ri]+'">'+
+        '<span style="width:70px;font-weight:600;font-size:11px">'+refTypes[ri]+'</span>'+
+        '<span style="color:var(--neon-green);font-weight:700;width:30px;text-align:right">'+typeCounts[refTypes[ri]]+'</span>'+
+      '</div>';
+    }
+    /* Seal status */
+    var sealOk=b.proof&&b.proof.ruleSeal;
+    cogHtml+='<div class="trilogy-row" style="margin-top:8px;border-top:1px solid var(--line);padding-top:8px">'+
+      '<span style="width:70px;font-size:11px">seal</span>'+
+      '<span style="color:'+(sealOk?'var(--ok)':'var(--bad)')+'">&#x25CF; '+(sealOk?'intact':'unsigned')+'</span>'+
+    '</div>';
+    /* Integrity */
+    var integrityPct=b.proof&&b.proof.proofChain?100:0;
+    cogHtml+='<div class="trilogy-row">'+
+      '<span style="width:70px;font-size:11px">integrity</span>'+
+      '<span style="color:var(--ok);font-weight:700">'+integrityPct+'%</span>'+
+    '</div>';
+  }else{
+    cogHtml+='<div class="trilogy-row" style="color:var(--muted)">No bundle loaded</div>';
+  }
+  cogLane.innerHTML=cogHtml;
+
+  /* Stats bar */
+  if(statsEl){
+    var totalFam=FAMILIES.length;
+    var overallPct=0;
+    var totalApp=0,totalWeighted=0;
+    for(var si=0;si<FAMILIES.length;si++){
+      var f=FAMILIES[si];var tot=f.full+f.strong+f.partial+f.na;var app=tot-f.na;
+      totalApp+=app;totalWeighted+=(f.full*1+f.strong*0.9+f.partial*0.5);
+    }
+    overallPct=totalApp>0?Math.round(totalWeighted/totalApp*1000)/10:0;
+    var artCount=b?(b.artifacts||[]).length:0;
+    statsEl.innerHTML=
+      '<div class="stat-box"><div class="stat-val">5</div><div class="stat-label">CERPA Stages</div></div>'+
+      '<div class="stat-box"><div class="stat-val">'+totalFam+'</div><div class="stat-label">CMMC Families</div></div>'+
+      '<div class="stat-box"><div class="stat-val" style="color:var(--neon-cyan)">'+overallPct+'%</div><div class="stat-label">Overall Coverage</div></div>'+
+      '<div class="stat-box"><div class="stat-val">'+artCount+'</div><div class="stat-label">COG Artifacts</div></div>';
+  }
+}
+
+function syncTrilogySelection(familyId,stage,reftype){
+  /* Clear all highlights */
+  var allRows=document.querySelectorAll(".trilogy-row");
+  for(var i=0;i<allRows.length;i++)allRows[i].classList.remove("trilogy-highlight");
+
+  if(familyId){
+    /* Clicked a CMMC family — highlight it + corresponding CERPA stage(s) */
+    var famRow=document.querySelector('.trilogy-row[data-family="'+familyId+'"]');
+    if(famRow)famRow.classList.add("trilogy-highlight");
+    var cf=CERPA_FAM[familyId];
+    if(cf){
+      var parts=cf.stage.split("+");
+      for(var p=0;p<parts.length;p++){
+        var stg=parts[p].trim();
+        if(stg==="All"){
+          var allStages=document.querySelectorAll(".trilogy-row[data-stage]");
+          for(var as=0;as<allStages.length;as++)allStages[as].classList.add("trilogy-highlight");
+        }else{
+          var stageRow=document.querySelector('.trilogy-row[data-stage="'+stg+'"]');
+          if(stageRow)stageRow.classList.add("trilogy-highlight");
+        }
+      }
+    }
+  }else if(stage){
+    /* Clicked a CERPA stage — highlight it + all families mapped to that stage */
+    var stageRow2=document.querySelector('.trilogy-row[data-stage="'+stage+'"]');
+    if(stageRow2)stageRow2.classList.add("trilogy-highlight");
+    for(var fi=0;fi<FAMILIES.length;fi++){
+      var fam=FAMILIES[fi];
+      var cf2=CERPA_FAM[fam.id];
+      if(cf2&&(cf2.stage.indexOf(stage)!==-1||cf2.stage==="All")){
+        var fr=document.querySelector('.trilogy-row[data-family="'+fam.id+'"]');
+        if(fr)fr.classList.add("trilogy-highlight");
+      }
+    }
+  }else if(reftype){
+    /* Clicked a COG refType — highlight it */
+    var rtRow=document.querySelector('.trilogy-row[data-reftype="'+reftype+'"]');
+    if(rtRow)rtRow.classList.add("trilogy-highlight");
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
    Explorer Pagination
    ══════════════════════════════════════════════════════════ */
 function getFilteredArtifacts(){
@@ -1402,159 +1546,15 @@ document.addEventListener("DOMContentLoaded",function(){
       toast("Reset to baseline complete");
     });
   }
-  /* ══════════════════════════════════════════════════════════
-     v4.3 Phase E: Trilogy Mode
-     ══════════════════════════════════════════════════════════ */
-  function renderTrilogy(){
-    var b=STATE.bundle;
-    var cerpaLane=document.getElementById("trilogyCerpa");
-    var cmmcLane=document.getElementById("trilogyCmmc");
-    var cogLane=document.getElementById("trilogyCog");
-    var statsEl=document.getElementById("trilogyStats");
-    if(!cerpaLane||!cmmcLane||!cogLane)return;
-
-    /* CERPA lane — 5 stages */
-    var cerpaStages=["Claim","Event","Review","Patch","Apply"];
-    var stageFamCount={};
-    for(var cs=0;cs<cerpaStages.length;cs++)stageFamCount[cerpaStages[cs]]=0;
-    for(var fi=0;fi<FAMILIES.length;fi++){
-      var cf=CERPA_FAM[FAMILIES[fi].id];
-      if(cf){
-        var parts=cf.stage.split("+");
-        for(var sp=0;sp<parts.length;sp++){
-          var stg=parts[sp].trim();
-          if(stg==="All"){for(var sa=0;sa<cerpaStages.length;sa++)stageFamCount[cerpaStages[sa]]++}
-          else if(stageFamCount[stg]!==undefined)stageFamCount[stg]++;
-        }
-      }
-    }
-    var cerpaHtml='<div class="trilogy-header th-cerpa">CERPA</div>';
-    for(var ci=0;ci<cerpaStages.length;ci++){
-      cerpaHtml+='<div class="trilogy-row" data-stage="'+cerpaStages[ci]+'">'+
-        '<span style="width:60px;font-weight:600">'+cerpaStages[ci]+'</span>'+
-        '<span style="color:var(--neon-cyan);font-weight:700">'+stageFamCount[cerpaStages[ci]]+'</span>'+
-        '<span style="color:var(--muted);font-size:10px">families</span>'+
-      '</div>';
-    }
-    cerpaHtml+='<div class="trilogy-flow"><span>C</span><span class="trilogy-flow-arrow">&rarr;</span><span>E</span><span class="trilogy-flow-arrow">&rarr;</span><span>R</span><span class="trilogy-flow-arrow">&rarr;</span><span>P</span><span class="trilogy-flow-arrow">&rarr;</span><span>A</span></div>';
-    cerpaLane.innerHTML=cerpaHtml;
-
-    /* CMMC lane — 14 families compact scorecard */
-    var cmmcHtml='<div class="trilogy-header th-cmmc">CMMC</div>';
-    for(var mi=0;mi<FAMILIES.length;mi++){
-      var fam=FAMILIES[mi];
-      var total=fam.full+fam.strong+fam.partial+fam.na;
-      var applicable=total-fam.na;
-      var pct=applicable>0?Math.round(((fam.full*1+fam.strong*0.9+fam.partial*0.5)/applicable)*1000)/10:0;
-      var barColor=pct>=90?"var(--neon-green)":pct>=70?"var(--neon-cyan)":"var(--neon-amber)";
-      cmmcHtml+='<div class="trilogy-row" data-family="'+fam.id+'">'+
-        '<span style="width:28px;font-weight:700">'+fam.id+'</span>'+
-        '<span style="width:42px;text-align:right;font-size:11px;color:'+barColor+'">'+pct+'%</span>'+
-        '<div class="trilogy-bar"><div class="trilogy-bar-fill" style="width:'+pct+'%;background:'+barColor+'"></div></div>'+
-      '</div>';
-    }
-    cmmcLane.innerHTML=cmmcHtml;
-
-    /* COG lane — artifact type distribution + integrity */
-    var cogHtml='<div class="trilogy-header th-cog">COG</div>';
-    if(b){
-      var arts=b.artifacts||[];
-      var typeCounts={evidence:0,rationale:0,memory:0,drift:0,patch:0};
-      for(var ai=0;ai<arts.length;ai++){if(typeCounts[arts[ai].refType]!==undefined)typeCounts[arts[ai].refType]++}
-      var refTypes=["evidence","rationale","memory","drift","patch"];
-      for(var ri=0;ri<refTypes.length;ri++){
-        cogHtml+='<div class="trilogy-row" data-reftype="'+refTypes[ri]+'">'+
-          '<span style="width:70px;font-weight:600;font-size:11px">'+refTypes[ri]+'</span>'+
-          '<span style="color:var(--neon-green);font-weight:700;width:30px;text-align:right">'+typeCounts[refTypes[ri]]+'</span>'+
-        '</div>';
-      }
-      /* Seal status */
-      var sealOk=b.proof&&b.proof.ruleSeal;
-      cogHtml+='<div class="trilogy-row" style="margin-top:8px;border-top:1px solid var(--line);padding-top:8px">'+
-        '<span style="width:70px;font-size:11px">seal</span>'+
-        '<span style="color:'+(sealOk?'var(--ok)':'var(--bad)')+'">&#x25CF; '+(sealOk?'intact':'unsigned')+'</span>'+
-      '</div>';
-      /* Integrity */
-      var integrityPct=b.proof&&b.proof.proofChain?100:0;
-      cogHtml+='<div class="trilogy-row">'+
-        '<span style="width:70px;font-size:11px">integrity</span>'+
-        '<span style="color:var(--ok);font-weight:700">'+integrityPct+'%</span>'+
-      '</div>';
-    }else{
-      cogHtml+='<div class="trilogy-row" style="color:var(--muted)">No bundle loaded</div>';
-    }
-    cogLane.innerHTML=cogHtml;
-
-    /* Stats bar */
-    if(statsEl){
-      var totalFam=FAMILIES.length;
-      var overallPct=0;
-      var totalApp=0,totalWeighted=0;
-      for(var si=0;si<FAMILIES.length;si++){
-        var f=FAMILIES[si];var tot=f.full+f.strong+f.partial+f.na;var app=tot-f.na;
-        totalApp+=app;totalWeighted+=(f.full*1+f.strong*0.9+f.partial*0.5);
-      }
-      overallPct=totalApp>0?Math.round(totalWeighted/totalApp*1000)/10:0;
-      var artCount=b?(b.artifacts||[]).length:0;
-      statsEl.innerHTML=
-        '<div class="stat-box"><div class="stat-val">5</div><div class="stat-label">CERPA Stages</div></div>'+
-        '<div class="stat-box"><div class="stat-val">'+totalFam+'</div><div class="stat-label">CMMC Families</div></div>'+
-        '<div class="stat-box"><div class="stat-val" style="color:var(--neon-cyan)">'+overallPct+'%</div><div class="stat-label">Overall Coverage</div></div>'+
-        '<div class="stat-box"><div class="stat-val">'+artCount+'</div><div class="stat-label">COG Artifacts</div></div>';
-    }
-
-    /* Sync click handler */
-    var grid=document.getElementById("trilogyGrid");
-    if(grid)grid.addEventListener("click",function(e){
-      var row=e.target.closest(".trilogy-row");if(!row)return;
-      var famId=row.getAttribute("data-family");
-      var stage=row.getAttribute("data-stage");
-      var reftype=row.getAttribute("data-reftype");
-      syncTrilogySelection(famId,stage,reftype);
-    });
-  }
-
-  function syncTrilogySelection(familyId,stage,reftype){
-    /* Clear all highlights */
-    var allRows=document.querySelectorAll(".trilogy-row");
-    for(var i=0;i<allRows.length;i++)allRows[i].classList.remove("trilogy-highlight");
-
-    if(familyId){
-      /* Clicked a CMMC family — highlight it + corresponding CERPA stage(s) + COG refTypes */
-      var famRow=document.querySelector('.trilogy-row[data-family="'+familyId+'"]');
-      if(famRow)famRow.classList.add("trilogy-highlight");
-      var cf=CERPA_FAM[familyId];
-      if(cf){
-        var parts=cf.stage.split("+");
-        for(var p=0;p<parts.length;p++){
-          var stg=parts[p].trim();
-          if(stg==="All"){
-            var allStages=document.querySelectorAll(".trilogy-row[data-stage]");
-            for(var as=0;as<allStages.length;as++)allStages[as].classList.add("trilogy-highlight");
-          }else{
-            var stageRow=document.querySelector('.trilogy-row[data-stage="'+stg+'"]');
-            if(stageRow)stageRow.classList.add("trilogy-highlight");
-          }
-        }
-      }
-    }else if(stage){
-      /* Clicked a CERPA stage — highlight it + all families mapped to that stage */
-      var stageRow=document.querySelector('.trilogy-row[data-stage="'+stage+'"]');
-      if(stageRow)stageRow.classList.add("trilogy-highlight");
-      for(var fi=0;fi<FAMILIES.length;fi++){
-        var fam=FAMILIES[fi];
-        var cf2=CERPA_FAM[fam.id];
-        if(cf2&&(cf2.stage.indexOf(stage)!==-1||cf2.stage==="All")){
-          var fr=document.querySelector('.trilogy-row[data-family="'+fam.id+'"]');
-          if(fr)fr.classList.add("trilogy-highlight");
-        }
-      }
-    }else if(reftype){
-      /* Clicked a COG refType — highlight it */
-      var rtRow=document.querySelector('.trilogy-row[data-reftype="'+reftype+'"]');
-      if(rtRow)rtRow.classList.add("trilogy-highlight");
-    }
-  }
+  /* v4.3: Trilogy click handler wiring */
+  var trilogyGrid=document.getElementById("trilogyGrid");
+  if(trilogyGrid)trilogyGrid.addEventListener("click",function(e){
+    var row=e.target.closest(".trilogy-row");if(!row)return;
+    var famId=row.getAttribute("data-family");
+    var stage=row.getAttribute("data-stage");
+    var reftype=row.getAttribute("data-reftype");
+    syncTrilogySelection(famId,stage,reftype);
+  });
 
   document.addEventListener("keydown",function(e){if(e.target.tagName==="TEXTAREA"||e.target.tagName==="INPUT")return;var tk={"1":"executive","2":"explorer","3":"proof","4":"export","5":"diff","6":"mapping","7":"schema","8":"trilogy"};if(tk[e.key]){e.preventDefault();var b=document.querySelector('.tab-btn[data-tab="'+tk[e.key]+'"]');if(b)b.click()}if(e.key==="Escape")closeDrawer();if(e.key==="?")$("#shortcutBar").classList.toggle("vis");if(e.key==="r"||e.key==="R"){e.preventDefault();loadBundle(Math.floor(Math.random()*100000))}});
 });
