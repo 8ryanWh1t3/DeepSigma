@@ -376,7 +376,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
 .graph-node:hover{r:10}
 .graph-edge{stroke:rgba(255,255,255,.12);stroke-width:1}
 .graph-label{font-size:8px;fill:var(--muted);pointer-events:none;text-anchor:middle}
-.graph-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:10px;color:var(--muted)}
+.graph-legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;font-size:10px;color:var(--muted)}
 .graph-legend-item{display:flex;align-items:center;gap:4px}
 .graph-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .graph-selected{stroke:var(--neon-cyan);stroke-width:2}
@@ -743,6 +743,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
   <div class="tab-panel" id="panel-graph" data-tab-title="Graph">
     <div class="stats-bar" id="graphStats"></div>
     <div class="card" style="padding:12px">
+      <div class="graph-legend" id="graphLegend"></div>
       <div class="graph-wrap" id="graphWrap">
         <svg id="graphSvg" xmlns="http://www.w3.org/2000/svg"></svg>
         <div class="graph-controls">
@@ -751,7 +752,6 @@ tr:hover td{background:rgba(0,240,255,.03)}
           <button id="graphZoomReset" title="Reset view">&#x21bb;</button>
         </div>
       </div>
-      <div class="graph-legend" id="graphLegend"></div>
       <div style="margin-top:10px;display:flex;gap:8px">
         <button class="copy-btn" id="btnCopyGraph">Copy Graph JSON</button>
         <button class="copy-btn" id="btnRelayout">Re-layout</button>

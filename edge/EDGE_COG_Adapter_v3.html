@@ -406,7 +406,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
 .graph-node:hover{r:10}
 .graph-edge{stroke:rgba(255,255,255,.12);stroke-width:1}
 .graph-label{font-size:8px;fill:var(--muted);pointer-events:none;text-anchor:middle}
-.graph-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:10px;color:var(--muted)}
+.graph-legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;font-size:10px;color:var(--muted)}
 .graph-legend-item{display:flex;align-items:center;gap:4px}
 .graph-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .graph-selected{stroke:var(--neon-cyan);stroke-width:2}
@@ -841,6 +841,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
     <div class="card">
       <h3>Bundle Topology</h3>
       <p style="color:var(--muted);font-size:11px;margin-bottom:10px">Force-directed graph of artifact dependencies from replay steps. Click a node to highlight its connections.</p>
+      <div class="graph-legend" id="graphLegend"></div>
       <div class="graph-wrap" id="graphWrap">
         <div class="graph-controls">
           <button id="graphZoomIn" title="Zoom in">+</button>
@@ -849,7 +850,6 @@ tr:hover td{background:rgba(0,240,255,.03)}
         </div>
         <svg id="graphSvg"></svg>
       </div>
-      <div class="graph-legend" id="graphLegend"></div>
     </div>
     <div style="margin-top:12px;display:flex;gap:10px">
       <button class="btn-primary" id="btnCopyGraph">Copy Graph JSON</button>
