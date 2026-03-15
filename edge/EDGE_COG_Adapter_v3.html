@@ -881,13 +881,16 @@ tr:hover td{background:rgba(0,240,255,.03)}
       <p style="color:var(--muted);font-size:11px;margin-bottom:10px">Artifacts sorted by downstream impact. Click to see the full dependency tree.</p>
       <div id="blastList"></div>
     </div>
+    <div class="card">
+      <h3>Blast Radius Graph</h3>
+      <p style="color:var(--muted);font-size:11px;margin-bottom:10px">Node size = downstream impact. Red = critical blast radius. Click a node to inspect.</p>
+      <div class="graph-wrap" id="blastGraphWrap">
+        <svg id="blastGraphSvg"></svg>
+      </div>
+    </div>
     <div class="card blast-critical" id="blastCritical" style="display:none">
       <h3>Critical Path</h3>
       <div id="blastCriticalList"></div>
-    </div>
-    <div class="card" id="blastDetail" style="display:none">
-      <h3>Dependency Tree</h3>
-      <div id="blastDetailContent"></div>
     </div>
   </div>
 
@@ -2086,13 +2089,15 @@ function renderHalfLife(){
 function buildDependencyGraph(replaySteps,artifacts){
   var graph={};
   for(var i=0;i<artifacts.length;i++)graph[artifacts[i].refId]=[];
+
+  /* Replay step connections */
   for(var s=0;s<replaySteps.length;s++){
     var step=replaySteps[s];
     if(step.inputRef&&step.outputRef&&graph[step.inputRef]){
       if(graph[step.inputRef].indexOf(step.outputRef)===-1)graph[step.inputRef].push(step.outputRef);
     }
   }
-  /* Also link artifacts that share replay steps */
+  /* Shared replay step transitive links */
   for(var s2=0;s2<replaySteps.length;s2++){
     var st=replaySteps[s2];
     if(st.outputRef){
@@ -2104,6 +2109,44 @@ function buildDependencyGraph(replaySteps,artifacts){
       }
     }
   }
+
+  /* Intra-type chains: link sequential artifacts within each refType */
+  var byType={};
+  for(var a=0;a<artifacts.length;a++){
+    var rt=artifacts[a].refType;
+    if(!byType[rt])byType[rt]=[];
+    byType[rt].push(artifacts[a].refId);
+  }
+  for(var tk in byType){
+    if(!byType.hasOwnProperty(tk))continue;
+    var members=byType[tk];
+    for(var m=0;m<members.length-1;m++){
+      if(graph[members[m]]&&graph[members[m]].indexOf(members[m+1])===-1)graph[members[m]].push(members[m+1]);
+    }
+  }
+
+  /* Cross-type via CERPA stage: connect first artifact of types sharing stages */
+  var stageToTypes={};
+  for(var ri=0;ri<REF_TYPES.length;ri++){
+    var cm=CERPA_MAP[REF_TYPES[ri]];if(!cm)continue;
+    var parts=cm.stage.split("+");
+    for(var p=0;p<parts.length;p++){
+      var stg=parts[p].trim();
+      if(!stageToTypes[stg])stageToTypes[stg]=[];
+      stageToTypes[stg].push(REF_TYPES[ri]);
+    }
+  }
+  for(var sk in stageToTypes){
+    if(!stageToTypes.hasOwnProperty(sk))continue;
+    var types=stageToTypes[sk];
+    for(var t1=0;t1<types.length-1;t1++){
+      var src=byType[types[t1]];var tgt=byType[types[t1+1]];
+      if(src&&src.length&&tgt&&tgt.length){
+        if(graph[src[0]]&&graph[src[0]].indexOf(tgt[0])===-1)graph[src[0]].push(tgt[0]);
+      }
+    }
+  }
+
   return graph;
 }
 
@@ -2174,6 +2217,98 @@ function renderBlastRadius(){
       }
       critListEl.innerHTML=critHtml;
     }else{critEl.style.display="none"}
+  }
+
+  /* Blast radius graph */
+  var blastSvg=document.getElementById("blastGraphSvg");
+  if(blastSvg){
+    var svgNS="http://www.w3.org/2000/svg";
+    var W=1400,H=800;
+    blastSvg.setAttribute("viewBox","0 0 "+W+" "+H);
+    blastSvg.innerHTML="";
+    var typeColors={evidence:"#4caf50",rationale:"#2196f3",memory:"#9c27b0",drift:"#ff9800",patch:"#e91e63"};
+    /* Build nodes with blast-weighted sizes */
+    var maxB=blastData.length>0?blastData[0].count:1;
+    var bNodes=[];var bNodeMap={};
+    for(var bn=0;bn<arts.length;bn++){
+      var bd2=null;
+      for(var bf=0;bf<blastData.length;bf++){if(blastData[bf].idx===bn){bd2=blastData[bf];break}}
+      var bc=bd2?bd2.count:0;
+      var angle=(2*Math.PI*bn)/arts.length;
+      var orbitR=Math.min(W,H)*0.38;
+      bNodes.push({id:arts[bn].refId,type:arts[bn].refType,x:W/2+orbitR*Math.cos(angle),y:H/2+orbitR*Math.sin(angle),vx:0,vy:0,blast:bc,r:Math.max(4,4+bc*2.5)});
+      bNodeMap[arts[bn].refId]=bn;
+    }
+    /* Build edges from graph */
+    var bEdges=[];
+    for(var bsrc in graph){
+      if(!graph.hasOwnProperty(bsrc))continue;
+      var tgts=graph[bsrc];
+      for(var bt=0;bt<tgts.length;bt++){
+        if(bNodeMap[bsrc]!==undefined&&bNodeMap[tgts[bt]]!==undefined){
+          bEdges.push({source:bNodeMap[bsrc],target:bNodeMap[tgts[bt]]});
+        }
+      }
+    }
+    /* Force layout */
+    _forceLayout(bNodes,bEdges,W,H,120);
+    /* Render edges */
+    for(var be=0;be<bEdges.length;be++){
+      var a2=bNodes[bEdges[be].source],b2=bNodes[bEdges[be].target];
+      var line=document.createElementNS(svgNS,"line");
+      line.setAttribute("x1",a2.x);line.setAttribute("y1",a2.y);
+      line.setAttribute("x2",b2.x);line.setAttribute("y2",b2.y);
+      line.setAttribute("class","graph-edge");
+      blastSvg.appendChild(line);
+    }
+    /* Render nodes */
+    for(var bni=0;bni<bNodes.length;bni++){
+      var nd=bNodes[bni];
+      var g=document.createElementNS(svgNS,"g");
+      g.setAttribute("data-blast-idx",bni);
+      var circle=document.createElementNS(svgNS,"circle");
+      circle.setAttribute("cx",nd.x);circle.setAttribute("cy",nd.y);
+      circle.setAttribute("r",nd.r);
+      var nodeColor=nd.blast>=3?"#f44336":nd.blast>=1?"#ff9800":(typeColors[nd.type]||"#888");
+      circle.setAttribute("fill",nodeColor);
+      circle.setAttribute("class","graph-node");
+      circle.setAttribute("opacity",nd.blast>0?"1":"0.6");
+      var title=document.createElementNS(svgNS,"title");
+      title.textContent=nd.id+" ["+nd.type+"] blast:"+nd.blast;
+      circle.appendChild(title);
+      g.appendChild(circle);
+      /* Label for high-blast nodes */
+      if(nd.blast>=2||bNodes.length<=30){
+        var lbl=document.createElementNS(svgNS,"text");
+        lbl.setAttribute("x",nd.x);lbl.setAttribute("y",nd.y-nd.r-4);
+        lbl.setAttribute("class","graph-label");
+        lbl.textContent=nd.id.substring(0,8);
+        g.appendChild(lbl);
+      }
+      blastSvg.appendChild(g);
+    }
+    /* Click handler for blast graph nodes */
+    blastSvg.addEventListener("click",function(ev){
+      var nodeG=ev.target.closest("[data-blast-idx]");if(!nodeG)return;
+      var idx=parseInt(nodeG.getAttribute("data-blast-idx"),10);
+      var bd3=null;
+      for(var bf2=0;bf2<blastData.length;bf2++){if(blastData[bf2].idx===idx){bd3=blastData[bf2];break}}
+      if(!bd3)return;
+      var ringColor=bd3.count>=3?"var(--bad)":bd3.count>=1?"var(--warn)":"var(--ok)";
+      var h2='<div style="margin-bottom:16px"><h3 style="font-size:16px;color:var(--neon-cyan);margin-bottom:4px">Blast Radius Detail</h3>';
+      h2+='<span class="badge badge-cyan">'+esc(bd3.art.refType)+'</span> ';
+      h2+='<span class="badge" style="border-color:'+ringColor+';color:'+ringColor+'">'+bd3.count+' downstream</span></div>';
+      h2+='<div class="drawer-section"><h4>Source</h4>';
+      h2+='<div class="drawer-kv"><span class="dk">Ref ID</span><span class="dv mono" style="font-size:10px">'+esc(bd3.art.refId)+'</span></div>';
+      h2+='<div class="drawer-kv"><span class="dk">Blast Count</span><span class="dv" style="color:'+ringColor+';font-weight:700">'+bd3.count+'</span></div></div>';
+      if(bd3.deps.length>0){
+        h2+='<div class="drawer-section"><h4>Downstream ('+bd3.deps.length+')</h4>';
+        for(var di2=0;di2<bd3.deps.length;di2++){h2+='<span class="blast-dep">'+esc(bd3.deps[di2].substring(0,12))+'</span>'}
+        h2+='</div>';
+      }
+      h2+='<button class="nav-link-btn" data-nav-tab="graph">View in Graph</button>';
+      openTray(h2);
+    });
   }
 
   /* Click handler: open tray with blast detail */
