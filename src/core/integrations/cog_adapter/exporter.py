@@ -85,19 +85,15 @@ def deepsigma_to_cog(artifact: DeepSigmaDecisionArtifact) -> CogBundle:
         metadata=artifact.metadata,
     )
 
-    # Build proof section
-    bundle_content = {
-        "artifactId": artifact.artifact_id,
-        "artifactHashes": [a.content_hash for a in artifacts],
-        "exportedAt": now,
-    }
+    # Build proof chain (per-artifact entries)
+    from .proof_chain import build_proof_chain
+
+    chain = build_proof_chain(artifacts)
+    rule_seal = artifact.metadata.get("policyHash") if artifact.metadata else None
     proof = CogProof(
-        proof_chain=[{
-            "index": 0,
-            "hash": _seal_hash(bundle_content),
-            "type": "bundle_seal",
-        }],
+        proof_chain=chain,
         timestamps=[now],
+        rule_seal=rule_seal,
     )
 
     # Build replay steps from replay record if present

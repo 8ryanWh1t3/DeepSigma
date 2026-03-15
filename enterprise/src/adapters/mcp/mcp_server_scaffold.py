@@ -462,6 +462,70 @@ def handle_tools_call(_id: Any, params: Dict[str, Any]) -> Dict[str, Any]:
             "outcome_code": entry.outcome_code,
         })
 
+    # ── COG adapter tools ──────────────────────────────────────────
+
+    if name == "cog.import_bundle":
+        path = arguments.get("path", "")
+        if not path:
+            return rpc_error(_id, -32602, "Missing params.arguments.path")
+        from core.integrations.cog_adapter import cog_to_deepsigma, load_cog_bundle
+        bundle = load_cog_bundle(path)
+        artifact = cog_to_deepsigma(bundle)
+        return rpc_result(_id, artifact.to_dict())
+
+    if name == "cog.export_artifact":
+        artifact_data = arguments.get("artifact", {})
+        output_path = arguments.get("outputPath", "")
+        if not artifact_data or not output_path:
+            return rpc_error(_id, -32602, "Missing params.arguments.artifact or outputPath")
+        from core.integrations.cog_adapter import deepsigma_to_cog, write_cog_bundle
+        from core.integrations.cog_adapter.models import DeepSigmaDecisionArtifact
+        artifact = DeepSigmaDecisionArtifact.from_dict(artifact_data)
+        bundle = deepsigma_to_cog(artifact)
+        write_cog_bundle(bundle, output_path)
+        return rpc_result(_id, {
+            "bundleId": bundle.manifest.bundle_id,
+            "artifactCount": len(bundle.artifacts),
+            "path": output_path,
+        })
+
+    if name == "cog.verify_bundle":
+        path = arguments.get("path", "")
+        if not path:
+            return rpc_error(_id, -32602, "Missing params.arguments.path")
+        from core.integrations.cog_adapter import load_cog_bundle, verify_cog_bundle
+        bundle = load_cog_bundle(path)
+        return rpc_result(_id, verify_cog_bundle(bundle))
+
+    if name == "cog.diff_bundles":
+        path1 = arguments.get("path1", "")
+        path2 = arguments.get("path2", "")
+        if not path1 or not path2:
+            return rpc_error(_id, -32602, "Missing params.arguments.path1 or path2")
+        from core.integrations.cog_adapter import diff_cog_bundles, load_cog_bundle
+        before = load_cog_bundle(path1)
+        after = load_cog_bundle(path2)
+        diff = diff_cog_bundles(before, after)
+        return rpc_result(_id, diff.to_dict())
+
+    if name == "cog.list_artifacts":
+        path = arguments.get("path", "")
+        if not path:
+            return rpc_error(_id, -32602, "Missing params.arguments.path")
+        from core.integrations.cog_adapter import load_cog_bundle
+        from core.integrations.cog_adapter.batch import filter_artifacts
+        bundle = load_cog_bundle(path)
+        ref_types = arguments.get("refTypes")
+        if ref_types:
+            arts = filter_artifacts(bundle, set(ref_types))
+        else:
+            arts = bundle.artifacts
+        return rpc_result(_id, {
+            "bundleId": bundle.manifest.bundle_id,
+            "total": len(arts),
+            "artifacts": [a.to_dict() for a in arts],
+        })
+
     return rpc_error(_id, -32601, f"Unknown tool: {name}")
 
 # ── Resources ───────────────────────────────────────────────────

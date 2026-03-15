@@ -97,6 +97,91 @@ def cmd_cog_verify(args: argparse.Namespace) -> None:
     sys.exit(0 if result["status"] == "pass" else 1)
 
 
+def cmd_cog_diff(args: argparse.Namespace) -> None:
+    """Compare two COG bundles and show differences."""
+    from .diff import diff_cog_bundles
+    from .importer import load_cog_bundle
+
+    for f in (args.file1, args.file2):
+        if not Path(f).exists():
+            print(f"Error: {f} not found", file=sys.stderr)
+            sys.exit(1)
+
+    before = load_cog_bundle(args.file1)
+    after = load_cog_bundle(args.file2)
+    diff = diff_cog_bundles(before, after)
+
+    if getattr(args, "json_output", False):
+        print(json.dumps(diff.to_dict(), indent=2))
+    else:
+        print(f"COG Diff | {diff.from_bundle_id} -> {diff.to_bundle_id}")
+        print(f"  Added:    {len(diff.added_artifacts)}")
+        print(f"  Removed:  {len(diff.removed_artifacts)}")
+        print(f"  Modified: {len(diff.modified_artifacts)}")
+        if diff.manifest_changes:
+            print(f"  Manifest: {list(diff.manifest_changes.keys())}")
+        if diff.proof_changes:
+            print(f"  Proof:    {list(diff.proof_changes.keys())}")
+        if diff.replay_changes:
+            print(f"  Replay:   {list(diff.replay_changes.keys())}")
+        for a in diff.added_artifacts:
+            print(f"  + {a['refId']} ({a['refType']})")
+        for r in diff.removed_artifacts:
+            print(f"  - {r['refId']} ({r['refType']})")
+        for m in diff.modified_artifacts:
+            print(f"  ~ {m['refId']} ({m['refType']})")
+
+
+def cmd_cog_batch_import(args: argparse.Namespace) -> None:
+    """Import all COG bundles from a directory."""
+    from .batch import batch_import_cog_bundles
+
+    directory = Path(args.directory)
+    if not directory.is_dir():
+        print(f"Error: {directory} is not a directory", file=sys.stderr)
+        sys.exit(1)
+
+    paths = sorted(str(p) for p in directory.glob("*.json"))
+    if not paths:
+        print(f"No JSON files found in {directory}", file=sys.stderr)
+        sys.exit(1)
+
+    result = batch_import_cog_bundles(paths)
+
+    if getattr(args, "json_output", False):
+        print(json.dumps(result.to_dict(), indent=2))
+    else:
+        print(f"COG Batch Import | {result.succeeded}/{result.total} succeeded")
+        if result.errors:
+            for err in result.errors:
+                print(f"  Error: {err}")
+
+
+def cmd_cog_merge(args: argparse.Namespace) -> None:
+    """Merge multiple COG bundles into one."""
+    from .batch import merge_bundles
+    from .exporter import write_cog_bundle
+    from .importer import load_cog_bundle
+
+    for f in args.bundles:
+        if not Path(f).exists():
+            print(f"Error: {f} not found", file=sys.stderr)
+            sys.exit(1)
+
+    bundles = [load_cog_bundle(f) for f in args.bundles]
+    merged = merge_bundles(bundles)
+
+    output = args.output
+    write_cog_bundle(merged, output)
+
+    if getattr(args, "json_output", False):
+        print(json.dumps(merged.to_dict(), indent=2))
+    else:
+        print(f"COG Merge | {len(bundles)} bundles -> {merged.manifest.bundle_id}")
+        print(f"  Artifacts:  {len(merged.artifacts)}")
+        print(f"  Written to: {output}")
+
+
 def register_cog_commands(subparsers: argparse._SubParsersAction) -> None:
     """Register COG adapter subcommands on the core CLI."""
     p_cog = subparsers.add_parser("cog", help="COG bundle adapter operations")
@@ -124,3 +209,29 @@ def register_cog_commands(subparsers: argparse._SubParsersAction) -> None:
     p_verify.add_argument("--json", action="store_true", dest="json_output",
                           help="Output as JSON")
     p_verify.set_defaults(func=cmd_cog_verify)
+
+    # coherence cog diff <file1> <file2>
+    p_diff = cog_sub.add_parser("diff", help="Compare two COG bundles")
+    p_diff.add_argument("file1", help="Path to first bundle")
+    p_diff.add_argument("file2", help="Path to second bundle")
+    p_diff.add_argument("--json", action="store_true", dest="json_output",
+                        help="Output as JSON")
+    p_diff.set_defaults(func=cmd_cog_diff)
+
+    # coherence cog batch-import <directory>
+    p_batch = cog_sub.add_parser("batch-import",
+                                 help="Import all COG bundles from a directory")
+    p_batch.add_argument("directory", help="Directory containing bundle JSON files")
+    p_batch.add_argument("--json", action="store_true", dest="json_output",
+                         help="Output as JSON")
+    p_batch.set_defaults(func=cmd_cog_batch_import)
+
+    # coherence cog merge <bundles...> <output>
+    p_merge = cog_sub.add_parser("merge",
+                                 help="Merge multiple COG bundles into one")
+    p_merge.add_argument("bundles", nargs="+", help="Bundle JSON files to merge")
+    p_merge.add_argument("--output", "-o", required=True,
+                         help="Output path for merged bundle")
+    p_merge.add_argument("--json", action="store_true", dest="json_output",
+                         help="Output as JSON")
+    p_merge.set_defaults(func=cmd_cog_merge)

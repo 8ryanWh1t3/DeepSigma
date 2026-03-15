@@ -156,7 +156,7 @@ class TestExport:
         assert bundle.manifest.bundle_id == "ds-artifact-001"
         assert len(bundle.artifacts) == 5  # 1 evidence + 1 rationale + 1 memory + 1 drift + 1 patch
         assert bundle.proof is not None
-        assert len(bundle.proof.proof_chain) == 1
+        assert len(bundle.proof.proof_chain) == 5  # one per artifact
         assert len(bundle.replay_steps) == 2
 
     def test_export_artifact_types(self, minimal_ds_artifact):
@@ -339,3 +339,265 @@ class TestRoundTrip:
         assert reimported.artifact_id == minimal_ds_artifact.artifact_id
         assert len(reimported.truth_claims) == 1
         assert len(reimported.memory_refs) == 1
+
+
+# ── Schema validation tests ──────────────────────────────────────
+
+
+class TestSchemaValidation:
+    """Test JSON Schema validation of COG bundles."""
+
+    def test_valid_bundle_passes_schema(self, sample_bundle_data):
+        """A well-formed bundle should pass schema validation."""
+        from core.schema_validator import clear_cache, validate
+
+        clear_cache()
+        result = validate(sample_bundle_data, "cog_bundle")
+        assert result.valid, result.errors
+
+    def test_missing_bundle_id_fails(self, sample_bundle_data):
+        """A bundle with no bundleId should fail validation."""
+        from core.schema_validator import clear_cache, validate
+
+        clear_cache()
+        data = copy.deepcopy(sample_bundle_data)
+        del data["manifest"]["bundleId"]
+        result = validate(data, "cog_bundle")
+        assert not result.valid
+
+    def test_invalid_ref_type_fails(self, sample_bundle_data):
+        """An artifact with an invalid refType should fail validation."""
+        from core.schema_validator import clear_cache, validate
+
+        clear_cache()
+        data = copy.deepcopy(sample_bundle_data)
+        data["artifacts"][0]["refType"] = "invalid_type"
+        result = validate(data, "cog_bundle")
+        assert not result.valid
+
+    def test_optional_fields_omitted(self):
+        """A minimal bundle with only manifest should pass."""
+        from core.schema_validator import clear_cache, validate
+
+        clear_cache()
+        data = {"manifest": {"bundleId": "minimal-001"}}
+        result = validate(data, "cog_bundle")
+        assert result.valid, result.errors
+
+
+# ── Proof chain tests ────────────────────────────────────────────
+
+
+class TestProofChain:
+    """Test per-artifact proof chain build and verify."""
+
+    def test_build_chain_length(self, minimal_ds_artifact):
+        """Chain should have one entry per artifact."""
+        from core.integrations.cog_adapter import deepsigma_to_cog
+        from core.integrations.cog_adapter.proof_chain import build_proof_chain
+
+        bundle = deepsigma_to_cog(minimal_ds_artifact)
+        chain = build_proof_chain(bundle.artifacts)
+        assert len(chain) == len(bundle.artifacts)
+
+    def test_verify_untampered_chain(self, minimal_ds_artifact):
+        """A freshly built chain should verify cleanly."""
+        from core.integrations.cog_adapter import deepsigma_to_cog
+        from core.integrations.cog_adapter.proof_chain import (
+            build_proof_chain,
+            verify_proof_chain,
+        )
+
+        bundle = deepsigma_to_cog(minimal_ds_artifact)
+        chain = build_proof_chain(bundle.artifacts)
+        valid, errors = verify_proof_chain(chain)
+        assert valid, errors
+
+    def test_detect_tampered_link(self, minimal_ds_artifact):
+        """Tampering with a chainHash should be detected."""
+        from core.integrations.cog_adapter import deepsigma_to_cog
+        from core.integrations.cog_adapter.proof_chain import (
+            build_proof_chain,
+            verify_proof_chain,
+        )
+
+        bundle = deepsigma_to_cog(minimal_ds_artifact)
+        chain = build_proof_chain(bundle.artifacts)
+        chain[1]["chainHash"] = "sha256:tampered"
+        valid, errors = verify_proof_chain(chain)
+        assert not valid
+        assert any("chainHash mismatch" in e for e in errors)
+
+    def test_empty_chain_valid(self):
+        """An empty chain is valid."""
+        from core.integrations.cog_adapter.proof_chain import verify_proof_chain
+
+        valid, errors = verify_proof_chain([])
+        assert valid
+        assert errors == []
+
+
+# ── Diff tests ───────────────────────────────────────────────────
+
+
+class TestDiff:
+    """Test bundle diff/compare."""
+
+    def test_identical_bundles(self, sample_bundle):
+        """Diffing identical bundles should show no changes."""
+        from core.integrations.cog_adapter.diff import diff_cog_bundles
+
+        diff = diff_cog_bundles(sample_bundle, sample_bundle)
+        assert diff.added_artifacts == []
+        assert diff.removed_artifacts == []
+        assert diff.modified_artifacts == []
+
+    def test_added_artifact(self, sample_bundle):
+        """An artifact present only in 'after' is detected as added."""
+        from core.integrations.cog_adapter.diff import diff_cog_bundles
+        from core.integrations.cog_adapter.models import CogArtifactRef, CogBundle
+
+        after = CogBundle(
+            manifest=sample_bundle.manifest,
+            artifacts=sample_bundle.artifacts + [
+                CogArtifactRef(ref_id="new-001", ref_type="evidence"),
+            ],
+            proof=sample_bundle.proof,
+            replay_steps=sample_bundle.replay_steps,
+        )
+        diff = diff_cog_bundles(sample_bundle, after)
+        assert len(diff.added_artifacts) == 1
+        assert diff.added_artifacts[0]["refId"] == "new-001"
+
+    def test_removed_artifact(self, sample_bundle):
+        """An artifact present only in 'before' is detected as removed."""
+        from core.integrations.cog_adapter.diff import diff_cog_bundles
+        from core.integrations.cog_adapter.models import CogBundle
+
+        after = CogBundle(
+            manifest=sample_bundle.manifest,
+            artifacts=sample_bundle.artifacts[1:],  # drop first
+            proof=sample_bundle.proof,
+            replay_steps=sample_bundle.replay_steps,
+        )
+        diff = diff_cog_bundles(sample_bundle, after)
+        assert len(diff.removed_artifacts) == 1
+        assert diff.removed_artifacts[0]["refId"] == sample_bundle.artifacts[0].ref_id
+
+    def test_modified_artifact(self, sample_bundle):
+        """An artifact with changed hash is detected as modified."""
+        from core.integrations.cog_adapter.diff import diff_cog_bundles
+        from core.integrations.cog_adapter.models import CogArtifactRef, CogBundle
+
+        modified_art = CogArtifactRef(
+            ref_id=sample_bundle.artifacts[0].ref_id,
+            ref_type=sample_bundle.artifacts[0].ref_type,
+            content_hash="sha256:changed",
+            payload=sample_bundle.artifacts[0].payload,
+        )
+        after = CogBundle(
+            manifest=sample_bundle.manifest,
+            artifacts=[modified_art] + sample_bundle.artifacts[1:],
+            proof=sample_bundle.proof,
+            replay_steps=sample_bundle.replay_steps,
+        )
+        diff = diff_cog_bundles(sample_bundle, after)
+        assert len(diff.modified_artifacts) == 1
+        assert diff.modified_artifacts[0]["afterHash"] == "sha256:changed"
+
+
+# ── Batch tests ──────────────────────────────────────────────────
+
+
+class TestBatch:
+    """Test batch import/export, filter, and merge."""
+
+    def test_batch_import(self, tmp_path, minimal_ds_artifact):
+        """Batch import a directory of bundles."""
+        from core.integrations.cog_adapter import deepsigma_to_cog, write_cog_bundle
+        from core.integrations.cog_adapter.batch import batch_import_cog_bundles
+
+        # Write two bundle files
+        for suffix in ("a", "b"):
+            bundle = deepsigma_to_cog(minimal_ds_artifact)
+            write_cog_bundle(bundle, str(tmp_path / f"bundle_{suffix}.json"))
+
+        result = batch_import_cog_bundles([
+            str(tmp_path / "bundle_a.json"),
+            str(tmp_path / "bundle_b.json"),
+        ])
+        assert result.total == 2
+        assert result.succeeded == 2
+        assert result.failed == 0
+
+    def test_batch_export(self, tmp_path, minimal_ds_artifact):
+        """Batch export multiple artifacts."""
+        from core.integrations.cog_adapter.batch import batch_export_deepsigma
+
+        result = batch_export_deepsigma([minimal_ds_artifact], str(tmp_path))
+        assert result.succeeded == 1
+        assert (tmp_path / "ds-artifact-001.cog.json").exists()
+
+    def test_filter_artifacts(self, sample_bundle):
+        """Filter artifacts by ref_type."""
+        from core.integrations.cog_adapter.batch import filter_artifacts
+
+        evidence = filter_artifacts(sample_bundle, {"evidence"})
+        assert len(evidence) == 1
+        assert evidence[0].ref_type == "evidence"
+
+        multi = filter_artifacts(sample_bundle, {"evidence", "drift"})
+        assert len(multi) == 2
+
+    def test_merge_bundles(self, sample_bundle):
+        """Merge two bundles with deduplication."""
+        from core.integrations.cog_adapter.batch import merge_bundles
+        from core.integrations.cog_adapter.models import CogArtifactRef, CogBundle, CogManifest
+
+        other = CogBundle(
+            manifest=CogManifest(bundle_id="other-001"),
+            artifacts=[
+                CogArtifactRef(ref_id="new-evidence-001", ref_type="evidence"),
+                # duplicate from sample_bundle
+                sample_bundle.artifacts[0],
+            ],
+        )
+        merged = merge_bundles([sample_bundle, other])
+        ref_ids = [a.ref_id for a in merged.artifacts]
+        # Deduplication: sample_bundle's artifact[0] should appear once
+        assert ref_ids.count(sample_bundle.artifacts[0].ref_id) == 1
+        assert "new-evidence-001" in ref_ids
+        assert merged.manifest.bundle_id.startswith("merged-")
+
+
+# ── Streaming tests ──────────────────────────────────────────────
+
+
+class TestStreaming:
+    """Test streaming artifact import."""
+
+    def test_stream_cog_artifacts(self):
+        """Stream yields correct number of artifacts."""
+        from core.integrations.cog_adapter.importer import stream_cog_artifacts
+
+        artifacts = list(stream_cog_artifacts(str(SAMPLE_BUNDLE_PATH)))
+        assert len(artifacts) == 5
+        assert artifacts[0].ref_id == "evidence-001"
+
+    def test_stream_empty_bundle(self, tmp_path):
+        """Stream from a bundle with no artifacts yields nothing."""
+        import json
+        from core.integrations.cog_adapter.importer import stream_cog_artifacts
+
+        path = tmp_path / "empty.json"
+        path.write_text(json.dumps({"manifest": {"bundleId": "empty"}}))
+        artifacts = list(stream_cog_artifacts(str(path)))
+        assert artifacts == []
+
+    def test_load_metadata_only(self):
+        """Metadata-only load returns manifest and proof without artifacts."""
+        from core.integrations.cog_adapter.importer import load_cog_bundle_metadata
+
+        manifest, proof = load_cog_bundle_metadata(str(SAMPLE_BUNDLE_PATH))
+        assert manifest.bundle_id == "cog-bundle-demo-001"
+        assert proof is not None

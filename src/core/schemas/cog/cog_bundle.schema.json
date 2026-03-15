@@ -1,0 +1,66 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://sigma-overwatch.dev/schemas/cog_bundle.schema.json",
+    "title": "COG Bundle",
+    "description": "Top-level COG portable cognition/proof bundle. Maps DeepSigma's five primitives to COG's four cognition planes.",
+    "type": "object",
+    "required": ["manifest"],
+    "additionalProperties": true,
+    "properties": {
+        "manifest": {
+            "type": "object",
+            "required": ["bundleId"],
+            "properties": {
+                "bundleId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Unique bundle identifier."
+                },
+                "version": {
+                    "type": "string",
+                    "description": "Bundle format version."
+                },
+                "createdAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "ISO 8601 creation timestamp."
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Human-readable bundle description."
+                },
+                "artifactRefs": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "Ordered list of artifact ref IDs in this bundle."
+                },
+                "metadata": {
+                    "type": "object",
+                    "description": "Optional manifest-level metadata."
+                }
+            }
+        },
+        "artifacts": {
+            "type": "array",
+            "items": {
+                "$ref": "https://sigma-overwatch.dev/schemas/cog_artifact_ref.schema.json"
+            },
+            "description": "Artifact references in the bundle."
+        },
+        "proof": {
+            "$ref": "https://sigma-overwatch.dev/schemas/cog_proof.schema.json",
+            "description": "Proof metadata section."
+        },
+        "replaySteps": {
+            "type": "array",
+            "items": {
+                "$ref": "https://sigma-overwatch.dev/schemas/cog_replay_step.schema.json"
+            },
+            "description": "Ordered replay steps for decision replay."
+        },
+        "rawMetadata": {
+            "type": "object",
+            "description": "Optional raw metadata from the originating system."
+        }
+    }
+}

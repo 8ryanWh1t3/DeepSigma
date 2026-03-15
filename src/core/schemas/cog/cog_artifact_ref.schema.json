@@ -1,0 +1,30 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://sigma-overwatch.dev/schemas/cog_artifact_ref.schema.json",
+    "title": "COG Artifact Reference",
+    "description": "A single artifact within a COG bundle, mapping to one of DeepSigma's five primitives.",
+    "type": "object",
+    "required": ["refId", "refType"],
+    "additionalProperties": false,
+    "properties": {
+        "refId": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Unique artifact identifier within the bundle."
+        },
+        "refType": {
+            "type": "string",
+            "enum": ["evidence", "rationale", "memory", "drift", "patch"],
+            "description": "Semantic type mapping to a DeepSigma primitive."
+        },
+        "contentHash": {
+            "type": "string",
+            "pattern": "^(sha256:[a-f0-9]{64})?$",
+            "description": "SHA-256 content hash with sha256: prefix."
+        },
+        "payload": {
+            "type": "object",
+            "description": "Artifact payload (structure depends on refType)."
+        }
+    }
+}
