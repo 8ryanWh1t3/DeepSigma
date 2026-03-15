@@ -273,6 +273,9 @@ ALLOWED_ACRONYMS = {
     # CERPA EV Charging / Healthcare / Smart Cities / Industry Verticals EDGE
     "AHA", "ALERT", "AQI", "CITY", "COBIT", "CROSS", "DEMAND", "DOMAIN",
     "DTLA", "EMS", "EVENTS", "FPR", "LAX", "MRI", "MULTI", "NWS", "SDG",
+    # CERPA Mars Mission EDGE — space ops, environment, comms tokens
+    "ASSIST", "COMMS", "DELAY", "DUST", "EARTH", "ISRU", "LIDAR",
+    "MARS", "MOXIE", "NASA", "NPR", "SOLAR", "SPE", "STORM",
     # Context Envelope dimension names
     "WHEN", "WHERE",
     # Decision Accounting — cost/value/debt ID prefixes, category enums
