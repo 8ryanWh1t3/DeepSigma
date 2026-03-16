@@ -644,9 +644,9 @@ footer strong{color:var(--accent);font-weight:600}
     <div class="card">
       <h3>Board-Ready Queue</h3>
       <table><thead><tr><th>Finding</th><th>BRQ</th><th>Severity</th><th>Action</th></tr></thead><tbody>
-        <tr><td class="mono" style="color:var(--accent)">F-184</td><td style="color:var(--ok)">0.91</td><td><span class="badge sev-high">HIGH</span></td><td>Approve Patch</td></tr>
-        <tr><td class="mono" style="color:var(--accent)">F-201</td><td style="color:var(--ok)">0.88</td><td><span class="badge sev-med">MED</span></td><td>Close</td></tr>
-        <tr><td class="mono" style="color:var(--accent)">F-155</td><td style="color:var(--bad)">0.63</td><td><span class="badge sev-high">HIGH</span></td><td>Send Back</td></tr>
+        <tr><td class="mono" style="color:var(--warn)">F-184</td><td style="color:var(--ok)">0.91</td><td><span class="badge sev-high">HIGH</span></td><td>Approve Patch</td></tr>
+        <tr><td class="mono" style="color:var(--ok)">F-201</td><td style="color:var(--ok)">0.88</td><td><span class="badge sev-med">MED</span></td><td>Close</td></tr>
+        <tr><td class="mono" style="color:var(--warn)">F-155</td><td style="color:var(--bad)">0.63</td><td><span class="badge sev-high">HIGH</span></td><td>Send Back</td></tr>
       </tbody></table>
     </div>
     <div class="card">
@@ -694,9 +694,9 @@ footer strong{color:var(--accent);font-weight:600}
   </div>
   <div class="card">
     <table><thead><tr><th>Finding</th><th>Sev</th><th>BRQ</th><th>DEG</th><th>CG</th><th>Recur</th><th>Recommendation</th><th>Action</th></tr></thead><tbody id="boardTbody">
-      <tr style="cursor:pointer" data-fid="184"><td class="mono" style="color:var(--accent)">F-184</td><td><span class="badge sev-high">HIGH</span></td><td style="color:var(--ok)">0.91</td><td>8d</td><td>22</td><td><span class="recur">×3</span></td><td>Approve Patch</td><td><button class="ok" style="font-size:9px">Approve</button></td></tr>
-      <tr style="cursor:pointer" data-fid="201"><td class="mono" style="color:var(--accent)">F-201</td><td><span class="badge sev-med">MED</span></td><td style="color:var(--ok)">0.88</td><td>4d</td><td>18</td><td>—</td><td>Close</td><td><button class="ok" style="font-size:9px">Close</button></td></tr>
-      <tr style="cursor:pointer" data-fid="155"><td class="mono" style="color:var(--accent)">F-155</td><td><span class="badge sev-high">HIGH</span></td><td style="color:var(--bad)">0.63</td><td style="color:var(--bad)">15d</td><td style="color:var(--bad)">47</td><td><span class="recur">×2</span></td><td>Send Back</td><td><button class="danger" style="font-size:9px">Send Back</button></td></tr>
+      <tr style="cursor:pointer" data-fid="184"><td class="mono" style="color:var(--warn)">F-184</td><td><span class="badge sev-high">HIGH</span></td><td style="color:var(--ok)">0.91</td><td>8d</td><td>22</td><td><span class="recur">×3</span></td><td>Approve Patch</td><td><button class="ok" style="font-size:9px">Approve</button></td></tr>
+      <tr style="cursor:pointer" data-fid="201"><td class="mono" style="color:var(--ok)">F-201</td><td><span class="badge sev-med">MED</span></td><td style="color:var(--ok)">0.88</td><td>4d</td><td>18</td><td>—</td><td>Close</td><td><button class="ok" style="font-size:9px">Close</button></td></tr>
+      <tr style="cursor:pointer" data-fid="155"><td class="mono" style="color:var(--warn)">F-155</td><td><span class="badge sev-high">HIGH</span></td><td style="color:var(--bad)">0.63</td><td style="color:var(--bad)">15d</td><td style="color:var(--bad)">47</td><td><span class="recur">×2</span></td><td>Send Back</td><td><button class="danger" style="font-size:9px">Send Back</button></td></tr>
     </tbody></table>
   </div>
   <div class="grid3" id="boardDetail">
@@ -819,8 +819,8 @@ footer strong{color:var(--accent);font-weight:600}
     <div class="card">
       <h3>Search Results</h3>
       <div class="wire" id="memResults">
-        <div class="wr" style="cursor:pointer" data-fid="184"><span class="wl mono" style="color:var(--accent)">F-184</span><span class="wv">SOP not aligned. In Review. BRQ 0.91. Recurring ×3.</span></div>
-        <div class="wr" style="cursor:pointer" data-fid="155"><span class="wl mono" style="color:var(--accent)">F-155</span><span class="wv">CCTV gap Building 7. In Review. CG: 47.</span></div>
+        <div class="wr" style="cursor:pointer" data-fid="184"><span class="wl mono" style="color:var(--warn)">F-184</span><span class="wv">SOP not aligned. In Review. BRQ 0.91. Recurring ×3.</span></div>
+        <div class="wr" style="cursor:pointer" data-fid="155"><span class="wl mono" style="color:var(--warn)">F-155</span><span class="wv">CCTV gap Building 7. In Review. CG: 47.</span></div>
         <div class="wr" style="cursor:pointer" data-fid="160"><span class="wl mono" style="color:var(--bad)">F-160</span><span class="wv">Perimeter fence lapse. Reopened. Patch failed.</span></div>
         <div class="wr" style="cursor:pointer" data-fid="195"><span class="wl mono" style="color:var(--ok)">F-195</span><span class="wv">Incident reporting SLA. Closed. PAR: held.</span></div>
         <div class="wr"><span class="wl mono" style="color:#a78bfa">MG-77</span><span class="wv">Root cause: SOP custodian role not assigned at unit level.</span></div>
@@ -913,9 +913,9 @@ footer strong{color:var(--accent);font-weight:600}
       <button class="primary">Export Audit Package</button>
     </div>
     <table><thead><tr><th>Finding</th><th>Closed</th><th>Verified</th><th>Evidence</th><th>Reopened</th><th>Decision By</th><th>Provenance Chain</th></tr></thead><tbody id="auditTbody">
-      <tr style="cursor:pointer" data-fid="195"><td class="mono" style="color:var(--accent)">F-195</td><td>2026-03-28</td><td style="color:var(--ok)">✓ Verified</td><td>4</td><td>No</td><td>Board Chair</td><td class="mono" style="font-size:8px;color:var(--muted)">CL-198 → R-287 → P-540</td></tr>
-      <tr style="cursor:pointer" data-fid="184"><td class="mono" style="color:var(--accent)">F-184</td><td>—</td><td style="color:var(--warn)">In Review</td><td>3</td><td>No</td><td>—</td><td class="mono" style="font-size:8px;color:var(--muted)">R-301 → P-555 (pending)</td></tr>
-      <tr style="cursor:pointer" data-fid="160"><td class="mono" style="color:var(--accent)">F-160</td><td>2026-02-20</td><td style="color:var(--bad)">✕ Reopened</td><td>2</td><td style="color:var(--bad)">Yes</td><td>Deputy</td><td class="mono" style="font-size:8px;color:var(--muted)">CL-172 → R-245 → P-495</td></tr>
+      <tr style="cursor:pointer" data-fid="195"><td class="mono" style="color:var(--ok)">F-195</td><td>2026-03-28</td><td style="color:var(--ok)">✓ Verified</td><td>4</td><td>No</td><td>Board Chair</td><td class="mono" style="font-size:8px;color:var(--muted)">CL-198 → R-287 → P-540</td></tr>
+      <tr style="cursor:pointer" data-fid="184"><td class="mono" style="color:var(--warn)">F-184</td><td>—</td><td style="color:var(--warn)">In Review</td><td>3</td><td>No</td><td>—</td><td class="mono" style="font-size:8px;color:var(--muted)">R-301 → P-555 (pending)</td></tr>
+      <tr style="cursor:pointer" data-fid="160"><td class="mono" style="color:var(--bad)">F-160</td><td>2026-02-20</td><td style="color:var(--bad)">✕ Reopened</td><td>2</td><td style="color:var(--bad)">Yes</td><td>Deputy</td><td class="mono" style="font-size:8px;color:var(--muted)">CL-172 → R-245 → P-495</td></tr>
     </tbody></table>
   </div>
   <div class="card"><h3>Evidence Chain — F-195</h3>
@@ -2104,7 +2104,7 @@ function updateBoardDetail(fid){
   var f=F[fid];if(!f)return;
   var evOk=f.evidence.filter(function(e){return e.ok}).length;
   document.getElementById("bdRisk").innerHTML='<h3>Finding / Risk</h3>'+
-    '<div class="wr"><span class="wl">Finding</span><span class="wv" style="color:var(--accent)">'+f.id+'</span></div>'+
+    '<div class="wr"><span class="wl">Finding</span><span class="wv" style="color:'+(stColorMap[f.status]||"var(--bad)")+'">'+escHTML(f.id)+'</span></div>'+
     '<div class="wr"><span class="wl">Claim</span><span class="wv">'+f.claim.substring(0,60)+'</span></div>'+
     '<div class="wr"><span class="wl">Severity</span><span class="wv" style="color:var(--bad)">'+f.sev+'</span></div>'+
     '<div class="wr"><span class="wl">Owner</span><span class="wv">'+f.owner+'</span></div>';
@@ -2336,7 +2336,8 @@ document.getElementById("heatmapGrid").addEventListener("click",function(e){
   body+='<table style="font-size:10px"><thead><tr><th>Finding</th><th>Title</th><th>OOL</th><th>Status</th></tr></thead><tbody>';
   findings.forEach(function(f){
     var stColor=f.status==="Closed"?"ok":f.status==="Reopened"?"bad":f.status==="In Review"?"warn":"accent";
-    body+='<tr style="cursor:pointer" data-hmfid="'+f.id+'"><td class="mono" style="color:var(--accent)">'+f.id+'</td><td>'+f.title+'</td><td>'+f.ool+'</td><td style="color:var(--'+stColor+')">'+f.status+'</td></tr>';
+    var fidColor=f.status==="Closed"||f.status==="Patch Approved"||f.status==="Closure Pending"?"ok":f.status==="New"||f.status==="Reopened"?"bad":"warn";
+    body+='<tr style="cursor:pointer" data-hmfid="'+f.id+'"><td class="mono" style="color:var(--'+fidColor+')">'+escHTML(f.id)+'</td><td>'+escHTML(f.title)+'</td><td>'+escHTML(f.ool)+'</td><td style="color:var(--'+stColor+')">'+escHTML(f.status)+'</td></tr>';
   });
   body+='</tbody></table>';
   if(sev==="HIGH"&&(ool==="8-14"||ool==="14+")){
@@ -2373,9 +2374,9 @@ document.getElementById("heatmapGrid").addEventListener("click",function(e){
         detEl.innerHTML=
           '<div style="border-top:1px solid var(--line);padding-top:12px">'+
           '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">'+
-          '<span class="mono" style="font-size:14px;color:var(--accent);font-weight:700">'+f.id+'</span>'+
+          '<span class="mono" style="font-size:14px;color:'+(stColorMap[f.status]||"var(--bad)")+';font-weight:700">'+escHTML(f.id)+'</span>'+
           sevBadge(f.sev)+stBadge(f.status)+
-          '<span style="font-size:9px;color:var(--muted)">Owner: <strong style="color:var(--txt)">'+f.owner+'</strong></span>'+
+          '<span style="font-size:9px;color:var(--muted)">Owner: <strong style="color:var(--txt)">'+escHTML(f.owner)+'</strong></span>'+
           '<span style="font-size:9px;color:var(--muted)">BRQ: <strong>'+f.brq+'</strong></span>'+
           (f.recurring>0?'<span class="recur">RECURRING × '+f.recurring+'</span>':'')+
           '</div>'+
