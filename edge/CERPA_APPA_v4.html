@@ -1902,10 +1902,13 @@ if(btnGraphSummary){
       '<span style="color:var(--muted)">Root Causes</span><strong>'+causes+'</strong>'+
       '<span style="color:var(--muted)">Max Fan-out</span><strong>'+maxNode+' ('+maxFan+')</strong>'+
       '</div>'+
-      '<button style="margin-top:8px;width:100%;font-size:10px;padding:4px" onclick="this.parentElement.remove()">Close</button>'+
+      '<button id="graphSummaryClose" style="margin-top:8px;width:100%;font-size:10px;padding:4px">Close</button>'+
       '</div>';
     var wrap=document.getElementById("mgWrap");
-    if(wrap){var d=document.createElement("div");d.innerHTML=html;wrap.style.position="relative";wrap.appendChild(d.firstChild)}
+    if(wrap){var d=document.createElement("div");safeHTML(d,html);wrap.style.position="relative";wrap.appendChild(d.firstChild);
+      var closeBtn=document.getElementById("graphSummaryClose");
+      if(closeBtn)closeBtn.addEventListener("click",function(){var ov=document.getElementById("graphSummaryOverlay");if(ov)ov.remove()});
+    }
   });
 }
 
