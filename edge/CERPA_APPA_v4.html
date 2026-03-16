@@ -619,7 +619,7 @@ footer strong{color:var(--accent);font-weight:600}
     <div class="kpi kpi-green clickable" data-kpi="cis"><div class="kv kv-green">81</div><div class="kl">CIS</div><div class="kfull">Closure Integrity Score</div><div class="spark-row" data-spark="60,64,62,68,72,74,77,81"></div></div>
     <div class="kpi kpi-green clickable" data-kpi="par"><div class="kv kv-green">88%</div><div class="kl">PAR</div><div class="kfull">Patch Adhesion Rate</div><div class="spark-row" data-spark="70,72,68,75,79,80,84,88"></div></div>
     <div class="kpi kpi-amber clickable" data-kpi="des"><div class="kv kv-amber">22</div><div class="kl">DES</div><div class="kfull">Deficiency Echo Score</div><div class="spark-row" data-spark="30,28,32,26,24,25,23,22"></div></div>
-    <div class="kpi kpi-cyan clickable" data-kpi="open"><div class="kv kv-cyan">16</div><div class="kl">Open</div><div class="kfull">Open Findings</div><div class="spark-row" data-spark="22,21,20,19,18,17,17,16"></div></div>
+    <div class="kpi kpi-cyan clickable" data-kpi="open"><div class="kv kv-cyan">19</div><div class="kl">Open</div><div class="kfull">Open Findings</div><div class="spark-row" data-spark="25,24,23,22,21,20,20,19"></div></div>
     <div class="kpi kpi-green clickable" data-kpi="closed"><div class="kv kv-green">31</div><div class="kl">Closed</div><div class="kfull">Verified Closures</div><div class="spark-row" data-spark="12,15,18,20,22,25,28,31"></div></div>
   </div>
   <div class="grid2">
@@ -668,7 +668,7 @@ footer strong{color:var(--accent);font-weight:600}
   <div class="filters">
     <select><option>All Status</option><option>New</option><option>Assigned</option><option>In Review</option><option>Patch Approved</option><option>Closure Pending</option><option>Closed</option><option>Reopened</option></select>
     <select><option>All Severity</option><option>HIGH</option><option>MEDIUM</option><option>LOW</option></select>
-    <select><option>All Functions</option><option>Protection</option><option>Access Control</option><option>Training</option></select>
+    <select><option>All Functions</option><option>Protection</option><option>Access Control</option><option>Training</option><option>Security</option></select>
     <input type="text" placeholder="Search findings..." style="width:200px"/>
     <button class="primary" id="btnNew">+ New Finding</button>
     <button id="btnCompare" style="border-color:rgba(139,92,246,.3);color:#a78bfa">Compare Findings</button>
@@ -1055,7 +1055,22 @@ var F={
   claim:"Unescorted contractor observed in restricted area during routine patrol",event:"Guard patrol identified contractor with expired temporary badge in Building 2 server room",risk:"High access control exposure / Active security breach",
   rootCause:"Contractor badge expiry notification not reaching sponsoring office",patch:"Suspend badge + implement automated expiry deactivation + sponsor notification chain",patchDue:"2026-05-08",ppi:0.45,
   evidence:[{name:"patrol_report.pdf",ok:1},{name:"badge_system_config.pdf",ok:0}],
-  edi:0.5,timeline:["Apr 12","—","—","—","—","—","—"],tlState:[1,0,0,0,0,0,0]}
+  edi:0.5,timeline:["Apr 12","—","—","—","—","—","—"],tlState:[1,0,0,0,0,0,0]},
+"275":{id:"F-275",title:"Unauthorized USB device detected on classified workstation",status:"New",sev:"HIGH",owner:"R. Chen",brq:0.25,cg:2,deg:"—",due:"Apr 20",func:"Security",src:"Security Alert",date:"2026-04-14",recurring:0,
+  claim:"USB mass storage device connected to classified terminal in SCIF Building 3",event:"Endpoint monitoring flagged unauthorized removable media connection at 0847",risk:"High data loss exposure / Potential spillage incident",
+  rootCause:"USB port disablement policy not enforced on recently reimaged workstation",patch:"Isolate workstation + forensic scan + enforce USB GPO across all SCIF terminals",patchDue:"2026-04-20",ppi:0.40,
+  evidence:[{name:"endpoint_alert_log.pdf",ok:1},{name:"forensic_scan_report.pdf",ok:0},{name:"GPO_enforcement_screenshot.png",ok:0}],
+  edi:0.5,timeline:["Apr 14","—","—","—","—","—","—"],tlState:[1,0,0,0,0,0,0]},
+"280":{id:"F-280",title:"Tailgating incident at Building 1 secure entrance — 2 events in 7 days",status:"Assigned",sev:"HIGH",owner:"J. Smith",brq:0.48,cg:8,deg:"—",due:"Apr 26",func:"Security",src:"Security Alert",date:"2026-04-09",recurring:1,
+  claim:"Two confirmed tailgating incidents captured on CCTV at Building 1 mantrap",event:"Guard force review of entrance footage identified unauthorized piggyback entries",risk:"High physical security exposure / Insider threat vector",
+  rootCause:"Mantrap anti-tailgate sensor offline since maintenance window Mar 28",patch:"Restore anti-tailgate sensor + post guard during peak hours + awareness briefing",patchDue:"2026-04-26",ppi:0.62,
+  evidence:[{name:"CCTV_capture_B1.mp4",ok:1},{name:"sensor_repair_ticket.pdf",ok:1},{name:"awareness_brief_slides.pdf",ok:0}],
+  edi:1.0,timeline:["Apr 9","Apr 11","—","—","—","—","—"],tlState:[1,1,0,0,0,0,0]},
+"285":{id:"F-285",title:"After-hours intrusion alarm — false positive rate exceeds 40%",status:"In Review",sev:"MED",owner:"K. Lee",brq:0.65,cg:28,deg:"11d",due:"Apr 22",func:"Security",src:"Security Alert",date:"2026-03-26",recurring:2,
+  claim:"IDS false positive rate at 43% is degrading guard force response confidence",event:"Monthly alarm analysis showed 19 of 44 after-hours alarms were environmental false triggers",risk:"Medium detection exposure / Response fatigue risk",
+  rootCause:"Sensor sensitivity not recalibrated after HVAC system upgrade",patch:"Recalibrate all zone sensors + implement environmental filtering + retrain response team",patchDue:"2026-04-22",ppi:0.74,
+  evidence:[{name:"alarm_analysis_report.xlsx",ok:1},{name:"sensor_calibration_log.pdf",ok:1},{name:"HVAC_change_order.pdf",ok:0}],
+  edi:2.0,timeline:["Mar 26","Mar 28","Apr 2","Apr 8","—","—","—"],tlState:[1,1,2,1,0,0,0]}
 };
 var TL_LABELS=["Observe","Assign","Review","Patch","Prove","Close","Remember"];
 
@@ -1617,7 +1632,7 @@ document.querySelectorAll("#s-dash button").forEach(function(b){
         '<div class="wr"><span class="wl">Period</span><span class="wv">Q2 FY26</span></div>'+
         '<div class="wr"><span class="wl">CCCI</span><span class="wv" style="color:var(--warn)">78.4 (AMBER)</span></div>'+
         '<div class="wr"><span class="wl">CIS</span><span class="wv" style="color:var(--ok)">81</span></div>'+
-        '<div class="wr"><span class="wl">Open</span><span class="wv">16 findings</span></div>'+
+        '<div class="wr"><span class="wl">Open</span><span class="wv">19 findings</span></div>'+
         '<div class="wr"><span class="wl">Closed</span><span class="wv">31 verified</span></div>'+
         '<div class="wr"><span class="wl">Reopened</span><span class="wv" style="color:var(--bad)">6</span></div>'+
         '<div class="wr"><span class="wl">Recurring</span><span class="wv" style="color:var(--warn)">3 trending up</span></div>'+
@@ -2207,7 +2222,7 @@ var kpiData={
   cis:{title:"Closure Integrity Score (CIS)",body:'<div class="wr"><span class="wl">Current</span><span class="wv" style="color:var(--ok)">81</span></div><div class="wr"><span class="wl">Formula</span><span class="wv mono" style="font-size:9px">0.25 PAR + 0.20 EDI_norm + 0.25 (1-FCR) + 0.15 (1-DEG_norm) + 0.15 PPI</span></div><div class="wr"><span class="wl">PAR</span><span class="wv">0.88 × 0.25 = 0.220</span></div><div class="wr"><span class="wl">EDI_norm</span><span class="wv">0.74 × 0.20 = 0.148</span></div><div class="wr"><span class="wl">1-FCR</span><span class="wv">0.90 × 0.25 = 0.225</span></div><div class="wr"><span class="wl">1-DEG_norm</span><span class="wv">0.65 × 0.15 = 0.098</span></div><div class="wr"><span class="wl">PPI</span><span class="wv">0.78 × 0.15 = 0.117</span></div><div style="margin-top:6px;font-size:10px;color:var(--accent);font-weight:700">CIS &gt; 0.75 = governance loop is real</div>'},
   par:{title:"Patch Adhesion Rate (PAR)",body:'<div class="wr"><span class="wl">Current</span><span class="wv" style="color:var(--ok)">88%</span></div><div class="wr"><span class="wl">Formula</span><span class="wv mono" style="font-size:9px">findings not reopened within 2 windows / total patched</span></div><div class="wr"><span class="wl">Patched</span><span class="wv">31 findings</span></div><div class="wr"><span class="wl">Held</span><span class="wv">27 (not reopened)</span></div><div class="wr"><span class="wl">Failed</span><span class="wv" style="color:var(--bad)">4 reopened</span></div><div class="wr"><span class="wl">Trend</span><span class="wv" style="color:var(--ok)">↑ from 79% Q1</span></div>'},
   des:{title:"Deficiency Echo Score (DES)",body:'<div class="wr"><span class="wl">Current</span><span class="wv" style="color:var(--warn)">22</span></div><div class="wr"><span class="wl">Formula</span><span class="wv mono" style="font-size:9px">repeat occurrences × spread factor × severity weight</span></div><div class="wr"><span class="wl">Top Echo</span><span class="wv">Physical security training (7 instances, ↑)</span></div><div class="wr"><span class="wl">2nd</span><span class="wv">Access control documentation (5, →)</span></div><div class="wr"><span class="wl">3rd</span><span class="wv">Inspection evidence gaps (4, ↑)</span></div><div class="wr"><span class="wl">Improving</span><span class="wv" style="color:var(--ok)">Incident reporting lag (4, ↓)</span></div>'},
-  open:{title:"Open Findings",body:'<div class="wr"><span class="wl">Total Open</span><span class="wv" style="color:var(--accent)">16</span></div><div class="wr"><span class="wl">New</span><span class="wv">3</span></div><div class="wr"><span class="wl">Assigned</span><span class="wv">4</span></div><div class="wr"><span class="wl">In Review</span><span class="wv">5</span></div><div class="wr"><span class="wl">Patch Approved</span><span class="wv">3</span></div><div class="wr"><span class="wl">Reopened</span><span class="wv" style="color:var(--bad)">1</span></div>'},
+  open:{title:"Open Findings",body:'<div class="wr"><span class="wl">Total Open</span><span class="wv" style="color:var(--accent)">19</span></div><div class="wr"><span class="wl">New</span><span class="wv">4</span></div><div class="wr"><span class="wl">Assigned</span><span class="wv">5</span></div><div class="wr"><span class="wl">In Review</span><span class="wv">6</span></div><div class="wr"><span class="wl">Patch Approved</span><span class="wv">3</span></div><div class="wr"><span class="wl">Reopened</span><span class="wv" style="color:var(--bad)">1</span></div>'},
   closed:{title:"Verified Closures",body:'<div class="wr"><span class="wl">Total Closed</span><span class="wv" style="color:var(--ok)">31</span></div><div class="wr"><span class="wl">Verified</span><span class="wv">28</span></div><div class="wr"><span class="wl">Pending Verification</span><span class="wv">3</span></div><div class="wr"><span class="wl">Avg Time to Close</span><span class="wv">18 days</span></div><div class="wr"><span class="wl">Avg Evidence</span><span class="wv">3.2 artifacts per closure</span></div>'}
 };
 document.getElementById("dashKpis").addEventListener("click",function(e){
@@ -2441,7 +2456,7 @@ addFeedItem();addFeedItem();addFeedItem();
 setInterval(addFeedItem,8000);
 
 /* ══════════ (#2) TAB BADGES ══════════ */
-var badgeCounts={find:16,board:3,audit:1};
+var badgeCounts={find:19,board:3,audit:1};
 function updateTabBadges(){
   tabs.forEach(function(t){
     var k=t.getAttribute("data-t");
