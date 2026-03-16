@@ -1118,6 +1118,7 @@ function escHTML(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").
 /* ══════════ FINDINGS TABLE RENDERER ══════════ */
 var stClassMap={"New":"st-new","Assigned":"st-assigned","In Review":"st-review","Patch Approved":"st-patched","Closure Pending":"st-pending","Closed":"st-closed","Reopened":"st-reopened"};
 var sevClassMap={"HIGH":"sev-high","MED":"sev-med","LOW":"sev-low"};
+var stColorMap={"New":"var(--bad)","Reopened":"var(--bad)","Assigned":"var(--warn)","In Review":"var(--warn)","Patch Approved":"var(--ok)","Closure Pending":"var(--ok)","Closed":"var(--ok)"};
 function renderFindingsTable(){
   var tbody=document.getElementById("findTbody");if(!tbody)return;
   var html="";
@@ -1132,9 +1133,10 @@ function renderFindingsTable(){
     var f=F[k];
     var stCls=stClassMap[f.status]||"st-new";
     var sevCls=sevClassMap[f.sev]||"sev-low";
+    var idColor=stColorMap[f.status]||"var(--bad)";
     var shortTitle=f.title.length>55?f.title.substring(0,52)+"...":f.title;
     html+='<tr style="cursor:pointer" data-fid="'+k+'">';
-    html+='<td class="mono" style="color:var(--accent)">'+escHTML(f.id)+'</td>';
+    html+='<td class="mono" style="color:'+idColor+'">'+escHTML(f.id)+'</td>';
     html+='<td>'+escHTML(shortTitle)+'</td>';
     html+='<td><span class="badge '+stCls+'">'+escHTML(f.status)+'</span></td>';
     html+='<td><span class="badge '+sevCls+'">'+escHTML(f.sev)+'</span></td>';
