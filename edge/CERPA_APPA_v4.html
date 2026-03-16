@@ -1177,20 +1177,15 @@ function renderTaskPanel(){
     safeHTML(taskList,'<div style="padding:20px;text-align:center;color:var(--muted);font-size:11px">No open tasks. All findings nominal.</div>');
     return;
   }
-  taskList.textContent='';
+  var html='';
   currentTasks.forEach(function(t){
-    var row=document.createElement("div");
-    row.className="task-row sev-"+t.severity;
-    row.setAttribute("data-task-tab",t.tab);
-    var dot=document.createElement("div");dot.className="task-dot";
-    row.appendChild(dot);
-    var wrap=document.createElement("div");
-    var lbl=document.createElement("div");lbl.className="task-label";lbl.textContent=t.label;
-    var det=document.createElement("div");det.className="task-detail";det.textContent=t.detail;
-    wrap.appendChild(lbl);wrap.appendChild(det);
-    row.appendChild(wrap);
-    taskList.appendChild(row);
+    html+='<div class="task-row sev-'+escHTML(t.severity)+'" data-task-tab="'+escHTML(t.tab)+'">'+
+      '<div class="task-dot"></div>'+
+      '<div><div class="task-label">'+escHTML(t.label)+'</div>'+
+      '<div class="task-detail">'+escHTML(t.detail)+'</div></div>'+
+      '</div>';
   });
+  taskList.innerHTML=html;
   taskList.querySelectorAll(".task-row[data-task-tab]").forEach(function(el){
     el.addEventListener("click",function(){
       var tab=el.getAttribute("data-task-tab");
@@ -1206,22 +1201,15 @@ function renderCriticalSummary(){
   var critical=currentTasks.filter(function(t){return t.severity==="critical"||t.severity==="high"}).slice(0,5);
   if(critical.length===0){card.style.display="none";return}
   card.style.display="block";
-  card.textContent='';
-  var h3=document.createElement("h3");
-  h3.style.cssText="color:var(--bad);margin-bottom:8px";
-  h3.textContent="Attention Required";
-  card.appendChild(h3);
+  var html='<h3 style="color:var(--bad);margin-bottom:8px">Attention Required</h3>';
   critical.forEach(function(t){
-    var row=document.createElement("div");
-    row.className="task-row sev-"+t.severity;
-    row.style.cssText="margin-bottom:4px;cursor:pointer";
-    row.setAttribute("data-crit-tab",t.tab);
-    var dot=document.createElement("div");dot.className="task-dot";
-    row.appendChild(dot);
-    var lbl=document.createElement("div");lbl.className="task-label";lbl.textContent=t.label;
-    row.appendChild(lbl);
-    row.addEventListener("click",function(){openTab(t.tab)});
-    card.appendChild(row);
+    html+='<div class="task-row sev-'+escHTML(t.severity)+'" data-crit-tab="'+escHTML(t.tab)+'" style="margin-bottom:4px;cursor:pointer">'+
+      '<div class="task-dot"></div>'+
+      '<div class="task-label">'+escHTML(t.label)+'</div></div>';
+  });
+  card.innerHTML=html;
+  card.querySelectorAll("[data-crit-tab]").forEach(function(el){
+    el.addEventListener("click",function(){openTab(el.getAttribute("data-crit-tab"))});
   });
 }
 if(btnTaskToggle){
@@ -2457,8 +2445,7 @@ if(mgSvgEl){
 }catch(enhErr){if(typeof console!=="undefined")console.log("[EDGE] Enhancement error: "+enhErr.message)}
 
 /* ══════════ INIT ══════════ */
-applyRole(false);
-renderTaskPanel();
+try{applyRole(false);renderTaskPanel()}catch(initErr){if(typeof console!=="undefined")console.log("[EDGE] Init error: "+initErr.message)}
 })();
 </script>
 </body>
