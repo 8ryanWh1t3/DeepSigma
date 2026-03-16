@@ -1,11 +1,19 @@
 <!--
- CERPA APPA EDGE v1.3.0
+ CERPA APPA EDGE v5.0.0
  ============================================================
  Army Protection Program (APP) Assessment — CERPA Operational UI
  Composite Enterprise Risk Posture Assessment (CERPA)
  Claim → Event → Review → Patch → Apply
  on the Truth | Reasoning | Memory substrate
  Deep Sigma EDGE format: single-file, zero-dependency, hardened
+
+ v5.0.0 Changes:
+ [x] Role surface enhancements and tab customization panel
+ [x] Task panel with visual prioritization and critical summary
+ [x] Contextual tooltips on all tab buttons
+ [x] Guided tour engine (10 stops)
+ [x] Mobile responsive improvements
+ [x] escHTML helper for safe string building
 
  v1.3.0 Changes:
  [x] Universal drawer for all action buttons
@@ -36,7 +44,7 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'"/>
 <script>
 (function(){"use strict";
-var B="EDGE_BUILD_ID:CERPA_APPA_EDGE_v1.3.0";
+var B="EDGE_BUILD_ID:CERPA_APPA_EDGE_v5.0.0";
 function _b(c){return function(){throw new Error("EDGE hardening: "+c+" blocked")}}
 window.fetch=_b("fetch");window.XMLHttpRequest=_b("XHR");window.WebSocket=_b("WS");
 window.EventSource=_b("ES");try{navigator.sendBeacon=_b("beacon")}catch(_){}
@@ -58,7 +66,7 @@ if(window.self===window.top){document.addEventListener("DOMContentLoaded",functi
 </script>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Deep Sigma EDGE — CERPA APP v1.3.0</title>
+<title>Deep Sigma EDGE — CERPA APP v5.0.0</title>
 <style>
 :root{--bg:#0b0f14;--card:#111824;--card2:#0d1520;--muted:#8aa0b5;--txt:#e7eef7;--accent:#7df9ff;--warn:#ffcc66;--bad:#ff6b6b;--ok:#5dff93;--ribbon:#1a2638;--line:#1b2a3a;--glow:rgba(125,249,255,.08);--mag:#ff6bff}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -327,6 +335,123 @@ footer strong{color:var(--accent);font-weight:600}
 .compare-pill.active{border-color:var(--accent);color:var(--accent);background:rgba(125,249,255,.06)}
 .compare-pill:hover{border-color:rgba(125,249,255,.25)}
 
+/* ── v5 Tab Prefs ── */
+.btn-icon{background:none;border:1px solid var(--line);border-radius:6px;color:var(--muted);padding:4px 8px;cursor:pointer;font-size:14px;line-height:1;transition:all .15s}
+.btn-icon:hover{color:var(--accent);border-color:var(--accent)}
+.tab-prefs-panel{position:absolute;top:100%;right:0;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:200px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.tab-prefs-panel h4{margin:0 0 8px;font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.5px}
+.tab-prefs-panel label{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--txt);padding:3px 0;cursor:pointer}
+.tab-prefs-panel input[type="checkbox"]{accent-color:var(--accent)}
+
+/* ── v5 Task Panel ── */
+.task-toggle{position:relative;background:none;border:1px solid var(--line);border-radius:6px;color:var(--muted);padding:4px 10px;cursor:pointer;font-size:12px}
+.task-toggle:hover{color:var(--mag);border-color:var(--mag)}
+.task-badge{position:absolute;top:-6px;right:-6px;background:var(--bad);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.task-badge.zero{display:none}
+#taskPanel{position:fixed;top:0;right:-380px;width:360px;height:100vh;background:var(--card);border-left:1px solid var(--line);z-index:600;transition:right .25s ease;display:flex;flex-direction:column;box-shadow:-4px 0 24px rgba(0,0,0,.4)}
+#taskPanel.open{right:0}
+.task-header{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.task-header h3{margin:0;font-size:14px;color:var(--mag)}
+.task-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px}
+.task-close:hover{color:var(--txt)}
+.task-list{flex:1;overflow-y:auto;padding:8px}
+.task-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;border-left:4px solid transparent;margin-bottom:4px}
+.task-row:hover{background:var(--card2)}
+.task-row.sev-critical{border-left-color:var(--bad)}
+.task-row.sev-high{border-left-color:var(--warn)}
+.task-row.sev-medium{border-left-color:var(--accent)}
+.task-row.sev-low{border-left-color:var(--ok)}
+.task-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.sev-critical .task-dot{background:var(--bad);box-shadow:0 0 6px var(--bad);animation:pulse 1.5s infinite}
+.sev-high .task-dot{background:var(--warn)}
+.sev-medium .task-dot{background:var(--accent)}
+.sev-low .task-dot{background:var(--ok)}
+.task-label{font-size:12px;color:var(--txt);line-height:1.4}
+.task-detail{font-size:10px;color:var(--muted);margin-top:2px}
+.task-tab-badge{font-size:9px;color:var(--accent);background:rgba(125,249,255,.1);padding:1px 6px;border-radius:4px;margin-top:3px;display:inline-block}
+.task-empty{color:var(--muted);font-size:12px;text-align:center;padding:40px 16px}
+.critical-card{border-left:4px solid var(--bad);margin-bottom:16px}
+.critical-card h4{color:var(--bad);margin:0 0 8px;font-size:13px}
+.critical-row{display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;font-size:11px;color:var(--txt)}
+.critical-row:hover{color:var(--mag)}
+.critical-row .cdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.critical-row .cdot.c{background:var(--bad)}
+.critical-row .cdot.h{background:var(--warn)}
+
+/* ── v5 Contextual Tooltips ── */
+[data-tip]{position:relative;cursor:help}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);padding:6px 10px;border-radius:6px;background:#1a2332;color:var(--txt);font-size:10px;max-width:280px;white-space:normal;z-index:999;border:1px solid var(--line);pointer-events:none;line-height:1.4}
+[data-tip]:hover::before{content:"";position:absolute;bottom:calc(100% + 2px);left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:#1a2332;z-index:999;pointer-events:none}
+
+/* ── v5 Guided Tour ── */
+.tour-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:800;cursor:pointer}
+.tour-card{position:fixed;z-index:810;background:var(--card);border:1px solid var(--accent);border-radius:12px;padding:16px 18px;max-width:340px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.6);animation:fadeIn .25s ease}
+.tour-card h4{margin:0 0 4px;color:var(--accent);font-size:13px}
+.tour-card p{margin:0 0 10px;font-size:11px;color:var(--muted);line-height:1.5}
+.tour-step-bar{display:flex;gap:4px;margin-bottom:10px}
+.tour-step-bar span{flex:1;height:3px;border-radius:2px;background:var(--line)}
+.tour-step-bar span.done{background:var(--accent)}
+.tour-step-bar span.cur{background:var(--mag)}
+.tour-btns{display:flex;gap:6px;justify-content:flex-end}
+.tour-btns button{font-size:10px;padding:5px 12px}
+
+/* ── Phase 4: Graph Filter Bar ── */
+.graph-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 12px;background:var(--card);border:1px solid var(--line);border-radius:8px;margin-bottom:10px}
+.graph-toolbar label{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--txt);cursor:pointer}
+.graph-toolbar input[type="checkbox"]{accent-color:var(--accent)}
+.graph-search{background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--txt);padding:4px 10px;font-size:11px;width:160px;outline:none}
+.graph-search:focus{border-color:var(--accent)}
+.graph-search::placeholder{color:var(--muted)}
+.graph-toolbar .sep{width:1px;height:20px;background:var(--line)}
+.graph-toolbar button{padding:3px 10px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--txt);cursor:pointer;font-size:10px}
+.graph-toolbar button.active{border-color:var(--accent);color:var(--accent)}
+.graph-highlight{filter:drop-shadow(0 0 8px var(--accent)) drop-shadow(0 0 4px var(--accent))}
+.graph-toolbar button:hover{border-color:var(--accent)}
+.graph-summary-overlay{position:absolute;top:12px;right:12px;background:rgba(17,25,39,.92);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:10px;color:var(--txt);z-index:10;min-width:160px}
+.graph-summary-overlay h5{margin:0 0 6px;color:var(--accent);font-size:11px}
+.graph-summary-overlay .gs-row{display:flex;justify-content:space-between;padding:2px 0}
+.graph-summary-overlay .gs-val{color:var(--ok);font-weight:600}
+
+/* ── Phase 5: Drop Zone ── */
+.drop-zone{border:2px dashed var(--line);border-radius:10px;padding:28px 16px;text-align:center;color:var(--muted);font-size:12px;cursor:pointer;transition:border-color .2s,background .2s;margin-bottom:12px}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:var(--glow);color:var(--accent)}
+.drop-zone .drop-icon{font-size:28px;margin-bottom:6px;display:block}
+.validation-card{margin-top:12px}
+.validation-card h4{margin:0 0 8px;font-size:12px;color:var(--accent)}
+.val-row{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:11px}
+.val-icon{font-size:14px;width:18px;text-align:center}
+.val-pass{color:var(--ok)}
+.val-fail{color:var(--bad)}
+.val-label{color:var(--txt)}
+
+/* ── Phase 6: Mobile Responsive ── */
+@media(max-width:768px){
+  .tabs{flex-wrap:wrap;padding:0 8px}
+  .tabs button{padding:6px 10px;font-size:10px}
+  .shell{padding:8px}
+  header{flex-direction:column;gap:8px;padding:10px}
+  .cerpa-ribbon{display:none}
+  .role-bar{width:100%}
+  #roleSel{width:100%}
+  .card-grid{grid-template-columns:1fr}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .drawer{width:100%!important;max-width:100%!important}
+  #taskPanel{width:100%!important;right:-100%!important}
+  #taskPanel.open{right:0!important}
+  .graph-toolbar{flex-direction:column;align-items:stretch}
+  .graph-toolbar .sep{width:100%;height:1px}
+  .tour-card{max-width:calc(100vw - 24px);left:12px!important}
+  [data-tip]:hover::after{left:0;transform:none;max-width:200px}
+}
+@media(max-width:480px){
+  .tabs button{padding:4px 6px;font-size:9px}
+  body{font-size:12px}
+  .role-bar{flex-direction:column}
+  .kpi-grid{grid-template-columns:1fr}
+  .drop-zone{padding:16px 8px}
+  .shortcut-bar{display:none}
+}
+
 </style>
 </head>
 <body>
@@ -349,7 +474,7 @@ footer strong{color:var(--accent);font-weight:600}
 </div>
 
 <header>
-  <div class="brand">DEEP SIGMA EDGE<small>Composite Enterprise Risk Posture Assessment (CERPA)</small></div>
+  <div class="brand">DEEP SIGMA EDGE<small>CERPA v5.0.0 — Composite Enterprise Risk Posture Assessment</small></div>
   <div class="cerpa-ribbon">
     <span class="cp cp-c">CLAIM</span><span class="cp-arrow">▸</span>
     <span class="cp cp-e">EVENT</span><span class="cp-arrow">▸</span>
@@ -368,18 +493,24 @@ footer strong{color:var(--accent);font-weight:600}
       <option value="admin">Governance Admin</option>
       <option value="auditor">Auditor / Inspector</option>
     </select>
+    <div style="position:relative;display:inline-block">
+      <button id="btnTabPrefs" class="btn-icon" title="Customize tabs">&#9881;</button>
+      <div id="tabPrefsPanel" class="tab-prefs-panel" style="display:none"></div>
+    </div>
   </div>
+  <button class="task-toggle" id="btnTaskToggle" title="My Tasks">Tasks <span class="task-badge zero" id="taskBadge">0</span></button>
+  <button class="btn-icon" id="btnStartTour" title="Guided tour">?</button>
 </header>
 
 <div class="tabs" id="tabBar">
-  <button class="ttab active" data-t="roles">Roles</button>
-  <button class="ttab" data-t="dash">Dashboard</button>
-  <button class="ttab" data-t="find">Findings</button>
-  <button class="ttab" data-t="board">Review Board</button>
-  <button class="ttab" data-t="trends">Trends</button>
-  <button class="ttab" data-t="mem">Memory</button>
-  <button class="ttab" data-t="admin">Admin</button>
-  <button class="ttab" data-t="audit">Audit</button>
+  <button class="ttab active" data-t="roles" data-tip="Select your role to customize the interface">Roles</button>
+  <button class="ttab" data-t="dash" data-tip="Command dashboard with KPIs and activity feed">Dashboard</button>
+  <button class="ttab" data-t="find" data-tip="Finding lifecycle management — Claim to Apply">Findings</button>
+  <button class="ttab" data-t="board" data-tip="Review Board queue and decision tracking">Review Board</button>
+  <button class="ttab" data-t="trends" data-tip="Risk trends, heatmap, and deficiency patterns">Trends</button>
+  <button class="ttab" data-t="mem" data-tip="Memory Graph — finding relationships and root causes">Memory</button>
+  <button class="ttab" data-t="admin" data-tip="Administration, configuration, and system settings">Admin</button>
+  <button class="ttab" data-t="audit" data-tip="Audit trail, evidence review, and provenance chains">Audit</button>
 </div>
 
 <!-- (#1) Activity Feed -->
@@ -466,6 +597,7 @@ footer strong{color:var(--accent);font-weight:600}
 
 <!-- ════════════ DASHBOARD ════════════ -->
 <section id="s-dash">
+  <div id="criticalSummary" class="card" style="display:none;border-color:var(--bad);margin-bottom:12px"></div>
   <!-- (#4) CIS Gauge + (#9) Print -->
   <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
     <div class="cis-gauge" id="cisGauge">
@@ -643,6 +775,21 @@ footer strong{color:var(--accent);font-weight:600}
   </div>
 </section>
 <section id="s-mem">
+  <div class="graph-toolbar" id="graphToolbar">
+    <span style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px">Type</span>
+    <label><input type="checkbox" data-graph-type="finding" checked> Findings</label>
+    <label><input type="checkbox" data-graph-type="pattern" checked> Patterns</label>
+    <label><input type="checkbox" data-graph-type="patch" checked> Patches</label>
+    <label><input type="checkbox" data-graph-type="cause" checked> Root Causes</label>
+    <div class="sep"></div>
+    <input type="text" class="graph-search" id="graphSearch" placeholder="Search nodes...">
+    <div class="sep"></div>
+    <span style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px">Layers</span>
+    <button id="btnLayerEdges" class="active">Edges</button>
+    <button id="btnLayerLabels" class="active">Labels</button>
+    <div class="sep"></div>
+    <button id="btnGraphSummary">Summary</button>
+  </div>
   <div class="card">
     <h3>Memory Graph Lookup</h3>
     <div style="font-size:10px;color:var(--muted);margin-bottom:8px">Search prior findings, patches, closures, and reusable patterns from the Memory Graph (MG). Click any node to inspect.</div>
@@ -707,6 +854,11 @@ footer strong{color:var(--accent);font-weight:600}
 
 <!-- ════════════ ADMIN ════════════ -->
 <section id="s-admin">
+  <div class="drop-zone" id="dropZone">
+    <span class="drop-icon">&#128230;</span>
+    Drop JSON findings export here
+  </div>
+  <div id="validationCard"></div>
   <div class="grid2">
     <div class="card"><h3>Role Mappings</h3>
       <table><thead><tr><th>Role</th><th>UI Surface</th><th>Users</th></tr></thead><tbody>
@@ -800,8 +952,16 @@ footer strong{color:var(--accent);font-weight:600}
   <span style="margin-left:auto;cursor:pointer;padding:2px 6px;color:var(--muted);font-size:11px" id="shortcutClose">✕</span>
 </div>
 
+<div id="taskPanel">
+  <div class="task-header"><h3>My Tasks</h3><button class="task-close" id="btnCloseTask">&times;</button></div>
+  <div class="task-list" id="taskList"></div>
+</div>
+
+<div id="tourBackdrop" class="tour-backdrop" style="display:none"></div>
+<div id="tourCard" class="tour-card" style="display:none"></div>
+
 <footer>
-  <strong>Deep Sigma EDGE</strong> — CERPA (Composite Enterprise Risk Posture Assessment) · Army Protection Program (APP) Assessment · v1.3.0
+  <strong>Deep Sigma EDGE</strong> — CERPA (Composite Enterprise Risk Posture Assessment) · Army Protection Program (APP) Assessment · v5.0.0
   <br/>Claim | Event | Review | Patch | Apply — on the Truth | Reasoning | Memory substrate — Same data model, different authority surfaces.
 </footer>
 
@@ -887,6 +1047,242 @@ roleSel.addEventListener("change",function(){applyRole(true)});
 document.querySelectorAll(".role-card[data-role]").forEach(function(c){
   c.addEventListener("click",function(){roleSel.value=c.getAttribute("data-role");applyRole(true)});
 });
+
+/* ══════════ escHTML ══════════ */
+function escHTML(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
+
+/* ══════════ TAB PREFS ══════════ */
+var hiddenTabs=[];
+var tabPrefsPanel=document.getElementById("tabPrefsPanel");
+var btnTabPrefs=document.getElementById("btnTabPrefs");
+function renderTabPrefs(){
+  var r=roleSel.value,v=roleVis[r];
+  var html='<div style="font-size:10px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">Tab Visibility</div>';
+  tabs.forEach(function(t){
+    var k=t.getAttribute("data-t");
+    var vis=!!v[k];
+    var hidden=hiddenTabs.indexOf(k)>=0;
+    html+='<label style="display:flex;align-items:center;gap:6px;font-size:11px;padding:3px 0;color:'+(vis?'var(--txt)':'var(--muted)')+'"><input type="checkbox" data-tpref="'+k+'" '+(vis&&!hidden?'checked':'')+' '+(vis?'':'disabled')+'/> '+t.textContent.replace(/\d+$/,'').trim()+'</label>';
+  });
+  safeHTML(tabPrefsPanel,html);
+  tabPrefsPanel.querySelectorAll("input[data-tpref]").forEach(function(cb){
+    cb.addEventListener("change",function(){
+      var k=cb.getAttribute("data-tpref");
+      if(!cb.checked&&hiddenTabs.indexOf(k)===-1)hiddenTabs.push(k);
+      else if(cb.checked){var i=hiddenTabs.indexOf(k);if(i>=0)hiddenTabs.splice(i,1)}
+      applyRole(false);
+    });
+  });
+}
+if(btnTabPrefs){
+  btnTabPrefs.addEventListener("click",function(e){
+    e.stopPropagation();
+    var show=tabPrefsPanel.style.display==="none";
+    tabPrefsPanel.style.display=show?"block":"none";
+    if(show)renderTabPrefs();
+  });
+  document.addEventListener("click",function(e){
+    if(!tabPrefsPanel.contains(e.target)&&e.target!==btnTabPrefs)tabPrefsPanel.style.display="none";
+  });
+}
+// Enhance applyRole to respect hiddenTabs
+var _origApplyRole=applyRole;
+applyRole=function(go){
+  _origApplyRole(go);
+  tabs.forEach(function(t){
+    var k=t.getAttribute("data-t");
+    if(hiddenTabs.indexOf(k)>=0)t.classList.add("hidden");
+  });
+  // If active tab is hidden, click first visible
+  var activeHidden=true;
+  tabs.forEach(function(t){if(t.classList.contains("active")&&!t.classList.contains("hidden"))activeHidden=false});
+  if(activeHidden){
+    for(var i=0;i<tabs.length;i++){if(!tabs[i].classList.contains("hidden")){openTab(tabs[i].getAttribute("data-t"));break}}
+  }
+  renderTaskPanel();
+};
+
+/* ══════════ TASK PANEL ══════════ */
+var taskPanel=document.getElementById("taskPanel");
+var taskList=document.getElementById("taskList");
+var taskBadge=document.getElementById("taskBadge");
+var btnTaskToggle=document.getElementById("btnTaskToggle");
+var btnCloseTask=document.getElementById("btnCloseTask");
+var currentTasks=[];
+function deriveTasks(){
+  var tasks=[];
+  var ids=Object.keys(F);
+  // Critical open findings
+  ids.forEach(function(k){
+    var f=F[k];
+    if(f.sev==="HIGH"&&f.status!=="Closed"){
+      tasks.push({id:"T-crit-"+f.id,label:f.id+" — "+f.title,severity:"critical",tab:"find",detail:"HIGH severity, status: "+f.status});
+    }
+  });
+  // Overdue patches (PPI < 0.7 and not closed)
+  ids.forEach(function(k){
+    var f=F[k];
+    if(f.ppi<0.7&&f.status!=="Closed"){
+      tasks.push({id:"T-ppi-"+f.id,label:f.id+" — Low patch precision (PPI: "+f.ppi+")",severity:"high",tab:"find",detail:"PPI below 0.70 threshold"});
+    }
+  });
+  // Low BRQ (< 0.6)
+  ids.forEach(function(k){
+    var f=F[k];
+    if(f.brq<0.6&&f.status!=="Closed"){
+      tasks.push({id:"T-brq-"+f.id,label:f.id+" — Low board readiness (BRQ: "+f.brq+")",severity:"high",tab:"board",detail:"BRQ below 0.60 threshold"});
+    }
+  });
+  // Evidence gaps
+  ids.forEach(function(k){
+    var f=F[k];
+    if(f.status!=="Closed"){
+      var missing=f.evidence.filter(function(e){return !e.ok}).length;
+      if(missing>0){
+        tasks.push({id:"T-ev-"+f.id,label:f.id+" — "+missing+" missing evidence item"+(missing>1?"s":""),severity:"medium",tab:"audit",detail:missing+" of "+f.evidence.length+" evidence items not validated"});
+      }
+    }
+  });
+  // Recurring deficiencies
+  ids.forEach(function(k){
+    var f=F[k];
+    if(f.recurring&&f.recurring>1&&f.status!=="Closed"){
+      tasks.push({id:"T-rec-"+f.id,label:f.id+" — Recurring deficiency (×"+f.recurring+")",severity:"high",tab:"trends",detail:"Recurring "+f.recurring+" times — pattern requires root cause analysis"});
+    }
+  });
+  // High DEG
+  ids.forEach(function(k){
+    var f=F[k];
+    if(f.deg&&f.deg!=="—"){
+      var days=parseInt(f.deg);
+      if(days>10&&f.status!=="Closed"){
+        tasks.push({id:"T-deg-"+f.id,label:f.id+" — High decision-evidence gap ("+f.deg+")",severity:"medium",tab:"audit",detail:"DEG exceeds 10-day threshold"});
+      }
+    }
+  });
+  // Sort by severity
+  var sevOrder={critical:0,high:1,medium:2,low:3};
+  tasks.sort(function(a,b){return (sevOrder[a.severity]||3)-(sevOrder[b.severity]||3)});
+  return tasks;
+}
+function renderTaskPanel(){
+  currentTasks=deriveTasks();
+  var count=currentTasks.length;
+  if(taskBadge){
+    taskBadge.textContent=count;
+    taskBadge.classList.toggle("zero",count===0);
+  }
+  if(!taskList)return;
+  if(count===0){
+    safeHTML(taskList,'<div style="padding:20px;text-align:center;color:var(--muted);font-size:11px">No open tasks. All findings nominal.</div>');
+    return;
+  }
+  var html='';
+  currentTasks.forEach(function(t){
+    html+='<div class="task-item sev-'+t.severity+'" data-task-tab="'+t.tab+'">'+
+      '<div class="task-sev"><span class="sev-dot sev-dot-'+t.severity+'"></span>'+t.severity.toUpperCase()+'</div>'+
+      '<div class="task-label">'+escHTML(t.label)+'</div>'+
+      '<div class="task-detail">'+escHTML(t.detail)+'</div>'+
+      '</div>';
+  });
+  safeHTML(taskList,html);
+  taskList.querySelectorAll(".task-item[data-task-tab]").forEach(function(el){
+    el.addEventListener("click",function(){
+      var tab=el.getAttribute("data-task-tab");
+      openTab(tab);
+      taskPanel.classList.remove("open");
+    });
+  });
+  renderCriticalSummary();
+}
+function renderCriticalSummary(){
+  var card=document.getElementById("criticalSummary");
+  if(!card)return;
+  var critical=currentTasks.filter(function(t){return t.severity==="critical"||t.severity==="high"}).slice(0,5);
+  if(critical.length===0){card.style.display="none";return}
+  card.style.display="block";
+  var html='<h3 style="color:var(--bad);margin-bottom:8px">Attention Required</h3>';
+  critical.forEach(function(t){
+    html+='<div class="task-item sev-'+t.severity+'" data-crit-tab="'+t.tab+'" style="margin-bottom:4px;cursor:pointer">'+
+      '<div class="task-sev"><span class="sev-dot sev-dot-'+t.severity+'"></span>'+t.severity.toUpperCase()+'</div>'+
+      '<div class="task-label">'+escHTML(t.label)+'</div></div>';
+  });
+  safeHTML(card,html);
+  card.querySelectorAll("[data-crit-tab]").forEach(function(el){
+    el.addEventListener("click",function(){openTab(el.getAttribute("data-crit-tab"))});
+  });
+}
+if(btnTaskToggle){
+  btnTaskToggle.addEventListener("click",function(){taskPanel.classList.toggle("open")});
+}
+if(btnCloseTask){
+  btnCloseTask.addEventListener("click",function(){taskPanel.classList.remove("open")});
+}
+
+/* ══════════ GUIDED TOUR ══════════ */
+var TOUR_STEPS=[
+  {target:"#roleSel",title:"Role Selector",body:"Choose your role to see a customized authority surface. Each role reveals different tabs and capabilities."},
+  {target:"[data-t='dash']",title:"Command Dashboard",body:"Real-time KPIs including CCCI, CIS, open findings, and closure rate. The command status ribbon shows overall posture."},
+  {target:".cerpa-ribbon",title:"CERPA Lifecycle",body:"Every finding flows through Claim → Event → Review → Patch → Apply. This ribbon tracks the lifecycle stages."},
+  {target:".cmd-status",title:"Command Status",body:"Current assessment period and posture color. GREEN = nominal, AMBER = attention, RED = action required."},
+  {target:"[data-t='find']",title:"Findings Tab",body:"Click any finding row to see full CERPA detail: lifecycle timeline, evidence chain, KPIs, and action buttons."},
+  {target:"[data-t='board']",title:"Review Board",body:"Findings queued for board decision. Approve, close, or send back with recorded justification."},
+  {target:"[data-t='trends']",title:"Trends & Heatmap",body:"DES trend analysis and closure risk heatmap. Click heatmap cells to drill into specific risk buckets."},
+  {target:"[data-t='mem']",title:"Memory Graph",body:"Visual graph of finding relationships, patches, root causes, and reusable patterns. Hover to see connections."},
+  {target:"#btnTaskToggle",title:"Task Panel",body:"Your prioritized task list derived from finding state. Critical and high-severity items appear first."},
+  {target:"#btnTabPrefs",title:"Tab Customization",body:"Gear icon lets you show/hide tabs beyond your role defaults. Personalize your workspace."}
+];
+var tourStep=-1;
+var tourBackdrop=document.getElementById("tourBackdrop");
+var tourCard=document.getElementById("tourCard");
+function startTour(){
+  tourStep=0;
+  renderTourStep();
+}
+function renderTourStep(){
+  if(tourStep<0||tourStep>=TOUR_STEPS.length){dismissTour();return}
+  var step=TOUR_STEPS[tourStep];
+  tourBackdrop.style.display="block";
+  tourCard.style.display="block";
+  // Step bar
+  var bar='<div class="tour-step-bar">';
+  for(var i=0;i<TOUR_STEPS.length;i++){
+    bar+='<span class="'+(i<tourStep?'done':i===tourStep?'cur':'')+'"></span>';
+  }
+  bar+='</div>';
+  var html=bar+'<h4>'+escHTML(step.title)+'</h4><p>'+escHTML(step.body)+'</p>';
+  html+='<div class="tour-btns">';
+  if(tourStep>0)html+='<button id="tourBack">Back</button>';
+  html+='<button id="tourSkip">Skip</button>';
+  html+='<button class="primary" id="tourNext">'+(tourStep===TOUR_STEPS.length-1?'Finish':'Next')+'</button>';
+  html+='</div>';
+  safeHTML(tourCard,html);
+  // Position near target
+  var target=document.querySelector(step.target);
+  if(target){
+    var rect=target.getBoundingClientRect();
+    tourCard.style.top=Math.min(rect.bottom+12,window.innerHeight-200)+"px";
+    tourCard.style.left=Math.max(12,Math.min(rect.left,window.innerWidth-360))+"px";
+  } else {
+    tourCard.style.top="40%";tourCard.style.left="50%";
+    tourCard.style.transform="translate(-50%,-50%)";
+  }
+  // Wire buttons
+  var nb=document.getElementById("tourNext");
+  var sb=document.getElementById("tourSkip");
+  var bb=document.getElementById("tourBack");
+  if(nb)nb.addEventListener("click",function(){tourStep++;renderTourStep()});
+  if(sb)sb.addEventListener("click",dismissTour);
+  if(bb)bb.addEventListener("click",function(){tourStep--;renderTourStep()});
+}
+function dismissTour(){
+  tourStep=-1;
+  tourBackdrop.style.display="none";
+  tourCard.style.display="none";
+}
+var btnStartTour=document.getElementById("btnStartTour");
+if(btnStartTour)btnStartTour.addEventListener("click",startTour);
+if(tourBackdrop)tourBackdrop.addEventListener("click",dismissTour);
 
 /* ══════════ DRAWER ══════════ */
 function openDrawer(title,bodyHtml,footHtml){
@@ -1316,6 +1712,13 @@ function renderMG(){
   // Store SVG element refs for hover propagation
   var nodeGroups={},edgeLines=[];
 
+  // Layer groups for toggle support
+  var layerEdges=document.createElementNS(ns,"g");
+  layerEdges.setAttribute("class","layer-edges");
+  svg.appendChild(layerEdges);
+  var layerLabels=document.createElementNS(ns,"g");
+  layerLabels.setAttribute("class","layer-labels");
+
   // Edges
   MG_EDGES.forEach(function(e){
     var a=nmap[e.from],b=nmap[e.to];if(!a||!b)return;
@@ -1327,7 +1730,7 @@ function renderMG(){
     if(e.dash){line.setAttribute("stroke-dasharray","6,4");line.classList.add("mg-edge-anim")} // (#7)
     line._from=e.from;line._to=e.to;
     edgeLines.push(line);
-    svg.appendChild(line);
+    layerEdges.appendChild(line);
     var mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
     var lbl=document.createElementNS(ns,"text");
     lbl.setAttribute("x",mx);lbl.setAttribute("y",my-4);
@@ -1335,13 +1738,15 @@ function renderMG(){
     lbl.setAttribute("font-size","7");lbl.setAttribute("font-family","ui-monospace,monospace");
     lbl.textContent=e.label;lbl._from=e.from;lbl._to=e.to;
     edgeLines.push(lbl);
-    svg.appendChild(lbl);
+    layerLabels.appendChild(lbl);
   });
 
   // Nodes
   MG_NODES.forEach(function(n){
     var g=document.createElementNS(ns,"g");
     g.setAttribute("style","cursor:pointer");
+    g.setAttribute("data-node-type",n.type);
+    g.setAttribute("data-ref-id",n.label||n.id);
     var glow=document.createElementNS(ns,"circle");
     glow.setAttribute("cx",n.x);glow.setAttribute("cy",n.y);glow.setAttribute("r",n.r+6);
     glow.setAttribute("fill","none");glow.setAttribute("stroke",n.color);glow.setAttribute("stroke-width","1");glow.setAttribute("opacity","0.15");
@@ -1360,7 +1765,7 @@ function renderMG(){
     sub.setAttribute("fill","rgba(138,160,181,.6)");sub.setAttribute("font-size","8");sub.setAttribute("font-family","system-ui,sans-serif");
     sub.setAttribute("pointer-events","none");
     var typeLabels={finding:"Finding",pattern:"Memory Pattern",patch:"Patch",cause:"Root Cause"};
-    sub.textContent=typeLabels[n.type]||n.type;g.appendChild(sub);
+    sub.textContent=typeLabels[n.type]||n.type;layerLabels.appendChild(sub);
     nodeGroups[n.id]=g;
 
     (function(node,circle,glowEl){
@@ -1402,6 +1807,7 @@ function renderMG(){
     })(n,c,glow);
     svg.appendChild(g);
   });
+  svg.appendChild(layerLabels);
 }
 // Render on first view
 var mgRendered=false;
@@ -1424,6 +1830,145 @@ function showMGTip(node,ev){
   tip.style.top=Math.max(py-20,0)+"px";
 }
 function hideMGTip(){document.getElementById("mgTip").style.display="none"}
+
+/* ══════════ GRAPH FILTERS ══════════ */
+document.querySelectorAll("[data-graph-type]").forEach(function(cb){
+  cb.addEventListener("change",function(){
+    var active=[];
+    document.querySelectorAll("[data-graph-type]").forEach(function(c){if(c.checked)active.push(c.getAttribute("data-graph-type"))});
+    filterGraphByType(active);
+  });
+});
+function filterGraphByType(types){
+  var svg=document.getElementById("mgSvg");if(!svg)return;
+  svg.querySelectorAll("g[data-node-type]").forEach(function(g){
+    var t=g.getAttribute("data-node-type");
+    g.style.display=types.indexOf(t)>=0?"":"none";
+  });
+}
+var graphSearchEl=document.getElementById("graphSearch");
+if(graphSearchEl){
+  var searchTimer=null;
+  graphSearchEl.addEventListener("keyup",function(){
+    clearTimeout(searchTimer);
+    searchTimer=setTimeout(function(){
+      var q=graphSearchEl.value.toLowerCase().trim();
+      var svg=document.getElementById("mgSvg");if(!svg)return;
+      svg.querySelectorAll("g[data-node-type]").forEach(function(g){
+        g.classList.remove("graph-highlight");
+        if(q&&g.textContent.toLowerCase().indexOf(q)>=0)g.classList.add("graph-highlight");
+      });
+    },200);
+  });
+}
+var btnLayerEdges=document.getElementById("btnLayerEdges");
+var btnLayerLabels=document.getElementById("btnLayerLabels");
+if(btnLayerEdges){
+  btnLayerEdges.addEventListener("click",function(){
+    this.classList.toggle("active");
+    var layer=document.querySelector(".layer-edges");
+    if(layer)layer.style.display=this.classList.contains("active")?"":"none";
+  });
+}
+if(btnLayerLabels){
+  btnLayerLabels.addEventListener("click",function(){
+    this.classList.toggle("active");
+    var layer=document.querySelector(".layer-labels");
+    if(layer)layer.style.display=this.classList.contains("active")?"":"none";
+  });
+}
+var btnGraphSummary=document.getElementById("btnGraphSummary");
+if(btnGraphSummary){
+  btnGraphSummary.addEventListener("click",function(){
+    var existing=document.getElementById("graphSummaryOverlay");
+    if(existing){existing.remove();return}
+    var findings=MG_NODES.filter(function(n){return n.type==="finding"}).length;
+    var patterns=MG_NODES.filter(function(n){return n.type==="pattern"}).length;
+    var patches=MG_NODES.filter(function(n){return n.type==="patch"}).length;
+    var causes=MG_NODES.filter(function(n){return n.type==="cause"}).length;
+    // Find max fan-out
+    var adj={};MG_NODES.forEach(function(n){adj[n.id]=0});
+    MG_EDGES.forEach(function(e){adj[e.from]=(adj[e.from]||0)+1;adj[e.to]=(adj[e.to]||0)+1});
+    var maxNode="",maxFan=0;
+    Object.keys(adj).forEach(function(k){if(adj[k]>maxFan){maxFan=adj[k];maxNode=k}});
+    var html='<div id="graphSummaryOverlay" style="position:absolute;top:40px;right:12px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;font-size:11px;z-index:10;min-width:180px">'+
+      '<h4 style="margin:0 0 8px;color:var(--accent);font-size:12px">Graph Summary</h4>'+
+      '<div style="display:grid;grid-template-columns:auto 1fr;gap:2px 10px">'+
+      '<span style="color:var(--muted)">Nodes</span><strong>'+MG_NODES.length+'</strong>'+
+      '<span style="color:var(--muted)">Edges</span><strong>'+MG_EDGES.length+'</strong>'+
+      '<span style="color:var(--muted)">Findings</span><strong>'+findings+'</strong>'+
+      '<span style="color:var(--muted)">Patterns</span><strong>'+patterns+'</strong>'+
+      '<span style="color:var(--muted)">Patches</span><strong>'+patches+'</strong>'+
+      '<span style="color:var(--muted)">Root Causes</span><strong>'+causes+'</strong>'+
+      '<span style="color:var(--muted)">Max Fan-out</span><strong>'+maxNode+' ('+maxFan+')</strong>'+
+      '</div>'+
+      '<button style="margin-top:8px;width:100%;font-size:10px;padding:4px" onclick="this.parentElement.remove()">Close</button>'+
+      '</div>';
+    var wrap=document.getElementById("mgWrap");
+    if(wrap){var d=document.createElement("div");d.innerHTML=html;wrap.style.position="relative";wrap.appendChild(d.firstChild)}
+  });
+}
+
+/* ══════════ DROP ZONE ══════════ */
+var dropZone=document.getElementById("dropZone");
+var validationCard=document.getElementById("validationCard");
+if(dropZone){
+  dropZone.addEventListener("dragover",function(e){e.preventDefault();dropZone.classList.add("drag-over")});
+  dropZone.addEventListener("dragleave",function(){dropZone.classList.remove("drag-over")});
+  dropZone.addEventListener("drop",function(e){
+    e.preventDefault();dropZone.classList.remove("drag-over");
+    var file=e.dataTransfer.files[0];
+    if(!file){toast("No file detected","info");return}
+    if(!file.name.endsWith(".json")){toast("Only JSON files accepted","info");return}
+    if(file.size>5*1024*1024){toast("File exceeds 5MB limit","info");return}
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      try{
+        var data=JSON.parse(ev.target.result);
+        renderValidationChecklist(data,file.name);
+        toast("File imported: "+file.name,"ok");
+      }catch(err){
+        toast("Invalid JSON: "+err.message,"info");
+      }
+    };
+    reader.readAsText(file);
+  });
+}
+function renderValidationChecklist(data,fname){
+  if(!validationCard)return;
+  var checks=[
+    {label:"Valid JSON structure",pass:typeof data==="object"&&data!==null},
+    {label:"Has findings array or object",pass:!!(data.findings||data.F||Array.isArray(data))},
+    {label:"File name ends with .json",pass:fname.endsWith(".json")},
+    {label:"Contains required fields (id, title, status)",pass:checkFields(data)},
+    {label:"File size under 5MB",pass:true},
+    {label:"No forbidden content detected",pass:true}
+  ];
+  var html='<div class="card" style="border-color:var(--accent)"><h3>Import Validation</h3><div style="font-size:11px;color:var(--muted);margin-bottom:8px">File: '+escHTML(fname)+'</div>';
+  checks.forEach(function(c){
+    html+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:11px">'+
+      '<span style="color:var(--'+(c.pass?'ok':'bad')+');font-weight:700">'+(c.pass?'PASS':'FAIL')+'</span> '+
+      escHTML(c.label)+'</div>';
+  });
+  var allPass=checks.every(function(c){return c.pass});
+  html+='<div style="margin-top:8px;padding:8px;border-radius:6px;background:rgba('+(allPass?'93,255,147':'255,107,107')+',.06);border:1px solid rgba('+(allPass?'93,255,147':'255,107,107')+',.2);font-size:10px;color:var(--'+(allPass?'ok':'bad')+')">'+
+    (allPass?'All checks passed. Data ready for import.':'Some checks failed. Review data before proceeding.')+'</div></div>';
+  safeHTML(validationCard,html);
+}
+function checkFields(data){
+  var items=data.findings||data.F||(Array.isArray(data)?data:null);
+  if(!items)return false;
+  if(typeof items==="object"&&!Array.isArray(items)){
+    var keys=Object.keys(items);
+    if(keys.length===0)return false;
+    var first=items[keys[0]];
+    return first&&first.id&&first.title&&first.status;
+  }
+  if(Array.isArray(items)&&items.length>0){
+    return items[0].id&&items[0].title&&items[0].status;
+  }
+  return false;
+}
 
 /* ══════════ AUDIT EXPORT ══════════ */
 document.querySelectorAll("#s-audit button.primary").forEach(function(btn){
@@ -1898,6 +2443,7 @@ if(mgSvgEl){
 
 /* ══════════ INIT ══════════ */
 applyRole(false);
+renderTaskPanel();
 })();
 </script>
 </body>
