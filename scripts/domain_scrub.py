@@ -122,6 +122,12 @@ ALLOWED_ACRONYMS = {
     "ACCESS", "LOCAL", "NEW", "FORM", "HALF", "LIFE",
     "DRAFT", "RESULT", "SHOULD", "ABOUT", "SHOW", "SWITCH",
     "DENIED", "TIMING", "LAG", "WEST", "BROKEN",
+    "BAND", "CARLO", "COVER", "EACH", "FINAL", "FOR", "FORMAT",
+    "IMPACT", "MAP", "MATRIX", "MED", "MIXED", "MOD", "MODE",
+    "MONTE", "OUTPUT", "PAGE", "POLICY", "PROMPT", "RIGOR",
+    "RULES", "STRESS", "SYSTEM", "TIGHT", "TREE", "USAGE", "WITH",
+    # Praxis Concord domain terms
+    "GWC", "GWO", "NSI", "PRAXIS", "SES", "ROI",
     # Project domain short codes (dashboards, fields, variable prefixes)
     "REG", "OPS", "CLN", "CRE", "OBJ", "PLT", "FIN",
     "MON", "DAT", "ZIP", "REQ", "MSG", "ACC", "REV",
