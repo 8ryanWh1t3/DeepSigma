@@ -1,8 +1,11 @@
 <!--
- EDGE COG Adapter — CMMC 2.0 Level 2 v5.0.0
+ EDGE COG Adapter — CMMC 2.0 Level 2 v5.1.0
  ============================================================
  CMMC 2.0 Compliance Bundle Explorer
  14 Practice Families | 110 Practices | CERPA Primitive Mapping
+
+ v5.1.0 Changes ("Role Dashboards"):
+ [x] Role-based dashboards, task panel, contextual tooltips, graph filters, drag-drop import, mobile responsive
 
  v5.0.0 Changes ("Full Compliance Suite"):
  [x] Heatmap — Family × Coverage interactive grid
@@ -46,7 +49,7 @@
 "use strict";
 /* EDGE_HARDENING_V1 — Runtime capability lockdown v1.1 */
 
-var EDGE_BUILD_ID="EDGE_BUILD_ID:CMMC_COG_Adapter_v5.0.0";
+var EDGE_BUILD_ID="EDGE_BUILD_ID:CMMC_COG_Adapter_v5.1.0";
 
 function _block(cap){
   return function(){throw new Error("EDGE hardening: "+cap+" is blocked")};
@@ -117,7 +120,7 @@ document.addEventListener("DOMContentLoaded",function(){
 
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>CERPA × CMMC 2.0 — COG Adapter v4.5.0</title>
+<title>CERPA × CMMC 2.0 — COG Adapter v5.1.0</title>
 <style>
 :root {
   --bg:#0a0e17; --card:#111927; --card-hover:#182235;
@@ -138,7 +141,7 @@ header{padding:12px 20px;border-bottom:1px solid var(--line);display:flex;align-
 .brand{font-weight:700;font-size:15px;letter-spacing:.5px;display:flex;align-items:center;gap:10px}
 .brand-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--neon-cyan),var(--neon-purple));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:#0a0e17;flex-shrink:0}
 .brand small{display:block;color:var(--muted);font-size:10px;font-weight:400;letter-spacing:0}
-.header-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:12px;position:relative}
 .plane-pills{display:flex;gap:6px}
 .plane-pill{padding:3px 10px;border-radius:12px;font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;border:1px solid var(--line);color:var(--muted);background:transparent}
 .plane-pill[data-plane="memory"]{color:var(--neon-cyan);border-color:rgba(0,240,255,.3)}
@@ -475,6 +478,123 @@ tr:hover td{background:rgba(0,240,255,.03)}
 .print-btn{background:rgba(57,255,20,.08);border:1px solid rgba(57,255,20,.25);color:var(--neon-green);padding:7px 14px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer}
 .print-btn:hover{background:rgba(57,255,20,.15)}
 
+/* ── v5.1: Role Bar + Tab Prefs ──────────────── */
+.role-bar{display:flex;align-items:center;gap:8px}
+.role-label{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px}
+#roleSelect{background:var(--card);color:var(--neon-cyan);border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;outline:none}
+#roleSelect:focus{border-color:var(--neon-cyan)}
+.btn-icon{background:none;border:1px solid var(--line);border-radius:6px;color:var(--muted);padding:4px 8px;cursor:pointer;font-size:14px}
+.btn-icon:hover{color:var(--neon-cyan);border-color:var(--neon-cyan)}
+.tab-prefs-panel{position:absolute;top:100%;right:0;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px;z-index:500;min-width:200px;max-height:320px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.tab-prefs-panel label{display:flex;align-items:center;gap:6px;padding:4px 0;color:var(--txt);font-size:11px;cursor:pointer}
+.tab-prefs-panel input[type="checkbox"]{accent-color:var(--neon-cyan)}
+/* ── Task Panel ─────────────────────────── */
+.task-toggle{position:relative;background:none;border:1px solid var(--line);border-radius:6px;color:var(--muted);padding:4px 10px;cursor:pointer;font-size:12px}
+.task-toggle:hover{color:var(--neon-pink);border-color:var(--neon-pink)}
+.task-badge{position:absolute;top:-6px;right:-6px;background:var(--bad);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.task-badge.zero{display:none}
+#taskPanel{position:fixed;top:0;right:-380px;width:360px;height:100vh;background:var(--card);border-left:1px solid var(--line);z-index:600;transition:right .25s ease;display:flex;flex-direction:column;box-shadow:-4px 0 24px rgba(0,0,0,.4)}
+#taskPanel.open{right:0}
+.task-header{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.task-header h3{margin:0;font-size:14px;color:var(--neon-pink)}
+.task-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px}
+.task-close:hover{color:var(--txt)}
+.task-list{flex:1;overflow-y:auto;padding:8px}
+.task-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;border-left:4px solid transparent;margin-bottom:4px}
+.task-row:hover{background:var(--card-hover)}
+.task-row.sev-critical{border-left-color:var(--bad)}
+.task-row.sev-high{border-left-color:var(--neon-amber)}
+.task-row.sev-medium{border-left-color:var(--neon-cyan)}
+.task-row.sev-low{border-left-color:var(--neon-green)}
+.task-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.sev-critical .task-dot{background:var(--bad);box-shadow:0 0 6px var(--bad);animation:pulse 1.5s infinite}
+.sev-high .task-dot{background:var(--neon-amber)}
+.sev-medium .task-dot{background:var(--neon-cyan)}
+.sev-low .task-dot{background:var(--neon-green)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.task-label{font-size:12px;color:var(--txt);line-height:1.4}
+.task-detail{font-size:10px;color:var(--muted);margin-top:2px}
+.task-tab-badge{font-size:9px;color:var(--neon-cyan);background:var(--glow-cyan);padding:1px 6px;border-radius:4px;margin-top:3px;display:inline-block}
+.task-empty{color:var(--muted);font-size:12px;text-align:center;padding:40px 16px}
+/* ── Tooltips ──────────────────────────── */
+[data-tip]{position:relative;cursor:help}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);padding:6px 10px;border-radius:6px;background:#1a2332;color:var(--txt);font-size:10px;max-width:280px;white-space:normal;z-index:999;border:1px solid var(--line);pointer-events:none;line-height:1.4}
+[data-tip]:hover::before{content:"";position:absolute;bottom:calc(100% + 2px);left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:#1a2332;z-index:999;pointer-events:none}
+/* ── Tour Overlay ─────────────────────── */
+.tour-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:700;pointer-events:auto}
+.tour-card{position:fixed;z-index:701;background:var(--card);border:1px solid var(--neon-cyan);border-radius:10px;padding:16px 20px;max-width:340px;box-shadow:0 8px 32px rgba(0,240,255,.15)}
+.tour-card h4{margin:0 0 6px;color:var(--neon-cyan);font-size:13px}
+.tour-card p{margin:0 0 12px;color:var(--txt);font-size:11px;line-height:1.5}
+.tour-step-bar{display:flex;gap:4px;margin-bottom:10px}
+.tour-step-dot{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.tour-step-dot.active{background:var(--neon-cyan)}
+.tour-step-dot.done{background:var(--neon-green)}
+.tour-btns{display:flex;gap:8px;justify-content:flex-end}
+.tour-btns button{padding:4px 14px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--txt);cursor:pointer;font-size:11px}
+.tour-btns button.primary{background:var(--neon-cyan);color:#000;border-color:var(--neon-cyan);font-weight:600}
+.tour-btns button:hover{opacity:.85}
+/* ── Graph Filters ─────────────────────── */
+.graph-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 12px;background:var(--card);border:1px solid var(--line);border-radius:8px;margin-bottom:10px}
+.graph-toolbar label{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--txt);cursor:pointer}
+.graph-toolbar input[type="checkbox"]{accent-color:var(--neon-cyan)}
+.graph-search{background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--txt);padding:4px 10px;font-size:11px;width:160px;outline:none}
+.graph-search:focus{border-color:var(--neon-cyan)}
+.graph-search::placeholder{color:var(--muted)}
+.graph-toolbar .sep{width:1px;height:20px;background:var(--line)}
+.graph-toolbar button{padding:3px 10px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--txt);cursor:pointer;font-size:10px}
+.graph-toolbar button.active{border-color:var(--neon-cyan);color:var(--neon-cyan)}
+.graph-toolbar button:hover{border-color:var(--neon-cyan)}
+.graph-summary-overlay{position:absolute;top:12px;right:12px;background:rgba(17,25,39,.92);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:10px;color:var(--txt);z-index:10;min-width:160px}
+.graph-summary-overlay h5{margin:0 0 6px;color:var(--neon-cyan);font-size:11px}
+.graph-summary-overlay .gs-row{display:flex;justify-content:space-between;padding:2px 0}
+.graph-summary-overlay .gs-val{color:var(--neon-green);font-weight:600}
+/* ── Critical Summary Card ────────────── */
+.critical-card{border-left:4px solid var(--bad);margin-bottom:16px}
+.critical-card h4{color:var(--bad);margin:0 0 8px;font-size:13px}
+.critical-row{display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;font-size:11px;color:var(--txt)}
+.critical-row:hover{color:var(--neon-pink)}
+.critical-row .cdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.critical-row .cdot.c{background:var(--bad)}
+.critical-row .cdot.h{background:var(--neon-amber)}
+/* ── Drop Zone ─────────────────────────── */
+.drop-zone{border:2px dashed var(--line);border-radius:10px;padding:28px 16px;text-align:center;color:var(--muted);font-size:12px;cursor:pointer;transition:border-color .2s,background .2s;margin-bottom:12px}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--neon-cyan);background:var(--glow-cyan);color:var(--neon-cyan)}
+.drop-zone .drop-icon{font-size:28px;margin-bottom:6px;display:block}
+/* ── Validation Checklist ──────────────── */
+.validation-card{margin-top:12px}
+.validation-card h4{margin:0 0 8px;font-size:12px;color:var(--neon-cyan)}
+.val-row{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:11px}
+.val-icon{font-size:14px;width:18px;text-align:center}
+.val-pass{color:var(--ok)}
+.val-fail{color:var(--bad)}
+.val-label{color:var(--txt)}
+/* ── Mobile Responsive ─────────────────── */
+@media(max-width:768px){
+  .tabs{flex-wrap:wrap;padding:0 8px}
+  .tab-btn{padding:6px 10px;font-size:10px}
+  .content{padding:8px;height:auto}
+  .card-grid,.card-grid-3{grid-template-columns:1fr}
+  header{flex-direction:column;gap:8px;padding:8px}
+  .header-right{margin-left:0;flex-wrap:wrap;justify-content:center}
+  .plane-pills{display:none}
+  .stat-row{flex-direction:column}
+  .detail-drawer{width:100%!important;right:0!important}
+  #taskPanel{width:100%!important;right:-100%!important}
+  #taskPanel.open{right:0!important}
+  #roleSelect{width:100%}
+  .graph-toolbar{flex-direction:column;align-items:stretch}
+  .graph-toolbar .sep{width:100%;height:1px}
+  .tour-card{max-width:calc(100vw - 24px);left:12px!important;right:12px}
+  [data-tip]:hover::after{left:0;transform:none;max-width:200px}
+}
+@media(max-width:480px){
+  .tab-btn{padding:4px 6px;font-size:9px}
+  .tabs{gap:0;justify-content:center}
+  body{font-size:12px}
+  .role-bar{flex-wrap:wrap}
+  .drop-zone{padding:16px 8px}
+}
+
 </style>
 </head>
 <body>
@@ -499,10 +619,26 @@ tr:hover td{background:rgba(0,240,255,.03)}
     <div class="brand-icon">CMMC</div>
     <div>
       CERPA × CMMC 2.0
-      <small>Level 2 Compliance Bundle Explorer — 110 Practices | 14 Families</small>
+      <small>Level 2 Compliance Bundle Explorer v5.1.0 — 110 Practices | 14 Families</small>
     </div>
   </div>
   <div class="header-right">
+    <div class="role-bar">
+      <label class="role-label">Role</label>
+      <select id="roleSelect">
+        <option value="analyst" selected>Analyst</option>
+        <option value="executive">Executive</option>
+        <option value="pm">Program Manager</option>
+        <option value="reviewer">Reviewer</option>
+        <option value="auditor">Auditor</option>
+      </select>
+      <button id="btnTabPrefs" class="btn-icon" title="Customize tabs">&#9881;</button>
+    </div>
+    <div id="tabPrefsPanel" class="tab-prefs-panel" style="display:none"></div>
+    <button class="task-toggle" id="btnTaskToggle" title="My Tasks">
+      Tasks <span class="task-badge zero" id="taskBadge">0</span>
+    </button>
+    <button class="btn-icon" id="btnStartTour" title="Guided tour">?</button>
     <div class="plane-pills">
       <span class="plane-pill" data-plane="memory" style="color:var(--neon-green);border-color:rgba(57,255,20,.3)">67 FULL</span>
       <span class="plane-pill" data-plane="behavior" style="color:var(--neon-cyan);border-color:rgba(0,240,255,.3)">26 STRONG</span>
@@ -513,20 +649,20 @@ tr:hover td{background:rgba(0,240,255,.03)}
 </header>
 
 <nav class="tabs" id="tabBar">
-  <button class="tab-btn active" data-tab="executive">Executive</button>
-  <button class="tab-btn" data-tab="explorer">Bundle Explorer</button>
-  <button class="tab-btn" data-tab="proof">Proof Chain</button>
-  <button class="tab-btn" data-tab="export">Export</button>
-  <button class="tab-btn" data-tab="diff">Diff</button>
-  <button class="tab-btn" data-tab="mapping">Mapping</button>
-  <button class="tab-btn" data-tab="schema">Schema</button>
-  <button class="tab-btn" data-tab="trilogy">Trilogy</button>
-  <button class="tab-btn" data-tab="graph">Graph</button>
-  <button class="tab-btn" data-tab="heatmap">Heatmap</button>
-  <button class="tab-btn" data-tab="halflife">Half-Life</button>
-  <button class="tab-btn" data-tab="blast">Blast Radius</button>
-  <button class="tab-btn" data-tab="poam">POA&M</button>
-  <button class="tab-btn" data-tab="crosswalk">Cross-walk</button>
+  <button class="tab-btn active" data-tab="executive" data-tip="CMMC compliance scorecard and critical issues">Executive</button>
+  <button class="tab-btn" data-tab="explorer" data-tip="Practice-level bundle explorer with CERPA mapping">Bundle Explorer</button>
+  <button class="tab-btn" data-tab="proof" data-tip="Per-practice cryptographic hash chain verification">Proof Chain</button>
+  <button class="tab-btn" data-tab="export" data-tip="Convert CMMC practices to CERPA artifacts">Export</button>
+  <button class="tab-btn" data-tab="diff" data-tip="Compliance version comparison">Diff</button>
+  <button class="tab-btn" data-tab="mapping" data-tip="CMMC families to CERPA primitives cross-reference">Mapping</button>
+  <button class="tab-btn" data-tab="schema" data-tip="CMMC compliance bundle JSON Schema viewer">Schema</button>
+  <button class="tab-btn" data-tab="trilogy" data-tip="Synchronized CMMC/CERPA/Proof lane view">Trilogy</button>
+  <button class="tab-btn" data-tab="graph" data-tip="110-node CMMC practice dependency topology">Graph</button>
+  <button class="tab-btn" data-tab="heatmap" data-tip="Family coverage interactive grid">Heatmap</button>
+  <button class="tab-btn" data-tab="halflife" data-tip="Compliance decay risk curves">Half-Life</button>
+  <button class="tab-btn" data-tab="blast" data-tip="Gap cascade across 10-framework series">Blast Radius</button>
+  <button class="tab-btn" data-tab="poam" data-tip="Plan of Action tracker for partial practices">POA&amp;M</button>
+  <button class="tab-btn" data-tab="crosswalk" data-tip="10-framework compliance mapping grid">Cross-walk</button>
 </nav>
 
 <div class="content" id="content">
@@ -591,6 +727,11 @@ tr:hover td{background:rgba(0,240,255,.03)}
 
   <!-- ═══════════════ TAB 1: Bundle Explorer ═══════════════ -->
   <div class="tab-panel" id="panel-explorer" data-tab-title="Bundle Explorer">
+    <div class="drop-zone" id="dropZone">
+      <span class="drop-icon">&#128230;</span>
+      Drop JSON bundle here or use the buttons below
+    </div>
+    <div id="validationCard"></div>
     <div class="stats-bar" id="explorerStats"></div>
 
     <div class="card">
@@ -827,6 +968,31 @@ tr:hover td{background:rgba(0,240,255,.03)}
 
   <!-- ═══════════════ TAB 9: Graph ═══════════════ -->
   <div class="tab-panel" id="panel-graph" data-tab-title="Graph">
+    <div class="graph-toolbar" id="graphToolbar">
+      <span style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px">Family</span>
+      <label><input type="checkbox" data-graph-type="AC" checked> AC</label>
+      <label><input type="checkbox" data-graph-type="AT" checked> AT</label>
+      <label><input type="checkbox" data-graph-type="AU" checked> AU</label>
+      <label><input type="checkbox" data-graph-type="CM" checked> CM</label>
+      <label><input type="checkbox" data-graph-type="IA" checked> IA</label>
+      <label><input type="checkbox" data-graph-type="IR" checked> IR</label>
+      <label><input type="checkbox" data-graph-type="MA" checked> MA</label>
+      <label><input type="checkbox" data-graph-type="MP" checked> MP</label>
+      <label><input type="checkbox" data-graph-type="PE" checked> PE</label>
+      <label><input type="checkbox" data-graph-type="PS" checked> PS</label>
+      <label><input type="checkbox" data-graph-type="RA" checked> RA</label>
+      <label><input type="checkbox" data-graph-type="CA" checked> CA</label>
+      <label><input type="checkbox" data-graph-type="SC" checked> SC</label>
+      <label><input type="checkbox" data-graph-type="SI" checked> SI</label>
+      <div class="sep"></div>
+      <input type="text" class="graph-search" id="graphSearch" placeholder="Search nodes...">
+      <div class="sep"></div>
+      <span style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px">Layers</span>
+      <button id="btnLayerEdges" class="active" data-layer="edges">Edges</button>
+      <button id="btnLayerLabels" class="active" data-layer="labels">Labels</button>
+      <div class="sep"></div>
+      <button id="btnGraphSummary">Summary</button>
+    </div>
     <div class="stats-bar" id="graphStats"></div>
     <div class="card" style="padding:12px">
       <div class="graph-legend" id="graphLegend"></div>
@@ -1086,7 +1252,7 @@ var explorerPage = 0, explorerPageSize = 25;
 var explorerFilter = "all";
 
 /* ── State ─── */
-var STATE={bundle:null,bundleB:null,proofChain:[],tampered:false,lastDiff:null};
+var STATE={bundle:null,bundleB:null,proofChain:[],tampered:false,lastDiff:null,role:"analyst",prefs:{hiddenTabs:[]}};
 var _tamperStack=[];
 var _liveSimInterval=null;
 var _liveSimActive=false;
@@ -1094,6 +1260,361 @@ var _baselineFamilies=null;
 var REF_TYPES=FAMILIES.map(function(f){return f.id});
 var PLANE_MAP={};var DS_MAP={};var CERPA_MAP={};
 for(var fi=0;fi<FAMILIES.length;fi++){var fam=FAMILIES[fi];PLANE_MAP[fam.id]="compliance";DS_MAP[fam.id]=CERPA_FAM[fam.id].stage.toLowerCase();CERPA_MAP[fam.id]=CERPA_FAM[fam.id]}
+
+/* ── v5.1: Role Tab Map ─── */
+var ROLE_TABS = {
+  analyst: ["executive","explorer","proof","export","diff","mapping","schema","trilogy","graph","heatmap","halflife","blast","poam","crosswalk"],
+  executive: ["executive","export","trilogy","crosswalk"],
+  pm: ["executive","explorer","export","heatmap","halflife","blast","trilogy","poam"],
+  reviewer: ["executive","proof","diff","mapping","crosswalk"],
+  auditor: ["executive","proof","export","schema","mapping","trilogy","poam","crosswalk"]
+};
+
+function applyRole(role) {
+  STATE.role = role;
+  var allowed = ROLE_TABS[role] || ROLE_TABS.analyst;
+  var hidden = STATE.prefs.hiddenTabs;
+  $$(".tab-btn").forEach(function(btn) {
+    var tab = btn.dataset.tab;
+    var visible = allowed.indexOf(tab) !== -1 && hidden.indexOf(tab) === -1;
+    btn.style.display = visible ? "" : "none";
+  });
+  var active = $(".tab-btn.active");
+  if (active && active.style.display === "none") {
+    var first = $$(".tab-btn").find(function(b) { return b.style.display !== "none"; });
+    if (first) first.click();
+  }
+}
+
+function renderTabPrefs() {
+  var panel = $("#tabPrefsPanel");
+  var allowed = ROLE_TABS[STATE.role] || ROLE_TABS.analyst;
+  var html = '<div style="color:var(--muted);font-size:10px;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">Visible Tabs</div>';
+  allowed.forEach(function(tab) {
+    var btn = $$(".tab-btn").find(function(b) { return b.dataset.tab === tab; });
+    var label = btn ? btn.textContent : tab;
+    var checked = STATE.prefs.hiddenTabs.indexOf(tab) === -1 ? "checked" : "";
+    html += '<label><input type="checkbox" data-pref-tab="' + escHTML(tab) + '" ' + checked + '> ' + escHTML(label) + '</label>';
+  });
+  panel.innerHTML = html;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Phase 2: Task Panel + Visual Prioritization
+   ══════════════════════════════════════════════════════════ */
+var SEV_ORDER = {critical:0, high:1, medium:2, low:3};
+
+function deriveTasks() {
+  if (!STATE.bundle) { STATE.tasks = []; return; }
+  var tasks = [];
+  var b = STATE.bundle;
+  var fams = b.families || [];
+
+  // 1. Tamper state
+  if (STATE.tampered) {
+    tasks.push({id:"tamper-active", label:"Proof chain tampered — integrity compromised", severity:"critical", tab:"proof", detail:"Undo tamper or reload bundle to restore integrity"});
+  }
+
+  // 2. Contradictions
+  var contras = STATE._contradictions || [];
+  if (contras.length > 0) {
+    var critCount = contras.filter(function(c){return c.severity==="critical"}).length;
+    tasks.push({id:"contradictions", label:contras.length + " contradiction" + (contras.length>1?"s":"") + " detected" + (critCount>0?" ("+critCount+" critical)":""), severity:critCount>0?"high":"medium", tab:"trilogy", detail:"Review contradiction panel in Trilogy tab"});
+  }
+
+  // 3. Proof chain gaps
+  var artCount = 0;
+  fams.forEach(function(f){ artCount += f.total || 0; });
+  if (STATE.proofChain.length > 0 && STATE.proofChain.length !== artCount) {
+    tasks.push({id:"chain-gap", label:"Proof chain length (" + STATE.proofChain.length + ") does not match practice count (" + artCount + ")", severity:"high", tab:"proof", detail:"Chain integrity may be incomplete"});
+  }
+
+  // 4. POA&M items with low progress
+  var poamItems = (b.artifacts || []).filter(function(a){ return a.status === "Partial" || a.status === "In Progress" || (a.progress !== undefined && a.progress < 50); });
+  if (poamItems.length > 0) {
+    tasks.push({id:"poam-low", label:poamItems.length + " practice" + (poamItems.length>1?"s":"") + " with incomplete remediation", severity:"high", tab:"poam", detail:"Review POA&M tracker for remediation progress"});
+  }
+
+  // 5. Coverage gaps — families below 70%
+  var weakFams = fams.filter(function(f){
+    if (!f.total || f.total === 0) return false;
+    var pct = ((f.full||0) + (f.strong||0)) / f.total * 100;
+    return pct < 70;
+  });
+  if (weakFams.length > 0) {
+    var names = weakFams.map(function(f){return f.id||f.name}).slice(0,4).join(", ");
+    tasks.push({id:"coverage-gap", label:weakFams.length + " famil" + (weakFams.length>1?"ies":"y") + " below 70% coverage", severity:"medium", tab:"crosswalk", detail:names});
+  }
+
+  // 6. Half-life warnings (if computeHalfLife exists)
+  if (typeof computeHalfLife === "function") {
+    var arts = b.artifacts || [];
+    var steps = b.replaySteps || [];
+    var expiredCount = 0, warnCount = 0;
+    arts.forEach(function(a) {
+      var hl = computeHalfLife(a, arts, steps);
+      if (hl && hl.status === "expired") expiredCount++;
+      else if (hl && hl.status === "warning") warnCount++;
+    });
+    if (expiredCount > 0) {
+      tasks.push({id:"halflife-expired", label:expiredCount + " practice" + (expiredCount>1?"s":"") + " with expired half-life", severity:"critical", tab:"halflife", detail:"Review and patch expired compliance assumptions"});
+    }
+    if (warnCount > 0) {
+      tasks.push({id:"halflife-warning", label:warnCount + " practice" + (warnCount>1?"s":"") + " approaching half-life expiry", severity:"medium", tab:"halflife", detail:"Proactive patching recommended"});
+    }
+  }
+
+  // 7. All clear
+  if (tasks.length === 0) {
+    tasks.push({id:"all-clear", label:"All checks passed — no issues detected", severity:"low", tab:"executive", detail:"Bundle is healthy"});
+  }
+
+  tasks.sort(function(a,b){return (SEV_ORDER[a.severity]||3) - (SEV_ORDER[b.severity]||3)});
+  STATE.tasks = tasks;
+}
+
+function renderTaskPanel() {
+  var list = $("#taskList");
+  var tasks = STATE.tasks || [];
+  if (tasks.length === 0 || (tasks.length===1 && tasks[0].id==="all-clear")) {
+    list.innerHTML = '<div class="task-empty">No issues found. Bundle is healthy.</div>';
+  } else {
+    var html = '';
+    tasks.forEach(function(t) {
+      html += '<div class="task-row sev-' + escHTML(t.severity) + '" data-task-tab="' + escHTML(t.tab) + '">';
+      html += '<div class="task-dot"></div>';
+      html += '<div><div class="task-label">' + escHTML(t.label) + '</div>';
+      html += '<div class="task-detail">' + escHTML(t.detail) + '</div>';
+      html += '<span class="task-tab-badge">' + escHTML(t.tab) + '</span>';
+      html += '</div></div>';
+    });
+    list.innerHTML = html;
+  }
+  var badge = $("#taskBadge");
+  var count = tasks.filter(function(t){return t.id!=="all-clear"}).length;
+  badge.textContent = count;
+  badge.className = "task-badge" + (count === 0 ? " zero" : "");
+}
+
+function renderCriticalSummary() {
+  var existing = $("#criticalSummary");
+  if (existing) existing.remove();
+  var tasks = (STATE.tasks || []).filter(function(t){return t.severity==="critical"||t.severity==="high"});
+  if (tasks.length === 0) return;
+  var card = document.createElement("div");
+  card.className = "card critical-card";
+  card.id = "criticalSummary";
+  var html = '<h4>&#9888; Critical Issues (' + tasks.length + ')</h4>';
+  tasks.slice(0, 5).forEach(function(t) {
+    var dotCls = t.severity === "critical" ? "c" : "h";
+    html += '<div class="critical-row" data-task-tab="' + escHTML(t.tab) + '"><span class="cdot ' + dotCls + '"></span> ' + escHTML(t.label) + '</div>';
+  });
+  card.innerHTML = html;
+  var panel = $("#panel-executive");
+  if (panel && panel.firstChild) panel.insertBefore(card, panel.firstChild);
+}
+
+/* ══════════════════════════════════════════════════════════
+   Guided Tour
+   ══════════════════════════════════════════════════════════ */
+var TOUR_STEPS = [
+  {target:"#roleSelect", title:"Role Selector", body:"Choose your role to filter tabs. Executives see high-level compliance views; analysts get full access to all 14 tabs."},
+  {target:"#btnTaskToggle", title:"Task Panel", body:"Auto-generated tasks from your compliance bundle — coverage gaps, POA&M items, contradictions, and integrity issues."},
+  {target:".tab-btn[data-tab='executive']", title:"Executive Dashboard", body:"CMMC compliance scorecard showing weighted coverage across 14 practice families."},
+  {target:".tab-btn[data-tab='explorer']", title:"Bundle Explorer", body:"Inspect 110 individual CMMC practices, their maturity levels, and CERPA stage mappings."},
+  {target:".tab-btn[data-tab='proof']", title:"Proof Chain", body:"Verify the cryptographic hash chain linking each practice assessment. Detect and simulate tampering."},
+  {target:".tab-btn[data-tab='trilogy']", title:"Trilogy Mode", body:"Three synchronized lanes: CMMC families, CERPA stages, and Proof state. Includes contradiction detection and So What summary."},
+  {target:".tab-btn[data-tab='graph']", title:"Dependency Graph", body:"Force-directed topology showing relationships between all 110 CMMC practices."},
+  {target:".tab-btn[data-tab='heatmap']", title:"Coverage Heatmap", body:"Interactive grid showing coverage state (Full/Strong/Partial/NA) across all families."},
+  {target:".tab-btn[data-tab='poam']", title:"POA&M Tracker", body:"Plan of Action and Milestones for practices with partial compliance. Track remediation progress."},
+  {target:".tab-btn[data-tab='crosswalk']", title:"10-Framework Cross-walk", body:"Map CMMC practices to 10 compliance frameworks including NIST, ISO, SOC2, and more."},
+  {target:"#btnLoadSample", title:"Load Sample Bundle", body:"Click here to load a sample CMMC bundle with 110 practices across 14 families. Try it now!"},
+  {target:"#btnDownloadForDashboard", title:"Dashboard Export", body:"Download your compliance bundle as JSON for the Live Dashboard."}
+];
+
+STATE.tourStep = -1;
+
+function startTour() {
+  STATE.tourStep = 0;
+  renderTourStep();
+}
+
+function renderTourStep() {
+  var step = TOUR_STEPS[STATE.tourStep];
+  if (!step) { dismissTour(); return; }
+  var backdrop = $("#tourBackdrop");
+  var card = $("#tourCard");
+  backdrop.style.display = "";
+  card.style.display = "";
+
+  var dots = '';
+  for (var i = 0; i < TOUR_STEPS.length; i++) {
+    var cls = i < STATE.tourStep ? "done" : i === STATE.tourStep ? "active" : "";
+    dots += '<div class="tour-step-dot ' + cls + '"></div>';
+  }
+
+  card.innerHTML = '<div class="tour-step-bar">' + dots + '</div>' +
+    '<h4>' + escHTML(step.title) + '</h4>' +
+    '<p>' + escHTML(step.body) + '</p>' +
+    '<div class="tour-btns">' +
+    (STATE.tourStep > 0 ? '<button id="tourBack">Back</button>' : '') +
+    '<button id="tourSkip">Skip</button>' +
+    (STATE.tourStep < TOUR_STEPS.length - 1 ?
+      '<button class="primary" id="tourNext">Next</button>' :
+      '<button class="primary" id="tourDone">Done</button>') +
+    '</div>';
+
+  var target = $(step.target);
+  if (target) {
+    target.scrollIntoView({behavior:"smooth", block:"center"});
+    var rect = target.getBoundingClientRect();
+    var top = rect.bottom + 12;
+    var left = Math.max(12, Math.min(rect.left, window.innerWidth - 360));
+    if (top + 200 > window.innerHeight) top = rect.top - 220;
+    card.style.top = top + "px";
+    card.style.left = left + "px";
+    card.style.transform = "";
+  } else {
+    card.style.top = "50%";
+    card.style.left = "50%";
+    card.style.transform = "translate(-50%,-50%)";
+  }
+
+  var next = $("#tourNext");
+  var back = $("#tourBack");
+  var skip = $("#tourSkip");
+  var done = $("#tourDone");
+  if (next) next.addEventListener("click", function() { STATE.tourStep++; renderTourStep(); });
+  if (back) back.addEventListener("click", function() { STATE.tourStep--; renderTourStep(); });
+  if (skip) skip.addEventListener("click", dismissTour);
+  if (done) done.addEventListener("click", dismissTour);
+}
+
+function dismissTour() {
+  STATE.tourStep = -1;
+  $("#tourBackdrop").style.display = "none";
+  $("#tourCard").style.display = "none";
+}
+
+/* ── Graph Filter / Search / Layers ────── */
+function filterGraphByType() {
+  var svg = $("#panel-graph svg");
+  if (!svg) return;
+  var checked = {};
+  $$("#graphToolbar input[data-graph-type]").forEach(function(cb) {
+    checked[cb.dataset.graphType] = cb.checked;
+  });
+  svg.querySelectorAll("[data-node-type]").forEach(function(g) {
+    var type = g.dataset.nodeType;
+    g.style.display = checked[type] !== false ? "" : "none";
+  });
+}
+
+function searchGraphNodes(query) {
+  var svg = $("#panel-graph svg");
+  if (!svg) return;
+  query = (query || "").toLowerCase();
+  svg.querySelectorAll("[data-ref-id]").forEach(function(g) {
+    var id = (g.dataset.refId || "").toLowerCase();
+    if (query && id.indexOf(query) !== -1) {
+      g.style.filter = "drop-shadow(0 0 8px var(--neon-cyan))";
+      g.style.opacity = "1";
+    } else if (query) {
+      g.style.filter = "";
+      g.style.opacity = "0.25";
+    } else {
+      g.style.filter = "";
+      g.style.opacity = "";
+    }
+  });
+}
+
+function toggleGraphLayer(layer) {
+  var svg = $("#panel-graph svg");
+  if (!svg) return;
+  var group = svg.querySelector(".layer-" + layer);
+  if (!group) return;
+  var hidden = group.style.display === "none";
+  group.style.display = hidden ? "" : "none";
+  var btn = $("#btnLayer" + layer.charAt(0).toUpperCase() + layer.slice(1));
+  if (btn) btn.classList.toggle("active", hidden);
+}
+
+/* ── Evidence Drop Handler + Validation ── */
+function handleDrop(e) {
+  e.preventDefault();
+  $("#dropZone").classList.remove("drag-over");
+  var files = e.dataTransfer && e.dataTransfer.files;
+  if (!files || files.length === 0) return;
+  var file = files[0];
+  if (file.size > 5 * 1024 * 1024) { toast("File too large (max 5 MB)","warn"); return; }
+  if (!file.name.endsWith(".json")) { toast("Only .json files accepted","warn"); return; }
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      var data = JSON.parse(ev.target.result);
+      if (typeof loadBundleFromObject === "function") {
+        loadBundleFromObject(data);
+      } else {
+        STATE.bundle = data;
+        loadBundle(42);
+      }
+      renderValidationChecklist(data, file.size);
+      toast("Bundle imported from " + file.name, "ok");
+    } catch(err) {
+      toast("Invalid JSON: " + err.message, "warn");
+    }
+  };
+  reader.readAsText(file);
+}
+
+function renderValidationChecklist(data, fileSize) {
+  var card = $("#validationCard");
+  if (!card) return;
+  var checks = [
+    {label:"JSON parsed successfully", pass:true},
+    {label:"Has families array", pass:Array.isArray(data.families)},
+    {label:"Has manifest object", pass:data.manifest && typeof data.manifest === "object"},
+    {label:"Has artifacts array", pass:Array.isArray(data.artifacts)},
+    {label:"File size under 5 MB", pass:fileSize ? fileSize <= 5*1024*1024 : true},
+    {label:"Family count matches manifest", pass:data.manifest && data.families ? data.families.length === (data.manifest.familyCount || 14) : false}
+  ];
+  var html = '<div class="card validation-card"><h4>Import Validation</h4>';
+  checks.forEach(function(c) {
+    html += '<div class="val-row"><span class="val-icon ' + (c.pass?"val-pass":"val-fail") + '">' + (c.pass?"\u2713":"\u2717") + '</span><span class="val-label">' + escHTML(c.label) + '</span></div>';
+  });
+  html += '</div>';
+  card.innerHTML = html;
+}
+
+function renderGraphSummary() {
+  var existing = $("#graphSummaryOverlay");
+  if (existing) { existing.remove(); return; }
+  var svg = $("#panel-graph svg");
+  if (!svg) return;
+  var nodes = svg.querySelectorAll("[data-node-type]");
+  var edges = svg.querySelectorAll(".layer-edges line, .layer-edges path");
+  var typeCounts = {};
+  nodes.forEach(function(n) {
+    var t = n.dataset.nodeType || "unknown";
+    typeCounts[t] = (typeCounts[t] || 0) + 1;
+  });
+  var html = '<h5>Graph Summary</h5>';
+  html += '<div class="gs-row"><span>Nodes</span><span class="gs-val">' + nodes.length + '</span></div>';
+  html += '<div class="gs-row"><span>Edges</span><span class="gs-val">' + edges.length + '</span></div>';
+  Object.keys(typeCounts).sort().forEach(function(t) {
+    html += '<div class="gs-row"><span>' + escHTML(t) + '</span><span class="gs-val">' + typeCounts[t] + '</span></div>';
+  });
+  var overlay = document.createElement("div");
+  overlay.className = "graph-summary-overlay";
+  overlay.id = "graphSummaryOverlay";
+  overlay.innerHTML = html;
+  var container = svg.parentElement;
+  if (container) {
+    container.style.position = "relative";
+    container.appendChild(overlay);
+  }
+}
 
 /* ══════════════════════════════════════════════════════════
    Event Delegation
@@ -1141,6 +1662,37 @@ document.addEventListener("DOMContentLoaded",function(){
     document.body.appendChild(a);a.click();document.body.removeChild(a);
     URL.revokeObjectURL(url);
     toast("Dashboard bundle downloaded");
+  });
+  // Guided tour
+  $("#btnStartTour").addEventListener("click", startTour);
+  $("#tourBackdrop").addEventListener("click", dismissTour);
+  // Task panel toggle
+  $("#btnTaskToggle").addEventListener("click", function() {
+    $("#taskPanel").classList.toggle("open");
+  });
+  $("#btnCloseTask").addEventListener("click", function() {
+    $("#taskPanel").classList.remove("open");
+  });
+  // Task row click → navigate
+  $("#taskList").addEventListener("click", function(e) {
+    var row = e.target.closest(".task-row");
+    if (!row) return;
+    var tab = row.dataset.taskTab;
+    if (tab) {
+      var btn = $$(".tab-btn").find(function(b){return b.dataset.tab===tab && b.style.display!=="none"});
+      if (btn) btn.click();
+      $("#taskPanel").classList.remove("open");
+    }
+  });
+  // Critical summary click → navigate
+  document.addEventListener("click", function(e) {
+    var row = e.target.closest(".critical-row");
+    if (!row) return;
+    var tab = row.dataset.taskTab;
+    if (tab) {
+      var btn = $$(".tab-btn").find(function(b){return b.dataset.tab===tab && b.style.display!=="none"});
+      if (btn) btn.click();
+    }
   });
   loadBundle(42);renderMapping();renderSchema("bundle");renderExecutive();
 });
@@ -1222,6 +1774,9 @@ function loadBundle(seed){
   buildProofChain(b.artifacts);
   STATE._contradictions=detectContradictions();
   setTimeout(function(){renderExecutive();renderTimeline();renderTrilogy();renderContradictions();renderGraph()},100);
+  deriveTasks();
+  renderTaskPanel();
+  renderCriticalSummary();
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -1634,7 +2189,7 @@ function _renderSvgNodes(svg,entries,startIdx,padX,padY,nodeW,nodeH,gapY,typeCol
     var hash=document.createElementNS(svgNS,"text");hash.setAttribute("x",padX+8);hash.setAttribute("y",y+34);hash.setAttribute("fill","var(--muted,#555)");hash.setAttribute("font-size","8");hash.setAttribute("font-family","monospace");hash.textContent=(entry.chainHash||"").substring(0,30)+"...";svg.appendChild(hash);
   }
 }
-function tamperChain(){if(!STATE.proofChain.length)return;var idx=Math.min(15,STATE.proofChain.length-1);STATE.proofChain[idx].chainHash="sha256:"+rngHex(64);STATE.tampered=true;renderProofChain();verifyChain()}
+function tamperChain(){if(!STATE.proofChain.length)return;var idx=Math.min(15,STATE.proofChain.length-1);STATE.proofChain[idx].chainHash="sha256:"+rngHex(64);STATE.tampered=true;renderProofChain();verifyChain();deriveTasks();renderTaskPanel();renderCriticalSummary()}
 /* ══════════════════════════════════════════════════════════
    v4.4: Chaos Mode — offline drift injection simulation
    ══════════════════════════════════════════════════════════ */
@@ -1785,6 +2340,7 @@ function simulateTamperRetcon(){
     panel.innerHTML=rhtml;panel.classList.remove("hidden");
   }
   toast("Tamper: "+detail);
+  deriveTasks();renderTaskPanel();renderCriticalSummary();
 }
 
 function undoTamper(){
@@ -1810,6 +2366,7 @@ function undoTamper(){
     if(undoBtn)undoBtn.textContent="Undo ("+_tamperStack.length+")";
   }
   renderProofChain();verifyChain();renderExecutive();renderTimeline();renderTrilogy();
+  deriveTasks();renderTaskPanel();renderCriticalSummary();
   toast("Tamper undone"+(~_tamperStack.length?" \u2014 "+_tamperStack.length+" remaining":""));
 }
 
@@ -2176,7 +2733,12 @@ function _renderGraphSvg(nodes,edges,W,H,typeColors,graph){
   if(!svg)return;
   svg.innerHTML="";
   svg.setAttribute("viewBox","0 0 "+W+" "+H);
+  svg.setAttribute("width","100%");
+  svg.style.height="auto";
+  svg.style.maxHeight="calc(100vh - 240px)";
 
+  var layerEdges=document.createElementNS(svgNS,"g");
+  layerEdges.setAttribute("class","layer-edges");
   for(var e=0;e<edges.length;e++){
     var a=nodes[edges[e].source],b2=nodes[edges[e].target];
     var line=document.createElementNS(svgNS,"line");
@@ -2185,8 +2747,9 @@ function _renderGraphSvg(nodes,edges,W,H,typeColors,graph){
     line.setAttribute("class","graph-edge");
     line.setAttribute("data-src",edges[e].source);
     line.setAttribute("data-tgt",edges[e].target);
-    svg.appendChild(line);
+    layerEdges.appendChild(line);
   }
+  svg.appendChild(layerEdges);
 
   /* v4.4: Cluster boundary ellipses (when showing individual nodes) */
   if(nodes.length>14&&!nodes[0]._cluster){
@@ -2227,9 +2790,13 @@ function _renderGraphSvg(nodes,edges,W,H,typeColors,graph){
     }
   }
 
+  var layerLabels=document.createElementNS(svgNS,"g");
+  layerLabels.setAttribute("class","layer-labels");
   for(var n=0;n<nodes.length;n++){
     var g=document.createElementNS(svgNS,"g");
     g.setAttribute("data-node-idx",n);
+    g.setAttribute("data-node-type",nodes[n].type||"");
+    g.setAttribute("data-ref-id",nodes[n].id||"");
     var circle=document.createElementNS(svgNS,"circle");
     circle.setAttribute("cx",nodes[n].x);circle.setAttribute("cy",nodes[n].y);
     circle.setAttribute("r",nodes[n]._cluster?15:6);
@@ -2244,9 +2811,10 @@ function _renderGraphSvg(nodes,edges,W,H,typeColors,graph){
     label.setAttribute("x",nodes[n].x);label.setAttribute("y",nodes[n].y-10);
     label.setAttribute("class","graph-label");
     label.textContent=nodes[n].label;
-    g.appendChild(label);
+    layerLabels.appendChild(label);
     svg.appendChild(g);
   }
+  svg.appendChild(layerLabels);
 
   svg.addEventListener("click",function(ev){
     var nodeG=ev.target.closest("[data-node-idx]");
@@ -2849,7 +3417,60 @@ document.addEventListener("DOMContentLoaded",function(){
     toast("Cluster expanded — showing all nodes");
   });
 
-  document.addEventListener("keydown",function(e){if(e.target.tagName==="TEXTAREA"||e.target.tagName==="INPUT")return;var tk={"1":"executive","2":"explorer","3":"proof","4":"export","5":"diff","6":"mapping","7":"schema","8":"trilogy","9":"graph","0":"heatmap","g":"graph","G":"graph","h":"heatmap","H":"halflife","b":"blast","B":"blast","p":"poam","P":"poam","x":"crosswalk","X":"crosswalk"};if(tk[e.key]){e.preventDefault();var b=document.querySelector('.tab-btn[data-tab="'+tk[e.key]+'"]');if(b)b.click()}if(e.key==="Escape")closeDrawer();if(e.key==="?")$("#shortcutBar").classList.toggle("vis");if(e.key==="r"||e.key==="R"){e.preventDefault();loadBundle(Math.floor(Math.random()*100000))}});
+  /* v5.1: Role selector */
+  $("#roleSelect").addEventListener("change", function() {
+    applyRole(this.value);
+    renderTabPrefs();
+  });
+
+  /* v5.1: Tab prefs gear button */
+  $("#btnTabPrefs").addEventListener("click", function() {
+    var panel = $("#tabPrefsPanel");
+    if (panel.style.display === "none") {
+      renderTabPrefs();
+      panel.style.display = "";
+    } else {
+      panel.style.display = "none";
+    }
+  });
+
+  /* v5.1: Tab prefs checkbox delegation */
+  $("#tabPrefsPanel").addEventListener("change", function(e) {
+    var cb = e.target;
+    if (!cb.dataset.prefTab) return;
+    var tab = cb.dataset.prefTab;
+    var idx = STATE.prefs.hiddenTabs.indexOf(tab);
+    if (cb.checked && idx !== -1) STATE.prefs.hiddenTabs.splice(idx, 1);
+    if (!cb.checked && idx === -1) STATE.prefs.hiddenTabs.push(tab);
+    applyRole(STATE.role);
+  });
+
+  /* v5.1: Apply default role on init */
+  applyRole(STATE.role);
+
+  /* Phase 5: Drop zone events */
+  var dz = $("#dropZone");
+  dz.addEventListener("dragover", function(e) { e.preventDefault(); dz.classList.add("drag-over"); });
+  dz.addEventListener("dragleave", function() { dz.classList.remove("drag-over"); });
+  dz.addEventListener("drop", handleDrop);
+
+  /* Phase 4: Graph filter toolbar events */
+  $("#graphToolbar").addEventListener("change", function(e) {
+    if (e.target.dataset.graphType) filterGraphByType();
+  });
+  var _graphSearchTimer;
+  $("#graphSearch").addEventListener("input", function() {
+    clearTimeout(_graphSearchTimer);
+    var q = this.value;
+    _graphSearchTimer = setTimeout(function() { searchGraphNodes(q); }, 200);
+  });
+  ["Edges","Labels"].forEach(function(l) {
+    var btn = $("#btnLayer" + l);
+    if (btn) btn.addEventListener("click", function() { toggleGraphLayer(l.toLowerCase()); });
+  });
+  $("#btnGraphSummary").addEventListener("click", renderGraphSummary);
+
+  document.addEventListener("keydown",function(e){if(e.target.tagName==="TEXTAREA"||e.target.tagName==="INPUT")return;var tk={"1":"executive","2":"explorer","3":"proof","4":"export","5":"diff","6":"mapping","7":"schema","8":"trilogy","9":"graph","0":"heatmap","g":"graph","G":"graph","h":"heatmap","H":"halflife","b":"blast","B":"blast","p":"poam","P":"poam","x":"crosswalk","X":"crosswalk"};if(tk[e.key]){e.preventDefault();var b=document.querySelector('.tab-btn[data-tab="'+tk[e.key]+'"]');if(b&&b.style.display!=="none")b.click()}if(e.key==="Escape")closeDrawer();if(e.key==="?")$("#shortcutBar").classList.toggle("vis");if(e.key==="r"||e.key==="R"){e.preventDefault();loadBundle(Math.floor(Math.random()*100000))}});
 });
 
 
@@ -3158,5 +3779,14 @@ function printExport(){
 
 })();
 </script>
+<div id="taskPanel">
+  <div class="task-header">
+    <h3>My Tasks</h3>
+    <button class="task-close" id="btnCloseTask">&times;</button>
+  </div>
+  <div class="task-list" id="taskList"></div>
+</div>
+<div id="tourBackdrop" class="tour-backdrop" style="display:none"></div>
+<div id="tourCard" class="tour-card" style="display:none"></div>
 </body>
 </html>

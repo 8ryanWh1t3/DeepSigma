@@ -1,9 +1,17 @@
 <!--
- EDGE COG Adapter v5.0.0
+ EDGE COG Adapter v5.1.0
  ============================================================
  Portable Cognition/Proof Bundle Explorer
  Four Cognition Planes: Memory, Behavior, Evolution, Proof
  Five DeepSigma Primitives: Truth, Reasoning, Memory, Drift, Patch
+
+ v5.1.0 Changes ("Role Surface"):
+ [x] Role-based dashboards
+ [x] Task panel
+ [x] Contextual tooltips
+ [x] Graph filters
+ [x] Drag-drop import
+ [x] Mobile responsive
 
  v5.0.0 Changes ("Full Suite"):
  [x] Print-ready compliance summary export (HTML download)
@@ -69,7 +77,7 @@
 "use strict";
 /* EDGE_HARDENING_V1 — Runtime capability lockdown v1.1 */
 
-var EDGE_BUILD_ID="EDGE_BUILD_ID:EDGE_COG_Adapter_v5.0.0";
+var EDGE_BUILD_ID="EDGE_BUILD_ID:EDGE_COG_Adapter_v5.1.0";
 
 function _block(cap){
   return function(){throw new Error("EDGE hardening: "+cap+" is blocked")};
@@ -140,7 +148,7 @@ document.addEventListener("DOMContentLoaded",function(){
 
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>EDGE COG Adapter v5.0.0</title>
+<title>EDGE COG Adapter v5.1.0</title>
 <style>
 :root {
   --bg:#0a0e17; --card:#111927; --card-hover:#182235;
@@ -489,6 +497,135 @@ tr:hover td{background:rgba(0,240,255,.03)}
 .print-btn{background:rgba(57,255,20,.08);border:1px solid rgba(57,255,20,.25);color:#39ff14;padding:7px 14px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer}
 .print-btn:hover{background:rgba(57,255,20,.15)}
 
+/* ── v5.1: Role Bar + Tab Prefs ─────────── */
+.header-right{position:relative}
+.role-bar{display:flex;align-items:center;gap:8px}
+.role-label{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px}
+#roleSelect{background:var(--card);color:var(--neon-cyan);border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;outline:none}
+#roleSelect:focus{border-color:var(--neon-cyan)}
+.btn-icon{background:none;border:1px solid var(--line);border-radius:6px;color:var(--muted);padding:4px 8px;cursor:pointer;font-size:14px}
+.btn-icon:hover{color:var(--neon-cyan);border-color:var(--neon-cyan)}
+/* ── Task Panel ─────────────────────────── */
+.task-toggle{position:relative;background:none;border:1px solid var(--line);border-radius:6px;color:var(--muted);padding:4px 10px;cursor:pointer;font-size:12px}
+.task-toggle:hover{color:var(--neon-pink);border-color:var(--neon-pink)}
+.task-badge{position:absolute;top:-6px;right:-6px;background:var(--bad);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.task-badge.zero{display:none}
+#taskPanel{position:fixed;top:0;right:-380px;width:360px;height:100vh;background:var(--card);border-left:1px solid var(--line);z-index:600;transition:right .25s ease;display:flex;flex-direction:column;box-shadow:-4px 0 24px rgba(0,0,0,.4)}
+#taskPanel.open{right:0}
+.task-header{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.task-header h3{margin:0;font-size:14px;color:var(--neon-pink)}
+.task-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px}
+.task-close:hover{color:var(--txt)}
+.task-list{flex:1;overflow-y:auto;padding:8px}
+.task-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;border-left:4px solid transparent;margin-bottom:4px}
+.task-row:hover{background:var(--card-hover)}
+.task-row.sev-critical{border-left-color:var(--bad)}
+.task-row.sev-high{border-left-color:var(--neon-amber)}
+.task-row.sev-medium{border-left-color:var(--neon-cyan)}
+.task-row.sev-low{border-left-color:var(--neon-green)}
+.task-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.sev-critical .task-dot{background:var(--bad);box-shadow:0 0 6px var(--bad);animation:pulse 1.5s infinite}
+.sev-high .task-dot{background:var(--neon-amber)}
+.sev-medium .task-dot{background:var(--neon-cyan)}
+.sev-low .task-dot{background:var(--neon-green)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.task-label{font-size:12px;color:var(--txt);line-height:1.4}
+.task-detail{font-size:10px;color:var(--muted);margin-top:2px}
+.task-tab-badge{font-size:9px;color:var(--neon-cyan);background:var(--glow-cyan);padding:1px 6px;border-radius:4px;margin-top:3px;display:inline-block}
+.task-empty{color:var(--muted);font-size:12px;text-align:center;padding:40px 16px}
+/* ── Tooltips ──────────────────────────── */
+[data-tip]{position:relative;cursor:help}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);padding:6px 10px;border-radius:6px;background:#1a2332;color:var(--txt);font-size:10px;max-width:280px;white-space:normal;z-index:999;border:1px solid var(--line);pointer-events:none;line-height:1.4}
+[data-tip]:hover::before{content:"";position:absolute;bottom:calc(100% + 2px);left:50%;transform:translateX(-50%);border:4px solid transparent;border-top-color:#1a2332;z-index:999;pointer-events:none}
+/* ── Tour Overlay ─────────────────────── */
+.tour-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:700;pointer-events:auto}
+.tour-card{position:fixed;z-index:701;background:var(--card);border:1px solid var(--neon-cyan);border-radius:10px;padding:16px 20px;max-width:340px;box-shadow:0 8px 32px rgba(0,240,255,.15)}
+.tour-card h4{margin:0 0 6px;color:var(--neon-cyan);font-size:13px}
+.tour-card p{margin:0 0 12px;color:var(--txt);font-size:11px;line-height:1.5}
+.tour-step-bar{display:flex;gap:4px;margin-bottom:10px}
+.tour-step-dot{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.tour-step-dot.active{background:var(--neon-cyan)}
+.tour-step-dot.done{background:var(--neon-green)}
+.tour-btns{display:flex;gap:8px;justify-content:flex-end}
+.tour-btns button{padding:4px 14px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--txt);cursor:pointer;font-size:11px}
+.tour-btns button.primary{background:var(--neon-cyan);color:#000;border-color:var(--neon-cyan);font-weight:600}
+.tour-btns button:hover{opacity:.85}
+/* ── Graph Filters ─────────────────────── */
+.graph-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 12px;background:var(--card);border:1px solid var(--line);border-radius:8px;margin-bottom:10px}
+.graph-toolbar label{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--txt);cursor:pointer}
+.graph-toolbar input[type="checkbox"]{accent-color:var(--neon-cyan)}
+.graph-search{background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--txt);padding:4px 10px;font-size:11px;width:160px;outline:none}
+.graph-search:focus{border-color:var(--neon-cyan)}
+.graph-search::placeholder{color:var(--muted)}
+.graph-toolbar .sep{width:1px;height:20px;background:var(--line)}
+.graph-toolbar button{padding:3px 10px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--txt);cursor:pointer;font-size:10px}
+.graph-toolbar button.active{border-color:var(--neon-cyan);color:var(--neon-cyan)}
+.graph-toolbar button:hover{border-color:var(--neon-cyan)}
+.graph-summary-overlay{position:absolute;top:12px;right:12px;background:rgba(17,25,39,.92);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:10px;color:var(--txt);z-index:10;min-width:160px}
+.graph-summary-overlay h5{margin:0 0 6px;color:var(--neon-cyan);font-size:11px}
+.graph-summary-overlay .gs-row{display:flex;justify-content:space-between;padding:2px 0}
+.graph-summary-overlay .gs-val{color:var(--neon-green);font-weight:600}
+/* ── Drop Zone ─────────────────────────── */
+.drop-zone{border:2px dashed var(--line);border-radius:10px;padding:28px 16px;text-align:center;color:var(--muted);font-size:12px;cursor:pointer;transition:border-color .2s,background .2s;margin-bottom:12px}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--neon-cyan);background:var(--glow-cyan);color:var(--neon-cyan)}
+.drop-zone .drop-icon{font-size:28px;margin-bottom:6px;display:block}
+/* ── Validation Checklist ──────────────── */
+.validation-card{margin-top:12px}
+.validation-card h4{margin:0 0 8px;font-size:12px;color:var(--neon-cyan)}
+.val-row{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:11px}
+.val-icon{font-size:14px;width:18px;text-align:center}
+.val-pass{color:var(--ok)}
+.val-fail{color:var(--bad)}
+.val-label{color:var(--txt)}
+/* ── Checklist View ────────────────────── */
+.checklist-toggle{display:flex;gap:4px;margin-bottom:10px}
+.checklist-toggle button{padding:3px 10px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--txt);cursor:pointer;font-size:10px}
+.checklist-toggle button.active{border-color:var(--neon-cyan);color:var(--neon-cyan)}
+.checklist-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px}
+.checklist-item{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.checklist-item h5{margin:0 0 4px;font-size:11px;color:var(--neon-cyan)}
+.checklist-item .ci-row{display:flex;justify-content:space-between;font-size:10px;padding:2px 0;color:var(--txt)}
+.ci-check{color:var(--ok)}
+.ci-miss{color:var(--bad)}
+/* ── Critical Summary Card ────────────── */
+.critical-card{border-left:4px solid var(--bad);margin-bottom:16px}
+.critical-card h4{color:var(--bad);margin:0 0 8px;font-size:13px}
+.critical-row{display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;font-size:11px;color:var(--txt)}
+.critical-row:hover{color:var(--neon-pink)}
+.critical-row .cdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.critical-row .cdot.c{background:var(--bad)}
+.critical-row .cdot.h{background:var(--neon-amber)}
+.tab-prefs-panel{position:absolute;top:100%;right:0;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px;z-index:500;min-width:200px;max-height:320px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+.tab-prefs-panel label{display:flex;align-items:center;gap:6px;padding:4px 0;color:var(--txt);font-size:11px;cursor:pointer}
+.tab-prefs-panel input[type="checkbox"]{accent-color:var(--neon-cyan)}
+/* ── Mobile Responsive ─────────────────── */
+@media(max-width:768px){
+  .tabs{flex-wrap:wrap;padding:0 8px}
+  .tab-btn{padding:6px 10px;font-size:10px}
+  .content{padding:8px;height:auto}
+  .card-grid,.card-grid-3{grid-template-columns:1fr}
+  header{flex-direction:column;gap:8px;padding:8px}
+  .header-right{margin-left:0;flex-wrap:wrap;justify-content:center}
+  .plane-pills{display:none}
+  .stat-row{flex-direction:column}
+  .detail-drawer{width:100%!important;right:0!important}
+  #taskPanel{width:100%!important;right:-100%!important}
+  #taskPanel.open{right:0!important}
+  #roleSelect{width:100%}
+  .graph-toolbar{flex-direction:column;align-items:stretch}
+  .graph-toolbar .sep{width:100%;height:1px}
+  .tour-card{max-width:calc(100vw - 24px);left:12px!important;right:12px}
+  .checklist-grid{grid-template-columns:1fr}
+  [data-tip]:hover::after{left:0;transform:none;max-width:200px}
+}
+@media(max-width:480px){
+  .tab-btn{padding:4px 6px;font-size:9px}
+  .tabs{gap:0;justify-content:center}
+  body{font-size:12px}
+  .role-bar{flex-wrap:wrap}
+  .drop-zone{padding:16px 8px}
+}
+
 </style>
 </head>
 <body>
@@ -514,10 +651,26 @@ tr:hover td{background:rgba(0,240,255,.03)}
     <div class="brand-icon">COG</div>
     <div>
       COG Adapter
-      <small>Portable Cognition / Proof Bundle Explorer v4.5.0</small>
+      <small>Portable Cognition / Proof Bundle Explorer v5.1.0</small>
     </div>
   </div>
   <div class="header-right">
+    <div class="role-bar">
+      <label class="role-label">Role</label>
+      <select id="roleSelect" title="Select dashboard role">
+        <option value="analyst" selected>Analyst</option>
+        <option value="executive">Executive</option>
+        <option value="pm">Program Manager</option>
+        <option value="reviewer">Reviewer</option>
+        <option value="auditor">Auditor</option>
+      </select>
+      <button id="btnTabPrefs" class="btn-icon" title="Customize tabs">&#9881;</button>
+    </div>
+    <div id="tabPrefsPanel" class="tab-prefs-panel" style="display:none"></div>
+    <button class="btn-icon" id="btnStartTour" title="Guided tour">?</button>
+    <button class="task-toggle" id="btnTaskToggle" title="My Tasks">
+      Tasks <span class="task-badge zero" id="taskBadge">0</span>
+    </button>
     <div class="plane-pills">
       <span class="plane-pill" data-plane="memory">Memory</span>
       <span class="plane-pill" data-plane="behavior">Behavior</span>
@@ -528,18 +681,18 @@ tr:hover td{background:rgba(0,240,255,.03)}
 </header>
 
 <nav class="tabs" id="tabBar">
-  <button class="tab-btn active" data-tab="executive">Executive</button>
-  <button class="tab-btn" data-tab="explorer">Bundle Explorer</button>
-  <button class="tab-btn" data-tab="proof">Proof Chain</button>
-  <button class="tab-btn" data-tab="export">Export</button>
-  <button class="tab-btn" data-tab="diff">Diff</button>
-  <button class="tab-btn" data-tab="mapping">Mapping</button>
-  <button class="tab-btn" data-tab="schema">Schema</button>
-  <button class="tab-btn" data-tab="heatmap">Drift Heatmap</button>
-  <button class="tab-btn" data-tab="halflife">Half-Life</button>
-  <button class="tab-btn" data-tab="blast">Blast Radius</button>
-  <button class="tab-btn" data-tab="graph">Graph</button>
-  <button class="tab-btn" data-tab="trilogy">Trilogy</button>
+  <button class="tab-btn active" data-tab="executive" data-tip="Bundle health scorecard and critical issues">Executive</button>
+  <button class="tab-btn" data-tab="explorer" data-tip="Load and inspect COG bundle artifacts">Bundle Explorer</button>
+  <button class="tab-btn" data-tab="proof" data-tip="Per-artifact cryptographic hash chain verification">Proof Chain</button>
+  <button class="tab-btn" data-tab="export" data-tip="Convert between DeepSigma and COG formats">Export</button>
+  <button class="tab-btn" data-tab="diff" data-tip="Side-by-side bundle comparison">Diff</button>
+  <button class="tab-btn" data-tab="mapping" data-tip="COG artifact type to CERPA primitive mapping">Mapping</button>
+  <button class="tab-btn" data-tab="schema" data-tip="JSON Schema 2020-12 structure viewer">Schema</button>
+  <button class="tab-btn" data-tab="heatmap" data-tip="Drift detection heatmap across deployment timeline">Drift Heatmap</button>
+  <button class="tab-btn" data-tab="halflife" data-tip="Assumption decay risk curves and expiry tracking">Half-Life</button>
+  <button class="tab-btn" data-tab="blast" data-tip="Gap cascade analysis — blast radius of failures">Blast Radius</button>
+  <button class="tab-btn" data-tab="graph" data-tip="Force-directed dependency topology visualization">Graph</button>
+  <button class="tab-btn" data-tab="trilogy" data-tip="Synchronized CERPA/COG/Proof lane view">Trilogy</button>
 </nav>
 
 <div class="content" id="content">
@@ -549,7 +702,7 @@ tr:hover td{background:rgba(0,240,255,.03)}
     <div class="card-grid">
       <div class="card" style="text-align:center">
         <h3>Bundle Integrity</h3>
-        <div class="exec-gauge">
+        <div class="exec-gauge" data-tip="Proof chain integrity — percentage of verified hash links">
           <svg viewBox="0 0 120 120"><circle class="g-bg" cx="60" cy="60" r="50" stroke-dasharray="314" stroke-dashoffset="79"/>
           <circle class="g-fill" id="execGaugeFill" cx="60" cy="60" r="50" stroke="var(--ok)" stroke-dasharray="314" stroke-dashoffset="47"/></svg>
           <div class="exec-gauge-label"><div class="exec-gauge-val" id="execGaugeVal" style="color:var(--ok)">100</div><div class="exec-gauge-sub">Score</div></div>
@@ -558,23 +711,23 @@ tr:hover td{background:rgba(0,240,255,.03)}
           <span class="cb">NIST AI RMF</span><span class="cb">CMMC 2.0</span><span class="cb">ISO 27001</span><span class="cb">EU AI Act</span>
         </div>
       </div>
-      <div><div class="stats-bar" id="execStats"></div></div>
+      <div><div class="stats-bar" id="execStats" data-tip="Total artifacts in the loaded COG bundle"></div></div>
     </div>
     <div class="card">
       <h3>Artifact Timeline</h3>
-      <div class="timeline" id="execTimeline"></div>
+      <div class="timeline" id="execTimeline" data-tip="Sequential replay steps tracking artifact evolution"></div>
       <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-top:2px"><span>Oldest</span><span>Most Recent</span></div>
     </div>
     <div class="card">
       <h3>Bundle Health Scorecard</h3>
-      <div id="execScorecard"></div>
+      <div id="execScorecard" data-tip="Number of cryptographic proof chain entries"></div>
     </div>
     <div class="card">
       <h3>Commit Boundary Snapshot</h3>
       <p style="color:var(--muted);font-size:11px;margin-bottom:12px">
         Authority, admissibility, and constraint metadata captured at bundle seal time.
       </p>
-      <div id="commitBoundary"></div>
+      <div id="commitBoundary" data-tip="Seal metadata — authority, constraints, and admissibility rules"></div>
     </div>
     <div class="card">
       <h3>Import Custom Bundle</h3>
@@ -621,6 +774,11 @@ tr:hover td{background:rgba(0,240,255,.03)}
 
   <!-- ═══════════════ TAB 1: Bundle Explorer ═══════════════ -->
   <div class="tab-panel" id="panel-explorer" data-tab-title="Bundle Explorer">
+    <div class="drop-zone" id="dropZone">
+      <span class="drop-icon">&#128230;</span>
+      Drop JSON bundle here or use the buttons below
+    </div>
+    <div id="validationCard"></div>
     <div class="stats-bar" id="explorerStats"></div>
 
     <div class="card">
@@ -905,6 +1063,23 @@ tr:hover td{background:rgba(0,240,255,.03)}
 
   <!-- ═══════════════ TAB 11: Graph ═══════════════ -->
   <div class="tab-panel" id="panel-graph" data-tab-title="Graph">
+    <div class="graph-toolbar" id="graphToolbar">
+      <span style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px">Filter</span>
+      <label><input type="checkbox" data-graph-type="Truth" checked> Truth</label>
+      <label><input type="checkbox" data-graph-type="Reasoning" checked> Reasoning</label>
+      <label><input type="checkbox" data-graph-type="Memory" checked> Memory</label>
+      <label><input type="checkbox" data-graph-type="Drift" checked> Drift</label>
+      <label><input type="checkbox" data-graph-type="Patch" checked> Patch</label>
+      <div class="sep"></div>
+      <input type="text" class="graph-search" id="graphSearch" placeholder="Search nodes...">
+      <div class="sep"></div>
+      <span style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px">Layers</span>
+      <button id="btnLayerEdges" class="active" data-layer="edges">Edges</button>
+      <button id="btnLayerLabels" class="active" data-layer="labels">Labels</button>
+      <button id="btnLayerClusters" class="active" data-layer="clusters">Clusters</button>
+      <div class="sep"></div>
+      <button id="btnGraphSummary">Summary</button>
+    </div>
     <div class="stats-bar" id="graphStats"></div>
     <div class="card">
       <h3>Bundle Topology</h3>
@@ -1145,7 +1320,239 @@ function deepsigmaToBundle(artifact){
 
 /* ── State ─── */
 var STATE={bundle:null,bundleB:null,proofChain:[],tampered:false,tamperStack:[],lastDiff:null};
+STATE.role="analyst";
+STATE.prefs={hiddenTabs:[]};
 var proofPage=0, proofPageSize=25;
+
+/* ── v5.1: Role Tab Map ─── */
+var ROLE_TABS={
+  analyst:["executive","explorer","proof","export","diff","mapping","schema","heatmap","halflife","blast","graph","trilogy"],
+  executive:["executive","export","trilogy"],
+  pm:["executive","explorer","export","heatmap","halflife","blast","trilogy"],
+  reviewer:["executive","proof","diff","mapping"],
+  auditor:["executive","proof","export","schema","mapping","trilogy"]
+};
+
+function applyRole(role){
+  STATE.role=role;
+  var allowed=ROLE_TABS[role]||ROLE_TABS.analyst;
+  var hidden=STATE.prefs.hiddenTabs;
+  $$(".tab-btn").forEach(function(btn){
+    var tab=btn.dataset.tab;
+    var visible=allowed.indexOf(tab)!==-1&&hidden.indexOf(tab)===-1;
+    btn.style.display=visible?"":"none";
+  });
+  // If active tab is now hidden, switch to first visible
+  var active=$(".tab-btn.active");
+  if(active&&active.style.display==="none"){
+    var first=$$(".tab-btn").find(function(b){return b.style.display!=="none";});
+    if(first)first.click();
+  }
+}
+
+function renderTabPrefs(){
+  var panel=$("#tabPrefsPanel");
+  var allowed=ROLE_TABS[STATE.role]||ROLE_TABS.analyst;
+  var html='<div style="color:var(--muted);font-size:10px;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">Visible Tabs</div>';
+  allowed.forEach(function(tab){
+    var btn=$$(".tab-btn").find(function(b){return b.dataset.tab===tab;});
+    var label=btn?btn.textContent:tab;
+    var checked=STATE.prefs.hiddenTabs.indexOf(tab)===-1?"checked":"";
+    html+='<label><input type="checkbox" data-pref-tab="'+escHTML(tab)+'" '+checked+'> '+escHTML(label)+'</label>';
+  });
+  panel.innerHTML=html;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Phase 2: Task Panel — deriveTasks / renderTaskPanel / renderCriticalSummary
+   ══════════════════════════════════════════════════════════ */
+var SEV_ORDER = {critical:0, high:1, medium:2, low:3};
+
+function deriveTasks() {
+  if (!STATE.bundle) { STATE.tasks = []; return; }
+  var tasks = [];
+  var b = STATE.bundle;
+  var arts = b.artifacts || [];
+  var steps = b.replaySteps || [];
+
+  // 1. Tamper state
+  if (STATE.tampered) {
+    tasks.push({id:"tamper-active", label:"Proof chain tampered — integrity compromised", severity:"critical", tab:"proof", detail:"Undo tamper or reload bundle to restore integrity"});
+  }
+
+  // 2. Half-life expired
+  var expiredCount = 0;
+  arts.forEach(function(a) {
+    var hl = computeHalfLife(a, arts, steps);
+    if (hl && hl.status === "expired") expiredCount++;
+  });
+  if (expiredCount > 0) {
+    tasks.push({id:"halflife-expired", label:expiredCount + " artifact" + (expiredCount>1?"s":"") + " with expired half-life", severity:"critical", tab:"halflife", detail:"Review and patch expired assumptions"});
+  }
+
+  // 3. Contradictions
+  var contras = STATE._contradictions || [];
+  if (contras.length > 0) {
+    var critCount = contras.filter(function(c){return c.severity==="critical"}).length;
+    tasks.push({id:"contradictions", label:contras.length + " contradiction" + (contras.length>1?"s":"") + " detected" + (critCount>0?" ("+critCount+" critical)":""), severity:critCount>0?"high":"medium", tab:"trilogy", detail:"Review contradiction panel in Trilogy tab"});
+  }
+
+  // 4. Proof chain gaps
+  if (STATE.proofChain.length > 0 && STATE.proofChain.length !== arts.length) {
+    tasks.push({id:"chain-gap", label:"Proof chain length (" + STATE.proofChain.length + ") does not match artifact count (" + arts.length + ")", severity:"high", tab:"proof", detail:"Chain integrity may be incomplete"});
+  }
+
+  // 5. Drift detected in recent replay steps
+  var driftSteps = steps.filter(function(s){return s.action && s.action.toLowerCase().indexOf("drift")!==-1});
+  if (driftSteps.length > 0) {
+    tasks.push({id:"drift-detected", label:driftSteps.length + " drift event" + (driftSteps.length>1?"s":"") + " in replay history", severity:"medium", tab:"heatmap", detail:"Check drift heatmap for affected artifacts"});
+  }
+
+  // 6. Half-life warnings (not expired, but critical)
+  var warnCount = 0;
+  arts.forEach(function(a) {
+    var hl = computeHalfLife(a, arts, steps);
+    if (hl && hl.status === "warning") warnCount++;
+  });
+  if (warnCount > 0) {
+    tasks.push({id:"halflife-warning", label:warnCount + " artifact" + (warnCount>1?"s":"") + " approaching half-life expiry", severity:"medium", tab:"halflife", detail:"Proactive patching recommended"});
+  }
+
+  // 7. Low-severity: bundle loaded successfully
+  if (tasks.length === 0) {
+    tasks.push({id:"all-clear", label:"All checks passed — no issues detected", severity:"low", tab:"executive", detail:"Bundle is healthy"});
+  }
+
+  tasks.sort(function(a,b){return (SEV_ORDER[a.severity]||3) - (SEV_ORDER[b.severity]||3)});
+  STATE.tasks = tasks;
+}
+
+function renderTaskPanel() {
+  var list = $("#taskList");
+  var tasks = STATE.tasks || [];
+  if (tasks.length === 0 || (tasks.length===1 && tasks[0].id==="all-clear")) {
+    list.innerHTML = '<div class="task-empty">No issues found. Bundle is healthy.</div>';
+  } else {
+    var html = '';
+    tasks.forEach(function(t) {
+      html += '<div class="task-row sev-' + escHTML(t.severity) + '" data-task-tab="' + escHTML(t.tab) + '">';
+      html += '<div class="task-dot"></div>';
+      html += '<div><div class="task-label">' + escHTML(t.label) + '</div>';
+      html += '<div class="task-detail">' + escHTML(t.detail) + '</div>';
+      html += '<span class="task-tab-badge">' + escHTML(t.tab) + '</span>';
+      html += '</div></div>';
+    });
+    list.innerHTML = html;
+  }
+  // Update badge
+  var badge = $("#taskBadge");
+  var count = tasks.filter(function(t){return t.id!=="all-clear"}).length;
+  badge.textContent = count;
+  badge.className = "task-badge" + (count === 0 ? " zero" : "");
+}
+
+function renderCriticalSummary() {
+  var existing = $("#criticalSummary");
+  if (existing) existing.remove();
+  var tasks = (STATE.tasks || []).filter(function(t){return t.severity==="critical"||t.severity==="high"});
+  if (tasks.length === 0) return;
+  var card = document.createElement("div");
+  card.className = "card critical-card";
+  card.id = "criticalSummary";
+  var html = '<h4>&#9888; Critical Issues (' + tasks.length + ')</h4>';
+  tasks.slice(0, 5).forEach(function(t) {
+    var dotCls = t.severity === "critical" ? "c" : "h";
+    html += '<div class="critical-row" data-task-tab="' + escHTML(t.tab) + '"><span class="cdot ' + dotCls + '"></span> ' + escHTML(t.label) + '</div>';
+  });
+  card.innerHTML = html;
+  var panel = $("#panel-executive");
+  if (panel && panel.firstChild) panel.insertBefore(card, panel.firstChild);
+}
+
+/* ══════════════════════════════════════════════════════════
+   Phase 3: Contextual Guidance — Onboarding Tour
+   ══════════════════════════════════════════════════════════ */
+var TOUR_STEPS = [
+  {target:"#roleSelect", title:"Role Selector", body:"Choose your role to filter tabs. Executives see high-level views; analysts get full access to all 12 tabs."},
+  {target:"#btnTaskToggle", title:"Task Panel", body:"Click here to see auto-generated tasks derived from your bundle state — expired items, contradictions, and integrity issues."},
+  {target:".tab-btn[data-tab='executive']", title:"Executive Dashboard", body:"Your starting point. Shows bundle health scorecard, integrity gauge, and critical issues summary."},
+  {target:".tab-btn[data-tab='explorer']", title:"Bundle Explorer", body:"Load a COG bundle to inspect individual artifacts, their payloads, and CERPA stage mappings."},
+  {target:".tab-btn[data-tab='proof']", title:"Proof Chain", body:"Verify the cryptographic hash chain linking each artifact. Detect tampering and run chaos simulations."},
+  {target:".tab-btn[data-tab='heatmap']", title:"Drift Heatmap", body:"Visualize drift events across your deployment timeline. Identify which artifacts are deviating from baseline."},
+  {target:".tab-btn[data-tab='halflife']", title:"Assumption Half-Life", body:"Track confidence decay over time. Expired half-lives signal assumptions that need patching."},
+  {target:".tab-btn[data-tab='blast']", title:"Blast Radius", body:"Analyze the cascade impact of a single artifact failure across the dependency graph."},
+  {target:".tab-btn[data-tab='graph']", title:"Dependency Graph", body:"Force-directed topology showing artifact relationships. Use filters and search to focus on specific types."},
+  {target:".tab-btn[data-tab='trilogy']", title:"Trilogy Mode", body:"Synchronized three-lane view: CERPA stages, COG primitives, and Proof state. Includes contradiction detection and executive summary."},
+  {target:"#btnLoadSample", title:"Load Sample Bundle", body:"Click here to load a sample COG bundle and explore the tool. Try it now!"},
+  {target:"#btnExportDashboard", title:"Dashboard Export", body:"Export your bundle as JSON for the Live Dashboard. One-click download."}
+];
+
+STATE.tourStep = -1;
+
+function startTour() {
+  STATE.tourStep = 0;
+  renderTourStep();
+}
+
+function renderTourStep() {
+  var step = TOUR_STEPS[STATE.tourStep];
+  if (!step) { dismissTour(); return; }
+  var backdrop = $("#tourBackdrop");
+  var card = $("#tourCard");
+  backdrop.style.display = "";
+  card.style.display = "";
+
+  // Build step dots
+  var dots = '';
+  for (var i = 0; i < TOUR_STEPS.length; i++) {
+    var cls = i < STATE.tourStep ? "done" : i === STATE.tourStep ? "active" : "";
+    dots += '<div class="tour-step-dot ' + cls + '"></div>';
+  }
+
+  card.innerHTML = '<div class="tour-step-bar">' + dots + '</div>' +
+    '<h4>' + escHTML(step.title) + '</h4>' +
+    '<p>' + escHTML(step.body) + '</p>' +
+    '<div class="tour-btns">' +
+    (STATE.tourStep > 0 ? '<button id="tourBack">Back</button>' : '') +
+    '<button id="tourSkip">Skip</button>' +
+    (STATE.tourStep < TOUR_STEPS.length - 1 ?
+      '<button class="primary" id="tourNext">Next</button>' :
+      '<button class="primary" id="tourDone">Done</button>') +
+    '</div>';
+
+  // Position card near target
+  var target = $(step.target);
+  if (target) {
+    target.scrollIntoView({behavior:"smooth", block:"center"});
+    var rect = target.getBoundingClientRect();
+    var top = rect.bottom + 12;
+    var left = Math.max(12, Math.min(rect.left, window.innerWidth - 360));
+    if (top + 200 > window.innerHeight) top = rect.top - 220;
+    card.style.top = top + "px";
+    card.style.left = left + "px";
+    card.style.transform = "";
+  } else {
+    card.style.top = "50%";
+    card.style.left = "50%";
+    card.style.transform = "translate(-50%,-50%)";
+  }
+
+  // Wire buttons
+  var next = $("#tourNext");
+  var back = $("#tourBack");
+  var skip = $("#tourSkip");
+  var done = $("#tourDone");
+  if (next) next.addEventListener("click", function() { STATE.tourStep++; renderTourStep(); });
+  if (back) back.addEventListener("click", function() { STATE.tourStep--; renderTourStep(); });
+  if (skip) skip.addEventListener("click", dismissTour);
+  if (done) done.addEventListener("click", dismissTour);
+}
+
+function dismissTour() {
+  STATE.tourStep = -1;
+  $("#tourBackdrop").style.display = "none";
+  $("#tourCard").style.display = "none";
+}
 
 /* ══════════════════════════════════════════════════════════
    v3.1: Auto-Suggest CERPA stage for unmapped refTypes
@@ -1543,6 +1950,10 @@ function loadBundle(seed){
 
   /* Update executive if visible */
   setTimeout(function(){renderExecutive();renderTimeline();renderHeatmap();renderHalfLife();renderBlastRadius();renderGraph();renderTrilogyCOG()},100);
+
+  deriveTasks();
+  renderTaskPanel();
+  renderCriticalSummary();
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -2903,6 +3314,17 @@ function _renderGraphSvg(nodes,edges,W,H,typeColors,graph){
   if(!svg)return;
   svg.innerHTML="";
   svg.setAttribute("viewBox","0 0 "+W+" "+H);
+  svg.setAttribute("width","100%");
+  svg.style.height="auto";
+  svg.style.maxHeight="calc(100vh - 240px)";
+
+  /* Layer groups */
+  var layerEdges=document.createElementNS(svgNS,"g");
+  layerEdges.setAttribute("class","layer-edges");
+  var layerLabels=document.createElementNS(svgNS,"g");
+  layerLabels.setAttribute("class","layer-labels");
+  var layerClusters=document.createElementNS(svgNS,"g");
+  layerClusters.setAttribute("class","layer-clusters");
 
   /* Edges */
   for(var e=0;e<edges.length;e++){
@@ -2913,13 +3335,16 @@ function _renderGraphSvg(nodes,edges,W,H,typeColors,graph){
     line.setAttribute("class","graph-edge");
     line.setAttribute("data-src",edges[e].source);
     line.setAttribute("data-tgt",edges[e].target);
-    svg.appendChild(line);
+    layerEdges.appendChild(line);
   }
+  svg.appendChild(layerEdges);
 
   /* Nodes */
   for(var n=0;n<nodes.length;n++){
     var g=document.createElementNS(svgNS,"g");
     g.setAttribute("data-node-idx",n);
+    g.setAttribute("data-node-type",nodes[n].type||"");
+    g.setAttribute("data-ref-id",nodes[n].id||"");
 
     var circle=document.createElementNS(svgNS,"circle");
     circle.setAttribute("cx",nodes[n].x);circle.setAttribute("cy",nodes[n].y);
@@ -2936,10 +3361,16 @@ function _renderGraphSvg(nodes,edges,W,H,typeColors,graph){
     label.setAttribute("x",nodes[n].x);label.setAttribute("y",nodes[n].y-10);
     label.setAttribute("class","graph-label");
     label.textContent=nodes[n].label;
-    g.appendChild(label);
+    layerLabels.appendChild(label);
 
-    svg.appendChild(g);
+    if(nodes[n]._cluster){
+      layerClusters.appendChild(g);
+    }else{
+      svg.appendChild(g);
+    }
   }
+  svg.appendChild(layerLabels);
+  svg.appendChild(layerClusters);
 
   /* Click handler: highlight node + open tray */
   svg.addEventListener("click",function(ev){
@@ -3055,6 +3486,130 @@ function _renderGraphSvg(nodes,edges,W,H,typeColors,graph){
   });
   svg.addEventListener("mouseup",function(){dragging=false;if(wrap)wrap.classList.remove("dragging")});
   svg.addEventListener("mouseleave",function(){dragging=false;if(wrap)wrap.classList.remove("dragging")});
+}
+
+/* ══════════════════════════════════════════════════════════
+   v5.1: Graph Filters, Search, Layers, Summary
+   ══════════════════════════════════════════════════════════ */
+function filterGraphByType() {
+  var svg = $("#panel-graph svg");
+  if (!svg) return;
+  var checked = {};
+  $$("#graphToolbar input[data-graph-type]").forEach(function(cb) {
+    checked[cb.dataset.graphType] = cb.checked;
+  });
+  svg.querySelectorAll("[data-node-type]").forEach(function(g) {
+    var type = g.dataset.nodeType;
+    g.style.display = checked[type] !== false ? "" : "none";
+  });
+}
+
+function searchGraphNodes(query) {
+  var svg = $("#panel-graph svg");
+  if (!svg) return;
+  query = (query || "").toLowerCase();
+  svg.querySelectorAll("[data-ref-id]").forEach(function(g) {
+    var id = (g.dataset.refId || "").toLowerCase();
+    if (query && id.indexOf(query) !== -1) {
+      g.style.filter = "drop-shadow(0 0 8px var(--neon-cyan))";
+      g.style.opacity = "1";
+    } else if (query) {
+      g.style.filter = "";
+      g.style.opacity = "0.25";
+    } else {
+      g.style.filter = "";
+      g.style.opacity = "";
+    }
+  });
+}
+
+function toggleGraphLayer(layer) {
+  var svg = $("#panel-graph svg");
+  if (!svg) return;
+  var group = svg.querySelector(".layer-" + layer);
+  if (!group) return;
+  var hidden = group.style.display === "none";
+  group.style.display = hidden ? "" : "none";
+  var btn = $("#btnLayer" + layer.charAt(0).toUpperCase() + layer.slice(1));
+  if (btn) btn.classList.toggle("active", hidden);
+}
+
+function renderGraphSummary() {
+  var existing = $("#graphSummaryOverlay");
+  if (existing) { existing.remove(); return; }
+  var svg = $("#panel-graph svg");
+  if (!svg) return;
+  var nodes = svg.querySelectorAll("[data-node-type]");
+  var edges = svg.querySelectorAll(".layer-edges line, .layer-edges path");
+  var typeCounts = {};
+  nodes.forEach(function(n) {
+    var t = n.dataset.nodeType || "unknown";
+    typeCounts[t] = (typeCounts[t] || 0) + 1;
+  });
+  var html = '<h5>Graph Summary</h5>';
+  html += '<div class="gs-row"><span>Nodes</span><span class="gs-val">' + nodes.length + '</span></div>';
+  html += '<div class="gs-row"><span>Edges</span><span class="gs-val">' + edges.length + '</span></div>';
+  Object.keys(typeCounts).sort().forEach(function(t) {
+    html += '<div class="gs-row"><span>' + escHTML(t) + '</span><span class="gs-val">' + typeCounts[t] + '</span></div>';
+  });
+  var overlay = document.createElement("div");
+  overlay.className = "graph-summary-overlay";
+  overlay.id = "graphSummaryOverlay";
+  overlay.innerHTML = html;
+  var container = svg.parentElement;
+  if (container) {
+    container.style.position = "relative";
+    container.appendChild(overlay);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   Phase 5: Evidence Management — Drop Handler + Validation
+   ══════════════════════════════════════════════════════════ */
+function handleDrop(e) {
+  e.preventDefault();
+  $("#dropZone").classList.remove("drag-over");
+  var files = e.dataTransfer && e.dataTransfer.files;
+  if (!files || files.length === 0) return;
+  var file = files[0];
+  if (file.size > 5 * 1024 * 1024) { toast("File too large (max 5 MB)","warn"); return; }
+  if (!file.name.endsWith(".json")) { toast("Only .json files accepted","warn"); return; }
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      var data = JSON.parse(ev.target.result);
+      if (typeof loadBundleFromObject === "function") {
+        loadBundleFromObject(data);
+      } else {
+        STATE.bundle = data;
+        loadBundle(42);
+      }
+      renderValidationChecklist(data, file.size);
+      toast("Bundle imported from " + file.name, "ok");
+    } catch(err) {
+      toast("Invalid JSON: " + err.message, "warn");
+    }
+  };
+  reader.readAsText(file);
+}
+
+function renderValidationChecklist(data, fileSize) {
+  var card = $("#validationCard");
+  if (!card) return;
+  var checks = [
+    {label:"JSON parsed successfully", pass:true},
+    {label:"Has artifacts array", pass:Array.isArray(data.artifacts)},
+    {label:"Has manifest object", pass:data.manifest && typeof data.manifest === "object"},
+    {label:"Has replay steps", pass:Array.isArray(data.replaySteps) && data.replaySteps.length > 0},
+    {label:"File size under 5 MB", pass:fileSize ? fileSize <= 5*1024*1024 : true},
+    {label:"Artifact count matches manifest", pass:data.manifest && data.artifacts ? data.artifacts.length === (data.manifest.artifactCount || data.artifacts.length) : false}
+  ];
+  var html = '<div class="card validation-card"><h4>Import Validation</h4>';
+  checks.forEach(function(c) {
+    html += '<div class="val-row"><span class="val-icon ' + (c.pass?"val-pass":"val-fail") + '">' + (c.pass?"\u2713":"\u2717") + '</span><span class="val-label">' + escHTML(c.label) + '</span></div>';
+  });
+  html += '</div>';
+  card.innerHTML = html;
 }
 
 function renderChainSvg(chain){
@@ -3276,6 +3831,9 @@ function tamperChain(){
   STATE.tampered=true;
   renderProofChain();
   verifyChain();
+  deriveTasks();
+  renderTaskPanel();
+  renderCriticalSummary();
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -3404,6 +3962,9 @@ function simulateTamperRetcon(){
   if(undoBtn){undoBtn.style.display="";undoBtn.textContent="Undo ("+STATE.tamperStack.length+")"}
   renderProofChain();verifyChain();
   toast("Tamper: "+detail);
+  deriveTasks();
+  renderTaskPanel();
+  renderCriticalSummary();
 }
 
 function undoTamper(){
@@ -3420,6 +3981,9 @@ function undoTamper(){
   }
   renderProofChain();verifyChain();renderExecutive();renderTimeline();
   toast("Tamper undone"+(STATE.tamperStack.length?" \u2014 "+STATE.tamperStack.length+" remaining":""));
+  deriveTasks();
+  renderTaskPanel();
+  renderCriticalSummary();
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -4023,6 +4587,89 @@ function importBundle(){
 document.addEventListener("DOMContentLoaded",function(){
   setTimeout(function(){renderExportPipeline();renderTimeline()},50);
 
+  /* v5.1: Role selector */
+  $("#roleSelect").addEventListener("change",function(){
+    applyRole(this.value);
+    renderTabPrefs();
+  });
+
+  /* v5.1: Tab prefs gear button */
+  $("#btnTabPrefs").addEventListener("click",function(){
+    var panel=$("#tabPrefsPanel");
+    if(panel.style.display==="none"){
+      renderTabPrefs();
+      panel.style.display="";
+    }else{
+      panel.style.display="none";
+    }
+  });
+
+  /* v5.1: Tab prefs checkbox delegation */
+  $("#tabPrefsPanel").addEventListener("change",function(e){
+    var cb=e.target;
+    if(!cb.dataset.prefTab)return;
+    var tab=cb.dataset.prefTab;
+    var idx=STATE.prefs.hiddenTabs.indexOf(tab);
+    if(cb.checked&&idx!==-1)STATE.prefs.hiddenTabs.splice(idx,1);
+    if(!cb.checked&&idx===-1)STATE.prefs.hiddenTabs.push(tab);
+    applyRole(STATE.role);
+  });
+
+  /* v5.1: Apply default role on init */
+  applyRole(STATE.role);
+
+  /* Phase 3: Tour */
+  $("#btnStartTour").addEventListener("click", startTour);
+  $("#tourBackdrop").addEventListener("click", dismissTour);
+
+  /* Phase 2: Task panel toggle */
+  $("#btnTaskToggle").addEventListener("click", function() {
+    $("#taskPanel").classList.toggle("open");
+  });
+  $("#btnCloseTask").addEventListener("click", function() {
+    $("#taskPanel").classList.remove("open");
+  });
+  /* Task row click → navigate to tab */
+  $("#taskList").addEventListener("click", function(e) {
+    var row = e.target.closest(".task-row");
+    if (!row) return;
+    var tab = row.dataset.taskTab;
+    if (tab) {
+      var btn = $$(".tab-btn").find(function(b){return b.dataset.tab===tab && b.style.display!=="none"});
+      if (btn) btn.click();
+      $("#taskPanel").classList.remove("open");
+    }
+  });
+  /* Critical summary click → navigate to tab */
+  document.addEventListener("click", function(e) {
+    var row = e.target.closest(".critical-row");
+    if (!row) return;
+    var tab = row.dataset.taskTab;
+    if (tab) {
+      var btn = $$(".tab-btn").find(function(b){return b.dataset.tab===tab && b.style.display!=="none"});
+      if (btn) btn.click();
+    }
+  });
+
+  /* v5.1: Graph type filters */
+  $("#graphToolbar").addEventListener("change", function(e) {
+    if (e.target.dataset.graphType) filterGraphByType();
+  });
+  /* v5.1: Graph search (debounced) */
+  var _graphSearchTimer;
+  $("#graphSearch").addEventListener("input", function() {
+    clearTimeout(_graphSearchTimer);
+    var q = this.value;
+    _graphSearchTimer = setTimeout(function() { searchGraphNodes(q); }, 200);
+  });
+  /* v5.1: Layer toggles */
+  ["Edges","Labels","Clusters"].forEach(function(l) {
+    var btn = $("#btnLayer" + l);
+    if (btn) btn.addEventListener("click", function() { toggleGraphLayer(l.toLowerCase()); });
+  });
+  /* v5.1: Summary toggle */
+  $("#btnGraphSummary").addEventListener("click", renderGraphSummary);
+
   /* v3: Drawer */
   $("#drawerClose").addEventListener("click",closeDrawer);
   $("#drawerOverlay").addEventListener("click",closeDrawer);
@@ -4340,7 +4987,7 @@ document.addEventListener("DOMContentLoaded",function(){
   document.addEventListener("keydown",function(e){
     if(e.target.tagName==="TEXTAREA"||e.target.tagName==="INPUT")return;
     var tk={"1":"executive","2":"explorer","3":"proof","4":"export","5":"diff","6":"mapping","7":"schema","8":"heatmap","9":"halflife","0":"blast","g":"graph","G":"graph","t":"trilogy","T":"trilogy"};
-    if(tk[e.key]){e.preventDefault();var b=document.querySelector('.tab-btn[data-tab="'+tk[e.key]+'"]');if(b)b.click()}
+    if(tk[e.key]){e.preventDefault();var b=document.querySelector('.tab-btn[data-tab="'+tk[e.key]+'"]');if(b&&b.style.display!=="none")b.click()}
     if(e.key==="Escape")closeDrawer();
     if(e.key==="?")$("#shortcutBar").classList.toggle("vis");
     if(e.key==="r"||e.key==="R"){e.preventDefault();loadBundle(Math.floor(Math.random()*100000))}
@@ -4452,6 +5099,16 @@ document.addEventListener("DOMContentLoaded",function(){
   });
 
   /* ══════════════════════════════════════════════════════════
+     Phase 5: Evidence Management — Drop Zone wiring
+     ══════════════════════════════════════════════════════════ */
+  var dz = $("#dropZone");
+  if (dz) {
+    dz.addEventListener("dragover", function(e) { e.preventDefault(); dz.classList.add("drag-over"); });
+    dz.addEventListener("dragleave", function() { dz.classList.remove("drag-over"); });
+    dz.addEventListener("drop", handleDrop);
+  }
+
+  /* ══════════════════════════════════════════════════════════
      Phase 4A: Custom Bundle Generator slider wiring
      ══════════════════════════════════════════════════════════ */
   var slArt=$("#sliderArtifacts");
@@ -4539,6 +5196,15 @@ function printBundleExport(){
 
 })();
 </script>
+<div id="tourBackdrop" class="tour-backdrop" style="display:none"></div>
+<div id="tourCard" class="tour-card" style="display:none"></div>
+<div id="taskPanel">
+  <div class="task-header">
+    <h3>My Tasks</h3>
+    <button class="task-close" id="btnCloseTask">&times;</button>
+  </div>
+  <div class="task-list" id="taskList"></div>
+</div>
 <div class="print-footer" style="display:none">Generated by DeepSigma COG Adapter · <span id="printTimestamp"></span></div>
 </body>
 </html>
