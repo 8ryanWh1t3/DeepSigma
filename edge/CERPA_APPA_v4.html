@@ -133,6 +133,7 @@ tbody tr{transition:background .1s;cursor:default}tbody tr:hover{background:rgba
 .st-assigned{color:#a78bfa;border-color:rgba(167,139,250,.25);background:rgba(167,139,250,.05)}
 .st-review{color:#fbbf24;border-color:rgba(251,191,36,.25);background:rgba(251,191,36,.05)}
 .st-patched{color:#f97316;border-color:rgba(249,115,22,.25);background:rgba(249,115,22,.05)}
+.st-pending{color:#38bdf8;border-color:rgba(56,189,248,.25);background:rgba(56,189,248,.05)}
 .st-closed{color:#5dff93;border-color:rgba(93,255,147,.25);background:rgba(93,255,147,.05)}
 .st-reopened{color:#ff6b6b;border-color:rgba(255,107,107,.35);background:rgba(255,107,107,.06)}
 .recur{display:inline-block;padding:2px 6px;border-radius:4px;font-size:8px;font-weight:700;color:#ff9f43;border:1px solid rgba(255,159,67,.25);background:rgba(255,159,67,.05)}
@@ -618,7 +619,7 @@ footer strong{color:var(--accent);font-weight:600}
     <div class="kpi kpi-green clickable" data-kpi="cis"><div class="kv kv-green">81</div><div class="kl">CIS</div><div class="kfull">Closure Integrity Score</div><div class="spark-row" data-spark="60,64,62,68,72,74,77,81"></div></div>
     <div class="kpi kpi-green clickable" data-kpi="par"><div class="kv kv-green">88%</div><div class="kl">PAR</div><div class="kfull">Patch Adhesion Rate</div><div class="spark-row" data-spark="70,72,68,75,79,80,84,88"></div></div>
     <div class="kpi kpi-amber clickable" data-kpi="des"><div class="kv kv-amber">22</div><div class="kl">DES</div><div class="kfull">Deficiency Echo Score</div><div class="spark-row" data-spark="30,28,32,26,24,25,23,22"></div></div>
-    <div class="kpi kpi-cyan clickable" data-kpi="open"><div class="kv kv-cyan">47</div><div class="kl">Open</div><div class="kfull">Open Findings</div><div class="spark-row" data-spark="60,58,55,52,50,49,48,47"></div></div>
+    <div class="kpi kpi-cyan clickable" data-kpi="open"><div class="kv kv-cyan">16</div><div class="kl">Open</div><div class="kfull">Open Findings</div><div class="spark-row" data-spark="22,21,20,19,18,17,17,16"></div></div>
     <div class="kpi kpi-green clickable" data-kpi="closed"><div class="kv kv-green">31</div><div class="kl">Closed</div><div class="kfull">Verified Closures</div><div class="spark-row" data-spark="12,15,18,20,22,25,28,31"></div></div>
   </div>
   <div class="grid2">
@@ -665,7 +666,7 @@ footer strong{color:var(--accent);font-weight:600}
 <!-- ════════════ FINDINGS ════════════ -->
 <section id="s-find">
   <div class="filters">
-    <select><option>All Status</option><option>New</option><option>Assigned</option><option>In Review</option><option>Patch Approved</option><option>Closed</option><option>Reopened</option></select>
+    <select><option>All Status</option><option>New</option><option>Assigned</option><option>In Review</option><option>Patch Approved</option><option>Closure Pending</option><option>Closed</option><option>Reopened</option></select>
     <select><option>All Severity</option><option>HIGH</option><option>MEDIUM</option><option>LOW</option></select>
     <select><option>All Functions</option><option>Protection</option><option>Access Control</option><option>Training</option></select>
     <input type="text" placeholder="Search findings..." style="width:200px"/>
@@ -674,14 +675,7 @@ footer strong{color:var(--accent);font-weight:600}
   </div>
   <div class="card">
     <table><thead><tr><th>ID</th><th>Title</th><th>Status</th><th>Sev</th><th>Owner</th><th>BRQ</th><th>CG</th><th>DEG</th><th>Due</th></tr></thead>
-    <tbody id="findTbody">
-      <tr style="cursor:pointer" data-fid="184"><td class="mono" style="color:var(--accent)">F-184</td><td>Physical Security SOP not aligned</td><td><span class="badge st-review">In Review</span></td><td><span class="badge sev-high">HIGH</span></td><td>J. Smith</td><td>0.91</td><td>22</td><td>8d</td><td>Apr 18</td></tr>
-      <tr style="cursor:pointer" data-fid="201"><td class="mono" style="color:var(--accent)">F-201</td><td>Badge reader maintenance overdue</td><td><span class="badge st-patched">Patch Approved</span></td><td><span class="badge sev-med">MED</span></td><td>K. Lee</td><td>0.88</td><td>18</td><td>4d</td><td>Apr 22</td></tr>
-      <tr style="cursor:pointer" data-fid="155"><td class="mono" style="color:var(--accent)">F-155</td><td>CCTV coverage gap Building 7</td><td><span class="badge st-review">In Review</span></td><td><span class="badge sev-high">HIGH</span></td><td>R. Chen</td><td>0.63</td><td>47</td><td>15d</td><td>Apr 10</td></tr>
-      <tr style="cursor:pointer" data-fid="210"><td class="mono" style="color:var(--accent)">F-210</td><td>Training records incomplete Q1</td><td><span class="badge st-assigned">Assigned</span></td><td><span class="badge sev-med">MED</span></td><td>M. Davis</td><td>0.42</td><td>8</td><td>—</td><td>May 01</td></tr>
-      <tr style="cursor:pointer" data-fid="195"><td class="mono" style="color:var(--accent)">F-195</td><td>Incident reporting SLA missed</td><td><span class="badge st-closed">Closed</span></td><td><span class="badge sev-low">LOW</span></td><td>A. Park</td><td>0.95</td><td>14</td><td>3d</td><td>—</td></tr>
-      <tr style="cursor:pointer" data-fid="160"><td class="mono" style="color:var(--accent)">F-160</td><td>Perimeter fence inspection lapse</td><td><span class="badge st-reopened">Reopened</span></td><td><span class="badge sev-high">HIGH</span></td><td>J. Smith</td><td>0.55</td><td>62</td><td>22d</td><td>Apr 25</td></tr>
-    </tbody></table>
+    <tbody id="findTbody"></tbody></table>
   </div>
 
   <!-- Finding Detail (dynamically rendered) -->
@@ -1006,7 +1000,62 @@ var F={
   claim:"Fence inspection for Zone 3 not conducted for 90+ days",event:"Prior closure found insufficient — patch did not address root scheduling gap",risk:"High operational exposure / Demonstrated recurrence pattern",
   rootCause:"Inspection schedule owned by rotating duty officer with no continuity",patch:"Assign permanent inspection coordinator + automated schedule + quarterly PMO audit",patchDue:"2026-04-25",ppi:0.55,
   evidence:[{name:"inspection_schedule_draft.pdf",ok:1},{name:"coordinator_appointment.pdf",ok:0}],
-  edi:1.0,timeline:["Feb 10","Feb 14","Feb 20","Feb 28","Mar 5","Mar 15","—"],tlState:[1,1,1,1,1,3,0]}
+  edi:1.0,timeline:["Feb 10","Feb 14","Feb 20","Feb 28","Mar 5","Mar 15","—"],tlState:[1,1,1,1,1,3,0]},
+"220":{id:"F-220",title:"Visitor log discrepancies at Gate 1 — 14 unsigned entries",status:"New",sev:"HIGH",owner:"T. Nguyen",brq:0.38,cg:5,deg:"—",due:"May 05",func:"Access Control",src:"APP Assessment",date:"2026-04-10",recurring:0,
+  claim:"Visitor log audit found 14 entries without escort signatures",event:"Monthly access log review identified unsigned visitor entries over 30-day period",risk:"High access control exposure / Compliance gap",
+  rootCause:"Guard shift changeover procedure does not verify log completeness",patch:"Implement digital visitor log + shift handoff checklist + supervisor spot-check",patchDue:"2026-05-05",ppi:0.50,
+  evidence:[{name:"visitor_log_audit.xlsx",ok:1},{name:"guard_SOP_revision.pdf",ok:0}],
+  edi:0.5,timeline:["Apr 10","—","—","—","—","—","—"],tlState:[1,0,0,0,0,0,0]},
+"225":{id:"F-225",title:"Key control inventory mismatch — 3 keys unaccounted",status:"Assigned",sev:"HIGH",owner:"R. Chen",brq:0.45,cg:12,deg:"—",due:"Apr 28",func:"Access Control",src:"APP Assessment",date:"2026-04-06",recurring:1,
+  claim:"Physical key inventory shows 3 keys issued but not returned or accounted for",event:"Quarterly key control audit identified discrepancy in master key log",risk:"High access control exposure / Potential unauthorized access",
+  rootCause:"No automated tracking system — paper-based key log",patch:"Conduct key recovery sweep + implement electronic key management system",patchDue:"2026-04-28",ppi:0.60,
+  evidence:[{name:"key_inventory_report.xlsx",ok:1},{name:"key_recovery_memo.pdf",ok:0},{name:"electronic_key_proposal.pdf",ok:0}],
+  edi:0.5,timeline:["Apr 6","Apr 8","—","—","—","—","—"],tlState:[1,1,0,0,0,0,0]},
+"230":{id:"F-230",title:"Emergency lighting test failure — Building 4 east wing",status:"In Review",sev:"MED",owner:"M. Davis",brq:0.72,cg:30,deg:"10d",due:"Apr 20",func:"Protection",src:"APP Assessment",date:"2026-03-20",recurring:0,
+  claim:"Emergency lighting failed quarterly test in 4 of 12 zones",event:"Scheduled quarterly emergency systems test revealed non-functional units",risk:"Medium safety exposure / Regulatory compliance gap",
+  rootCause:"Battery replacement schedule not synchronized with test schedule",patch:"Replace failed units + align battery replacement with quarterly test cycle",patchDue:"2026-04-20",ppi:0.78,
+  evidence:[{name:"lighting_test_report.pdf",ok:1},{name:"replacement_order.pdf",ok:1},{name:"zone_map_annotated.pdf",ok:0}],
+  edi:2.0,timeline:["Mar 20","Mar 22","Mar 28","Apr 2","—","—","—"],tlState:[1,1,2,1,0,0,0]},
+"235":{id:"F-235",title:"IDS sensor calibration overdue — north perimeter zone",status:"Patch Approved",sev:"MED",owner:"K. Lee",brq:0.80,cg:25,deg:"6d",due:"Apr 15",func:"Protection",src:"APP Assessment",date:"2026-03-25",recurring:0,
+  claim:"Intrusion detection sensors in Zone N-1 through N-4 past calibration date by 60 days",event:"Maintenance tracker audit flagged 4 sensors with expired calibration certificates",risk:"Medium detection exposure / Potential false negatives",
+  rootCause:"Calibration vendor contract lapsed during budget cycle transition",patch:"Emergency calibration service + new vendor contract + automated expiry alerts",patchDue:"2026-04-15",ppi:0.85,
+  evidence:[{name:"calibration_report.pdf",ok:1},{name:"vendor_contract.pdf",ok:1},{name:"sensor_test_results.xlsx",ok:1}],
+  edi:3.0,timeline:["Mar 25","Mar 26","Mar 30","Apr 5","Apr 10","—","—"],tlState:[1,1,1,1,1,0,0]},
+"240":{id:"F-240",title:"Armory access log incomplete — 6 entries missing weapon serial numbers",status:"Assigned",sev:"HIGH",owner:"J. Smith",brq:0.35,cg:10,deg:"—",due:"Apr 30",func:"Access Control",src:"APP Assessment",date:"2026-04-07",recurring:2,
+  claim:"Armory access log review found 6 entries without complete weapon serial documentation",event:"Monthly armory audit identified incomplete accountability records",risk:"High accountability exposure / Critical compliance gap",
+  rootCause:"Manual log entry process allows incomplete submissions",patch:"Implement barcode scanning for weapon checkout + supervisor verification step",patchDue:"2026-04-30",ppi:0.55,
+  evidence:[{name:"armory_audit_report.pdf",ok:1},{name:"barcode_system_proposal.pdf",ok:0}],
+  edi:0.5,timeline:["Apr 7","Apr 9","—","—","—","—","—"],tlState:[1,1,0,0,0,0,0]},
+"245":{id:"F-245",title:"Guard force training certification gap — 8 personnel expired",status:"In Review",sev:"MED",owner:"T. Nguyen",brq:0.58,cg:20,deg:"12d",due:"Apr 22",func:"Training",src:"APP Assessment",date:"2026-03-28",recurring:1,
+  claim:"8 of 42 guard force personnel have expired use-of-force certifications",event:"Quarterly personnel readiness review flagged certification gaps",risk:"Medium operational exposure / Regulatory non-compliance",
+  rootCause:"No automated certification expiry tracking in HR system",patch:"Schedule recertification classes + implement automated expiry notifications",patchDue:"2026-04-22",ppi:0.72,
+  evidence:[{name:"personnel_cert_matrix.xlsx",ok:1},{name:"recert_schedule.pdf",ok:1},{name:"hr_notification_config.pdf",ok:0}],
+  edi:2.0,timeline:["Mar 28","Mar 30","Apr 4","Apr 8","—","—","—"],tlState:[1,1,2,1,0,0,0]},
+"250":{id:"F-250",title:"Vehicle barrier maintenance overdue — Gate 3 bollard system",status:"New",sev:"MED",owner:"A. Park",brq:0.60,cg:7,deg:"—",due:"May 10",func:"Protection",src:"APP Assessment",date:"2026-04-11",recurring:0,
+  claim:"Hydraulic bollard system at Gate 3 failed operational test",event:"Quarterly vehicle barrier test showed 2 of 6 bollards non-responsive",risk:"Medium force protection exposure / Vehicle-borne threat gap",
+  rootCause:"Hydraulic fluid leak undetected due to missed scheduled inspection",patch:"Emergency hydraulic repair + reinstate monthly inspection checklist",patchDue:"2026-05-10",ppi:0.68,
+  evidence:[{name:"barrier_test_report.pdf",ok:1},{name:"repair_work_order.pdf",ok:0}],
+  edi:0.5,timeline:["Apr 11","—","—","—","—","—","—"],tlState:[1,0,0,0,0,0,0]},
+"255":{id:"F-255",title:"Duress alarm testing gap — 12 stations untested in Q1",status:"Assigned",sev:"HIGH",owner:"R. Chen",brq:0.40,cg:15,deg:"—",due:"Apr 25",func:"Protection",src:"APP Assessment",date:"2026-04-02",recurring:0,
+  claim:"12 of 28 duress alarm stations not tested during Q1 cycle",event:"Quarterly alarm system test audit found incomplete coverage",risk:"High safety exposure / Critical emergency response gap",
+  rootCause:"Test schedule only covers primary stations — satellite offices excluded",patch:"Expand test schedule to all 28 stations + assign zone owners",patchDue:"2026-04-25",ppi:0.58,
+  evidence:[{name:"alarm_test_matrix.xlsx",ok:1},{name:"zone_assignment_memo.pdf",ok:0},{name:"test_procedure_update.pdf",ok:0}],
+  edi:0.5,timeline:["Apr 2","Apr 4","—","—","—","—","—"],tlState:[1,1,0,0,0,0,0]},
+"260":{id:"F-260",title:"After-hours access policy violation — 4 unauthorized entries",status:"In Review",sev:"HIGH",owner:"K. Lee",brq:0.52,cg:18,deg:"9d",due:"Apr 18",func:"Access Control",src:"APP Assessment",date:"2026-03-22",recurring:1,
+  claim:"Access control system logged 4 after-hours entries by non-authorized personnel",event:"Monthly access log analysis identified unauthorized badge swipes between 2200-0500",risk:"High access control exposure / Insider threat indicator",
+  rootCause:"After-hours access list not updated after personnel rotation",patch:"Update access lists monthly + implement automated roster sync with badge system",patchDue:"2026-04-18",ppi:0.70,
+  evidence:[{name:"access_log_extract.xlsx",ok:1},{name:"roster_comparison.pdf",ok:1},{name:"updated_access_list.pdf",ok:0}],
+  edi:2.0,timeline:["Mar 22","Mar 24","Mar 30","Apr 5","—","—","—"],tlState:[1,1,2,1,0,0,0]},
+"265":{id:"F-265",title:"Security camera storage at 92% capacity — 48-hour retention risk",status:"Patch Approved",sev:"MED",owner:"M. Davis",brq:0.82,cg:22,deg:"5d",due:"Apr 12",func:"Protection",src:"APP Assessment",date:"2026-03-30",recurring:0,
+  claim:"Video storage server approaching capacity — current retention below 30-day requirement",event:"Automated storage monitoring alert triggered at 92% threshold",risk:"Medium evidence preservation risk / Compliance retention gap",
+  rootCause:"Storage expansion request delayed in procurement pipeline",patch:"Emergency storage expansion + implement tiered archiving + expedite procurement",patchDue:"2026-04-12",ppi:0.88,
+  evidence:[{name:"storage_capacity_report.pdf",ok:1},{name:"procurement_request.pdf",ok:1},{name:"archiving_SOP.pdf",ok:1}],
+  edi:3.0,timeline:["Mar 30","Mar 31","Apr 2","Apr 5","Apr 8","—","—"],tlState:[1,1,1,1,1,0,0]},
+"270":{id:"F-270",title:"Escort policy non-compliance — contractor access without escort",status:"New",sev:"HIGH",owner:"T. Nguyen",brq:0.30,cg:3,deg:"—",due:"May 08",func:"Access Control",src:"APP Assessment",date:"2026-04-12",recurring:0,
+  claim:"Unescorted contractor observed in restricted area during routine patrol",event:"Guard patrol identified contractor with expired temporary badge in Building 2 server room",risk:"High access control exposure / Active security breach",
+  rootCause:"Contractor badge expiry notification not reaching sponsoring office",patch:"Suspend badge + implement automated expiry deactivation + sponsor notification chain",patchDue:"2026-05-08",ppi:0.45,
+  evidence:[{name:"patrol_report.pdf",ok:1},{name:"badge_system_config.pdf",ok:0}],
+  edi:0.5,timeline:["Apr 12","—","—","—","—","—","—"],tlState:[1,0,0,0,0,0,0]}
 };
 var TL_LABELS=["Observe","Assign","Review","Patch","Prove","Close","Remember"];
 
@@ -1050,6 +1099,40 @@ document.querySelectorAll(".role-card[data-role]").forEach(function(c){
 
 /* ══════════ escHTML ══════════ */
 function escHTML(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
+
+/* ══════════ FINDINGS TABLE RENDERER ══════════ */
+var stClassMap={"New":"st-new","Assigned":"st-assigned","In Review":"st-review","Patch Approved":"st-patched","Closure Pending":"st-pending","Closed":"st-closed","Reopened":"st-reopened"};
+var sevClassMap={"HIGH":"sev-high","MED":"sev-med","LOW":"sev-low"};
+function renderFindingsTable(){
+  var tbody=document.getElementById("findTbody");if(!tbody)return;
+  var html="";
+  var ids=Object.keys(F);
+  ids.sort(function(a,b){
+    var sevOrd={"HIGH":0,"MED":1,"LOW":2};
+    var sa=sevOrd[F[a].sev]||2,sb=sevOrd[F[b].sev]||2;
+    if(sa!==sb)return sa-sb;
+    return parseInt(b)-parseInt(a);
+  });
+  ids.forEach(function(k){
+    var f=F[k];
+    var stCls=stClassMap[f.status]||"st-new";
+    var sevCls=sevClassMap[f.sev]||"sev-low";
+    var shortTitle=f.title.length>55?f.title.substring(0,52)+"...":f.title;
+    html+='<tr style="cursor:pointer" data-fid="'+k+'">';
+    html+='<td class="mono" style="color:var(--accent)">'+escHTML(f.id)+'</td>';
+    html+='<td>'+escHTML(shortTitle)+'</td>';
+    html+='<td><span class="badge '+stCls+'">'+escHTML(f.status)+'</span></td>';
+    html+='<td><span class="badge '+sevCls+'">'+escHTML(f.sev)+'</span></td>';
+    html+='<td>'+escHTML(f.owner)+'</td>';
+    html+='<td>'+f.brq+'</td>';
+    html+='<td>'+f.cg+'</td>';
+    html+='<td>'+escHTML(f.deg)+'</td>';
+    html+='<td>'+escHTML(f.due)+'</td>';
+    html+='</tr>';
+  });
+  tbody.innerHTML=html;
+}
+renderFindingsTable();
 
 /* ══════════ TAB PREFS ══════════ */
 var hiddenTabs=[];
@@ -1534,7 +1617,7 @@ document.querySelectorAll("#s-dash button").forEach(function(b){
         '<div class="wr"><span class="wl">Period</span><span class="wv">Q2 FY26</span></div>'+
         '<div class="wr"><span class="wl">CCCI</span><span class="wv" style="color:var(--warn)">78.4 (AMBER)</span></div>'+
         '<div class="wr"><span class="wl">CIS</span><span class="wv" style="color:var(--ok)">81</span></div>'+
-        '<div class="wr"><span class="wl">Open</span><span class="wv">47 findings</span></div>'+
+        '<div class="wr"><span class="wl">Open</span><span class="wv">16 findings</span></div>'+
         '<div class="wr"><span class="wl">Closed</span><span class="wv">31 verified</span></div>'+
         '<div class="wr"><span class="wl">Reopened</span><span class="wv" style="color:var(--bad)">6</span></div>'+
         '<div class="wr"><span class="wl">Recurring</span><span class="wv" style="color:var(--warn)">3 trending up</span></div>'+
@@ -2124,7 +2207,7 @@ var kpiData={
   cis:{title:"Closure Integrity Score (CIS)",body:'<div class="wr"><span class="wl">Current</span><span class="wv" style="color:var(--ok)">81</span></div><div class="wr"><span class="wl">Formula</span><span class="wv mono" style="font-size:9px">0.25 PAR + 0.20 EDI_norm + 0.25 (1-FCR) + 0.15 (1-DEG_norm) + 0.15 PPI</span></div><div class="wr"><span class="wl">PAR</span><span class="wv">0.88 × 0.25 = 0.220</span></div><div class="wr"><span class="wl">EDI_norm</span><span class="wv">0.74 × 0.20 = 0.148</span></div><div class="wr"><span class="wl">1-FCR</span><span class="wv">0.90 × 0.25 = 0.225</span></div><div class="wr"><span class="wl">1-DEG_norm</span><span class="wv">0.65 × 0.15 = 0.098</span></div><div class="wr"><span class="wl">PPI</span><span class="wv">0.78 × 0.15 = 0.117</span></div><div style="margin-top:6px;font-size:10px;color:var(--accent);font-weight:700">CIS &gt; 0.75 = governance loop is real</div>'},
   par:{title:"Patch Adhesion Rate (PAR)",body:'<div class="wr"><span class="wl">Current</span><span class="wv" style="color:var(--ok)">88%</span></div><div class="wr"><span class="wl">Formula</span><span class="wv mono" style="font-size:9px">findings not reopened within 2 windows / total patched</span></div><div class="wr"><span class="wl">Patched</span><span class="wv">31 findings</span></div><div class="wr"><span class="wl">Held</span><span class="wv">27 (not reopened)</span></div><div class="wr"><span class="wl">Failed</span><span class="wv" style="color:var(--bad)">4 reopened</span></div><div class="wr"><span class="wl">Trend</span><span class="wv" style="color:var(--ok)">↑ from 79% Q1</span></div>'},
   des:{title:"Deficiency Echo Score (DES)",body:'<div class="wr"><span class="wl">Current</span><span class="wv" style="color:var(--warn)">22</span></div><div class="wr"><span class="wl">Formula</span><span class="wv mono" style="font-size:9px">repeat occurrences × spread factor × severity weight</span></div><div class="wr"><span class="wl">Top Echo</span><span class="wv">Physical security training (7 instances, ↑)</span></div><div class="wr"><span class="wl">2nd</span><span class="wv">Access control documentation (5, →)</span></div><div class="wr"><span class="wl">3rd</span><span class="wv">Inspection evidence gaps (4, ↑)</span></div><div class="wr"><span class="wl">Improving</span><span class="wv" style="color:var(--ok)">Incident reporting lag (4, ↓)</span></div>'},
-  open:{title:"Open Findings",body:'<div class="wr"><span class="wl">Total Open</span><span class="wv" style="color:var(--accent)">47</span></div><div class="wr"><span class="wl">New</span><span class="wv">8</span></div><div class="wr"><span class="wl">Assigned</span><span class="wv">14</span></div><div class="wr"><span class="wl">In Review</span><span class="wv">12</span></div><div class="wr"><span class="wl">Patch Approved</span><span class="wv">7</span></div><div class="wr"><span class="wl">Reopened</span><span class="wv" style="color:var(--bad)">6</span></div>'},
+  open:{title:"Open Findings",body:'<div class="wr"><span class="wl">Total Open</span><span class="wv" style="color:var(--accent)">16</span></div><div class="wr"><span class="wl">New</span><span class="wv">3</span></div><div class="wr"><span class="wl">Assigned</span><span class="wv">4</span></div><div class="wr"><span class="wl">In Review</span><span class="wv">5</span></div><div class="wr"><span class="wl">Patch Approved</span><span class="wv">3</span></div><div class="wr"><span class="wl">Reopened</span><span class="wv" style="color:var(--bad)">1</span></div>'},
   closed:{title:"Verified Closures",body:'<div class="wr"><span class="wl">Total Closed</span><span class="wv" style="color:var(--ok)">31</span></div><div class="wr"><span class="wl">Verified</span><span class="wv">28</span></div><div class="wr"><span class="wl">Pending Verification</span><span class="wv">3</span></div><div class="wr"><span class="wl">Avg Time to Close</span><span class="wv">18 days</span></div><div class="wr"><span class="wl">Avg Evidence</span><span class="wv">3.2 artifacts per closure</span></div>'}
 };
 document.getElementById("dashKpis").addEventListener("click",function(e){
@@ -2358,7 +2441,7 @@ addFeedItem();addFeedItem();addFeedItem();
 setInterval(addFeedItem,8000);
 
 /* ══════════ (#2) TAB BADGES ══════════ */
-var badgeCounts={find:6,board:3,audit:1};
+var badgeCounts={find:16,board:3,audit:1};
 function updateTabBadges(){
   tabs.forEach(function(t){
     var k=t.getAttribute("data-t");
@@ -2409,10 +2492,12 @@ showFinding=function(fid){
         }
         if(next[0]==="Closed"){f.tlState=[1,1,1,1,1,1,1]}
         toast(f.id+" advanced to "+next[0],"ok");
+        renderFindingsTable();
         showFinding(fid);
         // Update badge count
         if(next[0]==="Closed"&&badgeCounts.find>0)badgeCounts.find--;
         updateTabBadges();
+        renderTaskPanel();
       });
       actionsDiv.insertBefore(btn,actionsDiv.firstChild);
     }
