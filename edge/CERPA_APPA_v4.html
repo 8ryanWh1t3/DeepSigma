@@ -1451,7 +1451,8 @@ function showFinding(fid){
   });
   // Header
   var hdr='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">';
-  hdr+='<span class="mono" style="font-size:16px;color:var(--accent);font-weight:700">'+escHTML(f.id)+'</span>';
+  var idColor=stColorMap[f.status]||"var(--bad)";
+  hdr+='<span class="mono" style="font-size:16px;color:'+idColor+';font-weight:700">'+escHTML(f.id)+'</span>';
   hdr+=sevBadge(escHTML(f.sev))+stBadge(escHTML(f.status));
   hdr+='<span style="font-size:10px;color:var(--muted)">Owner: <strong style="color:var(--txt)">'+escHTML(f.owner)+'</strong></span>';
   hdr+='<span style="font-size:10px;color:var(--muted)">BRQ: <strong style="color:var(--'+(f.brq>=0.8?"ok":f.brq>=0.6?"warn":"bad")+')">'+escHTML(String(f.brq))+'</strong></span>';
@@ -2160,7 +2161,9 @@ function showFindingInDrawer(fid,mode){
     evHtml+='<div class="ev"><span class="'+(e.ok?'ev-ok':'ev-miss')+'">'+(e.ok?'✓':'○')+'</span> '+e.name+' <span style="margin-left:auto;font-size:8px;color:var(--'+(e.ok?'ok':'bad')+');">'+(e.ok?'validated':'missing')+'</span></div>';
   });
   var isAudit=mode==="audit";
+  var dIdColor=stColorMap[f.status]||"var(--bad)";
   var body='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">'+
+    '<span class="mono" style="font-size:14px;color:'+dIdColor+';font-weight:700">'+escHTML(f.id)+'</span>'+
     sevBadge(f.sev)+stBadge(f.status)+
     '<span style="font-size:10px;color:var(--muted)">Owner: <strong style="color:var(--txt)">'+f.owner+'</strong></span>'+
     '<span style="font-size:10px;color:var(--muted)">BRQ: <strong>'+f.brq+'</strong></span>'+
@@ -2404,7 +2407,7 @@ document.getElementById("heatmapGrid").addEventListener("click",function(e){
         detEl.innerHTML=
           '<div style="border-top:1px solid var(--line);padding-top:12px">'+
           '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'+
-          '<span class="mono" style="font-size:14px;color:var(--accent);font-weight:700">'+escHTML(rawId)+'</span>'+
+          '<span class="mono" style="font-size:14px;color:'+(stColorMap[st]||"var(--bad)")+';font-weight:700">'+escHTML(rawId)+'</span>'+
           sevBadge(escHTML(sev))+stBadge(escHTML(st))+'</div>'+
           '<div style="font-size:12px;font-weight:600;margin-bottom:8px">'+escHTML(title)+'</div>'+
           '<div class="wire"><h4>Risk Profile</h4>'+
