@@ -972,7 +972,7 @@ footer strong{color:var(--accent);font-weight:600}
 function safeHTML(el,html){
   var doc=new DOMParser().parseFromString(html,'text/html');
   el.textContent='';
-  while(doc.body.firstChild)el.appendChild(doc.body.adoptNode(doc.body.firstChild));
+  while(doc.body.firstChild)el.appendChild(document.adoptNode(doc.body.firstChild));
 }
 
 /* ══════════ DEMO DATA ══════════ */
