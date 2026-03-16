@@ -1160,7 +1160,7 @@ function renderTabPrefs(){
     var k=t.getAttribute("data-t");
     var vis=!!v[k];
     var hidden=hiddenTabs.indexOf(k)>=0;
-    html+='<label style="display:flex;align-items:center;gap:6px;font-size:11px;padding:3px 0;color:'+(vis?'var(--txt)':'var(--muted)')+'"><input type="checkbox" data-tpref="'+k+'" '+(vis&&!hidden?'checked':'')+' '+(vis?'':'disabled')+'/> '+t.textContent.replace(/\d+$/,'').trim()+'</label>';
+    html+='<label style="display:flex;align-items:center;gap:6px;font-size:11px;padding:3px 0;color:'+(vis?'var(--txt)':'var(--muted)')+'"><input type="checkbox" data-tpref="'+escHTML(k)+'" '+(vis&&!hidden?'checked':'')+' '+(vis?'':'disabled')+'/> '+escHTML(t.textContent.replace(/\d+$/,'').trim())+'</label>';
   });
   tabPrefsPanel.innerHTML=html;
   tabPrefsPanel.querySelectorAll("input[data-tpref]").forEach(function(cb){
@@ -1389,10 +1389,11 @@ if(btnStartTour)btnStartTour.addEventListener("click",startTour);
 if(tourBackdrop)tourBackdrop.addEventListener("click",dismissTour);
 
 /* ══════════ DRAWER ══════════ */
+function setHTML(el,html){var t=document.createElement("template");t.innerHTML=html;el.textContent="";el.appendChild(t.content.cloneNode(true))}
 function openDrawer(title,bodyHtml,footHtml){
   dTitle.textContent=title;
-  dBody.innerHTML=bodyHtml;
-  dFoot.innerHTML=footHtml||"";
+  setHTML(dBody,bodyHtml);
+  setHTML(dFoot,footHtml||"");
   dOverlay.classList.add("open");
   dPanel.classList.add("open");
   // Wire close buttons inside drawer
@@ -1444,43 +1445,43 @@ function showFinding(fid){
   // Evidence
   var evHtml="";
   f.evidence.forEach(function(e){
-    evHtml+='<div class="ev"><span class="'+(e.ok?'ev-ok':'ev-miss')+'">'+(e.ok?'✓':'○')+'</span> '+e.name+' <span style="margin-left:auto;font-size:8px;color:var(--'+(e.ok?'ok':'bad')+');">'+(e.ok?'validated · locked':'missing')+'</span>'+(e.ok?'':'<button class="ev-upload" data-fid="'+fid+'" data-ename="'+e.name+'">Upload</button>')+'</div>';
+    evHtml+='<div class="ev"><span class="'+(e.ok?'ev-ok':'ev-miss')+'">'+(e.ok?'✓':'○')+'</span> '+escHTML(e.name)+' <span style="margin-left:auto;font-size:8px;color:var(--'+(e.ok?'ok':'bad')+');">'+(e.ok?'validated · locked':'missing')+'</span>'+(e.ok?'':'<button class="ev-upload" data-fid="'+escHTML(fid)+'" data-ename="'+escHTML(e.name)+'">Upload</button>')+'</div>';
   });
   // Header
   var hdr='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">';
-  hdr+='<span class="mono" style="font-size:16px;color:var(--accent);font-weight:700">'+f.id+'</span>';
-  hdr+=sevBadge(f.sev)+stBadge(f.status);
-  hdr+='<span style="font-size:10px;color:var(--muted)">Owner: <strong style="color:var(--txt)">'+f.owner+'</strong></span>';
-  hdr+='<span style="font-size:10px;color:var(--muted)">BRQ: <strong style="color:var(--'+(f.brq>=0.8?"ok":f.brq>=0.6?"warn":"bad")+')">'+f.brq+'</strong></span>';
+  hdr+='<span class="mono" style="font-size:16px;color:var(--accent);font-weight:700">'+escHTML(f.id)+'</span>';
+  hdr+=sevBadge(escHTML(f.sev))+stBadge(escHTML(f.status));
+  hdr+='<span style="font-size:10px;color:var(--muted)">Owner: <strong style="color:var(--txt)">'+escHTML(f.owner)+'</strong></span>';
+  hdr+='<span style="font-size:10px;color:var(--muted)">BRQ: <strong style="color:var(--'+(f.brq>=0.8?"ok":f.brq>=0.6?"warn":"bad")+')">'+escHTML(String(f.brq))+'</strong></span>';
   if(f.recurring>0)hdr+='<span class="recur">RECURRING × '+f.recurring+'</span>';
   hdr+='<button style="margin-left:auto;font-size:9px;color:var(--muted)" id="btnCloseD">✕ Close</button></div>';
-  hdr+='<div style="font-size:14px;font-weight:600;margin-bottom:3px">'+f.title+'</div>';
-  hdr+='<div style="font-size:10px;color:var(--muted);margin-bottom:12px">Source: '+f.src+' | '+f.date+' | Function: '+f.func+' | Command: PolicyOffice ProgramOffice</div>';
+  hdr+='<div style="font-size:14px;font-weight:600;margin-bottom:3px">'+escHTML(f.title)+'</div>';
+  hdr+='<div style="font-size:10px;color:var(--muted);margin-bottom:12px">Source: '+escHTML(f.src)+' | '+escHTML(f.date)+' | Function: '+escHTML(f.func)+' | Command: PolicyOffice ProgramOffice</div>';
   // Body
   var body=hdr+tlHtml;
   body+='<div class="grid2" style="margin-top:12px"><div>';
   body+='<div class="wire"><h4>Claim / Event</h4>';
-  body+='<div class="wr"><span class="wl">Claim</span><span class="wv">'+f.claim+'</span></div>';
-  body+='<div class="wr"><span class="wl">Event</span><span class="wv">'+f.event+'</span></div>';
-  body+='<div class="wr"><span class="wl">Risk</span><span class="wv">'+f.risk+'</span></div></div>';
+  body+='<div class="wr"><span class="wl">Claim</span><span class="wv">'+escHTML(f.claim)+'</span></div>';
+  body+='<div class="wr"><span class="wl">Event</span><span class="wv">'+escHTML(f.event)+'</span></div>';
+  body+='<div class="wr"><span class="wl">Risk</span><span class="wv">'+escHTML(f.risk)+'</span></div></div>';
   body+='<div class="wire"><h4>Review</h4>';
-  body+='<div class="wr"><span class="wl">Severity</span><span class="wv" style="color:var(--bad)">'+f.sev+'</span></div>';
+  body+='<div class="wr"><span class="wl">Severity</span><span class="wv" style="color:var(--bad)">'+escHTML(f.sev)+'</span></div>';
   if(f.recurring>0)body+='<div class="wr"><span class="wl">Recurring</span><span class="wv" style="color:#ff9f43">YES — '+f.recurring+' prior</span></div>';
-  body+='<div class="wr"><span class="wl">Root Cause</span><span class="wv">'+f.rootCause+'</span></div></div>';
+  body+='<div class="wr"><span class="wl">Root Cause</span><span class="wv">'+escHTML(f.rootCause)+'</span></div></div>';
   body+='</div><div>';
   body+='<div class="wire"><h4>Patch</h4>';
-  body+='<div class="wr"><span class="wl">Action</span><span class="wv">'+f.patch+'</span></div>';
-  body+='<div class="wr"><span class="wl">Due</span><span class="wv">'+f.patchDue+'</span></div>';
-  body+='<div class="wr"><span class="wl">PPI</span><span class="wv" style="color:var(--'+(f.ppi>=0.8?"ok":"warn")+')">'+f.ppi+' (Patch Precision Index)</span></div></div>';
+  body+='<div class="wr"><span class="wl">Action</span><span class="wv">'+escHTML(f.patch)+'</span></div>';
+  body+='<div class="wr"><span class="wl">Due</span><span class="wv">'+escHTML(f.patchDue)+'</span></div>';
+  body+='<div class="wr"><span class="wl">PPI</span><span class="wv" style="color:var(--'+(f.ppi>=0.8?"ok":"warn")+')">'+escHTML(String(f.ppi))+' (Patch Precision Index)</span></div></div>';
   body+='<div class="wire"><h4>Evidence</h4>'+evHtml;
-  body+='<div style="margin-top:6px;font-size:10px"><span style="color:var(--muted)">EDI:</span> <strong>'+f.edi+'</strong> &nbsp; <span style="color:var(--muted)">DEG:</span> <strong style="color:var(--warn)">'+f.deg+'</strong></div></div>';
+  body+='<div style="margin-top:6px;font-size:10px"><span style="color:var(--muted)">EDI:</span> <strong>'+escHTML(String(f.edi))+'</strong> &nbsp; <span style="color:var(--muted)">DEG:</span> <strong style="color:var(--warn)">'+escHTML(f.deg)+'</strong></div></div>';
   body+='</div></div>';
   // Actions
   body+='<div style="margin-top:10px;display:flex;gap:6px">';
-  body+='<button class="primary" data-fact="closure" data-fid="'+fid+'">Request Closure</button>';
-  body+='<button data-fact="review" data-fid="'+fid+'">Send to Review</button>';
-  body+='<button data-fact="link" data-fid="'+fid+'">Link Related</button>';
-  body+='<button data-fact="export" data-fid="'+fid+'">Export Packet</button></div>';
+  body+='<button class="primary" data-fact="closure" data-fid="'+escHTML(fid)+'">Request Closure</button>';
+  body+='<button data-fact="review" data-fid="'+escHTML(fid)+'">Send to Review</button>';
+  body+='<button data-fact="link" data-fid="'+escHTML(fid)+'">Link Related</button>';
+  body+='<button data-fact="export" data-fid="'+escHTML(fid)+'">Export Packet</button></div>';
   // Render
   fDet.innerHTML=body;
   fDet.classList.remove("hidden");
@@ -2241,7 +2242,7 @@ document.getElementById("fDetail").addEventListener("click",function(e){
   // Update demo data
   if(F[fid]){F[fid].evidence.forEach(function(ev){if(ev.name===ename)ev.ok=1})}
   // Re-render the evidence item
-  evDiv.innerHTML='<span class="ev-ok">✓</span> '+ename+' <span style="margin-left:auto;font-size:8px;color:var(--ok)">validated · locked</span>';
+  evDiv.innerHTML='<span class="ev-ok">✓</span> '+escHTML(ename)+' <span style="margin-left:auto;font-size:8px;color:var(--ok)">validated · locked</span>';
   toast("Evidence uploaded: "+ename,"ok");
   // Update EDI display
   if(F[fid]){
@@ -2401,14 +2402,14 @@ document.getElementById("heatmapGrid").addEventListener("click",function(e){
         detEl.innerHTML=
           '<div style="border-top:1px solid var(--line);padding-top:12px">'+
           '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'+
-          '<span class="mono" style="font-size:14px;color:var(--accent);font-weight:700">'+rawId+'</span>'+
-          sevBadge(sev)+stBadge(st)+'</div>'+
-          '<div style="font-size:12px;font-weight:600;margin-bottom:8px">'+title+'</div>'+
+          '<span class="mono" style="font-size:14px;color:var(--accent);font-weight:700">'+escHTML(rawId)+'</span>'+
+          sevBadge(escHTML(sev))+stBadge(escHTML(st))+'</div>'+
+          '<div style="font-size:12px;font-weight:600;margin-bottom:8px">'+escHTML(title)+'</div>'+
           '<div class="wire"><h4>Risk Profile</h4>'+
-          '<div class="wr"><span class="wl">Severity</span><span class="wv" style="color:var(--bad)">'+sev+'</span></div>'+
-          '<div class="wr"><span class="wl">OOL</span><span class="wv" style="color:var(--warn)">'+oolVal+'</span></div>'+
-          '<div class="wr"><span class="wl">Status</span><span class="wv">'+st+'</span></div>'+
-          '<div class="wr"><span class="wl">Risk Bucket</span><span class="wv">'+sevLabel+' × '+oolLabel+'</span></div></div>'+
+          '<div class="wr"><span class="wl">Severity</span><span class="wv" style="color:var(--bad)">'+escHTML(sev)+'</span></div>'+
+          '<div class="wr"><span class="wl">OOL</span><span class="wv" style="color:var(--warn)">'+escHTML(oolVal)+'</span></div>'+
+          '<div class="wr"><span class="wl">Status</span><span class="wv">'+escHTML(st)+'</span></div>'+
+          '<div class="wr"><span class="wl">Risk Bucket</span><span class="wv">'+escHTML(sevLabel)+' × '+escHTML(oolLabel)+'</span></div></div>'+
           '<div style="font-size:9px;color:var(--muted);margin-top:6px;font-style:italic">Full CERPA detail available when finding is loaded into the operational dataset.</div>'+
           '</div>';
       }

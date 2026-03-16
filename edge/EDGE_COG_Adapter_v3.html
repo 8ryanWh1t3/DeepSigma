@@ -3915,8 +3915,9 @@ function navigateTo(tab,filter,highlightId){
 }
 
 /* v4.3: Generic tray opener for governor tabs */
+function setHTML(el,h){var t=document.createElement("template");t.innerHTML=h;el.textContent="";el.appendChild(t.content.cloneNode(true))}
 function openTray(html){
-  $("#drawerContent").innerHTML=html;
+  setHTML($("#drawerContent"),html);
   $("#detailDrawer").classList.add("open");
   $("#drawerOverlay").classList.add("open");
 }
