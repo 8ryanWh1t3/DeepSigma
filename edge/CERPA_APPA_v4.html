@@ -1116,21 +1116,21 @@ function deriveTasks(){
   ids.forEach(function(k){
     var f=F[k];
     if(f.sev==="HIGH"&&f.status!=="Closed"){
-      tasks.push({id:"T-crit-"+f.id,label:f.id+" — "+f.title,severity:"critical",tab:"find",detail:"HIGH severity, status: "+f.status});
+      tasks.push({id:"T-crit-"+f.id,label:f.id+" — "+f.title,severity:"critical",tab:"find",fid:k,detail:"HIGH severity, status: "+f.status});
     }
   });
   // Overdue patches (PPI < 0.7 and not closed)
   ids.forEach(function(k){
     var f=F[k];
     if(f.ppi<0.7&&f.status!=="Closed"){
-      tasks.push({id:"T-ppi-"+f.id,label:f.id+" — Low patch precision (PPI: "+f.ppi+")",severity:"high",tab:"find",detail:"PPI below 0.70 threshold"});
+      tasks.push({id:"T-ppi-"+f.id,label:f.id+" — Low patch precision (PPI: "+f.ppi+")",severity:"high",tab:"find",fid:k,detail:"PPI below 0.70 threshold"});
     }
   });
   // Low BRQ (< 0.6)
   ids.forEach(function(k){
     var f=F[k];
     if(f.brq<0.6&&f.status!=="Closed"){
-      tasks.push({id:"T-brq-"+f.id,label:f.id+" — Low board readiness (BRQ: "+f.brq+")",severity:"high",tab:"board",detail:"BRQ below 0.60 threshold"});
+      tasks.push({id:"T-brq-"+f.id,label:f.id+" — Low board readiness (BRQ: "+f.brq+")",severity:"high",tab:"board",fid:k,detail:"BRQ below 0.60 threshold"});
     }
   });
   // Evidence gaps
@@ -1139,7 +1139,7 @@ function deriveTasks(){
     if(f.status!=="Closed"){
       var missing=f.evidence.filter(function(e){return !e.ok}).length;
       if(missing>0){
-        tasks.push({id:"T-ev-"+f.id,label:f.id+" — "+missing+" missing evidence item"+(missing>1?"s":""),severity:"medium",tab:"audit",detail:missing+" of "+f.evidence.length+" evidence items not validated"});
+        tasks.push({id:"T-ev-"+f.id,label:f.id+" — "+missing+" missing evidence item"+(missing>1?"s":""),severity:"medium",tab:"find",fid:k,detail:missing+" of "+f.evidence.length+" evidence items not validated"});
       }
     }
   });
@@ -1147,7 +1147,7 @@ function deriveTasks(){
   ids.forEach(function(k){
     var f=F[k];
     if(f.recurring&&f.recurring>1&&f.status!=="Closed"){
-      tasks.push({id:"T-rec-"+f.id,label:f.id+" — Recurring deficiency (×"+f.recurring+")",severity:"high",tab:"trends",detail:"Recurring "+f.recurring+" times — pattern requires root cause analysis"});
+      tasks.push({id:"T-rec-"+f.id,label:f.id+" — Recurring deficiency (×"+f.recurring+")",severity:"high",tab:"find",fid:k,detail:"Recurring "+f.recurring+" times — pattern requires root cause analysis"});
     }
   });
   // High DEG
@@ -1156,7 +1156,7 @@ function deriveTasks(){
     if(f.deg&&f.deg!=="—"){
       var days=parseInt(f.deg);
       if(days>10&&f.status!=="Closed"){
-        tasks.push({id:"T-deg-"+f.id,label:f.id+" — High decision-evidence gap ("+f.deg+")",severity:"medium",tab:"audit",detail:"DEG exceeds 10-day threshold"});
+        tasks.push({id:"T-deg-"+f.id,label:f.id+" — High decision-evidence gap ("+f.deg+")",severity:"medium",tab:"find",fid:k,detail:"DEG exceeds 10-day threshold"});
       }
     }
   });
@@ -1179,7 +1179,7 @@ function renderTaskPanel(){
   }
   var html='';
   currentTasks.forEach(function(t){
-    html+='<div class="task-row sev-'+escHTML(t.severity)+'" data-task-tab="'+escHTML(t.tab)+'">'+
+    html+='<div class="task-row sev-'+escHTML(t.severity)+'" data-task-tab="'+escHTML(t.tab)+'"'+(t.fid?' data-task-fid="'+escHTML(t.fid)+'"':'')+'>'+
       '<div class="task-dot"></div>'+
       '<div><div class="task-label">'+escHTML(t.label)+'</div>'+
       '<div class="task-detail">'+escHTML(t.detail)+'</div></div>'+
@@ -1189,8 +1189,10 @@ function renderTaskPanel(){
   taskList.querySelectorAll(".task-row[data-task-tab]").forEach(function(el){
     el.addEventListener("click",function(){
       var tab=el.getAttribute("data-task-tab");
+      var fid=el.getAttribute("data-task-fid");
       openTab(tab);
       taskPanel.classList.remove("open");
+      if(fid&&F[fid])showFinding(fid);
     });
   });
   renderCriticalSummary();
@@ -1203,13 +1205,17 @@ function renderCriticalSummary(){
   card.style.display="block";
   var html='<h3 style="color:var(--bad);margin-bottom:8px">Attention Required</h3>';
   critical.forEach(function(t){
-    html+='<div class="task-row sev-'+escHTML(t.severity)+'" data-crit-tab="'+escHTML(t.tab)+'" style="margin-bottom:4px;cursor:pointer">'+
+    html+='<div class="task-row sev-'+escHTML(t.severity)+'" data-crit-tab="'+escHTML(t.tab)+'"'+(t.fid?' data-crit-fid="'+escHTML(t.fid)+'"':'')+' style="margin-bottom:4px;cursor:pointer">'+
       '<div class="task-dot"></div>'+
       '<div class="task-label">'+escHTML(t.label)+'</div></div>';
   });
   card.innerHTML=html;
   card.querySelectorAll("[data-crit-tab]").forEach(function(el){
-    el.addEventListener("click",function(){openTab(el.getAttribute("data-crit-tab"))});
+    el.addEventListener("click",function(){
+      openTab(el.getAttribute("data-crit-tab"));
+      var fid=el.getAttribute("data-crit-fid");
+      if(fid&&F[fid])showFinding(fid);
+    });
   });
 }
 if(btnTaskToggle){
