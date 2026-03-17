@@ -843,6 +843,7 @@ var TOs={
 "1003":{id:"TO-1003",name:"Cybersecurity Operations",contract:"N00178-24-D-0042",vendor:"Apex Systems Inc.",status:"Critical",burnRate:0.18,plannedSpend:3200000,actualSpend:3776000,keyPersonnel:[{name:"VACANT",role:"CISO",clearance:"TS/SCI",status:"Vacant 34d"},{name:"K. Okafor",role:"Ops Lead",clearance:"TS/SCI",status:"Active"},{name:"D. Walsh",role:"Analyst",clearance:"Secret",status:"Clearance Lapsed"}],slaMetrics:[{name:"Incident Response",target:15,actual:22},{name:"Patch Compliance",target:95,actual:87}],riskLevel:"HIGH",findingCount:4},
 "1004":{id:"TO-1004",name:"Systems Integration",contract:"N00178-24-D-0042",vendor:"Northbridge Solutions",status:"At Risk",burnRate:0.06,plannedSpend:2800000,actualSpend:2968000,keyPersonnel:[{name:"A. Reeves",role:"PM",clearance:"Secret",status:"Active"},{name:"L. Gomez",role:"Integration Lead",clearance:"Secret",status:"Active"}],slaMetrics:[{name:"Integration Tests",target:90,actual:82},{name:"Config Compliance",target:100,actual:91}],riskLevel:"HIGH",findingCount:4}
 };
+var TO=TOs;
 
 /* ══════════ FINDINGS DATA ══════════ */
 var F={
@@ -1099,10 +1100,10 @@ function mgExpandDetail(ntype,nlabel){
       if(ff.linked.length)html+='<div class="wr"><span class="wl">Linked</span><span class="wv" style="color:var(--accent)">'+ff.linked.join(", ")+'</span></div>';
     }else html='<div style="color:var(--muted)">No data</div>';
   } else if(ntype==="taskorder"){
-    var tt=TO[nlabel];
+    var toKey=nlabel.replace("TO-","");var tt=TO[toKey];
     if(tt){
       html+='<div class="wr"><span class="wl">Name</span><span class="wv">'+escHTML(tt.name)+'</span></div>';
-      html+='<div class="wr"><span class="wl">Contract</span><span class="wv">'+escHTML(tt.contractNumber)+'</span></div>';
+      html+='<div class="wr"><span class="wl">Contract</span><span class="wv">'+escHTML(tt.contract)+'</span></div>';
       html+='<div class="wr"><span class="wl">Vendor</span><span class="wv">'+escHTML(tt.vendor)+'</span></div>';
       html+='<div class="wr"><span class="wl">Status</span><span class="wv">'+escHTML(tt.status)+'</span></div>';
       html+='<div class="wr"><span class="wl">Risk</span><span class="wv" style="color:var(--'+(tt.riskLevel==="HIGH"?"bad":"warn")+')">'+tt.riskLevel+'</span></div>';
@@ -1110,9 +1111,10 @@ function mgExpandDetail(ntype,nlabel){
       html+='<div class="wr"><span class="wl">Actual</span><span class="wv">$'+tt.actualSpend.toLocaleString()+'</span></div>';
       var bvar=((tt.actualSpend-tt.plannedSpend)/tt.plannedSpend*100).toFixed(1);
       html+='<div class="wr"><span class="wl">Burn Var</span><span class="wv" style="color:var(--'+(Math.abs(bvar)>15?"bad":"warn")+')">'+bvar+'%</span></div>';
-      html+='<div class="wr"><span class="wl">Key Personnel</span><span class="wv">'+tt.keyPersonnel.join(", ")+'</span></div>';
+      html+='<div class="wr"><span class="wl">Key Personnel</span><span class="wv">'+tt.keyPersonnel.map(function(p){return p.name+" ("+p.role+")"}).join(", ")+'</span></div>';
       var toF=Object.keys(F).filter(function(k){return F[k].taskOrder===nlabel});
       html+='<div class="wr"><span class="wl">Findings</span><span class="wv">'+toF.length+' ('+toF.filter(function(k){return F[k].sev==="HIGH"}).length+' HIGH)</span></div>';
+      tt.slaMetrics.forEach(function(s){html+='<div class="wr"><span class="wl">SLA: '+escHTML(s.name)+'</span><span class="wv" style="color:var(--'+(s.actual>=s.target?"ok":"bad")+')">'+s.actual+' / '+s.target+'</span></div>';});
     }else html='<div style="color:var(--muted)">No data</div>';
   } else if(ntype==="vendor"){
     var vf=Object.keys(F).filter(function(k){return F[k].vendor.indexOf(nlabel)>-1||nlabel.indexOf(F[k].vendor.substring(0,8))>-1});
@@ -1674,7 +1676,7 @@ function renderMG(){
           body+='<div class="wr"><span class="wl">Patch</span><span class="wv">'+escHTML(f.patch.substring(0,60))+'</span></div>';
         }
       } else if(nd.type==="taskorder"){
-        var tok=nd.label;var t=TO[tok];
+        var tok=nd.label.replace("TO-","");var t=TO[tok];
         if(t){
           body+='<div class="wr"><span class="wl">Name</span><span class="wv">'+escHTML(t.name)+'</span></div>';
           body+='<div class="wr"><span class="wl">Vendor</span><span class="wv">'+escHTML(t.vendor)+'</span></div>';
@@ -2169,7 +2171,7 @@ document.querySelectorAll("#s-trends table").forEach(function(tbl){
     var tok=toId.textContent.trim();
     row.style.cursor="pointer";
     row.addEventListener("click",function(){
-      var t=TO[tok];
+      var t=TO[tok.replace("TO-","")];
       var ids=Object.keys(F).filter(function(k){return F[k].taskOrder===tok});
       var body='<div class="wire"><h4>'+escHTML(tok)+'</h4>';
       if(t){
