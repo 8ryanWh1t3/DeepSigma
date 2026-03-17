@@ -605,28 +605,10 @@ footer strong{color:var(--accent);font-weight:600}
       </tbody></table>
     </div>
   </div>
-  <!-- Severity x Lag Heatmap -->
+  <!-- Severity x Lag Heatmap (rendered dynamically) -->
   <div class="card">
     <h3>Closure Risk Heatmap — Severity x Ownership Lag</h3>
-    <div class="heatmap" id="heatmapGrid" style="grid-template-columns:60px repeat(4,1fr);grid-template-rows:auto repeat(3,1fr)">
-      <div class="hm-label"></div>
-      <div class="hm-label">OOL 0-3d</div><div class="hm-label">OOL 4-7d</div><div class="hm-label">OOL 8-14d</div><div class="hm-label">OOL 14d+</div>
-      <div class="hm-label">HIGH</div>
-      <div class="hm-cell" style="background:rgba(93,255,147,.12);color:var(--ok)">1</div>
-      <div class="hm-cell" style="background:rgba(255,204,102,.18);color:var(--warn)">2</div>
-      <div class="hm-cell" style="background:rgba(255,107,107,.22);color:var(--bad)">1</div>
-      <div class="hm-cell" style="background:rgba(255,107,107,.35);color:var(--bad)">1</div>
-      <div class="hm-label">MED</div>
-      <div class="hm-cell" style="background:rgba(93,255,147,.12);color:var(--ok)">2</div>
-      <div class="hm-cell" style="background:rgba(93,255,147,.08);color:var(--ok)">1</div>
-      <div class="hm-cell" style="background:rgba(255,204,102,.14);color:var(--warn)">1</div>
-      <div class="hm-cell" style="background:rgba(27,42,58,.5);color:var(--muted)">0</div>
-      <div class="hm-label">LOW</div>
-      <div class="hm-cell" style="background:rgba(93,255,147,.08);color:var(--ok)">2</div>
-      <div class="hm-cell" style="background:rgba(93,255,147,.05);color:var(--ok)">1</div>
-      <div class="hm-cell" style="background:rgba(27,42,58,.5);color:var(--muted)">0</div>
-      <div class="hm-cell" style="background:rgba(27,42,58,.3);color:var(--muted)">0</div>
-    </div>
+    <div class="heatmap" id="heatmapGrid" style="grid-template-columns:60px repeat(4,1fr);grid-template-rows:auto repeat(3,1fr)"></div>
   </div>
   <div class="grid2">
     <div class="card"><h3>Task Order Drift Indicators</h3>
@@ -2062,20 +2044,22 @@ function renderTrends(){
       '<span style="width:24px;font-size:12px;color:#888">'+c.count+'</span></div>';
   }).join("");
 
-  /* severity heatmap */
-  var hm=document.getElementById("sevHeatmap");if(!hm)return;
-  var grid=[
-    ["HIGH","<7d",2],["HIGH","7-14d",1],["HIGH","14-30d",1],["HIGH",">30d",1],
-    ["MED","<7d",1],["MED","7-14d",2],["MED","14-30d",1],["MED",">30d",0],
-    ["LOW","<7d",0],["LOW","7-14d",1],["LOW","14-30d",1],["LOW",">30d",1]
-  ];
-  hm.innerHTML='<div style="display:grid;grid-template-columns:60px repeat(4,1fr);gap:2px;font-size:11px">'+
-    '<div></div><div style="text-align:center;color:#888">&lt;7d</div><div style="text-align:center;color:#888">7-14d</div><div style="text-align:center;color:#888">14-30d</div><div style="text-align:center;color:#888">&gt;30d</div>'+
-    grid.map(function(cell,i){
-      var prefix=i%4===0?'<div style="color:#aaa;display:flex;align-items:center">'+cell[0]+'</div>':'';
-      var opacity=cell[2]===0?0.05:cell[2]===1?0.3:cell[2]===2?0.6:0.9;
-      return prefix+'<div style="background:rgba(0,163,255,'+opacity+');height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff">'+cell[2]+'</div>';
-    }).join("")+'</div>';
+  /* severity × lag heatmap — computed from data */
+  var hm=document.getElementById("heatmapGrid");if(!hm)return;
+  var sevs=["HIGH","MED","LOW"];
+  var lagBuckets=[{label:"0-3d",min:0,max:3},{label:"4-7d",min:4,max:7},{label:"8-14d",min:8,max:14},{label:"14d+",min:15,max:999}];
+  var hmHtml='<div class="hm-label"></div>';
+  lagBuckets.forEach(function(b){hmHtml+='<div class="hm-label">OOL '+b.label+'</div>';});
+  sevs.forEach(function(sev){
+    hmHtml+='<div class="hm-label">'+sev+'</div>';
+    lagBuckets.forEach(function(b){
+      var count=Object.values(F).filter(function(f){return f.sev===sev&&f.cg>=b.min&&f.cg<=b.max}).length;
+      var opacity=count===0?0.05:count===1?0.2:count<=3?0.4:count<=5?0.6:0.9;
+      var color=count===0?"var(--muted)":count>=3?"var(--bad)":count>=2?"var(--warn)":"var(--ok)";
+      hmHtml+='<div class="hm-cell" style="background:rgba('+(sev==="HIGH"?"255,107,107":sev==="MED"?"255,204,102":"93,255,147")+','+opacity+');color:'+color+'">'+count+'</div>';
+    });
+  });
+  hm.innerHTML=hmHtml;
 
   /* TO drift */
   var td=document.getElementById("toDrift");if(!td)return;
@@ -2150,19 +2134,19 @@ document.querySelectorAll("#s-trends .cat-badge").forEach(function(badge){
   });
 });
 
-/* Heatmap cells → drill to findings matching severity × lag bucket */
-document.querySelectorAll("#heatmapGrid .hm-cell").forEach(function(cell,idx){
+/* Heatmap cells → drill (delegated since cells are rendered dynamically) */
+document.getElementById("heatmapGrid").addEventListener("click",function(e){
+  var cell=e.target.closest(".hm-cell");if(!cell)return;
+  var cells=Array.prototype.slice.call(document.querySelectorAll("#heatmapGrid .hm-cell"));
+  var idx=cells.indexOf(cell);if(idx<0)return;
   var row=Math.floor(idx/4);var col=idx%4;
   var sevs=["HIGH","MED","LOW"];var sev=sevs[row];
   var lagRanges=["0-3d","4-7d","8-14d","14d+"];var lag=lagRanges[col];
   var lagDays=[[0,3],[4,7],[8,14],[15,999]];var lr=lagDays[col];
-  cell.style.cursor="pointer";
-  cell.addEventListener("click",function(){
-    var ids=Object.keys(F).filter(function(k){var f=F[k];return f.sev===sev&&f.cg>=lr[0]&&f.cg<=lr[1]});
-    openDrawer(sev+" × "+lag+" — "+ids.length+" Findings",
-      '<div class="wire"><h4>Severity: '+sev+' · Ownership Lag: '+lag+'</h4>'+buildFindingListHTML(ids)+'</div>','');
-    wireDrillLinks();
-  });
+  var ids=Object.keys(F).filter(function(k){var f=F[k];return f.sev===sev&&f.cg>=lr[0]&&f.cg<=lr[1]});
+  openDrawer(sev+" × "+lag+" — "+ids.length+" Findings",
+    '<div class="wire"><h4>Severity: '+sev+' · Ownership Lag: '+lag+'</h4>'+buildFindingListHTML(ids)+'</div>','');
+  wireDrillLinks();
 });
 
 /* TO drift rows → drill to task order detail */
