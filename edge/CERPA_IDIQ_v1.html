@@ -1075,6 +1075,80 @@ function closeDrawer(){dOverlay.classList.remove("open");dPanel.classList.remove
 document.getElementById("dClose").addEventListener("click",closeDrawer);
 dOverlay.addEventListener("click",closeDrawer);
 
+/* ══════════ EXPANDABLE DETAIL (delegated) ══════════ */
+function mgExpandDetail(ntype,nlabel){
+  var html="";
+  if(ntype==="finding"){
+    var fk=nlabel.replace("F-","");var ff=F[fk];
+    if(ff){
+      html+='<div class="wr"><span class="wl">Title</span><span class="wv">'+escHTML(ff.title)+'</span></div>';
+      html+='<div class="wr"><span class="wl">Status</span><span class="wv" style="color:'+(stColorMap[ff.status]||"var(--accent)")+'">'+escHTML(ff.status)+'</span></div>';
+      html+='<div class="wr"><span class="wl">Severity</span><span class="wv">'+ff.sev+'</span></div>';
+      html+='<div class="wr"><span class="wl">Category</span><span class="wv">'+escHTML(ff.claimCat)+' / '+escHTML(ff.claimType)+'</span></div>';
+      html+='<div class="wr"><span class="wl">TO / Vendor</span><span class="wv">'+escHTML(ff.taskOrder)+' · '+escHTML(ff.vendor)+'</span></div>';
+      html+='<div class="wr"><span class="wl">Owner</span><span class="wv">'+escHTML(ff.owner)+'</span></div>';
+      html+='<div class="wr"><span class="wl">Financial</span><span class="wv" style="color:var(--warn)">'+escHTML(ff.financialImpact)+'</span></div>';
+      html+='<div class="wr"><span class="wl">Schedule</span><span class="wv">'+escHTML(ff.scheduleImpact)+'</span></div>';
+      html+='<div class="wr"><span class="wl">Root Cause</span><span class="wv">'+escHTML(ff.rootCause)+'</span></div>';
+      html+='<div class="wr"><span class="wl">Patch</span><span class="wv">'+escHTML(ff.patch)+'</span></div>';
+      html+='<div class="wr"><span class="wl">Decision</span><span class="wv">'+escHTML(ff.applyDecision)+'</span></div>';
+      html+='<div class="wr"><span class="wl">Evidence</span><span class="wv">'+ff.evidence.length+' artifacts · '+ff.evidence.filter(function(e){return e.ok}).length+' validated</span></div>';
+      html+='<div class="wr"><span class="wl">BRQ</span><span class="wv" style="color:var(--'+(ff.brq>=0.8?"ok":ff.brq>=0.6?"warn":"bad")+')">'+ff.brq+'</span></div>';
+      if(ff.recurring)html+='<div class="wr"><span class="wl">Recurring</span><span class="wv" style="color:var(--mag)">&times;'+ff.recurring+'</span></div>';
+      if(ff.contractRisk)html+='<div class="wr"><span class="wl">Contract Risk</span><span class="wv" style="color:var(--bad)">YES</span></div>';
+      if(ff.linked.length)html+='<div class="wr"><span class="wl">Linked</span><span class="wv" style="color:var(--accent)">'+ff.linked.join(", ")+'</span></div>';
+    }else html='<div style="color:var(--muted)">No data</div>';
+  } else if(ntype==="taskorder"){
+    var tt=TO[nlabel];
+    if(tt){
+      html+='<div class="wr"><span class="wl">Name</span><span class="wv">'+escHTML(tt.name)+'</span></div>';
+      html+='<div class="wr"><span class="wl">Contract</span><span class="wv">'+escHTML(tt.contractNumber)+'</span></div>';
+      html+='<div class="wr"><span class="wl">Vendor</span><span class="wv">'+escHTML(tt.vendor)+'</span></div>';
+      html+='<div class="wr"><span class="wl">Status</span><span class="wv">'+escHTML(tt.status)+'</span></div>';
+      html+='<div class="wr"><span class="wl">Risk</span><span class="wv" style="color:var(--'+(tt.riskLevel==="HIGH"?"bad":"warn")+')">'+tt.riskLevel+'</span></div>';
+      html+='<div class="wr"><span class="wl">Planned</span><span class="wv">$'+tt.plannedSpend.toLocaleString()+'</span></div>';
+      html+='<div class="wr"><span class="wl">Actual</span><span class="wv">$'+tt.actualSpend.toLocaleString()+'</span></div>';
+      var bvar=((tt.actualSpend-tt.plannedSpend)/tt.plannedSpend*100).toFixed(1);
+      html+='<div class="wr"><span class="wl">Burn Var</span><span class="wv" style="color:var(--'+(Math.abs(bvar)>15?"bad":"warn")+')">'+bvar+'%</span></div>';
+      html+='<div class="wr"><span class="wl">Key Personnel</span><span class="wv">'+tt.keyPersonnel.join(", ")+'</span></div>';
+      var toF=Object.keys(F).filter(function(k){return F[k].taskOrder===nlabel});
+      html+='<div class="wr"><span class="wl">Findings</span><span class="wv">'+toF.length+' ('+toF.filter(function(k){return F[k].sev==="HIGH"}).length+' HIGH)</span></div>';
+    }else html='<div style="color:var(--muted)">No data</div>';
+  } else if(ntype==="vendor"){
+    var vf=Object.keys(F).filter(function(k){return F[k].vendor.indexOf(nlabel)>-1||nlabel.indexOf(F[k].vendor.substring(0,8))>-1});
+    var vt=Object.keys(TO).filter(function(k){return TO[k].vendor.indexOf(nlabel)>-1||nlabel.indexOf(TO[k].vendor.substring(0,8))>-1});
+    html+='<div class="wr"><span class="wl">Findings</span><span class="wv">'+vf.length+'</span></div>';
+    html+='<div class="wr"><span class="wl">Open HIGH</span><span class="wv" style="color:var(--bad)">'+vf.filter(function(k){return F[k].sev==="HIGH"&&F[k].status!=="Closed"}).length+'</span></div>';
+    html+='<div class="wr"><span class="wl">Task Orders</span><span class="wv">'+vt.length+'</span></div>';
+    vt.forEach(function(tk){var t2=TO[tk];if(t2)html+='<div class="wr"><span class="wl" style="color:var(--warn)">'+escHTML(tk)+'</span><span class="wv">'+escHTML(t2.name)+' · '+t2.riskLevel+'</span></div>';});
+    vf.forEach(function(fk2){var f2=F[fk2];if(f2)html+='<div class="wr"><span class="wl" style="color:'+(stColorMap[f2.status]||"var(--accent)")+'">'+escHTML(f2.id)+'</span><span class="wv">'+escHTML(f2.title.substring(0,40))+'</span></div>';});
+  } else if(ntype==="pattern"){
+    html+='<div class="wr"><span class="wl">Pattern</span><span class="wv" style="color:var(--mag)">'+escHTML(nlabel)+'</span></div>';
+    html+='<div class="wr"><span class="wl">Insight</span><span class="wv">Recurring pattern across linked findings. Review root cause for systemic remediation.</span></div>';
+  } else if(ntype==="patch"){
+    html+='<div class="wr"><span class="wl">Patch</span><span class="wv" style="color:var(--ok)">'+escHTML(nlabel)+'</span></div>';
+    html+='<div class="wr"><span class="wl">Insight</span><span class="wv">Corrective action applied to linked findings. Monitor PAR for reopen risk.</span></div>';
+  } else if(ntype==="rootcause"){
+    html+='<div class="wr"><span class="wl">Root Cause</span><span class="wv" style="color:var(--bad)">'+escHTML(nlabel)+'</span></div>';
+    html+='<div class="wr"><span class="wl">Insight</span><span class="wv">Systemic driver. Address at process level to reduce DES.</span></div>';
+  }
+  return html||'<div style="color:var(--muted)">No additional data</div>';
+}
+
+/* Delegated expand/collapse for drawer content */
+dBody.addEventListener("click",function(e){
+  var row=e.target.closest("[data-mgx]");if(!row)return;
+  var detail=row.nextElementSibling;
+  if(!detail||!detail.classList.contains("mg-expand-detail"))return;
+  var open=detail.style.display!=="none";
+  var chevron=row.querySelector(".mg-chevron");
+  if(open){detail.style.display="none";if(chevron)chevron.style.transform="";return;}
+  detail.style.display="block";if(chevron)chevron.style.transform="rotate(90deg)";
+  if(detail.dataset.loaded)return;
+  detail.dataset.loaded="1";
+  detail.innerHTML=mgExpandDetail(detail.dataset.ntype,detail.dataset.nlabel);
+});
+
 /* ══════════ MAPS ══════════ */
 var stClassMap={"New":"st-new","Assigned":"st-assigned","In Review":"st-review","Patch Approved":"st-patched","Closure Pending":"st-pending","Closed":"st-closed","Reopened":"st-reopened"};
 var sevClassMap={"HIGH":"sev-high","MED":"sev-med","LOW":"sev-low"};
@@ -1648,77 +1722,7 @@ function renderMG(){
         foot='<button class="primary" id="mgDrill" data-fid="'+fk2+'">Open Finding Detail</button>';
       }
       openDrawer("Memory Node — "+escHTML(nd.label),body,foot);
-      /* wire expand/collapse */
-      dBody.querySelectorAll(".mg-expand-row").forEach(function(row){
-        row.addEventListener("click",function(){
-          var uid=row.dataset.mgx;
-          var detail=document.getElementById(uid);if(!detail)return;
-          var open=detail.style.display!=="none";
-          var chevron=row.querySelector(".mg-chevron");
-          if(open){detail.style.display="none";if(chevron)chevron.style.transform="";return;}
-          detail.style.display="block";if(chevron)chevron.style.transform="rotate(90deg)";
-          if(detail.dataset.loaded)return;
-          detail.dataset.loaded="1";
-          var ntype=detail.dataset.ntype;var nlabel=detail.dataset.nlabel;
-          var html="";
-          if(ntype==="finding"){
-            var fk3=nlabel.replace("F-","");var ff=F[fk3];
-            if(ff){
-              html='<div class="wr"><span class="wl">Title</span><span class="wv">'+escHTML(ff.title)+'</span></div>';
-              html+='<div class="wr"><span class="wl">Status</span><span class="wv" style="color:'+(stColorMap[ff.status]||"var(--accent)")+'">'+escHTML(ff.status)+'</span></div>';
-              html+='<div class="wr"><span class="wl">Severity</span><span class="wv">'+ff.sev+'</span></div>';
-              html+='<div class="wr"><span class="wl">Category</span><span class="wv">'+escHTML(ff.claimCat)+' / '+escHTML(ff.claimType)+'</span></div>';
-              html+='<div class="wr"><span class="wl">TO / Vendor</span><span class="wv">'+escHTML(ff.taskOrder)+' · '+escHTML(ff.vendor)+'</span></div>';
-              html+='<div class="wr"><span class="wl">Owner</span><span class="wv">'+escHTML(ff.owner)+'</span></div>';
-              html+='<div class="wr"><span class="wl">Financial</span><span class="wv" style="color:var(--warn)">'+escHTML(ff.financialImpact)+'</span></div>';
-              html+='<div class="wr"><span class="wl">Schedule</span><span class="wv">'+escHTML(ff.scheduleImpact)+'</span></div>';
-              html+='<div class="wr"><span class="wl">Root Cause</span><span class="wv">'+escHTML(ff.rootCause)+'</span></div>';
-              html+='<div class="wr"><span class="wl">Patch</span><span class="wv">'+escHTML(ff.patch)+'</span></div>';
-              html+='<div class="wr"><span class="wl">Decision</span><span class="wv">'+escHTML(ff.applyDecision)+'</span></div>';
-              html+='<div class="wr"><span class="wl">Evidence</span><span class="wv">'+ff.evidence.length+' artifacts · '+ff.evidence.filter(function(e){return e.ok}).length+' validated</span></div>';
-              html+='<div class="wr"><span class="wl">BRQ</span><span class="wv" style="color:var(--'+(ff.brq>=0.8?"ok":ff.brq>=0.6?"warn":"bad")+')">'+ff.brq+'</span></div>';
-              if(ff.recurring)html+='<div class="wr"><span class="wl">Recurring</span><span class="wv" style="color:var(--mag)">&times;'+ff.recurring+'</span></div>';
-              if(ff.contractRisk)html+='<div class="wr"><span class="wl">Contract Risk</span><span class="wv" style="color:var(--bad)">YES</span></div>';
-              if(ff.linked.length)html+='<div class="wr"><span class="wl">Linked</span><span class="wv" style="color:var(--accent)">'+ff.linked.join(", ")+'</span></div>';
-            }else{html='<div style="color:var(--muted)">No data</div>';}
-          } else if(ntype==="taskorder"){
-            var tt=TO[nlabel];
-            if(tt){
-              html='<div class="wr"><span class="wl">Name</span><span class="wv">'+escHTML(tt.name)+'</span></div>';
-              html+='<div class="wr"><span class="wl">Contract</span><span class="wv">'+escHTML(tt.contractNumber)+'</span></div>';
-              html+='<div class="wr"><span class="wl">Vendor</span><span class="wv">'+escHTML(tt.vendor)+'</span></div>';
-              html+='<div class="wr"><span class="wl">Status</span><span class="wv">'+escHTML(tt.status)+'</span></div>';
-              html+='<div class="wr"><span class="wl">Risk</span><span class="wv" style="color:var(--'+(tt.riskLevel==="HIGH"?"bad":"warn")+')">'+tt.riskLevel+'</span></div>';
-              html+='<div class="wr"><span class="wl">Planned Spend</span><span class="wv">$'+tt.plannedSpend.toLocaleString()+'</span></div>';
-              html+='<div class="wr"><span class="wl">Actual Spend</span><span class="wv">$'+tt.actualSpend.toLocaleString()+'</span></div>';
-              var bvar=((tt.actualSpend-tt.plannedSpend)/tt.plannedSpend*100).toFixed(1);
-              html+='<div class="wr"><span class="wl">Burn Variance</span><span class="wv" style="color:var(--'+(Math.abs(bvar)>15?"bad":"warn")+')">'+bvar+'%</span></div>';
-              html+='<div class="wr"><span class="wl">Key Personnel</span><span class="wv">'+tt.keyPersonnel.join(", ")+'</span></div>';
-              var toFindings=Object.keys(F).filter(function(k){return F[k].taskOrder===nlabel});
-              html+='<div class="wr"><span class="wl">Findings</span><span class="wv">'+toFindings.length+' ('+toFindings.filter(function(k){return F[k].sev==="HIGH"}).length+' HIGH)</span></div>';
-            }else{html='<div style="color:var(--muted)">No data</div>';}
-          } else if(ntype==="vendor"){
-            var vf=Object.keys(F).filter(function(k){return F[k].vendor.indexOf(nlabel)>-1||nlabel.indexOf(F[k].vendor.substring(0,8))>-1});
-            var vt=Object.keys(TO).filter(function(k){return TO[k].vendor.indexOf(nlabel)>-1||nlabel.indexOf(TO[k].vendor.substring(0,8))>-1});
-            html='<div class="wr"><span class="wl">Findings</span><span class="wv">'+vf.length+'</span></div>';
-            html+='<div class="wr"><span class="wl">Open HIGH</span><span class="wv" style="color:var(--bad)">'+vf.filter(function(k){return F[k].sev==="HIGH"&&F[k].status!=="Closed"}).length+'</span></div>';
-            html+='<div class="wr"><span class="wl">Task Orders</span><span class="wv">'+vt.length+'</span></div>';
-            vt.forEach(function(tk){var tt2=TO[tk];if(tt2)html+='<div class="wr"><span class="wl" style="color:var(--warn)">'+escHTML(tk)+'</span><span class="wv">'+escHTML(tt2.name)+' · '+tt2.riskLevel+'</span></div>';});
-            vf.forEach(function(fk4){var ff2=F[fk4];if(ff2)html+='<div class="wr"><span class="wl" style="color:'+(stColorMap[ff2.status]||"var(--accent)")+'">'+escHTML(ff2.id)+'</span><span class="wv">'+escHTML(ff2.title.substring(0,40))+'</span></div>';});
-          } else if(ntype==="pattern"){
-            var patFindings=MG_EDGES.filter(function(e){var pn=MG_NODES.find(function(n){return n.id===(e.from===nd.id?e.to:e.from)&&n.label===nlabel});return pn&&(e.from===pn.id||e.to===pn.id)});
-            html='<div class="wr"><span class="wl">Pattern</span><span class="wv" style="color:var(--mag)">'+escHTML(nlabel)+'</span></div>';
-            html+='<div class="wr"><span class="wl">Insight</span><span class="wv" style="color:var(--muted)">Recurring pattern detected across linked findings. Review root cause for systemic remediation opportunity.</span></div>';
-          } else if(ntype==="patch"){
-            html='<div class="wr"><span class="wl">Patch</span><span class="wv" style="color:var(--ok)">'+escHTML(nlabel)+'</span></div>';
-            html+='<div class="wr"><span class="wl">Insight</span><span class="wv" style="color:var(--muted)">Corrective action applied to linked findings. Monitor PAR (Patch Adhesion Rate) for reopen risk.</span></div>';
-          } else if(ntype==="rootcause"){
-            html='<div class="wr"><span class="wl">Root Cause</span><span class="wv" style="color:var(--bad)">'+escHTML(nlabel)+'</span></div>';
-            html+='<div class="wr"><span class="wl">Insight</span><span class="wv" style="color:var(--muted)">Systemic driver identified. Address at process level to reduce DES (Deficiency Echo Score).</span></div>';
-          }
-          detail.innerHTML=html;
-        });
-      });
+      /* drill button for finding nodes */
       if(nd.type==="finding"){
         var drillBtn=document.getElementById("mgDrill");
         if(drillBtn)drillBtn.addEventListener("click",function(){closeDrawer();openTab("find");setTimeout(function(){showFinding(drillBtn.dataset.fid)},150)});
