@@ -1,0 +1,1927 @@
+<!--
+ CERPA IDIQ EDGE v1.0.0
+ ============================================================
+ IDIQ Contract Management — CERPA Operational UI
+ Composite Enterprise Risk Posture Assessment (CERPA)
+ Claim → Event → Review → Patch → Apply
+ on the Truth | Reasoning | Memory substrate
+ Deep Sigma EDGE format: single-file, zero-dependency, hardened
+
+ Tabs: Roles | Dashboard | Findings | Review Board | Trends | Memory | Admin | Audit
+ Roles: Executive/Commander | Program Manager | Reviewer | Analyst | Admin | Auditor
+ Lead-6 KPIs: CIS, PAR, DES, DEG, BRQ, CG
+ IDIQ-6 KPIs: TOs At Risk, Open High-Risk, Avg Burn Var, Invoice Exc, Key Personnel Gap, SLA Drift
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'"/>
+<script>
+(function(){"use strict";
+var B="EDGE_BUILD_ID:CERPA_IDIQ_EDGE_v1.0.0";
+function _b(c){return function(){throw new Error("EDGE hardening: "+c+" blocked")}}
+window.fetch=_b("fetch");window.XMLHttpRequest=_b("XHR");window.WebSocket=_b("WS");
+window.EventSource=_b("ES");try{navigator.sendBeacon=_b("beacon")}catch(_){}
+window.eval=_b("eval");try{window.Function=_b("Function")}catch(_){}
+window.open=_b("window.open");window.RTCPeerConnection=_b("RTC");
+window.BroadcastChannel=_b("BC");window.SharedWorker=_b("SW");window.Worker=_b("W");
+try{Object.defineProperty(window,"localStorage",{get:_b("localStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"sessionStorage",{get:_b("sessionStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"indexedDB",{get:_b("indexedDB"),configurable:false})}catch(_){}
+if(typeof console!=="undefined")console.log("[EDGE] "+B);
+if(window.self===window.top){document.addEventListener("DOMContentLoaded",function(){
+  var v=[];
+  if(document.querySelectorAll("script[src],link[href]").length>0)v.push("external resource");
+  if(document.querySelectorAll("[onclick],[onerror],[onload]").length>0)v.push("inline handler");
+  if(v.length>0)document.body.innerHTML="<h1 style='color:red;font-family:monospace;padding:40px'>EDGE VIOLATION: "+v.join("; ")+"</h1>";
+});}
+})();
+</script>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Deep Sigma EDGE — CERPA IDIQ v1.0.0</title>
+<style>
+:root{--bg:#0b0f14;--card:#111824;--card2:#0d1520;--muted:#8aa0b5;--txt:#e7eef7;--accent:#7df9ff;--warn:#ffcc66;--bad:#ff6b6b;--ok:#5dff93;--ribbon:#1a2638;--line:#1b2a3a;--glow:rgba(125,249,255,.08);--mag:#ff6bff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt);font-size:13px;overflow-x:hidden}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hidden{display:none!important}
+header{padding:10px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;min-height:54px;background:rgba(8,12,20,.96);position:relative;z-index:100;flex-wrap:wrap}
+header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(125,249,255,.2) 15%,rgba(255,107,255,.12) 50%,rgba(125,249,255,.2) 85%,transparent)}
+.brand{white-space:nowrap;font-weight:700;letter-spacing:.5px;font-size:15px;background:linear-gradient(135deg,var(--accent),var(--mag));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.brand small{display:block;-webkit-text-fill-color:var(--muted);font-size:10px;font-weight:400;letter-spacing:.3px}
+.cerpa-ribbon{display:flex;align-items:center;gap:0;margin:0 auto}
+.cp{padding:3px 10px;border-radius:5px;font-size:9px;font-weight:700;letter-spacing:.5px;transition:all .2s}
+.cp-c{color:#00b4d8;background:rgba(0,180,216,.1)}.cp-e{color:#f59e0b;background:rgba(245,158,11,.1)}
+.cp-r{color:#8b5cf6;background:rgba(139,92,246,.1)}.cp-p{color:#ef4444;background:rgba(239,68,68,.1)}
+.cp-a{color:#10b981;background:rgba(16,185,129,.1)}
+.cp-arrow{color:#2a3a4e;font-size:8px;margin:0 2px}
+.cmd-status{padding:3px 10px;border-radius:999px;font-size:9px;font-weight:700;letter-spacing:.4px}
+.cmd-amber{color:#ffcc66;border:1px solid rgba(255,204,102,.4);background:rgba(255,204,102,.08)}
+.role-bar{display:flex;align-items:center;gap:6px}
+.role-bar label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.role-bar select{background:var(--card2);color:var(--accent);border:1px solid rgba(125,249,255,.25);border-radius:6px;padding:4px 8px;font-size:10px;font-weight:600}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);padding:0 16px;background:rgba(11,15,20,.92)}
+.ttab{padding:9px 14px;font-size:10.5px;font-weight:600;color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;letter-spacing:.3px;text-transform:uppercase}
+.ttab:hover{color:var(--txt)}.ttab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.main{height:calc(100vh - 134px);overflow-y:auto;padding:16px 20px}
+.main section{display:none;max-width:1440px;margin:0 auto}
+.main section.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px;transition:border-color .2s}
+.card:hover{border-color:rgba(125,249,255,.12)}
+.card h3{margin:0 0 10px;font-size:13px;color:#cfe2f7;letter-spacing:.4px;text-transform:uppercase}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 8px;text-align:center;position:relative;overflow:hidden;cursor:pointer;transition:all .2s}
+.kpi:hover{border-color:rgba(125,249,255,.3);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi.kpi-green::before{background:var(--ok)}.kpi.kpi-amber::before{background:var(--warn)}.kpi.kpi-red::before{background:var(--bad)}.kpi.kpi-cyan::before{background:var(--accent)}
+.kpi .kv{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi .kl{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:2px}
+.kpi .kfull{font-size:7px;color:#4a5a6a;margin-top:1px}
+.kv-green{color:var(--ok)}.kv-amber{color:var(--warn)}.kv-red{color:var(--bad)}.kv-cyan{color:var(--accent)}
+.spark-row{display:inline-flex;align-items:end;gap:1px;height:16px;margin-top:3px}
+.spark-bar{width:3px;border-radius:1px;min-height:2px}
+table{width:100%;border-collapse:collapse;font-size:11.5px}
+th,td{padding:7px 8px;border-bottom:1px solid #141e2d;text-align:left;vertical-align:top}
+th{color:#6b8099;font-weight:700;font-size:9px;text-transform:uppercase;letter-spacing:.5px}
+tbody tr{transition:background .1s;cursor:default}tbody tr:hover{background:rgba(125,249,255,.03)}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:9px;font-weight:700;letter-spacing:.3px;border:1px solid}
+.sev-high{color:#ff6b6b;border-color:rgba(255,107,107,.35);background:rgba(255,107,107,.06)}
+.sev-med{color:#ffcc66;border-color:rgba(255,204,102,.35);background:rgba(255,204,102,.06)}
+.sev-low{color:#7df9ff;border-color:rgba(125,249,255,.25);background:rgba(125,249,255,.05)}
+.st-new{color:#7df9ff;border-color:rgba(125,249,255,.25);background:rgba(125,249,255,.05)}
+.st-assigned{color:#a78bfa;border-color:rgba(167,139,250,.25);background:rgba(167,139,250,.05)}
+.st-review{color:#fbbf24;border-color:rgba(251,191,36,.25);background:rgba(251,191,36,.05)}
+.st-patched{color:#f97316;border-color:rgba(249,115,22,.25);background:rgba(249,115,22,.05)}
+.st-pending{color:#38bdf8;border-color:rgba(56,189,248,.25);background:rgba(56,189,248,.05)}
+.st-closed{color:#5dff93;border-color:rgba(93,255,147,.25);background:rgba(93,255,147,.05)}
+.st-reopened{color:#ff6b6b;border-color:rgba(255,107,107,.35);background:rgba(255,107,107,.06)}
+.recur{display:inline-block;padding:2px 6px;border-radius:4px;font-size:8px;font-weight:700;color:#ff9f43;border:1px solid rgba(255,159,67,.25);background:rgba(255,159,67,.05)}
+.cat-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:8px;font-weight:700;letter-spacing:.3px;border:1px solid}
+.cat-compliance{color:#38bdf8;border-color:rgba(56,189,248,.3);background:rgba(56,189,248,.05)}
+.cat-performance{color:#a78bfa;border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.05)}
+.cat-financial{color:#fbbf24;border-color:rgba(251,191,36,.3);background:rgba(251,191,36,.05)}
+.cat-risk{color:#f97316;border-color:rgba(249,115,22,.3);background:rgba(249,115,22,.05)}
+.cat-resource{color:#ec4899;border-color:rgba(236,72,153,.3);background:rgba(236,72,153,.05)}
+.cat-technical{color:#10b981;border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.05)}
+.cat-comms{color:#6366f1;border-color:rgba(99,102,241,.3);background:rgba(99,102,241,.05)}
+button{background:#182235;color:var(--txt);border:1px solid #243449;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:10.5px;transition:all .15s;font-weight:500}
+button:hover{border-color:#2f4765}
+button.primary{border-color:rgba(125,249,255,.35);color:var(--accent)}
+button.primary:hover{background:rgba(125,249,255,.06)}
+button.ok{border-color:rgba(93,255,147,.35);color:var(--ok)}
+button.danger{border-color:rgba(255,107,107,.35);color:var(--bad)}
+.wire{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:10px}
+.wire h4{margin:0 0 8px;font-size:11px;color:var(--accent);letter-spacing:.4px;text-transform:uppercase}
+.wr{display:flex;justify-content:space-between;padding:4px 0;font-size:11px;border-bottom:1px solid #141e2d}
+.wr:last-child{border:none}
+.wr .wl{color:var(--muted);min-width:80px}.wr .wv{font-weight:600;font-variant-numeric:tabular-nums;text-align:right;flex:1}
+.tl{display:flex;gap:0;margin:12px 0;overflow-x:auto}
+.tl-s{flex:1;text-align:center;position:relative;min-width:70px}
+.tl-dot{width:10px;height:10px;border-radius:50%;margin:0 auto 3px;border:2px solid var(--line)}
+.tl-dot.done{background:var(--ok);border-color:var(--ok)}.tl-dot.now{background:var(--accent);border-color:var(--accent);box-shadow:0 0 10px rgba(125,249,255,.5)}.tl-dot.wait{background:transparent}
+.tl-s::after{content:'';position:absolute;top:5px;left:50%;width:100%;height:1px;background:var(--line)}.tl-s:last-child::after{display:none}
+.tl-lb{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.tl-dt{font-size:7px;color:#3a4a5e}
+.ev{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid #141e2d;font-size:11px}
+.ev:last-child{border:none}
+.ev-ok{color:var(--ok);font-size:13px}.ev-miss{color:var(--bad);font-size:13px}
+.ev-upload{font-size:8px;padding:2px 8px;border-radius:4px;border:1px solid rgba(125,249,255,.25);background:rgba(125,249,255,.05);color:var(--accent);cursor:pointer;margin-left:6px}
+.role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.role-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;position:relative;overflow:hidden;transition:all .25s;cursor:pointer}
+.role-card:hover{border-color:rgba(125,249,255,.3);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.role-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.rc-exec::before{background:linear-gradient(90deg,var(--accent),var(--mag))}.rc-pm::before{background:var(--ok)}
+.rc-rev::before{background:var(--warn)}.rc-ana::before{background:#a78bfa}
+.rc-adm::before{background:var(--bad)}.rc-aud::before{background:#6b8099}
+.role-card .rc-icon{font-size:28px;margin-bottom:6px}
+.role-card .rc-title{font-size:14px;font-weight:700;margin-bottom:2px}
+.role-card .rc-tag{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+.role-card .rc-purpose{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:10px}
+.role-card .rc-screens{font-size:10px;color:var(--accent)}
+.role-card .rc-badge{position:absolute;top:14px;right:14px;font-size:8px;padding:2px 8px;border-radius:999px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+.rb-cmd{color:var(--accent);border:1px solid rgba(125,249,255,.25);background:rgba(125,249,255,.06)}
+.rb-ops{color:var(--ok);border:1px solid rgba(93,255,147,.25);background:rgba(93,255,147,.06)}
+.rb-gov{color:var(--bad);border:1px solid rgba(255,107,107,.25);background:rgba(255,107,107,.06)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.filters select,.filters input{background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:6px;padding:5px 8px;font-size:10.5px}
+.pp{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.pp span{padding:4px 10px;border-radius:6px;font-size:9px;font-weight:700;letter-spacing:.2px;border:1px solid}
+.pp-r{color:var(--bad);border-color:rgba(255,107,107,.25);background:rgba(255,107,107,.04)}
+.pp-c{color:var(--accent);border-color:rgba(125,249,255,.18);background:rgba(125,249,255,.03)}
+.pm-y{color:var(--ok);font-weight:600}.pm-n{color:#2a3a4e}.pm-r{color:var(--accent)}.pm-s{color:#a78bfa}.pm-l{color:var(--warn)}
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;opacity:0;pointer-events:none;transition:opacity .25s}
+.drawer-overlay.open{opacity:1;pointer-events:auto}
+.drawer-panel{position:fixed;top:0;right:0;width:480px;max-width:92vw;height:100vh;background:var(--card);border-left:1px solid var(--line);z-index:510;transform:translateX(100%);transition:transform .3s ease;overflow-y:auto;display:flex;flex-direction:column}
+.drawer-panel.open{transform:translateX(0)}
+.drawer-hdr{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:var(--card);z-index:10}
+.drawer-hdr h3{margin:0;font-size:14px;color:var(--accent);flex:1}
+.drawer-hdr .dx{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:2px 6px}
+.drawer-body{padding:16px;flex:1;overflow-y:auto}
+.drawer-foot{padding:10px 16px;border-top:1px solid var(--line);display:flex;gap:6px;background:var(--card)}
+.toast-wrap{position:fixed;top:70px;right:20px;z-index:600;display:flex;flex-direction:column;gap:8px}
+.toast{padding:10px 16px;border-radius:8px;font-size:11px;font-weight:600;animation:toastIn .3s ease;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.toast-ok{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);color:var(--ok)}
+.toast-warn{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);color:var(--warn)}
+.toast-info{background:rgba(125,249,255,.1);border:1px solid rgba(125,249,255,.3);color:var(--accent)}
+@keyframes toastIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.df{margin-bottom:10px}
+.df label{display:block;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.df input,.df select,.df textarea{width:100%;background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:6px;padding:7px 10px;font-size:11px}
+.df textarea{height:60px;resize:vertical}
+.df input:focus,.df select:focus,.df textarea:focus{border-color:rgba(125,249,255,.4);outline:none}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#243449;border-radius:3px}
+@keyframes edgePulse{0%{stroke-dashoffset:0}100%{stroke-dashoffset:20}}
+.mg-edge-anim{animation:edgePulse 2s linear infinite}
+.mg-dimmed{opacity:0.12!important;transition:opacity .2s}
+.mg-bright{opacity:1!important;transition:opacity .2s}
+.shortcut-bar{position:fixed;bottom:0;left:0;right:0;z-index:150;background:rgba(11,15,20,.94);border-top:1px solid var(--line);padding:4px 16px;display:flex;align-items:center;gap:14px;font-size:9px;color:var(--muted)}
+.shortcut-bar kbd{display:inline-block;padding:1px 5px;border-radius:3px;background:rgba(125,249,255,.08);border:1px solid rgba(125,249,255,.15);font-family:inherit;font-size:9px;color:var(--accent);margin:0 1px}
+.board-timer{font-size:11px;color:var(--accent);font-variant-numeric:tabular-nums;font-weight:600;margin-left:auto;display:flex;align-items:center;gap:4px}
+.board-timer .bt-dot{width:6px;height:6px;border-radius:50%;background:var(--ok);animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.heatmap{display:grid;gap:2px;margin:8px 0}
+.hm-cell{border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;min-height:32px;transition:all .15s;cursor:pointer}
+.hm-cell:hover{transform:scale(1.08);box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.hm-label{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;display:flex;align-items:center;justify-content:center}
+.onboard-overlay{position:fixed;inset:0;z-index:700;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;animation:fadeIn .3s}
+.onboard-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px 32px;max-width:520px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+.onboard-card h2{margin:0 0 6px;color:var(--accent);font-size:18px}
+.onboard-card .ob-sub{color:var(--muted);font-size:11px;margin-bottom:16px}
+.onboard-steps{list-style:none;padding:0;margin:0 0 18px}
+.onboard-steps li{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;font-size:12px;line-height:1.5}
+.ob-num{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:rgba(125,249,255,.1);border:1px solid rgba(125,249,255,.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.feed-toggle{position:fixed;right:12px;top:70px;z-index:90;padding:4px 10px;border-radius:6px;border:1px solid rgba(125,249,255,.2);background:rgba(11,15,20,.9);color:var(--accent);font-size:9px;font-weight:700;cursor:pointer}
+.feed-panel{position:fixed;right:0;top:56px;bottom:32px;width:280px;background:var(--card);border-left:1px solid var(--line);z-index:80;transform:translateX(100%);transition:transform .3s;overflow-y:auto;font-size:10px}
+.feed-panel.open{transform:translateX(0)}
+.feed-hdr{padding:8px 12px;border-bottom:1px solid var(--line);font-size:11px;font-weight:700;color:var(--accent);position:sticky;top:0;background:var(--card);z-index:2}
+.feed-item{padding:6px 12px;border-bottom:1px solid #141e2d;line-height:1.5;animation:feedIn .4s ease}
+.feed-item .fi-time{font-size:8px;color:#3a4a5e}
+.feed-item .fi-actor{color:var(--accent);font-weight:600}
+@keyframes feedIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)}}
+.cis-gauge-wrap{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.cis-gauge{position:relative;width:110px;height:110px;flex-shrink:0}
+.cis-gauge svg{width:110px;height:110px;transform:rotate(-90deg)}
+.cis-gauge-bg{fill:none;stroke:var(--line);stroke-width:8}
+.cis-gauge-fill{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .8s ease,stroke .3s}
+.cis-gauge-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.cis-gauge-score{font-size:28px;font-weight:700;line-height:1}
+.cis-gauge-sub{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.vendor-strip{display:flex;gap:10px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px}
+.vendor-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;min-width:200px;flex-shrink:0;position:relative;overflow:hidden}
+.vendor-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.vendor-card.v-high::before{background:var(--bad)}.vendor-card.v-med::before{background:var(--warn)}.vendor-card.v-ok::before{background:var(--ok)}
+.vendor-card .v-name{font-size:12px;font-weight:700;margin-bottom:2px}
+.vendor-card .v-to{font-size:9px;color:var(--muted)}
+.vendor-card .v-metric{font-size:10px;margin-top:4px}
+.graph-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 12px;background:var(--card);border:1px solid var(--line);border-radius:8px;margin-bottom:10px}
+.graph-toolbar label{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--txt);cursor:pointer}
+.graph-toolbar input[type="checkbox"]{accent-color:var(--accent)}
+.graph-search{background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--txt);padding:4px 10px;font-size:11px;width:160px;outline:none}
+.graph-search:focus{border-color:var(--accent)}
+.graph-toolbar .sep{width:1px;height:20px;background:var(--line)}
+.graph-toolbar button{padding:3px 10px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--txt);cursor:pointer;font-size:10px}
+.graph-toolbar button.active{border-color:var(--accent);color:var(--accent)}
+.graph-highlight{filter:drop-shadow(0 0 8px var(--accent)) drop-shadow(0 0 4px var(--accent))}
+.tier-diagram{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.tier-row{display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--card)}
+.tier-label{min-width:120px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.tier-roles{font-size:10px;color:var(--muted);flex:1}
+.tier-surface{font-size:9px;font-weight:700;padding:2px 8px;border-radius:4px}
+.drop-zone{border:2px dashed var(--line);border-radius:10px;padding:28px 16px;text-align:center;color:var(--muted);font-size:12px;cursor:pointer;transition:border-color .2s,background .2s;margin-bottom:12px}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:var(--glow);color:var(--accent)}
+[data-tip]{position:relative}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);padding:6px 10px;border-radius:6px;background:#1a2332;color:var(--txt);font-size:10px;max-width:280px;white-space:normal;z-index:999;border:1px solid var(--line);pointer-events:none;line-height:1.4}
+.tour-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:800;cursor:pointer}
+.tour-card{position:fixed;z-index:810;background:var(--card);border:1px solid var(--accent);border-radius:12px;padding:16px 18px;max-width:340px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.6);animation:fadeIn .25s ease}
+.tour-card h4{margin:0 0 4px;color:var(--accent);font-size:13px}
+.tour-card p{margin:0 0 10px;font-size:11px;color:var(--muted);line-height:1.5}
+.tour-step-bar{display:flex;gap:4px;margin-bottom:10px}
+.tour-step-bar span{flex:1;height:3px;border-radius:2px;background:var(--line)}
+.tour-step-bar span.done{background:var(--accent)}
+.tour-step-bar span.cur{background:var(--mag)}
+.tour-btns{display:flex;gap:6px;justify-content:flex-end}
+.tour-btns button{font-size:10px;padding:5px 12px}
+.task-toggle{position:relative;background:none;border:1px solid var(--line);border-radius:6px;color:var(--muted);padding:4px 10px;cursor:pointer;font-size:12px}
+.task-toggle:hover{color:var(--mag);border-color:var(--mag)}
+.task-badge{position:absolute;top:-6px;right:-6px;background:var(--bad);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.task-badge.zero{display:none}
+#taskPanel{position:fixed;top:0;right:-380px;width:360px;height:100vh;background:var(--card);border-left:1px solid var(--line);z-index:600;transition:right .25s ease;display:flex;flex-direction:column}
+#taskPanel.open{right:0}
+.task-header{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.task-header h3{margin:0;font-size:14px;color:var(--mag)}
+.task-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px}
+.task-list{flex:1;overflow-y:auto;padding:8px}
+.task-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;border-left:4px solid transparent;margin-bottom:4px}
+.task-row:hover{background:var(--card2)}
+.task-row.sev-critical{border-left-color:var(--bad)}
+.task-row.sev-high{border-left-color:var(--warn)}
+.task-row.sev-medium{border-left-color:var(--accent)}
+.task-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.sev-critical .task-dot{background:var(--bad);box-shadow:0 0 6px var(--bad);animation:pulse 1.5s infinite}
+.sev-high .task-dot{background:var(--warn)}
+.sev-medium .task-dot{background:var(--accent)}
+.task-label{font-size:12px;color:var(--txt);line-height:1.4}
+.task-detail{font-size:10px;color:var(--muted);margin-top:2px}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.compare-col{padding:10px;border-right:1px solid var(--line)}
+.compare-col:last-child{border-right:none}
+.compare-sel{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.compare-pill{padding:3px 10px;border-radius:6px;font-size:9px;font-weight:600;border:1px solid var(--line);cursor:pointer;transition:all .15s}
+.compare-pill.active{border-color:var(--accent);color:var(--accent);background:rgba(125,249,255,.06)}
+.btn-icon{background:none;border:1px solid var(--line);border-radius:6px;color:var(--muted);padding:4px 8px;cursor:pointer;font-size:14px;line-height:1}
+.btn-icon:hover{color:var(--accent);border-color:var(--accent)}
+.tab-prefs-panel{position:absolute;top:100%;right:0;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:200px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+footer{padding:8px 16px;border-top:1px solid var(--line);font-size:9px;color:var(--muted);text-align:center;background:rgba(8,12,20,.96);letter-spacing:.3px}
+footer strong{color:var(--accent);font-weight:600}
+@media print{
+  body{background:#fff!important;color:#111!important}
+  header,.tabs,.shortcut-bar,.feed-toggle,.feed-panel,.drawer-overlay,.drawer-panel,.toast-wrap,footer,button{display:none!important}
+  .main{height:auto!important;overflow:visible!important}
+  .card{background:#fff!important;border:1px solid #ccc!important;color:#111!important;break-inside:avoid}
+}
+@media(max-width:768px){
+  .tabs{flex-wrap:wrap;padding:0 8px}
+  .tabs button{padding:6px 10px;font-size:10px}
+  header{flex-direction:column;gap:8px;padding:10px}
+  .cerpa-ribbon{display:none}
+  .role-grid{grid-template-columns:1fr}
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+  .grid2,.grid3{grid-template-columns:1fr}
+  .drawer-panel{width:100%!important;max-width:100%!important}
+  #taskPanel{width:100%!important;right:-100%!important}
+  #taskPanel.open{right:0!important}
+  .shortcut-bar{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- Onboarding -->
+<div class="onboard-overlay" id="onboard">
+  <div class="onboard-card">
+    <h2>Welcome to CERPA — IDIQ</h2>
+    <div class="ob-sub">Composite Enterprise Risk Posture Assessment — IDIQ Contract Management</div>
+    <ul class="onboard-steps">
+      <li><span class="ob-num">1</span><div><strong>Choose a role</strong> — Click a role card or use the selector. Each role sees a different authority surface: Command UI, Ops UI, or Governance UI.</div></li>
+      <li><span class="ob-num">2</span><div><strong>Explore findings</strong> — Click any finding row to see the full CERPA lifecycle: Claim → Event → Review → Patch → Apply. Track task orders, vendors, and contract risk.</div></li>
+      <li><span class="ob-num">3</span><div><strong>Navigate the graph</strong> — The Memory tab shows how findings, patches, root causes, task orders, and vendors connect. Hover to see relationships.</div></li>
+    </ul>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="primary" id="onboardDismiss" style="padding:8px 20px">Enter CERPA</button>
+      <span style="font-size:9px;color:var(--muted)">6 Roles · 3 Surfaces · 7 Claim Categories · <kbd style="font-size:9px;padding:1px 4px;border-radius:3px;background:rgba(125,249,255,.08);border:1px solid rgba(125,249,255,.15);color:var(--accent)">?</kbd> for shortcuts</span>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="brand">DEEP SIGMA EDGE<small>CERPA IDIQ v1.0.0 — IDIQ Contract Management</small></div>
+  <div class="cerpa-ribbon">
+    <span class="cp cp-c">CLAIM</span><span class="cp-arrow">&#9658;</span>
+    <span class="cp cp-e">EVENT</span><span class="cp-arrow">&#9658;</span>
+    <span class="cp cp-r">REVIEW</span><span class="cp-arrow">&#9658;</span>
+    <span class="cp cp-p">PATCH</span><span class="cp-arrow">&#9658;</span>
+    <span class="cp cp-a">APPLY</span>
+  </div>
+  <span class="cmd-status cmd-amber">Q2 FY26 · AMBER</span>
+  <div class="role-bar">
+    <label>Active Role</label>
+    <select id="roleSel">
+      <option value="executive">Executive / Commander</option>
+      <option value="pm">Program Manager / Owner</option>
+      <option value="reviewer">Reviewer / Board Member</option>
+      <option value="analyst">Analyst / Assessment Lead</option>
+      <option value="admin">Governance Admin</option>
+      <option value="auditor">Auditor / Inspector</option>
+    </select>
+    <div style="position:relative;display:inline-block">
+      <button id="btnTabPrefs" class="btn-icon" title="Customize tabs">&#9881;</button>
+      <div id="tabPrefsPanel" class="tab-prefs-panel" style="display:none"></div>
+    </div>
+  </div>
+  <button class="task-toggle" id="btnTaskToggle" title="My Tasks">Tasks <span class="task-badge zero" id="taskBadge">0</span></button>
+  <button class="btn-icon" id="btnStartTour" title="Guided tour">?</button>
+</header>
+
+<div class="tabs" id="tabBar">
+  <button class="ttab active" data-t="roles" data-tip="Select your role to customize the interface">Roles</button>
+  <button class="ttab" data-t="dash" data-tip="Portfolio dashboard with KPIs and contract health">Dashboard</button>
+  <button class="ttab" data-t="find" data-tip="Finding lifecycle — Claim to Apply for IDIQ contracts">Findings</button>
+  <button class="ttab" data-t="board" data-tip="Review Board queue and decision tracking">Review Board</button>
+  <button class="ttab" data-t="trends" data-tip="Contract trends, category analysis, and risk heatmap">Trends</button>
+  <button class="ttab" data-t="mem" data-tip="Memory Graph — finding relationships, vendors, and task orders">Memory</button>
+  <button class="ttab" data-t="admin" data-tip="Administration, claim routing, workflow rules">Admin</button>
+  <button class="ttab" data-t="audit" data-tip="Audit trail, evidence chain, CERPA provenance">Audit</button>
+</div>
+
+<div class="feed-toggle" id="feedToggle">&#9654; Activity</div>
+<div class="feed-panel" id="feedPanel">
+  <div class="feed-hdr"><span class="bt-dot"></span> Live Activity Feed</div>
+  <div id="feedList"></div>
+</div>
+
+<div class="main" id="mainArea">
+
+<!-- ════════════ ROLES TAB ════════════ -->
+<section id="s-roles" class="active">
+  <div style="text-align:center;margin-bottom:20px">
+    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">IDIQ Contract Management</div>
+    <div style="font-size:22px;font-weight:700;letter-spacing:.5px">CERPA — 6 Roles, 3 Surfaces, 1 Data Model</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px">Claim → Event → Review → Patch → Apply on the Truth | Reasoning | Memory substrate</div>
+  </div>
+
+  <!-- 4-Tier Hierarchy Diagram -->
+  <div class="tier-diagram">
+    <div class="tier-row" style="border-color:rgba(125,249,255,.3)">
+      <div class="tier-label" style="color:var(--accent)">Executive</div>
+      <div class="tier-roles">Senior Contracting Official · Program Executive — strategic direction, escalations, portfolio oversight</div>
+      <span class="tier-surface rb-cmd">Command UI</span>
+    </div>
+    <div class="tier-row" style="border-color:rgba(93,255,147,.3)">
+      <div class="tier-label" style="color:var(--ok)">Management</div>
+      <div class="tier-roles">Contracting Officer (CO) · Program Manager · COR — legal compliance, day-to-day IDIQ management, technical monitoring</div>
+      <span class="tier-surface rb-ops">Ops UI</span>
+    </div>
+    <div class="tier-row" style="border-color:rgba(167,139,250,.3)">
+      <div class="tier-label" style="color:#a78bfa">Operational</div>
+      <div class="tier-roles">Task Order Managers · Technical Leads · Quality Assurance — TO execution, requirement validation, performance verification</div>
+      <span class="tier-surface rb-ops">Ops UI</span>
+    </div>
+    <div class="tier-row" style="border-color:rgba(255,107,107,.3)">
+      <div class="tier-label" style="color:var(--bad)">Support</div>
+      <div class="tier-roles">Financial Analysts · Data Analysts · Administrative Staff — cost tracking, CERPA maintenance, documentation</div>
+      <span class="tier-surface rb-gov">Governance UI</span>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;justify-content:center;margin-bottom:20px">
+    <span style="font-size:10px;padding:4px 14px;border-radius:6px;font-weight:700;color:var(--accent);border:1px solid rgba(125,249,255,.25);background:rgba(125,249,255,.05);letter-spacing:.4px">COMMAND UI — Decision Surface</span>
+    <span style="font-size:10px;padding:4px 14px;border-radius:6px;font-weight:700;color:var(--ok);border:1px solid rgba(93,255,147,.25);background:rgba(93,255,147,.05);letter-spacing:.4px">OPS UI — Execution Surface</span>
+    <span style="font-size:10px;padding:4px 14px;border-radius:6px;font-weight:700;color:var(--bad);border:1px solid rgba(255,107,107,.25);background:rgba(255,107,107,.05);letter-spacing:.4px">GOVERNANCE UI — Assurance Surface</span>
+  </div>
+
+  <div class="role-grid">
+    <div class="role-card rc-exec" data-role="executive">
+      <span class="rc-badge rb-cmd">Command UI</span>
+      <div class="rc-icon">&#11041;</div>
+      <div class="rc-title">Executive / Commander</div>
+      <div class="rc-tag">Senior Contracting Official / Program Executive</div>
+      <div class="rc-purpose">Views portfolio health, contract risk, task order status, trend indicators. Approves escalations and major patches. Read-heavy, decision-heavy. No raw evidence editing.</div>
+      <div class="rc-screens">Dashboard · Review Summary · Trends · Brief Export</div>
+    </div>
+    <div class="role-card rc-pm" data-role="pm">
+      <span class="rc-badge rb-ops">Ops UI</span>
+      <div class="rc-icon">&#9672;</div>
+      <div class="rc-title">Program Manager / Owner</div>
+      <div class="rc-tag">Program Manager / Task Order Lead</div>
+      <div class="rc-purpose">Drives findings toward durable closure. Owns patch plans, action tracking, and task order remediation. Can upload evidence and request closure. Cannot self-certify closure.</div>
+      <div class="rc-screens">My Queue · Finding Detail · Patch Builder · Evidence Panel</div>
+    </div>
+    <div class="role-card rc-rev" data-role="reviewer">
+      <span class="rc-badge rb-cmd">Command + Ops</span>
+      <div class="rc-icon">&#9678;</div>
+      <div class="rc-title">Reviewer / Board Member</div>
+      <div class="rc-tag">Contracting Officer / COR / QA Board</div>
+      <div class="rc-purpose">Judges whether closure is real. Approves, rejects, sends back, escalates. Evaluates readiness and recurrence risk. Cannot rewrite raw observation history.</div>
+      <div class="rc-screens">Review Board · Finding Detail · Evidence View · Recurrence History</div>
+    </div>
+    <div class="role-card rc-ana" data-role="analyst">
+      <span class="rc-badge rb-ops">Ops UI</span>
+      <div class="rc-icon">&#9671;</div>
+      <div class="rc-title">Analyst / Assessment Lead</div>
+      <div class="rc-tag">Task Order Manager / Technical Lead / QA</div>
+      <div class="rc-purpose">Captures claims and events. Structures findings, links evidence, prepares trend outputs. Performs intake and categorization. No final approval authority.</div>
+      <div class="rc-screens">Intake Workspace · Findings List · Trend Explorer · Memory Lookup</div>
+    </div>
+    <div class="role-card rc-adm" data-role="admin">
+      <span class="rc-badge rb-gov">Governance UI</span>
+      <div class="rc-icon">&#9881;</div>
+      <div class="rc-title">Governance Admin / System Admin</div>
+      <div class="rc-tag">Data Analyst / Administrative Staff</div>
+      <div class="rc-purpose">Manages thresholds, users, taxonomies, role mappings, workflow locks. Views audit logs. Cannot alter historical canon.</div>
+      <div class="rc-screens">Admin Console · Role Matrix · Threshold Config · Audit Logs</div>
+    </div>
+    <div class="role-card rc-aud" data-role="auditor">
+      <span class="rc-badge rb-gov">Governance UI</span>
+      <div class="rc-icon">&#8856;</div>
+      <div class="rc-title">Auditor / Inspector</div>
+      <div class="rc-tag">Financial Analyst / External Oversight</div>
+      <div class="rc-purpose">Read-only oversight. Exports audit packets. Traces claim → event → review → patch → apply provenance. Never modifies records.</div>
+      <div class="rc-screens">Audit Workspace · Evidence Chain · Export Center · Trace Viewer</div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:20px;font-size:11px;color:var(--muted)">
+    CERPA Workflow: <strong style="color:var(--txt)">Claim (Define) → Event (Monitor) → Review (Assess) → Patch (Correct) → Apply (Authorize)</strong>
+  </div>
+  <div style="text-align:center;margin-top:6px;font-size:10px;color:#4a5a6a">
+    Same data model. Different authority surfaces. Click a role card to enter that surface.
+  </div>
+</section>
+
+<!-- ════════════ DASHBOARD ════════════ -->
+<section id="s-dash">
+  <div id="criticalSummary" class="card" style="display:none"></div>
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+    <div class="cis-gauge" id="cisGauge">
+      <svg viewBox="0 0 110 110"><circle class="cis-gauge-bg" cx="55" cy="55" r="46"/><circle class="cis-gauge-fill" id="cisFill" cx="55" cy="55" r="46" stroke="var(--ok)" stroke-dasharray="289" stroke-dashoffset="55"/></svg>
+      <div class="cis-gauge-label"><div class="cis-gauge-score" style="color:var(--ok)">81</div><div class="cis-gauge-sub">CIS</div></div>
+    </div>
+    <div style="flex:1">
+      <div style="font-size:13px;font-weight:700;margin-bottom:2px">Closure Integrity Score: <span style="color:var(--ok)">81 / 100</span></div>
+      <div style="font-size:10px;color:var(--muted);margin-bottom:4px">CIS > 75 = governance loop is real. Trending &#8593; from 74 last quarter.</div>
+      <div style="font-size:9px;color:var(--muted)">0.25 PAR + 0.20 EDI_norm + 0.25 (1-FCR) + 0.15 (1-DEG_norm) + 0.15 PPI</div>
+    </div>
+    <button style="font-size:9px" id="printBtn">Print View</button>
+  </div>
+
+  <!-- CERPA Lead-6 KPIs -->
+  <div class="kpi-row" id="dashKpis">
+    <div class="kpi kpi-green" data-kpi="cis"><div class="kv kv-green">81</div><div class="kl">CIS</div><div class="kfull">Closure Integrity Score</div><div class="spark-row" data-spark="60,64,62,68,72,74,77,81"></div></div>
+    <div class="kpi kpi-green" data-kpi="par"><div class="kv kv-green">88%</div><div class="kl">PAR</div><div class="kfull">Patch Adhesion Rate</div><div class="spark-row" data-spark="70,72,68,75,79,80,84,88"></div></div>
+    <div class="kpi kpi-amber" data-kpi="des"><div class="kv kv-amber">18</div><div class="kl">DES</div><div class="kfull">Deficiency Echo Score</div><div class="spark-row" data-spark="30,28,25,22,20,19,19,18"></div></div>
+    <div class="kpi kpi-amber" data-kpi="deg"><div class="kv kv-amber">9d</div><div class="kl">DEG</div><div class="kfull">Decision-to-Evidence Gap</div><div class="spark-row" data-spark="14,13,12,11,10,10,9,9"></div></div>
+    <div class="kpi kpi-amber" data-kpi="brq"><div class="kv kv-amber">0.68</div><div class="kl">BRQ</div><div class="kfull">Board Readiness Quotient</div><div class="spark-row" data-spark="55,58,60,62,64,65,66,68"></div></div>
+    <div class="kpi kpi-red" data-kpi="cg"><div class="kv kv-red">24d</div><div class="kl">CG</div><div class="kfull">Closure Gravity (avg)</div><div class="spark-row" data-spark="32,30,28,27,26,25,25,24"></div></div>
+  </div>
+
+  <!-- IDIQ-6 KPIs -->
+  <div class="kpi-row" style="grid-template-columns:repeat(6,1fr)">
+    <div class="kpi kpi-red"><div class="kv kv-red">3</div><div class="kl">TOs At Risk</div><div class="kfull">Task Orders At Risk</div></div>
+    <div class="kpi kpi-red"><div class="kv kv-red">5</div><div class="kl">High-Risk</div><div class="kfull">Open High-Risk Claims</div></div>
+    <div class="kpi kpi-amber"><div class="kv kv-amber">12%</div><div class="kl">Burn Var</div><div class="kfull">Avg Burn Variance</div></div>
+    <div class="kpi kpi-amber"><div class="kv kv-amber">2</div><div class="kl">Invoice Exc</div><div class="kfull">Invoice Exception Count</div></div>
+    <div class="kpi kpi-red"><div class="kv kv-red">3</div><div class="kl">KP Gaps</div><div class="kfull">Key Personnel Gap Count</div></div>
+    <div class="kpi kpi-amber"><div class="kv kv-amber">2</div><div class="kl">SLA Drift</div><div class="kfull">SLA Drift Count</div></div>
+  </div>
+
+  <!-- At-Risk Vendors / TOs Strip -->
+  <div class="card" style="border-color:rgba(255,107,107,.2)">
+    <h3 style="color:var(--bad)">At-Risk Vendors / Task Orders</h3>
+    <div class="vendor-strip" id="vendorStrip">
+      <div class="vendor-card v-high">
+        <div class="v-name">Apex Systems Inc.</div>
+        <div class="v-to">TO-1003 · N00178-24-D-0042</div>
+        <div class="v-metric" style="color:var(--bad)">Burn +18% · 2 HIGH findings · KP vacancy 34d</div>
+      </div>
+      <div class="vendor-card v-high">
+        <div class="v-name">Northbridge Solutions</div>
+        <div class="v-to">TO-1004 · N00178-24-D-0042</div>
+        <div class="v-metric" style="color:var(--bad)">SLA miss · Clearance lapse · Config incomplete</div>
+      </div>
+      <div class="vendor-card v-med">
+        <div class="v-name">TechForward LLC</div>
+        <div class="v-to">TO-1002 · N00178-24-D-0042</div>
+        <div class="v-metric" style="color:var(--warn)">Invoice exceptions · Status report gaps</div>
+      </div>
+      <div class="vendor-card v-ok">
+        <div class="v-name">Sierra Dynamics Corp.</div>
+        <div class="v-to">TO-1001 · N00178-24-D-0042</div>
+        <div class="v-metric" style="color:var(--ok)">On track · All SLAs met · No open HIGH</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>Top Recurring Deficiencies</h3>
+      <table><thead><tr><th>#</th><th>Deficiency</th><th>Count</th><th>Trend</th></tr></thead><tbody>
+        <tr><td>1</td><td>Invoice documentation gaps</td><td>4</td><td style="color:var(--bad)">&#8593;</td></tr>
+        <tr><td>2</td><td>Key personnel vacancy churn</td><td>3</td><td style="color:var(--warn)">&#8594;</td></tr>
+        <tr><td>3</td><td>Late deliverable submissions</td><td>3</td><td style="color:var(--bad)">&#8593;</td></tr>
+        <tr><td>4</td><td>Evidence insufficiency at review</td><td>2</td><td style="color:var(--ok)">&#8595;</td></tr>
+        <tr><td>5</td><td>Subcontractor clearance lapses</td><td>2</td><td style="color:var(--warn)">&#8594;</td></tr>
+      </tbody></table>
+    </div>
+    <div class="card">
+      <h3>Command Attention</h3>
+      <div class="wr"><span class="wl" style="color:var(--bad)">&#9679;</span><span class="wv">3 task orders at risk — burn variance or HIGH findings</span></div>
+      <div class="wr"><span class="wl" style="color:var(--warn)">&#9679;</span><span class="wv">Key personnel position vacant 34 days (TO-1003)</span></div>
+      <div class="wr"><span class="wl" style="color:var(--bad)">&#9679;</span><span class="wv">Corrective action from prior review reopened (F-310)</span></div>
+      <div style="margin-top:10px;display:flex;gap:6px">
+        <button class="primary" data-nav="board">Open Review Board</button>
+        <button data-nav="trends">View Trends</button>
+        <button id="btnExportBrief">Export Brief</button>
+      </div>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h3>Board-Ready Queue</h3>
+      <table><thead><tr><th>Finding</th><th>BRQ</th><th>Severity</th><th>Action</th></tr></thead><tbody>
+        <tr><td class="mono" style="color:var(--warn)">F-308</td><td style="color:var(--ok)">0.85</td><td><span class="badge sev-high">HIGH</span></td><td>Approve Patch</td></tr>
+        <tr><td class="mono" style="color:var(--ok)">F-301</td><td style="color:var(--ok)">0.82</td><td><span class="badge sev-high">HIGH</span></td><td>Close</td></tr>
+        <tr><td class="mono" style="color:var(--warn)">F-310</td><td style="color:var(--bad)">0.50</td><td><span class="badge sev-high">HIGH</span></td><td>Send Back</td></tr>
+      </tbody></table>
+    </div>
+    <div class="card">
+      <h3>Contract Health Summary</h3>
+      <div class="wr"><span class="wl">Contract</span><span class="wv">N00178-24-D-0042</span></div>
+      <div class="wr"><span class="wl">Active TOs</span><span class="wv">4</span></div>
+      <div class="wr"><span class="wl">Open Findings</span><span class="wv" style="color:var(--warn)">10</span></div>
+      <div class="wr"><span class="wl">Closed (Verified)</span><span class="wv" style="color:var(--ok)">2</span></div>
+      <div class="wr"><span class="wl">Posture</span><span class="wv" style="color:var(--warn)">AMBER</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ FINDINGS ════════════ -->
+<section id="s-find">
+  <div class="filters">
+    <select id="fltStatus"><option value="">All Status</option><option>New</option><option>Assigned</option><option>In Review</option><option>Patch Approved</option><option>Closure Pending</option><option>Closed</option><option>Reopened</option></select>
+    <select id="fltSev"><option value="">All Severity</option><option>HIGH</option><option>MED</option><option>LOW</option></select>
+    <select id="fltCat"><option value="">All Claim Categories</option><option>Contract Compliance</option><option>Performance</option><option>Financial</option><option>Risk &amp; Issue</option><option>Resource</option><option>Technical</option><option>Communication</option></select>
+    <select id="fltTO"><option value="">All Task Orders</option><option>TO-1001</option><option>TO-1002</option><option>TO-1003</option><option>TO-1004</option></select>
+    <select id="fltVendor"><option value="">All Vendors</option><option>Sierra Dynamics</option><option>TechForward LLC</option><option>Apex Systems</option><option>Northbridge Solutions</option></select>
+    <input type="text" placeholder="Search findings..." style="width:180px" id="fltSearch"/>
+    <button class="primary" id="btnNew">+ New Finding</button>
+    <button id="btnCompare" style="border-color:rgba(139,92,246,.3);color:#a78bfa">Compare</button>
+  </div>
+  <div class="card">
+    <table><thead><tr><th>ID</th><th>Title</th><th>Status</th><th>Sev</th><th>Category</th><th>TO</th><th>Vendor</th><th>Owner</th><th>BRQ</th><th>Due</th></tr></thead>
+    <tbody id="findTbody"></tbody></table>
+  </div>
+  <div class="card hidden" id="fDetail"></div>
+</section>
+
+<!-- ════════════ REVIEW BOARD ════════════ -->
+<section id="s-board">
+  <div style="display:flex;align-items:center;margin-bottom:8px">
+    <span style="font-size:16px;font-weight:700">Review Board</span>
+    <span style="font-size:11px;color:var(--muted);font-weight:400;margin-left:8px">Session: Q2-IDIQ-BOARD</span>
+    <div class="board-timer"><span class="bt-dot"></span> Session: <span id="boardClock">00:00</span></div>
+  </div>
+  <div class="filters" id="boardFilters">
+    <button class="primary">Board Ready</button><button>High Severity</button><button>Recurring</button><button>Low Evidence</button><button>Overdue</button>
+  </div>
+  <div class="card">
+    <table><thead><tr><th>Finding</th><th>Sev</th><th>BRQ</th><th>DEG</th><th>CG</th><th>Category</th><th>Recur</th><th>Action</th></tr></thead><tbody id="boardTbody"></tbody></table>
+  </div>
+  <div class="grid3" id="boardDetail">
+    <div class="card" id="bdRisk"><h3>Contract / Risk</h3></div>
+    <div class="card" id="bdPatch"><h3>Patch / Evidence</h3></div>
+    <div class="card" id="bdHist"><h3>Recurrence / History</h3></div>
+  </div>
+  <div class="card">
+    <h3>Reviewer Decision</h3>
+    <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+      <button class="ok" id="btnBoardApprove">Approve</button><button class="danger" id="btnBoardReject">Reject</button><button id="btnBoardSendBack">Send Back</button><button id="btnBoardEscalate">Escalate</button>
+      <span style="font-size:10px;color:var(--muted);margin-left:10px">Severity:</span>
+      <select style="width:80px"><option>HIGH</option><option>MED</option><option>LOW</option></select>
+    </div>
+    <div style="margin-top:8px"><textarea style="width:100%;height:44px;background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:6px;padding:6px;font-size:10px;resize:vertical" placeholder="Board notes..."></textarea></div>
+    <div style="margin-top:6px;display:flex;gap:6px"><button class="primary" id="btnRecordDecision">Record Decision</button><button id="btnExportPacket">Export Packet</button></div>
+  </div>
+</section>
+
+<!-- ════════════ TRENDS ════════════ -->
+<section id="s-trends">
+  <div class="kpi-row" style="grid-template-columns:repeat(4,1fr)">
+    <div class="kpi kpi-green"><div class="kv kv-green">0.32</div><div class="kl">RDEV</div><div class="kfull">Recurring Deficiency Escape Velocity</div></div>
+    <div class="kpi kpi-green"><div class="kv kv-green">1.8x</div><div class="kl">RCR</div><div class="kfull">Review Compression Ratio</div></div>
+    <div class="kpi kpi-amber"><div class="kv kv-amber">6.2d</div><div class="kl">Avg OOL</div><div class="kfull">Observation-to-Ownership Lag</div></div>
+    <div class="kpi kpi-red"><div class="kv kv-red">9d</div><div class="kl">Avg DEG</div><div class="kfull">Decision-to-Evidence Gap</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>Claim Category Trends</h3>
+      <table><thead><tr><th>Category</th><th>Open</th><th>Closed</th><th>Trend</th></tr></thead><tbody>
+        <tr><td><span class="cat-badge cat-compliance">Contract Compliance</span></td><td>1</td><td>1</td><td style="color:var(--ok)">&#8595;</td></tr>
+        <tr><td><span class="cat-badge cat-performance">Performance</span></td><td>1</td><td>0</td><td style="color:var(--warn)">&#8594;</td></tr>
+        <tr><td><span class="cat-badge cat-financial">Financial</span></td><td>1</td><td>1</td><td style="color:var(--bad)">&#8593;</td></tr>
+        <tr><td><span class="cat-badge cat-risk">Risk &amp; Issue</span></td><td>1</td><td>0</td><td style="color:var(--bad)">&#8593;</td></tr>
+        <tr><td><span class="cat-badge cat-resource">Resource</span></td><td>2</td><td>0</td><td style="color:var(--bad)">&#8593;</td></tr>
+        <tr><td><span class="cat-badge cat-technical">Technical</span></td><td>1</td><td>1</td><td style="color:var(--warn)">&#8594;</td></tr>
+        <tr><td><span class="cat-badge cat-comms">Communication</span></td><td>1</td><td>1</td><td style="color:var(--ok)">&#8595;</td></tr>
+      </tbody></table>
+    </div>
+    <div class="card"><h3>CIS Component Trend</h3>
+      <table><thead><tr><th>Component</th><th>Q1</th><th>Q2</th><th>Weight</th></tr></thead><tbody>
+        <tr><td>PAR — Patch Adhesion Rate</td><td>0.79</td><td style="color:var(--ok)">0.88</td><td>0.25</td></tr>
+        <tr><td>EDI_norm — Evidence Density</td><td>0.68</td><td style="color:var(--ok)">0.74</td><td>0.20</td></tr>
+        <tr><td>1 - FCR — Closure Durability</td><td>0.84</td><td style="color:var(--ok)">0.90</td><td>0.25</td></tr>
+        <tr><td>1 - DEG_norm — Proof Speed</td><td>0.61</td><td style="color:var(--warn)">0.65</td><td>0.15</td></tr>
+        <tr><td>PPI — Patch Precision Index</td><td>0.72</td><td style="color:var(--ok)">0.78</td><td>0.15</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+  <!-- Severity x Lag Heatmap -->
+  <div class="card">
+    <h3>Closure Risk Heatmap — Severity x Ownership Lag</h3>
+    <div class="heatmap" id="heatmapGrid" style="grid-template-columns:60px repeat(4,1fr);grid-template-rows:auto repeat(3,1fr)">
+      <div class="hm-label"></div>
+      <div class="hm-label">OOL 0-3d</div><div class="hm-label">OOL 4-7d</div><div class="hm-label">OOL 8-14d</div><div class="hm-label">OOL 14d+</div>
+      <div class="hm-label">HIGH</div>
+      <div class="hm-cell" style="background:rgba(93,255,147,.12);color:var(--ok)">1</div>
+      <div class="hm-cell" style="background:rgba(255,204,102,.18);color:var(--warn)">2</div>
+      <div class="hm-cell" style="background:rgba(255,107,107,.22);color:var(--bad)">1</div>
+      <div class="hm-cell" style="background:rgba(255,107,107,.35);color:var(--bad)">1</div>
+      <div class="hm-label">MED</div>
+      <div class="hm-cell" style="background:rgba(93,255,147,.12);color:var(--ok)">2</div>
+      <div class="hm-cell" style="background:rgba(93,255,147,.08);color:var(--ok)">1</div>
+      <div class="hm-cell" style="background:rgba(255,204,102,.14);color:var(--warn)">1</div>
+      <div class="hm-cell" style="background:rgba(27,42,58,.5);color:var(--muted)">0</div>
+      <div class="hm-label">LOW</div>
+      <div class="hm-cell" style="background:rgba(93,255,147,.08);color:var(--ok)">2</div>
+      <div class="hm-cell" style="background:rgba(93,255,147,.05);color:var(--ok)">1</div>
+      <div class="hm-cell" style="background:rgba(27,42,58,.5);color:var(--muted)">0</div>
+      <div class="hm-cell" style="background:rgba(27,42,58,.3);color:var(--muted)">0</div>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>Task Order Drift Indicators</h3>
+      <table><thead><tr><th>TO</th><th>Vendor</th><th>Burn Var</th><th>Open HIGH</th><th>SLA</th><th>Status</th></tr></thead><tbody>
+        <tr><td class="mono">TO-1001</td><td>Sierra Dynamics</td><td style="color:var(--ok)">+2%</td><td>0</td><td style="color:var(--ok)">Met</td><td style="color:var(--ok)">GREEN</td></tr>
+        <tr><td class="mono">TO-1002</td><td>TechForward LLC</td><td style="color:var(--warn)">+8%</td><td>0</td><td style="color:var(--warn)">1 miss</td><td style="color:var(--warn)">AMBER</td></tr>
+        <tr><td class="mono">TO-1003</td><td>Apex Systems</td><td style="color:var(--bad)">+18%</td><td>2</td><td style="color:var(--bad)">2 miss</td><td style="color:var(--bad)">RED</td></tr>
+        <tr><td class="mono">TO-1004</td><td>Northbridge Solutions</td><td style="color:var(--warn)">+6%</td><td>1</td><td style="color:var(--warn)">1 miss</td><td style="color:var(--bad)">RED</td></tr>
+      </tbody></table>
+    </div>
+    <div class="card"><h3>Top Root Causes</h3>
+      <table><thead><tr><th>#</th><th>Root Cause</th><th>Findings</th></tr></thead><tbody>
+        <tr><td>1</td><td>Documentation/evidence gaps in deliverable packages</td><td>4</td></tr>
+        <tr><td>2</td><td>Personnel turnover and clearance management lag</td><td>3</td></tr>
+        <tr><td>3</td><td>Automated tracking/notification system gaps</td><td>3</td></tr>
+        <tr><td>4</td><td>Vendor oversight and subcontractor management</td><td>2</td></tr>
+        <tr><td>5</td><td>Baseline update and configuration control processes</td><td>2</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+  <div class="card"><h3>Reopening Trend</h3>
+    <div class="wr"><span class="wl">Q1 FY26</span><span class="wv">0 reopened</span></div>
+    <div class="wr"><span class="wl">Q2 FY26</span><span class="wv" style="color:var(--bad)">1 reopened (F-310)</span></div>
+    <div class="wr"><span class="wl">Cause</span><span class="wv">Weak patch durability — corrective action did not address root scheduling gap</span></div>
+  </div>
+</section>
+
+<!-- ════════════ MEMORY ════════════ -->
+<section id="s-mem">
+  <div class="graph-toolbar" id="graphToolbar">
+    <span style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px">Type</span>
+    <label><input type="checkbox" data-graph-type="finding" checked> Findings</label>
+    <label><input type="checkbox" data-graph-type="pattern" checked> Patterns</label>
+    <label><input type="checkbox" data-graph-type="patch" checked> Patches</label>
+    <label><input type="checkbox" data-graph-type="cause" checked> Root Causes</label>
+    <label><input type="checkbox" data-graph-type="taskorder" checked> Task Orders</label>
+    <label><input type="checkbox" data-graph-type="vendor" checked> Vendors</label>
+    <div class="sep"></div>
+    <input type="text" class="graph-search" id="graphSearch" placeholder="Search nodes...">
+    <div class="sep"></div>
+    <button id="btnLayerEdges" class="active">Edges</button>
+    <button id="btnLayerLabels" class="active">Labels</button>
+    <div class="sep"></div>
+    <button id="btnGraphSummary">Summary</button>
+  </div>
+  <div class="card" id="mgCard">
+    <h3>Memory Graph — Relationship View</h3>
+    <div style="position:relative;background:var(--card2);border-radius:8px;border:1px solid var(--line);overflow:hidden" id="mgWrap">
+      <svg id="mgSvg" viewBox="0 0 900 520" style="width:100%;height:auto;display:block"></svg>
+      <div id="mgTip" style="position:absolute;display:none;background:rgba(13,21,32,.96);border:1px solid var(--accent);border-radius:8px;padding:10px 14px;font-size:11px;max-width:280px;pointer-events:none;z-index:20;box-shadow:0 6px 20px rgba(0,0,0,.6)">
+        <div id="mgTipTitle" style="font-weight:700;color:var(--accent);margin-bottom:4px"></div>
+        <div id="mgTipBody" style="color:var(--muted);line-height:1.5"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:14px;margin-top:8px;font-size:9px;color:var(--muted);flex-wrap:wrap">
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#00b4d8;vertical-align:middle;margin-right:3px"></span>Finding</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#8b5cf6;vertical-align:middle;margin-right:3px"></span>Pattern</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#10b981;vertical-align:middle;margin-right:3px"></span>Patch</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#f59e0b;vertical-align:middle;margin-right:3px"></span>Root Cause</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#ec4899;vertical-align:middle;margin-right:3px"></span>Task Order</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#ef4444;vertical-align:middle;margin-right:3px"></span>Vendor</span>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h3>Reusable Patch History</h3>
+      <div class="wire" id="memResults">
+        <div class="wr"><span class="wl mono" style="color:#8b5cf6">MG-10</span><span class="wv">Pattern: Invoice documentation gaps — seen across TO-1002, TO-1003</span></div>
+        <div class="wr"><span class="wl mono" style="color:#10b981">MG-11</span><span class="wv">Reusable patch: Standardized deliverable checklist + automated validation</span></div>
+        <div class="wr"><span class="wl mono" style="color:#8b5cf6">MG-12</span><span class="wv">Pattern: Key personnel churn — clearance expiry notification gap</span></div>
+        <div class="wr"><span class="wl mono" style="color:#f59e0b">MG-13</span><span class="wv">Root cause: Vendor HR systems not integrated with contract tracking</span></div>
+        <div class="wr"><span class="wl mono" style="color:#8b5cf6">MG-14</span><span class="wv">Pattern: Subcontractor oversight insufficient for multi-tier IDIQ</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Graph Statistics</h3>
+      <div class="wire">
+        <div class="wr"><span class="wl">Total Nodes</span><span class="wv" style="color:var(--accent)">24</span></div>
+        <div class="wr"><span class="wl">Total Edges</span><span class="wv" style="color:var(--accent)">30</span></div>
+        <div class="wr"><span class="wl">Finding Nodes</span><span class="wv">12</span></div>
+        <div class="wr"><span class="wl">Task Order Nodes</span><span class="wv">4</span></div>
+        <div class="wr"><span class="wl">Vendor Nodes</span><span class="wv">4</span></div>
+        <div class="wr"><span class="wl">Patch Nodes</span><span class="wv">3</span></div>
+        <div class="wr"><span class="wl">Root Cause Nodes</span><span class="wv">3</span></div>
+        <div class="wr"><span class="wl">Pattern Nodes</span><span class="wv">3</span></div>
+        <div class="wr"><span class="wl">CMR</span><span class="wv" style="color:var(--ok)">0.58</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════ ADMIN ════════════ -->
+<section id="s-admin">
+  <div class="drop-zone" id="dropZone">
+    <span style="font-size:28px;display:block;margin-bottom:6px">&#128230;</span>
+    Drop JSON findings export here
+  </div>
+  <div id="validationCard"></div>
+  <div class="grid2">
+    <div class="card"><h3>Role Mappings</h3>
+      <table><thead><tr><th>Role</th><th>UI Surface</th><th>Users</th></tr></thead><tbody>
+        <tr><td>Executive / Commander</td><td>Command UI</td><td>3</td></tr>
+        <tr><td>Program Manager / Owner</td><td>Ops UI</td><td>8</td></tr>
+        <tr><td>Reviewer / Board Member</td><td>Command + Ops UI</td><td>5</td></tr>
+        <tr><td>Analyst / Assessment Lead</td><td>Ops UI</td><td>6</td></tr>
+        <tr><td>Governance Admin</td><td>Governance UI</td><td>2</td></tr>
+        <tr><td>Auditor / Inspector</td><td>Governance UI</td><td>3</td></tr>
+      </tbody></table>
+    </div>
+    <div class="card"><h3>Workflow Rules — Hard Law</h3>
+      <div class="wr"><span class="wl" style="color:var(--bad);font-weight:700">Rule 1</span><span class="wv">No self-certification of closure</span></div>
+      <div class="wr"><span class="wl" style="color:var(--bad);font-weight:700">Rule 2</span><span class="wv">No closure without owner + patch + evidence</span></div>
+      <div class="wr"><span class="wl" style="color:var(--bad);font-weight:700">Rule 3</span><span class="wv">No overwrite of historical canon — append only, version only, reopen only</span></div>
+      <div class="wr"><span class="wl" style="color:var(--bad);font-weight:700">Rule 4</span><span class="wv">Authority must be role-bound and state-bound</span></div>
+      <div class="wr"><span class="wl" style="color:var(--bad);font-weight:700">Rule 5</span><span class="wv">No evidence editing after review lock</span></div>
+      <div class="pp">
+        <span class="pp-r">No self-certification of closure</span>
+        <span class="pp-r">No closure without owner + patch + evidence</span>
+        <span class="pp-c">No overwrite of historical canon</span>
+        <span class="pp-c">Authority = role-bound + state-bound</span>
+        <span class="pp-r">No evidence editing after review lock</span>
+      </div>
+    </div>
+  </div>
+  <!-- Claim Routing Matrix -->
+  <div class="card"><h3>Claim Routing Matrix</h3>
+    <table><thead><tr><th>Claim Category</th><th>Primary Role</th><th>Specific Titles</th></tr></thead><tbody>
+      <tr><td><span class="cat-badge cat-compliance">Contract Compliance</span></td><td>CO / COR</td><td>Contracting Officer, COR</td></tr>
+      <tr><td><span class="cat-badge cat-performance">Performance</span></td><td>Program Manager / COR</td><td>PM, COR</td></tr>
+      <tr><td><span class="cat-badge cat-financial">Financial</span></td><td>Financial Manager / Budget Analyst</td><td>Financial Analysts</td></tr>
+      <tr><td><span class="cat-badge cat-risk">Risk &amp; Issue</span></td><td>Risk Manager / Project Manager</td><td>Task Order Managers</td></tr>
+      <tr><td><span class="cat-badge cat-resource">Resource</span></td><td>Resource Manager / Staffing Lead</td><td>Resource Manager</td></tr>
+      <tr><td><span class="cat-badge cat-technical">Technical</span></td><td>Technical Lead / Chief Engineer</td><td>Technical Leads</td></tr>
+      <tr><td><span class="cat-badge cat-comms">Communication</span></td><td>Communications Manager / COR</td><td>COR, Admin Staff</td></tr>
+    </tbody></table>
+  </div>
+  <div class="card"><h3>Permission Matrix</h3>
+    <table><thead><tr><th>Action</th><th>Executive</th><th>PM / Owner</th><th>Reviewer</th><th>Analyst</th><th>Admin</th><th>Auditor</th></tr></thead><tbody>
+      <tr><td>View dashboard</td><td class="pm-y">Yes</td><td class="pm-y">Yes</td><td class="pm-y">Yes</td><td class="pm-y">Yes</td><td class="pm-y">Yes</td><td class="pm-y">Yes</td></tr>
+      <tr><td>Create finding</td><td class="pm-n">—</td><td class="pm-y">Yes</td><td class="pm-n">—</td><td class="pm-y">Yes</td><td class="pm-n">—</td><td class="pm-n">—</td></tr>
+      <tr><td>Edit finding</td><td class="pm-n">—</td><td class="pm-s">Scoped</td><td class="pm-s">Scoped</td><td class="pm-y">Yes</td><td class="pm-n">—</td><td class="pm-n">—</td></tr>
+      <tr><td>Approve / reject</td><td class="pm-l">Limited</td><td class="pm-n">—</td><td class="pm-y">Yes</td><td class="pm-n">—</td><td class="pm-n">—</td><td class="pm-n">—</td></tr>
+      <tr><td>Create patch</td><td class="pm-n">—</td><td class="pm-y">Yes</td><td class="pm-r">Read</td><td class="pm-r">Read</td><td class="pm-n">—</td><td class="pm-n">—</td></tr>
+      <tr><td>Upload evidence</td><td class="pm-n">—</td><td class="pm-y">Yes</td><td class="pm-n">—</td><td class="pm-y">Yes</td><td class="pm-n">—</td><td class="pm-n">—</td></tr>
+      <tr><td>Approve closure</td><td class="pm-l">Limited</td><td class="pm-n">—</td><td class="pm-y">Yes</td><td class="pm-n">—</td><td class="pm-n">—</td><td class="pm-n">—</td></tr>
+      <tr><td>Reopen finding</td><td class="pm-l">Limited</td><td class="pm-n">—</td><td class="pm-y">Yes</td><td class="pm-n">—</td><td class="pm-n">—</td><td class="pm-n">—</td></tr>
+      <tr><td>Manage roles / config</td><td class="pm-n">—</td><td class="pm-n">—</td><td class="pm-n">—</td><td class="pm-n">—</td><td class="pm-y">Yes</td><td class="pm-n">—</td></tr>
+      <tr><td>Audit export</td><td class="pm-l">Limited</td><td class="pm-n">—</td><td class="pm-l">Limited</td><td class="pm-n">—</td><td class="pm-y">Yes</td><td class="pm-y">Yes</td></tr>
+    </tbody></table>
+  </div>
+  <div class="card"><h3>KPI Threshold Configuration</h3>
+    <table><thead><tr><th>KPI</th><th style="color:var(--ok)">Green</th><th style="color:var(--warn)">Amber</th><th style="color:var(--bad)">Red</th></tr></thead><tbody>
+      <tr><td>CIS — Closure Integrity Score</td><td>&ge; 0.75</td><td>0.50 – 0.74</td><td>&lt; 0.50</td></tr>
+      <tr><td>PAR — Patch Adhesion Rate</td><td>&ge; 0.85</td><td>0.65 – 0.84</td><td>&lt; 0.65</td></tr>
+      <tr><td>BRQ — Board Readiness Quotient</td><td>&ge; 0.80</td><td>0.60 – 0.79</td><td>&lt; 0.60</td></tr>
+      <tr><td>DEG — Decision-to-Evidence Gap</td><td>&le; 5 days</td><td>6 – 14 days</td><td>&gt; 14 days</td></tr>
+      <tr><td>CG — Closure Gravity</td><td>&le; 20</td><td>21 – 40</td><td>&gt; 40</td></tr>
+      <tr><td>Burn Variance</td><td>&le; 5%</td><td>6% – 15%</td><td>&gt; 15%</td></tr>
+    </tbody></table>
+  </div>
+</section>
+
+<!-- ════════════ AUDIT ════════════ -->
+<section id="s-audit">
+  <div class="card"><h3>Audit Workspace</h3>
+    <div class="filters">
+      <select><option>All Closures</option><option>Verified</option><option>Unverified</option><option>Reopened</option></select>
+      <select><option>All Periods</option><option>Q2 FY26</option><option>Q1 FY26</option></select>
+      <button class="primary" id="btnAuditExport">Export Audit Package</button>
+    </div>
+    <table><thead><tr><th>Finding</th><th>Closed</th><th>Verified</th><th>Evidence</th><th>Reopened</th><th>Decision By</th><th>Provenance Chain</th></tr></thead><tbody id="auditTbody"></tbody></table>
+  </div>
+  <div class="card" id="auditChainCard"><h3>Evidence Chain — Select a finding above</h3></div>
+</section>
+</div>
+
+<!-- DRAWER -->
+<div class="drawer-overlay" id="dOverlay"></div>
+<div class="drawer-panel" id="dPanel">
+  <div class="drawer-hdr"><h3 id="dTitle">Detail</h3><button class="dx" id="dClose">&#10005;</button></div>
+  <div class="drawer-body" id="dBody"></div>
+  <div class="drawer-foot" id="dFoot"></div>
+</div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<div class="shortcut-bar" id="shortcutBar">
+  <kbd>Esc</kbd> Close drawer &nbsp; <kbd>1</kbd>–<kbd>8</kbd> Switch tabs &nbsp; <kbd>N</kbd> New finding &nbsp; <kbd>?</kbd> Toggle shortcuts
+  <span style="margin-left:auto;cursor:pointer;padding:2px 6px;color:var(--muted);font-size:11px" id="shortcutClose">&#10005;</span>
+</div>
+
+<div id="taskPanel">
+  <div class="task-header"><h3>My Tasks</h3><button class="task-close" id="btnCloseTask">&times;</button></div>
+  <div class="task-list" id="taskList"></div>
+</div>
+
+<div id="tourBackdrop" class="tour-backdrop" style="display:none"></div>
+<div id="tourCard" class="tour-card" style="display:none"></div>
+
+<footer>
+  <strong>Deep Sigma EDGE</strong> — CERPA (Composite Enterprise Risk Posture Assessment) · IDIQ Contract Management · v1.0.0
+  <br/>Claim | Event | Review | Patch | Apply — on the Truth | Reasoning | Memory substrate — Same data model, different authority surfaces.
+</footer>
+
+<script>
+(function(){"use strict";
+
+function safeHTML(el,html){var doc=new DOMParser().parseFromString(html,'text/html');el.textContent='';while(doc.body.firstChild)el.appendChild(document.adoptNode(doc.body.firstChild))}
+function escHTML(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
+
+/* ══════════ TASK ORDERS ══════════ */
+var TOs={
+"1001":{id:"TO-1001",name:"Infrastructure Modernization",contract:"N00178-24-D-0042",vendor:"Sierra Dynamics Corp.",status:"On Track",burnRate:0.02,plannedSpend:2400000,actualSpend:2448000,keyPersonnel:[{name:"J. Torres",role:"PM",clearance:"TS/SCI",status:"Active"},{name:"R. Patel",role:"Tech Lead",clearance:"Secret",status:"Active"}],slaMetrics:[{name:"Uptime",target:99.5,actual:99.7},{name:"Response Time",target:4,actual:3.2}],riskLevel:"LOW",findingCount:1},
+"1002":{id:"TO-1002",name:"Data Analytics Platform",contract:"N00178-24-D-0042",vendor:"TechForward LLC",status:"At Risk",burnRate:0.08,plannedSpend:1800000,actualSpend:1944000,keyPersonnel:[{name:"M. Chen",role:"PM",clearance:"Secret",status:"Active"},{name:"S. Kim",role:"Data Lead",clearance:"Secret",status:"Active"}],slaMetrics:[{name:"Report Delivery",target:95,actual:88},{name:"Data Accuracy",target:99,actual:97}],riskLevel:"MED",findingCount:3},
+"1003":{id:"TO-1003",name:"Cybersecurity Operations",contract:"N00178-24-D-0042",vendor:"Apex Systems Inc.",status:"Critical",burnRate:0.18,plannedSpend:3200000,actualSpend:3776000,keyPersonnel:[{name:"VACANT",role:"CISO",clearance:"TS/SCI",status:"Vacant 34d"},{name:"K. Okafor",role:"Ops Lead",clearance:"TS/SCI",status:"Active"},{name:"D. Walsh",role:"Analyst",clearance:"Secret",status:"Clearance Lapsed"}],slaMetrics:[{name:"Incident Response",target:15,actual:22},{name:"Patch Compliance",target:95,actual:87}],riskLevel:"HIGH",findingCount:4},
+"1004":{id:"TO-1004",name:"Systems Integration",contract:"N00178-24-D-0042",vendor:"Northbridge Solutions",status:"At Risk",burnRate:0.06,plannedSpend:2800000,actualSpend:2968000,keyPersonnel:[{name:"A. Reeves",role:"PM",clearance:"Secret",status:"Active"},{name:"L. Gomez",role:"Integration Lead",clearance:"Secret",status:"Active"}],slaMetrics:[{name:"Integration Tests",target:90,actual:82},{name:"Config Compliance",target:100,actual:91}],riskLevel:"HIGH",findingCount:4}
+};
+
+/* ══════════ FINDINGS DATA ══════════ */
+var F={
+"301":{id:"F-301",title:"Deliverable package missing required PWS appendix",status:"In Review",sev:"HIGH",claimCat:"Contract Compliance",claimType:"Deliverable Compliance",taskOrder:"TO-1003",contract:"N00178-24-D-0042",vendor:"Apex Systems",owner:"K. Okafor",reviewer:"Board Chair",brq:0.82,cg:18,deg:"7d",due:"Apr 28",recurring:1,financialImpact:"$45,000 holdback risk",scheduleImpact:"14-day deliverable delay",contractRisk:true,linked:["F-306"],
+  claim:"Deliverable package for CDRL A003 submitted without required PWS Appendix C technical specifications",
+  event:"COR review of monthly deliverable identified missing appendix during acceptance inspection",
+  reviewSummary:"Material impact — incomplete deliverable cannot be accepted per DFARS clause",
+  rootCause:"Vendor deliverable checklist does not include PWS appendix cross-reference",
+  patch:"Implement standardized deliverable checklist with PWS cross-reference + re-submit with appendix",
+  applyDecision:"Pending board review",
+  evidence:[{name:"CDRL_A003_package.pdf",ok:1},{name:"PWS_appendix_C.pdf",ok:0},{name:"COR_rejection_memo.pdf",ok:1}],
+  auditChain:["CL-301","E-301","R-301"],
+  timeline:["Apr 10","Apr 11","Apr 14","Apr 18","—"],tlState:[1,1,2,1,0]},
+"302":{id:"F-302",title:"Task Order milestone slipped 21 days without approved baseline update",status:"Closed",sev:"MED",claimCat:"Contract Compliance",claimType:"Timeline Adherence",taskOrder:"TO-1001",contract:"N00178-24-D-0042",vendor:"Sierra Dynamics",owner:"J. Torres",reviewer:"CO",brq:0.95,cg:8,deg:"3d",due:"—",recurring:0,financialImpact:"Minimal — absorbed in margin",scheduleImpact:"21-day slip recovered",contractRisk:false,linked:[],
+  claim:"Milestone 3.2 delivery date slipped 21 days without formal baseline change request",
+  event:"PMO schedule review identified unapproved date change in IMS",
+  reviewSummary:"Administrative gap — vendor cooperated, baseline now updated",
+  rootCause:"Informal schedule adjustment not routed through formal baseline change process",
+  patch:"Formal baseline change request submitted and approved + process training for vendor PM",
+  applyDecision:"Closed — CO approved correction, baseline updated",
+  evidence:[{name:"baseline_change_request.pdf",ok:1},{name:"IMS_comparison.xlsx",ok:1},{name:"CO_approval_memo.pdf",ok:1},{name:"process_training_cert.pdf",ok:1}],
+  auditChain:["CL-302","E-302","R-302","P-302","A-302"],
+  timeline:["Mar 18","Mar 19","Mar 22","Mar 25","Apr 01"],tlState:[1,1,1,1,1]},
+"303":{id:"F-303",title:"Invoice line items do not reconcile with approved labor categories",status:"In Review",sev:"HIGH",claimCat:"Financial",claimType:"Invoice Accuracy",taskOrder:"TO-1003",contract:"N00178-24-D-0042",vendor:"Apex Systems",owner:"Budget Analyst",reviewer:"CO",brq:0.72,cg:22,deg:"10d",due:"Apr 25",recurring:2,financialImpact:"$127,000 disputed amount",scheduleImpact:"Payment hold — 30-day delay",contractRisk:true,linked:["F-309"],
+  claim:"Monthly invoice #INV-2026-03 contains labor categories not in approved rate schedule",
+  event:"Financial review flagged 4 labor categories billed at rates not matching contract ceiling",
+  reviewSummary:"Material financial impact — requires rate reconciliation before payment",
+  rootCause:"Vendor billing system not updated after contract modification 003",
+  patch:"Reconcile rates against mod 003 + resubmit corrected invoice + update vendor billing config",
+  applyDecision:"Pending — awaiting corrected invoice",
+  evidence:[{name:"invoice_INV-2026-03.pdf",ok:1},{name:"rate_schedule_comparison.xlsx",ok:1},{name:"mod_003_document.pdf",ok:1},{name:"corrected_invoice.pdf",ok:0}],
+  auditChain:["CL-303","E-303","R-303"],
+  timeline:["Apr 02","Apr 03","Apr 06","Apr 12","—"],tlState:[1,1,2,1,0]},
+"304":{id:"F-304",title:"Key personnel position vacant for 34 days",status:"Assigned",sev:"HIGH",claimCat:"Resource",claimType:"Key Personnel",taskOrder:"TO-1003",contract:"N00178-24-D-0042",vendor:"Apex Systems",owner:"D. Walsh",reviewer:"COR",brq:0.45,cg:34,deg:"—",due:"May 05",recurring:0,financialImpact:"$85,000 estimated productivity loss",scheduleImpact:"Ops tempo reduced 30%",contractRisk:true,linked:["F-305"],
+  claim:"CISO key personnel position has been vacant for 34 days exceeding 14-day replacement threshold",
+  event:"Monthly key personnel report showed CISO departure with no replacement candidate identified",
+  reviewSummary:"Critical staffing gap in cybersecurity operations — escalation required",
+  rootCause:"Insufficient bench depth for TS/SCI cleared cybersecurity leadership positions",
+  patch:"Activate interim CISO from bench + accelerate recruitment + request contract modification for temp staffing",
+  applyDecision:"Pending — vendor remediation plan due May 05",
+  evidence:[{name:"KP_vacancy_report.pdf",ok:1},{name:"recruitment_plan.pdf",ok:0},{name:"interim_staffing_memo.pdf",ok:0}],
+  auditChain:["CL-304","E-304"],
+  timeline:["Apr 01","Apr 03","—","—","—"],tlState:[1,1,0,0,0]},
+"305":{id:"F-305",title:"Subcontractor clearance lapse created execution risk",status:"Assigned",sev:"HIGH",claimCat:"Resource",claimType:"Clearance Status",taskOrder:"TO-1003",contract:"N00178-24-D-0042",vendor:"Apex Systems",owner:"K. Okafor",reviewer:"FSO",brq:0.40,cg:28,deg:"—",due:"May 01",recurring:0,financialImpact:"$42,000 rework cost",scheduleImpact:"Deliverable access restricted",contractRisk:true,linked:["F-304"],
+  claim:"Subcontractor analyst clearance lapsed without renewal — access to classified materials suspended",
+  event:"Security office audit identified expired clearance for D. Walsh, subcontractor analyst on TO-1003",
+  reviewSummary:"Immediate security risk — access properly suspended, remediation needed",
+  rootCause:"Clearance renewal tracking not integrated with contract personnel management system",
+  patch:"Initiate clearance renewal + implement automated expiry tracking + cross-check all sub clearances",
+  applyDecision:"Pending — clearance renewal submitted",
+  evidence:[{name:"clearance_expiry_notice.pdf",ok:1},{name:"renewal_submission.pdf",ok:1},{name:"access_suspension_memo.pdf",ok:1}],
+  auditChain:["CL-305","E-305"],
+  timeline:["Apr 05","Apr 06","—","—","—"],tlState:[1,1,0,0,0]},
+"306":{id:"F-306",title:"Configuration control evidence incomplete for delivered technical baseline",status:"Patch Approved",sev:"MED",claimCat:"Technical",claimType:"Configuration Management",taskOrder:"TO-1004",contract:"N00178-24-D-0042",vendor:"Northbridge Solutions",owner:"L. Gomez",reviewer:"QA Board",brq:0.78,cg:20,deg:"6d",due:"Apr 22",recurring:0,financialImpact:"Minimal",scheduleImpact:"Acceptance delayed 10 days",contractRisk:false,linked:["F-301","F-312"],
+  claim:"Technical baseline delivery missing configuration item list and version control documentation",
+  event:"QA acceptance review found no CI list or version trace for delivered software baseline 2.1",
+  reviewSummary:"Incomplete but recoverable — vendor has data, needs formal packaging",
+  rootCause:"CM process relies on informal version tracking not aligned with contract CDRL requirements",
+  patch:"Generate CI list from repo + create formal version trace document + update CM SOP",
+  applyDecision:"Patch approved — awaiting evidence upload",
+  evidence:[{name:"CI_list_v2.1.xlsx",ok:1},{name:"version_trace_doc.pdf",ok:1},{name:"CM_SOP_updated.pdf",ok:0}],
+  auditChain:["CL-306","E-306","R-306","P-306"],
+  timeline:["Mar 28","Mar 29","Apr 02","Apr 08","—"],tlState:[1,1,1,1,0]},
+"307":{id:"F-307",title:"Monthly status report omitted required KPI data",status:"Closed",sev:"LOW",claimCat:"Communication",claimType:"Status Reporting",taskOrder:"TO-1002",contract:"N00178-24-D-0042",vendor:"TechForward LLC",owner:"M. Chen",reviewer:"COR",brq:0.92,cg:12,deg:"2d",due:"—",recurring:0,financialImpact:"None",scheduleImpact:"None",contractRisk:false,linked:["F-311"],
+  claim:"March monthly status report missing 3 of 8 required KPI metrics per CDRL B002",
+  event:"COR review of monthly deliverable identified incomplete KPI section",
+  reviewSummary:"Administrative gap — low severity, vendor corrected within 48 hours",
+  rootCause:"Report template not updated after KPI requirements added in contract mod 002",
+  patch:"Update report template + resubmit March report + add template version check to QC process",
+  applyDecision:"Closed — corrected report accepted by COR",
+  evidence:[{name:"original_report.pdf",ok:1},{name:"corrected_report.pdf",ok:1},{name:"updated_template.docx",ok:1},{name:"COR_acceptance.pdf",ok:1}],
+  auditChain:["CL-307","E-307","R-307","P-307","A-307"],
+  timeline:["Mar 22","Mar 23","Mar 24","Mar 25","Mar 27"],tlState:[1,1,1,1,1]},
+"308":{id:"F-308",title:"SLA threshold missed on help desk response time",status:"In Review",sev:"HIGH",claimCat:"Performance",claimType:"SLA Achievement",taskOrder:"TO-1003",contract:"N00178-24-D-0042",vendor:"Apex Systems",owner:"K. Okafor",reviewer:"COR",brq:0.85,cg:15,deg:"5d",due:"Apr 20",recurring:1,financialImpact:"$18,000 SLA penalty exposure",scheduleImpact:"User satisfaction impact",contractRisk:true,linked:[],
+  claim:"Help desk 15-minute response time SLA missed — actual average 22 minutes for March",
+  event:"Monthly SLA dashboard showed response time at 147% of threshold for 18 of 30 days",
+  reviewSummary:"Performance deficiency with financial penalty implications",
+  rootCause:"Staffing reduction during key personnel transition degraded help desk coverage",
+  patch:"Restore staffing levels + implement automated ticket routing + add real-time SLA monitor",
+  applyDecision:"Pending board review",
+  evidence:[{name:"SLA_dashboard_march.pdf",ok:1},{name:"ticket_analysis.xlsx",ok:1},{name:"staffing_plan.pdf",ok:0}],
+  auditChain:["CL-308","E-308","R-308"],
+  timeline:["Apr 05","Apr 06","Apr 08","Apr 12","—"],tlState:[1,1,2,1,0]},
+"309":{id:"F-309",title:"Burn rate exceeds planned spend by 18%",status:"Assigned",sev:"HIGH",claimCat:"Financial",claimType:"Burn Rate Analysis",taskOrder:"TO-1003",contract:"N00178-24-D-0042",vendor:"Apex Systems",owner:"Budget Analyst",reviewer:"CO",brq:0.48,cg:20,deg:"—",due:"May 01",recurring:0,financialImpact:"$576,000 overrun at current trajectory",scheduleImpact:"Funding exhaustion risk Q3",contractRisk:true,linked:["F-303"],
+  claim:"TO-1003 actual spend exceeds planned spend by 18% — $576K projected overrun",
+  event:"Quarterly financial review identified burn rate variance exceeding 15% threshold",
+  reviewSummary:"Critical financial risk — requires immediate vendor cost control plan",
+  rootCause:"Unplanned overtime for SLA recovery + interim staffing costs for key personnel gap",
+  patch:"Vendor cost control plan + overtime reduction + negotiate rate adjustment for interim staff",
+  applyDecision:"Pending — cost control plan due May 01",
+  evidence:[{name:"burn_rate_analysis.xlsx",ok:1},{name:"cost_control_plan.pdf",ok:0}],
+  auditChain:["CL-309","E-309"],
+  timeline:["Apr 08","Apr 10","—","—","—"],tlState:[1,1,0,0,0]},
+"310":{id:"F-310",title:"Corrective action from prior review reopened due to weak patch durability",status:"Reopened",sev:"HIGH",claimCat:"Risk & Issue",claimType:"Corrective Actions",taskOrder:"TO-1004",contract:"N00178-24-D-0042",vendor:"Northbridge Solutions",owner:"A. Reeves",reviewer:"QA Board",brq:0.50,cg:45,deg:"14d",due:"May 10",recurring:2,financialImpact:"$35,000 rework cost",scheduleImpact:"Integration milestone at risk",contractRisk:true,linked:["F-312"],
+  claim:"Prior corrective action for integration test failures did not address root validation process gap",
+  event:"Quarterly re-assessment found same integration test category failing — patch did not hold",
+  reviewSummary:"Reopened — original patch addressed symptoms, not root cause",
+  rootCause:"Validation process relies on manual test execution without automated regression",
+  patch:"Implement automated regression suite + formalize validation gateway + assign dedicated QA lead",
+  applyDecision:"Pending — new patch plan under review",
+  evidence:[{name:"original_closure_record.pdf",ok:1},{name:"retest_failure_report.pdf",ok:1},{name:"automated_regression_plan.pdf",ok:0}],
+  auditChain:["CL-310","E-310","R-310a","P-310a","A-310a","R-310b"],
+  timeline:["Feb 15","Feb 18","Mar 01","Mar 10","Mar 20"],tlState:[1,1,1,1,3]},
+"311":{id:"F-311",title:"COR review packet missing documentation trail",status:"Patch Approved",sev:"MED",claimCat:"Communication",claimType:"Documentation Updates",taskOrder:"TO-1002",contract:"N00178-24-D-0042",vendor:"TechForward LLC",owner:"S. Kim",reviewer:"COR",brq:0.80,cg:16,deg:"5d",due:"Apr 18",recurring:0,financialImpact:"None",scheduleImpact:"Review delayed 5 days",contractRisk:false,linked:["F-307"],
+  claim:"COR quarterly review packet submitted without required meeting minutes and action item log",
+  event:"COR pre-review checklist flagged 2 of 6 required documents missing from packet",
+  reviewSummary:"Administrative gap — documents exist but were not included in formal packet",
+  rootCause:"No automated packet assembly — manual collection process prone to omissions",
+  patch:"Implement packet assembly checklist + centralized document repository + automated completeness check",
+  applyDecision:"Patch approved — implementation in progress",
+  evidence:[{name:"review_packet_original.pdf",ok:1},{name:"meeting_minutes.pdf",ok:1},{name:"action_item_log.xlsx",ok:1},{name:"completeness_checklist.pdf",ok:0}],
+  auditChain:["CL-311","E-311","R-311","P-311"],
+  timeline:["Mar 25","Mar 26","Mar 30","Apr 05","—"],tlState:[1,1,1,1,0]},
+"312":{id:"F-312",title:"Integration test success claimed without signed validation artifact",status:"New",sev:"MED",claimCat:"Technical",claimType:"Integration Success",taskOrder:"TO-1004",contract:"N00178-24-D-0042",vendor:"Northbridge Solutions",owner:"L. Gomez",reviewer:"Tech Board",brq:0.35,cg:5,deg:"—",due:"May 15",recurring:0,financialImpact:"$22,000 retest cost risk",scheduleImpact:"Acceptance pending validation",contractRisk:false,linked:["F-306","F-310"],
+  claim:"Vendor reported integration test Phase 2 as passed but no signed validation artifact exists",
+  event:"Technical review of test evidence found unsigned test report — no QA lead signature",
+  reviewSummary:"Pending — need signed artifact before acceptance",
+  rootCause:"Test completion process does not require formal QA sign-off before reporting",
+  patch:"Require QA lead signature on all test reports + implement test completion gateway",
+  applyDecision:"Pending — new finding, intake complete",
+  evidence:[{name:"unsigned_test_report.pdf",ok:1},{name:"test_log_extract.xlsx",ok:0}],
+  auditChain:["CL-312"],
+  timeline:["Apr 14","—","—","—","—"],tlState:[1,0,0,0,0]}
+};
+var TL_LABELS=["Claim","Event","Review","Patch","Apply"];
+
+/* ══════════ DOM REFS ══════════ */
+var tabs=document.querySelectorAll(".ttab"),secs=document.querySelectorAll(".main section");
+var dOverlay=document.getElementById("dOverlay"),dPanel=document.getElementById("dPanel");
+var dTitle=document.getElementById("dTitle"),dBody=document.getElementById("dBody"),dFoot=document.getElementById("dFoot");
+var toastWrap=document.getElementById("toastWrap");
+
+/* ══════════ TABS ══════════ */
+function openTab(n){
+  tabs.forEach(function(t){t.classList.toggle("active",t.getAttribute("data-t")===n)});
+  secs.forEach(function(s){s.classList.toggle("active",s.id==="s-"+n)});
+  if(n==="mem"&&!mgRendered){renderMG();mgRendered=true}
+}
+tabs.forEach(function(t){t.addEventListener("click",function(){openTab(t.getAttribute("data-t"))})});
+document.querySelectorAll("[data-nav]").forEach(function(b){
+  b.addEventListener("click",function(){openTab(b.getAttribute("data-nav"))});
+});
+
+/* ══════════ ROLES ══════════ */
+var roleVis={
+  executive:{roles:1,dash:1,find:1,board:1,trends:1,mem:1,admin:0,audit:0,land:"dash"},
+  pm:{roles:1,dash:1,find:1,board:0,trends:0,mem:1,admin:0,audit:0,land:"find"},
+  reviewer:{roles:1,dash:1,find:1,board:1,trends:1,mem:1,admin:0,audit:0,land:"board"},
+  analyst:{roles:1,dash:1,find:1,board:0,trends:1,mem:1,admin:0,audit:0,land:"find"},
+  admin:{roles:1,dash:1,find:1,board:0,trends:1,mem:1,admin:1,audit:1,land:"admin"},
+  auditor:{roles:1,dash:0,find:0,board:0,trends:1,mem:1,admin:0,audit:1,land:"audit"}
+};
+var roleSel=document.getElementById("roleSel");
+function applyRole(go){
+  var r=roleSel.value,v=roleVis[r];
+  tabs.forEach(function(t){t.classList.toggle("hidden",!v[t.getAttribute("data-t")])});
+  var bn=document.getElementById("btnNew");
+  if(bn)bn.style.display=(r==="pm"||r==="analyst")?"":"none";
+  if(go)openTab(v.land);
+  renderTaskPanel();
+}
+roleSel.addEventListener("change",function(){applyRole(true)});
+document.querySelectorAll(".role-card[data-role]").forEach(function(c){
+  c.addEventListener("click",function(){roleSel.value=c.getAttribute("data-role");applyRole(true)});
+});
+
+/* ══════════ TOAST ══════════ */
+function toast(msg,type){
+  var t=document.createElement("div");
+  t.className="toast toast-"+(type||"info");
+  t.textContent=msg;
+  toastWrap.appendChild(t);
+  setTimeout(function(){t.style.opacity="0";t.style.transition="opacity .3s";setTimeout(function(){t.remove()},300)},2800);
+}
+
+/* ══════════ DRAWER ══════════ */
+function setHTML(el,html){var t=document.createElement("template");t.innerHTML=html;el.textContent="";el.appendChild(t.content.cloneNode(true))}
+function openDrawer(title,bodyHtml,footHtml){
+  dTitle.textContent=title;
+  setHTML(dBody,bodyHtml);setHTML(dFoot,footHtml||"");
+  dOverlay.classList.add("open");dPanel.classList.add("open");
+  dBody.querySelectorAll("[data-dact]").forEach(function(b){b.addEventListener("click",function(){var act=b.getAttribute("data-dact");closeDrawer();if(act)toast(act,"ok")})});
+  dFoot.querySelectorAll("[data-dact]").forEach(function(b){b.addEventListener("click",function(){var act=b.getAttribute("data-dact");closeDrawer();if(act)toast(act,"ok")})});
+}
+function closeDrawer(){dOverlay.classList.remove("open");dPanel.classList.remove("open")}
+document.getElementById("dClose").addEventListener("click",closeDrawer);
+dOverlay.addEventListener("click",closeDrawer);
+
+/* ══════════ MAPS ══════════ */
+var stClassMap={"New":"st-new","Assigned":"st-assigned","In Review":"st-review","Patch Approved":"st-patched","Closure Pending":"st-pending","Closed":"st-closed","Reopened":"st-reopened"};
+var sevClassMap={"HIGH":"sev-high","MED":"sev-med","LOW":"sev-low"};
+var stColorMap={"New":"var(--accent)","Reopened":"var(--bad)","Assigned":"var(--warn)","In Review":"var(--warn)","Patch Approved":"var(--ok)","Closure Pending":"var(--ok)","Closed":"var(--ok)"};
+var catClassMap={"Contract Compliance":"cat-compliance","Performance":"cat-performance","Financial":"cat-financial","Risk & Issue":"cat-risk","Resource":"cat-resource","Technical":"cat-technical","Communication":"cat-comms"};
+
+/* ══════════ FINDINGS TABLE ══════════ */
+function renderFindingsTable(){
+  var tbody=document.getElementById("findTbody");if(!tbody)return;
+  var html="";
+  var ids=Object.keys(F);
+  // Apply filters
+  var fltS=document.getElementById("fltStatus"),fltV=document.getElementById("fltSev"),fltC=document.getElementById("fltCat"),fltT=document.getElementById("fltTO"),fltVe=document.getElementById("fltVendor"),fltSr=document.getElementById("fltSearch");
+  var fs=fltS?fltS.value:"",fv=fltV?fltV.value:"",fc=fltC?fltC.value:"",ft=fltT?fltT.value:"",fve=fltVe?fltVe.value:"",fsr=fltSr?fltSr.value.toLowerCase():"";
+  ids=ids.filter(function(k){
+    var f=F[k];
+    if(fs&&f.status!==fs)return false;
+    if(fv&&f.sev!==fv)return false;
+    if(fc&&f.claimCat!==fc)return false;
+    if(ft&&f.taskOrder!==ft)return false;
+    if(fve&&f.vendor.indexOf(fve)===-1)return false;
+    if(fsr&&(f.title.toLowerCase().indexOf(fsr)===-1&&f.id.toLowerCase().indexOf(fsr)===-1))return false;
+    return true;
+  });
+  ids.sort(function(a,b){
+    var sevOrd={"HIGH":0,"MED":1,"LOW":2};
+    var sa=sevOrd[F[a].sev]||2,sb=sevOrd[F[b].sev]||2;
+    if(sa!==sb)return sa-sb;
+    return parseInt(b)-parseInt(a);
+  });
+  ids.forEach(function(k){
+    var f=F[k];
+    var stCls=stClassMap[f.status]||"st-new";
+    var sevCls=sevClassMap[f.sev]||"sev-low";
+    var catCls=catClassMap[f.claimCat]||"cat-compliance";
+    var idColor=stColorMap[f.status]||"var(--accent)";
+    var shortTitle=f.title.length>45?f.title.substring(0,42)+"...":f.title;
+    html+='<tr style="cursor:pointer" data-fid="'+k+'">';
+    html+='<td class="mono" style="color:'+idColor+'">'+escHTML(f.id)+'</td>';
+    html+='<td>'+escHTML(shortTitle)+'</td>';
+    html+='<td><span class="badge '+stCls+'">'+escHTML(f.status)+'</span></td>';
+    html+='<td><span class="badge '+sevCls+'">'+escHTML(f.sev)+'</span></td>';
+    html+='<td><span class="cat-badge '+catCls+'">'+escHTML(f.claimCat)+'</span></td>';
+    html+='<td class="mono" style="font-size:10px">'+escHTML(f.taskOrder)+'</td>';
+    html+='<td style="font-size:10px">'+escHTML(f.vendor)+'</td>';
+    html+='<td>'+escHTML(f.owner)+'</td>';
+    html+='<td>'+f.brq+'</td>';
+    html+='<td>'+escHTML(f.due)+'</td>';
+    html+='</tr>';
+  });
+  tbody.innerHTML=html;
+}
+renderFindingsTable();
+// Wire filters
+["fltStatus","fltSev","fltCat","fltTO","fltVendor"].forEach(function(id){
+  var el=document.getElementById(id);
+  if(el)el.addEventListener("change",renderFindingsTable);
+});
+var fltSearchEl=document.getElementById("fltSearch");
+if(fltSearchEl){var st;fltSearchEl.addEventListener("keyup",function(){clearTimeout(st);st=setTimeout(renderFindingsTable,200)})}
+
+/* ══════════ FINDING DETAIL ══════════ */
+var fDet=document.getElementById("fDetail");
+function showFinding(fid){
+  var f=F[fid];if(!f)return;
+  var tlHtml='<div class="tl">';
+  for(var i=0;i<5;i++){
+    var ds=f.tlState[i];
+    var cls=ds===1?"done":ds===2?"now":ds===3?"done":"wait";
+    tlHtml+='<div class="tl-s"><div class="tl-dot '+cls+'"></div><div class="tl-lb">'+TL_LABELS[i]+'</div><div class="tl-dt">'+f.timeline[i]+'</div></div>';
+  }
+  tlHtml+='</div>';
+  var evHtml="";
+  f.evidence.forEach(function(e){
+    evHtml+='<div class="ev"><span class="'+(e.ok?'ev-ok':'ev-miss')+'">'+(e.ok?'&#10003;':'&#9675;')+'</span> '+escHTML(e.name)+' <span style="margin-left:auto;font-size:8px;color:var(--'+(e.ok?'ok':'bad')+');">'+(e.ok?'validated':'missing')+'</span>'+(e.ok?'':'<button class="ev-upload">Upload</button>')+'</div>';
+  });
+  var idColor=stColorMap[f.status]||"var(--accent)";
+  var hdr='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">';
+  hdr+='<span class="mono" style="font-size:16px;color:'+idColor+';font-weight:700">'+escHTML(f.id)+'</span>';
+  hdr+='<span class="badge '+(sevClassMap[f.sev]||"sev-low")+'">'+escHTML(f.sev)+'</span>';
+  hdr+='<span class="badge '+(stClassMap[f.status]||"st-new")+'">'+escHTML(f.status)+'</span>';
+  hdr+='<span class="cat-badge '+(catClassMap[f.claimCat]||"cat-compliance")+'">'+escHTML(f.claimCat)+'</span>';
+  if(f.recurring>0)hdr+='<span class="recur">RECURRING &times; '+f.recurring+'</span>';
+  if(f.contractRisk)hdr+='<span style="font-size:8px;padding:2px 6px;border-radius:4px;color:var(--bad);border:1px solid rgba(255,107,107,.25);background:rgba(255,107,107,.05);font-weight:700">CONTRACT RISK</span>';
+  hdr+='<button style="margin-left:auto;font-size:9px;color:var(--muted)" id="btnCloseD">&#10005; Close</button></div>';
+  hdr+='<div style="font-size:14px;font-weight:600;margin-bottom:3px">'+escHTML(f.title)+'</div>';
+  hdr+='<div style="font-size:10px;color:var(--muted);margin-bottom:12px">'+escHTML(f.taskOrder)+' · '+escHTML(f.contract)+' · '+escHTML(f.vendor)+' · Owner: <strong style="color:var(--txt)">'+escHTML(f.owner)+'</strong></div>';
+  var body=hdr+tlHtml;
+  body+='<div class="grid2" style="margin-top:12px"><div>';
+  body+='<div class="wire"><h4>Claim / Event</h4>';
+  body+='<div class="wr"><span class="wl">Claim</span><span class="wv">'+escHTML(f.claim)+'</span></div>';
+  body+='<div class="wr"><span class="wl">Event</span><span class="wv">'+escHTML(f.event)+'</span></div>';
+  body+='<div class="wr"><span class="wl">Category</span><span class="wv">'+escHTML(f.claimCat)+' / '+escHTML(f.claimType)+'</span></div></div>';
+  body+='<div class="wire"><h4>Review</h4>';
+  body+='<div class="wr"><span class="wl">Summary</span><span class="wv">'+escHTML(f.reviewSummary)+'</span></div>';
+  body+='<div class="wr"><span class="wl">Root Cause</span><span class="wv">'+escHTML(f.rootCause)+'</span></div>';
+  body+='<div class="wr"><span class="wl">BRQ</span><span class="wv" style="color:var(--'+(f.brq>=0.8?"ok":f.brq>=0.6?"warn":"bad")+')">'+f.brq+'</span></div></div>';
+  body+='</div><div>';
+  body+='<div class="wire"><h4>Patch</h4>';
+  body+='<div class="wr"><span class="wl">Action</span><span class="wv">'+escHTML(f.patch)+'</span></div>';
+  body+='<div class="wr"><span class="wl">Decision</span><span class="wv">'+escHTML(f.applyDecision)+'</span></div>';
+  body+='<div class="wr"><span class="wl">DEG</span><span class="wv" style="color:var(--warn)">'+escHTML(f.deg)+'</span></div></div>';
+  body+='<div class="wire"><h4>Evidence</h4>'+evHtml+'</div>';
+  body+='<div class="wire"><h4>Impact</h4>';
+  body+='<div class="wr"><span class="wl">Financial</span><span class="wv" style="color:var(--warn)">'+escHTML(f.financialImpact)+'</span></div>';
+  body+='<div class="wr"><span class="wl">Schedule</span><span class="wv">'+escHTML(f.scheduleImpact)+'</span></div>';
+  if(f.linked.length>0)body+='<div class="wr"><span class="wl">Linked</span><span class="wv" style="color:var(--accent)">'+f.linked.join(", ")+'</span></div>';
+  body+='</div>';
+  body+='</div></div>';
+  body+='<div style="margin-top:10px;display:flex;gap:6px">';
+  body+='<button class="primary" data-fact="closure" data-fid="'+fid+'">Request Closure</button>';
+  body+='<button data-fact="review" data-fid="'+fid+'">Send to Review</button>';
+  body+='<button data-fact="link" data-fid="'+fid+'">Link Related</button>';
+  body+='<button data-fact="export" data-fid="'+fid+'">Export Packet</button>';
+  body+='<button data-fact="evidence" data-fid="'+fid+'">Add Evidence</button></div>';
+  fDet.innerHTML=body;
+  fDet.classList.remove("hidden");
+  fDet.scrollIntoView({behavior:"smooth",block:"start"});
+  var bc=document.getElementById("btnCloseD");
+  if(bc)bc.addEventListener("click",function(){fDet.classList.add("hidden")});
+  fDet.querySelectorAll("[data-fact]").forEach(function(b){
+    b.addEventListener("click",function(){openActionDrawer(b.getAttribute("data-fact"),b.getAttribute("data-fid"))});
+  });
+}
+document.getElementById("findTbody").addEventListener("click",function(e){
+  var tr=e.target.closest("tr");if(!tr)return;
+  var fid=tr.getAttribute("data-fid");if(fid)showFinding(fid);
+});
+
+/* ══════════ ACTION DRAWERS ══════════ */
+function openActionDrawer(action,fid){
+  var f=F[fid];if(!f)return;
+  if(action==="closure"){
+    openDrawer("Request Closure — "+f.id,
+      '<div class="wire"><h4>Closure Checklist</h4>'+
+      '<div class="wr"><span class="wl">Owner</span><span class="wv" style="color:var(--ok)">'+escHTML(f.owner)+' &#10003;</span></div>'+
+      '<div class="wr"><span class="wl">Patch</span><span class="wv" style="color:var(--ok)">Proposed &#10003;</span></div>'+
+      '<div class="wr"><span class="wl">Evidence</span><span class="wv" style="color:var(--'+(f.evidence.every(function(e){return e.ok})?"ok":"bad")+')">'+f.evidence.filter(function(e){return e.ok}).length+' of '+f.evidence.length+'</span></div>'+
+      '<div class="wr"><span class="wl">BRQ</span><span class="wv">'+f.brq+'</span></div></div>'+
+      '<div style="font-size:10px;color:var(--muted);margin-top:8px">Submitting closure request to Review Board.</div>',
+      '<button class="primary" data-dact="Closure requested for '+f.id+'">Submit</button><button data-dact="">Cancel</button>');
+  } else if(action==="review"){
+    openDrawer("Send to Review — "+f.id,
+      '<div class="wire"><h4>Review Routing</h4>'+
+      '<div class="wr"><span class="wl">Finding</span><span class="wv">'+f.id+' — '+f.sev+'</span></div>'+
+      '<div class="wr"><span class="wl">Board</span><span class="wv">Q2-IDIQ-BOARD</span></div></div>'+
+      '<div class="df"><label>Priority Note</label><textarea placeholder="Context for the review board..."></textarea></div>',
+      '<button class="primary" data-dact="'+f.id+' sent to Review Board">Send</button>');
+  } else if(action==="link"){
+    var matches=Object.keys(F).filter(function(k){return k!==fid}).map(function(k){
+      return '<div class="wr"><span class="wl mono">'+F[k].id+'</span><span class="wv">'+escHTML(F[k].title.substring(0,40))+'...</span></div>';
+    }).join("");
+    openDrawer("Link Related — "+f.id,'<div class="wire"><h4>Available Findings</h4>'+matches+'</div>',
+      '<button class="primary" data-dact="Linkage created for '+f.id+'">Create Link</button>');
+  } else if(action==="export"){
+    openDrawer("Export Packet — "+f.id,
+      '<div class="wire"><h4>Packet Contents</h4>'+
+      '<div class="wr"><span class="wl">Finding</span><span class="wv">'+f.id+'</span></div>'+
+      '<div class="wr"><span class="wl">Contract</span><span class="wv">'+f.contract+'</span></div>'+
+      '<div class="wr"><span class="wl">Task Order</span><span class="wv">'+f.taskOrder+'</span></div>'+
+      '<div class="wr"><span class="wl">Evidence</span><span class="wv">'+f.evidence.length+' artifacts</span></div>'+
+      '<div class="wr"><span class="wl">Audit Chain</span><span class="wv">'+f.auditChain.join(' → ')+'</span></div></div>',
+      '<button class="primary" data-dact="Packet exported for '+f.id+'">Export PDF</button><button data-dact="JSON copied">Copy JSON</button>');
+  } else if(action==="evidence"){
+    openDrawer("Add Evidence — "+f.id,
+      '<div class="df"><label>Evidence Type</label><select><option>Document</option><option>Screenshot</option><option>Artifact</option><option>Signed Memo</option></select></div>'+
+      '<div class="df"><label>Description</label><input type="text" placeholder="Evidence description..."/></div>'+
+      '<div style="border:2px dashed var(--line);border-radius:8px;padding:20px;text-align:center;color:var(--muted);font-size:11px;margin-top:8px">Drop file here or click to browse</div>',
+      '<button class="primary" data-dact="Evidence added to '+f.id+'">Upload</button>');
+  }
+}
+
+/* ══════════ NEW FINDING ══════════ */
+document.getElementById("btnNew").addEventListener("click",function(){
+  openDrawer("New Finding — IDIQ Intake",
+    '<div class="df"><label>Title</label><input type="text" placeholder="Short description of the finding..."/></div>'+
+    '<div class="grid2">'+
+    '<div class="df"><label>Severity</label><select><option>HIGH</option><option>MED</option><option>LOW</option></select></div>'+
+    '<div class="df"><label>Claim Category</label><select><option>Contract Compliance</option><option>Performance</option><option>Financial</option><option>Risk &amp; Issue</option><option>Resource</option><option>Technical</option><option>Communication</option></select></div></div>'+
+    '<div class="grid2">'+
+    '<div class="df"><label>Task Order</label><select><option>TO-1001</option><option>TO-1002</option><option>TO-1003</option><option>TO-1004</option></select></div>'+
+    '<div class="df"><label>Vendor</label><select><option>Sierra Dynamics</option><option>TechForward LLC</option><option>Apex Systems</option><option>Northbridge Solutions</option></select></div></div>'+
+    '<div class="df"><label>Claim Statement</label><textarea placeholder="What is asserted, deficient, required, or at risk..."></textarea></div>'+
+    '<div class="df"><label>Event Summary</label><textarea placeholder="The observed fact, inspection result, or incident..."></textarea></div>'+
+    '<div class="grid2">'+
+    '<div class="df"><label>Assign To</label><input type="text" placeholder="Owner name..."/></div>'+
+    '<div class="df"><label>Due Date</label><input type="date"/></div></div>'+
+    '<div style="font-size:9px;color:var(--muted);margin-top:6px">This finding enters the CERPA cycle at <strong style="color:#00b4d8">CLAIM</strong> stage.</div>',
+    '<button class="primary" data-dact="Finding created and assigned">Create Finding</button><button data-dact="">Cancel</button>');
+});
+
+/* ══════════ COMPARE ══════════ */
+var cmpBtn=document.getElementById("btnCompare");
+if(cmpBtn){cmpBtn.addEventListener("click",function(){
+  var ids=Object.keys(F);
+  var pills=ids.map(function(k){return '<span class="compare-pill" data-cfid="'+k+'">'+F[k].id+'</span>'}).join("");
+  openDrawer("Compare Findings",
+    '<div style="font-size:11px;color:var(--muted);margin-bottom:8px">Select two findings to compare.</div>'+
+    '<div class="compare-sel" id="compareSel">'+pills+'</div>'+
+    '<div id="compareBody" style="font-size:10px;color:var(--muted);text-align:center;padding:20px">Select two findings above.</div>','');
+  var selected=[];
+  dBody.querySelectorAll(".compare-pill").forEach(function(p){
+    p.addEventListener("click",function(){
+      var fid=p.getAttribute("data-cfid");
+      var idx=selected.indexOf(fid);
+      if(idx>=0){selected.splice(idx,1);p.classList.remove("active")}
+      else if(selected.length<2){selected.push(fid);p.classList.add("active")}
+      if(selected.length===2){
+        var fa=F[selected[0]],fb=F[selected[1]];
+        var cb=document.getElementById("compareBody");
+        if(cb)cb.innerHTML='<div class="compare-grid">'+
+          '<div class="compare-col"><h4 style="color:var(--accent)">'+fa.id+'</h4>'+
+          '<div class="wr"><span class="wl">Status</span><span class="wv">'+fa.status+'</span></div>'+
+          '<div class="wr"><span class="wl">Category</span><span class="wv">'+fa.claimCat+'</span></div>'+
+          '<div class="wr"><span class="wl">Vendor</span><span class="wv">'+fa.vendor+'</span></div>'+
+          '<div class="wr"><span class="wl">BRQ</span><span class="wv">'+fa.brq+'</span></div>'+
+          '<div class="wr"><span class="wl">Root Cause</span><span class="wv">'+fa.rootCause+'</span></div></div>'+
+          '<div class="compare-col"><h4 style="color:var(--accent)">'+fb.id+'</h4>'+
+          '<div class="wr"><span class="wl">Status</span><span class="wv">'+fb.status+'</span></div>'+
+          '<div class="wr"><span class="wl">Category</span><span class="wv">'+fb.claimCat+'</span></div>'+
+          '<div class="wr"><span class="wl">Vendor</span><span class="wv">'+fb.vendor+'</span></div>'+
+          '<div class="wr"><span class="wl">BRQ</span><span class="wv">'+fb.brq+'</span></div>'+
+          '<div class="wr"><span class="wl">Root Cause</span><span class="wv">'+fb.rootCause+'</span></div></div></div>';
+      }
+    });
+  });
+})}
+
+/* ══════════ REVIEW BOARD ══════════ */
+function renderBoardQueue(){
+  var tbody=document.getElementById("boardTbody");if(!tbody)return;
+  var html="";
+  var boardIds=Object.keys(F).filter(function(k){var f=F[k];return f.status!=="Closed"&&f.brq>=0.4});
+  boardIds.sort(function(a,b){return F[b].brq-F[a].brq});
+  boardIds.forEach(function(k){
+    var f=F[k];
+    var catCls=catClassMap[f.claimCat]||"cat-compliance";
+    html+='<tr style="cursor:pointer" data-fid="'+k+'">';
+    html+='<td class="mono" style="color:'+(stColorMap[f.status]||"var(--accent)")+'">'+escHTML(f.id)+'</td>';
+    html+='<td><span class="badge '+(sevClassMap[f.sev]||"sev-low")+'">'+escHTML(f.sev)+'</span></td>';
+    html+='<td style="color:var(--'+(f.brq>=0.8?"ok":f.brq>=0.6?"warn":"bad")+')">'+f.brq+'</td>';
+    html+='<td>'+escHTML(f.deg)+'</td>';
+    html+='<td>'+f.cg+'</td>';
+    html+='<td><span class="cat-badge '+catCls+'">'+escHTML(f.claimCat.substring(0,12))+'</span></td>';
+    html+='<td>'+(f.recurring>0?'<span class="recur">&times;'+f.recurring+'</span>':'—')+'</td>';
+    var act=f.brq>=0.8?"Approve":"Send Back";
+    html+='<td><button class="'+(f.brq>=0.8?"ok":"danger")+'" style="font-size:9px">'+act+'</button></td>';
+    html+='</tr>';
+  });
+  tbody.innerHTML=html;
+}
+renderBoardQueue();
+
+function updateBoardDetail(fid){
+  var f=F[fid];if(!f)return;
+  var evOk=f.evidence.filter(function(e){return e.ok}).length;
+  document.getElementById("bdRisk").innerHTML='<h3>Contract / Risk</h3>'+
+    '<div class="wr"><span class="wl">Finding</span><span class="wv" style="color:'+(stColorMap[f.status]||"var(--accent)")+'">'+escHTML(f.id)+'</span></div>'+
+    '<div class="wr"><span class="wl">Contract</span><span class="wv">'+escHTML(f.contract)+'</span></div>'+
+    '<div class="wr"><span class="wl">Task Order</span><span class="wv">'+escHTML(f.taskOrder)+'</span></div>'+
+    '<div class="wr"><span class="wl">Vendor</span><span class="wv">'+escHTML(f.vendor)+'</span></div>'+
+    '<div class="wr"><span class="wl">Financial</span><span class="wv" style="color:var(--warn)">'+escHTML(f.financialImpact)+'</span></div>'+
+    '<div class="wr"><span class="wl">Contract Risk</span><span class="wv" style="color:var(--'+(f.contractRisk?'bad':'ok')+');">'+(f.contractRisk?'YES':'No')+'</span></div>';
+  document.getElementById("bdPatch").innerHTML='<h3>Patch / Evidence</h3>'+
+    '<div class="wr"><span class="wl">Patch</span><span class="wv">'+escHTML(f.patch.substring(0,60))+'</span></div>'+
+    '<div class="wr"><span class="wl">Decision</span><span class="wv">'+escHTML(f.applyDecision)+'</span></div>'+
+    '<div class="wr"><span class="wl">Evidence</span><span class="wv">'+evOk+' of '+f.evidence.length+'</span></div>';
+  document.getElementById("bdHist").innerHTML='<h3>Recurrence / History</h3>'+
+    '<div class="wr"><span class="wl">Recurring</span><span class="wv">'+(f.recurring>0?'YES &times;'+f.recurring:'None')+'</span></div>'+
+    '<div class="wr"><span class="wl">Root Cause</span><span class="wv">'+escHTML(f.rootCause)+'</span></div>'+
+    '<div class="wr"><span class="wl">Linked</span><span class="wv">'+(f.linked.length>0?f.linked.join(", "):'None')+'</span></div>';
+}
+var firstBoard=Object.keys(F).filter(function(k){return F[k].status!=="Closed"&&F[k].brq>=0.4})[0];
+if(firstBoard)updateBoardDetail(firstBoard);
+
+document.getElementById("boardTbody").addEventListener("click",function(e){
+  if(e.target.closest("button")){
+    var tr=e.target.closest("tr");
+    var fid=tr?tr.getAttribute("data-fid"):"";
+    var act=e.target.textContent.trim();
+    toast(act+" recorded for F-"+fid,"ok");
+    e.stopPropagation();return;
+  }
+  var tr=e.target.closest("tr");if(!tr)return;
+  var fid=tr.getAttribute("data-fid");if(!fid)return;
+  document.querySelectorAll("#boardTbody tr").forEach(function(r){r.style.background=""});
+  tr.style.background="rgba(125,249,255,.06)";
+  updateBoardDetail(fid);
+});
+
+// Board decision buttons
+["btnBoardApprove","btnBoardReject","btnBoardSendBack","btnBoardEscalate"].forEach(function(id){
+  var btn=document.getElementById(id);
+  if(btn)btn.addEventListener("click",function(){toast(btn.textContent.trim()+" decision recorded","ok")});
+});
+var btnRD=document.getElementById("btnRecordDecision");
+if(btnRD)btnRD.addEventListener("click",function(){toast("Decision recorded — Review Board session updated","ok")});
+var btnEP=document.getElementById("btnExportPacket");
+if(btnEP)btnEP.addEventListener("click",function(){
+  openDrawer("Export Board Packet",'<div class="wire"><h4>Session: Q2-IDIQ-BOARD</h4><div class="wr"><span class="wl">Findings</span><span class="wv">'+Object.keys(F).length+' tracked</span></div></div>',
+    '<button class="primary" data-dact="Board packet exported">Export PDF</button>');
+});
+
+// Board filters
+document.querySelectorAll("#boardFilters button").forEach(function(btn){
+  btn.addEventListener("click",function(){
+    var wasActive=btn.classList.contains("primary");
+    document.querySelectorAll("#boardFilters button").forEach(function(b){b.classList.remove("primary")});
+    if(!wasActive)btn.classList.add("primary");
+    toast("Filter: "+(wasActive?"All":btn.textContent),"info");
+  });
+});
+
+/* ══════════ AUDIT ══════════ */
+function renderAudit(){
+  var tbody=document.getElementById("auditTbody");if(!tbody)return;
+  var html="";
+  Object.keys(F).forEach(function(k){
+    var f=F[k];
+    var closed=f.status==="Closed";
+    var reopened=f.status==="Reopened";
+    html+='<tr style="cursor:pointer" data-fid="'+k+'">';
+    html+='<td class="mono" style="color:'+(stColorMap[f.status]||"var(--accent)")+'">'+escHTML(f.id)+'</td>';
+    html+='<td>'+(closed?'2026-Q2':'—')+'</td>';
+    html+='<td style="color:var(--'+(closed?'ok':reopened?'bad':'warn')+');">'+(closed?'&#10003; Verified':reopened?'&#10007; Reopened':'Pending')+'</td>';
+    html+='<td>'+f.evidence.length+'</td>';
+    html+='<td style="color:var(--'+(reopened?'bad':'ok')+');">'+(reopened?'Yes':'No')+'</td>';
+    html+='<td>'+(closed?escHTML(f.reviewer):'—')+'</td>';
+    html+='<td class="mono" style="font-size:8px;color:var(--muted)">'+f.auditChain.join(' → ')+'</td>';
+    html+='</tr>';
+  });
+  tbody.innerHTML=html;
+}
+renderAudit();
+
+document.getElementById("auditTbody").addEventListener("click",function(e){
+  var tr=e.target.closest("tr");if(!tr)return;
+  var fid=tr.getAttribute("data-fid");if(!fid)return;
+  var f=F[fid];if(!f)return;
+  var card=document.getElementById("auditChainCard");
+  card.innerHTML='<h3>Evidence Chain — '+escHTML(f.id)+'</h3>'+
+    '<div class="wire">'+
+    '<div class="wr"><span class="wl">Claim</span><span class="wv">'+escHTML(f.auditChain[0]||"—")+' · '+escHTML(f.claim.substring(0,60))+'</span></div>'+
+    '<div class="wr"><span class="wl">Event</span><span class="wv">'+(f.auditChain[1]||"—")+' · '+escHTML(f.event.substring(0,60))+'</span></div>'+
+    '<div class="wr"><span class="wl">Review</span><span class="wv">'+(f.auditChain[2]||"Pending")+' · '+escHTML(f.reviewSummary.substring(0,60))+'</span></div>'+
+    '<div class="wr"><span class="wl">Patch</span><span class="wv">'+(f.auditChain[3]||"Pending")+' · '+escHTML(f.patch.substring(0,60))+'</span></div>'+
+    '<div class="wr"><span class="wl">Apply</span><span class="wv">'+(f.auditChain[4]||"Pending")+' · '+escHTML(f.applyDecision)+'</span></div>'+
+    '<div class="wr"><span class="wl">Evidence</span><span class="wv">'+f.evidence.length+' artifacts · '+f.evidence.filter(function(e){return e.ok}).length+' validated</span></div>'+
+    '<div class="wr"><span class="wl">Status</span><span class="wv" style="color:var(--'+(f.status==="Closed"?"ok":f.status==="Reopened"?"bad":"warn")+');">'+escHTML(f.status)+'</span></div>'+
+    '</div>';
+});
+
+var btnAE=document.getElementById("btnAuditExport");
+if(btnAE)btnAE.addEventListener("click",function(){
+  openDrawer("Export Audit Package",'<div class="wire"><h4>Audit Package</h4><div class="wr"><span class="wl">Period</span><span class="wv">Q2 FY26</span></div><div class="wr"><span class="wl">Findings</span><span class="wv">'+Object.keys(F).length+'</span></div><div class="wr"><span class="wl">Contract</span><span class="wv">N00178-24-D-0042</span></div></div>',
+    '<button class="primary" data-dact="Audit package exported">Export</button>');
+});
+
+/* ══════════ EXPORT BRIEF ══════════ */
+var btnEB=document.getElementById("btnExportBrief");
+if(btnEB)btnEB.addEventListener("click",function(){
+  openDrawer("Export Command Brief — Q2 FY26 IDIQ",
+    '<div class="wire"><h4>Brief Contents</h4>'+
+    '<div class="wr"><span class="wl">Contract</span><span class="wv">N00178-24-D-0042</span></div>'+
+    '<div class="wr"><span class="wl">CIS</span><span class="wv" style="color:var(--ok)">81</span></div>'+
+    '<div class="wr"><span class="wl">TOs At Risk</span><span class="wv" style="color:var(--bad)">3</span></div>'+
+    '<div class="wr"><span class="wl">Open HIGH</span><span class="wv" style="color:var(--bad)">5</span></div>'+
+    '<div class="wr"><span class="wl">Posture</span><span class="wv" style="color:var(--warn)">AMBER</span></div></div>',
+    '<button class="primary" data-dact="Command Brief exported">Export PDF</button>');
+});
+
+/* ══════════ MEMORY GRAPH ══════════ */
+var MG_NODES=[
+  {id:"n1",type:"finding",label:"F-301",x:300,y:200},{id:"n2",type:"finding",label:"F-302",x:420,y:140},
+  {id:"n3",type:"finding",label:"F-303",x:180,y:280},{id:"n4",type:"finding",label:"F-304",x:500,y:300},
+  {id:"n5",type:"finding",label:"F-305",x:350,y:350},{id:"n6",type:"finding",label:"F-306",x:600,y:180},
+  {id:"n7",type:"finding",label:"F-307",x:100,y:160},{id:"n8",type:"finding",label:"F-308",x:700,y:260},
+  {id:"n9",type:"finding",label:"F-309",x:240,y:400},{id:"n10",type:"finding",label:"F-310",x:550,y:400},
+  {id:"n11",type:"finding",label:"F-311",x:650,y:350},{id:"n12",type:"finding",label:"F-312",x:450,y:450},
+  {id:"p1",type:"pattern",label:"Late Deliverables",x:260,y:120},{id:"p2",type:"pattern",label:"Invoice Gaps",x:150,y:350},
+  {id:"p3",type:"pattern",label:"Staffing Churn",x:430,y:240},{id:"p4",type:"pattern",label:"Evidence Insufficiency",x:550,y:120},
+  {id:"p5",type:"pattern",label:"Subcontractor Issues",x:700,y:160},
+  {id:"rc1",type:"rootcause",label:"Vendor Capacity",x:340,y:80},{id:"rc2",type:"rootcause",label:"Process Gap",x:80,y:240},
+  {id:"rc3",type:"rootcause",label:"Scope Creep",x:620,y:80},{id:"rc4",type:"rootcause",label:"Turnover",x:480,y:180},
+  {id:"pa1",type:"patch",label:"Staffing Plan Rev",x:400,y:320},{id:"pa2",type:"patch",label:"Invoice Audit SOP",x:120,y:420},
+  {id:"pa3",type:"patch",label:"CM Baseline Reset",x:560,y:320},{id:"pa4",type:"patch",label:"SLA Renegotiation",x:680,y:300},
+  {id:"to1",type:"taskorder",label:"TO-1001",x:200,y:180},{id:"to2",type:"taskorder",label:"TO-1002",x:350,y:280},
+  {id:"to3",type:"taskorder",label:"TO-1003",x:500,y:360},{id:"to4",type:"taskorder",label:"TO-1004",x:640,y:240},
+  {id:"v1",type:"vendor",label:"Sierra Dynamics",x:150,y:80},{id:"v2",type:"vendor",label:"TechForward",x:300,y:420},
+  {id:"v3",type:"vendor",label:"Apex Systems",x:550,y:460},{id:"v4",type:"vendor",label:"Northbridge",x:720,y:380}
+];
+
+var MG_EDGES=[
+  {from:"n1",to:"p1"},{from:"n2",to:"p1"},{from:"n3",to:"p2"},{from:"n9",to:"p2"},
+  {from:"n4",to:"p3"},{from:"n5",to:"p3"},{from:"n6",to:"p4"},{from:"n11",to:"p4"},
+  {from:"n5",to:"p5"},{from:"n8",to:"p5"},
+  {from:"p1",to:"rc1"},{from:"p2",to:"rc2"},{from:"p3",to:"rc4"},{from:"p4",to:"rc3"},{from:"p5",to:"rc1"},
+  {from:"n4",to:"pa1"},{from:"n5",to:"pa1"},{from:"n3",to:"pa2"},{from:"n9",to:"pa2"},
+  {from:"n6",to:"pa3"},{from:"n12",to:"pa3"},{from:"n8",to:"pa4"},
+  {from:"n1",to:"to1"},{from:"n2",to:"to1"},{from:"n7",to:"to1"},
+  {from:"n3",to:"to2"},{from:"n4",to:"to2"},{from:"n5",to:"to2"},
+  {from:"n6",to:"to3"},{from:"n10",to:"to3"},{from:"n12",to:"to3"},
+  {from:"n8",to:"to4"},{from:"n9",to:"to4"},{from:"n11",to:"to4"},
+  {from:"to1",to:"v1"},{from:"to2",to:"v2"},{from:"to3",to:"v3"},{from:"to4",to:"v4"}
+];
+
+var MG_COLORS={finding:"var(--accent)",pattern:"var(--mag)",rootcause:"var(--bad)",patch:"var(--ok)",taskorder:"var(--warn)",vendor:"#e0e0e0"};
+
+function renderMG(){
+  var svg=document.getElementById("mgSVG");if(!svg)return;
+  var w=svg.clientWidth||800,h=svg.clientHeight||500;
+  var activeTypes={};
+  document.querySelectorAll("#mgToolbar .mg-filter").forEach(function(b){
+    activeTypes[b.dataset.type]=b.classList.contains("active");
+  });
+  var visNodes=MG_NODES.filter(function(n){return activeTypes[n.type]!==false});
+  var visIds={};visNodes.forEach(function(n){visIds[n.id]=true});
+  var visEdges=MG_EDGES.filter(function(e){return visIds[e.from]&&visIds[e.to]});
+
+  var html='';
+  visEdges.forEach(function(e){
+    var a=MG_NODES.find(function(n){return n.id===e.from});
+    var b=MG_NODES.find(function(n){return n.id===e.to});
+    if(a&&b) html+='<line x1="'+a.x+'" y1="'+a.y+'" x2="'+b.x+'" y2="'+b.y+'" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" data-from="'+e.from+'" data-to="'+e.to+'"/>';
+  });
+  visNodes.forEach(function(n){
+    var r=n.type==="finding"?18:n.type==="vendor"?22:16;
+    html+='<circle cx="'+n.x+'" cy="'+n.y+'" r="'+r+'" fill="'+MG_COLORS[n.type]+'" opacity="0.85" data-nid="'+n.id+'" class="mg-node" style="cursor:pointer"/>';
+    html+='<text x="'+n.x+'" y="'+(n.y+r+14)+'" fill="#aaa" font-size="10" text-anchor="middle">'+escHTML(n.label)+'</text>';
+  });
+  svg.innerHTML=html;
+
+  svg.querySelectorAll(".mg-node").forEach(function(el){
+    el.addEventListener("mouseenter",function(){
+      var nid=el.dataset.nid;
+      svg.querySelectorAll("line").forEach(function(ln){
+        if(ln.dataset.from===nid||ln.dataset.to===nid){ln.setAttribute("stroke","var(--accent)");ln.setAttribute("stroke-width","3");}
+        else{ln.setAttribute("stroke","rgba(255,255,255,0.04)");ln.setAttribute("stroke-width","1");}
+      });
+      svg.querySelectorAll(".mg-node").forEach(function(c){
+        var cid=c.dataset.nid;
+        var connected=visEdges.some(function(e){return(e.from===nid&&e.to===cid)||(e.to===nid&&e.from===cid)});
+        c.setAttribute("opacity",cid===nid||connected?"1":"0.2");
+      });
+    });
+    el.addEventListener("mouseleave",function(){
+      svg.querySelectorAll("line").forEach(function(ln){ln.setAttribute("stroke","rgba(255,255,255,0.12)");ln.setAttribute("stroke-width","1.5");});
+      svg.querySelectorAll(".mg-node").forEach(function(c){c.setAttribute("opacity","0.85");});
+    });
+    el.addEventListener("click",function(){
+      var nid=el.dataset.nid;var nd=MG_NODES.find(function(n){return n.id===nid});if(!nd)return;
+      var rels=visEdges.filter(function(e){return e.from===nid||e.to===nid}).map(function(e){
+        var tid=e.from===nid?e.to:e.from;var tn=MG_NODES.find(function(n){return n.id===tid});
+        return tn?tn.label:"?";
+      });
+      openDrawer("Memory Node — "+escHTML(nd.label),
+        '<div class="wire"><div class="wr"><span class="wl">Type</span><span class="wv" style="color:'+MG_COLORS[nd.type]+'">'+nd.type.toUpperCase()+'</span></div>'+
+        '<div class="wr"><span class="wl">Connections</span><span class="wv">'+rels.length+'</span></div>'+
+        '<div class="wr"><span class="wl">Linked To</span><span class="wv">'+rels.join(", ")+'</span></div></div>','');
+    });
+  });
+
+  /* graph stats */
+  var gs=document.getElementById("graphStats");
+  if(gs) gs.innerHTML='<div class="wr"><span class="wl">Nodes</span><span class="wv">'+visNodes.length+'</span></div>'+
+    '<div class="wr"><span class="wl">Edges</span><span class="wv">'+visEdges.length+'</span></div>'+
+    '<div class="wr"><span class="wl">Types</span><span class="wv">'+Object.keys(activeTypes).filter(function(k){return activeTypes[k]!==false}).length+'/6</span></div>'+
+    '<div class="wr"><span class="wl">Density</span><span class="wv">'+(visNodes.length>1?(visEdges.length/(visNodes.length*(visNodes.length-1)/2)*100).toFixed(1):0)+'%</span></div>';
+
+  /* reusable patch history */
+  var rp=document.getElementById("mgPatches");
+  if(rp) rp.innerHTML='<div class="wr"><span class="wl">Staffing Plan Rev</span><span class="wv">Applied 2× (F-304, F-305)</span></div>'+
+    '<div class="wr"><span class="wl">Invoice Audit SOP</span><span class="wv">Applied 2× (F-303, F-309)</span></div>'+
+    '<div class="wr"><span class="wl">CM Baseline Reset</span><span class="wv">Applied 2× (F-306, F-312)</span></div>'+
+    '<div class="wr"><span class="wl">SLA Renegotiation</span><span class="wv">Applied 1× (F-308)</span></div>';
+}
+
+/* graph toolbar filters */
+document.querySelectorAll("#mgToolbar .mg-filter").forEach(function(b){
+  b.addEventListener("click",function(){b.classList.toggle("active");renderMG();});
+});
+var mgSearch=document.getElementById("mgSearch");
+if(mgSearch)mgSearch.addEventListener("input",function(){
+  var q=this.value.toLowerCase();
+  var svg=document.getElementById("mgSVG");if(!svg)return;
+  svg.querySelectorAll(".mg-node").forEach(function(c){
+    var nid=c.dataset.nid;var nd=MG_NODES.find(function(n){return n.id===nid});
+    c.setAttribute("opacity",!q||nd.label.toLowerCase().indexOf(q)>-1?"0.85":"0.15");
+  });
+});
+
+/* ══════════ TASK PANEL ══════════ */
+function deriveTasks(){
+  var tasks=[];
+  Object.keys(F).forEach(function(k){
+    var f=F[k];
+    if(f.sev==="HIGH"&&f.status==="Open") tasks.push({pri:1,label:f.id+": "+f.title,tag:"HIGH OPEN",color:"var(--bad)"});
+    if(f.status==="Reopened") tasks.push({pri:2,label:f.id+": Reopened — requires re-review",tag:"REOPENED",color:"var(--mag)"});
+    if(f.brq<60) tasks.push({pri:3,label:f.id+": Low BRQ ("+f.brq+") — add evidence",tag:"LOW BRQ",color:"var(--warn)"});
+    if(f.recurring) tasks.push({pri:4,label:f.id+": Recurring pattern — review root cause",tag:"RECURRING",color:"var(--warn)"});
+  });
+  Object.keys(TO).forEach(function(k){
+    var t=TO[k];
+    if(t.riskLevel==="HIGH") tasks.push({pri:1,label:t.id+": "+t.name+" — HIGH RISK TO",tag:"AT RISK",color:"var(--bad)"});
+    var bv=Math.abs(((t.actualSpend-t.plannedSpend)/t.plannedSpend)*100);
+    if(bv>15) tasks.push({pri:2,label:t.id+": Burn variance "+bv.toFixed(0)+"%",tag:"BURN",color:"var(--warn)"});
+  });
+  tasks.sort(function(a,b){return a.pri-b.pri});
+  return tasks.slice(0,10);
+}
+
+function renderTaskPanel(){
+  var tp=document.getElementById("taskPanelBody");if(!tp)return;
+  var tasks=deriveTasks();
+  if(!tasks.length){tp.innerHTML='<p style="color:#666;padding:12px">No priority tasks</p>';return;}
+  tp.innerHTML=tasks.map(function(t){
+    return '<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--bd)">'+
+      '<span class="badge" style="background:'+t.color+';font-size:10px">'+escHTML(t.tag)+'</span>'+
+      '<span style="font-size:13px;color:#ccc">'+escHTML(t.label)+'</span></div>';
+  }).join("");
+}
+
+function renderCriticalSummary(){
+  var cs=document.getElementById("critSummary");if(!cs)return;
+  var highOpen=Object.values(F).filter(function(f){return f.sev==="HIGH"&&f.status!=="Closed"}).length;
+  var reopened=Object.values(F).filter(function(f){return f.status==="Reopened"}).length;
+  var atRiskTO=Object.values(TO).filter(function(t){return t.riskLevel==="HIGH"}).length;
+  cs.innerHTML='<div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">'+
+    '<div class="kpi" style="border-color:var(--bad)"><div class="kpi-val" style="color:var(--bad)">'+highOpen+'</div><div class="kpi-lbl">Open HIGH Findings</div></div>'+
+    '<div class="kpi" style="border-color:var(--mag)"><div class="kpi-val" style="color:var(--mag)">'+reopened+'</div><div class="kpi-lbl">Reopened Findings</div></div>'+
+    '<div class="kpi" style="border-color:var(--warn)"><div class="kpi-val" style="color:var(--warn)">'+atRiskTO+'</div><div class="kpi-lbl">At-Risk Task Orders</div></div></div>';
+}
+
+/* ══════════ ACTIVITY FEED ══════════ */
+var FEED_ITEMS=[
+  {ts:"10:42",who:"CO",text:"F-301 escalated to Review Board",icon:"⚡"},
+  {ts:"10:38",who:"COR",text:"Evidence added to F-306 (CM baseline)",icon:"📎"},
+  {ts:"10:35",who:"PM",text:"F-304 owner reassigned to Task Lead",icon:"👤"},
+  {ts:"10:30",who:"QA",text:"F-308 SLA metrics re-evaluated",icon:"📊"},
+  {ts:"10:22",who:"FIN",text:"F-309 burn rate variance flagged",icon:"💰"},
+  {ts:"10:18",who:"CO",text:"F-310 corrective action approved",icon:"✅"},
+  {ts:"10:12",who:"TOM",text:"TO-1002 status updated to AMBER",icon:"🔶"},
+  {ts:"10:05",who:"SYS",text:"CIS recalculated: 81 (+2)",icon:"📈"},
+  {ts:"09:58",who:"COR",text:"F-312 integration test results attached",icon:"🔗"},
+  {ts:"09:50",who:"PM",text:"Weekly IDIQ review scheduled",icon:"📅"}
+];
+
+function renderFeed(){
+  var fb=document.getElementById("feedBody");if(!fb)return;
+  fb.innerHTML=FEED_ITEMS.map(function(fi){
+    return '<div class="feed-item"><span class="feed-icon">'+fi.icon+'</span><span class="feed-ts">'+escHTML(fi.ts)+'</span><span class="feed-who">'+escHTML(fi.who)+'</span><span class="feed-text">'+escHTML(fi.text)+'</span></div>';
+  }).join("");
+}
+
+var feedToggle=document.getElementById("feedToggle");
+var feedPanel=document.getElementById("feedPanel");
+if(feedToggle&&feedPanel){
+  feedToggle.addEventListener("click",function(){
+    feedPanel.classList.toggle("open");
+    feedToggle.textContent=feedPanel.classList.contains("open")?"✕":"⚡";
+  });
+}
+
+/* ══════════ SPARKLINES ══════════ */
+function renderSparklines(){
+  document.querySelectorAll(".spark").forEach(function(el){
+    var raw=el.dataset.vals;if(!raw)return;
+    var vals=raw.split(",").map(Number);
+    var mx=Math.max.apply(null,vals),mn=Math.min.apply(null,vals);
+    var w=60,h=20,step=w/(vals.length-1);
+    var pts=vals.map(function(v,i){return (i*step)+","+(h-((v-mn)/(mx-mn||1))*h);}).join(" ");
+    el.innerHTML='<svg width="'+w+'" height="'+h+'" style="vertical-align:middle"><polyline points="'+pts+'" fill="none" stroke="var(--accent)" stroke-width="1.5"/></svg>';
+  });
+}
+
+/* ══════════ KEYBOARD SHORTCUTS ══════════ */
+document.addEventListener("keydown",function(e){
+  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA"||e.target.tagName==="SELECT")return;
+  var k=e.key;
+  if(k>="1"&&k<="8"){e.preventDefault();openTab(parseInt(k)-1);return;}
+  if(k==="Escape"){
+    var dw=document.getElementById("drawer");if(dw&&dw.classList.contains("open")){closeDrawer();e.preventDefault();return;}
+    var tp=document.getElementById("taskPanel");if(tp&&tp.classList.contains("open")){tp.classList.remove("open");e.preventDefault();return;}
+    if(feedPanel&&feedPanel.classList.contains("open")){feedPanel.classList.remove("open");feedToggle.textContent="⚡";e.preventDefault();return;}
+  }
+  if(k==="n"||k==="N"){e.preventDefault();openNewFindingDrawer();return;}
+  if(k==="?"){e.preventDefault();document.getElementById("shortcutBar").classList.toggle("open");return;}
+  if(k==="/"){
+    e.preventDefault();
+    var si=document.getElementById("findSearch");
+    if(si){openTab(2);si.focus();}
+    return;
+  }
+});
+
+/* ══════════ GUIDED TOUR ══════════ */
+var TOUR_STEPS=[
+  {el:"header",text:"Welcome to DEEP SIGMA EDGE — CERPA IDIQ v1.0.0. This is your IDIQ Contract Management control surface."},
+  {el:"s-roles",text:"Roles define your view. Each role sees different tabs and lands on a specific surface.",tab:0},
+  {el:"s-dash",text:"The Dashboard shows 12 KPIs, CIS gauge, At-Risk vendors, and command attention items.",tab:1},
+  {el:"s-find",text:"Findings are the core unit. Filter by status, severity, claim category, task order, or vendor.",tab:2},
+  {el:"s-board",text:"The Review Board is where findings are assessed and decisions are made under the CERPA lifecycle.",tab:3},
+  {el:"s-trends",text:"Trends show category distributions, severity heatmaps, TO drift, and root cause patterns.",tab:4},
+  {el:"s-mem",text:"The Memory Graph maps relationships between findings, patterns, patches, root causes, TOs, and vendors.",tab:5},
+  {el:"s-admin",text:"Admin configures roles, workflow hard laws, claim routing, permissions, and KPI thresholds.",tab:6},
+  {el:"s-audit",text:"Audit provides the evidence chain, CERPA lineage, export packages, and closure verification.",tab:7},
+  {el:"shortcutBar",text:"Press ? for keyboard shortcuts. 1-8 switch tabs, N opens new finding, / searches, Esc closes."}
+];
+var tourIdx=0;
+
+function startTour(){
+  tourIdx=0;
+  document.getElementById("onboardModal").style.display="none";
+  renderTourStep();
+}
+
+function renderTourStep(){
+  var overlay=document.getElementById("tourOverlay");
+  if(!overlay){overlay=document.createElement("div");overlay.id="tourOverlay";overlay.className="tour-overlay";document.body.appendChild(overlay);}
+  if(tourIdx>=TOUR_STEPS.length){overlay.remove();return;}
+  var step=TOUR_STEPS[tourIdx];
+  if(step.tab!==undefined)openTab(step.tab);
+  overlay.innerHTML='<div class="tour-box"><div class="tour-text">'+escHTML(step.text)+'</div>'+
+    '<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">'+
+    '<span style="color:#666;font-size:12px">'+(tourIdx+1)+'/'+TOUR_STEPS.length+'</span>'+
+    (tourIdx>0?'<button class="ghost" id="tourPrev">Back</button>':'')+
+    '<button class="primary" id="tourNext">'+(tourIdx===TOUR_STEPS.length-1?"Finish":"Next")+'</button></div></div>';
+  var nb=document.getElementById("tourNext");if(nb)nb.addEventListener("click",function(){tourIdx++;renderTourStep();});
+  var pb=document.getElementById("tourPrev");if(pb)pb.addEventListener("click",function(){tourIdx--;renderTourStep();});
+}
+
+/* onboarding dismiss */
+var obDismiss=document.getElementById("onboardDismiss");
+if(obDismiss)obDismiss.addEventListener("click",function(){document.getElementById("onboardModal").style.display="none";});
+var obTour=document.getElementById("onboardTour");
+if(obTour)obTour.addEventListener("click",function(){startTour();});
+
+/* ══════════ BOARD SESSION TIMER ══════════ */
+var boardTime=0,boardTimer=null;
+function startBoardTimer(){
+  if(boardTimer)return;
+  boardTime=0;
+  boardTimer=setInterval(function(){
+    boardTime++;
+    var m=Math.floor(boardTime/60),s=boardTime%60;
+    var el=document.getElementById("boardTimer");
+    if(el)el.textContent=(m<10?"0":"")+m+":"+(s<10?"0":"")+s;
+  },1000);
+}
+function stopBoardTimer(){if(boardTimer){clearInterval(boardTimer);boardTimer=null;}}
+
+/* ══════════ DROP ZONE (Admin) ══════════ */
+var dz=document.getElementById("dropZone");
+if(dz){
+  dz.addEventListener("dragover",function(e){e.preventDefault();dz.classList.add("dragover");});
+  dz.addEventListener("dragleave",function(){dz.classList.remove("dragover");});
+  dz.addEventListener("drop",function(e){
+    e.preventDefault();dz.classList.remove("dragover");
+    toast("File import is disabled in EDGE-hardened mode","warn");
+  });
+}
+
+/* ══════════ TAB PREFS ══════════ */
+var tabPrefBtn=document.getElementById("tabPrefBtn");
+if(tabPrefBtn)tabPrefBtn.addEventListener("click",function(){
+  var tabs=["Roles","Dashboard","Findings","Review Board","Trends","Memory","Admin","Audit"];
+  var html='<div class="wire"><h4>Tab Visibility Preferences</h4>'+tabs.map(function(t,i){
+    return '<div class="wr"><span class="wl">'+escHTML(t)+'</span><span class="wv"><input type="checkbox" checked data-tab="'+i+'"></span></div>';
+  }).join("")+'</div>';
+  openDrawer("Tab Preferences",html,'<button class="primary" data-dact="Tab preferences saved">Apply</button>');
+});
+
+/* ══════════ PRINT VIEW ══════════ */
+var printBtn=document.getElementById("printBtn");
+if(printBtn)printBtn.addEventListener("click",function(){window.print();});
+
+/* ══════════ TASK PANEL TOGGLE ══════════ */
+var tpToggle=document.getElementById("taskPanelToggle");
+var tpEl=document.getElementById("taskPanel");
+if(tpToggle&&tpEl){
+  tpToggle.addEventListener("click",function(){tpEl.classList.toggle("open");});
+}
+
+/* ══════════ SHORTCUT BAR ══════════ */
+var sbToggle=document.getElementById("shortcutToggle");
+if(sbToggle)sbToggle.addEventListener("click",function(){
+  document.getElementById("shortcutBar").classList.toggle("open");
+});
+
+/* ══════════ CIS GAUGE ══════════ */
+function renderCISGauge(){
+  var el=document.getElementById("cisArc");if(!el)return;
+  var cis=81,pct=cis/100,circumf=2*Math.PI*54,offset=circumf*(1-pct*0.75);
+  var color=cis>=80?"var(--ok)":cis>=60?"var(--warn)":"var(--bad)";
+  el.innerHTML='<svg viewBox="0 0 120 120" width="120" height="120">'+
+    '<circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10" stroke-dasharray="'+circumf+'" stroke-dashoffset="'+(circumf*0.25)+'" transform="rotate(135 60 60)"/>'+
+    '<circle cx="60" cy="60" r="54" fill="none" stroke="'+color+'" stroke-width="10" stroke-dasharray="'+circumf+'" stroke-dashoffset="'+offset+'" stroke-linecap="round" transform="rotate(135 60 60)" style="transition:stroke-dashoffset 1s"/>'+
+    '<text x="60" y="58" text-anchor="middle" fill="'+color+'" font-size="28" font-weight="700">'+cis+'</text>'+
+    '<text x="60" y="74" text-anchor="middle" fill="#888" font-size="10">CIS</text></svg>';
+}
+
+/* ══════════ AT-RISK STRIP ══════════ */
+function renderAtRiskStrip(){
+  var el=document.getElementById("atRiskStrip");if(!el)return;
+  var items=[];
+  Object.values(TO).forEach(function(t){
+    if(t.riskLevel==="HIGH"||Math.abs(((t.actualSpend-t.plannedSpend)/t.plannedSpend)*100)>15){
+      items.push({id:t.id,name:t.name,vendor:t.vendor,risk:t.riskLevel,burn:((t.actualSpend/t.plannedSpend)*100).toFixed(0)});
+    }
+  });
+  Object.values(F).forEach(function(f){
+    if(f.sev==="HIGH"&&f.status!=="Closed"&&!items.some(function(i){return i.vendor===f.vendor})){
+      items.push({id:f.id,name:f.title.substring(0,30),vendor:f.vendor,risk:"HIGH",burn:"—"});
+    }
+  });
+  if(!items.length){el.innerHTML='<div style="padding:12px;color:#666">No at-risk items</div>';return;}
+  el.innerHTML=items.map(function(it){
+    return '<div class="vendor-strip-item" style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(255,59,48,0.08);border:1px solid rgba(255,59,48,0.2);border-radius:8px;margin:4px">'+
+      '<span class="badge" style="background:var(--bad)">'+escHTML(it.risk)+'</span>'+
+      '<span style="color:#ccc;font-size:13px"><strong>'+escHTML(it.id)+'</strong> · '+escHTML(it.vendor)+'</span>'+
+      '<span style="color:#888;font-size:11px">Burn: '+it.burn+'%</span></div>';
+  }).join("");
+}
+
+/* ══════════ KPI RENDERING ══════════ */
+function renderKPIs(){
+  var kpis=[
+    {id:"kCIS",val:81,lbl:"CIS",color:"ok",spark:"72,75,78,76,80,81"},
+    {id:"kPAR",val:88,lbl:"PAR",color:"ok",spark:"82,84,85,87,86,88"},
+    {id:"kDES",val:3,lbl:"DES",color:"warn",spark:"5,4,4,3,3,3"},
+    {id:"kDEG",val:4.2,lbl:"DEG (days)",color:"warn",spark:"6,5.5,5,4.8,4.5,4.2"},
+    {id:"kBRQ",val:72,lbl:"BRQ",color:"warn",spark:"60,63,65,68,70,72"},
+    {id:"kCG",val:18,lbl:"CG (days)",color:"warn",spark:"25,22,20,19,18,18"},
+    {id:"kTOR",val:3,lbl:"TOs At Risk",color:"bad",spark:"1,2,2,3,3,3"},
+    {id:"kOHR",val:5,lbl:"Open HIGH",color:"bad",spark:"3,4,4,5,5,5"},
+    {id:"kABV",val:12,lbl:"Avg Burn Var %",color:"warn",spark:"8,9,10,11,12,12"},
+    {id:"kIEC",val:2,lbl:"Invoice Exceptions",color:"warn",spark:"4,3,3,2,2,2"},
+    {id:"kKPG",val:1,lbl:"Key Personnel Gaps",color:"warn",spark:"2,2,1,1,1,1"},
+    {id:"kSLD",val:2,lbl:"SLA Drift Count",color:"warn",spark:"1,1,2,2,2,2"}
+  ];
+  kpis.forEach(function(kp){
+    var el=document.getElementById(kp.id);if(!el)return;
+    el.innerHTML='<div class="kpi-val" style="color:var(--'+kp.color+')">'+kp.val+'</div>'+
+      '<div class="kpi-lbl">'+escHTML(kp.lbl)+'</div>'+
+      '<div class="spark" data-vals="'+kp.spark+'"></div>';
+  });
+}
+
+/* ══════════ TRENDS RENDERING ══════════ */
+function renderTrends(){
+  var cats=[
+    {name:"Contract Compliance",count:2,color:"var(--accent)"},
+    {name:"Financial",count:2,color:"var(--warn)"},
+    {name:"Resource",count:2,color:"var(--mag)"},
+    {name:"Technical",count:2,color:"#4ecdc4"},
+    {name:"Communication",count:2,color:"#95a5a6"},
+    {name:"Performance",count:1,color:"var(--ok)"},
+    {name:"Risk & Issue",count:1,color:"var(--bad)"}
+  ];
+  var maxC=Math.max.apply(null,cats.map(function(c){return c.count}));
+  var el=document.getElementById("catTrends");if(!el)return;
+  el.innerHTML=cats.map(function(c){
+    var pct=(c.count/maxC*100).toFixed(0);
+    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'+
+      '<span style="width:160px;font-size:12px;color:#aaa;text-align:right">'+escHTML(c.name)+'</span>'+
+      '<div style="flex:1;background:rgba(255,255,255,0.04);border-radius:4px;height:20px">'+
+      '<div style="width:'+pct+'%;height:100%;background:'+c.color+';border-radius:4px;transition:width 0.5s"></div></div>'+
+      '<span style="width:24px;font-size:12px;color:#888">'+c.count+'</span></div>';
+  }).join("");
+
+  /* severity heatmap */
+  var hm=document.getElementById("sevHeatmap");if(!hm)return;
+  var grid=[
+    ["HIGH","<7d",2],["HIGH","7-14d",1],["HIGH","14-30d",1],["HIGH",">30d",1],
+    ["MED","<7d",1],["MED","7-14d",2],["MED","14-30d",1],["MED",">30d",0],
+    ["LOW","<7d",0],["LOW","7-14d",1],["LOW","14-30d",1],["LOW",">30d",1]
+  ];
+  hm.innerHTML='<div style="display:grid;grid-template-columns:60px repeat(4,1fr);gap:2px;font-size:11px">'+
+    '<div></div><div style="text-align:center;color:#888">&lt;7d</div><div style="text-align:center;color:#888">7-14d</div><div style="text-align:center;color:#888">14-30d</div><div style="text-align:center;color:#888">&gt;30d</div>'+
+    grid.map(function(cell,i){
+      var prefix=i%4===0?'<div style="color:#aaa;display:flex;align-items:center">'+cell[0]+'</div>':'';
+      var opacity=cell[2]===0?0.05:cell[2]===1?0.3:cell[2]===2?0.6:0.9;
+      return prefix+'<div style="background:rgba(0,163,255,'+opacity+');height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff">'+cell[2]+'</div>';
+    }).join("")+'</div>';
+
+  /* TO drift */
+  var td=document.getElementById("toDrift");if(!td)return;
+  td.innerHTML=Object.values(TO).map(function(t){
+    var bv=((t.actualSpend-t.plannedSpend)/t.plannedSpend*100).toFixed(1);
+    var color=Math.abs(bv)>15?"var(--bad)":Math.abs(bv)>10?"var(--warn)":"var(--ok)";
+    return '<div class="wr"><span class="wl">'+escHTML(t.id)+' · '+escHTML(t.vendor)+'</span><span class="wv" style="color:'+color+'">'+(bv>0?"+":"")+bv+'%</span></div>';
+  }).join("");
+
+  /* top root causes */
+  var rc=document.getElementById("topRootCauses");if(!rc)return;
+  var causes={};Object.values(F).forEach(function(f){causes[f.rootCause]=(causes[f.rootCause]||0)+1;});
+  var sorted=Object.keys(causes).sort(function(a,b){return causes[b]-causes[a];});
+  rc.innerHTML=sorted.map(function(c){
+    return '<div class="wr"><span class="wl">'+escHTML(c)+'</span><span class="wv">'+causes[c]+' findings</span></div>';
+  }).join("");
+}
+
+/* ══════════ DASHBOARD RENDERING ══════════ */
+function renderDashboard(){
+  renderCISGauge();
+  renderKPIs();
+  renderAtRiskStrip();
+  renderCriticalSummary();
+  renderTaskPanel();
+
+  /* board-ready queue */
+  var brq=document.getElementById("boardReadyQueue");
+  if(brq){
+    var ready=Object.values(F).filter(function(f){return f.brq>=70&&f.status!=="Closed"});
+    brq.innerHTML=ready.length?ready.map(function(f){
+      return '<div class="wr" style="cursor:pointer" onclick="openTab(3)"><span class="wl">'+escHTML(f.id)+'</span><span class="wv">BRQ '+f.brq+' · '+escHTML(f.claimCat)+'</span></div>';
+    }).join(""):'<div style="padding:8px;color:#666">No board-ready findings</div>';
+  }
+
+  /* contract health */
+  var ch=document.getElementById("contractHealth");
+  if(ch){
+    var openCount=Object.values(F).filter(function(f){return f.status!=="Closed"}).length;
+    var highCount=Object.values(F).filter(function(f){return f.sev==="HIGH"&&f.status!=="Closed"}).length;
+    var posture=highCount>=4?"RED":highCount>=2?"AMBER":"GREEN";
+    var pc=posture==="RED"?"var(--bad)":posture==="AMBER"?"var(--warn)":"var(--ok)";
+    ch.innerHTML='<div class="wr"><span class="wl">Contract</span><span class="wv">N00178-24-D-0042</span></div>'+
+      '<div class="wr"><span class="wl">Open Findings</span><span class="wv">'+openCount+'</span></div>'+
+      '<div class="wr"><span class="wl">Open HIGH</span><span class="wv" style="color:var(--bad)">'+highCount+'</span></div>'+
+      '<div class="wr"><span class="wl">Posture</span><span class="wv" style="color:'+pc+';font-weight:700">'+posture+'</span></div>';
+  }
+}
+
+/* ══════════ INIT ══════════ */
+renderDashboard();
+renderFindingsTable();
+renderBoardQueue();
+renderTrends();
+renderMG();
+renderAudit();
+renderFeed();
+renderSparklines();
+applyRole("executive");
+
+/* show onboarding on first load */
+var om=document.getElementById("onboardModal");
+if(om)om.style.display="flex";
+
+})();
+</script>
+</body>
+</html>
