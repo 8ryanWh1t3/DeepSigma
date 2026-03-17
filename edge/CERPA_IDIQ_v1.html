@@ -682,12 +682,12 @@ footer strong{color:var(--accent);font-weight:600}
       </div>
     </div>
     <div style="display:flex;gap:14px;margin-top:8px;font-size:9px;color:var(--muted);flex-wrap:wrap">
-      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#00b4d8;vertical-align:middle;margin-right:3px"></span>Finding</span>
-      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#8b5cf6;vertical-align:middle;margin-right:3px"></span>Pattern</span>
-      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#10b981;vertical-align:middle;margin-right:3px"></span>Patch</span>
-      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#f59e0b;vertical-align:middle;margin-right:3px"></span>Root Cause</span>
-      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#ec4899;vertical-align:middle;margin-right:3px"></span>Task Order</span>
-      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#ef4444;vertical-align:middle;margin-right:3px"></span>Vendor</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent);vertical-align:middle;margin-right:3px"></span>Finding</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--mag);vertical-align:middle;margin-right:3px"></span>Pattern</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--ok);vertical-align:middle;margin-right:3px"></span>Patch</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--bad);vertical-align:middle;margin-right:3px"></span>Root Cause</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--warn);vertical-align:middle;margin-right:3px"></span>Task Order</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--txt);vertical-align:middle;margin-right:3px"></span>Vendor</span>
     </div>
   </div>
   <div class="grid2">
@@ -1594,7 +1594,8 @@ var MG_EDGES=[
   {from:"to1",to:"v1"},{from:"to2",to:"v2"},{from:"to3",to:"v3"},{from:"to4",to:"v4"}
 ];
 
-var MG_COLORS={finding:"var(--accent)",pattern:"var(--mag)",rootcause:"var(--bad)",patch:"var(--ok)",taskorder:"var(--warn)",vendor:"#e0e0e0"};
+/* MG colors — resolved values matching CSS primitives (SVG fill needs actual colors, not var()) */
+var MG_COLORS={finding:"#7df9ff",pattern:"#ff6bff",rootcause:"#ff6b6b",patch:"#5dff93",taskorder:"#ffcc66",vendor:"#e7eef7"};
 
 function renderMG(){
   var svg=document.getElementById("mgSvg");if(!svg)return;
@@ -1616,21 +1617,22 @@ function renderMG(){
     if(a&&b){
       var ln=document.createElementNS(NS,"line");
       ln.setAttribute("x1",a.x);ln.setAttribute("y1",a.y);ln.setAttribute("x2",b.x);ln.setAttribute("y2",b.y);
-      ln.setAttribute("stroke","rgba(255,255,255,0.12)");ln.setAttribute("stroke-width","1.5");
+      ln.setAttribute("stroke","rgba(255,255,255,0.25)");ln.setAttribute("stroke-width","1.5");
       ln.dataset.from=e.from;ln.dataset.to=e.to;
       svg.appendChild(ln);
     }
   });
   visNodes.forEach(function(n){
-    var r=n.type==="finding"?18:n.type==="vendor"?22:16;
+    var r=n.type==="finding"?20:n.type==="vendor"?24:18;
     var c=document.createElementNS(NS,"circle");
     c.setAttribute("cx",n.x);c.setAttribute("cy",n.y);c.setAttribute("r",r);
-    c.setAttribute("fill",MG_COLORS[n.type]);c.setAttribute("opacity","0.85");
+    c.setAttribute("fill",MG_COLORS[n.type]);c.setAttribute("opacity","1");
+    c.setAttribute("stroke","rgba(0,0,0,0.4)");c.setAttribute("stroke-width","2");
     c.dataset.nid=n.id;c.classList.add("mg-node");c.style.cursor="pointer";
     svg.appendChild(c);
     var t=document.createElementNS(NS,"text");
     t.setAttribute("x",n.x);t.setAttribute("y",n.y+r+14);
-    t.setAttribute("fill","#aaa");t.setAttribute("font-size","10");t.setAttribute("text-anchor","middle");
+    t.setAttribute("fill","#ccc");t.setAttribute("font-size","10");t.setAttribute("text-anchor","middle");
     t.textContent=n.label;
     svg.appendChild(t);
   });
@@ -1649,8 +1651,8 @@ function renderMG(){
       });
     });
     el.addEventListener("mouseleave",function(){
-      svg.querySelectorAll("line").forEach(function(ln){ln.setAttribute("stroke","rgba(255,255,255,0.12)");ln.setAttribute("stroke-width","1.5");});
-      svg.querySelectorAll(".mg-node").forEach(function(c){c.setAttribute("opacity","0.85");});
+      svg.querySelectorAll("line").forEach(function(ln){ln.setAttribute("stroke","rgba(255,255,255,0.25)");ln.setAttribute("stroke-width","1.5");});
+      svg.querySelectorAll(".mg-node").forEach(function(c){c.setAttribute("opacity","1");});
     });
     el.addEventListener("click",function(){
       var nid=el.dataset.nid;var nd=MG_NODES.find(function(n){return n.id===nid});if(!nd)return;
@@ -1757,7 +1759,7 @@ if(mgSearch)mgSearch.addEventListener("input",function(){
   var svg=document.getElementById("mgSvg");if(!svg)return;
   svg.querySelectorAll(".mg-node").forEach(function(c){
     var nid=c.dataset.nid;var nd=MG_NODES.find(function(n){return n.id===nid});
-    c.setAttribute("opacity",!q||nd.label.toLowerCase().indexOf(q)>-1?"0.85":"0.15");
+    c.setAttribute("opacity",!q||nd.label.toLowerCase().indexOf(q)>-1?"1":"0.15");
   });
 });
 
