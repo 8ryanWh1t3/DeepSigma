@@ -1081,6 +1081,28 @@ var sevClassMap={"HIGH":"sev-high","MED":"sev-med","LOW":"sev-low"};
 var stColorMap={"New":"var(--accent)","Reopened":"var(--bad)","Assigned":"var(--warn)","In Review":"var(--warn)","Patch Approved":"var(--ok)","Closure Pending":"var(--ok)","Closed":"var(--ok)"};
 var catClassMap={"Contract Compliance":"cat-compliance","Performance":"cat-performance","Financial":"cat-financial","Risk & Issue":"cat-risk","Resource":"cat-resource","Technical":"cat-technical","Communication":"cat-comms"};
 
+/* ══════════ FINDING LIST BUILDER (for drawers) ══════════ */
+function buildFindingListHTML(ids){
+  if(!ids.length)return '<div style="padding:8px;color:var(--muted)">No findings match</div>';
+  return ids.map(function(k){
+    var f=F[k];if(!f)return "";
+    var idColor=stColorMap[f.status]||"var(--accent)";
+    return '<div class="wr" style="cursor:pointer" data-drill="'+k+'">'+
+      '<span class="wl"><span class="mono" style="color:'+idColor+';font-weight:700">'+escHTML(f.id)+'</span>'+
+      ' <span class="badge '+(sevClassMap[f.sev]||"sev-low")+'" style="font-size:8px;vertical-align:middle">'+f.sev+'</span></span>'+
+      '<span class="wv" style="font-size:11px">'+escHTML(f.title.substring(0,50))+(f.title.length>50?"...":"")+'</span></div>';
+  }).join("");
+}
+function wireDrillLinks(){
+  dBody.querySelectorAll("[data-drill]").forEach(function(el){
+    el.addEventListener("click",function(){
+      var fid=el.dataset.drill;
+      closeDrawer();openTab("find");
+      setTimeout(function(){showFinding(fid)},150);
+    });
+  });
+}
+
 /* ══════════ FINDINGS TABLE ══════════ */
 function renderFindingsTable(){
   var tbody=document.getElementById("findTbody");if(!tbody)return;
@@ -1556,14 +1578,75 @@ function renderMG(){
     });
     el.addEventListener("click",function(){
       var nid=el.dataset.nid;var nd=MG_NODES.find(function(n){return n.id===nid});if(!nd)return;
-      var rels=visEdges.filter(function(e){return e.from===nid||e.to===nid}).map(function(e){
-        var tid=e.from===nid?e.to:e.from;var tn=MG_NODES.find(function(n){return n.id===tid});
-        return tn?tn.label:"?";
+      var relNodes=visEdges.filter(function(e){return e.from===nid||e.to===nid}).map(function(e){
+        var tid=e.from===nid?e.to:e.from;return MG_NODES.find(function(n){return n.id===tid});
+      }).filter(Boolean);
+      var byType={};relNodes.forEach(function(rn){byType[rn.type]=byType[rn.type]||[];byType[rn.type].push(rn)});
+      var body='<div class="wire">';
+      body+='<div class="wr"><span class="wl">Type</span><span class="wv" style="color:'+MG_COLORS[nd.type]+'">'+nd.type.toUpperCase()+'</span></div>';
+      body+='<div class="wr"><span class="wl">Connections</span><span class="wv">'+relNodes.length+'</span></div>';
+      /* type-specific detail */
+      if(nd.type==="finding"){
+        var fk=nd.label.replace("F-","");var f=F[fk];
+        if(f){
+          body+='<div class="wr"><span class="wl">Status</span><span class="wv" style="color:'+(stColorMap[f.status]||"var(--accent)")+'">'+escHTML(f.status)+'</span></div>';
+          body+='<div class="wr"><span class="wl">Severity</span><span class="wv">'+f.sev+'</span></div>';
+          body+='<div class="wr"><span class="wl">Category</span><span class="wv">'+escHTML(f.claimCat)+'</span></div>';
+          body+='<div class="wr"><span class="wl">Task Order</span><span class="wv">'+escHTML(f.taskOrder)+'</span></div>';
+          body+='<div class="wr"><span class="wl">Vendor</span><span class="wv">'+escHTML(f.vendor)+'</span></div>';
+          body+='<div class="wr"><span class="wl">Owner</span><span class="wv">'+escHTML(f.owner)+'</span></div>';
+          body+='<div class="wr"><span class="wl">Financial</span><span class="wv" style="color:var(--warn)">'+escHTML(f.financialImpact)+'</span></div>';
+          body+='<div class="wr"><span class="wl">Root Cause</span><span class="wv">'+escHTML(f.rootCause)+'</span></div>';
+          body+='<div class="wr"><span class="wl">Patch</span><span class="wv">'+escHTML(f.patch.substring(0,60))+'</span></div>';
+        }
+      } else if(nd.type==="taskorder"){
+        var tok=nd.label;var t=TO[tok];
+        if(t){
+          body+='<div class="wr"><span class="wl">Name</span><span class="wv">'+escHTML(t.name)+'</span></div>';
+          body+='<div class="wr"><span class="wl">Vendor</span><span class="wv">'+escHTML(t.vendor)+'</span></div>';
+          body+='<div class="wr"><span class="wl">Risk</span><span class="wv" style="color:var(--'+(t.riskLevel==="HIGH"?"bad":"warn")+')">'+t.riskLevel+'</span></div>';
+          body+='<div class="wr"><span class="wl">Burn Rate</span><span class="wv">'+((t.actualSpend/t.plannedSpend)*100).toFixed(0)+'%</span></div>';
+          body+='<div class="wr"><span class="wl">Planned</span><span class="wv">$'+t.plannedSpend.toLocaleString()+'</span></div>';
+          body+='<div class="wr"><span class="wl">Actual</span><span class="wv">$'+t.actualSpend.toLocaleString()+'</span></div>';
+        }
+      } else if(nd.type==="vendor"){
+        var vFindings=Object.keys(F).filter(function(k){return F[k].vendor.indexOf(nd.label)>-1||nd.label.indexOf(F[k].vendor.substring(0,8))>-1});
+        var vTOs=Object.keys(TO).filter(function(k){return TO[k].vendor.indexOf(nd.label)>-1||nd.label.indexOf(TO[k].vendor.substring(0,8))>-1});
+        body+='<div class="wr"><span class="wl">Findings</span><span class="wv">'+vFindings.length+'</span></div>';
+        body+='<div class="wr"><span class="wl">Task Orders</span><span class="wv">'+vTOs.length+'</span></div>';
+        var highCount=vFindings.filter(function(k){return F[k].sev==="HIGH"&&F[k].status!=="Closed"}).length;
+        if(highCount)body+='<div class="wr"><span class="wl">Open HIGH</span><span class="wv" style="color:var(--bad)">'+highCount+'</span></div>';
+      } else if(nd.type==="pattern"){
+        body+='<div class="wr"><span class="wl">Pattern</span><span class="wv" style="color:var(--mag)">'+escHTML(nd.label)+'</span></div>';
+        body+='<div class="wr"><span class="wl">Insight</span><span class="wv" style="color:var(--muted)">Recurring pattern detected across linked findings. Review root cause for systemic remediation.</span></div>';
+      } else if(nd.type==="patch"){
+        body+='<div class="wr"><span class="wl">Patch</span><span class="wv" style="color:var(--ok)">'+escHTML(nd.label)+'</span></div>';
+        var patchFindings=relNodes.filter(function(rn){return rn.type==="finding"});
+        body+='<div class="wr"><span class="wl">Applied To</span><span class="wv">'+patchFindings.map(function(rn){return rn.label}).join(", ")+'</span></div>';
+      } else if(nd.type==="rootcause"){
+        body+='<div class="wr"><span class="wl">Root Cause</span><span class="wv" style="color:var(--bad)">'+escHTML(nd.label)+'</span></div>';
+      }
+      body+='</div>';
+      /* connected nodes grouped by type */
+      var typeLabels={finding:"Findings",pattern:"Patterns",patch:"Patches",rootcause:"Root Causes",taskorder:"Task Orders",vendor:"Vendors"};
+      Object.keys(byType).forEach(function(tp){
+        body+='<div class="wire" style="margin-top:8px"><h4 style="font-size:11px;color:'+MG_COLORS[tp]+'">'+typeLabels[tp]+' ('+byType[tp].length+')</h4>';
+        byType[tp].forEach(function(rn){
+          body+='<div class="wr"><span class="wl" style="color:'+MG_COLORS[rn.type]+'">'+escHTML(rn.label)+'</span><span class="wv">'+rn.type+'</span></div>';
+        });
+        body+='</div>';
       });
-      openDrawer("Memory Node — "+escHTML(nd.label),
-        '<div class="wire"><div class="wr"><span class="wl">Type</span><span class="wv" style="color:'+MG_COLORS[nd.type]+'">'+nd.type.toUpperCase()+'</span></div>'+
-        '<div class="wr"><span class="wl">Connections</span><span class="wv">'+rels.length+'</span></div>'+
-        '<div class="wr"><span class="wl">Linked To</span><span class="wv">'+rels.join(", ")+'</span></div></div>','');
+      /* if finding node, add drill link */
+      var foot='';
+      if(nd.type==="finding"){
+        var fk2=nd.label.replace("F-","");
+        foot='<button class="primary" id="mgDrill" data-fid="'+fk2+'">Open Finding Detail</button>';
+      }
+      openDrawer("Memory Node — "+escHTML(nd.label),body,foot);
+      if(nd.type==="finding"){
+        var drillBtn=document.getElementById("mgDrill");
+        if(drillBtn)drillBtn.addEventListener("click",function(){closeDrawer();openTab("find");setTimeout(function(){showFinding(drillBtn.dataset.fid)},150)});
+      }
     });
   });
 
@@ -1962,6 +2045,85 @@ function renderDashboard(){
 document.addEventListener("click",function(e){
   var el=e.target.closest("[data-goto]");
   if(el)openTab(parseInt(el.dataset.goto));
+});
+
+/* ══════════ TRENDS TAB CLICK HANDLERS ══════════ */
+
+/* Category trend rows → drill to findings in that category */
+document.querySelectorAll("#s-trends .cat-badge").forEach(function(badge){
+  var row=badge.closest("tr");if(!row)return;
+  row.style.cursor="pointer";
+  row.addEventListener("click",function(){
+    var cat=badge.textContent.trim();
+    var ids=Object.keys(F).filter(function(k){return F[k].claimCat===cat});
+    openDrawer(cat+" — "+ids.length+" Findings",
+      '<div class="wire"><h4>Claim Category: '+escHTML(cat)+'</h4>'+
+      '<div class="wr"><span class="wl">Open</span><span class="wv">'+ids.filter(function(k){return F[k].status!=="Closed"}).length+'</span></div>'+
+      '<div class="wr"><span class="wl">Closed</span><span class="wv">'+ids.filter(function(k){return F[k].status==="Closed"}).length+'</span></div>'+
+      '<div class="wr"><span class="wl">HIGH</span><span class="wv" style="color:var(--bad)">'+ids.filter(function(k){return F[k].sev==="HIGH"}).length+'</span></div></div>'+
+      '<div class="wire" style="margin-top:8px"><h4>Findings</h4>'+buildFindingListHTML(ids)+'</div>','');
+    wireDrillLinks();
+  });
+});
+
+/* Heatmap cells → drill to findings matching severity × lag bucket */
+document.querySelectorAll("#heatmapGrid .hm-cell").forEach(function(cell,idx){
+  var row=Math.floor(idx/4);var col=idx%4;
+  var sevs=["HIGH","MED","LOW"];var sev=sevs[row];
+  var lagRanges=["0-3d","4-7d","8-14d","14d+"];var lag=lagRanges[col];
+  var lagDays=[[0,3],[4,7],[8,14],[15,999]];var lr=lagDays[col];
+  cell.style.cursor="pointer";
+  cell.addEventListener("click",function(){
+    var ids=Object.keys(F).filter(function(k){var f=F[k];return f.sev===sev&&f.cg>=lr[0]&&f.cg<=lr[1]});
+    openDrawer(sev+" × "+lag+" — "+ids.length+" Findings",
+      '<div class="wire"><h4>Severity: '+sev+' · Ownership Lag: '+lag+'</h4>'+buildFindingListHTML(ids)+'</div>','');
+    wireDrillLinks();
+  });
+});
+
+/* TO drift rows → drill to task order detail */
+document.querySelectorAll("#s-trends table").forEach(function(tbl){
+  if(!tbl.querySelector("th")||tbl.querySelector("th").textContent.trim()!=="TO")return;
+  tbl.querySelectorAll("tbody tr").forEach(function(row){
+    var toId=row.querySelector("td");if(!toId)return;
+    var tok=toId.textContent.trim();
+    row.style.cursor="pointer";
+    row.addEventListener("click",function(){
+      var t=TO[tok];
+      var ids=Object.keys(F).filter(function(k){return F[k].taskOrder===tok});
+      var body='<div class="wire"><h4>'+escHTML(tok)+'</h4>';
+      if(t){
+        body+='<div class="wr"><span class="wl">Name</span><span class="wv">'+escHTML(t.name)+'</span></div>';
+        body+='<div class="wr"><span class="wl">Vendor</span><span class="wv">'+escHTML(t.vendor)+'</span></div>';
+        body+='<div class="wr"><span class="wl">Risk</span><span class="wv" style="color:var(--'+(t.riskLevel==="HIGH"?"bad":"warn")+')">'+t.riskLevel+'</span></div>';
+        body+='<div class="wr"><span class="wl">Planned</span><span class="wv">$'+t.plannedSpend.toLocaleString()+'</span></div>';
+        body+='<div class="wr"><span class="wl">Actual</span><span class="wv">$'+t.actualSpend.toLocaleString()+'</span></div>';
+        body+='<div class="wr"><span class="wl">Burn Var</span><span class="wv" style="color:var(--'+(Math.abs((t.actualSpend-t.plannedSpend)/t.plannedSpend)>0.15?"bad":"warn")+')">'+((t.actualSpend-t.plannedSpend)/t.plannedSpend*100).toFixed(1)+'%</span></div>';
+      }
+      body+='</div>';
+      body+='<div class="wire" style="margin-top:8px"><h4>Findings ('+ids.length+')</h4>'+buildFindingListHTML(ids)+'</div>';
+      openDrawer("Task Order — "+tok,body,'');
+      wireDrillLinks();
+    });
+  });
+});
+
+/* Root cause rows → drill to findings with that root cause */
+document.querySelectorAll("#s-trends table").forEach(function(tbl){
+  if(!tbl.querySelector("th")||tbl.querySelector("th").textContent.trim()!=="#")return;
+  tbl.querySelectorAll("tbody tr").forEach(function(row){
+    var cells=row.querySelectorAll("td");if(cells.length<2)return;
+    var cause=cells[1].textContent.trim();
+    row.style.cursor="pointer";
+    row.addEventListener("click",function(){
+      var ids=Object.keys(F).filter(function(k){return F[k].rootCause.indexOf(cause.substring(0,20))>-1});
+      openDrawer("Root Cause — "+cause.substring(0,40),
+        '<div class="wire"><h4>'+escHTML(cause)+'</h4>'+
+        '<div class="wr"><span class="wl">Findings</span><span class="wv">'+ids.length+'</span></div></div>'+
+        '<div class="wire" style="margin-top:8px"><h4>Affected Findings</h4>'+buildFindingListHTML(ids)+'</div>','');
+      wireDrillLinks();
+    });
+  });
 });
 
 /* ══════════ INIT ══════════ */
