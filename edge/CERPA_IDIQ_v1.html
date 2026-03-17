@@ -2541,16 +2541,16 @@ function deriveTasks(){
   var tasks=[];
   Object.keys(F).forEach(function(k){
     var f=F[k];
-    if(f.sev==="HIGH"&&f.status==="Open") tasks.push({pri:1,label:f.id+": "+f.title,tag:"HIGH OPEN",color:"var(--bad)"});
-    if(f.status==="Reopened") tasks.push({pri:2,label:f.id+": Reopened — requires re-review",tag:"REOPENED",color:"var(--mag)"});
-    if(f.brq<60) tasks.push({pri:3,label:f.id+": Low BRQ ("+f.brq+") — add evidence",tag:"LOW BRQ",color:"var(--warn)"});
-    if(f.recurring) tasks.push({pri:4,label:f.id+": Recurring pattern — review root cause",tag:"RECURRING",color:"var(--warn)"});
+    if(f.sev==="HIGH"&&f.status!=="Closed"&&f.status!=="Archived") tasks.push({pri:1,fid:k,type:"finding",label:f.id+": "+f.title,tag:"HIGH OPEN",color:"var(--bad)"});
+    if(f.status==="Reopened") tasks.push({pri:2,fid:k,type:"finding",label:f.id+": Reopened — requires re-review",tag:"REOPENED",color:"var(--mag)"});
+    if(f.brq<0.6&&f.status!=="Closed") tasks.push({pri:3,fid:k,type:"finding",label:f.id+": Low BRQ ("+f.brq+") — add evidence",tag:"LOW BRQ",color:"var(--warn)"});
+    if(f.recurring&&f.status!=="Closed") tasks.push({pri:4,fid:k,type:"finding",label:f.id+": Recurring pattern — review root cause",tag:"RECURRING",color:"var(--warn)"});
   });
   Object.keys(TO).forEach(function(k){
     var t=TO[k];
-    if(t.riskLevel==="HIGH") tasks.push({pri:1,label:t.id+": "+t.name+" — HIGH RISK TO",tag:"AT RISK",color:"var(--bad)"});
+    if(t.riskLevel==="HIGH") tasks.push({pri:1,fid:k,type:"to",label:t.id+": "+t.name+" — HIGH RISK TO",tag:"AT RISK",color:"var(--bad)"});
     var bv=Math.abs(((t.actualSpend-t.plannedSpend)/t.plannedSpend)*100);
-    if(bv>15) tasks.push({pri:2,label:t.id+": Burn variance "+bv.toFixed(0)+"%",tag:"BURN",color:"var(--warn)"});
+    if(bv>15) tasks.push({pri:2,fid:k,type:"to",label:t.id+": Burn variance "+bv.toFixed(0)+"%",tag:"BURN",color:"var(--warn)"});
   });
   tasks.sort(function(a,b){return a.pri-b.pri});
   return tasks.slice(0,10);
@@ -2559,12 +2559,56 @@ function deriveTasks(){
 function renderTaskPanel(){
   var tp=document.getElementById("taskList");if(!tp)return;
   var tasks=deriveTasks();
+  /* update badge count */
+  var badge=document.getElementById("taskBadge");
+  if(badge){badge.textContent=tasks.length;badge.classList.toggle("zero",tasks.length===0)}
   if(!tasks.length){tp.innerHTML='<p style="color:#666;padding:12px">No priority tasks</p>';return;}
-  tp.innerHTML=tasks.map(function(t){
-    return '<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--bd)">'+
+  tp.innerHTML=tasks.map(function(t,i){
+    var detail='';
+    if(t.type==="finding"&&F[t.fid]){
+      var f=F[t.fid];
+      detail='<div class="task-detail" id="td-'+i+'" style="display:none;padding:6px 8px 8px 28px;font-size:11px;color:var(--muted);border-bottom:1px solid rgba(255,255,255,.03)">';
+      detail+='<div>Status: <span style="color:'+(stColorMap[f.status]||"var(--accent)")+'">'+escHTML(f.status)+'</span></div>';
+      detail+='<div>Category: '+escHTML(f.claimCat)+'</div>';
+      detail+='<div>Owner: '+escHTML(f.owner)+'</div>';
+      detail+='<div>TO: '+escHTML(f.taskOrder||"—")+'</div>';
+      detail+='<div style="margin-top:4px"><span style="cursor:pointer;color:var(--accent);text-decoration:underline" data-taskfid="'+t.fid+'">Open Finding &#8250;</span></div>';
+      detail+='</div>';
+    }else if(t.type==="to"&&TO[t.fid]){
+      var to=TO[t.fid];
+      detail='<div class="task-detail" id="td-'+i+'" style="display:none;padding:6px 8px 8px 28px;font-size:11px;color:var(--muted);border-bottom:1px solid rgba(255,255,255,.03)">';
+      detail+='<div>Vendor: '+escHTML(to.vendor)+'</div>';
+      detail+='<div>Risk: <span style="color:var(--bad)">'+escHTML(to.riskLevel)+'</span></div>';
+      detail+='<div>Burn: '+((to.actualSpend/to.plannedSpend)*100).toFixed(0)+'%</div>';
+      detail+='</div>';
+    }
+    return '<div class="task-row" data-tidx="'+i+'" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer">'+
+      '<span style="font-size:10px;color:var(--muted);transition:transform .15s" id="tc-'+i+'">&#9654;</span>'+
       '<span class="badge" style="background:'+t.color+';font-size:10px">'+escHTML(t.tag)+'</span>'+
-      '<span style="font-size:13px;color:#ccc">'+escHTML(t.label)+'</span></div>';
+      '<span style="font-size:12px;color:#ccc;flex:1">'+escHTML(t.label)+'</span></div>'+detail;
   }).join("");
+  /* wire chevron expand/collapse */
+  tp.querySelectorAll(".task-row").forEach(function(row){
+    row.addEventListener("click",function(){
+      var idx=row.getAttribute("data-tidx");
+      var det=document.getElementById("td-"+idx);
+      var chev=document.getElementById("tc-"+idx);
+      if(det){
+        var open=det.style.display!=="none";
+        det.style.display=open?"none":"block";
+        if(chev)chev.style.transform=open?"rotate(0deg)":"rotate(90deg)";
+      }
+    });
+  });
+  /* wire "Open Finding" links */
+  tp.querySelectorAll("[data-taskfid]").forEach(function(el){
+    el.addEventListener("click",function(e){
+      e.stopPropagation();
+      var tpPanel=document.getElementById("taskPanel");
+      if(tpPanel)tpPanel.classList.remove("open");
+      showFinding(el.getAttribute("data-taskfid"));
+    });
+  });
 }
 
 function renderCriticalSummary(){
