@@ -1888,7 +1888,7 @@ function renderDashboard(){
   if(brq){
     var ready=Object.values(F).filter(function(f){return f.brq>=70&&f.status!=="Closed"});
     brq.innerHTML=ready.length?ready.map(function(f){
-      return '<div class="wr" style="cursor:pointer" onclick="openTab(3)"><span class="wl">'+escHTML(f.id)+'</span><span class="wv">BRQ '+f.brq+' · '+escHTML(f.claimCat)+'</span></div>';
+      return '<div class="wr brq-link" style="cursor:pointer" data-goto="3"><span class="wl">'+escHTML(f.id)+'</span><span class="wv">BRQ '+f.brq+' · '+escHTML(f.claimCat)+'</span></div>';
     }).join(""):'<div style="padding:8px;color:#666">No board-ready findings</div>';
   }
 
@@ -1905,6 +1905,12 @@ function renderDashboard(){
       '<div class="wr"><span class="wl">Posture</span><span class="wv" style="color:'+pc+';font-weight:700">'+posture+'</span></div>';
   }
 }
+
+/* delegated click for board-ready links (no inline handlers — EDGE safe) */
+document.addEventListener("click",function(e){
+  var el=e.target.closest("[data-goto]");
+  if(el)openTab(parseInt(el.dataset.goto));
+});
 
 /* ══════════ INIT ══════════ */
 renderDashboard();
