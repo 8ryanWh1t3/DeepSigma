@@ -317,6 +317,36 @@ footer strong{color:var(--accent);font-weight:600}
 .audit-log .ae{padding:4px 0;border-bottom:1px solid rgba(255,255,255,.03)}
 .audit-log .ae-ts{color:#666;margin-right:6px}
 .audit-log .ae-act{color:var(--accent);font-weight:600;margin-right:4px}
+/* ── Sync badges ── */
+.sync-badge{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;letter-spacing:.3px;text-transform:uppercase;line-height:1.4}
+.sync-synced{background:rgba(93,255,147,.12);color:var(--ok);border:1px solid rgba(93,255,147,.25)}
+.sync-local{background:rgba(255,204,102,.12);color:var(--warn);border:1px solid rgba(255,204,102,.25)}
+.sync-conflict{background:rgba(255,107,107,.15);color:var(--bad);border:1px solid rgba(255,107,107,.3)}
+.sync-outdated{background:rgba(125,249,255,.1);color:var(--accent);border:1px solid rgba(125,249,255,.2)}
+.sync-review{background:rgba(255,107,255,.12);color:var(--mag);border:1px solid rgba(255,107,255,.25)}
+.sync-archived{background:rgba(107,128,153,.12);color:#6b8099;border:1px solid rgba(107,128,153,.25)}
+/* ── Conflict drawer ── */
+.conflict-section{margin-bottom:14px}
+.conflict-field{display:grid;grid-template-columns:100px 1fr 1fr 1fr;gap:6px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:11px}
+.cf-label{color:var(--muted);font-weight:600;text-transform:uppercase;font-size:9px;align-self:center}
+.cf-base,.cf-current,.cf-pending{padding:4px 6px;border-radius:4px;background:rgba(255,255,255,.03);word-break:break-word}
+.cf-clash .cf-current{background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.2)}
+.cf-clash .cf-pending{background:rgba(255,204,102,.1);border:1px solid rgba(255,204,102,.2)}
+.conflict-hdr{display:grid;grid-template-columns:100px 1fr 1fr 1fr;gap:6px;padding:4px 0;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--line)}
+/* ── History timeline ── */
+.history-entry{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer}
+.history-entry:hover{background:rgba(125,249,255,.03)}
+.he-rev{display:inline-block;font-size:9px;font-weight:700;background:rgba(125,249,255,.1);color:var(--accent);padding:1px 5px;border-radius:4px;margin-right:6px}
+.he-ts{font-size:10px;color:#666;margin-right:8px}
+.he-act{font-size:10px;font-weight:600;color:var(--accent);margin-right:6px}
+.he-summary{font-size:10px;color:var(--muted)}
+.he-expand{display:none;margin-top:6px;padding:6px;background:rgba(0,0,0,.2);border-radius:4px}
+.he-expand.open{display:block}
+/* ── History diff ── */
+.history-diff{font-size:10px;padding:3px 0;display:flex;gap:8px}
+.hd-field{color:var(--muted);font-weight:600;min-width:80px}
+.hd-old{color:var(--bad);text-decoration:line-through}
+.hd-new{color:var(--ok)}
 </style>
 </head>
 <body>
@@ -528,11 +558,7 @@ footer strong{color:var(--accent);font-weight:600}
   <div class="grid2">
     <div class="card">
       <h3>Board-Ready Queue</h3>
-      <table><thead><tr><th>Finding</th><th>BRQ</th><th>Severity</th><th>Action</th></tr></thead><tbody>
-        <tr><td class="mono" style="color:var(--warn)">F-308</td><td style="color:var(--ok)">0.85</td><td><span class="badge sev-high">HIGH</span></td><td>Approve Patch</td></tr>
-        <tr><td class="mono" style="color:var(--ok)">F-301</td><td style="color:var(--ok)">0.82</td><td><span class="badge sev-high">HIGH</span></td><td>Close</td></tr>
-        <tr><td class="mono" style="color:var(--warn)">F-310</td><td style="color:var(--bad)">0.50</td><td><span class="badge sev-high">HIGH</span></td><td>Send Back</td></tr>
-      </tbody></table>
+      <div id="boardReadyQueue"></div>
     </div>
     <div class="card">
       <h3>Contract Health Summary</h3>
@@ -560,7 +586,7 @@ footer strong{color:var(--accent);font-weight:600}
     <label style="cursor:pointer;font-size:10px;padding:5px 10px;border:1px solid var(--line);border-radius:6px;color:var(--muted)">Import JSON<input type="file" accept=".json" id="btnImportFindings" style="display:none"></label>
   </div>
   <div class="card">
-    <table><thead><tr><th>ID</th><th>Title</th><th>Status</th><th>Sev</th><th>Category</th><th>TO</th><th>Vendor</th><th>Owner</th><th>BRQ</th><th>Due</th><th>Actions</th></tr></thead>
+    <table><thead><tr><th>ID</th><th>Title</th><th>Status</th><th>Sev</th><th>Category</th><th>TO</th><th>Vendor</th><th>Owner</th><th>BRQ</th><th>Due</th><th style="width:48px">Sync</th><th>Actions</th></tr></thead>
     <tbody id="findTbody"></tbody></table>
   </div>
   <div class="card hidden" id="fDetail"></div>
@@ -803,9 +829,12 @@ footer strong{color:var(--accent);font-weight:600}
       <button class="btn-danger" id="btnClearAll">Clear All</button>
       <button id="btnSnapshot">Create Snapshot</button>
       <button id="btnRestore">Restore Snapshot</button>
+      <button id="btnExportFullState" style="border-color:var(--accent);color:var(--accent)">Export Full State</button>
+      <button id="btnImportFullState" style="border-color:var(--mag);color:var(--mag)">Import Full State</button>
     </div>
     <div id="snapshotInfo" style="font-size:10px;color:var(--muted);margin-top:8px">No snapshot</div>
     <input type="file" accept=".json" id="admImportFile" style="display:none"/>
+    <input type="file" accept=".json" id="fullStateImportFile" style="display:none"/>
   </div>
 </section>
 
@@ -989,9 +1018,13 @@ var F={
   timeline:["Apr 14","—","—","—","—"],tlState:[1,0,0,0,0]}
 };
 /* ── Workbench state ── */
-var activeFindingId=null,editBuffer=null,editDirty=false,lastSnapshot=null;
+var activeFindingId=null,editBuffer=null,editDirty=false,lastSnapshot=null,editBaseRevision=null,editBaseUpdatedAt=null,editBaseSnapshot=null;
 var DEMO_F=JSON.parse(JSON.stringify(F));
 var DEMO_TO=JSON.parse(JSON.stringify(TO));
+function generateSessionId(){return "s-"+(Date.now()).toString(36)+"-"+(Math.random()*1e6|0).toString(36)}
+var CHANGELOG={};
+var SYNC_META={};
+var SESSION_ID=generateSessionId();
 var TL_LABELS=["Claim","Event","Review","Patch","Apply"];
 
 /* ══════════ DOM REFS ══════════ */
@@ -1144,6 +1177,7 @@ function openDrawer(title,bodyHtml,footHtml){
 function actualCloseDrawer(){
   dOverlay.classList.remove("open");dPanel.classList.remove("open");
   editDirty=false;editBuffer=null;activeFindingId=null;
+  editBaseRevision=null;editBaseUpdatedAt=null;editBaseSnapshot=null;
 }
 function closeDrawer(){
   if(editDirty){confirmAction("You have unsaved changes. Discard?",actualCloseDrawer);return;}
@@ -1278,6 +1312,7 @@ function normalizeFinding(f){
 }
 /* normalize all existing findings at load */
 Object.values(F).forEach(normalizeFinding);
+Object.keys(F).forEach(function(k){ensureChangeLog(k);ensureSyncMeta(k)});
 
 function appendAuditEvent(f,action,details){
   if(!f.auditEvents)f.auditEvents=[];
@@ -1285,6 +1320,263 @@ function appendAuditEvent(f,action,details){
   f.revision=(f.revision||0)+1;
   f.updatedAt=new Date().toISOString();
   f.updatedByRole=roleSel.value;
+}
+
+/* ══════════ CHANGELOG / SYNC HELPERS ══════════ */
+var EDITABLE_FIELDS=["title","sev","status","claimCat","claimType","taskOrder","vendor","claim","event","reviewSummary","rootCause","patch","applyDecision","owner","reviewer","due","brq","deg","cg","financialImpact","scheduleImpact","recurring","contractRisk","notes"];
+var WORKFLOW_FIELDS=["status"];
+
+function generateChangeId(){return "c-"+(Date.now()).toString(36)+"-"+(Math.random()*1e6|0).toString(36)}
+
+function ensureChangeLog(key){if(!CHANGELOG[key])CHANGELOG[key]=[]}
+
+function ensureSyncMeta(key){
+  if(!SYNC_META[key]){
+    var f=F[key]||{};
+    SYNC_META[key]={revision:f.revision||0,updatedAt:f.updatedAt||null,updatedByRole:f.updatedByRole||null,syncState:"synced",lockState:"none",conflictState:"none",lastChangeId:null};
+  }
+}
+
+function diffFindingFields(oldRec,newRec){
+  var changes=[];
+  EDITABLE_FIELDS.forEach(function(field){
+    var ov=oldRec[field],nv=newRec[field];
+    if(ov===undefined)ov=null;
+    if(nv===undefined)nv=null;
+    if(JSON.stringify(ov)!==JSON.stringify(nv)){
+      changes.push({field:field,oldValue:ov,newValue:nv});
+    }
+  });
+  return changes;
+}
+
+function classifyConflict(baseRec,currentRec,pendingRec){
+  var baseToCurrent=diffFindingFields(baseRec,currentRec);
+  var baseToPending=diffFindingFields(baseRec,pendingRec);
+  if(baseToCurrent.length===0)return {type:"none",conflictFields:[],safeFields:baseToPending.map(function(c){return c.field})};
+  var currentFields={},pendingFields={};
+  baseToCurrent.forEach(function(c){currentFields[c.field]=true});
+  baseToPending.forEach(function(c){pendingFields[c.field]=true});
+  var clashFields=[];
+  var safeFields=[];
+  baseToPending.forEach(function(c){
+    if(currentFields[c.field])clashFields.push(c.field);
+    else safeFields.push(c.field);
+  });
+  var hasWorkflow=clashFields.some(function(f){return WORKFLOW_FIELDS.indexOf(f)>=0});
+  if(hasWorkflow)return {type:"workflow",conflictFields:clashFields,safeFields:safeFields};
+  if(clashFields.length===0)return {type:"none",conflictFields:[],safeFields:safeFields};
+  var hasHard=clashFields.some(function(f){
+    var cv=currentRec[f],pv=pendingRec[f];
+    return JSON.stringify(cv)!==JSON.stringify(pv);
+  });
+  return {type:hasHard?"hard":"soft",conflictFields:clashFields,safeFields:safeFields};
+}
+
+function appendChangeLogEvent(key,action,oldRec,newRec,summary){
+  ensureChangeLog(key);
+  var changes=diffFindingFields(oldRec,newRec);
+  var entry={changeId:generateChangeId(),findingId:"F-"+key,revision:(F[key]||{}).revision||0,priorRevision:((F[key]||{}).revision||1)-1,actorRole:getRole(),sessionId:SESSION_ID,ts:new Date().toISOString(),actionType:action,fieldChanges:changes,summary:summary||action};
+  CHANGELOG[key].push(entry);
+  return entry;
+}
+
+function updateSyncMeta(key,patch){
+  ensureSyncMeta(key);
+  var m=SYNC_META[key];
+  Object.keys(patch).forEach(function(k){m[k]=patch[k]});
+}
+
+function getCurrentRevision(key){
+  if(SYNC_META[key])return SYNC_META[key].revision;
+  return (F[key]||{}).revision||0;
+}
+
+function getFindingHistory(key){
+  ensureChangeLog(key);
+  return CHANGELOG[key];
+}
+
+function compareRevisions(baseRec,currentRec,pendingRec){
+  var rows=[];
+  EDITABLE_FIELDS.forEach(function(field){
+    var bv=baseRec[field],cv=currentRec[field],pv=pendingRec[field];
+    if(bv===undefined)bv=null;if(cv===undefined)cv=null;if(pv===undefined)pv=null;
+    var bs=JSON.stringify(bv),cs=JSON.stringify(cv),ps=JSON.stringify(pv);
+    if(bs===cs&&bs===ps)return;
+    rows.push({field:field,base:bv,current:cv,pending:pv,clash:cs!==bs&&ps!==bs&&cs!==ps});
+  });
+  return rows;
+}
+
+function safeMergeRecords(baseRec,currentRec,pendingRec){
+  var merged=deepClone(currentRec);
+  var blocked=false;
+  var conflictFields=[];
+  EDITABLE_FIELDS.forEach(function(field){
+    var bv=JSON.stringify(baseRec[field]),cv=JSON.stringify(currentRec[field]),pv=JSON.stringify(pendingRec[field]);
+    if(WORKFLOW_FIELDS.indexOf(field)>=0&&cv!==bv){blocked=true;conflictFields.push(field);return;}
+    if(bv===cv&&pv!==bv){merged[field]=pendingRec[field];return;}
+    if(bv===pv){return;}
+    if(cv===pv){return;}
+    if(cv!==bv&&pv!==bv&&cv!==pv){blocked=true;conflictFields.push(field);}
+  });
+  if(blocked)return {blocked:true,conflictFields:conflictFields};
+  return {blocked:false,merged:merged};
+}
+
+function markFindingConflict(key,type){
+  updateSyncMeta(key,{syncState:"conflict",conflictState:type});
+}
+
+function clearFindingConflict(key){
+  updateSyncMeta(key,{syncState:"synced",conflictState:"none"});
+}
+
+function canResolveConflict(role){return role==="pm"||role==="analyst"||role==="admin"}
+function canMergeConflict(role){return role==="pm"||role==="admin"}
+function canHardDelete(role){return role==="admin"}
+function canViewHistory(role){return true}
+
+function commitFindingUpdateWithSync(id,updated,actionLabel){
+  ensureChangeLog(id);ensureSyncMeta(id);
+  var currentRev=getCurrentRevision(id);
+  if(editBaseRevision!==null&&editBaseRevision!==currentRev){
+    /* revision mismatch — classify conflict */
+    var baseRec=editBaseSnapshot||{};
+    var currentRec=F[id];
+    var classification=classifyConflict(baseRec,currentRec,updated);
+    if(classification.type==="none"){
+      /* disjoint changes, safe to save */
+    }else{
+      markFindingConflict(id,classification.type);
+      openConflictDrawer(id,baseRec,currentRec,updated,classification);
+      return false;
+    }
+  }
+  var oldRec=deepClone(F[id]);
+  F[id]=updated;
+  appendAuditEvent(F[id],actionLabel,actionLabel+" by "+getRole());
+  var entry=appendChangeLogEvent(id,actionLabel,oldRec,F[id],actionLabel+" — "+F[id].id);
+  updateSyncMeta(id,{revision:F[id].revision,updatedAt:F[id].updatedAt,updatedByRole:getRole(),syncState:"synced",lastChangeId:entry.changeId});
+  clearFindingConflict(id);
+  return true;
+}
+
+function openConflictDrawer(id,baseRec,currentRec,pendingRec,classification){
+  editDirty=false;
+  var rows=compareRevisions(baseRec,currentRec,pendingRec);
+  var typeBadge='<span class="sync-badge sync-conflict" style="margin-right:8px">'+classification.type.toUpperCase()+'</span>';
+  var h='<div class="conflict-section"><p style="font-size:11px;color:var(--muted)">'+typeBadge+'Conflict on <strong>F-'+id+'</strong> — the record was modified (rev '+getCurrentRevision(id)+') since you began editing (rev '+(editBaseRevision||"?")+'). Review differences below and choose a resolution.</p></div>';
+  h+='<div class="conflict-hdr"><span>Field</span><span>Base (rev '+(editBaseRevision||"?")+')</span><span>Current (rev '+getCurrentRevision(id)+')</span><span>Your Edit</span></div>';
+  rows.forEach(function(r){
+    var cls=r.clash?' cf-clash':'';
+    h+='<div class="conflict-field'+cls+'">';
+    h+='<span class="cf-label">'+escHTML(r.field)+'</span>';
+    h+='<span class="cf-base">'+escHTML(String(r.base===null?"—":r.base))+'</span>';
+    h+='<span class="cf-current">'+escHTML(String(r.current===null?"—":r.current))+'</span>';
+    h+='<span class="cf-pending">'+escHTML(String(r.pending===null?"—":r.pending))+'</span>';
+    h+='</div>';
+  });
+  if(rows.length===0)h+='<div style="padding:8px;color:var(--muted)">No field differences found.</div>';
+  var role=getRole();
+  var foot='<button class="primary" id="cfReload">Reload Current</button>';
+  if(canMergeConflict(role)&&classification.type!=="hard"&&classification.type!=="workflow")foot+='<button class="primary" id="cfMerge" style="background:rgba(93,255,147,.12);border-color:var(--ok);color:var(--ok)">Merge Safe Fields</button>';
+  foot+='<button id="cfKeepDraft" style="border-color:var(--warn);color:var(--warn)">Keep Mine as Draft</button>';
+  if(canResolveConflict(role))foot+='<button id="cfEscalate" style="border-color:var(--mag);color:var(--mag)">Escalate for Review</button>';
+  foot+='<button id="cfCancel">Cancel</button>';
+  openDrawer("Conflict — F-"+id,h,foot);
+  /* wire resolution buttons */
+  var btnReload=document.getElementById("cfReload");
+  if(btnReload)btnReload.addEventListener("click",function(){
+    clearFindingConflict(id);
+    actualCloseDrawer();
+    openEditDrawer(id);
+  });
+  var btnMerge=document.getElementById("cfMerge");
+  if(btnMerge)btnMerge.addEventListener("click",function(){
+    var result=safeMergeRecords(baseRec,currentRec,pendingRec);
+    if(result.blocked){toast("Cannot auto-merge — conflicts on: "+result.conflictFields.join(", "),"warn");return;}
+    var oldRec=deepClone(F[id]);
+    F[id]=result.merged;
+    appendAuditEvent(F[id],"MERGED","Auto-merged by "+getRole());
+    ensureChangeLog(id);
+    appendChangeLogEvent(id,"MERGED",oldRec,F[id],"Merged — "+F[id].id);
+    updateSyncMeta(id,{revision:F[id].revision,updatedAt:F[id].updatedAt,updatedByRole:getRole(),syncState:"synced",lastChangeId:CHANGELOG[id][CHANGELOG[id].length-1].changeId});
+    clearFindingConflict(id);
+    actualCloseDrawer();rerenderAll();
+    toast(F[id].id+" merged successfully","ok");
+  });
+  var btnKeep=document.getElementById("cfKeepDraft");
+  if(btnKeep)btnKeep.addEventListener("click",function(){
+    var key=nextFindingId();
+    var draft=deepClone(pendingRec);
+    draft.id="F-"+key;draft.status="New";
+    draft.auditEvents=[];draft.revision=0;
+    var now=new Date().toISOString();
+    draft.createdAt=now;draft.updatedAt=now;
+    draft.createdByRole=getRole();draft.updatedByRole=getRole();
+    normalizeFinding(draft);
+    appendAuditEvent(draft,"DRAFT_FROM_CONFLICT","Draft created from conflict on F-"+id);
+    F[key]=draft;
+    ensureChangeLog(key);ensureSyncMeta(key);
+    appendChangeLogEvent(key,"DRAFT_FROM_CONFLICT",{},draft,"Draft from conflict on F-"+id);
+    updateSyncMeta(key,{revision:draft.revision,updatedAt:draft.updatedAt,updatedByRole:getRole(),syncState:"synced",lastChangeId:CHANGELOG[key][CHANGELOG[key].length-1].changeId});
+    clearFindingConflict(id);
+    actualCloseDrawer();rerenderAll();
+    toast("Draft "+draft.id+" created from conflict","ok");
+  });
+  var btnEsc=document.getElementById("cfEscalate");
+  if(btnEsc)btnEsc.addEventListener("click",function(){
+    updateSyncMeta(id,{syncState:"review",conflictState:classification.type});
+    ensureChangeLog(id);
+    appendChangeLogEvent(id,"ESCALATED",F[id],F[id],"Escalated for review by "+getRole());
+    appendAuditEvent(F[id],"ESCALATED","Conflict escalated for review by "+getRole());
+    actualCloseDrawer();rerenderAll();
+    toast("F-"+id+" escalated for review","ok");
+  });
+  var btnCan=document.getElementById("cfCancel");
+  if(btnCan)btnCan.addEventListener("click",function(){actualCloseDrawer()});
+}
+
+function openHistoryDrawer(fid){
+  var history=getFindingHistory(fid);
+  var h='<div style="margin-bottom:12px"><span class="sync-badge sync-'+((SYNC_META[fid]||{}).syncState||"synced")+'" style="margin-right:8px">'+((SYNC_META[fid]||{}).syncState||"synced").toUpperCase()+'</span><span style="font-size:11px;color:var(--muted)">F-'+fid+' · '+history.length+' event'+(history.length!==1?"s":"")+'</span></div>';
+  if(history.length===0){
+    h+='<div style="padding:12px;color:var(--muted)">No changelog entries yet.</div>';
+  }else{
+    var sorted=history.slice().sort(function(a,b){return b.ts>a.ts?1:b.ts<a.ts?-1:0});
+    sorted.forEach(function(entry,idx){
+      h+='<div class="history-entry" data-hidx="'+idx+'">';
+      h+='<span class="he-rev">r'+entry.revision+'</span>';
+      h+='<span class="he-ts">'+(entry.ts||"").slice(0,16).replace("T"," ")+'</span>';
+      h+='<span class="he-act">'+escHTML(entry.actionType)+'</span>';
+      h+='<span class="he-summary">'+escHTML(entry.summary||"")+'</span>';
+      if(entry.fieldChanges&&entry.fieldChanges.length>0){
+        h+='<div class="he-expand" id="he-'+idx+'">';
+        entry.fieldChanges.forEach(function(fc){
+          h+='<div class="history-diff">';
+          h+='<span class="hd-field">'+escHTML(fc.field)+'</span>';
+          h+='<span class="hd-old">'+escHTML(String(fc.oldValue===null?"—":fc.oldValue))+'</span>';
+          h+='<span class="hd-new">'+escHTML(String(fc.newValue===null?"—":fc.newValue))+'</span>';
+          h+='</div>';
+        });
+        h+='</div>';
+      }
+      h+='</div>';
+    });
+  }
+  openDrawer("History — F-"+fid,h,'<button id="hClose">Close</button>');
+  /* wire expand/collapse */
+  dBody.querySelectorAll(".history-entry").forEach(function(el){
+    el.addEventListener("click",function(){
+      var idx=el.getAttribute("data-hidx");
+      var exp=document.getElementById("he-"+idx);
+      if(exp)exp.classList.toggle("open");
+    });
+  });
+  var btnHC=document.getElementById("hClose");
+  if(btnHC)btnHC.addEventListener("click",function(){actualCloseDrawer()});
 }
 
 function nextFindingId(){
@@ -1377,11 +1669,16 @@ function renderFindingsTable(){
     html+='<td>'+escHTML(f.owner)+'</td>';
     html+='<td>'+f.brq+'</td>';
     html+='<td>'+escHTML(f.due)+'</td>';
+    var syncSt=(SYNC_META[k]||{}).syncState||"synced";
+    if(f.status==="Archived")syncSt="archived";
+    var syncLabels={synced:"Synced",local:"Local",conflict:"Conflict",outdated:"Outdated",review:"Review",archived:"Archived"};
+    html+='<td><span class="sync-badge sync-'+syncSt+'">'+(syncLabels[syncSt]||syncSt)+'</span></td>';
     html+='<td class="actions-cell">'+
       '<button class="action-btn" data-act="view" data-afid="'+k+'" title="View">&#128065;</button>'+
       '<button class="action-btn" data-act="edit" data-afid="'+k+'" title="Edit">&#9998;</button>'+
       '<button class="action-btn" data-act="clone" data-afid="'+k+'" title="Clone">&#128203;</button>'+
       '<button class="action-btn" data-act="export" data-afid="'+k+'" title="Export">&#128228;</button>'+
+      '<button class="action-btn" data-act="history" data-afid="'+k+'" title="History">&#128214;</button>'+
       '<button class="action-btn" data-act="archive" data-afid="'+k+'" title="Archive">&#128451;</button></td>';
     html+='</tr>';
   });
@@ -1474,6 +1771,7 @@ document.getElementById("findTbody").addEventListener("click",function(e){
     else if(act==="edit"){if(typeof openEditDrawer==="function")openEditDrawer(afid);else toast("Edit coming soon","info");}
     else if(act==="clone"){if(typeof cloneFinding==="function")cloneFinding(afid);else toast("Clone coming soon","info");}
     else if(act==="export")openActionDrawer("export",afid);
+    else if(act==="history"){if(typeof openHistoryDrawer==="function")openHistoryDrawer(afid);else toast("History coming soon","info");}
     else if(act==="archive"){if(typeof archiveFinding==="function")archiveFinding(afid);else toast("Archive coming soon","info");}
     return;
   }
@@ -1571,6 +1869,9 @@ document.getElementById("btnNew").addEventListener("click",function(){
     });
     appendAuditEvent(f,"CREATED","Finding created by "+getRole());
     F[key]=f;
+    ensureChangeLog(key);ensureSyncMeta(key);
+    appendChangeLogEvent(key,"CREATED",{},f,"Created "+f.id);
+    updateSyncMeta(key,{revision:f.revision,updatedAt:f.updatedAt,updatedByRole:getRole(),syncState:"synced",lastChangeId:CHANGELOG[key][CHANGELOG[key].length-1].changeId});
     closeDrawer();rerenderAll();
     toast("Finding "+f.id+" created","ok");
   });
@@ -1682,6 +1983,9 @@ function openEditDrawer(fid){
   if(editDirty){confirmAction("Discard unsaved changes on current edit?",function(){editDirty=false;openEditDrawer(fid)});return;}
   activeFindingId=fid;
   editBuffer=deepClone(F[fid]);
+  editBaseRevision=F[fid].revision;
+  editBaseUpdatedAt=F[fid].updatedAt;
+  editBaseSnapshot=deepClone(F[fid]);
   editDirty=false;
   var bodyHtml=buildEditFieldHTML(editBuffer,role);
   var footHtml='<button class="primary" id="btnSaveDraft">Save Draft</button>';
@@ -1700,8 +2004,8 @@ function openEditDrawer(fid){
   var btnSave=document.getElementById("btnSaveDraft");
   if(btnSave)btnSave.addEventListener("click",function(){
     readEditFields();
-    F[activeFindingId]=editBuffer;
-    appendAuditEvent(F[activeFindingId],"EDITED","Draft saved by "+getRole());
+    var ok=commitFindingUpdateWithSync(activeFindingId,editBuffer,"EDITED");
+    if(!ok)return;
     editDirty=false;actualCloseDrawer();rerenderAll();
     toast(F[activeFindingId].id+" saved","ok");
   });
@@ -1709,8 +2013,8 @@ function openEditDrawer(fid){
   if(btnSubmit)btnSubmit.addEventListener("click",function(){
     readEditFields();
     editBuffer.status="In Review";
-    F[activeFindingId]=editBuffer;
-    appendAuditEvent(F[activeFindingId],"SUBMITTED_FOR_REVIEW","Submitted by "+getRole());
+    var ok=commitFindingUpdateWithSync(activeFindingId,editBuffer,"SUBMITTED_FOR_REVIEW");
+    if(!ok)return;
     editDirty=false;actualCloseDrawer();rerenderAll();
     toast(F[activeFindingId].id+" submitted for review","ok");
   });
@@ -1736,6 +2040,9 @@ function cloneFinding(fid){
   clone.linked=[];
   appendAuditEvent(clone,"CLONED","Cloned from "+src.id+" by "+getRole());
   F[key]=clone;
+  ensureChangeLog(key);ensureSyncMeta(key);
+  appendChangeLogEvent(key,"CLONED",{},clone,"Cloned from "+src.id);
+  updateSyncMeta(key,{revision:clone.revision,updatedAt:clone.updatedAt,updatedByRole:getRole(),syncState:"synced",lastChangeId:CHANGELOG[key][CHANGELOG[key].length-1].changeId});
   rerenderAll();
   toast("Cloned as "+clone.id,"ok");
 }
@@ -1745,8 +2052,12 @@ function archiveFinding(fid){
   if(!canArchiveFinding(role)){toast("No archive permission for role: "+role,"warn");return;}
   var f=F[fid];if(!f)return;
   confirmAction("Archive "+f.id+"? Status will be set to Archived.",function(){
+    var oldRec=deepClone(f);
     f.status="Archived";
     appendAuditEvent(f,"ARCHIVED","Archived by "+role);
+    ensureChangeLog(fid);ensureSyncMeta(fid);
+    appendChangeLogEvent(fid,"ARCHIVED",oldRec,f,"Archived "+f.id);
+    updateSyncMeta(fid,{revision:f.revision,updatedAt:f.updatedAt,updatedByRole:role,syncState:"synced"});
     editDirty=false;actualCloseDrawer();rerenderAll();
     toast(f.id+" archived","ok");
   });
@@ -1758,7 +2069,11 @@ function deleteFinding(fid){
   var f=F[fid];if(!f)return;
   confirmAction("PERMANENTLY DELETE "+f.id+"? A snapshot will be created first.",function(){
     if(typeof createSnapshot==="function")createSnapshot("Pre-delete: "+f.id);
+    var oldRec=deepClone(f);
     appendAuditEvent(f,"DELETED","Deleted by admin");
+    ensureChangeLog(fid);
+    appendChangeLogEvent(fid,"DELETED",oldRec,{},"Deleted "+f.id);
+    if(SYNC_META[fid])updateSyncMeta(fid,{syncState:"archived"});
     delete F[fid];
     editDirty=false;actualCloseDrawer();rerenderAll();
     toast(f.id+" deleted","ok");
@@ -1782,6 +2097,51 @@ function restoreSnapshot(){
     rerenderAll();
     toast("Snapshot restored ("+lastSnapshot.reason+")","ok");
   });
+}
+
+/* ══════════ FULL STATE EXPORT / IMPORT ══════════ */
+function exportStatePackage(){
+  return {
+    _meta:{format:"CERPA_IDIQ_EDGE",version:"1.1.0",type:"full_state",exported:new Date().toISOString(),sessionId:SESSION_ID,contract:"N00178-24-D-0042"},
+    findings:deepClone(F),
+    taskOrders:deepClone(TO),
+    changelog:deepClone(CHANGELOG),
+    syncMeta:deepClone(SYNC_META)
+  };
+}
+
+function importStatePackage(pkg){
+  createSnapshot("Pre-full-state-import");
+  /* findings */
+  Object.keys(F).forEach(function(k){delete F[k]});
+  if(pkg.findings){Object.keys(pkg.findings).forEach(function(k){F[k]=pkg.findings[k];normalizeFinding(F[k])})}
+  /* task orders */
+  Object.keys(TO).forEach(function(k){delete TO[k]});
+  if(pkg.taskOrders){Object.keys(pkg.taskOrders).forEach(function(k){TO[k]=pkg.taskOrders[k]})}
+  /* changelog — merge/deduplicate by changeId */
+  if(pkg.changelog){
+    Object.keys(pkg.changelog).forEach(function(k){
+      ensureChangeLog(k);
+      var existing={};
+      CHANGELOG[k].forEach(function(e){existing[e.changeId]=true});
+      (pkg.changelog[k]||[]).forEach(function(e){
+        if(!existing[e.changeId]){CHANGELOG[k].push(e);existing[e.changeId]=true}
+      });
+      CHANGELOG[k].sort(function(a,b){return a.ts>b.ts?1:a.ts<b.ts?-1:0});
+    });
+  }
+  /* syncMeta — take from package, reset states */
+  if(pkg.syncMeta){
+    Object.keys(pkg.syncMeta).forEach(function(k){
+      SYNC_META[k]=pkg.syncMeta[k];
+      SYNC_META[k].syncState="synced";
+      SYNC_META[k].conflictState="none";
+    });
+  }
+  /* ensure all keys have entries */
+  Object.keys(F).forEach(function(k){ensureChangeLog(k);ensureSyncMeta(k)});
+  rerenderAll();
+  toast("Full state imported — "+Object.keys(F).length+" findings","ok");
 }
 
 /* ══════════ COMPARE ══════════ */
@@ -1881,6 +2241,7 @@ document.getElementById("boardTbody").addEventListener("click",function(e){
   document.querySelectorAll("#boardTbody tr").forEach(function(r){r.style.background=""});
   tr.style.background="rgba(125,249,255,.06)";
   updateBoardDetail(fid);
+  showFinding(fid);
 });
 
 // Board decision buttons
@@ -2196,7 +2557,7 @@ function deriveTasks(){
 }
 
 function renderTaskPanel(){
-  var tp=document.getElementById("taskPanelBody");if(!tp)return;
+  var tp=document.getElementById("taskList");if(!tp)return;
   var tasks=deriveTasks();
   if(!tasks.length){tp.innerHTML='<p style="color:#666;padding:12px">No priority tasks</p>';return;}
   tp.innerHTML=tasks.map(function(t){
@@ -2395,6 +2756,9 @@ if(btnIF)btnIF.addEventListener("change",function(){
       Object.keys(TO).forEach(function(k){delete TO[k]});
       Object.keys(DEMO_TO).forEach(function(k){TO[k]=deepClone(DEMO_TO[k])});
       Object.values(F).forEach(normalizeFinding);
+      Object.keys(CHANGELOG).forEach(function(k){delete CHANGELOG[k]});
+      Object.keys(SYNC_META).forEach(function(k){delete SYNC_META[k]});
+      Object.keys(F).forEach(function(k){ensureChangeLog(k);ensureSyncMeta(k)});
       rerenderAll();toast("Demo data loaded","ok");
     });
   });
@@ -2403,6 +2767,8 @@ if(btnIF)btnIF.addEventListener("change",function(){
       createSnapshot("Pre-empty-workspace");
       Object.keys(F).forEach(function(k){delete F[k]});
       Object.keys(TO).forEach(function(k){delete TO[k]});
+      Object.keys(CHANGELOG).forEach(function(k){delete CHANGELOG[k]});
+      Object.keys(SYNC_META).forEach(function(k){delete SYNC_META[k]});
       rerenderAll();toast("Workspace cleared","ok");
     });
   });
@@ -2410,6 +2776,8 @@ if(btnIF)btnIF.addEventListener("change",function(){
     confirmAction("Clear all findings? Task orders will remain. Snapshot created first.",function(){
       createSnapshot("Pre-clear-findings");
       Object.keys(F).forEach(function(k){delete F[k]});
+      Object.keys(CHANGELOG).forEach(function(k){delete CHANGELOG[k]});
+      Object.keys(SYNC_META).forEach(function(k){delete SYNC_META[k]});
       rerenderAll();toast("Findings cleared","ok");
     });
   });
@@ -2425,11 +2793,36 @@ if(btnIF)btnIF.addEventListener("change",function(){
       createSnapshot("Pre-clear-all");
       Object.keys(F).forEach(function(k){delete F[k]});
       Object.keys(TO).forEach(function(k){delete TO[k]});
+      Object.keys(CHANGELOG).forEach(function(k){delete CHANGELOG[k]});
+      Object.keys(SYNC_META).forEach(function(k){delete SYNC_META[k]});
       rerenderAll();toast("All data cleared","ok");
     });
   });
   wire("btnSnapshot",function(){createSnapshot("Manual snapshot")});
   wire("btnRestore",function(){restoreSnapshot()});
+  wire("btnExportFullState",function(){
+    downloadJSON(exportStatePackage(),"CERPA_IDIQ_fullstate_"+new Date().toISOString().slice(0,10)+".json");
+  });
+  wire("btnImportFullState",function(){
+    var fi=document.getElementById("fullStateImportFile");if(fi)fi.click();
+  });
+  var fsFi=document.getElementById("fullStateImportFile");
+  if(fsFi)fsFi.addEventListener("change",function(){
+    var file=this.files&&this.files[0];
+    if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(e){
+      try{
+        var pkg=JSON.parse(e.target.result);
+        if(!pkg._meta||pkg._meta.type!=="full_state"){toast("Not a full state package","warn");return;}
+        confirmAction("Import full state from "+pkg._meta.exported+"? Current data will be replaced (snapshot created first).",function(){
+          importStatePackage(pkg);
+        });
+      }catch(ex){toast("Invalid JSON: "+ex.message,"warn")}
+    };
+    reader.readAsText(file);
+    this.value="";
+  });
 })();
 
 /* ══════════ TAB PREFS ══════════ */
@@ -2447,10 +2840,37 @@ var printBtn=document.getElementById("printBtn");
 if(printBtn)printBtn.addEventListener("click",function(){window.print();});
 
 /* ══════════ TASK PANEL TOGGLE ══════════ */
-var tpToggle=document.getElementById("taskPanelToggle");
+var tpToggle=document.getElementById("btnTaskToggle");
 var tpEl=document.getElementById("taskPanel");
 if(tpToggle&&tpEl){
   tpToggle.addEventListener("click",function(){tpEl.classList.toggle("open");});
+}
+var tpClose=document.getElementById("btnCloseTask");
+if(tpClose&&tpEl){tpClose.addEventListener("click",function(){tpEl.classList.remove("open")})}
+
+/* ══════════ TAB PREFERENCES (GEAR) ══════════ */
+var tabPrefsBtn=document.getElementById("btnTabPrefs");
+var tabPrefsPanel=document.getElementById("tabPrefsPanel");
+if(tabPrefsBtn&&tabPrefsPanel){
+  tabPrefsBtn.addEventListener("click",function(e){
+    e.stopPropagation();
+    if(tabPrefsPanel.style.display==="none"){
+      var allTabs=[{t:"roles",lbl:"Roles"},{t:"dash",lbl:"Dashboard"},{t:"find",lbl:"Findings"},{t:"board",lbl:"Review Board"},{t:"trends",lbl:"Trends"},{t:"mem",lbl:"Memory Graph"},{t:"admin",lbl:"Admin"},{t:"audit",lbl:"Audit"}];
+      var role=roleSel.value;var rv=roleVis[role]||{};
+      tabPrefsPanel.innerHTML='<div style="font-size:11px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.4px">Tab Visibility</div>'+
+        allTabs.map(function(tab){
+          var enabled=!!rv[tab.t];
+          return '<label style="display:flex;align-items:center;gap:6px;padding:3px 0;font-size:12px;color:'+(enabled?"var(--txt)":"var(--muted)")+'"><input type="checkbox" '+(enabled?"checked":"")+' disabled style="opacity:.6"/> '+tab.lbl+(enabled?'':' <span style="font-size:9px;color:#666">(role-locked)</span>')+'</label>';
+        }).join("")+
+        '<div style="margin-top:8px;font-size:10px;color:#666">Tab access is governed by the active role. Switch roles to change visible tabs.</div>';
+      tabPrefsPanel.style.display="block";
+    }else{
+      tabPrefsPanel.style.display="none";
+    }
+  });
+  document.addEventListener("click",function(e){
+    if(!tabPrefsPanel.contains(e.target)&&e.target!==tabPrefsBtn)tabPrefsPanel.style.display="none";
+  });
 }
 
 /* ══════════ SHORTCUT BAR ══════════ */
@@ -2473,7 +2893,7 @@ function renderCISGauge(){
 
 /* ══════════ AT-RISK STRIP ══════════ */
 function renderAtRiskStrip(){
-  var el=document.getElementById("atRiskStrip");if(!el)return;
+  var el=document.getElementById("vendorStrip");if(!el)return;
   var items=[];
   Object.values(TO).forEach(function(t){
     if(t.riskLevel==="HIGH"||Math.abs(((t.actualSpend-t.plannedSpend)/t.plannedSpend)*100)>15){
@@ -2487,11 +2907,50 @@ function renderAtRiskStrip(){
   });
   if(!items.length){el.innerHTML='<div style="padding:12px;color:#666">No at-risk items</div>';return;}
   el.innerHTML=items.map(function(it){
-    return '<div class="vendor-strip-item" style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(255,59,48,0.08);border:1px solid rgba(255,59,48,0.2);border-radius:8px;margin:4px">'+
+    var isTO=it.id.indexOf("TO-")===0;
+    return '<div class="vendor-strip-item" data-arid="'+escHTML(it.id)+'" data-artype="'+(isTO?"to":"finding")+'" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(255,59,48,0.08);border:1px solid rgba(255,59,48,0.2);border-radius:8px;margin:4px">'+
       '<span class="badge" style="background:var(--bad)">'+escHTML(it.risk)+'</span>'+
       '<span style="color:#ccc;font-size:13px"><strong>'+escHTML(it.id)+'</strong> · '+escHTML(it.vendor)+'</span>'+
       '<span style="color:#888;font-size:11px">Burn: '+it.burn+'%</span></div>';
   }).join("");
+  /* wire click-to-drawer */
+  el.querySelectorAll("[data-arid]").forEach(function(card){
+    card.addEventListener("click",function(){
+      var rid=card.getAttribute("data-arid");
+      var rtype=card.getAttribute("data-artype");
+      if(rtype==="to"){
+        var toKey=rid.replace("TO-","");
+        var t=TO[toKey];
+        if(!t){toast("Task order not found","warn");return;}
+        var h='<div class="wr"><span class="wl">Task Order</span><span class="wv" style="color:var(--accent)">'+escHTML(t.id)+'</span></div>';
+        h+='<div class="wr"><span class="wl">Name</span><span class="wv">'+escHTML(t.name)+'</span></div>';
+        h+='<div class="wr"><span class="wl">Vendor</span><span class="wv">'+escHTML(t.vendor)+'</span></div>';
+        h+='<div class="wr"><span class="wl">Contract</span><span class="wv">'+escHTML(t.contract)+'</span></div>';
+        h+='<div class="wr"><span class="wl">Risk Level</span><span class="wv" style="color:var(--bad)">'+escHTML(t.riskLevel)+'</span></div>';
+        h+='<div class="wr"><span class="wl">Status</span><span class="wv">'+escHTML(t.status)+'</span></div>';
+        var burn=((t.actualSpend/t.plannedSpend)*100).toFixed(1);
+        h+='<div class="wr"><span class="wl">Burn Rate</span><span class="wv" style="color:var('+(Math.abs(burn-100)>15?"--bad":"--warn")+')">'+burn+'%</span></div>';
+        h+='<div class="wr"><span class="wl">Planned</span><span class="wv">$'+t.plannedSpend.toLocaleString()+'</span></div>';
+        h+='<div class="wr"><span class="wl">Actual</span><span class="wv">$'+t.actualSpend.toLocaleString()+'</span></div>';
+        /* related findings */
+        var related=Object.values(F).filter(function(f){return f.taskOrder===t.id});
+        if(related.length){
+          h+='<h4 style="margin-top:12px;color:var(--muted);font-size:11px;text-transform:uppercase">Related Findings ('+related.length+')</h4>';
+          related.forEach(function(f){
+            h+='<div class="wr" style="cursor:pointer" data-fact="'+f.id.replace("F-","")+'"><span class="wl" style="color:'+(stColorMap[f.status]||"var(--accent)")+'">'+escHTML(f.id)+'</span><span class="wv">'+escHTML(f.title.substring(0,40))+'</span></div>';
+          });
+        }
+        openDrawer("Task Order — "+t.id,h,'<button data-dact="Closed detail">Close</button>');
+        /* wire finding links inside drawer */
+        dBody.querySelectorAll("[data-fact]").forEach(function(el){
+          el.addEventListener("click",function(){var fid=el.getAttribute("data-fact");actualCloseDrawer();showFinding(fid)});
+        });
+      }else{
+        var fid=rid.replace("F-","");
+        showFinding(fid);
+      }
+    });
+  });
 }
 
 /* ══════════ KPI RENDERING ══════════ */
@@ -2593,10 +3052,20 @@ function renderDashboard(){
   /* board-ready queue */
   var brq=document.getElementById("boardReadyQueue");
   if(brq){
-    var ready=Object.values(F).filter(function(f){return f.brq>=70&&f.status!=="Closed"});
-    brq.innerHTML=ready.length?ready.map(function(f){
-      return '<div class="wr brq-link" style="cursor:pointer" data-goto="3"><span class="wl">'+escHTML(f.id)+'</span><span class="wv">BRQ '+f.brq+' · '+escHTML(f.claimCat)+'</span></div>';
-    }).join(""):'<div style="padding:8px;color:#666">No board-ready findings</div>';
+    var ready=Object.values(F).filter(function(f){return f.brq>=0.7&&f.status!=="Closed"});
+    ready.sort(function(a,b){return b.brq-a.brq});
+    if(!ready.length){brq.innerHTML='<div style="padding:8px;color:#666">No board-ready findings</div>';}
+    else{
+      brq.innerHTML=ready.map(function(f){
+        var fid=f.id.replace("F-","");
+        var sevCls=sevClassMap[f.sev]||"sev-low";
+        var act=f.brq>=0.8?"Approve":"Send Back";
+        return '<div class="wr" style="cursor:pointer" data-brqfid="'+fid+'"><span class="wl mono" style="color:'+(stColorMap[f.status]||"var(--accent)")+'">'+escHTML(f.id)+'</span><span class="wv"><span class="badge '+sevCls+'" style="margin-right:6px">'+escHTML(f.sev)+'</span>BRQ '+f.brq+' · '+escHTML(f.claimCat)+'</span></div>';
+      }).join("");
+      brq.querySelectorAll("[data-brqfid]").forEach(function(el){
+        el.addEventListener("click",function(){showFinding(el.getAttribute("data-brqfid"))});
+      });
+    }
   }
 
   /* contract health */
@@ -2613,10 +3082,10 @@ function renderDashboard(){
   }
 }
 
-/* delegated click for board-ready links (no inline handlers — EDGE safe) */
+/* delegated click for data-goto links (no inline handlers — EDGE safe) */
 document.addEventListener("click",function(e){
   var el=e.target.closest("[data-goto]");
-  if(el)openTab(parseInt(el.dataset.goto));
+  if(el)openTab(el.dataset.goto);
 });
 
 /* ══════════ TRENDS TAB CLICK HANDLERS ══════════ */
