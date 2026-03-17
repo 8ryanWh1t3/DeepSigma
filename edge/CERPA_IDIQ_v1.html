@@ -535,6 +535,8 @@ footer strong{color:var(--accent);font-weight:600}
     <input type="text" placeholder="Search findings..." style="width:180px" id="fltSearch"/>
     <button class="primary" id="btnNew">+ New Finding</button>
     <button id="btnCompare" style="border-color:rgba(139,92,246,.3);color:#a78bfa">Compare</button>
+    <button id="btnExportFindings">Export JSON</button>
+    <label style="cursor:pointer;font-size:10px;padding:5px 10px;border:1px solid var(--line);border-radius:6px;color:var(--muted)">Import JSON<input type="file" accept=".json" id="btnImportFindings" style="display:none"></label>
   </div>
   <div class="card">
     <table><thead><tr><th>ID</th><th>Title</th><th>Status</th><th>Sev</th><th>Category</th><th>TO</th><th>Vendor</th><th>Owner</th><th>BRQ</th><th>Due</th></tr></thead>
@@ -1016,6 +1018,50 @@ function toast(msg,type){
   setTimeout(function(){t.style.opacity="0";t.style.transition="opacity .3s";setTimeout(function(){t.remove()},300)},2800);
 }
 
+/* ══════════ JSON I/O ══════════ */
+function downloadJSON(data,filename){
+  var json=JSON.stringify(data,null,2);
+  var blob=new Blob([json],{type:"application/json"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");
+  a.href=url;a.download=filename;
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast("Downloaded "+filename,"ok");
+}
+
+function buildExportPackage(){
+  return {
+    _meta:{format:"CERPA_IDIQ_EDGE",version:"1.0.0",exported:new Date().toISOString(),contract:"N00178-24-D-0042"},
+    findings:F,
+    taskOrders:TO
+  };
+}
+
+function importFindings(json){
+  try{
+    var data=JSON.parse(json);
+    var imported=0;
+    var src=data.findings||data;
+    if(typeof src!=="object"||src===null){toast("Invalid format — expected findings object","warn");return;}
+    Object.keys(src).forEach(function(k){
+      var f=src[k];
+      if(!f.id||!f.title){return;}
+      var key=f.id.replace("F-","");
+      if(!F[key]){F[key]=f;imported++;}
+      else{Object.keys(f).forEach(function(p){F[key][p]=f[p]});imported++;}
+    });
+    if(data.taskOrders){
+      Object.keys(data.taskOrders).forEach(function(k){
+        TO[k]=data.taskOrders[k];
+      });
+    }
+    renderFindingsTable();renderBoardQueue();renderDashboard();renderTrends();renderMG();renderAudit();
+    toast("Imported "+imported+" findings","ok");
+  }catch(e){toast("JSON parse error: "+e.message,"warn");}
+}
+
 /* ══════════ DRAWER ══════════ */
 function setHTML(el,html){var t=document.createElement("template");t.innerHTML=html;el.textContent="";el.appendChild(t.content.cloneNode(true))}
 function openDrawer(title,bodyHtml,footHtml){
@@ -1184,6 +1230,7 @@ function openActionDrawer(action,fid){
     openDrawer("Link Related — "+f.id,'<div class="wire"><h4>Available Findings</h4>'+matches+'</div>',
       '<button class="primary" data-dact="Linkage created for '+f.id+'">Create Link</button>');
   } else if(action==="export"){
+    var fPkg={_meta:{format:"CERPA_IDIQ_EDGE",version:"1.0.0",type:"finding_packet",exported:new Date().toISOString()},finding:f};
     openDrawer("Export Packet — "+f.id,
       '<div class="wire"><h4>Packet Contents</h4>'+
       '<div class="wr"><span class="wl">Finding</span><span class="wv">'+f.id+'</span></div>'+
@@ -1191,7 +1238,14 @@ function openActionDrawer(action,fid){
       '<div class="wr"><span class="wl">Task Order</span><span class="wv">'+f.taskOrder+'</span></div>'+
       '<div class="wr"><span class="wl">Evidence</span><span class="wv">'+f.evidence.length+' artifacts</span></div>'+
       '<div class="wr"><span class="wl">Audit Chain</span><span class="wv">'+f.auditChain.join(' → ')+'</span></div></div>',
-      '<button class="primary" data-dact="Packet exported for '+f.id+'">Export PDF</button><button data-dact="JSON copied">Copy JSON</button>');
+      '<button class="primary" id="btnDlFinding">Download JSON</button><button id="btnCopyFinding">Copy JSON</button>');
+    var _pkg=fPkg;
+    var bd=document.getElementById("btnDlFinding");
+    if(bd)bd.addEventListener("click",function(){downloadJSON(_pkg,f.id+"_packet.json");closeDrawer();});
+    var bc=document.getElementById("btnCopyFinding");
+    if(bc)bc.addEventListener("click",function(){
+      navigator.clipboard.writeText(JSON.stringify(_pkg,null,2)).then(function(){toast("JSON copied to clipboard","ok");closeDrawer();}).catch(function(){toast("Copy failed — download instead","warn");});
+    });
   } else if(action==="evidence"){
     openDrawer("Add Evidence — "+f.id,
       '<div class="df"><label>Evidence Type</label><select><option>Document</option><option>Screenshot</option><option>Artifact</option><option>Signed Memo</option></select></div>'+
@@ -1328,8 +1382,10 @@ var btnRD=document.getElementById("btnRecordDecision");
 if(btnRD)btnRD.addEventListener("click",function(){toast("Decision recorded — Review Board session updated","ok")});
 var btnEP=document.getElementById("btnExportPacket");
 if(btnEP)btnEP.addEventListener("click",function(){
-  openDrawer("Export Board Packet",'<div class="wire"><h4>Session: Q2-IDIQ-BOARD</h4><div class="wr"><span class="wl">Findings</span><span class="wv">'+Object.keys(F).length+' tracked</span></div></div>',
-    '<button class="primary" data-dact="Board packet exported">Export PDF</button>');
+  var boardFindings={};
+  Object.keys(F).filter(function(k){return F[k].status!=="Closed"&&F[k].brq>=0.4}).forEach(function(k){boardFindings[k]=F[k]});
+  var pkg={_meta:{format:"CERPA_IDIQ_EDGE",version:"1.0.0",type:"board_packet",session:"Q2-IDIQ-BOARD",exported:new Date().toISOString()},findings:boardFindings};
+  downloadJSON(pkg,"CERPA_IDIQ_board_"+new Date().toISOString().slice(0,10)+".json");
 });
 
 // Board filters
@@ -1383,21 +1439,26 @@ document.getElementById("auditTbody").addEventListener("click",function(e){
 
 var btnAE=document.getElementById("btnAuditExport");
 if(btnAE)btnAE.addEventListener("click",function(){
-  openDrawer("Export Audit Package",'<div class="wire"><h4>Audit Package</h4><div class="wr"><span class="wl">Period</span><span class="wv">Q2 FY26</span></div><div class="wr"><span class="wl">Findings</span><span class="wv">'+Object.keys(F).length+'</span></div><div class="wr"><span class="wl">Contract</span><span class="wv">N00178-24-D-0042</span></div></div>',
-    '<button class="primary" data-dact="Audit package exported">Export</button>');
+  var pkg=buildExportPackage();
+  pkg._meta.type="audit_package";pkg._meta.period="Q2 FY26";
+  pkg.auditTrail=Object.values(F).map(function(f){
+    return {id:f.id,status:f.status,auditChain:f.auditChain,evidence:f.evidence,timeline:f.timeline};
+  });
+  downloadJSON(pkg,"CERPA_IDIQ_audit_"+new Date().toISOString().slice(0,10)+".json");
 });
 
 /* ══════════ EXPORT BRIEF ══════════ */
 var btnEB=document.getElementById("btnExportBrief");
 if(btnEB)btnEB.addEventListener("click",function(){
-  openDrawer("Export Command Brief — Q2 FY26 IDIQ",
-    '<div class="wire"><h4>Brief Contents</h4>'+
-    '<div class="wr"><span class="wl">Contract</span><span class="wv">N00178-24-D-0042</span></div>'+
-    '<div class="wr"><span class="wl">CIS</span><span class="wv" style="color:var(--ok)">81</span></div>'+
-    '<div class="wr"><span class="wl">TOs At Risk</span><span class="wv" style="color:var(--bad)">3</span></div>'+
-    '<div class="wr"><span class="wl">Open HIGH</span><span class="wv" style="color:var(--bad)">5</span></div>'+
-    '<div class="wr"><span class="wl">Posture</span><span class="wv" style="color:var(--warn)">AMBER</span></div></div>',
-    '<button class="primary" data-dact="Command Brief exported">Export PDF</button>');
+  var highOpen=Object.values(F).filter(function(f){return f.sev==="HIGH"&&f.status!=="Closed"}).length;
+  var atRiskTO=Object.values(TO).filter(function(t){return t.riskLevel==="HIGH"}).length;
+  var posture=highOpen>=4?"RED":highOpen>=2?"AMBER":"GREEN";
+  var brief={
+    _meta:{format:"CERPA_IDIQ_EDGE",version:"1.0.0",type:"command_brief",exported:new Date().toISOString(),contract:"N00178-24-D-0042"},
+    summary:{cis:81,posture:posture,openHigh:highOpen,taskOrdersAtRisk:atRiskTO,totalFindings:Object.keys(F).length,period:"Q2 FY26"},
+    findings:F,taskOrders:TO
+  };
+  downloadJSON(brief,"CERPA_IDIQ_brief_"+new Date().toISOString().slice(0,10)+".json");
 });
 
 /* ══════════ MEMORY GRAPH ══════════ */
@@ -1696,15 +1757,35 @@ function startBoardTimer(){
 function stopBoardTimer(){if(boardTimer){clearInterval(boardTimer);boardTimer=null;}}
 
 /* ══════════ DROP ZONE (Admin) ══════════ */
+function handleImportFile(file){
+  if(!file||!file.name.endsWith(".json")){toast("Only .json files accepted","warn");return;}
+  var reader=new FileReader();
+  reader.onload=function(e){importFindings(e.target.result);};
+  reader.onerror=function(){toast("Failed to read file","warn");};
+  reader.readAsText(file);
+}
 var dz=document.getElementById("dropZone");
 if(dz){
   dz.addEventListener("dragover",function(e){e.preventDefault();dz.classList.add("dragover");});
   dz.addEventListener("dragleave",function(){dz.classList.remove("dragover");});
   dz.addEventListener("drop",function(e){
     e.preventDefault();dz.classList.remove("dragover");
-    toast("File import is disabled in EDGE-hardened mode","warn");
+    var file=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];
+    if(file)handleImportFile(file);
   });
 }
+
+/* ══════════ FINDINGS EXPORT / IMPORT ══════════ */
+var btnEF=document.getElementById("btnExportFindings");
+if(btnEF)btnEF.addEventListener("click",function(){
+  downloadJSON(buildExportPackage(),"CERPA_IDIQ_findings_"+new Date().toISOString().slice(0,10)+".json");
+});
+var btnIF=document.getElementById("btnImportFindings");
+if(btnIF)btnIF.addEventListener("change",function(){
+  var file=this.files&&this.files[0];
+  if(file)handleImportFile(file);
+  this.value="";
+});
 
 /* ══════════ TAB PREFS ══════════ */
 var tabPrefBtn=document.getElementById("tabPrefBtn");
