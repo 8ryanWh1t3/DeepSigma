@@ -367,98 +367,54 @@ footer strong{color:var(--accent);font-weight:600}
 
 <!-- ════════════ ROLES TAB ════════════ -->
 <section id="s-roles" class="active">
-  <div style="text-align:center;margin-bottom:20px">
-    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">IDIQ Contract Management</div>
-    <div style="font-size:22px;font-weight:700;letter-spacing:.5px">CERPA — 6 Roles, 3 Surfaces, 1 Data Model</div>
-    <div style="font-size:11px;color:var(--muted);margin-top:4px">Claim → Event → Review → Patch → Apply on the Truth | Reasoning | Memory substrate</div>
-  </div>
-
-  <!-- 4-Tier Hierarchy Diagram -->
-  <div class="tier-diagram">
-    <div class="tier-row" style="border-color:rgba(125,249,255,.3)">
-      <div class="tier-label" style="color:var(--accent)">Executive</div>
-      <div class="tier-roles">Senior Contracting Official · Program Executive — strategic direction, escalations, portfolio oversight</div>
-      <span class="tier-surface rb-cmd">Command UI</span>
-    </div>
-    <div class="tier-row" style="border-color:rgba(93,255,147,.3)">
-      <div class="tier-label" style="color:var(--ok)">Management</div>
-      <div class="tier-roles">Contracting Officer (CO) · Program Manager · COR — legal compliance, day-to-day IDIQ management, technical monitoring</div>
-      <span class="tier-surface rb-ops">Ops UI</span>
-    </div>
-    <div class="tier-row" style="border-color:rgba(167,139,250,.3)">
-      <div class="tier-label" style="color:#a78bfa">Operational</div>
-      <div class="tier-roles">Task Order Managers · Technical Leads · Quality Assurance — TO execution, requirement validation, performance verification</div>
-      <span class="tier-surface rb-ops">Ops UI</span>
-    </div>
-    <div class="tier-row" style="border-color:rgba(255,107,107,.3)">
-      <div class="tier-label" style="color:var(--bad)">Support</div>
-      <div class="tier-roles">Financial Analysts · Data Analysts · Administrative Staff — cost tracking, CERPA maintenance, documentation</div>
-      <span class="tier-surface rb-gov">Governance UI</span>
-    </div>
-  </div>
-
-  <div style="display:flex;gap:10px;justify-content:center;margin-bottom:20px">
-    <span style="font-size:10px;padding:4px 14px;border-radius:6px;font-weight:700;color:var(--accent);border:1px solid rgba(125,249,255,.25);background:rgba(125,249,255,.05);letter-spacing:.4px">COMMAND UI — Decision Surface</span>
-    <span style="font-size:10px;padding:4px 14px;border-radius:6px;font-weight:700;color:var(--ok);border:1px solid rgba(93,255,147,.25);background:rgba(93,255,147,.05);letter-spacing:.4px">OPS UI — Execution Surface</span>
-    <span style="font-size:10px;padding:4px 14px;border-radius:6px;font-weight:700;color:var(--bad);border:1px solid rgba(255,107,107,.25);background:rgba(255,107,107,.05);letter-spacing:.4px">GOVERNANCE UI — Assurance Surface</span>
+  <div style="text-align:center;margin-bottom:24px">
+    <div style="font-size:20px;font-weight:700;letter-spacing:.5px;margin-bottom:6px">Select Your Role</div>
+    <div style="font-size:11px;color:var(--muted)">Each role sees a different set of tabs. Click a card to enter that surface.</div>
   </div>
 
   <div class="role-grid">
-    <div class="role-card rc-exec" data-role="executive">
-      <span class="rc-badge rb-cmd">Command UI</span>
-      <div class="rc-icon">&#11041;</div>
-      <div class="rc-title">Executive / Commander</div>
-      <div class="rc-tag">Senior Contracting Official / Program Executive</div>
-      <div class="rc-purpose">Views portfolio health, contract risk, task order status, trend indicators. Approves escalations and major patches. Read-heavy, decision-heavy. No raw evidence editing.</div>
-      <div class="rc-screens">Dashboard · Review Summary · Trends · Brief Export</div>
+    <div class="role-card rc-exec" data-role="executive" style="cursor:pointer">
+      <span class="rc-badge rb-cmd">Command</span>
+      <div class="rc-title" style="margin-top:8px">Executive / Commander</div>
+      <div class="rc-tag">Senior Contracting Official · Program Executive</div>
+      <div class="rc-purpose">Portfolio health, contract risk, escalations. Lands on <strong>Dashboard</strong>.</div>
+      <div class="rc-screens" style="margin-top:auto">Dashboard · Findings · Board · Trends · Memory</div>
     </div>
-    <div class="role-card rc-pm" data-role="pm">
-      <span class="rc-badge rb-ops">Ops UI</span>
-      <div class="rc-icon">&#9672;</div>
-      <div class="rc-title">Program Manager / Owner</div>
-      <div class="rc-tag">Program Manager / Task Order Lead</div>
-      <div class="rc-purpose">Drives findings toward durable closure. Owns patch plans, action tracking, and task order remediation. Can upload evidence and request closure. Cannot self-certify closure.</div>
-      <div class="rc-screens">My Queue · Finding Detail · Patch Builder · Evidence Panel</div>
+    <div class="role-card rc-pm" data-role="pm" style="cursor:pointer">
+      <span class="rc-badge rb-ops">Ops</span>
+      <div class="rc-title" style="margin-top:8px">Program Manager</div>
+      <div class="rc-tag">Program Manager · Task Order Lead</div>
+      <div class="rc-purpose">Drives findings to closure, owns patches and TO remediation. Lands on <strong>Findings</strong>.</div>
+      <div class="rc-screens" style="margin-top:auto">Dashboard · Findings · Memory</div>
     </div>
-    <div class="role-card rc-rev" data-role="reviewer">
+    <div class="role-card rc-rev" data-role="reviewer" style="cursor:pointer">
       <span class="rc-badge rb-cmd">Command + Ops</span>
-      <div class="rc-icon">&#9678;</div>
-      <div class="rc-title">Reviewer / Board Member</div>
-      <div class="rc-tag">Contracting Officer / COR / QA Board</div>
-      <div class="rc-purpose">Judges whether closure is real. Approves, rejects, sends back, escalates. Evaluates readiness and recurrence risk. Cannot rewrite raw observation history.</div>
-      <div class="rc-screens">Review Board · Finding Detail · Evidence View · Recurrence History</div>
+      <div class="rc-title" style="margin-top:8px">Reviewer / Board Member</div>
+      <div class="rc-tag">Contracting Officer · COR · QA Board</div>
+      <div class="rc-purpose">Approves, rejects, sends back, escalates. Lands on <strong>Review Board</strong>.</div>
+      <div class="rc-screens" style="margin-top:auto">Dashboard · Findings · Board · Trends · Memory</div>
     </div>
-    <div class="role-card rc-ana" data-role="analyst">
-      <span class="rc-badge rb-ops">Ops UI</span>
-      <div class="rc-icon">&#9671;</div>
-      <div class="rc-title">Analyst / Assessment Lead</div>
-      <div class="rc-tag">Task Order Manager / Technical Lead / QA</div>
-      <div class="rc-purpose">Captures claims and events. Structures findings, links evidence, prepares trend outputs. Performs intake and categorization. No final approval authority.</div>
-      <div class="rc-screens">Intake Workspace · Findings List · Trend Explorer · Memory Lookup</div>
+    <div class="role-card rc-ana" data-role="analyst" style="cursor:pointer">
+      <span class="rc-badge rb-ops">Ops</span>
+      <div class="rc-title" style="margin-top:8px">Analyst / Assessment Lead</div>
+      <div class="rc-tag">Task Order Manager · Technical Lead · QA</div>
+      <div class="rc-purpose">Captures claims, structures findings, links evidence. Lands on <strong>Findings</strong>.</div>
+      <div class="rc-screens" style="margin-top:auto">Dashboard · Findings · Trends · Memory</div>
     </div>
-    <div class="role-card rc-adm" data-role="admin">
-      <span class="rc-badge rb-gov">Governance UI</span>
-      <div class="rc-icon">&#9881;</div>
-      <div class="rc-title">Governance Admin / System Admin</div>
-      <div class="rc-tag">Data Analyst / Administrative Staff</div>
-      <div class="rc-purpose">Manages thresholds, users, taxonomies, role mappings, workflow locks. Views audit logs. Cannot alter historical canon.</div>
-      <div class="rc-screens">Admin Console · Role Matrix · Threshold Config · Audit Logs</div>
+    <div class="role-card rc-adm" data-role="admin" style="cursor:pointer">
+      <span class="rc-badge rb-gov">Governance</span>
+      <div class="rc-title" style="margin-top:8px">Governance Admin</div>
+      <div class="rc-tag">Data Analyst · Administrative Staff</div>
+      <div class="rc-purpose">Manages roles, thresholds, taxonomies, workflow rules. Lands on <strong>Admin</strong>.</div>
+      <div class="rc-screens" style="margin-top:auto">Dashboard · Findings · Trends · Memory · Admin · Audit</div>
     </div>
-    <div class="role-card rc-aud" data-role="auditor">
-      <span class="rc-badge rb-gov">Governance UI</span>
-      <div class="rc-icon">&#8856;</div>
-      <div class="rc-title">Auditor / Inspector</div>
-      <div class="rc-tag">Financial Analyst / External Oversight</div>
-      <div class="rc-purpose">Read-only oversight. Exports audit packets. Traces claim → event → review → patch → apply provenance. Never modifies records.</div>
-      <div class="rc-screens">Audit Workspace · Evidence Chain · Export Center · Trace Viewer</div>
+    <div class="role-card rc-aud" data-role="auditor" style="cursor:pointer">
+      <span class="rc-badge rb-gov">Governance</span>
+      <div class="rc-title" style="margin-top:8px">Auditor / Inspector</div>
+      <div class="rc-tag">Financial Analyst · External Oversight</div>
+      <div class="rc-purpose">Read-only oversight, evidence chain, CERPA provenance. Lands on <strong>Audit</strong>.</div>
+      <div class="rc-screens" style="margin-top:auto">Trends · Memory · Audit</div>
     </div>
-  </div>
-
-  <div style="text-align:center;margin-top:20px;font-size:11px;color:var(--muted)">
-    CERPA Workflow: <strong style="color:var(--txt)">Claim (Define) → Event (Monitor) → Review (Assess) → Patch (Correct) → Apply (Authorize)</strong>
-  </div>
-  <div style="text-align:center;margin-top:6px;font-size:10px;color:#4a5a6a">
-    Same data model. Different authority surfaces. Click a role card to enter that surface.
   </div>
 </section>
 
