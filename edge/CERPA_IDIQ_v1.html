@@ -1021,7 +1021,7 @@ var toastWrap=document.getElementById("toastWrap");
 function openTab(n){
   tabs.forEach(function(t){t.classList.toggle("active",t.getAttribute("data-t")===n)});
   secs.forEach(function(s){s.classList.toggle("active",s.id==="s-"+n)});
-  if(n==="mem"&&!mgRendered){renderMG();mgRendered=true}
+  if(n==="mem")renderMG();
 }
 tabs.forEach(function(t){t.addEventListener("click",function(){openTab(t.getAttribute("data-t"))})});
 document.querySelectorAll("[data-nav]").forEach(function(b){
@@ -1482,28 +1482,43 @@ var MG_EDGES=[
 var MG_COLORS={finding:"var(--accent)",pattern:"var(--mag)",rootcause:"var(--bad)",patch:"var(--ok)",taskorder:"var(--warn)",vendor:"#e0e0e0"};
 
 function renderMG(){
-  var svg=document.getElementById("mgSVG");if(!svg)return;
+  var svg=document.getElementById("mgSvg");if(!svg)return;
   var w=svg.clientWidth||800,h=svg.clientHeight||500;
-  var activeTypes={};
-  document.querySelectorAll("#mgToolbar .mg-filter").forEach(function(b){
-    activeTypes[b.dataset.type]=b.classList.contains("active");
+  var activeTypes={finding:true,pattern:true,patch:true,rootcause:true,taskorder:true,vendor:true};
+  document.querySelectorAll("#graphToolbar input[data-graph-type]").forEach(function(cb){
+    var t=cb.dataset.graphType;if(t==="cause")t="rootcause";
+    activeTypes[t]=cb.checked;
   });
   var visNodes=MG_NODES.filter(function(n){return activeTypes[n.type]!==false});
   var visIds={};visNodes.forEach(function(n){visIds[n.id]=true});
   var visEdges=MG_EDGES.filter(function(e){return visIds[e.from]&&visIds[e.to]});
 
-  var html='';
+  while(svg.firstChild)svg.removeChild(svg.firstChild);
+  var NS="http://www.w3.org/2000/svg";
   visEdges.forEach(function(e){
     var a=MG_NODES.find(function(n){return n.id===e.from});
     var b=MG_NODES.find(function(n){return n.id===e.to});
-    if(a&&b) html+='<line x1="'+a.x+'" y1="'+a.y+'" x2="'+b.x+'" y2="'+b.y+'" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" data-from="'+e.from+'" data-to="'+e.to+'"/>';
+    if(a&&b){
+      var ln=document.createElementNS(NS,"line");
+      ln.setAttribute("x1",a.x);ln.setAttribute("y1",a.y);ln.setAttribute("x2",b.x);ln.setAttribute("y2",b.y);
+      ln.setAttribute("stroke","rgba(255,255,255,0.12)");ln.setAttribute("stroke-width","1.5");
+      ln.dataset.from=e.from;ln.dataset.to=e.to;
+      svg.appendChild(ln);
+    }
   });
   visNodes.forEach(function(n){
     var r=n.type==="finding"?18:n.type==="vendor"?22:16;
-    html+='<circle cx="'+n.x+'" cy="'+n.y+'" r="'+r+'" fill="'+MG_COLORS[n.type]+'" opacity="0.85" data-nid="'+n.id+'" class="mg-node" style="cursor:pointer"/>';
-    html+='<text x="'+n.x+'" y="'+(n.y+r+14)+'" fill="#aaa" font-size="10" text-anchor="middle">'+escHTML(n.label)+'</text>';
+    var c=document.createElementNS(NS,"circle");
+    c.setAttribute("cx",n.x);c.setAttribute("cy",n.y);c.setAttribute("r",r);
+    c.setAttribute("fill",MG_COLORS[n.type]);c.setAttribute("opacity","0.85");
+    c.dataset.nid=n.id;c.classList.add("mg-node");c.style.cursor="pointer";
+    svg.appendChild(c);
+    var t=document.createElementNS(NS,"text");
+    t.setAttribute("x",n.x);t.setAttribute("y",n.y+r+14);
+    t.setAttribute("fill","#aaa");t.setAttribute("font-size","10");t.setAttribute("text-anchor","middle");
+    t.textContent=n.label;
+    svg.appendChild(t);
   });
-  svg.innerHTML=html;
 
   svg.querySelectorAll(".mg-node").forEach(function(el){
     el.addEventListener("mouseenter",function(){
@@ -1551,13 +1566,13 @@ function renderMG(){
 }
 
 /* graph toolbar filters */
-document.querySelectorAll("#mgToolbar .mg-filter").forEach(function(b){
-  b.addEventListener("click",function(){b.classList.toggle("active");renderMG();});
+document.querySelectorAll("#graphToolbar input[data-graph-type]").forEach(function(cb){
+  cb.addEventListener("change",function(){renderMG();});
 });
-var mgSearch=document.getElementById("mgSearch");
+var mgSearch=document.getElementById("graphSearch");
 if(mgSearch)mgSearch.addEventListener("input",function(){
   var q=this.value.toLowerCase();
-  var svg=document.getElementById("mgSVG");if(!svg)return;
+  var svg=document.getElementById("mgSvg");if(!svg)return;
   svg.querySelectorAll(".mg-node").forEach(function(c){
     var nid=c.dataset.nid;var nd=MG_NODES.find(function(n){return n.id===nid});
     c.setAttribute("opacity",!q||nd.label.toLowerCase().indexOf(q)>-1?"0.85":"0.15");
