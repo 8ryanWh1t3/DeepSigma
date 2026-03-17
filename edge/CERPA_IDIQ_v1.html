@@ -296,6 +296,27 @@ footer strong{color:var(--accent);font-weight:600}
   #taskPanel.open{right:0!important}
   .shortcut-bar{display:none}
 }
+/* ── Workbench: lifecycle controls ── */
+.st-archived{background:rgba(107,128,153,.12);color:#6b8099;border-color:rgba(107,128,153,.25)}
+.df-readonly input,.df-readonly select,.df-readonly textarea{opacity:.55;pointer-events:none}
+.edit-dirty-badge{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--warn);margin-left:6px;animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center}
+.confirm-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:24px;max-width:420px;width:90%;text-align:center}
+.confirm-card h4{margin:0 0 10px;color:var(--txt);font-size:14px}
+.confirm-card p{margin:0 0 16px;color:var(--muted);font-size:12px}
+.confirm-card .confirm-btns{display:flex;gap:8px;justify-content:center}
+.actions-cell{display:flex;gap:3px;align-items:center;justify-content:center}
+.action-btn{font-size:11px;padding:2px 6px;border:1px solid var(--line);border-radius:4px;background:transparent;color:var(--muted);cursor:pointer;line-height:1.3}
+.action-btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:rgba(255,107,107,.12);color:var(--bad);border-color:rgba(255,107,107,.3)}
+.btn-danger:hover{background:rgba(255,107,107,.25)}
+.edit-section{margin-bottom:12px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.edit-section h4{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:0 0 8px}
+.audit-log{max-height:180px;overflow-y:auto;font-size:10px;color:var(--muted)}
+.audit-log .ae{padding:4px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.audit-log .ae-ts{color:#666;margin-right:6px}
+.audit-log .ae-act{color:var(--accent);font-weight:600;margin-right:4px}
 </style>
 </head>
 <body>
@@ -446,12 +467,12 @@ footer strong{color:var(--accent);font-weight:600}
 
   <!-- IDIQ-6 KPIs -->
   <div class="kpi-row" style="grid-template-columns:repeat(6,1fr)">
-    <div class="kpi kpi-red"><div class="kv kv-red">3</div><div class="kl">TOs At Risk</div><div class="kfull">Task Orders At Risk</div></div>
-    <div class="kpi kpi-red"><div class="kv kv-red">5</div><div class="kl">High-Risk</div><div class="kfull">Open High-Risk Claims</div></div>
-    <div class="kpi kpi-amber"><div class="kv kv-amber">12%</div><div class="kl">Burn Var</div><div class="kfull">Avg Burn Variance</div></div>
-    <div class="kpi kpi-amber"><div class="kv kv-amber">2</div><div class="kl">Invoice Exc</div><div class="kfull">Invoice Exception Count</div></div>
-    <div class="kpi kpi-red"><div class="kv kv-red">3</div><div class="kl">KP Gaps</div><div class="kfull">Key Personnel Gap Count</div></div>
-    <div class="kpi kpi-amber"><div class="kv kv-amber">2</div><div class="kl">SLA Drift</div><div class="kfull">SLA Drift Count</div></div>
+    <div class="kpi kpi-red" data-kpi="tor"><div class="kv kv-red">3</div><div class="kl">TOs At Risk</div><div class="kfull">Task Orders At Risk</div></div>
+    <div class="kpi kpi-red" data-kpi="ohr"><div class="kv kv-red">5</div><div class="kl">High-Risk</div><div class="kfull">Open High-Risk Claims</div></div>
+    <div class="kpi kpi-amber" data-kpi="abv"><div class="kv kv-amber">12%</div><div class="kl">Burn Var</div><div class="kfull">Avg Burn Variance</div></div>
+    <div class="kpi kpi-amber" data-kpi="iec"><div class="kv kv-amber">2</div><div class="kl">Invoice Exc</div><div class="kfull">Invoice Exception Count</div></div>
+    <div class="kpi kpi-red" data-kpi="kpg"><div class="kv kv-red">3</div><div class="kl">KP Gaps</div><div class="kfull">Key Personnel Gap Count</div></div>
+    <div class="kpi kpi-amber" data-kpi="sld"><div class="kv kv-amber">2</div><div class="kl">SLA Drift</div><div class="kfull">SLA Drift Count</div></div>
   </div>
 
   <!-- At-Risk Vendors / TOs Strip -->
@@ -527,7 +548,7 @@ footer strong{color:var(--accent);font-weight:600}
 <!-- ════════════ FINDINGS ════════════ -->
 <section id="s-find">
   <div class="filters">
-    <select id="fltStatus"><option value="">All Status</option><option>New</option><option>Assigned</option><option>In Review</option><option>Patch Approved</option><option>Closure Pending</option><option>Closed</option><option>Reopened</option></select>
+    <select id="fltStatus"><option value="">All Status</option><option>New</option><option>Assigned</option><option>In Review</option><option>Patch Approved</option><option>Closure Pending</option><option>Closed</option><option>Reopened</option><option>Archived</option></select>
     <select id="fltSev"><option value="">All Severity</option><option>HIGH</option><option>MED</option><option>LOW</option></select>
     <select id="fltCat"><option value="">All Claim Categories</option><option>Contract Compliance</option><option>Performance</option><option>Financial</option><option>Risk &amp; Issue</option><option>Resource</option><option>Technical</option><option>Communication</option></select>
     <select id="fltTO"><option value="">All Task Orders</option><option>TO-1001</option><option>TO-1002</option><option>TO-1003</option><option>TO-1004</option></select>
@@ -539,7 +560,7 @@ footer strong{color:var(--accent);font-weight:600}
     <label style="cursor:pointer;font-size:10px;padding:5px 10px;border:1px solid var(--line);border-radius:6px;color:var(--muted)">Import JSON<input type="file" accept=".json" id="btnImportFindings" style="display:none"></label>
   </div>
   <div class="card">
-    <table><thead><tr><th>ID</th><th>Title</th><th>Status</th><th>Sev</th><th>Category</th><th>TO</th><th>Vendor</th><th>Owner</th><th>BRQ</th><th>Due</th></tr></thead>
+    <table><thead><tr><th>ID</th><th>Title</th><th>Status</th><th>Sev</th><th>Category</th><th>TO</th><th>Vendor</th><th>Owner</th><th>BRQ</th><th>Due</th><th>Actions</th></tr></thead>
     <tbody id="findTbody"></tbody></table>
   </div>
   <div class="card hidden" id="fDetail"></div>
@@ -769,6 +790,23 @@ footer strong{color:var(--accent);font-weight:600}
       <tr><td>Burn Variance</td><td>&le; 5%</td><td>6% – 15%</td><td>&gt; 15%</td></tr>
     </tbody></table>
   </div>
+  <div class="card">
+    <h3>Data Lifecycle</h3>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button id="btnAdmImport">Import JSON</button>
+      <button id="btnAdmExport">Export JSON</button>
+      <button id="btnExportFiltered">Export Filtered</button>
+      <button id="btnLoadDemo">Load Demo Data</button>
+      <button id="btnLoadEmpty">Load Empty Workspace</button>
+      <button id="btnClearFindings">Clear Findings</button>
+      <button id="btnClearTOs">Clear Task Orders</button>
+      <button class="btn-danger" id="btnClearAll">Clear All</button>
+      <button id="btnSnapshot">Create Snapshot</button>
+      <button id="btnRestore">Restore Snapshot</button>
+    </div>
+    <div id="snapshotInfo" style="font-size:10px;color:var(--muted);margin-top:8px">No snapshot</div>
+    <input type="file" accept=".json" id="admImportFile" style="display:none"/>
+  </div>
 </section>
 
 <!-- ════════════ AUDIT ════════════ -->
@@ -950,6 +988,10 @@ var F={
   auditChain:["CL-312"],
   timeline:["Apr 14","—","—","—","—"],tlState:[1,0,0,0,0]}
 };
+/* ── Workbench state ── */
+var activeFindingId=null,editBuffer=null,editDirty=false,lastSnapshot=null;
+var DEMO_F=JSON.parse(JSON.stringify(F));
+var DEMO_TO=JSON.parse(JSON.stringify(TO));
 var TL_LABELS=["Claim","Event","Review","Patch","Apply"];
 
 /* ══════════ DOM REFS ══════════ */
@@ -1022,26 +1064,71 @@ function buildExportPackage(){
   };
 }
 
-function importFindings(json){
+function importFindings(json,mode){
+  mode=mode||"merge";
   try{
     var data=JSON.parse(json);
-    var imported=0;
     var src=data.findings||data;
     if(typeof src!=="object"||src===null){toast("Invalid format — expected findings object","warn");return;}
+    createSnapshot("Pre-import ("+mode+")");
+    if(mode==="replace_all"){Object.keys(F).forEach(function(k){delete F[k]})}
+    var imported=0,skipped=0;
     Object.keys(src).forEach(function(k){
       var f=src[k];
-      if(!f.id||!f.title){return;}
+      if(!f.id||!f.title){skipped++;return;}
       var key=f.id.replace("F-","");
-      if(!F[key]){F[key]=f;imported++;}
-      else{Object.keys(f).forEach(function(p){F[key][p]=f[p]});imported++;}
+      normalizeFinding(f);
+      if(mode==="replace_matching"||mode==="replace_all"){
+        F[key]=f;imported++;
+      }else{/* merge */
+        if(!F[key]){F[key]=f;imported++;}
+        else{Object.keys(f).forEach(function(p){F[key][p]=f[p]});imported++;}
+      }
     });
     if(data.taskOrders){
-      Object.keys(data.taskOrders).forEach(function(k){
-        TO[k]=data.taskOrders[k];
-      });
+      if(mode==="replace_all"){Object.keys(TO).forEach(function(k){delete TO[k]})}
+      Object.keys(data.taskOrders).forEach(function(k){TO[k]=data.taskOrders[k]});
     }
-    renderFindingsTable();renderBoardQueue();renderDashboard();renderTrends();renderMG();renderAudit();
-    toast("Imported "+imported+" findings","ok");
+    rerenderAll();
+    toast("Imported "+imported+" findings ("+mode+")"+(skipped?" · "+skipped+" skipped":""),"ok");
+  }catch(e){toast("JSON parse error: "+e.message,"warn");}
+}
+
+function showImportPreview(json){
+  try{
+    var data=JSON.parse(json);
+    var src=data.findings||data;
+    if(typeof src!=="object"||src===null){toast("Invalid format","warn");return;}
+    var keys=Object.keys(src);
+    var newCount=0,matchCount=0,invalidCount=0;
+    keys.forEach(function(k){
+      var f=src[k];
+      if(!f.id||!f.title){invalidCount++;return;}
+      var key=f.id.replace("F-","");
+      if(F[key])matchCount++;else newCount++;
+    });
+    var hasTOs=data.taskOrders?Object.keys(data.taskOrders).length:0;
+    var body='<div class="wire"><h4>Import Preview</h4>';
+    body+='<div class="wr"><span class="wl">Findings in file</span><span class="wv">'+(keys.length-invalidCount)+'</span></div>';
+    body+='<div class="wr"><span class="wl">New (will add)</span><span class="wv" style="color:var(--ok)">'+newCount+'</span></div>';
+    body+='<div class="wr"><span class="wl">Matching (exist)</span><span class="wv" style="color:var(--warn)">'+matchCount+'</span></div>';
+    if(invalidCount)body+='<div class="wr"><span class="wl">Invalid (skipped)</span><span class="wv" style="color:var(--bad)">'+invalidCount+'</span></div>';
+    if(hasTOs)body+='<div class="wr"><span class="wl">Task Orders</span><span class="wv">'+hasTOs+'</span></div>';
+    body+='</div>';
+    body+='<div class="df" style="margin-top:10px"><label>Import Mode</label><select id="importMode">';
+    body+='<option value="merge">Merge — add new, merge fields into existing</option>';
+    body+='<option value="replace_matching">Replace Matching — overwrite matching IDs</option>';
+    body+='<option value="replace_all">Replace All — clear current data, load file</option>';
+    body+='</select></div>';
+    openDrawer("Import Preview",body,
+      '<button class="primary" id="btnCommitImport">Commit Import</button><button data-dact="">Cancel</button>');
+    var _json=json;
+    var ci=document.getElementById("btnCommitImport");
+    if(ci)ci.addEventListener("click",function(){
+      var mode=(document.getElementById("importMode")||{}).value||"merge";
+      actualCloseDrawer();
+      importFindings(_json,mode);
+    });
   }catch(e){toast("JSON parse error: "+e.message,"warn");}
 }
 
@@ -1054,7 +1141,14 @@ function openDrawer(title,bodyHtml,footHtml){
   dBody.querySelectorAll("[data-dact]").forEach(function(b){b.addEventListener("click",function(){var act=b.getAttribute("data-dact");closeDrawer();if(act)toast(act,"ok")})});
   dFoot.querySelectorAll("[data-dact]").forEach(function(b){b.addEventListener("click",function(){var act=b.getAttribute("data-dact");closeDrawer();if(act)toast(act,"ok")})});
 }
-function closeDrawer(){dOverlay.classList.remove("open");dPanel.classList.remove("open")}
+function actualCloseDrawer(){
+  dOverlay.classList.remove("open");dPanel.classList.remove("open");
+  editDirty=false;editBuffer=null;activeFindingId=null;
+}
+function closeDrawer(){
+  if(editDirty){confirmAction("You have unsaved changes. Discard?",actualCloseDrawer);return;}
+  actualCloseDrawer();
+}
 document.getElementById("dClose").addEventListener("click",closeDrawer);
 dOverlay.addEventListener("click",closeDrawer);
 
@@ -1138,6 +1232,86 @@ var stClassMap={"New":"st-new","Assigned":"st-assigned","In Review":"st-review",
 var sevClassMap={"HIGH":"sev-high","MED":"sev-med","LOW":"sev-low"};
 var stColorMap={"New":"var(--accent)","Reopened":"var(--bad)","Assigned":"var(--warn)","In Review":"var(--warn)","Patch Approved":"var(--ok)","Closure Pending":"var(--ok)","Closed":"var(--ok)"};
 var catClassMap={"Contract Compliance":"cat-compliance","Performance":"cat-performance","Financial":"cat-financial","Risk & Issue":"cat-risk","Resource":"cat-resource","Technical":"cat-technical","Communication":"cat-comms"};
+stClassMap["Archived"]="st-archived";stColorMap["Archived"]="#6b8099";
+
+/* ══════════ WORKBENCH HELPERS ══════════ */
+function deepClone(o){return JSON.parse(JSON.stringify(o))}
+
+function normalizeFinding(f){
+  var now=new Date().toISOString();
+  if(f.revision==null)f.revision=0;
+  if(!f.createdAt)f.createdAt=now;
+  if(!f.updatedAt)f.updatedAt=now;
+  if(!f.createdByRole)f.createdByRole="system";
+  if(!f.updatedByRole)f.updatedByRole="system";
+  if(!f.auditEvents)f.auditEvents=[];
+  if(!f.evidence)f.evidence=[];
+  if(!f.auditChain)f.auditChain=[];
+  if(!f.timeline)f.timeline=["--","--","--","--","--"];
+  if(!f.tlState)f.tlState=[0,0,0,0,0];
+  if(!f.linked)f.linked=[];
+  if(f.recurring==null)f.recurring=0;
+  if(f.contractRisk==null)f.contractRisk=false;
+  if(f.brq==null)f.brq=0;
+  if(f.cg==null)f.cg=0;
+  if(f.deg==null)f.deg="--";
+  if(!f.financialImpact)f.financialImpact="TBD";
+  if(!f.scheduleImpact)f.scheduleImpact="TBD";
+  if(f.notes==null)f.notes="";
+  if(!f.claim)f.claim="";
+  if(!f.event)f.event="";
+  if(!f.reviewSummary)f.reviewSummary="";
+  if(!f.rootCause)f.rootCause="";
+  if(!f.patch)f.patch="";
+  if(!f.applyDecision)f.applyDecision="";
+  if(!f.owner)f.owner="Unassigned";
+  if(!f.reviewer)f.reviewer="";
+  if(!f.status)f.status="New";
+  if(!f.sev)f.sev="LOW";
+  if(!f.claimCat)f.claimCat="Contract Compliance";
+  if(!f.claimType)f.claimType="";
+  if(!f.taskOrder)f.taskOrder="";
+  if(!f.contract)f.contract="N00178-24-D-0042";
+  if(!f.vendor)f.vendor="";
+  if(!f.due)f.due="";
+  return f;
+}
+/* normalize all existing findings at load */
+Object.values(F).forEach(normalizeFinding);
+
+function appendAuditEvent(f,action,details){
+  if(!f.auditEvents)f.auditEvents=[];
+  f.auditEvents.push({ts:new Date().toISOString(),role:roleSel.value,action:action,details:details||""});
+  f.revision=(f.revision||0)+1;
+  f.updatedAt=new Date().toISOString();
+  f.updatedByRole=roleSel.value;
+}
+
+function nextFindingId(){
+  var mx=0;Object.keys(F).forEach(function(k){var n=parseInt(k,10);if(n>mx)mx=n});
+  return String(mx+1);
+}
+
+function getRole(){return roleSel.value}
+
+function canEditFinding(role){return role==="pm"||role==="analyst"||role==="reviewer"||role==="admin"}
+function canArchiveFinding(role){return role==="pm"||role==="admin"}
+function canDeleteFinding(role){return role==="admin"}
+function canSubmitReview(role){return role==="pm"||role==="analyst"}
+
+function rerenderAll(){
+  renderDashboard();renderFindingsTable();renderBoardQueue();
+  renderTrends();renderMG();renderAudit();
+}
+
+function confirmAction(msg,onYes){
+  var ov=document.createElement("div");ov.className="confirm-overlay";
+  ov.innerHTML='<div class="confirm-card"><h4>Confirm Action</h4><p>'+escHTML(msg)+'</p><div class="confirm-btns"><button class="primary" id="cfYes">Confirm</button><button id="cfNo">Cancel</button></div></div>';
+  document.body.appendChild(ov);
+  ov.querySelector("#cfYes").addEventListener("click",function(){document.body.removeChild(ov);if(onYes)onYes()});
+  ov.querySelector("#cfNo").addEventListener("click",function(){document.body.removeChild(ov)});
+  ov.addEventListener("click",function(e){if(e.target===ov)document.body.removeChild(ov)});
+}
 
 /* ══════════ FINDING LIST BUILDER (for drawers) ══════════ */
 function buildFindingListHTML(ids){
@@ -1203,6 +1377,12 @@ function renderFindingsTable(){
     html+='<td>'+escHTML(f.owner)+'</td>';
     html+='<td>'+f.brq+'</td>';
     html+='<td>'+escHTML(f.due)+'</td>';
+    html+='<td class="actions-cell">'+
+      '<button class="action-btn" data-act="view" data-afid="'+k+'" title="View">&#128065;</button>'+
+      '<button class="action-btn" data-act="edit" data-afid="'+k+'" title="Edit">&#9998;</button>'+
+      '<button class="action-btn" data-act="clone" data-afid="'+k+'" title="Clone">&#128203;</button>'+
+      '<button class="action-btn" data-act="export" data-afid="'+k+'" title="Export">&#128228;</button>'+
+      '<button class="action-btn" data-act="archive" data-afid="'+k+'" title="Archive">&#128451;</button></td>';
     html+='</tr>';
   });
   tbody.innerHTML=html;
@@ -1269,17 +1449,34 @@ function showFinding(fid){
   body+='<button data-fact="review" data-fid="'+fid+'">Send to Review</button>';
   body+='<button data-fact="link" data-fid="'+fid+'">Link Related</button>';
   body+='<button data-fact="export" data-fid="'+fid+'">Export Packet</button>';
-  body+='<button data-fact="evidence" data-fid="'+fid+'">Add Evidence</button></div>';
+  body+='<button data-fact="evidence" data-fid="'+fid+'">Add Evidence</button>';
+  if(canEditFinding(getRole()))body+='<button data-fedit="'+fid+'" style="border-color:var(--accent);color:var(--accent)">Edit</button>';
+  body+='</div>';
   fDet.innerHTML=body;
   fDet.classList.remove("hidden");
   fDet.scrollIntoView({behavior:"smooth",block:"start"});
   var bc=document.getElementById("btnCloseD");
   if(bc)bc.addEventListener("click",function(){fDet.classList.add("hidden")});
+  var editBtn=fDet.querySelector("[data-fedit]");
+  if(editBtn)editBtn.addEventListener("click",function(){fDet.classList.add("hidden");openEditDrawer(editBtn.getAttribute("data-fedit"))});
   fDet.querySelectorAll("[data-fact]").forEach(function(b){
     b.addEventListener("click",function(){openActionDrawer(b.getAttribute("data-fact"),b.getAttribute("data-fid"))});
   });
 }
 document.getElementById("findTbody").addEventListener("click",function(e){
+  /* action buttons intercept first */
+  var actBtn=e.target.closest("[data-act]");
+  if(actBtn){
+    e.stopPropagation();
+    var act=actBtn.getAttribute("data-act");
+    var afid=actBtn.getAttribute("data-afid");
+    if(act==="view")showFinding(afid);
+    else if(act==="edit"){if(typeof openEditDrawer==="function")openEditDrawer(afid);else toast("Edit coming soon","info");}
+    else if(act==="clone"){if(typeof cloneFinding==="function")cloneFinding(afid);else toast("Clone coming soon","info");}
+    else if(act==="export")openActionDrawer("export",afid);
+    else if(act==="archive"){if(typeof archiveFinding==="function")archiveFinding(afid);else toast("Archive coming soon","info");}
+    return;
+  }
   var tr=e.target.closest("tr");if(!tr)return;
   var fid=tr.getAttribute("data-fid");if(fid)showFinding(fid);
 });
@@ -1338,21 +1535,254 @@ function openActionDrawer(action,fid){
 /* ══════════ NEW FINDING ══════════ */
 document.getElementById("btnNew").addEventListener("click",function(){
   openDrawer("New Finding — IDIQ Intake",
-    '<div class="df"><label>Title</label><input type="text" placeholder="Short description of the finding..."/></div>'+
+    '<div class="df"><label>Title</label><input type="text" id="nfTitle" placeholder="Short description of the finding..."/></div>'+
     '<div class="grid2">'+
-    '<div class="df"><label>Severity</label><select><option>HIGH</option><option>MED</option><option>LOW</option></select></div>'+
-    '<div class="df"><label>Claim Category</label><select><option>Contract Compliance</option><option>Performance</option><option>Financial</option><option>Risk &amp; Issue</option><option>Resource</option><option>Technical</option><option>Communication</option></select></div></div>'+
+    '<div class="df"><label>Severity</label><select id="nfSev"><option>HIGH</option><option>MED</option><option>LOW</option></select></div>'+
+    '<div class="df"><label>Claim Category</label><select id="nfCat"><option>Contract Compliance</option><option>Performance</option><option>Financial</option><option>Risk &amp; Issue</option><option>Resource</option><option>Technical</option><option>Communication</option></select></div></div>'+
     '<div class="grid2">'+
-    '<div class="df"><label>Task Order</label><select><option>TO-1001</option><option>TO-1002</option><option>TO-1003</option><option>TO-1004</option></select></div>'+
-    '<div class="df"><label>Vendor</label><select><option>Sierra Dynamics</option><option>TechForward LLC</option><option>Apex Systems</option><option>Northbridge Solutions</option></select></div></div>'+
-    '<div class="df"><label>Claim Statement</label><textarea placeholder="What is asserted, deficient, required, or at risk..."></textarea></div>'+
-    '<div class="df"><label>Event Summary</label><textarea placeholder="The observed fact, inspection result, or incident..."></textarea></div>'+
+    '<div class="df"><label>Task Order</label><select id="nfTO"><option>TO-1001</option><option>TO-1002</option><option>TO-1003</option><option>TO-1004</option></select></div>'+
+    '<div class="df"><label>Vendor</label><select id="nfVendor"><option>Sierra Dynamics</option><option>TechForward LLC</option><option>Apex Systems</option><option>Northbridge Solutions</option></select></div></div>'+
+    '<div class="df"><label>Claim Statement</label><textarea id="nfClaim" placeholder="What is asserted, deficient, required, or at risk..."></textarea></div>'+
+    '<div class="df"><label>Event Summary</label><textarea id="nfEvent" placeholder="The observed fact, inspection result, or incident..."></textarea></div>'+
     '<div class="grid2">'+
-    '<div class="df"><label>Assign To</label><input type="text" placeholder="Owner name..."/></div>'+
-    '<div class="df"><label>Due Date</label><input type="date"/></div></div>'+
+    '<div class="df"><label>Assign To</label><input type="text" id="nfOwner" placeholder="Owner name..."/></div>'+
+    '<div class="df"><label>Due Date</label><input type="date" id="nfDue"/></div></div>'+
     '<div style="font-size:9px;color:var(--muted);margin-top:6px">This finding enters the CERPA cycle at <strong style="color:#00b4d8">CLAIM</strong> stage.</div>',
-    '<button class="primary" data-dact="Finding created and assigned">Create Finding</button><button data-dact="">Cancel</button>');
+    '<button class="primary" id="btnCreateFinding">Create Finding</button><button data-dact="">Cancel</button>');
+  var createBtn=document.getElementById("btnCreateFinding");
+  if(createBtn)createBtn.addEventListener("click",function(){
+    var title=(document.getElementById("nfTitle")||{}).value||"";
+    if(!title.trim()){toast("Title is required","warn");return;}
+    var key=nextFindingId();
+    var now=new Date().toISOString();
+    var f=normalizeFinding({
+      id:"F-"+key,title:title.trim(),
+      status:"New",sev:(document.getElementById("nfSev")||{}).value||"LOW",
+      claimCat:(document.getElementById("nfCat")||{}).value||"Contract Compliance",
+      claimType:"",taskOrder:(document.getElementById("nfTO")||{}).value||"",
+      contract:"N00178-24-D-0042",vendor:(document.getElementById("nfVendor")||{}).value||"",
+      owner:(document.getElementById("nfOwner")||{}).value||"Unassigned",
+      claim:(document.getElementById("nfClaim")||{}).value||"",
+      event:(document.getElementById("nfEvent")||{}).value||"",
+      due:(document.getElementById("nfDue")||{}).value||"",
+      revision:0,createdAt:now,updatedAt:now,
+      createdByRole:getRole(),updatedByRole:getRole(),
+      tlState:[1,0,0,0,0],timeline:[now.slice(0,10),"--","--","--","--"]
+    });
+    appendAuditEvent(f,"CREATED","Finding created by "+getRole());
+    F[key]=f;
+    closeDrawer();rerenderAll();
+    toast("Finding "+f.id+" created","ok");
+  });
 });
+
+/* ══════════ EDIT DRAWER ══════════ */
+function buildEditFieldHTML(buf,role){
+  var ro=function(field){
+    if(role==="reviewer"&&field!=="reviewSummary"&&field!=="brq")return ' class="df df-readonly"';
+    if(role==="analyst"&&(field==="status"||field==="applyDecision"||field==="reviewSummary"))return ' class="df df-readonly"';
+    return ' class="df"';
+  };
+  var h='<div class="edit-section"><h4>Finding Identity</h4>';
+  h+='<div'+ro("title")+'><label>Title</label><input type="text" id="efTitle" value="'+escHTML(buf.title||"")+'"/></div>';
+  h+='<div class="grid2">';
+  h+='<div'+ro("sev")+'><label>Severity</label><select id="efSev"><option'+(buf.sev==="HIGH"?" selected":"")+'>HIGH</option><option'+(buf.sev==="MED"?" selected":"")+'>MED</option><option'+(buf.sev==="LOW"?" selected":"")+'>LOW</option></select></div>';
+  h+='<div'+ro("status")+'><label>Status</label><select id="efStatus">';
+  ["New","Assigned","In Review","Patch Approved","Closure Pending","Closed","Reopened","Archived"].forEach(function(s){h+='<option'+(buf.status===s?" selected":"")+'>'+s+'</option>';});
+  h+='</select></div></div>';
+  h+='<div class="grid2">';
+  h+='<div'+ro("claimCat")+'><label>Claim Category</label><select id="efCat">';
+  ["Contract Compliance","Performance","Financial","Risk & Issue","Resource","Technical","Communication"].forEach(function(c){h+='<option'+(buf.claimCat===c?" selected":"")+'>'+escHTML(c)+'</option>';});
+  h+='</select></div>';
+  h+='<div'+ro("claimType")+'><label>Claim Type</label><input type="text" id="efClaimType" value="'+escHTML(buf.claimType||"")+'"/></div></div>';
+  h+='<div class="grid2">';
+  h+='<div'+ro("taskOrder")+'><label>Task Order</label><select id="efTO"><option value="">—</option>';
+  Object.values(TO).forEach(function(t){h+='<option'+(buf.taskOrder==="TO-"+t.id?" selected":"")+'>TO-'+t.id+'</option>';});
+  h+='</select></div>';
+  h+='<div'+ro("vendor")+'><label>Vendor</label><select id="efVendor"><option value="">—</option>';
+  var vendors=[];Object.values(TO).forEach(function(t){if(vendors.indexOf(t.vendor)===-1)vendors.push(t.vendor)});
+  vendors.forEach(function(v){h+='<option'+(buf.vendor===v?" selected":"")+'>'+escHTML(v)+'</option>';});
+  h+='</select></div></div></div>';
+
+  h+='<div class="edit-section"><h4>CERPA Context</h4>';
+  h+='<div'+ro("claim")+'><label>Claim Statement</label><textarea id="efClaim" rows="2">'+escHTML(buf.claim||"")+'</textarea></div>';
+  h+='<div'+ro("event")+'><label>Event Summary</label><textarea id="efEvent" rows="2">'+escHTML(buf.event||"")+'</textarea></div>';
+  h+='<div'+ro("reviewSummary")+'><label>Review Summary</label><textarea id="efReview" rows="2">'+escHTML(buf.reviewSummary||"")+'</textarea></div>';
+  h+='<div'+ro("rootCause")+'><label>Root Cause</label><textarea id="efRootCause" rows="2">'+escHTML(buf.rootCause||"")+'</textarea></div>';
+  h+='<div'+ro("patch")+'><label>Patch Action</label><textarea id="efPatch" rows="2">'+escHTML(buf.patch||"")+'</textarea></div>';
+  h+='<div'+ro("applyDecision")+'><label>Apply Decision</label><textarea id="efApply" rows="2">'+escHTML(buf.applyDecision||"")+'</textarea></div></div>';
+
+  h+='<div class="edit-section"><h4>Operational Fields</h4>';
+  h+='<div class="grid2">';
+  h+='<div'+ro("owner")+'><label>Owner</label><input type="text" id="efOwner" value="'+escHTML(buf.owner||"")+'"/></div>';
+  h+='<div'+ro("reviewer")+'><label>Reviewer</label><input type="text" id="efReviewer" value="'+escHTML(buf.reviewer||"")+'"/></div></div>';
+  h+='<div class="grid2">';
+  h+='<div'+ro("due")+'><label>Due Date</label><input type="date" id="efDue" value="'+escHTML(buf.due||"")+'"/></div>';
+  h+='<div'+ro("brq")+'><label>BRQ</label><input type="number" step="0.01" min="0" max="1" id="efBRQ" value="'+(buf.brq||0)+'"/></div></div>';
+  h+='<div class="grid2">';
+  h+='<div'+ro("deg")+'><label>DEG</label><input type="text" id="efDEG" value="'+escHTML(String(buf.deg||""))+'"/></div>';
+  h+='<div'+ro("cg")+'><label>CG (days)</label><input type="number" id="efCG" value="'+(buf.cg||0)+'"/></div></div>';
+  h+='<div class="grid2">';
+  h+='<div'+ro("financialImpact")+'><label>Financial Impact</label><input type="text" id="efFinImpact" value="'+escHTML(buf.financialImpact||"")+'"/></div>';
+  h+='<div'+ro("scheduleImpact")+'><label>Schedule Impact</label><input type="text" id="efSchImpact" value="'+escHTML(buf.scheduleImpact||"")+'"/></div></div>';
+  h+='<div class="grid2">';
+  h+='<div'+ro("recurring")+'><label>Recurring Count</label><input type="number" id="efRecurring" value="'+(buf.recurring||0)+'"/></div>';
+  h+='<div'+ro("contractRisk")+'><label style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="efContractRisk"'+(buf.contractRisk?" checked":"")+'/> Contract Risk Flag</label></div></div>';
+  h+='<div'+ro("notes")+'><label>Notes</label><textarea id="efNotes" rows="2">'+escHTML(buf.notes||"")+'</textarea></div></div>';
+
+  h+='<div class="edit-section"><h4>Audit / Metadata</h4>';
+  h+='<div class="grid2">';
+  h+='<div class="df df-readonly"><label>ID</label><input type="text" value="'+escHTML(buf.id||"")+'"/></div>';
+  h+='<div class="df df-readonly"><label>Revision</label><input type="text" value="'+(buf.revision||0)+'"/></div></div>';
+  h+='<div class="grid2">';
+  h+='<div class="df df-readonly"><label>Created</label><input type="text" value="'+escHTML((buf.createdAt||"").slice(0,10))+' by '+escHTML(buf.createdByRole||"")+'"/></div>';
+  h+='<div class="df df-readonly"><label>Updated</label><input type="text" value="'+escHTML((buf.updatedAt||"").slice(0,10))+' by '+escHTML(buf.updatedByRole||"")+'"/></div></div>';
+  if(buf.auditEvents&&buf.auditEvents.length){
+    h+='<div class="audit-log">';
+    buf.auditEvents.slice().reverse().forEach(function(ae){
+      h+='<div class="ae"><span class="ae-ts">'+escHTML((ae.ts||"").slice(0,16).replace("T"," "))+'</span><span class="ae-act">'+escHTML(ae.action)+'</span>'+escHTML(ae.details||"")+'</div>';
+    });
+    h+='</div>';
+  }
+  h+='</div>';
+  return h;
+}
+
+function readEditFields(){
+  var b=editBuffer;if(!b)return;
+  b.title=(document.getElementById("efTitle")||{}).value||b.title;
+  b.sev=(document.getElementById("efSev")||{}).value||b.sev;
+  b.status=(document.getElementById("efStatus")||{}).value||b.status;
+  b.claimCat=(document.getElementById("efCat")||{}).value||b.claimCat;
+  b.claimType=(document.getElementById("efClaimType")||{}).value||"";
+  b.taskOrder=(document.getElementById("efTO")||{}).value||"";
+  b.vendor=(document.getElementById("efVendor")||{}).value||"";
+  b.claim=(document.getElementById("efClaim")||{}).value||"";
+  b.event=(document.getElementById("efEvent")||{}).value||"";
+  b.reviewSummary=(document.getElementById("efReview")||{}).value||"";
+  b.rootCause=(document.getElementById("efRootCause")||{}).value||"";
+  b.patch=(document.getElementById("efPatch")||{}).value||"";
+  b.applyDecision=(document.getElementById("efApply")||{}).value||"";
+  b.owner=(document.getElementById("efOwner")||{}).value||"Unassigned";
+  b.reviewer=(document.getElementById("efReviewer")||{}).value||"";
+  b.due=(document.getElementById("efDue")||{}).value||"";
+  b.brq=parseFloat((document.getElementById("efBRQ")||{}).value)||0;
+  b.deg=(document.getElementById("efDEG")||{}).value||"--";
+  b.cg=parseInt((document.getElementById("efCG")||{}).value)||0;
+  b.financialImpact=(document.getElementById("efFinImpact")||{}).value||"TBD";
+  b.scheduleImpact=(document.getElementById("efSchImpact")||{}).value||"TBD";
+  b.recurring=parseInt((document.getElementById("efRecurring")||{}).value)||0;
+  b.contractRisk=!!(document.getElementById("efContractRisk")||{}).checked;
+  b.notes=(document.getElementById("efNotes")||{}).value||"";
+}
+
+function openEditDrawer(fid){
+  var role=getRole();
+  if(!canEditFinding(role)){toast("No edit permission for role: "+role,"warn");return;}
+  if(editDirty){confirmAction("Discard unsaved changes on current edit?",function(){editDirty=false;openEditDrawer(fid)});return;}
+  activeFindingId=fid;
+  editBuffer=deepClone(F[fid]);
+  editDirty=false;
+  var bodyHtml=buildEditFieldHTML(editBuffer,role);
+  var footHtml='<button class="primary" id="btnSaveDraft">Save Draft</button>';
+  if(canSubmitReview(role))footHtml+='<button class="primary" id="btnSubmitReview" style="background:rgba(125,249,255,.15);border-color:var(--accent)">Submit to Review</button>';
+  if(canArchiveFinding(role))footHtml+='<button id="btnArchiveFromEdit" style="border-color:rgba(107,128,153,.4);color:#6b8099">Archive</button>';
+  if(canDeleteFinding(role))footHtml+='<button class="btn-danger" id="btnDeleteFromEdit">Delete</button>';
+  footHtml+='<button id="btnCancelEdit">Cancel</button>';
+  openDrawer("Edit — "+editBuffer.id+'<span class="edit-dirty-badge" id="dirtyDot" style="display:none"></span>',bodyHtml,footHtml);
+
+  /* wire dirty tracking */
+  dBody.querySelectorAll("input,select,textarea").forEach(function(el){
+    el.addEventListener("input",function(){editDirty=true;var dd=document.getElementById("dirtyDot");if(dd)dd.style.display="inline-block"});
+    el.addEventListener("change",function(){editDirty=true;var dd=document.getElementById("dirtyDot");if(dd)dd.style.display="inline-block"});
+  });
+  /* wire footer buttons */
+  var btnSave=document.getElementById("btnSaveDraft");
+  if(btnSave)btnSave.addEventListener("click",function(){
+    readEditFields();
+    F[activeFindingId]=editBuffer;
+    appendAuditEvent(F[activeFindingId],"EDITED","Draft saved by "+getRole());
+    editDirty=false;actualCloseDrawer();rerenderAll();
+    toast(F[activeFindingId].id+" saved","ok");
+  });
+  var btnSubmit=document.getElementById("btnSubmitReview");
+  if(btnSubmit)btnSubmit.addEventListener("click",function(){
+    readEditFields();
+    editBuffer.status="In Review";
+    F[activeFindingId]=editBuffer;
+    appendAuditEvent(F[activeFindingId],"SUBMITTED_FOR_REVIEW","Submitted by "+getRole());
+    editDirty=false;actualCloseDrawer();rerenderAll();
+    toast(F[activeFindingId].id+" submitted for review","ok");
+  });
+  var btnArch=document.getElementById("btnArchiveFromEdit");
+  if(btnArch)btnArch.addEventListener("click",function(){archiveFinding(activeFindingId)});
+  var btnDel=document.getElementById("btnDeleteFromEdit");
+  if(btnDel)btnDel.addEventListener("click",function(){deleteFinding(activeFindingId)});
+  var btnCancel=document.getElementById("btnCancelEdit");
+  if(btnCancel)btnCancel.addEventListener("click",function(){closeDrawer()});
+}
+
+/* ══════════ CLONE / ARCHIVE / DELETE ══════════ */
+function cloneFinding(fid){
+  var src=F[fid];if(!src)return;
+  var key=nextFindingId();
+  var clone=deepClone(src);
+  var now=new Date().toISOString();
+  clone.id="F-"+key;clone.status="New";
+  clone.auditChain=[];clone.auditEvents=[];
+  clone.timeline=[now.slice(0,10),"--","--","--","--"];clone.tlState=[1,0,0,0,0];
+  clone.revision=0;clone.createdAt=now;clone.updatedAt=now;
+  clone.createdByRole=getRole();clone.updatedByRole=getRole();
+  clone.linked=[];
+  appendAuditEvent(clone,"CLONED","Cloned from "+src.id+" by "+getRole());
+  F[key]=clone;
+  rerenderAll();
+  toast("Cloned as "+clone.id,"ok");
+}
+
+function archiveFinding(fid){
+  var role=getRole();
+  if(!canArchiveFinding(role)){toast("No archive permission for role: "+role,"warn");return;}
+  var f=F[fid];if(!f)return;
+  confirmAction("Archive "+f.id+"? Status will be set to Archived.",function(){
+    f.status="Archived";
+    appendAuditEvent(f,"ARCHIVED","Archived by "+role);
+    editDirty=false;actualCloseDrawer();rerenderAll();
+    toast(f.id+" archived","ok");
+  });
+}
+
+function deleteFinding(fid){
+  var role=getRole();
+  if(!canDeleteFinding(role)){toast("Delete is admin-only","warn");return;}
+  var f=F[fid];if(!f)return;
+  confirmAction("PERMANENTLY DELETE "+f.id+"? A snapshot will be created first.",function(){
+    if(typeof createSnapshot==="function")createSnapshot("Pre-delete: "+f.id);
+    appendAuditEvent(f,"DELETED","Deleted by admin");
+    delete F[fid];
+    editDirty=false;actualCloseDrawer();rerenderAll();
+    toast(f.id+" deleted","ok");
+  });
+}
+
+/* ══════════ SNAPSHOT / RESTORE ══════════ */
+function createSnapshot(reason){
+  lastSnapshot={findings:deepClone(F),taskOrders:deepClone(TO),timestamp:new Date().toISOString(),reason:reason||"Manual snapshot"};
+  toast("Snapshot: "+lastSnapshot.reason,"info");
+  var si=document.getElementById("snapshotInfo");
+  if(si)si.textContent="Snapshot: "+lastSnapshot.reason+" at "+lastSnapshot.timestamp.slice(0,16).replace("T"," ");
+}
+function restoreSnapshot(){
+  if(!lastSnapshot){toast("No snapshot available","warn");return;}
+  confirmAction("Restore snapshot from "+lastSnapshot.timestamp.slice(0,16).replace("T"," ")+"? Current data will be replaced.",function(){
+    Object.keys(F).forEach(function(k){delete F[k]});
+    Object.keys(lastSnapshot.findings).forEach(function(k){F[k]=lastSnapshot.findings[k]});
+    Object.keys(TO).forEach(function(k){delete TO[k]});
+    Object.keys(lastSnapshot.taskOrders).forEach(function(k){TO[k]=lastSnapshot.taskOrders[k]});
+    rerenderAll();
+    toast("Snapshot restored ("+lastSnapshot.reason+")","ok");
+  });
+}
 
 /* ══════════ COMPARE ══════════ */
 var cmpBtn=document.getElementById("btnCompare");
@@ -1909,7 +2339,7 @@ function stopBoardTimer(){if(boardTimer){clearInterval(boardTimer);boardTimer=nu
 function handleImportFile(file){
   if(!file||!file.name.endsWith(".json")){toast("Only .json files accepted","warn");return;}
   var reader=new FileReader();
-  reader.onload=function(e){importFindings(e.target.result);};
+  reader.onload=function(e){showImportPreview(e.target.result);};
   reader.onerror=function(){toast("Failed to read file","warn");};
   reader.readAsText(file);
 }
@@ -1935,6 +2365,72 @@ if(btnIF)btnIF.addEventListener("change",function(){
   if(file)handleImportFile(file);
   this.value="";
 });
+
+/* ══════════ ADMIN DATA LIFECYCLE ══════════ */
+(function(){
+  var wire=function(id,fn){var el=document.getElementById(id);if(el)el.addEventListener("click",fn)};
+  wire("btnAdmImport",function(){var fi=document.getElementById("admImportFile");if(fi)fi.click()});
+  var admFi=document.getElementById("admImportFile");
+  if(admFi)admFi.addEventListener("change",function(){var file=this.files&&this.files[0];if(file)handleImportFile(file);this.value=""});
+  wire("btnAdmExport",function(){downloadJSON(buildExportPackage(),"CERPA_IDIQ_export_"+new Date().toISOString().slice(0,10)+".json")});
+  wire("btnExportFiltered",function(){
+    var fltS=document.getElementById("fltStatus"),fltV=document.getElementById("fltSev"),fltC=document.getElementById("fltCat"),fltT=document.getElementById("fltTO"),fltVe=document.getElementById("fltVendor");
+    var fs=fltS?fltS.value:"",fv=fltV?fltV.value:"",fc=fltC?fltC.value:"",ft=fltT?fltT.value:"",fve=fltVe?fltVe.value:"";
+    var filtered={};
+    Object.keys(F).forEach(function(k){
+      var f=F[k];
+      if(fs&&f.status!==fs)return;if(fv&&f.sev!==fv)return;
+      if(fc&&f.claimCat!==fc)return;if(ft&&f.taskOrder!==ft)return;
+      if(fve&&f.vendor.indexOf(fve)===-1)return;
+      filtered[k]=f;
+    });
+    var count=Object.keys(filtered).length;
+    downloadJSON({_meta:{format:"CERPA_IDIQ_EDGE",version:"1.0.0",type:"filtered_export",exported:new Date().toISOString(),count:count},findings:filtered},"CERPA_IDIQ_filtered_"+count+"_"+new Date().toISOString().slice(0,10)+".json");
+  });
+  wire("btnLoadDemo",function(){
+    confirmAction("Load demo data? Current data will be replaced. A snapshot will be created first.",function(){
+      createSnapshot("Pre-demo-load");
+      Object.keys(F).forEach(function(k){delete F[k]});
+      Object.keys(DEMO_F).forEach(function(k){F[k]=deepClone(DEMO_F[k])});
+      Object.keys(TO).forEach(function(k){delete TO[k]});
+      Object.keys(DEMO_TO).forEach(function(k){TO[k]=deepClone(DEMO_TO[k])});
+      Object.values(F).forEach(normalizeFinding);
+      rerenderAll();toast("Demo data loaded","ok");
+    });
+  });
+  wire("btnLoadEmpty",function(){
+    confirmAction("Load empty workspace? All findings and task orders will be cleared. Snapshot created first.",function(){
+      createSnapshot("Pre-empty-workspace");
+      Object.keys(F).forEach(function(k){delete F[k]});
+      Object.keys(TO).forEach(function(k){delete TO[k]});
+      rerenderAll();toast("Workspace cleared","ok");
+    });
+  });
+  wire("btnClearFindings",function(){
+    confirmAction("Clear all findings? Task orders will remain. Snapshot created first.",function(){
+      createSnapshot("Pre-clear-findings");
+      Object.keys(F).forEach(function(k){delete F[k]});
+      rerenderAll();toast("Findings cleared","ok");
+    });
+  });
+  wire("btnClearTOs",function(){
+    confirmAction("Clear all task orders? Findings will remain.",function(){
+      createSnapshot("Pre-clear-TOs");
+      Object.keys(TO).forEach(function(k){delete TO[k]});
+      rerenderAll();toast("Task orders cleared","ok");
+    });
+  });
+  wire("btnClearAll",function(){
+    confirmAction("CLEAR ALL DATA? Everything will be wiped. Snapshot created first.",function(){
+      createSnapshot("Pre-clear-all");
+      Object.keys(F).forEach(function(k){delete F[k]});
+      Object.keys(TO).forEach(function(k){delete TO[k]});
+      rerenderAll();toast("All data cleared","ok");
+    });
+  });
+  wire("btnSnapshot",function(){createSnapshot("Manual snapshot")});
+  wire("btnRestore",function(){restoreSnapshot()});
+})();
 
 /* ══════════ TAB PREFS ══════════ */
 var tabPrefBtn=document.getElementById("tabPrefBtn");
@@ -2034,48 +2530,56 @@ function renderTrends(){
     {name:"Risk & Issue",count:1,color:"var(--bad)"}
   ];
   var maxC=Math.max.apply(null,cats.map(function(c){return c.count}));
-  var el=document.getElementById("catTrends");if(!el)return;
-  el.innerHTML=cats.map(function(c){
-    var pct=(c.count/maxC*100).toFixed(0);
-    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'+
-      '<span style="width:160px;font-size:12px;color:#aaa;text-align:right">'+escHTML(c.name)+'</span>'+
-      '<div style="flex:1;background:rgba(255,255,255,0.04);border-radius:4px;height:20px">'+
-      '<div style="width:'+pct+'%;height:100%;background:'+c.color+';border-radius:4px;transition:width 0.5s"></div></div>'+
-      '<span style="width:24px;font-size:12px;color:#888">'+c.count+'</span></div>';
-  }).join("");
+  var el=document.getElementById("catTrends");
+  if(el){
+    el.innerHTML=cats.map(function(c){
+      var pct=(c.count/maxC*100).toFixed(0);
+      return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'+
+        '<span style="width:160px;font-size:12px;color:#aaa;text-align:right">'+escHTML(c.name)+'</span>'+
+        '<div style="flex:1;background:rgba(255,255,255,0.04);border-radius:4px;height:20px">'+
+        '<div style="width:'+pct+'%;height:100%;background:'+c.color+';border-radius:4px;transition:width 0.5s"></div></div>'+
+        '<span style="width:24px;font-size:12px;color:#888">'+c.count+'</span></div>';
+    }).join("");
+  }
 
   /* severity × lag heatmap — computed from data */
-  var hm=document.getElementById("heatmapGrid");if(!hm)return;
-  var sevs=["HIGH","MED","LOW"];
-  var lagBuckets=[{label:"0-3d",min:0,max:3},{label:"4-7d",min:4,max:7},{label:"8-14d",min:8,max:14},{label:"14d+",min:15,max:999}];
-  var hmHtml='<div class="hm-label"></div>';
-  lagBuckets.forEach(function(b){hmHtml+='<div class="hm-label">OOL '+b.label+'</div>';});
-  sevs.forEach(function(sev){
-    hmHtml+='<div class="hm-label">'+sev+'</div>';
-    lagBuckets.forEach(function(b){
-      var count=Object.values(F).filter(function(f){return f.sev===sev&&f.cg>=b.min&&f.cg<=b.max}).length;
-      var opacity=count===0?0.05:count===1?0.2:count<=3?0.4:count<=5?0.6:0.9;
-      var color=count===0?"var(--muted)":count>=3?"var(--bad)":count>=2?"var(--warn)":"var(--ok)";
-      hmHtml+='<div class="hm-cell" style="background:rgba('+(sev==="HIGH"?"255,107,107":sev==="MED"?"255,204,102":"93,255,147")+','+opacity+');color:'+color+'">'+count+'</div>';
+  var hm=document.getElementById("heatmapGrid");
+  if(hm){
+    var sevs=["HIGH","MED","LOW"];
+    var lagBuckets=[{label:"0-3d",min:0,max:3},{label:"4-7d",min:4,max:7},{label:"8-14d",min:8,max:14},{label:"14d+",min:15,max:999}];
+    var hmHtml='<div class="hm-label"></div>';
+    lagBuckets.forEach(function(b){hmHtml+='<div class="hm-label">OOL '+b.label+'</div>';});
+    sevs.forEach(function(sev){
+      hmHtml+='<div class="hm-label">'+sev+'</div>';
+      lagBuckets.forEach(function(b){
+        var count=Object.values(F).filter(function(f){return f.sev===sev&&f.cg>=b.min&&f.cg<=b.max}).length;
+        var opacity=count===0?0.05:count===1?0.2:count<=3?0.4:count<=5?0.6:0.9;
+        var color=count===0?"var(--muted)":count>=3?"var(--bad)":count>=2?"var(--warn)":"var(--ok)";
+        hmHtml+='<div class="hm-cell" style="background:rgba('+(sev==="HIGH"?"255,107,107":sev==="MED"?"255,204,102":"93,255,147")+','+opacity+');color:'+color+'">'+count+'</div>';
+      });
     });
-  });
-  hm.innerHTML=hmHtml;
+    hm.innerHTML=hmHtml;
+  }
 
   /* TO drift */
-  var td=document.getElementById("toDrift");if(!td)return;
-  td.innerHTML=Object.values(TO).map(function(t){
-    var bv=((t.actualSpend-t.plannedSpend)/t.plannedSpend*100).toFixed(1);
-    var color=Math.abs(bv)>15?"var(--bad)":Math.abs(bv)>10?"var(--warn)":"var(--ok)";
-    return '<div class="wr"><span class="wl">'+escHTML(t.id)+' · '+escHTML(t.vendor)+'</span><span class="wv" style="color:'+color+'">'+(bv>0?"+":"")+bv+'%</span></div>';
-  }).join("");
+  var td=document.getElementById("toDrift");
+  if(td){
+    td.innerHTML=Object.values(TO).map(function(t){
+      var bv=((t.actualSpend-t.plannedSpend)/t.plannedSpend*100).toFixed(1);
+      var color=Math.abs(bv)>15?"var(--bad)":Math.abs(bv)>10?"var(--warn)":"var(--ok)";
+      return '<div class="wr"><span class="wl">'+escHTML(t.id)+' · '+escHTML(t.vendor)+'</span><span class="wv" style="color:'+color+'">'+(bv>0?"+":"")+bv+'%</span></div>';
+    }).join("");
+  }
 
   /* top root causes */
-  var rc=document.getElementById("topRootCauses");if(!rc)return;
-  var causes={};Object.values(F).forEach(function(f){causes[f.rootCause]=(causes[f.rootCause]||0)+1;});
-  var sorted=Object.keys(causes).sort(function(a,b){return causes[b]-causes[a];});
-  rc.innerHTML=sorted.map(function(c){
-    return '<div class="wr"><span class="wl">'+escHTML(c)+'</span><span class="wv">'+causes[c]+' findings</span></div>';
-  }).join("");
+  var rc=document.getElementById("topRootCauses");
+  if(rc){
+    var causes={};Object.values(F).forEach(function(f){causes[f.rootCause]=(causes[f.rootCause]||0)+1;});
+    var sorted=Object.keys(causes).sort(function(a,b){return causes[b]-causes[a];});
+    rc.innerHTML=sorted.map(function(c){
+      return '<div class="wr"><span class="wl">'+escHTML(c)+'</span><span class="wv">'+causes[c]+' findings</span></div>';
+    }).join("");
+  }
 }
 
 /* ══════════ DASHBOARD RENDERING ══════════ */
@@ -2117,25 +2621,54 @@ document.addEventListener("click",function(e){
 
 /* ══════════ TRENDS TAB CLICK HANDLERS ══════════ */
 
-/* Category trend rows → drill to findings in that category */
+/* ── Trends: chevron expand/collapse for table rows ── */
+function trendChevron(row){
+  var chev=document.createElement("td");
+  chev.style.cssText="cursor:pointer;color:var(--accent);font-size:14px;width:20px;text-align:center";
+  chev.textContent="\u25B6";
+  chev.className="trend-chev";
+  row.insertBefore(chev,row.firstChild);
+  row.style.cursor="pointer";
+}
+function trendToggle(row,html){
+  var next=row.nextElementSibling;
+  if(next&&next.classList.contains("trend-detail")){
+    next.remove();
+    row.querySelector(".trend-chev").textContent="\u25B6";
+    return;
+  }
+  var dr=document.createElement("tr");dr.className="trend-detail";
+  var td=document.createElement("td");
+  td.colSpan=row.querySelectorAll("td").length;
+  td.style.cssText="padding:8px 12px;background:var(--card2);border-left:2px solid var(--accent)";
+  td.innerHTML=html;
+  dr.appendChild(td);
+  row.parentNode.insertBefore(dr,row.nextSibling);
+  row.querySelector(".trend-chev").textContent="\u25BC";
+  wireDrillLinks();
+}
+
+/* Category trend rows → chevron expand with findings in that category */
 document.querySelectorAll("#s-trends .cat-badge").forEach(function(badge){
   var row=badge.closest("tr");if(!row)return;
-  row.style.cursor="pointer";
+  trendChevron(row);
   row.addEventListener("click",function(){
     var cat=badge.textContent.trim();
     var ids=Object.keys(F).filter(function(k){return F[k].claimCat===cat});
-    openDrawer(cat+" — "+ids.length+" Findings",
-      '<div class="wire"><h4>Claim Category: '+escHTML(cat)+'</h4>'+
-      '<div class="wr"><span class="wl">Open</span><span class="wv">'+ids.filter(function(k){return F[k].status!=="Closed"}).length+'</span></div>'+
-      '<div class="wr"><span class="wl">Closed</span><span class="wv">'+ids.filter(function(k){return F[k].status==="Closed"}).length+'</span></div>'+
-      '<div class="wr"><span class="wl">HIGH</span><span class="wv" style="color:var(--bad)">'+ids.filter(function(k){return F[k].sev==="HIGH"}).length+'</span></div></div>'+
-      '<div class="wire" style="margin-top:8px"><h4>Findings</h4>'+buildFindingListHTML(ids)+'</div>','');
-    wireDrillLinks();
+    var openC=ids.filter(function(k){return F[k].status!=="Closed"}).length;
+    var closedC=ids.filter(function(k){return F[k].status==="Closed"}).length;
+    var highC=ids.filter(function(k){return F[k].sev==="HIGH"}).length;
+    trendToggle(row,
+      '<div style="margin-bottom:6px"><strong>'+escHTML(cat)+'</strong> — '+ids.length+' findings ('+openC+' open, '+closedC+' closed, <span style="color:var(--bad)">'+highC+' HIGH</span>)</div>'+
+      buildFindingListHTML(ids));
   });
 });
+/* add chevron header to category table */
+(function(){var th=document.querySelector("#s-trends .cat-badge");if(th){var hrow=th.closest("table").querySelector("thead tr");if(hrow){var h=document.createElement("th");h.style.width="20px";hrow.insertBefore(h,hrow.firstChild);}}})();
 
 /* Heatmap cells → drill (delegated since cells are rendered dynamically) */
-document.getElementById("heatmapGrid").addEventListener("click",function(e){
+var hmGrid=document.getElementById("heatmapGrid");
+if(hmGrid){hmGrid.addEventListener("click",function(e){
   var cell=e.target.closest(".hm-cell");if(!cell)return;
   var cells=Array.prototype.slice.call(document.querySelectorAll("#heatmapGrid .hm-cell"));
   var idx=cells.indexOf(cell);if(idx<0)return;
@@ -2147,52 +2680,121 @@ document.getElementById("heatmapGrid").addEventListener("click",function(e){
   openDrawer(sev+" × "+lag+" — "+ids.length+" Findings",
     '<div class="wire"><h4>Severity: '+sev+' · Ownership Lag: '+lag+'</h4>'+buildFindingListHTML(ids)+'</div>','');
   wireDrillLinks();
-});
+});}
 
-/* TO drift rows → drill to task order detail */
+/* TO drift rows → chevron expand with task order detail */
 document.querySelectorAll("#s-trends table").forEach(function(tbl){
   if(!tbl.querySelector("th")||tbl.querySelector("th").textContent.trim()!=="TO")return;
+  /* add header cell */
+  var hrow=tbl.querySelector("thead tr");if(hrow){var h=document.createElement("th");h.style.width="20px";hrow.insertBefore(h,hrow.firstChild);}
   tbl.querySelectorAll("tbody tr").forEach(function(row){
     var toId=row.querySelector("td");if(!toId)return;
     var tok=toId.textContent.trim();
-    row.style.cursor="pointer";
+    trendChevron(row);
     row.addEventListener("click",function(){
       var t=TO[tok.replace("TO-","")];
       var ids=Object.keys(F).filter(function(k){return F[k].taskOrder===tok});
-      var body='<div class="wire"><h4>'+escHTML(tok)+'</h4>';
+      var body='<strong>'+escHTML(tok)+'</strong>';
       if(t){
-        body+='<div class="wr"><span class="wl">Name</span><span class="wv">'+escHTML(t.name)+'</span></div>';
-        body+='<div class="wr"><span class="wl">Vendor</span><span class="wv">'+escHTML(t.vendor)+'</span></div>';
+        body+=' — '+escHTML(t.name)+' ('+escHTML(t.vendor)+')';
+        body+='<div style="margin:6px 0">';
         body+='<div class="wr"><span class="wl">Risk</span><span class="wv" style="color:var(--'+(t.riskLevel==="HIGH"?"bad":"warn")+')">'+t.riskLevel+'</span></div>';
         body+='<div class="wr"><span class="wl">Planned</span><span class="wv">$'+t.plannedSpend.toLocaleString()+'</span></div>';
         body+='<div class="wr"><span class="wl">Actual</span><span class="wv">$'+t.actualSpend.toLocaleString()+'</span></div>';
         body+='<div class="wr"><span class="wl">Burn Var</span><span class="wv" style="color:var(--'+(Math.abs((t.actualSpend-t.plannedSpend)/t.plannedSpend)>0.15?"bad":"warn")+')">'+((t.actualSpend-t.plannedSpend)/t.plannedSpend*100).toFixed(1)+'%</span></div>';
+        body+='</div>';
       }
-      body+='</div>';
-      body+='<div class="wire" style="margin-top:8px"><h4>Findings ('+ids.length+')</h4>'+buildFindingListHTML(ids)+'</div>';
-      openDrawer("Task Order — "+tok,body,'');
-      wireDrillLinks();
+      body+='<div style="margin-top:6px"><strong>Findings ('+ids.length+')</strong></div>'+buildFindingListHTML(ids);
+      trendToggle(row,body);
     });
   });
 });
 
-/* Root cause rows → drill to findings with that root cause */
+/* Root cause rows → chevron expand with affected findings */
 document.querySelectorAll("#s-trends table").forEach(function(tbl){
   if(!tbl.querySelector("th")||tbl.querySelector("th").textContent.trim()!=="#")return;
+  var hrow=tbl.querySelector("thead tr");if(hrow){var h=document.createElement("th");h.style.width="20px";hrow.insertBefore(h,hrow.firstChild);}
   tbl.querySelectorAll("tbody tr").forEach(function(row){
     var cells=row.querySelectorAll("td");if(cells.length<2)return;
     var cause=cells[1].textContent.trim();
-    row.style.cursor="pointer";
+    trendChevron(row);
     row.addEventListener("click",function(){
       var ids=Object.keys(F).filter(function(k){return F[k].rootCause.indexOf(cause.substring(0,20))>-1});
-      openDrawer("Root Cause — "+cause.substring(0,40),
-        '<div class="wire"><h4>'+escHTML(cause)+'</h4>'+
-        '<div class="wr"><span class="wl">Findings</span><span class="wv">'+ids.length+'</span></div></div>'+
-        '<div class="wire" style="margin-top:8px"><h4>Affected Findings</h4>'+buildFindingListHTML(ids)+'</div>','');
-      wireDrillLinks();
+      trendToggle(row,
+        '<strong>'+escHTML(cause)+'</strong> — '+ids.length+' findings'+
+        '<div style="margin-top:6px">'+buildFindingListHTML(ids)+'</div>');
     });
   });
 });
+
+/* ── KPI card click → drawer detail ── */
+document.getElementById("s-dash").addEventListener("click",function(e){
+  var card=e.target.closest("[data-kpi]");if(!card)return;
+  var k=card.getAttribute("data-kpi");
+  var title=card.querySelector(".kfull")?card.querySelector(".kfull").textContent:"KPI Detail";
+  var val=card.querySelector(".kv")?card.querySelector(".kv").textContent:"—";
+  var body='<div class="wire"><h4>'+escHTML(title)+'</h4><div class="wr"><span class="wl">Current Value</span><span class="wv" style="font-size:22px;font-weight:700">'+escHTML(val)+'</span></div>';
+  /* KPI-specific drill-down */
+  if(k==="cis"){
+    body+='<div class="wr"><span class="wl">Formula</span><span class="wv" style="font-size:10px">0.25 PAR + 0.20 EDI + 0.25 (1-FCR) + 0.15 (1-DEG) + 0.15 PPI</span></div>';
+    body+='<div class="wr"><span class="wl">Trend</span><span class="wv" style="color:var(--ok)">&#8593; from 74 last quarter</span></div>';
+    body+='<div class="wr"><span class="wl">Target</span><span class="wv">&ge; 75</span></div>';
+  }else if(k==="par"){
+    var reopened=Object.values(F).filter(function(f){return f.recurring});
+    body+='<div class="wr"><span class="wl">Patches Held</span><span class="wv">'+(12-reopened.length)+' / 12</span></div>';
+    body+='<div class="wr"><span class="wl">Reopened</span><span class="wv" style="color:var(--bad)">'+reopened.length+'</span></div>';
+  }else if(k==="des"){
+    var recur=Object.values(F).filter(function(f){return f.recurring});
+    body+='<div class="wr"><span class="wl">Recurring Findings</span><span class="wv" style="color:var(--warn)">'+recur.length+'</span></div>';
+    recur.forEach(function(f){body+='<div class="wr"><span class="wl drill-link" data-fid="'+f.id+'">'+f.id+'</span><span class="wv">'+escHTML(f.title)+'</span></div>';});
+  }else if(k==="deg"){
+    body+='<div class="wr"><span class="wl">Target</span><span class="wv">&le; 5 days</span></div>';
+    var highDeg=Object.values(F).filter(function(f){return f.deg>5&&f.status!=="Closed"});
+    body+='<div class="wr"><span class="wl">Above Target</span><span class="wv" style="color:var(--bad)">'+highDeg.length+' findings</span></div>';
+    highDeg.forEach(function(f){body+='<div class="wr"><span class="wl drill-link" data-fid="'+f.id+'">'+f.id+'</span><span class="wv">DEG '+f.deg+'d</span></div>';});
+  }else if(k==="brq"){
+    var ready=Object.values(F).filter(function(f){return f.brq>=70&&f.status!=="Closed"});
+    var notReady=Object.values(F).filter(function(f){return f.brq<70&&f.status!=="Closed"});
+    body+='<div class="wr"><span class="wl">Board Ready (&ge;70)</span><span class="wv" style="color:var(--ok)">'+ready.length+'</span></div>';
+    body+='<div class="wr"><span class="wl">Not Ready</span><span class="wv" style="color:var(--warn)">'+notReady.length+'</span></div>';
+    notReady.forEach(function(f){body+='<div class="wr"><span class="wl drill-link" data-fid="'+f.id+'">'+f.id+'</span><span class="wv">BRQ '+f.brq+'</span></div>';});
+  }else if(k==="cg"){
+    var sorted=Object.values(F).filter(function(f){return f.status!=="Closed"}).sort(function(a,b){return b.cg-a.cg});
+    body+='<div class="wr"><span class="wl">Target</span><span class="wv">&le; 14 days</span></div>';
+    sorted.forEach(function(f){body+='<div class="wr"><span class="wl drill-link" data-fid="'+f.id+'">'+f.id+'</span><span class="wv">'+f.cg+'d open</span></div>';});
+  }else if(k==="tor"){
+    var atRisk=Object.values(TOs).filter(function(t){return t.riskLevel==="HIGH"||Math.abs((t.actualSpend-t.plannedSpend)/t.plannedSpend)>0.15});
+    body+='<div class="wr"><span class="wl">At Risk</span><span class="wv" style="color:var(--bad)">'+atRisk.length+' / '+Object.keys(TOs).length+'</span></div>';
+    atRisk.forEach(function(t){body+='<div class="wr"><span class="wl">TO-'+t.id+'</span><span class="wv">'+escHTML(t.vendor)+' · '+t.riskLevel+'</span></div>';});
+  }else if(k==="ohr"){
+    var high=Object.values(F).filter(function(f){return f.sev==="HIGH"&&f.status!=="Closed"});
+    body+='<div class="wr"><span class="wl">Open HIGH</span><span class="wv" style="color:var(--bad)">'+high.length+'</span></div>';
+    high.forEach(function(f){body+='<div class="wr"><span class="wl drill-link" data-fid="'+f.id+'">'+f.id+'</span><span class="wv">'+escHTML(f.title)+'</span></div>';});
+  }else if(k==="abv"){
+    Object.values(TOs).forEach(function(t){
+      var bv=((t.actualSpend-t.plannedSpend)/t.plannedSpend*100).toFixed(1);
+      var color=Math.abs(bv)>15?"var(--bad)":Math.abs(bv)>10?"var(--warn)":"var(--ok)";
+      body+='<div class="wr"><span class="wl">TO-'+t.id+'</span><span class="wv" style="color:'+color+'">'+(bv>0?"+":"")+bv+'%</span></div>';
+    });
+  }else if(k==="iec"){
+    var inv=Object.values(F).filter(function(f){return f.claimType&&f.claimType.indexOf("Invoice")>-1});
+    body+='<div class="wr"><span class="wl">Invoice Findings</span><span class="wv">'+inv.length+'</span></div>';
+    inv.forEach(function(f){body+='<div class="wr"><span class="wl drill-link" data-fid="'+f.id+'">'+f.id+'</span><span class="wv">'+escHTML(f.title)+'</span></div>';});
+  }else if(k==="kpg"){
+    var kp=Object.values(F).filter(function(f){return f.claimType&&f.claimType.indexOf("Key Personnel")>-1});
+    body+='<div class="wr"><span class="wl">Personnel Findings</span><span class="wv">'+kp.length+'</span></div>';
+    kp.forEach(function(f){body+='<div class="wr"><span class="wl drill-link" data-fid="'+f.id+'">'+f.id+'</span><span class="wv">'+escHTML(f.title)+'</span></div>';});
+  }else if(k==="sld"){
+    var sla=Object.values(F).filter(function(f){return f.claimType&&f.claimType.indexOf("SLA")>-1});
+    body+='<div class="wr"><span class="wl">SLA Findings</span><span class="wv">'+sla.length+'</span></div>';
+    sla.forEach(function(f){body+='<div class="wr"><span class="wl drill-link" data-fid="'+f.id+'">'+f.id+'</span><span class="wv">'+escHTML(f.title)+'</span></div>';});
+  }
+  body+='</div>';
+  openDrawer(title,body,'');
+  wireDrillLinks();
+});
+/* style KPI cards as clickable */
+document.querySelectorAll("[data-kpi]").forEach(function(el){el.style.cursor="pointer";});
 
 /* ══════════ INIT ══════════ */
 renderDashboard();
