@@ -1838,14 +1838,37 @@ function openActionDrawer(action,fid){
       '<div class="wr"><span class="wl">Evidence</span><span class="wv" style="color:var(--'+(f.evidence.every(function(e){return e.ok})?"ok":"bad")+')">'+f.evidence.filter(function(e){return e.ok}).length+' of '+f.evidence.length+'</span></div>'+
       '<div class="wr"><span class="wl">BRQ</span><span class="wv">'+f.brq+'</span></div></div>'+
       '<div style="font-size:10px;color:var(--muted);margin-top:8px">Submitting closure request to Review Board.</div>',
-      '<button class="primary" data-dact="Closure requested for '+f.id+'">Submit</button><button data-dact="">Cancel</button>');
+      '<button class="primary" id="btnClosureConfirm">Submit</button><button data-dact="">Cancel</button>');
+    var closBtn=document.getElementById("btnClosureConfirm");
+    if(closBtn)closBtn.addEventListener("click",function(){
+      var oldRec=deepClone(f);
+      f.status="Closure Pending";
+      appendAuditEvent(f,"CLOSURE_REQUESTED","Closure requested by "+getRole());
+      ensureChangeLog(fid);ensureSyncMeta(fid);
+      appendChangeLogEvent(fid,"CLOSURE_REQUESTED",oldRec,f,"Closure requested — "+f.id);
+      updateSyncMeta(fid,{revision:f.revision,updatedAt:f.updatedAt,updatedByRole:getRole(),syncState:"synced"});
+      actualCloseDrawer();rerenderAll();
+      toast(f.id+" — closure requested, status → Closure Pending","ok");
+    });
   } else if(action==="review"){
     openDrawer("Send to Review — "+f.id,
       '<div class="wire"><h4>Review Routing</h4>'+
-      '<div class="wr"><span class="wl">Finding</span><span class="wv">'+f.id+' — '+f.sev+'</span></div>'+
+      '<div class="wr"><span class="wl">Finding</span><span class="wv">'+escHTML(f.id)+' — '+escHTML(f.sev)+'</span></div>'+
       '<div class="wr"><span class="wl">Board</span><span class="wv">Q2-IDIQ-BOARD</span></div></div>'+
-      '<div class="df"><label>Priority Note</label><textarea placeholder="Context for the review board..."></textarea></div>',
-      '<button class="primary" data-dact="'+f.id+' sent to Review Board">Send</button>');
+      '<div class="df"><label>Priority Note</label><textarea id="reviewNote" placeholder="Context for the review board..."></textarea></div>',
+      '<button class="primary" id="btnReviewConfirm">Send</button><button data-dact="">Cancel</button>');
+    var revBtn=document.getElementById("btnReviewConfirm");
+    if(revBtn)revBtn.addEventListener("click",function(){
+      var notes=(document.getElementById("reviewNote")||{}).value||"";
+      var oldRec=deepClone(f);
+      f.status="In Review";
+      appendAuditEvent(f,"SENT_TO_REVIEW","Sent to review board by "+getRole()+(notes?" — "+notes:""));
+      ensureChangeLog(fid);ensureSyncMeta(fid);
+      appendChangeLogEvent(fid,"SENT_TO_REVIEW",oldRec,f,"Sent to review — "+f.id);
+      updateSyncMeta(fid,{revision:f.revision,updatedAt:f.updatedAt,updatedByRole:getRole(),syncState:"synced"});
+      actualCloseDrawer();rerenderAll();
+      toast(f.id+" — sent to review board, status → In Review","ok");
+    });
   } else if(action==="link"){
     var matches=Object.keys(F).filter(function(k){return k!==fid}).map(function(k){
       return '<div class="wr"><span class="wl mono">'+F[k].id+'</span><span class="wv">'+escHTML(F[k].title.substring(0,40))+'...</span></div>';
@@ -2446,6 +2469,8 @@ var MG_NODES=[
   {id:"rc3",type:"rootcause",label:"Scope Creep",x:620,y:80},{id:"rc4",type:"rootcause",label:"Turnover",x:480,y:180},
   {id:"pa1",type:"patch",label:"Staffing Plan Rev",x:400,y:320},{id:"pa2",type:"patch",label:"Invoice Audit SOP",x:120,y:420},
   {id:"pa3",type:"patch",label:"CM Baseline Reset",x:560,y:320},{id:"pa4",type:"patch",label:"SLA Renegotiation",x:680,y:300},
+  {id:"pa5",type:"patch",label:"Deliverable Checklist",x:200,y:100},{id:"pa6",type:"patch",label:"Rate Reconciliation",x:80,y:320},
+  {id:"pa7",type:"patch",label:"SLA Staffing Restore",x:740,y:220},{id:"pa8",type:"patch",label:"Regression Suite",x:600,y:440},
   {id:"to1",type:"taskorder",label:"TO-1001",x:200,y:180},{id:"to2",type:"taskorder",label:"TO-1002",x:350,y:280},
   {id:"to3",type:"taskorder",label:"TO-1003",x:500,y:360},{id:"to4",type:"taskorder",label:"TO-1004",x:640,y:240},
   {id:"v1",type:"vendor",label:"Sierra Dynamics",x:150,y:80},{id:"v2",type:"vendor",label:"TechForward",x:300,y:420},
@@ -2459,6 +2484,9 @@ var MG_EDGES=[
   {from:"p1",to:"rc1"},{from:"p2",to:"rc2"},{from:"p3",to:"rc4"},{from:"p4",to:"rc3"},{from:"p5",to:"rc1"},
   {from:"n4",to:"pa1"},{from:"n5",to:"pa1"},{from:"n3",to:"pa2"},{from:"n9",to:"pa2"},
   {from:"n6",to:"pa3"},{from:"n12",to:"pa3"},{from:"n8",to:"pa4"},
+  {from:"n1",to:"pa5"},{from:"n7",to:"pa5"},{from:"n3",to:"pa6"},{from:"n9",to:"pa6"},
+  {from:"n8",to:"pa7"},{from:"n10",to:"pa8"},{from:"n12",to:"pa8"},
+  {from:"pa5",to:"rc1"},{from:"pa6",to:"rc2"},{from:"pa7",to:"rc4"},{from:"pa8",to:"rc3"},
   {from:"n1",to:"to1"},{from:"n2",to:"to1"},{from:"n7",to:"to1"},
   {from:"n3",to:"to2"},{from:"n4",to:"to2"},{from:"n5",to:"to2"},
   {from:"n6",to:"to3"},{from:"n10",to:"to3"},{from:"n12",to:"to3"},
@@ -2573,6 +2601,14 @@ function renderMG(){
         body+='<div class="wr"><span class="wl">Patch</span><span class="wv" style="color:var(--ok)">'+escHTML(nd.label)+'</span></div>';
         var patchFindings=relNodes.filter(function(rn){return rn.type==="finding"});
         body+='<div class="wr"><span class="wl">Applied To</span><span class="wv">'+patchFindings.map(function(rn){return rn.label}).join(", ")+'</span></div>';
+        var totalReuse=0;
+        patchFindings.forEach(function(rn){var fk=rn.label.replace("F-","");var ff=F[fk];if(ff&&ff.recurring>0)totalReuse+=ff.recurring});
+        if(totalReuse>0){
+          body+='<div class="wr"><span class="wl">Reuse Count</span><span class="wv" style="color:var(--warn)">&times;'+totalReuse+' across '+patchFindings.filter(function(rn){var fk=rn.label.replace("F-","");return F[fk]&&F[fk].recurring>0}).length+' findings</span></div>';
+          body+='<div class="wr"><span class="wl">Durability</span><span class="wv" style="color:var(--bad)">Patch reapplied — root cause may not be fully addressed</span></div>';
+        } else {
+          body+='<div class="wr"><span class="wl">Durability</span><span class="wv" style="color:var(--ok)">No recurrence detected</span></div>';
+        }
       } else if(nd.type==="rootcause"){
         body+='<div class="wr"><span class="wl">Root Cause</span><span class="wv" style="color:var(--bad)">'+escHTML(nd.label)+'</span></div>';
       }
