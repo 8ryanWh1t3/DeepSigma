@@ -299,6 +299,10 @@ ALLOWED_ACRONYMS = {
     "EDIPI", "EDIT", "EDITED", "FSO", "GEAR", "IMS", "INV", "LIST",
     "LLC", "MAPS", "MEMO", "ORDERS", "RPT", "SYS", "TOM", "TST",
     "VACANT",
+    # CERPA RMF EDGE — RMF lifecycle, control families, scoring, assessment artifacts
+    "ACAS", "ACTOR", "ASSESS", "BADGE", "CAT", "COLOR", "ISSM",
+    "ITEMS", "LINKED", "LPS", "POAM", "SAR", "SCA", "SSP", "STIG",
+    "VAL",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}
