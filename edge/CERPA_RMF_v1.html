@@ -3164,6 +3164,12 @@ if(tabPrefsBtn&&tabPrefsPanel){
 }
 
 /* ══════════ INITIALIZATION ══════════ */
+// Onboard dismiss
+var onbDismiss=document.getElementById("onboardDismiss");
+if(onbDismiss)onbDismiss.addEventListener("click",function(){
+  document.getElementById("onboardModal").style.display="none";
+});
+
 // Initial renders
 applyRole(false);
 openTab("roles");
