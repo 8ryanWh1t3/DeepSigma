@@ -634,10 +634,10 @@ footer strong{color:var(--accent);font-weight:600}
 <!-- ════════════ TRENDS ════════════ -->
 <section id="s-trends">
   <div class="kpi-row" style="grid-template-columns:repeat(4,1fr)">
-    <div class="kpi kpi-green"><div class="kv kv-green">0.32</div><div class="kl">RDEV</div><div class="kfull">Recurring Deficiency Escape Velocity</div></div>
-    <div class="kpi kpi-green"><div class="kv kv-green">1.8x</div><div class="kl">RCR</div><div class="kfull">Review Compression Ratio</div></div>
-    <div class="kpi kpi-amber"><div class="kv kv-amber">6.2d</div><div class="kl">Avg OOL</div><div class="kfull">Observation-to-Ownership Lag</div></div>
-    <div class="kpi kpi-red"><div class="kv kv-red">9d</div><div class="kl">Avg DEG</div><div class="kfull">Decision-to-Evidence Gap</div></div>
+    <div class="kpi kpi-green" data-tkpi="rdev"><div class="kv kv-green">0.32</div><div class="kl">RDEV</div><div class="kfull">Recurring Deficiency Escape Velocity</div></div>
+    <div class="kpi kpi-green" data-tkpi="rcr"><div class="kv kv-green">1.8x</div><div class="kl">RCR</div><div class="kfull">Review Compression Ratio</div></div>
+    <div class="kpi kpi-amber" data-tkpi="ool"><div class="kv kv-amber">6.2d</div><div class="kl">Avg OOL</div><div class="kfull">Observation-to-Ownership Lag</div></div>
+    <div class="kpi kpi-red" data-tkpi="deg"><div class="kv kv-red">9d</div><div class="kl">Avg DEG</div><div class="kfull">Decision-to-Evidence Gap</div></div>
   </div>
   <div class="grid2">
     <div class="card"><h3>Claim Category Trends</h3>
@@ -2238,7 +2238,8 @@ if(cmpBtn){cmpBtn.addEventListener("click",function(){
 function renderBoardQueue(){
   var tbody=document.getElementById("boardTbody");if(!tbody)return;
   var html="";
-  var boardIds=Object.keys(F).filter(function(k){var f=F[k];return f.status!=="Closed"&&f.brq>=0.4});
+  var boardStatuses={"New":1,"In Review":1,"Reopened":1,"Patch Proposed":1};
+  var boardIds=Object.keys(F).filter(function(k){var f=F[k];return boardStatuses[f.status]&&f.brq>=0.4});
   boardIds.sort(function(a,b){return F[b].brq-F[a].brq});
   boardIds.forEach(function(k){
     var f=F[k];
@@ -2351,7 +2352,8 @@ if(btnRD)btnRD.addEventListener("click",function(){
 var btnEP=document.getElementById("btnExportPacket");
 if(btnEP)btnEP.addEventListener("click",function(){
   var boardFindings={};
-  Object.keys(F).filter(function(k){return F[k].status!=="Closed"&&F[k].brq>=0.4}).forEach(function(k){boardFindings[k]=F[k]});
+  var pktSt={"New":1,"In Review":1,"Reopened":1,"Patch Proposed":1};
+  Object.keys(F).filter(function(k){return pktSt[F[k].status]&&F[k].brq>=0.4}).forEach(function(k){boardFindings[k]=F[k]});
   var pkg={_meta:{format:"CERPA_IDIQ_EDGE",version:"1.0.0",type:"board_packet",session:"Q2-IDIQ-BOARD",exported:new Date().toISOString()},findings:boardFindings};
   downloadJSON(pkg,"CERPA_IDIQ_board_"+new Date().toISOString().slice(0,10)+".json");
 });
@@ -2701,9 +2703,11 @@ function renderTaskPanel(){
   tp.querySelectorAll("[data-taskfid]").forEach(function(el){
     el.addEventListener("click",function(e){
       e.stopPropagation();
+      var fid=el.getAttribute("data-taskfid");
       var tpPanel=document.getElementById("taskPanel");
       if(tpPanel)tpPanel.classList.remove("open");
-      showFinding(el.getAttribute("data-taskfid"));
+      openTab("find");
+      setTimeout(function(){showFinding(fid)},300);
     });
   });
 }
@@ -3088,6 +3092,7 @@ function renderAtRiskStrip(){
         });
       }else{
         var fid=rid.replace("F-","");
+        openTab("find");
         showFinding(fid);
       }
     });
@@ -3193,18 +3198,47 @@ function renderDashboard(){
   /* board-ready queue */
   var brq=document.getElementById("boardReadyQueue");
   if(brq){
-    var ready=Object.values(F).filter(function(f){return f.brq>=0.7&&f.status!=="Closed"});
+    var dbBoardSt={"New":1,"In Review":1,"Reopened":1,"Patch Proposed":1};
+    var ready=Object.values(F).filter(function(f){return f.brq>=0.7&&dbBoardSt[f.status]});
     ready.sort(function(a,b){return b.brq-a.brq});
     if(!ready.length){brq.innerHTML='<div style="padding:8px;color:#666">No board-ready findings</div>';}
     else{
-      brq.innerHTML=ready.map(function(f){
+      brq.innerHTML=ready.map(function(f,idx){
         var fid=f.id.replace("F-","");
         var sevCls=sevClassMap[f.sev]||"sev-low";
-        var act=f.brq>=0.8?"Approve":"Send Back";
-        return '<div class="wr" style="cursor:pointer" data-brqfid="'+fid+'"><span class="wl mono" style="color:'+(stColorMap[f.status]||"var(--accent)")+'">'+escHTML(f.id)+'</span><span class="wv"><span class="badge '+sevCls+'" style="margin-right:6px">'+escHTML(f.sev)+'</span>BRQ '+f.brq+' · '+escHTML(f.claimCat)+'</span></div>';
+        var h='<div class="wr" style="cursor:pointer" data-brqrow="'+idx+'">';
+        h+='<span id="brqc-'+idx+'" style="display:inline-block;transition:transform .2s;transform:rotate(0deg);margin-right:6px;font-size:10px;color:var(--muted)">&#9654;</span>';
+        h+='<span class="wl mono" style="color:'+(stColorMap[f.status]||"var(--accent)")+'">'+escHTML(f.id)+'</span>';
+        h+='<span class="wv"><span class="badge '+sevCls+'" style="margin-right:6px">'+escHTML(f.sev)+'</span>BRQ '+f.brq+' · '+escHTML(f.claimCat)+'</span></div>';
+        h+='<div id="brqd-'+idx+'" style="display:none;padding:6px 12px 10px 24px;font-size:11px;border-bottom:1px solid var(--line)">';
+        h+='<div class="wr"><span class="wl">Title</span><span class="wv">'+escHTML(f.title)+'</span></div>';
+        h+='<div class="wr"><span class="wl">Status</span><span class="wv" style="color:'+(stColorMap[f.status]||"var(--accent)")+'">'+escHTML(f.status)+'</span></div>';
+        h+='<div class="wr"><span class="wl">Vendor</span><span class="wv">'+escHTML(f.vendor)+'</span></div>';
+        h+='<div class="wr"><span class="wl">Owner</span><span class="wv">'+escHTML(f.owner)+'</span></div>';
+        h+='<div class="wr"><span class="wl">Category</span><span class="wv">'+escHTML(f.claimCat)+' / '+escHTML(f.claimType)+'</span></div>';
+        h+='<div class="wr"><span class="wl">Financial</span><span class="wv" style="color:var(--warn)">'+escHTML(f.financialImpact)+'</span></div>';
+        h+='<div style="margin-top:4px"><span style="cursor:pointer;color:var(--accent);text-decoration:underline" data-brqopen="'+fid+'">Open Finding &#8250;</span></div>';
+        h+='</div>';
+        return h;
       }).join("");
-      brq.querySelectorAll("[data-brqfid]").forEach(function(el){
-        el.addEventListener("click",function(){showFinding(el.getAttribute("data-brqfid"))});
+      brq.querySelectorAll("[data-brqrow]").forEach(function(row){
+        row.addEventListener("click",function(){
+          var idx=row.getAttribute("data-brqrow");
+          var det=document.getElementById("brqd-"+idx);
+          var chev=document.getElementById("brqc-"+idx);
+          if(det){
+            var open=det.style.display!=="none";
+            det.style.display=open?"none":"block";
+            if(chev)chev.style.transform=open?"rotate(0deg)":"rotate(90deg)";
+          }
+        });
+      });
+      brq.querySelectorAll("[data-brqopen]").forEach(function(el){
+        el.addEventListener("click",function(e){
+          e.stopPropagation();
+          openTab("find");
+          showFinding(el.getAttribute("data-brqopen"));
+        });
       });
     }
   }
@@ -3335,6 +3369,55 @@ document.querySelectorAll("#s-trends table").forEach(function(tbl){
         '<div style="margin-top:6px">'+buildFindingListHTML(ids)+'</div>');
     });
   });
+});
+
+/* ── Trends KPI card click → drawer detail ── */
+document.getElementById("s-trends").addEventListener("click",function(e){
+  var card=e.target.closest("[data-tkpi]");if(!card)return;
+  var k=card.getAttribute("data-tkpi");
+  var title=card.querySelector(".kfull")?card.querySelector(".kfull").textContent:"KPI Detail";
+  var val=card.querySelector(".kv")?card.querySelector(".kv").textContent:"—";
+  var body='<div class="wire"><h4>'+escHTML(title)+'</h4><div class="wr"><span class="wl">Current Value</span><span class="wv" style="font-size:22px;font-weight:700">'+escHTML(val)+'</span></div>';
+  if(k==="rdev"){
+    var recur=Object.keys(F).filter(function(k){return F[k].recurring>0});
+    var total=Object.keys(F).length;
+    body+='<div class="wr"><span class="wl">Formula</span><span class="wv" style="font-size:10px">Recurring / Total Findings</span></div>';
+    body+='<div class="wr"><span class="wl">Recurring</span><span class="wv" style="color:var(--warn)">'+recur.length+'</span></div>';
+    body+='<div class="wr"><span class="wl">Total</span><span class="wv">'+total+'</span></div>';
+    body+='<div class="wr"><span class="wl">Target</span><span class="wv">&le; 0.25 (decreasing)</span></div>';
+    if(recur.length){body+='<h4 style="margin-top:10px;color:var(--muted);font-size:10px;text-transform:uppercase">Recurring Findings</h4>';body+=buildFindingListHTML(recur);}
+  }else if(k==="rcr"){
+    body+='<div class="wr"><span class="wl">Formula</span><span class="wv" style="font-size:10px">Expected Review Time / Actual Review Time</span></div>';
+    body+='<div class="wr"><span class="wl">Interpretation</span><span class="wv">&gt;1.0 = faster than expected</span></div>';
+    body+='<div class="wr"><span class="wl">Target</span><span class="wv">&ge; 1.5x</span></div>';
+    body+='<div class="wr"><span class="wl">Trend</span><span class="wv" style="color:var(--ok)">&#8593; from 1.4x last quarter</span></div>';
+    var reviewIds=Object.keys(F).filter(function(k){return F[k].status==="In Review"});
+    body+='<div class="wr"><span class="wl">Currently In Review</span><span class="wv">'+reviewIds.length+'</span></div>';
+    if(reviewIds.length){body+=buildFindingListHTML(reviewIds);}
+  }else if(k==="ool"){
+    var oolIds=Object.keys(F).filter(function(k){return F[k].status!=="Closed"});
+    oolIds.sort(function(a,b){return F[b].cg-F[a].cg});
+    body+='<div class="wr"><span class="wl">Formula</span><span class="wv" style="font-size:10px">Avg days from observation to assigned owner</span></div>';
+    body+='<div class="wr"><span class="wl">Target</span><span class="wv">&le; 5 days</span></div>';
+    body+='<div class="wr"><span class="wl">Open Findings</span><span class="wv">'+oolIds.length+'</span></div>';
+    if(oolIds.length){body+='<h4 style="margin-top:10px;color:var(--muted);font-size:10px;text-transform:uppercase">By Ownership Lag (CG)</h4>';}
+    oolIds.forEach(function(fk){var f=F[fk];body+='<div class="wr" style="cursor:pointer" data-drill="'+fk+'"><span class="wl mono" style="color:'+(stColorMap[f.status]||"var(--accent)")+'">'+escHTML(f.id)+'</span><span class="wv">'+f.cg+'d · '+escHTML(f.owner)+'</span></div>';});
+  }else if(k==="deg"){
+    var degIds=Object.keys(F).filter(function(k){return F[k].status!=="Closed"});
+    degIds.sort(function(a,b){return F[b].deg-F[a].deg});
+    body+='<div class="wr"><span class="wl">Formula</span><span class="wv" style="font-size:10px">Avg days between decision and supporting evidence</span></div>';
+    body+='<div class="wr"><span class="wl">Target</span><span class="wv">&le; 5 days</span></div>';
+    var above=degIds.filter(function(k){return F[k].deg>5});
+    body+='<div class="wr"><span class="wl">Above Target</span><span class="wv" style="color:var(--bad)">'+above.length+' findings</span></div>';
+    if(degIds.length){body+='<h4 style="margin-top:10px;color:var(--muted);font-size:10px;text-transform:uppercase">All Open — by DEG</h4>';}
+    degIds.forEach(function(fk){
+      var f=F[fk];var dc=f.deg>5?"bad":f.deg>3?"warn":"ok";
+      body+='<div class="wr" style="cursor:pointer" data-drill="'+fk+'"><span class="wl mono" style="color:'+(stColorMap[f.status]||"var(--accent)")+'">'+escHTML(f.id)+'</span><span class="wv" style="color:var(--'+dc+')">'+f.deg+'d</span></div>';
+    });
+  }
+  body+='</div>';
+  openDrawer(title,body,'');
+  wireDrillLinks();
 });
 
 /* ── KPI card click → drawer detail ── */
