@@ -190,7 +190,7 @@ button.danger{border-color:rgba(255,107,107,.35);color:var(--bad)}
 .board-timer{font-size:11px;color:var(--accent);font-variant-numeric:tabular-nums;font-weight:600;margin-left:auto;display:flex;align-items:center;gap:4px}
 .board-timer .bt-dot{width:6px;height:6px;border-radius:50%;background:var(--ok);animation:pulse 1.5s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.heatmap{display:grid;gap:2px;margin:8px 0}
+.heatmap{display:grid;grid-template-columns:60px repeat(4,1fr);gap:2px;margin:8px 0}
 .hm-cell{border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;min-height:32px;transition:all .15s;cursor:pointer}
 .hm-cell:hover{transform:scale(1.08);box-shadow:0 2px 8px rgba(0,0,0,.4)}
 .hm-label{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;display:flex;align-items:center;justify-content:center}
@@ -2350,14 +2350,13 @@ function renderLPSGauge(){
   var avg=count>0?Math.round(totalLPS/count):0;
   var pct=avg;
   var color=pct>=80?"var(--ok)":pct>=60?"var(--warn)":"var(--bad)";
-  var circumference=2*Math.PI*54;
+  var circumference=2*Math.PI*46;
   var offset=circumference-(pct/100)*circumference;
-  setHTML(el,'<svg viewBox="0 0 120 120" style="width:140px;height:140px">'+
-    '<circle cx="60" cy="60" r="54" fill="none" stroke="#141e2d" stroke-width="8"/>'+
-    '<circle cx="60" cy="60" r="54" fill="none" stroke="'+color+'" stroke-width="8" stroke-dasharray="'+circumference+'" stroke-dashoffset="'+offset+'" stroke-linecap="round" transform="rotate(-90 60 60)" style="transition:stroke-dashoffset .8s"/>'+
-    '<text x="60" y="55" text-anchor="middle" fill="'+color+'" font-size="28" font-weight="700" font-family="inherit">'+avg+'</text>'+
-    '<text x="60" y="72" text-anchor="middle" fill="var(--muted)" font-size="9" font-family="inherit">Live Posture</text>'+
-    '</svg>');
+  setHTML(el,'<svg viewBox="0 0 110 110">'+
+    '<circle class="cis-gauge-bg" cx="55" cy="55" r="46"/>'+
+    '<circle class="cis-gauge-fill" cx="55" cy="55" r="46" stroke="'+color+'" stroke-dasharray="'+circumference+'" stroke-dashoffset="'+offset+'"/>'+
+    '</svg>'+
+    '<div class="cis-gauge-label"><div class="cis-gauge-score" style="color:'+color+'">'+avg+'</div><div class="cis-gauge-sub">LPS</div></div>');
 }
 
 function renderDashboard(){
@@ -2389,7 +2388,7 @@ function renderDashboard(){
   ];
   kpis.forEach(function(k){
     var el=document.getElementById(k.id);
-    if(el)setHTML(el,'<div class="kpi" style="--kpi-color:'+k.color+'"><div class="kv">'+k.value+'</div><div class="kl">'+k.label+'</div></div>');
+    if(el){el.textContent=k.value;el.style.color=k.color;}
   });
 
   // Operational KPIs
@@ -2411,7 +2410,7 @@ function renderDashboard(){
   ];
   ops.forEach(function(k){
     var el=document.getElementById(k.id);
-    if(el)setHTML(el,'<div class="kpi" style="--kpi-color:'+k.color+'"><div class="kv">'+k.value+'</div><div class="kl">'+k.label+'</div></div>');
+    if(el){el.textContent=k.value;el.style.color=k.color;}
   });
 
   // RMF Step Distribution
@@ -3181,6 +3180,94 @@ renderPoam();
 renderTrends();
 renderMG();
 renderTaskPanel();
+
+/* ── Sparklines ── */
+function renderSparklines(){
+  document.querySelectorAll(".spark-row[data-spark]").forEach(function(el){
+    var raw=el.getAttribute("data-spark");if(!raw)return;
+    var vals=raw.split(",").map(Number);
+    var mx=Math.max.apply(null,vals),mn=Math.min.apply(null,vals);
+    var w=60,h=16,step=w/(vals.length-1);
+    var pts=vals.map(function(v,i){return (i*step)+","+(h-((v-mn)/(mx-mn||1))*h);}).join(" ");
+    setHTML(el,'<svg width="'+w+'" height="'+h+'" style="vertical-align:middle"><polyline points="'+pts+'" fill="none" stroke="var(--accent)" stroke-width="1.5"/></svg>');
+  });
+}
+renderSparklines();
+
+/* ── KPI card click → drawer detail ── */
+document.getElementById("s-dash").addEventListener("click",function(e){
+  var card=e.target.closest("[data-kpi]");if(!card)return;
+  var k=card.getAttribute("data-kpi");
+  var title=card.querySelector(".kfull")?card.querySelector(".kfull").textContent:"KPI Detail";
+  var val=card.querySelector(".kv")?card.querySelector(".kv").textContent:"\u2014";
+  var body='<div class="wire"><h4>'+escHTML(title)+'</h4><div class="wr"><span class="wl">Current Value</span><span class="wv" style="font-size:22px;font-weight:700">'+escHTML(val)+'</span></div>';
+
+  if(k==="lps"){
+    body+='<div class="wr"><span class="wl">Formula</span><span class="wv" style="font-size:10px">100 \u2212 severity \u2212 contradiction \u2212 reopen \u2212 evidence gaps</span></div>';
+    body+='<div class="wr"><span class="wl">Target</span><span class="wv">&ge; 75</span></div>';
+    Object.values(SYS).forEach(function(s){
+      var lps=computeLPS(s.id);var lc=lps>=80?"ok":lps>=60?"warn":"bad";
+      body+='<div class="wr"><span class="wl">'+escHTML(s.id)+'</span><span class="wv" style="color:var(--'+lc+')">'+lps+'</span></div>';
+    });
+  }else if(k==="auth"){
+    var authd=Object.values(SYS).filter(function(s){return s.authorizationStatus==="Authorized"});
+    var unauth=Object.values(SYS).filter(function(s){return s.authorizationStatus!=="Authorized"});
+    body+='<div class="wr"><span class="wl">Authorized</span><span class="wv" style="color:var(--ok)">'+authd.length+'</span></div>';
+    body+='<div class="wr"><span class="wl">Not Authorized</span><span class="wv" style="color:var(--bad)">'+unauth.length+'</span></div>';
+    unauth.forEach(function(s){body+='<div class="wr"><span class="wl">'+escHTML(s.id)+'</span><span class="wv">'+escHTML(s.authorizationStatus)+'</span></div>';});
+  }else if(k==="high"){
+    var high=Object.values(RF).filter(function(f){return f.sev==="HIGH"&&f.status!=="Closed"});
+    body+='<div class="wr"><span class="wl">Open HIGH</span><span class="wv" style="color:var(--bad)">'+high.length+'</span></div>';
+    high.forEach(function(f){body+='<div class="wr" style="cursor:pointer" data-drill="'+f.id+'"><span class="wl mono" style="color:var(--accent)">'+escHTML(f.id)+'</span><span class="wv">'+escHTML(f.title)+'</span></div>';});
+  }else if(k==="poamdue"){
+    var overdue=Object.values(POAM).filter(function(p){return p.status==="Overdue"});
+    body+='<div class="wr"><span class="wl">Overdue</span><span class="wv" style="color:var(--bad)">'+overdue.length+'</span></div>';
+    overdue.forEach(function(p){body+='<div class="wr"><span class="wl">'+escHTML(p.id)+'</span><span class="wv">'+escHTML(p.milestone||"")+'</span></div>';});
+  }else if(k==="evsuff"){
+    var evTotal=0,evOk=0;
+    Object.values(RF).forEach(function(f){f.evidence.forEach(function(ev){evTotal++;if(ev.ok)evOk++})});
+    body+='<div class="wr"><span class="wl">Sufficient</span><span class="wv" style="color:var(--ok)">'+evOk+' / '+evTotal+'</span></div>';
+    body+='<div class="wr"><span class="wl">Target</span><span class="wv">&ge; 80%</span></div>';
+  }else if(k==="patchlat"){
+    var degIds=Object.keys(RF).filter(function(fk){return RF[fk].status!=="Closed"&&!isNaN(parseInt(RF[fk].deg))});
+    var above=degIds.filter(function(fk){return parseInt(RF[fk].deg)>7});
+    body+='<div class="wr"><span class="wl">Target</span><span class="wv">&le; 7 days</span></div>';
+    body+='<div class="wr"><span class="wl">Above Target</span><span class="wv" style="color:var(--bad)">'+above.length+' findings</span></div>';
+    degIds.forEach(function(fk){
+      var f=RF[fk];var dc=parseInt(f.deg)>7?"bad":parseInt(f.deg)>5?"warn":"ok";
+      body+='<div class="wr" style="cursor:pointer" data-drill="'+f.id+'"><span class="wl mono" style="color:var(--accent)">'+escHTML(f.id)+'</span><span class="wv" style="color:var(--'+dc+')">'+f.deg+'d</span></div>';
+    });
+  }else if(k==="sysassess"){
+    var assessing=Object.values(SYS).filter(function(s){return s.currentRMFStep==="Assess"});
+    body+='<div class="wr"><span class="wl">In Assessment</span><span class="wv">'+assessing.length+'</span></div>';
+    assessing.forEach(function(s){body+='<div class="wr"><span class="wl">'+escHTML(s.id)+'</span><span class="wv">'+escHTML(s.name)+'</span></div>';});
+  }else if(k==="sysmonitor"){
+    var monitoring=Object.values(SYS).filter(function(s){return s.currentRMFStep==="Monitor"});
+    body+='<div class="wr"><span class="wl">In Monitoring</span><span class="wv">'+monitoring.length+'</span></div>';
+    monitoring.forEach(function(s){body+='<div class="wr"><span class="wl">'+escHTML(s.id)+'</span><span class="wv">'+escHTML(s.name)+'</span></div>';});
+  }else if(k==="contra"){
+    var contras=Object.values(RF).filter(function(f){return f.contradictionFlag&&f.status!=="Closed"});
+    body+='<div class="wr"><span class="wl">Contradictions</span><span class="wv" style="color:var(--bad)">'+contras.length+'</span></div>';
+    contras.forEach(function(f){body+='<div class="wr" style="cursor:pointer" data-drill="'+f.id+'"><span class="wl mono" style="color:var(--accent)">'+escHTML(f.id)+'</span><span class="wv">'+escHTML(f.title)+'</span></div>';});
+  }else if(k==="reopen"){
+    var reopened=Object.values(RF).filter(function(f){return f.status==="Reopened"});
+    body+='<div class="wr"><span class="wl">Reopened</span><span class="wv" style="color:var(--bad)">'+reopened.length+'</span></div>';
+    reopened.forEach(function(f){body+='<div class="wr" style="cursor:pointer" data-drill="'+f.id+'"><span class="wl mono" style="color:var(--accent)">'+escHTML(f.id)+'</span><span class="wv">'+escHTML(f.title)+'</span></div>';});
+  }else if(k==="famrisk"){
+    var families={};Object.values(RF).filter(function(f){return f.status!=="Closed"}).forEach(function(f){families[f.family]=(families[f.family]||0)+1});
+    var atRisk=Object.keys(families).filter(function(fk){return families[fk]>=2});
+    body+='<div class="wr"><span class="wl">Families at Risk (&ge;2 open)</span><span class="wv" style="color:var(--bad)">'+atRisk.length+'</span></div>';
+    atRisk.forEach(function(fam){body+='<div class="wr"><span class="wl">'+escHTML(fam)+'</span><span class="wv">'+families[fam]+' findings</span></div>';});
+  }else if(k==="authwatch"){
+    var watchlist=Object.values(SYS).filter(function(s){return s.authorizationStatus!=="Authorized"});
+    body+='<div class="wr"><span class="wl">On Watchlist</span><span class="wv" style="color:var(--warn)">'+watchlist.length+'</span></div>';
+    watchlist.forEach(function(s){body+='<div class="wr"><span class="wl">'+escHTML(s.id)+'</span><span class="wv">'+escHTML(s.authorizationStatus)+'</span></div>';});
+  }
+
+  body+='</div>';
+  openDrawer(title,body,'');
+  wireDrillLinks();
+});
 
 // Board timer starts when board tab is opened
 var origOpenTab=openTab;
