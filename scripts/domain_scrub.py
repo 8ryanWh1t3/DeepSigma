@@ -294,6 +294,10 @@ ALLOWED_ACRONYMS = {
     "COST", "DEBT", "TIME", "REWORK", "SNAP", "PREC", "BUD", "ETA",
     # JRM EDGE v3 Graph tab — thread IDs, protocol/security terms
     "THR", "SMB", "RDP", "APT", "INT", "DEAD",
+    # CERPA IDIQ EDGE — contract lifecycle, EDIPI identity, finding actions
+    "BURN", "CDRL", "CISO", "CLONE", "CLONED", "COR", "EDIPI", "EDIT",
+    "EDITED", "FSO", "GEAR", "IMS", "INV", "LIST", "LLC", "MAPS",
+    "ORDERS", "SYS", "TOM", "VACANT",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}

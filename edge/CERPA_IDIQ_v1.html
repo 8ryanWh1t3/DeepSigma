@@ -1030,7 +1030,7 @@ var F={
 var activeFindingId=null,editBuffer=null,editDirty=false,lastSnapshot=null,editBaseRevision=null,editBaseUpdatedAt=null,editBaseSnapshot=null;
 var DEMO_F=JSON.parse(JSON.stringify(F));
 var DEMO_TO=JSON.parse(JSON.stringify(TO));
-function generateSessionId(){return "s-"+(Date.now()).toString(36)+"-"+(Math.random()*1e6|0).toString(36)}
+function generateSessionId(){var a=new Uint32Array(1);crypto.getRandomValues(a);return "s-"+(Date.now()).toString(36)+"-"+a[0].toString(36)}
 var CHANGELOG={};
 var SYNC_META={};
 var SESSION_ID=generateSessionId();
@@ -1199,7 +1199,7 @@ function showImportPreview(json){
 }
 
 /* ══════════ DRAWER ══════════ */
-function setHTML(el,html){var t=document.createElement("template");t.innerHTML=html;el.textContent="";el.appendChild(t.content.cloneNode(true))}
+function setHTML(el,html){var d=new DOMParser().parseFromString("<template>"+html+"</template>","text/html");var t=d.querySelector("template");el.textContent="";if(t)el.appendChild(document.importNode(t.content,true))}
 function openDrawer(title,bodyHtml,footHtml){
   dTitle.textContent=title;
   setHTML(dBody,bodyHtml);setHTML(dFoot,footHtml||"");
@@ -1291,7 +1291,7 @@ dBody.addEventListener("click",function(e){
   detail.style.display="block";if(chevron)chevron.style.transform="rotate(90deg)";
   if(detail.dataset.loaded)return;
   detail.dataset.loaded="1";
-  detail.innerHTML=mgExpandDetail(detail.dataset.ntype,detail.dataset.nlabel);
+  setHTML(detail,mgExpandDetail(detail.dataset.ntype,detail.dataset.nlabel));
 });
 
 /* ══════════ MAPS ══════════ */
@@ -1369,7 +1369,7 @@ function appendAuditEvent(f,action,details){
 var EDITABLE_FIELDS=["title","sev","status","claimCat","claimType","taskOrder","vendor","claim","event","reviewSummary","rootCause","patch","applyDecision","owner","reviewer","due","brq","deg","cg","financialImpact","scheduleImpact","recurring","contractRisk","notes"];
 var WORKFLOW_FIELDS=["status"];
 
-function generateChangeId(){return "c-"+(Date.now()).toString(36)+"-"+(Math.random()*1e6|0).toString(36)}
+function generateChangeId(){var a=new Uint32Array(1);crypto.getRandomValues(a);return "c-"+(Date.now()).toString(36)+"-"+a[0].toString(36)}
 
 function ensureChangeLog(key){if(!CHANGELOG[key])CHANGELOG[key]=[]}
 
@@ -1730,7 +1730,7 @@ function renderFindingsTable(){
       '<button class="action-btn" data-act="archive" data-afid="'+k+'" title="Archive">&#128451;</button></td>';
     html+='</tr>';
   });
-  tbody.innerHTML=html;
+  setHTML(tbody,html);
 }
 renderFindingsTable();
 // Wire filters
@@ -1797,7 +1797,7 @@ function showFinding(fid){
   body+='<button data-fact="evidence" data-fid="'+fid+'">Add Evidence</button>';
   if(canEditFinding(getRole()))body+='<button data-fedit="'+fid+'" style="border-color:var(--accent);color:var(--accent)">Edit</button>';
   body+='</div>';
-  fDet.innerHTML=body;
+  setHTML(fDet,body);
   fDet.classList.remove("hidden");
   fDet.scrollIntoView({behavior:"smooth",block:"start"});
   var bc=document.getElementById("btnCloseD");
@@ -2216,19 +2216,19 @@ if(cmpBtn){cmpBtn.addEventListener("click",function(){
       if(selected.length===2){
         var fa=F[selected[0]],fb=F[selected[1]];
         var cb=document.getElementById("compareBody");
-        if(cb)cb.innerHTML='<div class="compare-grid">'+
-          '<div class="compare-col"><h4 style="color:var(--accent)">'+fa.id+'</h4>'+
-          '<div class="wr"><span class="wl">Status</span><span class="wv">'+fa.status+'</span></div>'+
-          '<div class="wr"><span class="wl">Category</span><span class="wv">'+fa.claimCat+'</span></div>'+
-          '<div class="wr"><span class="wl">Vendor</span><span class="wv">'+fa.vendor+'</span></div>'+
+        if(cb)setHTML(cb,'<div class="compare-grid">'+
+          '<div class="compare-col"><h4 style="color:var(--accent)">'+escHTML(fa.id)+'</h4>'+
+          '<div class="wr"><span class="wl">Status</span><span class="wv">'+escHTML(fa.status)+'</span></div>'+
+          '<div class="wr"><span class="wl">Category</span><span class="wv">'+escHTML(fa.claimCat)+'</span></div>'+
+          '<div class="wr"><span class="wl">Vendor</span><span class="wv">'+escHTML(fa.vendor)+'</span></div>'+
           '<div class="wr"><span class="wl">BRQ</span><span class="wv">'+fa.brq+'</span></div>'+
-          '<div class="wr"><span class="wl">Root Cause</span><span class="wv">'+fa.rootCause+'</span></div></div>'+
-          '<div class="compare-col"><h4 style="color:var(--accent)">'+fb.id+'</h4>'+
-          '<div class="wr"><span class="wl">Status</span><span class="wv">'+fb.status+'</span></div>'+
-          '<div class="wr"><span class="wl">Category</span><span class="wv">'+fb.claimCat+'</span></div>'+
-          '<div class="wr"><span class="wl">Vendor</span><span class="wv">'+fb.vendor+'</span></div>'+
+          '<div class="wr"><span class="wl">Root Cause</span><span class="wv">'+escHTML(fa.rootCause)+'</span></div></div>'+
+          '<div class="compare-col"><h4 style="color:var(--accent)">'+escHTML(fb.id)+'</h4>'+
+          '<div class="wr"><span class="wl">Status</span><span class="wv">'+escHTML(fb.status)+'</span></div>'+
+          '<div class="wr"><span class="wl">Category</span><span class="wv">'+escHTML(fb.claimCat)+'</span></div>'+
+          '<div class="wr"><span class="wl">Vendor</span><span class="wv">'+escHTML(fb.vendor)+'</span></div>'+
           '<div class="wr"><span class="wl">BRQ</span><span class="wv">'+fb.brq+'</span></div>'+
-          '<div class="wr"><span class="wl">Root Cause</span><span class="wv">'+fb.rootCause+'</span></div></div></div>';
+          '<div class="wr"><span class="wl">Root Cause</span><span class="wv">'+escHTML(fb.rootCause)+'</span></div></div></div>');
       }
     });
   });
@@ -2256,28 +2256,28 @@ function renderBoardQueue(){
     html+='<td><button class="'+(f.brq>=0.8?"ok":"danger")+'" style="font-size:9px">'+act+'</button></td>';
     html+='</tr>';
   });
-  tbody.innerHTML=html;
+  setHTML(tbody,html);
 }
 renderBoardQueue();
 
 function updateBoardDetail(fid){
   var f=F[fid];if(!f)return;
   var evOk=f.evidence.filter(function(e){return e.ok}).length;
-  document.getElementById("bdRisk").innerHTML='<h3>Contract / Risk</h3>'+
+  setHTML(document.getElementById("bdRisk"),'<h3>Contract / Risk</h3>'+
     '<div class="wr"><span class="wl">Finding</span><span class="wv" style="color:'+(stColorMap[f.status]||"var(--accent)")+'">'+escHTML(f.id)+'</span></div>'+
     '<div class="wr"><span class="wl">Contract</span><span class="wv">'+escHTML(f.contract)+'</span></div>'+
     '<div class="wr"><span class="wl">Task Order</span><span class="wv">'+escHTML(f.taskOrder)+'</span></div>'+
     '<div class="wr"><span class="wl">Vendor</span><span class="wv">'+escHTML(f.vendor)+'</span></div>'+
     '<div class="wr"><span class="wl">Financial</span><span class="wv" style="color:var(--warn)">'+escHTML(f.financialImpact)+'</span></div>'+
-    '<div class="wr"><span class="wl">Contract Risk</span><span class="wv" style="color:var(--'+(f.contractRisk?'bad':'ok')+');">'+(f.contractRisk?'YES':'No')+'</span></div>';
-  document.getElementById("bdPatch").innerHTML='<h3>Patch / Evidence</h3>'+
+    '<div class="wr"><span class="wl">Contract Risk</span><span class="wv" style="color:var(--'+(f.contractRisk?'bad':'ok')+');">'+(f.contractRisk?'YES':'No')+'</span></div>');
+  setHTML(document.getElementById("bdPatch"),'<h3>Patch / Evidence</h3>'+
     '<div class="wr"><span class="wl">Patch</span><span class="wv">'+escHTML(f.patch.substring(0,60))+'</span></div>'+
     '<div class="wr"><span class="wl">Decision</span><span class="wv">'+escHTML(f.applyDecision)+'</span></div>'+
-    '<div class="wr"><span class="wl">Evidence</span><span class="wv">'+evOk+' of '+f.evidence.length+'</span></div>';
-  document.getElementById("bdHist").innerHTML='<h3>Recurrence / History</h3>'+
+    '<div class="wr"><span class="wl">Evidence</span><span class="wv">'+evOk+' of '+f.evidence.length+'</span></div>');
+  setHTML(document.getElementById("bdHist"),'<h3>Recurrence / History</h3>'+
     '<div class="wr"><span class="wl">Recurring</span><span class="wv">'+(f.recurring>0?'YES &times;'+f.recurring:'None')+'</span></div>'+
     '<div class="wr"><span class="wl">Root Cause</span><span class="wv">'+escHTML(f.rootCause)+'</span></div>'+
-    '<div class="wr"><span class="wl">Linked</span><span class="wv">'+(f.linked.length>0?f.linked.join(", "):'None')+'</span></div>';
+    '<div class="wr"><span class="wl">Linked</span><span class="wv">'+(f.linked.length>0?escHTML(f.linked.join(", ")):'None')+'</span></div>');
 }
 var firstBoard=Object.keys(F).filter(function(k){return F[k].status!=="Closed"&&F[k].brq>=0.4})[0];
 if(firstBoard)updateBoardDetail(firstBoard);
@@ -2386,7 +2386,7 @@ function renderAudit(){
     html+='<td class="mono" style="font-size:8px;color:var(--muted)">'+f.auditChain.join(' → ')+'</td>';
     html+='</tr>';
   });
-  tbody.innerHTML=html;
+  setHTML(tbody,html);
 }
 renderAudit();
 
@@ -2395,7 +2395,7 @@ document.getElementById("auditTbody").addEventListener("click",function(e){
   var fid=tr.getAttribute("data-fid");if(!fid)return;
   var f=F[fid];if(!f)return;
   var card=document.getElementById("auditChainCard");
-  card.innerHTML='<h3>Evidence Chain — '+escHTML(f.id)+'</h3>'+
+  setHTML(card,'<h3>Evidence Chain — '+escHTML(f.id)+'</h3>'+
     '<div class="wire">'+
     '<div class="wr"><span class="wl">Claim</span><span class="wv">'+escHTML(f.auditChain[0]||"—")+' · '+escHTML(f.claim.substring(0,60))+'</span></div>'+
     '<div class="wr"><span class="wl">Event</span><span class="wv">'+(f.auditChain[1]||"—")+' · '+escHTML(f.event.substring(0,60))+'</span></div>'+
@@ -2404,7 +2404,7 @@ document.getElementById("auditTbody").addEventListener("click",function(e){
     '<div class="wr"><span class="wl">Apply</span><span class="wv">'+(f.auditChain[4]||"Pending")+' · '+escHTML(f.applyDecision)+'</span></div>'+
     '<div class="wr"><span class="wl">Evidence</span><span class="wv">'+f.evidence.length+' artifacts · '+f.evidence.filter(function(e){return e.ok}).length+' validated</span></div>'+
     '<div class="wr"><span class="wl">Status</span><span class="wv" style="color:var(--'+(f.status==="Closed"?"ok":f.status==="Reopened"?"bad":"warn")+');">'+escHTML(f.status)+'</span></div>'+
-    '</div>';
+    '</div>');
 });
 
 var btnAE=document.getElementById("btnAuditExport");
@@ -3250,10 +3250,10 @@ function renderDashboard(){
     var highCount=Object.values(F).filter(function(f){return f.sev==="HIGH"&&f.status!=="Closed"}).length;
     var posture=highCount>=4?"RED":highCount>=2?"AMBER":"GREEN";
     var pc=posture==="RED"?"var(--bad)":posture==="AMBER"?"var(--warn)":"var(--ok)";
-    ch.innerHTML='<div class="wr"><span class="wl">Contract</span><span class="wv">N00178-24-D-0042</span></div>'+
+    setHTML(ch,'<div class="wr"><span class="wl">Contract</span><span class="wv">N00178-24-D-0042</span></div>'+
       '<div class="wr"><span class="wl">Open Findings</span><span class="wv">'+openCount+'</span></div>'+
       '<div class="wr"><span class="wl">Open HIGH</span><span class="wv" style="color:var(--bad)">'+highCount+'</span></div>'+
-      '<div class="wr"><span class="wl">Posture</span><span class="wv" style="color:'+pc+';font-weight:700">'+posture+'</span></div>';
+      '<div class="wr"><span class="wl">Posture</span><span class="wv" style="color:'+pc+';font-weight:700">'+posture+'</span></div>');
   }
 }
 
@@ -3285,7 +3285,7 @@ function trendToggle(row,html){
   var td=document.createElement("td");
   td.colSpan=row.querySelectorAll("td").length;
   td.style.cssText="padding:8px 12px;background:var(--card2);border-left:2px solid var(--accent)";
-  td.innerHTML=html;
+  setHTML(td,html);
   dr.appendChild(td);
   row.parentNode.insertBefore(dr,row.nextSibling);
   row.querySelector(".trend-chev").textContent="\u25BC";

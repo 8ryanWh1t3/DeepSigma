@@ -1736,7 +1736,7 @@ function navigateTo(tab,filter,highlightId){
     },250);
   }
 }
-function setHTML(el,h){var t=document.createElement("template");t.innerHTML=h;el.textContent="";el.appendChild(t.content.cloneNode(true))}
+function setHTML(el,h){var d=new DOMParser().parseFromString("<template>"+h+"</template>","text/html");var t=d.querySelector("template");el.textContent="";if(t)el.appendChild(document.importNode(t.content,true))}
 function openTray(html){
   setHTML($("#drawerContent"),html);
   $("#detailDrawer").classList.add("open");
