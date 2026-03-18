@@ -1199,7 +1199,7 @@ function showImportPreview(json){
 }
 
 /* ══════════ DRAWER ══════════ */
-function setHTML(el,html){var d=new DOMParser().parseFromString("<template>"+html+"</template>","text/html");var t=d.querySelector("template");el.textContent="";if(t)el.appendChild(document.importNode(t.content,true))}
+function setHTML(el,html){var t=document.createElement("template");t.innerHTML=html;el.textContent="";el.appendChild(t.content.cloneNode(true))}
 function openDrawer(title,bodyHtml,footHtml){
   dTitle.textContent=title;
   setHTML(dBody,bodyHtml);setHTML(dFoot,footHtml||"");
