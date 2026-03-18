@@ -590,7 +590,7 @@ footer strong{color:var(--accent);font-weight:600}
     <button class="primary">Board Ready</button><button>High Severity</button><button>Recurring</button><button>Low Evidence</button><button>Overdue</button>
   </div>
   <div class="card">
-    <table><thead><tr><th>Finding</th><th>System</th><th>RMF Step</th><th>Sev</th><th>BRQ</th><th>Evidence</th><th>Recur</th><th>Action</th></tr></thead><tbody id="boardTbody"></tbody></table>
+    <table><thead><tr><th>Finding</th><th>System</th><th>Sev</th><th>BRQ</th><th>DEG</th><th>CG</th><th>RMF Step</th><th>Control</th><th>Recur</th><th>Action</th></tr></thead><tbody id="boardTbody"></tbody></table>
   </div>
   <div class="grid3" id="boardDetail">
     <div class="card" id="bdRisk"><h3>Risk / Impact</h3></div>
@@ -893,7 +893,7 @@ var roleVis={
   admin:{roles:1,dash:1,systems:1,find:1,board:1,poam:1,trends:1,mem:1,admin:1,audit:1,land:"admin"},
   auditor:{roles:1,dash:0,systems:0,find:0,board:0,poam:0,trends:1,mem:1,admin:0,audit:1,land:"audit"}
 };
-function getRole(){return (document.getElementById("roleSelect")||{}).value||"analyst"}
+function getRole(){return (document.getElementById("roleSel")||{}).value||"analyst"}
 function applyRole(go){
   var r=getRole();var v=roleVis[r]||roleVis.analyst;
   tabs.forEach(function(t){var k=t.getAttribute("data-t");t.style.display=v[k]?"":"none"});
@@ -928,7 +928,7 @@ function refreshSessionActor(){
 function getActorStamp(){
   return {actorId:SESSION_ACTOR.actorId,edipi:SESSION_ACTOR.edipi,role:SESSION_ACTOR.role,actorMode:SESSION_ACTOR.actorMode,sessionId:SESSION_ACTOR.sessionId,ts:new Date().toISOString()};
 }
-var roleSel=document.getElementById("roleSelect");
+var roleSel=document.getElementById("roleSel");
 if(roleSel)roleSel.addEventListener("change",function(){refreshSessionActor();applyRole(true)});
 document.querySelectorAll(".role-card[data-role]").forEach(function(c){
   c.addEventListener("click",function(){if(roleSel){roleSel.value=c.getAttribute("data-role");}refreshSessionActor();applyRole(true)});
@@ -2253,6 +2253,18 @@ document.querySelectorAll("[data-bdec]").forEach(function(btn){
   });
 });
 
+/* wire board decision buttons */
+var boardBtnMap={"btnBoardApprove":"Approve","btnBoardReturnEv":"Return for Evidence","btnBoardIssuePatch":"Issue Patch","btnBoardPoamReq":"POA&M Required","btnBoardSendBack":"Send Back","btnBoardEscalate":"Escalate","btnRecordDecision":"Record Decision"};
+Object.keys(boardBtnMap).forEach(function(bid){
+  var b=document.getElementById(bid);
+  if(b)b.addEventListener("click",function(){
+    if(!boardActiveFid){toast("Select a finding first","warn");return;}
+    openBoardDecisionDrawer(boardActiveFid,boardBtnMap[bid]);
+  });
+});
+var expPktBtn=document.getElementById("btnExportPacket");
+if(expPktBtn)expPktBtn.addEventListener("click",function(){downloadJSON(buildExportPackage(),"board_packet.json")});
+
 var boardTimerInterval=null,boardTimerStart=null;
 function startBoardTimer(){
   boardTimerStart=Date.now();
@@ -2261,15 +2273,31 @@ function startBoardTimer(){
   boardTimerInterval=setInterval(function(){
     var s=Math.floor((Date.now()-boardTimerStart)/1000);
     var m=Math.floor(s/60);s=s%60;
-    if(el)el.textContent="Session: "+(m<10?"0":"")+m+":"+(s<10?"0":"")+s;
+    if(el)el.textContent=(m<10?"0":"")+m+":"+(s<10?"0":"")+s;
   },1000);
 }
 
 /* ══════════ POA&M ══════════ */
 function renderPoam(){
   var tbody=document.getElementById("poamTbody");if(!tbody)return;
+  /* populate system dropdown if needed */
+  var poamSysFlt=document.getElementById("poamFltSystem");
+  if(poamSysFlt&&poamSysFlt.options.length<=1){
+    Object.keys(SYS).forEach(function(sk){
+      var opt=document.createElement("option");opt.value=SYS[sk].id;opt.textContent=SYS[sk].id+" — "+SYS[sk].name;
+      poamSysFlt.appendChild(opt);
+    });
+  }
+  /* read filters */
+  var pfStatus=(document.getElementById("poamFltStatus")||{}).value||"";
+  var pfSystem=(document.getElementById("poamFltSystem")||{}).value||"";
+  var pfSearch=((document.getElementById("poamFltSearch")||{}).value||"").toLowerCase();
   var h="";
-  Object.keys(POAM).forEach(function(k){
+  var keys=Object.keys(POAM);
+  if(pfStatus)keys=keys.filter(function(k){return POAM[k].status===pfStatus});
+  if(pfSystem)keys=keys.filter(function(k){return POAM[k].systemId===pfSystem});
+  if(pfSearch)keys=keys.filter(function(k){var p=POAM[k];return (p.id.toLowerCase().indexOf(pfSearch)>-1||p.milestone.toLowerCase().indexOf(pfSearch)>-1||p.owner.toLowerCase().indexOf(pfSearch)>-1)});
+  keys.forEach(function(k){
     var p=POAM[k];
     var f=RF[p.findingId.replace("RF-","")]||{};
     var sysName=(SYS[p.systemId]||{}).name||p.systemId;
@@ -2340,6 +2368,12 @@ document.getElementById("poamTbody").addEventListener("click",function(e){
       toast(p.id+" advanced to "+newPct+"%"+(newPct>=100?" — COMPLETED":""),"ok");
     });
   }
+});
+
+/* wire POA&M filters */
+["poamFltStatus","poamFltSystem","poamFltSearch"].forEach(function(id){
+  var el=document.getElementById(id);
+  if(el)el.addEventListener(el.type==="text"?"keyup":"change",function(){renderPoam()});
 });
 
 /* ══════════ DASHBOARD ══════════ */
@@ -2423,7 +2457,7 @@ function renderDashboard(){
       var pct=allF.length>0?Math.round(cnt/allF.length*100):0;
       sh+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><span style="width:70px;font-size:9px;color:var(--muted)">'+st+'</span><div style="flex:1;height:14px;background:#141e2d;border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--accent);border-radius:4px;transition:width .5s"></div></div><span style="font-size:9px;width:30px;text-align:right">'+cnt+'</span></div>';
     });
-    setHTML(stepDist,sh);
+    setHTML(stepDist,'<h3>RMF Step Distribution</h3>'+sh);
   }
 
   // High Risk Systems strip
@@ -2506,7 +2540,7 @@ function renderTrends(){
       var pct=allF.length>0?Math.round(cnt/allF.length*100):0;
       sh+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span style="width:75px;font-size:9px" class="badge '+(rmfStepClass[st]||"")+'">'+st+'</span><div style="flex:1;height:16px;background:#141e2d;border-radius:4px;overflow:hidden;position:relative"><div style="height:100%;width:'+pct+'%;background:var(--accent);border-radius:4px"></div></div><span style="font-size:9px;width:50px;text-align:right">'+open+' open</span></div>';
     });
-    setHTML(stepChart,sh);
+    setHTML(stepChart,'<h3>RMF Step Progression</h3>'+sh);
   }
 
   // Control Families at Risk
@@ -2521,7 +2555,7 @@ function renderTrends(){
       var pct=openF.length>0?Math.round(cnt/openF.length*100):0;
       fh+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:10px"><span style="width:140px;color:var(--muted)">'+escHTML(fam)+'</span><div style="flex:1;height:10px;background:#141e2d;border-radius:3px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--'+(cnt>=3?"bad":cnt>=2?"warn":"accent")+');border-radius:3px"></div></div><span style="width:20px;text-align:right">'+cnt+'</span></div>';
     });
-    setHTML(famTable,fh);
+    setHTML(famTable,'<h3>Control Families at Risk</h3>'+fh);
   }
 
   // Severity x Lag heatmap
@@ -2556,7 +2590,7 @@ function renderTrends(){
       var avg=degs.length>0?Math.round(degs.reduce(function(a,b){return a+b},0)/degs.length):0;
       ph+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:10px"><span style="width:120px;color:var(--muted)">'+escHTML(s.name.substring(0,20))+'</span><div style="flex:1;height:10px;background:#141e2d;border-radius:3px;overflow:hidden"><div style="height:100%;width:'+Math.min(100,avg*5)+'%;background:var(--'+(avg>10?"bad":avg>5?"warn":"ok")+');border-radius:3px"></div></div><span style="width:30px;text-align:right">'+avg+'d</span></div>';
     });
-    setHTML(pltEl,ph);
+    setHTML(pltEl,'<h3>Patch Latency by System</h3>'+ph);
   }
 
   // Reopening Trend
@@ -2573,7 +2607,7 @@ function renderTrends(){
       });
       rh+='</div>';
     }
-    setHTML(reopEl,rh);
+    setHTML(reopEl,'<h3>Reopening Trend</h3>'+rh);
   }
 }
 
@@ -2719,9 +2753,9 @@ function renderMG(){
         var sysKey=Object.keys(SYS).find(function(k){return SYS[k].name.indexOf(nd.label.substring(0,8))>-1});
         if(sysKey){var sys=SYS[sysKey];
           body+='<div class="wr"><span class="wl">System</span><span class="wv">'+escHTML(sys.name)+'</span></div>';
-          body+='<div class="wr"><span class="wl">RMF Step</span><span class="wv">'+escHTML(sys.rmfStep)+'</span></div>';
-          body+='<div class="wr"><span class="wl">Auth Status</span><span class="wv">'+escHTML(sys.authStatus)+'</span></div>';
-          body+='<div class="wr"><span class="wl">LPS</span><span class="wv">'+sys.lps+'</span></div>';
+          body+='<div class="wr"><span class="wl">RMF Step</span><span class="wv">'+escHTML(sys.currentRMFStep)+'</span></div>';
+          body+='<div class="wr"><span class="wl">Auth Status</span><span class="wv">'+escHTML(sys.authorizationStatus)+'</span></div>';
+          body+='<div class="wr"><span class="wl">LPS</span><span class="wv">'+computeLPS(sys.id)+'</span></div>';
         }
       } else if(nd.type==="pattern"){
         body+='<div class="wr"><span class="wl">Pattern</span><span class="wv" style="color:var(--mag)">'+escHTML(nd.label)+'</span></div>';
@@ -2773,14 +2807,14 @@ function renderMG(){
   var gs=document.getElementById("graphStats");
   if(gs){
     var typeCounts={};visNodes.forEach(function(n){typeCounts[n.type]=(typeCounts[n.type]||0)+1});
-    gs.innerHTML='<div class="wr"><span class="wl">Total Nodes</span><span class="wv" style="color:var(--accent)">'+visNodes.length+'</span></div>'+
+    setHTML(gs,'<div class="wr"><span class="wl">Total Nodes</span><span class="wv" style="color:var(--accent)">'+visNodes.length+'</span></div>'+
       '<div class="wr"><span class="wl">Total Edges</span><span class="wv" style="color:var(--accent)">'+visEdges.length+'</span></div>'+
       '<div class="wr"><span class="wl">System Nodes</span><span class="wv">'+(typeCounts.system||0)+'</span></div>'+
       '<div class="wr"><span class="wl">Finding Nodes</span><span class="wv">'+(typeCounts.finding||0)+'</span></div>'+
       '<div class="wr"><span class="wl">Control Nodes</span><span class="wv">'+(typeCounts.control||0)+'</span></div>'+
       '<div class="wr"><span class="wl">Patch Nodes</span><span class="wv">'+(typeCounts.patch||0)+'</span></div>'+
       '<div class="wr"><span class="wl">POA&M Nodes</span><span class="wv">'+(typeCounts.poam||0)+'</span></div>'+
-      '<div class="wr"><span class="wl">Pattern Nodes</span><span class="wv">'+(typeCounts.pattern||0)+'</span></div>';
+      '<div class="wr"><span class="wl">Pattern Nodes</span><span class="wv">'+(typeCounts.pattern||0)+'</span></div>');
   }
 
   /* reusable patch history */
@@ -3196,6 +3230,8 @@ renderSparklines();
 
 /* ── KPI card click → drawer detail ── */
 document.getElementById("s-dash").addEventListener("click",function(e){
+  var nav=e.target.closest("[data-nav]");
+  if(nav){openTab(nav.getAttribute("data-nav"));return;}
   var card=e.target.closest("[data-kpi]");if(!card)return;
   var k=card.getAttribute("data-kpi");
   var title=card.querySelector(".kfull")?card.querySelector(".kfull").textContent:"KPI Detail";
@@ -3216,9 +3252,9 @@ document.getElementById("s-dash").addEventListener("click",function(e){
     body+='<div class="wr"><span class="wl">Not Authorized</span><span class="wv" style="color:var(--bad)">'+unauth.length+'</span></div>';
     unauth.forEach(function(s){body+='<div class="wr"><span class="wl">'+escHTML(s.id)+'</span><span class="wv">'+escHTML(s.authorizationStatus)+'</span></div>';});
   }else if(k==="high"){
-    var high=Object.values(RF).filter(function(f){return f.sev==="HIGH"&&f.status!=="Closed"});
-    body+='<div class="wr"><span class="wl">Open HIGH</span><span class="wv" style="color:var(--bad)">'+high.length+'</span></div>';
-    high.forEach(function(f){body+='<div class="wr" style="cursor:pointer" data-drill="'+f.id+'"><span class="wl mono" style="color:var(--accent)">'+escHTML(f.id)+'</span><span class="wv">'+escHTML(f.title)+'</span></div>';});
+    var highKeys=Object.keys(RF).filter(function(fk){var f=RF[fk];return f.sev==="HIGH"&&f.status!=="Closed"});
+    body+='<div class="wr"><span class="wl">Open HIGH</span><span class="wv" style="color:var(--bad)">'+highKeys.length+'</span></div>';
+    highKeys.forEach(function(fk){var f=RF[fk];body+='<div class="wr" style="cursor:pointer" data-drill="'+fk+'"><span class="wl mono" style="color:var(--accent)">'+escHTML(f.id)+'</span><span class="wv">'+escHTML(f.title)+'</span></div>';});
   }else if(k==="poamdue"){
     var overdue=Object.values(POAM).filter(function(p){return p.status==="Overdue"});
     body+='<div class="wr"><span class="wl">Overdue</span><span class="wv" style="color:var(--bad)">'+overdue.length+'</span></div>';
@@ -3235,7 +3271,7 @@ document.getElementById("s-dash").addEventListener("click",function(e){
     body+='<div class="wr"><span class="wl">Above Target</span><span class="wv" style="color:var(--bad)">'+above.length+' findings</span></div>';
     degIds.forEach(function(fk){
       var f=RF[fk];var dc=parseInt(f.deg)>7?"bad":parseInt(f.deg)>5?"warn":"ok";
-      body+='<div class="wr" style="cursor:pointer" data-drill="'+f.id+'"><span class="wl mono" style="color:var(--accent)">'+escHTML(f.id)+'</span><span class="wv" style="color:var(--'+dc+')">'+f.deg+'d</span></div>';
+      body+='<div class="wr" style="cursor:pointer" data-drill="'+fk+'"><span class="wl mono" style="color:var(--accent)">'+escHTML(f.id)+'</span><span class="wv" style="color:var(--'+dc+')">'+f.deg+'d</span></div>';
     });
   }else if(k==="sysassess"){
     var assessing=Object.values(SYS).filter(function(s){return s.currentRMFStep==="Assess"});
@@ -3246,13 +3282,13 @@ document.getElementById("s-dash").addEventListener("click",function(e){
     body+='<div class="wr"><span class="wl">In Monitoring</span><span class="wv">'+monitoring.length+'</span></div>';
     monitoring.forEach(function(s){body+='<div class="wr"><span class="wl">'+escHTML(s.id)+'</span><span class="wv">'+escHTML(s.name)+'</span></div>';});
   }else if(k==="contra"){
-    var contras=Object.values(RF).filter(function(f){return f.contradictionFlag&&f.status!=="Closed"});
-    body+='<div class="wr"><span class="wl">Contradictions</span><span class="wv" style="color:var(--bad)">'+contras.length+'</span></div>';
-    contras.forEach(function(f){body+='<div class="wr" style="cursor:pointer" data-drill="'+f.id+'"><span class="wl mono" style="color:var(--accent)">'+escHTML(f.id)+'</span><span class="wv">'+escHTML(f.title)+'</span></div>';});
+    var contraKeys=Object.keys(RF).filter(function(fk){var f=RF[fk];return f.contradictionFlag&&f.status!=="Closed"});
+    body+='<div class="wr"><span class="wl">Contradictions</span><span class="wv" style="color:var(--bad)">'+contraKeys.length+'</span></div>';
+    contraKeys.forEach(function(fk){var f=RF[fk];body+='<div class="wr" style="cursor:pointer" data-drill="'+fk+'"><span class="wl mono" style="color:var(--accent)">'+escHTML(f.id)+'</span><span class="wv">'+escHTML(f.title)+'</span></div>';});
   }else if(k==="reopen"){
-    var reopened=Object.values(RF).filter(function(f){return f.status==="Reopened"});
-    body+='<div class="wr"><span class="wl">Reopened</span><span class="wv" style="color:var(--bad)">'+reopened.length+'</span></div>';
-    reopened.forEach(function(f){body+='<div class="wr" style="cursor:pointer" data-drill="'+f.id+'"><span class="wl mono" style="color:var(--accent)">'+escHTML(f.id)+'</span><span class="wv">'+escHTML(f.title)+'</span></div>';});
+    var reopenKeys=Object.keys(RF).filter(function(fk){return RF[fk].status==="Reopened"});
+    body+='<div class="wr"><span class="wl">Reopened</span><span class="wv" style="color:var(--bad)">'+reopenKeys.length+'</span></div>';
+    reopenKeys.forEach(function(fk){var f=RF[fk];body+='<div class="wr" style="cursor:pointer" data-drill="'+fk+'"><span class="wl mono" style="color:var(--accent)">'+escHTML(f.id)+'</span><span class="wv">'+escHTML(f.title)+'</span></div>';});
   }else if(k==="famrisk"){
     var families={};Object.values(RF).filter(function(f){return f.status!=="Closed"}).forEach(function(f){families[f.family]=(families[f.family]||0)+1});
     var atRisk=Object.keys(families).filter(function(fk){return families[fk]>=2});
@@ -3268,6 +3304,12 @@ document.getElementById("s-dash").addEventListener("click",function(e){
   openDrawer(title,body,'');
   wireDrillLinks();
 });
+
+/* wire printBtn and btnExportFindings */
+var printBtn=document.getElementById("printBtn");
+if(printBtn)printBtn.addEventListener("click",function(){window.print()});
+var expFindBtn=document.getElementById("btnExportFindings");
+if(expFindBtn)expFindBtn.addEventListener("click",function(){downloadJSON(buildExportPackage(),"rmf_findings_export.json");toast("Exported","ok")});
 
 // Board timer starts when board tab is opened
 var origOpenTab=openTab;
