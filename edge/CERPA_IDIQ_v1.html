@@ -129,6 +129,10 @@ button.danger{border-color:rgba(255,107,107,.35);color:var(--bad)}
 .ev:last-child{border:none}
 .ev-ok{color:var(--ok);font-size:13px}.ev-miss{color:var(--bad);font-size:13px}
 .ev-upload{font-size:8px;padding:2px 8px;border-radius:4px;border:1px solid rgba(125,249,255,.25);background:rgba(125,249,255,.05);color:var(--accent);cursor:pointer;margin-left:6px}
+.ev-validate{font-size:8px;padding:2px 8px;border-radius:4px;border:1px solid rgba(93,255,147,.25);background:rgba(93,255,147,.05);color:var(--ok);cursor:pointer;margin-left:6px}
+.ev-type{font-size:7px;padding:1px 5px;border-radius:3px;border:1px solid rgba(125,249,255,.15);color:var(--accent);margin-left:4px}
+.ev-path{font-size:9px;color:var(--muted);margin-left:22px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90%}
+.ev-desc{font-size:9px;color:#4a5a6e;margin-left:22px;font-style:italic}
 .role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .role-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;position:relative;overflow:hidden;transition:all .25s;cursor:pointer}
 .role-card:hover{border-color:rgba(125,249,255,.3);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
@@ -912,7 +916,7 @@ var F={
   rootCause:"Vendor deliverable checklist does not include PWS appendix cross-reference",
   patch:"Implement standardized deliverable checklist with PWS cross-reference + re-submit with appendix",
   applyDecision:"Pending board review",
-  evidence:[{name:"CDRL_A003_package.pdf",ok:1},{name:"PWS_appendix_C.pdf",ok:0},{name:"COR_rejection_memo.pdf",ok:1}],
+  evidence:[{type:"Document",name:"CDRL_A003_package.pdf",path:"\\\\share\\contracts\\TO-1003\\evidence\\CDRL_A003_package.pdf",description:"Submitted CDRL A003 deliverable package for acceptance review",source:"Common Path",ok:1,docId:"CDRL-A003-2026-03",addedByRole:"cor",addedByEdipi:"",addedAt:"2026-04-10T09:15:00Z"},{type:"Document",name:"PWS_appendix_C.pdf",path:"\\\\share\\contracts\\TO-1003\\evidence\\PWS_appendix_C.pdf",description:"PWS Appendix C technical specifications — missing from original submission",source:"Common Path",ok:0,docId:"",addedByRole:"cor",addedByEdipi:"",addedAt:"2026-04-11T10:30:00Z"},{type:"Signed Memo",name:"COR_rejection_memo.pdf",path:"\\\\share\\contracts\\TO-1003\\evidence\\COR_rejection_memo.pdf",description:"COR formal rejection memo citing missing appendix per DFARS clause",source:"Common Path",ok:1,docId:"MEMO-301-R1",addedByRole:"cor",addedByEdipi:"",addedAt:"2026-04-11T14:00:00Z"}],
   auditChain:["CL-301","E-301","R-301"],
   timeline:["Apr 10","Apr 11","Apr 14","Apr 18","—"],tlState:[1,1,2,1,0]},
 "302":{id:"F-302",title:"Task Order milestone slipped 21 days without approved baseline update",status:"Closed",sev:"MED",claimCat:"Contract Compliance",claimType:"Timeline Adherence",taskOrder:"TO-1001",contract:"N00178-24-D-0042",vendor:"Sierra Dynamics",owner:"J. Torres",reviewer:"CO",brq:0.95,cg:8,deg:"3d",due:"—",recurring:0,financialImpact:"Minimal — absorbed in margin",scheduleImpact:"21-day slip recovered",contractRisk:false,linked:[],
@@ -922,7 +926,7 @@ var F={
   rootCause:"Informal schedule adjustment not routed through formal baseline change process",
   patch:"Formal baseline change request submitted and approved + process training for vendor PM",
   applyDecision:"Closed — CO approved correction, baseline updated",
-  evidence:[{name:"baseline_change_request.pdf",ok:1},{name:"IMS_comparison.xlsx",ok:1},{name:"CO_approval_memo.pdf",ok:1},{name:"process_training_cert.pdf",ok:1}],
+  evidence:[{type:"Document",name:"baseline_change_request.pdf",path:"\\\\share\\contracts\\TO-1001\\evidence\\baseline_change_request.pdf",description:"Formal baseline change request for Milestone 3.2 schedule adjustment",source:"Common Path",ok:1,docId:"BCR-302-01",addedByRole:"pm",addedByEdipi:"",addedAt:"2026-03-18T11:00:00Z"},{type:"Artifact",name:"IMS_comparison.xlsx",path:"\\\\share\\contracts\\TO-1001\\evidence\\IMS_comparison.xlsx",description:"IMS comparison showing original vs. updated milestone dates",source:"SharePoint",ok:1,docId:"",addedByRole:"pm",addedByEdipi:"",addedAt:"2026-03-19T08:45:00Z"},{type:"Signed Memo",name:"CO_approval_memo.pdf",path:"\\\\share\\contracts\\TO-1001\\evidence\\CO_approval_memo.pdf",description:"CO approval memo authorizing baseline update",source:"Common Path",ok:1,docId:"MEMO-302-A1",addedByRole:"cor",addedByEdipi:"",addedAt:"2026-03-25T16:00:00Z"},{type:"Document",name:"process_training_cert.pdf",path:"\\\\share\\contracts\\TO-1001\\evidence\\process_training_cert.pdf",description:"Vendor PM process training completion certificate",source:"Share Drive",ok:1,docId:"",addedByRole:"pm",addedByEdipi:"",addedAt:"2026-03-28T10:30:00Z"}],
   auditChain:["CL-302","E-302","R-302","P-302","A-302"],
   timeline:["Mar 18","Mar 19","Mar 22","Mar 25","Apr 01"],tlState:[1,1,1,1,1]},
 "303":{id:"F-303",title:"Invoice line items do not reconcile with approved labor categories",status:"In Review",sev:"HIGH",claimCat:"Financial",claimType:"Invoice Accuracy",taskOrder:"TO-1003",contract:"N00178-24-D-0042",vendor:"Apex Systems",owner:"Budget Analyst",reviewer:"CO",brq:0.72,cg:22,deg:"10d",due:"Apr 25",recurring:2,financialImpact:"$127,000 disputed amount",scheduleImpact:"Payment hold — 30-day delay",contractRisk:true,linked:["F-309"],
@@ -932,7 +936,7 @@ var F={
   rootCause:"Vendor billing system not updated after contract modification 003",
   patch:"Reconcile rates against mod 003 + resubmit corrected invoice + update vendor billing config",
   applyDecision:"Pending — awaiting corrected invoice",
-  evidence:[{name:"invoice_INV-2026-03.pdf",ok:1},{name:"rate_schedule_comparison.xlsx",ok:1},{name:"mod_003_document.pdf",ok:1},{name:"corrected_invoice.pdf",ok:0}],
+  evidence:[{type:"Document",name:"invoice_INV-2026-03.pdf",path:"\\\\share\\contracts\\TO-1003\\evidence\\invoice_INV-2026-03.pdf",description:"Monthly invoice #INV-2026-03 with disputed labor categories",source:"Common Path",ok:1,docId:"INV-2026-03",addedByRole:"analyst",addedByEdipi:"",addedAt:"2026-04-02T09:00:00Z"},{type:"Artifact",name:"rate_schedule_comparison.xlsx",path:"\\\\share\\contracts\\TO-1003\\evidence\\rate_schedule_comparison.xlsx",description:"Rate schedule comparison — contract ceiling vs. billed rates",source:"SharePoint",ok:1,docId:"",addedByRole:"analyst",addedByEdipi:"",addedAt:"2026-04-03T11:20:00Z"},{type:"Document",name:"mod_003_document.pdf",path:"\\\\share\\contracts\\TO-1003\\evidence\\mod_003_document.pdf",description:"Contract modification 003 with updated rate schedule",source:"Common Path",ok:1,docId:"MOD-003",addedByRole:"cor",addedByEdipi:"",addedAt:"2026-04-03T14:00:00Z"},{type:"Document",name:"corrected_invoice.pdf",path:"\\\\share\\contracts\\TO-1003\\evidence\\corrected_invoice.pdf",description:"Corrected invoice pending vendor resubmission",source:"Common Path",ok:0,docId:"",addedByRole:"analyst",addedByEdipi:"",addedAt:"2026-04-06T08:00:00Z"}],
   auditChain:["CL-303","E-303","R-303"],
   timeline:["Apr 02","Apr 03","Apr 06","Apr 12","—"],tlState:[1,1,2,1,0]},
 "304":{id:"F-304",title:"Key personnel position vacant for 34 days",status:"Assigned",sev:"HIGH",claimCat:"Resource",claimType:"Key Personnel",taskOrder:"TO-1003",contract:"N00178-24-D-0042",vendor:"Apex Systems",owner:"D. Walsh",reviewer:"COR",brq:0.45,cg:34,deg:"—",due:"May 05",recurring:0,financialImpact:"$85,000 estimated productivity loss",scheduleImpact:"Ops tempo reduced 30%",contractRisk:true,linked:["F-305"],
@@ -942,7 +946,7 @@ var F={
   rootCause:"Insufficient bench depth for TS/SCI cleared cybersecurity leadership positions",
   patch:"Activate interim CISO from bench + accelerate recruitment + request contract modification for temp staffing",
   applyDecision:"Pending — vendor remediation plan due May 05",
-  evidence:[{name:"KP_vacancy_report.pdf",ok:1},{name:"recruitment_plan.pdf",ok:0},{name:"interim_staffing_memo.pdf",ok:0}],
+  evidence:[{type:"Document",name:"KP_vacancy_report.pdf",path:"\\\\share\\contracts\\TO-1003\\evidence\\KP_vacancy_report.pdf",description:"Key personnel vacancy report showing 34-day CISO gap",source:"Common Path",ok:1,docId:"KP-304-01",addedByRole:"cor",addedByEdipi:"",addedAt:"2026-04-01T10:00:00Z"},{type:"Document",name:"recruitment_plan.pdf",path:"\\\\share\\contracts\\TO-1003\\evidence\\recruitment_plan.pdf",description:"Vendor recruitment plan for TS/SCI CISO replacement — pending submission",source:"Common Path",ok:0,docId:"",addedByRole:"pm",addedByEdipi:"",addedAt:"2026-04-03T09:00:00Z"},{type:"Signed Memo",name:"interim_staffing_memo.pdf",path:"\\\\share\\contracts\\TO-1003\\evidence\\interim_staffing_memo.pdf",description:"Interim CISO staffing memo — pending bench activation",source:"Common Path",ok:0,docId:"",addedByRole:"pm",addedByEdipi:"",addedAt:"2026-04-03T09:30:00Z"}],
   auditChain:["CL-304","E-304"],
   timeline:["Apr 01","Apr 03","—","—","—"],tlState:[1,1,0,0,0]},
 "305":{id:"F-305",title:"Subcontractor clearance lapse created execution risk",status:"Assigned",sev:"HIGH",claimCat:"Resource",claimType:"Clearance Status",taskOrder:"TO-1003",contract:"N00178-24-D-0042",vendor:"Apex Systems",owner:"K. Okafor",reviewer:"FSO",brq:0.40,cg:28,deg:"—",due:"May 01",recurring:0,financialImpact:"$42,000 rework cost",scheduleImpact:"Deliverable access restricted",contractRisk:true,linked:["F-304"],
@@ -952,7 +956,7 @@ var F={
   rootCause:"Clearance renewal tracking not integrated with contract personnel management system",
   patch:"Initiate clearance renewal + implement automated expiry tracking + cross-check all sub clearances",
   applyDecision:"Pending — clearance renewal submitted",
-  evidence:[{name:"clearance_expiry_notice.pdf",ok:1},{name:"renewal_submission.pdf",ok:1},{name:"access_suspension_memo.pdf",ok:1}],
+  evidence:[{type:"Document",name:"clearance_expiry_notice.pdf",path:"\\\\share\\contracts\\TO-1003\\evidence\\clearance_expiry_notice.pdf",description:"Security office clearance expiry notice for D. Walsh",source:"Common Path",ok:1,docId:"SEC-305-01",addedByRole:"cor",addedByEdipi:"",addedAt:"2026-04-05T08:00:00Z"},{type:"Document",name:"renewal_submission.pdf",path:"\\\\share\\contracts\\TO-1003\\evidence\\renewal_submission.pdf",description:"Clearance renewal submission confirmation",source:"Share Drive",ok:1,docId:"",addedByRole:"cor",addedByEdipi:"",addedAt:"2026-04-06T10:15:00Z"},{type:"Signed Memo",name:"access_suspension_memo.pdf",path:"\\\\share\\contracts\\TO-1003\\evidence\\access_suspension_memo.pdf",description:"Formal access suspension memo pending clearance reinstatement",source:"Common Path",ok:1,docId:"MEMO-305-S1",addedByRole:"cor",addedByEdipi:"",addedAt:"2026-04-05T11:00:00Z"}],
   auditChain:["CL-305","E-305"],
   timeline:["Apr 05","Apr 06","—","—","—"],tlState:[1,1,0,0,0]},
 "306":{id:"F-306",title:"Configuration control evidence incomplete for delivered technical baseline",status:"Patch Approved",sev:"MED",claimCat:"Technical",claimType:"Configuration Management",taskOrder:"TO-1004",contract:"N00178-24-D-0042",vendor:"Northbridge Solutions",owner:"L. Gomez",reviewer:"QA Board",brq:0.78,cg:20,deg:"6d",due:"Apr 22",recurring:0,financialImpact:"Minimal",scheduleImpact:"Acceptance delayed 10 days",contractRisk:false,linked:["F-301","F-312"],
@@ -962,7 +966,7 @@ var F={
   rootCause:"CM process relies on informal version tracking not aligned with contract CDRL requirements",
   patch:"Generate CI list from repo + create formal version trace document + update CM SOP",
   applyDecision:"Patch approved — awaiting evidence upload",
-  evidence:[{name:"CI_list_v2.1.xlsx",ok:1},{name:"version_trace_doc.pdf",ok:1},{name:"CM_SOP_updated.pdf",ok:0}],
+  evidence:[{type:"Artifact",name:"CI_list_v2.1.xlsx",path:"\\\\share\\contracts\\TO-1004\\evidence\\CI_list_v2.1.xlsx",description:"Configuration item list generated from repo for baseline 2.1",source:"SharePoint",ok:1,docId:"CI-306-01",addedByRole:"pm",addedByEdipi:"",addedAt:"2026-03-28T14:00:00Z"},{type:"Document",name:"version_trace_doc.pdf",path:"\\\\share\\contracts\\TO-1004\\evidence\\version_trace_doc.pdf",description:"Formal version trace document for delivered software baseline",source:"Common Path",ok:1,docId:"",addedByRole:"pm",addedByEdipi:"",addedAt:"2026-03-29T09:30:00Z"},{type:"Document",name:"CM_SOP_updated.pdf",path:"\\\\share\\contracts\\TO-1004\\evidence\\CM_SOP_updated.pdf",description:"Updated CM SOP aligning informal version tracking with CDRL requirements",source:"Common Path",ok:0,docId:"",addedByRole:"pm",addedByEdipi:"",addedAt:"2026-04-02T10:00:00Z"}],
   auditChain:["CL-306","E-306","R-306","P-306"],
   timeline:["Mar 28","Mar 29","Apr 02","Apr 08","—"],tlState:[1,1,1,1,0]},
 "307":{id:"F-307",title:"Monthly status report omitted required KPI data",status:"Closed",sev:"LOW",claimCat:"Communication",claimType:"Status Reporting",taskOrder:"TO-1002",contract:"N00178-24-D-0042",vendor:"TechForward LLC",owner:"M. Chen",reviewer:"COR",brq:0.92,cg:12,deg:"2d",due:"—",recurring:0,financialImpact:"None",scheduleImpact:"None",contractRisk:false,linked:["F-311"],
@@ -972,7 +976,7 @@ var F={
   rootCause:"Report template not updated after KPI requirements added in contract mod 002",
   patch:"Update report template + resubmit March report + add template version check to QC process",
   applyDecision:"Closed — corrected report accepted by COR",
-  evidence:[{name:"original_report.pdf",ok:1},{name:"corrected_report.pdf",ok:1},{name:"updated_template.docx",ok:1},{name:"COR_acceptance.pdf",ok:1}],
+  evidence:[{type:"Document",name:"original_report.pdf",path:"\\\\share\\contracts\\TO-1002\\evidence\\original_report.pdf",description:"Original March status report with missing KPI metrics",source:"Common Path",ok:1,docId:"RPT-307-01",addedByRole:"cor",addedByEdipi:"",addedAt:"2026-03-22T09:00:00Z"},{type:"Document",name:"corrected_report.pdf",path:"\\\\share\\contracts\\TO-1002\\evidence\\corrected_report.pdf",description:"Corrected March report with all 8 required KPI metrics",source:"Common Path",ok:1,docId:"RPT-307-02",addedByRole:"pm",addedByEdipi:"",addedAt:"2026-03-24T15:00:00Z"},{type:"Artifact",name:"updated_template.docx",path:"\\\\share\\contracts\\TO-1002\\evidence\\updated_template.docx",description:"Updated report template incorporating mod 002 KPI requirements",source:"SharePoint",ok:1,docId:"",addedByRole:"pm",addedByEdipi:"",addedAt:"2026-03-25T10:00:00Z"},{type:"Signed Memo",name:"COR_acceptance.pdf",path:"\\\\share\\contracts\\TO-1002\\evidence\\COR_acceptance.pdf",description:"COR acceptance memo for corrected March deliverable",source:"Common Path",ok:1,docId:"MEMO-307-A1",addedByRole:"cor",addedByEdipi:"",addedAt:"2026-03-27T14:30:00Z"}],
   auditChain:["CL-307","E-307","R-307","P-307","A-307"],
   timeline:["Mar 22","Mar 23","Mar 24","Mar 25","Mar 27"],tlState:[1,1,1,1,1]},
 "308":{id:"F-308",title:"SLA threshold missed on help desk response time",status:"In Review",sev:"HIGH",claimCat:"Performance",claimType:"SLA Achievement",taskOrder:"TO-1003",contract:"N00178-24-D-0042",vendor:"Apex Systems",owner:"K. Okafor",reviewer:"COR",brq:0.85,cg:15,deg:"5d",due:"Apr 20",recurring:1,financialImpact:"$18,000 SLA penalty exposure",scheduleImpact:"User satisfaction impact",contractRisk:true,linked:[],
@@ -982,7 +986,7 @@ var F={
   rootCause:"Staffing reduction during key personnel transition degraded help desk coverage",
   patch:"Restore staffing levels + implement automated ticket routing + add real-time SLA monitor",
   applyDecision:"Pending board review",
-  evidence:[{name:"SLA_dashboard_march.pdf",ok:1},{name:"ticket_analysis.xlsx",ok:1},{name:"staffing_plan.pdf",ok:0}],
+  evidence:[{type:"Screenshot",name:"SLA_dashboard_march.pdf",path:"\\\\share\\contracts\\TO-1003\\evidence\\SLA_dashboard_march.pdf",description:"March SLA dashboard showing 147% response time threshold breach",source:"Common Path",ok:1,docId:"SLA-308-01",addedByRole:"cor",addedByEdipi:"",addedAt:"2026-04-05T09:00:00Z"},{type:"Artifact",name:"ticket_analysis.xlsx",path:"\\\\share\\contracts\\TO-1003\\evidence\\ticket_analysis.xlsx",description:"Help desk ticket analysis — 18 of 30 days exceeding 15-min SLA",source:"SharePoint",ok:1,docId:"",addedByRole:"analyst",addedByEdipi:"",addedAt:"2026-04-06T11:00:00Z"},{type:"Document",name:"staffing_plan.pdf",path:"\\\\share\\contracts\\TO-1003\\evidence\\staffing_plan.pdf",description:"Help desk staffing restoration plan — pending vendor submission",source:"Common Path",ok:0,docId:"",addedByRole:"pm",addedByEdipi:"",addedAt:"2026-04-08T08:00:00Z"}],
   auditChain:["CL-308","E-308","R-308"],
   timeline:["Apr 05","Apr 06","Apr 08","Apr 12","—"],tlState:[1,1,2,1,0]},
 "309":{id:"F-309",title:"Burn rate exceeds planned spend by 18%",status:"Assigned",sev:"HIGH",claimCat:"Financial",claimType:"Burn Rate Analysis",taskOrder:"TO-1003",contract:"N00178-24-D-0042",vendor:"Apex Systems",owner:"Budget Analyst",reviewer:"CO",brq:0.48,cg:20,deg:"—",due:"May 01",recurring:0,financialImpact:"$576,000 overrun at current trajectory",scheduleImpact:"Funding exhaustion risk Q3",contractRisk:true,linked:["F-303"],
@@ -992,7 +996,7 @@ var F={
   rootCause:"Unplanned overtime for SLA recovery + interim staffing costs for key personnel gap",
   patch:"Vendor cost control plan + overtime reduction + negotiate rate adjustment for interim staff",
   applyDecision:"Pending — cost control plan due May 01",
-  evidence:[{name:"burn_rate_analysis.xlsx",ok:1},{name:"cost_control_plan.pdf",ok:0}],
+  evidence:[{type:"Artifact",name:"burn_rate_analysis.xlsx",path:"\\\\share\\contracts\\TO-1003\\evidence\\burn_rate_analysis.xlsx",description:"Quarterly burn rate analysis showing 18% overrun trajectory",source:"SharePoint",ok:1,docId:"FIN-309-01",addedByRole:"analyst",addedByEdipi:"",addedAt:"2026-04-08T10:00:00Z"},{type:"Document",name:"cost_control_plan.pdf",path:"\\\\share\\contracts\\TO-1003\\evidence\\cost_control_plan.pdf",description:"Vendor cost control plan — pending submission by May 01",source:"Common Path",ok:0,docId:"",addedByRole:"analyst",addedByEdipi:"",addedAt:"2026-04-10T08:00:00Z"}],
   auditChain:["CL-309","E-309"],
   timeline:["Apr 08","Apr 10","—","—","—"],tlState:[1,1,0,0,0]},
 "310":{id:"F-310",title:"Corrective action from prior review reopened due to weak patch durability",status:"Reopened",sev:"HIGH",claimCat:"Risk & Issue",claimType:"Corrective Actions",taskOrder:"TO-1004",contract:"N00178-24-D-0042",vendor:"Northbridge Solutions",owner:"A. Reeves",reviewer:"QA Board",brq:0.50,cg:45,deg:"14d",due:"May 10",recurring:2,financialImpact:"$35,000 rework cost",scheduleImpact:"Integration milestone at risk",contractRisk:true,linked:["F-312"],
@@ -1002,7 +1006,7 @@ var F={
   rootCause:"Validation process relies on manual test execution without automated regression",
   patch:"Implement automated regression suite + formalize validation gateway + assign dedicated QA lead",
   applyDecision:"Pending — new patch plan under review",
-  evidence:[{name:"original_closure_record.pdf",ok:1},{name:"retest_failure_report.pdf",ok:1},{name:"automated_regression_plan.pdf",ok:0}],
+  evidence:[{type:"Document",name:"original_closure_record.pdf",path:"\\\\share\\contracts\\TO-1004\\evidence\\original_closure_record.pdf",description:"Original closure record from prior corrective action cycle",source:"Common Path",ok:1,docId:"CLO-310-01",addedByRole:"cor",addedByEdipi:"",addedAt:"2026-02-15T09:00:00Z"},{type:"Document",name:"retest_failure_report.pdf",path:"\\\\share\\contracts\\TO-1004\\evidence\\retest_failure_report.pdf",description:"Quarterly re-assessment retest failure report — same category failing",source:"Common Path",ok:1,docId:"TST-310-R2",addedByRole:"cor",addedByEdipi:"",addedAt:"2026-03-01T14:00:00Z"},{type:"Document",name:"automated_regression_plan.pdf",path:"\\\\share\\contracts\\TO-1004\\evidence\\automated_regression_plan.pdf",description:"Automated regression suite implementation plan — pending review",source:"Common Path",ok:0,docId:"",addedByRole:"pm",addedByEdipi:"",addedAt:"2026-03-10T10:00:00Z"}],
   auditChain:["CL-310","E-310","R-310a","P-310a","A-310a","R-310b"],
   timeline:["Feb 15","Feb 18","Mar 01","Mar 10","Mar 20"],tlState:[1,1,1,1,3]},
 "311":{id:"F-311",title:"COR review packet missing documentation trail",status:"Patch Approved",sev:"MED",claimCat:"Communication",claimType:"Documentation Updates",taskOrder:"TO-1002",contract:"N00178-24-D-0042",vendor:"TechForward LLC",owner:"S. Kim",reviewer:"COR",brq:0.80,cg:16,deg:"5d",due:"Apr 18",recurring:0,financialImpact:"None",scheduleImpact:"Review delayed 5 days",contractRisk:false,linked:["F-307"],
@@ -1012,7 +1016,7 @@ var F={
   rootCause:"No automated packet assembly — manual collection process prone to omissions",
   patch:"Implement packet assembly checklist + centralized document repository + automated completeness check",
   applyDecision:"Patch approved — implementation in progress",
-  evidence:[{name:"review_packet_original.pdf",ok:1},{name:"meeting_minutes.pdf",ok:1},{name:"action_item_log.xlsx",ok:1},{name:"completeness_checklist.pdf",ok:0}],
+  evidence:[{type:"Document",name:"review_packet_original.pdf",path:"\\\\share\\contracts\\TO-1002\\evidence\\review_packet_original.pdf",description:"Original COR quarterly review packet with missing documents",source:"Common Path",ok:1,docId:"PKT-311-01",addedByRole:"cor",addedByEdipi:"",addedAt:"2026-03-25T09:00:00Z"},{type:"Document",name:"meeting_minutes.pdf",path:"\\\\share\\contracts\\TO-1002\\evidence\\meeting_minutes.pdf",description:"Meeting minutes previously omitted from review packet",source:"Share Drive",ok:1,docId:"",addedByRole:"pm",addedByEdipi:"",addedAt:"2026-03-26T10:00:00Z"},{type:"Artifact",name:"action_item_log.xlsx",path:"\\\\share\\contracts\\TO-1002\\evidence\\action_item_log.xlsx",description:"Action item log previously omitted from review packet",source:"SharePoint",ok:1,docId:"",addedByRole:"pm",addedByEdipi:"",addedAt:"2026-03-26T10:30:00Z"},{type:"Document",name:"completeness_checklist.pdf",path:"\\\\share\\contracts\\TO-1002\\evidence\\completeness_checklist.pdf",description:"Packet completeness checklist — pending implementation",source:"Common Path",ok:0,docId:"",addedByRole:"pm",addedByEdipi:"",addedAt:"2026-03-30T08:00:00Z"}],
   auditChain:["CL-311","E-311","R-311","P-311"],
   timeline:["Mar 25","Mar 26","Mar 30","Apr 05","—"],tlState:[1,1,1,1,0]},
 "312":{id:"F-312",title:"Integration test success claimed without signed validation artifact",status:"New",sev:"MED",claimCat:"Technical",claimType:"Integration Success",taskOrder:"TO-1004",contract:"N00178-24-D-0042",vendor:"Northbridge Solutions",owner:"L. Gomez",reviewer:"Tech Board",brq:0.35,cg:5,deg:"—",due:"May 15",recurring:0,financialImpact:"$22,000 retest cost risk",scheduleImpact:"Acceptance pending validation",contractRisk:false,linked:["F-306","F-310"],
@@ -1022,7 +1026,7 @@ var F={
   rootCause:"Test completion process does not require formal QA sign-off before reporting",
   patch:"Require QA lead signature on all test reports + implement test completion gateway",
   applyDecision:"Pending — new finding, intake complete",
-  evidence:[{name:"unsigned_test_report.pdf",ok:1},{name:"test_log_extract.xlsx",ok:0}],
+  evidence:[{type:"Document",name:"unsigned_test_report.pdf",path:"\\\\share\\contracts\\TO-1004\\evidence\\unsigned_test_report.pdf",description:"Phase 2 integration test report — unsigned, no QA lead signature",source:"Common Path",ok:1,docId:"TST-312-01",addedByRole:"cor",addedByEdipi:"",addedAt:"2026-04-14T09:00:00Z"},{type:"Artifact",name:"test_log_extract.xlsx",path:"\\\\share\\contracts\\TO-1004\\evidence\\test_log_extract.xlsx",description:"Test log extract showing pass/fail results without sign-off",source:"SharePoint",ok:0,docId:"",addedByRole:"pm",addedByEdipi:"",addedAt:"2026-04-14T11:00:00Z"}],
   auditChain:["CL-312"],
   timeline:["Apr 14","—","—","—","—"],tlState:[1,0,0,0,0]}
 };
@@ -1319,6 +1323,17 @@ function normalizeFinding(f){
   if(!f.updatedByMode)f.updatedByMode="role_only";
   if(!f.auditEvents)f.auditEvents=[];
   if(!f.evidence)f.evidence=[];
+  f.evidence.forEach(function(e){
+    if(!e.type)e.type="Document";
+    if(!e.path)e.path="";
+    if(!e.description)e.description="";
+    if(!e.source)e.source="Manual Entry";
+    if(e.ok==null)e.ok=0;
+    if(!e.docId)e.docId="";
+    if(!e.addedByRole)e.addedByRole="system";
+    if(!e.addedByEdipi)e.addedByEdipi="";
+    if(!e.addedAt)e.addedAt=f.createdAt||new Date().toISOString();
+  });
   if(!f.auditChain)f.auditChain=[];
   if(!f.timeline)f.timeline=["--","--","--","--","--"];
   if(!f.tlState)f.tlState=[0,0,0,0,0];
@@ -1753,8 +1768,15 @@ function showFinding(fid){
   }
   tlHtml+='</div>';
   var evHtml="";
-  f.evidence.forEach(function(e){
-    evHtml+='<div class="ev"><span class="'+(e.ok?'ev-ok':'ev-miss')+'">'+(e.ok?'&#10003;':'&#9675;')+'</span> '+escHTML(e.name)+' <span style="margin-left:auto;font-size:8px;color:var(--'+(e.ok?'ok':'bad')+');">'+(e.ok?'validated':'missing')+'</span>'+(e.ok?'':'<button class="ev-upload">Upload</button>')+'</div>';
+  f.evidence.forEach(function(e,idx){
+    evHtml+='<div style="padding:5px 0;border-bottom:1px solid #141e2d">';
+    evHtml+='<div class="ev" style="border:none;padding:0"><span class="'+(e.ok?'ev-ok':'ev-miss')+'">'+(e.ok?'&#10003;':'&#9675;')+'</span> <strong>'+escHTML(e.name)+'</strong><span class="ev-type">'+escHTML(e.type)+'</span>';
+    evHtml+='<span style="margin-left:auto;font-size:8px;color:var(--'+(e.ok?'ok':'bad')+');">'+(e.ok?'validated':'pending')+'</span>';
+    if(!e.ok)evHtml+='<button class="ev-validate" data-evidx="'+idx+'" data-fid="'+fid+'">Validate</button>';
+    evHtml+='</div>';
+    if(e.path)evHtml+='<div class="ev-path">'+escHTML(e.path)+'</div>';
+    if(e.description)evHtml+='<div class="ev-desc">'+escHTML(e.description)+'</div>';
+    evHtml+='</div>';
   });
   var idColor=stColorMap[f.status]||"var(--accent)";
   var hdr='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">';
@@ -1794,7 +1816,7 @@ function showFinding(fid){
   body+='<button data-fact="review" data-fid="'+fid+'">Send to Review</button>';
   body+='<button data-fact="link" data-fid="'+fid+'">Link Related</button>';
   body+='<button data-fact="export" data-fid="'+fid+'">Export Packet</button>';
-  body+='<button data-fact="evidence" data-fid="'+fid+'">Add Evidence</button>';
+  body+='<button data-fact="evidence" data-fid="'+fid+'">Add Evidence Reference</button>';
   if(canEditFinding(getRole()))body+='<button data-fedit="'+fid+'" style="border-color:var(--accent);color:var(--accent)">Edit</button>';
   body+='</div>';
   setHTML(fDet,body);
@@ -1806,6 +1828,22 @@ function showFinding(fid){
   if(editBtn)editBtn.addEventListener("click",function(){fDet.classList.add("hidden");openEditDrawer(editBtn.getAttribute("data-fedit"))});
   fDet.querySelectorAll("[data-fact]").forEach(function(b){
     b.addEventListener("click",function(){openActionDrawer(b.getAttribute("data-fact"),b.getAttribute("data-fid"))});
+  });
+  fDet.querySelectorAll(".ev-validate").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      var idx=parseInt(btn.getAttribute("data-evidx"));
+      var evFid=btn.getAttribute("data-fid");
+      var ef=F[evFid];if(!ef||!ef.evidence[idx])return;
+      var oldRec=deepClone(ef);
+      var actor=getActorStamp();
+      ef.evidence[idx].ok=1;
+      appendAuditEvent(ef,"EVIDENCE_VALIDATED","Evidence validated: "+ef.evidence[idx].name+" by "+getRole());
+      ensureChangeLog(evFid);ensureSyncMeta(evFid);
+      appendChangeLogEvent(evFid,"EVIDENCE_VALIDATED",oldRec,ef,"Validated evidence — "+ef.evidence[idx].name);
+      updateSyncMeta(evFid,{revision:ef.revision,updatedAt:ef.updatedAt,updatedByRole:getRole(),syncState:"synced"});
+      showFinding(evFid);
+      toast(ef.evidence[idx].name+" — validated","ok");
+    });
   });
 }
 document.getElementById("findTbody").addEventListener("click",function(e){
@@ -1893,11 +1931,36 @@ function openActionDrawer(action,fid){
       navigator.clipboard.writeText(JSON.stringify(_pkg,null,2)).then(function(){toast("JSON copied to clipboard","ok");closeDrawer();}).catch(function(){toast("Copy failed — download instead","warn");});
     });
   } else if(action==="evidence"){
-    openDrawer("Add Evidence — "+f.id,
-      '<div class="df"><label>Evidence Type</label><select><option>Document</option><option>Screenshot</option><option>Artifact</option><option>Signed Memo</option></select></div>'+
-      '<div class="df"><label>Description</label><input type="text" placeholder="Evidence description..."/></div>'+
-      '<div style="border:2px dashed var(--line);border-radius:8px;padding:20px;text-align:center;color:var(--muted);font-size:11px;margin-top:8px">Drop file here or click to browse</div>',
-      '<button class="primary" data-dact="Evidence added to '+f.id+'">Upload</button>');
+    openDrawer("Add Evidence Reference — "+f.id,
+      '<div class="df"><label>Document Name <span style="color:var(--bad)">*</span></label><input type="text" id="evName" placeholder="e.g. CDRL_A003_package.pdf"/></div>'+
+      '<div class="df"><label>Common Path / URL</label><input type="text" id="evPath" placeholder="\\\\share\\contracts\\..."/></div>'+
+      '<div class="df"><label>Description</label><input type="text" id="evDesc" placeholder="Brief description of this evidence..."/></div>'+
+      '<div class="grid2">'+
+      '<div class="df"><label>Evidence Type</label><select id="evType"><option>Document</option><option>Screenshot</option><option>Artifact</option><option>Signed Memo</option></select></div>'+
+      '<div class="df"><label>Source</label><select id="evSource"><option>Common Path</option><option>Share Drive</option><option>SharePoint</option><option>Teams</option><option>Local Reference</option><option>Manual Entry</option></select></div></div>'+
+      '<div class="df"><label>Document ID <span style="color:var(--muted);font-size:9px">(optional)</span></label><input type="text" id="evDocId" placeholder="e.g. CDRL-A003-2026-03"/></div>'+
+      '<div style="display:flex;align-items:center;gap:8px;margin-top:8px"><input type="checkbox" id="evValidated"/><label for="evValidated" style="font-size:10px;color:var(--muted)">Mark as validated</label></div>',
+      '<button class="primary" id="btnAddEvRef">Add Evidence Reference</button><button data-dact="">Cancel</button>');
+    var evBtn=document.getElementById("btnAddEvRef");
+    if(evBtn)evBtn.addEventListener("click",function(){
+      var eName=(document.getElementById("evName")||{}).value||"";
+      if(!eName.trim()){toast("Document name is required","warn");return;}
+      var ePath=(document.getElementById("evPath")||{}).value||"";
+      var eDesc=(document.getElementById("evDesc")||{}).value||"";
+      var eType=(document.getElementById("evType")||{}).value||"Document";
+      var eSource=(document.getElementById("evSource")||{}).value||"Manual Entry";
+      var eDocId=(document.getElementById("evDocId")||{}).value||"";
+      var eOk=(document.getElementById("evValidated")||{}).checked?1:0;
+      var oldRec=deepClone(f);
+      var actor=getActorStamp();
+      f.evidence.push({type:eType,name:eName.trim(),path:ePath.trim(),description:eDesc.trim(),source:eSource,ok:eOk,docId:eDocId.trim(),addedByRole:getRole(),addedByEdipi:actor.edipi||"",addedAt:new Date().toISOString()});
+      appendAuditEvent(f,"EVIDENCE_ADDED","Evidence reference added: "+eName.trim()+" ["+eType+"] by "+getRole()+(eOk?" (validated)":""));
+      ensureChangeLog(fid);ensureSyncMeta(fid);
+      appendChangeLogEvent(fid,"EVIDENCE_ADDED",oldRec,f,"Added evidence reference — "+eName.trim());
+      updateSyncMeta(fid,{revision:f.revision,updatedAt:f.updatedAt,updatedByRole:getRole(),syncState:"synced"});
+      actualCloseDrawer();rerenderAll();
+      toast("Evidence reference added to "+f.id+" — "+eName.trim(),"ok");
+    });
   }
 }
 
@@ -2016,6 +2079,15 @@ function buildEditFieldHTML(buf,role){
     buf.auditEvents.slice().reverse().forEach(function(ae){
       var actorLbl=ae.actor?(ae.actor.role+(ae.actor.actorMode==="edipi"?" · "+ae.actor.edipi:"")):(ae.role||"");
       h+='<div class="ae"><span class="ae-ts">'+escHTML((ae.ts||"").slice(0,16).replace("T"," "))+'</span><span class="ae-act">'+escHTML(ae.action)+'</span><span style="color:var(--muted);font-size:9px;margin-right:4px">['+escHTML(actorLbl)+']</span>'+escHTML(ae.details||"")+'</div>';
+    });
+    h+='</div>';
+  }
+  if(buf.evidence&&buf.evidence.length){
+    h+='<div class="wire" style="margin-top:10px"><h4>Evidence References ('+buf.evidence.filter(function(e){return e.ok}).length+'/'+buf.evidence.length+' validated)</h4>';
+    buf.evidence.forEach(function(e){
+      h+='<div style="padding:3px 0;font-size:10px;border-bottom:1px solid #141e2d"><span style="color:var(--'+(e.ok?'ok':'bad')+');font-size:12px">'+(e.ok?'&#10003;':'&#9675;')+'</span> <strong>'+escHTML(e.name)+'</strong> <span class="ev-type">'+escHTML(e.type||"Document")+'</span> <span style="color:var(--muted);font-size:8px">'+escHTML(e.source||"")+'</span>';
+      if(e.path)h+='<div class="ev-path">'+escHTML(e.path)+'</div>';
+      h+='</div>';
     });
     h+='</div>';
   }
@@ -2403,7 +2475,7 @@ function renderAudit(){
     html+='<td class="mono" style="color:'+(stColorMap[f.status]||"var(--accent)")+'">'+escHTML(f.id)+'</td>';
     html+='<td>'+(closed?'2026-Q2':'—')+'</td>';
     html+='<td style="color:var(--'+(closed?'ok':reopened?'bad':'warn')+');">'+(closed?'&#10003; Verified':reopened?'&#10007; Reopened':'Pending')+'</td>';
-    html+='<td>'+f.evidence.length+'</td>';
+    var evOk=f.evidence.filter(function(e){return e.ok}).length;html+='<td>'+evOk+'/'+f.evidence.length+'</td>';
     html+='<td style="color:var(--'+(reopened?'bad':'ok')+');">'+(reopened?'Yes':'No')+'</td>';
     html+='<td>'+(closed?escHTML(f.reviewer):'—')+'</td>';
     html+='<td class="mono" style="font-size:8px;color:var(--muted)">'+f.auditChain.join(' → ')+'</td>';
@@ -2425,7 +2497,7 @@ document.getElementById("auditTbody").addEventListener("click",function(e){
     '<div class="wr"><span class="wl">Review</span><span class="wv">'+(f.auditChain[2]||"Pending")+' · '+escHTML(f.reviewSummary.substring(0,60))+'</span></div>'+
     '<div class="wr"><span class="wl">Patch</span><span class="wv">'+(f.auditChain[3]||"Pending")+' · '+escHTML(f.patch.substring(0,60))+'</span></div>'+
     '<div class="wr"><span class="wl">Apply</span><span class="wv">'+(f.auditChain[4]||"Pending")+' · '+escHTML(f.applyDecision)+'</span></div>'+
-    '<div class="wr"><span class="wl">Evidence</span><span class="wv">'+f.evidence.length+' artifacts · '+f.evidence.filter(function(e){return e.ok}).length+' validated</span></div>'+
+    '<div class="wr"><span class="wl">Evidence</span><span class="wv">'+f.evidence.filter(function(e){return e.ok}).length+'/'+f.evidence.length+' validated — '+(function(){var t={};f.evidence.forEach(function(e){t[e.type||"Document"]=(t[e.type||"Document"]||0)+1});return Object.keys(t).map(function(k){return t[k]+" "+k}).join(", ")}())+'</span></div>'+
     '<div class="wr"><span class="wl">Status</span><span class="wv" style="color:var(--'+(f.status==="Closed"?"ok":f.status==="Reopened"?"bad":"warn")+');">'+escHTML(f.status)+'</span></div>'+
     '</div>');
 });
