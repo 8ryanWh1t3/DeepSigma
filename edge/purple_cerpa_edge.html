@@ -1,0 +1,1011 @@
+<!-- CERPA PURPLE TEAM Showcase — Deep Sigma EDGE v0.1
+     Format: single-file, zero-dependency, hardened
+     Purpose: Demonstrate CERPA fit for PURPLE cyber team operations
+     Sections: Hero, Problem, CERPA Mapping, Walkthrough, Metrics, Tool Sprawl, ROI, Closing -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'"/>
+<script>
+(function(){"use strict";
+var B="EDGE_BUILD_ID:PURPLE_CERPA_EDGE_v0.1";
+function _b(c){return function(){throw new Error("EDGE hardening: "+c+" blocked")}}
+window.fetch=_b("fetch");window.XMLHttpRequest=_b("XHR");window.WebSocket=_b("WS");
+window.EventSource=_b("ES");try{navigator.sendBeacon=_b("beacon")}catch(_){}
+window.eval=_b("eval");try{window.Function=_b("Function")}catch(_){}
+window.open=_b("window.open");window.RTCPeerConnection=_b("RTC");
+window.BroadcastChannel=_b("BC");window.SharedWorker=_b("SW");window.Worker=_b("W");
+try{Object.defineProperty(window,"localStorage",{get:_b("localStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"sessionStorage",{get:_b("sessionStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"indexedDB",{get:_b("indexedDB"),configurable:false})}catch(_){}
+if(typeof console!=="undefined")console.log("[EDGE] "+B);
+if(window.self===window.top){document.addEventListener("DOMContentLoaded",function(){
+  var v=[];
+  if(document.querySelectorAll("script[src],link[href]").length>0)v.push("external resource");
+  if(document.querySelectorAll("[onclick],[onerror],[onload]").length>0)v.push("inline handler");
+  if(v.length>0)document.body.innerHTML="<h1 style='color:red;font-family:monospace;padding:40px'>EDGE VIOLATION: "+v.join("; ")+"</h1>";
+});}
+})();
+</script>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Deep Sigma EDGE — CERPA PURPLE TEAM v0.1</title>
+<style>
+:root{
+  --bg:#0a0812;--card:#13101f;--card2:#0e0b1a;--muted:#7a6b99;--txt:#e0d8f0;
+  --accent:#00f0ff;--warn:#ffcc66;--bad:#ff6b6b;--ok:#5dff93;
+  --ribbon:#1a1530;--line:#1e1530;--glow:rgba(0,240,255,.08);
+  --mag:#ff6bff;--purple:#a855f7;--neon-blue:#3b82ff
+}
+html{scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0;padding:0;
+  background:var(--bg);
+  color:var(--txt);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:14px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased
+}
+body::after{
+  content:"";
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);
+  pointer-events:none;
+  z-index:9999
+}
+
+/* Nav */
+.nav-bar{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  height:48px;
+  background:rgba(10,8,18,.92);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;
+  padding:0 24px;
+  gap:4px
+}
+.nav-brand{
+  font-size:10px;font-weight:700;letter-spacing:2px;
+  color:var(--accent);text-transform:uppercase;
+  margin-right:auto;
+  white-space:nowrap
+}
+.nav-link{
+  font-size:10px;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--muted);
+  padding:6px 10px;
+  cursor:pointer;
+  text-decoration:none;
+  border-bottom:2px solid transparent;
+  transition:color .2s,border-color .2s;
+  white-space:nowrap
+}
+.nav-link:hover{color:var(--txt)}
+.nav-link.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* Glow classes */
+.glow{text-shadow:0 0 10px var(--accent),0 0 40px rgba(0,240,255,.2)}
+.glow-mag{text-shadow:0 0 10px var(--mag),0 0 40px rgba(255,107,255,.2)}
+.glow-purple{text-shadow:0 0 10px var(--purple),0 0 40px rgba(168,85,247,.2)}
+
+/* Sections */
+section{
+  min-height:100vh;
+  padding:80px 40px 60px;
+  max-width:1100px;
+  margin:0 auto;
+  position:relative
+}
+
+/* Cards */
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:20px;
+  transition:all .25s
+}
+.card:hover{
+  border-color:rgba(0,240,255,.3);
+  box-shadow:0 0 20px rgba(0,240,255,.08)
+}
+
+/* Grids */
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+
+/* Section titles */
+h2{font-size:28px;margin-bottom:8px;letter-spacing:1px}
+.section-sub{color:var(--muted);font-size:13px;margin-bottom:32px}
+
+/* KPI */
+.kpi{text-align:center;padding:20px}
+.kpi-val{font-size:32px;font-weight:700}
+.kpi-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+
+/* Stage cards */
+.stage-card{
+  padding:16px;
+  cursor:pointer;
+  border-left:3px solid transparent;
+  transition:all .2s
+}
+.stage-card.active{
+  border-left-color:var(--accent);
+  background:rgba(0,240,255,.04);
+  box-shadow:0 0 15px rgba(0,240,255,.08)
+}
+
+/* Timeline */
+.tl-item{
+  position:relative;
+  padding-left:40px;
+  padding-bottom:32px;
+  border-left:2px solid var(--line);
+  margin-left:12px
+}
+.tl-dot{
+  position:absolute;
+  left:-7px;top:4px;
+  width:12px;height:12px;
+  border-radius:50%;
+  border:2px solid var(--accent)
+}
+
+/* Toggle */
+.toggle-bar{
+  display:flex;gap:0;
+  border-radius:8px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  width:fit-content;
+  margin-bottom:24px
+}
+.toggle-btn{
+  padding:10px 20px;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:600;
+  background:var(--card);
+  color:var(--muted);
+  border:none;
+  transition:all .2s;
+  font-family:inherit
+}
+.toggle-btn.active{
+  background:var(--accent);
+  color:#0a0812
+}
+
+/* Animations */
+@keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}
+@keyframes ringRotate{0%{stroke-dashoffset:314}100%{stroke-dashoffset:0}}
+
+/* Hero grid floor */
+.hero-grid{
+  position:absolute;bottom:0;left:0;right:0;height:200px;
+  background:
+    linear-gradient(transparent 40%,rgba(0,240,255,.03)),
+    repeating-linear-gradient(90deg,rgba(0,240,255,.04) 0px,rgba(0,240,255,.04) 1px,transparent 1px,transparent 60px),
+    repeating-linear-gradient(0deg,rgba(0,240,255,.04) 0px,rgba(0,240,255,.04) 1px,transparent 1px,transparent 60px);
+  transform:perspective(400px) rotateX(45deg);
+  transform-origin:bottom;
+  pointer-events:none
+}
+
+/* Quote */
+.quote{
+  font-size:14px;color:var(--accent);font-style:italic;
+  border-left:2px solid var(--mag);
+  padding-left:14px;margin:20px 0
+}
+
+/* Edge badge */
+.edge-badge{
+  font-size:8px;color:var(--muted);
+  border:1px solid var(--line);
+  padding:3px 8px;border-radius:4px;
+  letter-spacing:1px;text-transform:uppercase;
+  display:inline-block
+}
+
+/* Compare cards */
+.compare-card{padding:20px;border-radius:12px}
+.compare-bad{background:rgba(255,107,107,.04);border:1px solid rgba(255,107,107,.15)}
+.compare-good{background:rgba(93,255,147,.04);border:1px solid rgba(93,255,147,.15)}
+
+/* Footer */
+footer{
+  text-align:center;padding:20px;
+  font-size:9px;color:var(--muted);
+  border-top:1px solid var(--line);
+  letter-spacing:1px
+}
+
+/* Responsive */
+@media(max-width:768px){
+  .grid-3,.grid-2{grid-template-columns:1fr}
+  section{padding:70px 20px 40px}
+  .nav-link{padding:6px 6px;font-size:9px}
+  .stage-row{flex-direction:column}
+  h1{font-size:32px !important}
+}
+
+/* Problem card icon */
+.prob-icon{font-size:24px;margin-bottom:8px;display:block}
+.prob-title{font-weight:700;font-size:14px;margin-bottom:6px;color:var(--txt)}
+.prob-desc{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* Stage row */
+.stage-row{
+  display:flex;gap:8px;margin-bottom:20px;
+  flex-wrap:wrap
+}
+.stage-row .stage-card{flex:1;min-width:140px}
+
+/* Stage detail */
+#stageDetail{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:24px;
+  min-height:180px
+}
+
+/* Connecting line between stage cards */
+.stage-connector{
+  height:2px;
+  background:linear-gradient(90deg,var(--accent),var(--warn),var(--purple),var(--mag),var(--ok));
+  margin:-4px 0 16px;
+  border-radius:1px;
+  opacity:.4
+}
+
+/* Hero specifics */
+.hero-title{
+  font-size:48px;font-weight:700;
+  margin:0 0 12px;line-height:1.1
+}
+.hero-sub{
+  font-size:18px;color:var(--muted);
+  margin-bottom:24px
+}
+
+/* ROI card title */
+.roi-title{font-weight:700;font-size:15px;margin-bottom:8px;color:var(--accent)}
+.roi-desc{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* Callout */
+.callout{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:16px 20px;
+  font-size:13px;
+  color:var(--accent);
+  margin-top:24px;
+  text-align:center
+}
+
+/* Copy button */
+.copy-btn{
+  background:var(--accent);
+  color:#0a0812;
+  border:none;
+  padding:10px 24px;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  font-family:inherit;
+  letter-spacing:.5px;
+  transition:all .2s;
+  margin-top:20px
+}
+.copy-btn:hover{
+  box-shadow:0 0 20px rgba(0,240,255,.3);
+  transform:translateY(-1px)
+}
+
+/* Closing section */
+.closing-banner{
+  background:linear-gradient(135deg,rgba(168,85,247,.1),rgba(0,240,255,.05));
+  border-radius:16px;
+  padding:60px 40px;
+  text-align:center
+}
+.closing-main{
+  font-size:32px;font-weight:700;
+  margin:0 0 8px;line-height:1.3
+}
+.closing-sub{
+  font-size:15px;color:var(--muted);
+  margin:16px 0 24px
+}
+.closing-questions{
+  font-size:12px;color:var(--muted);
+  line-height:2;
+  margin-top:24px
+}
+
+/* Gauge container */
+.gauge-wrap{
+  display:flex;justify-content:center;
+  margin-bottom:32px
+}
+
+/* Problem grid — handles 7 items gracefully */
+.prob-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px
+}
+.prob-grid .card:nth-child(n+7){
+  grid-column:span 1
+}
+@media(max-width:768px){
+  .prob-grid{grid-template-columns:1fr}
+}
+
+/* Supporting text */
+.support-text{
+  font-size:13px;color:var(--muted);
+  margin-bottom:24px;
+  max-width:700px
+}
+
+/* Hero layout */
+.hero-content{
+  display:flex;
+  align-items:center;
+  gap:40px;
+  flex-wrap:wrap;
+  justify-content:center
+}
+.hero-text{flex:1;min-width:300px}
+.hero-ring{flex:0 0 auto}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ NAV BAR ═══════════════════════════════ -->
+<nav class="nav-bar">
+  <span class="nav-brand">Deep Sigma EDGE</span>
+  <a class="nav-link" data-nav="s-problem">Problem</a>
+  <a class="nav-link" data-nav="s-cerpa">CERPA</a>
+  <a class="nav-link" data-nav="s-walkthrough">Walkthrough</a>
+  <a class="nav-link" data-nav="s-metrics">Metrics</a>
+  <a class="nav-link" data-nav="s-compare">Compare</a>
+  <a class="nav-link" data-nav="s-roi">ROI</a>
+  <a class="nav-link" data-nav="s-closing">About</a>
+</nav>
+
+<!-- ═══════════════════════════════ SECTION 1: HERO ═══════════════════════════════ -->
+<section id="s-hero" style="display:flex;align-items:center;justify-content:center">
+  <div class="hero-content">
+    <div class="hero-text">
+      <h1 class="hero-title glow">CERPA for PURPLE Teams</h1>
+      <p class="hero-sub">From adversary simulation to governed learning</p>
+      <div class="quote">
+        "Red proves exposure. Blue proves visibility. CERPA preserves the memory."
+      </div>
+      <div style="margin-top:24px">
+        <span class="edge-badge">PURPLE_CERPA_EDGE_v0.1</span>
+      </div>
+    </div>
+    <div class="hero-ring">
+      <svg viewBox="0 0 220 220" style="width:200px;height:200px">
+        <!-- Ring nodes: C, E, R, P, A -->
+        <!-- Ring vertices at radius 80 from center (110,110) -->
+        <!-- Angles: -90, -18, 54, 126, 198 degrees -->
+        <!-- C: (110, 30) -->
+        <!-- E: (110+80*cos(-18deg), 110+80*sin(-18deg)) = (186.1, 85.3) -->
+        <!-- R: (110+80*cos(54deg), 110+80*sin(54deg)) = (157.0, 174.7) -->
+        <!-- P: (110+80*cos(126deg), 110+80*sin(126deg)) = (63.0, 174.7) -->
+        <!-- A: (110+80*cos(198deg), 110+80*sin(198deg)) = (33.9, 85.3) -->
+
+        <!-- Connecting lines -->
+        <line x1="110" y1="30" x2="186" y2="85" stroke="var(--line)" stroke-width="1.5"/>
+        <line x1="186" y1="85" x2="157" y2="175" stroke="var(--line)" stroke-width="1.5"/>
+        <line x1="157" y1="175" x2="63" y2="175" stroke="var(--line)" stroke-width="1.5"/>
+        <line x1="63" y1="175" x2="34" y2="85" stroke="var(--line)" stroke-width="1.5"/>
+        <line x1="34" y1="85" x2="110" y2="30" stroke="var(--line)" stroke-width="1.5"/>
+
+        <!-- Animated highlight path -->
+        <polyline
+          points="110,30 186,85 157,175 63,175 34,85 110,30"
+          fill="none"
+          stroke="var(--accent)"
+          stroke-width="2"
+          stroke-dasharray="600"
+          stroke-dashoffset="600"
+          stroke-linecap="round"
+          opacity=".7">
+          <animate attributeName="stroke-dashoffset" from="600" to="0" dur="3s" repeatCount="indefinite"/>
+        </polyline>
+
+        <!-- Node: Claim -->
+        <circle cx="110" cy="30" r="18" fill="var(--card)" stroke="var(--accent)" stroke-width="2"/>
+        <text x="110" y="27" text-anchor="middle" fill="var(--accent)" font-size="12" font-weight="700" font-family="inherit">C</text>
+        <text x="110" y="39" text-anchor="middle" fill="var(--muted)" font-size="6" font-family="inherit">Claim</text>
+
+        <!-- Node: Event -->
+        <circle cx="186" cy="85" r="18" fill="var(--card)" stroke="var(--warn)" stroke-width="2"/>
+        <text x="186" y="82" text-anchor="middle" fill="var(--warn)" font-size="12" font-weight="700" font-family="inherit">E</text>
+        <text x="186" y="94" text-anchor="middle" fill="var(--muted)" font-size="6" font-family="inherit">Event</text>
+
+        <!-- Node: Review -->
+        <circle cx="157" cy="175" r="18" fill="var(--card)" stroke="var(--purple)" stroke-width="2"/>
+        <text x="157" y="172" text-anchor="middle" fill="var(--purple)" font-size="12" font-weight="700" font-family="inherit">R</text>
+        <text x="157" y="184" text-anchor="middle" fill="var(--muted)" font-size="6" font-family="inherit">Review</text>
+
+        <!-- Node: Patch -->
+        <circle cx="63" cy="175" r="18" fill="var(--card)" stroke="var(--mag)" stroke-width="2"/>
+        <text x="63" y="172" text-anchor="middle" fill="var(--mag)" font-size="12" font-weight="700" font-family="inherit">P</text>
+        <text x="63" y="184" text-anchor="middle" fill="var(--muted)" font-size="6" font-family="inherit">Patch</text>
+
+        <!-- Node: Apply -->
+        <circle cx="34" cy="85" r="18" fill="var(--card)" stroke="var(--ok)" stroke-width="2"/>
+        <text x="34" y="82" text-anchor="middle" fill="var(--ok)" font-size="12" font-weight="700" font-family="inherit">A</text>
+        <text x="34" y="94" text-anchor="middle" fill="var(--muted)" font-size="6" font-family="inherit">Apply</text>
+      </svg>
+    </div>
+  </div>
+  <div class="hero-grid"></div>
+</section>
+
+<!-- ═══════════════════════════════ SECTION 2: PROBLEM ═══════════════════════════════ -->
+<section id="s-problem">
+  <h2 class="glow-mag">The PURPLE Problem</h2>
+  <p class="section-sub">Current exercises generate heat. CERPA generates memory.</p>
+
+  <div class="prob-grid">
+    <div class="card">
+      <span class="prob-icon">&#x1F91D;</span>
+      <div class="prob-title">Handoff Friction</div>
+      <div class="prob-desc">Red findings get translated, summarized, and diluted before blue ever sees them.</div>
+    </div>
+    <div class="card">
+      <span class="prob-icon">&#x1F4AD;</span>
+      <div class="prob-title">No Durable Memory</div>
+      <div class="prob-desc">Each exercise starts from scratch. Previous findings live in old reports nobody reads.</div>
+    </div>
+    <div class="card">
+      <span class="prob-icon">&#x23F3;</span>
+      <div class="prob-title">Patch Validation Delays</div>
+      <div class="prob-desc">Weeks pass between patch approval and retest. Drift accumulates.</div>
+    </div>
+    <div class="card">
+      <span class="prob-icon">&#x1F50D;</span>
+      <div class="prob-title">Weak Provenance</div>
+      <div class="prob-desc">Who approved this risk acceptance? When? Based on what evidence?</div>
+    </div>
+    <div class="card">
+      <span class="prob-icon">&#x1F504;</span>
+      <div class="prob-title">Regression</div>
+      <div class="prob-desc">Old vulnerabilities reappear because no one tracks whether patches held.</div>
+    </div>
+    <div class="card">
+      <span class="prob-icon">&#x1F4C9;</span>
+      <div class="prob-title">Lagging Metrics</div>
+      <div class="prob-desc">Leadership sees reports from last quarter, not the current posture.</div>
+    </div>
+    <div class="card">
+      <span class="prob-icon">&#x1F9F0;</span>
+      <div class="prob-title">Tool Sprawl</div>
+      <div class="prob-desc">Scanners, ticketing, spreadsheets, docs, email &mdash; no common language.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ SECTION 3: CERPA MAPPING ═══════════════════════════════ -->
+<section id="s-cerpa">
+  <h2 class="glow">The CERPA Lifecycle</h2>
+  <p class="section-sub">Five stages. One chain of evidence. Complete memory.</p>
+  <p class="support-text">CERPA does not replace red tools or blue tools. It governs the handoff between them.</p>
+
+  <div class="stage-row">
+    <div class="card stage-card active" data-stage="claim">
+      <div style="font-weight:700;font-size:13px;color:var(--accent)">CLAIM</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Validated Exposure</div>
+    </div>
+    <div class="card stage-card" data-stage="event">
+      <div style="font-weight:700;font-size:13px;color:var(--warn)">EVENT</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Observed Evidence</div>
+    </div>
+    <div class="card stage-card" data-stage="review">
+      <div style="font-weight:700;font-size:13px;color:var(--purple)">REVIEW</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Joint Adjudication</div>
+    </div>
+    <div class="card stage-card" data-stage="patch">
+      <div style="font-weight:700;font-size:13px;color:var(--mag)">PATCH</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Approved Correction</div>
+    </div>
+    <div class="card stage-card" data-stage="apply">
+      <div style="font-weight:700;font-size:13px;color:var(--ok)">APPLY</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Enforced + Retested</div>
+    </div>
+  </div>
+
+  <div class="stage-connector"></div>
+
+  <div id="stageDetail">
+    <!-- Populated by JS -->
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ SECTION 4: WALKTHROUGH ═══════════════════════════════ -->
+<section id="s-walkthrough">
+  <h2 class="glow-purple">Exercise Walkthrough</h2>
+  <p class="section-sub">A realistic lateral movement engagement mapped through CERPA</p>
+
+  <div style="margin-top:16px">
+    <div class="tl-item">
+      <div class="tl-dot" style="border-color:var(--accent);background:var(--card)"></div>
+      <div style="font-weight:700;font-size:13px;color:var(--accent);margin-bottom:4px">T+0h &mdash; CLAIM</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6">
+        Red team deploys lateral movement via compromised service account using Pass-the-Hash.
+        Technique mapped to MITRE ATT&amp;CK T1550.002. Exploitation evidence logged with timestamps,
+        source host, and target credentials.
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot" style="border-color:var(--warn);background:var(--card)"></div>
+      <div style="font-weight:700;font-size:13px;color:var(--warn);margin-bottom:4px">T+2h &mdash; EVENT</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6">
+        Blue SOC observes anomalous SMB authentication from unexpected subnet. Partial telemetry &mdash;
+        endpoint agent missed initial credential access. Detection coverage gap documented.
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot" style="border-color:var(--purple);background:var(--card)"></div>
+      <div style="font-weight:700;font-size:13px;color:var(--purple);margin-bottom:4px">T+4h &mdash; REVIEW</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6">
+        Joint red/blue adjudication session. Confirmed: exposure is real, detection coverage is partial.
+        Mission impact assessed as HIGH. Board Readiness Quotient: 0.82. Contradiction flags raised on
+        two prior risk acceptances.
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot" style="border-color:var(--mag);background:var(--card)"></div>
+      <div style="font-weight:700;font-size:13px;color:var(--mag);margin-bottom:4px">T+8h &mdash; PATCH</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6">
+        Network segmentation rule deployed. Detection logic updated for credential relay patterns.
+        Endpoint agent configuration hardened. Change control approval logged with authorizing official
+        and evidence references.
+      </div>
+    </div>
+
+    <div class="tl-item" style="border-left-color:transparent">
+      <div class="tl-dot" style="border-color:var(--ok);background:var(--card)"></div>
+      <div style="font-weight:700;font-size:13px;color:var(--ok);margin-bottom:4px">T+24h &mdash; APPLY</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6">
+        Red retests &mdash; technique now blocked at network boundary. Evidence logged. Patch marked
+        durable. Memory updated for future exercises. Regression baseline established.
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    From <span style="color:var(--bad)">event &rarr; report &rarr; forget</span>
+    &nbsp;to&nbsp;
+    <span style="color:var(--ok)">evidence &rarr; review &rarr; patch &rarr; memory</span>
+  </div>
+
+  <div style="margin-top:32px">
+    <h3 style="font-size:15px;color:var(--muted);margin-bottom:16px;letter-spacing:.5px">Artifact Chain Summary</h3>
+    <div class="grid-2">
+      <div class="card" style="padding:16px">
+        <div style="font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Red Artifacts Captured</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">
+          &bull; Pass-the-Hash execution log with timestamps<br/>
+          &bull; MITRE ATT&amp;CK T1550.002 technique mapping<br/>
+          &bull; Source/target host identifiers<br/>
+          &bull; Compromised credential metadata<br/>
+          &bull; Lateral movement path diagram
+        </div>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-size:10px;color:var(--warn);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Blue Artifacts Captured</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">
+          &bull; SIEM alert correlation ID and timeline<br/>
+          &bull; SMB authentication anomaly details<br/>
+          &bull; Detection coverage gap analysis<br/>
+          &bull; Endpoint agent blind spot documentation<br/>
+          &bull; Analyst observation notes with confidence scores
+        </div>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-size:10px;color:var(--purple);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Review Outputs</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">
+          &bull; Joint adjudication decision record<br/>
+          &bull; Mission impact: HIGH<br/>
+          &bull; Board Readiness Quotient: 0.82<br/>
+          &bull; Prior risk acceptance contradiction flags<br/>
+          &bull; Authorized remediation priority
+        </div>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-size:10px;color:var(--ok);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Durability Evidence</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">
+          &bull; Retest execution log (T+24h)<br/>
+          &bull; Technique blocked at network boundary<br/>
+          &bull; Patch durability: CONFIRMED<br/>
+          &bull; Regression baseline established<br/>
+          &bull; Memory graph node created
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ SECTION 5: METRICS ═══════════════════════════════ -->
+<section id="s-metrics">
+  <h2 class="glow">Executive Visibility</h2>
+  <p class="section-sub">Real-time posture &mdash; not last quarter's report</p>
+
+  <div class="gauge-wrap">
+    <div id="coherenceGauge">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="card kpi">
+      <div class="kpi-val" style="color:var(--accent)">14</div>
+      <div class="kpi-label">Validated Exposures</div>
+    </div>
+    <div class="card kpi">
+      <div class="kpi-val" style="color:var(--warn)">23</div>
+      <div class="kpi-label">Observed Events</div>
+    </div>
+    <div class="card kpi">
+      <div class="kpi-val" style="color:var(--ok)">91%</div>
+      <div class="kpi-label">Review Closure Rate</div>
+    </div>
+    <div class="card kpi">
+      <div class="kpi-val" style="color:var(--ok)">6.2h</div>
+      <div class="kpi-label">Patch Cycle Time</div>
+    </div>
+    <div class="card kpi">
+      <div class="kpi-val" style="color:var(--bad)">2</div>
+      <div class="kpi-label">Regression Alerts</div>
+    </div>
+    <div class="card kpi">
+      <div class="kpi-val" style="color:var(--ok)">96%</div>
+      <div class="kpi-label">Memory Coverage</div>
+    </div>
+  </div>
+
+  <div style="margin-top:32px">
+    <h3 style="font-size:15px;color:var(--muted);margin-bottom:16px;letter-spacing:.5px">What These Numbers Mean</h3>
+    <div class="grid-2">
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">
+          <strong style="color:var(--accent)">Validated Exposures</strong> count adversary techniques
+          that successfully executed against the environment. Each exposure has a full CERPA claim
+          with ATT&amp;CK mapping, execution evidence, and impact assessment.
+        </div>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">
+          <strong style="color:var(--warn)">Observed Events</strong> track blue team detections
+          correlated to red claims. The ratio of events to exposures reveals detection coverage.
+          A gap means adversary activity went unnoticed.
+        </div>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">
+          <strong style="color:var(--ok)">Review Closure Rate</strong> measures how many joint
+          adjudication sessions produced a final decision. Open reviews indicate unresolved
+          disagreements between red and blue assessments.
+        </div>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">
+          <strong style="color:var(--bad)">Regression Alerts</strong> fire when a previously
+          patched vulnerability reappears in a subsequent exercise. Two alerts means two old
+          exposures resurfaced &mdash; the patches did not hold.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ SECTION 6: COMPARE ═══════════════════════════════ -->
+<section id="s-compare">
+  <h2 class="glow-mag">Traditional vs. Governed</h2>
+  <p class="section-sub">Same teams. Same tools. Different substrate.</p>
+
+  <div class="toggle-bar">
+    <button class="toggle-btn active" data-toggle="traditional">Traditional PURPLE</button>
+    <button class="toggle-btn" data-toggle="governed">CERPA-Governed PURPLE</button>
+  </div>
+
+  <div id="compareContent">
+    <!-- Populated by JS -->
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ SECTION 7: ROI ═══════════════════════════════ -->
+<section id="s-roi">
+  <h2 class="glow">Why It Matters</h2>
+  <p class="section-sub">CERPA creates value at every level of the organization</p>
+
+  <div class="grid-3">
+    <div class="card" style="padding:24px">
+      <div class="roi-title">Institutional Memory</div>
+      <div class="roi-desc">Exercises become cumulative. Every finding, every patch, every retest adds to the organization's knowledge base.</div>
+    </div>
+    <div class="card" style="padding:24px">
+      <div class="roi-title">Handoff Integrity</div>
+      <div class="roi-desc">Red-to-blue provenance chain eliminates translation loss. What was found is what gets fixed.</div>
+    </div>
+    <div class="card" style="padding:24px">
+      <div class="roi-title">Regression Prevention</div>
+      <div class="roi-desc">Retest gates prevent old vulnerabilities from reappearing. Patches are verified, not assumed.</div>
+    </div>
+    <div class="card" style="padding:24px">
+      <div class="roi-title">Executive Visibility</div>
+      <div class="roi-desc">Real-time KPIs replace quarterly reports. Commanders see current posture, not historical snapshots.</div>
+    </div>
+    <div class="card" style="padding:24px">
+      <div class="roi-title">Compliance Alignment</div>
+      <div class="roi-desc">CERPA maps naturally to NIST, CMMC, and RMF frameworks. One governance substrate, multiple compliance outputs.</div>
+    </div>
+    <div class="card" style="padding:24px">
+      <div class="roi-title">Tool Consolidation</div>
+      <div class="roi-desc">Keep your red tools. Keep your blue tools. CERPA governs the space between them.</div>
+    </div>
+  </div>
+
+  <div style="margin-top:32px">
+    <h3 style="font-size:15px;color:var(--muted);margin-bottom:16px;letter-spacing:.5px">Stakeholder Value Map</h3>
+    <div class="grid-2">
+      <div class="card" style="padding:16px;border-left:3px solid var(--bad)">
+        <div style="font-size:11px;color:var(--bad);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;font-weight:700">Red Team Leads</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7">
+          Stop writing reports that vanish. Every technique execution feeds directly into an
+          evidence chain that persists across exercises. Your work compounds instead of expiring.
+        </div>
+      </div>
+      <div class="card" style="padding:16px;border-left:3px solid var(--neon-blue)">
+        <div style="font-size:11px;color:var(--neon-blue);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;font-weight:700">Blue SOC Analysts</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7">
+          See exactly what red executed &mdash; not a sanitized summary. Coverage gaps are documented,
+          not guessed. Detection improvements are validated through retest, not assumed.
+        </div>
+      </div>
+      <div class="card" style="padding:16px;border-left:3px solid var(--purple)">
+        <div style="font-size:11px;color:var(--purple);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;font-weight:700">Mission Owners</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7">
+          Authoritative risk decisions with full provenance. Know who approved what, when,
+          and based on which evidence. Contradiction detection surfaces stale risk acceptances.
+        </div>
+      </div>
+      <div class="card" style="padding:16px;border-left:3px solid var(--warn)">
+        <div style="font-size:11px;color:var(--warn);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;font-weight:700">Executive Leadership</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7">
+          Real-time coherence scores and posture dashboards replace quarterly briefings.
+          Board-ready metrics that reflect current state, not last month's snapshot.
+        </div>
+      </div>
+      <div class="card" style="padding:16px;border-left:3px solid var(--ok)">
+        <div style="font-size:11px;color:var(--ok);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;font-weight:700">Compliance Officers</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7">
+          CERPA stages map directly to NIST SP 800-53, CMMC Level 2+, and RMF authorization
+          boundaries. One governance loop produces evidence for multiple compliance frameworks.
+        </div>
+      </div>
+      <div class="card" style="padding:16px;border-left:3px solid var(--mag)">
+        <div style="font-size:11px;color:var(--mag);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;font-weight:700">Change Control Boards</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7">
+          Every patch carries its evidence chain: what exposure triggered it, who reviewed it,
+          what was approved, and whether the fix survived retest. No more orphaned change requests.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ SECTION 8: CLOSING ═══════════════════════════════ -->
+<section id="s-closing" style="display:flex;align-items:center;justify-content:center">
+  <div class="closing-banner" style="width:100%">
+    <p class="closing-main glow">PURPLE is not just a collaboration exercise.</p>
+    <p class="closing-main glow-mag">It is a memory loop.</p>
+    <p class="closing-sub">CERPA turns adversary simulation into a governed learning system.</p>
+    <div class="closing-questions">
+      What was exposed? &nbsp;&bull;&nbsp;
+      What was observed? &nbsp;&bull;&nbsp;
+      What was decided? &nbsp;&bull;&nbsp;
+      What was patched? &nbsp;&bull;&nbsp;
+      Did it hold?
+    </div>
+    <button class="copy-btn" id="btnCopy">Copy Brief</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ FOOTER ═══════════════════════════════ -->
+<footer>Deep Sigma EDGE &middot; CERPA &middot; PURPLE TEAM</footer>
+
+<!-- ═══════════════════════════════ JAVASCRIPT ═══════════════════════════════ -->
+<script>
+/* Utilities */
+function escHTML(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function setHTML(el,html){var t=document.createElement("template");t.innerHTML=html;el.textContent="";el.appendChild(t.content.cloneNode(true))}
+
+/* Nav smooth scroll */
+document.querySelector(".nav-bar").addEventListener("click",function(e){
+  var link=e.target.closest("[data-nav]");if(!link)return;
+  e.preventDefault();
+  var target=document.getElementById(link.getAttribute("data-nav"));
+  if(target)target.scrollIntoView({behavior:"smooth"});
+});
+
+/* Scroll spy with IntersectionObserver */
+var navLinks=document.querySelectorAll("[data-nav]");
+var sections=document.querySelectorAll("section[id]");
+var observer=new IntersectionObserver(function(entries){
+  entries.forEach(function(entry){
+    if(entry.isIntersecting){
+      navLinks.forEach(function(l){l.classList.remove("active")});
+      var active=document.querySelector('[data-nav="'+entry.target.id+'"]');
+      if(active)active.classList.add("active");
+    }
+  });
+},{threshold:0.3,rootMargin:"-48px 0px 0px 0px"});
+sections.forEach(function(s){observer.observe(s)});
+
+/* CERPA Stage cards */
+var stageData = {
+  claim: {
+    title: "CLAIM \u2014 Validated Adversary Exposure",
+    who: "Red team operators, penetration testers, threat emulation leads",
+    artifacts: "Technique execution logs, ATT&CK mapping, exploitation evidence, initial access vectors",
+    value: "Establishes ground truth. Every downstream decision traces back to a validated claim \u2014 not a scan result, not a rumor, not a checkbox.",
+    question: "What was exposed?"
+  },
+  event: {
+    title: "EVENT \u2014 Telemetry and Analyst Observation",
+    who: "Blue SOC analysts, detection engineers, endpoint/network defenders",
+    artifacts: "SIEM alerts, EDR telemetry, network flow data, analyst observations, coverage gaps identified",
+    value: "Captures what blue actually saw \u2014 and what they missed. The gap between claim and event is the detection deficit.",
+    question: "What was observed?"
+  },
+  review: {
+    title: "REVIEW \u2014 Joint Red/Blue Adjudication",
+    who: "Red/blue leads jointly, assessors, mission owners, risk adjudicators",
+    artifacts: "Exploitability assessment, detectability rating, mission impact score, Board Readiness Quotient, contradiction flags",
+    value: "Transforms raw findings into authoritative decisions. Joint review eliminates translation loss and forces shared understanding.",
+    question: "What was decided?"
+  },
+  patch: {
+    title: "PATCH \u2014 Approved Correction",
+    who: "System owners, detection engineers, network architects, change control board",
+    artifacts: "Detection rule updates, network segmentation changes, configuration hardening, endpoint policy updates, approval stamps",
+    value: "Documents not just what changed, but who approved it, when, and based on what evidence. Creates the audit trail that compliance requires.",
+    question: "What was patched?"
+  },
+  apply: {
+    title: "APPLY \u2014 Enforced and Retested",
+    who: "Red team (retest), blue team (validation), authorizing officials",
+    artifacts: "Retest results, patch durability confirmation, evidence sufficiency validation, memory graph update, regression baseline",
+    value: "Closes the loop. Proves the patch held under adversary pressure. Updates institutional memory so future exercises build on \u2014 not repeat \u2014 past work.",
+    question: "Did it hold?"
+  }
+};
+
+var stageCards=document.querySelectorAll("[data-stage]");
+var stageDetail=document.getElementById("stageDetail");
+
+document.getElementById("s-cerpa").addEventListener("click",function(e){
+  var card=e.target.closest("[data-stage]");if(!card)return;
+  var key=card.getAttribute("data-stage");
+  var d=stageData[key];if(!d)return;
+  stageCards.forEach(function(c){c.classList.remove("active")});
+  card.classList.add("active");
+  setHTML(stageDetail,
+    '<h3 style="color:var(--accent);margin:0 0 12px">'+escHTML(d.title)+'</h3>'+
+    '<div style="margin-bottom:10px"><span style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px">Participants</span><div style="font-size:13px;margin-top:4px">'+escHTML(d.who)+'</div></div>'+
+    '<div style="margin-bottom:10px"><span style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px">Artifacts</span><div style="font-size:13px;margin-top:4px">'+escHTML(d.artifacts)+'</div></div>'+
+    '<div style="margin-bottom:10px"><span style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px">Value</span><div style="font-size:13px;margin-top:4px">'+escHTML(d.value)+'</div></div>'+
+    '<div class="quote" style="margin-top:16px;font-size:16px">'+escHTML(d.question)+'</div>'
+  );
+});
+
+/* Trigger initial stage display */
+(function(){
+  var firstCard=document.querySelector('[data-stage="claim"]');
+  if(firstCard){
+    var evt=new MouseEvent("click",{bubbles:true});
+    firstCard.dispatchEvent(evt);
+  }
+})();
+
+/* Tool sprawl toggle */
+var traditionalHTML = '<div class="compare-bad card" style="padding:24px">'+
+  '<h3 style="color:var(--bad);margin:0 0 16px">Traditional PURPLE</h3>'+
+  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+  ['Red tools (Cobalt Strike, custom implants)','Blue tools (SIEM, EDR, SOAR)','Spreadsheet tracking','Email and chat handoffs','Static reports','Fragmented memory','No regression detection','No evidence chain'].map(function(t){
+    return '<div style="display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 0"><span style="color:var(--bad)">&#9679;</span>'+t+'</div>';
+  }).join('')+
+  '</div>'+
+  '<div style="margin-top:20px;padding-top:12px;border-top:1px solid rgba(255,107,107,.15);font-size:13px;color:var(--bad);font-weight:600">Result: heat without memory</div>'+
+  '</div>';
+
+var governedHTML = '<div class="compare-good card" style="padding:24px">'+
+  '<h3 style="color:var(--ok);margin:0 0 16px">CERPA-Governed PURPLE</h3>'+
+  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+  ['Common language across red and blue','Closed-loop evidence chain','Authoritative review with provenance','Patch memory with retest gates','Durable audit trail','Regression detection built in','Executive dashboard from live data','Institutional knowledge that compounds'].map(function(t){
+    return '<div style="display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 0"><span style="color:var(--ok)">&#9679;</span>'+t+'</div>';
+  }).join('')+
+  '</div>'+
+  '<div style="margin-top:20px;padding-top:12px;border-top:1px solid rgba(93,255,147,.15);font-size:13px;color:var(--ok);font-weight:600">Result: governed learning system</div>'+
+  '</div>';
+
+var compareContent=document.getElementById("compareContent");
+setHTML(compareContent, traditionalHTML);
+
+document.querySelector(".toggle-bar").addEventListener("click",function(e){
+  var btn=e.target.closest("[data-toggle]");if(!btn)return;
+  document.querySelectorAll("[data-toggle]").forEach(function(b){b.classList.remove("active")});
+  btn.classList.add("active");
+  var mode=btn.getAttribute("data-toggle");
+  setHTML(compareContent, mode==="traditional"? traditionalHTML : governedHTML);
+});
+
+/* SVG Gauge render */
+(function(){
+  var gauge=document.getElementById("coherenceGauge");if(!gauge)return;
+  var score=87;
+  var circumference=2*Math.PI*52;
+  var offset=circumference-(score/100)*circumference;
+  var color=score>=80?"var(--ok)":score>=60?"var(--warn)":"var(--bad)";
+  setHTML(gauge,
+    '<svg viewBox="0 0 120 120" style="width:160px;height:160px">'+
+    '<circle cx="60" cy="60" r="52" fill="none" stroke="var(--line)" stroke-width="8"/>'+
+    '<circle cx="60" cy="60" r="52" fill="none" stroke="'+color+'" stroke-width="8" stroke-dasharray="'+circumference+'" stroke-dashoffset="'+offset+'" stroke-linecap="round" style="transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset .8s"/>'+
+    '<text x="60" y="55" text-anchor="middle" fill="'+color+'" font-size="32" font-weight="700" font-family="inherit">'+score+'</text>'+
+    '<text x="60" y="72" text-anchor="middle" fill="var(--muted)" font-size="9" font-family="inherit">COHERENCE</text>'+
+    '</svg>'
+  );
+})();
+
+/* Copy brief */
+var copyBtn=document.getElementById("btnCopy");
+if(copyBtn)copyBtn.addEventListener("click",function(){
+  var brief=[
+    "CERPA for PURPLE Teams \u2014 Executive Brief",
+    "",
+    "CERPA (Composite Enterprise Risk Posture Assessment) provides a governed lifecycle for PURPLE team operations:",
+    "  Claim: Validated adversary exposure",
+    "  Event: Observed telemetry and analyst evidence",
+    "  Review: Joint red/blue adjudication with mission impact scoring",
+    "  Patch: Approved correction with provenance trail",
+    "  Apply: Enforced change with retest verification",
+    "",
+    "Key advantages over traditional PURPLE exercises:",
+    "  - Eliminates red-to-blue translation loss",
+    "  - Creates durable institutional memory across exercises",
+    "  - Detects regression and contradiction automatically",
+    "  - Provides real-time executive visibility via live KPIs",
+    "  - Aligns naturally with NIST, CMMC, and RMF compliance frameworks",
+    "",
+    "Bottom line: CERPA turns adversary simulation into a governed learning system.",
+    "",
+    "Deep Sigma EDGE | CERPA | PURPLE TEAM"
+  ].join("\n");
+  navigator.clipboard.writeText(brief).then(function(){
+    copyBtn.textContent="Copied!";
+    setTimeout(function(){copyBtn.textContent="Copy Brief"},1500);
+  });
+});
+</script>
+</body>
+</html>

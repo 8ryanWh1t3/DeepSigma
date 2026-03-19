@@ -303,6 +303,8 @@ ALLOWED_ACRONYMS = {
     "ACAS", "ACTOR", "ASSESS", "BADGE", "CAT", "COLOR", "ISSM",
     "ITEMS", "LINKED", "LPS", "POAM", "SAR", "SCA", "SSP", "STIG",
     "VAL",
+    # CERPA PURPLE EDGE — showcase, cyber team, threat framework tokens
+    "PURPLE", "TEAM", "HERO", "MITRE", "SIEM", "SOAR", "EDR", "ATT",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}
