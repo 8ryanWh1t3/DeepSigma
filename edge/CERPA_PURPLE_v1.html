@@ -216,8 +216,6 @@ button.danger{border-color:rgba(255,107,107,.35);color:var(--bad)}
 .cis-gauge-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
 .cis-gauge-score{font-size:28px;font-weight:700;line-height:1}
 .cis-gauge-sub{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
-#s-mem{display:flex;flex-direction:column;height:calc(100vh - 180px)}
-#mgCanvas{flex:1;min-height:0}
 .graph-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 12px;background:var(--card);border:1px solid var(--line);border-radius:8px;margin-bottom:10px}
 .graph-toolbar label{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--txt);cursor:pointer}
 .graph-toolbar input[type="checkbox"]{accent-color:var(--accent)}
@@ -671,7 +669,7 @@ var tabs=document.querySelectorAll(".ttab");
 var secs=document.querySelectorAll("section[id^='s-']");
 function openTab(n){
   tabs.forEach(function(t){t.classList.toggle("active",t.getAttribute("data-t")===n)});
-  secs.forEach(function(s){var active=s.id==="s-"+n;s.style.display=active?(s.id==="s-mem"?"flex":"block"):"none"});
+  secs.forEach(function(s){s.style.display=s.id==="s-"+n?"block":"none"});
   if(n==="mem")renderMG();
 }
 tabs.forEach(function(t){t.addEventListener("click",function(){openTab(t.getAttribute("data-t"))})});
@@ -2446,6 +2444,12 @@ var MG_NS="http://www.w3.org/2000/svg";
 function renderMG(){
   var svg=document.getElementById("mgCanvas");
   if(!svg)return;
+
+  /* size SVG to fill from its top edge to the bottom of the viewport, minus footer space */
+  var svgTop=svg.getBoundingClientRect().top;
+  var availH=window.innerHeight-svgTop-52;
+  if(availH<300)availH=520;
+  svg.setAttribute("height",availH);
 
   /* filter by type checkboxes */
   var visTypes={};
