@@ -549,7 +549,7 @@ footer strong{color:var(--accent);font-weight:600}
     <label><input type="checkbox" checked id="mgEdges"/> Edges</label>
     <label><input type="checkbox" checked id="mgLabels"/> Labels</label>
   </div>
-  <div id="mgCanvas" style="background:var(--card);border:1px solid var(--line);border-radius:10px;min-height:520px"></div>
+  <svg id="mgCanvas" width="100%" height="520" style="background:var(--card);border:1px solid var(--line);border-radius:10px"></svg>
   <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
     <button id="mgSummary" class="primary">Graph Summary</button>
     <div id="mgStats" style="font-size:10px;color:var(--muted)"></div>
@@ -1170,57 +1170,65 @@ Object.keys(PF).forEach(function(k){ensureChangeLog(k);ensureSyncMeta(k)});
 
 /* ══════════ SECTION 10: MEMORY GRAPH DATA ══════════ */
 var MG_NODES=[
-  {id:"ex1",type:"exercise",label:"IRON FORGE",ref:"EX-001"},
-  {id:"ex2",type:"exercise",label:"Cloud Pivot",ref:"EX-002"},
-  {id:"ex3",type:"exercise",label:"Ransomware TTX",ref:"EX-003"},
-  {id:"f101",type:"finding",label:"PF-101 PtH",ref:"101"},
-  {id:"f102",type:"finding",label:"PF-102 PS",ref:"102"},
-  {id:"f103",type:"finding",label:"PF-103 LSASS",ref:"103"},
-  {id:"f104",type:"finding",label:"PF-104 C2",ref:"104"},
-  {id:"f105",type:"finding",label:"PF-105 DomAcct",ref:"105"},
-  {id:"f106",type:"finding",label:"PF-106 Exfil",ref:"106"},
-  {id:"f107",type:"finding",label:"PF-107 RDP",ref:"107"},
-  {id:"f108",type:"finding",label:"PF-108 Phish",ref:"108"},
-  {id:"f109",type:"finding",label:"PF-109 Tamper",ref:"109"},
-  {id:"f110",type:"finding",label:"PF-110 Ransom",ref:"110"},
-  {id:"f111",type:"finding",label:"PF-111 Obfusc",ref:"111"},
-  {id:"f112",type:"finding",label:"PF-112 BrowsCred",ref:"112"},
-  {id:"t1550",type:"technique",label:"T1550.002 PtH"},
-  {id:"t1059",type:"technique",label:"T1059.001 PS"},
-  {id:"t1003",type:"technique",label:"T1003.001 LSASS"},
-  {id:"t1071",type:"technique",label:"T1071.001 C2"},
-  {id:"t1078",type:"technique",label:"T1078.002 DomAcct"},
-  {id:"t1048",type:"technique",label:"T1048.003 Exfil"},
-  {id:"t1021",type:"technique",label:"T1021.001 RDP"},
-  {id:"t1566",type:"technique",label:"T1566.001 Phish"},
-  {id:"t1562",type:"technique",label:"T1562.001 Tamper"},
-  {id:"t1486",type:"technique",label:"T1486 Encryption"},
-  {id:"t1027",type:"technique",label:"T1027 Obfusc"},
-  {id:"t1555",type:"technique",label:"T1555.003 BrowsCred"},
-  {id:"tac_latmov",type:"tactic",label:"Lateral Movement"},
-  {id:"tac_exec",type:"tactic",label:"Execution"},
-  {id:"tac_credacc",type:"tactic",label:"Credential Access"},
-  {id:"tac_c2",type:"tactic",label:"Command & Control"},
-  {id:"tac_persist",type:"tactic",label:"Persistence"},
-  {id:"tac_exfil",type:"tactic",label:"Exfiltration"},
-  {id:"tac_ia",type:"tactic",label:"Initial Access"},
-  {id:"tac_de",type:"tactic",label:"Defense Evasion"},
-  {id:"tac_impact",type:"tactic",label:"Impact"},
-  {id:"pat_detgap",type:"pattern",label:"Detection Gap"},
-  {id:"pat_credexp",type:"pattern",label:"Credential Exposure"},
-  {id:"pat_latchain",type:"pattern",label:"Lateral Movement Chain"},
-  {id:"pat_triagefail",type:"pattern",label:"Triage Failure"},
-  {id:"rc_edr",type:"rootcause",label:"EDR Config Gap"},
-  {id:"rc_siem",type:"rootcause",label:"SIEM Correlation Gap"},
-  {id:"rc_dlp",type:"rootcause",label:"DLP Bypass"},
-  {id:"rc_triage",type:"rootcause",label:"Triage Process Gap"},
-  {id:"p_edrrule",type:"patch",label:"EDR Rule Deploy"},
-  {id:"p_netseg",type:"patch",label:"Network Segmentation"},
-  {id:"p_ja3",type:"patch",label:"JA3 Fingerprinting"},
-  {id:"p_tamper",type:"patch",label:"Tamper Protection"},
-  {id:"d_missed",type:"detection",label:"Missed (6)"},
-  {id:"d_partial",type:"detection",label:"Partial (3)"},
-  {id:"d_detected",type:"detection",label:"Detected (3)"}
+  /* Exercises — top row */
+  {id:"ex1",type:"exercise",label:"IRON FORGE",ref:"EX-001",x:150,y:60},
+  {id:"ex2",type:"exercise",label:"Cloud Pivot",ref:"EX-002",x:450,y:60},
+  {id:"ex3",type:"exercise",label:"Ransomware TTX",ref:"EX-003",x:750,y:60},
+  /* Findings — second row, spread under their exercises */
+  {id:"f101",type:"finding",label:"PF-101 PtH",ref:"101",x:60,y:150},
+  {id:"f102",type:"finding",label:"PF-102 PS",ref:"102",x:130,y:170},
+  {id:"f103",type:"finding",label:"PF-103 LSASS",ref:"103",x:200,y:150},
+  {id:"f104",type:"finding",label:"PF-104 C2",ref:"104",x:270,y:170},
+  {id:"f105",type:"finding",label:"PF-105 DomAcct",ref:"105",x:340,y:150},
+  {id:"f106",type:"finding",label:"PF-106 Exfil",ref:"106",x:420,y:150},
+  {id:"f107",type:"finding",label:"PF-107 RDP",ref:"107",x:490,y:170},
+  {id:"f108",type:"finding",label:"PF-108 Phish",ref:"108",x:560,y:150},
+  {id:"f109",type:"finding",label:"PF-109 Tamper",ref:"109",x:630,y:170},
+  {id:"f110",type:"finding",label:"PF-110 Ransom",ref:"110",x:700,y:150},
+  {id:"f111",type:"finding",label:"PF-111 Obfusc",ref:"111",x:770,y:170},
+  {id:"f112",type:"finding",label:"PF-112 BrowsCred",ref:"112",x:840,y:150},
+  /* Techniques — third row */
+  {id:"t1550",type:"technique",label:"T1550.002 PtH",x:60,y:260},
+  {id:"t1059",type:"technique",label:"T1059.001 PS",x:140,y:260},
+  {id:"t1003",type:"technique",label:"T1003.001 LSASS",x:220,y:260},
+  {id:"t1071",type:"technique",label:"T1071.001 C2",x:300,y:260},
+  {id:"t1078",type:"technique",label:"T1078.002 DomAcct",x:380,y:260},
+  {id:"t1048",type:"technique",label:"T1048.003 Exfil",x:460,y:260},
+  {id:"t1021",type:"technique",label:"T1021.001 RDP",x:540,y:260},
+  {id:"t1566",type:"technique",label:"T1566.001 Phish",x:620,y:260},
+  {id:"t1562",type:"technique",label:"T1562.001 Tamper",x:700,y:260},
+  {id:"t1486",type:"technique",label:"T1486 Encryption",x:780,y:260},
+  {id:"t1027",type:"technique",label:"T1027 Obfusc",x:830,y:290},
+  {id:"t1555",type:"technique",label:"T1555.003 BrowsCred",x:870,y:260},
+  /* Tactics — fourth row */
+  {id:"tac_latmov",type:"tactic",label:"Lateral Movement",x:80,y:350},
+  {id:"tac_exec",type:"tactic",label:"Execution",x:200,y:350},
+  {id:"tac_credacc",type:"tactic",label:"Credential Access",x:320,y:350},
+  {id:"tac_c2",type:"tactic",label:"Command & Control",x:440,y:350},
+  {id:"tac_persist",type:"tactic",label:"Persistence",x:540,y:350},
+  {id:"tac_exfil",type:"tactic",label:"Exfiltration",x:640,y:350},
+  {id:"tac_ia",type:"tactic",label:"Initial Access",x:740,y:350},
+  {id:"tac_de",type:"tactic",label:"Defense Evasion",x:840,y:350},
+  {id:"tac_impact",type:"tactic",label:"Impact",x:440,y:390},
+  /* Patterns — bottom left */
+  {id:"pat_detgap",type:"pattern",label:"Detection Gap",x:120,y:440},
+  {id:"pat_credexp",type:"pattern",label:"Credential Exposure",x:280,y:440},
+  {id:"pat_latchain",type:"pattern",label:"Lateral Movement Chain",x:440,y:440},
+  {id:"pat_triagefail",type:"pattern",label:"Triage Failure",x:600,y:440},
+  /* Root Causes — bottom center */
+  {id:"rc_edr",type:"rootcause",label:"EDR Config Gap",x:160,y:490},
+  {id:"rc_siem",type:"rootcause",label:"SIEM Correlation Gap",x:340,y:490},
+  {id:"rc_dlp",type:"rootcause",label:"DLP Bypass",x:500,y:490},
+  {id:"rc_triage",type:"rootcause",label:"Triage Process Gap",x:660,y:490},
+  /* Patches — bottom right */
+  {id:"p_edrrule",type:"patch",label:"EDR Rule Deploy",x:100,y:510},
+  {id:"p_netseg",type:"patch",label:"Network Segmentation",x:300,y:510},
+  {id:"p_ja3",type:"patch",label:"JA3 Fingerprinting",x:500,y:510},
+  {id:"p_tamper",type:"patch",label:"Tamper Protection",x:700,y:510},
+  /* Detection status — right side */
+  {id:"d_missed",type:"detection",label:"Missed (6)",x:830,y:430},
+  {id:"d_partial",type:"detection",label:"Partial (3)",x:830,y:460},
+  {id:"d_detected",type:"detection",label:"Detected (3)",x:830,y:490}
 ];
 var MG_EDGES=[
   {from:"ex1",to:"f101"},{from:"ex1",to:"f102"},{from:"ex1",to:"f103"},{from:"ex1",to:"f104"},{from:"ex1",to:"f105"},
@@ -2432,90 +2440,105 @@ function renderTrends(){
 }
 
 /* ══════════ STAGE 12: MEMORY GRAPH ══════════ */
+var MG_NS="http://www.w3.org/2000/svg";
 function renderMG(){
-  var canvas=document.getElementById("mgCanvas");
-  if(!canvas)return;
-  var W=canvas.getBoundingClientRect().width||900;
-  var H=520;
+  var svg=document.getElementById("mgCanvas");
+  if(!svg)return;
 
   /* filter by type checkboxes */
   var visTypes={};
   document.querySelectorAll("[data-mg]").forEach(function(cb){visTypes[cb.getAttribute("data-mg")]=cb.checked});
   var searchQ=(document.getElementById("mgSearch").value||"").toLowerCase();
 
-  var nodes=MG_NODES.filter(function(n){
+  var visNodes=MG_NODES.filter(function(n){
     if(!visTypes[n.type])return false;
     if(searchQ&&n.label.toLowerCase().indexOf(searchQ)===-1)return false;
     return true;
   });
-  var nodeIds={};nodes.forEach(function(n){nodeIds[n.id]=n});
+  var visIds={};visNodes.forEach(function(n){visIds[n.id]=true});
+  var visEdges=MG_EDGES.filter(function(e){return visIds[e.from]&&visIds[e.to]});
 
-  var edges=MG_EDGES.filter(function(e){return nodeIds[e.from]&&nodeIds[e.to]});
   var showEdges=document.getElementById("mgEdges").checked;
   var showLabels=document.getElementById("mgLabels").checked;
 
-  /* layout — force-directed simplified (circular initial + push) */
-  var cx=W/2,cy=H/2;
-  nodes.forEach(function(n,i){
-    var a=(i/nodes.length)*Math.PI*2;
-    var r=Math.min(W,H)*0.38;
-    n.x=cx+Math.cos(a)*r*(0.6+Math.random()*0.4);
-    n.y=cy+Math.sin(a)*r*(0.6+Math.random()*0.4);
-  });
-  /* simple repulsion/attraction passes */
-  for(var iter=0;iter<60;iter++){
-    nodes.forEach(function(a){
-      nodes.forEach(function(b){
-        if(a===b)return;
-        var dx=a.x-b.x,dy=a.y-b.y;
-        var dist=Math.sqrt(dx*dx+dy*dy)||1;
-        if(dist<80){var f=(80-dist)*0.15;a.x+=dx/dist*f;a.y+=dy/dist*f}
-      });
+  /* clear SVG */
+  while(svg.firstChild)svg.removeChild(svg.firstChild);
+
+  /* draw edges */
+  if(showEdges){
+    visEdges.forEach(function(e){
+      var a=MG_NODES.find(function(n){return n.id===e.from});
+      var b=MG_NODES.find(function(n){return n.id===e.to});
+      if(a&&b){
+        var ln=document.createElementNS(MG_NS,"line");
+        ln.setAttribute("x1",a.x);ln.setAttribute("y1",a.y);
+        ln.setAttribute("x2",b.x);ln.setAttribute("y2",b.y);
+        ln.setAttribute("stroke","rgba(255,255,255,0.15)");ln.setAttribute("stroke-width","1");
+        ln.dataset.from=e.from;ln.dataset.to=e.to;
+        svg.appendChild(ln);
+      }
     });
-    edges.forEach(function(e){
-      var a=nodeIds[e.from],b=nodeIds[e.to];
-      if(!a||!b)return;
-      var dx=b.x-a.x,dy=b.y-a.y;
-      var dist=Math.sqrt(dx*dx+dy*dy)||1;
-      var ideal=100;
-      var f=(dist-ideal)*0.02;
-      a.x+=dx/dist*f;a.y+=dy/dist*f;
-      b.x-=dx/dist*f;b.y-=dy/dist*f;
-    });
-    /* keep in bounds */
-    nodes.forEach(function(n){n.x=Math.max(30,Math.min(W-30,n.x));n.y=Math.max(30,Math.min(H-30,n.y))});
   }
 
-  /* render full SVG tag into the wrapper div */
-  var svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" style="display:block">';
-  if(showEdges){
-    edges.forEach(function(e){
-      var a=nodeIds[e.from],b=nodeIds[e.to];
-      svg+='<line x1="'+a.x+'" y1="'+a.y+'" x2="'+b.x+'" y2="'+b.y+'" stroke="#2a2040" stroke-width="1" opacity="0.6"/>';
-    });
-  }
-  nodes.forEach(function(n){
+  /* draw nodes */
+  visNodes.forEach(function(n){
     var col=MG_COLORS[n.type]||"#888";
-    var r=n.type==="exercise"?10:n.type==="finding"?8:n.type==="tactic"?9:7;
-    svg+='<circle cx="'+n.x+'" cy="'+n.y+'" r="'+r+'" fill="'+col+'" opacity="0.85" style="cursor:pointer" data-mgn="'+escHTML(n.id)+'"/>';
+    var r=n.type==="exercise"?12:n.type==="finding"?9:n.type==="tactic"?10:8;
+    var c=document.createElementNS(MG_NS,"circle");
+    c.setAttribute("cx",n.x);c.setAttribute("cy",n.y);c.setAttribute("r",r);
+    c.setAttribute("fill",col);c.setAttribute("opacity","0.9");
+    c.setAttribute("stroke","rgba(0,0,0,0.3)");c.setAttribute("stroke-width","1.5");
+    c.dataset.nid=n.id;c.classList.add("mg-node");c.style.cursor="pointer";
+    svg.appendChild(c);
     if(showLabels){
-      svg+='<text x="'+n.x+'" y="'+(n.y+r+12)+'" text-anchor="middle" fill="'+col+'" font-size="8" opacity="0.7">'+escHTML(n.label)+'</text>';
+      var t=document.createElementNS(MG_NS,"text");
+      t.setAttribute("x",n.x);t.setAttribute("y",n.y+r+12);
+      t.setAttribute("fill",col);t.setAttribute("font-size","8");t.setAttribute("text-anchor","middle");
+      t.setAttribute("opacity","0.7");
+      t.textContent=n.label;
+      svg.appendChild(t);
     }
   });
-  svg+='</svg>';
-  setHTML(canvas,svg);
 
-  /* click handler for nodes */
-  canvas.querySelectorAll("[data-mgn]").forEach(function(el){
+  /* hover: highlight connected */
+  svg.querySelectorAll(".mg-node").forEach(function(el){
+    el.addEventListener("mouseenter",function(){
+      var nid=el.dataset.nid;
+      svg.querySelectorAll("line").forEach(function(ln){
+        if(ln.dataset.from===nid||ln.dataset.to===nid){ln.setAttribute("stroke","var(--accent)");ln.setAttribute("stroke-width","2");}
+        else{ln.setAttribute("stroke","rgba(255,255,255,0.04)");ln.setAttribute("stroke-width","1");}
+      });
+      svg.querySelectorAll(".mg-node").forEach(function(c2){
+        var cid=c2.dataset.nid;
+        var connected=visEdges.some(function(e){return(e.from===nid&&e.to===cid)||(e.to===nid&&e.from===cid)});
+        c2.setAttribute("opacity",cid===nid||connected?"1":"0.2");
+      });
+      /* tooltip */
+      var nd=MG_NODES.find(function(n){return n.id===nid});
+      if(nd){
+        var tip=document.getElementById("mgTooltip");
+        tip.innerHTML='<strong style="color:'+(MG_COLORS[nd.type]||"#888")+'">'+escHTML(nd.label)+'</strong><br><span style="color:var(--muted)">'+escHTML(nd.type)+'</span>';
+        tip.style.display="block";
+      }
+    });
+    el.addEventListener("mousemove",function(ev){
+      var tip=document.getElementById("mgTooltip");
+      tip.style.left=(ev.pageX+12)+"px";tip.style.top=(ev.pageY-20)+"px";
+    });
+    el.addEventListener("mouseleave",function(){
+      svg.querySelectorAll("line").forEach(function(ln){ln.setAttribute("stroke","rgba(255,255,255,0.15)");ln.setAttribute("stroke-width","1");});
+      svg.querySelectorAll(".mg-node").forEach(function(c2){c2.setAttribute("opacity","0.9");});
+      document.getElementById("mgTooltip").style.display="none";
+    });
+    /* click → detail drawer */
     el.addEventListener("click",function(){
-      var nid=el.getAttribute("data-mgn");
+      var nid=el.dataset.nid;
       var nd=MG_NODES.find(function(n){return n.id===nid});
       if(!nd)return;
       var body='<div class="wire"><div class="wr"><span class="wl">ID</span><span class="wv">'+escHTML(nd.id)+'</span></div>';
       body+='<div class="wr"><span class="wl">Type</span><span class="wv"><span style="color:'+(MG_COLORS[nd.type]||"#888")+'">'+escHTML(nd.type)+'</span></span></div>';
       body+='<div class="wr"><span class="wl">Label</span><span class="wv">'+escHTML(nd.label)+'</span></div>';
       if(nd.ref)body+='<div class="wr"><span class="wl">Ref</span><span class="wv mono">'+escHTML(nd.ref)+'</span></div>';
-      /* connected nodes */
       var connected=MG_EDGES.filter(function(e){return e.from===nid||e.to===nid}).map(function(e){return e.from===nid?e.to:e.from});
       var unique=connected.filter(function(v,i,a){return a.indexOf(v)===i});
       body+='<div class="wr"><span class="wl">Connections</span><span class="wv">'+unique.length+'</span></div>';
@@ -2532,25 +2555,11 @@ function renderMG(){
     });
   });
 
-  /* tooltip on hover */
-  var tip=document.getElementById("mgTooltip");
-  canvas.querySelectorAll("[data-mgn]").forEach(function(el){
-    el.addEventListener("mouseenter",function(ev){
-      var nid=el.getAttribute("data-mgn");
-      var nd=MG_NODES.find(function(n){return n.id===nid});
-      if(!nd)return;
-      tip.innerHTML='<strong style="color:'+(MG_COLORS[nd.type]||"#888")+'">'+escHTML(nd.label)+'</strong><br><span style="color:var(--muted)">'+escHTML(nd.type)+'</span>';
-      tip.style.display="block";
-      tip.style.left=(ev.pageX+12)+"px";tip.style.top=(ev.pageY-20)+"px";
-    });
-    el.addEventListener("mouseleave",function(){tip.style.display="none"});
-  });
-
   /* stats */
   var statsEl=document.getElementById("mgStats");
   if(statsEl){
-    var typeCounts={};nodes.forEach(function(n){typeCounts[n.type]=(typeCounts[n.type]||0)+1});
-    var st=nodes.length+" nodes, "+edges.length+" edges | ";
+    var typeCounts={};visNodes.forEach(function(n){typeCounts[n.type]=(typeCounts[n.type]||0)+1});
+    var st=visNodes.length+" nodes, "+visEdges.length+" edges | ";
     Object.keys(typeCounts).sort().forEach(function(t){st+=t+": "+typeCounts[t]+"  "});
     statsEl.textContent=st;
   }
