@@ -185,6 +185,7 @@ button.danger{border-color:rgba(255,107,107,.35);color:var(--bad)}
 .mg-bright{opacity:1!important;transition:opacity .2s}
 .shortcut-bar{position:fixed;bottom:0;left:0;right:0;z-index:150;background:rgba(10,8,18,.94);border-top:1px solid var(--line);padding:4px 16px;display:flex;align-items:center;gap:14px;font-size:9px;color:var(--muted)}
 .shortcut-bar kbd{display:inline-block;padding:1px 5px;border-radius:3px;background:rgba(0,240,255,.08);border:1px solid rgba(0,240,255,.15);font-family:inherit;font-size:9px;color:var(--accent);margin:0 1px}
+.sc-chev{font-size:6px;color:rgba(0,240,255,.25);margin:0 2px}
 .board-timer{font-size:11px;color:var(--accent);font-variant-numeric:tabular-nums;font-weight:600;margin-left:auto;display:flex;align-items:center;gap:4px}
 .board-timer .bt-dot{width:6px;height:6px;border-radius:50%;background:var(--ok);animation:pulse 1.5s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
@@ -623,14 +624,16 @@ footer strong{color:var(--accent);font-weight:600}
 
 <!-- Shortcut Bar -->
 <div class="shortcut-bar">
-  <span><kbd>R</kbd> Roles</span>
-  <span><kbd>D</kbd> Dashboard</span>
-  <span><kbd>X</kbd> Exercises</span>
-  <span><kbd>F</kbd> Findings</span>
-  <span><kbd>B</kbd> Board</span>
-  <span><kbd>T</kbd> Trends</span>
-  <span><kbd>M</kbd> Memory</span>
-  <span><kbd>?</kbd> Tour</span>
+  <span><kbd>R</kbd> Roles</span><span class="sc-chev">&#9654;</span>
+  <span><kbd>D</kbd> Dashboard</span><span class="sc-chev">&#9654;</span>
+  <span><kbd>X</kbd> Exercises</span><span class="sc-chev">&#9654;</span>
+  <span><kbd>F</kbd> Findings</span><span class="sc-chev">&#9654;</span>
+  <span><kbd>B</kbd> Board</span><span class="sc-chev">&#9654;</span>
+  <span><kbd>T</kbd> Trends</span><span class="sc-chev">&#9654;</span>
+  <span><kbd>M</kbd> Memory</span><span class="sc-chev">&#9654;</span>
+  <span><kbd>N</kbd> New</span><span class="sc-chev">&#9654;</span>
+  <span><kbd>Esc</kbd> Close</span><span class="sc-chev">&#9654;</span>
+  <span><kbd>?</kbd> Help</span>
 </div>
 
 <footer>
@@ -2450,7 +2453,9 @@ function renderMG(){
   var availH=window.innerHeight-svgTop-52;
   if(availH<300)availH=520;
   svg.setAttribute("height",availH);
-  svg.setAttribute("viewBox","0 0 900 "+availH);
+  /* viewBox centers the node field (x:40-890, y:40-530) with padding */
+  svg.setAttribute("viewBox","0 0 930 550");
+  svg.setAttribute("preserveAspectRatio","xMidYMid meet");
 
   /* filter by type checkboxes */
   var visTypes={};
