@@ -2556,14 +2556,65 @@ function renderMG(){
       body+='<div class="wr"><span class="wl">Connections</span><span class="wv">'+unique.length+'</span></div>';
       if(unique.length>0){
         body+='<div style="margin-top:8px"><strong style="font-size:10px">Connected Nodes</strong>';
-        unique.forEach(function(cid){
+        unique.forEach(function(cid,ci){
           var cn=MG_NODES.find(function(n){return n.id===cid});
-          if(cn)body+='<div style="font-size:10px;padding:3px 0;color:'+(MG_COLORS[cn.type]||"#888")+';display:flex;align-items:center;gap:6px"><span style="font-size:6px">&#9679;</span>'+escHTML(cn.label)+' <span style="color:var(--muted);font-size:9px">('+escHTML(cn.type)+')</span></div>';
+          if(!cn)return;
+          var col=MG_COLORS[cn.type]||"#888";
+          var did="mgd-"+ci;
+          body+='<div style="border-bottom:1px solid var(--line)">';
+          body+='<div data-mgtog="'+did+'" style="cursor:pointer;display:flex;align-items:center;gap:6px;padding:5px 0;font-size:10px;color:'+col+'">';
+          body+='<span class="mg-chev" style="display:inline-block;font-size:8px;transition:transform .2s">&#9654;</span>';
+          body+=escHTML(cn.label)+' <span style="color:var(--muted);font-size:9px">('+escHTML(cn.type)+')</span></div>';
+          /* detail panel */
+          body+='<div id="'+did+'" style="display:none;padding:4px 0 6px 18px;font-size:10px">';
+          body+='<div style="color:var(--muted)">ID: <span style="color:'+col+'">'+escHTML(cn.id)+'</span></div>';
+          body+='<div style="color:var(--muted)">Type: <span style="color:'+col+'">'+escHTML(cn.type)+'</span></div>';
+          if(cn.ref){
+            body+='<div style="color:var(--muted)">Ref: <span class="mono" style="color:var(--accent)">'+escHTML(cn.ref)+'</span></div>';
+            /* if it's a finding ref, show finding details */
+            if(cn.type==="finding"&&PF[cn.ref]){
+              var pf=PF[cn.ref];
+              body+='<div style="margin-top:4px;padding-top:4px;border-top:1px solid var(--line)">';
+              body+='<div style="color:var(--muted)">Title: <span style="color:var(--txt)">'+escHTML(pf.title)+'</span></div>';
+              body+='<div style="color:var(--muted)">Sev: <span class="badge '+(sevClassMap[pf.sev]||"sev-low")+'" style="font-size:9px">'+escHTML(pf.sev)+'</span></div>';
+              body+='<div style="color:var(--muted)">Status: <span style="color:var(--txt)">'+escHTML(pf.status)+'</span></div>';
+              body+='<div style="color:var(--muted)">Detection: <span style="color:var(--txt)">'+escHTML(pf.detectionStatus)+'</span></div>';
+              body+='<div style="color:var(--muted)">Technique: <span style="color:var(--mag)">'+escHTML(pf.technique)+'</span></div>';
+              body+='</div>';
+            }
+            /* if it's an exercise ref, show exercise details */
+            if(cn.type==="exercise"&&EX[cn.ref]){
+              var ex=EX[cn.ref];
+              body+='<div style="margin-top:4px;padding-top:4px;border-top:1px solid var(--line)">';
+              body+='<div style="color:var(--muted)">Name: <span style="color:var(--txt)">'+escHTML(ex.name)+'</span></div>';
+              body+='<div style="color:var(--muted)">Type: <span style="color:var(--txt)">'+escHTML(ex.type)+'</span></div>';
+              body+='<div style="color:var(--muted)">Status: <span style="color:var(--txt)">'+escHTML(ex.status)+'</span></div>';
+              var pcs=computePCS(cn.ref);var pc=pcs>=80?"var(--ok)":pcs>=60?"var(--warn)":"var(--bad)";
+              body+='<div style="color:var(--muted)">PCS: <span style="color:'+pc+';font-weight:700">'+pcs+'</span></div>';
+              body+='</div>';
+            }
+          }
+          /* connected count for this sub-node */
+          var subConn=MG_EDGES.filter(function(e){return e.from===cid||e.to===cid}).length;
+          body+='<div style="color:var(--muted)">Connections: '+subConn+'</div>';
+          body+='</div></div>';
         });
         body+='</div>';
       }
       body+='</div>';
       openDrawer("Node: "+nd.label,body,"");
+      /* wire chevron expand/collapse on each connected node */
+      document.querySelectorAll("[data-mgtog]").forEach(function(row){
+        row.addEventListener("click",function(){
+          var tgt=document.getElementById(row.getAttribute("data-mgtog"));
+          var chev=row.querySelector(".mg-chev");
+          if(tgt){
+            var open=tgt.style.display!=="none";
+            tgt.style.display=open?"none":"block";
+            if(chev)chev.style.transform=open?"rotate(0deg)":"rotate(90deg)";
+          }
+        });
+      });
     });
   });
 
