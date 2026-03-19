@@ -2503,7 +2503,8 @@ function renderMG(){
       svg+='<text x="'+n.x+'" y="'+(n.y+r+12)+'" text-anchor="middle" fill="'+col+'" font-size="8" opacity="0.7">'+escHTML(n.label)+'</text>';
     }
   });
-  setHTML(canvas,svg);
+  /* SVG requires namespace-aware insertion — template approach breaks SVG elements */
+  canvas.innerHTML=svg;
 
   /* click handler for nodes */
   canvas.querySelectorAll("[data-mgn]").forEach(function(el){
