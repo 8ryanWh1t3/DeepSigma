@@ -2555,15 +2555,42 @@ function renderMG(){
       var unique=connected.filter(function(v,i,a){return a.indexOf(v)===i});
       body+='<div class="wr"><span class="wl">Connections</span><span class="wv">'+unique.length+'</span></div>';
       if(unique.length>0){
-        body+='<div style="margin-top:8px"><strong style="font-size:10px">Connected Nodes</strong>';
+        /* group by type */
+        var byType={};
         unique.forEach(function(cid){
           var cn=MG_NODES.find(function(n){return n.id===cid});
-          if(cn)body+='<div style="font-size:10px;padding:2px 0;color:'+(MG_COLORS[cn.type]||"#888")+'">'+escHTML(cn.label)+' ('+escHTML(cn.type)+')</div>';
+          if(cn){if(!byType[cn.type])byType[cn.type]=[];byType[cn.type].push(cn)}
         });
-        body+='</div>';
+        var gi=0;
+        Object.keys(byType).sort().forEach(function(typ){
+          var items=byType[typ];var gid="mg-grp-"+gi;gi++;
+          body+='<div style="margin-top:8px">';
+          body+='<div data-toggle="'+gid+'" style="cursor:pointer;display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--line)">';
+          body+='<span class="mg-chev" style="display:inline-block;font-size:8px;color:'+(MG_COLORS[typ]||"#888")+';transition:transform .2s">&#9654;</span>';
+          body+='<strong style="font-size:10px;color:'+(MG_COLORS[typ]||"#888")+'">'+escHTML(typ)+'</strong>';
+          body+='<span style="font-size:9px;color:var(--muted)">('+items.length+')</span></div>';
+          body+='<div id="'+gid+'" style="display:none;padding-left:16px">';
+          items.forEach(function(cn){
+            body+='<div style="font-size:10px;padding:3px 0;color:'+(MG_COLORS[cn.type]||"#888")+';display:flex;align-items:center;gap:6px">';
+            body+='<span style="font-size:6px">&#9679;</span>'+escHTML(cn.label)+'</div>';
+          });
+          body+='</div></div>';
+        });
       }
       body+='</div>';
       openDrawer("Node: "+nd.label,body,"");
+      /* wire chevron toggles */
+      document.querySelectorAll("[data-toggle]").forEach(function(hdr){
+        hdr.addEventListener("click",function(){
+          var tgt=document.getElementById(hdr.getAttribute("data-toggle"));
+          var chev=hdr.querySelector(".mg-chev");
+          if(tgt){
+            var open=tgt.style.display!=="none";
+            tgt.style.display=open?"none":"block";
+            if(chev)chev.style.transform=open?"rotate(0deg)":"rotate(90deg)";
+          }
+        });
+      });
     });
   });
 
