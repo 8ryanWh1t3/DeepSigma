@@ -549,7 +549,7 @@ footer strong{color:var(--accent);font-weight:600}
     <label><input type="checkbox" checked id="mgEdges"/> Edges</label>
     <label><input type="checkbox" checked id="mgLabels"/> Labels</label>
   </div>
-  <svg id="mgCanvas" width="100%" height="520" style="background:var(--card);border:1px solid var(--line);border-radius:10px"></svg>
+  <div id="mgCanvas" style="background:var(--card);border:1px solid var(--line);border-radius:10px;min-height:520px"></div>
   <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
     <button id="mgSummary" class="primary">Graph Summary</button>
     <div id="mgStats" style="font-size:10px;color:var(--muted)"></div>
@@ -2437,7 +2437,6 @@ function renderMG(){
   if(!canvas)return;
   var W=canvas.getBoundingClientRect().width||900;
   var H=520;
-  canvas.setAttribute("viewBox","0 0 "+W+" "+H);
 
   /* filter by type checkboxes */
   var visTypes={};
@@ -2487,8 +2486,8 @@ function renderMG(){
     nodes.forEach(function(n){n.x=Math.max(30,Math.min(W-30,n.x));n.y=Math.max(30,Math.min(H-30,n.y))});
   }
 
-  /* render SVG */
-  var svg='';
+  /* render full SVG tag into the wrapper div */
+  var svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" style="display:block">';
   if(showEdges){
     edges.forEach(function(e){
       var a=nodeIds[e.from],b=nodeIds[e.to];
@@ -2503,8 +2502,8 @@ function renderMG(){
       svg+='<text x="'+n.x+'" y="'+(n.y+r+12)+'" text-anchor="middle" fill="'+col+'" font-size="8" opacity="0.7">'+escHTML(n.label)+'</text>';
     }
   });
-  /* SVG requires namespace-aware insertion — template approach breaks SVG elements */
-  canvas.innerHTML=svg;
+  svg+='</svg>';
+  setHTML(canvas,svg);
 
   /* click handler for nodes */
   canvas.querySelectorAll("[data-mgn]").forEach(function(el){
