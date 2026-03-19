@@ -1,0 +1,2835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>CERPA PURPLE TEAM — Deep Sigma EDGE</title>
+<!-- CERPA PURPLE TEAM Cyber Exercise Workbench — Deep Sigma EDGE v1.0.0
+     Format: single-file, zero-dependency, hardened
+     Roles: Red Operator | Blue Defender | Purple Lead | Executive/Commander
+     Tabs: Roles | Dashboard | Exercises | Findings | Review Board | Trends | Memory | Admin
+     Lifecycle: Claim (red reports) → Event (blue observes) → Review (joint) → Patch (remediate) → Apply (retest)
+     Domain: PURPLE team cyber exercises — adversary simulation governance -->
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'"/>
+<script>
+(function(){"use strict";
+var B="EDGE_BUILD_ID:CERPA_PURPLE_EDGE_v1.0.0";
+function _b(c){return function(){throw new Error("EDGE hardening: "+c+" blocked")}}
+window.fetch=_b("fetch");window.XMLHttpRequest=_b("XHR");window.WebSocket=_b("WS");
+window.EventSource=_b("ES");try{navigator.sendBeacon=_b("beacon")}catch(_){}
+window.eval=_b("eval");try{window.Function=_b("Function")}catch(_){}
+window.open=_b("window.open");window.RTCPeerConnection=_b("RTC");
+window.BroadcastChannel=_b("BC");window.SharedWorker=_b("SW");window.Worker=_b("W");
+try{Object.defineProperty(window,"localStorage",{get:_b("localStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"sessionStorage",{get:_b("sessionStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"indexedDB",{get:_b("indexedDB"),configurable:false})}catch(_){}
+if(typeof console!=="undefined")console.log("[EDGE] "+B);
+if(window.self===window.top){document.addEventListener("DOMContentLoaded",function(){
+  var v=[];
+  if(document.querySelectorAll("script[src],link[href]").length>0)v.push("external resource");
+  if(document.querySelectorAll("[onclick],[onerror],[onload]").length>0)v.push("inline handler");
+  if(v.length>0)document.body.innerHTML="<h1 style='color:red;font-family:monospace;padding:40px'>EDGE VIOLATION: "+v.join("; ")+"</h1>";
+});}
+})();
+</script>
+<style>
+:root{--bg:#0a0812;--card:#13101f;--card2:#0e0b1a;--muted:#7a6b99;--txt:#e0d8f0;--accent:#00f0ff;--warn:#ffcc66;--bad:#ff6b6b;--ok:#5dff93;--ribbon:#1a1530;--line:#1e1530;--glow:rgba(0,240,255,.08);--mag:#ff6bff;--purple:#a855f7;--neon-blue:#3b82ff;--red-team:#ff4444;--blue-team:#3b82ff;--purple-team:#a855f7}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--txt);font-size:13px;overflow-x:hidden}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hidden{display:none!important}
+header{padding:10px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;min-height:54px;background:rgba(10,8,18,.96);position:relative;z-index:100;flex-wrap:wrap}
+header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(0,240,255,.2) 15%,rgba(168,85,247,.2) 50%,rgba(0,240,255,.2) 85%,transparent)}
+.brand{white-space:nowrap;font-weight:700;letter-spacing:.5px;font-size:15px;background:linear-gradient(135deg,var(--accent),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.brand small{display:block;-webkit-text-fill-color:var(--muted);font-size:10px;font-weight:400;letter-spacing:.3px}
+.cerpa-ribbon{display:flex;align-items:center;gap:0;margin:0 auto}
+.cp{padding:3px 10px;border-radius:5px;font-size:9px;font-weight:700;letter-spacing:.5px;transition:all .2s}
+.cp-claim{color:var(--red-team);background:rgba(255,68,68,.1)}
+.cp-event{color:var(--blue-team);background:rgba(59,130,255,.1)}
+.cp-review{color:var(--purple);background:rgba(168,85,247,.1)}
+.cp-patch{color:var(--warn);background:rgba(255,204,102,.1)}
+.cp-apply{color:var(--ok);background:rgba(93,255,147,.1)}
+.cp-arrow{color:#2a1e40;font-size:8px;margin:0 2px}
+.cmd-status{padding:3px 10px;border-radius:999px;font-size:9px;font-weight:700;letter-spacing:.4px}
+.cmd-amber{color:#ffcc66;border:1px solid rgba(255,204,102,.4);background:rgba(255,204,102,.08)}
+.role-bar{display:flex;align-items:center;gap:6px}
+.role-bar label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+.role-bar select{background:var(--card2);color:var(--accent);border:1px solid rgba(0,240,255,.25);border-radius:6px;padding:4px 8px;font-size:10px;font-weight:600}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);padding:0 16px;background:rgba(10,8,18,.92)}
+.ttab{padding:9px 14px;font-size:10.5px;font-weight:600;color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;letter-spacing:.3px;text-transform:uppercase}
+.ttab:hover{color:var(--txt)}.ttab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.main{height:calc(100vh - 134px);overflow-y:auto;padding:16px 20px}
+.main section{display:none;max-width:1440px;margin:0 auto}
+.main section.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px;transition:border-color .2s}
+.card:hover{border-color:rgba(0,240,255,.12)}
+.card h3{margin:0 0 10px;font-size:13px;color:#c8bfe0;letter-spacing:.4px;text-transform:uppercase}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 8px;text-align:center;position:relative;overflow:hidden;cursor:pointer;transition:all .2s}
+.kpi:hover{border-color:rgba(0,240,255,.3);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi.kpi-green::before{background:var(--ok)}.kpi.kpi-amber::before{background:var(--warn)}.kpi.kpi-red::before{background:var(--bad)}.kpi.kpi-cyan::before{background:var(--accent)}
+.kpi .kv{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi .kl{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:2px}
+.kpi .kfull{font-size:7px;color:#3a2e55;margin-top:1px}
+.kv-green{color:var(--ok)}.kv-amber{color:var(--warn)}.kv-red{color:var(--bad)}.kv-cyan{color:var(--accent)}
+.spark-row{display:inline-flex;align-items:end;gap:1px;height:16px;margin-top:3px}
+.spark-bar{width:3px;border-radius:1px;min-height:2px}
+table{width:100%;border-collapse:collapse;font-size:11.5px}
+th,td{padding:7px 8px;border-bottom:1px solid #1a1230;text-align:left;vertical-align:top}
+th{color:#5a4d80;font-weight:700;font-size:9px;text-transform:uppercase;letter-spacing:.5px}
+tbody tr{transition:background .1s;cursor:default}tbody tr:hover{background:rgba(0,240,255,.03)}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:9px;font-weight:700;letter-spacing:.3px;border:1px solid}
+.sev-high{color:#ff6b6b;border-color:rgba(255,107,107,.35);background:rgba(255,107,107,.06)}
+.sev-med{color:#ffcc66;border-color:rgba(255,204,102,.35);background:rgba(255,204,102,.06)}
+.sev-low{color:#00f0ff;border-color:rgba(0,240,255,.25);background:rgba(0,240,255,.05)}
+.st-new{color:#00f0ff;border-color:rgba(0,240,255,.25);background:rgba(0,240,255,.05)}
+.st-review{color:#fbbf24;border-color:rgba(251,191,36,.25);background:rgba(251,191,36,.05)}
+.st-assigned{color:#a855f7;border-color:rgba(168,85,247,.25);background:rgba(168,85,247,.05)}
+.st-patch{color:#ff6bff;border-color:rgba(255,107,255,.25);background:rgba(255,107,255,.05)}
+.st-approved{color:#5dff93;border-color:rgba(93,255,147,.25);background:rgba(93,255,147,.05)}
+.st-closed{color:#5dff93;border-color:rgba(93,255,147,.25);background:rgba(93,255,147,.05)}
+.st-reopen{color:#ff6b6b;border-color:rgba(255,107,107,.35);background:rgba(255,107,107,.06)}
+.recur{display:inline-block;padding:2px 6px;border-radius:4px;font-size:8px;font-weight:700;color:#ff9f43;border:1px solid rgba(255,159,67,.25);background:rgba(255,159,67,.05)}
+/* Detection status badges */
+.det-detected{background:rgba(93,255,147,.1);color:var(--ok);border:1px solid rgba(93,255,147,.2);display:inline-block;padding:2px 8px;border-radius:999px;font-size:9px;font-weight:700;letter-spacing:.3px}
+.det-partial{background:rgba(255,204,102,.1);color:var(--warn);border:1px solid rgba(255,204,102,.2);display:inline-block;padding:2px 8px;border-radius:999px;font-size:9px;font-weight:700;letter-spacing:.3px}
+.det-missed{background:rgba(255,107,107,.1);color:var(--bad);border:1px solid rgba(255,107,107,.2);display:inline-block;padding:2px 8px;border-radius:999px;font-size:9px;font-weight:700;letter-spacing:.3px}
+/* Retest badges */
+.retest-pass{display:inline-block;padding:2px 8px;border-radius:999px;font-size:9px;font-weight:700;color:var(--ok);border:1px solid rgba(93,255,147,.3);background:rgba(93,255,147,.08)}
+.retest-fail{display:inline-block;padding:2px 8px;border-radius:999px;font-size:9px;font-weight:700;color:var(--bad);border:1px solid rgba(255,107,107,.3);background:rgba(255,107,107,.08)}
+.retest-partial{display:inline-block;padding:2px 8px;border-radius:999px;font-size:9px;font-weight:700;color:var(--warn);border:1px solid rgba(255,204,102,.3);background:rgba(255,204,102,.08)}
+.retest-pending{display:inline-block;padding:2px 8px;border-radius:999px;font-size:9px;font-weight:700;color:var(--muted);border:1px solid rgba(122,107,153,.3);background:rgba(122,107,153,.08)}
+/* Tactic badge */
+.tactic-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:8px;font-weight:700;letter-spacing:.3px;color:var(--warn);border:1px solid rgba(255,204,102,.25);background:rgba(255,204,102,.05)}
+/* Exercise card */
+.ex-card{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:12px;padding:14px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.ex-card:hover{border-color:rgba(0,240,255,.3);box-shadow:0 4px 20px rgba(0,240,255,.06);transform:translateY(-1px)}
+/* Role card team colors */
+.role-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.role-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;position:relative;overflow:hidden;transition:all .25s;cursor:pointer}
+.role-card:hover{border-color:rgba(0,240,255,.3);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.role-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.rc-red::before{background:var(--red-team)}
+.rc-blue::before{background:var(--blue-team)}
+.rc-purple::before{background:var(--purple-team)}
+.rc-exec::before{background:linear-gradient(90deg,var(--accent),var(--mag))}
+.role-card .rc-icon{font-size:28px;margin-bottom:6px}
+.role-card .rc-title{font-size:14px;font-weight:700;margin-bottom:2px}
+.role-card .rc-tag{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+.role-card .rc-purpose{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:10px}
+.role-card .rc-screens{font-size:10px;color:var(--accent)}
+.role-card .rc-badge{position:absolute;top:14px;right:14px;font-size:8px;padding:2px 8px;border-radius:999px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+.rb-red{color:var(--red-team);border:1px solid rgba(255,68,68,.25);background:rgba(255,68,68,.06)}
+.rb-blue{color:var(--blue-team);border:1px solid rgba(59,130,255,.25);background:rgba(59,130,255,.06)}
+.rb-purple{color:var(--purple);border:1px solid rgba(168,85,247,.25);background:rgba(168,85,247,.06)}
+.rb-exec{color:var(--accent);border:1px solid rgba(0,240,255,.25);background:rgba(0,240,255,.06)}
+/* Team color utilities */
+.team-red{color:var(--red-team)}.team-blue{color:var(--blue-team)}.team-purple{color:var(--purple-team)}
+.team-red-bg{background:rgba(255,68,68,.08)}.team-blue-bg{background:rgba(59,130,255,.08)}.team-purple-bg{background:rgba(168,85,247,.08)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.filters select,.filters input{background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:6px;padding:5px 8px;font-size:10.5px}
+button{background:#15112a;color:var(--txt);border:1px solid #2a2045;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:10.5px;transition:all .15s;font-weight:500}
+button:hover{border-color:#3a2e65}
+button.primary{border-color:rgba(0,240,255,.35);color:var(--accent)}
+button.primary:hover{background:rgba(0,240,255,.06)}
+button.ok{border-color:rgba(93,255,147,.35);color:var(--ok)}
+button.danger{border-color:rgba(255,107,107,.35);color:var(--bad)}
+.wire{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:10px}
+.wire h4{margin:0 0 8px;font-size:11px;color:var(--accent);letter-spacing:.4px;text-transform:uppercase}
+.wr{display:flex;justify-content:space-between;padding:4px 0;font-size:11px;border-bottom:1px solid #1a1230}
+.wr:last-child{border:none}
+.wr .wl{color:var(--muted);min-width:80px}.wr .wv{font-weight:600;font-variant-numeric:tabular-nums;text-align:right;flex:1}
+.tl{display:flex;gap:0;margin:12px 0;overflow-x:auto}
+.tl-s{flex:1;text-align:center;position:relative;min-width:70px}
+.tl-dot{width:10px;height:10px;border-radius:50%;margin:0 auto 3px;border:2px solid var(--line)}
+.tl-dot.done{background:var(--ok);border-color:var(--ok)}.tl-dot.now{background:var(--accent);border-color:var(--accent);box-shadow:0 0 10px rgba(0,240,255,.5)}.tl-dot.wait{background:transparent}
+.tl-s::after{content:'';position:absolute;top:5px;left:50%;width:100%;height:1px;background:var(--line)}.tl-s:last-child::after{display:none}
+.tl-lb{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.tl-dt{font-size:7px;color:#3a2e55}
+.ev{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid #1a1230;font-size:11px}
+.ev:last-child{border:none}
+.ev-ok{color:var(--ok);font-size:13px}.ev-miss{color:var(--bad);font-size:13px}
+.ev-upload{font-size:8px;padding:2px 8px;border-radius:4px;border:1px solid rgba(0,240,255,.25);background:rgba(0,240,255,.05);color:var(--accent);cursor:pointer;margin-left:6px}
+.ev-validate{font-size:8px;padding:2px 8px;border-radius:4px;border:1px solid rgba(93,255,147,.25);background:rgba(93,255,147,.05);color:var(--ok);cursor:pointer;margin-left:6px}
+.ev-type{font-size:7px;padding:1px 5px;border-radius:3px;border:1px solid rgba(0,240,255,.15);color:var(--accent);margin-left:4px}
+.ev-path{font-size:9px;color:var(--muted);margin-left:22px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90%}
+.ev-desc{font-size:9px;color:#4a3e6e;margin-left:22px;font-style:italic}
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;opacity:0;pointer-events:none;transition:opacity .25s}
+.drawer-overlay.open{opacity:1;pointer-events:auto}
+.drawer-panel{position:fixed;top:0;right:0;width:480px;max-width:92vw;height:100vh;background:var(--card);border-left:1px solid var(--line);z-index:510;transform:translateX(100%);transition:transform .3s ease;overflow-y:auto;display:flex;flex-direction:column}
+.drawer-panel.open{transform:translateX(0)}
+.drawer-hdr{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:var(--card);z-index:10}
+.drawer-hdr h3{margin:0;font-size:14px;color:var(--accent);flex:1}
+.drawer-hdr .dx{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:2px 6px}
+.drawer-body{padding:16px;flex:1;overflow-y:auto}
+.drawer-foot{padding:10px 16px;border-top:1px solid var(--line);display:flex;gap:6px;background:var(--card)}
+.toast-wrap{position:fixed;top:70px;right:20px;z-index:600;display:flex;flex-direction:column;gap:8px}
+.toast{padding:10px 16px;border-radius:8px;font-size:11px;font-weight:600;animation:toastIn .3s ease;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.toast-ok{background:rgba(93,255,147,.15);border:1px solid rgba(93,255,147,.4);color:var(--ok)}
+.toast-warn{background:rgba(255,204,102,.15);border:1px solid rgba(255,204,102,.4);color:var(--warn)}
+.toast-info{background:rgba(0,240,255,.1);border:1px solid rgba(0,240,255,.3);color:var(--accent)}
+.toast-bad{background:rgba(255,107,107,.15);border:1px solid rgba(255,107,107,.4);color:var(--bad)}
+@keyframes toastIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.df{margin-bottom:10px}
+.df label{display:block;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.df input,.df select,.df textarea{width:100%;background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:6px;padding:7px 10px;font-size:11px}
+.df textarea{height:60px;resize:vertical}
+.df input:focus,.df select:focus,.df textarea:focus{border-color:rgba(0,240,255,.4);outline:none}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#2a2045;border-radius:3px}
+@keyframes edgePulse{0%{stroke-dashoffset:0}100%{stroke-dashoffset:20}}
+.mg-edge-anim{animation:edgePulse 2s linear infinite}
+.mg-dimmed{opacity:0.12!important;transition:opacity .2s}
+.mg-bright{opacity:1!important;transition:opacity .2s}
+.shortcut-bar{position:fixed;bottom:0;left:0;right:0;z-index:150;background:rgba(10,8,18,.94);border-top:1px solid var(--line);padding:4px 16px;display:flex;align-items:center;gap:14px;font-size:9px;color:var(--muted)}
+.shortcut-bar kbd{display:inline-block;padding:1px 5px;border-radius:3px;background:rgba(0,240,255,.08);border:1px solid rgba(0,240,255,.15);font-family:inherit;font-size:9px;color:var(--accent);margin:0 1px}
+.board-timer{font-size:11px;color:var(--accent);font-variant-numeric:tabular-nums;font-weight:600;margin-left:auto;display:flex;align-items:center;gap:4px}
+.board-timer .bt-dot{width:6px;height:6px;border-radius:50%;background:var(--ok);animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.heatmap{display:grid;grid-template-columns:60px repeat(4,1fr);gap:2px;margin:8px 0}
+.hm-cell{border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;min-height:32px;transition:all .15s;cursor:pointer}
+.hm-cell:hover{transform:scale(1.08);box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.hm-label{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;display:flex;align-items:center;justify-content:center}
+.onboard-overlay{position:fixed;inset:0;z-index:700;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;animation:fadeIn .3s}
+.onboard-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px 32px;max-width:520px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.6)}
+.onboard-card h2{margin:0 0 6px;color:var(--accent);font-size:18px}
+.onboard-card .ob-sub{color:var(--muted);font-size:11px;margin-bottom:16px}
+.onboard-steps{list-style:none;padding:0;margin:0 0 18px}
+.onboard-steps li{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;font-size:12px;line-height:1.5}
+.ob-num{flex-shrink:0;width:24px;height:24px;border-radius:50%;background:rgba(0,240,255,.1);border:1px solid rgba(0,240,255,.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.feed-toggle{position:fixed;right:12px;top:70px;z-index:90;padding:4px 10px;border-radius:6px;border:1px solid rgba(0,240,255,.2);background:rgba(10,8,18,.9);color:var(--accent);font-size:9px;font-weight:700;cursor:pointer}
+.feed-panel{position:fixed;right:0;top:56px;bottom:32px;width:280px;background:var(--card);border-left:1px solid var(--line);z-index:80;transform:translateX(100%);transition:transform .3s;overflow-y:auto;font-size:10px}
+.feed-panel.open{transform:translateX(0)}
+.feed-hdr{padding:8px 12px;border-bottom:1px solid var(--line);font-size:11px;font-weight:700;color:var(--accent);position:sticky;top:0;background:var(--card);z-index:2}
+.feed-item{padding:6px 12px;border-bottom:1px solid #1a1230;line-height:1.5;animation:feedIn .4s ease}
+.feed-item .fi-time{font-size:8px;color:#3a2e55}
+.feed-item .fi-actor{color:var(--accent);font-weight:600}
+@keyframes feedIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)}}
+.cis-gauge-wrap{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.cis-gauge{position:relative;width:110px;height:110px;flex-shrink:0}
+.cis-gauge svg{width:110px;height:110px;transform:rotate(-90deg)}
+.cis-gauge-bg{fill:none;stroke:var(--line);stroke-width:8}
+.cis-gauge-fill{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .8s ease,stroke .3s}
+.cis-gauge-label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.cis-gauge-score{font-size:28px;font-weight:700;line-height:1}
+.cis-gauge-sub{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.graph-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 12px;background:var(--card);border:1px solid var(--line);border-radius:8px;margin-bottom:10px}
+.graph-toolbar label{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--txt);cursor:pointer}
+.graph-toolbar input[type="checkbox"]{accent-color:var(--accent)}
+.graph-search{background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--txt);padding:4px 10px;font-size:11px;width:160px;outline:none}
+.graph-search:focus{border-color:var(--accent)}
+.graph-toolbar .sep{width:1px;height:20px;background:var(--line)}
+.graph-toolbar button{padding:3px 10px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--txt);cursor:pointer;font-size:10px}
+.graph-toolbar button.active{border-color:var(--accent);color:var(--accent)}
+.graph-highlight{filter:drop-shadow(0 0 8px var(--accent)) drop-shadow(0 0 4px var(--accent))}
+.drop-zone{border:2px dashed var(--line);border-radius:10px;padding:28px 16px;text-align:center;color:var(--muted);font-size:12px;cursor:pointer;transition:border-color .2s,background .2s;margin-bottom:12px}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:var(--glow);color:var(--accent)}
+[data-tip]{position:relative}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);padding:6px 10px;border-radius:6px;background:#1a1230;color:var(--txt);font-size:10px;max-width:280px;white-space:normal;z-index:999;border:1px solid var(--line);pointer-events:none;line-height:1.4}
+.tour-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:800;cursor:pointer}
+.tour-card{position:fixed;z-index:810;background:var(--card);border:1px solid var(--accent);border-radius:12px;padding:16px 18px;max-width:340px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.6);animation:fadeIn .25s ease}
+.tour-card h4{margin:0 0 4px;color:var(--accent);font-size:13px}
+.tour-card p{margin:0 0 10px;font-size:11px;color:var(--muted);line-height:1.5}
+.tour-step-bar{display:flex;gap:4px;margin-bottom:10px}
+.tour-step-bar span{flex:1;height:3px;border-radius:2px;background:var(--line)}
+.tour-step-bar span.done{background:var(--accent)}
+.tour-step-bar span.cur{background:var(--mag)}
+.tour-btns{display:flex;gap:6px;justify-content:flex-end}
+.tour-btns button{font-size:10px;padding:5px 12px}
+.task-toggle{position:relative;background:none;border:1px solid var(--line);border-radius:6px;color:var(--muted);padding:4px 10px;cursor:pointer;font-size:12px}
+.task-toggle:hover{color:var(--mag);border-color:var(--mag)}
+.task-badge{position:absolute;top:-6px;right:-6px;background:var(--bad);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.task-badge.zero{display:none}
+#taskPanel{position:fixed;top:0;right:-380px;width:360px;height:100vh;background:var(--card);border-left:1px solid var(--line);z-index:600;transition:right .25s ease;display:flex;flex-direction:column}
+#taskPanel.open{right:0}
+.task-header{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.task-header h3{margin:0;font-size:14px;color:var(--mag)}
+.task-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px}
+.task-list{flex:1;overflow-y:auto;padding:8px}
+.task-row{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;border-left:4px solid transparent;margin-bottom:4px}
+.task-row:hover{background:var(--card2)}
+.task-row.sev-critical{border-left-color:var(--bad)}
+.task-row.sev-high{border-left-color:var(--warn)}
+.task-row.sev-medium{border-left-color:var(--accent)}
+.task-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.sev-critical .task-dot{background:var(--bad);box-shadow:0 0 6px var(--bad);animation:pulse 1.5s infinite}
+.sev-high .task-dot{background:var(--warn)}
+.sev-medium .task-dot{background:var(--accent)}
+.task-label{font-size:12px;color:var(--txt);line-height:1.4}
+.task-detail{font-size:10px;color:var(--muted);margin-top:2px}
+.btn-icon{background:none;border:1px solid var(--line);border-radius:6px;color:var(--muted);padding:4px 8px;cursor:pointer;font-size:14px;line-height:1}
+.btn-icon:hover{color:var(--accent);border-color:var(--accent)}
+.tab-prefs-panel{position:absolute;top:100%;right:0;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:200px;z-index:200;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+footer{padding:8px 16px;border-top:1px solid var(--line);font-size:9px;color:var(--muted);text-align:center;background:rgba(10,8,18,.96);letter-spacing:.3px}
+footer strong{color:var(--accent);font-weight:600}
+.edipi-input{background:var(--card2);color:var(--accent);border:1px solid rgba(0,240,255,.25);border-radius:6px;padding:4px 8px;font-size:10px;font-weight:600;width:90px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.edipi-input::placeholder{color:#3a2e55;font-weight:400}
+.id-badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:9px;font-weight:700;letter-spacing:.4px;vertical-align:middle}
+.id-linked{color:var(--ok);border:1px solid rgba(93,255,147,.4);background:rgba(93,255,147,.08)}
+.id-role-only{color:var(--warn);border:1px solid rgba(255,204,102,.4);background:rgba(255,204,102,.08)}
+.id-no-role{color:var(--muted);border:1px solid rgba(122,107,153,.3);background:rgba(122,107,153,.06)}
+.sync-badge{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;letter-spacing:.3px;text-transform:uppercase;line-height:1.4}
+.sync-synced{background:rgba(93,255,147,.12);color:var(--ok);border:1px solid rgba(93,255,147,.25)}
+.sync-local{background:rgba(255,204,102,.12);color:var(--warn);border:1px solid rgba(255,204,102,.25)}
+.sync-conflict{background:rgba(255,107,107,.15);color:var(--bad);border:1px solid rgba(255,107,107,.3)}
+.contradiction{color:var(--bad);font-weight:700}
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center}
+.confirm-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:24px;max-width:420px;width:90%;text-align:center}
+.confirm-card h4{margin:0 0 10px;color:var(--txt);font-size:14px}
+.confirm-card p{margin:0 0 16px;color:var(--muted);font-size:12px}
+.confirm-card .confirm-btns{display:flex;gap:8px;justify-content:center}
+.actions-cell{display:flex;gap:3px;align-items:center;justify-content:center}
+.action-btn{font-size:11px;padding:2px 6px;border:1px solid var(--line);border-radius:4px;background:transparent;color:var(--muted);cursor:pointer;line-height:1.3}
+.action-btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:rgba(255,107,107,.12);color:var(--bad);border-color:rgba(255,107,107,.3)}
+.btn-danger:hover{background:rgba(255,107,107,.25)}
+.edit-section{margin-bottom:12px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.edit-section h4{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:0 0 8px}
+.audit-log{max-height:180px;overflow-y:auto;font-size:10px;color:var(--muted)}
+.audit-log .ae{padding:4px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.audit-log .ae-ts{color:#555;margin-right:6px}
+.audit-log .ae-act{color:var(--accent);font-weight:600;margin-right:4px}
+.df-readonly input,.df-readonly select,.df-readonly textarea{opacity:.55;pointer-events:none}
+.edit-dirty-badge{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--warn);margin-left:6px;animation:pulse 1.2s infinite}
+.pp{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.pp span{padding:4px 10px;border-radius:6px;font-size:9px;font-weight:700;letter-spacing:.2px;border:1px solid}
+.pp-r{color:var(--bad);border-color:rgba(255,107,107,.25);background:rgba(255,107,107,.04)}
+.pp-c{color:var(--accent);border-color:rgba(0,240,255,.18);background:rgba(0,240,255,.03)}
+.vendor-strip{display:flex;gap:10px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px}
+.vendor-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;min-width:200px;flex-shrink:0;position:relative;overflow:hidden}
+.vendor-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.vendor-card.v-high::before{background:var(--bad)}.vendor-card.v-med::before{background:var(--warn)}.vendor-card.v-ok::before{background:var(--ok)}
+@media print{
+  body{background:#fff!important;color:#111!important}
+  header,.tabs,.shortcut-bar,.feed-toggle,.feed-panel,.drawer-overlay,.drawer-panel,.toast-wrap,footer,button{display:none!important}
+  .main{height:auto!important;overflow:visible!important}
+  .card{background:#fff!important;border:1px solid #ccc!important;color:#111!important;break-inside:avoid}
+}
+@media(max-width:768px){
+  .tabs{flex-wrap:wrap;padding:0 8px}
+  .tabs button{padding:6px 10px;font-size:10px}
+  header{flex-direction:column;gap:8px;padding:10px}
+  .cerpa-ribbon{display:none}
+  .role-grid{grid-template-columns:1fr}
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+  .grid2,.grid3{grid-template-columns:1fr}
+  .drawer-panel{width:100%!important;max-width:100%!important}
+  #taskPanel{width:100%!important;right:-100%!important}
+  #taskPanel.open{right:0!important}
+  .shortcut-bar{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- Onboarding -->
+<div class="onboard-overlay" id="onboardModal">
+  <div class="onboard-card">
+    <h2>Welcome to CERPA — PURPLE Team</h2>
+    <div class="ob-sub">Composite Enterprise Risk Posture Assessment — Purple Team Cyber Exercises</div>
+    <ul class="onboard-steps">
+      <li><span class="ob-num">1</span><div><strong>Choose a role</strong> — Red Operator, Blue Defender, Purple Lead, or Executive/Commander. Each role sees a tailored authority surface.</div></li>
+      <li><span class="ob-num">2</span><div><strong>Explore findings</strong> — Click any finding row to see the full CERPA lifecycle: Claim, Event, Review, Patch, Apply. Track detection status, evidence, and retest results.</div></li>
+      <li><span class="ob-num">3</span><div><strong>Navigate the graph</strong> — The Memory tab shows how exercises, findings, techniques, tactics, patches, and root causes connect.</div></li>
+    </ul>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="primary" id="onboardDismiss" style="padding:8px 20px">Enter CERPA</button>
+      <span style="font-size:9px;color:var(--muted)">4 Roles · 8 Tabs · 5 CERPA Steps · <kbd style="font-size:9px;padding:1px 4px;border-radius:3px;background:rgba(0,240,255,.08);border:1px solid rgba(0,240,255,.15);color:var(--accent)">?</kbd> for shortcuts</span>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="brand">DEEP SIGMA EDGE<small>PURPLE v1.0.0 — Purple Team Cyber Exercises</small></div>
+  <div style="font-size:9px;color:var(--muted);letter-spacing:.3px">CERPA-Enhanced Purple Team Exercise Governance Surface</div>
+  <div class="cerpa-ribbon">
+    <span class="cp cp-claim">CLAIM</span><span class="cp-arrow">&#9658;</span>
+    <span class="cp cp-event">EVENT</span><span class="cp-arrow">&#9658;</span>
+    <span class="cp cp-review">REVIEW</span><span class="cp-arrow">&#9658;</span>
+    <span class="cp cp-patch">PATCH</span><span class="cp-arrow">&#9658;</span>
+    <span class="cp cp-apply">APPLY</span>
+  </div>
+  <span class="cmd-status cmd-amber">EXERCISE CYCLE ACTIVE</span>
+  <div class="role-bar">
+    <label>Active Role</label>
+    <select id="roleSel">
+      <option value="red">Red Operator</option>
+      <option value="blue">Blue Defender</option>
+      <option value="purple" selected>Purple Lead</option>
+      <option value="exec">Executive / Commander</option>
+    </select>
+    <input type="text" id="edipiInput" class="edipi-input" placeholder="EDIPI" maxlength="10" autocomplete="off"/>
+    <span id="idBadge" class="id-badge id-role-only">Role Only</span>
+    <div style="position:relative;display:inline-block">
+      <button id="btnTabPrefs" class="btn-icon" title="Customize tabs">&#9881;</button>
+      <div id="tabPrefsPanel" class="tab-prefs-panel" style="display:none"></div>
+    </div>
+  </div>
+  <button class="task-toggle" id="btnTaskToggle" title="My Tasks">Tasks <span class="task-badge zero" id="taskBadge">0</span></button>
+  <button class="btn-icon" id="btnStartTour" title="Guided tour">?</button>
+</header>
+
+<div class="tabs" id="tabBar">
+  <button class="ttab active" data-t="roles" data-tip="Select your role to customize the interface">Roles</button>
+  <button class="ttab" data-t="dash" data-tip="PCS gauge, Lead-6 KPIs, exercise status">Dashboard</button>
+  <button class="ttab" data-t="exercises" data-tip="Exercise management — plan, execute, close">Exercises</button>
+  <button class="ttab" data-t="find" data-tip="Purple findings — claims, events, detection, remediation">Findings</button>
+  <button class="ttab" data-t="board" data-tip="Review Board — adjudication and board-ready queue">Review Board</button>
+  <button class="ttab" data-t="trends" data-tip="Detection distribution, tactic heatmap, retest trends">Trends</button>
+  <button class="ttab" data-t="mem" data-tip="Memory Graph — exercise, finding, technique relationships">Memory</button>
+  <button class="ttab" data-t="admin" data-tip="Administration, import/export, role configuration">Admin</button>
+</div>
+
+<div class="feed-toggle" id="feedToggle">&#9654; Activity</div>
+<div class="feed-panel" id="feedPanel">
+  <div class="feed-hdr"><span class="bt-dot"></span> Live Activity Feed</div>
+  <div id="feedList"></div>
+</div>
+
+<div class="main" id="mainArea">
+
+<!-- ═══ ROLES ═══ -->
+<section id="s-roles">
+  <div class="card"><h3>Select Your Role</h3>
+    <div class="role-grid">
+      <div class="role-card rc-red" data-role="red">
+        <span class="rc-badge rb-red">OFFENSE</span>
+        <div class="rc-icon">&#9876;</div>
+        <div class="rc-title">Red Operator</div>
+        <div class="rc-tag">Adversary Simulation</div>
+        <div class="rc-purpose">Adversary simulation operator. Execute techniques, document claims, attach red team evidence.</div>
+        <div class="rc-screens">Findings · Exercises · Trends · Memory</div>
+      </div>
+      <div class="role-card rc-blue" data-role="blue">
+        <span class="rc-badge rb-blue">DEFENSE</span>
+        <div class="rc-icon">&#128737;</div>
+        <div class="rc-title">Blue Defender</div>
+        <div class="rc-tag">Defensive Security</div>
+        <div class="rc-purpose">Defensive security analyst. Document observations, detection events, and blue team evidence.</div>
+        <div class="rc-screens">Findings · Exercises · Trends · Memory</div>
+      </div>
+      <div class="role-card rc-purple" data-role="purple">
+        <span class="rc-badge rb-purple">LEAD</span>
+        <div class="rc-icon">&#9733;</div>
+        <div class="rc-title">Purple Lead</div>
+        <div class="rc-tag">Joint Exercise Lead</div>
+        <div class="rc-purpose">Joint exercise lead. Full access to exercises, findings, review board, and administration.</div>
+        <div class="rc-screens">All Tabs · Full Authority</div>
+      </div>
+      <div class="role-card rc-exec" data-role="exec">
+        <span class="rc-badge rb-exec">COMMAND</span>
+        <div class="rc-icon">&#9883;</div>
+        <div class="rc-title">Executive / Commander</div>
+        <div class="rc-tag">Strategic Oversight</div>
+        <div class="rc-purpose">Strategic oversight. View dashboard, exercise status, and board-ready findings.</div>
+        <div class="rc-screens">Dashboard · Exercises · Board · Trends · Memory</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ DASHBOARD ═══ -->
+<section id="s-dash">
+  <div class="cis-gauge-wrap" id="pcsGauge"></div>
+  <div class="kpi-row">
+    <div class="kpi kpi-cyan" id="kPCS" data-kpi="pcs"><div class="kv kv-cyan">--</div><div class="kl">PCS</div><div class="kfull">Purple Composite Score</div><div class="spark-row"></div></div>
+    <div class="kpi kpi-amber" id="kExActive" data-kpi="exactive"><div class="kv kv-amber">--</div><div class="kl">Active Ex</div><div class="kfull">Active Exercises</div><div class="spark-row"></div></div>
+    <div class="kpi kpi-red" id="kOpenHigh" data-kpi="openhigh"><div class="kv kv-red">--</div><div class="kl">Open HIGH</div><div class="kfull">Open High-Severity Findings</div><div class="spark-row"></div></div>
+    <div class="kpi kpi-green" id="kDetRate" data-kpi="detrate"><div class="kv kv-green">--</div><div class="kl">Det Rate</div><div class="kfull">Detection Rate %</div><div class="spark-row"></div></div>
+    <div class="kpi kpi-amber" id="kPatchCycle" data-kpi="patchcycle"><div class="kv kv-amber">--</div><div class="kl">Patch Cycle</div><div class="kfull">Avg Days to Patch</div><div class="spark-row"></div></div>
+    <div class="kpi kpi-green" id="kRetestPass" data-kpi="retestpass"><div class="kv kv-green">--</div><div class="kl">Retest Pass</div><div class="kfull">Retest Pass Rate %</div><div class="spark-row"></div></div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi kpi-cyan" id="kTechTested" data-kpi="techtested"><div class="kv kv-cyan">--</div><div class="kl">Techniques</div><div class="kfull">Unique Techniques Tested</div><div class="spark-row"></div></div>
+    <div class="kpi kpi-red" id="kCoverageGaps" data-kpi="covgaps"><div class="kv kv-red">--</div><div class="kl">Coverage Gaps</div><div class="kfull">Detection Coverage Gaps</div><div class="spark-row"></div></div>
+    <div class="kpi kpi-amber" id="kContra" data-kpi="contra"><div class="kv kv-amber">--</div><div class="kl">Contradictions</div><div class="kfull">Contradiction Flags</div><div class="spark-row"></div></div>
+    <div class="kpi kpi-red" id="kReopen" data-kpi="reopen"><div class="kv kv-red">--</div><div class="kl">Reopened</div><div class="kfull">Reopened Findings</div><div class="spark-row"></div></div>
+    <div class="kpi kpi-amber" id="kAvgExploit" data-kpi="avgexploit"><div class="kv kv-amber">--</div><div class="kl">Avg Exploit</div><div class="kfull">Avg Exploitability Score</div><div class="spark-row"></div></div>
+    <div class="kpi kpi-red" id="kAvgMission" data-kpi="avgmission"><div class="kv kv-red">--</div><div class="kl">Avg Mission</div><div class="kfull">Avg Mission Impact Score</div><div class="spark-row"></div></div>
+  </div>
+  <div class="card" id="techCoverage"><h3>Technique Coverage</h3></div>
+  <div class="grid2">
+    <div class="card"><h3>Active Exercises</h3><div id="activeExStrip" class="vendor-strip"></div></div>
+    <div class="card"><h3>Command Attention</h3><div id="cmdAttention"></div></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>Board-Ready Queue</h3><div id="dashBoardQueue"></div></div>
+    <div class="card"><h3>Exercise Coherence</h3><div id="exCoherence"></div></div>
+  </div>
+</section>
+
+<!-- ═══ EXERCISES ═══ -->
+<section id="s-exercises">
+  <div class="filters">
+    <select id="fltExType"><option value="">All Types</option><option>Full Engagement</option><option>Assumed Breach</option><option>Tabletop</option><option>Atomic Test</option></select>
+    <select id="fltExStatus"><option value="">All Status</option><option>Planning</option><option>Active</option><option>Adjudication</option><option>Closed</option></select>
+    <input type="text" id="fltExSearch" placeholder="Search exercises..." style="width:180px"/>
+  </div>
+  <div id="exGrid" class="grid2"></div>
+  <div id="exDetail" class="hidden"></div>
+</section>
+
+<!-- ═══ FINDINGS ═══ -->
+<section id="s-find">
+  <div class="filters">
+    <select id="fltExercise"><option value="">All Exercises</option></select>
+    <select id="fltStatus"><option value="">All Status</option><option>New</option><option>In Review</option><option>Adjudicated</option><option>Patch Proposed</option><option>Patch Approved</option><option>Retested</option><option>Closed</option><option>Reopened</option></select>
+    <select id="fltSev"><option value="">All Severity</option><option>HIGH</option><option>MED</option><option>LOW</option></select>
+    <select id="fltDetection"><option value="">All Detection</option><option>Detected</option><option>Partial</option><option>Missed</option></select>
+    <select id="fltTactic"><option value="">All Tactics</option><option>Lateral Movement</option><option>Execution</option><option>Credential Access</option><option>Command and Control</option><option>Persistence</option><option>Exfiltration</option><option>Initial Access</option><option>Defense Evasion</option><option>Impact</option></select>
+    <input type="text" id="fltSearch" placeholder="Search findings..." style="width:180px"/>
+  </div>
+  <table>
+    <thead><tr><th>ID</th><th>Exercise</th><th>Technique</th><th>Tactic</th><th>Sev</th><th>Status</th><th>Detection</th><th>Retest</th><th>Red Op</th><th>Blue Def</th><th>BRQ</th></tr></thead>
+    <tbody id="pfTbody"></tbody>
+  </table>
+  <div id="fDet" class="hidden">
+    <div style="margin-bottom:10px"><button class="primary" id="fDetBack">&#8592; Back to Findings</button></div>
+    <div id="fDetContent"></div>
+    <div id="fDetActions" style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap"></div>
+  </div>
+</section>
+
+<!-- ═══ REVIEW BOARD ═══ -->
+<section id="s-board">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+    <h3 style="margin:0;font-size:14px;color:var(--accent)">Review Board</h3>
+    <div class="board-timer" id="boardTimer"><span class="bt-dot"></span> <span id="boardTimerText">00:00:00</span></div>
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+    <button class="primary" id="btnAdjudicate">Adjudicate</button>
+    <button id="btnReturnEvidence">Return for Evidence</button>
+    <button class="ok" id="btnRecordDecision">Record Decision</button>
+    <button id="btnExportPacket">Export Packet</button>
+  </div>
+  <div class="filters" style="margin-bottom:10px">
+    <button class="primary" data-bf="all">All</button>
+    <button data-bf="high">HIGH Only</button>
+    <button data-bf="missed">Missed</button>
+    <button data-bf="contra">Contradictions</button>
+  </div>
+  <table>
+    <thead><tr><th>ID</th><th>Exercise</th><th>Technique</th><th>Sev</th><th>Status</th><th>Detection</th><th>BRQ</th><th>Contra</th><th>Actions</th></tr></thead>
+    <tbody id="boardTbody"></tbody>
+  </table>
+  <div id="boardDetail" class="hidden"></div>
+</section>
+
+<!-- ═══ TRENDS ═══ -->
+<section id="s-trends">
+  <div class="card"><h3>Detection Distribution</h3><div id="detDistChart"></div></div>
+  <div class="grid2">
+    <div class="card"><h3>Severity Distribution</h3><div id="sevDistChart"></div></div>
+    <div class="card"><h3>Retest Performance</h3><div id="retestChart"></div></div>
+  </div>
+  <div class="card"><h3>Tactic Heatmap</h3><div id="tacticHeatmap"></div></div>
+  <div class="grid2">
+    <div class="card"><h3>Top Root Causes</h3><div id="rootCauseList"></div></div>
+    <div class="card"><h3>Exercise Coherence</h3><div id="exCohTrend"></div></div>
+  </div>
+</section>
+
+<!-- ═══ MEMORY ═══ -->
+<section id="s-mem">
+  <div class="graph-toolbar">
+    <label><input type="checkbox" checked data-mg="exercise"/> Exercise</label>
+    <label><input type="checkbox" checked data-mg="finding"/> Finding</label>
+    <label><input type="checkbox" checked data-mg="technique"/> Technique</label>
+    <label><input type="checkbox" checked data-mg="tactic"/> Tactic</label>
+    <label><input type="checkbox" checked data-mg="pattern"/> Pattern</label>
+    <label><input type="checkbox" checked data-mg="rootcause"/> Root Cause</label>
+    <label><input type="checkbox" checked data-mg="patch"/> Patch</label>
+    <label><input type="checkbox" checked data-mg="detection"/> Detection</label>
+    <span class="sep"></span>
+    <input type="text" class="graph-search" id="mgSearch" placeholder="Search nodes..."/>
+    <span class="sep"></span>
+    <label><input type="checkbox" checked id="mgEdges"/> Edges</label>
+    <label><input type="checkbox" checked id="mgLabels"/> Labels</label>
+  </div>
+  <svg id="mgCanvas" width="100%" height="520" style="background:var(--card);border:1px solid var(--line);border-radius:10px"></svg>
+  <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+    <button id="mgSummary" class="primary">Graph Summary</button>
+    <div id="mgStats" style="font-size:10px;color:var(--muted)"></div>
+  </div>
+  <div id="mgTooltip" style="position:absolute;display:none;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:10px;z-index:300;max-width:260px;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.5)"></div>
+</section>
+
+<!-- ═══ ADMIN ═══ -->
+<section id="s-admin">
+  <div class="card">
+    <h3>Role / Permission Matrix</h3>
+    <table>
+      <thead><tr><th>Capability</th><th>Red</th><th>Blue</th><th>Purple</th><th>Exec</th></tr></thead>
+      <tbody>
+        <tr><td>File Claims</td><td style="color:var(--ok)">&#10003;</td><td style="color:var(--bad)">&#10007;</td><td style="color:var(--ok)">&#10003;</td><td style="color:var(--bad)">&#10007;</td></tr>
+        <tr><td>File Events</td><td style="color:var(--bad)">&#10007;</td><td style="color:var(--ok)">&#10003;</td><td style="color:var(--ok)">&#10003;</td><td style="color:var(--bad)">&#10007;</td></tr>
+        <tr><td>Edit Findings</td><td style="color:var(--bad)">&#10007;</td><td style="color:var(--bad)">&#10007;</td><td style="color:var(--ok)">&#10003;</td><td style="color:var(--bad)">&#10007;</td></tr>
+        <tr><td>Adjudicate / Review</td><td style="color:var(--bad)">&#10007;</td><td style="color:var(--bad)">&#10007;</td><td style="color:var(--ok)">&#10003;</td><td style="color:var(--bad)">&#10007;</td></tr>
+        <tr><td>Admin Panel</td><td style="color:var(--bad)">&#10007;</td><td style="color:var(--bad)">&#10007;</td><td style="color:var(--ok)">&#10003;</td><td style="color:var(--bad)">&#10007;</td></tr>
+        <tr><td>View Dashboard</td><td style="color:var(--ok)">&#10003;</td><td style="color:var(--ok)">&#10003;</td><td style="color:var(--ok)">&#10003;</td><td style="color:var(--ok)">&#10003;</td></tr>
+        <tr><td>View Board</td><td style="color:var(--bad)">&#10007;</td><td style="color:var(--bad)">&#10007;</td><td style="color:var(--ok)">&#10003;</td><td style="color:var(--ok)">&#10003;</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h3>Import</h3>
+    <div class="drop-zone" id="importDropZone">Drop JSON state file here or click to browse</div>
+    <input type="file" id="importFile" accept=".json" style="display:none"/>
+  </div>
+  <div class="card">
+    <h3>Export</h3>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="primary" id="btnExportFindings">Export Findings</button>
+      <button id="btnExportBrief">Command Brief</button>
+      <button id="btnExportAudit">Audit Package</button>
+      <button id="btnExportState">Full State</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Data Lifecycle</h3>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="primary" id="btnLoadDemo">Load Demo</button>
+      <button id="btnLoadEmpty">Load Empty</button>
+      <button class="danger" id="btnClearFindings">Clear Findings</button>
+      <button class="danger" id="btnClearExercises">Clear Exercises</button>
+      <button class="danger" id="btnClearAll">Clear All</button>
+      <button id="btnSnapshot">Snapshot</button>
+      <button id="btnRestore">Restore</button>
+    </div>
+  </div>
+</section>
+
+</div><!-- /main -->
+
+<!-- Drawer -->
+<div class="drawer-overlay" id="dOverlay"></div>
+<div class="drawer-panel" id="dPanel">
+  <div class="drawer-hdr"><h3 id="dTitle"></h3><button class="dx" id="dClose">&#10005;</button></div>
+  <div class="drawer-body" id="dBody"></div>
+  <div class="drawer-foot" id="dFoot"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- Task Panel -->
+<div id="taskPanel">
+  <div class="task-header"><h3>My Tasks</h3><button class="task-close" id="taskClose">&#10005;</button></div>
+  <div class="task-list" id="taskList"></div>
+</div>
+
+<!-- Shortcut Bar -->
+<div class="shortcut-bar">
+  <span><kbd>R</kbd> Roles</span>
+  <span><kbd>D</kbd> Dashboard</span>
+  <span><kbd>X</kbd> Exercises</span>
+  <span><kbd>F</kbd> Findings</span>
+  <span><kbd>B</kbd> Board</span>
+  <span><kbd>T</kbd> Trends</span>
+  <span><kbd>M</kbd> Memory</span>
+  <span><kbd>?</kbd> Tour</span>
+</div>
+
+<footer>
+  <strong>DEEP SIGMA EDGE</strong> — CERPA PURPLE v1.0.0 — Purple Team Cyber Exercise Governance — Zero-dependency hardened surface
+</footer>
+
+<script>
+/* ══════════ CERPA PURPLE EDGE v1.0.0 — JavaScript ══════════ */
+
+/* ══════════ SECTION 1: UTILITY FUNCTIONS ══════════ */
+function escHTML(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
+function setHTML(el,html){var t=document.createElement("template");t.innerHTML=html;el.textContent="";el.appendChild(t.content.cloneNode(true))}
+function toast(msg,type){
+  var tw=document.getElementById("toastWrap");
+  var t=document.createElement("div");
+  t.className="toast toast-"+(type||"info");
+  t.textContent=msg;
+  tw.appendChild(t);
+  setTimeout(function(){t.style.opacity="0";t.style.transition="opacity .3s";setTimeout(function(){t.remove()},300)},2800);
+}
+function downloadJSON(data,filename){
+  var json=JSON.stringify(data,null,2);
+  var blob=new Blob([json],{type:"application/json"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");
+  a.href=url;a.download=filename;
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast("Downloaded "+filename,"ok");
+}
+function deepClone(o){return JSON.parse(JSON.stringify(o))}
+
+/* ══════════ SECTION 2: TAB SYSTEM ══════════ */
+var tabs=document.querySelectorAll(".ttab");
+var secs=document.querySelectorAll("section[id^='s-']");
+function openTab(n){
+  tabs.forEach(function(t){t.classList.toggle("active",t.getAttribute("data-t")===n)});
+  secs.forEach(function(s){s.style.display=s.id==="s-"+n?"block":"none"});
+  if(n==="mem")renderMG();
+}
+tabs.forEach(function(t){t.addEventListener("click",function(){openTab(t.getAttribute("data-t"))})});
+
+/* ══════════ SECTION 3: ROLE SYSTEM ══════════ */
+var roleVis={
+  red:{roles:1,dash:1,exercises:1,find:1,board:0,trends:1,mem:1,admin:0,land:"find"},
+  blue:{roles:1,dash:1,exercises:1,find:1,board:0,trends:1,mem:1,admin:0,land:"find"},
+  purple:{roles:1,dash:1,exercises:1,find:1,board:1,trends:1,mem:1,admin:1,land:"exercises"},
+  exec:{roles:1,dash:1,exercises:1,find:0,board:1,trends:1,mem:1,admin:0,land:"dash"}
+};
+function getRole(){return (document.getElementById("roleSel")||{}).value||"purple"}
+function applyRole(go){
+  var r=getRole();var v=roleVis[r]||roleVis.purple;
+  tabs.forEach(function(t){var k=t.getAttribute("data-t");t.style.display=v[k]?"":"none"});
+  if(go)openTab(v.land);
+}
+function canEditClaim(r){return r==="red"||r==="purple"}
+function canEditEvent(r){return r==="blue"||r==="purple"}
+function canEditFinding(r){return r==="purple"}
+function canReview(r){return r==="purple"}
+function canAdmin(r){return r==="purple"}
+
+/* ══════════ SECTION 4: SESSION & ACTOR IDENTITY ══════════ */
+function generateSessionId(){var a=new Uint32Array(1);crypto.getRandomValues(a);return "s-"+(Date.now()).toString(36)+"-"+a[0].toString(36)}
+function generateChangeId(){var a=new Uint32Array(1);crypto.getRandomValues(a);return "c-"+(Date.now()).toString(36)+"-"+a[0].toString(36)}
+var SESSION_ACTOR={actorId:"UNSPECIFIED",edipi:"",role:"",actorMode:"role_only",sessionId:"",startedAt:new Date().toISOString()};
+function refreshSessionActor(){
+  var edipiEl=document.getElementById("edipiInput");
+  var raw=edipiEl?edipiEl.value.replace(/\D/g,""):"";
+  var role=getRole();
+  var hasEdipi=raw.length===10;
+  SESSION_ACTOR.edipi=hasEdipi?raw:"";
+  SESSION_ACTOR.role=role;
+  SESSION_ACTOR.actorMode=hasEdipi?"edipi":"role_only";
+  SESSION_ACTOR.actorId=hasEdipi?raw:"UNSPECIFIED";
+  SESSION_ACTOR.sessionId=SESSION_ID;
+  var badge=document.getElementById("idBadge");
+  if(badge){
+    badge.className="id-badge "+(hasEdipi?"id-linked":role?"id-role-only":"id-no-role");
+    badge.textContent=hasEdipi?"EDIPI Linked":role?"Role Only":"No Role";
+  }
+}
+function getActorStamp(){
+  return {actorId:SESSION_ACTOR.actorId,edipi:SESSION_ACTOR.edipi,role:SESSION_ACTOR.role,actorMode:SESSION_ACTOR.actorMode,sessionId:SESSION_ACTOR.sessionId,ts:new Date().toISOString()};
+}
+var roleSel=document.getElementById("roleSel");
+if(roleSel)roleSel.addEventListener("change",function(){refreshSessionActor();applyRole(true)});
+document.querySelectorAll(".role-card[data-role]").forEach(function(c){
+  c.addEventListener("click",function(){if(roleSel){roleSel.value=c.getAttribute("data-role");}refreshSessionActor();applyRole(true)});
+});
+var edipiEl=document.getElementById("edipiInput");
+if(edipiEl)edipiEl.addEventListener("input",function(){refreshSessionActor()});
+
+/* ══════════ SECTION 5: DEMO DATA — EXERCISES ══════════ */
+var EX={
+"EX-001":{id:"EX-001",name:"Operation IRON FORGE",type:"Full Engagement",objective:"Validate enterprise detection coverage against credential-based lateral movement chain",scope:"Corporate AD environment, cloud pivot points, endpoint fleet",status:"Active",startDate:"2026-02-15",endDate:"2026-03-15",redLead:"R. Torres",blueLead:"K. Patel",purpleLead:"M. Chen",techniqueCount:5,findingCount:5,patchedCount:2,coherenceScore:0,revision:0,createdAt:"2026-02-10T08:00:00Z",updatedAt:"2026-03-15T12:00:00Z",createdByRole:"purple",updatedByRole:"purple",createdByActorId:"UNSPECIFIED",updatedByActorId:"UNSPECIFIED",createdByEdipi:"",createdByMode:"role_only",updatedByEdipi:"",updatedByMode:"role_only",auditEvents:[],notes:""},
+"EX-002":{id:"EX-002",name:"Assumed Breach — Cloud Pivot",type:"Assumed Breach",objective:"Test detection and response when adversary has valid cloud credentials",scope:"Azure AD, O365, cloud storage, CASB integration",status:"Adjudication",startDate:"2026-01-20",endDate:"2026-02-20",redLead:"J. Kim",blueLead:"S. Martinez",purpleLead:"M. Chen",techniqueCount:4,findingCount:4,patchedCount:1,coherenceScore:0,revision:0,createdAt:"2026-01-15T09:00:00Z",updatedAt:"2026-02-22T15:00:00Z",createdByRole:"purple",updatedByRole:"purple",createdByActorId:"UNSPECIFIED",updatedByActorId:"UNSPECIFIED",createdByEdipi:"",createdByMode:"role_only",updatedByEdipi:"",updatedByMode:"role_only",auditEvents:[],notes:""},
+"EX-003":{id:"EX-003",name:"Tabletop — Ransomware Response",type:"Tabletop",objective:"Evaluate incident response procedures for ransomware scenario",scope:"IR playbooks, backup procedures, communication plans",status:"Closed",startDate:"2025-12-01",endDate:"2025-12-15",redLead:"A. Volkov",blueLead:"D. Johnson",purpleLead:"M. Chen",techniqueCount:3,findingCount:3,patchedCount:3,coherenceScore:0,revision:0,createdAt:"2025-11-20T10:00:00Z",updatedAt:"2025-12-20T14:00:00Z",createdByRole:"purple",updatedByRole:"purple",createdByActorId:"UNSPECIFIED",updatedByActorId:"UNSPECIFIED",createdByEdipi:"",createdByMode:"role_only",updatedByEdipi:"",updatedByMode:"role_only",auditEvents:[],notes:""},
+"EX-004":{id:"EX-004",name:"Atomic Test — Credential Harvesting",type:"Atomic Test",objective:"Isolated test of credential harvesting detection rules",scope:"Endpoint detection rules, LSASS protection, credential guard",status:"Planning",startDate:"2026-04-01",endDate:"2026-04-05",redLead:"R. Torres",blueLead:"K. Patel",purpleLead:"M. Chen",techniqueCount:0,findingCount:0,patchedCount:0,coherenceScore:0,revision:0,createdAt:"2026-03-10T11:00:00Z",updatedAt:"2026-03-10T11:00:00Z",createdByRole:"purple",updatedByRole:"purple",createdByActorId:"UNSPECIFIED",updatedByActorId:"UNSPECIFIED",createdByEdipi:"",createdByMode:"role_only",updatedByEdipi:"",updatedByMode:"role_only",auditEvents:[],notes:""}
+};
+
+/* ══════════ SECTION 6: DEMO DATA — PURPLE FINDINGS ══════════ */
+var PF={
+"101":{
+  id:"PF-101",exerciseId:"EX-001",title:"Pass-the-Hash Lateral Movement Undetected",
+  technique:"T1550.002",tacticCategory:"Lateral Movement",
+  sev:"HIGH",status:"In Review",detectionStatus:"Missed",retestResult:"Pending",
+  redOperator:"R. Torres",blueDefender:"K. Patel",
+  exploitability:0.9,detectability:0.2,missionImpact:0.85,brq:0.82,
+  contradictionFlag:false,recurring:false,linked:[],
+  claim:"Red team successfully moved laterally from WORKSTATION-14 to DC-02 using extracted NTLM hash. No alerts generated. Total time from credential extraction to domain controller access: 4 minutes.",
+  event:"Blue SOC observed no alerts from EDR or SIEM during the lateral movement window. Post-exercise log review revealed SMB authentication events were logged but not correlated. Endpoint agent was running but lacked pass-the-hash detection rules.",
+  reviewSummary:"Joint review confirmed complete detection gap for pass-the-hash technique. EDR vendor configuration does not include credential relay detection by default. SIEM correlation rules need update for anomalous SMB authentication patterns.",
+  rootCause:"EDR detection rules missing for credential relay attacks. SIEM correlation gap for cross-host authentication anomalies.",
+  patch:"Deploy EDR credential relay detection module. Add SIEM correlation rule for anomalous SMB authentication from non-standard sources. Implement network segmentation between workstation and DC subnets.",
+  applyDecision:"Pending retest authorization",
+  deg:8,cg:12,
+  evidence:[
+    {type:"Red Team Log",name:"PtH Execution Log",path:"/evidence/ex001/pth_log.json",description:"Complete pass-the-hash execution chain with timestamps",source:"Red Team",ok:1,docId:"RED-001",addedByRole:"red",addedByEdipi:"",addedAt:"2026-02-18T14:30:00Z"},
+    {type:"Blue Team Log",name:"SIEM Gap Analysis",path:"/evidence/ex001/siem_gap.pdf",description:"Analysis of missing SIEM correlation rules for SMB auth",source:"Blue Team",ok:1,docId:"BLUE-001",addedByRole:"blue",addedByEdipi:"",addedAt:"2026-02-19T09:15:00Z"},
+    {type:"Screenshot",name:"EDR Config Screenshot",path:"/evidence/ex001/edr_config.png",description:"EDR configuration showing missing credential relay module",source:"Blue Team",ok:0,docId:"BLUE-002",addedByRole:"blue",addedByEdipi:"",addedAt:"2026-02-19T10:00:00Z"}
+  ],
+  auditChain:[],timeline:["Claim","Event","Review","",""],tlState:["done","done","active","",""],
+  revision:0,createdAt:"2026-02-18T14:00:00Z",updatedAt:"2026-02-20T11:00:00Z",
+  createdByRole:"red",updatedByRole:"purple",
+  createdByActorId:"UNSPECIFIED",updatedByActorId:"UNSPECIFIED",
+  createdByEdipi:"",createdByMode:"role_only",updatedByEdipi:"",updatedByMode:"role_only",
+  auditEvents:[],notes:""
+},
+"102":{
+  id:"PF-102",exerciseId:"EX-001",title:"PowerShell Execution Policy Bypass Detected",
+  technique:"T1059.001",tacticCategory:"Execution",
+  sev:"MED",status:"Closed",detectionStatus:"Detected",retestResult:"Pass",
+  redOperator:"R. Torres",blueDefender:"K. Patel",
+  exploitability:0.6,detectability:0.9,missionImpact:0.4,brq:0.91,
+  contradictionFlag:false,recurring:false,linked:[],
+  claim:"Red team executed encoded PowerShell payload to establish persistence via scheduled task. Execution was detected within 30 seconds by endpoint protection. Command-line logging captured full payload.",
+  event:"Blue SOC received real-time alert from EDR for PowerShell execution policy bypass. SIEM correlated the event with scheduled task creation. Analyst confirmed malicious intent within 2 minutes of alert.",
+  reviewSummary:"Detection pipeline performed well. PowerShell script block logging and command-line auditing captured complete execution chain. Response time within acceptable SLA.",
+  rootCause:"N/A — detection successful. Minor improvement: add automated containment for known-bad PowerShell patterns.",
+  patch:"Add automated containment playbook for encoded PowerShell execution. Tune alert priority for faster escalation.",
+  applyDecision:"Closed — detection validated, minor improvements implemented",
+  deg:2,cg:5,
+  evidence:[
+    {type:"Red Team Log",name:"PowerShell Payload Log",path:"/evidence/ex001/ps_payload.json",description:"Encoded PowerShell payload and execution timestamps",source:"Red Team",ok:1,docId:"RED-002",addedByRole:"red",addedByEdipi:"",addedAt:"2026-02-20T10:00:00Z"},
+    {type:"Blue Team Log",name:"EDR Alert Timeline",path:"/evidence/ex001/edr_alert_ps.pdf",description:"EDR alert timeline showing 30-second detection",source:"Blue Team",ok:1,docId:"BLUE-003",addedByRole:"blue",addedByEdipi:"",addedAt:"2026-02-20T11:00:00Z"},
+    {type:"Screenshot",name:"SIEM Correlation",path:"/evidence/ex001/siem_ps_corr.png",description:"SIEM correlation view showing PowerShell to scheduled task chain",source:"Blue Team",ok:1,docId:"BLUE-004",addedByRole:"blue",addedByEdipi:"",addedAt:"2026-02-20T11:30:00Z"}
+  ],
+  auditChain:[],timeline:["Claim","Event","Review","Patch","Apply"],tlState:["done","done","done","done","done"],
+  revision:0,createdAt:"2026-02-20T09:00:00Z",updatedAt:"2026-03-01T10:00:00Z",
+  createdByRole:"red",updatedByRole:"purple",
+  createdByActorId:"UNSPECIFIED",updatedByActorId:"UNSPECIFIED",
+  createdByEdipi:"",createdByMode:"role_only",updatedByEdipi:"",updatedByMode:"role_only",
+  auditEvents:[],notes:""
+},
+"103":{
+  id:"PF-103",exerciseId:"EX-001",title:"LSASS Memory Dump Partially Detected",
+  technique:"T1003.001",tacticCategory:"Credential Access",
+  sev:"HIGH",status:"Adjudicated",detectionStatus:"Partial",retestResult:"Pending",
+  redOperator:"R. Torres",blueDefender:"K. Patel",
+  exploitability:0.85,detectability:0.5,missionImpact:0.8,brq:0.75,
+  contradictionFlag:false,recurring:false,linked:["101"],
+  claim:"Red team used comsvcs.dll MiniDump technique to dump LSASS process memory on WORKSTATION-14. Credential guard was not enabled. Dump file was successfully exfiltrated to staging server within 2 minutes.",
+  event:"Blue SOC received a medium-priority alert for suspicious process access to LSASS but did not escalate within the exercise window. Post-exercise analysis confirmed the alert was generated but triaged as false positive due to similar legitimate backup agent behavior.",
+  reviewSummary:"Partial detection — alert was generated but triage process failed to distinguish attack from legitimate activity. Credential guard absence allowed the technique to succeed. Need better triage playbooks for LSASS access alerts.",
+  rootCause:"Alert triage playbook does not differentiate between legitimate and malicious LSASS access patterns. Credential guard not deployed on workstation fleet.",
+  patch:"Update LSASS access triage playbook with known-bad process chains. Deploy credential guard to workstation fleet. Add high-fidelity rule for comsvcs.dll LSASS access.",
+  applyDecision:"Adjudicated — partial detection confirmed, remediation approved",
+  deg:6,cg:10,
+  evidence:[
+    {type:"Red Team Log",name:"LSASS Dump Log",path:"/evidence/ex001/lsass_dump.json",description:"LSASS memory dump execution via comsvcs.dll with timestamps",source:"Red Team",ok:1,docId:"RED-003",addedByRole:"red",addedByEdipi:"",addedAt:"2026-02-21T09:00:00Z"},
+    {type:"Blue Team Log",name:"EDR Alert — LSASS Access",path:"/evidence/ex001/edr_lsass_alert.pdf",description:"EDR alert for LSASS process access — triaged as FP",source:"Blue Team",ok:1,docId:"BLUE-005",addedByRole:"blue",addedByEdipi:"",addedAt:"2026-02-21T10:30:00Z"}
+  ],
+  auditChain:[],timeline:["Claim","Event","Review","",""],tlState:["done","done","done","",""],
+  revision:0,createdAt:"2026-02-21T08:00:00Z",updatedAt:"2026-02-25T14:00:00Z",
+  createdByRole:"red",updatedByRole:"purple",
+  createdByActorId:"UNSPECIFIED",updatedByActorId:"UNSPECIFIED",
+  createdByEdipi:"",createdByMode:"role_only",updatedByEdipi:"",updatedByMode:"role_only",
+  auditEvents:[],notes:""
+},
+"104":{
+  id:"PF-104",exerciseId:"EX-001",title:"HTTPS C2 Channel Undetected by Proxy",
+  technique:"T1071.001",tacticCategory:"Command and Control",
+  sev:"HIGH",status:"Patch Proposed",detectionStatus:"Missed",retestResult:"Pending",
+  redOperator:"R. Torres",blueDefender:"K. Patel",
+  exploitability:0.75,detectability:0.15,missionImpact:0.9,brq:0.78,
+  contradictionFlag:false,recurring:false,linked:[],
+  claim:"Red team established persistent C2 channel over HTTPS to external domain using domain-fronting technique. Proxy inspection did not flag the traffic. C2 operated for 6 hours during exercise window undetected.",
+  event:"Blue SOC had no visibility into the C2 channel. TLS inspection was enabled but domain-fronting bypassed SNI-based categorization. Post-exercise NetFlow analysis revealed anomalous traffic volume to CDN endpoints.",
+  reviewSummary:"Complete detection gap for domain-fronting C2. TLS inspection relies on SNI which is bypassed by domain fronting. Need JA3/JA3S fingerprinting and anomalous traffic volume detection for CDN-hosted endpoints.",
+  rootCause:"TLS inspection architecture relies solely on SNI categorization. No JA3 fingerprinting deployed. CDN traffic volume anomaly detection not implemented.",
+  patch:"Deploy JA3/JA3S fingerprinting on proxy. Implement CDN traffic volume anomaly detection. Add domain-fronting indicators to threat intelligence feed.",
+  applyDecision:"Patch proposed — pending security architecture review",
+  deg:10,cg:14,
+  evidence:[
+    {type:"Red Team Log",name:"C2 Infrastructure Log",path:"/evidence/ex001/c2_infra.json",description:"C2 channel configuration, domain-fronting setup, and session logs",source:"Red Team",ok:1,docId:"RED-004",addedByRole:"red",addedByEdipi:"",addedAt:"2026-02-22T15:00:00Z"},
+    {type:"Blue Team Log",name:"Proxy Log Analysis",path:"/evidence/ex001/proxy_gap.pdf",description:"Proxy log analysis showing no alerts for C2 traffic period",source:"Blue Team",ok:1,docId:"BLUE-006",addedByRole:"blue",addedByEdipi:"",addedAt:"2026-02-23T09:00:00Z"},
+    {type:"Artifact",name:"NetFlow Anomaly Report",path:"/evidence/ex001/netflow_anomaly.xlsx",description:"Post-exercise NetFlow analysis showing CDN traffic anomaly",source:"Blue Team",ok:0,docId:"",addedByRole:"blue",addedByEdipi:"",addedAt:"2026-02-24T10:00:00Z"}
+  ],
+  auditChain:[],timeline:["Claim","Event","Review","Patch",""],tlState:["done","done","done","active",""],
+  revision:0,createdAt:"2026-02-22T14:00:00Z",updatedAt:"2026-03-05T11:00:00Z",
+  createdByRole:"red",updatedByRole:"purple",
+  createdByActorId:"UNSPECIFIED",updatedByActorId:"UNSPECIFIED",
+  createdByEdipi:"",createdByMode:"role_only",updatedByEdipi:"",updatedByMode:"role_only",
+  auditEvents:[],notes:""
+},
+"105":{
+  id:"PF-105",exerciseId:"EX-001",title:"Domain Account Abuse Detected and Contained",
+  technique:"T1078.002",tacticCategory:"Persistence",
+  sev:"MED",status:"Retested",detectionStatus:"Detected",retestResult:"Pass",
+  redOperator:"R. Torres",blueDefender:"K. Patel",
+  exploitability:0.5,detectability:0.85,missionImpact:0.45,brq:0.88,
+  contradictionFlag:false,recurring:false,linked:[],
+  claim:"Red team created a rogue domain account with elevated privileges using compromised domain admin credentials. Account was used to access file shares and internal applications for 45 minutes before detection.",
+  event:"Blue SOC detected anomalous account creation via real-time AD audit log monitoring. SIEM alert triggered within 3 minutes of account creation. SOC analyst initiated containment — account disabled within 8 minutes of creation.",
+  reviewSummary:"Detection and response successful. AD monitoring rules correctly identified unusual account creation pattern. Response time was within SLA. Retest confirmed detection persists after rule tuning.",
+  rootCause:"N/A — detection successful. Minor gap: 45-minute window between account creation and file share access went unmonitored.",
+  patch:"Add behavioral analytics for new account file share access patterns. Reduce detection-to-containment window target from 10 to 5 minutes.",
+  applyDecision:"Closed — detection validated, retest passed",
+  deg:3,cg:6,
+  evidence:[
+    {type:"Red Team Log",name:"Account Creation Log",path:"/evidence/ex001/rogue_account.json",description:"Rogue domain account creation and privilege escalation chain",source:"Red Team",ok:1,docId:"RED-005",addedByRole:"red",addedByEdipi:"",addedAt:"2026-02-23T11:00:00Z"},
+    {type:"Blue Team Log",name:"AD Monitoring Alert",path:"/evidence/ex001/ad_alert.pdf",description:"AD monitoring alert for anomalous account creation with timeline",source:"Blue Team",ok:1,docId:"BLUE-007",addedByRole:"blue",addedByEdipi:"",addedAt:"2026-02-23T12:00:00Z"}
+  ],
+  auditChain:[],timeline:["Claim","Event","Review","Patch","Apply"],tlState:["done","done","done","done","done"],
+  revision:0,createdAt:"2026-02-23T10:00:00Z",updatedAt:"2026-03-08T09:00:00Z",
+  createdByRole:"red",updatedByRole:"purple",
+  createdByActorId:"UNSPECIFIED",updatedByActorId:"UNSPECIFIED",
+  createdByEdipi:"",createdByMode:"role_only",updatedByEdipi:"",updatedByMode:"role_only",
+  auditEvents:[],notes:""
+},
+"106":{
+  id:"PF-106",exerciseId:"EX-002",title:"Data Exfiltration Over HTTPS to Cloud Storage",
+  technique:"T1048.003",tacticCategory:"Exfiltration",
+  sev:"HIGH",status:"New",detectionStatus:"Missed",retestResult:"Pending",
+  redOperator:"J. Kim",blueDefender:"S. Martinez",
+  exploitability:0.8,detectability:0.1,missionImpact:0.95,brq:0.7,
+  contradictionFlag:false,recurring:false,linked:[],
+  claim:"Red team exfiltrated 2.4 GB of simulated sensitive data to an external cloud storage endpoint over HTTPS. Data was staged in 50 MB chunks and transmitted over 4 hours. No DLP alerts were generated.",
+  event:"Blue SOC had no visibility into the exfiltration. DLP solution does not inspect HTTPS traffic to approved cloud storage providers. Post-exercise review of proxy logs showed sustained upload activity but no alert was triggered.",
+  reviewSummary:"Complete DLP gap for HTTPS exfiltration to cloud storage. Current DLP architecture trusts approved cloud providers and does not inspect encrypted uploads. Need content-aware inspection for all outbound HTTPS traffic.",
+  rootCause:"DLP bypass for approved cloud storage providers. No content-aware inspection for encrypted outbound traffic. Upload volume anomaly detection not deployed.",
+  patch:"Enable DLP content inspection for all cloud storage uploads. Deploy upload volume anomaly detection. Implement data classification labeling for sensitive repositories.",
+  applyDecision:"New — awaiting initial review",
+  deg:12,cg:18,
+  evidence:[
+    {type:"Red Team Log",name:"Exfiltration Log",path:"/evidence/ex002/exfil_log.json",description:"Data exfiltration timestamps, chunk sizes, and destination endpoints",source:"Red Team",ok:1,docId:"RED-006",addedByRole:"red",addedByEdipi:"",addedAt:"2026-02-05T16:00:00Z"},
+    {type:"Blue Team Log",name:"DLP Configuration Review",path:"/evidence/ex002/dlp_config.pdf",description:"DLP configuration showing cloud storage provider bypass rules",source:"Blue Team",ok:1,docId:"BLUE-008",addedByRole:"blue",addedByEdipi:"",addedAt:"2026-02-06T10:00:00Z"},
+    {type:"Artifact",name:"Proxy Upload Analysis",path:"/evidence/ex002/proxy_uploads.xlsx",description:"Proxy log analysis showing sustained upload volume during exercise",source:"Blue Team",ok:0,docId:"",addedByRole:"blue",addedByEdipi:"",addedAt:"2026-02-07T09:00:00Z"}
+  ],
+  auditChain:[],timeline:["Claim","","","",""],tlState:["done","","","",""],
+  revision:0,createdAt:"2026-02-05T15:00:00Z",updatedAt:"2026-02-07T10:00:00Z",
+  createdByRole:"red",updatedByRole:"red",
+  createdByActorId:"UNSPECIFIED",updatedByActorId:"UNSPECIFIED",
+  createdByEdipi:"",createdByMode:"role_only",updatedByEdipi:"",updatedByMode:"role_only",
+  auditEvents:[],notes:""
+},
+"107":{
+  id:"PF-107",exerciseId:"EX-002",title:"RDP Lateral Movement Partially Detected",
+  technique:"T1021.001",tacticCategory:"Lateral Movement",
+  sev:"MED",status:"In Review",detectionStatus:"Partial",retestResult:"Pending",
+  redOperator:"J. Kim",blueDefender:"S. Martinez",
+  exploitability:0.55,detectability:0.6,missionImpact:0.5,brq:0.72,
+  contradictionFlag:false,recurring:false,linked:[],
+  claim:"Red team used stolen credentials to RDP from cloud jump host to internal server DBSRV-03. Connection succeeded and persisted for 90 minutes. Red team accessed database backup files during the session.",
+  event:"Blue SOC received an alert for RDP connection from an unusual source IP but classified it as authorized VPN traffic after checking the source against the VPN IP range. The cloud jump host IP was within the VPN range, so the alert was dismissed.",
+  reviewSummary:"Partial detection — RDP alert was generated but misclassified during triage. VPN IP range overlap with cloud infrastructure created a blind spot. Need to separate cloud infrastructure IPs from VPN ranges in triage playbooks.",
+  rootCause:"VPN IP range overlap with cloud infrastructure IPs. Triage playbook does not distinguish between VPN user traffic and cloud-originating RDP sessions.",
+  patch:"Segregate cloud infrastructure IP ranges from VPN user ranges. Update RDP triage playbook with cloud-origin indicators. Add contextual enrichment for RDP source classification.",
+  applyDecision:"Pending — review in progress",
+  deg:5,cg:8,
+  evidence:[
+    {type:"Red Team Log",name:"RDP Session Log",path:"/evidence/ex002/rdp_session.json",description:"RDP session from cloud jump host to DBSRV-03 with timestamps",source:"Red Team",ok:1,docId:"RED-007",addedByRole:"red",addedByEdipi:"",addedAt:"2026-02-08T14:00:00Z"},
+    {type:"Blue Team Log",name:"RDP Alert Triage",path:"/evidence/ex002/rdp_alert_triage.pdf",description:"RDP alert triage notes showing misclassification rationale",source:"Blue Team",ok:1,docId:"BLUE-009",addedByRole:"blue",addedByEdipi:"",addedAt:"2026-02-09T09:00:00Z"}
+  ],
+  auditChain:[],timeline:["Claim","Event","Review","",""],tlState:["done","done","active","",""],
+  revision:0,createdAt:"2026-02-08T13:00:00Z",updatedAt:"2026-02-12T11:00:00Z",
+  createdByRole:"red",updatedByRole:"purple",
+  createdByActorId:"UNSPECIFIED",updatedByActorId:"UNSPECIFIED",
+  createdByEdipi:"",createdByMode:"role_only",updatedByEdipi:"",updatedByMode:"role_only",
+  auditEvents:[],notes:""
+},
+"108":{
+  id:"PF-108",exerciseId:"EX-002",title:"Spearphishing Attachment Detected by Mail Gateway",
+  technique:"T1566.001",tacticCategory:"Initial Access",
+  sev:"HIGH",status:"Patch Approved",detectionStatus:"Detected",retestResult:"Pending",
+  redOperator:"J. Kim",blueDefender:"S. Martinez",
+  exploitability:0.7,detectability:0.88,missionImpact:0.6,brq:0.85,
+  contradictionFlag:false,recurring:false,linked:[],
+  claim:"Red team sent targeted spearphishing emails with weaponized DOCX attachments to 5 users in the finance department. Mail gateway sandboxed and quarantined 4 of 5 emails. One email reached the user inbox due to a sandbox timeout.",
+  event:"Blue SOC received mail gateway alerts for 4 quarantined emails within 1 minute. The 5th email was flagged after user reported it to the phishing hotline 12 minutes later. All 5 attachments were confirmed malicious by sandbox detonation.",
+  reviewSummary:"Strong detection — 4 of 5 blocked at gateway. One bypass due to sandbox timeout on complex macro. User reporting served as backup detection. Need to tune sandbox timeout thresholds and add pre-delivery macro analysis.",
+  rootCause:"Mail gateway sandbox timeout too short for complex macro analysis (default 30s). No pre-delivery static macro analysis layer.",
+  patch:"Increase sandbox timeout to 120s for DOCX attachments. Add static macro analysis as pre-delivery check. Reinforce user phishing reporting training.",
+  applyDecision:"Patch approved — sandbox configuration change scheduled",
+  deg:4,cg:7,
+  evidence:[
+    {type:"Red Team Log",name:"Phishing Campaign Log",path:"/evidence/ex002/phish_campaign.json",description:"Spearphishing email details, targets, and delivery status",source:"Red Team",ok:1,docId:"RED-008",addedByRole:"red",addedByEdipi:"",addedAt:"2026-02-02T10:00:00Z"},
+    {type:"Blue Team Log",name:"Mail Gateway Report",path:"/evidence/ex002/mail_gw_report.pdf",description:"Mail gateway quarantine report for 4 of 5 phishing emails",source:"Blue Team",ok:1,docId:"BLUE-010",addedByRole:"blue",addedByEdipi:"",addedAt:"2026-02-02T11:00:00Z"},
+    {type:"Artifact",name:"Sandbox Analysis",path:"/evidence/ex002/sandbox_analysis.xlsx",description:"Sandbox detonation results for all 5 attachments with timeout data",source:"Blue Team",ok:1,docId:"BLUE-011",addedByRole:"blue",addedByEdipi:"",addedAt:"2026-02-03T09:00:00Z"}
+  ],
+  auditChain:[],timeline:["Claim","Event","Review","Patch",""],tlState:["done","done","done","done",""],
+  revision:0,createdAt:"2026-02-02T09:00:00Z",updatedAt:"2026-02-15T14:00:00Z",
+  createdByRole:"red",updatedByRole:"purple",
+  createdByActorId:"UNSPECIFIED",updatedByActorId:"UNSPECIFIED",
+  createdByEdipi:"",createdByMode:"role_only",updatedByEdipi:"",updatedByMode:"role_only",
+  auditEvents:[],notes:""
+},
+"109":{
+  id:"PF-109",exerciseId:"EX-002",title:"Security Tool Tampering Undetected",
+  technique:"T1562.001",tacticCategory:"Defense Evasion",
+  sev:"HIGH",status:"Adjudicated",detectionStatus:"Missed",retestResult:"Pending",
+  redOperator:"J. Kim",blueDefender:"S. Martinez",
+  exploitability:0.88,detectability:0.1,missionImpact:0.92,brq:0.68,
+  contradictionFlag:true,recurring:false,linked:[],
+  claim:"Red team disabled Windows Defender real-time protection and Sysmon logging on CLOUDSRV-01 using local admin credentials. Services remained disabled for the remainder of the exercise window (3 hours). No alerts were generated for the service state change.",
+  event:"Blue SOC had no visibility into the security tool tampering. EDR heartbeat monitoring was configured for 24-hour intervals, so the 3-hour outage window was not detected. Post-exercise review confirmed both services were stopped. Contradiction: blue team initially claimed Sysmon was running during the exercise window.",
+  reviewSummary:"Critical detection gap for security tool tampering. EDR heartbeat interval too long to detect short-duration tampering. Contradiction identified between blue team initial claim and forensic evidence. Need real-time tamper detection and reduced heartbeat intervals.",
+  rootCause:"EDR heartbeat monitoring interval too long (24h). No real-time tamper protection for security tool service state. No SIEM alert for security service stop events.",
+  patch:"Reduce EDR heartbeat interval to 5 minutes. Deploy tamper protection for Defender and Sysmon. Add SIEM alert for security service stop/disable events on all endpoints.",
+  applyDecision:"Adjudicated — contradiction resolved, full remediation required",
+  deg:14,cg:20,
+  evidence:[
+    {type:"Red Team Log",name:"Tool Tampering Log",path:"/evidence/ex002/tool_tamper.json",description:"Defender and Sysmon disable commands with timestamps",source:"Red Team",ok:1,docId:"RED-009",addedByRole:"red",addedByEdipi:"",addedAt:"2026-02-10T14:00:00Z"},
+    {type:"Blue Team Log",name:"EDR Heartbeat Report",path:"/evidence/ex002/edr_heartbeat.pdf",description:"EDR heartbeat report showing 24-hour check interval configuration",source:"Blue Team",ok:1,docId:"BLUE-012",addedByRole:"blue",addedByEdipi:"",addedAt:"2026-02-11T09:00:00Z"},
+    {type:"Artifact",name:"Forensic Service State",path:"/evidence/ex002/service_state.xlsx",description:"Forensic analysis of service state changes during exercise window",source:"Purple Team",ok:1,docId:"PUR-001",addedByRole:"purple",addedByEdipi:"",addedAt:"2026-02-12T10:00:00Z"}
+  ],
+  auditChain:[],timeline:["Claim","Event","Review","",""],tlState:["done","done","done","",""],
+  revision:0,createdAt:"2026-02-10T13:00:00Z",updatedAt:"2026-02-15T16:00:00Z",
+  createdByRole:"red",updatedByRole:"purple",
+  createdByActorId:"UNSPECIFIED",updatedByActorId:"UNSPECIFIED",
+  createdByEdipi:"",createdByMode:"role_only",updatedByEdipi:"",updatedByMode:"role_only",
+  auditEvents:[],notes:""
+},
+"110":{
+  id:"PF-110",exerciseId:"EX-003",title:"Ransomware Encryption Simulation Partially Detected",
+  technique:"T1486",tacticCategory:"Impact",
+  sev:"HIGH",status:"Closed",detectionStatus:"Partial",retestResult:"Pass",
+  redOperator:"A. Volkov",blueDefender:"D. Johnson",
+  exploitability:0.7,detectability:0.65,missionImpact:0.95,brq:0.9,
+  contradictionFlag:false,recurring:false,linked:[],
+  claim:"During tabletop exercise, red team presented ransomware encryption scenario targeting backup servers and file shares. Simulation showed encryption would complete within 15 minutes for 80% of critical data before IR procedures could contain the spread.",
+  event:"Blue team walked through IR playbook response. Detection was partial — ransomware behavior analytics would alert within 2 minutes but containment procedures required manual network isolation taking 12+ minutes. Backup restoration tested successfully but RTO exceeded 4-hour target.",
+  reviewSummary:"Tabletop confirmed partial detection capability. Alert generation adequate but containment gap exists. IR playbook needs automated network isolation capability. Backup RTO needs improvement through pre-staged recovery images.",
+  rootCause:"Manual network isolation process too slow for ransomware containment. Backup restoration process not optimized for rapid recovery.",
+  patch:"Implement automated network isolation triggered by ransomware behavior detection. Pre-stage recovery images for critical servers. Reduce backup RTO from 6 hours to 2 hours.",
+  applyDecision:"Closed — all remediation items implemented and validated",
+  deg:5,cg:8,
+  evidence:[
+    {type:"Document",name:"Tabletop Scenario Brief",path:"/evidence/ex003/ttx_scenario.pdf",description:"Ransomware tabletop exercise scenario and injects",source:"Purple Team",ok:1,docId:"PUR-002",addedByRole:"purple",addedByEdipi:"",addedAt:"2025-12-01T09:00:00Z"},
+    {type:"Blue Team Log",name:"IR Playbook Walkthrough",path:"/evidence/ex003/ir_walkthrough.pdf",description:"IR playbook walkthrough notes with timing analysis",source:"Blue Team",ok:1,docId:"BLUE-013",addedByRole:"blue",addedByEdipi:"",addedAt:"2025-12-05T14:00:00Z"},
+    {type:"Artifact",name:"RTO Analysis",path:"/evidence/ex003/rto_analysis.xlsx",description:"Backup restoration timing analysis showing RTO gaps",source:"Blue Team",ok:1,docId:"BLUE-014",addedByRole:"blue",addedByEdipi:"",addedAt:"2025-12-08T10:00:00Z"}
+  ],
+  auditChain:[],timeline:["Claim","Event","Review","Patch","Apply"],tlState:["done","done","done","done","done"],
+  revision:0,createdAt:"2025-12-01T08:00:00Z",updatedAt:"2025-12-18T15:00:00Z",
+  createdByRole:"purple",updatedByRole:"purple",
+  createdByActorId:"UNSPECIFIED",updatedByActorId:"UNSPECIFIED",
+  createdByEdipi:"",createdByMode:"role_only",updatedByEdipi:"",updatedByMode:"role_only",
+  auditEvents:[],notes:""
+},
+"111":{
+  id:"PF-111",exerciseId:"EX-003",title:"Obfuscated Payload Detected by YARA Rules",
+  technique:"T1027",tacticCategory:"Defense Evasion",
+  sev:"LOW",status:"Closed",detectionStatus:"Detected",retestResult:"Pass",
+  redOperator:"A. Volkov",blueDefender:"D. Johnson",
+  exploitability:0.4,detectability:0.9,missionImpact:0.25,brq:0.93,
+  contradictionFlag:false,recurring:false,linked:[],
+  claim:"During tabletop, red team presented base64-encoded and XOR-obfuscated payload delivery scenario. Analysis showed the payload would be written to disk in obfuscated form before execution.",
+  event:"Blue team confirmed YARA rules on endpoint would detect the obfuscation patterns. Live testing against sandboxed endpoint confirmed detection within 5 seconds of file write. SIEM alert generated and correlated with process execution event.",
+  reviewSummary:"Detection capability confirmed. YARA rules cover common obfuscation patterns including base64 and XOR variants. No remediation needed — validated existing controls.",
+  rootCause:"N/A — detection successful.",
+  patch:"No remediation required. Add quarterly YARA rule update cycle to maintain coverage against new obfuscation techniques.",
+  applyDecision:"Closed — detection validated",
+  deg:1,cg:3,
+  evidence:[
+    {type:"Document",name:"Obfuscation Scenario",path:"/evidence/ex003/obfuscation_scenario.pdf",description:"Obfuscated payload delivery scenario and technique details",source:"Red Team",ok:1,docId:"RED-010",addedByRole:"red",addedByEdipi:"",addedAt:"2025-12-03T10:00:00Z"},
+    {type:"Blue Team Log",name:"YARA Detection Results",path:"/evidence/ex003/yara_results.pdf",description:"YARA rule detection results with timing data",source:"Blue Team",ok:1,docId:"BLUE-015",addedByRole:"blue",addedByEdipi:"",addedAt:"2025-12-03T11:00:00Z"}
+  ],
+  auditChain:[],timeline:["Claim","Event","Review","Patch","Apply"],tlState:["done","done","done","done","done"],
+  revision:0,createdAt:"2025-12-03T09:00:00Z",updatedAt:"2025-12-10T12:00:00Z",
+  createdByRole:"red",updatedByRole:"purple",
+  createdByActorId:"UNSPECIFIED",updatedByActorId:"UNSPECIFIED",
+  createdByEdipi:"",createdByMode:"role_only",updatedByEdipi:"",updatedByMode:"role_only",
+  auditEvents:[],notes:""
+},
+"112":{
+  id:"PF-112",exerciseId:"EX-003",title:"Browser Credential Store Extraction Undetected",
+  technique:"T1555.003",tacticCategory:"Credential Access",
+  sev:"MED",status:"Closed",detectionStatus:"Missed",retestResult:"Pass",
+  redOperator:"A. Volkov",blueDefender:"D. Johnson",
+  exploitability:0.65,detectability:0.3,missionImpact:0.55,brq:0.87,
+  contradictionFlag:false,recurring:false,linked:[],
+  claim:"During tabletop, red team demonstrated browser credential store extraction using SharpChromium tool. Scenario showed extraction of saved passwords from Chrome credential store on 3 workstations without triggering EDR alerts.",
+  event:"Blue team confirmed EDR does not have detection rules for browser credential store access via third-party tools. After exercise, blue team deployed custom detection rule for credential store file access by non-browser processes.",
+  reviewSummary:"Detection gap confirmed during tabletop and validated by live testing. Custom detection rule deployed and validated post-exercise. Retest confirmed new rule detects SharpChromium and similar tools.",
+  rootCause:"EDR default rule set does not include browser credential store access detection. No custom rules deployed for credential store file access patterns.",
+  patch:"Deploy custom EDR rule for non-browser process access to credential store files. Add Credential Guard for browser-stored credentials where supported.",
+  applyDecision:"Closed — custom detection rule deployed and retest passed",
+  deg:4,cg:6,
+  evidence:[
+    {type:"Red Team Log",name:"Credential Extraction Demo",path:"/evidence/ex003/cred_extract_demo.json",description:"SharpChromium credential extraction demonstration log",source:"Red Team",ok:1,docId:"RED-011",addedByRole:"red",addedByEdipi:"",addedAt:"2025-12-05T10:00:00Z"},
+    {type:"Blue Team Log",name:"Custom Rule Deployment",path:"/evidence/ex003/custom_rule_deploy.pdf",description:"Custom EDR rule for credential store access — deployment and test results",source:"Blue Team",ok:1,docId:"BLUE-016",addedByRole:"blue",addedByEdipi:"",addedAt:"2025-12-12T14:00:00Z"},
+    {type:"Artifact",name:"Retest Results",path:"/evidence/ex003/retest_cred_store.xlsx",description:"Retest results showing detection of SharpChromium and 3 similar tools",source:"Blue Team",ok:1,docId:"BLUE-017",addedByRole:"blue",addedByEdipi:"",addedAt:"2025-12-15T09:00:00Z"}
+  ],
+  auditChain:[],timeline:["Claim","Event","Review","Patch","Apply"],tlState:["done","done","done","done","done"],
+  revision:0,createdAt:"2025-12-05T09:00:00Z",updatedAt:"2025-12-15T15:00:00Z",
+  createdByRole:"red",updatedByRole:"purple",
+  createdByActorId:"UNSPECIFIED",updatedByActorId:"UNSPECIFIED",
+  createdByEdipi:"",createdByMode:"role_only",updatedByEdipi:"",updatedByMode:"role_only",
+  auditEvents:[],notes:""
+}
+};
+
+/* ══════════ SECTION 7: TECHNIQUE LOOKUP ══════════ */
+var TECH={
+  "T1550.002":{id:"T1550.002",name:"Pass the Hash",tactic:"Lateral Movement"},
+  "T1059.001":{id:"T1059.001",name:"PowerShell",tactic:"Execution"},
+  "T1003.001":{id:"T1003.001",name:"LSASS Memory",tactic:"Credential Access"},
+  "T1071.001":{id:"T1071.001",name:"Web Protocols",tactic:"Command and Control"},
+  "T1078.002":{id:"T1078.002",name:"Domain Accounts",tactic:"Persistence"},
+  "T1048.003":{id:"T1048.003",name:"Exfil Over HTTPS",tactic:"Exfiltration"},
+  "T1021.001":{id:"T1021.001",name:"Remote Desktop",tactic:"Lateral Movement"},
+  "T1566.001":{id:"T1566.001",name:"Spearphishing Attachment",tactic:"Initial Access"},
+  "T1562.001":{id:"T1562.001",name:"Disable Security Tools",tactic:"Defense Evasion"},
+  "T1486":{id:"T1486",name:"Data Encrypted for Impact",tactic:"Impact"},
+  "T1027":{id:"T1027",name:"Obfuscated Files",tactic:"Defense Evasion"},
+  "T1555.003":{id:"T1555.003",name:"Credentials from Browsers",tactic:"Credential Access"}
+};
+
+/* ══════════ SECTION 8: WORKBENCH STATE ══════════ */
+var activeFindingId=null,editBuffer=null,editDirty=false;
+var activeExerciseId=null;
+var editBaseRevision=null,editBaseUpdatedAt=null,editBaseSnapshot=null;
+var boardActiveFid=null,boardSeconds=0,boardInterval=null;
+var lastSnapshot=null;
+var DEMO_EX=deepClone(EX),DEMO_PF=deepClone(PF);
+var CHANGELOG={},SYNC_META={};
+var SESSION_ID=generateSessionId();
+SESSION_ACTOR.sessionId=SESSION_ID;
+var FEED_ITEMS=[
+  {ts:"2026-03-18T09:15:00Z",text:"Purple Lead M. Chen opened Exercise EX-001",type:"info"},
+  {ts:"2026-03-18T09:30:00Z",text:"Red Op R. Torres filed PF-101: Pass-the-Hash Undetected",type:"warn"},
+  {ts:"2026-03-18T10:00:00Z",text:"Blue Def K. Patel attached SIEM gap analysis to PF-101",type:"info"},
+  {ts:"2026-03-18T10:30:00Z",text:"Joint review session started for EX-001 findings",type:"info"},
+  {ts:"2026-03-18T11:00:00Z",text:"PF-103 adjudicated: partial detection confirmed",type:"ok"},
+  {ts:"2026-03-18T11:15:00Z",text:"Contradiction flag raised on PF-109: conflicting evidence",type:"bad"},
+  {ts:"2026-03-18T11:30:00Z",text:"PF-102 closed: PowerShell detection validated",type:"ok"},
+  {ts:"2026-03-18T12:00:00Z",text:"EX-003 closed: all findings resolved, retests passed",type:"ok"}
+];
+
+/* ══════════ SECTION 9: NORMALIZE FUNCTIONS ══════════ */
+function normalizeFinding(f){
+  var now=new Date().toISOString();
+  if(f.revision==null)f.revision=0;
+  if(!f.createdAt)f.createdAt=now;
+  if(!f.updatedAt)f.updatedAt=now;
+  if(!f.createdByRole)f.createdByRole="system";
+  if(!f.updatedByRole)f.updatedByRole="system";
+  if(!f.createdByActorId)f.createdByActorId=f.createdByRole||"UNSPECIFIED";
+  if(!f.createdByEdipi)f.createdByEdipi="";
+  if(!f.createdByMode)f.createdByMode="role_only";
+  if(!f.updatedByActorId)f.updatedByActorId=f.updatedByRole||"UNSPECIFIED";
+  if(!f.updatedByEdipi)f.updatedByEdipi="";
+  if(!f.updatedByMode)f.updatedByMode="role_only";
+  if(!f.auditEvents)f.auditEvents=[];
+  if(!f.evidence)f.evidence=[];
+  f.evidence.forEach(function(e){
+    if(!e.type)e.type="Document";
+    if(!e.path)e.path="";
+    if(!e.description)e.description="";
+    if(!e.source)e.source="Manual Entry";
+    if(e.ok==null)e.ok=0;
+    if(!e.docId)e.docId="";
+    if(!e.addedByRole)e.addedByRole="";
+    if(!e.addedByEdipi)e.addedByEdipi="";
+    if(!e.addedAt)e.addedAt=now;
+  });
+  if(!f.auditChain)f.auditChain=[];
+  if(!f.timeline)f.timeline=["","","","",""];
+  if(!f.tlState)f.tlState=["","","","",""];
+  if(!f.linked)f.linked=[];
+  if(!f.retestResult)f.retestResult="Pending";
+  if(!f.detectionStatus)f.detectionStatus="Missed";
+  if(f.exploitability==null)f.exploitability=0;
+  if(f.detectability==null)f.detectability=0;
+  if(f.missionImpact==null)f.missionImpact=0;
+  if(f.brq==null)f.brq=0;
+  if(f.deg==null)f.deg=0;
+  if(f.cg==null)f.cg=0;
+  if(f.contradictionFlag==null)f.contradictionFlag=false;
+  if(f.recurring==null)f.recurring=false;
+  if(!f.exerciseId)f.exerciseId="";
+  if(!f.technique)f.technique="";
+  if(!f.tacticCategory)f.tacticCategory="";
+  if(!f.redOperator)f.redOperator="";
+  if(!f.blueDefender)f.blueDefender="";
+  if(!f.claim)f.claim="";
+  if(!f.event)f.event="";
+  if(!f.reviewSummary)f.reviewSummary="";
+  if(!f.rootCause)f.rootCause="";
+  if(!f.patch)f.patch="";
+  if(!f.applyDecision)f.applyDecision="";
+  if(!f.status)f.status="New";
+  if(!f.sev)f.sev="LOW";
+  if(f.notes==null)f.notes="";
+  return f;
+}
+function normalizeExercise(ex){
+  var now=new Date().toISOString();
+  if(ex.revision==null)ex.revision=0;
+  if(!ex.createdAt)ex.createdAt=now;
+  if(!ex.updatedAt)ex.updatedAt=now;
+  if(!ex.createdByRole)ex.createdByRole="purple";
+  if(!ex.updatedByRole)ex.updatedByRole="purple";
+  if(!ex.createdByActorId)ex.createdByActorId="UNSPECIFIED";
+  if(!ex.updatedByActorId)ex.updatedByActorId="UNSPECIFIED";
+  if(!ex.createdByEdipi)ex.createdByEdipi="";
+  if(!ex.createdByMode)ex.createdByMode="role_only";
+  if(!ex.updatedByEdipi)ex.updatedByEdipi="";
+  if(!ex.updatedByMode)ex.updatedByMode="role_only";
+  if(!ex.auditEvents)ex.auditEvents=[];
+  if(!ex.notes)ex.notes="";
+  if(!ex.name)ex.name="Unnamed Exercise";
+  if(!ex.type)ex.type="Full Engagement";
+  if(!ex.objective)ex.objective="";
+  if(!ex.scope)ex.scope="";
+  if(!ex.status)ex.status="Planning";
+  if(ex.techniqueCount==null)ex.techniqueCount=0;
+  if(ex.findingCount==null)ex.findingCount=0;
+  if(ex.patchedCount==null)ex.patchedCount=0;
+  if(ex.coherenceScore==null)ex.coherenceScore=0;
+  return ex;
+}
+Object.values(PF).forEach(normalizeFinding);
+Object.values(EX).forEach(normalizeExercise);
+Object.keys(PF).forEach(function(k){ensureChangeLog(k);ensureSyncMeta(k)});
+
+/* ══════════ SECTION 10: MEMORY GRAPH DATA ══════════ */
+var MG_NODES=[
+  {id:"ex1",type:"exercise",label:"IRON FORGE",ref:"EX-001"},
+  {id:"ex2",type:"exercise",label:"Cloud Pivot",ref:"EX-002"},
+  {id:"ex3",type:"exercise",label:"Ransomware TTX",ref:"EX-003"},
+  {id:"f101",type:"finding",label:"PF-101 PtH",ref:"101"},
+  {id:"f102",type:"finding",label:"PF-102 PS",ref:"102"},
+  {id:"f103",type:"finding",label:"PF-103 LSASS",ref:"103"},
+  {id:"f104",type:"finding",label:"PF-104 C2",ref:"104"},
+  {id:"f105",type:"finding",label:"PF-105 DomAcct",ref:"105"},
+  {id:"f106",type:"finding",label:"PF-106 Exfil",ref:"106"},
+  {id:"f107",type:"finding",label:"PF-107 RDP",ref:"107"},
+  {id:"f108",type:"finding",label:"PF-108 Phish",ref:"108"},
+  {id:"f109",type:"finding",label:"PF-109 Tamper",ref:"109"},
+  {id:"f110",type:"finding",label:"PF-110 Ransom",ref:"110"},
+  {id:"f111",type:"finding",label:"PF-111 Obfusc",ref:"111"},
+  {id:"f112",type:"finding",label:"PF-112 BrowsCred",ref:"112"},
+  {id:"t1550",type:"technique",label:"T1550.002 PtH"},
+  {id:"t1059",type:"technique",label:"T1059.001 PS"},
+  {id:"t1003",type:"technique",label:"T1003.001 LSASS"},
+  {id:"t1071",type:"technique",label:"T1071.001 C2"},
+  {id:"t1078",type:"technique",label:"T1078.002 DomAcct"},
+  {id:"t1048",type:"technique",label:"T1048.003 Exfil"},
+  {id:"t1021",type:"technique",label:"T1021.001 RDP"},
+  {id:"t1566",type:"technique",label:"T1566.001 Phish"},
+  {id:"t1562",type:"technique",label:"T1562.001 Tamper"},
+  {id:"t1486",type:"technique",label:"T1486 Encryption"},
+  {id:"t1027",type:"technique",label:"T1027 Obfusc"},
+  {id:"t1555",type:"technique",label:"T1555.003 BrowsCred"},
+  {id:"tac_latmov",type:"tactic",label:"Lateral Movement"},
+  {id:"tac_exec",type:"tactic",label:"Execution"},
+  {id:"tac_credacc",type:"tactic",label:"Credential Access"},
+  {id:"tac_c2",type:"tactic",label:"Command & Control"},
+  {id:"tac_persist",type:"tactic",label:"Persistence"},
+  {id:"tac_exfil",type:"tactic",label:"Exfiltration"},
+  {id:"tac_ia",type:"tactic",label:"Initial Access"},
+  {id:"tac_de",type:"tactic",label:"Defense Evasion"},
+  {id:"tac_impact",type:"tactic",label:"Impact"},
+  {id:"pat_detgap",type:"pattern",label:"Detection Gap"},
+  {id:"pat_credexp",type:"pattern",label:"Credential Exposure"},
+  {id:"pat_latchain",type:"pattern",label:"Lateral Movement Chain"},
+  {id:"pat_triagefail",type:"pattern",label:"Triage Failure"},
+  {id:"rc_edr",type:"rootcause",label:"EDR Config Gap"},
+  {id:"rc_siem",type:"rootcause",label:"SIEM Correlation Gap"},
+  {id:"rc_dlp",type:"rootcause",label:"DLP Bypass"},
+  {id:"rc_triage",type:"rootcause",label:"Triage Process Gap"},
+  {id:"p_edrrule",type:"patch",label:"EDR Rule Deploy"},
+  {id:"p_netseg",type:"patch",label:"Network Segmentation"},
+  {id:"p_ja3",type:"patch",label:"JA3 Fingerprinting"},
+  {id:"p_tamper",type:"patch",label:"Tamper Protection"},
+  {id:"d_missed",type:"detection",label:"Missed (6)"},
+  {id:"d_partial",type:"detection",label:"Partial (3)"},
+  {id:"d_detected",type:"detection",label:"Detected (3)"}
+];
+var MG_EDGES=[
+  {from:"ex1",to:"f101"},{from:"ex1",to:"f102"},{from:"ex1",to:"f103"},{from:"ex1",to:"f104"},{from:"ex1",to:"f105"},
+  {from:"ex2",to:"f106"},{from:"ex2",to:"f107"},{from:"ex2",to:"f108"},{from:"ex2",to:"f109"},
+  {from:"ex3",to:"f110"},{from:"ex3",to:"f111"},{from:"ex3",to:"f112"},
+  {from:"f101",to:"t1550"},{from:"f102",to:"t1059"},{from:"f103",to:"t1003"},{from:"f104",to:"t1071"},
+  {from:"f105",to:"t1078"},{from:"f106",to:"t1048"},{from:"f107",to:"t1021"},{from:"f108",to:"t1566"},
+  {from:"f109",to:"t1562"},{from:"f110",to:"t1486"},{from:"f111",to:"t1027"},{from:"f112",to:"t1555"},
+  {from:"t1550",to:"tac_latmov"},{from:"t1059",to:"tac_exec"},{from:"t1003",to:"tac_credacc"},
+  {from:"t1071",to:"tac_c2"},{from:"t1078",to:"tac_persist"},{from:"t1048",to:"tac_exfil"},
+  {from:"t1021",to:"tac_latmov"},{from:"t1566",to:"tac_ia"},{from:"t1562",to:"tac_de"},
+  {from:"t1486",to:"tac_impact"},{from:"t1027",to:"tac_de"},{from:"t1555",to:"tac_credacc"},
+  {from:"f101",to:"pat_detgap"},{from:"f104",to:"pat_detgap"},{from:"f106",to:"pat_detgap"},{from:"f109",to:"pat_detgap"},
+  {from:"f101",to:"pat_latchain"},{from:"f107",to:"pat_latchain"},
+  {from:"f103",to:"pat_credexp"},{from:"f112",to:"pat_credexp"},
+  {from:"f103",to:"pat_triagefail"},{from:"f107",to:"pat_triagefail"},
+  {from:"pat_detgap",to:"rc_edr"},{from:"pat_detgap",to:"rc_siem"},
+  {from:"pat_credexp",to:"rc_edr"},{from:"pat_triagefail",to:"rc_triage"},
+  {from:"f106",to:"rc_dlp"},
+  {from:"rc_edr",to:"p_edrrule"},{from:"rc_siem",to:"p_netseg"},
+  {from:"rc_siem",to:"p_ja3"},{from:"rc_edr",to:"p_tamper"},
+  {from:"f101",to:"d_missed"},{from:"f104",to:"d_missed"},{from:"f106",to:"d_missed"},
+  {from:"f109",to:"d_missed"},{from:"f112",to:"d_missed"},
+  {from:"f103",to:"d_partial"},{from:"f107",to:"d_partial"},{from:"f110",to:"d_partial"},
+  {from:"f102",to:"d_detected"},{from:"f105",to:"d_detected"},{from:"f108",to:"d_detected"},{from:"f111",to:"d_detected"},
+  {from:"p_edrrule",to:"f101"},{from:"p_netseg",to:"f101"},{from:"p_ja3",to:"f104"},{from:"p_tamper",to:"f109"}
+];
+var MG_COLORS={exercise:"#a855f7",finding:"#00f0ff",technique:"#ff6bff",tactic:"#ffcc66",pattern:"#ff9f43",rootcause:"#ff6b6b",patch:"#5dff93",detection:"#3b82ff"};
+
+/* ══════════ SECTION 11: SCORING — computePCS ══════════ */
+function computePCS(exId){
+  var findings=Object.values(PF).filter(function(f){return f.exerciseId===exId&&f.status!=="Closed"});
+  var score=100;
+  findings.forEach(function(f){
+    if(f.detectionStatus==="Missed")score-=10;
+    if(f.detectionStatus==="Partial")score-=4;
+    if(f.sev==="HIGH"&&f.status!=="Patch Approved"&&f.status!=="Retested"&&f.status!=="Closed")score-=6;
+    if(f.retestResult==="Fail")score-=8;
+    if(f.contradictionFlag)score-=5;
+    if(f.recurring||f.status==="Reopened")score-=7;
+  });
+  return Math.max(0,Math.min(100,score));
+}
+
+/* ══════════ SECTION 12: CHANGELOG & SYNC ══════════ */
+function appendAuditEvent(f,action,details){
+  if(!f.auditEvents)f.auditEvents=[];
+  var stamp=getActorStamp();
+  f.auditEvents.push({ts:stamp.ts,role:stamp.role,actor:stamp,action:action,details:details||""});
+  f.revision=(f.revision||0)+1;
+  f.updatedAt=stamp.ts;
+  f.updatedByRole=stamp.role;
+  f.updatedByActorId=stamp.actorId;
+  f.updatedByEdipi=stamp.edipi;
+  f.updatedByMode=stamp.actorMode;
+}
+
+var EDITABLE_FIELDS=["title","sev","status","exerciseId","technique","tacticCategory","claim","event","reviewSummary","rootCause","patch","applyDecision","redOperator","blueDefender","brq","deg","cg","exploitability","detectability","missionImpact","detectionStatus","retestResult","contradictionFlag","recurring","notes"];
+var WORKFLOW_FIELDS=["status"];
+
+function ensureChangeLog(key){if(!CHANGELOG[key])CHANGELOG[key]=[]}
+
+function ensureSyncMeta(key){
+  if(!SYNC_META[key]){
+    var f=PF[key]||{};
+    SYNC_META[key]={revision:f.revision||0,updatedAt:f.updatedAt||null,updatedByRole:f.updatedByRole||null,syncState:"synced",lockState:"none",conflictState:"none",lastChangeId:null};
+  }
+}
+
+function diffFindingFields(oldRec,newRec){
+  var changes=[];
+  EDITABLE_FIELDS.forEach(function(field){
+    var ov=oldRec[field],nv=newRec[field];
+    if(ov===undefined)ov=null;
+    if(nv===undefined)nv=null;
+    if(JSON.stringify(ov)!==JSON.stringify(nv)){
+      changes.push({field:field,oldValue:ov,newValue:nv});
+    }
+  });
+  return changes;
+}
+
+function appendChangeLogEvent(key,action,oldRec,newRec,summary){
+  ensureChangeLog(key);
+  var changes=diffFindingFields(oldRec,newRec);
+  var stamp=getActorStamp();
+  var entry={changeId:generateChangeId(),findingId:"PF-"+key,revision:(PF[key]||{}).revision||0,priorRevision:((PF[key]||{}).revision||1)-1,actorRole:stamp.role,actor:stamp,sessionId:SESSION_ID,ts:stamp.ts,actionType:action,fieldChanges:changes,summary:summary||action};
+  CHANGELOG[key].push(entry);
+  return entry;
+}
+
+function updateSyncMeta(key,patch){
+  ensureSyncMeta(key);
+  var m=SYNC_META[key];
+  Object.keys(patch).forEach(function(k){m[k]=patch[k]});
+}
+
+/* ══════════ SECTION 13: EXPORT ══════════ */
+function buildExportPackage(){return {exercises:deepClone(EX),findings:deepClone(PF),changelog:deepClone(CHANGELOG),syncMeta:deepClone(SYNC_META),_meta:{exported:new Date().toISOString(),buildId:"CERPA_PURPLE_EDGE_v1.0.0"}}}
+function buildCommandBrief(){
+  var openHigh=Object.values(PF).filter(function(f){return f.sev==="HIGH"&&f.status!=="Closed"}).length;
+  var detected=Object.values(PF).filter(function(f){return f.detectionStatus==="Detected"}).length;
+  var total=Object.keys(PF).length;
+  var detRate=total>0?Math.round(detected/total*100):0;
+  var avgPCS=Math.round(Object.values(EX).filter(function(e){return e.status!=="Planning"}).reduce(function(a,e){return a+computePCS(e.id)},0)/Math.max(1,Object.values(EX).filter(function(e){return e.status!=="Planning"}).length));
+  return {_meta:{type:"command_brief",version:"1.0.0",exportedAt:new Date().toISOString()},pcs:avgPCS,detectionRate:detRate+"%",openHigh:openHigh,totalFindings:total,activeExercises:Object.values(EX).filter(function(e){return e.status==="Active"}).length,period:"Exercise Cycle 2026"};
+}
+function buildAuditPackage(){
+  var pkg=buildExportPackage();
+  pkg._meta.type="audit_package";
+  pkg.auditTrail=Object.values(PF).map(function(f){return {id:f.id,exerciseId:f.exerciseId,status:f.status,auditChain:f.auditChain,evidence:f.evidence,timeline:f.timeline}});
+  return pkg;
+}
+function exportStatePackage(){downloadJSON(buildExportPackage(),"cerpa_purple_state.json");toast("State exported","ok")}
+function importStatePackage(pkg){
+  if(pkg&&pkg.exercises)EX=pkg.exercises;
+  if(pkg&&pkg.findings)PF=pkg.findings;
+  if(pkg&&pkg.changelog)CHANGELOG=pkg.changelog;
+  if(pkg&&pkg.syncMeta)SYNC_META=pkg.syncMeta;
+  Object.values(PF).forEach(normalizeFinding);
+  Object.values(EX).forEach(normalizeExercise);
+  rerenderAll();
+  toast("State imported","ok");
+}
+
+/* ══════════ SECTION 14: RERENDER + HELPERS ══════════ */
+function rerenderAll(){renderExercises();renderPurpleFindings();renderBoardQueue();renderDashboard();renderTrends();renderMG();renderTaskPanel();renderFeed();renderAudit()}
+function buildFindingListHTML(ids){
+  var h="";
+  ids.forEach(function(fid){
+    var f=PF[fid];if(!f)return;
+    h+='<div style="padding:4px 0;border-bottom:1px solid #1a1230;font-size:10px;cursor:pointer" data-drill="'+fid+'"><span class="mono" style="color:var(--accent)">'+escHTML(f.id)+'</span> <span class="badge '+(f.sev==="HIGH"?"sev-high":f.sev==="MED"?"sev-med":"sev-low")+'">'+escHTML(f.sev)+'</span> '+escHTML(f.title.substring(0,50))+'</div>';
+  });
+  return h;
+}
+function wireDrillLinks(){
+  document.querySelectorAll("[data-drill]").forEach(function(el){
+    el.addEventListener("click",function(){
+      var fid=el.getAttribute("data-drill");
+      actualCloseDrawer();openTab("find");
+      setTimeout(function(){showPurpleFinding(fid)},120);
+    });
+  });
+}
+
+/* ══════════ SECTION 15: COLOR/BADGE MAPS ══════════ */
+var sevClassMap={"HIGH":"sev-high","MED":"sev-med","LOW":"sev-low"};
+var stClassMap={"New":"st-new","In Review":"st-review","Adjudicated":"st-assigned","Patch Proposed":"st-patch","Patch Approved":"st-approved","Retested":"st-approved","Closed":"st-closed","Reopened":"st-reopen"};
+var stColorMap={"New":"var(--accent)","In Review":"var(--warn)","Adjudicated":"var(--purple)","Patch Proposed":"var(--mag)","Patch Approved":"var(--ok)","Retested":"var(--ok)","Closed":"var(--ok)","Reopened":"var(--bad)"};
+var detClassMap={"Detected":"det-detected","Partial":"det-partial","Missed":"det-missed"};
+var retestClassMap={"Pass":"retest-pass","Fail":"retest-fail","Partial":"retest-partial","Pending":"retest-pending"};
+var TL_LABELS=["Claim","Event","Review","Patch","Retest"];
+var boardStatuses={"New":1,"In Review":1,"Adjudicated":1,"Patch Proposed":1,"Reopened":1};
+
+/* ══════════ SECTION 16: DRAWER SYSTEM ══════════ */
+var dOverlay=document.getElementById("dOverlay"),dPanel=document.getElementById("dPanel");
+var dTitle=document.getElementById("dTitle"),dBody=document.getElementById("dBody"),dFoot=document.getElementById("dFoot");
+var toastWrap=document.getElementById("toastWrap");
+
+function openDrawer(title,bodyHtml,footHtml){
+  dTitle.textContent=title;
+  setHTML(dBody,bodyHtml);setHTML(dFoot,footHtml||"");
+  dOverlay.classList.add("open");dPanel.classList.add("open");
+  dBody.querySelectorAll("[data-dact]").forEach(function(b){b.addEventListener("click",function(){var act=b.getAttribute("data-dact");closeDrawer();if(act)toast(act,"ok")})});
+  dFoot.querySelectorAll("[data-dact]").forEach(function(b){b.addEventListener("click",function(){var act=b.getAttribute("data-dact");closeDrawer();if(act)toast(act,"ok")})});
+}
+function actualCloseDrawer(){
+  dOverlay.classList.remove("open");dPanel.classList.remove("open");
+  editDirty=false;editBuffer=null;activeFindingId=null;
+  editBaseRevision=null;editBaseUpdatedAt=null;editBaseSnapshot=null;
+}
+function closeDrawer(){
+  if(editDirty){confirmAction("You have unsaved changes. Discard?",actualCloseDrawer);return;}
+  actualCloseDrawer();
+}
+function confirmAction(msg,onYes){
+  var ov=document.createElement("div");ov.className="confirm-overlay";
+  var inner='<div class="confirm-card"><h4>Confirm Action</h4><p>'+escHTML(msg)+'</p><div class="confirm-btns"><button class="primary" id="cfYes">Confirm</button><button id="cfNo">Cancel</button></div></div>';
+  var t=document.createElement("template");t.innerHTML=inner;
+  ov.appendChild(t.content.cloneNode(true));
+  document.body.appendChild(ov);
+  ov.querySelector("#cfYes").addEventListener("click",function(){document.body.removeChild(ov);if(onYes)onYes()});
+  ov.querySelector("#cfNo").addEventListener("click",function(){document.body.removeChild(ov)});
+  ov.addEventListener("click",function(e){if(e.target===ov)document.body.removeChild(ov)});
+}
+document.getElementById("dClose").addEventListener("click",closeDrawer);
+dOverlay.addEventListener("click",closeDrawer);
+
+/* ══════════ STAGE 7: EXERCISES TAB ══════════ */
+function renderExercises(){
+  var grid=document.getElementById("exGrid");if(!grid)return;
+  var fltType=document.getElementById("fltExType"),fltStatus=document.getElementById("fltExStatus"),fltSearch=document.getElementById("fltExSearch");
+  var ft=fltType?fltType.value:"",fs=fltStatus?fltStatus.value:"",fsr=fltSearch?fltSearch.value.toLowerCase():"";
+  var ids=Object.keys(EX).filter(function(k){
+    var ex=EX[k];
+    if(ft&&ex.type!==ft)return false;
+    if(fs&&ex.status!==fs)return false;
+    if(fsr&&ex.name.toLowerCase().indexOf(fsr)===-1&&ex.id.toLowerCase().indexOf(fsr)===-1)return false;
+    return true;
+  });
+  var h='<div class="grid2">';
+  ids.forEach(function(k){
+    var ex=EX[k];
+    var pcs=computePCS(ex.id);
+    var pcsColor=pcs>=80?"var(--ok)":pcs>=60?"var(--warn)":"var(--bad)";
+    var statusCls=ex.status==="Active"?"st-review":ex.status==="Closed"?"st-closed":ex.status==="Planning"?"st-new":"st-assigned";
+    var typeBadge=ex.type==="Full Engagement"?"badge sev-high":ex.type==="Assumed Breach"?"badge sev-med":"badge sev-low";
+    var exFindings=Object.values(PF).filter(function(f){return f.exerciseId===ex.id});
+    var openFindings=exFindings.filter(function(f){return f.status!=="Closed"}).length;
+    var missedCount=exFindings.filter(function(f){return f.detectionStatus==="Missed"}).length;
+    h+='<div class="card ex-card" data-exid="'+escHTML(ex.id)+'" style="cursor:pointer">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+    h+='<span class="mono" style="color:var(--accent);font-size:12px">'+escHTML(ex.id)+'</span>';
+    h+='<span class="badge '+statusCls+'">'+escHTML(ex.status)+'</span>';
+    h+='</div>';
+    h+='<div style="font-weight:700;font-size:14px;margin-bottom:4px">'+escHTML(ex.name)+'</div>';
+    h+='<div style="font-size:10px;color:var(--muted);margin-bottom:8px"><span class="'+typeBadge+'">'+escHTML(ex.type)+'</span></div>';
+    h+='<div style="display:flex;gap:12px;font-size:10px;color:var(--muted);margin-bottom:6px">';
+    h+='<span>Findings: <strong style="color:var(--txt)">'+exFindings.length+'</strong></span>';
+    h+='<span>Open: <strong style="color:'+(openFindings>0?"var(--warn)":"var(--ok)")+'">'+openFindings+'</strong></span>';
+    h+='<span>Missed: <strong style="color:'+(missedCount>0?"var(--bad)":"var(--ok)")+'">'+missedCount+'</strong></span>';
+    h+='</div>';
+    h+='<div style="display:flex;justify-content:space-between;align-items:center">';
+    h+='<span style="font-size:10px;color:var(--muted)">'+escHTML(ex.startDate)+' → '+escHTML(ex.endDate)+'</span>';
+    h+='<span style="font-size:18px;font-weight:700;color:'+pcsColor+'">'+pcs+'</span>';
+    h+='</div>';
+    h+='</div>';
+  });
+  h+='</div>';
+  setHTML(grid,h);
+  grid.querySelectorAll("[data-exid]").forEach(function(c){
+    c.addEventListener("click",function(){openExerciseDrawer(c.getAttribute("data-exid"))});
+  });
+}
+
+function openExerciseDrawer(exId){
+  var ex=EX[exId];if(!ex)return;
+  var pcs=computePCS(ex.id);
+  var pcsColor=pcs>=80?"var(--ok)":pcs>=60?"var(--warn)":"var(--bad)";
+  var exFindings=Object.values(PF).filter(function(f){return f.exerciseId===ex.id});
+  var fids=Object.keys(PF).filter(function(k){return PF[k].exerciseId===ex.id});
+  var techs={};
+  exFindings.forEach(function(f){
+    var t=TECH[f.technique];
+    techs[f.technique]={name:t?t.name:f.technique,detection:f.detectionStatus};
+  });
+  var body='<div class="wire"><h4>Exercise Detail</h4>';
+  body+='<div class="wr"><span class="wl">ID</span><span class="wv mono">'+escHTML(ex.id)+'</span></div>';
+  body+='<div class="wr"><span class="wl">Name</span><span class="wv">'+escHTML(ex.name)+'</span></div>';
+  body+='<div class="wr"><span class="wl">Type</span><span class="wv">'+escHTML(ex.type)+'</span></div>';
+  body+='<div class="wr"><span class="wl">Status</span><span class="wv"><span class="badge '+(stClassMap[ex.status]||"st-new")+'">'+escHTML(ex.status)+'</span></span></div>';
+  body+='<div class="wr"><span class="wl">Objective</span><span class="wv" style="font-size:10px">'+escHTML(ex.objective)+'</span></div>';
+  body+='<div class="wr"><span class="wl">Scope</span><span class="wv" style="font-size:10px">'+escHTML(ex.scope)+'</span></div>';
+  body+='<div class="wr"><span class="wl">Dates</span><span class="wv">'+escHTML(ex.startDate)+' → '+escHTML(ex.endDate)+'</span></div>';
+  body+='<div class="wr"><span class="wl">Red Lead</span><span class="wv team-red">'+escHTML(ex.redLead)+'</span></div>';
+  body+='<div class="wr"><span class="wl">Blue Lead</span><span class="wv team-blue">'+escHTML(ex.blueLead)+'</span></div>';
+  body+='<div class="wr"><span class="wl">Purple Lead</span><span class="wv team-purple">'+escHTML(ex.purpleLead)+'</span></div>';
+  body+='<div class="wr"><span class="wl">PCS</span><span class="wv" style="font-size:18px;font-weight:700;color:'+pcsColor+'">'+pcs+'</span></div>';
+  body+='</div>';
+  if(fids.length>0){
+    body+='<div class="wire"><h4>Findings ('+fids.length+')</h4>';
+    body+=buildFindingListHTML(fids);
+    body+='</div>';
+  }
+  if(Object.keys(techs).length>0){
+    body+='<div class="wire"><h4>Technique Coverage</h4>';
+    Object.keys(techs).forEach(function(tid){
+      var t=techs[tid];
+      var dcls=detClassMap[t.detection]||"det-missed";
+      body+='<div class="wr"><span class="wl mono" style="font-size:9px">'+escHTML(tid)+'</span><span class="wv">'+escHTML(t.name)+' <span class="'+dcls+'">'+escHTML(t.detection)+'</span></span></div>';
+    });
+    body+='</div>';
+  }
+  var foot='<button class="primary" id="exDrawerViewFindings">View Findings</button>';
+  foot+='<button id="exDrawerExport">Export Exercise</button>';
+  openDrawer(escHTML(ex.name),body,foot);
+  document.getElementById("exDrawerViewFindings").addEventListener("click",function(){
+    actualCloseDrawer();
+    openTab("find");
+    var fltEx=document.getElementById("fltExercise");
+    if(fltEx){fltEx.value=exId;}
+    setTimeout(function(){renderPurpleFindings()},80);
+  });
+  document.getElementById("exDrawerExport").addEventListener("click",function(){
+    var pkg={exercise:deepClone(ex),findings:exFindings.map(function(f){return deepClone(f)}),_meta:{exported:new Date().toISOString(),type:"exercise_export"}};
+    downloadJSON(pkg,"cerpa_exercise_"+ex.id+".json");
+  });
+  wireDrillLinks();
+}
+
+(function(){
+  var ft=document.getElementById("fltExType"),fs=document.getElementById("fltExStatus"),fsr=document.getElementById("fltExSearch");
+  if(ft)ft.addEventListener("change",renderExercises);
+  if(fs)fs.addEventListener("change",renderExercises);
+  if(fsr)fsr.addEventListener("keyup",renderExercises);
+})();
+
+/* ══════════ STAGE 8: FINDINGS TAB + DETAIL + EDIT ══════════ */
+var _exFilterPopulated=false;
+function renderPurpleFindings(){
+  var tbody=document.getElementById("pfTbody");if(!tbody)return;
+  var fltEx=document.getElementById("fltExercise"),fltSt=document.getElementById("fltStatus"),fltSev=document.getElementById("fltSev");
+  var fltDet=document.getElementById("fltDetection"),fltTac=document.getElementById("fltTactic"),fltSr=document.getElementById("fltSearch");
+  var fe=fltEx?fltEx.value:"",fst=fltSt?fltSt.value:"",fsv=fltSev?fltSev.value:"";
+  var fd=fltDet?fltDet.value:"",ftc=fltTac?fltTac.value:"",fsr=fltSr?fltSr.value.toLowerCase():"";
+  if(!_exFilterPopulated&&fltEx){
+    _exFilterPopulated=true;
+    var optH='<option value="">All Exercises</option>';
+    Object.keys(EX).forEach(function(k){optH+='<option value="'+escHTML(k)+'">'+escHTML(k+" — "+EX[k].name)+'</option>'});
+    setHTML(fltEx,optH);
+    if(fe)fltEx.value=fe;
+  }
+  var sevOrd={"HIGH":0,"MED":1,"LOW":2};
+  var keys=Object.keys(PF).filter(function(k){
+    var f=PF[k];
+    if(fe&&f.exerciseId!==fe)return false;
+    if(fst&&f.status!==fst)return false;
+    if(fsv&&f.sev!==fsv)return false;
+    if(fd&&f.detectionStatus!==fd)return false;
+    if(ftc&&f.tacticCategory!==ftc)return false;
+    if(fsr&&f.title.toLowerCase().indexOf(fsr)===-1&&f.id.toLowerCase().indexOf(fsr)===-1&&f.technique.toLowerCase().indexOf(fsr)===-1)return false;
+    return true;
+  }).sort(function(a,b){
+    var sa=sevOrd[PF[a].sev]||2,sb=sevOrd[PF[b].sev]||2;
+    if(sa!==sb)return sa-sb;
+    return b.localeCompare(a);
+  });
+  var h="";
+  keys.forEach(function(k){
+    var f=PF[k];
+    var sc=sevClassMap[f.sev]||"sev-low";
+    var stc=stClassMap[f.status]||"st-new";
+    var dc=detClassMap[f.detectionStatus]||"det-missed";
+    var rc=retestClassMap[f.retestResult]||"retest-pending";
+    h+='<tr data-fid="'+escHTML(k)+'" style="cursor:pointer">';
+    h+='<td><span class="mono" style="color:'+(stColorMap[f.status]||"var(--accent)")+'">'+escHTML(f.id)+'</span></td>';
+    h+='<td>'+escHTML(f.exerciseId)+'</td>';
+    h+='<td><span class="mono" style="font-size:10px">'+escHTML(f.technique)+'</span></td>';
+    h+='<td><span class="tactic-badge">'+escHTML(f.tacticCategory)+'</span></td>';
+    h+='<td><span class="badge '+sc+'">'+escHTML(f.sev)+'</span></td>';
+    h+='<td><span class="badge '+stc+'">'+escHTML(f.status)+'</span></td>';
+    h+='<td><span class="'+dc+'">'+escHTML(f.detectionStatus)+'</span></td>';
+    h+='<td><span class="'+rc+'">'+escHTML(f.retestResult)+'</span></td>';
+    h+='<td style="font-size:10px;color:var(--red-team)">'+escHTML(f.redOperator)+'</td>';
+    h+='<td style="font-size:10px;color:var(--blue-team)">'+escHTML(f.blueDefender)+'</td>';
+    h+='<td style="font-weight:700">'+((f.brq||0).toFixed(2))+'</td>';
+    h+='</tr>';
+  });
+  setHTML(tbody,h);
+  tbody.querySelectorAll("[data-fid]").forEach(function(row){
+    row.addEventListener("click",function(){showPurpleFinding(row.getAttribute("data-fid"))});
+  });
+}
+
+function showPurpleFinding(fid){
+  var f=PF[fid];if(!f)return;
+  var det=document.getElementById("fDet"),tbl=document.getElementById("pfTbody");
+  if(!det)return;
+  if(tbl&&tbl.parentElement)tbl.parentElement.style.display="none";
+  var fltRow=document.querySelector("#s-find .filters");if(fltRow)fltRow.style.display="none";
+  det.classList.remove("hidden");
+  var sc=sevClassMap[f.sev]||"sev-low";
+  var stc=stClassMap[f.status]||"st-new";
+  var dc=detClassMap[f.detectionStatus]||"det-missed";
+  var rc=retestClassMap[f.retestResult]||"retest-pending";
+  var h='<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:12px">';
+  h+='<span class="mono" style="color:var(--accent);font-size:14px;font-weight:700">'+escHTML(f.id)+'</span>';
+  h+='<span class="badge '+sc+'">'+escHTML(f.sev)+'</span>';
+  h+='<span class="badge '+stc+'">'+escHTML(f.status)+'</span>';
+  h+='<span class="'+dc+'">'+escHTML(f.detectionStatus)+'</span>';
+  h+='<span class="'+rc+'">'+escHTML(f.retestResult)+'</span>';
+  h+='<span class="tactic-badge">'+escHTML(f.tacticCategory)+'</span>';
+  if(f.contradictionFlag)h+='<span class="contradiction">&#9888; CONTRADICTION</span>';
+  if(f.recurring)h+='<span class="recur">RECURRING</span>';
+  h+='</div>';
+  h+='<div style="font-weight:700;font-size:13px;margin-bottom:10px">'+escHTML(f.title)+'</div>';
+  /* Timeline bar */
+  h+='<div class="tl">';
+  for(var ti=0;ti<5;ti++){
+    var cls=f.tlState[ti]==="done"?"done":f.tlState[ti]==="active"?"now":"wait";
+    h+='<div class="tl-s"><div class="tl-dot '+cls+'"></div><div class="tl-lb">'+TL_LABELS[ti]+'</div></div>';
+  }
+  h+='</div>';
+  /* Exercise ref */
+  var ex=EX[f.exerciseId];
+  if(ex){h+='<div style="font-size:10px;color:var(--muted);margin-bottom:10px">Exercise: <span class="mono" style="color:var(--accent);cursor:pointer" data-drill-ex="'+escHTML(f.exerciseId)+'">'+escHTML(f.exerciseId)+' — '+escHTML(ex.name)+'</span></div>';}
+  /* Two-column wire layout */
+  h+='<div class="grid2">';
+  /* Left column */
+  h+='<div>';
+  h+='<div class="wire" style="border-left:3px solid var(--red-team)"><h4 style="color:var(--red-team)">Claim</h4>';
+  h+='<div style="font-size:11px;line-height:1.6;margin-bottom:6px">'+escHTML(f.claim)+'</div>';
+  h+='<div class="wr"><span class="wl">Red Op</span><span class="wv team-red">'+escHTML(f.redOperator)+'</span></div>';
+  h+='</div>';
+  h+='<div class="wire" style="border-left:3px solid var(--blue-team)"><h4 style="color:var(--blue-team)">Event</h4>';
+  h+='<div style="font-size:11px;line-height:1.6;margin-bottom:6px">'+escHTML(f.event)+'</div>';
+  h+='<div class="wr"><span class="wl">Blue Def</span><span class="wv team-blue">'+escHTML(f.blueDefender)+'</span></div>';
+  h+='<div class="wr"><span class="wl">Detection</span><span class="wv"><span class="'+dc+'">'+escHTML(f.detectionStatus)+'</span></span></div>';
+  h+='</div>';
+  /* Evidence */
+  h+='<div class="wire"><h4>Evidence ('+f.evidence.length+')</h4>';
+  f.evidence.forEach(function(e,ei){
+    var icon=e.ok?'<span class="ev-ok">&#10003;</span>':'<span class="ev-miss">&#10007;</span>';
+    h+='<div class="ev">'+icon+'<span>'+escHTML(e.name)+'</span><span class="ev-type">'+escHTML(e.type)+'</span>';
+    if(canReview(getRole())){h+='<button class="ev-validate" data-evidx="'+ei+'">'+(!e.ok?"Validate":"Invalidate")+'</button>';}
+    h+='</div>';
+    if(e.description)h+='<div class="ev-desc">'+escHTML(e.description)+'</div>';
+    if(e.path)h+='<div class="ev-path">'+escHTML(e.path)+'</div>';
+  });
+  h+='</div>';
+  h+='</div>';
+  /* Right column */
+  h+='<div>';
+  h+='<div class="wire" style="border-left:3px solid var(--purple-team)"><h4 style="color:var(--purple-team)">Review</h4>';
+  h+='<div style="font-size:11px;line-height:1.6;margin-bottom:6px">'+escHTML(f.reviewSummary)+'</div>';
+  h+='<div class="wr"><span class="wl">Root Cause</span><span class="wv" style="font-size:10px">'+escHTML(f.rootCause)+'</span></div>';
+  h+='<div class="wr"><span class="wl">BRQ</span><span class="wv" style="font-weight:700">'+((f.brq||0).toFixed(2))+'</span></div>';
+  h+='</div>';
+  h+='<div class="wire" style="border-left:3px solid var(--warn)"><h4 style="color:var(--warn)">Patch</h4>';
+  h+='<div style="font-size:11px;line-height:1.6;margin-bottom:6px">'+escHTML(f.patch)+'</div>';
+  h+='<div class="wr"><span class="wl">DEG</span><span class="wv">'+f.deg+'</span></div>';
+  h+='<div class="wr"><span class="wl">Decision</span><span class="wv" style="font-size:10px">'+escHTML(f.applyDecision)+'</span></div>';
+  h+='</div>';
+  h+='<div class="wire" style="border-left:3px solid var(--ok)"><h4 style="color:var(--ok)">Retest</h4>';
+  h+='<div class="wr"><span class="wl">Result</span><span class="wv"><span class="'+rc+'">'+escHTML(f.retestResult)+'</span></span></div>';
+  h+='</div>';
+  h+='<div class="wire"><h4>Scoring</h4>';
+  h+='<div class="wr"><span class="wl">Exploitability</span><span class="wv" style="color:'+(f.exploitability>=0.7?"var(--bad)":f.exploitability>=0.4?"var(--warn)":"var(--ok)")+'">'+((f.exploitability||0).toFixed(2))+'</span></div>';
+  h+='<div class="wr"><span class="wl">Detectability</span><span class="wv" style="color:'+(f.detectability>=0.7?"var(--ok)":f.detectability>=0.4?"var(--warn)":"var(--bad)")+'">'+((f.detectability||0).toFixed(2))+'</span></div>';
+  h+='<div class="wr"><span class="wl">Mission Impact</span><span class="wv" style="color:'+(f.missionImpact>=0.7?"var(--bad)":f.missionImpact>=0.4?"var(--warn)":"var(--ok)")+'">'+((f.missionImpact||0).toFixed(2))+'</span></div>';
+  h+='</div>';
+  h+='</div>';
+  h+='</div>';/* end grid2 */
+  setHTML(document.getElementById("fDetContent"),h);
+  /* Action buttons */
+  var role=getRole();
+  var ah='<button class="primary" data-fact="closure">Request Closure</button>';
+  ah+='<button data-fact="review">Send to Review</button>';
+  ah+='<button data-fact="export">Export Packet</button>';
+  ah+='<button data-fact="evidence">Add Evidence</button>';
+  if(canEditFinding(role)||canEditClaim(role)||canEditEvent(role)){
+    ah+='<button class="ok" data-fedit="'+escHTML(fid)+'">Edit</button>';
+  }
+  setHTML(document.getElementById("fDetActions"),ah);
+  /* Wire action buttons */
+  document.getElementById("fDetActions").querySelectorAll("[data-fact]").forEach(function(btn){
+    btn.addEventListener("click",function(){openActionDrawer(btn.getAttribute("data-fact"),fid)});
+  });
+  var editBtn=document.getElementById("fDetActions").querySelector("[data-fedit]");
+  if(editBtn)editBtn.addEventListener("click",function(){openEditDrawer(fid)});
+  /* Wire evidence validate buttons */
+  document.getElementById("fDetContent").querySelectorAll("[data-evidx]").forEach(function(btn){
+    btn.addEventListener("click",function(ev){
+      ev.stopPropagation();
+      var idx=parseInt(btn.getAttribute("data-evidx"),10);
+      var ef=PF[fid];if(!ef||!ef.evidence[idx])return;
+      ef.evidence[idx].ok=ef.evidence[idx].ok?0:1;
+      appendAuditEvent(ef,"evidence_validate","Evidence #"+idx+" "+(ef.evidence[idx].ok?"validated":"invalidated")+": "+ef.evidence[idx].name);
+      showPurpleFinding(fid);
+      toast("Evidence "+(ef.evidence[idx].ok?"validated":"invalidated"),"ok");
+    });
+  });
+  /* Wire exercise ref click */
+  var exRef=document.getElementById("fDetContent").querySelector("[data-drill-ex]");
+  if(exRef)exRef.addEventListener("click",function(){openExerciseDrawer(exRef.getAttribute("data-drill-ex"))});
+}
+
+function hideFindingDetail(){
+  var det=document.getElementById("fDet"),tbl=document.getElementById("pfTbody");
+  if(det)det.classList.add("hidden");
+  if(tbl&&tbl.parentElement)tbl.parentElement.style.display="";
+  var fltRow=document.querySelector("#s-find .filters");if(fltRow)fltRow.style.display="";
+}
+
+function openActionDrawer(action,fid){
+  var f=PF[fid];if(!f)return;
+  if(action==="closure"){
+    var body='<div class="wire"><h4>Request Closure</h4>';
+    body+='<p style="font-size:11px;color:var(--muted);margin-bottom:10px">Confirm closure for <strong>'+escHTML(f.id)+'</strong>. This will mark the finding as Closed with Retest Pass.</p>';
+    body+='</div>';
+    var foot='<button class="ok" id="btnConfirmClosure">Confirm Closure</button><button id="btnCancelClosure">Cancel</button>';
+    openDrawer("Request Closure — "+escHTML(f.id),body,foot);
+    document.getElementById("btnConfirmClosure").addEventListener("click",function(){
+      var old=deepClone(f);
+      f.status="Closed";f.retestResult="Pass";
+      f.timeline=["Claim","Event","Review","Patch","Retest"];
+      f.tlState=["done","done","done","done","done"];
+      appendAuditEvent(f,"closure","Finding closed via closure request");
+      var key=fid;ensureChangeLog(key);
+      appendChangeLogEvent(key,"closure",old,f,"Finding closed");
+      updateSyncMeta(key,{revision:f.revision,updatedAt:f.updatedAt,syncState:"local"});
+      actualCloseDrawer();rerenderAll();showPurpleFinding(fid);
+      toast("Finding "+f.id+" closed","ok");
+    });
+    document.getElementById("btnCancelClosure").addEventListener("click",function(){actualCloseDrawer()});
+  } else if(action==="review"){
+    var old=deepClone(f);
+    f.status="In Review";
+    appendAuditEvent(f,"send_to_review","Finding sent to review");
+    var key=fid;ensureChangeLog(key);
+    appendChangeLogEvent(key,"status_change",old,f,"Sent to review");
+    updateSyncMeta(key,{revision:f.revision,updatedAt:f.updatedAt,syncState:"local"});
+    rerenderAll();showPurpleFinding(fid);
+    toast("Finding "+f.id+" sent to review","ok");
+  } else if(action==="export"){
+    var pkg={finding:deepClone(f),exercise:EX[f.exerciseId]?deepClone(EX[f.exerciseId]):null,changelog:CHANGELOG[fid]?deepClone(CHANGELOG[fid]):[],_meta:{exported:new Date().toISOString(),type:"finding_packet"}};
+    downloadJSON(pkg,"cerpa_finding_"+f.id+".json");
+  } else if(action==="evidence"){
+    var body='<div class="df"><label>Type</label><select id="evType"><option>Red Team Log</option><option>Blue Team Log</option><option>Screenshot</option><option>Artifact</option><option>Document</option></select></div>';
+    body+='<div class="df"><label>Name</label><input type="text" id="evName" placeholder="Evidence name"/></div>';
+    body+='<div class="df"><label>Path</label><input type="text" id="evPath" placeholder="/evidence/..."/></div>';
+    body+='<div class="df"><label>Description</label><textarea id="evDesc" placeholder="Brief description"></textarea></div>';
+    body+='<div class="df"><label>Source</label><select id="evSource"><option>Red Team</option><option>Blue Team</option><option>Joint</option><option>External</option></select></div>';
+    body+='<div class="df"><label>Doc ID</label><input type="text" id="evDocId" placeholder="DOC-XXX"/></div>';
+    var foot='<button class="primary" id="btnAddEvidence">Add Evidence</button><button id="btnCancelEvidence">Cancel</button>';
+    openDrawer("Add Evidence — "+escHTML(f.id),body,foot);
+    document.getElementById("btnAddEvidence").addEventListener("click",function(){
+      var name=document.getElementById("evName").value.trim();
+      if(!name){toast("Evidence name required","warn");return;}
+      var ev={
+        type:document.getElementById("evType").value,
+        name:name,
+        path:document.getElementById("evPath").value.trim(),
+        description:document.getElementById("evDesc").value.trim(),
+        source:document.getElementById("evSource").value,
+        ok:0,
+        docId:document.getElementById("evDocId").value.trim(),
+        addedByRole:getRole(),
+        addedByEdipi:SESSION_ACTOR.edipi,
+        addedAt:new Date().toISOString()
+      };
+      f.evidence.push(ev);
+      appendAuditEvent(f,"evidence_add","Added evidence: "+name);
+      actualCloseDrawer();rerenderAll();showPurpleFinding(fid);
+      toast("Evidence added","ok");
+    });
+    document.getElementById("btnCancelEvidence").addEventListener("click",function(){actualCloseDrawer()});
+  }
+}
+
+function openEditDrawer(fid){
+  var f=PF[fid];if(!f)return;
+  var role=getRole();
+  var canR=canEditClaim(role),canB=canEditEvent(role),canP=canEditFinding(role);
+  editBuffer=deepClone(f);editDirty=false;activeFindingId=fid;
+  editBaseRevision=f.revision;editBaseUpdatedAt=f.updatedAt;editBaseSnapshot=deepClone(f);
+  var ro=function(canField){return canField?'':'class="df-readonly"'};
+  var body='<div class="edit-section"><h4>Core</h4>';
+  body+='<div class="df" '+ro(canP)+'><label>Title</label><input type="text" id="edTitle" value="'+escHTML(f.title)+'"/></div>';
+  body+='<div class="df" '+ro(canP)+'><label>Severity</label><select id="edSev"><option '+(f.sev==="HIGH"?"selected":"")+'>HIGH</option><option '+(f.sev==="MED"?"selected":"")+'>MED</option><option '+(f.sev==="LOW"?"selected":"")+'>LOW</option></select></div>';
+  body+='<div class="df" '+ro(canP)+'><label>Status</label><select id="edStatus"><option>New</option><option>In Review</option><option>Adjudicated</option><option>Patch Proposed</option><option>Patch Approved</option><option>Retested</option><option>Closed</option><option>Reopened</option></select></div>';
+  body+='<div class="df" '+ro(canR)+'><label>Technique</label><input type="text" id="edTechnique" value="'+escHTML(f.technique)+'"/></div>';
+  body+='<div class="df" '+ro(canR)+'><label>Tactic Category</label><input type="text" id="edTactic" value="'+escHTML(f.tacticCategory)+'"/></div>';
+  body+='</div>';
+  body+='<div class="edit-section"><h4 style="color:var(--red-team)">Claim (Red)</h4>';
+  body+='<div class="df" '+ro(canR)+'><label>Claim</label><textarea id="edClaim">'+escHTML(f.claim)+'</textarea></div>';
+  body+='<div class="df" '+ro(canR)+'><label>Exploitability</label><input type="number" id="edExploit" step="0.01" min="0" max="1" value="'+f.exploitability+'"/></div>';
+  body+='</div>';
+  body+='<div class="edit-section"><h4 style="color:var(--blue-team)">Event (Blue)</h4>';
+  body+='<div class="df" '+ro(canB)+'><label>Event</label><textarea id="edEvent">'+escHTML(f.event)+'</textarea></div>';
+  body+='<div class="df" '+ro(canB)+'><label>Detection Status</label><select id="edDetStatus"><option '+(f.detectionStatus==="Detected"?"selected":"")+'>Detected</option><option '+(f.detectionStatus==="Partial"?"selected":"")+'>Partial</option><option '+(f.detectionStatus==="Missed"?"selected":"")+'>Missed</option></select></div>';
+  body+='<div class="df" '+ro(canB)+'><label>Detectability</label><input type="number" id="edDetect" step="0.01" min="0" max="1" value="'+f.detectability+'"/></div>';
+  body+='</div>';
+  body+='<div class="edit-section"><h4 style="color:var(--purple-team)">Review / Patch (Purple)</h4>';
+  body+='<div class="df" '+ro(canP)+'><label>Review Summary</label><textarea id="edReview">'+escHTML(f.reviewSummary)+'</textarea></div>';
+  body+='<div class="df" '+ro(canP)+'><label>Root Cause</label><textarea id="edRootCause">'+escHTML(f.rootCause)+'</textarea></div>';
+  body+='<div class="df" '+ro(canP)+'><label>Patch</label><textarea id="edPatch">'+escHTML(f.patch)+'</textarea></div>';
+  body+='<div class="df" '+ro(canP)+'><label>Mission Impact</label><input type="number" id="edMission" step="0.01" min="0" max="1" value="'+f.missionImpact+'"/></div>';
+  body+='<div class="df" '+ro(canP)+'><label>BRQ</label><input type="number" id="edBrq" step="0.01" min="0" max="1" value="'+f.brq+'"/></div>';
+  body+='<div class="df" '+ro(canP)+'><label>Notes</label><textarea id="edNotes">'+escHTML(f.notes)+'</textarea></div>';
+  body+='</div>';
+  var foot='<button class="primary" id="btnSaveEdit">Save</button><button id="btnCancelEdit">Cancel</button>';
+  openDrawer("Edit — "+escHTML(f.id),body,foot);
+  var stSel=document.getElementById("edStatus");if(stSel)stSel.value=f.status;
+  /* Mark dirty on any change */
+  dBody.querySelectorAll("input,select,textarea").forEach(function(el){
+    el.addEventListener("input",function(){editDirty=true});
+    el.addEventListener("change",function(){editDirty=true});
+  });
+  document.getElementById("btnSaveEdit").addEventListener("click",function(){
+    var old=deepClone(editBaseSnapshot);
+    var nf=PF[fid];
+    if(canP||canR){nf.title=document.getElementById("edTitle").value.trim();}
+    if(canP){nf.sev=document.getElementById("edSev").value;nf.status=document.getElementById("edStatus").value;}
+    if(canR){nf.technique=document.getElementById("edTechnique").value.trim();nf.tacticCategory=document.getElementById("edTactic").value.trim();}
+    if(canR){nf.claim=document.getElementById("edClaim").value.trim();nf.exploitability=parseFloat(document.getElementById("edExploit").value)||0;}
+    if(canB){nf.event=document.getElementById("edEvent").value.trim();nf.detectionStatus=document.getElementById("edDetStatus").value;nf.detectability=parseFloat(document.getElementById("edDetect").value)||0;}
+    if(canP){
+      nf.reviewSummary=document.getElementById("edReview").value.trim();
+      nf.rootCause=document.getElementById("edRootCause").value.trim();
+      nf.patch=document.getElementById("edPatch").value.trim();
+      nf.missionImpact=parseFloat(document.getElementById("edMission").value)||0;
+      nf.brq=parseFloat(document.getElementById("edBrq").value)||0;
+      nf.notes=document.getElementById("edNotes").value.trim();
+    }
+    appendAuditEvent(nf,"edit","Finding edited by "+role);
+    var key=fid;ensureChangeLog(key);
+    appendChangeLogEvent(key,"edit",old,nf,"Finding edited");
+    updateSyncMeta(key,{revision:nf.revision,updatedAt:nf.updatedAt,syncState:"local"});
+    editDirty=false;
+    actualCloseDrawer();rerenderAll();showPurpleFinding(fid);
+    toast("Finding saved","ok");
+  });
+  document.getElementById("btnCancelEdit").addEventListener("click",function(){
+    editDirty=false;actualCloseDrawer();
+  });
+}
+
+/* New finding button */
+(function(){
+  /* Add a "New Finding" button to the findings section filters */
+  var fltRow=document.querySelector("#s-find .filters");
+  if(fltRow){
+    var nb=document.createElement("button");
+    nb.className="primary";nb.id="btnNewFinding";nb.textContent="+ New Finding";
+    fltRow.appendChild(nb);
+    nb.addEventListener("click",function(){
+      var role=getRole();
+      var body='<div class="df"><label>Exercise</label><select id="nfExercise">';
+      Object.keys(EX).forEach(function(k){body+='<option value="'+escHTML(k)+'">'+escHTML(k+" — "+EX[k].name)+'</option>'});
+      body+='</select></div>';
+      body+='<div class="df"><label>Title</label><input type="text" id="nfTitle" placeholder="Finding title"/></div>';
+      body+='<div class="df"><label>Technique</label><input type="text" id="nfTechnique" placeholder="T1234.001"/></div>';
+      body+='<div class="df"><label>Severity</label><select id="nfSev"><option>HIGH</option><option>MED</option><option selected>LOW</option></select></div>';
+      if(canEditClaim(role))body+='<div class="df"><label>Claim</label><textarea id="nfClaim" placeholder="Red team claim..."></textarea></div>';
+      if(canEditEvent(role))body+='<div class="df"><label>Event</label><textarea id="nfEvent" placeholder="Blue team observation..."></textarea></div>';
+      var foot='<button class="primary" id="btnCreateFinding">Create</button><button id="btnCancelNewFinding">Cancel</button>';
+      openDrawer("New Finding",body,foot);
+      document.getElementById("btnCreateFinding").addEventListener("click",function(){
+        var title=document.getElementById("nfTitle").value.trim();
+        if(!title){toast("Title required","warn");return;}
+        var maxId=100;
+        Object.keys(PF).forEach(function(k){var n=parseInt(k,10);if(n>maxId)maxId=n});
+        var newKey=String(maxId+1);
+        var techId=document.getElementById("nfTechnique").value.trim();
+        var techInfo=TECH[techId];
+        var nf={
+          id:"PF-"+newKey,
+          exerciseId:document.getElementById("nfExercise").value,
+          title:title,
+          technique:techId,
+          tacticCategory:techInfo?techInfo.tactic:"",
+          sev:document.getElementById("nfSev").value,
+          status:"New",
+          detectionStatus:"Missed",
+          retestResult:"Pending",
+          redOperator:role==="red"?SESSION_ACTOR.actorId:"",
+          blueDefender:role==="blue"?SESSION_ACTOR.actorId:"",
+          exploitability:0,detectability:0,missionImpact:0,brq:0,
+          contradictionFlag:false,recurring:false,linked:[],
+          claim:document.getElementById("nfClaim")?document.getElementById("nfClaim").value.trim():"",
+          event:document.getElementById("nfEvent")?document.getElementById("nfEvent").value.trim():"",
+          reviewSummary:"",rootCause:"",patch:"",applyDecision:"",
+          deg:0,cg:0,
+          evidence:[],
+          auditChain:[],timeline:["Claim","","","",""],tlState:["done","","","",""],
+          revision:0,notes:""
+        };
+        normalizeFinding(nf);
+        PF[newKey]=nf;
+        ensureChangeLog(newKey);ensureSyncMeta(newKey);
+        appendAuditEvent(nf,"create","Finding created by "+role);
+        actualCloseDrawer();rerenderAll();
+        toast("Finding "+nf.id+" created","ok");
+      });
+      document.getElementById("btnCancelNewFinding").addEventListener("click",function(){actualCloseDrawer()});
+    });
+  }
+})();
+
+/* Wire findings filter events */
+(function(){
+  var ids=["fltExercise","fltStatus","fltSev","fltDetection","fltTactic"];
+  ids.forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener("change",renderPurpleFindings)});
+  var sr=document.getElementById("fltSearch");if(sr)sr.addEventListener("keyup",renderPurpleFindings);
+})();
+
+/* Wire back button */
+(function(){
+  var backBtn=document.getElementById("fDetBack");
+  if(backBtn)backBtn.addEventListener("click",hideFindingDetail);
+})();
+
+/* ══════════ STAGE 9: REVIEW BOARD ══════════ */
+var boardFilter="all";
+function renderBoardQueue(){
+  var tbody=document.getElementById("boardTbody");if(!tbody)return;
+  var keys=Object.keys(PF).filter(function(k){
+    var f=PF[k];
+    if(!boardStatuses[f.status])return false;
+    if(f.brq<0.5)return false;
+    if(boardFilter==="high"&&f.sev!=="HIGH")return false;
+    if(boardFilter==="missed"&&f.detectionStatus!=="Missed")return false;
+    if(boardFilter==="contra"&&!f.contradictionFlag)return false;
+    return true;
+  }).sort(function(a,b){return (PF[b].brq||0)-(PF[a].brq||0)});
+  var h="";
+  keys.forEach(function(k){
+    var f=PF[k];
+    var sc=sevClassMap[f.sev]||"sev-low";
+    var stc=stClassMap[f.status]||"st-new";
+    var dc=detClassMap[f.detectionStatus]||"det-missed";
+    h+='<tr data-bfid="'+escHTML(k)+'" style="cursor:pointer">';
+    h+='<td><span class="mono" style="color:var(--accent)">'+escHTML(f.id)+'</span></td>';
+    h+='<td>'+escHTML(f.exerciseId)+'</td>';
+    h+='<td class="mono" style="font-size:10px">'+escHTML(f.technique)+'</td>';
+    h+='<td><span class="badge '+sc+'">'+escHTML(f.sev)+'</span></td>';
+    h+='<td><span class="badge '+stc+'">'+escHTML(f.status)+'</span></td>';
+    h+='<td><span class="'+dc+'">'+escHTML(f.detectionStatus)+'</span></td>';
+    h+='<td style="font-weight:700">'+((f.brq||0).toFixed(2))+'</td>';
+    h+='<td>'+(f.contradictionFlag?'<span class="contradiction">&#9888;</span>':'—')+'</td>';
+    h+='<td><div class="actions-cell"><button class="action-btn" data-bact="review" data-bactfid="'+escHTML(k)+'">Review</button></div></td>';
+    h+='</tr>';
+  });
+  setHTML(tbody,h);
+  tbody.querySelectorAll("[data-bfid]").forEach(function(row){
+    row.addEventListener("click",function(e){
+      if(e.target.closest("[data-bact]"))return;
+      boardActiveFid=row.getAttribute("data-bfid");
+      updateBoardDetail(boardActiveFid);
+    });
+  });
+  tbody.querySelectorAll("[data-bact]").forEach(function(btn){
+    btn.addEventListener("click",function(e){
+      e.stopPropagation();
+      var afid=btn.getAttribute("data-bactfid");
+      boardActiveFid=afid;
+      updateBoardDetail(afid);
+    });
+  });
+}
+
+function updateBoardDetail(fid){
+  var det=document.getElementById("boardDetail");if(!det)return;
+  var f=PF[fid];if(!f){det.classList.add("hidden");return;}
+  det.classList.remove("hidden");
+  var ex=EX[f.exerciseId];
+  var dc=detClassMap[f.detectionStatus]||"det-missed";
+  var sc=sevClassMap[f.sev]||"sev-low";
+  var validatedCount=f.evidence.filter(function(e){return e.ok}).length;
+  var h='<div class="grid3">';
+  /* Card 1: Exercise/Technique */
+  h+='<div class="card"><h3>Exercise / Technique</h3>';
+  h+='<div class="wr"><span class="wl">Exercise</span><span class="wv">'+(ex?escHTML(ex.name):escHTML(f.exerciseId))+'</span></div>';
+  h+='<div class="wr"><span class="wl">Technique</span><span class="wv mono">'+escHTML(f.technique)+'</span></div>';
+  h+='<div class="wr"><span class="wl">Tactic</span><span class="wv"><span class="tactic-badge">'+escHTML(f.tacticCategory)+'</span></span></div>';
+  h+='<div class="wr"><span class="wl">Severity</span><span class="wv"><span class="badge '+sc+'">'+escHTML(f.sev)+'</span></span></div>';
+  h+='<div class="wr"><span class="wl">Detection</span><span class="wv"><span class="'+dc+'">'+escHTML(f.detectionStatus)+'</span></span></div>';
+  h+='</div>';
+  /* Card 2: Evidence/Scoring */
+  h+='<div class="card"><h3>Evidence / Scoring</h3>';
+  h+='<div class="wr"><span class="wl">Evidence</span><span class="wv">'+f.evidence.length+' ('+validatedCount+' validated)</span></div>';
+  h+='<div class="wr"><span class="wl">Exploitability</span><span class="wv">'+((f.exploitability||0).toFixed(2))+'</span></div>';
+  h+='<div class="wr"><span class="wl">Detectability</span><span class="wv">'+((f.detectability||0).toFixed(2))+'</span></div>';
+  h+='<div class="wr"><span class="wl">Mission Impact</span><span class="wv">'+((f.missionImpact||0).toFixed(2))+'</span></div>';
+  h+='</div>';
+  /* Card 3: History */
+  h+='<div class="card"><h3>History</h3>';
+  h+='<div class="wr"><span class="wl">Claim</span><span class="wv" style="font-size:10px">'+escHTML((f.claim||"").substring(0,120))+(f.claim&&f.claim.length>120?"...":"")+'</span></div>';
+  h+='<div class="wr"><span class="wl">Event</span><span class="wv" style="font-size:10px">'+escHTML((f.event||"").substring(0,120))+(f.event&&f.event.length>120?"...":"")+'</span></div>';
+  h+='<div class="wr"><span class="wl">Status</span><span class="wv"><span class="badge '+(stClassMap[f.status]||"st-new")+'">'+escHTML(f.status)+'</span></span></div>';
+  if(f.contradictionFlag)h+='<div class="wr"><span class="wl">Flag</span><span class="wv contradiction">&#9888; CONTRADICTION</span></div>';
+  h+='</div>';
+  h+='</div>';
+  setHTML(det,h);
+}
+
+function openBoardDecisionDrawer(fid,decision){
+  var f=PF[fid];if(!f)return;
+  if(decision==="adjudicate"){
+    var body='<div class="df"><label>Verdict</label><select id="bdVerdict"><option>Detected</option><option>Partial</option><option>Missed</option></select></div>';
+    body+='<div class="df"><label>Root Cause</label><input type="text" id="bdRootCause" value="'+escHTML(f.rootCause)+'"/></div>';
+    body+='<div class="df"><label>Patch Recommendation</label><textarea id="bdPatchRec">'+escHTML(f.patch)+'</textarea></div>';
+    body+='<div class="df"><label><input type="checkbox" id="bdRetestReq" checked/> Retest Required</label></div>';
+    var foot='<button class="primary" id="btnBdConfirm">Adjudicate</button><button id="btnBdCancel">Cancel</button>';
+    openDrawer("Adjudicate — "+escHTML(f.id),body,foot);
+    document.getElementById("btnBdConfirm").addEventListener("click",function(){
+      var old=deepClone(f);
+      f.status="Adjudicated";
+      f.reviewSummary=document.getElementById("bdRootCause").value.trim();
+      f.rootCause=document.getElementById("bdRootCause").value.trim();
+      f.detectionStatus=document.getElementById("bdVerdict").value;
+      f.patch=document.getElementById("bdPatchRec").value.trim();
+      appendAuditEvent(f,"adjudicate","Finding adjudicated: "+f.detectionStatus);
+      var key=fid;ensureChangeLog(key);
+      appendChangeLogEvent(key,"adjudicate",old,f,"Finding adjudicated");
+      updateSyncMeta(key,{revision:f.revision,updatedAt:f.updatedAt,syncState:"local"});
+      actualCloseDrawer();rerenderAll();
+      toast("Finding "+f.id+" adjudicated","ok");
+    });
+    document.getElementById("btnBdCancel").addEventListener("click",function(){actualCloseDrawer()});
+  } else if(decision==="return"){
+    var old=deepClone(f);
+    f.status="In Review";
+    appendAuditEvent(f,"return_evidence","Returned for additional evidence");
+    var key=fid;ensureChangeLog(key);
+    appendChangeLogEvent(key,"status_change",old,f,"Returned for evidence");
+    updateSyncMeta(key,{revision:f.revision,updatedAt:f.updatedAt,syncState:"local"});
+    rerenderAll();
+    toast("Finding "+f.id+" returned for evidence","warn");
+  } else if(decision==="record"){
+    var body='<div class="df"><label>Decision Notes</label><textarea id="bdNotes" placeholder="Record decision..."></textarea></div>';
+    var foot='<button class="primary" id="btnBdRecord">Record</button><button id="btnBdRecordCancel">Cancel</button>';
+    openDrawer("Record Decision — "+escHTML(f.id),body,foot);
+    document.getElementById("btnBdRecord").addEventListener("click",function(){
+      var notes=document.getElementById("bdNotes").value.trim();
+      appendAuditEvent(f,"decision_recorded","Board decision: "+notes);
+      actualCloseDrawer();rerenderAll();
+      toast("Decision recorded","ok");
+    });
+    document.getElementById("btnBdRecordCancel").addEventListener("click",function(){actualCloseDrawer()});
+  } else if(decision==="export"){
+    var pkg={finding:deepClone(f),exercise:EX[f.exerciseId]?deepClone(EX[f.exerciseId]):null,changelog:CHANGELOG[fid]?deepClone(CHANGELOG[fid]):[],_meta:{exported:new Date().toISOString(),type:"finding_packet"}};
+    downloadJSON(pkg,"cerpa_finding_"+f.id+".json");
+  }
+}
+
+function startBoardTimer(){
+  if(boardInterval)clearInterval(boardInterval);
+  boardSeconds=0;
+  boardInterval=setInterval(function(){
+    boardSeconds++;
+    var hh=String(Math.floor(boardSeconds/3600)).padStart(2,"0");
+    var mm=String(Math.floor((boardSeconds%3600)/60)).padStart(2,"0");
+    var ss=String(boardSeconds%60).padStart(2,"0");
+    var el=document.getElementById("boardTimerText");
+    if(el)el.textContent=hh+":"+mm+":"+ss;
+  },1000);
+}
+
+/* Wire board buttons */
+(function(){
+  var btnAdj=document.getElementById("btnAdjudicate");
+  if(btnAdj)btnAdj.addEventListener("click",function(){
+    if(!boardActiveFid){toast("Select a finding first","warn");return;}
+    openBoardDecisionDrawer(boardActiveFid,"adjudicate");
+  });
+  var btnRet=document.getElementById("btnReturnEvidence");
+  if(btnRet)btnRet.addEventListener("click",function(){
+    if(!boardActiveFid){toast("Select a finding first","warn");return;}
+    openBoardDecisionDrawer(boardActiveFid,"return");
+  });
+  var btnRec=document.getElementById("btnRecordDecision");
+  if(btnRec)btnRec.addEventListener("click",function(){
+    if(!boardActiveFid){toast("Select a finding first","warn");return;}
+    openBoardDecisionDrawer(boardActiveFid,"record");
+  });
+  var btnExp=document.getElementById("btnExportPacket");
+  if(btnExp)btnExp.addEventListener("click",function(){
+    if(!boardActiveFid){toast("Select a finding first","warn");return;}
+    openBoardDecisionDrawer(boardActiveFid,"export");
+  });
+  /* Board filter buttons */
+  document.querySelectorAll("[data-bf]").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      boardFilter=btn.getAttribute("data-bf");
+      document.querySelectorAll("[data-bf]").forEach(function(b){b.classList.toggle("active",b===btn)});
+      renderBoardQueue();
+    });
+  });
+  startBoardTimer();
+})();
+
+/* ══════════ STAGE 10: DASHBOARD ══════════ */
+function renderPCSGauge(){
+  var el=document.getElementById("pcsGauge");if(!el)return;
+  var activeExIds=Object.keys(EX).filter(function(k){return EX[k].status!=="Planning"});
+  var pcs=0;
+  if(activeExIds.length>0){
+    var sum=0;
+    activeExIds.forEach(function(k){sum+=computePCS(k)});
+    pcs=Math.round(sum/activeExIds.length);
+  }
+  var pcsColor=pcs>=80?"var(--ok)":pcs>=60?"var(--warn)":"var(--bad)";
+  var circ=2*Math.PI*46;
+  var offset=circ-(pcs/100)*circ;
+  var h='<div class="cis-gauge"><svg viewBox="0 0 110 110"><circle class="cis-gauge-bg" cx="55" cy="55" r="46"/>';
+  h+='<circle class="cis-gauge-fill" cx="55" cy="55" r="46" stroke="'+pcsColor+'" stroke-dasharray="'+circ.toFixed(1)+'" stroke-dashoffset="'+offset.toFixed(1)+'"/>';
+  h+='</svg><div class="cis-gauge-label"><div class="cis-gauge-score" style="color:'+pcsColor+'">'+pcs+'</div><div class="cis-gauge-sub">COHERENCE</div></div></div>';
+  h+='<div style="flex:1"><div style="font-size:12px;color:var(--muted);margin-bottom:4px">Purple Composite Score</div>';
+  h+='<div style="font-size:10px;color:var(--muted)">Across '+activeExIds.length+' active/closed exercises</div></div>';
+  setHTML(el,h);
+}
+
+function renderDashboard(){
+  renderPCSGauge();
+  var allF=Object.values(PF);
+  var total=allF.length;
+  /* Lead KPIs */
+  var activeExIds=Object.keys(EX).filter(function(k){return EX[k].status!=="Planning"});
+  var pcs=0;
+  if(activeExIds.length>0){var sum=0;activeExIds.forEach(function(k){sum+=computePCS(k)});pcs=Math.round(sum/activeExIds.length);}
+  var exActive=Object.values(EX).filter(function(e){return e.status!=="Closed"&&e.status!=="Planning"}).length;
+  var openHigh=allF.filter(function(f){return f.sev==="HIGH"&&f.status!=="Closed"}).length;
+  var detected=allF.filter(function(f){return f.detectionStatus==="Detected"}).length;
+  var detRate=total>0?Math.round(detected/total*100):0;
+  var openF=allF.filter(function(f){return f.status!=="Closed"});
+  var totalDeg=0;openF.forEach(function(f){totalDeg+=f.deg||0});
+  var patchCycle=openF.length>0?Math.round(totalDeg/openF.length):0;
+  var retestedF=allF.filter(function(f){return f.retestResult!=="Pending"});
+  var retestPassed=retestedF.filter(function(f){return f.retestResult==="Pass"}).length;
+  var retestRate=retestedF.length>0?Math.round(retestPassed/retestedF.length*100):0;
+
+  function setKPI(id,val,colorCls){
+    var el=document.getElementById(id);if(!el)return;
+    var kv=el.querySelector(".kv");if(kv){kv.textContent=val;kv.className="kv "+colorCls;}
+  }
+  setKPI("kPCS",pcs,pcs>=80?"kv-green":pcs>=60?"kv-amber":"kv-red");
+  setKPI("kExActive",exActive,exActive>0?"kv-amber":"kv-green");
+  setKPI("kOpenHigh",openHigh,openHigh>0?"kv-red":"kv-green");
+  setKPI("kDetRate",detRate+"%",detRate>=70?"kv-green":detRate>=40?"kv-amber":"kv-red");
+  setKPI("kPatchCycle",patchCycle,patchCycle<=5?"kv-green":patchCycle<=10?"kv-amber":"kv-red");
+  setKPI("kRetestPass",retestRate+"%",retestRate>=80?"kv-green":retestRate>=50?"kv-amber":"kv-red");
+
+  /* Operational KPIs */
+  var uniqueTechs={};allF.forEach(function(f){if(f.technique)uniqueTechs[f.technique]=1});
+  var techTested=Object.keys(uniqueTechs).length;
+  var coverageGaps=allF.filter(function(f){return f.detectionStatus==="Missed"}).length;
+  var contraCount=allF.filter(function(f){return f.contradictionFlag}).length;
+  var reopenCount=allF.filter(function(f){return f.status==="Reopened"||f.recurring}).length;
+  var avgExploit=0,avgMission=0;
+  if(total>0){
+    var sumE=0,sumM=0;
+    allF.forEach(function(f){sumE+=f.exploitability||0;sumM+=f.missionImpact||0});
+    avgExploit=(sumE/total).toFixed(2);avgMission=(sumM/total).toFixed(2);
+  }
+  setKPI("kTechTested",techTested,"kv-cyan");
+  setKPI("kCoverageGaps",coverageGaps,coverageGaps>3?"kv-red":coverageGaps>0?"kv-amber":"kv-green");
+  setKPI("kContra",contraCount,contraCount>0?"kv-amber":"kv-green");
+  setKPI("kReopen",reopenCount,reopenCount>0?"kv-red":"kv-green");
+  setKPI("kAvgExploit",avgExploit,avgExploit>=0.7?"kv-red":avgExploit>=0.4?"kv-amber":"kv-green");
+  setKPI("kAvgMission",avgMission,avgMission>=0.7?"kv-red":avgMission>=0.4?"kv-amber":"kv-green");
+
+  /* Technique Coverage chart */
+  var techCov=document.getElementById("techCoverage");
+  if(techCov){
+    var tactics={};
+    allF.forEach(function(f){
+      var tac=f.tacticCategory||"Unknown";
+      if(!tactics[tac])tactics[tac]={total:0,detected:0};
+      tactics[tac].total++;
+      if(f.detectionStatus==="Detected")tactics[tac].detected++;
+    });
+    var maxTac=0;
+    Object.values(tactics).forEach(function(t){if(t.total>maxTac)maxTac=t.total});
+    var th='<h3>Technique Coverage</h3>';
+    Object.keys(tactics).sort().forEach(function(tac){
+      var t=tactics[tac];
+      var pct=maxTac>0?Math.round(t.total/maxTac*100):0;
+      var detRatio=t.total>0?t.detected/t.total:0;
+      var barColor=detRatio>=0.7?"var(--ok)":detRatio>=0.3?"var(--warn)":"var(--bad)";
+      th+='<div style="display:flex;align-items:center;gap:8px;margin:4px 0">';
+      th+='<span style="min-width:120px;font-size:9px;color:var(--muted);text-align:right">'+escHTML(tac)+'</span>';
+      th+='<div style="flex:1;height:14px;background:var(--card2);border-radius:4px;overflow:hidden">';
+      th+='<div style="height:100%;width:'+pct+'%;background:'+barColor+';border-radius:4px;transition:width .5s"></div>';
+      th+='</div>';
+      th+='<span style="min-width:40px;font-size:9px;color:var(--txt)">'+t.total+' ('+Math.round(detRatio*100)+'%)</span>';
+      th+='</div>';
+    });
+    setHTML(techCov,th);
+  }
+
+  /* Active Exercises strip */
+  var exStrip=document.getElementById("activeExStrip");
+  if(exStrip){
+    var eh="";
+    Object.values(EX).filter(function(e){return e.status==="Active"||e.status==="Adjudication"}).forEach(function(ex){
+      var epcs=computePCS(ex.id);
+      var eColor=epcs>=80?"var(--ok)":epcs>=60?"var(--warn)":"var(--bad)";
+      eh+='<div class="vendor-card '+(epcs>=80?"v-ok":epcs>=60?"v-med":"v-high")+'" data-dashex="'+escHTML(ex.id)+'" style="cursor:pointer">';
+      eh+='<div style="font-size:10px;color:var(--accent);font-weight:700">'+escHTML(ex.id)+'</div>';
+      eh+='<div style="font-size:12px;font-weight:600;margin:4px 0">'+escHTML(ex.name)+'</div>';
+      eh+='<div style="font-size:9px;color:var(--muted)">'+escHTML(ex.status)+'</div>';
+      eh+='<div style="font-size:18px;font-weight:700;color:'+eColor+';margin-top:4px">'+epcs+'</div>';
+      eh+='</div>';
+    });
+    if(!eh)eh='<div style="font-size:10px;color:var(--muted)">No active exercises</div>';
+    setHTML(exStrip,eh);
+    exStrip.querySelectorAll("[data-dashex]").forEach(function(c){
+      c.addEventListener("click",function(){openExerciseDrawer(c.getAttribute("data-dashex"))});
+    });
+  }
+
+  /* Command Attention */
+  var cmdAttn=document.getElementById("cmdAttention");
+  if(cmdAttn){
+    var items=[];
+    allF.filter(function(f){return f.sev==="HIGH"&&f.detectionStatus==="Missed"&&f.status!=="Closed"}).forEach(function(f){
+      items.push({icon:"&#9888;",text:escHTML(f.id)+" — Missed HIGH detection: "+escHTML(f.title.substring(0,60)),color:"var(--bad)",fid:Object.keys(PF).find(function(k){return PF[k]===f})});
+    });
+    allF.filter(function(f){return f.retestResult==="Fail"}).forEach(function(f){
+      items.push({icon:"&#10007;",text:escHTML(f.id)+" — Retest FAILED",color:"var(--bad)",fid:Object.keys(PF).find(function(k){return PF[k]===f})});
+    });
+    allF.filter(function(f){return f.contradictionFlag}).forEach(function(f){
+      items.push({icon:"&#9888;",text:escHTML(f.id)+" — Contradiction flagged",color:"var(--warn)",fid:Object.keys(PF).find(function(k){return PF[k]===f})});
+    });
+    Object.values(EX).filter(function(e){return e.status==="Adjudication"}).forEach(function(e){
+      items.push({icon:"&#9733;",text:escHTML(e.id)+" — Exercise in adjudication",color:"var(--purple)"});
+    });
+    var ch="";
+    if(items.length===0)ch='<div style="font-size:10px;color:var(--muted)">No items requiring attention</div>';
+    items.forEach(function(it){
+      ch+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid #1a1230;font-size:10px;cursor:'+(it.fid?"pointer":"default")+'" '+(it.fid?'data-drill="'+it.fid+'"':'')+'>';
+      ch+='<span style="color:'+it.color+'">'+it.icon+'</span>';
+      ch+='<span>'+it.text+'</span>';
+      ch+='</div>';
+    });
+    setHTML(cmdAttn,ch);
+    wireDrillLinks();
+  }
+
+  /* Board-Ready Queue (top 5) */
+  var dashBQ=document.getElementById("dashBoardQueue");
+  if(dashBQ){
+    var bqKeys=Object.keys(PF).filter(function(k){
+      var f=PF[k];return boardStatuses[f.status]&&f.brq>=0.5;
+    }).sort(function(a,b){return (PF[b].brq||0)-(PF[a].brq||0)}).slice(0,5);
+    var bh="";
+    if(bqKeys.length===0)bh='<div style="font-size:10px;color:var(--muted)">No board-ready findings</div>';
+    bqKeys.forEach(function(k){
+      var f=PF[k];
+      bh+='<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid #1a1230;font-size:10px;cursor:pointer" data-drill="'+escHTML(k)+'">';
+      bh+='<span class="mono" style="color:var(--accent)">'+escHTML(f.id)+'</span>';
+      bh+='<span class="badge '+(sevClassMap[f.sev]||"sev-low")+'">'+escHTML(f.sev)+'</span>';
+      bh+='<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+escHTML(f.title.substring(0,50))+'</span>';
+      bh+='<span style="font-weight:700">'+((f.brq||0).toFixed(2))+'</span>';
+      bh+='</div>';
+    });
+    setHTML(dashBQ,bh);
+    wireDrillLinks();
+  }
+
+  renderSparklines();
+}
+
+function renderSparklines(){
+  document.querySelectorAll(".spark-row[data-spark]").forEach(function(el){
+    var raw=el.getAttribute("data-spark");
+    if(!raw)return;
+    var vals=raw.split(",").map(function(v){return parseFloat(v)||0});
+    if(vals.length===0)return;
+    var max=Math.max.apply(null,vals);if(max===0)max=1;
+    var w=vals.length*5;
+    var pts=vals.map(function(v,i){return (i*5)+","+(30-Math.round(v/max*28))}).join(" ");
+    var svg='<svg width="'+w+'" height="30" viewBox="0 0 '+w+' 30"><polyline fill="none" stroke="var(--accent)" stroke-width="1.5" points="'+pts+'"/></svg>';
+    setHTML(el,svg);
+  });
+}
+
+/* Wire KPI card click handlers */
+(function(){
+  var dashEl=document.getElementById("s-dash");
+  if(!dashEl)return;
+  dashEl.addEventListener("click",function(e){
+    var kpiEl=e.target.closest("[data-kpi]");
+    if(!kpiEl)return;
+    var kpi=kpiEl.getAttribute("data-kpi");
+    var allF=Object.values(PF);
+    var body="",title="";
+    if(kpi==="pcs"){
+      title="PCS Detail";
+      body='<div class="wire"><h4>PCS by Exercise</h4>';
+      Object.keys(EX).filter(function(k){return EX[k].status!=="Planning"}).forEach(function(k){
+        var p=computePCS(k);var c=p>=80?"var(--ok)":p>=60?"var(--warn)":"var(--bad)";
+        body+='<div class="wr"><span class="wl">'+escHTML(k)+'</span><span class="wv" style="color:'+c+';font-weight:700">'+p+'</span></div>';
+      });
+      body+='</div>';
+    } else if(kpi==="openhigh"){
+      title="Open HIGH Findings";
+      var fids=Object.keys(PF).filter(function(k){return PF[k].sev==="HIGH"&&PF[k].status!=="Closed"});
+      body=buildFindingListHTML(fids);
+    } else if(kpi==="detrate"){
+      title="Detection Rate Breakdown";
+      var det=allF.filter(function(f){return f.detectionStatus==="Detected"}).length;
+      var par=allF.filter(function(f){return f.detectionStatus==="Partial"}).length;
+      var mis=allF.filter(function(f){return f.detectionStatus==="Missed"}).length;
+      body='<div class="wire"><div class="wr"><span class="wl">Detected</span><span class="wv" style="color:var(--ok)">'+det+'</span></div>';
+      body+='<div class="wr"><span class="wl">Partial</span><span class="wv" style="color:var(--warn)">'+par+'</span></div>';
+      body+='<div class="wr"><span class="wl">Missed</span><span class="wv" style="color:var(--bad)">'+mis+'</span></div></div>';
+    } else if(kpi==="covgaps"){
+      title="Coverage Gaps (Missed)";
+      var fids=Object.keys(PF).filter(function(k){return PF[k].detectionStatus==="Missed"});
+      body=buildFindingListHTML(fids);
+    } else if(kpi==="contra"){
+      title="Contradiction Flags";
+      var fids=Object.keys(PF).filter(function(k){return PF[k].contradictionFlag});
+      body=fids.length>0?buildFindingListHTML(fids):'<div style="font-size:10px;color:var(--muted)">No contradictions</div>';
+    } else {
+      title=kpiEl.querySelector(".kfull")?kpiEl.querySelector(".kfull").textContent:"KPI Detail";
+      body='<div style="font-size:11px;color:var(--muted)">Value: <strong>'+escHTML(kpiEl.querySelector(".kv")?kpiEl.querySelector(".kv").textContent:"--")+'</strong></div>';
+    }
+    openDrawer(title,body,"");
+    wireDrillLinks();
+  });
+})();
+
+/* ══════════ STAGE 11: TRENDS TAB ══════════ */
+function renderTrends(){
+  var allF=Object.values(PF);
+  /* Detection Distribution */
+  var detCounts={Detected:0,Partial:0,Missed:0};
+  allF.forEach(function(f){if(detCounts[f.detectionStatus]!=null)detCounts[f.detectionStatus]++});
+  var detTotal=allF.length||1;
+  var detEl=document.getElementById("detDistChart");
+  if(detEl){
+    var dh='<div style="display:flex;flex-direction:column;gap:6px">';
+    [{k:"Detected",c:"var(--ok)"},{k:"Partial",c:"var(--warn)"},{k:"Missed",c:"var(--bad)"}].forEach(function(d){
+      var pct=Math.round(detCounts[d.k]/detTotal*100);
+      dh+='<div style="display:flex;align-items:center;gap:8px"><span style="width:60px;font-size:10px;color:'+d.c+'">'+d.k+'</span>';
+      dh+='<div style="flex:1;height:18px;background:var(--bg);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+d.c+';border-radius:4px;transition:width .3s"></div></div>';
+      dh+='<span style="width:40px;text-align:right;font-size:10px;font-weight:700">'+detCounts[d.k]+' ('+pct+'%)</span></div>';
+    });
+    dh+='</div>';
+    setHTML(detEl,dh);
+  }
+  /* Severity Distribution */
+  var sevCounts={HIGH:0,MED:0,LOW:0};
+  allF.forEach(function(f){if(sevCounts[f.sev]!=null)sevCounts[f.sev]++});
+  var sevEl=document.getElementById("sevDistChart");
+  if(sevEl){
+    var sh='<div style="display:flex;gap:12px;align-items:flex-end;height:120px;padding-top:8px">';
+    [{k:"HIGH",c:"var(--bad)"},{k:"MED",c:"var(--warn)"},{k:"LOW",c:"var(--ok)"}].forEach(function(d){
+      var h=Math.max(8,Math.round(sevCounts[d.k]/detTotal*100));
+      sh+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">';
+      sh+='<span style="font-size:10px;font-weight:700">'+sevCounts[d.k]+'</span>';
+      sh+='<div style="width:100%;height:'+h+'px;background:'+d.c+';border-radius:4px 4px 0 0"></div>';
+      sh+='<span style="font-size:9px;color:var(--muted)">'+d.k+'</span></div>';
+    });
+    sh+='</div>';
+    setHTML(sevEl,sh);
+  }
+  /* Retest Performance */
+  var rtCounts={Pass:0,Fail:0,Partial:0,Pending:0};
+  allF.forEach(function(f){if(rtCounts[f.retestResult]!=null)rtCounts[f.retestResult]++});
+  var rtEl=document.getElementById("retestChart");
+  if(rtEl){
+    var rh='<div style="display:flex;gap:12px;align-items:flex-end;height:120px;padding-top:8px">';
+    [{k:"Pass",c:"var(--ok)"},{k:"Fail",c:"var(--bad)"},{k:"Partial",c:"var(--warn)"},{k:"Pending",c:"var(--muted)"}].forEach(function(d){
+      var h=Math.max(8,Math.round(rtCounts[d.k]/(allF.length||1)*100));
+      rh+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">';
+      rh+='<span style="font-size:10px;font-weight:700">'+rtCounts[d.k]+'</span>';
+      rh+='<div style="width:100%;height:'+h+'px;background:'+d.c+';border-radius:4px 4px 0 0"></div>';
+      rh+='<span style="font-size:9px;color:var(--muted)">'+d.k+'</span></div>';
+    });
+    rh+='</div>';
+    setHTML(rtEl,rh);
+  }
+  /* Tactic x Detection Heatmap */
+  var tacEl=document.getElementById("tacticHeatmap");
+  if(tacEl){
+    var tactics={};
+    allF.forEach(function(f){
+      var t=f.tacticCategory||"Unknown";
+      if(!tactics[t])tactics[t]={Detected:0,Partial:0,Missed:0,total:0};
+      tactics[t][f.detectionStatus||"Missed"]++;
+      tactics[t].total++;
+    });
+    var tacKeys=Object.keys(tactics).sort();
+    var th='<div class="heatmap"><div class="hm-corner"></div><div class="hm-hdr">Detected</div><div class="hm-hdr">Partial</div><div class="hm-hdr">Missed</div><div class="hm-hdr">Total</div>';
+    tacKeys.forEach(function(t){
+      th+='<div class="hm-label">'+escHTML(t)+'</div>';
+      var row=tactics[t];
+      th+='<div class="hm-cell" style="background:rgba(93,255,147,'+(row.Detected/Math.max(1,row.total)*0.8)+')">'+row.Detected+'</div>';
+      th+='<div class="hm-cell" style="background:rgba(255,204,102,'+(row.Partial/Math.max(1,row.total)*0.8)+')">'+row.Partial+'</div>';
+      th+='<div class="hm-cell" style="background:rgba(255,107,107,'+(row.Missed/Math.max(1,row.total)*0.8)+')">'+row.Missed+'</div>';
+      th+='<div class="hm-cell" style="font-weight:700">'+row.total+'</div>';
+    });
+    th+='</div>';
+    setHTML(tacEl,th);
+  }
+  /* Top Root Causes */
+  var rcEl=document.getElementById("rootCauseList");
+  if(rcEl){
+    var rcMap={};
+    allF.forEach(function(f){
+      if(!f.rootCause||f.rootCause.indexOf("N/A")===0)return;
+      var snip=f.rootCause.substring(0,80);
+      if(!rcMap[snip])rcMap[snip]={text:f.rootCause.substring(0,120),count:0};
+      rcMap[snip].count++;
+    });
+    var rcArr=Object.values(rcMap).sort(function(a,b){return b.count-a.count}).slice(0,6);
+    var rch='';
+    if(rcArr.length===0)rch='<div style="font-size:10px;color:var(--muted)">No root causes documented</div>';
+    rcArr.forEach(function(r,i){
+      rch+='<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:10px">';
+      rch+='<span style="color:var(--accent);font-weight:700;min-width:16px">'+(i+1)+'.</span>';
+      rch+='<span style="flex:1">'+escHTML(r.text)+'</span>';
+      rch+='<span class="badge" style="background:var(--purple)">'+r.count+'</span></div>';
+    });
+    setHTML(rcEl,rch);
+  }
+  /* Exercise Coherence Sparkline */
+  var cohEl=document.getElementById("exCohTrend");
+  if(cohEl){
+    var exKeys=Object.keys(EX).filter(function(k){return EX[k].status!=="Planning"});
+    if(exKeys.length===0){setHTML(cohEl,'<div style="font-size:10px;color:var(--muted)">No scored exercises</div>');return}
+    var ch='<div style="display:flex;flex-direction:column;gap:8px">';
+    exKeys.forEach(function(k){
+      var pcs=computePCS(k);
+      var c=pcs>=80?"var(--ok)":pcs>=60?"var(--warn)":"var(--bad)";
+      ch+='<div style="display:flex;align-items:center;gap:8px">';
+      ch+='<span style="width:80px;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="'+escHTML(EX[k].name)+'">'+escHTML(k)+'</span>';
+      ch+='<div style="flex:1;height:14px;background:var(--bg);border-radius:4px;overflow:hidden"><div style="height:100%;width:'+pcs+'%;background:'+c+';border-radius:4px"></div></div>';
+      ch+='<span style="width:36px;text-align:right;font-size:10px;font-weight:700;color:'+c+'">'+pcs+'</span></div>';
+    });
+    ch+='</div>';
+    setHTML(cohEl,ch);
+  }
+}
+
+/* ══════════ STAGE 12: MEMORY GRAPH ══════════ */
+function renderMG(){
+  var canvas=document.getElementById("mgCanvas");
+  if(!canvas)return;
+  var W=canvas.getBoundingClientRect().width||900;
+  var H=520;
+  canvas.setAttribute("viewBox","0 0 "+W+" "+H);
+
+  /* filter by type checkboxes */
+  var visTypes={};
+  document.querySelectorAll("[data-mg]").forEach(function(cb){visTypes[cb.getAttribute("data-mg")]=cb.checked});
+  var searchQ=(document.getElementById("mgSearch").value||"").toLowerCase();
+
+  var nodes=MG_NODES.filter(function(n){
+    if(!visTypes[n.type])return false;
+    if(searchQ&&n.label.toLowerCase().indexOf(searchQ)===-1)return false;
+    return true;
+  });
+  var nodeIds={};nodes.forEach(function(n){nodeIds[n.id]=n});
+
+  var edges=MG_EDGES.filter(function(e){return nodeIds[e.from]&&nodeIds[e.to]});
+  var showEdges=document.getElementById("mgEdges").checked;
+  var showLabels=document.getElementById("mgLabels").checked;
+
+  /* layout — force-directed simplified (circular initial + push) */
+  var cx=W/2,cy=H/2;
+  nodes.forEach(function(n,i){
+    var a=(i/nodes.length)*Math.PI*2;
+    var r=Math.min(W,H)*0.38;
+    n.x=cx+Math.cos(a)*r*(0.6+Math.random()*0.4);
+    n.y=cy+Math.sin(a)*r*(0.6+Math.random()*0.4);
+  });
+  /* simple repulsion/attraction passes */
+  for(var iter=0;iter<60;iter++){
+    nodes.forEach(function(a){
+      nodes.forEach(function(b){
+        if(a===b)return;
+        var dx=a.x-b.x,dy=a.y-b.y;
+        var dist=Math.sqrt(dx*dx+dy*dy)||1;
+        if(dist<80){var f=(80-dist)*0.15;a.x+=dx/dist*f;a.y+=dy/dist*f}
+      });
+    });
+    edges.forEach(function(e){
+      var a=nodeIds[e.from],b=nodeIds[e.to];
+      if(!a||!b)return;
+      var dx=b.x-a.x,dy=b.y-a.y;
+      var dist=Math.sqrt(dx*dx+dy*dy)||1;
+      var ideal=100;
+      var f=(dist-ideal)*0.02;
+      a.x+=dx/dist*f;a.y+=dy/dist*f;
+      b.x-=dx/dist*f;b.y-=dy/dist*f;
+    });
+    /* keep in bounds */
+    nodes.forEach(function(n){n.x=Math.max(30,Math.min(W-30,n.x));n.y=Math.max(30,Math.min(H-30,n.y))});
+  }
+
+  /* render SVG */
+  var svg='';
+  if(showEdges){
+    edges.forEach(function(e){
+      var a=nodeIds[e.from],b=nodeIds[e.to];
+      svg+='<line x1="'+a.x+'" y1="'+a.y+'" x2="'+b.x+'" y2="'+b.y+'" stroke="#2a2040" stroke-width="1" opacity="0.6"/>';
+    });
+  }
+  nodes.forEach(function(n){
+    var col=MG_COLORS[n.type]||"#888";
+    var r=n.type==="exercise"?10:n.type==="finding"?8:n.type==="tactic"?9:7;
+    svg+='<circle cx="'+n.x+'" cy="'+n.y+'" r="'+r+'" fill="'+col+'" opacity="0.85" style="cursor:pointer" data-mgn="'+escHTML(n.id)+'"/>';
+    if(showLabels){
+      svg+='<text x="'+n.x+'" y="'+(n.y+r+12)+'" text-anchor="middle" fill="'+col+'" font-size="8" opacity="0.7">'+escHTML(n.label)+'</text>';
+    }
+  });
+  setHTML(canvas,svg);
+
+  /* click handler for nodes */
+  canvas.querySelectorAll("[data-mgn]").forEach(function(el){
+    el.addEventListener("click",function(){
+      var nid=el.getAttribute("data-mgn");
+      var nd=MG_NODES.find(function(n){return n.id===nid});
+      if(!nd)return;
+      var body='<div class="wire"><div class="wr"><span class="wl">ID</span><span class="wv">'+escHTML(nd.id)+'</span></div>';
+      body+='<div class="wr"><span class="wl">Type</span><span class="wv"><span style="color:'+(MG_COLORS[nd.type]||"#888")+'">'+escHTML(nd.type)+'</span></span></div>';
+      body+='<div class="wr"><span class="wl">Label</span><span class="wv">'+escHTML(nd.label)+'</span></div>';
+      if(nd.ref)body+='<div class="wr"><span class="wl">Ref</span><span class="wv mono">'+escHTML(nd.ref)+'</span></div>';
+      /* connected nodes */
+      var connected=MG_EDGES.filter(function(e){return e.from===nid||e.to===nid}).map(function(e){return e.from===nid?e.to:e.from});
+      var unique=connected.filter(function(v,i,a){return a.indexOf(v)===i});
+      body+='<div class="wr"><span class="wl">Connections</span><span class="wv">'+unique.length+'</span></div>';
+      if(unique.length>0){
+        body+='<div style="margin-top:8px"><strong style="font-size:10px">Connected Nodes</strong>';
+        unique.forEach(function(cid){
+          var cn=MG_NODES.find(function(n){return n.id===cid});
+          if(cn)body+='<div style="font-size:10px;padding:2px 0;color:'+(MG_COLORS[cn.type]||"#888")+'">'+escHTML(cn.label)+' ('+escHTML(cn.type)+')</div>';
+        });
+        body+='</div>';
+      }
+      body+='</div>';
+      openDrawer("Node: "+nd.label,body,"");
+    });
+  });
+
+  /* tooltip on hover */
+  var tip=document.getElementById("mgTooltip");
+  canvas.querySelectorAll("[data-mgn]").forEach(function(el){
+    el.addEventListener("mouseenter",function(ev){
+      var nid=el.getAttribute("data-mgn");
+      var nd=MG_NODES.find(function(n){return n.id===nid});
+      if(!nd)return;
+      tip.innerHTML='<strong style="color:'+(MG_COLORS[nd.type]||"#888")+'">'+escHTML(nd.label)+'</strong><br><span style="color:var(--muted)">'+escHTML(nd.type)+'</span>';
+      tip.style.display="block";
+      tip.style.left=(ev.pageX+12)+"px";tip.style.top=(ev.pageY-20)+"px";
+    });
+    el.addEventListener("mouseleave",function(){tip.style.display="none"});
+  });
+
+  /* stats */
+  var statsEl=document.getElementById("mgStats");
+  if(statsEl){
+    var typeCounts={};nodes.forEach(function(n){typeCounts[n.type]=(typeCounts[n.type]||0)+1});
+    var st=nodes.length+" nodes, "+edges.length+" edges | ";
+    Object.keys(typeCounts).sort().forEach(function(t){st+=t+": "+typeCounts[t]+"  "});
+    statsEl.textContent=st;
+  }
+}
+
+/* Graph Summary drawer */
+document.getElementById("mgSummary").addEventListener("click",function(){
+  var typeCounts={};MG_NODES.forEach(function(n){typeCounts[n.type]=(typeCounts[n.type]||0)+1});
+  var body='<div class="wire"><h4>Graph Statistics</h4>';
+  body+='<div class="wr"><span class="wl">Total Nodes</span><span class="wv">'+MG_NODES.length+'</span></div>';
+  body+='<div class="wr"><span class="wl">Total Edges</span><span class="wv">'+MG_EDGES.length+'</span></div>';
+  body+='<h4 style="margin-top:12px">Node Types</h4>';
+  Object.keys(typeCounts).sort().forEach(function(t){
+    body+='<div class="wr"><span class="wl" style="color:'+(MG_COLORS[t]||"#888")+'">'+escHTML(t)+'</span><span class="wv">'+typeCounts[t]+'</span></div>';
+  });
+  /* pattern analysis */
+  body+='<h4 style="margin-top:12px">Pattern Analysis</h4>';
+  var patternNodes=MG_NODES.filter(function(n){return n.type==="pattern"});
+  patternNodes.forEach(function(p){
+    var linked=MG_EDGES.filter(function(e){return e.to===p.id}).map(function(e){return e.from});
+    body+='<div style="font-size:10px;padding:4px 0;border-bottom:1px solid var(--line)">';
+    body+='<strong style="color:'+MG_COLORS.pattern+'">'+escHTML(p.label)+'</strong> — '+linked.length+' linked findings</div>';
+  });
+  body+='</div>';
+  openDrawer("Memory Graph Summary",body,"");
+});
+
+/* Graph filter/search reactivity */
+document.querySelectorAll("[data-mg]").forEach(function(cb){cb.addEventListener("change",renderMG)});
+document.getElementById("mgSearch").addEventListener("input",renderMG);
+document.getElementById("mgEdges").addEventListener("change",renderMG);
+document.getElementById("mgLabels").addEventListener("change",renderMG);
+
+/* ══════════ STAGE 13: FEED + TASKS + AUDIT ══════════ */
+function renderFeed(){
+  var el=document.getElementById("feedList");
+  if(!el)return;
+  var items=FEED_ITEMS.slice().reverse();
+  var h='';
+  items.forEach(function(it){
+    var tc=it.type==="ok"?"var(--ok)":it.type==="warn"?"var(--warn)":it.type==="bad"?"var(--bad)":"var(--muted)";
+    var ts=it.ts?it.ts.substring(11,16):"--:--";
+    h+='<div style="display:flex;gap:8px;padding:5px 8px;border-bottom:1px solid #1a1230;font-size:10px;align-items:flex-start">';
+    h+='<span style="color:var(--muted);min-width:36px">'+ts+'</span>';
+    h+='<span style="width:6px;height:6px;border-radius:50%;background:'+tc+';margin-top:4px;flex-shrink:0"></span>';
+    h+='<span style="flex:1">'+escHTML(it.text)+'</span></div>';
+  });
+  if(items.length===0)h='<div style="font-size:10px;color:var(--muted);padding:8px">No activity</div>';
+  setHTML(el,h);
+}
+
+function renderTaskPanel(){
+  var el=document.getElementById("taskList");
+  if(!el)return;
+  var tasks=[];
+  /* derive tasks from finding data */
+  Object.keys(PF).forEach(function(k){
+    var f=PF[k];
+    if(f.detectionStatus==="Missed"&&f.status!=="Closed"){
+      tasks.push({icon:"&#9888;",text:f.id+" — Missed detection, needs review",pri:"high",fid:k});
+    }
+    if(f.retestResult==="Fail"){
+      tasks.push({icon:"&#10007;",text:f.id+" — Retest failed, needs remediation",pri:"high",fid:k});
+    }
+    if(f.contradictionFlag&&f.status!=="Closed"){
+      tasks.push({icon:"&#9888;",text:f.id+" — Contradiction flagged, resolve conflict",pri:"med",fid:k});
+    }
+    if(f.status==="New"){
+      tasks.push({icon:"&#9679;",text:f.id+" — New finding, pending triage",pri:"low",fid:k});
+    }
+    if(f.status==="Patch Proposed"&&f.applyDecision===""){
+      tasks.push({icon:"&#8635;",text:f.id+" — Patch proposed, awaiting approval",pri:"med",fid:k});
+    }
+  });
+  tasks.sort(function(a,b){var pm={high:0,med:1,low:2};return (pm[a.pri]||2)-(pm[b.pri]||2)});
+  var h='';
+  if(tasks.length===0)h='<div style="font-size:10px;color:var(--muted);padding:8px">No tasks</div>';
+  tasks.forEach(function(t){
+    var pc=t.pri==="high"?"var(--bad)":t.pri==="med"?"var(--warn)":"var(--muted)";
+    h+='<div style="display:flex;gap:8px;padding:6px 8px;border-bottom:1px solid #1a1230;font-size:10px;cursor:pointer;align-items:center" '+(t.fid?'data-drill="'+escHTML(t.fid)+'"':'')+'>';
+    h+='<span style="color:'+pc+'">'+t.icon+'</span>';
+    h+='<span style="flex:1">'+escHTML(t.text)+'</span>';
+    h+='<span class="badge" style="background:'+pc+';font-size:8px">'+t.pri.toUpperCase()+'</span></div>';
+  });
+  setHTML(el,h);
+  wireDrillLinks();
+}
+
+function renderAudit(){
+  /* Inline audit viewer in admin — show recent audit events across all findings */
+  var sec=document.getElementById("s-admin");
+  if(!sec)return;
+  var existing=document.getElementById("auditViewer");
+  if(!existing){
+    var card=document.createElement("div");card.className="card";card.id="auditViewer";
+    card.innerHTML='<h3>Recent Audit Events</h3><div id="auditList"></div>';
+    sec.appendChild(card);
+  }
+  var aEl=document.getElementById("auditList");
+  if(!aEl)return;
+  var allEvents=[];
+  Object.keys(PF).forEach(function(k){
+    var f=PF[k];
+    if(f.auditEvents)f.auditEvents.forEach(function(ev){
+      allEvents.push({ts:ev.ts,fid:f.id,key:k,action:ev.action,role:ev.role,details:ev.details||""});
+    });
+  });
+  allEvents.sort(function(a,b){return b.ts.localeCompare(a.ts)});
+  var top=allEvents.slice(0,20);
+  var h='';
+  if(top.length===0)h='<div style="font-size:10px;color:var(--muted)">No audit events</div>';
+  top.forEach(function(ev){
+    h+='<div style="display:flex;gap:6px;padding:4px 0;border-bottom:1px solid var(--line);font-size:10px;cursor:pointer" data-drill="'+escHTML(ev.key)+'">';
+    h+='<span style="color:var(--muted);min-width:80px">'+escHTML(ev.ts.substring(0,16).replace("T"," "))+'</span>';
+    h+='<span class="mono" style="color:var(--accent);min-width:48px">'+escHTML(ev.fid)+'</span>';
+    h+='<span style="color:var(--purple);min-width:48px">'+escHTML(ev.role)+'</span>';
+    h+='<span style="flex:1">'+escHTML(ev.action)+(ev.details?" — "+escHTML(ev.details.substring(0,60)):"")+'</span></div>';
+  });
+  setHTML(aEl,h);
+  wireDrillLinks();
+}
+
+/* ══════════ FEED TOGGLE ══════════ */
+document.getElementById("feedToggle").addEventListener("click",function(){
+  document.getElementById("feedPanel").classList.toggle("open");
+});
+
+/* ══════════ TASK PANEL TOGGLE ══════════ */
+document.getElementById("btnTaskToggle").addEventListener("click",function(){
+  document.getElementById("taskPanel").classList.toggle("open");
+});
+document.getElementById("taskClose").addEventListener("click",function(){
+  document.getElementById("taskPanel").classList.remove("open");
+});
+
+/* ══════════ ADMIN BUTTON WIRING ══════════ */
+document.getElementById("btnExportState").addEventListener("click",function(){exportStatePackage()});
+document.getElementById("btnExportFindings").addEventListener("click",function(){downloadJSON(deepClone(PF),"cerpa_purple_findings.json")});
+document.getElementById("btnExportBrief").addEventListener("click",function(){downloadJSON(buildCommandBrief(),"cerpa_purple_command_brief.json")});
+document.getElementById("btnExportAudit").addEventListener("click",function(){downloadJSON(buildAuditPackage(),"cerpa_purple_audit.json")});
+document.getElementById("btnLoadDemo").addEventListener("click",function(){
+  EX=deepClone(DEMO_EX);PF=deepClone(DEMO_PF);CHANGELOG={};SYNC_META={};
+  Object.values(PF).forEach(normalizeFinding);Object.values(EX).forEach(normalizeExercise);
+  Object.keys(PF).forEach(function(k){ensureChangeLog(k);ensureSyncMeta(k)});
+  rerenderAll();toast("Demo data loaded","ok");
+});
+document.getElementById("btnLoadEmpty").addEventListener("click",function(){
+  confirmAction("Clear all data and start empty?",function(){EX={};PF={};CHANGELOG={};SYNC_META={};rerenderAll();toast("Cleared — empty state","warn")});
+});
+document.getElementById("btnClearFindings").addEventListener("click",function(){
+  confirmAction("Clear all findings?",function(){PF={};CHANGELOG={};SYNC_META={};rerenderAll();toast("Findings cleared","warn")});
+});
+document.getElementById("btnClearExercises").addEventListener("click",function(){
+  confirmAction("Clear all exercises?",function(){EX={};rerenderAll();toast("Exercises cleared","warn")});
+});
+document.getElementById("btnClearAll").addEventListener("click",function(){
+  confirmAction("Clear ALL data?",function(){EX={};PF={};CHANGELOG={};SYNC_META={};rerenderAll();toast("All data cleared","warn")});
+});
+document.getElementById("btnSnapshot").addEventListener("click",function(){
+  lastSnapshot={ex:deepClone(EX),pf:deepClone(PF),cl:deepClone(CHANGELOG),sm:deepClone(SYNC_META)};
+  toast("Snapshot saved","ok");
+});
+document.getElementById("btnRestore").addEventListener("click",function(){
+  if(!lastSnapshot){toast("No snapshot to restore","warn");return;}
+  confirmAction("Restore from last snapshot?",function(){
+    EX=deepClone(lastSnapshot.ex);PF=deepClone(lastSnapshot.pf);CHANGELOG=deepClone(lastSnapshot.cl);SYNC_META=deepClone(lastSnapshot.sm);
+    rerenderAll();toast("Restored from snapshot","ok");
+  });
+});
+
+/* ══════════ IMPORT HANDLING ══════════ */
+var importDZ=document.getElementById("importDropZone");
+var importFI=document.getElementById("importFile");
+importDZ.addEventListener("click",function(){importFI.click()});
+importDZ.addEventListener("dragover",function(e){e.preventDefault();importDZ.classList.add("drag-over")});
+importDZ.addEventListener("dragleave",function(){importDZ.classList.remove("drag-over")});
+importDZ.addEventListener("drop",function(e){e.preventDefault();importDZ.classList.remove("drag-over");if(e.dataTransfer.files.length>0)handleImportFile(e.dataTransfer.files[0])});
+importFI.addEventListener("change",function(){if(importFI.files.length>0)handleImportFile(importFI.files[0])});
+function handleImportFile(file){
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{var pkg=JSON.parse(e.target.result);importStatePackage(pkg)}
+    catch(err){toast("Import failed: "+err.message,"bad")}
+  };
+  reader.readAsText(file);
+}
+
+/* ══════════ STAGE 14: KEYBOARD SHORTCUTS ══════════ */
+document.addEventListener("keydown",function(e){
+  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA"||e.target.tagName==="SELECT")return;
+  var k=e.key.toLowerCase();
+  if(k==="r")openTab("roles");
+  else if(k==="d")openTab("dash");
+  else if(k==="x")openTab("exercises");
+  else if(k==="f")openTab("find");
+  else if(k==="b"&&roleVis[currentRole].board)openTab("board");
+  else if(k==="t")openTab("trends");
+  else if(k==="m")openTab("mem");
+  else if(k==="a"&&roleVis[currentRole].admin)openTab("admin");
+  else if(k==="n"){
+    /* new finding shortcut — click the button */
+    var nfb=document.getElementById("btnNewFinding");
+    if(nfb&&roleVis[currentRole].find){openTab("find");nfb.click()}
+  }
+  else if(k==="escape"){actualCloseDrawer()}
+  else if(k==="?"||k==="/"){
+    e.preventDefault();
+    var body='<div class="wire"><h4>Keyboard Shortcuts</h4>';
+    body+='<div class="wr"><span class="wl"><kbd>R</kbd></span><span class="wv">Roles</span></div>';
+    body+='<div class="wr"><span class="wl"><kbd>D</kbd></span><span class="wv">Dashboard</span></div>';
+    body+='<div class="wr"><span class="wl"><kbd>X</kbd></span><span class="wv">Exercises</span></div>';
+    body+='<div class="wr"><span class="wl"><kbd>F</kbd></span><span class="wv">Findings</span></div>';
+    body+='<div class="wr"><span class="wl"><kbd>B</kbd></span><span class="wv">Review Board</span></div>';
+    body+='<div class="wr"><span class="wl"><kbd>T</kbd></span><span class="wv">Trends</span></div>';
+    body+='<div class="wr"><span class="wl"><kbd>M</kbd></span><span class="wv">Memory Graph</span></div>';
+    body+='<div class="wr"><span class="wl"><kbd>A</kbd></span><span class="wv">Admin</span></div>';
+    body+='<div class="wr"><span class="wl"><kbd>N</kbd></span><span class="wv">New Finding</span></div>';
+    body+='<div class="wr"><span class="wl"><kbd>Esc</kbd></span><span class="wv">Close Drawer</span></div>';
+    body+='<div class="wr"><span class="wl"><kbd>?</kbd></span><span class="wv">This Help</span></div>';
+    body+='</div>';
+    openDrawer("Keyboard Shortcuts",body,"");
+  }
+});
+
+/* ══════════ GUIDED TOUR ══════════ */
+var TOUR_STEPS=[
+  {tab:"roles",el:".role-grid",text:"Choose your role. Red files claims, Blue files events, Purple leads, Exec oversees."},
+  {tab:"dash",el:"#pcsGauge",text:"The PCS gauge shows overall Purple Coherence Score across all active exercises."},
+  {tab:"dash",el:"#leadKPIs",text:"Lead KPIs track critical metrics. Click any card to drill down."},
+  {tab:"exercises",el:"#exerciseGrid",text:"Exercise cards show each engagement with PCS score and finding counts."},
+  {tab:"find",el:"#findingsTable",text:"The findings table lists all purple findings. Use filters to narrow down."},
+  {tab:"find",el:"#findFilters",text:"Filter findings by exercise, status, severity, detection status, or search text."},
+  {tab:"board",el:"#boardQueue",text:"The Review Board shows findings ready for adjudication (BRQ score ≥ 0.5)."},
+  {tab:"trends",el:"#detDistChart",text:"Trends show detection distribution, severity, tactic heatmaps, and root causes."},
+  {tab:"mem",el:"#mgCanvas",text:"The Memory Graph visualizes relationships between exercises, findings, techniques, and patterns."},
+  {tab:"admin",el:"#importDropZone",text:"Admin panel for import/export, data lifecycle management, and role configuration."}
+];
+var tourStep=0;
+function runTour(){
+  if(tourStep>=TOUR_STEPS.length){toast("Tour complete!","ok");tourStep=0;return}
+  var s=TOUR_STEPS[tourStep];
+  openTab(s.tab);
+  setTimeout(function(){
+    var target=document.querySelector(s.el);
+    if(target){target.scrollIntoView({behavior:"smooth",block:"center"})}
+    var body='<div style="font-size:12px;line-height:1.6">'+escHTML(s.text)+'</div>';
+    body+='<div style="margin-top:12px;font-size:10px;color:var(--muted)">Step '+(tourStep+1)+' of '+TOUR_STEPS.length+'</div>';
+    var foot='<button class="primary" id="tourNext">'+(tourStep<TOUR_STEPS.length-1?"Next":"Finish")+'</button>';
+    if(tourStep>0)foot='<button id="tourPrev">Back</button> '+foot;
+    foot+=' <button id="tourSkip">Skip Tour</button>';
+    openDrawer("Guided Tour",body,foot);
+    var nextBtn=document.getElementById("tourNext");
+    if(nextBtn)nextBtn.addEventListener("click",function(){tourStep++;actualCloseDrawer();setTimeout(runTour,200)});
+    var prevBtn=document.getElementById("tourPrev");
+    if(prevBtn)prevBtn.addEventListener("click",function(){tourStep--;actualCloseDrawer();setTimeout(runTour,200)});
+    var skipBtn=document.getElementById("tourSkip");
+    if(skipBtn)skipBtn.addEventListener("click",function(){tourStep=0;actualCloseDrawer();toast("Tour skipped","warn")});
+  },150);
+}
+
+/* ══════════ INITIALIZATION ══════════ */
+var onbDismiss=document.getElementById("onboardDismiss");
+if(onbDismiss)onbDismiss.addEventListener("click",function(){
+  document.getElementById("onboardModal").style.display="none";
+  /* offer tour on first dismiss */
+  setTimeout(function(){
+    var body='<div style="font-size:12px;line-height:1.6">Would you like a guided tour of the CERPA PURPLE workbench?</div>';
+    openDrawer("Welcome",body,'<button class="primary" id="startTour">Start Tour</button> <button id="skipTour">Skip</button>');
+    var stBtn=document.getElementById("startTour");
+    if(stBtn)stBtn.addEventListener("click",function(){actualCloseDrawer();setTimeout(runTour,200)});
+    var skBtn=document.getElementById("skipTour");
+    if(skBtn)skBtn.addEventListener("click",function(){actualCloseDrawer()});
+  },300);
+});
+refreshSessionActor();
+applyRole(false);
+openTab("roles");
+rerenderAll();
+renderFeed();
+</script>
+</body>
+</html>
