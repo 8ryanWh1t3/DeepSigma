@@ -309,6 +309,8 @@ ALLOWED_ACRONYMS = {
     "BLUE", "CASB", "DBSRV", "DLP", "DOC", "DOCX", "FORGE", "IRON",
     "LEAD", "LOOKUP", "LSASS", "NTLM", "PCS", "PUR", "RTO",
     "SNI", "STAGE", "TASKS", "TTX", "XOR", "YARA",
+    # ISO 27001 CERPA Intake — audit, compliance, PDF parsing tokens
+    "APL", "BSI", "FND", "HCPC", "INTAKE", "ISMS", "OFI",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}
