@@ -432,7 +432,7 @@ footer{
 <nav class="nav-bar">
   <span class="nav-brand">Deep Sigma EDGE</span>
   <a class="nav-link" data-nav="s-problem">Problem</a>
-  <a class="nav-link" data-nav="s-lifecycle">Lifecycle</a>
+  <a class="nav-link" data-nav="s-lifecycle">Risk Lifecycle</a>
   <a class="nav-link" data-nav="s-deep">Deep Dive</a>
   <a class="nav-link" data-nav="s-model">Data Model</a>
   <a class="nav-link" data-nav="s-walk">Walkthrough</a>
@@ -447,14 +447,15 @@ footer{
   <div class="hero-content">
     <div class="hero-text">
       <h1 class="hero-title glow">CERPA</h1>
-      <p class="hero-sub">Composite Enterprise Risk Posture Assessment</p>
-      <p style="font-size:14px;color:var(--muted);max-width:500px;line-height:1.7">
-        A five-phase governance lifecycle that transforms fragmented observations into
-        durable institutional memory. From initial claim through enforced correction &mdash;
-        every decision carries its evidence chain.
+      <p class="hero-sub">A Closed-Loop Model for Risk Management</p>
+      <p style="font-size:15px;color:var(--txt);max-width:520px;line-height:1.7;margin-bottom:16px">
+        CERPA closes the gap between identifying risk and acting on it.
+      </p>
+      <p style="font-size:13px;color:var(--muted);max-width:520px;line-height:1.7">
+        Most organizations can document risk. CERPA helps leaders govern it.
       </p>
       <div class="quote">
-        "What was claimed? What was observed? What was decided? What was corrected? Did it hold?"
+        "See risk clearly. Decide quickly. Act with traceability."
       </div>
       <div style="margin-top:24px">
         <span class="edge-badge">CERPA_SHOWCASE_EDGE_v0.1</span>
@@ -508,8 +509,8 @@ footer{
 
 <!-- ═══════════════════════════════ SECTION 2: PROBLEM ═══════════════════════════════ -->
 <section id="s-problem">
-  <h2 class="glow-mag">The Governance Gap</h2>
-  <p class="section-sub">Organizations generate findings everywhere. Almost none of them become durable memory.</p>
+  <h2 class="glow-mag">The Gap</h2>
+  <p class="section-sub">Most organizations can identify risk. Few can trace a finding through review, response, and verification.</p>
 
   <div class="prob-grid">
     <div class="card">
@@ -547,34 +548,34 @@ footer{
 
 <!-- ═══════════════════════════════ SECTION 3: LIFECYCLE ═══════════════════════════════ -->
 <section id="s-lifecycle">
-  <h2 class="glow">The CERPA Lifecycle</h2>
-  <p class="section-sub">Five phases. One chain of evidence. Complete memory.</p>
+  <h2 class="glow">The CERPA Risk Lifecycle</h2>
+  <p class="section-sub">A common operational language for risk management</p>
   <p class="support-text">
-    CERPA is not a tool. It is a governance substrate &mdash; a structured lifecycle that any domain-specific
-    process can map onto. Each phase produces artifacts that chain forward, creating an unbroken evidence trail
-    from initial observation through verified correction.
+    CERPA provides a common operational language for risk management. Each phase moves risk
+    from identification through evidence, review, corrective action, and authorized execution.
+    Every decision carries its evidence chain.
   </p>
 
   <div class="stage-row">
     <div class="card stage-card active" data-stage="claim">
       <div style="font-weight:700;font-size:13px;color:var(--c-claim)">CLAIM</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:4px">Asserted Condition</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Identifies the risk</div>
     </div>
     <div class="card stage-card" data-stage="event">
       <div style="font-weight:700;font-size:13px;color:var(--c-event)">EVENT</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:4px">Observed Evidence</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Captures the evidence</div>
     </div>
     <div class="card stage-card" data-stage="review">
       <div style="font-weight:700;font-size:13px;color:var(--c-review)">REVIEW</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:4px">Adjudicated Decision</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Determines significance</div>
     </div>
     <div class="card stage-card" data-stage="patch">
       <div style="font-weight:700;font-size:13px;color:var(--c-patch)">PATCH</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:4px">Approved Correction</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Defines the response</div>
     </div>
     <div class="card stage-card" data-stage="apply">
       <div style="font-weight:700;font-size:13px;color:var(--c-apply)">APPLY</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:4px">Enforced and Verified</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Authorizes execution</div>
     </div>
   </div>
 
@@ -585,7 +586,9 @@ footer{
   </div>
 
   <div class="callout" style="margin-top:32px">
-    Every phase answers one question. Together they form a complete governance record.
+    Standardizes how risk is identified, reviewed, and acted on.
+    Accelerates movement from finding to decision to action.
+    Creates traceability across assessment, response, and execution.
   </div>
 </section>
 
@@ -639,18 +642,22 @@ footer{
     &nbsp;&nbsp;<span class="dm-key">"event_timestamp"</span>: <span class="dm-type">ISO 8601</span>,<br/>
     &nbsp;&nbsp;<span class="dm-key">"event_observer"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// who or what captured the evidence</span><br/>
     <br/>
-    &nbsp;&nbsp;<span class="dm-comment">// ─── REVIEW ───</span><br/>
+    &nbsp;&nbsp;<span class="dm-comment">// ─── REVIEW (Risk Assessment) ───</span><br/>
     &nbsp;&nbsp;<span class="dm-key">"review_id"</span>: <span class="dm-type">string</span>,<br/>
     &nbsp;&nbsp;<span class="dm-key">"review_decision"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// accept, mitigate, transfer, defer</span><br/>
     &nbsp;&nbsp;<span class="dm-key">"review_rationale"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// why this decision was made</span><br/>
     &nbsp;&nbsp;<span class="dm-key">"review_authority"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// who authorized the decision</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"review_severity"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// critical, high, moderate, low</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"review_likelihood"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// almost certain, likely, possible, unlikely, rare</span><br/>
     &nbsp;&nbsp;<span class="dm-key">"review_impact"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// assessed impact level</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"review_residual_risk"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// expected risk level after treatment</span><br/>
     <br/>
-    &nbsp;&nbsp;<span class="dm-comment">// ─── PATCH ───</span><br/>
+    &nbsp;&nbsp;<span class="dm-comment">// ─── PATCH (Risk Treatment) ───</span><br/>
     &nbsp;&nbsp;<span class="dm-key">"patch_id"</span>: <span class="dm-type">string</span>,<br/>
-    &nbsp;&nbsp;<span class="dm-key">"patch_action"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// the corrective action taken</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"patch_action"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// mitigate, control, transfer, accept, escalate</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"patch_description"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// the corrective action taken</span><br/>
     &nbsp;&nbsp;<span class="dm-key">"patch_owner"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// responsible party for implementation</span><br/>
-    &nbsp;&nbsp;<span class="dm-key">"patch_deadline"</span>: <span class="dm-type">ISO 8601</span>,<br/>
+    &nbsp;&nbsp;<span class="dm-key">"patch_deadline"</span>: <span class="dm-type">ISO 8601</span>, <span class="dm-comment">// due date</span><br/>
     &nbsp;&nbsp;<span class="dm-key">"patch_status"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// planned, in_progress, complete</span><br/>
     <br/>
     &nbsp;&nbsp;<span class="dm-comment">// ─── APPLY ───</span><br/>
@@ -694,6 +701,40 @@ footer{
     <div class="callout" style="margin-top:16px">
       A score of 1.00 means every phase has evidence. A score of 0.40 means the record has a claim
       and an event but no review, no patch, and no verification &mdash; an open governance gap.
+    </div>
+  </div>
+
+  <div style="margin-top:32px">
+    <h3 style="font-size:15px;color:var(--muted);margin-bottom:16px;letter-spacing:.5px">Risk Panel</h3>
+    <p class="support-text">
+      Every CERPA record carries risk attributes that are populated during Review and refined through
+      Patch and Apply. These fields make CERPA legible as an operational risk register.
+    </p>
+    <div class="grid-3" style="gap:12px">
+      <div class="card" style="padding:14px;border-left:3px solid var(--bad)">
+        <div style="font-size:10px;color:var(--bad);text-transform:uppercase;letter-spacing:.5px;font-weight:700">Severity</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px">Critical, High, Moderate, Low. Set during Review based on the potential consequence if the risk is realized.</div>
+      </div>
+      <div class="card" style="padding:14px;border-left:3px solid var(--warn)">
+        <div style="font-size:10px;color:var(--warn);text-transform:uppercase;letter-spacing:.5px;font-weight:700">Likelihood</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px">Almost Certain, Likely, Possible, Unlikely, Rare. Derived from Event evidence and historical frequency.</div>
+      </div>
+      <div class="card" style="padding:14px;border-left:3px solid var(--purple)">
+        <div style="font-size:10px;color:var(--purple);text-transform:uppercase;letter-spacing:.5px;font-weight:700">Impact</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px">Assessed during Review. Encompasses mission, financial, reputational, legal, and operational dimensions.</div>
+      </div>
+      <div class="card" style="padding:14px;border-left:3px solid var(--accent)">
+        <div style="font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;font-weight:700">Confidence</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px">0.00 &ndash; 1.00. Mechanical score reflecting evidence completeness across all five CERPA phases.</div>
+      </div>
+      <div class="card" style="padding:14px;border-left:3px solid var(--mag)">
+        <div style="font-size:10px;color:var(--mag);text-transform:uppercase;letter-spacing:.5px;font-weight:700">Owner &amp; Due Date</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px">Set during Patch. Names the accountable party and the deadline for treatment completion.</div>
+      </div>
+      <div class="card" style="padding:14px;border-left:3px solid var(--ok)">
+        <div style="font-size:10px;color:var(--ok);text-transform:uppercase;letter-spacing:.5px;font-weight:700">Residual Risk</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px">Expected risk level after treatment is applied and verified. Only confirmed durable in the Apply phase.</div>
+      </div>
     </div>
   </div>
 </section>
@@ -938,7 +979,7 @@ footer{
 <!-- ═══════════════════════════════ SECTION 9: COMPARE ═══════════════════════════════ -->
 <section id="s-compare">
   <h2 class="glow-mag">Traditional vs. Governed</h2>
-  <p class="section-sub">Same organization. Same findings. Different substrate.</p>
+  <p class="section-sub">Traditional risk management records risk. CERPA governs risk through action and memory.</p>
 
   <div class="toggle-bar">
     <button class="toggle-btn active" data-toggle="traditional">Traditional</button>
@@ -989,15 +1030,15 @@ footer{
 <!-- ═══════════════════════════════ SECTION 10: CLOSING ═══════════════════════════════ -->
 <section id="s-closing" style="display:flex;align-items:center;justify-content:center">
   <div class="closing-banner" style="width:100%">
-    <p class="closing-main glow">Governance is not a report.</p>
-    <p class="closing-main glow-mag">It is a memory loop.</p>
-    <p class="closing-sub">CERPA transforms fragmented observations into durable institutional knowledge.</p>
+    <p class="closing-main glow">Most organizations can document risk.</p>
+    <p class="closing-main glow-mag">CERPA helps leaders govern it.</p>
+    <p class="closing-sub">CERPA gives senior leaders a simple, common framework to see risk clearly, decide quickly, and act with traceability.</p>
     <div class="closing-questions">
-      What was claimed? &nbsp;&bull;&nbsp;
-      What was observed? &nbsp;&bull;&nbsp;
-      What was decided? &nbsp;&bull;&nbsp;
-      What was corrected? &nbsp;&bull;&nbsp;
-      Did it hold?
+      Claim identifies the risk &nbsp;&bull;&nbsp;
+      Event captures the evidence &nbsp;&bull;&nbsp;
+      Review determines significance &nbsp;&bull;&nbsp;
+      Patch defines the response &nbsp;&bull;&nbsp;
+      Apply authorizes execution
     </div>
     <button class="copy-btn" id="btnCopy">Copy Brief</button>
   </div>
@@ -1037,48 +1078,48 @@ sections.forEach(function(s){observer.observe(s)});
 /* ─── Lifecycle stage cards ─── */
 var stageData = {
   claim: {
-    title: "CLAIM \u2014 The Asserted Condition",
+    title: "CLAIM / Finding \u2014 Risk Identified",
     color: "var(--c-claim)",
-    definition: "A Claim is any asserted condition that requires governance attention. It can originate from an audit finding, a vulnerability scan, a policy requirement, a risk identification, or any other source that produces a statement about the current or required state of a system, process, or control.",
-    inputs: "Assessment reports, scan outputs, policy requirements, framework controls, incident declarations, stakeholder assertions",
+    definition: "A Claim is any identified risk, finding, condition, or exposure that requires governance attention. It can originate from an audit finding, a vulnerability scan, a policy requirement, a risk identification, or any other source that produces a statement about the current or required state of a system, process, or control.",
+    inputs: "Assessment reports, scan outputs, policy requirements, framework controls, incident declarations, risk registers, stakeholder assertions",
     outputs: "Structured finding record with unique ID, classification, severity, source reference, and requirement text",
-    question: "What condition has been asserted?",
+    question: "What risk has been identified?",
     key_property: "A Claim does not require proof. It is an assertion that evidence will either support or refute. The separation of claim from evidence is fundamental \u2014 it prevents confirmation bias by requiring independent observation."
   },
   event: {
-    title: "EVENT \u2014 The Observed Evidence",
+    title: "EVENT / Evidence \u2014 Risk Evidence Observed",
     color: "var(--c-event)",
-    definition: "An Event captures the evidence that substantiates (or refutes) a Claim. Events are observations \u2014 interviews conducted, documents reviewed, tests performed, logs analyzed, systems inspected. The Event record preserves what was actually observed, by whom, when, and through what method.",
-    inputs: "Interview transcripts, document review notes, test results, system logs, scan outputs, technical observations",
+    definition: "An Event captures the evidence that a risk is real, changing, or being exercised. Events are observations \u2014 interviews conducted, documents reviewed, tests performed, logs analyzed, systems inspected. The Event record preserves what was actually observed, by whom, when, and through what method.",
+    inputs: "Interview transcripts, document review notes, test results, system logs, scan outputs, technical observations, risk indicators",
     outputs: "Timestamped evidence record with observation type, observer identity, evidence text, and quality assessment",
-    question: "What was actually observed?",
+    question: "What evidence confirms the risk?",
     key_property: "Events must be attributable and timestamped. An observation without a recorded observer or timestamp has no evidentiary value. The Event phase enforces evidence discipline."
   },
   review: {
-    title: "REVIEW \u2014 The Adjudicated Decision",
+    title: "REVIEW / Assessment \u2014 Risk Evaluated",
     color: "var(--c-review)",
-    definition: "A Review is the authoritative decision made after considering the Claim and its supporting Events. The review determines: is this finding valid? What is the impact? What action is required? Reviews transform raw findings into governance decisions with provenance \u2014 who decided, when, based on what evidence, and with what authority.",
+    definition: "A Review assesses severity, likelihood, impact, and confidence. Authorized decision-makers examine the Claim, weigh the Event evidence, and determine the appropriate risk response. Reviews transform raw findings into governance decisions with provenance \u2014 who decided, when, based on what evidence, and with what authority.",
     inputs: "Validated claims, supporting evidence, impact assessment criteria, risk appetite framework, authority boundaries",
-    outputs: "Decision record with action determination (accept, mitigate, transfer, defer), authorizing official, rationale, impact level, and deadline",
-    question: "What has been decided?",
+    outputs: "Decision record with risk treatment determination (mitigate, control, transfer, accept, escalate), severity, likelihood, impact, authorizing official, rationale, and deadline",
+    question: "How severe is the risk and what should be done?",
     key_property: "Reviews carry authority. Every review decision must identify who made it and what evidence justified it. This creates the provenance trail that compliance requires and accountability demands."
   },
   patch: {
-    title: "PATCH \u2014 The Approved Correction",
+    title: "PATCH / Mitigation \u2014 Risk Treatment Selected",
     color: "var(--c-patch)",
-    definition: "A Patch is the corrective action taken in response to a Review decision. Patches encompass any change: policy updates, technical controls, process modifications, training, configuration changes. The Patch record documents not just what was changed, but who approved it, who implemented it, and what evidence chain justified the change.",
-    inputs: "Review decision, remediation requirements, change control procedures, implementation resources",
-    outputs: "Change record with action description, implementation owner, approval chain, deadline, and current status (planned, in progress, complete)",
-    question: "What correction was made?",
-    key_property: "Patches without provenance are dangerous. A configuration change that cannot be traced back to an authorized review decision is an uncontrolled modification. CERPA enforces the evidence chain from finding to fix."
+    definition: "A Patch selects and implements the risk treatment: mitigation, control, transfer, acceptance, or escalation. The Patch record documents not just what was changed, but who approved it, who implemented it, what the deadline is, and what evidence chain justified the change.",
+    inputs: "Review decision, risk treatment options, change control procedures, implementation resources, owner assignment",
+    outputs: "Change record with treatment type, action description, implementation owner, approval chain, due date, and current status (planned, in progress, complete)",
+    question: "What risk treatment was selected and implemented?",
+    key_property: "Patches without provenance are dangerous. A configuration change that cannot be traced back to an authorized review decision is an uncontrolled modification. CERPA enforces the evidence chain from risk identification to treatment."
   },
   apply: {
-    title: "APPLY \u2014 The Verified Enforcement",
+    title: "APPLY / Authorization \u2014 Risk Decision Executed",
     color: "var(--c-apply)",
-    definition: "Apply is the verification phase that closes the governance loop. An independent party confirms that the Patch was implemented correctly, that it addresses the original Claim, and that the correction survives under real conditions. Apply is not a checkbox \u2014 it is a retest. The finding is not resolved until the fix is proven durable.",
-    inputs: "Patch implementation records, original claim reference, verification criteria, retest methodology",
-    outputs: "Verification record with test results, durability assessment (pass/fail/partial), and confidence update. The completed record enters institutional memory.",
-    question: "Did the correction hold?",
+    definition: "Apply authorizes and verifies the risk response. An independent party confirms that the Patch was implemented correctly, that it addresses the original Claim, and that the correction survives under real conditions. Apply also confirms the residual risk level. The finding is not resolved until the fix is proven durable.",
+    inputs: "Patch implementation records, original claim reference, verification criteria, retest methodology, residual risk threshold",
+    outputs: "Verification record with test results, durability assessment (pass/fail/partial), residual risk confirmation, and confidence update. The completed record enters institutional memory.",
+    question: "Was the risk response authorized, executed, and verified?",
     key_property: "Apply is what separates governance from paperwork. Without independent verification, corrections are assumed effective. CERPA does not assume \u2014 it verifies. A Patch that fails Apply returns to the Review phase for re-adjudication."
   }
 };
@@ -1116,8 +1157,8 @@ renderStage("claim");
 var ddData = {
   claim: {
     color: "var(--c-claim)",
-    title: "CLAIM",
-    subtitle: "The assertion that initiates governance",
+    title: "CLAIM / Finding",
+    subtitle: "The risk identification that initiates the loop",
     sections: [
       {heading:"What Is a Claim?", text:"A Claim is the entry point of the CERPA lifecycle. It asserts that a condition exists (or should exist) that requires governance attention. Claims can be positive (a control is required) or negative (a deficiency was found). They can originate from any source: automated scanners, human assessors, policy documents, framework requirements, or operational observations."},
       {heading:"Claim Types", text:"Nonconformity \u2014 a requirement is not met. Observation \u2014 a potential gap that is not yet a full nonconformity. Opportunity for Improvement \u2014 a suggestion for enhancement beyond minimum requirements. Conformity \u2014 a requirement is met (positive claims create the evidence that compliance auditors need). Risk Identification \u2014 an identified threat or vulnerability that may require treatment."},
@@ -1127,8 +1168,8 @@ var ddData = {
   },
   event: {
     color: "var(--c-event)",
-    title: "EVENT",
-    subtitle: "The evidence that substantiates the claim",
+    title: "EVENT / Evidence",
+    subtitle: "The evidence that the risk is real, changing, or being exercised",
     sections: [
       {heading:"What Is an Event?", text:"An Event is a recorded observation that provides evidence for or against a Claim. Events are not opinions \u2014 they are documented facts: what was seen, heard, measured, or tested, by whom, when, and through what method. The quality of governance decisions depends entirely on the quality of Event evidence."},
       {heading:"Evidence Types", text:"Document Review \u2014 examination of policies, procedures, records, logs. Interview \u2014 structured conversation with personnel about practices and knowledge. Technical Test \u2014 hands-on verification of system configurations, controls, or processes. Observation \u2014 direct witnessing of activities, behaviors, or conditions. Automated Scan \u2014 tool-generated evidence from vulnerability scanners, configuration analyzers, or monitoring systems."},
@@ -1138,8 +1179,8 @@ var ddData = {
   },
   review: {
     color: "var(--c-review)",
-    title: "REVIEW",
-    subtitle: "The authoritative decision with provenance",
+    title: "REVIEW / Assessment",
+    subtitle: "Severity, likelihood, impact, and confidence evaluated",
     sections: [
       {heading:"What Is a Review?", text:"A Review is the point where evidence becomes a decision. Authorized decision-makers examine the Claim, weigh the Event evidence, assess impact, and determine the appropriate response. Reviews are the most governance-critical phase because they carry authority: they determine what happens next."},
       {heading:"Decision Types", text:"Accept \u2014 the risk is acknowledged and no corrective action is taken (requires documented justification and expiration). Mitigate \u2014 corrective action will be taken to reduce the risk (drives the Patch phase). Transfer \u2014 the risk is shifted to another party (insurance, contractual obligation). Defer \u2014 the decision is postponed pending additional evidence (returns to Event phase for more observation)."},
@@ -1149,8 +1190,8 @@ var ddData = {
   },
   patch: {
     color: "var(--c-patch)",
-    title: "PATCH",
-    subtitle: "The corrective action with full traceability",
+    title: "PATCH / Mitigation",
+    subtitle: "Risk treatment selected and implemented with full traceability",
     sections: [
       {heading:"What Is a Patch?", text:"A Patch is the corrective action taken to address a Review decision. The term is deliberately broad: it encompasses technical fixes, policy updates, process changes, training programs, configuration modifications, and any other remediation activity. What makes it a CERPA Patch is the evidence chain that connects it back to the original Claim."},
       {heading:"Patch Components", text:"Action Description \u2014 what was changed, added, or removed. Owner \u2014 who is responsible for implementation. Approval Chain \u2014 who authorized this specific correction. Evidence References \u2014 which Claim and Review drove this change. Deadline \u2014 when implementation must be complete. Status \u2014 planned, in progress, or complete."},
@@ -1160,8 +1201,8 @@ var ddData = {
   },
   apply: {
     color: "var(--c-apply)",
-    title: "APPLY",
-    subtitle: "Independent verification that closes the loop",
+    title: "APPLY / Authorization",
+    subtitle: "Risk decision authorized, executed, and independently verified",
     sections: [
       {heading:"What Is Apply?", text:"Apply is the verification phase that proves a correction worked. It is not a sign-off or an acknowledgment \u2014 it is an independent test. Someone other than the person who implemented the Patch verifies that the original Claim has been addressed, that the correction is effective, and that it survives under realistic conditions."},
       {heading:"Verification Methods", text:"Retest \u2014 repeating the original assessment to confirm the finding no longer exists. Inspection \u2014 independent review of the implemented change against requirements. Monitoring \u2014 observing the corrected system over time to confirm durability. Evidence Review \u2014 examining artifacts that demonstrate the correction is in place and functioning."},
@@ -1223,7 +1264,7 @@ var traditionalHTML = '<div class="compare-bad card" style="padding:24px">'+
     return '<div style="display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 0"><span style="color:var(--bad)">&#9679;</span>'+t+'</div>';
   }).join('')+
   '</div>'+
-  '<div style="margin-top:20px;padding-top:12px;border-top:1px solid rgba(255,107,107,.15);font-size:13px;color:var(--bad);font-weight:600">Result: compliance theater without institutional memory</div>'+
+  '<div style="margin-top:20px;padding-top:12px;border-top:1px solid rgba(255,107,107,.15);font-size:13px;color:var(--bad);font-weight:600">Traditional risk management records risk. It does not govern it.</div>'+
   '</div>';
 
 var governedHTML = '<div class="compare-good card" style="padding:24px">'+
@@ -1233,7 +1274,7 @@ var governedHTML = '<div class="compare-good card" style="padding:24px">'+
     return '<div style="display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 0"><span style="color:var(--ok)">&#9679;</span>'+t+'</div>';
   }).join('')+
   '</div>'+
-  '<div style="margin-top:20px;padding-top:12px;border-top:1px solid rgba(93,255,147,.15);font-size:13px;color:var(--ok);font-weight:600">Result: durable governance with cumulative learning</div>'+
+  '<div style="margin-top:20px;padding-top:12px;border-top:1px solid rgba(93,255,147,.15);font-size:13px;color:var(--ok);font-weight:600">CERPA governs risk through action and memory.</div>'+
   '</div>';
 
 var compareContent=document.getElementById("compareContent");
@@ -1251,28 +1292,29 @@ document.querySelector(".toggle-bar").addEventListener("click",function(e){
 var copyBtn=document.getElementById("btnCopy");
 if(copyBtn)copyBtn.addEventListener("click",function(){
   var brief=[
-    "CERPA \u2014 Composite Enterprise Risk Posture Assessment",
+    "CERPA: A Closed-Loop Model for Risk Management",
     "",
-    "CERPA is a five-phase governance lifecycle that transforms fragmented findings into durable institutional memory:",
+    "CERPA closes the gap between identifying risk and acting on it.",
     "",
-    "  CLAIM:  An asserted condition requiring governance attention",
-    "  EVENT:  Observed evidence that substantiates the claim",
-    "  REVIEW: Authoritative decision with provenance (who decided, when, based on what)",
-    "  PATCH:  Approved corrective action with full traceability",
-    "  APPLY:  Independent verification that the correction holds",
+    "CERPA provides a common operational language for risk management:",
+    "  Claim identifies the risk.",
+    "  Event captures the evidence.",
+    "  Review determines significance.",
+    "  Patch defines the response.",
+    "  Apply authorizes execution.",
     "",
-    "Core properties:",
-    "  - Evidence chaining: every phase links to the previous",
-    "  - Institutional memory: records persist across assessment cycles",
-    "  - Contradiction detection: conflicting decisions are surfaced automatically",
-    "  - Regression awareness: previously resolved findings that reappear are flagged",
-    "  - Real-time posture: coherence scores reflect current state, not last quarter's report",
-    "  - Domain agnostic: security, compliance, procurement, operations all map to CERPA",
+    "Three key points:",
+    "  \u2022 Standardizes how risk is identified, reviewed, and acted on",
+    "  \u2022 Accelerates movement from finding to decision to action",
+    "  \u2022 Creates traceability across assessment, response, and execution",
     "",
-    "CERPA does not replace existing tools or processes. It governs the space between them.",
+    "Risk attributes per record:",
+    "  Severity, Likelihood, Impact, Confidence, Owner, Due Date, Residual Risk",
     "",
-    "Key question at each phase:",
-    "  What was claimed? What was observed? What was decided? What was corrected? Did it hold?",
+    "Most organizations can document risk. CERPA helps leaders govern it.",
+    "",
+    "CERPA gives senior leaders a simple, common framework to see risk",
+    "clearly, decide quickly, and act with traceability.",
     "",
     "Deep Sigma EDGE | CERPA | Composite Enterprise Risk Posture Assessment"
   ].join("\n");
