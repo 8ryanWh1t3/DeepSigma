@@ -3,30 +3,30 @@
 ## Latest Factors
 - Formula: **v3**
 - ICR: **GREEN** (RCF=1.0, RL_open=0)
-- PCR: **medium** (CCF=0.9, CL14=34)
+- PCR: **low** (CCF=1.0, CL14=23)
 - Quality Factor: **1.0** (confidence-weighted KPI mean=10.0, n=8)
 - Stability Factor: **0.828** (SSI=65.6)
 
 ## Edition Metrics
-- CORE: TEC=693.5 | C-TEC=516.8 | CC=0.7452
-- ENTERPRISE: TEC=1558.26 | C-TEC=1161.22 | CC=0.7452
-- TOTAL: TEC=3191.83 | C-TEC=2378.55 | CC=0.7452
+- CORE: TEC=693.5 | C-TEC=574.22 | CC=0.828
+- ENTERPRISE: TEC=1561.95 | C-TEC=1293.3 | CC=0.828
+- TOTAL: TEC=3199.52 | C-TEC=2649.2 | CC=0.828
 
 ## Tiers (from TOTAL C-TEC)
 ### Internal @ $150/hr
-- Low:  1902.8 hrs | $285426
-- Base: 2378.6 hrs | $356782
-- High: 3211.0 hrs | $481656
+- Low:  2119.4 hrs | $317904
+- Base: 2649.2 hrs | $397380
+- High: 3576.4 hrs | $536463
 
 ### Executive @ $225/hr
-- Low:  1902.8 hrs | $428139
-- Base: 2378.6 hrs | $535174
-- High: 3211.0 hrs | $722485
+- Low:  2119.4 hrs | $476856
+- Base: 2649.2 hrs | $596070
+- High: 3576.4 hrs | $804694
 
 ### Public Sector Fully Burdened @ $275/hr
-- Low:  1902.8 hrs | $523281
-- Base: 2378.6 hrs | $654101
-- High: 3211.0 hrs | $883037
+- Low:  2119.4 hrs | $582824
+- Base: 2649.2 hrs | $728530
+- High: 3576.4 hrs | $983516
 
 ## Release KPI Scores
 
@@ -94,5 +94,5 @@
 - **v3 Quality Factor (QF):** Replaces binary file-existence checks with confidence-weighted KPI scores. Evidence level (simulated vs production) directly affects weight via eligibility confidence.
 - **v3 Stability Factor (SF):** SSI (System Stability Index) feeds into C-TEC. Unstable systems get a lower control multiplier, reflecting higher real-world effort.
 - **v3 LOC in TEC:** Lines of code now contribute to the TEC formula, so complexity reflects actual code volume — not just file counts.
-- Computes C-TEC as `TEC × QF × SF × RCF × CCF` = `TEC × 0.7452`.
+- Computes C-TEC as `TEC × QF × SF × RCF × CCF` = `TEC × 0.828`.
 - Produces deterministic daily snapshots (`ICR/PCR/TEC`) so trend direction is measurable and auditable over time.
