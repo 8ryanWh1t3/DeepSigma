@@ -311,6 +311,8 @@ ALLOWED_ACRONYMS = {
     "SNI", "STAGE", "TASKS", "TTX", "XOR", "YARA",
     # ISO 27001 CERPA Intake — audit, compliance, PDF parsing tokens
     "APL", "BSI", "DIVE", "FND", "HCPC", "INTAKE", "ISMS", "OFI",
+    # CERPA MCPP R2P2 EDGE — R2P2 compressed mode, demo data, UI tokens
+    "ACME", "CLOCK", "INPUTS", "LABEL", "MRT", "RAPID",
     # MCPP EDGE — Marine Corps Planning Process tokens
     "ACA", "ALPHA", "ASP", "BAS", "BFT", "BHL", "BRAVO", "BRONZE",
     "CAAT", "CAS", "CCIR", "COA", "DTG", "FAC", "FFIR", "FIRES",
