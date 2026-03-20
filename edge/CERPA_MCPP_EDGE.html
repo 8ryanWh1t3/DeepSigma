@@ -1,0 +1,1567 @@
+<!--
+ CERPA EDGE v1.0.0
+ ============================================================
+ Deep Sigma EDGE — CERPA Console
+ Claim → Event → Review → Patch → Apply
+ Five-Step CERPA Workflow with optional MCPP Crosswalk
+ Deep Sigma EDGE format: single-file, zero-dependency, hardened
+
+ Tabs: Overview | Claim | Event | Review | Patch | Apply |
+       Crosswalk | Timeline | Exports | Doctrine | Memory | Packet
+
+ EDGE_POLICY_EXCEPTION: local_storage — required for session persistence
+ EDGE_POLICY_EXCEPTION: download — required for Blob URL exports
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'"/>
+<!-- EDGE_POLICY_EXCEPTION: local_storage — CERPA requires session persistence for auto-save -->
+<!-- EDGE_POLICY_EXCEPTION: download — CERPA requires Blob URL for export functions -->
+<script>
+(function(){"use strict";
+var B="EDGE_BUILD_ID:CERPA_EDGE_v1.0.0";
+function _b(c){return function(){throw new Error("EDGE hardening: "+c+" blocked")}}
+window.fetch=_b("fetch");window.XMLHttpRequest=_b("XHR");window.WebSocket=_b("WS");
+window.EventSource=_b("ES");try{navigator.sendBeacon=_b("beacon")}catch(_){}
+window.eval=_b("eval");try{window.Function=_b("Function")}catch(_){}
+window.open=_b("window.open");window.RTCPeerConnection=_b("RTC");
+window.BroadcastChannel=_b("BC");window.SharedWorker=_b("SW");window.Worker=_b("W");
+try{Object.defineProperty(window,"indexedDB",{get:_b("indexedDB"),configurable:false})}catch(_){}
+if(typeof console!=="undefined")console.log("[EDGE] "+B+" (localStorage PERMITTED by policy exception)");
+if(window.self===window.top){document.addEventListener("DOMContentLoaded",function(){
+  var v=[];
+  if(document.querySelectorAll("script[src],link[href]").length>0)v.push("external resource");
+  if(document.querySelectorAll("[onclick],[onerror],[onload]").length>0)v.push("inline handler");
+  if(v.length>0)document.body.innerHTML="<h1 style='color:red;font-family:monospace;padding:40px'>EDGE VIOLATION: "+v.join("; ")+"</h1>";
+});}
+})();
+</script>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Deep Sigma EDGE — CERPA Console v1.0.0</title>
+<style>
+:root{--bg:#0b0f14;--card:#111824;--card2:#0d1520;--muted:#8aa0b5;--txt:#e7eef7;--accent:#7df9ff;--warn:#ffcc66;--bad:#ff6b6b;--ok:#5dff93;--ribbon:#1a2638;--line:#1b2a3a;--glow:rgba(125,249,255,.08);--mag:#ff6bff;--step-done:#5dff93;--step-active:#7df9ff;--step-future:#3a4a5e;--c-claim:#7df9ff;--c-event:#38bdf8;--c-review:#ffcc66;--c-patch:#ff6bff;--c-apply:#5dff93}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt);font-size:13px;overflow-x:hidden}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hidden{display:none!important}
+
+/* ── Header ── */
+header{padding:10px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;min-height:54px;background:rgba(8,12,20,.96);position:relative;z-index:100;flex-wrap:wrap}
+header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(125,249,255,.2) 15%,rgba(255,107,255,.12) 50%,rgba(125,249,255,.2) 85%,transparent)}
+.brand{white-space:nowrap;font-weight:700;letter-spacing:.5px;font-size:15px;background:linear-gradient(135deg,var(--accent),var(--mag));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.brand small{display:block;-webkit-text-fill-color:var(--muted);font-size:10px;font-weight:400;letter-spacing:.3px}
+
+/* ── Progress Strip ── */
+.progress-strip{display:flex;align-items:center;gap:0;margin:0 auto;flex-wrap:nowrap}
+.ps-pill{padding:4px 12px;border-radius:6px;font-size:9px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .25s;border:1px solid transparent;white-space:nowrap}
+.ps-pill.step-future{color:var(--step-future);background:rgba(58,74,94,.12);border-color:rgba(58,74,94,.3)}
+.ps-pill.step-active{color:var(--step-active);background:rgba(125,249,255,.1);border-color:rgba(125,249,255,.35);box-shadow:0 0 8px rgba(125,249,255,.15)}
+.ps-pill.step-done{color:#0b0f14;background:var(--step-done);border-color:var(--step-done)}
+.ps-arrow{color:#2a3a4e;font-size:8px;margin:0 3px}
+.save-indicator{font-size:9px;color:var(--muted);margin-left:auto;white-space:nowrap}
+.save-indicator.dirty{color:var(--warn)}
+
+/* ── Tabs ── */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);padding:0 16px;background:rgba(11,15,20,.92);overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs .tsep{width:1px;height:24px;background:var(--line);margin:auto 6px;flex-shrink:0}
+.ttab{padding:9px 14px;font-size:10.5px;font-weight:600;color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;letter-spacing:.3px;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
+.ttab:hover{color:var(--txt)}.ttab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ── Main ── */
+.main{height:calc(100vh - 118px);overflow-y:auto;padding:16px 20px}
+.main section{max-width:1440px;margin:0 auto}
+
+/* ── Cards ── */
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px;transition:border-color .2s}
+.card:hover{border-color:rgba(125,249,255,.12)}
+.card h3{margin:0 0 10px;font-size:13px;color:#cfe2f7;letter-spacing:.4px;text-transform:uppercase}
+.card h4{margin:0 0 8px;font-size:11px;color:var(--accent);letter-spacing:.4px;text-transform:uppercase}
+
+/* ── Grids ── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+
+/* ── KPI ── */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 8px;text-align:center;position:relative;overflow:hidden;cursor:pointer;transition:all .2s}
+.kpi:hover{border-color:rgba(125,249,255,.3);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi.kpi-green::before{background:var(--ok)}.kpi.kpi-amber::before{background:var(--warn)}.kpi.kpi-red::before{background:var(--bad)}.kpi.kpi-cyan::before{background:var(--accent)}
+.kpi .kv{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi .kl{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:2px}
+.kv-green{color:var(--ok)}.kv-amber{color:var(--warn)}.kv-red{color:var(--bad)}.kv-cyan{color:var(--accent)}
+
+/* ── Forms ── */
+.df{margin-bottom:10px}
+.df label{display:block;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.df input,.df select,.df textarea{width:100%;background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:6px;padding:7px 10px;font-size:11px;font-family:inherit}
+.df textarea{height:80px;resize:vertical}
+.df input:focus,.df select:focus,.df textarea:focus{border-color:rgba(125,249,255,.4);outline:none}
+.df-readonly input,.df-readonly select,.df-readonly textarea{opacity:.55;pointer-events:none}
+
+/* ── Buttons ── */
+button{background:#182235;color:var(--txt);border:1px solid #243449;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:10.5px;transition:all .15s;font-weight:500;font-family:inherit}
+button:hover{border-color:#2f4765}
+button.primary{border-color:rgba(125,249,255,.35);color:var(--accent)}
+button.primary:hover{background:rgba(125,249,255,.06)}
+button.ok{border-color:rgba(93,255,147,.35);color:var(--ok)}
+button.ok:hover{background:rgba(93,255,147,.06)}
+button.danger{border-color:rgba(255,107,107,.35);color:var(--bad)}
+button.danger:hover{background:rgba(255,107,107,.06)}
+button.warn{border-color:rgba(255,204,102,.35);color:var(--warn)}
+
+/* ── Tables ── */
+table{width:100%;border-collapse:collapse;font-size:11.5px}
+th,td{padding:7px 8px;border-bottom:1px solid #141e2d;text-align:left;vertical-align:top}
+th{color:#6b8099;font-weight:700;font-size:9px;text-transform:uppercase;letter-spacing:.5px}
+tbody tr{transition:background .1s;cursor:default}tbody tr:hover{background:rgba(125,249,255,.03)}
+
+/* ── Badges ── */
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:9px;font-weight:700;letter-spacing:.3px;border:1px solid}
+.b-green{color:var(--ok);border-color:rgba(93,255,147,.35);background:rgba(93,255,147,.06)}
+.b-amber{color:var(--warn);border-color:rgba(255,204,102,.35);background:rgba(255,204,102,.06)}
+.b-red{color:var(--bad);border-color:rgba(255,107,107,.35);background:rgba(255,107,107,.06)}
+.b-cyan{color:var(--accent);border-color:rgba(125,249,255,.25);background:rgba(125,249,255,.05)}
+.b-mag{color:var(--mag);border-color:rgba(255,107,255,.3);background:rgba(255,107,255,.06)}
+.b-gray{color:var(--muted);border-color:rgba(138,160,181,.3);background:rgba(138,160,181,.06)}
+
+/* ── List items (add/remove pattern) ── */
+.list-items{margin:4px 0 8px}
+.list-item{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #141e2d;font-size:11px}
+.list-item:last-child{border:none}
+.list-item input{flex:1;background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:4px;padding:4px 8px;font-size:11px;font-family:inherit}
+.list-item input:focus{border-color:rgba(125,249,255,.4);outline:none}
+.list-item .li-rm{background:none;border:none;color:var(--bad);cursor:pointer;font-size:14px;padding:2px 4px;opacity:.6}
+.list-item .li-rm:hover{opacity:1}
+.list-add{font-size:10px;padding:3px 10px;margin-top:4px}
+
+/* ── Toast ── */
+.toast-wrap{position:fixed;top:70px;right:20px;z-index:600;display:flex;flex-direction:column;gap:8px}
+.toast{padding:10px 16px;border-radius:8px;font-size:11px;font-weight:600;animation:toastIn .3s ease;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.toast-ok{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);color:var(--ok)}
+.toast-warn{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);color:var(--warn)}
+.toast-info{background:rgba(125,249,255,.1);border:1px solid rgba(125,249,255,.3);color:var(--accent)}
+.toast-bad{background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.35);color:var(--bad)}
+@keyframes toastIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Drawer ── */
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;opacity:0;pointer-events:none;transition:opacity .25s}
+.drawer-overlay.open{opacity:1;pointer-events:auto}
+.drawer-panel{position:fixed;top:0;right:0;width:520px;max-width:92vw;height:100vh;background:var(--card);border-left:1px solid var(--line);z-index:510;transform:translateX(100%);transition:transform .3s ease;overflow-y:auto;display:flex;flex-direction:column}
+.drawer-panel.open{transform:translateX(0)}
+.drawer-hdr{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:var(--card);z-index:10}
+.drawer-hdr h3{margin:0;font-size:14px;color:var(--accent);flex:1}
+.drawer-hdr .dx{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:2px 6px}
+.drawer-body{padding:16px;flex:1;overflow-y:auto}
+
+/* ── Confirm modal ── */
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center}
+.confirm-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:24px;max-width:420px;width:90%;text-align:center}
+.confirm-card h4{margin:0 0 10px;color:var(--txt);font-size:14px}
+.confirm-card p{margin:0 0 16px;color:var(--muted);font-size:12px}
+.confirm-card .confirm-btns{display:flex;gap:8px;justify-content:center}
+
+/* ── Collapsible sections ── */
+.collapsible-hdr{display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 0;border-bottom:1px solid var(--line);margin-bottom:8px}
+.collapsible-hdr h4{margin:0;flex:1}
+.collapsible-hdr .chevron{color:var(--muted);font-size:10px;transition:transform .2s}
+.collapsible-hdr.open .chevron{transform:rotate(90deg)}
+.collapsible-body{overflow:hidden;transition:max-height .3s ease}
+.collapsible-body.collapsed{max-height:0!important;overflow:hidden;padding:0!important}
+
+/* ── Step cards ── */
+.step-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;position:relative;overflow:hidden;transition:all .2s;cursor:pointer}
+.step-card:hover{border-color:rgba(125,249,255,.2);transform:translateY(-1px)}
+.step-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.step-card.sc-done::before{background:var(--ok)}
+.step-card.sc-active::before{background:var(--accent)}
+.step-card.sc-future::before{background:var(--step-future)}
+.step-card .sc-num{font-size:20px;font-weight:700;color:var(--muted);margin-bottom:4px}
+.step-card .sc-name{font-size:12px;font-weight:600;margin-bottom:4px}
+.step-card .sc-status{font-size:9px;text-transform:uppercase;letter-spacing:.4px}
+
+/* ── Event cards ── */
+.ev-card{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .2s;margin-bottom:8px}
+.ev-card:hover{border-color:rgba(56,189,248,.3)}
+.ev-card .ev-title{font-size:12px;font-weight:600}
+.ev-card .ev-meta{font-size:9px;color:var(--muted);margin-top:4px}
+
+/* ── Timeline ── */
+.tl-vertical{position:relative;padding-left:30px}
+.tl-line{position:absolute;left:14px;top:0;bottom:0;width:2px;background:var(--line)}
+.tl-item{position:relative;margin-bottom:20px}
+.tl-dot{position:absolute;left:-22px;top:4px;width:12px;height:12px;border-radius:50%;border:2px solid var(--line);background:var(--bg)}
+.tl-dot.tl-claim{border-color:var(--c-claim);background:var(--c-claim)}
+.tl-dot.tl-event{border-color:var(--c-event);background:var(--c-event)}
+.tl-dot.tl-review{border-color:var(--c-review);background:var(--c-review)}
+.tl-dot.tl-patch{border-color:var(--c-patch);background:var(--c-patch)}
+.tl-dot.tl-apply{border-color:var(--c-apply);background:var(--c-apply)}
+.tl-content{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.tl-content .tl-name{font-size:12px;font-weight:600}
+.tl-content .tl-date{font-size:10px;color:var(--muted);margin-top:2px}
+.tl-content .tl-cat{font-size:8px;text-transform:uppercase;letter-spacing:.4px;margin-top:4px}
+
+/* ── Crosswalk ── */
+.xwalk-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.xwalk-col{flex:1;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;text-align:center}
+.xwalk-mcpp{background:rgba(138,160,181,.08);color:var(--muted);border:1px solid rgba(138,160,181,.2)}
+.xwalk-cerpa{background:rgba(125,249,255,.06);color:var(--accent);border:1px solid rgba(125,249,255,.2)}
+.xwalk-arrow{color:var(--muted);font-size:14px;flex-shrink:0}
+
+/* ── Packet preview ── */
+.packet-preview{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:16px;font-size:11px;line-height:1.7;white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;max-height:600px;overflow-y:auto}
+
+/* ── Confidence slider ── */
+.conf-slider{display:flex;align-items:center;gap:10px}
+.conf-slider input[type="range"]{flex:1;accent-color:var(--accent)}
+.conf-val{font-size:14px;font-weight:700;color:var(--accent);min-width:36px;text-align:center}
+
+/* ── Progress bar ── */
+.progress-bar{width:100%;height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin:8px 0}
+.progress-fill{height:100%;border-radius:4px;transition:width .3s}
+
+/* ── Doctrine ── */
+.doctrine-card{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:10px}
+.doctrine-hdr{padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .15s}
+.doctrine-hdr:hover{background:rgba(125,249,255,.03)}
+.doctrine-hdr h4{margin:0;flex:1;font-size:12px;color:var(--accent)}
+.doctrine-hdr .chevron{color:var(--muted);font-size:10px;transition:transform .2s}
+.doctrine-hdr.open .chevron{transform:rotate(90deg)}
+.doctrine-body{padding:0 14px;max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s}
+.doctrine-body.open{max-height:2000px;padding:10px 14px 14px}
+.doctrine-body p{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:8px}
+.doctrine-body ul{margin:0 0 8px 16px;font-size:11px;color:var(--muted);line-height:1.6}
+
+/* ── Shortcut bar ── */
+.shortcut-bar{position:fixed;bottom:0;left:0;right:0;z-index:150;background:rgba(11,15,20,.94);border-top:1px solid var(--line);padding:4px 16px;display:flex;align-items:center;gap:14px;font-size:9px;color:var(--muted)}
+.shortcut-bar kbd{display:inline-block;padding:1px 5px;border-radius:3px;background:rgba(125,249,255,.08);border:1px solid rgba(125,249,255,.15);font-family:inherit;font-size:9px;color:var(--accent);margin:0 1px}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#243449;border-radius:3px}
+
+/* ── Print ── */
+@media print{
+  body{background:#fff!important;color:#111!important}
+  header,.tabs,.shortcut-bar,.drawer-overlay,.drawer-panel,.toast-wrap,.confirm-overlay{display:none!important}
+  .main{height:auto!important;overflow:visible!important}
+  .card{background:#fff!important;border:1px solid #ccc!important;color:#111!important;break-inside:avoid}
+}
+/* ── Responsive ── */
+@media(max-width:900px){
+  .grid2,.grid3,.grid4{grid-template-columns:1fr}
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:600px){
+  header{flex-direction:column;gap:8px;padding:10px}
+  .progress-strip{display:none}
+  .shortcut-bar{display:none}
+  .drawer-panel{width:100%!important;max-width:100%!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header>
+  <div class="brand">CERPA Console<small>Deep Sigma EDGE &mdash; Claim &rarr; Event &rarr; Review &rarr; Patch &rarr; Apply</small></div>
+  <div class="progress-strip" id="progressStrip"></div>
+  <div class="save-indicator" id="saveIndicator">No changes</div>
+</header>
+
+<!-- ═══ TABS ═══ -->
+<nav class="tabs" id="tabBar">
+  <button class="ttab active" data-t="overview">Overview</button>
+  <span class="tsep"></span>
+  <button class="ttab" data-t="claim">Claim</button>
+  <button class="ttab" data-t="event">Event</button>
+  <button class="ttab" data-t="review">Review</button>
+  <button class="ttab" data-t="patch">Patch</button>
+  <button class="ttab" data-t="apply">Apply</button>
+  <span class="tsep"></span>
+  <button class="ttab" data-t="crosswalk">Crosswalk</button>
+  <button class="ttab" data-t="timeline">Timeline</button>
+  <span class="tsep"></span>
+  <button class="ttab" data-t="exports">Exports</button>
+  <button class="ttab" data-t="doctrine">Doctrine</button>
+  <span class="tsep"></span>
+  <button class="ttab" data-t="memory">Memory</button>
+  <button class="ttab" data-t="packet">Packet</button>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main" id="mainArea">
+  <section id="tab-overview"></section>
+  <section id="tab-claim" class="hidden"></section>
+  <section id="tab-event" class="hidden"></section>
+  <section id="tab-review" class="hidden"></section>
+  <section id="tab-patch" class="hidden"></section>
+  <section id="tab-apply" class="hidden"></section>
+  <section id="tab-crosswalk" class="hidden"></section>
+  <section id="tab-timeline" class="hidden"></section>
+  <section id="tab-exports" class="hidden"></section>
+  <section id="tab-doctrine" class="hidden"></section>
+  <section id="tab-memory" class="hidden"></section>
+  <section id="tab-packet" class="hidden"></section>
+</div>
+
+<!-- Toast container -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- Drawer overlay -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="drawer-panel" id="drawerPanel">
+  <div class="drawer-hdr"><h3 id="drawerTitle">Detail</h3><button class="dx" id="drawerClose">&times;</button></div>
+  <div class="drawer-body" id="drawerBody"></div>
+</div>
+
+<!-- Shortcut bar -->
+<div class="shortcut-bar">
+  <span><kbd>1</kbd>-<kbd>9</kbd><kbd>0</kbd> tabs</span>
+  <span><kbd>Esc</kbd> close</span>
+  <span><kbd>?</kbd> doctrine</span>
+  <span><kbd>/</kbd> search</span>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   CERPA EDGE v1.0.0 — JavaScript
+   Deep Sigma EDGE — Claim → Event → Review → Patch → Apply
+   ══════════════════════════════════════════════════════════════ */
+
+/* ══════════ SECTION 1: UTILITIES ══════════ */
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
+function setHTML(el,html){var t=document.createElement("template");t.innerHTML=html;el.textContent="";el.appendChild(t.content.cloneNode(true))}
+function $(id){return document.getElementById(id)}
+function showToast(msg,type){
+  var t=document.createElement("div");
+  t.className="toast toast-"+(type||"info");
+  t.textContent=msg;
+  $("toastWrap").appendChild(t);
+  setTimeout(function(){t.style.opacity="0";t.style.transition="opacity .3s";setTimeout(function(){t.remove()},300)},2800);
+}
+function downloadFile(content,filename,mime){
+  var blob=new Blob([content],{type:mime||"text/plain"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");
+  a.href=url;a.download=filename;
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast("Downloaded "+filename,"ok");
+}
+function uid(){return "c"+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function deepClone(o){return JSON.parse(JSON.stringify(o))}
+function debounce(fn,ms){var t;return function(){clearTimeout(t);t=setTimeout(fn,ms)}}
+function fmtDate(d){if(!d)return"--";try{return new Date(d).toLocaleDateString("en-US",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})}catch(e){return d}}
+function pct(n,d){return d?Math.round(n/d*100):0}
+
+/* ── Storage wrapper ── */
+var store={
+  save:function(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){console.warn("[EDGE] localStorage save failed:",e);return false}},
+  load:function(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){console.warn("[EDGE] localStorage load failed:",e);return null}},
+  remove:function(k){try{localStorage.removeItem(k)}catch(e){}},
+  size:function(){try{var t=0;for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);t+=localStorage.getItem(k).length}return t}catch(e){return 0}}
+};
+
+/* ── Form helpers ── */
+function dfInput(id,label,val){return '<div class="df"><label>'+esc(label)+'</label><input id="sf-'+id+'" type="text" value="'+esc(val)+'"/></div>'}
+function dfSelect(id,label,opts,val){var h='<div class="df"><label>'+esc(label)+'</label><select id="sf-'+id+'">';opts.forEach(function(o){h+='<option'+(o===val?' selected':'')+'>'+esc(o)+'</option>'});return h+'</select></div>'}
+function dfTextarea(id,label,val){return '<div class="df">'+(label?'<label>'+esc(label)+'</label>':'')+'<textarea id="sf-'+id+'">'+esc(val)+'</textarea></div>'}
+function dfDate(id,label,val){return '<div class="df"><label>'+esc(label)+'</label><input id="sf-'+id+'" type="date" value="'+esc(val)+'"/></div>'}
+function dfDatetime(id,label,val){return '<div class="df"><label>'+esc(label)+'</label><input id="sf-'+id+'" type="datetime-local" value="'+esc(val)+'"/></div>'}
+
+/* ══════════ SECTION 2: STATE MODEL ══════════ */
+var STORE_KEY="cerpa_edge_state";
+var OLD_MCPP_KEY="mcpp_edge_state";
+
+function defaultState(){
+  return {
+    metadata:{
+      title:"",org:"",domain:"",owner:"",
+      classification:"UNCLASSIFIED",
+      created:new Date().toISOString(),
+      updated:"",
+      context_type:"",
+      urgency:"normal",
+      status:"draft"
+    },
+    claim:{
+      id:uid(),title:"",statement:"",type:"",source:"",
+      priority:"P3",authority:"",
+      assumptions:[],constraints:[],success_criteria:[],tags:[]
+    },
+    events:[],
+    review:{
+      summary:"",findings:[],options_considered:[],rejected_options:[],
+      confidence:0.5,risk_level:"medium",drift_signals:[],
+      rationale:"",decision_basis:""
+    },
+    patch:{
+      selected_action:"",patch_type:"",change_summary:"",
+      owner:"",due_date:"",dependencies:[],approvals:[],
+      blast_radius:"",rollback_plan:"",kill_switch:"",notes:""
+    },
+    apply:{
+      execution_status:"not_started",actions:[],
+      validation_method:"",validation_evidence:"",
+      outcome_summary:"",lessons_observed:[],
+      follow_on_actions:[],completed_at:""
+    },
+    memory:{
+      packet_id:"",lineage_notes:"",
+      prior_related_cases:[],drift_history:[],
+      supersedes:"",superseded_by:"",retrieval_tags:[]
+    },
+    timeline:{milestones:[]},
+    crosswalk:{framework:"MCPP",mappings:[]},
+    _dirty:false,
+    _lastSaved:null
+  };
+}
+
+function defaultEvent(){
+  return {
+    id:uid(),title:"",type:"observation",source:"",
+    timestamp:new Date().toISOString().slice(0,16),
+    description:"",evidence:"",confidence:0.5,
+    severity:"medium",related_claims:[],tags:[]
+  };
+}
+
+function defaultFinding(){
+  return {
+    id:uid(),title:"",finding_class:"supported",
+    statement:"",evidence_links:[],risk:"medium",
+    confidence:0.5,notes:""
+  };
+}
+
+function defaultAction(){
+  return {
+    id:uid(),action:"",owner:"",due:"",
+    status:"open",done_when:"",validation:"",notes:""
+  };
+}
+
+var STATE=defaultState();
+
+/* ══════════ SECTION 3: TAB SYSTEM ══════════ */
+var TAB_NAMES=["overview","claim","event","review","patch","apply","crosswalk","timeline","exports","doctrine","memory","packet"];
+var currentTab="overview";
+function setTab(name){
+  currentTab=name;
+  TAB_NAMES.forEach(function(t){
+    var sec=$("tab-"+t);if(sec)sec.classList.toggle("hidden",t!==name);
+  });
+  document.querySelectorAll(".ttab").forEach(function(b){b.classList.toggle("active",b.getAttribute("data-t")===name)});
+  renderTab(name);
+}
+document.querySelectorAll(".ttab").forEach(function(b){b.addEventListener("click",function(){setTab(b.getAttribute("data-t"))})});
+
+/* ══════════ SECTION 4: PROGRESS STRIP (CERPA) ══════════ */
+var STEP_LABELS=[
+  {key:"claim",label:"Claim",tab:"claim",color:"var(--c-claim)"},
+  {key:"event",label:"Event",tab:"event",color:"var(--c-event)"},
+  {key:"review",label:"Review",tab:"review",color:"var(--c-review)"},
+  {key:"patch",label:"Patch",tab:"patch",color:"var(--c-patch)"},
+  {key:"apply",label:"Apply",tab:"apply",color:"var(--c-apply)"}
+];
+
+function cerpaProgress(){
+  var p={};
+  p.claim=!!(STATE.claim.title&&STATE.claim.statement);
+  p.event=STATE.events.length>0&&STATE.events.some(function(e){return e.description||e.evidence});
+  p.review=!!(STATE.review.summary&&STATE.review.confidence>0);
+  p.patch=!!STATE.patch.selected_action;
+  p.apply=STATE.apply.execution_status!=="not_started"&&(STATE.apply.actions.length>0||STATE.apply.validation_method||STATE.apply.outcome_summary);
+  return p;
+}
+
+function stepsComplete(){var p=cerpaProgress();var c=0;STEP_LABELS.forEach(function(s){if(p[s.key])c++});return c}
+
+function updateProgress(){
+  var strip=$("progressStrip");
+  var progress=cerpaProgress();
+  var html="";
+  var foundActive=false;
+  STEP_LABELS.forEach(function(s,i){
+    var done=progress[s.key];
+    var cls="step-future";
+    if(done){cls="step-done"}
+    else if(!foundActive){cls="step-active";foundActive=true}
+    html+='<span class="ps-pill '+cls+'" data-step="'+s.tab+'">'+esc(s.label)+'</span>';
+    if(i<STEP_LABELS.length-1)html+='<span class="ps-arrow">&#9654;</span>';
+  });
+  setHTML(strip,html);
+  strip.querySelectorAll(".ps-pill").forEach(function(p){
+    p.addEventListener("click",function(){setTab(p.getAttribute("data-step"))});
+  });
+}
+
+/* ══════════ SECTION 5: AUTO-SAVE ══════════ */
+function markDirty(){STATE._dirty=true;updateSaveIndicator()}
+var scheduleSave=debounce(function(){doSave()},800);
+function doSave(){
+  var s=deepClone(STATE);s._dirty=false;s._lastSaved=new Date().toISOString();
+  s.metadata.updated=s._lastSaved;
+  if(store.save(STORE_KEY,s)){STATE._dirty=false;STATE._lastSaved=s._lastSaved;updateSaveIndicator()}
+}
+function loadState(){
+  var s=store.load(STORE_KEY);
+  if(s){STATE=s;STATE._dirty=false;return true}
+  return false;
+}
+function updateSaveIndicator(){
+  var el=$("saveIndicator");
+  if(STATE._dirty){el.textContent="Unsaved changes";el.className="save-indicator dirty"}
+  else if(STATE._lastSaved){el.textContent="Saved "+fmtDate(STATE._lastSaved);el.className="save-indicator"}
+  else{el.textContent="No changes";el.className="save-indicator"}
+}
+function mutate(fn){fn();markDirty();scheduleSave();updateProgress()}
+
+/* ══════════ SECTION 6: DRAWER ══════════ */
+function openDrawer(title,html){
+  $("drawerTitle").textContent=title;
+  setHTML($("drawerBody"),html);
+  $("drawerOverlay").classList.add("open");
+  $("drawerPanel").classList.add("open");
+}
+function closeDrawer(){
+  $("drawerOverlay").classList.remove("open");
+  $("drawerPanel").classList.remove("open");
+}
+$("drawerOverlay").addEventListener("click",closeDrawer);
+$("drawerClose").addEventListener("click",closeDrawer);
+
+/* ══════════ SECTION 7: LIST HELPERS ══════════ */
+function renderListItems(arr,containerId,onchange){
+  var c=$(containerId);if(!c)return;
+  var html="";
+  arr.forEach(function(v,i){
+    html+='<div class="list-item"><input type="text" value="'+esc(v)+'" data-idx="'+i+'"/><button class="li-rm" data-idx="'+i+'">&times;</button></div>';
+  });
+  html+='<button class="list-add primary">+ Add</button>';
+  setHTML(c,html);
+  c.querySelectorAll("input").forEach(function(inp){
+    inp.addEventListener("blur",function(){
+      var idx=parseInt(inp.getAttribute("data-idx"));
+      if(arr[idx]!==inp.value){arr[idx]=inp.value;mutate(function(){});if(onchange)onchange()}
+    });
+  });
+  c.querySelectorAll(".li-rm").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      var idx=parseInt(btn.getAttribute("data-idx"));
+      arr.splice(idx,1);mutate(function(){});if(onchange)onchange();
+      renderListItems(arr,containerId,onchange);
+    });
+  });
+  c.querySelector(".list-add").addEventListener("click",function(){
+    arr.push("");mutate(function(){});if(onchange)onchange();
+    renderListItems(arr,containerId,onchange);
+    var inputs=c.querySelectorAll("input");
+    if(inputs.length)inputs[inputs.length-1].focus();
+  });
+}
+
+/* ══════════ SECTION 8: RENDER ROUTER ══════════ */
+function renderTab(name){
+  switch(name){
+    case"overview":renderOverview();break;
+    case"claim":renderClaim();break;
+    case"event":renderEvent();break;
+    case"review":renderReview();break;
+    case"patch":renderPatch();break;
+    case"apply":renderApply();break;
+    case"crosswalk":renderCrosswalk();break;
+    case"timeline":renderTimeline();break;
+    case"exports":renderExports();break;
+    case"doctrine":renderDoctrine();break;
+    case"memory":renderMemory();break;
+    case"packet":renderPacket();break;
+  }
+}
+
+/* ══════════ SECTION 9: OVERVIEW ══════════ */
+function renderOverview(){
+  var sec=$("tab-overview");
+  var prog=cerpaProgress();
+  var done=stepsComplete();
+  var nEvents=STATE.events.length;
+  var nFindings=STATE.review.findings.length;
+  var nActions=STATE.apply.actions.length;
+  var conf=Math.round(STATE.review.confidence*100);
+
+  var html='<div class="kpi-row" style="grid-template-columns:repeat(6,1fr)">';
+  html+='<div class="kpi '+(done===5?"kpi-green":"kpi-cyan")+'" data-step="overview"><div class="kv '+(done===5?"kv-green":"kv-cyan")+'">'+done+'/5</div><div class="kl">CERPA Progress</div></div>';
+  html+='<div class="kpi kpi-cyan" data-step="claim"><div class="kv" style="font-size:16px;color:var(--c-claim)">'+(esc(STATE.claim.title)||"--")+'</div><div class="kl">Active Claim</div></div>';
+  html+='<div class="kpi '+(nEvents>0?"kpi-green":"kpi-amber")+'" data-step="event"><div class="kv '+(nEvents>0?"kv-cyan":"kv-amber")+'">'+nEvents+'</div><div class="kl">Events</div></div>';
+  html+='<div class="kpi '+(conf>=70?"kpi-green":conf>=40?"kpi-amber":"kpi-red")+'" data-step="review"><div class="kv '+(conf>=70?"kv-green":conf>=40?"kv-amber":"kv-red")+'">'+conf+'%</div><div class="kl">Review Confidence</div></div>';
+  html+='<div class="kpi '+(prog.patch?"kpi-green":"kpi-amber")+'" data-step="patch"><div class="kv" style="font-size:14px;'+(prog.patch?"color:var(--ok)":"color:var(--muted)")+'">'+(esc(STATE.patch.selected_action)||"--")+'</div><div class="kl">Selected Patch</div></div>';
+  html+='<div class="kpi '+(prog.apply?"kpi-green":"kpi-amber")+'" data-step="apply"><div class="kv" style="font-size:14px;'+(prog.apply?"color:var(--ok)":"color:var(--muted)")+'">'+esc(STATE.apply.execution_status.replace(/_/g," "))+'</div><div class="kl">Apply Status</div></div>';
+  html+='</div>';
+
+  /* Summary card */
+  html+='<div class="card"><h3>Session Summary</h3>';
+  html+='<p style="font-size:12px;color:var(--muted);margin-bottom:6px"><strong style="color:var(--c-claim)">Claim:</strong> '+(esc(STATE.claim.statement)||"<em>No claim defined</em>")+'</p>';
+  html+='<p style="font-size:12px;color:var(--muted);margin-bottom:6px"><strong style="color:var(--accent)">Organization:</strong> '+(esc(STATE.metadata.org)||"<em>Not set</em>")+' &middot; <strong style="color:var(--accent)">Domain:</strong> '+(esc(STATE.metadata.domain)||"<em>Not set</em>")+'</p>';
+  html+='<p style="font-size:12px;color:var(--muted);margin-bottom:6px"><strong style="color:var(--accent)">Priority:</strong> <span class="badge '+(STATE.claim.priority==="P1"?"b-red":STATE.claim.priority==="P2"?"b-amber":"b-gray")+'">'+esc(STATE.claim.priority)+'</span>';
+  html+=' <strong style="color:var(--accent);margin-left:8px">Risk:</strong> <span class="badge '+(STATE.review.risk_level==="high"?"b-red":STATE.review.risk_level==="medium"?"b-amber":"b-green")+'">'+esc(STATE.review.risk_level)+'</span>';
+  html+=' <strong style="color:var(--accent);margin-left:8px">Status:</strong> <span class="badge b-cyan">'+esc(STATE.metadata.status)+'</span></p>';
+  html+='</div>';
+
+  /* CERPA step cards */
+  html+='<h3 style="margin:16px 0 10px;font-size:13px;color:#cfe2f7;letter-spacing:.4px;text-transform:uppercase">CERPA Workflow</h3>';
+  html+='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">';
+  STEP_LABELS.forEach(function(s,i){
+    var isDone=prog[s.key];
+    var cls=isDone?"sc-done":"sc-future";
+    var stLabel=isDone?"Complete":"Incomplete";
+    var stColor=isDone?"color:var(--ok)":"color:var(--muted)";
+    html+='<div class="step-card '+cls+'" data-step="'+s.tab+'" style="text-align:center"><div class="sc-num" style="color:'+s.color+'">'+(i+1)+'</div><div class="sc-name" style="color:'+s.color+'">'+esc(s.label)+'</div><div class="sc-status" style="'+stColor+'">'+stLabel+'</div></div>';
+  });
+  html+='</div>';
+
+  /* Health cards */
+  html+='<h3 style="margin:16px 0 10px;font-size:13px;color:#cfe2f7;letter-spacing:.4px;text-transform:uppercase">Health Summary</h3>';
+  html+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">';
+  var claimHealth=prog.claim?"defined":"missing";
+  var evidenceLoad=nEvents>0?(nEvents>=3?"strong":"light"):"none";
+  var memComplete=(STATE.memory.lineage_notes||STATE.memory.prior_related_cases.length||STATE.memory.retrieval_tags.length)?"partial":"empty";
+  html+='<div class="card" style="text-align:center"><h4 style="color:var(--c-claim)">Claim Health</h4><span class="badge '+(claimHealth==="defined"?"b-green":"b-red")+'">'+claimHealth+'</span></div>';
+  html+='<div class="card" style="text-align:center"><h4 style="color:var(--c-event)">Evidence Load</h4><span class="badge '+(evidenceLoad==="strong"?"b-green":evidenceLoad==="light"?"b-amber":"b-red")+'">'+evidenceLoad+' ('+nEvents+')</span></div>';
+  html+='<div class="card" style="text-align:center"><h4 style="color:var(--c-review)">Review Confidence</h4><span class="badge '+(conf>=70?"b-green":conf>=40?"b-amber":"b-red")+'">'+conf+'%</span></div>';
+  html+='<div class="card" style="text-align:center"><h4 style="color:var(--c-patch)">Patch Readiness</h4><span class="badge '+(prog.patch?"b-green":"b-amber")+'">'+(prog.patch?"ready":"pending")+'</span></div>';
+  html+='<div class="card" style="text-align:center"><h4 style="color:var(--c-apply)">Apply Status</h4><span class="badge '+(prog.apply?"b-green":"b-amber")+'">'+esc(STATE.apply.execution_status.replace(/_/g," "))+'</span></div>';
+  html+='<div class="card" style="text-align:center"><h4>Memory Completeness</h4><span class="badge '+(memComplete==="partial"?"b-amber":"b-gray")+'">'+memComplete+'</span></div>';
+  html+='</div>';
+
+  /* Next step */
+  var nextStep=STEP_LABELS.find(function(s){return!prog[s.key]});
+  if(nextStep){
+    html+='<div style="margin-top:16px;text-align:center"><button class="primary" id="btnNextStep" data-step="'+nextStep.tab+'">Continue: '+esc(nextStep.label)+' &#9654;</button></div>';
+  }
+
+  /* Demo */
+  if(!STATE.claim.title&&!STATE.events.length){
+    html+='<div style="margin-top:20px;text-align:center;padding:20px;border:1px dashed var(--line);border-radius:10px"><p style="color:var(--muted);font-size:11px;margin-bottom:8px">No CERPA data yet. Start a new claim or load a sample scenario.</p><button class="warn" id="btnLoadDemo">Load Demo: Supply Chain Drift Detection</button></div>';
+  }
+
+  setHTML(sec,html);
+  sec.querySelectorAll("[data-step]").forEach(function(c){c.addEventListener("click",function(){var t=c.getAttribute("data-step");if(t&&t!=="overview")setTab(t)})});
+  var btn=$("btnNextStep");if(btn)btn.addEventListener("click",function(){setTab(btn.getAttribute("data-step"))});
+  var btnDemo=$("btnLoadDemo");if(btnDemo)btnDemo.addEventListener("click",function(){loadDemoData()});
+}
+
+/* ══════════ SECTION 10: CLAIM TAB ══════════ */
+function renderClaim(){
+  var sec=$("tab-claim");var cl=STATE.claim;
+  var html='<div class="card"><h3 style="color:var(--c-claim)">Claim Definition</h3>';
+  html+='<p style="font-size:10px;color:var(--muted);margin-bottom:10px">What is being asserted, required, detected, or framed as the issue?</p>';
+  html+='<div class="grid2">';
+  html+=dfInput("cl-title","Claim Title",cl.title);
+  html+=dfSelect("cl-type","Claim Type",["","assertion","requirement","detection","observation","hypothesis","directive","alert","anomaly"],cl.type);
+  html+=dfInput("cl-source","Source / Origin",cl.source);
+  html+=dfInput("cl-authority","Authority",cl.authority);
+  html+=dfSelect("cl-priority","Priority",["P1","P2","P3","P4"],cl.priority);
+  html+='<div></div>';
+  html+='</div>';
+  html+=dfTextarea("cl-statement","Claim Statement",cl.statement);
+  html+='</div>';
+
+  html+='<div class="grid2">';
+  html+='<div class="card"><h4>Assumptions</h4><div id="cl-ls-assumptions"></div></div>';
+  html+='<div class="card"><h4>Constraints</h4><div id="cl-ls-constraints"></div></div>';
+  html+='<div class="card"><h4>Success Criteria</h4><div id="cl-ls-success"></div></div>';
+  html+='<div class="card"><h4>Tags</h4><div id="cl-ls-tags"></div></div>';
+  html+='</div>';
+
+  setHTML(sec,html);
+  var fields=[["cl-title","title"],["cl-statement","statement"],["cl-type","type"],["cl-source","source"],["cl-authority","authority"],["cl-priority","priority"]];
+  fields.forEach(function(f){
+    var el=$("sf-"+f[0]);if(!el)return;
+    var handler=function(){mutate(function(){cl[f[1]]=el.value})};
+    if(el.tagName==="SELECT")el.addEventListener("change",handler);
+    else el.addEventListener("blur",handler);
+  });
+  renderListItems(cl.assumptions,"cl-ls-assumptions");
+  renderListItems(cl.constraints,"cl-ls-constraints");
+  renderListItems(cl.success_criteria,"cl-ls-success");
+  renderListItems(cl.tags,"cl-ls-tags");
+}
+
+/* ══════════ SECTION 11: EVENT TAB ══════════ */
+function renderEvent(){
+  var sec=$("tab-event");
+  var html='<div class="card"><h3 style="color:var(--c-event)">Event Log</h3>';
+  html+='<p style="font-size:10px;color:var(--muted);margin-bottom:10px">What happened, what was observed, and what evidence exists?</p>';
+  html+='<button class="primary" id="btnAddEvent">+ Add Event</button>';
+  html+='</div>';
+
+  if(STATE.events.length){
+    html+='<div id="eventList">';
+    STATE.events.forEach(function(ev,i){
+      var sevCls=ev.severity==="high"?"b-red":ev.severity==="medium"?"b-amber":"b-green";
+      var confPct=Math.round((ev.confidence||0.5)*100);
+      html+='<div class="ev-card" data-evi="'+i+'">';
+      html+='<div style="display:flex;align-items:center;gap:8px"><span class="ev-title" style="flex:1">'+esc(ev.title||"Untitled Event")+'</span>';
+      html+='<span class="badge '+sevCls+'">'+esc(ev.severity)+'</span>';
+      html+='<span class="badge b-cyan">'+confPct+'%</span>';
+      html+='<button class="danger" data-rmev="'+i+'" style="padding:2px 6px;font-size:10px">&times;</button></div>';
+      html+='<div class="ev-meta">'+esc(ev.type)+' &middot; '+fmtDate(ev.timestamp)+' &middot; '+esc(ev.source||"no source")+'</div>';
+      if(ev.description)html+='<p style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.5">'+esc(ev.description.substring(0,200))+(ev.description.length>200?"...":"")+'</p>';
+      html+='</div>';
+    });
+    html+='</div>';
+  }else{
+    html+='<p style="color:var(--muted);font-size:11px;text-align:center;padding:30px">No events recorded. Click + Add Event to begin evidence collection.</p>';
+  }
+
+  setHTML(sec,html);
+  $("btnAddEvent").addEventListener("click",function(){
+    var ev=defaultEvent();
+    mutate(function(){STATE.events.push(ev)});
+    openEventDrawer(STATE.events.length-1);
+  });
+  sec.querySelectorAll(".ev-card").forEach(function(c){
+    c.addEventListener("click",function(e){
+      if(e.target.hasAttribute("data-rmev"))return;
+      openEventDrawer(parseInt(c.getAttribute("data-evi")));
+    });
+  });
+  sec.querySelectorAll("[data-rmev]").forEach(function(b){
+    b.addEventListener("click",function(e){
+      e.stopPropagation();
+      var i=parseInt(b.getAttribute("data-rmev"));
+      mutate(function(){STATE.events.splice(i,1)});
+      renderEvent();
+      showToast("Event removed","warn");
+    });
+  });
+}
+
+function openEventDrawer(idx){
+  var ev=STATE.events[idx];if(!ev)return;
+  var html='<div class="df"><label>Title</label><input id="ev-title" type="text" value="'+esc(ev.title)+'"/></div>';
+  html+='<div class="grid2">';
+  html+='<div class="df"><label>Type</label><select id="ev-type">';
+  ["observation","detection","alert","anomaly","report","intelligence","measurement","feedback"].forEach(function(t){
+    html+='<option'+(ev.type===t?' selected':'')+'>'+t+'</option>';
+  });
+  html+='</select></div>';
+  html+='<div class="df"><label>Severity</label><select id="ev-severity">';
+  ["low","medium","high","critical"].forEach(function(s){html+='<option'+(ev.severity===s?' selected':'')+'>'+s+'</option>'});
+  html+='</select></div>';
+  html+='</div>';
+  html+='<div class="grid2">';
+  html+='<div class="df"><label>Source</label><input id="ev-source" type="text" value="'+esc(ev.source)+'"/></div>';
+  html+='<div class="df"><label>Timestamp</label><input id="ev-timestamp" type="datetime-local" value="'+esc(ev.timestamp)+'"/></div>';
+  html+='</div>';
+  html+='<div class="df"><label>Description</label><textarea id="ev-desc" style="height:100px">'+esc(ev.description)+'</textarea></div>';
+  html+='<div class="df"><label>Evidence</label><textarea id="ev-evidence" style="height:100px">'+esc(ev.evidence)+'</textarea></div>';
+  html+='<div class="df"><label>Confidence</label><div class="conf-slider"><input type="range" id="ev-conf" min="0" max="100" value="'+Math.round(ev.confidence*100)+'"/><span class="conf-val" id="ev-conf-val">'+Math.round(ev.confidence*100)+'%</span></div></div>';
+  html+='<div class="df"><label>Tags (comma-separated)</label><input id="ev-tags" type="text" value="'+esc((ev.tags||[]).join(", "))+'"/></div>';
+  html+='<button class="ok" id="btnSaveEvent" style="margin-top:12px;width:100%">Save Event</button>';
+
+  openDrawer("Event Detail",html);
+
+  $("ev-conf").addEventListener("input",function(){$("ev-conf-val").textContent=this.value+"%"});
+  $("btnSaveEvent").addEventListener("click",function(){
+    mutate(function(){
+      ev.title=$("ev-title").value;
+      ev.type=$("ev-type").value;
+      ev.severity=$("ev-severity").value;
+      ev.source=$("ev-source").value;
+      ev.timestamp=$("ev-timestamp").value;
+      ev.description=$("ev-desc").value;
+      ev.evidence=$("ev-evidence").value;
+      ev.confidence=parseInt($("ev-conf").value)/100;
+      ev.tags=$("ev-tags").value.split(",").map(function(t){return t.trim()}).filter(Boolean);
+    });
+    closeDrawer();renderEvent();showToast("Event saved","ok");
+  });
+}
+
+/* ══════════ SECTION 12: REVIEW TAB ══════════ */
+function renderReview(){
+  var sec=$("tab-review");var rv=STATE.review;
+  var html='<div class="card"><h3 style="color:var(--c-review)">Review Workspace</h3>';
+  html+='<p style="font-size:10px;color:var(--muted);margin-bottom:10px">What does the evidence mean? Evaluate findings, assess confidence, and document rationale.</p>';
+  html+=dfTextarea("rv-summary","Review Summary",rv.summary);
+  html+='<div class="grid2">';
+  html+='<div class="df"><label>Confidence</label><div class="conf-slider"><input type="range" id="rv-conf" min="0" max="100" value="'+Math.round(rv.confidence*100)+'"/><span class="conf-val" id="rv-conf-val">'+Math.round(rv.confidence*100)+'%</span></div></div>';
+  html+=dfSelect("rv-risk","Risk Level",["low","medium","high","critical"],rv.risk_level);
+  html+='</div>';
+  html+=dfTextarea("rv-rationale","Rationale",rv.rationale);
+  html+=dfTextarea("rv-decision-basis","Decision Basis",rv.decision_basis);
+  html+='</div>';
+
+  /* Findings */
+  html+='<div class="card"><h3>Findings</h3>';
+  html+='<button class="primary" id="btnAddFinding" style="margin-bottom:8px">+ Add Finding</button>';
+  if(rv.findings.length){
+    rv.findings.forEach(function(f,i){
+      var clsCls=f.finding_class==="supported"?"b-green":f.finding_class==="refuted"?"b-red":"b-amber";
+      html+='<div class="ev-card" data-fi="'+i+'">';
+      html+='<div style="display:flex;align-items:center;gap:8px"><span class="ev-title" style="flex:1">'+esc(f.title||"Finding "+(i+1))+'</span>';
+      html+='<span class="badge '+clsCls+'">'+esc(f.finding_class)+'</span>';
+      html+='<button class="danger" data-rmf="'+i+'" style="padding:2px 6px;font-size:10px">&times;</button></div>';
+      if(f.statement)html+='<p style="font-size:10px;color:var(--muted);margin-top:4px">'+esc(f.statement.substring(0,150))+'</p>';
+      html+='</div>';
+    });
+  }
+  html+='</div>';
+
+  html+='<div class="grid2">';
+  html+='<div class="card"><h4>Options Considered</h4><div id="rv-ls-options"></div></div>';
+  html+='<div class="card"><h4>Rejected Options</h4><div id="rv-ls-rejected"></div></div>';
+  html+='<div class="card" style="grid-column:1/-1"><h4>Drift Signals</h4><div id="rv-ls-drift"></div></div>';
+  html+='</div>';
+
+  setHTML(sec,html);
+
+  var rvSum=$("sf-rv-summary");if(rvSum)rvSum.addEventListener("blur",function(){mutate(function(){rv.summary=rvSum.value})});
+  var rvRat=$("sf-rv-rationale");if(rvRat)rvRat.addEventListener("blur",function(){mutate(function(){rv.rationale=rvRat.value})});
+  var rvDB=$("sf-rv-decision-basis");if(rvDB)rvDB.addEventListener("blur",function(){mutate(function(){rv.decision_basis=rvDB.value})});
+  var rvRisk=$("sf-rv-risk");if(rvRisk)rvRisk.addEventListener("change",function(){mutate(function(){rv.risk_level=rvRisk.value})});
+  var rvConf=$("rv-conf");
+  if(rvConf){
+    rvConf.addEventListener("input",function(){$("rv-conf-val").textContent=this.value+"%"});
+    rvConf.addEventListener("change",function(){mutate(function(){rv.confidence=parseInt(rvConf.value)/100})});
+  }
+
+  $("btnAddFinding").addEventListener("click",function(){
+    var f=defaultFinding();
+    mutate(function(){rv.findings.push(f)});
+    openFindingDrawer(rv.findings.length-1);
+  });
+  sec.querySelectorAll("[data-fi]").forEach(function(c){
+    c.addEventListener("click",function(e){
+      if(e.target.hasAttribute("data-rmf"))return;
+      openFindingDrawer(parseInt(c.getAttribute("data-fi")));
+    });
+  });
+  sec.querySelectorAll("[data-rmf]").forEach(function(b){
+    b.addEventListener("click",function(e){
+      e.stopPropagation();
+      var i=parseInt(b.getAttribute("data-rmf"));
+      mutate(function(){rv.findings.splice(i,1)});
+      renderReview();showToast("Finding removed","warn");
+    });
+  });
+
+  renderListItems(rv.options_considered,"rv-ls-options");
+  renderListItems(rv.rejected_options,"rv-ls-rejected");
+  renderListItems(rv.drift_signals,"rv-ls-drift");
+}
+
+function openFindingDrawer(idx){
+  var f=STATE.review.findings[idx];if(!f)return;
+  var html='<div class="df"><label>Title</label><input id="fd-title" type="text" value="'+esc(f.title)+'"/></div>';
+  html+='<div class="df"><label>Finding Class</label><select id="fd-class">';
+  ["supported","refuted","inconclusive","partial"].forEach(function(c){html+='<option'+(f.finding_class===c?' selected':'')+'>'+c+'</option>'});
+  html+='</select></div>';
+  html+='<div class="df"><label>Statement</label><textarea id="fd-statement">'+esc(f.statement)+'</textarea></div>';
+  html+='<div class="grid2">';
+  html+='<div class="df"><label>Risk</label><select id="fd-risk">';
+  ["low","medium","high","critical"].forEach(function(r){html+='<option'+(f.risk===r?' selected':'')+'>'+r+'</option>'});
+  html+='</select></div>';
+  html+='<div class="df"><label>Confidence</label><div class="conf-slider"><input type="range" id="fd-conf" min="0" max="100" value="'+Math.round(f.confidence*100)+'"/><span class="conf-val" id="fd-conf-val">'+Math.round(f.confidence*100)+'%</span></div></div>';
+  html+='</div>';
+  html+='<div class="df"><label>Evidence Links (comma-separated)</label><input id="fd-links" type="text" value="'+esc((f.evidence_links||[]).join(", "))+'"/></div>';
+  html+='<div class="df"><label>Notes</label><textarea id="fd-notes">'+esc(f.notes)+'</textarea></div>';
+  html+='<button class="ok" id="btnSaveFinding" style="margin-top:12px;width:100%">Save Finding</button>';
+
+  openDrawer("Finding Detail",html);
+  $("fd-conf").addEventListener("input",function(){$("fd-conf-val").textContent=this.value+"%"});
+  $("btnSaveFinding").addEventListener("click",function(){
+    mutate(function(){
+      f.title=$("fd-title").value;
+      f.finding_class=$("fd-class").value;
+      f.statement=$("fd-statement").value;
+      f.risk=$("fd-risk").value;
+      f.confidence=parseInt($("fd-conf").value)/100;
+      f.evidence_links=$("fd-links").value.split(",").map(function(t){return t.trim()}).filter(Boolean);
+      f.notes=$("fd-notes").value;
+    });
+    closeDrawer();renderReview();showToast("Finding saved","ok");
+  });
+}
+
+/* ══════════ SECTION 13: PATCH TAB ══════════ */
+function renderPatch(){
+  var sec=$("tab-patch");var pa=STATE.patch;
+  var html='<div class="card"><h3 style="color:var(--c-patch)">Patch Definition</h3>';
+  html+='<p style="font-size:10px;color:var(--muted);margin-bottom:10px">What change are we making in response? Define the corrective action.</p>';
+  html+='<div class="grid2">';
+  html+=dfInput("pa-action","Selected Action",pa.selected_action);
+  html+=dfSelect("pa-type","Patch Type",["","corrective","preventive","adaptive","investigative","escalation","rollback","policy_change","configuration","process_update"],pa.patch_type);
+  html+=dfInput("pa-owner","Owner",pa.owner);
+  html+=dfDate("pa-due","Due Date",pa.due_date);
+  html+='</div>';
+  html+=dfTextarea("pa-summary","Change Summary",pa.change_summary);
+  html+='<div class="grid2">';
+  html+=dfTextarea("pa-blast","Blast Radius",pa.blast_radius);
+  html+=dfTextarea("pa-rollback","Rollback Plan",pa.rollback_plan);
+  html+='</div>';
+  html+=dfInput("pa-kill","Kill Switch",pa.kill_switch);
+  html+=dfTextarea("pa-notes","Notes",pa.notes);
+  html+='</div>';
+
+  html+='<div class="grid2">';
+  html+='<div class="card"><h4>Dependencies</h4><div id="pa-ls-deps"></div></div>';
+  html+='<div class="card"><h4>Approvals</h4><div id="pa-ls-approvals"></div></div>';
+  html+='</div>';
+
+  setHTML(sec,html);
+  var binds=[["pa-action","selected_action"],["pa-type","patch_type"],["pa-owner","owner"],["pa-due","due_date"],["pa-summary","change_summary"],["pa-blast","blast_radius"],["pa-rollback","rollback_plan"],["pa-kill","kill_switch"],["pa-notes","notes"]];
+  binds.forEach(function(b){
+    var el=$("sf-"+b[0]);if(!el)return;
+    var handler=function(){mutate(function(){pa[b[1]]=el.value})};
+    if(el.tagName==="SELECT")el.addEventListener("change",handler);
+    else el.addEventListener("blur",handler);
+  });
+  renderListItems(pa.dependencies,"pa-ls-deps");
+  renderListItems(pa.approvals,"pa-ls-approvals");
+}
+
+/* ══════════ SECTION 14: APPLY TAB ══════════ */
+function renderApply(){
+  var sec=$("tab-apply");var ap=STATE.apply;
+  var actionsDone=ap.actions.filter(function(a){return a.status==="done"}).length;
+  var actionsPct=pct(actionsDone,ap.actions.length);
+
+  var html='<div class="card"><h3 style="color:var(--c-apply)">Execution &amp; Validation</h3>';
+  html+='<p style="font-size:10px;color:var(--muted);margin-bottom:10px">What got executed, validated, and learned?</p>';
+  html+=dfSelect("ap-status","Execution Status",["not_started","in_progress","blocked","completed","validated","rolled_back"],ap.execution_status);
+  html+='</div>';
+
+  /* Action tracker */
+  html+='<div class="card"><h3>Action Tracker</h3>';
+  if(ap.actions.length){
+    html+='<div class="progress-bar"><div class="progress-fill" style="width:'+actionsPct+'%;background:var(--c-apply)"></div></div>';
+    html+='<p style="font-size:10px;color:var(--muted);margin-bottom:8px">'+actionsDone+'/'+ap.actions.length+' actions complete ('+actionsPct+'%)</p>';
+  }
+  html+='<table><thead><tr><th>Action</th><th>Owner</th><th>Due</th><th>Status</th><th>Done When</th><th></th></tr></thead><tbody id="apActionBody">';
+  ap.actions.forEach(function(a,i){
+    var stCls=a.status==="done"?"b-green":a.status==="in_progress"?"b-amber":"b-gray";
+    html+='<tr><td><input type="text" value="'+esc(a.action)+'" data-api="'+i+'" data-apf="action" style="background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:4px;padding:3px 6px;font-size:10px;width:100%"/></td>';
+    html+='<td><input type="text" value="'+esc(a.owner)+'" data-api="'+i+'" data-apf="owner" style="background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:4px;padding:3px 6px;font-size:10px;width:100%"/></td>';
+    html+='<td><input type="date" value="'+esc(a.due)+'" data-api="'+i+'" data-apf="due" style="background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:4px;padding:3px 6px;font-size:10px"/></td>';
+    html+='<td><select data-api="'+i+'" data-apf="status" style="background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:4px;padding:3px 6px;font-size:10px">';
+    ["open","in_progress","blocked","done"].forEach(function(s){html+='<option'+(a.status===s?' selected':'')+'>'+s+'</option>'});
+    html+='</select></td>';
+    html+='<td><input type="text" value="'+esc(a.done_when)+'" data-api="'+i+'" data-apf="done_when" style="background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:4px;padding:3px 6px;font-size:10px;width:100%"/></td>';
+    html+='<td><button class="danger" data-rmap="'+i+'" style="padding:2px 6px;font-size:10px">&times;</button></td></tr>';
+  });
+  html+='</tbody></table>';
+  html+='<button class="primary" id="btnAddAction" style="margin-top:8px">+ Add Action</button></div>';
+
+  /* Validation */
+  html+='<div class="card"><h3>Validation</h3>';
+  html+=dfTextarea("ap-val-method","Validation Method",ap.validation_method);
+  html+=dfTextarea("ap-val-evidence","Validation Evidence",ap.validation_evidence);
+  html+='</div>';
+
+  /* Outcomes */
+  html+='<div class="card"><h3>Outcomes</h3>';
+  html+=dfTextarea("ap-outcome","Outcome Summary",ap.outcome_summary);
+  html+=dfDatetime("ap-completed","Completed At",ap.completed_at);
+  html+='</div>';
+
+  html+='<div class="grid2">';
+  html+='<div class="card"><h4>Lessons Observed</h4><div id="ap-ls-lessons"></div></div>';
+  html+='<div class="card"><h4>Follow-on Actions</h4><div id="ap-ls-followon"></div></div>';
+  html+='</div>';
+
+  setHTML(sec,html);
+
+  var apStatus=$("sf-ap-status");if(apStatus)apStatus.addEventListener("change",function(){mutate(function(){ap.execution_status=apStatus.value});renderApply()});
+
+  sec.querySelectorAll("[data-api]").forEach(function(el){
+    var handler=function(){
+      var i=parseInt(el.getAttribute("data-api"));var f=el.getAttribute("data-apf");
+      mutate(function(){ap.actions[i][f]=el.value});
+      if(f==="status")renderApply();
+    };
+    if(el.tagName==="SELECT")el.addEventListener("change",handler);
+    else el.addEventListener("blur",handler);
+  });
+  sec.querySelectorAll("[data-rmap]").forEach(function(b){
+    b.addEventListener("click",function(){var i=parseInt(b.getAttribute("data-rmap"));mutate(function(){ap.actions.splice(i,1)});renderApply()});
+  });
+  $("btnAddAction").addEventListener("click",function(){
+    mutate(function(){ap.actions.push(defaultAction())});renderApply();
+  });
+
+  var valBinds=[["ap-val-method","validation_method"],["ap-val-evidence","validation_evidence"],["ap-outcome","outcome_summary"],["ap-completed","completed_at"]];
+  valBinds.forEach(function(b){
+    var el=$("sf-"+b[0]);if(!el)return;
+    el.addEventListener("blur",function(){mutate(function(){ap[b[1]]=el.value})});
+  });
+  renderListItems(ap.lessons_observed,"ap-ls-lessons");
+  renderListItems(ap.follow_on_actions,"ap-ls-followon");
+}
+
+/* ══════════ SECTION 15: CROSSWALK TAB ══════════ */
+function renderCrosswalk(){
+  var sec=$("tab-crosswalk");
+  var html='<div class="card"><h3>CERPA &harr; MCPP Crosswalk</h3>';
+  html+='<p style="font-size:10px;color:var(--muted);margin-bottom:14px">CERPA is the canonical operating model. MCPP mapping is provided as a doctrinal reference aid only.</p>';
+
+  var mappings=[
+    ["Problem Framing","Claim","What is the issue or assertion being framed?"],
+    ["COA Development","Event","What evidence and observations inform options?"],
+    ["COA Wargaming","Review","What does the evidence mean when stress-tested?"],
+    ["Decision / Orders","Patch","What corrective response is selected and planned?"],
+    ["Transition","Apply","What gets executed, validated, and recorded?"]
+  ];
+
+  html+='<div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;align-items:center;margin-bottom:16px">';
+  html+='<div style="text-align:center;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:8px">MCPP (Reference)</div>';
+  html+='<div></div>';
+  html+='<div style="text-align:center;font-size:9px;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;padding:8px;font-weight:700">CERPA (Canonical)</div>';
+  html+='<div></div>';
+  html+='<div style="text-align:center;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:8px">Purpose</div>';
+  html+='</div>';
+
+  mappings.forEach(function(m){
+    html+='<div class="xwalk-row">';
+    html+='<div class="xwalk-col xwalk-mcpp">'+esc(m[0])+'</div>';
+    html+='<span class="xwalk-arrow">&#10132;</span>';
+    html+='<div class="xwalk-col xwalk-cerpa">'+esc(m[1])+'</div>';
+    html+='<span class="xwalk-arrow">=</span>';
+    html+='<div style="flex:1.2;font-size:10px;color:var(--muted)">'+esc(m[2])+'</div>';
+    html+='</div>';
+  });
+  html+='</div>';
+
+  html+='<div class="card"><h3>Framework Notes</h3>';
+  html+='<p style="font-size:11px;color:var(--muted);line-height:1.7">CERPA (Claim &rarr; Event &rarr; Review &rarr; Patch &rarr; Apply) is an evidence-first, correction-oriented decision cycle designed for institutional decision infrastructure. Unlike MCPP, which is optimized for military operational planning with mission-oriented sequential steps, CERPA is domain-agnostic and centers on <strong style="color:var(--accent)">traceability</strong>, <strong style="color:var(--accent)">evidence</strong>, <strong style="color:var(--accent)">correction</strong>, and <strong style="color:var(--accent)">validation</strong>.</p>';
+  html+='<p style="font-size:11px;color:var(--muted);line-height:1.7;margin-top:8px">The crosswalk exists to help practitioners familiar with MCPP translate their existing mental models. CERPA should be used as the primary frame for all new work.</p>';
+  html+='</div>';
+
+  setHTML(sec,html);
+}
+
+/* ══════════ SECTION 16: TIMELINE TAB ══════════ */
+function renderTimeline(){
+  var sec=$("tab-timeline");var tl=STATE.timeline;
+  var html='<div class="card"><h3>CERPA Timeline</h3>';
+  html+='<button class="primary" id="btnAutoMilestones" style="margin-bottom:10px">Auto-Generate from State</button>';
+  html+=' <button class="primary" id="btnAddMilestone">+ Add Milestone</button>';
+  html+='</div>';
+
+  if(tl.milestones.length){
+    var sorted=tl.milestones.slice().sort(function(a,b){return(a.datetime||"").localeCompare(b.datetime||"")});
+    html+='<div class="tl-vertical"><div class="tl-line"></div>';
+    sorted.forEach(function(m,i){
+      var catCls="tl-"+(m.category||"claim");
+      html+='<div class="tl-item"><div class="tl-dot '+catCls+'"></div>';
+      html+='<div class="tl-content"><div class="tl-name">'+esc(m.name)+'</div>';
+      html+='<div class="tl-date">'+fmtDate(m.datetime)+'</div>';
+      html+='<div class="tl-cat" style="color:var(--muted)">'+esc(m.category||"claim")+'</div>';
+      html+='<button class="danger" data-rmml="'+i+'" style="margin-top:4px;font-size:9px;padding:2px 6px">&times;</button>';
+      html+='</div></div>';
+    });
+    html+='</div>';
+  }else{
+    html+='<p style="color:var(--muted);font-size:11px;text-align:center;padding:20px">No milestones. Click Auto-Generate or + Add Milestone.</p>';
+  }
+
+  setHTML(sec,html);
+
+  $("btnAutoMilestones").addEventListener("click",function(){
+    var prog=cerpaProgress();
+    mutate(function(){
+      tl.milestones=[];
+      var now=new Date().toISOString();
+      tl.milestones.push({name:"Session Created",datetime:STATE.metadata.created||now,category:"claim"});
+      if(prog.claim)tl.milestones.push({name:"Claim Defined",datetime:now,category:"claim"});
+      if(prog.event)tl.milestones.push({name:"Evidence Collected ("+STATE.events.length+" events)",datetime:now,category:"event"});
+      if(prog.review)tl.milestones.push({name:"Review Complete ("+Math.round(STATE.review.confidence*100)+"% confidence)",datetime:now,category:"review"});
+      if(prog.patch)tl.milestones.push({name:"Patch Selected: "+STATE.patch.selected_action,datetime:now,category:"patch"});
+      if(prog.apply)tl.milestones.push({name:"Apply: "+STATE.apply.execution_status.replace(/_/g," "),datetime:now,category:"apply"});
+      STATE.apply.actions.forEach(function(a){
+        if(a.due)tl.milestones.push({name:a.action||"Action Due",datetime:a.due+"T00:00:00",category:"apply"});
+      });
+    });
+    showToast("Milestones auto-generated","ok");renderTimeline();
+  });
+
+  $("btnAddMilestone").addEventListener("click",function(){
+    openDrawer("Add Milestone",'<div class="df"><label>Name</label><input id="ml-name" type="text"/></div><div class="df"><label>Date/Time</label><input id="ml-dt" type="datetime-local"/></div><div class="df"><label>Category</label><select id="ml-cat"><option>claim</option><option>event</option><option>review</option><option>patch</option><option>apply</option></select></div><button class="ok" id="btnSaveMl" style="margin-top:10px">Save</button>');
+    $("btnSaveMl").addEventListener("click",function(){
+      var name=$("ml-name").value;var dt=$("ml-dt").value;var cat=$("ml-cat").value;
+      if(!name){showToast("Name required","warn");return}
+      mutate(function(){tl.milestones.push({name:name,datetime:dt||new Date().toISOString(),category:cat})});
+      closeDrawer();showToast("Milestone added","ok");renderTimeline();
+    });
+  });
+
+  sec.querySelectorAll("[data-rmml]").forEach(function(b){
+    b.addEventListener("click",function(){var i=parseInt(b.getAttribute("data-rmml"));mutate(function(){tl.milestones.splice(i,1)});renderTimeline()});
+  });
+}
+
+/* ══════════ SECTION 17: EXPORTS TAB ══════════ */
+function renderExports(){
+  var sec=$("tab-exports");
+  var storageKB=(store.size()/1024).toFixed(1);
+  var html='<div class="card"><h3>Session Management</h3>';
+  html+='<p style="font-size:11px;color:var(--muted);margin-bottom:10px">Last saved: '+(STATE._lastSaved?fmtDate(STATE._lastSaved):"Never")+' &middot; Storage: '+storageKB+' KB</p>';
+  html+='<div style="display:flex;gap:8px;flex-wrap:wrap">';
+  html+='<button class="primary" id="btnSaveNow">Save Now</button>';
+  html+='<button id="btnLoadStorage">Load from Storage</button>';
+  html+='<button class="danger" id="btnResetAll">Reset All</button>';
+  html+='</div></div>';
+
+  html+='<div class="card"><h3>CERPA Exports</h3><div style="display:flex;gap:8px;flex-wrap:wrap">';
+  html+='<button class="primary" id="btnExportJSON">Full Session JSON</button>';
+  html+='<button id="btnExportPacket">CERPA Packet JSON</button>';
+  html+='<button id="btnExportEventCSV">Event Log CSV</button>';
+  html+='<button id="btnExportActionCSV">Apply Actions CSV</button>';
+  html+='<button id="btnExportSummary">Executive Summary TXT</button>';
+  html+='<button id="btnExportPrint">Printable Packet HTML</button>';
+  html+='</div></div>';
+
+  html+='<div class="card"><h3>Import</h3>';
+  html+='<p style="font-size:11px;color:var(--muted);margin-bottom:8px">Import a previously exported CERPA JSON file to restore state.</p>';
+  html+='<input type="file" id="importFile" accept=".json" style="font-size:11px;color:var(--muted)"/>';
+  html+='</div>';
+
+  setHTML(sec,html);
+
+  $("btnSaveNow").addEventListener("click",function(){doSave();showToast("Saved","ok");renderExports()});
+  $("btnLoadStorage").addEventListener("click",function(){if(loadState()){showToast("State loaded","ok");updateProgress();renderTab(currentTab)}else{showToast("No saved state found","warn")}});
+  $("btnResetAll").addEventListener("click",function(){
+    var overlay=document.createElement("div");overlay.className="confirm-overlay";
+    overlay.innerHTML='<div class="confirm-card"><h4>Reset All CERPA Data?</h4><p>This will permanently delete all claim, event, review, patch, and apply data. This cannot be undone.</p><div class="confirm-btns"><button class="danger" id="confirmReset">Reset Everything</button><button id="cancelReset">Cancel</button></div></div>';
+    document.body.appendChild(overlay);
+    document.getElementById("confirmReset").addEventListener("click",function(){
+      STATE=defaultState();store.remove(STORE_KEY);
+      overlay.remove();showToast("All data reset","warn");updateProgress();updateSaveIndicator();setTab("overview");
+    });
+    document.getElementById("cancelReset").addEventListener("click",function(){overlay.remove()});
+  });
+
+  /* Export handlers */
+  $("btnExportJSON").addEventListener("click",function(){
+    var s=deepClone(STATE);delete s._dirty;
+    downloadFile(JSON.stringify(s,null,2),(STATE.metadata.title||STATE.claim.title||"cerpa")+"_session.json","application/json");
+  });
+
+  $("btnExportPacket").addEventListener("click",function(){
+    var pkt=buildPacket();
+    downloadFile(JSON.stringify(pkt,null,2),(STATE.metadata.title||STATE.claim.title||"cerpa")+"_packet.json","application/json");
+  });
+
+  $("btnExportEventCSV").addEventListener("click",function(){
+    var csv="id,title,type,source,timestamp,description,evidence,confidence,severity,tags\n";
+    STATE.events.forEach(function(e){
+      csv+='"'+e.id+'","'+esc(e.title)+'","'+e.type+'","'+esc(e.source)+'","'+e.timestamp+'","'+esc(e.description)+'","'+esc(e.evidence)+'",'+e.confidence+',"'+e.severity+'","'+(e.tags||[]).join(";")+'"\n';
+    });
+    downloadFile(csv,(STATE.claim.title||"cerpa")+"_events.csv","text/csv");
+  });
+
+  $("btnExportActionCSV").addEventListener("click",function(){
+    var csv="id,action,owner,due,status,done_when,validation,notes\n";
+    STATE.apply.actions.forEach(function(a){
+      csv+='"'+a.id+'","'+esc(a.action)+'","'+esc(a.owner)+'","'+a.due+'","'+a.status+'","'+esc(a.done_when)+'","'+esc(a.validation)+'","'+esc(a.notes)+'"\n';
+    });
+    downloadFile(csv,(STATE.claim.title||"cerpa")+"_actions.csv","text/csv");
+  });
+
+  $("btnExportSummary").addEventListener("click",function(){
+    var txt="CERPA EXECUTIVE SUMMARY\n"+("=".repeat(50))+"\n\n";
+    txt+="Title: "+(STATE.metadata.title||STATE.claim.title||"Untitled")+"\n";
+    txt+="Organization: "+(STATE.metadata.org||"N/A")+"\n";
+    txt+="Classification: "+STATE.metadata.classification+"\n";
+    txt+="Status: "+STATE.metadata.status+"\n";
+    txt+="Generated: "+new Date().toISOString()+"\n\n";
+    txt+="CLAIM\n"+("-".repeat(30))+"\n";
+    txt+="Title: "+STATE.claim.title+"\nPriority: "+STATE.claim.priority+"\nStatement: "+STATE.claim.statement+"\n\n";
+    txt+="EVENTS ("+STATE.events.length+")\n"+("-".repeat(30))+"\n";
+    STATE.events.forEach(function(e,i){txt+="  "+(i+1)+". "+e.title+" ["+e.severity+"] — "+e.type+"\n"});
+    txt+="\nREVIEW\n"+("-".repeat(30))+"\n";
+    txt+="Confidence: "+Math.round(STATE.review.confidence*100)+"%\nRisk: "+STATE.review.risk_level+"\nSummary: "+STATE.review.summary+"\n\n";
+    txt+="PATCH\n"+("-".repeat(30))+"\n";
+    txt+="Action: "+STATE.patch.selected_action+"\nType: "+STATE.patch.patch_type+"\nOwner: "+STATE.patch.owner+"\n\n";
+    txt+="APPLY\n"+("-".repeat(30))+"\n";
+    txt+="Status: "+STATE.apply.execution_status+"\nActions: "+STATE.apply.actions.length+"\n";
+    STATE.apply.actions.forEach(function(a,i){txt+="  "+(i+1)+". "+a.action+" ["+a.status+"] — "+a.owner+"\n"});
+    txt+="\nPROGRESS\n"+("-".repeat(30))+"\n";
+    var prog=cerpaProgress();
+    STEP_LABELS.forEach(function(s){txt+="  "+s.label+": "+(prog[s.key]?"COMPLETE":"INCOMPLETE")+"\n"});
+    downloadFile(txt,(STATE.claim.title||"cerpa")+"_summary.txt","text/plain");
+  });
+
+  $("btnExportPrint").addEventListener("click",function(){
+    var pkt=buildPacket();
+    var h="<html><head><title>CERPA Packet</title><style>body{font-family:system-ui;max-width:800px;margin:40px auto;line-height:1.6}h1{color:#1a5276}h2{color:#2874a6;border-bottom:2px solid #eee;padding-bottom:4px;margin-top:24px}pre{background:#f5f5f5;padding:12px;border-radius:6px;overflow-x:auto;font-size:11px}.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:6px 8px;text-align:left;font-size:11px}th{background:#f0f0f0}</style></head><body>";
+    h+="<h1>CERPA Packet</h1>";
+    h+="<p><strong>"+esc(STATE.metadata.title||STATE.claim.title)+"</strong> &middot; "+STATE.metadata.classification+" &middot; "+new Date().toLocaleDateString()+"</p>";
+    h+="<h2>Claim</h2><p><strong>"+esc(STATE.claim.title)+"</strong> ["+STATE.claim.priority+"]</p><p>"+esc(STATE.claim.statement)+"</p>";
+    h+="<h2>Events ("+STATE.events.length+")</h2><table><tr><th>Title</th><th>Type</th><th>Severity</th><th>Source</th></tr>";
+    STATE.events.forEach(function(e){h+="<tr><td>"+esc(e.title)+"</td><td>"+e.type+"</td><td>"+e.severity+"</td><td>"+esc(e.source)+"</td></tr>"});
+    h+="</table>";
+    h+="<h2>Review</h2><p>Confidence: "+Math.round(STATE.review.confidence*100)+"% &middot; Risk: "+STATE.review.risk_level+"</p><p>"+esc(STATE.review.summary)+"</p>";
+    h+="<h2>Patch</h2><p><strong>"+esc(STATE.patch.selected_action)+"</strong> ("+esc(STATE.patch.patch_type)+")</p><p>"+esc(STATE.patch.change_summary)+"</p>";
+    h+="<h2>Apply</h2><p>Status: "+STATE.apply.execution_status+"</p><table><tr><th>Action</th><th>Owner</th><th>Status</th></tr>";
+    STATE.apply.actions.forEach(function(a){h+="<tr><td>"+esc(a.action)+"</td><td>"+esc(a.owner)+"</td><td>"+a.status+"</td></tr>"});
+    h+="</table>";
+    if(STATE.apply.outcome_summary)h+="<h2>Outcome</h2><p>"+esc(STATE.apply.outcome_summary)+"</p>";
+    h+="<h2>Raw JSON</h2><pre>"+esc(JSON.stringify(pkt,null,2))+"</pre>";
+    h+="</body></html>";
+    downloadFile(h,(STATE.claim.title||"cerpa")+"_packet.html","text/html");
+  });
+
+  $("importFile").addEventListener("change",function(e){
+    var file=e.target.files[0];if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      try{
+        var data=JSON.parse(ev.target.result);
+        if(data.claim&&data.metadata){
+          STATE=data;STATE._dirty=false;
+          doSave();showToast("CERPA state imported","ok");updateProgress();setTab("overview");
+        }else if(data.metadata&&data.progress){
+          migrateMCPP(data);
+          showToast("MCPP data migrated to CERPA","ok");updateProgress();setTab("overview");
+        }else{showToast("Unrecognized file format","bad")}
+      }catch(err){showToast("Invalid JSON file","bad")}
+    };
+    reader.readAsText(file);
+  });
+}
+
+function buildPacket(){
+  return {
+    metadata:deepClone(STATE.metadata),
+    claim:deepClone(STATE.claim),
+    events:deepClone(STATE.events),
+    review:deepClone(STATE.review),
+    patch:deepClone(STATE.patch),
+    apply:deepClone(STATE.apply),
+    memory:deepClone(STATE.memory),
+    generated:new Date().toISOString()
+  };
+}
+
+/* ══════════ SECTION 18: DOCTRINE TAB ══════════ */
+var DOCTRINE=[
+  {title:"C — Claim",body:"<p><strong style='color:var(--c-claim)'>What is being asserted, required, detected, or framed as the issue?</strong></p><p>The Claim step defines the central assertion, hypothesis, directive, or detected condition that initiates the CERPA cycle. It answers: <em>What do we believe, need, or observe?</em></p><ul><li>Define a clear, falsifiable or actionable claim statement</li><li>Identify the source and authority behind the claim</li><li>Set priority and constraints</li><li>Capture assumptions that could invalidate the claim</li><li>Establish success criteria for resolution</li></ul>"},
+  {title:"E — Event",body:"<p><strong style='color:var(--c-event)'>What happened, what was observed, and what evidence exists?</strong></p><p>Events are the evidence layer — observations, detections, alerts, measurements, and intelligence that inform the claim. Each event should be traceable, timestamped, and assessed for confidence and severity.</p><ul><li>Capture multiple events with structured metadata</li><li>Rate confidence and severity for each</li><li>Link evidence directly to the claim</li><li>Maintain an audit trail of what was observed</li></ul>"},
+  {title:"R — Review",body:"<p><strong style='color:var(--c-review)'>What does the evidence mean?</strong></p><p>Review is the analytical step where evidence is evaluated, findings are classified, and judgment is applied. It produces a confidence-rated assessment with documented rationale.</p><ul><li>Summarize the totality of evidence</li><li>Classify findings as supported, refuted, or inconclusive</li><li>Consider and reject alternative options with reasoning</li><li>Identify drift signals — early indicators of deviation</li><li>Document the decision basis for traceability</li></ul>"},
+  {title:"P — Patch",body:"<p><strong style='color:var(--c-patch)'>What change are we making in response?</strong></p><p>Patch defines the selected corrective, preventive, or adaptive action. It answers: <em>Given what we know, what do we do about it?</em></p><ul><li>Select and classify the action (corrective, preventive, adaptive, etc.)</li><li>Assess blast radius and rollback options</li><li>Identify dependencies and required approvals</li><li>Define a kill switch for rapid reversal</li><li>Assign ownership and deadlines</li></ul>"},
+  {title:"A — Apply",body:"<p><strong style='color:var(--c-apply)'>What got executed, validated, and learned?</strong></p><p>Apply closes the loop: execution, validation, and knowledge capture. Nothing is done until it is validated. Nothing is validated until it is recorded.</p><ul><li>Track execution status and individual actions</li><li>Define and execute validation methods</li><li>Capture outcome evidence</li><li>Record lessons observed (not just learned)</li><li>Identify follow-on actions for the next cycle</li></ul>"},
+  {title:"CERPA vs. MCPP",body:"<p>CERPA is not a replacement for MCPP — it is a different kind of decision cycle with different priorities:</p><ul><li><strong>MCPP</strong>: Mission-oriented, sequential planning for military operations. Optimized for offensive/defensive planning with COA development and wargaming.</li><li><strong>CERPA</strong>: Evidence-first, correction-oriented cycle for institutional decision infrastructure. Optimized for detection, response, validation, and memory.</li></ul><p>Use MCPP when you are planning operations. Use CERPA when you are responding to claims, correcting drift, validating changes, or building institutional memory.</p><p style='margin-top:8px'><strong>Crosswalk:</strong></p><ul><li>Problem Framing → Claim</li><li>COA Development → Event</li><li>COA Wargaming → Review</li><li>Decision / Orders → Patch</li><li>Transition → Apply</li></ul>"},
+  {title:"Evidence-First Thinking",body:"<p>CERPA is built on the principle that <strong>evidence comes before judgment</strong>. Unlike planning frameworks that begin with intent, CERPA begins with observation. The claim is tested against events, not the other way around.</p><p>This inversion matters because most institutional failures are not planning failures — they are failures to observe, validate, or correct.</p>"},
+  {title:"Traceability & Memory",body:"<p>Every CERPA cycle produces a traceable decision record — a <strong>packet</strong> — that connects the claim to its evidence, the evidence to its assessment, the assessment to its correction, and the correction to its validation.</p><p>The Memory layer ensures that future cycles can reference prior decisions, detect drift patterns over time, and avoid repeating validated mistakes.</p>"},
+  {title:"Correction Over Planning",body:"<p>CERPA privileges correction over prediction. Rather than trying to anticipate all possible futures (as in COA development), CERPA assumes that reality will deviate from expectations and builds the correction cycle into the operating model.</p><p>This makes CERPA particularly suited for complex adaptive systems where the environment is changing faster than plans can be updated.</p>"}
+];
+
+function renderDoctrine(){
+  var sec=$("tab-doctrine");
+  var html='<div class="df"><label>Search Doctrine</label><input id="docSearch" type="text" placeholder="Type to filter..."/></div>';
+  DOCTRINE.forEach(function(d,i){
+    html+='<div class="doctrine-card" data-doci="'+i+'">';
+    html+='<div class="doctrine-hdr" data-doci="'+i+'"><h4>'+esc(d.title)+'</h4><span class="chevron">&#9654;</span></div>';
+    html+='<div class="doctrine-body">'+d.body+'</div></div>';
+  });
+  setHTML(sec,html);
+  sec.querySelectorAll(".doctrine-hdr").forEach(function(hdr){
+    hdr.addEventListener("click",function(){
+      hdr.classList.toggle("open");
+      var body=hdr.nextElementSibling;body.classList.toggle("open");
+    });
+  });
+  $("docSearch").addEventListener("input",function(){
+    var q=this.value.toLowerCase();
+    sec.querySelectorAll(".doctrine-card").forEach(function(card){
+      var idx=parseInt(card.getAttribute("data-doci"));
+      var d=DOCTRINE[idx];
+      var match=!q||d.title.toLowerCase().includes(q)||d.body.toLowerCase().includes(q);
+      card.style.display=match?"":"none";
+    });
+  });
+}
+
+/* ══════════ SECTION 19: MEMORY TAB ══════════ */
+function renderMemory(){
+  var sec=$("tab-memory");var mem=STATE.memory;
+  var html='<div class="card"><h3>Institutional Memory</h3>';
+  html+='<p style="font-size:10px;color:var(--muted);margin-bottom:10px">Lineage, prior cases, drift history, and retrieval metadata for this CERPA cycle.</p>';
+  html+=dfInput("mem-packet","Packet ID",mem.packet_id);
+  html+=dfTextarea("mem-lineage","Lineage Notes",mem.lineage_notes);
+  html+='<div class="grid2">';
+  html+=dfInput("mem-supersedes","Supersedes",mem.supersedes);
+  html+=dfInput("mem-superseded","Superseded By",mem.superseded_by);
+  html+='</div>';
+  html+='</div>';
+
+  html+='<div class="grid2">';
+  html+='<div class="card"><h4>Prior Related Cases</h4><div id="mem-ls-prior"></div></div>';
+  html+='<div class="card"><h4>Drift History</h4><div id="mem-ls-drift"></div></div>';
+  html+='<div class="card" style="grid-column:1/-1"><h4>Retrieval Tags</h4><div id="mem-ls-tags"></div></div>';
+  html+='</div>';
+
+  setHTML(sec,html);
+  var binds=[["mem-packet","packet_id"],["mem-lineage","lineage_notes"],["mem-supersedes","supersedes"],["mem-superseded","superseded_by"]];
+  binds.forEach(function(b){
+    var el=$("sf-"+b[0]);if(!el)return;
+    el.addEventListener("blur",function(){mutate(function(){mem[b[1]]=el.value})});
+  });
+  renderListItems(mem.prior_related_cases,"mem-ls-prior");
+  renderListItems(mem.drift_history,"mem-ls-drift");
+  renderListItems(mem.retrieval_tags,"mem-ls-tags");
+}
+
+/* ══════════ SECTION 20: PACKET TAB ══════════ */
+function renderPacket(){
+  var sec=$("tab-packet");
+  var pkt=buildPacket();
+  var html='<div class="card"><h3>CERPA Packet</h3>';
+  html+='<p style="font-size:10px;color:var(--muted);margin-bottom:10px">A compact decision/correction record with its complete evidence chain and memory.</p>';
+  html+='<div style="display:flex;gap:8px;margin-bottom:14px">';
+  html+='<button class="primary" id="pktCopyJSON">Copy Packet JSON</button>';
+  html+='<button id="pktExportJSON">Export Packet JSON</button>';
+  html+='<button id="pktPrint">Print Summary</button>';
+  html+='</div></div>';
+
+  /* Packet sections */
+  var sections=[
+    {label:"Metadata",color:"var(--accent)",data:pkt.metadata},
+    {label:"Claim",color:"var(--c-claim)",data:pkt.claim},
+    {label:"Events ("+pkt.events.length+")",color:"var(--c-event)",data:pkt.events},
+    {label:"Review",color:"var(--c-review)",data:pkt.review},
+    {label:"Patch",color:"var(--c-patch)",data:pkt.patch},
+    {label:"Apply",color:"var(--c-apply)",data:pkt.apply},
+    {label:"Memory",color:"var(--muted)",data:pkt.memory}
+  ];
+
+  sections.forEach(function(s){
+    html+='<div class="card"><h3 style="color:'+s.color+'">'+esc(s.label)+'</h3>';
+    html+='<div class="packet-preview">'+esc(JSON.stringify(s.data,null,2))+'</div></div>';
+  });
+
+  setHTML(sec,html);
+
+  $("pktCopyJSON").addEventListener("click",function(){
+    if(navigator.clipboard){navigator.clipboard.writeText(JSON.stringify(pkt,null,2)).then(function(){showToast("Packet JSON copied","ok")})}
+  });
+  $("pktExportJSON").addEventListener("click",function(){
+    downloadFile(JSON.stringify(pkt,null,2),(STATE.claim.title||"cerpa")+"_packet.json","application/json");
+  });
+  $("pktPrint").addEventListener("click",function(){window.print()});
+}
+
+/* ══════════ SECTION 21: SEARCH ══════════ */
+function globalSearch(query){
+  if(!query)return [];
+  var q=query.toLowerCase();
+  var results=[];
+  function check(text,source,tab){
+    if(text&&String(text).toLowerCase().includes(q)){
+      results.push({text:String(text).substring(0,100),source:source,tab:tab});
+    }
+  }
+  check(STATE.claim.title,"Claim Title","claim");
+  check(STATE.claim.statement,"Claim Statement","claim");
+  STATE.events.forEach(function(e,i){
+    check(e.title,"Event "+(i+1)+" Title","event");
+    check(e.description,"Event "+(i+1)+" Description","event");
+    check(e.evidence,"Event "+(i+1)+" Evidence","event");
+  });
+  STATE.review.findings.forEach(function(f,i){
+    check(f.title,"Finding "+(i+1),"review");
+    check(f.statement,"Finding "+(i+1)+" Statement","review");
+  });
+  check(STATE.review.summary,"Review Summary","review");
+  check(STATE.patch.selected_action,"Patch Action","patch");
+  check(STATE.patch.change_summary,"Patch Summary","patch");
+  STATE.apply.actions.forEach(function(a,i){
+    check(a.action,"Apply Action "+(i+1),"apply");
+  });
+  check(STATE.apply.outcome_summary,"Apply Outcome","apply");
+  check(STATE.memory.lineage_notes,"Memory Notes","memory");
+  return results;
+}
+
+/* ══════════ SECTION 22: MCPP MIGRATION ══════════ */
+function migrateMCPP(old){
+  STATE=defaultState();
+  STATE.metadata.title=old.metadata.op_name||"";
+  STATE.metadata.org=old.metadata.unit||"";
+  STATE.metadata.owner=old.metadata.planner||"";
+  STATE.metadata.classification=old.metadata.classification||"UNCLASSIFIED";
+  STATE.metadata.created=old.metadata.created||new Date().toISOString();
+  STATE.metadata.context_type="migrated_from_mcpp";
+  STATE.metadata.status="migrated";
+
+  if(old.problem_framing){
+    STATE.claim.statement=old.problem_framing.problem_statement||"";
+    STATE.claim.title=old.metadata.op_name||"Migrated MCPP Claim";
+    STATE.claim.source=old.problem_framing.operational_approach||"";
+    if(old.problem_framing.governing_factors)STATE.claim.constraints=old.problem_framing.governing_factors.slice();
+    if(old.problem_framing.information_gaps)STATE.claim.assumptions=old.problem_framing.information_gaps.slice();
+  }
+  if(old.mission_setup){
+    if(!STATE.claim.statement)STATE.claim.statement=old.mission_setup.mission_statement||"";
+    if(old.mission_setup.constraints)STATE.claim.constraints=STATE.claim.constraints.concat(old.mission_setup.constraints);
+    if(old.mission_setup.assumptions)STATE.claim.assumptions=STATE.claim.assumptions.concat(old.mission_setup.assumptions);
+  }
+
+  /* COAs → events */
+  if(old.coas){
+    old.coas.forEach(function(coa){
+      var ev=defaultEvent();
+      ev.title="COA: "+coa.name;
+      ev.type="observation";
+      ev.description=coa.concept||coa.summary||"";
+      ev.evidence="Advantages: "+(coa.advantages||[]).join("; ")+"\nDisadvantages: "+(coa.disadvantages||[]).join("; ");
+      ev.confidence=0.5;
+      ev.severity="medium";
+      STATE.events.push(ev);
+    });
+  }
+
+  /* Decision → review */
+  if(old.decision){
+    var selCoa=old.coas?old.coas.find(function(c){return c.id===old.decision.selected_coa_id}):null;
+    STATE.review.summary="Decision: "+(selCoa?selCoa.name:"N/A");
+    STATE.review.rationale=old.decision.rationale||"";
+    if(old.decision.modifications)STATE.review.options_considered=old.decision.modifications;
+    if(old.decision.residual_risks)STATE.review.drift_signals=old.decision.residual_risks;
+    STATE.review.confidence=0.6;
+  }
+
+  /* Orders → patch */
+  if(old.orders){
+    STATE.patch.selected_action=old.orders.mission_text||old.mission_setup.mission_statement||"";
+    STATE.patch.change_summary=old.orders.execution_concept||"";
+    STATE.patch.owner=old.metadata.planner||"";
+  }
+
+  /* Transition → apply */
+  if(old.transition){
+    STATE.apply.execution_status="in_progress";
+    old.transition.tasks.forEach(function(t){
+      var a=defaultAction();
+      a.action=t.name;a.owner=t.assigned;a.due=t.suspense;
+      a.status=t.status==="ready"?"done":t.status==="partial"?"in_progress":"open";
+      STATE.apply.actions.push(a);
+    });
+  }
+
+  STATE.memory.lineage_notes="Migrated from MCPP EDGE session. Original operation: "+(old.metadata.op_name||"Unknown");
+  doSave();
+}
+
+/* ══════════ SECTION 23: DEMO DATA ══════════ */
+function loadDemoData(){
+  STATE=defaultState();
+  STATE.metadata={title:"Supply Chain Drift Detection",org:"Sigma Operations",domain:"supply-chain",owner:"J. Torres",classification:"UNCLASSIFIED",created:new Date().toISOString(),updated:"",context_type:"operational",urgency:"elevated",status:"active"};
+  STATE.claim={id:uid(),title:"Vendor SLA Drift",statement:"Primary logistics vendor (ACME Freight) has shown a pattern of SLA violations over the past 30 days, with delivery latency increasing 23% and damage rates doubling. This may indicate capacity degradation or a systemic shift in service quality that requires corrective action before Q2 fulfillment commitments.",type:"detection",source:"Automated SLA monitoring + warehouse intake reports",priority:"P2",authority:"VP Operations",assumptions:["SLA baseline is still contractually valid","Vendor has not communicated planned service changes","Internal demand patterns have not significantly changed"],constraints:["Cannot switch vendors mid-quarter without board approval","Penalty clauses cap at 15% of contract value","Must maintain 98% fulfillment rate for Q2 commitments"],success_criteria:["Vendor latency returns to within SLA thresholds","Damage rate drops below 1.5%","Root cause documented and corrective plan in place"],tags:["supply-chain","vendor","sla","drift","q2"]};
+  STATE.events=[
+    {id:uid(),title:"SLA Latency Spike — Week 9",type:"detection",source:"SLA Monitor v3",timestamp:"2026-03-01T08:00",description:"Average delivery latency exceeded SLA threshold of 48hrs, reaching 59hrs for the first time in 6 months. Spike concentrated in Northeast corridor.",evidence:"SLA dashboard export: 127 of 340 shipments exceeded 48hr threshold. Mean: 59.2hrs, P95: 78hrs. Northeast corridor: 84% of violations.",confidence:0.9,severity:"high",related_claims:[],tags:["latency","northeast"]},
+    {id:uid(),title:"Damage Rate Increase — Feb",type:"observation",source:"Warehouse QC Reports",timestamp:"2026-02-28T14:00",description:"Damage rate at intake doubled from 0.8% to 1.7% over February. New packaging damage pattern suggests handling changes at origin.",evidence:"QC log: 47 damaged units out of 2,764 received. 31 showed crushing damage consistent with improper stacking. Previous month: 23 of 2,890.",confidence:0.85,severity:"medium",related_claims:[],tags:["damage","qc","packaging"]},
+    {id:uid(),title:"Vendor Driver Turnover Report",type:"intelligence",source:"Account Manager (informal)",timestamp:"2026-03-05T11:00",description:"ACME Freight account manager mentioned in a call that they have experienced 30% driver turnover in Q1 and are backfilling with contract drivers. This was not formally communicated.",evidence:"Call notes from J. Torres, 2026-03-05. No formal vendor notification received. Cross-referenced with Indeed job postings showing 15 open driver positions for ACME in Northeast.",confidence:0.65,severity:"medium",related_claims:[],tags:["vendor","turnover","drivers"]},
+    {id:uid(),title:"Competitor Bid Received",type:"observation",source:"Procurement",timestamp:"2026-03-10T09:00",description:"FastTrack Logistics submitted an unsolicited bid at 8% below current ACME contract rate with guaranteed SLA matching. Bid valid through Q2.",evidence:"Bid document FTL-2026-0342. References include two comparable accounts with verified SLA compliance >99.5%. Terms: 90-day trial with exit clause.",confidence:0.75,severity:"low",related_claims:[],tags:["competitor","procurement","alternative"]}
+  ];
+  STATE.review={summary:"Evidence strongly supports the claim that ACME Freight is experiencing systemic service degradation driven by workforce instability. The latency spike and damage increase are correlated with reported driver turnover. The vendor has not proactively communicated the issue, which reduces confidence in their awareness and corrective capacity.",findings:[
+    {id:uid(),title:"SLA Violations are Real and Worsening",finding_class:"supported",statement:"The SLA monitoring data is high-confidence and shows a clear upward trend in latency. The pattern is concentrated in the Northeast, matching known ACME staffing gaps.",evidence_links:["SLA Monitor v3","Warehouse QC"],risk:"high",confidence:0.9,notes:"Trend is accelerating, not stabilizing."},
+    {id:uid(),title:"Root Cause is Workforce-Related",finding_class:"supported",statement:"Driver turnover at 30% in Q1 combined with contract driver backfill explains both latency and damage patterns. Contract drivers are less experienced with stacking and routing.",evidence_links:["Account Manager call","Indeed postings"],risk:"medium",confidence:0.7,notes:"Partially based on informal source. Would benefit from formal vendor confirmation."},
+    {id:uid(),title:"Vendor Self-Correction Unlikely",finding_class:"inconclusive",statement:"ACME has not formally acknowledged the issue or communicated a corrective plan. This may indicate they are unaware of the severity or are hoping to resolve internally.",evidence_links:[],risk:"medium",confidence:0.5,notes:"Absence of communication is not proof of absence of action."}
+  ],options_considered:["Issue formal SLA violation notice and demand corrective plan","Begin parallel evaluation of FastTrack Logistics","Negotiate temporary volume reduction with ACME","Accept degraded service through Q2 and revisit at renewal"],rejected_options:["Accept degraded service — violates Q2 fulfillment commitments","Immediate vendor switch — contractually prohibited mid-quarter"],confidence:0.78,risk_level:"high",drift_signals:["Vendor communication gap","Accelerating latency trend","Informal rather than formal disclosure of workforce issues"],rationale:"The evidence supports immediate corrective action. The vendor's failure to communicate proactively, combined with worsening metrics, suggests this will not self-resolve. A dual-track approach (demand plan from ACME + evaluate alternative) provides optionality.",decision_basis:"SLA monitoring data, QC reports, account manager intelligence, competitor bid"};
+  STATE.patch={selected_action:"Dual-track: Formal SLA notice to ACME + FastTrack trial evaluation",patch_type:"corrective",change_summary:"1) Issue formal SLA violation notice to ACME Freight with 14-day corrective plan deadline. 2) Initiate 30-day parallel evaluation of FastTrack Logistics on Northeast corridor subset. 3) Establish weekly SLA review cadence with ACME. 4) Pre-negotiate board-ready vendor switch package for Q2 contingency.",owner:"J. Torres",due_date:"2026-03-24",dependencies:["Legal review of SLA violation notice","Procurement authorization for FastTrack trial","Board pre-briefing on contingency scenario"],approvals:["VP Operations","General Counsel (SLA notice)","CPO (FastTrack trial)"],blast_radius:"Northeast corridor logistics, vendor relationship, Q2 fulfillment pipeline. Does not affect other corridors or vendors.",rollback_plan:"If FastTrack trial fails or ACME corrects within 14 days, revert to single-vendor model with enhanced monitoring.",kill_switch:"Halt FastTrack evaluation if ACME demonstrates corrective plan compliance within 14 days.",notes:"Key risk: ACME may view parallel evaluation as hostile. Mitigate through transparent communication — frame as risk management, not punishment."};
+  STATE.apply={execution_status:"in_progress",actions:[
+    {id:uid(),action:"Draft and send SLA violation notice to ACME",owner:"Legal / J. Torres",due:"2026-03-14",status:"done",done_when:"Notice sent and acknowledged by vendor",validation:"Email confirmation + read receipt",notes:"Sent 2026-03-13. ACME acknowledged receipt."},
+    {id:uid(),action:"Initiate FastTrack trial evaluation",owner:"Procurement",due:"2026-03-17",status:"in_progress",done_when:"Trial shipment batch dispatched on Northeast corridor",validation:"First batch tracking numbers confirmed",notes:"Contract signed. First batch shipping 2026-03-18."},
+    {id:uid(),action:"Establish weekly SLA review cadence with ACME",owner:"J. Torres",due:"2026-03-15",status:"done",done_when:"First review meeting held",validation:"Meeting notes distributed",notes:"First meeting held 2026-03-14. ACME presented initial corrective plan."},
+    {id:uid(),action:"Pre-brief board on vendor contingency",owner:"VP Operations",due:"2026-03-21",status:"open",done_when:"Board acknowledges contingency scenario",validation:"Board meeting minutes",notes:"Scheduled for 2026-03-20 board session."}
+  ],validation_method:"Compare ACME SLA metrics at Day 14 vs. baseline. Compare FastTrack trial metrics against ACME current performance. Pass/fail threshold: latency must return to <50hrs, damage <1.5%.",validation_evidence:"",outcome_summary:"",lessons_observed:[],follow_on_actions:["Full vendor review at Q2 midpoint regardless of outcome","Update vendor monitoring thresholds based on this incident","Document driver turnover as a leading indicator for SLA drift"],completed_at:""};
+  STATE.memory={packet_id:"CERPA-2026-SC-001",lineage_notes:"First CERPA cycle for supply chain domain. No prior related cases in this system.",prior_related_cases:["Q3-2025 ACME late delivery cluster (resolved informally, no formal record)"],drift_history:["2025-Q3: Informal latency complaints, no formal action taken","2026-Q1: SLA monitoring automated, first formal detection"],supersedes:"",superseded_by:"",retrieval_tags:["vendor-sla","acme-freight","supply-chain-drift","northeast-corridor","q2-risk"]};
+  STATE.timeline={milestones:[
+    {name:"SLA Drift Detected",datetime:"2026-03-01T08:00:00",category:"event"},
+    {name:"Claim Framed",datetime:"2026-03-06T10:00:00",category:"claim"},
+    {name:"Review Complete",datetime:"2026-03-10T16:00:00",category:"review"},
+    {name:"Patch Approved",datetime:"2026-03-12T09:00:00",category:"patch"},
+    {name:"SLA Notice Sent",datetime:"2026-03-13T11:00:00",category:"apply"},
+    {name:"FastTrack Trial Start",datetime:"2026-03-18T00:00:00",category:"apply"},
+    {name:"Board Pre-Brief",datetime:"2026-03-20T14:00:00",category:"patch"},
+    {name:"14-Day ACME Corrective Deadline",datetime:"2026-03-27T00:00:00",category:"apply"}
+  ]};
+
+  markDirty();scheduleSave();updateProgress();updateSaveIndicator();
+  showToast("Demo loaded: Supply Chain Drift Detection","ok");
+  setTab("overview");
+}
+
+/* ══════════ SECTION 24: KEYBOARD SHORTCUTS ══════════ */
+document.addEventListener("keydown",function(e){
+  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA"||e.target.tagName==="SELECT")return;
+  var key=e.key;
+  if(key>="1"&&key<="9"){var idx=parseInt(key)-1;if(idx<TAB_NAMES.length){e.preventDefault();setTab(TAB_NAMES[idx])}}
+  if(key==="0"){e.preventDefault();setTab(TAB_NAMES[9])}
+  if(key==="-"){e.preventDefault();if(TAB_NAMES[10])setTab(TAB_NAMES[10])}
+  if(key==="="){e.preventDefault();if(TAB_NAMES[11])setTab(TAB_NAMES[11])}
+  if(key==="Escape"){closeDrawer()}
+  if(key==="?"){e.preventDefault();setTab("doctrine")}
+  if(key==="/"){
+    e.preventDefault();
+    openDrawer("Search",'<div class="df"><label>Search across all CERPA data</label><input id="globalSearchInput" type="text" placeholder="Type to search..." autofocus/></div><div id="searchResults"></div>');
+    var si=$("globalSearchInput");
+    si.addEventListener("input",function(){
+      var results=globalSearch(si.value);
+      var html="";
+      if(!si.value){html='<p style="font-size:10px;color:var(--muted)">Start typing to search claims, events, findings, patches, and actions.</p>'}
+      else if(!results.length){html='<p style="font-size:10px;color:var(--muted)">No results found.</p>'}
+      else{
+        results.slice(0,20).forEach(function(r){
+          html+='<div class="ev-card" data-searchtab="'+r.tab+'" style="cursor:pointer"><div class="ev-title">'+esc(r.source)+'</div><div class="ev-meta">'+esc(r.text)+'</div></div>';
+        });
+      }
+      setHTML($("searchResults"),html);
+      $("searchResults").querySelectorAll("[data-searchtab]").forEach(function(c){
+        c.addEventListener("click",function(){closeDrawer();setTab(c.getAttribute("data-searchtab"))});
+      });
+    });
+    setTimeout(function(){si.focus()},100);
+  }
+});
+
+/* ══════════ SECTION 25: MCPP MIGRATION ON INIT ══════════ */
+function checkMCPPMigration(){
+  var old=store.load(OLD_MCPP_KEY);
+  if(old&&old.metadata&&old.progress){
+    var existing=store.load(STORE_KEY);
+    if(!existing){
+      migrateMCPP(old);
+      showToast("MCPP session migrated to CERPA","ok");
+      return true;
+    }
+  }
+  return false;
+}
+
+/* ══════════ SECTION 26: INIT ══════════ */
+function initApp(){
+  var loaded=loadState();
+  if(!loaded){
+    var migrated=checkMCPPMigration();
+    if(migrated)loaded=true;
+  }
+  if(loaded)showToast("CERPA session restored","ok");
+  updateProgress();
+  updateSaveIndicator();
+  setTab("overview");
+}
+document.addEventListener("DOMContentLoaded",initApp);
+
+</script>
+</body>
+</html>
