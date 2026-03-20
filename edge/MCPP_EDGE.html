@@ -1,0 +1,1538 @@
+<!--
+ MCPP EDGE v1.0.0
+ ============================================================
+ Marine Corps Planning Process — Deep Sigma EDGE Console
+ Six-Step MCPP Workflow: Problem Framing → COA Dev → Wargaming
+   → COA Compare → Decision → Orders → Transition
+ Deep Sigma EDGE format: single-file, zero-dependency, hardened
+
+ Tabs: Overview | Mission Setup | Problem Framing | COA Dev |
+       Wargaming | COA Compare | Decision | Orders |
+       Transition | Timeline | Exports | Doctrine
+
+ EDGE_POLICY_EXCEPTION: local_storage — required for session persistence
+ EDGE_POLICY_EXCEPTION: download — required for Blob URL exports
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'"/>
+<!-- EDGE_POLICY_EXCEPTION: local_storage — MCPP requires session persistence for auto-save -->
+<!-- EDGE_POLICY_EXCEPTION: download — MCPP requires Blob URL for export functions -->
+<script>
+(function(){"use strict";
+var B="EDGE_BUILD_ID:MCPP_EDGE_v1.0.0";
+function _b(c){return function(){throw new Error("EDGE hardening: "+c+" blocked")}}
+window.fetch=_b("fetch");window.XMLHttpRequest=_b("XHR");window.WebSocket=_b("WS");
+window.EventSource=_b("ES");try{navigator.sendBeacon=_b("beacon")}catch(_){}
+window.eval=_b("eval");try{window.Function=_b("Function")}catch(_){}
+window.open=_b("window.open");window.RTCPeerConnection=_b("RTC");
+window.BroadcastChannel=_b("BC");window.SharedWorker=_b("SW");window.Worker=_b("W");
+try{Object.defineProperty(window,"indexedDB",{get:_b("indexedDB"),configurable:false})}catch(_){}
+if(typeof console!=="undefined")console.log("[EDGE] "+B+" (localStorage PERMITTED by policy exception)");
+if(window.self===window.top){document.addEventListener("DOMContentLoaded",function(){
+  var v=[];
+  if(document.querySelectorAll("script[src],link[href]").length>0)v.push("external resource");
+  if(document.querySelectorAll("[onclick],[onerror],[onload]").length>0)v.push("inline handler");
+  if(v.length>0)document.body.innerHTML="<h1 style='color:red;font-family:monospace;padding:40px'>EDGE VIOLATION: "+v.join("; ")+"</h1>";
+});}
+})();
+</script>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Deep Sigma EDGE — MCPP v1.0.0</title>
+<style>
+:root{--bg:#0b0f14;--card:#111824;--card2:#0d1520;--muted:#8aa0b5;--txt:#e7eef7;--accent:#7df9ff;--warn:#ffcc66;--bad:#ff6b6b;--ok:#5dff93;--ribbon:#1a2638;--line:#1b2a3a;--glow:rgba(125,249,255,.08);--mag:#ff6bff;--step-done:#5dff93;--step-active:#7df9ff;--step-future:#3a4a5e}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt);font-size:13px;overflow-x:hidden}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.hidden{display:none!important}
+
+/* ── Header ── */
+header{padding:10px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;min-height:54px;background:rgba(8,12,20,.96);position:relative;z-index:100;flex-wrap:wrap}
+header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(125,249,255,.2) 15%,rgba(255,107,255,.12) 50%,rgba(125,249,255,.2) 85%,transparent)}
+.brand{white-space:nowrap;font-weight:700;letter-spacing:.5px;font-size:15px;background:linear-gradient(135deg,var(--accent),var(--mag));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.brand small{display:block;-webkit-text-fill-color:var(--muted);font-size:10px;font-weight:400;letter-spacing:.3px}
+
+/* ── Progress Strip ── */
+.progress-strip{display:flex;align-items:center;gap:0;margin:0 auto;flex-wrap:nowrap}
+.ps-pill{padding:4px 12px;border-radius:6px;font-size:9px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:all .25s;border:1px solid transparent;white-space:nowrap}
+.ps-pill.step-future{color:var(--step-future);background:rgba(58,74,94,.12);border-color:rgba(58,74,94,.3)}
+.ps-pill.step-active{color:var(--step-active);background:rgba(125,249,255,.1);border-color:rgba(125,249,255,.35);box-shadow:0 0 8px rgba(125,249,255,.15)}
+.ps-pill.step-done{color:#0b0f14;background:var(--step-done);border-color:var(--step-done)}
+.ps-arrow{color:#2a3a4e;font-size:8px;margin:0 3px}
+.save-indicator{font-size:9px;color:var(--muted);margin-left:auto;white-space:nowrap}
+.save-indicator.dirty{color:var(--warn)}
+
+/* ── Tabs ── */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);padding:0 16px;background:rgba(11,15,20,.92);overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs .tsep{width:1px;height:24px;background:var(--line);margin:auto 6px;flex-shrink:0}
+.ttab{padding:9px 14px;font-size:10.5px;font-weight:600;color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;letter-spacing:.3px;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
+.ttab:hover{color:var(--txt)}.ttab.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ── Main ── */
+.main{height:calc(100vh - 118px);overflow-y:auto;padding:16px 20px}
+.main section{max-width:1440px;margin:0 auto}
+
+/* ── Cards ── */
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px;transition:border-color .2s}
+.card:hover{border-color:rgba(125,249,255,.12)}
+.card h3{margin:0 0 10px;font-size:13px;color:#cfe2f7;letter-spacing:.4px;text-transform:uppercase}
+.card h4{margin:0 0 8px;font-size:11px;color:var(--accent);letter-spacing:.4px;text-transform:uppercase}
+
+/* ── Grids ── */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+
+/* ── KPI ── */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 8px;text-align:center;position:relative;overflow:hidden;cursor:pointer;transition:all .2s}
+.kpi:hover{border-color:rgba(125,249,255,.3);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi.kpi-green::before{background:var(--ok)}.kpi.kpi-amber::before{background:var(--warn)}.kpi.kpi-red::before{background:var(--bad)}.kpi.kpi-cyan::before{background:var(--accent)}
+.kpi .kv{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi .kl{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:2px}
+.kv-green{color:var(--ok)}.kv-amber{color:var(--warn)}.kv-red{color:var(--bad)}.kv-cyan{color:var(--accent)}
+
+/* ── Forms ── */
+.df{margin-bottom:10px}
+.df label{display:block;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.df input,.df select,.df textarea{width:100%;background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:6px;padding:7px 10px;font-size:11px;font-family:inherit}
+.df textarea{height:80px;resize:vertical}
+.df input:focus,.df select:focus,.df textarea:focus{border-color:rgba(125,249,255,.4);outline:none}
+.df-readonly input,.df-readonly select,.df-readonly textarea{opacity:.55;pointer-events:none}
+
+/* ── Buttons ── */
+button{background:#182235;color:var(--txt);border:1px solid #243449;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:10.5px;transition:all .15s;font-weight:500;font-family:inherit}
+button:hover{border-color:#2f4765}
+button.primary{border-color:rgba(125,249,255,.35);color:var(--accent)}
+button.primary:hover{background:rgba(125,249,255,.06)}
+button.ok{border-color:rgba(93,255,147,.35);color:var(--ok)}
+button.ok:hover{background:rgba(93,255,147,.06)}
+button.danger{border-color:rgba(255,107,107,.35);color:var(--bad)}
+button.danger:hover{background:rgba(255,107,107,.06)}
+button.warn{border-color:rgba(255,204,102,.35);color:var(--warn)}
+
+/* ── Tables ── */
+table{width:100%;border-collapse:collapse;font-size:11.5px}
+th,td{padding:7px 8px;border-bottom:1px solid #141e2d;text-align:left;vertical-align:top}
+th{color:#6b8099;font-weight:700;font-size:9px;text-transform:uppercase;letter-spacing:.5px}
+tbody tr{transition:background .1s;cursor:default}tbody tr:hover{background:rgba(125,249,255,.03)}
+
+/* ── Badges ── */
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:9px;font-weight:700;letter-spacing:.3px;border:1px solid}
+.b-green{color:var(--ok);border-color:rgba(93,255,147,.35);background:rgba(93,255,147,.06)}
+.b-amber{color:var(--warn);border-color:rgba(255,204,102,.35);background:rgba(255,204,102,.06)}
+.b-red{color:var(--bad);border-color:rgba(255,107,107,.35);background:rgba(255,107,107,.06)}
+.b-cyan{color:var(--accent);border-color:rgba(125,249,255,.25);background:rgba(125,249,255,.05)}
+.b-gray{color:var(--muted);border-color:rgba(138,160,181,.3);background:rgba(138,160,181,.06)}
+
+/* ── List items (add/remove pattern) ── */
+.list-items{margin:4px 0 8px}
+.list-item{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #141e2d;font-size:11px}
+.list-item:last-child{border:none}
+.list-item input{flex:1;background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:4px;padding:4px 8px;font-size:11px;font-family:inherit}
+.list-item input:focus{border-color:rgba(125,249,255,.4);outline:none}
+.list-item .li-rm{background:none;border:none;color:var(--bad);cursor:pointer;font-size:14px;padding:2px 4px;opacity:.6}
+.list-item .li-rm:hover{opacity:1}
+.list-add{font-size:10px;padding:3px 10px;margin-top:4px}
+
+/* ── Toast ── */
+.toast-wrap{position:fixed;top:70px;right:20px;z-index:600;display:flex;flex-direction:column;gap:8px}
+.toast{padding:10px 16px;border-radius:8px;font-size:11px;font-weight:600;animation:toastIn .3s ease;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.toast-ok{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.4);color:var(--ok)}
+.toast-warn{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);color:var(--warn)}
+.toast-info{background:rgba(125,249,255,.1);border:1px solid rgba(125,249,255,.3);color:var(--accent)}
+.toast-bad{background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.35);color:var(--bad)}
+@keyframes toastIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Drawer ── */
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;opacity:0;pointer-events:none;transition:opacity .25s}
+.drawer-overlay.open{opacity:1;pointer-events:auto}
+.drawer-panel{position:fixed;top:0;right:0;width:520px;max-width:92vw;height:100vh;background:var(--card);border-left:1px solid var(--line);z-index:510;transform:translateX(100%);transition:transform .3s ease;overflow-y:auto;display:flex;flex-direction:column}
+.drawer-panel.open{transform:translateX(0)}
+.drawer-hdr{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:var(--card);z-index:10}
+.drawer-hdr h3{margin:0;font-size:14px;color:var(--accent);flex:1}
+.drawer-hdr .dx{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:2px 6px}
+.drawer-body{padding:16px;flex:1;overflow-y:auto}
+
+/* ── Confirm modal ── */
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;display:flex;align-items:center;justify-content:center}
+.confirm-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:24px;max-width:420px;width:90%;text-align:center}
+.confirm-card h4{margin:0 0 10px;color:var(--txt);font-size:14px}
+.confirm-card p{margin:0 0 16px;color:var(--muted);font-size:12px}
+.confirm-card .confirm-btns{display:flex;gap:8px;justify-content:center}
+
+/* ── Collapsible sections ── */
+.collapsible-hdr{display:flex;align-items:center;gap:8px;cursor:pointer;padding:8px 0;border-bottom:1px solid var(--line);margin-bottom:8px}
+.collapsible-hdr h4{margin:0;flex:1}
+.collapsible-hdr .chevron{color:var(--muted);font-size:10px;transition:transform .2s}
+.collapsible-hdr.open .chevron{transform:rotate(90deg)}
+.collapsible-body{overflow:hidden;transition:max-height .3s ease}
+.collapsible-body.collapsed{max-height:0!important;overflow:hidden;padding:0!important}
+
+/* ── Status cards ── */
+.step-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;position:relative;overflow:hidden;transition:all .2s;cursor:pointer}
+.step-card:hover{border-color:rgba(125,249,255,.2);transform:translateY(-1px)}
+.step-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.step-card.sc-done::before{background:var(--ok)}
+.step-card.sc-active::before{background:var(--accent)}
+.step-card.sc-future::before{background:var(--step-future)}
+.step-card .sc-num{font-size:20px;font-weight:700;color:var(--muted);margin-bottom:4px}
+.step-card .sc-name{font-size:12px;font-weight:600;margin-bottom:4px}
+.step-card .sc-status{font-size:9px;text-transform:uppercase;letter-spacing:.4px}
+
+/* ── COA panels ── */
+.coa-list{display:flex;flex-direction:column;gap:8px}
+.coa-card{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .2s}
+.coa-card:hover{border-color:rgba(125,249,255,.2)}
+.coa-card.selected{border-color:var(--accent);background:rgba(125,249,255,.04)}
+.coa-card .cc-name{font-size:12px;font-weight:600}
+.coa-card .cc-status{margin-top:4px}
+.coa-actions{display:flex;gap:4px;margin-top:6px}
+.two-panel{display:grid;grid-template-columns:280px 1fr;gap:14px}
+
+/* ── Wargame matrix ── */
+.wg-matrix{width:100%;border-collapse:collapse}
+.wg-matrix th{background:var(--card2);position:sticky;top:0}
+.wg-matrix td{vertical-align:top}
+.wg-matrix textarea{width:100%;background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:4px;padding:4px 6px;font-size:10px;height:50px;resize:vertical;font-family:inherit}
+.wg-matrix textarea:focus{border-color:rgba(125,249,255,.4);outline:none}
+
+/* ── Radar chart ── */
+.radar-wrap{display:flex;justify-content:center;margin:16px 0}
+
+/* ── Scoring grid ── */
+.score-grid{width:100%;border-collapse:collapse}
+.score-grid th{font-size:8px;padding:4px 6px}
+.score-grid td{padding:4px 6px;text-align:center}
+.score-grid input[type="range"]{width:60px;accent-color:var(--accent)}
+.score-val{font-size:11px;font-weight:700;color:var(--accent);min-width:20px;display:inline-block;text-align:center}
+
+/* ── Timeline ── */
+.tl-vertical{position:relative;padding-left:30px}
+.tl-line{position:absolute;left:14px;top:0;bottom:0;width:2px;background:var(--line)}
+.tl-item{position:relative;margin-bottom:20px}
+.tl-dot{position:absolute;left:-22px;top:4px;width:12px;height:12px;border-radius:50%;border:2px solid var(--line);background:var(--bg)}
+.tl-dot.tl-planning{border-color:#a78bfa;background:#a78bfa}
+.tl-dot.tl-execution{border-color:var(--accent);background:var(--accent)}
+.tl-dot.tl-logistics{border-color:var(--warn);background:var(--warn)}
+.tl-content{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.tl-content .tl-name{font-size:12px;font-weight:600}
+.tl-content .tl-date{font-size:10px;color:var(--muted);margin-top:2px}
+.tl-content .tl-cat{font-size:8px;text-transform:uppercase;letter-spacing:.4px;margin-top:4px}
+
+/* ── Order preview ── */
+.order-preview{background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:16px;font-size:11px;line-height:1.7;white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;max-height:600px;overflow-y:auto}
+
+/* ── Transition progress ── */
+.progress-bar{width:100%;height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin:8px 0}
+.progress-fill{height:100%;background:var(--ok);border-radius:4px;transition:width .3s}
+
+/* ── Checklist ── */
+.checklist-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #141e2d;font-size:11px}
+.checklist-item input[type="checkbox"]{accent-color:var(--accent)}
+
+/* ── Doctrine ── */
+.doctrine-card{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:10px}
+.doctrine-hdr{padding:10px 14px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .15s}
+.doctrine-hdr:hover{background:rgba(125,249,255,.03)}
+.doctrine-hdr h4{margin:0;flex:1;font-size:12px;color:var(--accent)}
+.doctrine-hdr .chevron{color:var(--muted);font-size:10px;transition:transform .2s}
+.doctrine-hdr.open .chevron{transform:rotate(90deg)}
+.doctrine-body{padding:0 14px;max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s}
+.doctrine-body.open{max-height:2000px;padding:10px 14px 14px}
+.doctrine-body p{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:8px}
+.doctrine-body ul{margin:0 0 8px 16px;font-size:11px;color:var(--muted);line-height:1.6}
+
+/* ── Shortcut bar ── */
+.shortcut-bar{position:fixed;bottom:0;left:0;right:0;z-index:150;background:rgba(11,15,20,.94);border-top:1px solid var(--line);padding:4px 16px;display:flex;align-items:center;gap:14px;font-size:9px;color:var(--muted)}
+.shortcut-bar kbd{display:inline-block;padding:1px 5px;border-radius:3px;background:rgba(125,249,255,.08);border:1px solid rgba(125,249,255,.15);font-family:inherit;font-size:9px;color:var(--accent);margin:0 1px}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#243449;border-radius:3px}
+
+/* ── Print ── */
+@media print{
+  body{background:#fff!important;color:#111!important}
+  header,.tabs,.shortcut-bar,.drawer-overlay,.drawer-panel,.toast-wrap,.confirm-overlay{display:none!important}
+  .main{height:auto!important;overflow:visible!important}
+  .card{background:#fff!important;border:1px solid #ccc!important;color:#111!important;break-inside:avoid}
+}
+/* ── Responsive ── */
+@media(max-width:900px){
+  .two-panel{grid-template-columns:1fr}
+  .grid2,.grid3,.grid4{grid-template-columns:1fr}
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:600px){
+  header{flex-direction:column;gap:8px;padding:10px}
+  .progress-strip{display:none}
+  .shortcut-bar{display:none}
+  .drawer-panel{width:100%!important;max-width:100%!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header>
+  <div class="brand">MCPP Console<small>Deep Sigma EDGE &mdash; Marine Corps Planning Process v1.0.0</small></div>
+  <div class="progress-strip" id="progressStrip"></div>
+  <div class="save-indicator" id="saveIndicator">No changes</div>
+</header>
+
+<!-- ═══ TABS ═══ -->
+<nav class="tabs" id="tabBar">
+  <button class="ttab active" data-t="overview">Overview</button>
+  <button class="ttab" data-t="setup">Mission Setup</button>
+  <span class="tsep"></span>
+  <button class="ttab" data-t="framing">Problem Framing</button>
+  <button class="ttab" data-t="coadev">COA Dev</button>
+  <button class="ttab" data-t="wargame">Wargaming</button>
+  <button class="ttab" data-t="compare">COA Compare</button>
+  <button class="ttab" data-t="decision">Decision</button>
+  <button class="ttab" data-t="orders">Orders</button>
+  <span class="tsep"></span>
+  <button class="ttab" data-t="transition">Transition</button>
+  <button class="ttab" data-t="timeline">Timeline</button>
+  <span class="tsep"></span>
+  <button class="ttab" data-t="exports">Exports</button>
+  <button class="ttab" data-t="doctrine">Doctrine</button>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main" id="mainArea">
+
+  <!-- TAB: Overview -->
+  <section id="tab-overview"></section>
+
+  <!-- TAB: Mission Setup -->
+  <section id="tab-setup" class="hidden"></section>
+
+  <!-- TAB: Problem Framing -->
+  <section id="tab-framing" class="hidden"></section>
+
+  <!-- TAB: COA Dev -->
+  <section id="tab-coadev" class="hidden"></section>
+
+  <!-- TAB: Wargaming -->
+  <section id="tab-wargame" class="hidden"></section>
+
+  <!-- TAB: COA Compare -->
+  <section id="tab-compare" class="hidden"></section>
+
+  <!-- TAB: Decision -->
+  <section id="tab-decision" class="hidden"></section>
+
+  <!-- TAB: Orders -->
+  <section id="tab-orders" class="hidden"></section>
+
+  <!-- TAB: Transition -->
+  <section id="tab-transition" class="hidden"></section>
+
+  <!-- TAB: Timeline -->
+  <section id="tab-timeline" class="hidden"></section>
+
+  <!-- TAB: Exports -->
+  <section id="tab-exports" class="hidden"></section>
+
+  <!-- TAB: Doctrine -->
+  <section id="tab-doctrine" class="hidden"></section>
+</div>
+
+<!-- Toast container -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- Drawer overlay -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="drawer-panel" id="drawerPanel">
+  <div class="drawer-hdr"><h3 id="drawerTitle">Help</h3><button class="dx" id="drawerClose">&times;</button></div>
+  <div class="drawer-body" id="drawerBody"></div>
+</div>
+
+<!-- Shortcut bar -->
+<div class="shortcut-bar">
+  <span><kbd>1</kbd>-<kbd>9</kbd><kbd>0</kbd> tabs</span>
+  <span><kbd>Esc</kbd> close</span>
+  <span><kbd>?</kbd> doctrine</span>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   MCPP EDGE v1.0.0 — JavaScript
+   ══════════════════════════════════════════════════════════════ */
+
+/* ══════════ SECTION 1: UTILITIES ══════════ */
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;")}
+function setHTML(el,html){var t=document.createElement("template");t.innerHTML=html;el.textContent="";el.appendChild(t.content.cloneNode(true))}
+function $(id){return document.getElementById(id)}
+function showToast(msg,type){
+  var t=document.createElement("div");
+  t.className="toast toast-"+(type||"info");
+  t.textContent=msg;
+  $("toastWrap").appendChild(t);
+  setTimeout(function(){t.style.opacity="0";t.style.transition="opacity .3s";setTimeout(function(){t.remove()},300)},2800);
+}
+function downloadFile(content,filename,mime){
+  var blob=new Blob([content],{type:mime||"text/plain"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");
+  a.href=url;a.download=filename;
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast("Downloaded "+filename,"ok");
+}
+function uid(){return "u"+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function deepClone(o){return JSON.parse(JSON.stringify(o))}
+function debounce(fn,ms){var t;return function(){clearTimeout(t);t=setTimeout(fn,ms)}}
+function fmtDate(d){if(!d)return"--";try{return new Date(d).toLocaleDateString("en-US",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit"})}catch(e){return d}}
+
+/* ── Storage wrapper ── */
+var store={
+  save:function(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){console.warn("[EDGE] localStorage save failed:",e);return false}},
+  load:function(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){console.warn("[EDGE] localStorage load failed:",e);return null}},
+  remove:function(k){try{localStorage.removeItem(k)}catch(e){}},
+  size:function(){try{var t=0;for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);t+=localStorage.getItem(k).length}return t}catch(e){return 0}}
+};
+
+/* ══════════ SECTION 2: STATE MODEL ══════════ */
+var STORE_KEY="mcpp_edge_state";
+function defaultState(){
+  return {
+    metadata:{op_name:"",unit:"",higher_hq:"",planner:"",classification:"UNCLASSIFIED",planning_horizon:"",mission_type:"",time_available:"",created:new Date().toISOString()},
+    mission_setup:{mission_statement:"",commander_intent:"",specified_tasks:[],implied_tasks:[],essential_tasks:[],constraints:[],assumptions:[],ccirs:[],risks:[]},
+    problem_framing:{operational_context:"",environment:"",friendly_situation:"",enemy_threat:"",civil_considerations:"",cog_own:"",cog_enemy:"",problem_statement:"",desired_end_state:"",operational_approach:"",governing_factors:[],information_gaps:[]},
+    coas:[],
+    decision:{selected_coa_id:"",rationale:"",modifications:[],residual_risks:[],followon_guidance:"",locked:false},
+    orders:{situation_enemy:"",situation_friendly:"",situation_attachments:"",mission_text:"",execution_intent:"",execution_concept:"",execution_tasks:[],coordinating_instructions:"",admin_supply:"",admin_transport:"",admin_medical:"",command_relationships:"",command_signal:"",preview:""},
+    transition:{tasks:[],checklist:[
+      {id:"t1",text:"Brief subordinate commanders",done:false},
+      {id:"t2",text:"Issue warning order",done:false},
+      {id:"t3",text:"Issue operations order",done:false},
+      {id:"t4",text:"Conduct rehearsals",done:false},
+      {id:"t5",text:"Conduct inspections",done:false},
+      {id:"t6",text:"Confirm communications plan",done:false},
+      {id:"t7",text:"Verify logistics posture",done:false},
+      {id:"t8",text:"Update running estimate",done:false}
+    ],dsm:[],ccir_monitor:[]},
+    timeline:{milestones:[]},
+    progress:{framing:false,coadev:false,wargame:false,compare:false,decision:false,orders:false},
+    _dirty:false,
+    _lastSaved:null
+  };
+}
+function defaultCOA(){
+  return {
+    id:uid(),name:"",summary:"",concept:"",main_effort:"",
+    supporting_efforts:[],decisive_points:[],phasing:[],tasks:[],
+    advantages:[],disadvantages:[],risks:[],resource_demands:[],
+    assumptions:[],branches:[],sequels:[],
+    wargame:{turns:[],critical_events:[],decision_points:[],ccirs:[],support_reqs:[],assessment:""},
+    wargamed:false,
+    comparison_scores:{feasibility:5,acceptability:5,suitability:5,distinguishability:5,completeness:5,risk:5,tempo:5,sustainability:5},
+    rationale:""
+  };
+}
+var STATE=defaultState();
+
+/* ══════════ SECTION 3: TAB SYSTEM ══════════ */
+var TAB_NAMES=["overview","setup","framing","coadev","wargame","compare","decision","orders","transition","timeline","exports","doctrine"];
+var currentTab="overview";
+function setTab(name){
+  currentTab=name;
+  TAB_NAMES.forEach(function(t){
+    var sec=$("tab-"+t);if(sec)sec.classList.toggle("hidden",t!==name);
+  });
+  document.querySelectorAll(".ttab").forEach(function(b){b.classList.toggle("active",b.getAttribute("data-t")===name)});
+  renderTab(name);
+}
+document.querySelectorAll(".ttab").forEach(function(b){b.addEventListener("click",function(){setTab(b.getAttribute("data-t"))})});
+
+/* ══════════ SECTION 4: PROGRESS STRIP ══════════ */
+var STEP_LABELS=[
+  {key:"framing",label:"Problem Framing",tab:"framing"},
+  {key:"coadev",label:"COA Dev",tab:"coadev"},
+  {key:"wargame",label:"Wargaming",tab:"wargame"},
+  {key:"compare",label:"COA Compare",tab:"compare"},
+  {key:"decision",label:"Decision",tab:"decision"},
+  {key:"orders",label:"Orders",tab:"orders"}
+];
+function updateProgress(){
+  var strip=$("progressStrip");
+  var html="";
+  var foundActive=false;
+  STEP_LABELS.forEach(function(s,i){
+    var done=STATE.progress[s.key];
+    var cls="step-future";
+    if(done){cls="step-done"}
+    else if(!foundActive){cls="step-active";foundActive=true}
+    html+='<span class="ps-pill '+cls+'" data-step="'+s.tab+'">'+esc(s.label)+'</span>';
+    if(i<STEP_LABELS.length-1)html+='<span class="ps-arrow">&#9654;</span>';
+  });
+  setHTML(strip,html);
+  strip.querySelectorAll(".ps-pill").forEach(function(p){
+    p.addEventListener("click",function(){setTab(p.getAttribute("data-step"))});
+  });
+}
+
+/* ══════════ SECTION 5: AUTO-SAVE ══════════ */
+function markDirty(){STATE._dirty=true;updateSaveIndicator()}
+var scheduleSave=debounce(function(){doSave()},800);
+function doSave(){
+  var s=deepClone(STATE);s._dirty=false;s._lastSaved=new Date().toISOString();
+  if(store.save(STORE_KEY,s)){STATE._dirty=false;STATE._lastSaved=s._lastSaved;updateSaveIndicator()}
+}
+function loadState(){
+  var s=store.load(STORE_KEY);
+  if(s){STATE=s;STATE._dirty=false;return true}
+  return false;
+}
+function updateSaveIndicator(){
+  var el=$("saveIndicator");
+  if(STATE._dirty){el.textContent="Unsaved changes";el.className="save-indicator dirty"}
+  else if(STATE._lastSaved){el.textContent="Saved "+fmtDate(STATE._lastSaved);el.className="save-indicator"}
+  else{el.textContent="No changes";el.className="save-indicator"}
+}
+function mutate(fn){fn();markDirty();scheduleSave();updateProgress()}
+
+/* ══════════ SECTION 6: DRAWER ══════════ */
+function openDrawer(title,html){
+  $("drawerTitle").textContent=title;
+  setHTML($("drawerBody"),html);
+  $("drawerOverlay").classList.add("open");
+  $("drawerPanel").classList.add("open");
+}
+function closeDrawer(){
+  $("drawerOverlay").classList.remove("open");
+  $("drawerPanel").classList.remove("open");
+}
+$("drawerOverlay").addEventListener("click",closeDrawer);
+$("drawerClose").addEventListener("click",closeDrawer);
+
+/* ══════════ SECTION 7: LIST HELPERS ══════════ */
+function renderListItems(arr,containerId,onchange){
+  var c=$(containerId);if(!c)return;
+  var html="";
+  arr.forEach(function(v,i){
+    html+='<div class="list-item"><input type="text" value="'+esc(v)+'" data-idx="'+i+'"/><button class="li-rm" data-idx="'+i+'">&times;</button></div>';
+  });
+  html+='<button class="list-add primary">+ Add</button>';
+  setHTML(c,html);
+  c.querySelectorAll("input").forEach(function(inp){
+    inp.addEventListener("blur",function(){
+      var idx=parseInt(inp.getAttribute("data-idx"));
+      if(arr[idx]!==inp.value){arr[idx]=inp.value;mutate(function(){});if(onchange)onchange()}
+    });
+  });
+  c.querySelectorAll(".li-rm").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      var idx=parseInt(btn.getAttribute("data-idx"));
+      arr.splice(idx,1);mutate(function(){});if(onchange)onchange();
+      renderListItems(arr,containerId,onchange);
+    });
+  });
+  c.querySelector(".list-add").addEventListener("click",function(){
+    arr.push("");mutate(function(){});if(onchange)onchange();
+    renderListItems(arr,containerId,onchange);
+    var inputs=c.querySelectorAll("input");
+    if(inputs.length)inputs[inputs.length-1].focus();
+  });
+}
+
+/* ══════════ SECTION 8: RENDER ROUTER ══════════ */
+function renderTab(name){
+  switch(name){
+    case"overview":renderOverview();break;
+    case"setup":renderSetup();break;
+    case"framing":renderFraming();break;
+    case"coadev":renderCOADev();break;
+    case"wargame":renderWargame();break;
+    case"compare":renderCompare();break;
+    case"decision":renderDecision();break;
+    case"orders":renderOrders();break;
+    case"transition":renderTransition();break;
+    case"timeline":renderTimeline();break;
+    case"exports":renderExports();break;
+    case"doctrine":renderDoctrine();break;
+  }
+}
+
+/* ══════════ SECTION 9: OVERVIEW ══════════ */
+function stepsComplete(){var c=0;STEP_LABELS.forEach(function(s){if(STATE.progress[s.key])c++});return c}
+function renderOverview(){
+  var sec=$("tab-overview");
+  var done=stepsComplete();
+  var nCoas=STATE.coas.length;
+  var nWargamed=STATE.coas.filter(function(c){return c.wargamed}).length;
+  var selCoa=STATE.decision.selected_coa_id?STATE.coas.find(function(c){return c.id===STATE.decision.selected_coa_id}):null;
+  var html='<div class="kpi-row">';
+  html+='<div class="kpi '+(done===6?"kpi-green":"kpi-cyan")+'"><div class="kv '+(done===6?"kv-green":"kv-cyan")+'">'+done+'/6</div><div class="kl">Steps Complete</div></div>';
+  html+='<div class="kpi kpi-cyan"><div class="kv kv-cyan">'+nCoas+'</div><div class="kl">COAs Developed</div></div>';
+  html+='<div class="kpi '+(nWargamed>0?"kpi-green":"kpi-amber")+'"><div class="kv '+(nWargamed>0?"kv-green":"kv-amber")+'">'+nWargamed+'</div><div class="kl">COAs Wargamed</div></div>';
+  html+='<div class="kpi '+(selCoa?"kpi-green":"kpi-amber")+'"><div class="kv '+(selCoa?"kv-green":"kv-amber")+'">'+(selCoa?esc(selCoa.name):"--")+'</div><div class="kl">Selected COA</div></div>';
+  html+='</div>';
+
+  html+='<div class="card"><h3>Mission Summary</h3>';
+  html+='<p style="font-size:12px;color:var(--muted);margin-bottom:6px"><strong style="color:var(--accent)">Operation:</strong> '+(esc(STATE.metadata.op_name)||"<em>Not set</em>")+'</p>';
+  html+='<p style="font-size:12px;color:var(--muted);margin-bottom:6px"><strong style="color:var(--accent)">Unit:</strong> '+(esc(STATE.metadata.unit)||"<em>Not set</em>")+'</p>';
+  html+='<p style="font-size:12px;color:var(--muted);margin-bottom:6px"><strong style="color:var(--accent)">Mission:</strong> '+(esc(STATE.mission_setup.mission_statement)||"<em>Not set</em>")+'</p>';
+  html+='<p style="font-size:12px;color:var(--muted)"><strong style="color:var(--accent)">Intent:</strong> '+(esc(STATE.mission_setup.commander_intent)||"<em>Not set</em>")+'</p>';
+  html+='</div>';
+
+  html+='<h3 style="margin:16px 0 10px;font-size:13px;color:#cfe2f7;letter-spacing:.4px;text-transform:uppercase">Planning Steps</h3>';
+  html+='<div class="grid3">';
+  STEP_LABELS.forEach(function(s,i){
+    var done=STATE.progress[s.key];
+    var cls=done?"sc-done":"sc-future";
+    var stLabel=done?"Complete":"Not Started";
+    var stColor=done?"color:var(--ok)":"color:var(--muted)";
+    html+='<div class="step-card '+cls+'" data-step="'+s.tab+'"><div class="sc-num">'+(i+1)+'</div><div class="sc-name">'+esc(s.label)+'</div><div class="sc-status" style="'+stColor+'">'+stLabel+'</div></div>';
+  });
+  html+='</div>';
+
+  var nextStep=STEP_LABELS.find(function(s){return!STATE.progress[s.key]});
+  if(nextStep){
+    html+='<div style="margin-top:16px;text-align:center"><button class="primary" id="btnNextStep" data-step="'+nextStep.tab+'">Continue: '+esc(nextStep.label)+' &#9654;</button></div>';
+  }
+
+  setHTML(sec,html);
+  sec.querySelectorAll(".step-card").forEach(function(c){c.addEventListener("click",function(){setTab(c.getAttribute("data-step"))})});
+  var btn=$("btnNextStep");if(btn)btn.addEventListener("click",function(){setTab(btn.getAttribute("data-step"))});
+}
+
+/* ══════════ SECTION 10: MISSION SETUP ══════════ */
+function renderSetup(){
+  var sec=$("tab-setup");
+  var m=STATE.metadata;var ms=STATE.mission_setup;
+  var html='<div class="card"><h3>Operation Details</h3><div class="grid2">';
+  html+=dfInput("op_name","Operation Name",m.op_name);
+  html+=dfInput("unit","Unit",m.unit);
+  html+=dfInput("higher_hq","Higher HQ",m.higher_hq);
+  html+=dfInput("planner","Planner",m.planner);
+  html+=dfSelect("classification","Classification",["UNCLASSIFIED","CUI","CONFIDENTIAL","SECRET","TOP SECRET"],m.classification);
+  html+=dfInput("planning_horizon","Planning Horizon",m.planning_horizon);
+  html+=dfInput("mission_type","Mission Type",m.mission_type);
+  html+=dfInput("time_available","Time Available",m.time_available);
+  html+='</div></div>';
+
+  html+='<div class="card"><h3>Mission Statement</h3>';
+  html+=dfTextarea("mission_statement","",ms.mission_statement);
+  html+='</div>';
+
+  html+='<div class="card"><h3>Commander\'s Intent</h3>';
+  html+=dfTextarea("commander_intent","",ms.commander_intent);
+  html+='</div>';
+
+  html+='<div class="grid2">';
+  html+='<div class="card"><h3>Specified Tasks</h3><div id="ls-specified"></div></div>';
+  html+='<div class="card"><h3>Implied Tasks</h3><div id="ls-implied"></div></div>';
+  html+='<div class="card"><h3>Essential Tasks</h3><div id="ls-essential"></div></div>';
+  html+='<div class="card"><h3>Constraints</h3><div id="ls-constraints"></div></div>';
+  html+='<div class="card"><h3>Assumptions</h3><div id="ls-assumptions"></div></div>';
+  html+='<div class="card"><h3>CCIRs</h3><div id="ls-ccirs"></div></div>';
+  html+='<div class="card"><h3>Risks</h3><div id="ls-risks"></div></div>';
+  html+='</div>';
+
+  html+='<div style="margin-top:14px;text-align:center"><button class="ok" id="btnSetupDone">Mark Setup Complete &#10003;</button></div>';
+
+  setHTML(sec,html);
+  bindSetupFields();
+  renderListItems(ms.specified_tasks,"ls-specified");
+  renderListItems(ms.implied_tasks,"ls-implied");
+  renderListItems(ms.essential_tasks,"ls-essential");
+  renderListItems(ms.constraints,"ls-constraints");
+  renderListItems(ms.assumptions,"ls-assumptions");
+  renderListItems(ms.ccirs,"ls-ccirs");
+  renderListItems(ms.risks,"ls-risks");
+  $("btnSetupDone").addEventListener("click",function(){setTab("framing")});
+}
+function dfInput(id,label,val){return '<div class="df"><label>'+esc(label)+'</label><input id="sf-'+id+'" type="text" value="'+esc(val)+'"/></div>'}
+function dfSelect(id,label,opts,val){var h='<div class="df"><label>'+esc(label)+'</label><select id="sf-'+id+'">';opts.forEach(function(o){h+='<option'+(o===val?' selected':'')+'>'+esc(o)+'</option>'});return h+'</select></div>'}
+function dfTextarea(id,label,val){return '<div class="df">'+(label?'<label>'+esc(label)+'</label>':'')+'<textarea id="sf-'+id+'">'+esc(val)+'</textarea></div>'}
+function bindSetupFields(){
+  var metaFields=["op_name","unit","higher_hq","planner","classification","planning_horizon","mission_type","time_available"];
+  metaFields.forEach(function(f){
+    var el=$("sf-"+f);if(!el)return;
+    el.addEventListener("blur",function(){mutate(function(){STATE.metadata[f]=el.value})});
+    if(el.tagName==="SELECT")el.addEventListener("change",function(){mutate(function(){STATE.metadata[f]=el.value})});
+  });
+  ["mission_statement","commander_intent"].forEach(function(f){
+    var el=$("sf-"+f);if(!el)return;
+    el.addEventListener("blur",function(){mutate(function(){STATE.mission_setup[f]=el.value})});
+  });
+}
+
+/* ══════════ SECTION 11: PROBLEM FRAMING ══════════ */
+function renderFraming(){
+  var sec=$("tab-framing");var pf=STATE.problem_framing;
+  var html='<div class="grid2">';
+  html+='<div class="card"><h3>Operational Context</h3>'+dfTextarea("pf-operational_context","",pf.operational_context)+'</div>';
+  html+='<div class="card"><h3>Environment Summary</h3>'+dfTextarea("pf-environment","",pf.environment)+'</div>';
+  html+='<div class="card"><h3>Friendly Situation</h3>'+dfTextarea("pf-friendly_situation","",pf.friendly_situation)+'</div>';
+  html+='<div class="card"><h3>Enemy / Threat</h3>'+dfTextarea("pf-enemy_threat","",pf.enemy_threat)+'</div>';
+  html+='<div class="card"><h3>Civil Considerations</h3>'+dfTextarea("pf-civil_considerations","",pf.civil_considerations)+'</div>';
+  html+='<div class="card"><h3>Center of Gravity (Own)</h3>'+dfTextarea("pf-cog_own","",pf.cog_own)+'</div>';
+  html+='<div class="card"><h3>Center of Gravity (Enemy)</h3>'+dfTextarea("pf-cog_enemy","",pf.cog_enemy)+'</div>';
+  html+='</div>';
+
+  html+='<div class="card"><h3>Problem Statement</h3>'+dfTextarea("pf-problem_statement","",pf.problem_statement)+'</div>';
+  html+='<div class="card"><h3>Desired End State</h3>'+dfTextarea("pf-desired_end_state","",pf.desired_end_state)+'</div>';
+  html+='<div class="card"><h3>Operational Approach</h3>'+dfTextarea("pf-operational_approach","",pf.operational_approach)+'</div>';
+
+  html+='<div class="grid2">';
+  html+='<div class="card"><h3>Governing Factors</h3><div id="ls-gov-factors"></div></div>';
+  html+='<div class="card"><h3>Information Gaps</h3><div id="ls-info-gaps"></div></div>';
+  html+='</div>';
+
+  html+='<div class="card"><h3>Framing Assistant</h3><p style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:8px">Use these prompts to guide your problem framing:</p>';
+  html+='<ul style="font-size:11px;color:var(--muted);line-height:1.8;margin-left:16px">';
+  html+='<li>What is the problem we are trying to solve?</li>';
+  html+='<li>What conditions define success (end state)?</li>';
+  html+='<li>What are the key assumptions that could invalidate our approach?</li>';
+  html+='<li>What information do we need but do not have?</li>';
+  html+='<li>What are the enemy\'s most likely and most dangerous courses of action?</li>';
+  html+='<li>What are the critical vulnerabilities in both our and the enemy\'s center of gravity?</li>';
+  html+='</ul></div>';
+
+  html+='<div style="margin-top:14px;text-align:center"><button class="ok" id="btnFramingDone">Mark Problem Framing Complete &#10003;</button></div>';
+
+  setHTML(sec,html);
+  var pfFields=["operational_context","environment","friendly_situation","enemy_threat","civil_considerations","cog_own","cog_enemy","problem_statement","desired_end_state","operational_approach"];
+  pfFields.forEach(function(f){
+    var el=$("pf-"+f);if(!el)return;
+    el.addEventListener("blur",function(){mutate(function(){STATE.problem_framing[f]=el.value})});
+  });
+  renderListItems(pf.governing_factors,"ls-gov-factors");
+  renderListItems(pf.information_gaps,"ls-info-gaps");
+  $("btnFramingDone").addEventListener("click",function(){mutate(function(){STATE.progress.framing=true});showToast("Problem Framing complete","ok");renderTab("framing")});
+}
+
+/* ══════════ SECTION 12: COA DEVELOPMENT ══════════ */
+var selectedCOA=null;
+function renderCOADev(){
+  var sec=$("tab-coadev");
+  var html='<div class="two-panel"><div>';
+  html+='<h3 style="font-size:13px;color:#cfe2f7;letter-spacing:.4px;text-transform:uppercase;margin-bottom:10px">Courses of Action</h3>';
+  html+='<button class="primary" id="btnAddCOA" style="margin-bottom:10px;width:100%">+ Add COA</button>';
+  html+='<div class="coa-list" id="coaList">';
+  STATE.coas.forEach(function(c){
+    var sel=selectedCOA===c.id?"selected":"";
+    var statusCls=c.wargamed?"b-green":"b-gray";
+    var statusTxt=c.wargamed?"Wargamed":"Draft";
+    html+='<div class="coa-card '+sel+'" data-id="'+c.id+'">';
+    html+='<div class="cc-name">'+esc(c.name||"Unnamed COA")+'</div>';
+    html+='<div class="cc-status"><span class="badge '+statusCls+'">'+statusTxt+'</span></div>';
+    html+='<div class="coa-actions"><button class="primary" data-act="edit" data-id="'+c.id+'">Edit</button><button data-act="dup" data-id="'+c.id+'">Dup</button><button class="danger" data-act="del" data-id="'+c.id+'">Del</button></div>';
+    html+='</div>';
+  });
+  if(!STATE.coas.length)html+='<p style="font-size:11px;color:var(--muted);text-align:center;padding:20px">No COAs yet. Click + Add COA to begin.</p>';
+  html+='</div></div>';
+
+  html+='<div id="coaDetail">';
+  if(selectedCOA){
+    var c=STATE.coas.find(function(x){return x.id===selectedCOA});
+    if(c)html+=renderCOAForm(c);
+    else html+='<p style="color:var(--muted);font-size:11px">Select a COA to edit.</p>';
+  }else{
+    html+='<p style="color:var(--muted);font-size:11px">Select a COA to edit.</p>';
+  }
+  html+='</div></div>';
+
+  if(STATE.coas.length>0){
+    html+='<div style="margin-top:14px;text-align:center"><button class="ok" id="btnCOADevDone">Mark COA Development Complete &#10003;</button></div>';
+  }
+
+  setHTML(sec,html);
+  $("btnAddCOA").addEventListener("click",function(){
+    var c=defaultCOA();c.name="COA "+(STATE.coas.length+1);
+    mutate(function(){STATE.coas.push(c)});
+    selectedCOA=c.id;renderCOADev();
+  });
+  sec.querySelectorAll("[data-act]").forEach(function(b){
+    b.addEventListener("click",function(e){
+      e.stopPropagation();
+      var id=b.getAttribute("data-id");
+      var act=b.getAttribute("data-act");
+      if(act==="edit"){selectedCOA=id;renderCOADev()}
+      else if(act==="dup"){
+        var orig=STATE.coas.find(function(x){return x.id===id});
+        if(orig){var d=deepClone(orig);d.id=uid();d.name=orig.name+" (Copy)";mutate(function(){STATE.coas.push(d)});selectedCOA=d.id;renderCOADev();showToast("COA duplicated","ok")}
+      }
+      else if(act==="del"){
+        mutate(function(){STATE.coas=STATE.coas.filter(function(x){return x.id!==id})});
+        if(selectedCOA===id)selectedCOA=null;
+        renderCOADev();showToast("COA deleted","warn");
+      }
+    });
+  });
+  sec.querySelectorAll(".coa-card").forEach(function(c){
+    c.addEventListener("click",function(){selectedCOA=c.getAttribute("data-id");renderCOADev()});
+  });
+  var btnDone=$("btnCOADevDone");
+  if(btnDone)btnDone.addEventListener("click",function(){mutate(function(){STATE.progress.coadev=true});showToast("COA Development complete","ok");renderCOADev()});
+
+  if(selectedCOA)bindCOAForm();
+}
+function renderCOAForm(c){
+  var h='<div class="card"><h3>'+esc(c.name||"COA Detail")+'</h3>';
+  h+=dfInput("coa-name","COA Name",c.name);
+  h+=dfTextarea("coa-summary","Summary",c.summary);
+  h+=dfTextarea("coa-concept","Concept of Operations",c.concept);
+  h+=dfInput("coa-main_effort","Main Effort",c.main_effort);
+  h+='</div>';
+
+  var lists=[
+    ["supporting_efforts","Supporting Efforts"],["decisive_points","Decisive Points"],
+    ["phasing","Phasing"],["tasks","Tasks"],
+    ["advantages","Advantages"],["disadvantages","Disadvantages"],
+    ["risks","Risks"],["resource_demands","Resource Demands"],
+    ["assumptions","Assumptions"],["branches","Branches"],["sequels","Sequels"]
+  ];
+  h+='<div class="grid2">';
+  lists.forEach(function(l){
+    h+='<div class="card"><h4>'+l[1]+'</h4><div id="coa-ls-'+l[0]+'"></div></div>';
+  });
+  h+='</div>';
+  return h;
+}
+function bindCOAForm(){
+  var c=STATE.coas.find(function(x){return x.id===selectedCOA});if(!c)return;
+  ["name","summary","concept","main_effort"].forEach(function(f){
+    var el=$("sf-coa-"+f)||$("coa-"+f);
+    if(!el)el=document.querySelector("#tab-coadev [id='sf-coa-"+f+"']")||document.querySelector("#tab-coadev [id='coa-"+f+"']");
+    if(!el)return;
+    el.addEventListener("blur",function(){
+      mutate(function(){c[f]=el.value});
+      if(f==="name")renderCOADev();
+    });
+  });
+  var lists=["supporting_efforts","decisive_points","phasing","tasks","advantages","disadvantages","risks","resource_demands","assumptions","branches","sequels"];
+  lists.forEach(function(l){renderListItems(c[l],"coa-ls-"+l)});
+}
+
+/* ══════════ SECTION 13: WARGAMING ══════════ */
+function renderWargame(){
+  var sec=$("tab-wargame");
+  var html='<div class="card"><h3>COA Wargaming</h3>';
+  if(!STATE.coas.length){
+    html+='<p style="font-size:11px;color:var(--muted)">No COAs available. Develop COAs first.</p></div>';
+    setHTML(sec,html);return;
+  }
+  html+='<div class="df"><label>Select COA</label><select id="wg-coa-sel">';
+  STATE.coas.forEach(function(c){html+='<option value="'+c.id+'"'+(selectedCOA===c.id?' selected':'')+'>'+esc(c.name||"Unnamed")+'</option>'});
+  html+='</select></div></div>';
+
+  var coaId=selectedCOA||STATE.coas[0].id;
+  var c=STATE.coas.find(function(x){return x.id===coaId});
+  if(!c){setHTML(sec,html);return}
+
+  html+='<div class="card"><h4>Wargaming Matrix</h4>';
+  html+='<div style="overflow-x:auto"><table class="wg-matrix"><thead><tr><th style="width:40px">#</th><th>Friendly Action</th><th>Enemy Reaction</th><th>Friendly Counteraction</th><th>Notes</th><th style="width:40px"></th></tr></thead><tbody id="wgMatrixBody">';
+  c.wargame.turns.forEach(function(t,i){
+    html+='<tr><td style="text-align:center;font-weight:700;color:var(--accent)">'+(i+1)+'</td>';
+    html+='<td><textarea data-f="friendly" data-i="'+i+'">'+esc(t.friendly)+'</textarea></td>';
+    html+='<td><textarea data-f="enemy" data-i="'+i+'">'+esc(t.enemy)+'</textarea></td>';
+    html+='<td><textarea data-f="counter" data-i="'+i+'">'+esc(t.counter)+'</textarea></td>';
+    html+='<td><textarea data-f="notes" data-i="'+i+'">'+esc(t.notes)+'</textarea></td>';
+    html+='<td><button class="danger" data-rmturn="'+i+'" style="padding:2px 6px;font-size:10px">&times;</button></td></tr>';
+  });
+  html+='</tbody></table></div>';
+  html+='<button class="primary" id="btnAddTurn" style="margin-top:8px">+ Add Turn</button></div>';
+
+  html+='<div class="grid2">';
+  html+='<div class="card"><h4>Critical Events</h4><div id="wg-ls-critical"></div></div>';
+  html+='<div class="card"><h4>Decision Points</h4><div id="wg-ls-dp"></div></div>';
+  html+='<div class="card"><h4>CCIRs</h4><div id="wg-ls-ccirs"></div></div>';
+  html+='<div class="card"><h4>Support Requirements</h4><div id="wg-ls-support"></div></div>';
+  html+='</div>';
+
+  html+='<div class="card"><h4>Assessment Notes</h4>'+dfTextarea("wg-assessment","",c.wargame.assessment)+'</div>';
+
+  html+='<div style="margin-top:14px;text-align:center">';
+  if(c.wargamed){html+='<span class="badge b-green" style="font-size:11px;padding:6px 16px">Wargamed &#10003;</span>';}
+  else{html+='<button class="ok" id="btnMarkWargamed">Mark COA Wargamed &#10003;</button>';}
+  html+='</div>';
+
+  var allWargamed=STATE.coas.length>0&&STATE.coas.every(function(x){return x.wargamed});
+  if(allWargamed&&!STATE.progress.wargame){
+    html+='<div style="margin-top:10px;text-align:center"><button class="ok" id="btnWargameDone">Mark Wargaming Step Complete &#10003;</button></div>';
+  }
+
+  setHTML(sec,html);
+
+  $("wg-coa-sel").addEventListener("change",function(){selectedCOA=this.value;renderWargame()});
+  $("btnAddTurn").addEventListener("click",function(){
+    mutate(function(){c.wargame.turns.push({friendly:"",enemy:"",counter:"",notes:""})});renderWargame();
+  });
+  sec.querySelectorAll("[data-rmturn]").forEach(function(b){
+    b.addEventListener("click",function(){var i=parseInt(b.getAttribute("data-rmturn"));mutate(function(){c.wargame.turns.splice(i,1)});renderWargame()});
+  });
+  sec.querySelectorAll(".wg-matrix textarea").forEach(function(ta){
+    ta.addEventListener("blur",function(){
+      var f=ta.getAttribute("data-f");var i=parseInt(ta.getAttribute("data-i"));
+      mutate(function(){c.wargame.turns[i][f]=ta.value});
+    });
+  });
+  var wgAssess=$("wg-assessment")||document.querySelector("#tab-wargame [id='sf-wg-assessment']");
+  if(wgAssess)wgAssess.addEventListener("blur",function(){mutate(function(){c.wargame.assessment=wgAssess.value})});
+
+  renderListItems(c.wargame.critical_events,"wg-ls-critical");
+  renderListItems(c.wargame.decision_points,"wg-ls-dp");
+  renderListItems(c.wargame.ccirs,"wg-ls-ccirs");
+  renderListItems(c.wargame.support_reqs,"wg-ls-support");
+
+  var btnMW=$("btnMarkWargamed");
+  if(btnMW)btnMW.addEventListener("click",function(){mutate(function(){c.wargamed=true});showToast(esc(c.name)+" wargamed","ok");renderWargame()});
+  var btnWD=$("btnWargameDone");
+  if(btnWD)btnWD.addEventListener("click",function(){mutate(function(){STATE.progress.wargame=true});showToast("Wargaming complete","ok");renderWargame()});
+}
+
+/* ══════════ SECTION 14: COA COMPARISON + RADAR ══════════ */
+var CRITERIA=["feasibility","acceptability","suitability","distinguishability","completeness","risk","tempo","sustainability"];
+var CRITERIA_LABELS=["Feasibility","Acceptability","Suitability","Distinguish.","Completeness","Risk","Tempo","Sustain."];
+var CRITERIA_WEIGHTS={};
+CRITERIA.forEach(function(c){CRITERIA_WEIGHTS[c]=1});
+var COA_COLORS=["#7df9ff","#ff6bff","#5dff93","#ffcc66","#a78bfa","#ff6b6b","#38bdf8","#f97316"];
+
+function renderCompare(){
+  var sec=$("tab-compare");
+  if(!STATE.coas.length){
+    setHTML(sec,'<div class="card"><h3>COA Comparison</h3><p style="font-size:11px;color:var(--muted)">No COAs available. Develop COAs first.</p></div>');return;
+  }
+  var html='<div class="card"><h3>Criterion Weights</h3><div class="grid4">';
+  CRITERIA.forEach(function(c,i){
+    var w=CRITERIA_WEIGHTS[c]||1;
+    html+='<div class="df"><label>'+CRITERIA_LABELS[i]+' (x'+w+')</label><input type="range" min="1" max="3" value="'+w+'" data-wt="'+c+'" style="width:100%;accent-color:var(--accent)"/></div>';
+  });
+  html+='</div></div>';
+
+  html+='<div class="card"><h3>Scoring Grid</h3><div style="overflow-x:auto"><table class="score-grid"><thead><tr><th>COA</th>';
+  CRITERIA_LABELS.forEach(function(l){html+='<th>'+l+'</th>'});
+  html+='<th>Weighted Total</th></tr></thead><tbody>';
+  STATE.coas.forEach(function(coa,ci){
+    html+='<tr><td style="font-weight:600;color:'+COA_COLORS[ci%COA_COLORS.length]+'">'+esc(coa.name||"COA "+(ci+1))+'</td>';
+    CRITERIA.forEach(function(cr){
+      var v=coa.comparison_scores[cr]||5;
+      html+='<td><input type="range" min="1" max="10" value="'+v+'" data-coa="'+coa.id+'" data-cr="'+cr+'"/><span class="score-val">'+v+'</span></td>';
+    });
+    var total=calcWeightedTotal(coa);
+    html+='<td style="font-weight:700;font-size:14px;color:var(--accent)">'+total.toFixed(1)+'</td></tr>';
+  });
+  html+='</tbody></table></div></div>';
+
+  html+='<div class="card"><h3>Radar Chart</h3><div class="radar-wrap" id="radarWrap"></div>';
+  html+='<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">';
+  STATE.coas.forEach(function(coa,ci){
+    html+='<span style="font-size:10px;font-weight:600;color:'+COA_COLORS[ci%COA_COLORS.length]+'">&#9632; '+esc(coa.name||"COA "+(ci+1))+'</span>';
+  });
+  html+='</div></div>';
+
+  html+='<div class="card"><h3>Ranking</h3><div id="rankList"></div></div>';
+
+  html+='<div class="card"><h3>Rationale Notes</h3>';
+  STATE.coas.forEach(function(coa,ci){
+    html+='<div class="df"><label style="color:'+COA_COLORS[ci%COA_COLORS.length]+'">'+esc(coa.name||"COA "+(ci+1))+'</label><textarea id="rat-'+coa.id+'">'+esc(coa.rationale||"")+'</textarea></div>';
+  });
+  html+='</div>';
+
+  if(!STATE.progress.compare){
+    html+='<div style="margin-top:14px;text-align:center"><button class="ok" id="btnCompareDone">Mark Comparison Complete &#10003;</button></div>';
+  }
+
+  setHTML(sec,html);
+
+  sec.querySelectorAll("[data-wt]").forEach(function(r){
+    r.addEventListener("input",function(){CRITERIA_WEIGHTS[r.getAttribute("data-wt")]=parseInt(r.value);renderCompare()});
+  });
+  sec.querySelectorAll("[data-coa]").forEach(function(r){
+    r.addEventListener("input",function(){
+      var coaId=r.getAttribute("data-coa");var cr=r.getAttribute("data-cr");var v=parseInt(r.value);
+      var c=STATE.coas.find(function(x){return x.id===coaId});
+      if(c){mutate(function(){c.comparison_scores[cr]=v});r.nextElementSibling.textContent=v;updateRadar();updateRanking()}
+    });
+  });
+  STATE.coas.forEach(function(coa){
+    var el=$("rat-"+coa.id);if(el)el.addEventListener("blur",function(){mutate(function(){coa.rationale=el.value})});
+  });
+
+  renderRadarChart();
+  updateRanking();
+
+  var btnCD=$("btnCompareDone");
+  if(btnCD)btnCD.addEventListener("click",function(){mutate(function(){STATE.progress.compare=true});showToast("Comparison complete","ok");renderCompare()});
+}
+
+function calcWeightedTotal(coa){
+  var sum=0;var wsum=0;
+  CRITERIA.forEach(function(cr){var w=CRITERIA_WEIGHTS[cr]||1;sum+=((coa.comparison_scores[cr]||5)*w);wsum+=w});
+  return wsum?sum/wsum*10/10:0;
+}
+
+function renderRadarChart(){
+  var wrap=$("radarWrap");if(!wrap)return;
+  var W=400,H=400,cx=200,cy=200,R=150;
+  var n=CRITERIA.length;
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" width="360" height="360" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">';
+
+  for(var ring=2;ring<=10;ring+=2){
+    var rr=R*ring/10;var pts=[];
+    for(var i=0;i<n;i++){var a=Math.PI*2*i/n-Math.PI/2;pts.push((cx+rr*Math.cos(a)).toFixed(1)+","+(cy+rr*Math.sin(a)).toFixed(1))}
+    svg+='<polygon points="'+pts.join(" ")+'" fill="none" stroke="#1b2a3a" stroke-width="1"/>';
+  }
+  for(var i=0;i<n;i++){
+    var a=Math.PI*2*i/n-Math.PI/2;
+    var ex=(cx+R*Math.cos(a)).toFixed(1);var ey=(cy+R*Math.sin(a)).toFixed(1);
+    svg+='<line x1="'+cx+'" y1="'+cy+'" x2="'+ex+'" y2="'+ey+'" stroke="#1b2a3a" stroke-width="1"/>';
+    var lx=(cx+(R+18)*Math.cos(a)).toFixed(1);var ly=(cy+(R+18)*Math.sin(a)).toFixed(1);
+    svg+='<text x="'+lx+'" y="'+ly+'" text-anchor="middle" dominant-baseline="middle" fill="#8aa0b5" font-size="8" font-weight="600">'+CRITERIA_LABELS[i]+'</text>';
+  }
+
+  STATE.coas.forEach(function(coa,ci){
+    var pts=[];
+    for(var i=0;i<n;i++){
+      var v=(coa.comparison_scores[CRITERIA[i]]||5)/10;
+      var a=Math.PI*2*i/n-Math.PI/2;
+      pts.push((cx+R*v*Math.cos(a)).toFixed(1)+","+(cy+R*v*Math.sin(a)).toFixed(1));
+    }
+    var col=COA_COLORS[ci%COA_COLORS.length];
+    svg+='<polygon points="'+pts.join(" ")+'" fill="'+col+'" fill-opacity="0.1" stroke="'+col+'" stroke-width="2"/>';
+    for(var i=0;i<n;i++){
+      var v=(coa.comparison_scores[CRITERIA[i]]||5)/10;
+      var a=Math.PI*2*i/n-Math.PI/2;
+      svg+='<circle cx="'+(cx+R*v*Math.cos(a)).toFixed(1)+'" cy="'+(cy+R*v*Math.sin(a)).toFixed(1)+'" r="3" fill="'+col+'"/>';
+    }
+  });
+
+  svg+='</svg>';
+  setHTML(wrap,svg);
+}
+function updateRadar(){renderRadarChart()}
+
+function updateRanking(){
+  var el=$("rankList");if(!el)return;
+  var ranked=STATE.coas.slice().sort(function(a,b){return calcWeightedTotal(b)-calcWeightedTotal(a)});
+  var html='';
+  ranked.forEach(function(c,i){
+    var ci=STATE.coas.indexOf(c);
+    var col=COA_COLORS[ci%COA_COLORS.length];
+    html+='<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #141e2d">';
+    html+='<span style="font-size:16px;font-weight:700;color:var(--muted);width:24px">#'+(i+1)+'</span>';
+    html+='<span style="font-size:12px;font-weight:600;color:'+col+';flex:1">'+esc(c.name||"COA "+(ci+1))+'</span>';
+    html+='<span style="font-size:14px;font-weight:700;color:var(--accent)">'+calcWeightedTotal(c).toFixed(1)+'</span>';
+    html+='</div>';
+  });
+  setHTML(el,html);
+}
+
+/* ══════════ SECTION 15: DECISION ══════════ */
+function renderDecision(){
+  var sec=$("tab-decision");var d=STATE.decision;
+  var locked=d.locked;
+  var cls=locked?" df-readonly":"";
+  var html='<div class="card'+cls+'"><h3>Commander Decision</h3>';
+  html+='<div class="df"><label>Select COA</label><select id="dec-coa">';
+  html+='<option value="">-- Select --</option>';
+  STATE.coas.forEach(function(c){html+='<option value="'+c.id+'"'+(d.selected_coa_id===c.id?' selected':'')+'>'+esc(c.name||"Unnamed")+'</option>'});
+  html+='</select></div>';
+  html+=dfTextarea("dec-rationale","Rationale",d.rationale);
+  html+=dfTextarea("dec-followon","Follow-on Guidance",d.followon_guidance);
+  html+='</div>';
+
+  html+='<div class="grid2'+cls+'">';
+  html+='<div class="card"><h4>Modifications</h4><div id="dec-ls-mods"></div></div>';
+  html+='<div class="card"><h4>Residual Risks</h4><div id="dec-ls-risks"></div></div>';
+  html+='</div>';
+
+  if(d.selected_coa_id){
+    var sc=STATE.coas.find(function(x){return x.id===d.selected_coa_id});
+    if(sc){
+      html+='<div class="card"><h3>Decision Packet Summary</h3>';
+      html+='<p style="font-size:12px;margin-bottom:6px"><strong style="color:var(--accent)">Selected:</strong> '+esc(sc.name)+'</p>';
+      html+='<p style="font-size:12px;margin-bottom:6px"><strong style="color:var(--accent)">Score:</strong> '+calcWeightedTotal(sc).toFixed(1)+'</p>';
+      if(d.rationale)html+='<p style="font-size:12px;margin-bottom:6px"><strong style="color:var(--accent)">Why:</strong> '+esc(d.rationale)+'</p>';
+      if(d.modifications.length)html+='<p style="font-size:12px;margin-bottom:6px"><strong style="color:var(--warn)">Modifications:</strong> '+d.modifications.map(function(m){return esc(m)}).join("; ")+'</p>';
+      if(d.residual_risks.length)html+='<p style="font-size:12px"><strong style="color:var(--bad)">Residual Risks:</strong> '+d.residual_risks.map(function(r){return esc(r)}).join("; ")+'</p>';
+      html+='</div>';
+    }
+  }
+
+  html+='<div style="margin-top:14px;text-align:center">';
+  if(locked){
+    html+='<span class="badge b-green" style="font-size:11px;padding:6px 16px">Decision Locked &#10003;</span>';
+    html+=' <button class="warn" id="btnUnlockDec">Unlock</button>';
+  }else{
+    html+='<button class="ok" id="btnLockDec">Lock Decision &#10003;</button>';
+  }
+  html+='</div>';
+
+  setHTML(sec,html);
+
+  if(!locked){
+    var decCoa=$("dec-coa");
+    if(decCoa)decCoa.addEventListener("change",function(){mutate(function(){d.selected_coa_id=decCoa.value});renderDecision()});
+    var decRat=$("sf-dec-rationale");if(decRat)decRat.addEventListener("blur",function(){mutate(function(){d.rationale=decRat.value})});
+    var decFol=$("sf-dec-followon");if(decFol)decFol.addEventListener("blur",function(){mutate(function(){d.followon_guidance=decFol.value})});
+    renderListItems(d.modifications,"dec-ls-mods");
+    renderListItems(d.residual_risks,"dec-ls-risks");
+  }
+
+  var btnLock=$("btnLockDec");
+  if(btnLock)btnLock.addEventListener("click",function(){
+    if(!d.selected_coa_id){showToast("Select a COA first","warn");return}
+    mutate(function(){d.locked=true;STATE.progress.decision=true});showToast("Decision locked","ok");renderDecision();
+  });
+  var btnUnlock=$("btnUnlockDec");
+  if(btnUnlock)btnUnlock.addEventListener("click",function(){
+    mutate(function(){d.locked=false;STATE.progress.decision=false});showToast("Decision unlocked","warn");renderDecision();
+  });
+}
+
+/* ══════════ SECTION 16: ORDERS DEVELOPMENT ══════════ */
+function renderOrders(){
+  var sec=$("tab-orders");var o=STATE.orders;
+  var selCoa=STATE.decision.selected_coa_id?STATE.coas.find(function(c){return c.id===STATE.decision.selected_coa_id}):null;
+
+  var html='<div class="card"><h3>Operations Order (5-Paragraph Format)</h3>';
+  if(!selCoa)html+='<p style="font-size:11px;color:var(--warn);margin-bottom:10px">No COA selected. Lock a decision first for auto-population.</p>';
+  html+='</div>';
+
+  html+=collapsibleSection("ord-1","1. Situation",function(){
+    var h=dfTextarea("ord-sit-enemy","a. Enemy Forces",o.situation_enemy);
+    h+=dfTextarea("ord-sit-friendly","b. Friendly Forces",o.situation_friendly);
+    h+=dfTextarea("ord-sit-attach","c. Attachments / Detachments",o.situation_attachments);
+    return h;
+  });
+
+  var missionText=o.mission_text||(STATE.mission_setup.mission_statement||"");
+  html+=collapsibleSection("ord-2","2. Mission",function(){
+    return dfTextarea("ord-mission","Mission Statement",missionText);
+  });
+
+  var intentText=o.execution_intent||(STATE.mission_setup.commander_intent||"");
+  var conceptText=o.execution_concept||(selCoa?selCoa.concept:"");
+  html+=collapsibleSection("ord-3","3. Execution",function(){
+    var h=dfTextarea("ord-exec-intent","a. Commander\'s Intent",intentText);
+    h+=dfTextarea("ord-exec-concept","b. Concept of Operations",conceptText);
+    h+='<h4 style="margin-top:10px">c. Tasks to Subordinate Units</h4><div id="ord-tasks-list"></div>';
+    h+='<button class="primary" id="btnAddOrdTask" style="margin-top:6px">+ Add Task</button>';
+    h+=dfTextarea("ord-coord","d. Coordinating Instructions",o.coordinating_instructions);
+    return h;
+  });
+
+  html+=collapsibleSection("ord-4","4. Administration & Logistics",function(){
+    var h=dfTextarea("ord-admin-supply","a. Supply",o.admin_supply);
+    h+=dfTextarea("ord-admin-transport","b. Transportation",o.admin_transport);
+    h+=dfTextarea("ord-admin-medical","c. Medical",o.admin_medical);
+    return h;
+  });
+
+  html+=collapsibleSection("ord-5","5. Command & Signal",function(){
+    var h=dfTextarea("ord-cmd-rel","a. Command Relationships",o.command_relationships);
+    h+=dfTextarea("ord-cmd-sig","b. Signal",o.command_signal);
+    return h;
+  });
+
+  html+='<div style="margin-top:14px;display:flex;gap:8px;justify-content:center">';
+  html+='<button class="primary" id="btnGenPreview">Generate Order Preview</button>';
+  html+='<button id="btnCopyOrder">Copy Full Order</button>';
+  html+='</div>';
+
+  html+='<div class="card" style="margin-top:14px" id="orderPreviewCard" '+(o.preview?'':'style="display:none"')+'>';
+  html+='<h3>Order Preview</h3><div class="order-preview" id="orderPreview">'+esc(o.preview||"Click 'Generate Order Preview' to see consolidated order.")+'</div></div>';
+
+  if(!STATE.progress.orders){
+    html+='<div style="margin-top:14px;text-align:center"><button class="ok" id="btnOrdersDone">Mark Orders Complete &#10003;</button></div>';
+  }
+
+  setHTML(sec,html);
+  bindOrderFields();
+  renderOrderTasks();
+
+  $("btnGenPreview").addEventListener("click",function(){generateOrderPreview()});
+  $("btnCopyOrder").addEventListener("click",function(){
+    var txt=$("orderPreview").textContent;
+    if(navigator.clipboard){navigator.clipboard.writeText(txt).then(function(){showToast("Order copied to clipboard","ok")})}
+  });
+  var btnOD=$("btnOrdersDone");
+  if(btnOD)btnOD.addEventListener("click",function(){mutate(function(){STATE.progress.orders=true});showToast("Orders complete","ok");renderOrders()});
+}
+
+function collapsibleSection(id,title,contentFn){
+  var h='<div class="card" id="'+id+'-wrap">';
+  h+='<div class="collapsible-hdr open" id="'+id+'-hdr"><h4>'+title+'</h4><span class="chevron">&#9654;</span></div>';
+  h+='<div class="collapsible-body" id="'+id+'-body">'+contentFn()+'</div>';
+  h+='</div>';
+  return h;
+}
+
+function bindOrderFields(){
+  var o=STATE.orders;
+  var binds=[
+    ["ord-sit-enemy","situation_enemy"],["ord-sit-friendly","situation_friendly"],["ord-sit-attach","situation_attachments"],
+    ["ord-mission","mission_text"],["ord-exec-intent","execution_intent"],["ord-exec-concept","execution_concept"],
+    ["ord-coord","coordinating_instructions"],["ord-admin-supply","admin_supply"],["ord-admin-transport","admin_transport"],
+    ["ord-admin-medical","admin_medical"],["ord-cmd-rel","command_relationships"],["ord-cmd-sig","command_signal"]
+  ];
+  binds.forEach(function(b){
+    var el=$("sf-"+b[0]);if(!el)return;
+    el.addEventListener("blur",function(){mutate(function(){o[b[1]]=el.value})});
+  });
+  document.querySelectorAll("#tab-orders .collapsible-hdr").forEach(function(hdr){
+    hdr.addEventListener("click",function(){
+      hdr.classList.toggle("open");
+      var body=hdr.nextElementSibling;
+      if(body)body.classList.toggle("collapsed");
+    });
+  });
+}
+
+function renderOrderTasks(){
+  var c=$("ord-tasks-list");if(!c)return;
+  var tasks=STATE.orders.execution_tasks;
+  var html='';
+  tasks.forEach(function(t,i){
+    html+='<div class="card" style="padding:10px;margin-bottom:6px"><div class="grid2">';
+    html+=dfInput("ot-unit-"+i,"Unit",t.unit);
+    html+=dfInput("ot-task-"+i,"Task",t.task);
+    html+=dfInput("ot-purpose-"+i,"Purpose",t.purpose);
+    html+=dfInput("ot-priority-"+i,"Priority",t.priority);
+    html+='</div>'+dfInput("ot-coord-"+i,"Coordinating Instructions",t.coordinating||"");
+    html+='<button class="danger" data-rmot="'+i+'" style="margin-top:4px;font-size:9px">Remove</button></div>';
+  });
+  setHTML(c,html);
+  tasks.forEach(function(t,i){
+    ["unit","task","purpose","priority","coord"].forEach(function(f){
+      var el=$("sf-ot-"+f+"-"+i);if(!el)return;
+      var key=f==="coord"?"coordinating":f;
+      el.addEventListener("blur",function(){mutate(function(){t[key]=el.value})});
+    });
+  });
+  c.querySelectorAll("[data-rmot]").forEach(function(b){
+    b.addEventListener("click",function(){var i=parseInt(b.getAttribute("data-rmot"));mutate(function(){tasks.splice(i,1)});renderOrderTasks()});
+  });
+  var btn=$("btnAddOrdTask");
+  if(btn)btn.addEventListener("click",function(){mutate(function(){tasks.push({unit:"",task:"",purpose:"",priority:"",coordinating:""})});renderOrderTasks()});
+}
+
+function generateOrderPreview(){
+  var o=STATE.orders;var m=STATE.metadata;var ms=STATE.mission_setup;
+  var selCoa=STATE.decision.selected_coa_id?STATE.coas.find(function(c){return c.id===STATE.decision.selected_coa_id}):null;
+  var txt="";
+  txt+="OPERATIONS ORDER\n";
+  txt+="Classification: "+m.classification+"\n";
+  txt+="Operation: "+m.op_name+"\n";
+  txt+="Unit: "+m.unit+"\n";
+  txt+="DTG: "+new Date().toISOString()+"\n\n";
+  txt+="1. SITUATION\n";
+  txt+="   a. Enemy Forces: "+(o.situation_enemy||"N/A")+"\n";
+  txt+="   b. Friendly Forces: "+(o.situation_friendly||"N/A")+"\n";
+  txt+="   c. Attachments/Detachments: "+(o.situation_attachments||"N/A")+"\n\n";
+  txt+="2. MISSION\n";
+  txt+="   "+(o.mission_text||ms.mission_statement||"N/A")+"\n\n";
+  txt+="3. EXECUTION\n";
+  txt+="   a. Commander's Intent: "+(o.execution_intent||ms.commander_intent||"N/A")+"\n";
+  txt+="   b. Concept of Operations: "+(o.execution_concept||(selCoa?selCoa.concept:"")||"N/A")+"\n";
+  txt+="   c. Tasks to Subordinate Units:\n";
+  o.execution_tasks.forEach(function(t,i){
+    txt+="      ("+(i+1)+") "+t.unit+": "+t.task+" (Purpose: "+t.purpose+")\n";
+  });
+  txt+="   d. Coordinating Instructions: "+(o.coordinating_instructions||"N/A")+"\n\n";
+  txt+="4. ADMINISTRATION & LOGISTICS\n";
+  txt+="   a. Supply: "+(o.admin_supply||"N/A")+"\n";
+  txt+="   b. Transportation: "+(o.admin_transport||"N/A")+"\n";
+  txt+="   c. Medical: "+(o.admin_medical||"N/A")+"\n\n";
+  txt+="5. COMMAND & SIGNAL\n";
+  txt+="   a. Command Relationships: "+(o.command_relationships||"N/A")+"\n";
+  txt+="   b. Signal: "+(o.command_signal||"N/A")+"\n";
+
+  mutate(function(){o.preview=txt});
+  $("orderPreview").textContent=txt;
+  $("orderPreviewCard").style.display="block";
+  showToast("Order preview generated","ok");
+}
+
+/* ══════════ SECTION 17: TRANSITION ══════════ */
+function renderTransition(){
+  var sec=$("tab-transition");var tr=STATE.transition;
+
+  var tasksDone=tr.tasks.filter(function(t){return t.status==="ready"}).length;
+  var tasksPct=tr.tasks.length?Math.round(tasksDone/tr.tasks.length*100):0;
+  var checkDone=tr.checklist.filter(function(c){return c.done}).length;
+
+  var html='<div class="kpi-row" style="grid-template-columns:repeat(3,1fr)">';
+  html+='<div class="kpi kpi-cyan"><div class="kv kv-cyan">'+tr.tasks.length+'</div><div class="kl">Transition Tasks</div></div>';
+  html+='<div class="kpi '+(tasksPct===100?"kpi-green":"kpi-amber")+'"><div class="kv '+(tasksPct===100?"kv-green":"kv-amber")+'">'+tasksPct+'%</div><div class="kl">Task Readiness</div></div>';
+  html+='<div class="kpi '+(checkDone===tr.checklist.length?"kpi-green":"kpi-amber")+'"><div class="kv '+(checkDone===tr.checklist.length?"kv-green":"kv-amber")+'">'+checkDone+'/'+tr.checklist.length+'</div><div class="kl">Checklist Items</div></div>';
+  html+='</div>';
+
+  html+='<div class="card"><h3>Task Tracker</h3>';
+  html+='<div class="progress-bar"><div class="progress-fill" style="width:'+tasksPct+'%"></div></div>';
+  html+='<table><thead><tr><th>Task</th><th>Assigned To</th><th>Suspense</th><th>Status</th><th>Notes</th><th></th></tr></thead><tbody id="trTaskBody">';
+  tr.tasks.forEach(function(t,i){
+    var stCls=t.status==="ready"?"b-green":t.status==="partial"?"b-amber":"b-red";
+    html+='<tr><td><input type="text" value="'+esc(t.name)+'" data-tri="'+i+'" data-trf="name" style="background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:4px;padding:3px 6px;font-size:10px;width:100%"/></td>';
+    html+='<td><input type="text" value="'+esc(t.assigned)+'" data-tri="'+i+'" data-trf="assigned" style="background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:4px;padding:3px 6px;font-size:10px;width:100%"/></td>';
+    html+='<td><input type="date" value="'+esc(t.suspense)+'" data-tri="'+i+'" data-trf="suspense" style="background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:4px;padding:3px 6px;font-size:10px"/></td>';
+    html+='<td><select data-tri="'+i+'" data-trf="status" style="background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:4px;padding:3px 6px;font-size:10px">';
+    ["not ready","partial","ready"].forEach(function(s){html+='<option'+(t.status===s?' selected':'')+'>'+s+'</option>'});
+    html+='</select></td>';
+    html+='<td><input type="text" value="'+esc(t.notes)+'" data-tri="'+i+'" data-trf="notes" style="background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:4px;padding:3px 6px;font-size:10px;width:100%"/></td>';
+    html+='<td><button class="danger" data-rmtr="'+i+'" style="padding:2px 6px;font-size:10px">&times;</button></td></tr>';
+  });
+  html+='</tbody></table>';
+  html+='<button class="primary" id="btnAddTrTask" style="margin-top:8px">+ Add Task</button></div>';
+
+  html+='<div class="card"><h3>Transition Checklist</h3>';
+  tr.checklist.forEach(function(c,i){
+    html+='<div class="checklist-item"><input type="checkbox" data-chi="'+i+'"'+(c.done?' checked':'')+'/><span>'+esc(c.text)+'</span></div>';
+  });
+  html+='</div>';
+
+  html+='<div class="grid2">';
+  html+='<div class="card"><h4>Decision Support Matrix</h4><div id="tr-ls-dsm"></div></div>';
+  html+='<div class="card"><h4>CCIR Monitoring</h4><div id="tr-ls-ccir"></div></div>';
+  html+='</div>';
+
+  setHTML(sec,html);
+
+  sec.querySelectorAll("[data-tri]").forEach(function(el){
+    var handler=function(){
+      var i=parseInt(el.getAttribute("data-tri"));var f=el.getAttribute("data-trf");
+      mutate(function(){tr.tasks[i][f]=el.value});
+      if(f==="status")renderTransition();
+    };
+    if(el.tagName==="SELECT")el.addEventListener("change",handler);
+    else el.addEventListener("blur",handler);
+  });
+  sec.querySelectorAll("[data-rmtr]").forEach(function(b){
+    b.addEventListener("click",function(){var i=parseInt(b.getAttribute("data-rmtr"));mutate(function(){tr.tasks.splice(i,1)});renderTransition()});
+  });
+  $("btnAddTrTask").addEventListener("click",function(){
+    mutate(function(){tr.tasks.push({name:"",assigned:"",suspense:"",status:"not ready",notes:""})});renderTransition();
+  });
+  sec.querySelectorAll("[data-chi]").forEach(function(cb){
+    cb.addEventListener("change",function(){var i=parseInt(cb.getAttribute("data-chi"));mutate(function(){tr.checklist[i].done=cb.checked});renderTransition()});
+  });
+  renderListItems(tr.dsm,"tr-ls-dsm");
+  renderListItems(tr.ccir_monitor,"tr-ls-ccir");
+}
+
+/* ══════════ SECTION 18: TIMELINE ══════════ */
+function renderTimeline(){
+  var sec=$("tab-timeline");var tl=STATE.timeline;
+  var html='<div class="card"><h3>Planning Timeline</h3>';
+  html+='<button class="primary" id="btnAutoMilestones" style="margin-bottom:10px">Auto-Generate from State</button>';
+  html+=' <button class="primary" id="btnAddMilestone">+ Add Milestone</button>';
+  html+='</div>';
+
+  if(tl.milestones.length){
+    var sorted=tl.milestones.slice().sort(function(a,b){return(a.datetime||"").localeCompare(b.datetime||"")});
+    html+='<div class="tl-vertical"><div class="tl-line"></div>';
+    sorted.forEach(function(m,i){
+      var catCls="tl-"+(m.category||"planning");
+      html+='<div class="tl-item"><div class="tl-dot '+catCls+'"></div>';
+      html+='<div class="tl-content"><div class="tl-name">'+esc(m.name)+'</div>';
+      html+='<div class="tl-date">'+fmtDate(m.datetime)+'</div>';
+      html+='<div class="tl-cat" style="color:var(--muted)">'+esc(m.category||"planning")+'</div>';
+      html+='<button class="danger" data-rmml="'+i+'" style="margin-top:4px;font-size:9px;padding:2px 6px">&times;</button>';
+      html+='</div></div>';
+    });
+    html+='</div>';
+  }else{
+    html+='<p style="color:var(--muted);font-size:11px;text-align:center;padding:20px">No milestones. Click Auto-Generate or + Add Milestone.</p>';
+  }
+
+  setHTML(sec,html);
+
+  $("btnAutoMilestones").addEventListener("click",function(){
+    mutate(function(){
+      tl.milestones=[];
+      var now=new Date().toISOString();
+      tl.milestones.push({name:"Planning Start",datetime:now,category:"planning"});
+      if(STATE.metadata.op_name)tl.milestones.push({name:"WARNO Issued",datetime:now,category:"planning"});
+      if(STATE.progress.framing)tl.milestones.push({name:"Problem Framing Complete",datetime:now,category:"planning"});
+      if(STATE.progress.coadev)tl.milestones.push({name:"COA Development Complete",datetime:now,category:"planning"});
+      if(STATE.progress.wargame)tl.milestones.push({name:"Wargaming Complete",datetime:now,category:"planning"});
+      if(STATE.progress.compare)tl.milestones.push({name:"COA Comparison Complete",datetime:now,category:"planning"});
+      if(STATE.progress.decision)tl.milestones.push({name:"Decision Brief",datetime:now,category:"execution"});
+      if(STATE.progress.orders)tl.milestones.push({name:"OPORD Issued",datetime:now,category:"execution"});
+      STATE.transition.tasks.forEach(function(t){
+        if(t.suspense)tl.milestones.push({name:t.name||"Task Suspense",datetime:t.suspense+"T00:00:00",category:"logistics"});
+      });
+    });
+    showToast("Milestones auto-generated","ok");renderTimeline();
+  });
+
+  $("btnAddMilestone").addEventListener("click",function(){
+    openDrawer("Add Milestone",'<div class="df"><label>Name</label><input id="ml-name" type="text"/></div><div class="df"><label>Date/Time</label><input id="ml-dt" type="datetime-local"/></div><div class="df"><label>Category</label><select id="ml-cat"><option>planning</option><option>execution</option><option>logistics</option></select></div><button class="ok" id="btnSaveMl" style="margin-top:10px">Save</button>');
+    $("btnSaveMl").addEventListener("click",function(){
+      var name=$("ml-name").value;var dt=$("ml-dt").value;var cat=$("ml-cat").value;
+      if(!name){showToast("Name required","warn");return}
+      mutate(function(){tl.milestones.push({name:name,datetime:dt||new Date().toISOString(),category:cat})});
+      closeDrawer();showToast("Milestone added","ok");renderTimeline();
+    });
+  });
+
+  sec.querySelectorAll("[data-rmml]").forEach(function(b){
+    b.addEventListener("click",function(){var i=parseInt(b.getAttribute("data-rmml"));mutate(function(){tl.milestones.splice(i,1)});renderTimeline()});
+  });
+}
+
+/* ══════════ SECTION 19: EXPORTS ══════════ */
+function renderExports(){
+  var sec=$("tab-exports");
+  var storageKB=(store.size()/1024).toFixed(1);
+  var html='<div class="card"><h3>Session Management</h3>';
+  html+='<p style="font-size:11px;color:var(--muted);margin-bottom:10px">Last saved: '+(STATE._lastSaved?fmtDate(STATE._lastSaved):"Never")+' &middot; Storage: '+storageKB+' KB</p>';
+  html+='<div style="display:flex;gap:8px;flex-wrap:wrap">';
+  html+='<button class="primary" id="btnSaveNow">Save Now</button>';
+  html+='<button id="btnLoadStorage">Load from Storage</button>';
+  html+='<button class="danger" id="btnResetAll">Reset All</button>';
+  html+='</div></div>';
+
+  html+='<div class="card"><h3>Export</h3><div style="display:flex;gap:8px;flex-wrap:wrap">';
+  html+='<button class="primary" id="btnExportJSON">Export Full JSON</button>';
+  html+='<button id="btnExportOPORD">Export OPORD (TXT)</button>';
+  html+='<button id="btnExportSummary">Export Summary (TXT)</button>';
+  html+='<button id="btnExportCompCSV">Export COA Comparison (CSV)</button>';
+  html+='<button id="btnExportTransCSV">Export Transition Tasks (CSV)</button>';
+  html+='</div></div>';
+
+  html+='<div class="card"><h3>Import</h3>';
+  html+='<p style="font-size:11px;color:var(--muted);margin-bottom:8px">Import a previously exported JSON file to restore state.</p>';
+  html+='<input type="file" id="importFile" accept=".json" style="font-size:11px;color:var(--muted)"/>';
+  html+='</div>';
+
+  setHTML(sec,html);
+
+  $("btnSaveNow").addEventListener("click",function(){doSave();showToast("Saved","ok");renderExports()});
+  $("btnLoadStorage").addEventListener("click",function(){if(loadState()){showToast("State loaded","ok");updateProgress();renderTab(currentTab)}else{showToast("No saved state found","warn")}});
+  $("btnResetAll").addEventListener("click",function(){
+    var overlay=document.createElement("div");overlay.className="confirm-overlay";
+    overlay.innerHTML='<div class="confirm-card"><h4>Reset All Data?</h4><p>This will permanently delete all planning data. This cannot be undone.</p><div class="confirm-btns"><button class="danger" id="confirmReset">Reset Everything</button><button id="cancelReset">Cancel</button></div></div>';
+    document.body.appendChild(overlay);
+    document.getElementById("confirmReset").addEventListener("click",function(){
+      STATE=defaultState();store.remove(STORE_KEY);selectedCOA=null;
+      overlay.remove();showToast("All data reset","warn");updateProgress();updateSaveIndicator();setTab("overview");
+    });
+    document.getElementById("cancelReset").addEventListener("click",function(){overlay.remove()});
+  });
+
+  $("btnExportJSON").addEventListener("click",function(){
+    var s=deepClone(STATE);delete s._dirty;
+    downloadFile(JSON.stringify(s,null,2),(STATE.metadata.op_name||"mcpp")+"_export.json","application/json");
+  });
+  $("btnExportOPORD").addEventListener("click",function(){
+    if(!STATE.orders.preview){generateOrderPreview()}
+    downloadFile(STATE.orders.preview||"No order generated",(STATE.metadata.op_name||"mcpp")+"_OPORD.txt","text/plain");
+  });
+  $("btnExportSummary").addEventListener("click",function(){
+    var txt="MCPP PLANNING SUMMARY\n"+("=".repeat(40))+"\n\n";
+    txt+="Operation: "+STATE.metadata.op_name+"\nUnit: "+STATE.metadata.unit+"\nClassification: "+STATE.metadata.classification+"\n\n";
+    txt+="MISSION: "+STATE.mission_setup.mission_statement+"\n\n";
+    txt+="INTENT: "+STATE.mission_setup.commander_intent+"\n\n";
+    txt+="PROBLEM STATEMENT: "+STATE.problem_framing.problem_statement+"\n\n";
+    txt+="END STATE: "+STATE.problem_framing.desired_end_state+"\n\n";
+    txt+="COAs DEVELOPED: "+STATE.coas.length+"\n";
+    STATE.coas.forEach(function(c,i){txt+="  COA "+(i+1)+": "+c.name+" (Score: "+calcWeightedTotal(c).toFixed(1)+")\n"});
+    var selCoa=STATE.decision.selected_coa_id?STATE.coas.find(function(x){return x.id===STATE.decision.selected_coa_id}):null;
+    if(selCoa)txt+="\nSELECTED: "+selCoa.name+"\nRATIONALE: "+STATE.decision.rationale+"\n";
+    txt+="\nPROGRESS:\n";
+    STEP_LABELS.forEach(function(s){txt+="  "+s.label+": "+(STATE.progress[s.key]?"COMPLETE":"INCOMPLETE")+"\n"});
+    downloadFile(txt,(STATE.metadata.op_name||"mcpp")+"_summary.txt","text/plain");
+  });
+  $("btnExportCompCSV").addEventListener("click",function(){
+    var csv="COA,"+CRITERIA_LABELS.join(",")+",Weighted Total\n";
+    STATE.coas.forEach(function(c){
+      csv+='"'+c.name+'"';
+      CRITERIA.forEach(function(cr){csv+=","+(c.comparison_scores[cr]||5)});
+      csv+=","+calcWeightedTotal(c).toFixed(1)+"\n";
+    });
+    downloadFile(csv,(STATE.metadata.op_name||"mcpp")+"_comparison.csv","text/csv");
+  });
+  $("btnExportTransCSV").addEventListener("click",function(){
+    var csv="Task,Assigned To,Suspense,Status,Notes\n";
+    STATE.transition.tasks.forEach(function(t){csv+='"'+t.name+'","'+t.assigned+'","'+t.suspense+'","'+t.status+'","'+t.notes+'"\n'});
+    downloadFile(csv,(STATE.metadata.op_name||"mcpp")+"_transition.csv","text/csv");
+  });
+
+  $("importFile").addEventListener("change",function(e){
+    var file=e.target.files[0];if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      try{
+        var data=JSON.parse(ev.target.result);
+        if(!data.metadata||!data.progress){showToast("Invalid MCPP export file","bad");return}
+        STATE=data;STATE._dirty=false;
+        doSave();showToast("State imported successfully","ok");updateProgress();setTab("overview");
+      }catch(err){showToast("Invalid JSON file","bad")}
+    };
+    reader.readAsText(file);
+  });
+}
+
+/* ══════════ SECTION 20: DOCTRINE / HELP ══════════ */
+var DOCTRINE=[
+  {title:"Step 1: Problem Framing",body:"<p>Problem framing is the most critical step in MCPP. It ensures the planning team understands the operational environment, the problem to be solved, and the desired end state before developing solutions.</p><ul><li>Analyze the higher commander's intent and guidance</li><li>Conduct initial intelligence preparation of the battlespace</li><li>Identify the problem, its root causes, and contributing factors</li><li>Define the desired military end state</li><li>Develop an operational approach</li></ul>"},
+  {title:"Step 2: COA Development",body:"<p>COA development produces broad concepts of operations that accomplish the mission. Each COA must be suitable, feasible, acceptable, distinguishable, and complete.</p><ul><li>Analyze relative combat power</li><li>Generate options (COAs)</li><li>Array initial forces and develop scheme of maneuver</li><li>Assign headquarters and develop concept of operations</li><li>Prepare COA statements and sketches</li></ul>"},
+  {title:"Step 3: COA Wargaming",body:"<p>Wargaming is a disciplined process of visualizing the interaction of friendly and enemy forces. It identifies strengths and weaknesses of each COA.</p><ul><li>Use action-reaction-counteraction methodology</li><li>Identify decision points, critical events, and CCIRs</li><li>Refine COAs based on wargame results</li><li>Identify requirements for support</li><li>Document results in a synchronization matrix</li></ul>"},
+  {title:"Step 4: COA Comparison & Decision",body:"<p>The staff compares COAs against evaluation criteria and presents findings to the commander. The commander selects a COA or modifies one for further development.</p><ul><li>Analyze each COA against criteria (feasibility, acceptability, suitability, etc.)</li><li>Weight criteria based on commander's guidance</li><li>Compare COAs and identify advantages/disadvantages</li><li>Present the decision brief</li><li>Commander selects or modifies a COA</li></ul>"},
+  {title:"Step 5: Orders Development",body:"<p>The staff converts the selected COA into a complete operations order using the 5-paragraph format.</p><ul><li>Prepare the OPORD: Situation, Mission, Execution, Admin & Logistics, Command & Signal</li><li>Develop annexes and appendices as needed</li><li>Conduct an orders crosswalk</li><li>Reconcile the plan with available resources</li></ul>"},
+  {title:"Step 6: Transition",body:"<p>Transition bridges planning and execution. The staff ensures subordinate units understand the order and are prepared to execute.</p><ul><li>Brief subordinate commanders</li><li>Issue warning orders and operations orders</li><li>Conduct rehearsals and backbriefs</li><li>Verify readiness of subordinate units</li><li>Establish monitoring and assessment criteria</li></ul>"},
+  {title:"Commander-Driven Planning",body:"<p>MCPP is commander-driven. The commander's intent, guidance, and decisions drive each step. The staff supports the commander by developing information, analyzing options, and recommending decisions.</p>"},
+  {title:"Iterative Planning",body:"<p>MCPP is iterative, not purely sequential. As new information emerges, the staff may revisit earlier steps. Planning continues throughout execution as the situation evolves.</p>"},
+  {title:"Rapid Planning",body:"<p>When time is limited, steps can be compressed or conducted concurrently. The commander may abbreviate the process, focusing on the most critical decisions. Problem framing and COA development may be combined; wargaming may be limited to the most dangerous enemy COA.</p>"}
+];
+function renderDoctrine(){
+  var sec=$("tab-doctrine");
+  var html='<div class="df"><label>Search Doctrine</label><input id="docSearch" type="text" placeholder="Type to filter..."/></div>';
+  DOCTRINE.forEach(function(d,i){
+    html+='<div class="doctrine-card" data-doci="'+i+'">';
+    html+='<div class="doctrine-hdr" data-doci="'+i+'"><h4>'+esc(d.title)+'</h4><span class="chevron">&#9654;</span></div>';
+    html+='<div class="doctrine-body">'+d.body+'</div></div>';
+  });
+  setHTML(sec,html);
+  sec.querySelectorAll(".doctrine-hdr").forEach(function(hdr){
+    hdr.addEventListener("click",function(){
+      hdr.classList.toggle("open");
+      var body=hdr.nextElementSibling;body.classList.toggle("open");
+    });
+  });
+  $("docSearch").addEventListener("input",function(){
+    var q=this.value.toLowerCase();
+    sec.querySelectorAll(".doctrine-card").forEach(function(card){
+      var idx=parseInt(card.getAttribute("data-doci"));
+      var d=DOCTRINE[idx];
+      var match=!q||d.title.toLowerCase().includes(q)||d.body.toLowerCase().includes(q);
+      card.style.display=match?"":"none";
+    });
+  });
+}
+
+/* ══════════ SECTION 21: KEYBOARD SHORTCUTS ══════════ */
+document.addEventListener("keydown",function(e){
+  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA"||e.target.tagName==="SELECT")return;
+  var key=e.key;
+  if(key>="1"&&key<="9"){var idx=parseInt(key)-1;if(idx<TAB_NAMES.length){e.preventDefault();setTab(TAB_NAMES[idx])}}
+  if(key==="0"){e.preventDefault();setTab(TAB_NAMES[9])}
+  if(key==="Escape"){closeDrawer()}
+  if(key==="?"){e.preventDefault();setTab("doctrine")}
+});
+
+/* ══════════ SECTION 22: INIT ══════════ */
+function initApp(){
+  var loaded=loadState();
+  if(loaded)showToast("Session restored","ok");
+  updateProgress();
+  updateSaveIndicator();
+  setTab("overview");
+}
+document.addEventListener("DOMContentLoaded",initApp);
+
+</script>
+</body>
+</html>
