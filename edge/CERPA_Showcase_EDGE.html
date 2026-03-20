@@ -1,0 +1,1301 @@
+<!-- CERPA Showcase — Deep Sigma EDGE v0.1
+     Format: single-file, zero-dependency, hardened
+     Purpose: Complete explanation of the CERPA lifecycle framework
+     Sections: Hero, Problem, Lifecycle, Deep Dive, Data Model, Walkthrough, Domains, Coherence, Compare, Closing -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-src 'none'; object-src 'none'"/>
+<script>
+(function(){"use strict";
+var B="EDGE_BUILD_ID:CERPA_SHOWCASE_EDGE_v0.1";
+function _b(c){return function(){throw new Error("EDGE hardening: "+c+" blocked")}}
+window.fetch=_b("fetch");window.XMLHttpRequest=_b("XHR");window.WebSocket=_b("WS");
+window.EventSource=_b("ES");try{navigator.sendBeacon=_b("beacon")}catch(_){}
+window.eval=_b("eval");try{window.Function=_b("Function")}catch(_){}
+window.open=_b("window.open");window.RTCPeerConnection=_b("RTC");
+window.BroadcastChannel=_b("BC");window.SharedWorker=_b("SW");window.Worker=_b("W");
+try{Object.defineProperty(window,"localStorage",{get:_b("localStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"sessionStorage",{get:_b("sessionStorage"),configurable:false})}catch(_){}
+try{Object.defineProperty(window,"indexedDB",{get:_b("indexedDB"),configurable:false})}catch(_){}
+if(typeof console!=="undefined")console.log("[EDGE] "+B);
+if(window.self===window.top){document.addEventListener("DOMContentLoaded",function(){
+  var v=[];
+  if(document.querySelectorAll("script[src],link[href]").length>0)v.push("external resource");
+  if(document.querySelectorAll("[onclick],[onerror],[onload]").length>0)v.push("inline handler");
+  if(v.length>0)document.body.innerHTML="<h1 style='color:red;font-family:monospace;padding:40px'>EDGE VIOLATION: "+v.join("; ")+"</h1>";
+});}
+})();
+</script>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Deep Sigma EDGE — CERPA Showcase v0.1</title>
+<style>
+:root{
+  --bg:#0a0812;--card:#13101f;--card2:#0e0b1a;--muted:#7a6b99;--txt:#e0d8f0;
+  --accent:#00f0ff;--warn:#ffcc66;--bad:#ff6b6b;--ok:#5dff93;
+  --ribbon:#1a1530;--line:#1e1530;--glow:rgba(0,240,255,.08);
+  --mag:#ff6bff;--purple:#a855f7;--neon-blue:#3b82ff;
+  --c-claim:var(--accent);--c-event:var(--warn);--c-review:var(--purple);
+  --c-patch:var(--mag);--c-apply:var(--ok)
+}
+html{scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:border-box}
+body{
+  margin:0;padding:0;
+  background:var(--bg);
+  color:var(--txt);
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:14px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased
+}
+body::after{
+  content:"";
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);
+  pointer-events:none;
+  z-index:9999
+}
+
+/* Nav */
+.nav-bar{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  height:48px;
+  background:rgba(10,8,18,.92);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;
+  padding:0 24px;
+  gap:4px
+}
+.nav-brand{
+  font-size:10px;font-weight:700;letter-spacing:2px;
+  color:var(--accent);text-transform:uppercase;
+  margin-right:auto;
+  white-space:nowrap
+}
+.nav-link{
+  font-size:10px;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--muted);
+  padding:6px 10px;
+  cursor:pointer;
+  text-decoration:none;
+  border-bottom:2px solid transparent;
+  transition:color .2s,border-color .2s;
+  white-space:nowrap
+}
+.nav-link:hover{color:var(--txt)}
+.nav-link.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* Glow classes */
+.glow{text-shadow:0 0 10px var(--accent),0 0 40px rgba(0,240,255,.2)}
+.glow-mag{text-shadow:0 0 10px var(--mag),0 0 40px rgba(255,107,255,.2)}
+.glow-purple{text-shadow:0 0 10px var(--purple),0 0 40px rgba(168,85,247,.2)}
+
+/* Sections */
+section{
+  min-height:100vh;
+  padding:80px 40px 60px;
+  max-width:1100px;
+  margin:0 auto;
+  position:relative
+}
+
+/* Cards */
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:20px;
+  transition:all .25s
+}
+.card:hover{
+  border-color:rgba(0,240,255,.3);
+  box-shadow:0 0 20px rgba(0,240,255,.08)
+}
+
+/* Grids */
+.grid-5{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+
+/* Section titles */
+h2{font-size:28px;margin-bottom:8px;letter-spacing:1px}
+.section-sub{color:var(--muted);font-size:13px;margin-bottom:32px}
+
+/* KPI */
+.kpi{text-align:center;padding:20px}
+.kpi-val{font-size:32px;font-weight:700}
+.kpi-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+
+/* Stage cards */
+.stage-card{
+  padding:16px;
+  cursor:pointer;
+  border-left:3px solid transparent;
+  transition:all .2s
+}
+.stage-card.active{
+  border-left-color:var(--accent);
+  background:rgba(0,240,255,.04);
+  box-shadow:0 0 15px rgba(0,240,255,.08)
+}
+
+/* Timeline */
+.tl-item{
+  position:relative;
+  padding-left:40px;
+  padding-bottom:32px;
+  border-left:2px solid var(--line);
+  margin-left:12px
+}
+.tl-dot{
+  position:absolute;
+  left:-7px;top:4px;
+  width:12px;height:12px;
+  border-radius:50%;
+  border:2px solid var(--accent)
+}
+
+/* Toggle */
+.toggle-bar{
+  display:flex;gap:0;
+  border-radius:8px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  width:fit-content;
+  margin-bottom:24px
+}
+.toggle-btn{
+  padding:10px 20px;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:600;
+  background:var(--card);
+  color:var(--muted);
+  border:none;
+  transition:all .2s;
+  font-family:inherit
+}
+.toggle-btn.active{
+  background:var(--accent);
+  color:#0a0812
+}
+
+/* Animations */
+@keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}
+
+/* Hero grid floor */
+.hero-grid{
+  position:absolute;bottom:0;left:0;right:0;height:200px;
+  background:
+    linear-gradient(transparent 40%,rgba(0,240,255,.03)),
+    repeating-linear-gradient(90deg,rgba(0,240,255,.04) 0px,rgba(0,240,255,.04) 1px,transparent 1px,transparent 60px),
+    repeating-linear-gradient(0deg,rgba(0,240,255,.04) 0px,rgba(0,240,255,.04) 1px,transparent 1px,transparent 60px);
+  transform:perspective(400px) rotateX(45deg);
+  transform-origin:bottom;
+  pointer-events:none
+}
+
+/* Quote */
+.quote{
+  font-size:14px;color:var(--accent);font-style:italic;
+  border-left:2px solid var(--mag);
+  padding-left:14px;margin:20px 0
+}
+
+/* Edge badge */
+.edge-badge{
+  font-size:8px;color:var(--muted);
+  border:1px solid var(--line);
+  padding:3px 8px;border-radius:4px;
+  letter-spacing:1px;text-transform:uppercase;
+  display:inline-block
+}
+
+/* Compare cards */
+.compare-card{padding:20px;border-radius:12px}
+.compare-bad{background:rgba(255,107,107,.04);border:1px solid rgba(255,107,107,.15)}
+.compare-good{background:rgba(93,255,147,.04);border:1px solid rgba(93,255,147,.15)}
+
+/* Footer */
+footer{
+  text-align:center;padding:20px;
+  font-size:9px;color:var(--muted);
+  border-top:1px solid var(--line);
+  letter-spacing:1px
+}
+
+/* Responsive */
+@media(max-width:768px){
+  .grid-5,.grid-3,.grid-2{grid-template-columns:1fr}
+  section{padding:70px 20px 40px}
+  .nav-link{padding:6px 6px;font-size:9px}
+  .stage-row{flex-direction:column}
+  h1{font-size:32px !important}
+}
+
+/* Problem card icon */
+.prob-icon{font-size:24px;margin-bottom:8px;display:block}
+.prob-title{font-weight:700;font-size:14px;margin-bottom:6px;color:var(--txt)}
+.prob-desc{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* Stage row */
+.stage-row{
+  display:flex;gap:8px;margin-bottom:20px;
+  flex-wrap:wrap
+}
+.stage-row .stage-card{flex:1;min-width:140px}
+
+/* Stage detail */
+#stageDetail{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:24px;
+  min-height:180px
+}
+
+/* Connecting line between stage cards */
+.stage-connector{
+  height:2px;
+  background:linear-gradient(90deg,var(--c-claim),var(--c-event),var(--c-review),var(--c-patch),var(--c-apply));
+  margin:-4px 0 16px;
+  border-radius:1px;
+  opacity:.4
+}
+
+/* Hero specifics */
+.hero-title{
+  font-size:48px;font-weight:700;
+  margin:0 0 12px;line-height:1.1
+}
+.hero-sub{
+  font-size:18px;color:var(--muted);
+  margin-bottom:24px
+}
+
+/* Supporting text */
+.support-text{
+  font-size:13px;color:var(--muted);
+  margin-bottom:24px;
+  max-width:700px
+}
+
+/* Hero layout */
+.hero-content{
+  display:flex;
+  align-items:center;
+  gap:40px;
+  flex-wrap:wrap;
+  justify-content:center
+}
+.hero-text{flex:1;min-width:300px}
+.hero-ring{flex:0 0 auto}
+
+/* Problem grid */
+.prob-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px
+}
+@media(max-width:768px){
+  .prob-grid{grid-template-columns:1fr}
+}
+
+/* Copy button */
+.copy-btn{
+  background:var(--accent);
+  color:#0a0812;
+  border:none;
+  padding:10px 24px;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  font-family:inherit;
+  letter-spacing:.5px;
+  transition:all .2s;
+  margin-top:20px
+}
+.copy-btn:hover{
+  box-shadow:0 0 20px rgba(0,240,255,.3);
+  transform:translateY(-1px)
+}
+
+/* Closing section */
+.closing-banner{
+  background:linear-gradient(135deg,rgba(168,85,247,.1),rgba(0,240,255,.05));
+  border-radius:16px;
+  padding:60px 40px;
+  text-align:center
+}
+.closing-main{
+  font-size:32px;font-weight:700;
+  margin:0 0 8px;line-height:1.3
+}
+.closing-sub{
+  font-size:15px;color:var(--muted);
+  margin:16px 0 24px
+}
+.closing-questions{
+  font-size:12px;color:var(--muted);
+  line-height:2;
+  margin-top:24px
+}
+
+/* Gauge container */
+.gauge-wrap{
+  display:flex;justify-content:center;
+  margin-bottom:32px
+}
+
+/* Callout */
+.callout{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:16px 20px;
+  font-size:13px;
+  color:var(--accent);
+  margin-top:24px;
+  text-align:center
+}
+
+/* Phase pill */
+.phase-pill{
+  display:inline-block;
+  font-size:10px;font-weight:700;
+  letter-spacing:.5px;
+  padding:3px 10px;
+  border-radius:10px;
+  text-transform:uppercase
+}
+
+/* Deep dive tabs */
+.dd-tabs{display:flex;gap:0;margin-bottom:20px;flex-wrap:wrap}
+.dd-tab{
+  padding:12px 20px;cursor:pointer;font-size:12px;font-weight:700;
+  letter-spacing:.5px;text-transform:uppercase;
+  border:1px solid var(--line);background:var(--card);color:var(--muted);
+  transition:all .2s;font-family:inherit
+}
+.dd-tab:first-child{border-radius:8px 0 0 8px}
+.dd-tab:last-child{border-radius:0 8px 8px 0}
+.dd-tab.active{color:#0a0812}
+.dd-tab[data-dd="claim"].active{background:var(--c-claim)}
+.dd-tab[data-dd="event"].active{background:var(--c-event)}
+.dd-tab[data-dd="review"].active{background:var(--c-review)}
+.dd-tab[data-dd="patch"].active{background:var(--c-patch)}
+.dd-tab[data-dd="apply"].active{background:var(--c-apply)}
+
+/* Data model code block */
+.dm-block{
+  background:#0d0a17;
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:16px 20px;
+  font-family:"SF Mono",Menlo,Consolas,monospace;
+  font-size:12px;
+  line-height:1.7;
+  overflow-x:auto;
+  color:var(--muted)
+}
+.dm-key{color:var(--accent)}
+.dm-type{color:var(--warn)}
+.dm-comment{color:#555;font-style:italic}
+
+/* Domain card */
+.domain-card{
+  padding:20px;
+  border-left:3px solid var(--accent);
+  cursor:pointer;
+  transition:all .2s
+}
+.domain-card:hover{border-left-color:var(--c-claim)}
+.domain-title{font-weight:700;font-size:14px;margin-bottom:6px}
+.domain-desc{font-size:12px;color:var(--muted);line-height:1.5}
+.domain-mapping{font-size:11px;margin-top:10px;line-height:1.8}
+.dm-phase{font-weight:600;font-size:10px;letter-spacing:.5px}
+
+/* Principle cards */
+.principle-card{padding:20px;text-align:center}
+.principle-icon{font-size:28px;margin-bottom:10px}
+.principle-title{font-weight:700;font-size:13px;margin-bottom:6px;color:var(--accent)}
+.principle-desc{font-size:12px;color:var(--muted);line-height:1.5}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ NAV BAR ═══════════════════════════════ -->
+<nav class="nav-bar">
+  <span class="nav-brand">Deep Sigma EDGE</span>
+  <a class="nav-link" data-nav="s-problem">Problem</a>
+  <a class="nav-link" data-nav="s-lifecycle">Lifecycle</a>
+  <a class="nav-link" data-nav="s-deep">Deep Dive</a>
+  <a class="nav-link" data-nav="s-model">Data Model</a>
+  <a class="nav-link" data-nav="s-walk">Walkthrough</a>
+  <a class="nav-link" data-nav="s-domains">Domains</a>
+  <a class="nav-link" data-nav="s-coherence">Coherence</a>
+  <a class="nav-link" data-nav="s-compare">Compare</a>
+  <a class="nav-link" data-nav="s-closing">About</a>
+</nav>
+
+<!-- ═══════════════════════════════ SECTION 1: HERO ═══════════════════════════════ -->
+<section id="s-hero" style="display:flex;align-items:center;justify-content:center">
+  <div class="hero-content">
+    <div class="hero-text">
+      <h1 class="hero-title glow">CERPA</h1>
+      <p class="hero-sub">Composite Enterprise Risk Posture Assessment</p>
+      <p style="font-size:14px;color:var(--muted);max-width:500px;line-height:1.7">
+        A five-phase governance lifecycle that transforms fragmented observations into
+        durable institutional memory. From initial claim through enforced correction &mdash;
+        every decision carries its evidence chain.
+      </p>
+      <div class="quote">
+        "What was claimed? What was observed? What was decided? What was corrected? Did it hold?"
+      </div>
+      <div style="margin-top:24px">
+        <span class="edge-badge">CERPA_SHOWCASE_EDGE_v0.1</span>
+      </div>
+    </div>
+    <div class="hero-ring">
+      <svg viewBox="0 0 220 220" style="width:200px;height:200px">
+        <!-- Five-node ring: C, E, R, P, A -->
+        <line x1="110" y1="30" x2="186" y2="85" stroke="var(--line)" stroke-width="1.5"/>
+        <line x1="186" y1="85" x2="157" y2="175" stroke="var(--line)" stroke-width="1.5"/>
+        <line x1="157" y1="175" x2="63" y2="175" stroke="var(--line)" stroke-width="1.5"/>
+        <line x1="63" y1="175" x2="34" y2="85" stroke="var(--line)" stroke-width="1.5"/>
+        <line x1="34" y1="85" x2="110" y2="30" stroke="var(--line)" stroke-width="1.5"/>
+
+        <polyline
+          points="110,30 186,85 157,175 63,175 34,85 110,30"
+          fill="none"
+          stroke="var(--accent)"
+          stroke-width="2"
+          stroke-dasharray="600"
+          stroke-dashoffset="600"
+          stroke-linecap="round"
+          opacity=".7">
+          <animate attributeName="stroke-dashoffset" from="600" to="0" dur="3s" repeatCount="indefinite"/>
+        </polyline>
+
+        <circle cx="110" cy="30" r="18" fill="var(--card)" stroke="var(--c-claim)" stroke-width="2"/>
+        <text x="110" y="27" text-anchor="middle" fill="var(--c-claim)" font-size="12" font-weight="700" font-family="inherit">C</text>
+        <text x="110" y="39" text-anchor="middle" fill="var(--muted)" font-size="6" font-family="inherit">Claim</text>
+
+        <circle cx="186" cy="85" r="18" fill="var(--card)" stroke="var(--c-event)" stroke-width="2"/>
+        <text x="186" y="82" text-anchor="middle" fill="var(--c-event)" font-size="12" font-weight="700" font-family="inherit">E</text>
+        <text x="186" y="94" text-anchor="middle" fill="var(--muted)" font-size="6" font-family="inherit">Event</text>
+
+        <circle cx="157" cy="175" r="18" fill="var(--card)" stroke="var(--c-review)" stroke-width="2"/>
+        <text x="157" y="172" text-anchor="middle" fill="var(--c-review)" font-size="12" font-weight="700" font-family="inherit">R</text>
+        <text x="157" y="184" text-anchor="middle" fill="var(--muted)" font-size="6" font-family="inherit">Review</text>
+
+        <circle cx="63" cy="175" r="18" fill="var(--card)" stroke="var(--c-patch)" stroke-width="2"/>
+        <text x="63" y="172" text-anchor="middle" fill="var(--c-patch)" font-size="12" font-weight="700" font-family="inherit">P</text>
+        <text x="63" y="184" text-anchor="middle" fill="var(--muted)" font-size="6" font-family="inherit">Patch</text>
+
+        <circle cx="34" cy="85" r="18" fill="var(--card)" stroke="var(--c-apply)" stroke-width="2"/>
+        <text x="34" y="82" text-anchor="middle" fill="var(--c-apply)" font-size="12" font-weight="700" font-family="inherit">A</text>
+        <text x="34" y="94" text-anchor="middle" fill="var(--muted)" font-size="6" font-family="inherit">Apply</text>
+      </svg>
+    </div>
+  </div>
+  <div class="hero-grid"></div>
+</section>
+
+<!-- ═══════════════════════════════ SECTION 2: PROBLEM ═══════════════════════════════ -->
+<section id="s-problem">
+  <h2 class="glow-mag">The Governance Gap</h2>
+  <p class="section-sub">Organizations generate findings everywhere. Almost none of them become durable memory.</p>
+
+  <div class="prob-grid">
+    <div class="card">
+      <span class="prob-icon">&#x1F4CB;</span>
+      <div class="prob-title">Findings Without Provenance</div>
+      <div class="prob-desc">Audit results, scan outputs, and assessment findings land in spreadsheets with no chain of evidence back to the original observation.</div>
+    </div>
+    <div class="card">
+      <span class="prob-icon">&#x1F504;</span>
+      <div class="prob-title">Recurring Problems</div>
+      <div class="prob-desc">The same issues surface year after year because there is no durable record of what was fixed, who approved it, and whether the fix held.</div>
+    </div>
+    <div class="card">
+      <span class="prob-icon">&#x1F91D;</span>
+      <div class="prob-title">Handoff Friction</div>
+      <div class="prob-desc">Assessors hand findings to reviewers who hand decisions to implementers. Context is lost at every boundary.</div>
+    </div>
+    <div class="card">
+      <span class="prob-icon">&#x23F3;</span>
+      <div class="prob-title">Stale Risk Decisions</div>
+      <div class="prob-desc">Risk acceptances persist long after the conditions that justified them have changed. No mechanism flags contradictions.</div>
+    </div>
+    <div class="card">
+      <span class="prob-icon">&#x1F50D;</span>
+      <div class="prob-title">No Verification Loop</div>
+      <div class="prob-desc">Patches are assumed effective. Corrections are marked complete without retest. Nobody confirms the fix survived real conditions.</div>
+    </div>
+    <div class="card">
+      <span class="prob-icon">&#x1F4C9;</span>
+      <div class="prob-title">Lagging Visibility</div>
+      <div class="prob-desc">Leadership sees last quarter's report, not the current posture. Decisions are made on stale data.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ SECTION 3: LIFECYCLE ═══════════════════════════════ -->
+<section id="s-lifecycle">
+  <h2 class="glow">The CERPA Lifecycle</h2>
+  <p class="section-sub">Five phases. One chain of evidence. Complete memory.</p>
+  <p class="support-text">
+    CERPA is not a tool. It is a governance substrate &mdash; a structured lifecycle that any domain-specific
+    process can map onto. Each phase produces artifacts that chain forward, creating an unbroken evidence trail
+    from initial observation through verified correction.
+  </p>
+
+  <div class="stage-row">
+    <div class="card stage-card active" data-stage="claim">
+      <div style="font-weight:700;font-size:13px;color:var(--c-claim)">CLAIM</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Asserted Condition</div>
+    </div>
+    <div class="card stage-card" data-stage="event">
+      <div style="font-weight:700;font-size:13px;color:var(--c-event)">EVENT</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Observed Evidence</div>
+    </div>
+    <div class="card stage-card" data-stage="review">
+      <div style="font-weight:700;font-size:13px;color:var(--c-review)">REVIEW</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Adjudicated Decision</div>
+    </div>
+    <div class="card stage-card" data-stage="patch">
+      <div style="font-weight:700;font-size:13px;color:var(--c-patch)">PATCH</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Approved Correction</div>
+    </div>
+    <div class="card stage-card" data-stage="apply">
+      <div style="font-weight:700;font-size:13px;color:var(--c-apply)">APPLY</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Enforced and Verified</div>
+    </div>
+  </div>
+
+  <div class="stage-connector"></div>
+
+  <div id="stageDetail">
+    <!-- Populated by JS -->
+  </div>
+
+  <div class="callout" style="margin-top:32px">
+    Every phase answers one question. Together they form a complete governance record.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ SECTION 4: DEEP DIVE ═══════════════════════════════ -->
+<section id="s-deep">
+  <h2 class="glow-purple">Phase Deep Dive</h2>
+  <p class="section-sub">What each phase does, what it produces, and why it matters</p>
+
+  <div class="dd-tabs">
+    <div class="dd-tab active" data-dd="claim">Claim</div>
+    <div class="dd-tab" data-dd="event">Event</div>
+    <div class="dd-tab" data-dd="review">Review</div>
+    <div class="dd-tab" data-dd="patch">Patch</div>
+    <div class="dd-tab" data-dd="apply">Apply</div>
+  </div>
+
+  <div id="ddContent">
+    <!-- Populated by JS -->
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ SECTION 5: DATA MODEL ═══════════════════════════════ -->
+<section id="s-model">
+  <h2 class="glow">Data Model</h2>
+  <p class="section-sub">Every CERPA record carries structured fields across all five phases</p>
+  <p class="support-text">
+    A CERPA record is a single unit of governance memory. It tracks one finding from initial assertion
+    through verified correction. Fields are grouped by phase, and every record carries a confidence
+    score reflecting the completeness of its evidence chain.
+  </p>
+
+  <div class="dm-block">
+    <span class="dm-comment">// A single CERPA record</span><br/>
+    {<br/>
+    &nbsp;&nbsp;<span class="dm-key">"id"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// unique record identifier</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"source"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// originating system, report, or assessment</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"created"</span>: <span class="dm-type">ISO 8601</span>,<br/>
+    &nbsp;&nbsp;<span class="dm-key">"confidence"</span>: <span class="dm-type">0.00 &ndash; 1.00</span>, <span class="dm-comment">// evidence completeness score</span><br/>
+    <br/>
+    &nbsp;&nbsp;<span class="dm-comment">// ─── CLAIM ───</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"claim_id"</span>: <span class="dm-type">string</span>,<br/>
+    &nbsp;&nbsp;<span class="dm-key">"claim_text"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// the asserted condition or requirement</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"claim_source"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// framework, standard, or policy reference</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"claim_class"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// finding classification (severity/type)</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"claim_refs"</span>: <span class="dm-type">string[]</span>, <span class="dm-comment">// control, clause, or requirement references</span><br/>
+    <br/>
+    &nbsp;&nbsp;<span class="dm-comment">// ─── EVENT ───</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"event_id"</span>: <span class="dm-type">string</span>,<br/>
+    &nbsp;&nbsp;<span class="dm-key">"event_type"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// observation method (interview, document, test, scan)</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"event_evidence"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// what was actually observed</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"event_timestamp"</span>: <span class="dm-type">ISO 8601</span>,<br/>
+    &nbsp;&nbsp;<span class="dm-key">"event_observer"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// who or what captured the evidence</span><br/>
+    <br/>
+    &nbsp;&nbsp;<span class="dm-comment">// ─── REVIEW ───</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"review_id"</span>: <span class="dm-type">string</span>,<br/>
+    &nbsp;&nbsp;<span class="dm-key">"review_decision"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// accept, mitigate, transfer, defer</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"review_rationale"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// why this decision was made</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"review_authority"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// who authorized the decision</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"review_impact"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// assessed impact level</span><br/>
+    <br/>
+    &nbsp;&nbsp;<span class="dm-comment">// ─── PATCH ───</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"patch_id"</span>: <span class="dm-type">string</span>,<br/>
+    &nbsp;&nbsp;<span class="dm-key">"patch_action"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// the corrective action taken</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"patch_owner"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// responsible party for implementation</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"patch_deadline"</span>: <span class="dm-type">ISO 8601</span>,<br/>
+    &nbsp;&nbsp;<span class="dm-key">"patch_status"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// planned, in_progress, complete</span><br/>
+    <br/>
+    &nbsp;&nbsp;<span class="dm-comment">// ─── APPLY ───</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"apply_id"</span>: <span class="dm-type">string</span>,<br/>
+    &nbsp;&nbsp;<span class="dm-key">"apply_verified"</span>: <span class="dm-type">boolean</span>, <span class="dm-comment">// was the correction independently verified?</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"apply_method"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// how verification was performed</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"apply_result"</span>: <span class="dm-type">string</span>, <span class="dm-comment">// pass, fail, partial</span><br/>
+    &nbsp;&nbsp;<span class="dm-key">"apply_durable"</span>: <span class="dm-type">boolean</span> <span class="dm-comment">// did the fix survive retest?</span><br/>
+    }
+  </div>
+
+  <div style="margin-top:32px">
+    <h3 style="font-size:15px;color:var(--muted);margin-bottom:16px;letter-spacing:.5px">Confidence Scoring</h3>
+    <p class="support-text">
+      Every CERPA record carries a confidence score (0.00 &ndash; 1.00) that reflects evidence completeness.
+      The score is computed from weighted components &mdash; not a subjective judgment, but a mechanical
+      measure of how much of the lifecycle has been filled in.
+    </p>
+    <div class="grid-5" style="gap:8px">
+      <div class="card" style="padding:12px;text-align:center">
+        <div style="font-size:20px;font-weight:700;color:var(--c-claim)">+0.20</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px">Claim reference present</div>
+      </div>
+      <div class="card" style="padding:12px;text-align:center">
+        <div style="font-size:20px;font-weight:700;color:var(--c-event)">+0.20</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px">Event evidence captured</div>
+      </div>
+      <div class="card" style="padding:12px;text-align:center">
+        <div style="font-size:20px;font-weight:700;color:var(--c-review)">+0.20</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px">Review decision recorded</div>
+      </div>
+      <div class="card" style="padding:12px;text-align:center">
+        <div style="font-size:20px;font-weight:700;color:var(--c-patch)">+0.20</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px">Patch action documented</div>
+      </div>
+      <div class="card" style="padding:12px;text-align:center">
+        <div style="font-size:20px;font-weight:700;color:var(--c-apply)">+0.20</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px">Apply verification done</div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:16px">
+      A score of 1.00 means every phase has evidence. A score of 0.40 means the record has a claim
+      and an event but no review, no patch, and no verification &mdash; an open governance gap.
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ SECTION 6: WALKTHROUGH ═══════════════════════════════ -->
+<section id="s-walk">
+  <h2 class="glow-purple">Lifecycle Walkthrough</h2>
+  <p class="section-sub">A single finding traced through all five phases</p>
+  <p class="support-text">
+    This walkthrough follows one governance record from initial observation to verified correction.
+    The domain is deliberately generic &mdash; CERPA applies the same way whether the finding comes
+    from an audit, a security assessment, a compliance review, or an operational inspection.
+  </p>
+
+  <div style="margin-top:16px">
+    <div class="tl-item">
+      <div class="tl-dot" style="border-color:var(--c-claim);background:var(--card)"></div>
+      <div style="font-weight:700;font-size:13px;color:var(--c-claim);margin-bottom:4px">Phase 1 &mdash; CLAIM</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6">
+        An assessor identifies that access control procedures do not meet the requirements specified in
+        the governing standard. The claim references a specific control (e.g., clause 9.2), classifies the
+        finding as a nonconformity, and establishes the gap between the stated requirement and the observed state.
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--c-claim)">
+        Artifacts: finding ID, control reference, classification, requirement text, assessor identity
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot" style="border-color:var(--c-event);background:var(--card)"></div>
+      <div style="font-weight:700;font-size:13px;color:var(--c-event);margin-bottom:4px">Phase 2 &mdash; EVENT</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6">
+        The evidence that substantiates the claim is captured. Interviews with personnel confirm that access
+        reviews are not performed on the required schedule. Document review reveals the access control policy
+        was last updated 18 months ago. System logs show no evidence of periodic access recertification.
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--c-event)">
+        Artifacts: interview notes, document timestamps, system log excerpts, observation type, evidence quality assessment
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot" style="border-color:var(--c-review);background:var(--card)"></div>
+      <div style="font-weight:700;font-size:13px;color:var(--c-review);margin-bottom:4px">Phase 3 &mdash; REVIEW</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6">
+        The finding is adjudicated by authorized decision-makers. They confirm the nonconformity, assess the
+        impact as moderate, and determine that the corrective action must address both the policy gap and the
+        missing technical controls. A remediation deadline is established and the decision is recorded with
+        the identity of the authorizing official.
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--c-review)">
+        Artifacts: decision record, impact assessment, authorizing official, remediation deadline, rationale
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot" style="border-color:var(--c-patch);background:var(--card)"></div>
+      <div style="font-weight:700;font-size:13px;color:var(--c-patch);margin-bottom:4px">Phase 4 &mdash; PATCH</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6">
+        The corrective action is implemented. The access control policy is updated to reflect current
+        requirements. An automated access recertification process is deployed. Personnel are trained on
+        the new procedure. Change control records capture who approved the changes, when they were implemented,
+        and what evidence was used to justify the approach.
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--c-patch)">
+        Artifacts: updated policy document, technical change records, training completion, change approval, implementation owner
+      </div>
+    </div>
+
+    <div class="tl-item" style="border-left-color:transparent">
+      <div class="tl-dot" style="border-color:var(--c-apply);background:var(--card)"></div>
+      <div style="font-weight:700;font-size:13px;color:var(--c-apply);margin-bottom:4px">Phase 5 &mdash; APPLY</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6">
+        The correction is independently verified. An assessor confirms that access reviews now occur on
+        schedule, the updated policy is in force, and the automated recertification process has completed
+        at least one cycle successfully. The finding is marked as resolved with durable evidence. The
+        record enters institutional memory as a baseline for future assessments.
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--c-apply)">
+        Artifacts: verification results, retest evidence, durability confirmation, memory graph update, confidence: 1.00
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    From <span style="color:var(--bad)">finding &rarr; report &rarr; forget</span>
+    &nbsp;to&nbsp;
+    <span style="color:var(--ok)">claim &rarr; evidence &rarr; decision &rarr; correction &rarr; verification</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ SECTION 7: DOMAINS ═══════════════════════════════ -->
+<section id="s-domains">
+  <h2 class="glow">Domain Applications</h2>
+  <p class="section-sub">One lifecycle, many domains. CERPA maps to any governance process that produces findings.</p>
+
+  <div class="grid-2" style="margin-bottom:24px">
+    <div class="card domain-card" style="border-left-color:var(--c-claim)">
+      <div class="domain-title" style="color:var(--c-claim)">Security Operations</div>
+      <div class="domain-desc">Adversary simulation, penetration testing, vulnerability assessment, SOC operations</div>
+      <div class="domain-mapping">
+        <span class="dm-phase" style="color:var(--c-claim)">C</span> Validated exposure
+        <span class="dm-phase" style="color:var(--c-event);margin-left:8px">E</span> Telemetry / observation
+        <span class="dm-phase" style="color:var(--c-review);margin-left:8px">R</span> Joint adjudication<br/>
+        <span class="dm-phase" style="color:var(--c-patch)">P</span> Detection / mitigation update
+        <span class="dm-phase" style="color:var(--c-apply);margin-left:8px">A</span> Retest confirmation
+      </div>
+    </div>
+    <div class="card domain-card" style="border-left-color:var(--c-event)">
+      <div class="domain-title" style="color:var(--c-event)">Compliance and Audit</div>
+      <div class="domain-desc">ISO 27001, SOC 2, CMMC, RMF, internal audit, third-party assessments</div>
+      <div class="domain-mapping">
+        <span class="dm-phase" style="color:var(--c-claim)">C</span> Control requirement
+        <span class="dm-phase" style="color:var(--c-event);margin-left:8px">E</span> Audit evidence
+        <span class="dm-phase" style="color:var(--c-review);margin-left:8px">R</span> Finding adjudication<br/>
+        <span class="dm-phase" style="color:var(--c-patch)">P</span> Corrective action
+        <span class="dm-phase" style="color:var(--c-apply);margin-left:8px">A</span> Closure verification
+      </div>
+    </div>
+    <div class="card domain-card" style="border-left-color:var(--c-review)">
+      <div class="domain-title" style="color:var(--c-review)">Risk Management</div>
+      <div class="domain-desc">Enterprise risk registers, risk appetite frameworks, board-level risk oversight</div>
+      <div class="domain-mapping">
+        <span class="dm-phase" style="color:var(--c-claim)">C</span> Identified risk
+        <span class="dm-phase" style="color:var(--c-event);margin-left:8px">E</span> Risk indicators / events
+        <span class="dm-phase" style="color:var(--c-review);margin-left:8px">R</span> Risk decision (accept/mitigate/transfer)<br/>
+        <span class="dm-phase" style="color:var(--c-patch)">P</span> Treatment plan
+        <span class="dm-phase" style="color:var(--c-apply);margin-left:8px">A</span> Residual risk validation
+      </div>
+    </div>
+    <div class="card domain-card" style="border-left-color:var(--c-patch)">
+      <div class="domain-title" style="color:var(--c-patch)">Procurement and Acquisition</div>
+      <div class="domain-desc">Proposal evaluation, vendor risk, contract compliance, IDIQ task orders</div>
+      <div class="domain-mapping">
+        <span class="dm-phase" style="color:var(--c-claim)">C</span> Requirement / evaluation criterion
+        <span class="dm-phase" style="color:var(--c-event);margin-left:8px">E</span> Proposal evidence<br/>
+        <span class="dm-phase" style="color:var(--c-review);margin-left:8px">R</span> Evaluation decision
+        <span class="dm-phase" style="color:var(--c-patch)">P</span> Award / corrective action
+        <span class="dm-phase" style="color:var(--c-apply);margin-left:8px">A</span> Performance verification
+      </div>
+    </div>
+    <div class="card domain-card" style="border-left-color:var(--c-apply)">
+      <div class="domain-title" style="color:var(--c-apply)">Incident Response</div>
+      <div class="domain-desc">Security incidents, operational disruptions, after-action reviews</div>
+      <div class="domain-mapping">
+        <span class="dm-phase" style="color:var(--c-claim)">C</span> Incident declaration
+        <span class="dm-phase" style="color:var(--c-event);margin-left:8px">E</span> Forensic evidence
+        <span class="dm-phase" style="color:var(--c-review);margin-left:8px">R</span> Root cause analysis<br/>
+        <span class="dm-phase" style="color:var(--c-patch)">P</span> Remediation actions
+        <span class="dm-phase" style="color:var(--c-apply);margin-left:8px">A</span> Lessons learned validation
+      </div>
+    </div>
+    <div class="card domain-card" style="border-left-color:var(--neon-blue)">
+      <div class="domain-title" style="color:var(--neon-blue)">Change Management</div>
+      <div class="domain-desc">Configuration changes, deployment validation, release management</div>
+      <div class="domain-mapping">
+        <span class="dm-phase" style="color:var(--c-claim)">C</span> Change request / requirement
+        <span class="dm-phase" style="color:var(--c-event);margin-left:8px">E</span> Impact assessment evidence<br/>
+        <span class="dm-phase" style="color:var(--c-review);margin-left:8px">R</span> Approval decision
+        <span class="dm-phase" style="color:var(--c-patch)">P</span> Implementation
+        <span class="dm-phase" style="color:var(--c-apply);margin-left:8px">A</span> Post-change verification
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    The phases are constant. The vocabulary adapts to the domain. The evidence chain is always the same.
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ SECTION 8: COHERENCE ═══════════════════════════════ -->
+<section id="s-coherence">
+  <h2 class="glow">Coherence Score</h2>
+  <p class="section-sub">A single number that tells you how much of your governance surface has complete evidence chains</p>
+
+  <div class="gauge-wrap">
+    <div id="coherenceGauge"></div>
+  </div>
+
+  <div class="grid-3">
+    <div class="card kpi">
+      <div class="kpi-val" style="color:var(--c-claim)">142</div>
+      <div class="kpi-label">Total Claims</div>
+    </div>
+    <div class="card kpi">
+      <div class="kpi-val" style="color:var(--c-event)">138</div>
+      <div class="kpi-label">Events Captured</div>
+    </div>
+    <div class="card kpi">
+      <div class="kpi-val" style="color:var(--c-review)">91%</div>
+      <div class="kpi-label">Review Closure Rate</div>
+    </div>
+    <div class="card kpi">
+      <div class="kpi-val" style="color:var(--c-patch)">124</div>
+      <div class="kpi-label">Patches Applied</div>
+    </div>
+    <div class="card kpi">
+      <div class="kpi-val" style="color:var(--c-apply)">96%</div>
+      <div class="kpi-label">Verification Rate</div>
+    </div>
+    <div class="card kpi">
+      <div class="kpi-val" style="color:var(--bad)">3</div>
+      <div class="kpi-label">Regression Alerts</div>
+    </div>
+  </div>
+
+  <div style="margin-top:32px">
+    <h3 style="font-size:15px;color:var(--muted);margin-bottom:16px;letter-spacing:.5px">What Coherence Measures</h3>
+    <div class="grid-2">
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">
+          <strong style="color:var(--accent)">Completeness</strong> &mdash; what percentage of CERPA records
+          have evidence across all five phases? Incomplete records represent governance gaps: findings without
+          decisions, decisions without corrections, corrections without verification.
+        </div>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">
+          <strong style="color:var(--warn)">Consistency</strong> &mdash; do review decisions align with evidence?
+          Do patch actions address the actual findings? Coherence detects contradictions: a risk accepted in one
+          record that is being actively mitigated in another.
+        </div>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">
+          <strong style="color:var(--ok)">Durability</strong> &mdash; how many corrections survived independent
+          verification? A patch that was never retested contributes less to coherence than one that was
+          verified and confirmed durable.
+        </div>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;color:var(--muted);line-height:1.8">
+          <strong style="color:var(--bad)">Regression</strong> &mdash; are previously resolved findings
+          reappearing? Regression alerts fire when a new claim matches a closed record, indicating the
+          original correction did not hold. This is a direct measure of institutional memory quality.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ SECTION 9: COMPARE ═══════════════════════════════ -->
+<section id="s-compare">
+  <h2 class="glow-mag">Traditional vs. Governed</h2>
+  <p class="section-sub">Same organization. Same findings. Different substrate.</p>
+
+  <div class="toggle-bar">
+    <button class="toggle-btn active" data-toggle="traditional">Traditional</button>
+    <button class="toggle-btn" data-toggle="governed">CERPA-Governed</button>
+  </div>
+
+  <div id="compareContent">
+    <!-- Populated by JS -->
+  </div>
+
+  <div style="margin-top:32px">
+    <h3 style="font-size:15px;color:var(--muted);margin-bottom:16px;letter-spacing:.5px">Design Principles</h3>
+    <div class="grid-3">
+      <div class="card principle-card">
+        <div class="principle-icon">&#x1F517;</div>
+        <div class="principle-title">Evidence Chaining</div>
+        <div class="principle-desc">Every phase links to the previous. No decision exists without the evidence that produced it.</div>
+      </div>
+      <div class="card principle-card">
+        <div class="principle-icon">&#x1F9E0;</div>
+        <div class="principle-title">Institutional Memory</div>
+        <div class="principle-desc">Records persist across assessment cycles. Future assessments build on past findings instead of starting from scratch.</div>
+      </div>
+      <div class="card principle-card">
+        <div class="principle-icon">&#x1F50D;</div>
+        <div class="principle-title">Contradiction Detection</div>
+        <div class="principle-desc">Stale risk acceptances and conflicting decisions are surfaced automatically as the evidence base grows.</div>
+      </div>
+      <div class="card principle-card">
+        <div class="principle-icon">&#x1F504;</div>
+        <div class="principle-title">Regression Awareness</div>
+        <div class="principle-desc">When a previously resolved finding reappears, the system flags it immediately. Patches that do not hold are identified.</div>
+      </div>
+      <div class="card principle-card">
+        <div class="principle-icon">&#x1F4CA;</div>
+        <div class="principle-title">Real-Time Posture</div>
+        <div class="principle-desc">Executive visibility comes from live data, not quarterly reports. Coherence scores reflect current state.</div>
+      </div>
+      <div class="card principle-card">
+        <div class="principle-icon">&#x1F30D;</div>
+        <div class="principle-title">Domain Agnostic</div>
+        <div class="principle-desc">The five phases are universal. Security, compliance, procurement, operations &mdash; any process that produces findings maps onto CERPA.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ SECTION 10: CLOSING ═══════════════════════════════ -->
+<section id="s-closing" style="display:flex;align-items:center;justify-content:center">
+  <div class="closing-banner" style="width:100%">
+    <p class="closing-main glow">Governance is not a report.</p>
+    <p class="closing-main glow-mag">It is a memory loop.</p>
+    <p class="closing-sub">CERPA transforms fragmented observations into durable institutional knowledge.</p>
+    <div class="closing-questions">
+      What was claimed? &nbsp;&bull;&nbsp;
+      What was observed? &nbsp;&bull;&nbsp;
+      What was decided? &nbsp;&bull;&nbsp;
+      What was corrected? &nbsp;&bull;&nbsp;
+      Did it hold?
+    </div>
+    <button class="copy-btn" id="btnCopy">Copy Brief</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ FOOTER ═══════════════════════════════ -->
+<footer>Deep Sigma EDGE &middot; CERPA &middot; Composite Enterprise Risk Posture Assessment</footer>
+
+<!-- ═══════════════════════════════ JAVASCRIPT ═══════════════════════════════ -->
+<script>
+/* Utilities */
+function escHTML(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function setHTML(el,html){var t=document.createElement("template");t.innerHTML=html;el.textContent="";el.appendChild(t.content.cloneNode(true))}
+
+/* ─── Nav smooth scroll ─── */
+document.querySelector(".nav-bar").addEventListener("click",function(e){
+  var link=e.target.closest("[data-nav]");if(!link)return;
+  e.preventDefault();
+  var target=document.getElementById(link.getAttribute("data-nav"));
+  if(target)target.scrollIntoView({behavior:"smooth"});
+});
+
+/* ─── Scroll spy ─── */
+var navLinks=document.querySelectorAll("[data-nav]");
+var sections=document.querySelectorAll("section[id]");
+var observer=new IntersectionObserver(function(entries){
+  entries.forEach(function(entry){
+    if(entry.isIntersecting){
+      navLinks.forEach(function(l){l.classList.remove("active")});
+      var active=document.querySelector('[data-nav="'+entry.target.id+'"]');
+      if(active)active.classList.add("active");
+    }
+  });
+},{threshold:0.3,rootMargin:"-48px 0px 0px 0px"});
+sections.forEach(function(s){observer.observe(s)});
+
+/* ─── Lifecycle stage cards ─── */
+var stageData = {
+  claim: {
+    title: "CLAIM \u2014 The Asserted Condition",
+    color: "var(--c-claim)",
+    definition: "A Claim is any asserted condition that requires governance attention. It can originate from an audit finding, a vulnerability scan, a policy requirement, a risk identification, or any other source that produces a statement about the current or required state of a system, process, or control.",
+    inputs: "Assessment reports, scan outputs, policy requirements, framework controls, incident declarations, stakeholder assertions",
+    outputs: "Structured finding record with unique ID, classification, severity, source reference, and requirement text",
+    question: "What condition has been asserted?",
+    key_property: "A Claim does not require proof. It is an assertion that evidence will either support or refute. The separation of claim from evidence is fundamental \u2014 it prevents confirmation bias by requiring independent observation."
+  },
+  event: {
+    title: "EVENT \u2014 The Observed Evidence",
+    color: "var(--c-event)",
+    definition: "An Event captures the evidence that substantiates (or refutes) a Claim. Events are observations \u2014 interviews conducted, documents reviewed, tests performed, logs analyzed, systems inspected. The Event record preserves what was actually observed, by whom, when, and through what method.",
+    inputs: "Interview transcripts, document review notes, test results, system logs, scan outputs, technical observations",
+    outputs: "Timestamped evidence record with observation type, observer identity, evidence text, and quality assessment",
+    question: "What was actually observed?",
+    key_property: "Events must be attributable and timestamped. An observation without a recorded observer or timestamp has no evidentiary value. The Event phase enforces evidence discipline."
+  },
+  review: {
+    title: "REVIEW \u2014 The Adjudicated Decision",
+    color: "var(--c-review)",
+    definition: "A Review is the authoritative decision made after considering the Claim and its supporting Events. The review determines: is this finding valid? What is the impact? What action is required? Reviews transform raw findings into governance decisions with provenance \u2014 who decided, when, based on what evidence, and with what authority.",
+    inputs: "Validated claims, supporting evidence, impact assessment criteria, risk appetite framework, authority boundaries",
+    outputs: "Decision record with action determination (accept, mitigate, transfer, defer), authorizing official, rationale, impact level, and deadline",
+    question: "What has been decided?",
+    key_property: "Reviews carry authority. Every review decision must identify who made it and what evidence justified it. This creates the provenance trail that compliance requires and accountability demands."
+  },
+  patch: {
+    title: "PATCH \u2014 The Approved Correction",
+    color: "var(--c-patch)",
+    definition: "A Patch is the corrective action taken in response to a Review decision. Patches encompass any change: policy updates, technical controls, process modifications, training, configuration changes. The Patch record documents not just what was changed, but who approved it, who implemented it, and what evidence chain justified the change.",
+    inputs: "Review decision, remediation requirements, change control procedures, implementation resources",
+    outputs: "Change record with action description, implementation owner, approval chain, deadline, and current status (planned, in progress, complete)",
+    question: "What correction was made?",
+    key_property: "Patches without provenance are dangerous. A configuration change that cannot be traced back to an authorized review decision is an uncontrolled modification. CERPA enforces the evidence chain from finding to fix."
+  },
+  apply: {
+    title: "APPLY \u2014 The Verified Enforcement",
+    color: "var(--c-apply)",
+    definition: "Apply is the verification phase that closes the governance loop. An independent party confirms that the Patch was implemented correctly, that it addresses the original Claim, and that the correction survives under real conditions. Apply is not a checkbox \u2014 it is a retest. The finding is not resolved until the fix is proven durable.",
+    inputs: "Patch implementation records, original claim reference, verification criteria, retest methodology",
+    outputs: "Verification record with test results, durability assessment (pass/fail/partial), and confidence update. The completed record enters institutional memory.",
+    question: "Did the correction hold?",
+    key_property: "Apply is what separates governance from paperwork. Without independent verification, corrections are assumed effective. CERPA does not assume \u2014 it verifies. A Patch that fails Apply returns to the Review phase for re-adjudication."
+  }
+};
+
+var stageCards=document.querySelectorAll("[data-stage]");
+var stageDetail=document.getElementById("stageDetail");
+
+function renderStage(key){
+  var d=stageData[key];if(!d)return;
+  stageCards.forEach(function(c){c.classList.remove("active")});
+  var active=document.querySelector('[data-stage="'+key+'"]');
+  if(active)active.classList.add("active");
+  setHTML(stageDetail,
+    '<h3 style="color:'+d.color+';margin:0 0 16px;font-size:18px">'+escHTML(d.title)+'</h3>'+
+    '<div style="font-size:13px;color:var(--txt);line-height:1.7;margin-bottom:16px">'+escHTML(d.definition)+'</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">'+
+      '<div><span style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px">Inputs</span><div style="font-size:12px;margin-top:4px;color:var(--muted);line-height:1.6">'+escHTML(d.inputs)+'</div></div>'+
+      '<div><span style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px">Outputs</span><div style="font-size:12px;margin-top:4px;color:var(--muted);line-height:1.6">'+escHTML(d.outputs)+'</div></div>'+
+    '</div>'+
+    '<div style="background:var(--card2);border-radius:8px;padding:12px 16px;margin-bottom:12px">'+
+      '<span style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.5px">Key Property</span>'+
+      '<div style="font-size:12px;margin-top:4px;color:var(--txt);line-height:1.6">'+escHTML(d.key_property)+'</div>'+
+    '</div>'+
+    '<div class="quote" style="margin-top:16px;font-size:16px;border-left-color:'+d.color+'">'+escHTML(d.question)+'</div>'
+  );
+}
+
+document.getElementById("s-lifecycle").addEventListener("click",function(e){
+  var card=e.target.closest("[data-stage]");if(!card)return;
+  renderStage(card.getAttribute("data-stage"));
+});
+renderStage("claim");
+
+/* ─── Deep Dive phase tabs ─── */
+var ddData = {
+  claim: {
+    color: "var(--c-claim)",
+    title: "CLAIM",
+    subtitle: "The assertion that initiates governance",
+    sections: [
+      {heading:"What Is a Claim?", text:"A Claim is the entry point of the CERPA lifecycle. It asserts that a condition exists (or should exist) that requires governance attention. Claims can be positive (a control is required) or negative (a deficiency was found). They can originate from any source: automated scanners, human assessors, policy documents, framework requirements, or operational observations."},
+      {heading:"Claim Types", text:"Nonconformity \u2014 a requirement is not met. Observation \u2014 a potential gap that is not yet a full nonconformity. Opportunity for Improvement \u2014 a suggestion for enhancement beyond minimum requirements. Conformity \u2014 a requirement is met (positive claims create the evidence that compliance auditors need). Risk Identification \u2014 an identified threat or vulnerability that may require treatment."},
+      {heading:"Classification", text:"Every Claim carries a classification that drives priority: severity (critical, high, moderate, low), type (finding, observation, recommendation), and source framework reference (control number, clause, requirement ID). Classification is set at claim creation and may be revised during Review."},
+      {heading:"Why Separate Claims from Evidence?", text:"Separating the assertion from the evidence that supports it prevents circular reasoning. A scanner output is not a finding \u2014 it is an assertion that must be validated by observation. By treating claims as hypotheses, CERPA enforces intellectual discipline: every finding must be substantiated by independent evidence in the Event phase."}
+    ]
+  },
+  event: {
+    color: "var(--c-event)",
+    title: "EVENT",
+    subtitle: "The evidence that substantiates the claim",
+    sections: [
+      {heading:"What Is an Event?", text:"An Event is a recorded observation that provides evidence for or against a Claim. Events are not opinions \u2014 they are documented facts: what was seen, heard, measured, or tested, by whom, when, and through what method. The quality of governance decisions depends entirely on the quality of Event evidence."},
+      {heading:"Evidence Types", text:"Document Review \u2014 examination of policies, procedures, records, logs. Interview \u2014 structured conversation with personnel about practices and knowledge. Technical Test \u2014 hands-on verification of system configurations, controls, or processes. Observation \u2014 direct witnessing of activities, behaviors, or conditions. Automated Scan \u2014 tool-generated evidence from vulnerability scanners, configuration analyzers, or monitoring systems."},
+      {heading:"Evidence Quality", text:"Not all evidence is equal. CERPA tracks evidence quality through attribution (who observed it), methodology (how it was observed), timeliness (when it was observed), and corroboration (is it supported by multiple sources). Higher quality evidence produces higher confidence scores on the parent CERPA record."},
+      {heading:"The Detection Gap", text:"When a Claim exists but no Event substantiates it, there is a detection gap \u2014 a condition was asserted but not independently verified. When an Event exists that contradicts a Claim, there is a disagreement that must be resolved in Review. Both states are valuable governance signals."}
+    ]
+  },
+  review: {
+    color: "var(--c-review)",
+    title: "REVIEW",
+    subtitle: "The authoritative decision with provenance",
+    sections: [
+      {heading:"What Is a Review?", text:"A Review is the point where evidence becomes a decision. Authorized decision-makers examine the Claim, weigh the Event evidence, assess impact, and determine the appropriate response. Reviews are the most governance-critical phase because they carry authority: they determine what happens next."},
+      {heading:"Decision Types", text:"Accept \u2014 the risk is acknowledged and no corrective action is taken (requires documented justification and expiration). Mitigate \u2014 corrective action will be taken to reduce the risk (drives the Patch phase). Transfer \u2014 the risk is shifted to another party (insurance, contractual obligation). Defer \u2014 the decision is postponed pending additional evidence (returns to Event phase for more observation)."},
+      {heading:"Authority and Provenance", text:"Every Review decision records: who made the decision (by name and role), what authority they hold to make it, what evidence they considered, when the decision was made, and when it expires (no risk acceptance is permanent). This provenance trail is what transforms opinions into auditable governance records."},
+      {heading:"Contradiction Detection", text:"As the CERPA evidence base grows, Reviews can be checked against each other. If one record accepts a risk that another record is actively mitigating, that is a contradiction. If a previous risk acceptance has expired but no new review has occurred, that is a governance gap. CERPA surfaces these automatically."}
+    ]
+  },
+  patch: {
+    color: "var(--c-patch)",
+    title: "PATCH",
+    subtitle: "The corrective action with full traceability",
+    sections: [
+      {heading:"What Is a Patch?", text:"A Patch is the corrective action taken to address a Review decision. The term is deliberately broad: it encompasses technical fixes, policy updates, process changes, training programs, configuration modifications, and any other remediation activity. What makes it a CERPA Patch is the evidence chain that connects it back to the original Claim."},
+      {heading:"Patch Components", text:"Action Description \u2014 what was changed, added, or removed. Owner \u2014 who is responsible for implementation. Approval Chain \u2014 who authorized this specific correction. Evidence References \u2014 which Claim and Review drove this change. Deadline \u2014 when implementation must be complete. Status \u2014 planned, in progress, or complete."},
+      {heading:"Change Control Integration", text:"CERPA Patches do not replace existing change management processes. They wrap them. An organization's change control board still approves changes through its normal workflow. CERPA adds the provenance layer: this change was approved because this Review decided that this Claim, supported by this Event evidence, required this correction."},
+      {heading:"Orphaned Patches", text:"A Patch without a Review is an uncontrolled change. A Review without a Patch is an unfulfilled decision. CERPA tracks both states. Orphaned patches indicate changes that bypassed governance. Missing patches indicate decisions that were made but never executed. Both are governance failures that coherence scoring will detect."}
+    ]
+  },
+  apply: {
+    color: "var(--c-apply)",
+    title: "APPLY",
+    subtitle: "Independent verification that closes the loop",
+    sections: [
+      {heading:"What Is Apply?", text:"Apply is the verification phase that proves a correction worked. It is not a sign-off or an acknowledgment \u2014 it is an independent test. Someone other than the person who implemented the Patch verifies that the original Claim has been addressed, that the correction is effective, and that it survives under realistic conditions."},
+      {heading:"Verification Methods", text:"Retest \u2014 repeating the original assessment to confirm the finding no longer exists. Inspection \u2014 independent review of the implemented change against requirements. Monitoring \u2014 observing the corrected system over time to confirm durability. Evidence Review \u2014 examining artifacts that demonstrate the correction is in place and functioning."},
+      {heading:"Durability", text:"A fix that works on day one but fails on day thirty is not durable. CERPA Apply tracks durability: did the correction survive its first reassessment cycle? Has it been confirmed across multiple time periods? Durability is what separates temporary workarounds from permanent improvements."},
+      {heading:"The Memory Loop", text:"When Apply confirms a correction is durable, the record enters institutional memory. Future assessments can reference it. If a similar Claim appears later, the system flags it as a potential regression. This is the loop that transforms one-time assessments into cumulative organizational learning. Without Apply, there is no loop \u2014 just a sequence of disconnected reports."}
+    ]
+  }
+};
+
+var ddTabs=document.querySelectorAll("[data-dd]");
+var ddContent=document.getElementById("ddContent");
+
+function renderDD(key){
+  var d=ddData[key];if(!d)return;
+  ddTabs.forEach(function(t){t.classList.remove("active")});
+  var active=document.querySelector('[data-dd="'+key+'"]');
+  if(active)active.classList.add("active");
+  var html='<div style="border-left:3px solid '+d.color+';padding-left:20px;margin-bottom:24px">'+
+    '<h3 style="color:'+d.color+';margin:0 0 4px;font-size:20px">'+escHTML(d.title)+'</h3>'+
+    '<div style="font-size:13px;color:var(--muted)">'+escHTML(d.subtitle)+'</div>'+
+  '</div>';
+  d.sections.forEach(function(s){
+    html+='<div style="margin-bottom:24px">'+
+      '<h4 style="font-size:14px;color:var(--txt);margin:0 0 8px">'+escHTML(s.heading)+'</h4>'+
+      '<div style="font-size:13px;color:var(--muted);line-height:1.7">'+escHTML(s.text)+'</div>'+
+    '</div>';
+  });
+  setHTML(ddContent,html);
+}
+
+document.getElementById("s-deep").addEventListener("click",function(e){
+  var tab=e.target.closest("[data-dd]");if(!tab)return;
+  renderDD(tab.getAttribute("data-dd"));
+});
+renderDD("claim");
+
+/* ─── Coherence gauge ─── */
+(function(){
+  var gauge=document.getElementById("coherenceGauge");if(!gauge)return;
+  var score=87;
+  var circumference=2*Math.PI*52;
+  var offset=circumference-(score/100)*circumference;
+  var color=score>=80?"var(--ok)":score>=60?"var(--warn)":"var(--bad)";
+  setHTML(gauge,
+    '<svg viewBox="0 0 120 120" style="width:160px;height:160px">'+
+    '<circle cx="60" cy="60" r="52" fill="none" stroke="var(--line)" stroke-width="8"/>'+
+    '<circle cx="60" cy="60" r="52" fill="none" stroke="'+color+'" stroke-width="8" stroke-dasharray="'+circumference+'" stroke-dashoffset="'+offset+'" stroke-linecap="round" style="transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset .8s"/>'+
+    '<text x="60" y="55" text-anchor="middle" fill="'+color+'" font-size="32" font-weight="700" font-family="inherit">'+score+'</text>'+
+    '<text x="60" y="72" text-anchor="middle" fill="var(--muted)" font-size="9" font-family="inherit">COHERENCE</text>'+
+    '</svg>'
+  );
+})();
+
+/* ─── Compare toggle ─── */
+var traditionalHTML = '<div class="compare-bad card" style="padding:24px">'+
+  '<h3 style="color:var(--bad);margin:0 0 16px">Traditional Governance</h3>'+
+  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+  ['Findings in spreadsheets and slide decks','Handoff via email and meeting notes','Decisions without recorded rationale','Corrections without verification','No regression detection','Risk acceptances that never expire','Quarterly reports as primary visibility','Each assessment starts from scratch'].map(function(t){
+    return '<div style="display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 0"><span style="color:var(--bad)">&#9679;</span>'+t+'</div>';
+  }).join('')+
+  '</div>'+
+  '<div style="margin-top:20px;padding-top:12px;border-top:1px solid rgba(255,107,107,.15);font-size:13px;color:var(--bad);font-weight:600">Result: compliance theater without institutional memory</div>'+
+  '</div>';
+
+var governedHTML = '<div class="compare-good card" style="padding:24px">'+
+  '<h3 style="color:var(--ok);margin:0 0 16px">CERPA-Governed</h3>'+
+  '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+
+  ['Structured records with full evidence chains','Provenance from finding to fix','Decisions with authority and rationale','Corrections verified through independent retest','Automatic regression detection','Risk acceptances with expiration dates','Real-time coherence scoring','Cumulative institutional memory'].map(function(t){
+    return '<div style="display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 0"><span style="color:var(--ok)">&#9679;</span>'+t+'</div>';
+  }).join('')+
+  '</div>'+
+  '<div style="margin-top:20px;padding-top:12px;border-top:1px solid rgba(93,255,147,.15);font-size:13px;color:var(--ok);font-weight:600">Result: durable governance with cumulative learning</div>'+
+  '</div>';
+
+var compareContent=document.getElementById("compareContent");
+setHTML(compareContent, traditionalHTML);
+
+document.querySelector(".toggle-bar").addEventListener("click",function(e){
+  var btn=e.target.closest("[data-toggle]");if(!btn)return;
+  document.querySelectorAll("[data-toggle]").forEach(function(b){b.classList.remove("active")});
+  btn.classList.add("active");
+  var mode=btn.getAttribute("data-toggle");
+  setHTML(compareContent, mode==="traditional"? traditionalHTML : governedHTML);
+});
+
+/* ─── Copy brief ─── */
+var copyBtn=document.getElementById("btnCopy");
+if(copyBtn)copyBtn.addEventListener("click",function(){
+  var brief=[
+    "CERPA \u2014 Composite Enterprise Risk Posture Assessment",
+    "",
+    "CERPA is a five-phase governance lifecycle that transforms fragmented findings into durable institutional memory:",
+    "",
+    "  CLAIM:  An asserted condition requiring governance attention",
+    "  EVENT:  Observed evidence that substantiates the claim",
+    "  REVIEW: Authoritative decision with provenance (who decided, when, based on what)",
+    "  PATCH:  Approved corrective action with full traceability",
+    "  APPLY:  Independent verification that the correction holds",
+    "",
+    "Core properties:",
+    "  - Evidence chaining: every phase links to the previous",
+    "  - Institutional memory: records persist across assessment cycles",
+    "  - Contradiction detection: conflicting decisions are surfaced automatically",
+    "  - Regression awareness: previously resolved findings that reappear are flagged",
+    "  - Real-time posture: coherence scores reflect current state, not last quarter's report",
+    "  - Domain agnostic: security, compliance, procurement, operations all map to CERPA",
+    "",
+    "CERPA does not replace existing tools or processes. It governs the space between them.",
+    "",
+    "Key question at each phase:",
+    "  What was claimed? What was observed? What was decided? What was corrected? Did it hold?",
+    "",
+    "Deep Sigma EDGE | CERPA | Composite Enterprise Risk Posture Assessment"
+  ].join("\n");
+  navigator.clipboard.writeText(brief).then(function(){
+    copyBtn.textContent="Copied!";
+    setTimeout(function(){copyBtn.textContent="Copy Brief"},1500);
+  });
+});
+
+/* ─── Keyboard shortcuts ─── */
+document.addEventListener("keydown",function(e){
+  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA"||e.target.tagName==="SELECT")return;
+  var sectionIds=["s-hero","s-problem","s-lifecycle","s-deep","s-model","s-walk","s-domains","s-coherence","s-compare","s-closing"];
+  var num=parseInt(e.key);
+  if(num>=1&&num<=9&&num<=sectionIds.length){
+    var el=document.getElementById(sectionIds[num-1]);
+    if(el)el.scrollIntoView({behavior:"smooth"});
+  }
+  if(e.key==="0"){
+    var el=document.getElementById(sectionIds[9]);
+    if(el)el.scrollIntoView({behavior:"smooth"});
+  }
+});
+</script>
+</body>
+</html>
