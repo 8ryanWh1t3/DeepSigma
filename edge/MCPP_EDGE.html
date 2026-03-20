@@ -561,6 +561,200 @@ function renderTab(name){
   }
 }
 
+/* ══════════ SECTION 8B: DEMO DATA ══════════ */
+function loadDemoData(){
+  var coa1id=uid(),coa2id=uid(),coa3id=uid();
+  STATE={
+    metadata:{op_name:"IRON TEMPEST",unit:"1st Marine Regiment",higher_hq:"1st Marine Division",planner:"Maj J. Rodriguez",classification:"SECRET",planning_horizon:"72 hours",mission_type:"Offensive",time_available:"48 hours planning, 24 hours prep",created:new Date().toISOString()},
+    mission_setup:{
+      mission_statement:"1st Marine Regiment attacks to seize OBJ GRANITE NLT 190600Z MAR 2026 in order to deny enemy use of the Kara River crossing and establish conditions for follow-on operations by 1st Marine Division.",
+      commander_intent:"Purpose: Deny enemy freedom of movement across the Kara River and isolate enemy forces south of Phase Line STEEL. Method: Rapid penetration of enemy forward defenses followed by exploitation to OBJ GRANITE. Main effort is 2nd Battalion. End state: Enemy forces south of PL STEEL are isolated, OBJ GRANITE is secured, and the regiment is postured to support division follow-on operations.",
+      specified_tasks:["Seize OBJ GRANITE NLT 190600Z MAR","Establish blocking positions along PL STEEL","Conduct passage of lines through 3rd Marine Regiment","Maintain MSR ALPHA for division logistics"],
+      implied_tasks:["Conduct reconnaissance of enemy forward positions","Coordinate fire support plan with 11th Marines","Establish casualty collection points","Coordinate air support with MACG-18"],
+      essential_tasks:["Seize and hold OBJ GRANITE","Deny enemy use of Kara River crossing"],
+      constraints:["No fires within 1km of Kara Village (civilian population)","Maintain at least one battalion as regimental reserve until PL IRON","Do not cross PL STEEL without division approval"],
+      assumptions:["3rd Marine Regiment will complete relief in place NLT 180400Z","Enemy strength in sector does not exceed reinforced battalion","Air superiority maintained throughout operation","MSR ALPHA remains trafficable"],
+      ccirs:["PIR 1: Location and strength of enemy reserve forces","PIR 2: Status of Kara River bridge (intact/destroyed)","PIR 3: Enemy intent to reinforce south of PL STEEL","FFIR 1: Status of 2nd Battalion combat power at LD","FFIR 2: Ammunition resupply status at SP"],
+      risks:["Risk of enemy counterattack from the northeast after river crossing","Civilian casualties in vicinity of Kara Village","Logistics over-extension if advance exceeds 72-hour supply","Risk of fratricide during passage of lines"]
+    },
+    problem_framing:{
+      operational_context:"1st Marine Division is conducting offensive operations to secure the Kara River valley as part of I MEF's campaign to establish freedom of movement in the northern corridor. Enemy forces have established defensive positions along the south bank of the Kara River, centered on OBJ GRANITE, which controls the primary river crossing site.",
+      environment:"Mixed terrain: rolling hills with sparse vegetation transitioning to urban terrain near Kara Village. The Kara River is fordable at two points but the bridge at OBJ GRANITE is the only improved crossing capable of supporting heavy vehicles. Weather forecast: clear, temps 15-22C, winds NW 10-15 knots.",
+      friendly_situation:"1st Marine Regiment (+) with three infantry battalions, one tank platoon attached, and priority of fires from 11th Marines. Adjacent: 5th Marine Regiment to the west (supporting attack), 3rd Marine Regiment conducting relief in place. Reserve: Division reserve uncommitted. Morale and readiness: HIGH.",
+      enemy_threat:"Reinforced enemy mechanized infantry battalion defending in sector. Estimated 3 infantry companies in prepared positions along PL IRON, 1 mech company in reserve vicinity OBJ GRANITE, artillery battery in direct support. Enemy has demonstrated capability for deliberate counterattack within 4-6 hours. Obstacles: wire, mines, and anti-vehicle ditches along PL IRON.",
+      civil_considerations:"Kara Village (pop. ~2,200) located 800m east of OBJ GRANITE. Civilian evacuation NOT complete — estimated 40% of population remains. Hospital and school are potential protected sites. Local leadership has been cooperative but cannot guarantee civilian movement. Media presence likely.",
+      cog_own:"Combined arms integration — the ability to synchronize infantry, armor, artillery, and air in a rapid offensive",
+      cog_enemy:"Kara River bridge — control of the improved crossing enables enemy lateral movement and reinforcement",
+      problem_statement:"How does 1st Marine Regiment penetrate enemy forward defenses, seize OBJ GRANITE, and deny enemy use of the Kara River crossing while minimizing risk to the civilian population in Kara Village and maintaining momentum for division follow-on operations?",
+      desired_end_state:"OBJ GRANITE secured with friendly forces controlling the Kara River bridge. Enemy forces south of PL STEEL isolated and unable to reinforce. Regiment postured along PL STEEL with at least one battalion available for division tasking. Kara Village population undisturbed, no civilian casualties.",
+      operational_approach:"Penetrate enemy forward defenses with a main attack along Axis THUNDER, fix enemy along Axis LIGHTNING, and exploit success to seize OBJ GRANITE before enemy can reinforce from the northeast. Shape the battlespace with fires and deception to create conditions for rapid penetration.",
+      governing_factors:["72-hour operational timeline","Civilian population in Kara Village","Limited improved crossing sites","Enemy reserve counterattack capability","Division timeline for follow-on operations"],
+      information_gaps:["Exact composition of enemy reserve","Status of minefields along Axis THUNDER","Civilian evacuation progress in Kara Village","Trafficability of alternate ford sites","Enemy air defense posture in objective area"]
+    },
+    coas:[
+      {id:coa1id,name:"COA 1: Thunder Strike",summary:"Main attack along Axis THUNDER (east) with supporting attack along Axis LIGHTNING (west). 2nd Bn main effort penetrates enemy defenses east of Kara Village, bypasses the village, and seizes OBJ GRANITE from the southeast.",
+       concept:"Phase 1 (Shape): 11th Marines conducts 30-min artillery prep on enemy positions along PL IRON. Feint by 3rd Bn along Axis LIGHTNING fixes enemy western company. Phase 2 (Penetrate): 2nd Bn attacks along Axis THUNDER, penetrates between enemy eastern and central companies, exploits gap. 1st Bn follows and supports. Phase 3 (Exploit): 2nd Bn seizes OBJ GRANITE from southeast. 1st Bn establishes blocking positions along PL STEEL. 3rd Bn transitions to reserve.",
+       main_effort:"2nd Battalion along Axis THUNDER",
+       supporting_efforts:["3rd Battalion feint along Axis LIGHTNING","1st Battalion follow and support, then block along PL STEEL","11th Marines artillery preparation and on-call fires"],
+       decisive_points:["Penetration of PL IRON between enemy eastern and central positions","Seizure of high ground at Hill 342 overlooking OBJ GRANITE","Control of Kara River bridge"],
+       phasing:["Phase 1: Shape (H-30 to H-Hour)","Phase 2: Penetrate (H-Hour to H+4)","Phase 3: Exploit (H+4 to H+12)","Phase 4: Consolidate (H+12 to H+24)"],
+       tasks:["2nd Bn: Attack to penetrate PL IRON, seize Hill 342, continue to seize OBJ GRANITE","1st Bn: Follow 2nd Bn, establish blocking positions PL STEEL","3rd Bn: Conduct feint along Axis LIGHTNING, be prepared to assume reserve","Weapons Co: Provide overwatch from Hill 287 during penetration"],
+       advantages:["Avoids Kara Village, reducing civilian risk","Exploits gap between enemy positions","Maintains regiment in depth with follow-and-support"],
+       disadvantages:["Longer approach march for main effort","Exposes eastern flank to enemy reserve counterattack","Single axis of advance for main effort limits flexibility"],
+       risks:["Enemy reserve counterattack into exposed eastern flank","Terrain channelization along Axis THUNDER","Loss of surprise if feint is identified early"],
+       resource_demands:["Tank platoon attached to 2nd Bn","Priority of fires to 2nd Bn during Phase 2","2x CASEVAC rotary wing on standby","Engineer support for obstacle breach at PL IRON"],
+       assumptions:["Gap between enemy companies at PL IRON is exploitable","Hill 342 is not heavily defended","Enemy reserve requires 4+ hours to counterattack"],
+       branches:["Branch 1: If penetration at PL IRON fails, 1st Bn conducts supporting attack to create second penetration","Branch 2: If enemy reserve commits early, 3rd Bn transitions from feint to blocking position"],
+       sequels:["Sequel 1: Continue attack north of Kara River if bridge intact","Sequel 2: Transition to defense if enemy reinforces in strength"],
+       wargame:{
+         turns:[
+           {friendly:"2nd Bn crosses LD, advances along Axis THUNDER. 11th Marines begins 30-min artillery prep on PL IRON.",enemy:"Enemy forward companies take cover in prepared positions. Enemy reserve alerted.",counter:"Shift fires to suppress enemy observation posts. 3rd Bn begins feint along Axis LIGHTNING.",notes:"Critical: Artillery effect on enemy positions determines penetration feasibility."},
+           {friendly:"2nd Bn reaches PL IRON, begins breach of obstacle belt between enemy eastern and central companies.",enemy:"Enemy eastern company repositions to close gap. Enemy directs mortar fire on breach site.",counter:"Weapons Co engages enemy eastern company from Hill 287. Smoke obscures breach site. 2nd Bn pushes through with tank platoon leading.",notes:"Decision Point: If breach fails within 2 hours, execute Branch 1."},
+           {friendly:"2nd Bn through PL IRON, advances on Hill 342. 1st Bn crosses LD, follows along Axis THUNDER.",enemy:"Enemy central company attempts to reorient. Enemy reserve begins movement from northeast.",counter:"11th Marines shifts fires to interdict enemy reserve movement route. 2nd Bn secures Hill 342 with one company, continues to OBJ GRANITE with two companies.",notes:"PIR 1 confirmed: enemy reserve is mechanized company, 6km northeast."},
+           {friendly:"2nd Bn assaults OBJ GRANITE from southeast. 1st Bn occupies blocking positions along PL STEEL.",enemy:"Enemy garrison at OBJ GRANITE conducts prepared defense. Enemy reserve 2 hours from objective.",counter:"Close air support engaged on enemy reserve column. 2nd Bn breaches OBJ GRANITE perimeter with tank-infantry team.",notes:"Critical Event: Bridge status — must be seized intact."},
+           {friendly:"2nd Bn secures OBJ GRANITE and bridge. 3rd Bn transitions to regimental reserve. 1st Bn completes PL STEEL blocking positions.",enemy:"Enemy reserve arrives but finds blocking positions. Attempts probing attack against 1st Bn.",counter:"1st Bn repels probe with direct fire. 11th Marines provides defensive fires. 3rd Bn postured to reinforce.",notes:"End state conditions largely met. Report to division."}
+         ],
+         critical_events:["Breach of obstacle belt at PL IRON","Seizure of Hill 342","Bridge status at OBJ GRANITE (intact or destroyed)","Enemy reserve commitment timing and direction","3rd Bn feint effectiveness"],
+         decision_points:["DP1: Commit Branch 1 if penetration at PL IRON stalls beyond H+2","DP2: Commit 3rd Bn from reserve if enemy reserve threatens 1st Bn at PL STEEL","DP3: Halt advance if bridge destroyed — transition to deliberate river crossing"],
+         ccirs:["PIR 1: Enemy reserve location and movement","PIR 2: Bridge status at OBJ GRANITE","FFIR 1: 2nd Bn combat power status at PL IRON"],
+         support_reqs:["4x 155mm howitzer battery for 30-min prep","2x F/A-18 sections on-call CAS","Engineer breach team with MICLIC","CASEVAC rotary wing"],
+         assessment:"COA 1 wargame indicates moderate risk at the penetration point but strong probability of success if breach is achieved within 2 hours. Enemy reserve timing is the critical variable — air interdiction is essential. Bridge status is a significant unknown."
+       },
+       wargamed:true,
+       comparison_scores:{feasibility:8,acceptability:7,suitability:9,distinguishability:8,completeness:8,risk:6,tempo:8,sustainability:7},
+       rationale:"Strong concept that avoids civilian area and exploits gap in enemy line. Main risk is exposed flank during exploitation phase."
+      },
+      {id:coa2id,name:"COA 2: Iron Hammer",summary:"Frontal attack with two battalions abreast along Axis LIGHTNING (west) and Axis THUNDER (east). Overwhelm enemy forward defenses with mass and seize OBJ GRANITE from the south. 3rd Bn as reserve.",
+       concept:"Phase 1 (Shape): Heavy artillery prep across entire enemy frontage. Phase 2 (Attack): 1st Bn and 2nd Bn attack abreast, 1st Bn along Axis LIGHTNING, 2nd Bn along Axis THUNDER. Penetrate enemy defenses on a broad front. Phase 3 (Seize): Lead battalion seizes OBJ GRANITE. Trail battalion establishes PL STEEL positions. 3rd Bn reserve.",
+       main_effort:"2nd Battalion along Axis THUNDER, 1st Battalion supporting along Axis LIGHTNING",
+       supporting_efforts:["11th Marines suppression across enemy frontage","Tank platoon with 2nd Bn","Weapons Co split between both axes"],
+       decisive_points:["Simultaneous breach of PL IRON on both axes","Convergence on OBJ GRANITE from two directions","Destruction of enemy forward companies"],
+       phasing:["Phase 1: Shape (H-45 to H-Hour)","Phase 2: Attack (H-Hour to H+6)","Phase 3: Seize (H+6 to H+14)","Phase 4: Consolidate (H+14 to H+24)"],
+       tasks:["2nd Bn: Attack along Axis THUNDER to seize OBJ GRANITE","1st Bn: Attack along Axis LIGHTNING to fix enemy and seize PL STEEL","3rd Bn: Regimental reserve, be prepared to exploit or reinforce"],
+       advantages:["Overwhelms enemy with mass on two axes","Prevents enemy from concentrating against single penetration","Faster breach due to divided enemy attention"],
+       disadvantages:["Higher casualty risk from frontal assault","1st Bn axis passes near Kara Village — civilian risk","No deception; telegraphs main attack","Splits supporting arms across two axes"],
+       risks:["Civilian casualties near Kara Village","Higher friendly casualties in frontal assault","Difficulty synchronizing two-axis attack","Reserve committed late if both axes stall"],
+       resource_demands:["Both tank sections committed early","Artillery split between two axes","Engineer teams on both breach sites","Higher CASEVAC requirement"],
+       assumptions:["Artillery prep achieves sufficient suppression","Both breach sites are viable","Enemy cannot reinforce faster than friendly advance"],
+       branches:["Branch: If 1st Bn stalls at Kara Village, halt and redirect through 2nd Bn axis"],
+       sequels:["Continue attack north if conditions permit"],
+       wargame:{
+         turns:[
+           {friendly:"1st and 2nd Bn cross LD simultaneously. 45-min artillery prep across PL IRON.",enemy:"Enemy hunkers in prepared positions. All three companies engage on their respective fronts.",counter:"Push through with mass. Both battalions breach simultaneously.",notes:"High ammunition expenditure. Civilian concern near 1st Bn axis."},
+           {friendly:"Both battalions breach PL IRON. Heavy fighting at both breach sites.",enemy:"Enemy commits local reserves to reinforce both breach sites. Mortar fire on both axes.",counter:"Tank platoon leads 2nd Bn through breach. 1st Bn clears enemy positions methodically.",notes:"Casualties estimated higher than COA 1. 1st Bn proximity to Kara Village creates risk."},
+           {friendly:"2nd Bn advances toward OBJ GRANITE. 1st Bn clears to PL STEEL.",enemy:"Enemy reserve moves south to reinforce OBJ GRANITE directly.",counter:"CAS on enemy reserve. 2nd Bn assaults OBJ GRANITE with remaining combat power.",notes:"Both battalions attrited. Reserve may be needed earlier than planned."}
+         ],
+         critical_events:["Simultaneous breach at PL IRON","Civilian situation near 1st Bn axis","Enemy reserve timing"],
+         decision_points:["DP1: Redirect 1st Bn if Kara Village engagement risk is too high","DP2: Commit 3rd Bn reserve if either axis stalls"],
+         ccirs:["PIR 1: Enemy reserve location","FFIR 1: Civilian status near Axis LIGHTNING"],
+         support_reqs:["Full artillery allocation for extended prep","CAS priority throughout","Double CASEVAC allocation"],
+         assessment:"COA 2 offers speed through mass but at higher cost in casualties and civilian risk. Less elegant but more straightforward. Higher logistics burden."
+       },
+       wargamed:true,
+       comparison_scores:{feasibility:7,acceptability:5,suitability:6,distinguishability:7,completeness:7,risk:4,tempo:7,sustainability:5},
+       rationale:"Straightforward but costly. Civilian risk near Kara Village is a significant concern. Higher casualty estimates make this less acceptable."
+      },
+      {id:coa3id,name:"COA 3: Silent Anvil",summary:"Deception-heavy approach: demonstrate along Axis LIGHTNING, infiltrate 2nd Bn through alternate ford site to north, envelop OBJ GRANITE from the rear while 1st Bn fixes enemy frontally.",
+       concept:"Phase 1 (Shape): 3rd Bn conducts aggressive demonstration along Axis LIGHTNING with artillery support to fix enemy attention south. Phase 2 (Infiltrate): 2nd Bn moves through concealed route to alternate ford site 4km upstream, crosses Kara River at night, positions behind OBJ GRANITE. Phase 3 (Envelop): At H-Hour, 1st Bn attacks frontally along Axis THUNDER to fix enemy. 2nd Bn attacks OBJ GRANITE from the north/rear. 3rd Bn transitions to blocking along PL STEEL.",
+       main_effort:"2nd Battalion infiltration and envelopment",
+       supporting_efforts:["3rd Battalion demonstration along Axis LIGHTNING","1st Battalion frontal fix along Axis THUNDER","11th Marines fires in support of deception"],
+       decisive_points:["Successful river crossing at alternate ford","Surprise of enemy garrison at OBJ GRANITE from rear","Coordination of frontal fix with envelopment"],
+       phasing:["Phase 1: Shape/Demonstrate (D-1 to H-Hour)","Phase 2: Infiltrate (H-12 to H-Hour)","Phase 3: Envelop (H-Hour to H+8)","Phase 4: Consolidate (H+8 to H+24)"],
+       tasks:["2nd Bn: Infiltrate to alternate ford, cross river, attack OBJ GRANITE from north","1st Bn: Fix enemy with frontal attack along Axis THUNDER at H-Hour","3rd Bn: Demonstrate along Axis LIGHTNING D-1, then block along PL STEEL"],
+       advantages:["Achieves tactical surprise","Avoids enemy prepared defenses and obstacle belt","Minimal exposure to Kara Village","Envelopment from rear demoralizes enemy"],
+       disadvantages:["Complex — requires precise timing and coordination","2nd Bn isolated across river until bridge secured","Dependent on alternate ford being trafficable","If detected during infiltration, 2nd Bn is extremely vulnerable"],
+       risks:["Alternate ford site may not support vehicle crossing","Detection during infiltration catastrophic","2nd Bn unsupported if river crossing fails","Weather/visibility could compromise night movement"],
+       resource_demands:["Reconnaissance teams to verify ford site","Night vision and navigation equipment for 2nd Bn","Minimal artillery support during infiltration phase","Bridging assets for follow-on crossing"],
+       assumptions:["Alternate ford site is trafficable for infantry","2nd Bn can infiltrate undetected","Enemy does not have significant forces north of river","Night conditions support concealed movement"],
+       branches:["Branch: If ford is not trafficable, 2nd Bn redirects to support 1st Bn frontal attack (reverts to modified COA 1)"],
+       sequels:["Exploit north of Kara River using established crossing site"],
+       wargame:{
+         turns:[
+           {friendly:"3rd Bn conducts aggressive demonstration with artillery support. 2nd Bn begins infiltration movement.",enemy:"Enemy focuses attention on demonstration. Forward companies reinforce western positions.",counter:"Continue demonstration intensity. 2nd Bn moves through concealed route to ford site.",notes:"Deception is working. Critical that 2nd Bn maintains noise and light discipline."},
+           {friendly:"2nd Bn reaches ford site, begins river crossing at 0200. 1st Bn moves to assault positions.",enemy:"Enemy unaware of infiltration. Reserve remains in garrison at OBJ GRANITE.",counter:"2nd Bn completes crossing by 0500. Establishes assault positions north of OBJ GRANITE.",notes:"Ford site is marginal — infantry only, no vehicles. This limits 2nd Bn firepower."},
+           {friendly:"H-Hour: 1st Bn attacks along Axis THUNDER. 2nd Bn simultaneously attacks OBJ GRANITE from the north.",enemy:"Enemy surprised by attack from rear. Garrison attempts to reorient but caught between two forces.",counter:"2nd Bn seizes bridge from north side. 1st Bn pushes through weakened enemy forward positions.",notes:"Tactical surprise achieved. Bridge seized intact. Enemy garrison surrenders or withdraws."}
+         ],
+         critical_events:["Ford site trafficability confirmation","Undetected river crossing","Simultaneous attack coordination","Bridge seizure from north"],
+         decision_points:["DP1: Abort infiltration if 2nd Bn detected — revert to COA 1 variant","DP2: If ford not trafficable, redirect 2nd Bn"],
+         ccirs:["PIR: Alternate ford site trafficability","PIR: Enemy observation capability north of river","FFIR: 2nd Bn crossing status"],
+         support_reqs:["Recon teams 24hr prior","Night vision equipment","Minimal fires during infiltration","Bridging assets on standby"],
+         assessment:"COA 3 is the highest-payoff but highest-risk option. If surprise is achieved, casualties will be minimal and OBJ GRANITE seized rapidly. If detected during infiltration, 2nd Bn is catastrophically exposed. Requires excellent reconnaissance and timing."
+       },
+       wargamed:true,
+       comparison_scores:{feasibility:5,acceptability:8,suitability:7,distinguishability:9,completeness:6,risk:4,tempo:6,sustainability:6},
+       rationale:"Brilliant if it works, catastrophic if it fails. High reward but hinges entirely on undetected infiltration and ford site trafficability."
+      }
+    ],
+    decision:{selected_coa_id:coa1id,rationale:"COA 1 Thunder Strike selected. Best balance of feasibility and tactical advantage. Avoids civilian risk at Kara Village. Exploits identified gap in enemy defenses. Manageable risk at penetration point with strong branch plan if breach stalls. Enemy reserve threat mitigated by air interdiction.",modifications:["Reinforce 2nd Bn with engineer platoon for obstacle breach","Add one section of CAAT to 1st Bn for PL STEEL blocking positions","Request division release of one AH-1Z section for reserve interdiction"],residual_risks:["Enemy reserve may commit faster than 4-hour estimate","Bridge at OBJ GRANITE may be destroyed before seizure","Passage of lines with 3rd Marine Regiment could delay LD time"],followon_guidance:"Upon seizure of OBJ GRANITE, 2nd Bn prepare for relief in place by division follow-on forces. Maintain bridge security as priority. Be prepared to continue attack north of Kara River on division order.",locked:true},
+    orders:{
+      situation_enemy:"Reinforced enemy mechanized infantry battalion defends in sector. 3x infantry companies in prepared positions along PL IRON with wire, mines, and anti-vehicle ditches. 1x mechanized company in reserve vicinity OBJ GRANITE (~6km NE). 1x artillery battery in direct support. Enemy has demonstrated counterattack capability within 4-6 hours of initial contact.",
+      situation_friendly:"1st Marine Regiment (+) with 1st, 2nd, 3rd Infantry Battalions. Tank platoon attached to 2nd Bn. Priority of fires from 11th Marines (1x 155mm battery). Adjacent: 5th Marine Regiment (W), 3rd Marine Regiment (conducting RIP). Division reserve uncommitted. Morale: HIGH. Supply status: GREEN across all classes.",
+      situation_attachments:"Attached: 1x Tank Platoon (Alpha Co, 1st Tank Bn); 1x Engineer Platoon (Combat Engineer Bn). OPCON: None. Detached: None.",
+      mission_text:"1st Marine Regiment attacks to seize OBJ GRANITE NLT 190600Z MAR 2026 in order to deny enemy use of the Kara River crossing and establish conditions for follow-on operations by 1st Marine Division.",
+      execution_intent:"Purpose: Deny enemy freedom of movement across the Kara River. Method: Rapid penetration of enemy forward defenses along Axis THUNDER followed by exploitation to OBJ GRANITE. End state: OBJ GRANITE secured, enemy south of PL STEEL isolated, regiment postured for division follow-on operations.",
+      execution_concept:"Scheme of Maneuver: Shape with 30-min artillery prep and 3rd Bn feint along Axis LIGHTNING. 2nd Bn (main effort) penetrates PL IRON between enemy eastern and central companies along Axis THUNDER, seizes Hill 342, continues to seize OBJ GRANITE from the southeast. 1st Bn follows and supports, then establishes blocking positions along PL STEEL. 3rd Bn transitions to regimental reserve after feint.",
+      execution_tasks:[
+        {unit:"2nd Battalion (Main Effort)",task:"Attack along Axis THUNDER to penetrate PL IRON, seize Hill 342, continue attack to seize OBJ GRANITE",purpose:"Deny enemy use of Kara River crossing",priority:"1",coordinating:"Tank platoon leads breach. Engineer platoon supports obstacle reduction. Priority of fires H-Hour to H+4."},
+        {unit:"1st Battalion",task:"Follow and support 2nd Bn through PL IRON, then establish blocking positions along PL STEEL",purpose:"Isolate enemy forces south of PL STEEL and prevent reinforcement",priority:"2",coordinating:"Assume priority of fires after H+4. One CAAT section attached."},
+        {unit:"3rd Battalion",task:"Conduct feint along Axis LIGHTNING from H-30 to H+2, then transition to regimental reserve",purpose:"Fix enemy western company and create conditions for main effort penetration",priority:"3",coordinating:"Artillery support for feint H-30 to H-Hour. Be prepared to reinforce 1st Bn or exploit success."},
+        {unit:"Weapons Company",task:"Establish overwatch position on Hill 287, provide direct fire support for 2nd Bn penetration",purpose:"Suppress enemy positions and enable breach at PL IRON",priority:"2",coordinating:"In position NLT H-30. Priority targets: enemy eastern company positions."}
+      ],
+      coordinating_instructions:"H-Hour: 190100Z MAR 2026. LD: PL BRONZE. Passage of lines with 3rd Marine Regiment complete NLT 180400Z. No fires within 1km of Kara Village without regimental approval. Report crossing PL IRON, seizure of Hill 342, and seizure of OBJ GRANITE immediately. ACA: Altitude — 5000ft and above for CAS. BHL: PL STEEL. FSCL: PL GRANITE.",
+      admin_supply:"Class I: 3 days carried. Class III: Top off prior to LD. Class V: 2x basic load carried; ASP at SP BRAVO opens H+6. Water: 2 days carried; water point established at SP BRAVO. LOGPAC schedule: Every 12 hours from H+12.",
+      admin_transport:"MSR ALPHA primary. MSR BRAVO alternate. Priority of movement: ammunition, CASEVAC, water. Vehicle recovery: trail battalion responsibility.",
+      admin_medical:"BAS locations: 2nd Bn at Hill 287 (forward), Regimental at SP BRAVO. CASEVAC: 2x rotary wing on standby from H-Hour. Mass casualty plan: Annex Q. Blood products: pre-positioned at SP BRAVO.",
+      command_relationships:"CO 1st Marines at CP ALPHA (Hill 220). TAC CP forward with 2nd Bn from H-Hour. Succession: XO, CO 2nd Bn, CO 1st Bn. Liaison: LNO to 11th Marines, LNO to 5th Marines.",
+      command_signal:"Primary: TAC-1 (Bn cmd nets). Alternate: TAC-2. Emergency: Guard. Digital: BFT primary for reporting. Challenge/Password: THUNDER/STRIKE. Running password: GRANITE. Signal: Green star cluster = OBJ GRANITE seized.",
+      preview:""
+    },
+    transition:{
+      tasks:[
+        {name:"Passage of lines coordination with 3rd Marines",assigned:"S-3",suspense:"2026-03-18",status:"ready",notes:"Coordination complete. Gap marked with chem lights."},
+        {name:"Fire support coordination with 11th Marines",assigned:"FSO",suspense:"2026-03-18",status:"ready",notes:"Target list approved. Ammunition pre-positioned."},
+        {name:"CAS request and ACA coordination",assigned:"FAC",suspense:"2026-03-18",status:"partial",notes:"2x sections confirmed. ACA altitude approved. Pending final freq assignment."},
+        {name:"Engineer breach plan rehearsal",assigned:"Eng Plt Ldr",suspense:"2026-03-18",status:"ready",notes:"Full dress rehearsal complete. MICLIC certified."},
+        {name:"CASEVAC plan and BAS setup",assigned:"Surgeon",suspense:"2026-03-18",status:"partial",notes:"BAS site prepared. Rotary wing coordination pending final confirmation."},
+        {name:"Logistics pre-positioning at SP BRAVO",assigned:"S-4",suspense:"2026-03-18",status:"ready",notes:"Class I, III, V pre-positioned. Water point operational."},
+        {name:"Communications check all nets",assigned:"Comms O",suspense:"2026-03-18",status:"not ready",notes:"Scheduled for 181800Z."},
+        {name:"2nd Bn combined arms rehearsal",assigned:"CO 2nd Bn",suspense:"2026-03-18",status:"ready",notes:"Rehearsal complete. Tank-infantry integration drills conducted."},
+        {name:"Intelligence update brief",assigned:"S-2",suspense:"2026-03-18",status:"partial",notes:"Latest imagery analysis pending. Enemy reserve location narrowed to 2 possible positions."}
+      ],
+      checklist:[
+        {id:"t1",text:"Brief subordinate commanders",done:true},
+        {id:"t2",text:"Issue warning order",done:true},
+        {id:"t3",text:"Issue operations order",done:true},
+        {id:"t4",text:"Conduct rehearsals",done:true},
+        {id:"t5",text:"Conduct inspections",done:false},
+        {id:"t6",text:"Confirm communications plan",done:false},
+        {id:"t7",text:"Verify logistics posture",done:true},
+        {id:"t8",text:"Update running estimate",done:false}
+      ],
+      dsm:["DP1: Commit Branch 1 if breach at PL IRON stalls beyond H+2 — Indicator: 2nd Bn reports no progress, casualties exceed threshold","DP2: Commit 3rd Bn reserve if enemy reserve threatens PL STEEL — Indicator: Enemy mech company moving south confirmed by ISR","DP3: Halt advance if bridge destroyed — Indicator: Bridge status report from 2nd Bn lead element"],
+      ccir_monitor:["PIR 1: Enemy reserve location — Last update: 2 possible positions NE of OBJ GRANITE, monitoring via UAV","PIR 2: Bridge status — Intact as of last imagery (6hrs ago)","FFIR 1: 2nd Bn at 98% strength, all key leaders present","FFIR 2: Ammunition at 100% basic load"]
+    },
+    timeline:{milestones:[
+      {name:"WARNO Issued",datetime:"2026-03-17T08:00:00",category:"planning"},
+      {name:"Problem Framing Complete",datetime:"2026-03-17T14:00:00",category:"planning"},
+      {name:"COA Development Complete",datetime:"2026-03-17T20:00:00",category:"planning"},
+      {name:"Wargaming Complete",datetime:"2026-03-18T02:00:00",category:"planning"},
+      {name:"COA Comparison & Decision Brief",datetime:"2026-03-18T06:00:00",category:"planning"},
+      {name:"OPORD Issued",datetime:"2026-03-18T10:00:00",category:"execution"},
+      {name:"Passage of Lines Complete",datetime:"2026-03-18T04:00:00",category:"execution"},
+      {name:"Combined Arms Rehearsal",datetime:"2026-03-18T14:00:00",category:"execution"},
+      {name:"Final Coordination & Inspections",datetime:"2026-03-18T18:00:00",category:"execution"},
+      {name:"Logistics Pre-position Complete",datetime:"2026-03-18T12:00:00",category:"logistics"},
+      {name:"CASEVAC Assets on Station",datetime:"2026-03-18T22:00:00",category:"logistics"},
+      {name:"H-Hour: Attack Commences",datetime:"2026-03-19T01:00:00",category:"execution"}
+    ]},
+    progress:{framing:true,coadev:true,wargame:true,compare:true,decision:true,orders:true},
+    _dirty:false,
+    _lastSaved:null
+  };
+  markDirty();scheduleSave();updateProgress();updateSaveIndicator();
+  showToast("Demo data loaded: Operation IRON TEMPEST","ok");
+  setTab("overview");
+}
+
 /* ══════════ SECTION 9: OVERVIEW ══════════ */
 function stepsComplete(){var c=0;STEP_LABELS.forEach(function(s){if(STATE.progress[s.key])c++});return c}
 function renderOverview(){
@@ -599,9 +793,14 @@ function renderOverview(){
     html+='<div style="margin-top:16px;text-align:center"><button class="primary" id="btnNextStep" data-step="'+nextStep.tab+'">Continue: '+esc(nextStep.label)+' &#9654;</button></div>';
   }
 
+  if(!STATE.metadata.op_name&&!STATE.coas.length){
+    html+='<div style="margin-top:20px;text-align:center;padding:20px;border:1px dashed var(--line);border-radius:10px"><p style="color:var(--muted);font-size:11px;margin-bottom:8px">No planning data yet. Start from scratch or load a sample scenario.</p><button class="warn" id="btnLoadDemo">Load Demo: Operation IRON TEMPEST</button></div>';
+  }
+
   setHTML(sec,html);
   sec.querySelectorAll(".step-card").forEach(function(c){c.addEventListener("click",function(){setTab(c.getAttribute("data-step"))})});
   var btn=$("btnNextStep");if(btn)btn.addEventListener("click",function(){setTab(btn.getAttribute("data-step"))});
+  var btnDemo=$("btnLoadDemo");if(btnDemo)btnDemo.addEventListener("click",function(){loadDemoData()});
 }
 
 /* ══════════ SECTION 10: MISSION SETUP ══════════ */

@@ -312,10 +312,13 @@ ALLOWED_ACRONYMS = {
     # ISO 27001 CERPA Intake — audit, compliance, PDF parsing tokens
     "APL", "BSI", "DIVE", "FND", "HCPC", "INTAKE", "ISMS", "OFI",
     # MCPP EDGE — Marine Corps Planning Process tokens
-    "CCIR", "COA", "DTG", "FFIR", "FIRES", "FRAGORD", "FRAGO",
-    "HELP", "INTENT", "LOGPAC", "MAGTF", "MCPP", "MEF", "METT",
-    "MSR", "OPORD", "PIR", "RADAR", "ROE", "ROUTER", "SAVE",
-    "SETUP", "WARNO",
+    "ACA", "ALPHA", "ASP", "BAS", "BFT", "BHL", "BRAVO", "BRONZE",
+    "CAAT", "CAS", "CCIR", "COA", "DTG", "FAC", "FFIR", "FIRES",
+    "FRAGORD", "FRAGO", "FSCL", "GREEN", "HELP", "HIGH", "III",
+    "INTENT", "IRON", "ISR", "LNO", "LOGPAC", "MACG", "MAGTF",
+    "MAR", "MCPP", "MEF", "METT", "MICLIC", "MSR", "NLT", "OBJ",
+    "OPCON", "OPORD", "PIR", "RADAR", "RIP", "ROE", "ROUTER",
+    "SAVE", "SETUP", "STEEL", "STRIKE", "TAC", "UAV", "WARNO",
 }
 
 SCAN_EXTS = {".md", ".txt", ".py", ".html", ".yaml", ".yml", ".json", ".toml"}
