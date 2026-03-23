@@ -2,7 +2,7 @@
   "schema": "tec_ctec_v3_tier",
   "source": "enterprise/scripts/tec_ctec.py",
   "tier": "public_sector",
-  "generated_at": "2026-03-20T14:07:38Z",
+  "generated_at": "2026-03-23T14:34:46Z",
   "mode": "report_only",
   "core": {
     "inventory": {
@@ -35,16 +35,16 @@
   },
   "enterprise": {
     "inventory": {
-      "files": 1082,
+      "files": 1085,
       "directories": 156,
-      "loc": 122301,
+      "loc": 122545,
       "packages": 39,
-      "configs": 229,
+      "configs": 232,
       "tests": 6,
       "run_surfaces": 122,
-      "artifacts": 332
+      "artifacts": 335
     },
-    "tec": 1561.95,
+    "tec": 1565.67,
     "controls": {
       "required": 6,
       "passed": 6,
@@ -59,21 +59,21 @@
       }
     },
     "control_coverage": 0.828,
-    "ctec": 1293.3,
-    "r_tec": 1561.95
+    "ctec": 1296.38,
+    "r_tec": 1565.67
   },
   "total": {
     "inventory": {
-      "files": 2062,
+      "files": 2065,
       "directories": 309,
-      "loc": 218236,
+      "loc": 218482,
       "packages": 71,
-      "configs": 477,
+      "configs": 480,
       "tests": 199,
       "run_surfaces": 161,
-      "artifacts": 340
+      "artifacts": 343
     },
-    "tec": 3199.52,
+    "tec": 3203.24,
     "controls": {
       "required": 12,
       "passed": 12,
@@ -81,8 +81,8 @@
       "checks_scope": "composite(core+enterprise)"
     },
     "control_coverage": 0.828,
-    "ctec": 2649.2,
-    "r_tec": 3199.52
+    "ctec": 2652.28,
+    "r_tec": 3203.24
   },
   "factors": {
     "formula_version": "v3",
@@ -100,15 +100,15 @@
   },
   "rate_hourly": 275.0,
   "low": {
-    "hours": 2119.4,
-    "cost": 582824.0
+    "hours": 2121.8,
+    "cost": 583502.0
   },
   "base": {
-    "hours": 2649.2,
-    "cost": 728530.0
+    "hours": 2652.3,
+    "cost": 729377.0
   },
   "high": {
-    "hours": 3576.4,
-    "cost": 983516.0
+    "hours": 3580.6,
+    "cost": 984659.0
   }
 }
