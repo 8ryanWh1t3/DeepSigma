@@ -9,24 +9,24 @@
 
 ## Edition Metrics
 - CORE: TEC=693.5 | C-TEC=574.22 | CC=0.828
-- ENTERPRISE: TEC=1602.51 | C-TEC=1326.87 | CC=0.828
-- TOTAL: TEC=3240.07 | C-TEC=2682.78 | CC=0.828
+- ENTERPRISE: TEC=1606.18 | C-TEC=1329.91 | CC=0.828
+- TOTAL: TEC=3243.75 | C-TEC=2685.82 | CC=0.828
 
 ## Tiers (from TOTAL C-TEC)
 ### Internal @ $150/hr
-- Low:  2146.2 hrs | $321934
-- Base: 2682.8 hrs | $402417
-- High: 3621.8 hrs | $543263
+- Low:  2148.7 hrs | $322298
+- Base: 2685.8 hrs | $402873
+- High: 3625.9 hrs | $543879
 
 ### Executive @ $225/hr
-- Low:  2146.2 hrs | $482900
-- Base: 2682.8 hrs | $603626
-- High: 3621.8 hrs | $814894
+- Low:  2148.7 hrs | $483448
+- Base: 2685.8 hrs | $604310
+- High: 3625.9 hrs | $815818
 
 ### Public Sector Fully Burdened @ $275/hr
-- Low:  2146.2 hrs | $590212
-- Base: 2682.8 hrs | $737764
-- High: 3621.8 hrs | $995982
+- Low:  2148.7 hrs | $590880
+- Base: 2685.8 hrs | $738600
+- High: 3625.9 hrs | $997111
 
 ## Release KPI Scores
 
