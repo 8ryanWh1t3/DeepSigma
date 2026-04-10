@@ -1,13 +1,13 @@
 # Health Summary (v2)
 
-- Generated: 2026-04-09T15:00:59Z
+- Generated: 2026-04-10T14:31:58Z
 - Source: `enterprise/release_kpis/health`
 
 ## Latest
 
 - CORE: TEC=693.5 | C-TEC=574.22 | KPI=1.0
-- ENTERPRISE: TEC=1613.52 | C-TEC=1336.0 | KPI=1.0
-- TOTAL: TEC=3251.09 | C-TEC=2691.9 | KPI=-
+- ENTERPRISE: TEC=1617.19 | C-TEC=1339.04 | KPI=1.0
+- TOTAL: TEC=3254.76 | C-TEC=2694.94 | KPI=-
 - ICR: GREEN | RL_open=0
 - PCR: low | CL14=0
 
@@ -15,13 +15,13 @@
 
 | Date | CORE C-TEC | ENT C-TEC | TOTAL C-TEC | ICR | RL_open | CL14 |
 |---|---:|---:|---:|---|---:|---:|
-| 2026-04-01 | 574.22 | 1317.75 | 2673.66 | GREEN | 0 | 0 |
 | 2026-04-02 | 574.22 | 1320.79 | 2676.7 | GREEN | 0 | 0 |
 | 2026-04-03 | 574.22 | 1323.83 | 2679.74 | GREEN | 0 | 0 |
 | 2026-04-06 | 574.22 | 1326.87 | 2682.78 | GREEN | 0 | 0 |
 | 2026-04-07 | 574.22 | 1329.91 | 2685.82 | GREEN | 0 | 0 |
 | 2026-04-08 | 574.22 | 1332.96 | 2688.86 | GREEN | 0 | 0 |
 | 2026-04-09 | 574.22 | 1336.0 | 2691.9 | GREEN | 0 | 0 |
+| 2026-04-10 | 574.22 | 1339.04 | 2694.94 | GREEN | 0 | 0 |
 
 ## Enforcement Signal
 
