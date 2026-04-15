@@ -2,7 +2,7 @@
   "schema": "tec_ctec_v3_tier",
   "source": "enterprise/scripts/tec_ctec.py",
   "tier": "internal",
-  "generated_at": "2026-04-14T14:57:47Z",
+  "generated_at": "2026-04-15T14:50:45Z",
   "mode": "report_only",
   "core": {
     "inventory": {
@@ -35,16 +35,16 @@
   },
   "enterprise": {
     "inventory": {
-      "files": 1133,
+      "files": 1136,
       "directories": 156,
-      "loc": 125080,
+      "loc": 125367,
       "packages": 39,
-      "configs": 280,
+      "configs": 283,
       "tests": 6,
       "run_surfaces": 122,
-      "artifacts": 383
+      "artifacts": 386
     },
-    "tec": 1624.54,
+    "tec": 1628.28,
     "controls": {
       "required": 6,
       "passed": 6,
@@ -59,21 +59,21 @@
       }
     },
     "control_coverage": 0.828,
-    "ctec": 1345.12,
-    "r_tec": 1624.54
+    "ctec": 1348.22,
+    "r_tec": 1628.28
   },
   "total": {
     "inventory": {
-      "files": 2113,
+      "files": 2116,
       "directories": 309,
-      "loc": 221017,
+      "loc": 221304,
       "packages": 71,
-      "configs": 528,
+      "configs": 531,
       "tests": 199,
       "run_surfaces": 161,
-      "artifacts": 391
+      "artifacts": 394
     },
-    "tec": 3262.11,
+    "tec": 3265.85,
     "controls": {
       "required": 12,
       "passed": 12,
@@ -81,8 +81,8 @@
       "checks_scope": "composite(core+enterprise)"
     },
     "control_coverage": 0.828,
-    "ctec": 2701.03,
-    "r_tec": 3262.11
+    "ctec": 2704.13,
+    "r_tec": 3265.85
   },
   "factors": {
     "formula_version": "v3",
@@ -90,7 +90,7 @@
     "icr_status": "GREEN",
     "rl_open": 0,
     "ccf": 1.0,
-    "cl14": 0,
+    "cl14": 9,
     "load_bucket": "low",
     "qf": 1.0,
     "qf_weighted_mean": 10.0,
@@ -100,15 +100,15 @@
   },
   "rate_hourly": 150.0,
   "low": {
-    "hours": 2160.8,
-    "cost": 324124.0
+    "hours": 2163.3,
+    "cost": 324496.0
   },
   "base": {
-    "hours": 2701.0,
-    "cost": 405155.0
+    "hours": 2704.1,
+    "cost": 405620.0
   },
   "high": {
-    "hours": 3646.4,
-    "cost": 546959.0
+    "hours": 3650.6,
+    "cost": 547586.0
   }
 }
