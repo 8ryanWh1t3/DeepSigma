@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Deep Sigma · Genesis Coherence Ops EDGE v1.0.0 · Demonstration · RC7</title>
+<!--
+  GENESIS COHERENCE OPERATIONS — DEMONSTRATION EDGE  v1.0.0 · RC7
+  Deep Sigma · Phase II · §5D one-question live demonstration, scientific specialization.
+  Single file · offline · no dependencies · localStorage only (key: dsedge.genesis.v1).
+  RC7: question collapsed to a single top line led by "Why?"; the Autonomy Wall & Governance
+  panel removed. The autonomy-wall BEHAVIOR is unchanged and still enforced — a trigger
+  proposes only (shadow), and canonical admissibility/record changes solely on human Apply
+  (see the triggers note and the CERPA chain). SYNTHETIC marking remains in the header pill.
+-->
+<style>
+:root{
+  --bg:#0B1220; --bg2:#0E1626; --panel:#111c30; --panel2:#16223a;
+  --line:#22304d; --line2:#33476e;
+  --ink:#EAF1FB; --ink-dim:#AEC0DC; --ink-faint:#9DB0CC;
+  --intel:#38d6ee; --reops:#fbcf3a; --fran:#b79bff; --altcog:#ff9d4d;
+  --auth:#7ab2ff; --patch:#5ce695; --drift:#ff7a6b;
+  --gray:#8294af; --accent:#5ce695; --amber:#ffc15e;
+  --mono:"JetBrains Mono","SFMono-Regular",Consolas,ui-monospace,monospace;
+  --sans:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --radius:11px; --radius-sm:7px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;max-width:100%;overflow-x:hidden;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5}
+.app{max-width:1760px;margin:0 auto;padding:14px 18px 32px;min-width:0}
+.app,.card,.episode-map,.episode-grid,.model-dependency-grid{min-width:0;max-width:100%}
+/* ---------- header ---------- */
+.top{display:flex;align-items:center;gap:13px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:12px}
+.brand{display:flex;align-items:center;gap:9px}
+.sig{font-family:var(--mono);font-weight:700;color:var(--accent);font-size:22px;line-height:1}
+.nm{font-family:var(--mono);letter-spacing:.4px;font-size:16px;color:var(--ink-dim)}
+.nm b{color:var(--ink)}
+.pill{font-family:var(--mono);font-size:15px;border:1px solid var(--line2);border-radius:20px;padding:3px 11px;color:var(--ink-dim)}
+.pill b{color:var(--accent)}
+.synth{font-family:var(--mono);font-size:15px;letter-spacing:.4px;color:var(--amber);border:1px solid var(--amber);border-radius:20px;padding:3px 11px;background:rgba(255,193,94,.08)}
+.spacer{flex:1}
+.btn{font-family:var(--mono);font-size:15px;background:var(--panel);color:var(--ink);border:1px solid var(--line2);border-radius:var(--radius-sm);padding:6px 12px;cursor:pointer;transition:.12s}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.sm{font-size:15px;padding:5px 10px}
+.btn.human{border-color:var(--auth);color:#cfe3ff;background:rgba(122,178,255,.10)}
+.btn.human:hover{border-color:#a9ccff;color:#eaf3ff}
+.btn:disabled{opacity:.42;cursor:not-allowed;border-color:var(--line)}
+.btn.ghost{background:transparent}
+.btn:focus-visible,[tabindex]:focus-visible,a:focus-visible{outline:3px solid #8ad0ff;outline-offset:2px}
+/* ---------- question bar ---------- */
+.qbar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:14px 0 4px;background:linear-gradient(180deg,rgba(92,230,149,.07),rgba(92,230,149,.02));border:1px solid #1f4533;border-radius:var(--radius);padding:13px 18px}
+.qbar .q{font-size:18px;color:var(--ink);max-width:1000px;line-height:1.4}
+.qbar .q b{color:var(--accent)}
+.qbar .q .hint{font-size:15px;color:var(--ink-dim);margin-top:6px;font-weight:400}
+.qbar .timer{font-family:var(--mono);text-align:right;min-width:190px}
+.qbar .timer .big{font-size:26px;font-weight:700;color:var(--accent);line-height:1.1}
+.qbar .timer .lab{font-size:15px;letter-spacing:.3px;color:var(--ink-dim);margin-top:2px}
+/* ---------- layout ---------- */
+.grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:14px}
+.operations-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+@media(max-width:980px){.operations-grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+.card h3{margin:0 0 11px;font-size:18px;font-family:var(--mono);letter-spacing:.3px;color:var(--ink);text-transform:uppercase;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.card h3 .n{font-family:var(--sans);text-transform:none;letter-spacing:0;color:var(--ink-dim);font-size:15px;font-weight:400}
+.card h3 .sub{flex-basis:100%;font-family:var(--sans);text-transform:none;letter-spacing:0;color:var(--ink-dim);font-size:15px;font-weight:400;margin-top:2px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:15px;color:var(--ink-dim);margin-top:12px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:11px;height:11px;border-radius:50%;display:inline-block;border:1px solid rgba(255,255,255,.15)}
+/* ---------- EPISODE MAP ---------- */
+.episode-map{display:flex;flex-direction:column;gap:10px}
+.episode-lane{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--bg2);padding:11px 12px}
+.lane-title{font-family:var(--mono);font-size:16px;letter-spacing:.4px;color:var(--ink-dim);text-transform:uppercase;margin-bottom:9px}
+.episode-grid{display:grid;gap:10px;width:100%}
+.scientific-basis{grid-template-columns:repeat(5,minmax(0,1fr))}
+.governance{grid-template-columns:repeat(4,minmax(0,1fr))}
+.learning{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:1250px){
+  .scientific-basis{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .governance,.learning{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:760px){
+  .scientific-basis,.governance,.learning{grid-template-columns:1fr}
+}
+.lane-transition{font-family:var(--mono);font-size:16px;letter-spacing:.5px;color:var(--accent);text-align:center;padding:2px 0}
+/* episode card */
+.ecard{background:#101c33;border:1px solid var(--line2);border-radius:9px;padding:11px 12px;display:flex;flex-direction:column;gap:3px;min-width:0;max-width:100%;overflow-wrap:anywhere;word-break:normal}
+.ecard .estep{font-family:var(--mono);font-size:15px;color:var(--ink-faint);letter-spacing:.3px;text-transform:uppercase}
+.ecard .eval{font-size:16px;font-weight:600;color:var(--ink);line-height:1.2;overflow-wrap:anywhere}
+.ecard .esub{font-size:15px;color:var(--ink-dim);line-height:1.25;overflow-wrap:anywhere}
+.ecard .estatus{font-family:var(--mono);font-size:15px;color:var(--ink-dim);line-height:1.25;overflow-wrap:anywhere}
+.ecard .estatus.warn{color:var(--drift)} .ecard .estatus.ok{color:var(--patch)} .ecard .estatus.hold{color:var(--amber)}
+.ecard .enext{font-family:var(--mono);font-size:15px;color:var(--ink-faint);margin-top:auto}
+.ecard .adm-line{font-family:var(--mono);font-size:15px;line-height:1.3;overflow-wrap:anywhere}
+.ecard .adm-line .cur{color:var(--ink-dim)} .ecard .adm-line .prop{color:var(--amber)} .ecard .adm-line .app{color:var(--drift)}
+.ecard .slabel{display:inline-block;align-self:flex-start;font-family:var(--mono);font-size:15px;padding:1px 8px;border-radius:5px;border:1px solid var(--line2);color:var(--ink-dim);margin-top:1px}
+/* states */
+.ecard.is-affected,.ecard.is-drifting,.ecard.is-expired,.ecard.is-contested,.ecard.is-active{border-color:var(--drift);background:rgba(255,122,107,.08)}
+.ecard.is-reopened,.ecard.is-demoted,.ecard.is-held{border-color:var(--amber);background:rgba(255,193,94,.06)}
+.ecard.is-patched,.ecard.is-sealed,.ecard.is-resolved{border-color:var(--patch);background:rgba(92,230,149,.07)}
+.ecard.is-unaffected{opacity:.72}
+.slabel.s-red{border-color:var(--drift);color:var(--drift)}
+.slabel.s-amber{border-color:var(--amber);color:var(--amber)}
+.slabel.s-green{border-color:var(--patch);color:var(--patch)}
+.slabel.s-gray{border-color:var(--gray);color:var(--ink-dim)}
+/* ---------- MODEL DEPENDENCY ---------- */
+.model-hub{max-width:360px;margin:0 auto 6px}
+.spokes{font-family:var(--mono);font-size:18px;color:var(--ink-faint);text-align:center;letter-spacing:30px;padding:2px 0 6px;overflow:hidden}
+.model-dependency-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media(max-width:760px){.model-dependency-grid{grid-template-columns:1fr}}
+/* ---------- answer ---------- */
+.answer{border:1px solid var(--accent);background:linear-gradient(180deg,rgba(92,230,149,.10),rgba(92,230,149,.03));border-radius:var(--radius);padding:14px 18px}
+.answer .ey{font-family:var(--mono);font-size:15px;letter-spacing:.8px;color:var(--accent);margin-bottom:5px}
+.answer .head{font-size:18px;font-weight:600;color:var(--ink);line-height:1.35;overflow-wrap:anywhere}
+.answer .rows{margin-top:9px;display:grid;grid-template-columns:1fr;gap:6px}
+.answer .arow{display:flex;gap:10px;flex-wrap:wrap;font-size:16px}
+.answer .arow .l{font-family:var(--mono);font-size:15px;color:var(--ink-dim);min-width:150px}
+.answer .arow .v{color:var(--ink);flex:1;min-width:240px;overflow-wrap:anywhere}
+.answer.idle{border-color:var(--line2);background:var(--bg2)}
+.answer.idle .ey{color:var(--ink-dim)} .answer.idle .head{color:var(--ink-dim);font-weight:500;font-size:16px}
+/* ---------- triggers (top action bar — the only interactive surface) ---------- */
+.triggers-top{border-color:#2b6b48}
+.triggers-top h3{color:var(--accent)}
+.trg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media(max-width:900px){.trg{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.trg{grid-template-columns:1fr}}
+.trg button{text-align:left;display:flex;flex-direction:column;gap:3px;padding:11px 13px;line-height:1.3;height:100%}
+.trg button .tt{font-family:var(--mono);font-size:16px;color:var(--ink)}
+.trg button .td{font-size:15px;color:var(--ink-dim)}
+.trg button[aria-pressed="true"]{border-color:var(--drift);background:rgba(255,122,107,.09)}
+.trg button[aria-pressed="true"] .tt{color:var(--drift)}
+.hint{font-size:15px;color:var(--ink-dim);margin-top:9px;line-height:1.45}
+/* ---------- blast ---------- */
+.brow{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.brow:last-child{border-bottom:0}
+.tag{font-family:var(--mono);font-size:15px;padding:2px 8px;border-radius:5px;border:1px solid var(--line2);color:var(--ink-dim);white-space:nowrap}
+.tag.prim{border-color:var(--drift);color:var(--drift)} .tag.ok{border-color:var(--patch);color:var(--patch)}
+.tag.ai{border-color:var(--altcog);color:var(--altcog)} .tag.human{border-color:var(--auth);color:#cfe3ff}
+.brow .bt{font-size:16px;color:var(--ink);line-height:1.4;overflow-wrap:anywhere}
+.brow .bd{font-size:15px;color:var(--ink-dim);margin-top:3px;line-height:1.45;overflow-wrap:anywhere}
+.muted{color:var(--ink-dim);font-size:15px;line-height:1.45}
+.demote{font-family:var(--mono);font-size:15px;color:var(--amber);margin-top:3px;overflow-wrap:anywhere}
+.demote.applied{color:var(--drift)} .demote s{color:var(--ink-faint)}
+/* ---------- CERPA ---------- */
+.cerpa{display:flex;align-items:stretch;gap:5px;margin:4px 0 11px;flex-wrap:wrap}
+.cstep{flex:1 1 64px;text-align:center;border:1px solid var(--line2);border-radius:7px;padding:8px 3px;font-family:var(--mono)}
+.cstep .l{font-size:22px;font-weight:700;color:var(--ink-faint);line-height:1.1}
+.cstep .n{font-size:15px;letter-spacing:.2px;color:var(--ink-dim)}
+.cstep.done{border-color:var(--patch);background:rgba(92,230,149,.10)} .cstep.done .l,.cstep.done .n{color:var(--patch)}
+.cstep.active{border-color:var(--accent);background:rgba(92,230,149,.18)} .cstep.active .l{color:var(--accent)}
+.carrow{display:flex;align-items:center;color:var(--ink-faint);font-family:var(--mono);font-size:18px}
+.shadow{border:1px dashed var(--altcog);border-radius:var(--radius-sm);padding:11px 13px;background:rgba(255,157,77,.06);margin-bottom:10px}
+.shadow .h{font-family:var(--mono);font-size:15px;letter-spacing:.5px;color:var(--altcog);margin-bottom:5px}
+.shadow .bd{font-size:16px;color:var(--ink);line-height:1.45;overflow-wrap:anywhere}
+.actlbl{font-family:var(--mono);font-size:15px;color:var(--auth);margin:4px 0 7px}
+.wall{font-family:var(--mono);font-size:15px;color:var(--ink-dim);border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px 14px;background:var(--bg2);line-height:1.65}
+.wall b{color:var(--ink)}
+.rules{display:flex;gap:12px;flex-wrap:wrap;margin-top:11px}
+.rule{flex:1 1 220px;border:1px solid var(--line);border-radius:var(--radius-sm);padding:11px 13px;background:var(--bg2);font-size:15px;color:var(--ink-dim);line-height:1.5}
+.rule b{color:var(--ink)}
+.foot{margin-top:20px;font-family:var(--mono);font-size:15px;color:var(--ink-dim);border-top:1px solid var(--line);padding-top:13px;line-height:1.65;overflow-wrap:anywhere}
+.k{font-family:var(--mono);color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="brand">
+      <span class="sig">&Sigma;</span>
+      <span class="nm">DEEP SIGMA &middot; <b>GENESIS COHERENCE OPS</b> &middot; DEMONSTRATION</span>
+      <span class="pill">v<b>1.0.0</b> &middot; RC7</span>
+    </div>
+    <span class="synth">SYNTHETIC &middot; ILLUSTRATIVE</span>
+    <div class="spacer"></div>
+    <button class="btn sm ghost" id="btnReset">&#8635; Reset demo</button>
+  </div>
+
+  <div class="qbar">
+    <div class="q"><b style="color:var(--accent);font-size:20px">Why?</b> &nbsp;When this decision, assumption, model, or policy changes &mdash; what else is affected, and can we explain it?</div>
+  </div>
+
+  <div class="grid">
+    <!-- CHANGE TRIGGERS — top action bar (the only interactive surface) -->
+    <div class="card triggers-top">
+      <h3>Change Triggers <span class="n">Start here &middot; AI-detected &middot; shadow &middot; the only interactive control</span></h3>
+      <div class="trg" id="triggers" role="group" aria-label="Change triggers"></div>
+      <div class="hint">Each trigger raises an AI-proposed drift signature. Propagation is <b style="color:var(--ink)">curated invalidation</b>, not naive transitive closure. Selecting a trigger does not alter the canonical record &mdash; it proposes only.</div>
+    </div>
+
+    <!-- SCIENTIFIC EPISODE MAP (responsive, no SVG, no scroll) -->
+    <div class="card">
+      <h3>Scientific Episode Map
+        <span class="sub">A three-stage operating system &mdash; scientific basis, human governance, institutional learning</span>
+      </h3>
+      <div class="episode-map" id="episodeMap"></div>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--drift)"></i>AFFECTED</span>
+        <span><i class="dot" style="background:var(--amber)"></i>REVIEW / PROPOSED HOLD</span>
+        <span><i class="dot" style="background:var(--patch)"></i>RESOLVED / APPLIED</span>
+        <span><i class="dot" style="background:var(--gray)"></i>UNAFFECTED</span>
+      </div>
+    </div>
+
+    <!-- MODEL DEPENDENCY BLAST RADIUS (separate visual) -->
+    <div class="card">
+      <h3>Model Dependency Blast Radius
+        <span class="sub">Distinct from the episode lifecycle &mdash; which program claims are bound to the model version</span>
+      </h3>
+      <div id="modelDep"></div>
+    </div>
+
+    <!-- LEADERSHIP ANSWER -->
+    <div class="answer idle" id="answer" aria-live="polite" aria-label="Demonstration answer">
+      <div class="ey">ANSWER</div>
+      <div class="head" id="ansHead">Select a change trigger to test the coherence of the scientific record.</div>
+      <div class="rows" id="ansRows"></div>
+    </div>
+
+    <!-- OPERATING CARDS -->
+    <div class="operations-grid">
+      <div class="card">
+        <h3>Blast Radius &amp; Why <span class="n" id="brCount">&mdash;</span></h3>
+        <div id="blast" aria-live="polite"><div class="muted">No active change. Fire a trigger to see what is affected, why, and what was deliberately excluded.</div></div>
+      </div>
+      <div class="card">
+        <h3>CERPA Chain of Custody <span class="n" id="cerpaTarget">&mdash;</span></h3>
+        <div class="cerpa" id="cerpaBar"></div>
+        <div id="cerpaBody" aria-live="polite"><div class="muted">Chain of custody for a decision. Opens when a change is active.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+(function(){
+const STORE="dsedge.genesis.v1";
+const $=(s,r=document)=>r.querySelector(s);
+const ce=(t,c)=>{const e=document.createElement(t);if(c)e.className=c;return e;};
+const esc=s=>String(s).replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));
+
+/* ---------- admissibility ladder ---------- */
+const ADM=["Registered","Exploration","Experiment","Decision-Support","Operational-Use"];
+const demote=l=>ADM[Math.max(0,ADM.indexOf(l)-1)];
+
+const PROGRAMS={
+  "PRG-A":{lab:"NL-Central"}, "PRG-B":{lab:"NL-North"}, "PRG-C":{lab:"NL-West"}
+};
+const CLAIMS={
+  "CL-A":{prog:"PRG-A", label:"Alloy temperature tolerance", adm:"Experiment"},
+  "CL-B":{prog:"PRG-B", label:"First-wall coating limit",    adm:"Decision-Support"},
+  "CL-C":{prog:"PRG-C", label:"Storage medium stability",    adm:"Operational-Use"}
+};
+
+/* ---------- episode cards (three lanes) ---------- */
+const BASIS=[
+  {id:"sci-question",step:"1.1",title:"Scientific Question",val:"Alloy X service limit?",sub:"Leading-edge temperature",next:"Model version"},
+  {id:"model",       step:"1.2",title:"Model Version",      val:"mat-disc-3.2",          sub:"Materials discovery model",next:"Scientific claim"},
+  {id:"claim",       step:"1.3",title:"Scientific Claim",   val:"Tolerates \u2265 target temp Y",sub:"Origin: model assertion",next:"Evidence"},
+  {id:"evidence",    step:"1.4",title:"Evidence",           val:"Sim + instrument + prior",sub:"Bound datasets",        next:"Assumption"},
+  {id:"assumption",  step:"1.5",title:"Assumption",         val:"No phase change < Y",     sub:"Purity \u2265 spec",     next:"Domain review"}
+];
+const GOV=[
+  {id:"review",       step:"2.1",title:"Domain Review",  val:"Sufficiency + contradiction check",sub:"Reviewer panel",next:"Determination"},
+  {id:"determination",step:"2.2",title:"Determination",  val:"Sufficient to test",sub:"Named human authority",next:"Admissibility"},
+  {id:"admissibility",step:"2.3",title:"Admissibility",  val:"",sub:"Claim CL-A rights",admCard:true,next:"Decision / test"},
+  {id:"decision",     step:"2.4",title:"Decision / Test Authorization",val:"Authorize physical test",sub:"Experiment authority",next:"Outcome"}
+];
+const LEARN=[
+  {id:"outcome",step:"3.1",title:"Outcome",               val:"Pending test",sub:"awaiting result",next:"Drift signature"},
+  {id:"drift",  step:"3.2",title:"Drift Signature",       val:"None active",sub:"AI-detected \u00b7 shadow",next:"Patch"},
+  {id:"patch",  step:"3.3",title:"Patch",                 val:"None",sub:"Human-authored",next:"Memory packet"},
+  {id:"memory", step:"3.4",title:"Scientific Memory Packet",val:"Episode (open)",sub:"reusable on seal",next:null}
+];
+
+/* ---------- triggers: single source of truth ---------- */
+const TRIGGERS={
+  evidence:{
+    name:"Evidence revised", short:"Instrument recalibrated; bound output corrected",
+    episode:{evidence:"is-affected",claim:"is-affected",assumption:"is-reopened",drift:"is-active"},
+    claims:["CL-A"], proposedDemote:[],
+    why:"A recalibration corrected the instrument output the alloy claim rests on; its support is no longer current, and the dependent assumption must be re-checked. Curated to the alloy thread \u2014 sibling claims bind to different evidence and are deliberately excluded.",
+    answer:{head:"Recalibrated evidence affects one claim (CL-A) in PRG-A.",
+      reason:"Only the alloy claim rests on the corrected instrument output.",
+      action:"Re-resolve the evidence binding, recompute confidence, and revalidate under named human authority.",
+      unaffected:"CL-B and CL-C bind to different evidence and remain valid."}
+  },
+  assumption:{
+    name:"Assumption expired", short:"Review date 2026-05-01 passed unrevalidated",
+    episode:{assumption:"is-expired",claim:"is-drifting",review:"is-reopened",admissibility:"is-demoted",drift:"is-active"},
+    claims:["CL-A"], proposedDemote:["CL-A"],
+    why:"The load-bearing assumption (no phase change below Y) passed its review date with no revalidation; the claim now stands on an unexamined premise and a lower admissibility is proposed until it is re-confirmed. Curated to the thread that binds this assumption.",
+    answer:{head:"An expired assumption affects the bound alloy thread (CL-A, PRG-A).",
+      reason:"The claim rests on a premise (no phase change below Y) past its review date.",
+      action:"Reopen the assumption, apply the proposed admissibility hold, and revalidate under named human authority.",
+      unaffected:"CL-B and CL-C do not rest on this assumption and remain valid."}
+  },
+  model:{
+    name:"Model version deprecated", short:"mat-disc-3.2 mishandles a phase transition", marquee:true,
+    episode:{model:"is-affected",claim:"is-affected",review:"is-reopened",admissibility:"is-demoted",drift:"is-active"},
+    claims:["CL-A","CL-B","CL-C"], proposedDemote:["CL-A","CL-B","CL-C"],
+    why:"Every claim generated by mat-disc-3.2 inherits the defect \u2014 three programs across three laboratories, not one. The blast radius is exactly the model-bound set; claims produced by other model versions are untouched. Without model-to-claim lineage, no one could answer which conclusions were affected.",
+    answer:{head:"Model mat-disc-3.2 affects three claims across three programs.",
+      reason:"Each claim was generated by or explicitly bound to that model version.",
+      action:"Apply the proposed admissibility hold, reopen review, and revalidate under named human authority.",
+      unaffected:"Claims not bound to mat-disc-3.2 remain valid."}
+  },
+  contradiction:{
+    name:"Cross-lab contradiction", short:"NL-West reports a conflicting alloy result",
+    episode:{claim:"is-contested",review:"is-reopened",determination:"is-reopened",admissibility:"is-held",drift:"is-active"},
+    claims:["CL-A"], proposedDemote:[],
+    why:"A credible result from another laboratory conflicts with the standing alloy claim. Two authoritative conclusions cannot both hold, so the determination is reopened and admissibility is held pending resolution. Curated to the contradicted claim and its authorization \u2014 the model and sibling programs are not implicated.",
+    answer:{head:"A conflicting NL-West result reopens the alloy claim (CL-A) and its determination.",
+      reason:"Two authoritative conclusions cannot both hold.",
+      action:"Reopen the determination, hold admissibility, and run a discriminating test under named human authority.",
+      unaffected:"The model version and sibling programs (CL-B, CL-C) are not implicated."}
+  }
+};
+const CERPA=[{l:"C",n:"CLAIM"},{l:"E",n:"EVENT"},{l:"R",n:"REVIEW"},{l:"P",n:"PATCH"},{l:"A",n:"APPLY"}];
+const STATE_LABEL={"is-affected":"AFFECTED","is-unaffected":"UNAFFECTED","is-drifting":"DRIFTING","is-expired":"EXPIRED","is-contested":"CONTESTED","is-reopened":"REVIEW REQUIRED","is-demoted":"PROPOSED HOLD","is-held":"HELD","is-active":"ACTIVE","is-patched":"PATCHED","is-sealed":"SEALED","is-resolved":"RESOLVED"};
+const STATE_TONE={"is-affected":"s-red","is-drifting":"s-red","is-expired":"s-red","is-contested":"s-red","is-active":"s-red","is-reopened":"s-amber","is-demoted":"s-amber","is-held":"s-amber","is-patched":"s-green","is-sealed":"s-green","is-resolved":"s-green","is-unaffected":"s-gray"};
+
+/* ---------- state (canonical vs proposed) ---------- */
+let S=load();
+function fresh(){
+  const can={}; for(const id in CLAIMS) can[id]=CLAIMS[id].adm;
+  return {active:null, fired:{}, claimAdmCanonical:can, claimAdmProposed:{}, cerpa:0, recon:null, sealed:false};
+}
+function load(){ try{const r=JSON.parse(localStorage.getItem(STORE)); return (r&&r.claimAdmCanonical&&ADM.indexOf(r.claimAdmCanonical["CL-A"])>=0)?r:fresh();}catch(e){return fresh();} }
+function save(){ try{localStorage.setItem(STORE,JSON.stringify(S));}catch(e){} }
+
+/* ---------- helpers ---------- */
+function episodeStateOf(id){
+  let cls=""; if(S.active){const m=TRIGGERS[S.active].episode||{}; if(m[id])cls=m[id];}
+  if(S.sealed){ if(id==="patch")cls="is-patched"; if(id==="memory")cls="is-sealed"; if(id==="drift")cls="is-resolved"; }
+  return cls;
+}
+function statusOf(id){
+  const a=S.active;
+  if(id==="model")  return a==="model" ? {t:S.sealed?"STATUS: REBOUND":"STATUS: DEPRECATED",c:S.sealed?"ok":"warn"} : {t:"STATUS: TRUSTED",c:"ok"};
+  if(id==="claim"){ if(S.sealed)return{t:"REVALIDATED",c:"ok"}; if(a==="contradiction")return{t:"CONTESTED",c:"warn"}; if(a)return{t:"DRIFTING",c:"warn"}; return{t:"SUPPORTED",c:"ok"}; }
+  if(id==="evidence") return a==="evidence" ? {t:"BINDING: STALE",c:"warn"} : {t:"BINDING: CURRENT",c:""};
+  if(id==="assumption") return a==="assumption" ? {t:"REVIEW: EXPIRED",c:"warn"} : {t:"REVIEW: 2026-05-01",c:""};
+  if(id==="review") return (a==="model"||a==="assumption"||a==="contradiction") ? {t:"REOPENED \u00b7 review required",c:"hold"} : {t:"PASSED",c:""};
+  if(id==="determination") return a==="contradiction" ? {t:"REOPENED",c:"warn"} : {t:"AUTHORITY: human",c:""};
+  if(id==="decision") return {t:"Experiment authority",c:""};
+  if(id==="outcome") return S.sealed ? {t:"Failed below Y",c:"warn"} : {t:"awaiting result",c:""};
+  if(id==="drift"){ if(S.sealed)return{t:"Signature closed",c:"ok"}; if(a)return{t:TRIGGERS[a].name,c:"warn"}; return{t:"None active",c:""}; }
+  if(id==="patch"){ if(S.sealed)return{t:"Applied under authority",c:"ok"}; if(S.cerpa>=4)return{t:"Authoring",c:"hold"}; return{t:"None",c:""}; }
+  if(id==="memory") return S.sealed ? {t:"Sealed \u00b7 reusable",c:"ok"} : {t:"Open",c:""};
+  return {t:"",c:""};
+}
+function admView(cid){
+  const canon=S.claimAdmCanonical[cid], prop=S.claimAdmProposed[cid], orig=CLAIMS[cid].adm;
+  const held=S.active==="contradiction" && cid==="CL-A";
+  if(prop && !S.sealed) return {mode:"proposed",canon,prop};
+  if(held && !S.sealed) return {mode:"held",canon};
+  if(S.sealed && canon!==orig) return {mode:"applied",canon,orig};
+  return {mode:"normal",canon};
+}
+
+/* ---------- render: episode map ---------- */
+function renderEpisode(){
+  const host=$("#episodeMap"); host.innerHTML="";
+  host.appendChild(lane("1 \u00b7 SCIENTIFIC BASIS","scientific-basis",BASIS));
+  host.appendChild(transition("\u2193  HUMAN REVIEW GATE"));
+  host.appendChild(lane("2 \u00b7 GOVERNANCE","governance",GOV));
+  host.appendChild(transition("\u2193  AUTHORIZED TEST / DECISION"));
+  host.appendChild(lane("3 \u00b7 OUTCOME, CORRECTION & MEMORY","learning",LEARN));
+}
+function transition(t){ const d=ce("div","lane-transition"); d.textContent=t; return d; }
+function lane(title,gridCls,cards){
+  const sec=ce("section","episode-lane");
+  const h=ce("div","lane-title"); h.textContent=title; sec.appendChild(h);
+  const g=ce("div","episode-grid "+gridCls);
+  cards.forEach(c=>g.appendChild(ecard(c)));
+  sec.appendChild(g); return sec;
+}
+function ecard(c){
+  const cls=episodeStateOf(c.id);
+  const el=ce("div","ecard"+(cls?(" "+cls):"")); el.id="ec-"+c.id;
+  el.appendChild(textDiv("estep",c.step+" \u00b7 "+c.title.toUpperCase()));
+  if(c.admCard){
+    const v=admView("CL-A");
+    el.appendChild(textDiv("eval","Admissibility"));
+    const a=ce("div","adm-line");
+    if(v.mode==="proposed") a.innerHTML='<span class="cur">CURRENT: '+esc(v.canon)+'</span><br><span class="prop">PROPOSED HOLD: '+esc(v.prop)+' \u25bc</span>';
+    else if(v.mode==="held") a.innerHTML='<span class="cur">CURRENT: '+esc(v.canon)+'</span><br><span class="prop">HELD pending resolution</span>';
+    else if(v.mode==="applied") a.innerHTML='<span class="app">APPLIED: '+esc(v.canon)+' \u25bc</span><br><span class="cur">was '+esc(v.orig)+'</span>';
+    else a.innerHTML='<span class="cur">'+esc(v.canon)+'</span>';
+    el.appendChild(a);
+    el.appendChild(textDiv("esub",c.sub));
+  } else {
+    let val=c.val, sub=c.sub;
+    if(c.id==="outcome"){ val=S.sealed?"Failed below Y":"Pending test"; sub=S.sealed?"observation captured":"awaiting result"; }
+    if(c.id==="memory"){ val=S.sealed?"Episode sealed":"Episode (open)"; sub=S.sealed?"reusable asset":"reusable on seal"; }
+    if(c.id==="drift"){ val=S.active?(S.sealed?"Resolved":"Raised"):"None active"; }
+    if(c.id==="patch"){ val=S.sealed?"Applied":(S.cerpa>=4?"Authoring":"None"); }
+    el.appendChild(textDiv("eval",val));
+    el.appendChild(textDiv("esub",sub));
+  }
+  const st=statusOf(c.id);
+  if(st.t) el.appendChild(textDiv("estatus"+(st.c?(" "+st.c):""),st.t));
+  if(cls){ const lbl=ce("span","slabel "+(STATE_TONE[cls]||"s-gray")); lbl.textContent=STATE_LABEL[cls]||""; el.appendChild(lbl); }
+  if(c.next) el.appendChild(textDiv("enext","NEXT \u2192 "+c.next));
+  return el;
+}
+function textDiv(cls,txt){ const d=ce("div",cls); d.textContent=txt; return d; }
+
+/* ---------- render: model dependency (hub & spoke) ---------- */
+function renderModelDep(){
+  const host=$("#modelDep"); host.innerHTML="";
+  const modelAffected = S.active==="model";
+  const hub=ce("div","ecard model-hub"+(modelAffected?" is-affected":""));
+  hub.appendChild(textDiv("estep","MODEL VERSION"));
+  hub.appendChild(textDiv("eval","mat-disc-3.2"));
+  hub.appendChild(textDiv("esub","Materials discovery model"));
+  hub.appendChild(textDiv("estatus"+(modelAffected?" warn":" ok"),modelAffected?"STATUS: DEPRECATED":"STATUS: TRUSTED"));
+  if(modelAffected){ const l=ce("span","slabel s-red");l.textContent="AFFECTED";hub.appendChild(l); }
+  host.appendChild(hub);
+  const sp=ce("div","spokes"); sp.textContent="\u2193 \u2193 \u2193"; host.appendChild(sp);
+  const grid=ce("div","model-dependency-grid");
+  Object.keys(CLAIMS).forEach(cid=>grid.appendChild(claimCard(cid)));
+  host.appendChild(grid);
+}
+function claimCard(cid){
+  const c=CLAIMS[cid], p=PROGRAMS[c.prog];
+  const affected = S.active && TRIGGERS[S.active].claims.includes(cid);
+  const v=admView(cid);
+  let cls=""; if(affected){ cls = v.mode==="proposed"?"is-demoted":"is-affected"; } else if(S.active){ cls="is-unaffected"; }
+  const el=ce("div","ecard"+(cls?(" "+cls):"")); el.id="claim-"+cid;
+  el.appendChild(textDiv("estep","CLAIM \u00b7 "+cid));
+  el.appendChild(textDiv("eval",c.label));
+  el.appendChild(textDiv("esub",c.prog+" \u00b7 "+p.lab));
+  const a=ce("div","adm-line");
+  if(v.mode==="proposed") a.innerHTML='<span class="cur">CURRENT: '+esc(v.canon)+'</span><br><span class="prop">PROPOSED HOLD: '+esc(v.prop)+' \u25bc</span>';
+  else if(v.mode==="applied") a.innerHTML='<span class="app">APPLIED: '+esc(v.canon)+' \u25bc</span><br><span class="cur">was '+esc(v.orig)+'</span>';
+  else a.innerHTML='<span class="cur">ADM: '+esc(v.canon)+'</span>';
+  el.appendChild(a);
+  if(S.active){ const lbl=ce("span","slabel "+(affected?(v.mode==="proposed"?"s-amber":"s-red"):"s-gray")); lbl.textContent=affected?(v.mode==="proposed"?"PROPOSED HOLD":"AFFECTED"):"UNAFFECTED"; el.appendChild(lbl); }
+  return el;
+}
+
+/* ---------- triggers ---------- */
+function renderTriggers(){
+  const wrap=$("#triggers"); wrap.innerHTML="";
+  Object.entries(TRIGGERS).forEach(([k,t])=>{
+    const b=ce("button","btn");
+    b.setAttribute("aria-pressed", S.active===k?"true":"false");
+    b.setAttribute("aria-label", t.name+". "+t.short);
+    b.innerHTML='<span class="tt">'+(t.marquee?"\u2605 ":"")+esc(t.name)+'</span><span class="td">'+esc(t.short)+'</span>';
+    b.addEventListener("click",()=>fireTrigger(k));
+    wrap.appendChild(b);
+  });
+}
+function fireTrigger(k){
+  const t=TRIGGERS[k];
+  S.active=k; S.fired[k]=true; S.cerpa=2; S.sealed=false;
+  // SHADOW proposal only — do NOT mutate canonical admissibility
+  S.claimAdmProposed={};
+  t.proposedDemote.forEach(cid=>{ S.claimAdmProposed[cid]=demote(S.claimAdmCanonical[cid]); });
+  save(); renderAll();
+}
+
+/* ---------- answer ---------- */
+function renderAnswer(){
+  const box=$("#answer"), head=$("#ansHead"), rows=$("#ansRows"); rows.innerHTML="";
+  if(!S.active){ box.classList.add("idle"); head.textContent="Select a change trigger to test the coherence of the scientific record."; return; }
+  box.classList.remove("idle");
+  const a=TRIGGERS[S.active].answer; head.textContent=a.head;
+  const mk=(l,v)=>{const r=ce("div","arow"); r.appendChild(textDiv("l",l)); r.appendChild(textDiv("v",v)); return r;};
+  rows.appendChild(mk("Reason:",a.reason));
+  rows.appendChild(mk("Required action:",a.action));
+  rows.appendChild(mk("Unaffected:",a.unaffected));
+}
+
+/* ---------- blast ---------- */
+function renderBlast(){
+  const host=$("#blast"); host.innerHTML="";
+  if(!S.active){ host.innerHTML='<div class="muted">No active change. Fire a trigger to see what is affected, why, and what was deliberately excluded.</div>'; $("#brCount").textContent="\u2014"; return; }
+  const t=TRIGGERS[S.active];
+  $("#brCount").textContent=t.claims.length+" claim(s)";
+
+  const hd=ce("div","shadow");
+  hd.innerHTML='<div class="h">AI-PROPOSED DRIFT SIGNATURE \u00b7 SHADOW</div><div class="bd"><b>1 \u00b7 What changed:</b> '+esc(t.name)+'. '+esc(t.short)+'. Detection is autonomous; the record is unchanged \u2014 a named human must apply any correction.</div>';
+  host.appendChild(hd);
+
+  t.claims.forEach(cid=>{
+    const c=CLAIMS[cid], p=PROGRAMS[c.prog], v=admView(cid);
+    let dem;
+    if(v.mode==="proposed") dem='<div class="demote">PROPOSED HOLD \u00b7 admissibility <s>'+esc(v.canon)+'</s> \u2192 '+esc(v.prop)+' \u25bc (applies on human Apply)</div>';
+    else if(v.mode==="applied") dem='<div class="demote applied">APPLIED \u00b7 admissibility '+esc(v.canon)+' \u25bc (was '+esc(v.orig)+')</div>';
+    else dem='<div class="muted">admissibility '+esc(v.canon)+' (unchanged)</div>';
+    const row=ce("div","brow");
+    row.innerHTML='<span class="tag prim">AFFECTED</span><div><div class="bt"><b>2 \u00b7</b> '+esc(cid)+' \u2014 '+esc(c.label)+' <span class="muted">\u00b7 '+esc(c.prog)+' \u00b7 '+esc(p.lab)+'</span></div>'+dem+'</div>';
+    host.appendChild(row);
+  });
+
+  const wr=ce("div","brow");
+  wr.innerHTML='<span class="tag ai">WHY</span><div><div class="bt"><b>3 \u00b7 Why affected</b></div><div class="bd">'+esc(t.why)+'</div></div>';
+  host.appendChild(wr);
+
+  const out=Object.keys(CLAIMS).filter(c=>!t.claims.includes(c));
+  if(out.length){
+    const o=ce("div","brow");
+    o.innerHTML='<span class="tag ok">UNAFFECTED</span><div><div class="bt"><b>4 \u00b7 Deliberately excluded:</b> '+out.join(", ")+'</div><div class="bd">Not bound to the changed object \u2014 invalidation is curated, not transitive. Stale evidence may remain in memory but cannot silently stay load-bearing.</div></div>';
+    host.appendChild(o);
+  }
+  const ha=ce("div","brow");
+  ha.innerHTML='<span class="tag human">HUMAN ACTION REQUIRED</span><div><div class="bd"><b>6 \u00b7</b> Review, patch, and Apply under named authority in the CERPA panel \u2014 detection alone changes nothing.</div></div>';
+  host.appendChild(ha);
+}
+
+/* ---------- CERPA ---------- */
+function renderCerpa(){
+  const bar=$("#cerpaBar"), body=$("#cerpaBody"); bar.innerHTML=""; body.innerHTML="";
+  if(!S.active){ $("#cerpaTarget").textContent="\u2014"; body.innerHTML='<div class="muted">Chain of custody for a decision. Opens when a change is active.</div>'; return; }
+  const t=TRIGGERS[S.active], cid=t.cerpa||"CL-A", c=CLAIMS[cid];
+  $("#cerpaTarget").textContent=cid+" \u00b7 "+c.prog;
+  CERPA.forEach((st,i)=>{
+    const cls=i<S.cerpa?"cstep done":(i===S.cerpa?"cstep active":"cstep");
+    const d=ce("div",cls); d.innerHTML='<div class="l">'+st.l+'</div><div class="n">'+st.n+'</div>'; bar.appendChild(d);
+    if(i<CERPA.length-1){const a=ce("div","carrow");a.textContent="\u203a";bar.appendChild(a);}
+  });
+  const info=ce("div"); info.style.cssText="font-size:16px;color:var(--ink-dim);margin-bottom:10px;line-height:1.5";
+  info.innerHTML='<b style="color:var(--ink)">'+cid+'</b> &mdash; '+esc(c.label)+'. The event bound the change at <b style="color:var(--ink)">E</b>. Detection was AI-proposed; <b style="color:var(--ink)">Review, Patch, and Apply are human acts</b>.';
+  body.appendChild(info);
+
+  if(S.cerpa<5 && !S.sealed){
+    const patch = S.active==="model" ? "Retire predictions from mat-disc-3.2; rebind to a re-validated model version; apply the proposed admissibility hold across PRG-A / PRG-B / PRG-C."
+              : S.active==="assumption" ? "Re-open the assumption; set a new review date; apply the proposed admissibility hold until revalidated."
+              : S.active==="contradiction" ? "Open an AltCog discriminating test against the NL-West result; hold the claim CONTESTED pending resolution."
+              : "Re-resolve the evidence binding to the recalibrated output; recompute confidence; re-validate the claim.";
+    const sh=ce("div","shadow"); sh.innerHTML='<div class="h">AI-PROPOSED CANDIDATE PATCH \u00b7 SHADOW</div><div class="bd">'+esc(patch)+'</div>'; body.appendChild(sh);
+    const al=ce("div","actlbl"); al.textContent="HUMAN ACTION REQUIRED"; body.appendChild(al);
+    const act=ce("div"); act.style.cssText="display:flex;gap:9px;flex-wrap:wrap";
+    const mk=(label,fn,on)=>{const b=ce("button","btn sm human");b.textContent=label;b.disabled=!on;if(!on)b.setAttribute("aria-disabled","true");b.addEventListener("click",fn);return b;};
+    act.appendChild(mk("Record review",()=>{S.cerpa=3;save();renderAll();},S.cerpa===2));
+    act.appendChild(mk("Author patch",()=>{S.cerpa=4;save();renderAll();},S.cerpa===3));
+    act.appendChild(mk("Apply under authority",()=>applyPatch(),S.cerpa===4));
+    body.appendChild(act);
+  } else {
+    const done=ce("div","brow");
+    done.innerHTML='<span class="tag ok">DRIFT SIGNATURE CLOSED</span><div><div class="bt">Patch applied under named authority; proposed admissibility hold committed to canonical.</div><div class="bd">Predecessor preserved and linked \u2014 never deleted. Outcome captured; <b style="color:var(--ink)">episode sealed as reusable scientific memory</b> in the Memory Packet.</div></div>';
+    body.appendChild(done);
+  }
+}
+function applyPatch(){
+  // human Apply commits the proposed hold to canonical
+  for(const cid in S.claimAdmProposed){ S.claimAdmCanonical[cid]=S.claimAdmProposed[cid]; }
+  S.claimAdmProposed={}; S.cerpa=5; S.sealed=true; save(); renderAll();
+}
+
+function renderAll(){ renderEpisode(); renderModelDep(); renderTriggers(); renderAnswer(); renderBlast(); renderCerpa(); }
+
+$("#btnReset").addEventListener("click",()=>{ S=fresh(); save(); renderAll(); });
+renderAll();
+})();
+</script>
+</body>
+</html>
