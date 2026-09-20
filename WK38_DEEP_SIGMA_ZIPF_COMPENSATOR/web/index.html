@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Deep Sigma · Zipf review console</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="engine.js" defer></script>
+  <script src="demo.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#review-heading">Skip to review queue</a>
+  <div class="shell">
+    <header class="masthead">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">Σ</span><div><span class="eyebrow">DEEP SIGMA</span><h1>ZIPF <span>/ RESONATOR</span></h1></div></div>
+      <div class="runtime"><span class="status-dot" aria-hidden="true"></span><span id="runtime-label">Initializing evaluator</span></div>
+    </header>
+    <main>
+      <section class="intro" aria-labelledby="page-heading">
+        <div><p class="eyebrow">Synthetic pilot · Simulated release checks</p><h2 id="page-heading">Give consequential<br class="desktop-break"> exceptions a hearing.</h2><p class="intro-copy">Compare frequency-sensitive retrieval with bounded rarity compensation, then inspect the evidence and authority requirements separately.</p></div>
+        <aside class="principle"><span class="eyebrow">THE GOVERNING PRINCIPLE</span><p>Attention is earned.<br>Verification is separate.</p><span>Rare does not mean true. Repeated does not mean independently confirmed.</span></aside>
+      </section>
+
+      <section class="controls panel" aria-label="Scenario controls">
+        <div class="control-field"><label for="budget">Review budget</label><div class="input-with-note"><input id="budget" type="number" min="1" max="100" step="1" value="3"><span>nonmandatory claims</span></div></div>
+        <div class="control-field scenario-clock"><label for="as-of">Scenario time · UTC</label><input id="as-of" type="text" readonly value="—"></div>
+        <div class="control-actions"><input id="import-file" type="file" accept=".json,application/json" hidden><button id="import-button" class="button">Import JSON</button><button id="reset-button" class="button subtle">Reset demo</button><button id="export-button" class="button primary" disabled>Export results <span aria-hidden="true">↗</span></button></div>
+      </section>
+      <div id="error" class="error-banner" role="alert" hidden></div>
+      <p id="status" class="status-line" role="status" aria-live="polite">Loading the synthetic scenario…</p>
+      <section id="diagnostics" class="diagnostics" aria-label="Scenario summary"></section>
+
+      <section class="comparison-section" aria-labelledby="comparison-heading">
+        <div class="section-heading"><div><p class="eyebrow">01 / COMPARE ATTENTION</p><h3 id="comparison-heading">One scenario. Three views.</h3></div><p class="section-caption">Same review budget in every view.</p></div>
+        <div class="tabs" role="tablist" aria-label="Evaluation mode">
+          <button id="tab-baseline" class="tab" role="tab" aria-selected="true" aria-controls="review-panel" data-mode="baseline"><span class="tab-index">01</span><span><strong>Baseline</strong><small>Frequency-sensitive comparator</small></span></button>
+          <button id="tab-compensated" class="tab" role="tab" aria-selected="false" aria-controls="review-panel" tabindex="-1" data-mode="compensated"><span class="tab-index">02</span><span><strong>Compensated</strong><small>Bounded rarity adjustment</small></span></button>
+          <button id="tab-full_control" class="tab" role="tab" aria-selected="false" aria-controls="review-panel" tabindex="-1" data-mode="full_control"><span class="tab-index">03</span><span><strong>Full control</strong><small>Same ranking + simulated gate</small></span></button>
+        </div>
+        <div id="metrics-section" class="panel metric-panel" hidden><div class="metric-heading"><strong>Evaluator labels only</strong><span>These labels never enter scoring or gate checks. Counts describe this synthetic scenario.</span></div><div class="table-scroll"><table class="metrics-table"><caption class="sr-only">Selected claims compared with supplied evaluator labels</caption><thead><tr><th scope="col">View</th><th scope="col">Rare & relevant found</th><th scope="col">Irrelevant selected</th><th scope="col">Mandatory retained</th><th scope="col">Gaps surfaced</th></tr></thead><tbody id="metric-body"></tbody></table></div></div>
+      </section>
+
+      <section id="review-panel" role="tabpanel" aria-labelledby="tab-baseline">
+        <div class="mode-note" id="mode-note"></div>
+        <section class="mandatory-panel" aria-labelledby="mandatory-heading"><div class="mandatory-title"><div><span class="eyebrow">PROTECTED REVIEW LANE</span><h3 id="mandatory-heading">Mandatory claims <span id="mandatory-count" class="count-badge">0</span></h3></div><p>Always included. Uses none of the review budget.</p></div><div id="mandatory-list" class="mandatory-list"></div></section>
+        <div class="workbench">
+          <section class="queue panel" aria-labelledby="review-heading"><div class="panel-heading"><div><p class="eyebrow">02 / REVIEW SELECTION</p><h3 id="review-heading" tabindex="-1">Attention queue</h3></div><span id="queue-count" class="pill">—</span></div><div class="table-scroll"><table class="queue-table"><caption class="sr-only">Nonmandatory claims selected within the review budget</caption><thead><tr><th scope="col">Rank / claim</th><th scope="col">Score</th><th scope="col">Reports</th><th id="gate-column-label" scope="col">Review</th></tr></thead><tbody id="queue-body"></tbody></table></div><div class="queue-footer">Score prioritizes review; it never verifies a claim.</div><div class="all-claims"><label for="claim-search">Inspect every claim</label><input id="claim-search" type="search" placeholder="Search claim text or ID…" autocomplete="off"><div id="all-claim-list" class="all-claim-list"></div></div></section>
+          <aside class="detail panel" aria-labelledby="detail-heading"><div class="panel-heading"><div><p class="eyebrow">03 / INSPECT THE REASON</p><h3 id="detail-heading">Claim detail</h3></div><span id="detail-id" class="pill">—</span></div><div id="detail-body" class="detail-body"><p class="empty">Select a claim to inspect its evidence.</p></div></aside>
+        </div>
+      </section>
+      <section class="limits" aria-label="Pilot limits"><strong>Local simulation, not production authorization.</strong><p>Origins, evidence assessments, identities and approvals are supplied scenario assertions. This pilot does not authenticate reviewers, establish real-world truth, publish a report or authorize an action. Production enforcement belongs in a trusted runtime with authenticated identities and controlled evidence.</p></section>
+    </main>
+    <footer><span>DEEP SIGMA · ZIPF PILOT 1.0</span><span id="privacy-note">No LLM. Explicit policy. Explainable results.</span></footer>
+  </div>
+</body>
+</html>

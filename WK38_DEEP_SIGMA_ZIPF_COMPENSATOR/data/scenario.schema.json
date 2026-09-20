@@ -1,0 +1,434 @@
+{
+  "type": "object",
+  "required": [
+    "schema_version",
+    "as_of",
+    "review_budget",
+    "policy",
+    "aliases",
+    "claims",
+    "reports"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "as_of": {
+      "$ref": "#/$defs/timestamp"
+    },
+    "review_budget": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100
+    },
+    "policy": {
+      "$ref": "#/$defs/policy"
+    },
+    "aliases": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/concept"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/concept"
+      }
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/claim"
+      },
+      "minItems": 1,
+      "maxItems": 1000
+    },
+    "reports": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/report"
+      },
+      "minItems": 0,
+      "maxItems": 50000
+    },
+    "labels": {
+      "description": "Optional evaluator labels. Not used by core ranking or gate logic.",
+      "type": "object",
+      "properties": {
+        "rare_relevant_claim_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identifier"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "irrelevant_claim_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identifier"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "mandatory_claim_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identifier"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "gap_claim_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identifier"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        }
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Deep Sigma Zipf Pilot Scenario 1.0",
+  "description": "Editor assistance. Engine validation additionally enforces cross-record identity, real calendar timestamps and alias rules. No remote schema fetch is required by the software.",
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "pattern": "^[A-Za-z0-9_.:\\-]+$"
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "pattern": "^[^\\u0000-\\u001f\\u007f]*[^\\s\\u0000-\\u001f\\u007f][^\\u0000-\\u001f\\u007f]*$"
+    },
+    "concept": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80,
+      "pattern": "^[A-Za-z0-9 _-]*[A-Za-z0-9_-][A-Za-z0-9 _-]*$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "policy": {
+      "type": "object",
+      "required": [
+        "id",
+        "version",
+        "rarity_cap",
+        "min_relevance",
+        "min_quality",
+        "min_independent_support",
+        "required_evidence_types",
+        "max_evidence_age_days",
+        "reviewer_roles",
+        "authority_roles",
+        "intended_use"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "rarity_cap": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 30
+        },
+        "min_relevance": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "min_quality": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "min_independent_support": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "required_evidence_types": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/label"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "max_evidence_age_days": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3650
+        },
+        "reviewer_roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/label"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "authority_roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/label"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "intended_use": {
+          "$ref": "#/$defs/label"
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "required": [
+        "id",
+        "origin_id",
+        "event_id",
+        "kind",
+        "stance",
+        "claim_version",
+        "observed_at",
+        "support_assessed"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "origin_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "event_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "kind": {
+          "$ref": "#/$defs/label"
+        },
+        "stance": {
+          "enum": [
+            "supports",
+            "contradicts",
+            "neutral"
+          ]
+        },
+        "claim_version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "observed_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "support_assessed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "required": [
+        "reviewer_id",
+        "role",
+        "claim_version",
+        "policy_version",
+        "decision",
+        "expires_at"
+      ],
+      "properties": {
+        "reviewer_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "role": {
+          "$ref": "#/$defs/label"
+        },
+        "claim_version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "policy_version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "decision": {
+          "enum": [
+            "approved",
+            "rejected"
+          ]
+        },
+        "expires_at": {
+          "$ref": "#/$defs/timestamp"
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "required": [
+        "authority_id",
+        "role",
+        "claim_version",
+        "policy_version",
+        "intended_use",
+        "expires_at",
+        "revoked"
+      ],
+      "properties": {
+        "authority_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "role": {
+          "$ref": "#/$defs/label"
+        },
+        "claim_version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "policy_version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "intended_use": {
+          "$ref": "#/$defs/label"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "revoked": {
+          "type": "boolean"
+        }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "required": [
+        "id",
+        "version",
+        "concept",
+        "statement",
+        "relevance",
+        "consequence",
+        "quality",
+        "contradiction",
+        "mandatory",
+        "required_evidence_types",
+        "evidence",
+        "review",
+        "authority"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "concept": {
+          "$ref": "#/$defs/concept"
+        },
+        "statement": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        },
+        "relevance": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "consequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "quality": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "contradiction": {
+          "type": "boolean"
+        },
+        "mandatory": {
+          "type": "boolean"
+        },
+        "required_evidence_types": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/label"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence"
+          },
+          "minItems": 0
+        },
+        "review": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/review"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "authority": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/authority"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "report": {
+      "type": "object",
+      "required": [
+        "id",
+        "claim_id",
+        "origin_id",
+        "event_id"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "claim_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "origin_id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "event_id": {
+          "$ref": "#/$defs/identifier"
+        }
+      }
+    }
+  }
+}

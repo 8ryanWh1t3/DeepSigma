@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0",
+  "as_of": "2026-09-20T12:00:00Z",
+  "review_budget": 1,
+  "policy": {
+    "id": "DS-ZIPF-PILOT",
+    "version": 1,
+    "rarity_cap": 20,
+    "min_relevance": 60,
+    "min_quality": 60,
+    "min_independent_support": 2,
+    "required_evidence_types": [
+      "manifest",
+      "independent_observation"
+    ],
+    "max_evidence_age_days": 30,
+    "reviewer_roles": [
+      "analyst"
+    ],
+    "authority_roles": [
+      "release_authority"
+    ],
+    "intended_use": "verified_report_release"
+  },
+  "aliases": {},
+  "claims": [
+    {
+      "id": "example_claim",
+      "version": 1,
+      "concept": "example concept",
+      "statement": "Synthetic example with two assessed supporting origins.",
+      "relevance": 75,
+      "consequence": 65,
+      "quality": 80,
+      "contradiction": false,
+      "mandatory": false,
+      "required_evidence_types": [],
+      "evidence": [
+        {
+          "id": "example_claim_ev_a",
+          "origin_id": "example_claim_source_a",
+          "event_id": "example_claim_ev_event_a",
+          "kind": "manifest",
+          "stance": "supports",
+          "claim_version": 1,
+          "observed_at": "2026-09-19T09:00:00Z",
+          "support_assessed": true
+        },
+        {
+          "id": "example_claim_ev_b",
+          "origin_id": "example_claim_source_b",
+          "event_id": "example_claim_ev_event_b",
+          "kind": "independent_observation",
+          "stance": "supports",
+          "claim_version": 1,
+          "observed_at": "2026-09-19T10:00:00Z",
+          "support_assessed": true
+        }
+      ],
+      "review": {
+        "reviewer_id": "synthetic_analyst",
+        "role": "analyst",
+        "claim_version": 1,
+        "policy_version": 1,
+        "decision": "approved",
+        "expires_at": "2026-10-20T12:00:00Z"
+      },
+      "authority": {
+        "authority_id": "synthetic_release_officer",
+        "role": "release_authority",
+        "claim_version": 1,
+        "policy_version": 1,
+        "intended_use": "verified_report_release",
+        "expires_at": "2026-10-20T12:00:00Z",
+        "revoked": false
+      }
+    }
+  ],
+  "reports": [
+    {
+      "id": "example_report",
+      "claim_id": "example_claim",
+      "origin_id": "example_origin",
+      "event_id": "example_event"
+    }
+  ]
+}

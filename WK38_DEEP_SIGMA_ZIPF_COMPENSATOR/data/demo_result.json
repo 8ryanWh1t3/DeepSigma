@@ -1,0 +1,1091 @@
+{
+  "schema_version": "1.0",
+  "as_of": "2026-09-20T12:00:00Z",
+  "policy": {
+    "id": "DS-ZIPF-PILOT",
+    "version": 1
+  },
+  "items": [
+    {
+      "id": "cargo_allegation",
+      "statement": "Illustrative AI cargo allegation: nuclear-program components are asserted without assessed support. This is not a reconstruction of an actual vessel.",
+      "canonical_concept": "high consequence allegation",
+      "mandatory": false,
+      "relevance": 90,
+      "consequence": 98,
+      "quality": 85,
+      "base_score": 91,
+      "baseline_score": 95,
+      "rarity_bonus": 20,
+      "compensated_score": 111,
+      "report_count": 51,
+      "independent_events": 1,
+      "concept_events": 1,
+      "reasons": [
+        "DUPLICATE_REPORTS_COLLAPSED",
+        "RARITY_BONUS_APPLIED"
+      ],
+      "gate": {
+        "status": "HOLD",
+        "simulated": true,
+        "reasons": [
+          "INSUFFICIENT_INDEPENDENT_SUPPORT",
+          "MISSING_EVIDENCE_TYPES"
+        ],
+        "independent_support_origins": [],
+        "missing_evidence_types": [
+          "independent_observation",
+          "manifest"
+        ],
+        "excluded_evidence": [
+          {
+            "id": "cargo_allegation_ev_a",
+            "reason": "UNASSESSED_SUPPORT"
+          },
+          {
+            "id": "cargo_allegation_ev_b",
+            "reason": "UNASSESSED_SUPPORT"
+          }
+        ]
+      }
+    },
+    {
+      "id": "contradiction",
+      "statement": "Synthetic sources disagree about the cargo description.",
+      "canonical_concept": "cargo conflict",
+      "mandatory": false,
+      "relevance": 80,
+      "consequence": 85,
+      "quality": 80,
+      "base_score": 81,
+      "baseline_score": 85,
+      "rarity_bonus": 20,
+      "compensated_score": 101,
+      "report_count": 1,
+      "independent_events": 1,
+      "concept_events": 1,
+      "reasons": [
+        "RARITY_BONUS_APPLIED",
+        "UNASSESSED_CONTRADICTION"
+      ],
+      "gate": {
+        "status": "HOLD",
+        "simulated": true,
+        "reasons": [
+          "CONTRADICTION"
+        ],
+        "independent_support_origins": [
+          "contradiction_source_a",
+          "contradiction_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "critical_01",
+      "statement": "Synthetic mandatory critical alert 1; always shown outside the discretionary budget.",
+      "canonical_concept": "routine_status",
+      "mandatory": true,
+      "relevance": 90,
+      "consequence": 100,
+      "quality": 90,
+      "base_score": 93,
+      "baseline_score": 113,
+      "rarity_bonus": 0,
+      "compensated_score": 93,
+      "report_count": 10,
+      "independent_events": 10,
+      "concept_events": 1020,
+      "reasons": [
+        "MANDATORY_REVIEW"
+      ],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "critical_01_source_a",
+          "critical_01_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "critical_02",
+      "statement": "Synthetic mandatory critical alert 2; always shown outside the discretionary budget.",
+      "canonical_concept": "routine_status",
+      "mandatory": true,
+      "relevance": 90,
+      "consequence": 100,
+      "quality": 90,
+      "base_score": 93,
+      "baseline_score": 113,
+      "rarity_bonus": 0,
+      "compensated_score": 93,
+      "report_count": 10,
+      "independent_events": 10,
+      "concept_events": 1020,
+      "reasons": [
+        "MANDATORY_REVIEW"
+      ],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "critical_02_source_a",
+          "critical_02_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "distractor_01",
+      "statement": "Synthetic unusual but irrelevant formatting detail 1.",
+      "canonical_concept": "unusual topic 1",
+      "mandatory": false,
+      "relevance": 15,
+      "consequence": 10,
+      "quality": 30,
+      "base_score": 16,
+      "baseline_score": 20,
+      "rarity_bonus": 0,
+      "compensated_score": 16,
+      "report_count": 1,
+      "independent_events": 1,
+      "concept_events": 1,
+      "reasons": [
+        "RARITY_THRESHOLD_NOT_MET"
+      ],
+      "gate": {
+        "status": "HOLD",
+        "simulated": true,
+        "reasons": [
+          "INSUFFICIENT_INDEPENDENT_SUPPORT",
+          "MISSING_EVIDENCE_TYPES",
+          "MISSING_REVIEW",
+          "MISSING_AUTHORITY"
+        ],
+        "independent_support_origins": [],
+        "missing_evidence_types": [
+          "independent_observation",
+          "manifest"
+        ],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "distractor_02",
+      "statement": "Synthetic unusual but irrelevant formatting detail 2.",
+      "canonical_concept": "unusual topic 2",
+      "mandatory": false,
+      "relevance": 15,
+      "consequence": 10,
+      "quality": 30,
+      "base_score": 16,
+      "baseline_score": 20,
+      "rarity_bonus": 0,
+      "compensated_score": 16,
+      "report_count": 1,
+      "independent_events": 1,
+      "concept_events": 1,
+      "reasons": [
+        "RARITY_THRESHOLD_NOT_MET"
+      ],
+      "gate": {
+        "status": "HOLD",
+        "simulated": true,
+        "reasons": [
+          "INSUFFICIENT_INDEPENDENT_SUPPORT",
+          "MISSING_EVIDENCE_TYPES",
+          "MISSING_REVIEW",
+          "MISSING_AUTHORITY"
+        ],
+        "independent_support_origins": [],
+        "missing_evidence_types": [
+          "independent_observation",
+          "manifest"
+        ],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "distractor_03",
+      "statement": "Synthetic unusual but irrelevant formatting detail 3.",
+      "canonical_concept": "unusual topic 3",
+      "mandatory": false,
+      "relevance": 15,
+      "consequence": 10,
+      "quality": 30,
+      "base_score": 16,
+      "baseline_score": 20,
+      "rarity_bonus": 0,
+      "compensated_score": 16,
+      "report_count": 1,
+      "independent_events": 1,
+      "concept_events": 1,
+      "reasons": [
+        "RARITY_THRESHOLD_NOT_MET"
+      ],
+      "gate": {
+        "status": "HOLD",
+        "simulated": true,
+        "reasons": [
+          "INSUFFICIENT_INDEPENDENT_SUPPORT",
+          "MISSING_EVIDENCE_TYPES",
+          "MISSING_REVIEW",
+          "MISSING_AUTHORITY"
+        ],
+        "independent_support_origins": [],
+        "missing_evidence_types": [
+          "independent_observation",
+          "manifest"
+        ],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "distractor_04",
+      "statement": "Synthetic unusual but irrelevant formatting detail 4.",
+      "canonical_concept": "unusual topic 4",
+      "mandatory": false,
+      "relevance": 15,
+      "consequence": 10,
+      "quality": 30,
+      "base_score": 16,
+      "baseline_score": 20,
+      "rarity_bonus": 0,
+      "compensated_score": 16,
+      "report_count": 1,
+      "independent_events": 1,
+      "concept_events": 1,
+      "reasons": [
+        "RARITY_THRESHOLD_NOT_MET"
+      ],
+      "gate": {
+        "status": "HOLD",
+        "simulated": true,
+        "reasons": [
+          "INSUFFICIENT_INDEPENDENT_SUPPORT",
+          "MISSING_EVIDENCE_TYPES",
+          "MISSING_REVIEW",
+          "MISSING_AUTHORITY"
+        ],
+        "independent_support_origins": [],
+        "missing_evidence_types": [
+          "independent_observation",
+          "manifest"
+        ],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "distractor_05",
+      "statement": "Synthetic unusual but irrelevant formatting detail 5.",
+      "canonical_concept": "unusual topic 5",
+      "mandatory": false,
+      "relevance": 15,
+      "consequence": 10,
+      "quality": 30,
+      "base_score": 16,
+      "baseline_score": 20,
+      "rarity_bonus": 0,
+      "compensated_score": 16,
+      "report_count": 1,
+      "independent_events": 1,
+      "concept_events": 1,
+      "reasons": [
+        "RARITY_THRESHOLD_NOT_MET"
+      ],
+      "gate": {
+        "status": "HOLD",
+        "simulated": true,
+        "reasons": [
+          "INSUFFICIENT_INDEPENDENT_SUPPORT",
+          "MISSING_EVIDENCE_TYPES",
+          "MISSING_REVIEW",
+          "MISSING_AUTHORITY"
+        ],
+        "independent_support_origins": [],
+        "missing_evidence_types": [
+          "independent_observation",
+          "manifest"
+        ],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "distractor_06",
+      "statement": "Synthetic unusual but irrelevant formatting detail 6.",
+      "canonical_concept": "unusual topic 6",
+      "mandatory": false,
+      "relevance": 15,
+      "consequence": 10,
+      "quality": 30,
+      "base_score": 16,
+      "baseline_score": 20,
+      "rarity_bonus": 0,
+      "compensated_score": 16,
+      "report_count": 1,
+      "independent_events": 1,
+      "concept_events": 1,
+      "reasons": [
+        "RARITY_THRESHOLD_NOT_MET"
+      ],
+      "gate": {
+        "status": "HOLD",
+        "simulated": true,
+        "reasons": [
+          "INSUFFICIENT_INDEPENDENT_SUPPORT",
+          "MISSING_EVIDENCE_TYPES",
+          "MISSING_REVIEW",
+          "MISSING_AUTHORITY"
+        ],
+        "independent_support_origins": [],
+        "missing_evidence_types": [
+          "independent_observation",
+          "manifest"
+        ],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "expired_approval",
+      "statement": "A synthetic approval has expired; review is required before verified release.",
+      "canonical_concept": "approval expiry",
+      "mandatory": false,
+      "relevance": 85,
+      "consequence": 80,
+      "quality": 85,
+      "base_score": 83,
+      "baseline_score": 87,
+      "rarity_bonus": 20,
+      "compensated_score": 103,
+      "report_count": 1,
+      "independent_events": 1,
+      "concept_events": 1,
+      "reasons": [
+        "RARITY_BONUS_APPLIED"
+      ],
+      "gate": {
+        "status": "HOLD",
+        "simulated": true,
+        "reasons": [
+          "AUTHORITY_EXPIRED"
+        ],
+        "independent_support_origins": [
+          "expired_approval_source_a",
+          "expired_approval_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "missing_evidence",
+      "statement": "A synthetic cargo assertion lacks the required independent observation.",
+      "canonical_concept": "evidence gap",
+      "mandatory": false,
+      "relevance": 80,
+      "consequence": 78,
+      "quality": 70,
+      "base_score": 77,
+      "baseline_score": 81,
+      "rarity_bonus": 20,
+      "compensated_score": 97,
+      "report_count": 1,
+      "independent_events": 1,
+      "concept_events": 1,
+      "reasons": [
+        "RARITY_BONUS_APPLIED"
+      ],
+      "gate": {
+        "status": "HOLD",
+        "simulated": true,
+        "reasons": [
+          "INSUFFICIENT_INDEPENDENT_SUPPORT",
+          "MISSING_EVIDENCE_TYPES"
+        ],
+        "independent_support_origins": [
+          "missing_evidence_source_a"
+        ],
+        "missing_evidence_types": [
+          "independent_observation"
+        ],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "routine_01",
+      "statement": "Synthetic routine cargo-status summary 01. No exception reported.",
+      "canonical_concept": "routine_status",
+      "mandatory": false,
+      "relevance": 75,
+      "consequence": 65,
+      "quality": 80,
+      "base_score": 72,
+      "baseline_score": 92,
+      "rarity_bonus": 0,
+      "compensated_score": 72,
+      "report_count": 50,
+      "independent_events": 50,
+      "concept_events": 1020,
+      "reasons": [],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "routine_01_source_a",
+          "routine_01_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "routine_02",
+      "statement": "Synthetic routine cargo-status summary 02. No exception reported.",
+      "canonical_concept": "routine_status",
+      "mandatory": false,
+      "relevance": 75,
+      "consequence": 65,
+      "quality": 80,
+      "base_score": 72,
+      "baseline_score": 92,
+      "rarity_bonus": 0,
+      "compensated_score": 72,
+      "report_count": 50,
+      "independent_events": 50,
+      "concept_events": 1020,
+      "reasons": [],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "routine_02_source_a",
+          "routine_02_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "routine_03",
+      "statement": "Synthetic routine cargo-status summary 03. No exception reported.",
+      "canonical_concept": "routine_status",
+      "mandatory": false,
+      "relevance": 75,
+      "consequence": 65,
+      "quality": 80,
+      "base_score": 72,
+      "baseline_score": 92,
+      "rarity_bonus": 0,
+      "compensated_score": 72,
+      "report_count": 50,
+      "independent_events": 50,
+      "concept_events": 1020,
+      "reasons": [],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "routine_03_source_a",
+          "routine_03_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "routine_04",
+      "statement": "Synthetic routine cargo-status summary 04. No exception reported.",
+      "canonical_concept": "routine_status",
+      "mandatory": false,
+      "relevance": 75,
+      "consequence": 65,
+      "quality": 80,
+      "base_score": 72,
+      "baseline_score": 92,
+      "rarity_bonus": 0,
+      "compensated_score": 72,
+      "report_count": 50,
+      "independent_events": 50,
+      "concept_events": 1020,
+      "reasons": [],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "routine_04_source_a",
+          "routine_04_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "routine_05",
+      "statement": "Synthetic routine cargo-status summary 05. No exception reported.",
+      "canonical_concept": "routine_status",
+      "mandatory": false,
+      "relevance": 75,
+      "consequence": 65,
+      "quality": 80,
+      "base_score": 72,
+      "baseline_score": 92,
+      "rarity_bonus": 0,
+      "compensated_score": 72,
+      "report_count": 50,
+      "independent_events": 50,
+      "concept_events": 1020,
+      "reasons": [],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "routine_05_source_a",
+          "routine_05_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "routine_06",
+      "statement": "Synthetic routine cargo-status summary 06. No exception reported.",
+      "canonical_concept": "routine_status",
+      "mandatory": false,
+      "relevance": 75,
+      "consequence": 65,
+      "quality": 80,
+      "base_score": 72,
+      "baseline_score": 92,
+      "rarity_bonus": 0,
+      "compensated_score": 72,
+      "report_count": 50,
+      "independent_events": 50,
+      "concept_events": 1020,
+      "reasons": [],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "routine_06_source_a",
+          "routine_06_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "routine_07",
+      "statement": "Synthetic routine cargo-status summary 07. No exception reported.",
+      "canonical_concept": "routine_status",
+      "mandatory": false,
+      "relevance": 75,
+      "consequence": 65,
+      "quality": 80,
+      "base_score": 72,
+      "baseline_score": 92,
+      "rarity_bonus": 0,
+      "compensated_score": 72,
+      "report_count": 50,
+      "independent_events": 50,
+      "concept_events": 1020,
+      "reasons": [],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "routine_07_source_a",
+          "routine_07_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "routine_08",
+      "statement": "Synthetic routine cargo-status summary 08. No exception reported.",
+      "canonical_concept": "routine_status",
+      "mandatory": false,
+      "relevance": 75,
+      "consequence": 65,
+      "quality": 80,
+      "base_score": 72,
+      "baseline_score": 92,
+      "rarity_bonus": 0,
+      "compensated_score": 72,
+      "report_count": 50,
+      "independent_events": 50,
+      "concept_events": 1020,
+      "reasons": [],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "routine_08_source_a",
+          "routine_08_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "routine_09",
+      "statement": "Synthetic routine cargo-status summary 09. No exception reported.",
+      "canonical_concept": "routine_status",
+      "mandatory": false,
+      "relevance": 75,
+      "consequence": 65,
+      "quality": 80,
+      "base_score": 72,
+      "baseline_score": 92,
+      "rarity_bonus": 0,
+      "compensated_score": 72,
+      "report_count": 50,
+      "independent_events": 50,
+      "concept_events": 1020,
+      "reasons": [],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "routine_09_source_a",
+          "routine_09_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "routine_10",
+      "statement": "Synthetic routine cargo-status summary 10. No exception reported.",
+      "canonical_concept": "routine_status",
+      "mandatory": false,
+      "relevance": 75,
+      "consequence": 65,
+      "quality": 80,
+      "base_score": 72,
+      "baseline_score": 92,
+      "rarity_bonus": 0,
+      "compensated_score": 72,
+      "report_count": 50,
+      "independent_events": 50,
+      "concept_events": 1020,
+      "reasons": [],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "routine_10_source_a",
+          "routine_10_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "routine_11",
+      "statement": "Synthetic routine cargo-status summary 11. No exception reported.",
+      "canonical_concept": "routine_status",
+      "mandatory": false,
+      "relevance": 75,
+      "consequence": 65,
+      "quality": 80,
+      "base_score": 72,
+      "baseline_score": 92,
+      "rarity_bonus": 0,
+      "compensated_score": 72,
+      "report_count": 50,
+      "independent_events": 50,
+      "concept_events": 1020,
+      "reasons": [],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "routine_11_source_a",
+          "routine_11_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "routine_12",
+      "statement": "Synthetic routine cargo-status summary 12. No exception reported.",
+      "canonical_concept": "routine_status",
+      "mandatory": false,
+      "relevance": 75,
+      "consequence": 65,
+      "quality": 80,
+      "base_score": 72,
+      "baseline_score": 92,
+      "rarity_bonus": 0,
+      "compensated_score": 72,
+      "report_count": 50,
+      "independent_events": 50,
+      "concept_events": 1020,
+      "reasons": [],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "routine_12_source_a",
+          "routine_12_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "routine_13",
+      "statement": "Synthetic routine cargo-status summary 13. No exception reported.",
+      "canonical_concept": "routine_status",
+      "mandatory": false,
+      "relevance": 75,
+      "consequence": 65,
+      "quality": 80,
+      "base_score": 72,
+      "baseline_score": 92,
+      "rarity_bonus": 0,
+      "compensated_score": 72,
+      "report_count": 50,
+      "independent_events": 50,
+      "concept_events": 1020,
+      "reasons": [],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "routine_13_source_a",
+          "routine_13_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "routine_14",
+      "statement": "Synthetic routine cargo-status summary 14. No exception reported.",
+      "canonical_concept": "routine_status",
+      "mandatory": false,
+      "relevance": 75,
+      "consequence": 65,
+      "quality": 80,
+      "base_score": 72,
+      "baseline_score": 92,
+      "rarity_bonus": 0,
+      "compensated_score": 72,
+      "report_count": 50,
+      "independent_events": 50,
+      "concept_events": 1020,
+      "reasons": [],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "routine_14_source_a",
+          "routine_14_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "routine_15",
+      "statement": "Synthetic routine cargo-status summary 15. No exception reported.",
+      "canonical_concept": "routine_status",
+      "mandatory": false,
+      "relevance": 75,
+      "consequence": 65,
+      "quality": 80,
+      "base_score": 72,
+      "baseline_score": 92,
+      "rarity_bonus": 0,
+      "compensated_score": 72,
+      "report_count": 50,
+      "independent_events": 50,
+      "concept_events": 1020,
+      "reasons": [],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "routine_15_source_a",
+          "routine_15_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "routine_16",
+      "statement": "Synthetic routine cargo-status summary 16. No exception reported.",
+      "canonical_concept": "routine_status",
+      "mandatory": false,
+      "relevance": 75,
+      "consequence": 65,
+      "quality": 80,
+      "base_score": 72,
+      "baseline_score": 92,
+      "rarity_bonus": 0,
+      "compensated_score": 72,
+      "report_count": 50,
+      "independent_events": 50,
+      "concept_events": 1020,
+      "reasons": [],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "routine_16_source_a",
+          "routine_16_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "routine_17",
+      "statement": "Synthetic routine cargo-status summary 17. No exception reported.",
+      "canonical_concept": "routine_status",
+      "mandatory": false,
+      "relevance": 75,
+      "consequence": 65,
+      "quality": 80,
+      "base_score": 72,
+      "baseline_score": 92,
+      "rarity_bonus": 0,
+      "compensated_score": 72,
+      "report_count": 50,
+      "independent_events": 50,
+      "concept_events": 1020,
+      "reasons": [],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "routine_17_source_a",
+          "routine_17_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "routine_18",
+      "statement": "Synthetic routine cargo-status summary 18. No exception reported.",
+      "canonical_concept": "routine_status",
+      "mandatory": false,
+      "relevance": 75,
+      "consequence": 65,
+      "quality": 80,
+      "base_score": 72,
+      "baseline_score": 92,
+      "rarity_bonus": 0,
+      "compensated_score": 72,
+      "report_count": 50,
+      "independent_events": 50,
+      "concept_events": 1020,
+      "reasons": [],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "routine_18_source_a",
+          "routine_18_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "routine_19",
+      "statement": "Synthetic routine cargo-status summary 19. No exception reported.",
+      "canonical_concept": "routine_status",
+      "mandatory": false,
+      "relevance": 75,
+      "consequence": 65,
+      "quality": 80,
+      "base_score": 72,
+      "baseline_score": 92,
+      "rarity_bonus": 0,
+      "compensated_score": 72,
+      "report_count": 50,
+      "independent_events": 50,
+      "concept_events": 1020,
+      "reasons": [],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "routine_19_source_a",
+          "routine_19_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "routine_20",
+      "statement": "Synthetic routine cargo-status summary 20. No exception reported.",
+      "canonical_concept": "routine_status",
+      "mandatory": false,
+      "relevance": 75,
+      "consequence": 65,
+      "quality": 80,
+      "base_score": 72,
+      "baseline_score": 92,
+      "rarity_bonus": 0,
+      "compensated_score": 72,
+      "report_count": 50,
+      "independent_events": 50,
+      "concept_events": 1020,
+      "reasons": [],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "routine_20_source_a",
+          "routine_20_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    },
+    {
+      "id": "valid_exception",
+      "statement": "Synthetic manifest discrepancy has assessed support from two declared independent origins.",
+      "canonical_concept": "cargo exception",
+      "mandatory": false,
+      "relevance": 85,
+      "consequence": 80,
+      "quality": 90,
+      "base_score": 84,
+      "baseline_score": 88,
+      "rarity_bonus": 20,
+      "compensated_score": 104,
+      "report_count": 1,
+      "independent_events": 1,
+      "concept_events": 1,
+      "reasons": [
+        "RARITY_BONUS_APPLIED"
+      ],
+      "gate": {
+        "status": "ELIGIBLE",
+        "simulated": true,
+        "reasons": [],
+        "independent_support_origins": [
+          "valid_exception_source_a",
+          "valid_exception_source_b"
+        ],
+        "missing_evidence_types": [],
+        "excluded_evidence": []
+      }
+    }
+  ],
+  "modes": {
+    "baseline": {
+      "mandatory_ids": [
+        "critical_01",
+        "critical_02"
+      ],
+      "review_ids": [
+        "cargo_allegation",
+        "routine_01",
+        "routine_02",
+        "routine_03",
+        "routine_04"
+      ],
+      "selected_ids": [
+        "critical_01",
+        "critical_02",
+        "cargo_allegation",
+        "routine_01",
+        "routine_02",
+        "routine_03",
+        "routine_04"
+      ],
+      "gate_applied": false
+    },
+    "compensated": {
+      "mandatory_ids": [
+        "critical_01",
+        "critical_02"
+      ],
+      "review_ids": [
+        "cargo_allegation",
+        "valid_exception",
+        "expired_approval",
+        "contradiction",
+        "missing_evidence"
+      ],
+      "selected_ids": [
+        "critical_01",
+        "critical_02",
+        "cargo_allegation",
+        "valid_exception",
+        "expired_approval",
+        "contradiction",
+        "missing_evidence"
+      ],
+      "gate_applied": false
+    },
+    "full_control": {
+      "mandatory_ids": [
+        "critical_01",
+        "critical_02"
+      ],
+      "review_ids": [
+        "cargo_allegation",
+        "valid_exception",
+        "expired_approval",
+        "contradiction",
+        "missing_evidence"
+      ],
+      "selected_ids": [
+        "critical_01",
+        "critical_02",
+        "cargo_allegation",
+        "valid_exception",
+        "expired_approval",
+        "contradiction",
+        "missing_evidence"
+      ],
+      "gate_applied": true
+    }
+  },
+  "diagnostics": {
+    "report_count": 1081,
+    "unique_events": 1031,
+    "duplicate_reports": 50,
+    "claims": 33,
+    "mandatory_count": 2,
+    "review_budget": 5
+  }
+}
