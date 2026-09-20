@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>DEEP SIGMA · Liddell Lens</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script defer src="js/engine.js"></script>
+  <script defer src="js/examples.js"></script>
+  <script defer src="js/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to results</a>
+  <header class="masthead wrap">
+    <div class="brand"><span class="sigma" aria-hidden="true">Σ</span><div><strong>DEEP SIGMA</strong><span>LIDDELL LENS / 01</span></div></div>
+    <span class="offline"><span aria-hidden="true">●</span> LOCAL &amp; OFFLINE</span>
+  </header>
+  <main class="wrap" id="main">
+    <section class="intro" aria-labelledby="headline">
+      <div><p class="eyebrow">THE DECISION LOSS METER</p><h1 id="headline">Does preparation<br>pay off?</h1><p class="lede">Compare baseline work with CERPA. See the effort invested, the rework avoided, and the decisions completed.</p></div>
+      <div class="intro-note"><span class="large-symbol" aria-hidden="true">Σ</span><p>Measure the whole path<br>from intent to decision.</p><small>Claim → Event → Review → Patch → Apply</small></div>
+    </section>
+
+    <section class="workspace" aria-label="Choose evaluation data">
+      <div class="choose-example"><label for="example-select">Start with an example</label><select id="example-select" aria-describedby="example-help"><option value="">Loading examples…</option></select><small id="example-help">Built-in examples are illustrative, including a case where overhead exceeds benefit.</small></div>
+      <div class="import-box"><label class="button secondary" for="file-input">Import your JSON <span aria-hidden="true">↗</span></label><input type="file" id="file-input" accept=".json,application/json"><button id="download-template" class="text-button" type="button">Get a blank template ↓</button><small>No upload. No account. Files stay in this browser session.</small></div>
+    </section>
+
+    <div id="error-box" class="error-box" role="alert" tabindex="-1" hidden><strong>Unable to analyze this file</strong><p id="error-message"></p><small>Correct the field above and import the file again. Previous results have been cleared.</small></div>
+    <div id="data-banner" class="data-banner" role="status" aria-live="polite">Preparing the example…</div>
+
+    <div class="results-top"><div><p class="eyebrow">CURRENT EVALUATION</p><h2 id="evaluation-title">Your comparison</h2><p id="case-summary" class="muted"></p></div><div class="export-actions"><button type="button" id="export-input" class="button small secondary" disabled>Input JSON ↓</button><button type="button" id="export-json" class="button small" disabled>Results JSON ↓</button><button type="button" id="export-csv" class="button small secondary" disabled>Cases CSV ↓</button></div></div>
+
+    <div id="results" hidden>
+      <section class="metric-grid" aria-label="Savings compared with baseline">
+        <article class="metric"><p class="eyebrow">TOTAL EFFORT</p><div class="metric-value" id="effort-saving">—</div><p class="unit">person-minutes saved</p><p id="effort-percent" class="metric-detail"></p><small>Includes preparation, execution, review, clarification, and rework for every case.</small></article>
+        <article class="metric"><p class="eyebrow">REWORK</p><div class="metric-value" id="rework-saving">—</div><p class="unit">person-minutes saved</p><p id="rework-percent" class="metric-detail"></p><small>A component of total effort; do not add this saving to the total.</small></article>
+        <article class="metric featured"><p class="eyebrow">PAIRED ELAPSED TIME</p><div class="metric-value" id="elapsed-saving">—</div><p class="unit">minutes saved per paired case</p><p id="elapsed-percent" class="metric-detail"></p><small id="paired-count"></small></article>
+      </section>
+      <p class="reading-note">Savings = baseline − CERPA. Negative savings mean CERPA used more. N/A means a zero baseline or no eligible pair.</p>
+
+      <section class="completion panel" aria-labelledby="completion-title">
+        <div class="section-intro"><p class="eyebrow">KEEP THE OUTCOME IN VIEW</p><h2 id="completion-title">Completed, supported, authorized</h2><p>A decision counts here only when all three recorded flags are true. These are human assessments.</p></div>
+        <div class="completion-arm"><span>BASELINE</span><strong id="baseline-completion">—</strong><small id="baseline-rate"></small></div>
+        <div class="completion-arm"><span>CERPA</span><strong id="cerpa-completion">—</strong><small id="cerpa-rate"></small></div>
+      </section>
+
+      <div class="two-column">
+        <section class="panel" aria-labelledby="breakdown-title"><div class="section-heading"><div><p class="eyebrow">PERSON-MINUTES · ALL CASES</p><h2 id="breakdown-title">Where the effort went</h2></div><div class="legend"><span><i class="baseline-key"></i>Baseline</span><span><i class="cerpa-key"></i>CERPA</span></div></div><p class="section-description">Preparation and review are investments. Their value depends on the complete result.</p><div id="effort-breakdown" class="effort-breakdown"></div><div class="total-row"><strong>Total effort</strong><span id="effort-totals"></span></div></section>
+        <section class="panel" aria-labelledby="friction-title"><p class="eyebrow">COUNTS · ALL CASES</p><h2 id="friction-title">Clarification &amp; contradictions</h2><table class="compact-table"><thead><tr><th scope="col">Measure</th><th scope="col">Baseline</th><th scope="col">CERPA</th><th scope="col">Reduction</th></tr></thead><tbody id="friction-body"></tbody></table><p class="section-description">Unresolved contradictions are reported separately. They do not automatically change the recorded completion flags.</p><div class="paired-box"><h3>Paired elapsed time</h3><dl><div><dt>Baseline mean</dt><dd id="baseline-elapsed"></dd></div><div><dt>CERPA mean</dt><dd id="cerpa-elapsed"></dd></div></dl><p id="excluded-summary"></p><details id="excluded-details"><summary>Show excluded case IDs</summary><p id="excluded-ids"></p></details></div></section>
+      </div>
+
+      <section class="panel cases-panel" aria-labelledby="cases-title"><div class="section-heading"><div><p class="eyebrow">INSPECT THE COMPARISON</p><h2 id="cases-title">Every case stays visible</h2></div><label class="checkbox-label"><input type="checkbox" id="excluded-only"> Show timing exclusions only</label></div><p class="section-description" id="case-table-note">“Complete” requires closed, supported, and authorized. Elapsed values are raw wall-clock minutes; elapsed savings require completion in both arms. Effort values are person-minutes.</p><div class="table-scroll" tabindex="0" role="region" aria-label="Case comparison table, scroll horizontally on small screens"><table class="case-table" aria-describedby="case-table-note"><thead><tr><th scope="col">Case</th><th scope="col">Baseline<br>complete</th><th scope="col">CERPA<br>complete</th><th scope="col">Baseline<br>effort</th><th scope="col">CERPA<br>effort</th><th scope="col">Effort<br>saved</th><th scope="col">Baseline<br>elapsed</th><th scope="col">CERPA<br>elapsed</th><th scope="col">Paired elapsed<br>saved</th></tr></thead><tbody id="cases-body"></tbody></table></div><div class="pagination"><p id="page-summary" aria-live="polite"></p><div><button id="prev-page" type="button" class="button small secondary">← Previous</button><button id="next-page" type="button" class="button small secondary">Next →</button></div></div></section>
+
+      <section class="comparison-notes" aria-labelledby="notes-title"><h2 id="notes-title">Read these results in context</h2><ul id="warnings"></ul></section>
+    </div>
+    <details class="method"><summary>How to record a fair comparison</summary><div><p>Use comparable cases, the same observation window, and a consistent definition of completion. Record all costs, including data collection, within nonoverlapping effort categories. Effort is the sum of person-minutes across people; elapsed time is wall-clock time from intake to closure or the observation cutoff.</p><p>Each case compares a baseline run with a CERPA run. Only decisions closed, supported, and authorized in both arms enter paired timing. Every case remains in effort and count measures. An observed difference does not establish causation.</p><p>The template contains zeros and false flags as placeholders and is marked illustrative. Replace every value with your measurements, then change data_kind to observed before interpreting results. The tool does not inspect evidence, make authorization decisions, or produce a combined efficiency score.</p></div></details>
+  </main>
+  <footer class="wrap"><p><strong>DEEP SIGMA</strong> · Liddell Lens v1.0.0</p><p>Inspired by B. H. Liddell Hart’s indirect approach. An original Deep Sigma measurement tool.</p></footer>
+</body>
+</html>

@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "data_kind": "illustrative",
+  "title": "Illustration — preparation pays off",
+  "cases": [
+    {
+      "case_id": "POLICY-001",
+      "baseline": {
+        "elapsed_minutes": 200,
+        "effort_minutes": {
+          "preparation": 10,
+          "execution": 40,
+          "review": 10,
+          "clarification": 30,
+          "rework": 50
+        },
+        "clarification_cycles": 4,
+        "unresolved_contradictions": 0,
+        "closed": true,
+        "supported": true,
+        "authorized": true
+      },
+      "cerpa": {
+        "elapsed_minutes": 120,
+        "effort_minutes": {
+          "preparation": 25,
+          "execution": 40,
+          "review": 20,
+          "clarification": 5,
+          "rework": 10
+        },
+        "clarification_cycles": 1,
+        "unresolved_contradictions": 0,
+        "closed": true,
+        "supported": true,
+        "authorized": true
+      }
+    },
+    {
+      "case_id": "POLICY-002",
+      "baseline": {
+        "elapsed_minutes": 300,
+        "effort_minutes": {
+          "preparation": 10,
+          "execution": 50,
+          "review": 15,
+          "clarification": 45,
+          "rework": 80
+        },
+        "clarification_cycles": 6,
+        "unresolved_contradictions": 0,
+        "closed": true,
+        "supported": true,
+        "authorized": true
+      },
+      "cerpa": {
+        "elapsed_minutes": 180,
+        "effort_minutes": {
+          "preparation": 30,
+          "execution": 50,
+          "review": 30,
+          "clarification": 10,
+          "rework": 20
+        },
+        "clarification_cycles": 2,
+        "unresolved_contradictions": 0,
+        "closed": true,
+        "supported": true,
+        "authorized": true
+      }
+    }
+  ]
+}
