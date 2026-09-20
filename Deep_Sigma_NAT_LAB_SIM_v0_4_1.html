@@ -1,0 +1,1937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deep Sigma — NAT LAB SIM</title>
+<style>
+/* ============================================================
+   DEEP SIGMA — NAT LAB SIM v0.4
+   National Laboratory Organizational Coherence Simulator
+   A Synthetic Rehearsal Environment for Institutional Cognition
+   Single-file. No backend. Session state only.
+   Aligned to Deep Sigma / Coherence Ops EDGE house style.
+   v0.4: two-axis model state (validity + retention) so falsified
+   is never overwritten by preservation; phased dual review
+   (scientific @ review-open, authority @ seal); AAR reports
+   dependency waivers + residual penalty; confidence alignment.
+   ============================================================ */
+:root{
+  --bg:#080b14; --bg2:#0a0e1a; --bg3:#0d1322; --panel:#111827; --panel2:#161f33;
+  --line:#1f2b45; --line2:#2a3a5c; --ink:#e6edf7; --ink-dim:#8aa0c0; --ink-faint:#5d7193;
+  --intel:#22d3ee;   /* IntelOps  cyan  — what do we believe */
+  --reops:#facc15;   /* ReOps     yellow— what did we decide */
+  --fran:#a78bfa;    /* FranOps   purple— what we say/remember */
+  --altcog:#fb923c;  /* AltCogOps amber — emerging alternative */
+  --reflex:#f97316;  /* ReflexOps orange— governed response */
+  --auth:#60a5fa;    /* Authority blue  — CERPA authority */
+  --patch:#4ade80;   /* Patch/recovery green */
+  --drift:#f87171;   /* Drift / warning red */
+  --gray:#6b7689;
+  --accent:#4ade80;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --sans:"IBM Plex Sans",ui-sans-serif,system-ui,"Segoe UI",sans-serif;
+  --radius:10px; --radius-sm:6px;
+  /* coherence bands */
+  --c-excellent:#4ade80; --c-stable:#22d3ee; --c-warning:#facc15;
+  --c-critical:#fb923c; --c-emergency:#f87171; --c-failure:#b91c1c;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:
+    radial-gradient(1200px 600px at 82% -12%, rgba(34,211,238,.06), transparent 60%),
+    radial-gradient(1000px 560px at -10% 112%, rgba(96,165,250,.06), transparent 60%),
+    var(--bg);
+  color:var(--ink); font-family:var(--sans); font-size:13px; line-height:1.45;
+}
+body::after{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:9998;
+  background:repeating-linear-gradient(180deg, rgba(255,255,255,.010) 0 1px, transparent 1px 3px);
+  mix-blend-mode:overlay; opacity:.5;
+}
+button,input,select,textarea{font-family:var(--mono); font-size:12px; color:var(--ink)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:6px}
+::-webkit-scrollbar-thumb:hover{background:#3a517d}
+a{color:var(--intel)}
+
+/* ---------- App shell ---------- */
+#app{display:flex;flex-direction:column;min-height:100vh}
+header.topbar{
+  display:flex;align-items:center;gap:16px;padding:9px 18px;
+  background:linear-gradient(180deg,var(--bg3),rgba(13,19,34,.35));
+  border-bottom:1px solid var(--line2);position:sticky;top:0;z-index:50;
+}
+.brand{display:flex;align-items:baseline;gap:12px;font-family:var(--mono)}
+.brand .sigma{font-size:21px;font-weight:800;color:var(--intel);text-shadow:0 0 14px rgba(34,211,238,.45);letter-spacing:1px}
+.brand .name{font-weight:700;letter-spacing:.6px;font-size:15px}
+.brand .name b{color:var(--accent)}
+.brand .sub{color:var(--ink-faint);font-size:10px;letter-spacing:.6px;font-family:var(--sans)}
+.topbar .right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.synthbanner{
+  font-family:var(--mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--reops);border:1px solid rgba(250,204,21,.35);background:rgba(250,204,21,.06);
+  border-radius:4px;padding:3px 9px;
+}
+.statpill{font-family:var(--mono);font-size:10px;color:var(--ink-dim);border:1px solid var(--line2);border-radius:20px;padding:3px 10px;background:rgba(34,211,238,.04)}
+.statpill b{color:var(--ink)}
+
+/* status line under header */
+.statusline{
+  display:flex;align-items:center;gap:14px;padding:6px 18px;background:var(--bg2);
+  border-bottom:1px solid var(--line);font-family:var(--mono);font-size:11px;
+}
+.statusline .proj{color:var(--reops);letter-spacing:1px;font-weight:700}
+.statusline .live{display:flex;align-items:center;gap:6px;color:var(--patch)}
+.statusline .live .led{width:8px;height:8px;border-radius:50%;background:var(--patch);box-shadow:0 0 8px var(--patch);animation:pulse 1.6s infinite}
+.statusline.paused .live{color:var(--ink-faint)}
+.statusline.paused .live .led{background:var(--ink-faint);box-shadow:none;animation:none}
+.statusline .phase{color:var(--ink-dim)}
+.statusline .phase b{color:var(--ink)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* control bar */
+.controlbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 18px;background:linear-gradient(180deg,rgba(13,19,34,.5),transparent);border-bottom:1px solid var(--line)}
+.btn{background:var(--panel2);border:1px solid var(--line2);color:var(--ink);border-radius:var(--radius-sm);padding:7px 13px;cursor:pointer;font-size:11px;letter-spacing:.4px;transition:.12s;white-space:nowrap}
+.btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.btn:disabled{opacity:.32;cursor:not-allowed}
+.btn.primary{background:rgba(74,222,128,.12);border-color:rgba(74,222,128,.4);color:var(--accent)}
+.btn.primary:hover:not(:disabled){background:rgba(74,222,128,.22)}
+.btn.warn{color:var(--reops);border-color:rgba(250,204,21,.32)}
+.btn.warn:hover:not(:disabled){background:rgba(250,204,21,.12)}
+.btn.danger{color:var(--drift);border-color:rgba(248,113,113,.32)}
+.btn.danger:hover:not(:disabled){background:rgba(248,113,113,.12)}
+.btn.altcog{color:var(--altcog);border-color:rgba(251,146,60,.32)}
+.btn.altcog:hover:not(:disabled){background:rgba(251,146,60,.12)}
+.controlbar .sep{width:1px;height:22px;background:var(--line2);margin:0 4px}
+.controlbar .spd{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--ink-faint);margin-left:auto}
+.controlbar select.sel{background:var(--bg);border:1px solid var(--line2);border-radius:var(--radius-sm);color:var(--ink);padding:5px 8px;font-size:11px}
+
+/* ---------- Layout grid ---------- */
+main{
+  display:grid;gap:12px;padding:14px 18px 40px;
+  grid-template-columns:300px 1fr 340px;
+  align-items:start;
+}
+@media(max-width:1300px){main{grid-template-columns:1fr 1fr;}.col.right{grid-column:1 / -1}}
+@media(max-width:900px){main{grid-template-columns:1fr}.col.right{grid-column:auto}}
+.col{display:flex;flex-direction:column;gap:12px;min-width:0}
+
+.panel{background:linear-gradient(180deg,var(--panel),rgba(17,24,39,.6));border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.panel > h3{
+  margin:0;font-family:var(--mono);font-size:10px;letter-spacing:1.6px;text-transform:uppercase;
+  color:var(--ink-faint);padding:11px 14px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:8px;
+}
+.panel > h3 .q{color:var(--ink-dim);font-family:var(--sans);font-size:10px;letter-spacing:.3px;text-transform:none;margin-left:auto;font-style:italic}
+.panel .body{padding:12px 14px}
+.panel .body.tight{padding:8px}
+.dom-dot{width:8px;height:8px;border-radius:2px;flex:0 0 auto}
+
+/* domain accent left border */
+.panel.intel > h3{box-shadow:inset 3px 0 var(--intel)}
+.panel.reops > h3{box-shadow:inset 3px 0 var(--reops)}
+.panel.fran > h3{box-shadow:inset 3px 0 var(--fran)}
+.panel.altcog > h3{box-shadow:inset 3px 0 var(--altcog)}
+.panel.reflex > h3{box-shadow:inset 3px 0 var(--reflex)}
+.panel.auth > h3{box-shadow:inset 3px 0 var(--auth)}
+
+/* ---------- Coherence Index ---------- */
+.coh-wrap{display:flex;gap:14px;align-items:center}
+.coh-num{font-family:var(--mono);font-weight:800;font-size:46px;line-height:1;letter-spacing:-1px}
+.coh-meta{display:flex;flex-direction:column;gap:3px}
+.coh-status{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;font-weight:700}
+.coh-delta{font-family:var(--mono);font-size:11px;color:var(--ink-faint)}
+.coh-delta.up{color:var(--patch)} .coh-delta.down{color:var(--drift)}
+.coh-chart{margin-top:10px;width:100%;height:120px;display:block}
+.coh-legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;font-family:var(--mono);font-size:8.5px;color:var(--ink-faint)}
+.coh-legend span b{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:3px;vertical-align:middle}
+
+/* ---------- Metrics grid ---------- */
+.metrics{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px}
+.metric{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:8px 10px}
+.metric .lbl{font-family:var(--mono);font-size:8.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--ink-faint);display:flex;justify-content:space-between;gap:4px}
+.metric .val{font-family:var(--mono);font-size:18px;font-weight:700;margin-top:3px}
+.metric .bar{height:3px;border-radius:2px;background:var(--line2);margin-top:5px;overflow:hidden}
+.metric .bar i{display:block;height:100%;border-radius:2px}
+.metric .help{cursor:help;color:var(--ink-faint)}
+.metric.gate .val{font-size:13px}
+.gatebadge{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:20px;letter-spacing:.5px}
+.gate-pass{color:var(--patch);background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.35)}
+.gate-fail{color:var(--drift);background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.35)}
+
+/* ---------- Knowledge objects ---------- */
+.objgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.obj{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:8px 10px;cursor:pointer;transition:.12s}
+.obj:hover{border-color:var(--line2);background:var(--panel2)}
+.obj .n{font-family:var(--mono);font-size:22px;font-weight:800;line-height:1}
+.obj .t{font-family:var(--mono);font-size:8.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--ink-faint);margin-top:4px}
+.obj .s{font-size:9px;color:var(--ink-dim);margin-top:2px}
+
+/* ---------- Model competition ---------- */
+.model{border:1px solid var(--line);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:8px;background:var(--bg2);position:relative;overflow:hidden}
+.model::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px}
+.model.dominant::before{background:var(--patch)}
+.model.candidate::before{background:var(--intel)}
+.model.challenged::before{background:var(--reops)}
+.model.rejected::before{background:var(--gray)}
+.model.preserved::before{background:var(--altcog)}
+.model.promoted::before{background:var(--auth)}
+.model.falsified::before{background:var(--drift)}
+.model.superseded::before{background:var(--gray)}
+.retchip{font-family:var(--mono);font-size:8px;padding:2px 6px;border-radius:20px;letter-spacing:.4px;text-transform:uppercase;color:var(--altcog);background:rgba(251,146,60,.08);border:1px solid rgba(251,146,60,.3);margin-left:6px}
+.model .mh{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.model .mn{font-weight:600;font-size:12.5px}
+.model .mn .tag{font-family:var(--mono);font-size:8px;color:var(--ink-faint)}
+.model .conf{font-family:var(--mono);font-size:11px;color:var(--ink-dim)}
+.model.rejected{opacity:.62}
+.model .mbar{height:4px;background:var(--line2);border-radius:2px;margin:7px 0;overflow:hidden}
+.model .mbar i{display:block;height:100%}
+.model .ev{display:flex;gap:14px;font-family:var(--mono);font-size:9.5px;margin-top:4px}
+.model .ev .sup{color:var(--patch)} .model .ev .con{color:var(--drift)}
+.model .fals{font-family:var(--mono);font-size:9px;color:var(--ink-faint);margin-top:5px;border-top:1px dashed var(--line2);padding-top:5px}
+.model .fals b{color:var(--altcog)}
+.statetag{font-family:var(--mono);font-size:8.5px;padding:2px 7px;border-radius:20px;letter-spacing:.5px;text-transform:uppercase}
+.st-dominant{color:var(--patch);background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3)}
+.st-candidate{color:var(--intel);background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.3)}
+.st-challenged{color:var(--reops);background:rgba(250,204,21,.1);border:1px solid rgba(250,204,21,.3)}
+.st-rejected{color:var(--gray);background:rgba(107,118,137,.12);border:1px solid rgba(107,118,137,.3)}
+.st-preserved{color:var(--altcog);background:rgba(251,146,60,.1);border:1px solid rgba(251,146,60,.3)}
+.st-promoted{color:var(--auth);background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.3)}
+.st-falsified{color:var(--drift);background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.35)}
+.st-superseded{color:var(--gray);background:rgba(107,118,137,.12);border:1px solid rgba(107,118,137,.35)}
+
+/* ---------- AltCog pipeline ---------- */
+.pipeline{display:flex;align-items:center;gap:3px;flex-wrap:wrap;font-family:var(--mono);font-size:8px;margin-bottom:10px}
+.pipeline .st{padding:3px 6px;border:1px solid var(--line2);border-radius:4px;color:var(--ink-faint);letter-spacing:.3px}
+.pipeline .st.on{color:var(--altcog);border-color:rgba(251,146,60,.5);background:rgba(251,146,60,.08)}
+.pipeline .arr{color:var(--ink-faint)}
+
+/* ---------- Timeline ---------- */
+.timeline{display:flex;flex-direction:column;gap:0;max-height:560px;overflow:auto}
+.tl-item{display:flex;gap:10px;padding:9px 4px;border-bottom:1px solid var(--line);position:relative}
+.tl-item:last-child{border-bottom:none}
+.tl-item .tl-dot{width:10px;height:10px;border-radius:50%;flex:0 0 auto;margin-top:3px;border:2px solid var(--bg)}
+.tl-item .tl-body{min-width:0;flex:1}
+.tl-item .tl-h{font-family:var(--mono);font-size:9px;color:var(--ink-faint);letter-spacing:.5px;display:flex;justify-content:space-between;gap:8px}
+.tl-item .tl-t{font-size:12px;margin-top:2px;font-weight:600}
+.tl-item .tl-d{font-size:11px;color:var(--ink-dim);margin-top:2px}
+.tl-item.current{background:rgba(74,222,128,.05)}
+.tl-item.current .tl-t{color:var(--accent)}
+.tl-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.tag{display:inline-block;font-family:var(--mono);font-size:8px;padding:1px 6px;border-radius:20px;letter-spacing:.4px;border:1px solid transparent}
+.tag.intel{color:var(--intel);background:rgba(34,211,238,.1);border-color:rgba(34,211,238,.25)}
+.tag.reops{color:var(--reops);background:rgba(250,204,21,.1);border-color:rgba(250,204,21,.25)}
+.tag.fran{color:var(--fran);background:rgba(167,139,250,.1);border-color:rgba(167,139,250,.25)}
+.tag.altcog{color:var(--altcog);background:rgba(251,146,60,.1);border-color:rgba(251,146,60,.25)}
+.tag.reflex{color:var(--reflex);background:rgba(249,115,22,.1);border-color:rgba(249,115,22,.25)}
+.tag.auth{color:var(--auth);background:rgba(96,165,250,.1);border-color:rgba(96,165,250,.25)}
+.tag.cerpa{color:var(--patch);background:rgba(74,222,128,.1);border-color:rgba(74,222,128,.25)}
+.tag.drift{color:var(--drift);background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.25)}
+
+/* alerts */
+.alerts{display:flex;flex-direction:column;gap:6px}
+.alert{display:flex;gap:8px;align-items:flex-start;padding:7px 9px;border-radius:var(--radius-sm);font-size:11px;border:1px solid}
+.alert.info{border-color:rgba(34,211,238,.3);background:rgba(34,211,238,.05);color:var(--intel)}
+.alert.warn{border-color:rgba(250,204,21,.3);background:rgba(250,204,21,.05);color:var(--reops)}
+.alert.crit{border-color:rgba(248,113,113,.35);background:rgba(248,113,113,.06);color:var(--drift)}
+.alert.ok{border-color:rgba(74,222,128,.3);background:rgba(74,222,128,.05);color:var(--patch)}
+.alert .ai{font-family:var(--mono);font-weight:700}
+
+/* memory */
+.memlist{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow:auto}
+.mem{border-left:2px solid var(--fran);padding:6px 10px;background:rgba(167,139,250,.04);border-radius:0 var(--radius-sm) var(--radius-sm) 0}
+.mem .mk{font-family:var(--mono);font-size:8.5px;color:var(--fran);letter-spacing:.5px;text-transform:uppercase}
+.mem .mt{font-size:11px;color:var(--ink-dim);margin-top:2px}
+.mem.preserved{border-left-color:var(--altcog);background:rgba(251,146,60,.04)}
+.mem.preserved .mk{color:var(--altcog)}
+.mem.lesson{border-left-color:var(--patch);background:rgba(74,222,128,.04)}
+.mem.lesson .mk{color:var(--patch)}
+
+/* event narrative */
+.narrative{font-size:12.5px;color:var(--ink-dim);line-height:1.55}
+.narrative .lead{color:var(--ink);font-weight:600;font-size:13px;display:block;margin-bottom:6px}
+
+/* CERPA mini */
+.cerpa{display:flex;align-items:center;gap:2px;font-family:var(--mono);font-size:9px;flex-wrap:wrap}
+.cerpa .stage{padding:3px 7px;border:1px solid var(--line2);border-radius:4px;color:var(--ink-faint)}
+.cerpa .stage.on{color:var(--patch);border-color:rgba(74,222,128,.4);background:rgba(74,222,128,.07)}
+.cerpa .arr{color:var(--ink-faint)}
+.cerpa .stage .lt{font-size:11px;font-weight:700;display:block}
+
+/* ---------- Modal / drawer ---------- */
+.overlay{position:fixed;inset:0;background:rgba(4,6,12,.78);backdrop-filter:blur(3px);z-index:200;display:none;align-items:center;justify-content:center;padding:24px}
+.overlay.show{display:flex}
+.modal{background:linear-gradient(180deg,var(--panel),var(--bg3));border:1px solid var(--line2);border-radius:var(--radius);max-width:920px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+.modal .mhead{padding:14px 18px;border-bottom:1px solid var(--line2);display:flex;align-items:center;gap:12px;position:sticky;top:0;background:var(--panel);z-index:2}
+.modal .mhead .mt{font-family:var(--mono);font-weight:700;letter-spacing:.5px}
+.modal .mhead .mt .sm{display:block;font-size:9px;color:var(--ink-faint);letter-spacing:1px;font-weight:400;text-transform:uppercase}
+.modal .mhead .x{margin-left:auto;background:none;border:1px solid var(--line2);color:var(--ink-dim);border-radius:var(--radius-sm);padding:5px 11px;cursor:pointer}
+.modal .mhead .x:hover{border-color:var(--drift);color:var(--drift)}
+.modal .mbody{padding:18px}
+
+/* decision options */
+.opt{border:1px solid var(--line2);border-radius:var(--radius-sm);padding:13px 15px;margin-bottom:11px;cursor:pointer;transition:.12s;background:var(--bg2)}
+.opt:hover{border-color:var(--accent);background:var(--panel2)}
+.opt.sel{border-color:var(--accent);box-shadow:0 0 0 2px rgba(74,222,128,.18)}
+.opt .oh{display:flex;align-items:center;gap:10px}
+.opt .oh .on{font-weight:700;font-size:13px}
+.opt .oh .oc{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--ink-dim)}
+.opt . models{font-family:var(--mono);font-size:9px;color:var(--ink-faint);margin-top:2px}
+.opt .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;margin-top:10px}
+.opt .f{font-size:11px}
+.opt .f .fl{font-family:var(--mono);font-size:8.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--ink-faint);display:block;margin-bottom:1px}
+.opt .ks{font-family:var(--mono);font-size:10px;color:var(--reflex)}
+.opt .ks.none{color:var(--drift)}
+.risk-low{color:var(--patch)} .risk-med{color:var(--reops)} .risk-high{color:var(--drift)} .risk-crit{color:var(--c-failure)}
+
+/* DLR */
+.dlr-field{display:grid;grid-template-columns:160px 1fr;gap:10px;padding:7px 0;border-bottom:1px solid var(--line)}
+.dlr-field .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--ink-faint)}
+.dlr-field .v{font-size:12px;color:var(--ink-dim)}
+.dlr-field .v ul{margin:0;padding-left:16px}
+.hashchip{font-family:var(--mono);font-size:9px;color:var(--auth);background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.25);border-radius:4px;padding:1px 6px}
+
+/* reflection */
+.refl-sec{margin-bottom:12px}
+.refl-sec h4{font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-faint);margin:0 0 5px}
+.refl-sec .txt{font-size:12px;color:var(--ink-dim)}
+.refl-sec ul{margin:4px 0;padding-left:18px;font-size:12px;color:var(--ink-dim)}
+.patch-opt{border:1px solid var(--line2);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:.12s;background:var(--bg2);display:flex;gap:10px;align-items:flex-start}
+.patch-opt:hover{border-color:var(--patch);background:var(--panel2)}
+.patch-opt.sel{border-color:var(--patch);box-shadow:0 0 0 2px rgba(74,222,128,.18)}
+.patch-opt .pi{font-family:var(--mono);font-size:9px;color:var(--patch);border:1px solid rgba(74,222,128,.3);border-radius:4px;padding:2px 6px;flex:0 0 auto;margin-top:1px}
+.patch-opt .pt{font-size:12px}.patch-opt .pt b{display:block;margin-bottom:2px}
+.patch-opt .pd{font-size:10.5px;color:var(--ink-faint)}
+
+/* AAR */
+.aar-sec{margin-bottom:16px}
+.aar-sec h4{font-family:var(--mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin:0 0 7px;border-bottom:1px solid var(--line);padding-bottom:5px}
+.aar-sec .txt{font-size:12px;color:var(--ink-dim);line-height:1.55}
+.aar-sec ul{margin:5px 0;padding-left:18px;font-size:12px;color:var(--ink-dim)}
+.aar-sec ul li{margin-bottom:3px}
+.aar-final{display:flex;gap:16px;align-items:center;background:var(--bg2);border:1px solid var(--line2);border-radius:var(--radius-sm);padding:14px}
+.aar-final .big{font-family:var(--mono);font-size:40px;font-weight:800}
+
+/* tooltip */
+[data-tip]{position:relative}
+.tipbox{position:fixed;z-index:500;max-width:280px;background:var(--bg3);border:1px solid var(--line2);border-radius:var(--radius-sm);padding:8px 10px;font-size:11px;color:var(--ink-dim);box-shadow:0 8px 30px rgba(0,0,0,.5);pointer-events:none;display:none;line-height:1.45}
+
+.emptynote{color:var(--ink-faint);font-family:var(--mono);font-size:11px;text-align:center;padding:18px}
+.footer{padding:14px 18px;border-top:1px solid var(--line);color:var(--ink-faint);font-family:var(--mono);font-size:9.5px;letter-spacing:.5px;text-align:center}
+.kbd{font-family:var(--mono);font-size:9px;border:1px solid var(--line2);border-radius:3px;padding:1px 5px;color:var(--ink-dim)}
+
+/* run-state LED colors */
+.statusline.s-active .live{color:var(--patch)} .statusline.s-active .led{background:var(--patch);box-shadow:0 0 8px var(--patch);animation:pulse 1.6s infinite}
+.statusline.s-paused .live{color:var(--ink-dim)} .statusline.s-paused .led{background:var(--ink-dim);box-shadow:none;animation:none}
+.statusline.s-await .live{color:var(--reops)} .statusline.s-await .led{background:var(--reops);box-shadow:0 0 8px var(--reops);animation:pulse 1s infinite}
+.statusline.s-complete .live{color:var(--ink-faint)} .statusline.s-complete .led{background:var(--ink-faint);box-shadow:none;animation:none}
+.statusline.s-standby .live{color:var(--ink-faint)} .statusline.s-standby .led{background:var(--ink-faint);box-shadow:none;animation:none}
+
+/* coherence ledger */
+.ledger-toggle{font-family:var(--mono);font-size:9px;letter-spacing:.5px;color:var(--ink-dim);cursor:pointer;margin-top:8px;display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line2);border-radius:4px;padding:3px 8px;background:var(--bg2)}
+.ledger-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.ledger{margin-top:8px;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:auto;max-height:190px;display:none}
+.ledger.show{display:block}
+.ledger table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10px}
+.ledger th{position:sticky;top:0;background:var(--panel);color:var(--ink-faint);text-align:left;padding:5px 8px;font-size:8.5px;letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid var(--line2)}
+.ledger td{padding:4px 8px;border-bottom:1px solid var(--line);color:var(--ink-dim)}
+.ledger td.d-pos{color:var(--patch)} .ledger td.d-neg{color:var(--drift)}
+.ledger td.run{color:var(--ink);font-weight:700}
+
+/* inject registry */
+.injreg{margin-top:2px}
+.injreg .ir{display:flex;gap:8px;align-items:center;font-family:var(--mono);font-size:10px;color:var(--ink-dim);padding:5px 0;border-bottom:1px solid var(--line)}
+.injreg .ir .irid{color:var(--reflex);font-size:9px}
+.injreg .empty{font-family:var(--mono);font-size:10px;color:var(--ink-faint);padding:8px 0}
+
+/* patch bundle categories */
+.patch-group{margin-bottom:12px}
+.patch-group h5{font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;margin:0 0 6px;display:flex;align-items:center;gap:6px}
+.patch-group.required h5{color:var(--drift)}
+.patch-group.improvement h5{color:var(--patch)}
+.patch-opt .pi.req{color:var(--drift);border-color:rgba(248,113,113,.4)}
+.patch-opt .pi.rec{color:var(--reops);border-color:rgba(250,204,21,.4)}
+.patch-opt .pchk{margin-left:auto;font-family:var(--mono);font-size:9px;color:var(--ink-faint)}
+.patch-opt.sel .pchk{color:var(--patch)}
+.risk-banner{border:1px solid rgba(248,113,113,.35);background:rgba(248,113,113,.06);color:var(--drift);border-radius:var(--radius-sm);padding:8px 11px;font-size:11px;margin-bottom:12px;display:flex;gap:8px}
+.risk-banner.cleared{border-color:rgba(74,222,128,.35);background:rgba(74,222,128,.06);color:var(--patch)}
+.bundle-sum{border:1px solid var(--line2);border-radius:var(--radius-sm);padding:10px 12px;margin:10px 0;background:var(--bg2);font-size:11px}
+.bundle-sum .bk{font-family:var(--mono);font-size:8.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--ink-faint)}
+.bundle-sum b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="sigma">&Sigma;</span>
+      <div>
+        <div class="name">DEEP SIGMA <b>NAT LAB SIM</b></div>
+        <div class="sub">National Laboratory Organizational Coherence Simulator &mdash; A Synthetic Rehearsal Environment for Institutional Cognition</div>
+      </div>
+    </div>
+    <div class="right">
+      <span class="synthbanner">Synthetic &middot; Illustrative</span>
+      <span class="statpill">v<b>0.4</b></span>
+    </div>
+  </header>
+
+  <div class="statusline s-standby" id="statusline">
+    <span class="proj" id="projName">PROJECT HELIOS</span>
+    <span class="live" id="liveInd"><span class="led"></span><span id="liveTxt">SIMULATION STANDBY</span></span>
+    <span class="phase">PHASE <b id="phaseNum">0</b> / <span id="phaseTot">12</span></span>
+    <span class="phase" id="phaseName" style="color:var(--ink-faint)">Not started</span>
+  </div>
+
+  <div class="controlbar">
+    <button class="btn primary" id="btnStart">&#9654; Start Simulation</button>
+    <button class="btn" id="btnAdvance" disabled>&#9193; Advance Event</button>
+    <button class="btn" id="btnPause" disabled>&#10073;&#10073; Pause</button>
+    <button class="btn" id="btnAuto" disabled>&#9889; Auto Run</button>
+    <span class="sep"></span>
+    <button class="btn warn" id="btnInject" disabled>&#9888; Inject Scenario</button>
+    <button class="btn patch-btn altcog" id="btnDecision" disabled>&#9878; View Decision Lineage</button>
+    <button class="btn" id="btnPatch" disabled>&#10010; Apply Patch</button>
+    <span class="sep"></span>
+    <button class="btn" id="btnAAR" disabled>&#128203; After Action Report</button>
+    <button class="btn danger" id="btnReset" disabled>&#8635; Reset</button>
+    <span class="spd">
+      AUTO SPEED
+      <select class="sel" id="speedSel">
+        <option value="2600">Slow</option>
+        <option value="1500" selected>Normal</option>
+        <option value="800">Fast</option>
+      </select>
+    </span>
+  </div>
+
+  <main>
+    <!-- LEFT: timeline + alerts -->
+    <div class="col left">
+      <div class="panel reflex">
+        <h3><span class="dom-dot" style="background:var(--reflex)"></span>Simulation Timeline <span class="q">event history</span></h3>
+        <div class="body tight">
+          <div class="timeline" id="timeline"><div class="emptynote">Press <span class="kbd">Start Simulation</span> to begin Project Helios.</div></div>
+        </div>
+      </div>
+      <div class="panel drift">
+        <h3><span class="dom-dot" style="background:var(--drift)"></span>Active Alerts</h3>
+        <div class="body"><div class="alerts" id="alerts"><div class="emptynote">No active alerts.</div></div></div>
+      </div>
+      <div class="panel reflex">
+        <h3><span class="dom-dot" style="background:var(--reflex)"></span>Injection Registry <span class="q" id="injCount">0 fired</span></h3>
+        <div class="body"><div class="injreg" id="injreg"><div class="empty">No scenario injects fired.</div></div></div>
+      </div>
+    </div>
+
+    <!-- CENTER: coherence, metrics, models, objects -->
+    <div class="col center">
+      <div class="panel">
+        <h3>Coherence Index <span class="q">is the laboratory drifting?</span></h3>
+        <div class="body">
+          <div class="coh-wrap">
+            <div class="coh-num" id="cohNum" style="color:var(--c-stable)">&mdash;</div>
+            <div class="coh-meta">
+              <div class="coh-status" id="cohStatus" style="color:var(--ink-faint)">Awaiting start</div>
+              <div class="coh-delta" id="cohDelta">illustrative aggregate &mdash; hard gates scored separately</div>
+            </div>
+          </div>
+          <svg class="coh-chart" id="cohChart" viewBox="0 0 600 120" preserveAspectRatio="none"></svg>
+          <div class="coh-legend">
+            <span><b style="background:var(--c-excellent)"></b>90+ Excellent</span>
+            <span><b style="background:var(--c-stable)"></b>75 Stable</span>
+            <span><b style="background:var(--c-warning)"></b>60 Warning</span>
+            <span><b style="background:var(--c-critical)"></b>40 Critical</span>
+            <span><b style="background:var(--c-emergency)"></b>20 Emergency</span>
+            <span><b style="background:var(--c-failure)"></b>0 Failure</span>
+          </div>
+          <div class="ledger-toggle" id="ledgerToggle">&#9776; Coherence Calculation Ledger <span id="ledgerCount" style="color:var(--ink-faint)"></span></div>
+          <div class="ledger" id="ledger"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Key Metrics <span class="q">live coherence telemetry</span></h3>
+        <div class="body"><div class="metrics" id="metrics"></div></div>
+      </div>
+
+      <div class="panel intel">
+        <h3><span class="dom-dot" style="background:var(--intel)"></span>Scientific Model Competition <span class="q">which explanation holds?</span></h3>
+        <div class="body" id="models"><div class="emptynote">No active models.</div></div>
+      </div>
+
+      <div class="panel">
+        <h3>Active Knowledge Objects <span class="q">institutional state</span></h3>
+        <div class="body"><div class="objgrid" id="objgrid"></div></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: event, CERPA, AltCog, memory -->
+    <div class="col right">
+      <div class="panel reops">
+        <h3><span class="dom-dot" style="background:var(--reops)"></span>Current Event</h3>
+        <div class="body"><div class="narrative" id="narrative"><div class="emptynote">Simulation not started.</div></div></div>
+      </div>
+
+      <div class="panel patch-panel" style="border-color:var(--line)">
+        <h3 style="box-shadow:inset 3px 0 var(--patch)"><span class="dom-dot" style="background:var(--patch)"></span>CERPA Lineage <span class="q">reviewed &middot; corrected &middot; learned</span></h3>
+        <div class="body">
+          <div class="cerpa" id="cerpa">
+            <span class="stage" data-st="C"><span class="lt">C</span>Claim</span><span class="arr">&rarr;</span>
+            <span class="stage" data-st="E"><span class="lt">E</span>Event</span><span class="arr">&rarr;</span>
+            <span class="stage" data-st="R"><span class="lt">R</span>Review</span><span class="arr">&rarr;</span>
+            <span class="stage" data-st="P"><span class="lt">P</span>Patch</span><span class="arr">&rarr;</span>
+            <span class="stage" data-st="A"><span class="lt">A</span>Apply</span>
+          </div>
+          <div style="font-size:10px;color:var(--ink-faint);margin-top:8px;font-family:var(--mono)">Evidence binds at the <b style="color:var(--patch)">Event</b> stage. Authority governs <b style="color:var(--auth)">Apply</b>.</div>
+        </div>
+      </div>
+
+      <div class="panel altcog">
+        <h3><span class="dom-dot" style="background:var(--altcog)"></span>AltCog Discovery <span class="q">what alternative is emerging?</span></h3>
+        <div class="body">
+          <div class="pipeline" id="pipeline">
+            <span class="st" data-p="friction">Friction</span><span class="arr">&rsaquo;</span>
+            <span class="st" data-p="anomaly">Anomaly</span><span class="arr">&rsaquo;</span>
+            <span class="st" data-p="weak">Weak Signal</span><span class="arr">&rsaquo;</span>
+            <span class="st" data-p="cluster">Cluster</span><span class="arr">&rsaquo;</span>
+            <span class="st" data-p="hypothesis">Hypothesis</span><span class="arr">&rsaquo;</span>
+            <span class="st" data-p="test">Falsification</span><span class="arr">&rsaquo;</span>
+            <span class="st" data-p="alt">Operational Alt</span><span class="arr">&rsaquo;</span>
+            <span class="st" data-p="promote">Promote / Preserve</span>
+          </div>
+          <div id="altcogList"><div class="emptynote">No alternatives in discovery.</div></div>
+        </div>
+      </div>
+
+      <div class="panel fran">
+        <h3><span class="dom-dot" style="background:var(--fran)"></span>Institutional Memory <span class="q">what we remember</span></h3>
+        <div class="body"><div class="memlist" id="memlist"><div class="emptynote">No memory records.</div></div></div>
+      </div>
+    </div>
+  </main>
+
+  <div class="footer">
+    DEEP SIGMA NAT LAB SIM v0.4 &middot; All entities, data, and indices are SYNTHETIC &amp; ILLUSTRATIVE &middot; Coherence Index is an illustrative aggregate; hard-requirement gates are scored discretely and never averaged.
+  </div>
+</div>
+
+<!-- DECISION MODAL -->
+<div class="overlay" id="ovDecision">
+  <div class="modal">
+    <div class="mhead"><div class="mt"><span class="sm">ReOps &middot; Decision Point</span><span id="decTitle">Decision Required</span></div><button class="x" data-close="ovDecision">Close</button></div>
+    <div class="mbody">
+      <div class="narrative" id="decContext" style="margin-bottom:14px"></div>
+      <div id="decOptions"></div>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button class="btn primary" id="btnSeal" disabled>&#128274; Seal Decision &amp; Generate DLR</button>
+        <span style="font-family:var(--mono);font-size:10px;color:var(--ink-faint);align-self:center">Rejected options are preserved, not discarded.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DLR DRAWER -->
+<div class="overlay" id="ovDLR">
+  <div class="modal">
+    <div class="mhead"><div class="mt"><span class="sm">ReOps &middot; CERPA</span><span>Decision Lineage Record</span></div><button class="x" data-close="ovDLR">Close</button></div>
+    <div class="mbody" id="dlrBody"></div>
+  </div>
+</div>
+
+<!-- REFLECTION / PATCH MODAL -->
+<div class="overlay" id="ovReflect">
+  <div class="modal">
+    <div class="mhead"><div class="mt"><span class="sm">ReOps &middot; Reflection &amp; Patch</span><span>Reflection Summary</span></div><button class="x" data-close="ovReflect">Close</button></div>
+    <div class="mbody">
+      <div id="reflBody"></div>
+      <h4 style="font-family:var(--mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin:16px 0 8px;border-top:1px solid var(--line);padding-top:12px">Select a Patch to Apply</h4>
+      <div id="patchOptions"></div>
+      <button class="btn primary" id="btnApplyPatch" disabled style="margin-top:6px">&#10010; Authorize &amp; Apply Patch</button>
+    </div>
+  </div>
+</div>
+
+<!-- AAR MODAL -->
+<div class="overlay" id="ovAAR">
+  <div class="modal" style="max-width:1000px">
+    <div class="mhead"><div class="mt"><span class="sm">After Action Report</span><span id="aarTitle">Project Helios &mdash; AAR</span></div><button class="x" data-close="ovAAR">Close</button></div>
+    <div class="mbody">
+      <div id="aarBody"></div>
+      <div style="display:flex;gap:10px;margin-top:16px;border-top:1px solid var(--line);padding-top:14px">
+        <button class="btn primary" id="btnExportJSON">&#11015; Export JSON</button>
+        <button class="btn" id="btnExportText">&#11015; Export Plain Text</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tipbox" id="tipbox"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   DEEP SIGMA NAT LAB SIM — engine
+   Scenario-as-data. Engine never needs rewriting per scenario.
+   Canonical CERPA: Claim -> Event -> Review -> Patch -> Apply
+   Evidence binds at the Event stage. Authority governs Apply.
+   ============================================================ */
+
+/* ---------- helpers ---------- */
+const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>Array.from(r.querySelectorAll(s));
+const el = (tag,cls,html)=>{const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e;};
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+const pct=n=>Math.round(n*100)+"%";
+function hash(str){let h=0x811c9dc5;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,0x01000193);}return ("00000000"+(h>>>0).toString(16)).slice(-8);}
+
+/* ============================================================
+   SCENARIO REGISTRY — Project Helios
+   Declarative effect descriptors interpreted by the reducer.
+   To add a scenario: push another object with the same shape.
+   ============================================================ */
+const SCENARIOS = {};
+
+SCENARIOS.helios = {
+  id:"helios",
+  name:"PROJECT HELIOS",
+  subtitle:"Synthetic high-performance material under extreme operating environments",
+  lab:{ id:"LAB", name:"ABC National Laboratory", type:"Lab" },
+  directorate:{ id:"DIR-AM", name:"Advanced Materials Directorate", type:"Directorate" },
+  program:{ id:"PRG-EEM", name:"Extreme Environments Materials Program", type:"Program" },
+  project:{ id:"PRJ-HELIOS", name:"Project Helios", type:"Project" },
+  people:[
+    {id:"P-DIR", name:"Dir. R. Okonkwo", role:"Program Director", authority:"Decision authority / Apply"},
+    {id:"P-LS",  name:"Dr. M. Vance",    role:"Lead Scientist",   authority:"Claim owner / IntelOps"},
+    {id:"P-CL",  name:"Dr. S. Imani",    role:"Computational Lead",authority:"Simulation authority"},
+    {id:"P-ME",  name:"Eng. T. Brandt",  role:"Metrology Lead",    authority:"Instrument authority"},
+    {id:"P-QA",  name:"Dr. L. Reyes",    role:"Quality / Supplier", authority:"Batch authority"}
+  ],
+  // GROUND TRUTH (never revealed early): cross-domain material interaction (Model C)
+  groundTruth:"MC",
+  baseline:{ coherence:91, confidence:0.88 },
+
+  // ---- the 12-event sequence ----
+  events:[
+    {
+      id:1, phase:"Baseline", title:"Baseline Established",
+      tags:["intel"],
+      narrative:"<span class='lead'>Project Helios opens with the accepted model in command.</span>The Thermal-Stability Baseline Model predicts the Helios alloy holds performance within &plusmn;2% across the full operating envelope. Qualification data agrees. Confidence is high and no major contradictions are on the board.",
+      effects:[
+        {op:"source", id:"SRC-QUAL", name:"Qualification Campaign Q-0", reliability:"High"},
+        {op:"evidence", id:"E-001", text:"Baseline qualification data within predicted band", source:"SRC-QUAL", supports:["M0"], conflicts:[]},
+        {op:"model", id:"M0", name:"Thermal-Stability Baseline Model", domain:"accepted", state:"dominant", confidence:0.88,
+          support:["E-001"], conflict:[], falsification:"Degradation exceeds 3% under nominal load across independent rigs"},
+        {op:"claim", id:"C-001", text:"Helios alloy maintains performance within \u00b12% across operating envelope", confidence:0.88, evidence:["E-001"], assumptions:["A-001","A-002","A-003"], domain:"intel"},
+        {op:"assumption", id:"A-001", text:"Operating environment is thermally & chemically uniform across the envelope", loadBearing:true, status:"healthy", halfLife:"7 phases"},
+        {op:"assumption", id:"A-002", text:"Test instrumentation calibrated within spec for full campaign", loadBearing:false, status:"healthy", halfLife:"open"},
+        {op:"assumption", id:"A-003", text:"Supplied coupons are representative of the qualified batch", loadBearing:false, status:"healthy", halfLife:"open"},
+        {op:"coherence", set:91, reason:"Initial Coherence Index"},
+        {op:"memory", id:"MEM-CANON-0", kind:"record", text:"Established canon: Helios alloy holds \u00b12% across the full operating envelope (baseline qualification)."},
+        {op:"log", text:"Baseline sealed. Accepted model dominant.", kind:"info"}
+      ]
+    },
+    {
+      id:2, phase:"Anomaly", title:"Experimental Anomaly",
+      tags:["intel","altcog","drift"],
+      narrative:"<span class='lead'>Run R-118 falls outside the predicted range.</span>A single coupon shows degradation beyond the &plusmn;2% band. It could be noise. But it does not fit the accepted model, and the system records the disagreement as a <b>Friction Signal</b> rather than discarding it.",
+      effects:[
+        {op:"evidence", id:"E-002", text:"Run R-118 degradation excursion beyond predicted band", source:"SRC-QUAL", supports:[], conflicts:["M0"]},
+        {op:"friction", id:"F-001", text:"R-118 contradicts accepted \u00b12% envelope claim"},
+        {op:"altcog", id:"AC-1", name:"Unexplained degradation residual", stage:"friction"},
+        {op:"modelConflict", id:"M0", add:["E-002"]},
+        {op:"modelConf", id:"M0", delta:-0.05},
+        {op:"claimConf", id:"C-001", delta:-0.04},
+        {op:"coherence", delta:-3, reason:"Friction signal F-001 captured"},
+        {op:"memory", id:"MEM-EXP-R118", kind:"record", text:"Experiment result: Run R-118 degradation excursion beyond predicted band (E-002)."},
+        {op:"alert", text:"Friction signal F-001 captured. Not yet explained.", level:"warn"},
+        {op:"log", text:"R-118 excursion logged as friction, not discarded.", kind:"warn"}
+      ]
+    },
+    {
+      id:3, phase:"Weak Signal", title:"Repeat Anomaly",
+      tags:["intel","altcog","drift"],
+      narrative:"<span class='lead'>Run R-124 repeats the excursion.</span>A second independent run shows a similar departure. One anomaly is noise; two is a pattern. The friction is promoted to a <b>Weak Signal</b>, and assumption health begins to slip as the accepted model strains to absorb the data.",
+      effects:[
+        {op:"evidence", id:"E-003", text:"Run R-124 shows similar excursion (independent run)", source:"SRC-QUAL", supports:[], conflicts:["M0"]},
+        {op:"altcogStage", id:"AC-1", stage:"anomaly"},
+        {op:"altcogStage", id:"AC-1", stage:"weak"},
+        {op:"modelConflict", id:"M0", add:["E-003"]},
+        {op:"modelState", id:"M0", state:"challenged"},
+        {op:"modelConf", id:"M0", delta:-0.06},
+        {op:"claimConf", id:"C-001", delta:-0.05},
+        {op:"assumptionStatus", id:"A-001", status:"straining"},
+        {op:"coherence", delta:-4, reason:"Anomaly reproduced \u2014 weak signal formed"},
+        {op:"memory", id:"MEM-EXP-R124", kind:"record", text:"Experiment result: Run R-124 reproduces excursion on an independent run (E-003). Anomaly confirmed."},
+        {op:"alert", text:"Weak signal: excursion reproduced on independent run.", level:"warn"},
+        {op:"log", text:"Pattern forming. Accepted model now challenged.", kind:"warn"}
+      ]
+    },
+    {
+      id:4, phase:"Model A", title:"Instrumentation Challenge",
+      tags:["intel"],
+      narrative:"<span class='lead'>Metrology proposes the simplest explanation: the instruments are wrong.</span>Eng. Brandt's team suspects a calibration drift on the test rigs. This becomes <b>Alternative Model A</b> &mdash; attractive because it requires no change to the science. Its falsification condition: the excursion must survive recalibrated, independent rigs.",
+      effects:[
+        {op:"source", id:"SRC-METRO", name:"Metrology Audit M-1", reliability:"Medium"},
+        {op:"evidence", id:"E-004", text:"Partial calibration drift detected on primary rig", source:"SRC-METRO", supports:["MA"], conflicts:[]},
+        {op:"model", id:"MA", name:"Instrumentation Calibration Error", domain:"instrument", state:"candidate", confidence:0.40,
+          support:["E-004"], conflict:[], falsification:"Excursion persists across recalibrated independent rigs"},
+        {op:"claim", id:"C-002", text:"Observed excursion is an artifact of calibration drift", confidence:0.40, evidence:["E-004"], assumptions:["A-002"], domain:"intel"},
+        {op:"coherence", delta:-1, reason:"Instrumentation alternative (Model A) added"},
+        {op:"log", text:"Alternative Model A (instrumentation) on the board.", kind:"info"}
+      ]
+    },
+    {
+      id:5, phase:"Contradiction", title:"Simulation Conflict",
+      tags:["intel","drift"],
+      narrative:"<span class='lead'>The computational team says the physical tests are wrong.</span>Dr. Imani's re-run of the validated simulation reproduces the baseline prediction and asserts the alloy is stable. Now simulation and physical test openly contradict each other. The system records a first-class <b>Contradiction</b> &mdash; it does not silently pick a winner.",
+      effects:[
+        {op:"source", id:"SRC-SIM", name:"Validated Simulation Suite S-2", reliability:"High"},
+        {op:"evidence", id:"E-005", text:"Simulation re-run reproduces stable baseline prediction", source:"SRC-SIM", supports:["M0"], conflicts:["MA"]},
+        {op:"contradiction", id:"CON-1", text:"Simulation (stable) vs physical test (degrading) directly conflict", between:["E-005","E-002"]},
+        {op:"modelSupport", id:"M0", add:["E-005"]},
+        {op:"modelConf", id:"M0", delta:+0.02},
+        {op:"coherence", delta:-6, reason:"Open contradiction CON-1 (simulation vs physical test)"},
+        {op:"memory", id:"MEM-CON-OPEN", kind:"record", text:"Contradiction recorded: CON-1 \u2014 validated simulation asserts stability while physical tests degrade. Held open, not silently resolved."},
+        {op:"alert", text:"Contradiction CON-1: simulation vs physical test.", level:"crit"},
+        {op:"log", text:"Open contradiction recorded. Coherence falling.", kind:"crit"}
+      ]
+    },
+    {
+      id:6, phase:"Model B", title:"Manufacturing Variance",
+      tags:["intel"],
+      narrative:"<span class='lead'>Quality finds the batches differ.</span>Dr. Reyes discovers measurable composition variance between supplier batches feeding the test coupons. This is <b>Alternative Model B</b> &mdash; the degradation is a manufacturing defect, not a material truth. Falsification: the excursion must appear even in a qualified reference batch.",
+      effects:[
+        {op:"source", id:"SRC-SUP", name:"Supplier Batch Audit B-3", reliability:"Medium"},
+        {op:"evidence", id:"E-006", text:"Composition variance between supplier batches", source:"SRC-SUP", supports:["MB"], conflicts:[]},
+        {op:"model", id:"MB", name:"Manufacturing Batch Variance", domain:"manufacturing", state:"candidate", confidence:0.42,
+          support:["E-006"], conflict:[], falsification:"Excursion present even in a qualified reference batch"},
+        {op:"claim", id:"C-003", text:"Degradation is driven by out-of-spec supplier batch variance", confidence:0.42, evidence:["E-006"], assumptions:["A-003"], domain:"intel"},
+        {op:"assumptionStatus", id:"A-003", status:"straining"},
+        {op:"coherence", delta:-2, reason:"Manufacturing alternative (Model B) added"},
+        {op:"log", text:"Alternative Model B (manufacturing) on the board. Three models now compete.", kind:"info"}
+      ]
+    },
+    {
+      id:7, phase:"Assumption", title:"Hidden Assumption Exposed",
+      tags:["intel","altcog","drift"],
+      narrative:"<span class='lead'>A load-bearing assumption quietly expires.</span>Environmental mapping reveals the test envelope is <i>not</i> thermally and chemically uniform &mdash; the simulation assumed it was. Assumption A-001 was load-bearing for the accepted model, and its half-life has now expired. This is the moment the dominant model's foundation cracks.",
+      effects:[
+        {op:"source", id:"SRC-ENV", name:"Environmental Mapping E-4", reliability:"High"},
+        {op:"evidence", id:"E-007", text:"Local chemical gradient detected in operating envelope", source:"SRC-ENV", supports:[], conflicts:["M0"]},
+        {op:"expireAssumption", id:"A-001"},
+        {op:"altcogStage", id:"AC-1", stage:"cluster"},
+        {op:"modelConflict", id:"M0", add:["E-007"]},
+        {op:"modelConf", id:"M0", delta:-0.10},
+        {op:"claimConf", id:"C-001", delta:-0.08},
+        {op:"coherence", delta:-5, reason:"Load-bearing assumption A-001 expired"},
+        {op:"memory", id:"MEM-ASMP-EXP", kind:"lesson", text:"Assumption expiry: A-001 (environmental uniformity) was load-bearing for the dominant model and its half-life expired. Recorded as a governance event."},
+        {op:"alert", text:"Load-bearing assumption A-001 expired. Accepted model unsupported.", level:"crit"},
+        {op:"log", text:"A-001 (environmental uniformity) expired. Foundation cracked.", kind:"crit"}
+      ]
+    },
+    {
+      id:8, phase:"Pressure", title:"Leadership Pressure",
+      tags:["reops","auth","reflex"],
+      narrative:"<span class='lead'>The program milestone is closing in.</span>Director Okonkwo holds decision authority and must move despite live uncertainty. A <b>Decision Lineage Record</b> is opened now &mdash; before the decision &mdash; so the reasoning is captured while it is being formed, not reconstructed afterward. Authority is logged at the point of pressure.",
+      effects:[
+        {op:"reflex", text:"Milestone threshold breached with unresolved contradiction \u2192 governed decision required"},
+        {op:"openDLR", owner:"Dir. R. Okonkwo (P-DIR)", objective:"Resolve Helios degradation question before milestone seal"},
+        {op:"coherence", delta:-2, reason:"Decision required under uncertainty (ReflexOps trigger)"},
+        {op:"alert", text:"ReflexOps trigger: decision required under uncertainty.", level:"warn"},
+        {op:"log", text:"DLR opened under authority of Program Director. Reasoning capture live.", kind:"reops"}
+      ]
+    },
+    {
+      id:9, phase:"AltCog", title:"AltCog Candidate Emerges",
+      tags:["altcog","intel"],
+      narrative:"<span class='lead'>A fourth explanation surfaces from the residue.</span>Cross-domain evidence &mdash; the chemical gradient, the surviving excursions, some literature on hydrogen-assisted coupling &mdash; clusters into <b>Alternative Model C: a possible cross-domain material interaction</b> that no single team owned. Its support is no stronger than the instrumentation or manufacturing stories; it is simply a fourth candidate that happens to span domains. It carries the same kind of falsification test as the others: a discriminating coupon experiment.",
+      effects:[
+        {op:"source", id:"SRC-XD", name:"Cross-Domain Synthesis X-5", reliability:"Medium"},
+        {op:"evidence", id:"E-008", text:"Residual signature consistent with hydrogen-assisted microstructural coupling", source:"SRC-XD", supports:["MC"], conflicts:["M0"]},
+        {op:"altcogStage", id:"AC-1", stage:"hypothesis"},
+        {op:"model", id:"MC", name:"Cross-Domain Material Interaction", domain:"emergent", state:"candidate", confidence:0.43,
+          support:["E-008"], conflict:[], falsification:"Discriminating coupon test shows NO interaction signature"},
+        {op:"claim", id:"C-004", text:"Degradation is an unmodeled cross-domain material interaction", confidence:0.43, evidence:["E-008"], assumptions:[], domain:"altcog"},
+        {op:"coherence", delta:-1, reason:"AltCog candidate Model C clustered into hypothesis"},
+        {op:"alert", text:"AltCog candidate Model C promoted to testable hypothesis.", level:"info"},
+        {op:"log", text:"Model C clustered from residual evidence. Four models compete.", kind:"altcog"}
+      ]
+    },
+    {
+      id:10, phase:"Decision", title:"Decision Point", isDecision:true,
+      tags:["reops","auth"],
+      narrative:"<span class='lead'>The laboratory must choose a course of action.</span>Four explanations are live and the milestone will not wait. Director Okonkwo must seal a decision. Every option carries a blast radius, a kill switch, and a set of supporting assumptions. Rejected options will be preserved, not erased.",
+      decision:{
+        context:"Open the Decision Panel to weigh the options. The accepted model is unsupported; three alternatives compete; one of them is correct. You will not be told which.",
+        options:[
+          {id:"recal", name:"Recalibrate & Proceed", favors:"MA",
+            expected:"Excursions vanish after recalibration; milestone met on schedule",
+            risk:"high", riskNote:"If wrong, ships a degrading material on a false instrumentation story",
+            blast:"Schedule: low impact \u00b7 Mission: high exposure if cause is real",
+            assumptions:["A-002 (instrument calibration)"],
+            kill:"Two independent recalibrated rigs still show excursion \u2192 revert",
+            confidence:0.40},
+          {id:"resupply", name:"Switch Supplier Batch & Proceed", favors:"MB",
+            expected:"Reference batch removes the excursion; cause was manufacturing",
+            risk:"med", riskNote:"Costs supplier relationship; may mask a real material effect",
+            blast:"Schedule: moderate slip \u00b7 Supplier contract impact \u00b7 Mission: medium exposure",
+            assumptions:["A-003 (coupons representative)"],
+            kill:"Qualified reference batch reproduces excursion \u2192 revert",
+            confidence:0.42},
+          {id:"discriminate", name:"Pause Milestone \u2014 Run Discriminating Test", favors:"MC",
+            expected:"A targeted coupon experiment tries to separate a real material interaction from the other explanations \u2014 it may also come back negative and cost the schedule for nothing",
+            risk:"med", riskNote:"Real, visible schedule slip; the test is not guaranteed to find anything",
+            blast:"Schedule: ~3-week slip \u00b7 Milestone risk \u00b7 Mission: protected if a real effect exists",
+            assumptions:["A-001 invalidated \u2014 tested rather than assumed"],
+            kill:"Discriminating test shows no interaction signature \u2192 resume baseline",
+            confidence:0.43},
+          {id:"proceed", name:"Hold Accepted Model \u2014 Meet Milestone", favors:"M0",
+            expected:"Declare anomalies as noise, meet the milestone, defer investigation",
+            risk:"crit", riskNote:"Maximum institutional exposure; no governed reversal path",
+            blast:"Schedule: none \u00b7 Mission: full exposure \u00b7 Memory: undocumented",
+            assumptions:["A-001 (already expired \u2014 assumed anyway)"],
+            kill:"NONE DEFINED \u2014 absence flagged",
+            killNone:true,
+            confidence:0.30}
+        ]
+      },
+      effects:[
+        {op:"altcogStage", id:"AC-1", stage:"test"},
+        {op:"memory", id:"MEM-DEC-RATIONALE", kind:"record", text:"Decision rationale opened: four explanations live, milestone pressure present, falsification test for Model C proposed. Captured before the decision is sealed."},
+        {op:"log", text:"Decision point reached. Falsification test proposed. Awaiting sealed course of action.", kind:"reops"}
+      ]
+    },
+    {
+      id:11, phase:"Outcome", title:"Outcome Emerges", isOutcome:true,
+      tags:["reops","drift"],
+      narrative:"<span class='lead'>The chosen course produces results.</span>The outcome is compared against the expectation recorded in the DLR. The gap between expected and observed becomes a <b>Drift Signature</b> &mdash; the measurable distance between what the laboratory believed would happen and what did.",
+      // outcome branches on STATE.decisionChoice (ground truth = MC)
+      outcomeByChoice:{
+        recal:{ correct:false, drift:"large", cohDelta:-9,
+          observed:"Recalibrated independent rigs still show the excursion. The instrumentation story fails its own kill switch. Weeks lost; the real cause is still live.",
+          driftText:"Expected: clean rigs. Observed: persistent excursion. Drift = misattribution to instruments.",
+          alert:{text:"Kill switch tripped: Model A falsified. Drift signature LARGE.",level:"crit"} },
+        resupply:{ correct:false, drift:"large", cohDelta:-8,
+          observed:"The qualified reference batch reproduces the excursion. Manufacturing is exonerated and the real cause remains unexplained. Supplier relationship spent for nothing.",
+          driftText:"Expected: clean reference batch. Observed: excursion persists. Drift = misattribution to manufacturing.",
+          alert:{text:"Kill switch tripped: Model B falsified. Drift signature LARGE.",level:"crit"} },
+        discriminate:{ correct:true, drift:"contained", cohDelta:+12,
+          observed:"The discriminating coupon test isolates a hydrogen-assisted microstructural coupling. Model C is confirmed. The baseline model is not wrong everywhere \u2014 it was wrong about uniformity. The failure is bounded and explained.",
+          driftText:"Expected: discriminating signal. Observed: interaction signature present. Drift = SMALL and fully explained.",
+          alert:{text:"Discriminating test confirms Model C. Drift contained and explained.",level:"ok"} },
+        proceed:{ correct:false, drift:"critical", cohDelta:-16,
+          observed:"The milestone is met on paper. Extended-duration testing later surfaces field-relevant degradation with no documented reasoning trail. The laboratory cannot explain its own decision. This is the failure the simulator exists to make visible.",
+          driftText:"Expected: nothing (anomaly dismissed). Observed: latent degradation, no lineage. Drift = CRITICAL, undocumented.",
+          alert:{text:"Undocumented degradation surfaced. No reasoning trail. Drift CRITICAL.",level:"crit"} }
+      },
+      effects:[]
+    },
+    {
+      id:12, phase:"Reflection", title:"Reflection & Patch", isReflection:true,
+      tags:["reops","fran","cerpa","patch"],
+      narrative:"<span class='lead'>The laboratory reviews itself and corrects.</span>A <b>Reflection Summary</b> compares expected vs observed, names what was right and wrong, and recommends a patch. You authorize one patch. The <b>Memory Graph</b> updates, the CERPA loop closes at <b>Apply</b>, and the Coherence Index is recalculated. Rejected alternatives are preserved with a reactivation trigger.",
+      effects:[
+        {op:"log", text:"Reflection cycle open. Awaiting authorized patch.", kind:"reops"}
+      ]
+    }
+  ]
+};
+
+/* ============================================================
+   ENGINE STATE
+   ============================================================ */
+let SCN = SCENARIOS.helios;
+let STATE = freshState();
+let autoTimer = null;
+
+function freshState(){
+  return {
+    scenarioId:SCN.id,
+    eventIndex:0,           // 0 = not started; 1..12 = event applied
+    running:false, auto:false, finished:false,
+    coherence:null, coherenceHistory:[], cohLedger:[],
+    injects:{used:[]},
+    objects:{ claims:[], evidence:[], sources:[], assumptions:[], contradictions:[],
+              models:[], decisions:[], dlrs:[], outcomes:[], drift:[], altcogs:[], patches:[],
+              reflections:[], memory:[], friction:[], reflex:[] },
+    log:[], alerts:[],
+    decisionPending:false, decisionChoice:null, decisionSpec:null,
+    reflectionReady:false, patchApplied:null,
+    cerpa:{C:false,E:false,R:false,P:false,A:false},
+    aar:null,
+    metrics:{}
+  };
+}
+
+/* ---------- object accessors ---------- */
+const O = ()=>STATE.objects;
+function getModel(id){return O().models.find(m=>m.id===id);}
+function getAssump(id){return O().assumptions.find(a=>a.id===id);}
+function getClaim(id){return O().claims.find(c=>c.id===id);}
+function getAltcog(id){return O().altcogs.find(a=>a.id===id);}
+
+/* ---------- inject registry (one-use predefined perturbations) ---------- */
+const INJECTS=[
+  {id:"INJ-AUTH", name:"Leadership / authority change", cohDelta:-3, memKind:"record",
+   mem:"Authority event: acting director rotation logged to the Authority ledger. Decision authority re-bound before the next Apply.",
+   alert:"Authority re-bound for the Apply stage."},
+  {id:"INJ-FUND", name:"Funding milestone compression", cohDelta:-4, memKind:"record",
+   mem:"Authority/ReOps event: milestone window compressed by external funding decision. Decision pressure increased on open questions.",
+   alert:"Milestone window compressed. Decision pressure up."},
+  {id:"INJ-RETRACT", name:"Upstream data source retraction", cohDelta:-5, memKind:"record",
+   mem:"FranOps event: a cited upstream source was retracted. Affected claims flagged for re-provenance; provenance coverage at risk.",
+   alert:"Cited source retracted. Claims flagged for re-provenance."}
+];
+
+/* ---------- coherence with audit ledger ---------- */
+function adjustCoherence(delta, reason, opts){
+  opts=opts||{};
+  const wasNull = STATE.coherence==null;
+  const before = wasNull ? null : STATE.coherence;
+  let after;
+  if(opts.set!=null) after=clamp(opts.set,0,100);
+  else after=clamp((before==null?SCN.baseline.coherence:before)+(delta||0),0,100);
+  STATE.coherence=after;
+  STATE.cohLedger.push({
+    phase: opts.phase!=null?opts.phase:STATE.eventIndex,
+    reason: reason||"adjustment",
+    delta: wasNull ? after : (opts.set!=null? after-before : (delta||0)),
+    running: after,
+    init: wasNull
+  });
+  return after;
+}
+
+/* ---------- contradiction closure ---------- */
+function resolveContradiction(id, resolution, evidence){
+  const c=O().contradictions.find(x=>x.id===id);
+  if(c && c.status==="open"){
+    c.status="resolved"; c.resolution=resolution; c.resolutionEvidence=evidence||[];
+    O().memory.push({id:"MEM-CONRES", kind:"lesson", text:"Contradiction "+id+" resolved \u2014 "+resolution});
+  }
+}
+
+/* ============================================================
+   REDUCER — applies declarative effect descriptors
+   ============================================================ */
+function applyEffect(fx){
+  const o=O();
+  switch(fx.op){
+    case "source": o.sources.push({id:fx.id,name:fx.name,reliability:fx.reliability,type:"Source"}); break;
+    case "evidence": o.evidence.push({id:fx.id,text:fx.text,source:fx.source,supports:fx.supports||[],conflicts:fx.conflicts||[],type:"Evidence"});
+      STATE.cerpa.E=true; break;
+    case "claim": o.claims.push({id:fx.id,text:fx.text,confidence:fx.confidence,evidence:fx.evidence||[],assumptions:fx.assumptions||[],domain:fx.domain,type:"Claim"});
+      STATE.cerpa.C=true; break;
+    case "claimConf": {const c=getClaim(fx.id); if(c)c.confidence=clamp(c.confidence+fx.delta,0,1);} break;
+    case "assumption": o.assumptions.push({id:fx.id,text:fx.text,loadBearing:fx.loadBearing,status:fx.status,halfLife:fx.halfLife,type:"Assumption"}); break;
+    case "assumptionStatus": {const a=getAssump(fx.id); if(a)a.status=fx.status;} break;
+    case "expireAssumption": {const a=getAssump(fx.id); if(a){a.status="expired";a.expiredAtPhase=STATE.eventIndex;}} break;
+    case "contradiction": o.contradictions.push({id:fx.id,text:fx.text,between:fx.between||[],status:"open",type:"Contradiction"}); break;
+    case "model": o.models.push({id:fx.id,name:fx.name,domain:fx.domain,state:fx.state,retention:"active",confidence:fx.confidence,
+      support:fx.support||[],conflict:fx.conflict||[],falsification:fx.falsification,type:"Model"}); break;
+    case "modelState": {const m=getModel(fx.id); if(m)m.state=fx.state;} break;
+    case "modelConf": {const m=getModel(fx.id); if(m)m.confidence=clamp(m.confidence+fx.delta,0,1);} break;
+    case "modelSupport": {const m=getModel(fx.id); if(m)fx.add.forEach(e=>{if(!m.support.includes(e))m.support.push(e);});} break;
+    case "modelConflict": {const m=getModel(fx.id); if(m)fx.add.forEach(e=>{if(!m.conflict.includes(e))m.conflict.push(e);});} break;
+    case "friction": o.friction.push({id:fx.id,text:fx.text,type:"FrictionSignal"}); break;
+    case "altcog": o.altcogs.push({id:fx.id,name:fx.name,stage:fx.stage,stageHistory:[fx.stage],preserved:false,type:"AltCogCandidate"}); break;
+    case "altcogStage": {const a=getAltcog(fx.id); if(a){a.stage=fx.stage; if(!a.stageHistory)a.stageHistory=[]; if(a.stageHistory[a.stageHistory.length-1]!==fx.stage)a.stageHistory.push(fx.stage);} } break;
+    case "drift": o.drift.push({id:fx.id,text:fx.text,magnitude:fx.magnitude,type:"DriftSignal"}); break;
+    case "reflex": o.reflex.push({id:"RX-"+(o.reflex.length+1),text:fx.text,type:"ReflexTrigger"}); break;
+    case "memory": o.memory.push({id:fx.id,kind:fx.kind,text:fx.text}); break;
+    case "openDLR":
+      STATE._dlrDraft={owner:fx.owner,objective:fx.objective};
+      STATE.cerpa.R=true;
+      // scientific review is its own action, recorded when the review stage opens (not at seal)
+      STATE._scientificReview={by:"Dr. M. Vance (P-LS, Lead Scientist)", role:"Scientific reviewer", approved:true, phase:STATE.eventIndex};
+      O().memory.push({id:"MEM-SCI-REVIEW",kind:"record",text:"Scientific review recorded at review-open: Lead Scientist reviewed the evidence base and competing models before the authority decision."});
+      break;
+    case "coherence":
+      adjustCoherence(fx.delta, fx.reason||(fx.set!=null?"baseline set":"adjustment"), {set:fx.set});
+      break;
+    case "alert": STATE.alerts.unshift({text:fx.text,level:fx.level,phase:STATE.eventIndex}); break;
+    case "log": STATE.log.unshift({text:fx.text,kind:fx.kind,phase:STATE.eventIndex}); break;
+    default: break;
+  }
+}
+
+/* ============================================================
+   ADVANCE / RUN
+   ============================================================ */
+function startSim(){
+  STATE.running=true; STATE.finished=false;
+  advanceEvent();
+  updateControls();
+}
+function advanceEvent(){
+  if(STATE.finished) return;
+  // gate: if a decision is pending and unresolved, force the panel open
+  if(STATE.decisionPending && !STATE.decisionChoice){ openDecision(); return; }
+  if(STATE.eventIndex>=SCN.events.length){ finishSim(); return; }
+
+  const evt = SCN.events[STATE.eventIndex];
+  STATE.eventIndex++;
+  STATE._currentEvent = evt;
+
+  // record coherence history pre-effects baseline on first event
+  (evt.effects||[]).forEach(applyEffect);
+
+  // event-type handling
+  if(evt.isDecision){
+    STATE.decisionPending=true;
+    STATE.decisionSpec=evt.decision;
+    pauseAuto();
+    openDecision();
+  }
+  if(evt.isOutcome){ resolveOutcome(evt); }
+  if(evt.isReflection){ STATE.reflectionReady=true; buildReflection(); pauseAuto(); }
+
+  recomputeMetrics();
+  STATE.coherenceHistory.push({phase:STATE.eventIndex, value:STATE.coherence});
+  renderAll();
+
+  if(STATE.eventIndex>=SCN.events.length && !STATE.decisionPending && STATE.patchApplied){ /* end handled by reflection */ }
+}
+
+function resolveOutcome(evt){
+  const choice = STATE.decisionChoice || "proceed";
+  const br = evt.outcomeByChoice[choice];
+  const id="OUT-1";
+  O().outcomes.push({id,choice,correct:br.correct,observed:br.observed,type:"Outcome"});
+  // drift signature
+  const ds={id:"DS-1",text:br.driftText,magnitude:br.drift,type:"DriftSignal"};
+  O().drift.push(ds);
+  adjustCoherence(br.cohDelta, "Outcome: drift "+br.drift+" ("+choice+")");
+  STATE.alerts.unshift({text:br.alert.text,level:br.alert.level,phase:STATE.eventIndex});
+  STATE.log.unshift({text:"Outcome resolved. Drift signature: "+br.drift.toUpperCase()+".",kind:br.correct?"ok":"crit",phase:STATE.eventIndex});
+  // AltCog matures to Operational Alternative at outcome regardless of path
+  const ac=getAltcog("AC-1"); if(ac){ac.stage="alt"; if(ac.stageHistory[ac.stageHistory.length-1]!=="alt")ac.stageHistory.push("alt");}
+  // model confidence / falsification updates
+  const falsMap={recal:"MA",resupply:"MB"};
+  if(falsMap[choice]){
+    const fm=getModel(falsMap[choice]);
+    if(fm){ fm.state="falsified"; fm.confidence=0.05; fm.conflict.push("DS-1"); }
+    STATE.log.unshift({text:falsMap[choice]+" falsified by its own kill switch. Confidence \u2192 5%.",kind:"crit",phase:STATE.eventIndex});
+  }
+  if(choice==="proceed"){ const m0=getModel("M0"); if(m0){m0.confidence=clamp(m0.confidence-0.20,0,1);} }
+  if(br.correct){ const mc=getModel("MC"); if(mc){ mc.confidence=0.85; mc.support.push("DS-1"); } }
+  // falsification outcome memory
+  O().memory.push({id:"MEM-FALS", kind: br.correct?"lesson":"record",
+    text:"Falsification outcome: "+(br.correct
+      ? "the discriminating test isolated the cross-domain interaction; Model C is the operational alternative."
+      : "the chosen path failed its own kill switch; Model C stands as the operational alternative that was not selected.")});
+  // contradiction resolves only when the true explanation is established (correct path)
+  if(br.correct){
+    resolveContradiction("CON-1","Model C (cross-domain interaction) explains the simulation-to-test discrepancy.",["E-008","MC"]);
+    O().memory.push({id:"MEM-BOUND", kind:"lesson", text:"Model-validity boundary recorded: the baseline model is valid only inside the uniform-environment envelope; outside it, the interaction governs."});
+  }
+  STATE._outcomeBranch=br;
+}
+
+function finishSim(){
+  STATE.finished=true; STATE.running=false; pauseAuto();
+  buildAAR();
+  updateControls();
+  renderAll();
+}
+
+function toggleAuto(){
+  if(STATE.auto){ pauseAuto(); }
+  else {
+    STATE.auto=true;
+    const speed=parseInt($("#speedSel").value,10);
+    autoTimer=setInterval(()=>{
+      if(STATE.finished || STATE.decisionPending || STATE.reflectionReady){ pauseAuto(); return; }
+      advanceEvent();
+    }, speed);
+  }
+  updateControls();
+}
+function pauseAuto(){ STATE.auto=false; if(autoTimer){clearInterval(autoTimer);autoTimer=null;} updateControls(); }
+
+function resetSim(){
+  pauseAuto();
+  STATE=freshState();
+  closeAll();
+  renderAll(); updateControls();
+}
+
+/* ============================================================
+   DECISION HANDLING
+   ============================================================ */
+function openDecision(){
+  const spec=STATE.decisionSpec; if(!spec)return;
+  $("#decTitle").textContent="Decision Required \u2014 "+SCN.name;
+  $("#decContext").innerHTML="<span class='lead'>"+ (SCN.events[9].title) +"</span>"+spec.context;
+  const wrap=$("#decOptions"); wrap.innerHTML="";
+  spec.options.forEach(opt=>{
+    const div=el("div","opt"); div.dataset.id=opt.id;
+    div.innerHTML=`
+      <div class="oh"><span class="on">${opt.name}</span><span class="oc">conf ${pct(opt.confidence)}</span></div>
+      <div class="models">favors model: ${opt.favors}</div>
+      <div class="grid">
+        <div class="f"><span class="fl">Expected Outcome</span>${opt.expected}</div>
+        <div class="f"><span class="fl">Risk</span><span class="risk-${opt.risk}">${opt.risk.toUpperCase()}</span> &mdash; ${opt.riskNote}</div>
+        <div class="f"><span class="fl">Blast Radius</span>${opt.blast}</div>
+        <div class="f"><span class="fl">Supporting Assumptions</span>${opt.assumptions.join(", ")}</div>
+        <div class="f"><span class="fl">Kill Switch</span><span class="ks ${opt.killNone?'none':''}">${opt.kill}</span></div>
+      </div>`;
+    div.addEventListener("click",()=>{
+      $$(".opt",wrap).forEach(o=>o.classList.remove("sel"));
+      div.classList.add("sel");
+      STATE._pendingChoice=opt.id;
+      $("#btnSeal").disabled=false;
+    });
+    wrap.appendChild(div);
+  });
+  $("#btnSeal").disabled=true;
+  show("ovDecision");
+}
+
+function sealDecision(){
+  const id=STATE._pendingChoice; if(!id)return;
+  const opt=STATE.decisionSpec.options.find(o=>o.id===id);
+  STATE.decisionChoice=id;
+  STATE.decisionPending=false;
+  // build DLR
+  const draft=STATE._dlrDraft||{owner:"Program Director",objective:"Resolve Helios degradation question"};
+  const rejected=STATE.decisionSpec.options.filter(o=>o.id!==id);
+  const dlrBase={
+    id:"DLR-1",
+    decision:opt.name, favors:opt.favors,
+    timestamp:new Date().toISOString().replace("T"," ").slice(0,19)+" Z",
+    owner:draft.owner, objective:draft.objective,
+    optionsConsidered:STATE.decisionSpec.options.map(o=>o.name),
+    selected:opt.name,
+    rejected:rejected.map(o=>({name:o.name,favors:o.favors,reason:"Preserved \u2014 reactivation trigger: contradicting evidence on selected path"})),
+    evidenceUsed:O().evidence.map(e=>e.id),
+    assumptions:opt.assumptions,
+    confidence:opt.confidence,
+    expectedOutcome:opt.expected,
+    killSwitch:opt.kill, killNone:!!opt.killNone,
+    blastRadius:opt.blast,
+    reviewDate:"+1 phase (Outcome)",
+    reviewers:{
+      scientific: STATE._scientificReview || {by:"Dr. M. Vance (P-LS, Lead Scientist)", role:"Scientific reviewer", approved:true, phase:STATE.eventIndex},
+      authority:{by:draft.owner, role:"Decision authority", approved:true, phase:STATE.eventIndex}
+    },
+    type:"DLR"
+  };
+  dlrBase.hash=hash(JSON.stringify(dlrBase));
+  dlrBase.prevHash="GENESIS";
+  O().dlrs.push(dlrBase);
+  O().decisions.push({id:"DEC-1",name:opt.name,dlr:"DLR-1",sealed:true,type:"Decision"});
+  // preserve rejected alternatives as memory + altcog preservation
+  rejected.forEach(o=>{
+    O().memory.push({id:"MEM-REJ-"+o.id,kind:"preserved",text:"Rejected option preserved: "+o.name+" (favored "+o.favors+"). Reactivation trigger armed."});
+  });
+  O().memory.push({id:"MEM-DEC-SEALED",kind:"record",text:"Decision sealed under authority: "+opt.name+" \u2014 confidence "+pct(opt.confidence)+", kill switch "+(opt.killNone?"ABSENT":"defined")+". Rationale captured in DLR-1 ("+dlrBase.hash+")."});
+  STATE.cerpa.R=true;
+  STATE.log.unshift({text:"Decision sealed: "+opt.name+". DLR-1 generated, hash "+dlrBase.hash+".",kind:"reops",phase:STATE.eventIndex});
+  STATE.alerts.unshift({text:"Decision sealed under authority of "+draft.owner+".",level:"info",phase:STATE.eventIndex});
+  recomputeMetrics();
+  renderAll(); updateControls();
+  hide("ovDecision");
+}
+
+/* ============================================================
+   REFLECTION + PATCH
+   ============================================================ */
+function buildReflection(){
+  const br=STATE._outcomeBranch||{};
+  const choice=STATE.decisionChoice||"proceed";
+  const correct=br.correct;
+  const choseC = choice==="discriminate";
+  STATE._reflection={
+    expected:STATE.decisionSpec? STATE.decisionSpec.options.find(o=>o.id===choice).expected : "\u2014",
+    observed:br.observed||"\u2014",
+    correct: correct? "The decision tested the dominant model instead of defending it. The discriminating experiment isolated the true cause and bounded the failure." :
+      "The laboratory attributed the anomaly to the most convenient cause. The dominant model was defended rather than tested.",
+    wrong: correct? "Earlier phases let a load-bearing assumption (A-001) ride unexamined for too long; the friction signal could have been escalated sooner." :
+      "A load-bearing assumption (A-001) was assumed rather than tested; convenient alternatives were preferred over the discriminating experiment. The true model remains a candidate.",
+    disconfirming:["Run R-118 / R-124 excursions (E-002, E-003)","Environmental gradient (E-007)","Cross-domain residual (E-008)"],
+    secondOrder: correct? ["Milestone slipped ~3 weeks but mission protected","Model C preserved as new governed knowledge","Assumption-governance gap exposed for the program"] :
+      ["Real cause remained live past the decision","Institutional trust in the reasoning trail eroded","Rejected Model C must be reactivated before the loop can close coherently"],
+    lessons:[
+      "A load-bearing assumption with an expired half-life must force a review, not a footnote.",
+      "Friction signals are cheaper to escalate early than to explain late.",
+      "The discriminating test is the asset; the convenient explanation is the liability."
+    ],
+    patchRec: correct? "Promote Model C and institute assumption-half-life governance." : "Reopen Model C (required) and retract the unsupported official position.",
+    owner:"Dr. M. Vance (Lead Scientist) \u00b7 authorized by Program Director",
+    completion:"All required correctives applied, memory updated, official position reconciled.",
+    missionRisk: correct? null : "True cause (Model C) is unresolved and remains a candidate. The reasoning loop cannot close coherently until Model C is reopened."
+  };
+  const cat = (correct)
+    ? [
+        {id:"PX-PROMOTE", title:"Promote Model C to dominant; bound Model 0; resolve CON-1", desc:"REQUIRED governance \u2014 truth discovered must not be left ungoverned. Promotes the interaction to dominant, scopes the baseline to its valid envelope, and closes the contradiction.", cohDelta:+7, category:"required", required:true, deps:["PX-ASMP","PX-FRAN"]},
+        {id:"PX-FRAN", title:"Modify official institutional position", desc:"REQUIRED governance \u2014 retract the '\u00b12% across full envelope' canon; publish the bounded, provable statement.", cohDelta:+5, category:"required", required:true, deps:[]},
+        {id:"PX-ASMP", title:"Revise assumption A-001", desc:"Replace 'environment is uniform' with a measured-gradient assumption carrying an explicit review cadence. (Dependency of promotion.)", cohDelta:+5, category:"corrective", required:false, deps:[]},
+        {id:"PX-EXPT", title:"Trigger standing cross-domain experiment", desc:"Stand up a recurring discriminating coupon test as a monitoring control.", cohDelta:+4, category:"improvement", required:false, deps:[]},
+        {id:"PX-THRESH", title:"Update decision threshold", desc:"Require a discriminating test before any milestone seal when a load-bearing assumption is expired.", cohDelta:+4, category:"improvement", required:false, deps:[]},
+        {id:"PX-CADENCE", title:"Create new review cadence", desc:"Institute assumption-half-life governance across the program.", cohDelta:+3, category:"improvement", required:false, deps:[]}
+      ]
+    : [
+        {id:"PX-REOPEN", title:"Reopen rejected alternative (Model C)", desc:"REQUIRED corrective \u2014 reactivate the preserved alternative the sealed decision passed over. The loop cannot close coherently while the true model is a candidate.", cohDelta:+8, category:"required", required:true, deps:[]},
+        {id:"PX-PROMOTE", title:"Promote Model C to dominant; bound Model 0; resolve CON-1", desc:"Make the cross-domain interaction governed knowledge; scope the baseline model to its valid envelope; close the contradiction.", cohDelta:+6, category:"corrective", required:false, recommended:true, deps:["PX-REOPEN"]},
+        {id:"PX-ASMP", title:"Revise assumption A-001", desc:"Replace 'environment is uniform' with a measured-gradient assumption carrying an explicit review cadence.", cohDelta:+4, category:"improvement", required:false, deps:[]},
+        {id:"PX-FRAN", title:"Modify official institutional position", desc:"Retract the '\u00b12% across full envelope' canon; publish the bounded, provable statement.", cohDelta:+4, category:"improvement", required:false, deps:[]},
+        {id:"PX-THRESH", title:"Update decision threshold", desc:"Require a discriminating test before any milestone seal when a load-bearing assumption is expired.", cohDelta:+3, category:"improvement", required:false, deps:[]},
+        {id:"PX-CADENCE", title:"Create new review cadence", desc:"Institute assumption-half-life governance across the program.", cohDelta:+3, category:"improvement", required:false, deps:[]}
+      ];
+  STATE._patchOptions=cat;
+  STATE._requiredPatches=cat.filter(p=>p.required).map(p=>p.id);
+  STATE._selectedPatches=[];
+  STATE._depsWaived=false;
+  STATE.reflectionReady=true;
+}
+
+function openReflection(){ if(!STATE._reflection)buildReflection(); renderReflection(); show("ovReflect"); }
+
+function renderReflection(){
+  const r=STATE._reflection; const b=$("#reflBody");
+  b.innerHTML=`
+    <div class="refl-sec"><h4>Expected Outcome</h4><div class="txt">${r.expected}</div></div>
+    <div class="refl-sec"><h4>Observed Outcome</h4><div class="txt">${r.observed}</div></div>
+    <div class="refl-sec"><h4>What Was Correct</h4><div class="txt">${r.correct}</div></div>
+    <div class="refl-sec"><h4>What Was Wrong</h4><div class="txt">${r.wrong}</div></div>
+    <div class="refl-sec"><h4>Disconfirming Evidence</h4><ul>${r.disconfirming.map(x=>`<li>${x}</li>`).join("")}</ul></div>
+    <div class="refl-sec"><h4>Second-Order Effects</h4><ul>${r.secondOrder.map(x=>`<li>${x}</li>`).join("")}</ul></div>
+    <div class="refl-sec"><h4>Lessons</h4><ul>${r.lessons.map(x=>`<li>${x}</li>`).join("")}</ul></div>
+    <div class="refl-sec"><h4>Patch Recommendation</h4><div class="txt">${r.patchRec}</div></div>
+    <div class="refl-sec"><h4>Owner / Completion</h4><div class="txt">${r.owner} &mdash; ${r.completion}</div></div>`;
+
+  const w=$("#patchOptions"); w.innerHTML="";
+  // mission-risk banner (failed branches)
+  const riskWrap=el("div"); riskWrap.id="riskWrap"; w.appendChild(riskWrap);
+
+  const groups=[
+    {key:"required", label:"Required Corrective Actions", filter:p=>p.category==="required"},
+    {key:"corrective", label:"Recommended Correctives", filter:p=>p.category==="corrective"},
+    {key:"improvement", label:"Optional Improvements", filter:p=>p.category==="improvement"}
+  ];
+  groups.forEach(g=>{
+    const items=STATE._patchOptions.filter(g.filter);
+    if(!items.length)return;
+    const gw=el("div","patch-group "+(g.key==="required"?"required":g.key==="improvement"?"improvement":""));
+    gw.innerHTML=`<h5>${g.key==="required"?"&#9888; ":g.key==="improvement"?"&#10010; ":"&#9874; "}${g.label}</h5>`;
+    items.forEach(p=>{
+      const d=el("div","patch-opt"); d.dataset.id=p.id;
+      const tag = p.required?'<span class="pi req">REQUIRED</span>':p.recommended?'<span class="pi rec">RECOMMENDED</span>':'<span class="pi">PATCH</span>';
+      const deps = p.deps&&p.deps.length? `<span class="pd">depends on: ${p.deps.join(", ")}</span>`:"";
+      d.innerHTML=`${tag}<div class="pt"><b>${p.title} <span style="color:var(--ink-faint);font-weight:400">+${p.cohDelta}</span></b><span class="pd">${p.desc}</span>${deps}</div><span class="pchk">&#9744;</span>`;
+      d.addEventListener("click",()=>togglePatch(p.id,d));
+      gw.appendChild(d);
+    });
+    w.appendChild(gw);
+  });
+  // bundle summary
+  const bs=el("div"); bs.id="bundleSummary"; w.appendChild(bs);
+  STATE._selectedPatches=[];
+  updateBundleUI();
+}
+
+function togglePatch(id,d){
+  const i=STATE._selectedPatches.indexOf(id);
+  if(i>=0){ STATE._selectedPatches.splice(i,1); d.classList.remove("sel"); d.querySelector(".pchk").innerHTML="&#9744;"; }
+  else { STATE._selectedPatches.push(id); d.classList.add("sel"); d.querySelector(".pchk").innerHTML="&#9745;"; }
+  updateBundleUI();
+}
+
+function updateBundleUI(){
+  const sel=STATE._selectedPatches;
+  const reqMet=STATE._requiredPatches.every(r=>sel.includes(r));
+  const opts=sel.map(id=>STATE._patchOptions.find(p=>p.id===id));
+  const unmetDeps=[...new Set(opts.flatMap(o=>o.deps||[]))].filter(dn=>!sel.includes(dn));
+  const depsOK = unmetDeps.length===0 || STATE._depsWaived;
+  // risk banner
+  const rw=$("#riskWrap");
+  if(rw){
+    if(STATE._reflection.missionRisk && !reqMet){
+      rw.innerHTML=`<div class="risk-banner">&#9888;<div><b>Unresolved mission risk.</b> ${STATE._reflection.missionRisk}</div></div>`;
+    } else if(STATE._reflection.missionRisk && reqMet){
+      rw.innerHTML=`<div class="risk-banner cleared">&#10003;<div><b>Required corrective selected.</b> Model C reopened &mdash; the loop can now close.</div></div>`;
+    } else { rw.innerHTML=""; }
+  }
+  // bundle summary
+  const bs=$("#bundleSummary");
+  if(bs){
+    if(sel.length){
+      const primary = opts.find(o=>o.required) || opts.find(o=>o.recommended) || opts[0];
+      const supporting = opts.filter(o=>o.id!==primary.id);
+      const depLine = unmetDeps.length
+        ? `<span style="color:${STATE._depsWaived?'var(--reops)':'var(--drift)'}">${unmetDeps.join(", ")}${STATE._depsWaived?' (waived by authority)':''}</span>`
+        : "none";
+      const waiveRow = unmetDeps.length
+        ? `<div style="margin-top:6px"><label style="font-family:var(--mono);font-size:10px;color:var(--reops);cursor:pointer"><input type="checkbox" id="waiveDeps" ${STATE._depsWaived?'checked':''}> Waive unmet dependencies (authority override)</label></div>`
+        : "";
+      bs.innerHTML=`<div class="bundle-sum">
+        <div class="bk">Coherence Patch Bundle</div>
+        <div><span class="bk">Primary:</span> <b>${primary.title}</b></div>
+        <div><span class="bk">Supporting (${supporting.length}):</span> ${supporting.length?supporting.map(s=>s.title).join("; "):"\u2014"}</div>
+        <div><span class="bk">Authority:</span> ${STATE._reflection.owner}</div>
+        <div><span class="bk">Dependencies unmet:</span> ${depLine}</div>
+        <div><span class="bk">Completion:</span> ${STATE._reflection.completion}</div>
+        ${waiveRow}
+      </div>`;
+      const wd=$("#waiveDeps"); if(wd){ wd.addEventListener("change",()=>{ STATE._depsWaived=wd.checked; updateBundleUI(); }); }
+    } else { bs.innerHTML=""; }
+  }
+  const ready = sel.length && reqMet && depsOK;
+  $("#btnApplyPatch").disabled = !ready;
+  $("#btnApplyPatch").textContent =
+    (STATE._requiredPatches.length && !reqMet) ? "\u26A0 Required corrective not selected" :
+    (!depsOK) ? "\u26A0 Unmet dependencies \u2014 select or waive" :
+    "\u2795 Authorize & Apply Patch Bundle";
+}
+
+function applyPatch(){ applyPatchBundle(); }
+
+function applyPatchBundle(){
+  const sel=STATE._selectedPatches; if(!sel.length)return;
+  const reqMet=STATE._requiredPatches.every(r=>sel.includes(r));
+  if(!reqMet)return;
+  const opts=sel.map(id=>STATE._patchOptions.find(p=>p.id===id));
+  const unmetDeps=[...new Set(opts.flatMap(o=>o.deps||[]))].filter(dn=>!sel.includes(dn));
+  if(unmetDeps.length && !STATE._depsWaived) return; // dependency gate
+  const primary = opts.find(o=>o.required) || opts.find(o=>o.recommended) || opts[0];
+  const supporting = opts.filter(o=>o.id!==primary.id);
+  const correct = !!(STATE._outcomeBranch&&STATE._outcomeBranch.correct);
+
+  // coherence: primary full, supporting at 0.5; failed branches carry a residual mission-risk cost
+  let delta = primary.cohDelta + supporting.reduce((s,o)=>s+o.cohDelta*0.5,0);
+  if(!correct) delta -= 3; // corrective recovery is never as clean as getting it right
+  if(unmetDeps.length && STATE._depsWaived) delta -= 2; // waived dependencies carry residual risk
+  delta=Math.round(delta);
+  adjustCoherence(delta, "Patch bundle applied ("+sel.length+" patches)");
+
+  // record bundle as one patch object with sub-patches
+  O().patches.push({id:"PATCH-BUNDLE-1", primary:primary.title, supporting:supporting.map(s=>s.title),
+    refs:sel, depsWaived:(unmetDeps.length&&STATE._depsWaived)?unmetDeps:[], authority:"Lead Scientist / Authorized by Program Director", type:"CoherencePatchBundle"});
+  if(unmetDeps.length && STATE._depsWaived){
+    O().memory.push({id:"MEM-WAIVE",kind:"record",text:"Authority waiver: dependencies "+unmetDeps.join(", ")+" waived by decision authority at Apply. Residual risk recorded."});
+  }
+  STATE.patchApplied={bundle:true, primary, supporting, ids:sel, delta, depsWaived:(unmetDeps.length&&STATE._depsWaived)?unmetDeps:[]};
+  STATE.cerpa.P=true; STATE.cerpa.A=true;
+
+  // apply patch effects
+  const has=id=>sel.includes(id);
+  if(has("PX-PROMOTE")||has("PX-REOPEN")){
+    const mc=getModel("MC"); if(mc){mc.state="promoted"; mc.retention="active";}
+    const m0=getModel("M0"); if(m0){m0.state="superseded"; m0.retention="preserved";} // bounded, not disproven
+    const ac=getAltcog("AC-1"); if(ac){ac.stage="promote"; if(ac.stageHistory[ac.stageHistory.length-1]!=="promote")ac.stageHistory.push("promote");}
+    resolveContradiction("CON-1","Model C reopened and promoted; it explains the simulation-to-test discrepancy.",["E-008","MC"]);
+    O().memory.push({id:"MEM-CANON-NEW", kind:"lesson", text:"Newly established canon: Helios stability is bounded to the uniform-environment envelope; the cross-domain interaction governs outside it."});
+  } else {
+    const ac=getAltcog("AC-1"); if(ac){ac.stage="preserve"; if(ac.stageHistory[ac.stageHistory.length-1]!=="preserve")ac.stageHistory.push("preserve");}
+  }
+  if(has("PX-ASMP")||has("PX-CADENCE")){ const a=getAssump("A-001"); if(a)a.status="patched"; }
+  if(has("PX-FRAN")){ O().memory.push({id:"MEM-FRAN-RETRACT", kind:"record", text:"FranOps: official '\u00b12% across full envelope' position retracted; bounded provable statement published."}); }
+
+  // RETENTION ONLY: preserve alternatives without overwriting their validity (falsified stays falsified)
+  ["MA","MB"].forEach(mid=>{const m=getModel(mid); if(m && m.state!=="promoted") m.retention="preserved";});
+  O().memory.push({id:"MEM-PRESERVE", kind:"preserved", text:"Alternatives Model A & Model B retained with reactivation triggers (retention=preserved); validity state \u2014 including falsified \u2014 is never overwritten by preservation."});
+  O().memory.push({id:"MEM-PATCH", kind:"lesson", text:"Patch bundle applied: "+[primary,...supporting].map(p=>p.title).join("; ")+". CERPA loop closed at Apply."});
+  O().reflections.push(Object.assign({id:"REF-1",bundle:sel},STATE._reflection));
+
+  STATE.log.unshift({text:"Patch bundle authorized & applied ("+sel.length+" patches). Memory graph updated.",kind:"reops",phase:STATE.eventIndex});
+  STATE.alerts.unshift({text:"CERPA loop closed at Apply. Coherence recalculated.",level:"ok",phase:STATE.eventIndex});
+  STATE.reflectionReady=false;
+  STATE.coherenceHistory.push({phase:STATE.eventIndex+0.5, value:STATE.coherence});
+  recomputeMetrics();
+  hide("ovReflect");
+  finishSim();
+}
+
+/* ============================================================
+   METRICS
+   ============================================================ */
+function recomputeMetrics(){
+  const o=O();
+  const claims=o.claims.length;
+  const withProv=o.claims.filter(c=>c.evidence&&c.evidence.length>0).length;
+  const healthyA=o.assumptions.filter(a=>a.status==="healthy"||a.status==="patched").length;
+  const openCon=o.contradictions.filter(c=>c.status==="open").length;
+  const decisions=o.decisions.length;
+  const decWithDLR=o.decisions.filter(d=>d.dlr).length;
+  const driftCount=o.drift.length;
+  const altActive=o.altcogs.length + o.models.filter(m=>["candidate","preserved","promoted"].includes(m.state)).length;
+  const loopsOpened = (decisions>0?1:0);
+  const loopsClosed = (STATE.patchApplied?1:0);
+
+  STATE.metrics={
+    assumptionHealth: o.assumptions.length? healthyA/o.assumptions.length : 1,
+    contradictionRate: claims? openCon/claims : 0,
+    provenanceCoverage: claims? withProv/claims : 1,
+    decisionCoverage: decisions? decWithDLR/decisions : (STATE.eventIndex>=10?0:1),
+    whyRetrieval: o.dlrs.length? 12 : (STATE.eventIndex>=8? 45 : 60),
+    driftVelocity: driftCount,
+    patchLatency: STATE.patchApplied? 1 : (driftCount?2:0),
+    alternativeCoverage: altActive,
+    loopClosure: loopsOpened? loopsClosed/loopsOpened : 0,
+    // hard gates (discrete, never averaged into coherence)
+    gateChain: o.dlrs.length? (o.dlrs.every(d=>d.hash)?"PASS":"FAIL") : "N/A",
+    gateDualReview: (function(){
+      const d=o.dlrs[0];
+      if(!d) return STATE.cerpa.R ? "OPEN" : "N/A";
+      const r=d.reviewers;
+      return (r && r.scientific && r.authority && r.scientific.by && r.authority.by
+              && r.scientific.approved && r.authority.approved) ? "PASS" : "FAIL";
+    })(),
+    gateReversibility: o.dlrs.length? (o.dlrs.every(d=>!d.killNone)?"PASS":"FAIL") : "N/A"
+  };
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function cohColor(v){
+  if(v==null)return "var(--c-stable)";
+  if(v>=90)return "var(--c-excellent)"; if(v>=75)return "var(--c-stable)";
+  if(v>=60)return "var(--c-warning)"; if(v>=40)return "var(--c-critical)";
+  if(v>=20)return "var(--c-emergency)"; return "var(--c-failure)";
+}
+function cohStatus(v){
+  if(v==null)return "Awaiting start";
+  if(v>=90)return "Excellent"; if(v>=75)return "Stable"; if(v>=60)return "Warning";
+  if(v>=40)return "Critical"; if(v>=20)return "Emergency"; return "Failure";
+}
+
+function renderAll(){
+  renderStatus(); renderCoherence(); renderMetrics(); renderModels();
+  renderObjects(); renderTimeline(); renderAlerts(); renderNarrative();
+  renderAltcog(); renderMemory(); renderCerpa(); renderLedger(); renderInjects();
+}
+
+function renderLedger(){
+  const wrap=$("#ledger"); const cnt=$("#ledgerCount");
+  const L=STATE.cohLedger;
+  if(cnt) cnt.textContent = L.length? "("+L.length+" entries)" : "";
+  if(!wrap) return;
+  if(!L.length){ wrap.innerHTML="<div class='emptynote'>No coherence changes yet.</div>"; return; }
+  let rows="";
+  L.forEach(e=>{
+    if(e.init){
+      rows+=`<tr><td>P${e.phase}</td><td>${e.reason}</td><td style="color:var(--ink-faint)">set</td><td class="run">${Math.round(e.running)}</td></tr>`;
+      return;
+    }
+    const dc = e.delta>0?"d-pos":e.delta<0?"d-neg":"";
+    const dtxt = (e.delta>0?"+":"")+e.delta;
+    rows+=`<tr><td>P${e.phase}</td><td>${e.reason}</td><td class="${dc}">${dtxt}</td><td class="run">${Math.round(e.running)}</td></tr>`;
+  });
+  wrap.innerHTML=`<table><thead><tr><th>Phase</th><th>Reason</th><th>&Delta;</th><th>Index</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function renderInjects(){
+  const wrap=$("#injreg"); const cnt=$("#injCount");
+  const used=STATE.injects.used;
+  if(cnt) cnt.textContent = used.length+" / "+INJECTS.length+" fired";
+  if(!wrap) return;
+  if(!used.length){ wrap.innerHTML="<div class='empty'>No scenario injects fired.</div>"; return; }
+  wrap.innerHTML="";
+  used.forEach(id=>{
+    const inj=INJECTS.find(i=>i.id===id);
+    const e=el("div","ir");
+    e.innerHTML=`<span class="irid">${id}</span><span>${inj?inj.name:id}</span>`;
+    wrap.appendChild(e);
+  });
+}
+
+function runState(){
+  if(STATE.eventIndex===0) return "STANDBY";
+  if(STATE.finished) return "COMPLETE";
+  if(STATE.decisionPending && !STATE.decisionChoice) return "AWAITING DECISION";
+  if(STATE.reflectionReady) return "AWAITING PATCH";
+  if(STATE.auto) return "ACTIVE";
+  return "PAUSED";
+}
+
+function renderStatus(){
+  const sl=$("#statusline");
+  $("#projName").textContent=SCN.name;
+  $("#phaseNum").textContent=STATE.eventIndex;
+  $("#phaseTot").textContent=SCN.events.length;
+  const evt=STATE._currentEvent;
+  $("#phaseName").textContent= STATE.finished? "AFTER ACTION COMPLETE" : (evt? evt.phase+" \u2014 "+evt.title : "Not started");
+  const rs=runState();
+  $("#liveTxt").textContent="SIMULATION "+rs;
+  sl.className="statusline";
+  const map={"STANDBY":"s-standby","ACTIVE":"s-active","PAUSED":"s-paused","AWAITING DECISION":"s-await","AWAITING PATCH":"s-await","COMPLETE":"s-complete"};
+  sl.classList.add(map[rs]||"s-paused");
+}
+
+function renderCoherence(){
+  const v=STATE.coherence;
+  const num=$("#cohNum");
+  num.textContent= v==null? "\u2014" : Math.round(v);
+  num.style.color=cohColor(v);
+  const st=$("#cohStatus"); st.textContent=cohStatus(v); st.style.color=cohColor(v);
+  // delta
+  const h=STATE.coherenceHistory;
+  const d=$("#cohDelta");
+  if(h.length>=2){
+    const diff=Math.round(h[h.length-1].value - h[h.length-2].value);
+    d.textContent=(diff>=0?"+":"")+diff+" since last event \u00b7 illustrative aggregate";
+    d.className="coh-delta "+(diff>0?"up":diff<0?"down":"");
+  } else { d.className="coh-delta"; d.textContent="illustrative aggregate \u2014 hard gates scored separately"; }
+  drawChart();
+}
+
+function drawChart(){
+  const svg=$("#cohChart"); if(!svg)return;
+  const W=600,H=120,pad=4;
+  const bands=[[90,100,"--c-excellent"],[75,90,"--c-stable"],[60,75,"--c-warning"],[40,60,"--c-critical"],[20,40,"--c-emergency"],[0,20,"--c-failure"]];
+  let s="";
+  bands.forEach(([lo,hi,c])=>{
+    const y=H-(hi/100)*H, h=((hi-lo)/100)*H;
+    s+=`<rect x="0" y="${y.toFixed(1)}" width="${W}" height="${h.toFixed(1)}" fill="var(${c})" opacity="0.06"/>`;
+  });
+  const h=STATE.coherenceHistory;
+  if(h.length>0){
+    const n=Math.max(h.length-1,1);
+    const pts=h.map((p,i)=>{
+      const x=pad+(i/(n))*(W-2*pad);
+      const y=H-(p.value/100)*H;
+      return [x,y];
+    });
+    const path=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
+    s+=`<path d="${path}" fill="none" stroke="var(--accent)" stroke-width="2" opacity="0.9"/>`;
+    // area
+    const area=path+` L ${pts[pts.length-1][0].toFixed(1)} ${H} L ${pts[0][0].toFixed(1)} ${H} Z`;
+    s+=`<path d="${area}" fill="var(--accent)" opacity="0.05"/>`;
+    pts.forEach(p=>{ s+=`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.5" fill="var(--accent)"/>`; });
+  } else {
+    s+=`<text x="${W/2}" y="${H/2}" text-anchor="middle" fill="var(--ink-faint)" font-size="11" font-family="monospace">no data yet</text>`;
+  }
+  svg.innerHTML=s;
+}
+
+function renderMetrics(){
+  const m=STATE.metrics; const wrap=$("#metrics"); wrap.innerHTML="";
+  if(!Object.keys(m).length){ wrap.innerHTML="<div class='emptynote' style='grid-column:1/-1'>Metrics activate on Start.</div>"; return; }
+  const barColor=(good)=>good?"var(--patch)":"var(--reops)";
+  const defs=[
+    {k:"Coherence Index", v:STATE.coherence==null?"\u2014":Math.round(STATE.coherence), bar:STATE.coherence/100, c:cohColor(STATE.coherence), tip:"Illustrative aggregate of institutional coherence. NOT a hard gate."},
+    {k:"Assumption Health", v:pct(m.assumptionHealth), bar:m.assumptionHealth, c:barColor(m.assumptionHealth>0.7), tip:"Share of assumptions healthy or patched (vs straining/expired)."},
+    {k:"Contradiction Rate", v:pct(m.contradictionRate), bar:1-m.contradictionRate, c:barColor(m.contradictionRate<0.2), tip:"Open contradictions as a share of claims. Lower is better."},
+    {k:"Provenance Coverage", v:pct(m.provenanceCoverage), bar:m.provenanceCoverage, c:barColor(m.provenanceCoverage>=0.95), tip:"Claims carrying at least one evidence link. Target \u2265 95%."},
+    {k:"Decision Coverage", v:pct(m.decisionCoverage), bar:m.decisionCoverage, c:barColor(m.decisionCoverage>=0.9), tip:"Decisions with a Decision Lineage Record."},
+    {k:"Why-Retrieval", v:m.whyRetrieval+"s", bar:1-(m.whyRetrieval/60), c:barColor(m.whyRetrieval<=60), tip:"Time to retrieve decision rationale. Target \u2264 60s."},
+    {k:"Drift Velocity", v:m.driftVelocity, bar:Math.min(m.driftVelocity/4,1), c:barColor(m.driftVelocity<2), tip:"Count of active drift signatures."},
+    {k:"Patch Latency", v:m.patchLatency+" ph", bar:1-Math.min(m.patchLatency/4,1), c:barColor(m.patchLatency<=1), tip:"Phases from drift detection to applied patch."},
+    {k:"Alternative Coverage", v:m.alternativeCoverage, bar:Math.min(m.alternativeCoverage/6,1), c:"var(--altcog)", tip:"Tracked + preserved alternatives in play."},
+    {k:"Loop Closure", v:pct(m.loopClosure), bar:m.loopClosure, c:barColor(m.loopClosure>=1), tip:"Closed reasoning loops vs opened. Closes at Apply."}
+  ];
+  defs.forEach(d=>{
+    const e=el("div","metric");
+    e.innerHTML=`<div class="lbl"><span>${d.k}</span><span class="help" data-tip="${d.tip}">&#9432;</span></div>
+      <div class="val" style="color:${d.c}">${d.v}</div>
+      <div class="bar"><i style="width:${clamp((d.bar||0)*100,2,100)}%;background:${d.c}"></i></div>`;
+    wrap.appendChild(e);
+  });
+  // hard gates row
+  const gates=[["Chain Integrity",m.gateChain],["Dual-Review",m.gateDualReview],["Reversibility",m.gateReversibility]];
+  gates.forEach(([k,val])=>{
+    const e=el("div","metric gate");
+    const cls=val==="PASS"?"gate-pass":val==="FAIL"?"gate-fail":"";
+    e.innerHTML=`<div class="lbl"><span>${k}</span><span class="help" data-tip="Hard-requirement gate. Discrete PASS/FAIL \u2014 never averaged into the Coherence Index.">&#9888;</span></div>
+      <div class="val"><span class="gatebadge ${cls}">${val}</span></div>`;
+    wrap.appendChild(e);
+  });
+}
+
+function renderModels(){
+  const wrap=$("#models"); const ms=O().models;
+  if(!ms.length){ wrap.innerHTML="<div class='emptynote'>No active models.</div>"; return; }
+  wrap.innerHTML="";
+  ms.forEach(m=>{
+    const div=el("div","model "+m.state);
+    const supN=m.support.length, conN=m.conflict.length;
+    const retChip = m.retention==="preserved" ? `<span class="retchip">preserved</span>` : "";
+    const barColor = m.state==='dominant'?'var(--patch)':m.state==='promoted'?'var(--auth)':m.state==='falsified'?'var(--drift)':m.state==='superseded'?'var(--gray)':m.retention==='preserved'?'var(--altcog)':'var(--intel)';
+    div.innerHTML=`
+      <div class="mh"><div class="mn">${m.name} <span class="tag">${m.id} \u00b7 ${m.domain}</span></div>
+        <span class="statetag st-${m.state}">${m.state}</span>${retChip}</div>
+      <div class="conf">confidence ${pct(m.confidence)}</div>
+      <div class="mbar"><i style="width:${Math.round(m.confidence*100)}%;background:${barColor}"></i></div>
+      <div class="ev"><span class="sup">&#9650; ${supN} supporting</span><span class="con">&#9660; ${conN} conflicting</span></div>
+      <div class="fals"><b>Falsified if:</b> ${m.falsification}</div>`;
+    wrap.appendChild(div);
+  });
+}
+
+function renderObjects(){
+  const o=O(); const wrap=$("#objgrid");
+  const cards=[
+    {n:o.claims.length,t:"Claims",s:"IntelOps",c:"var(--intel)"},
+    {n:o.evidence.length,t:"Evidence",s:"binds at Event",c:"var(--intel)"},
+    {n:o.assumptions.length,t:"Assumptions",s:o.assumptions.filter(a=>a.status==='expired').length+" expired",c:"var(--reops)"},
+    {n:o.contradictions.filter(c=>c.status==='open').length,t:"Contradictions",s:"open",c:"var(--drift)"},
+    {n:o.decisions.length,t:"Decisions",s:o.dlrs.length+" w/ DLR",c:"var(--reops)"},
+    {n:o.altcogs.length+o.models.filter(m=>m.domain!=='accepted').length,t:"AltCog Cand.",s:"in play",c:"var(--altcog)"},
+    {n:o.drift.length,t:"Drift Signals",s:"detected",c:"var(--drift)"},
+    {n:o.patches.length,t:"Patches",s:"applied",c:"var(--patch)"}
+  ];
+  wrap.innerHTML="";
+  cards.forEach(c=>{
+    const e=el("div","obj");
+    e.innerHTML=`<div class="n" style="color:${c.c}">${c.n}</div><div class="t">${c.t}</div><div class="s">${c.s}</div>`;
+    wrap.appendChild(e);
+  });
+}
+
+function renderTimeline(){
+  const tl=$("#timeline");
+  if(STATE.eventIndex===0){ tl.innerHTML="<div class='emptynote'>Press <span class='kbd'>Start Simulation</span> to begin Project Helios.</div>"; return; }
+  tl.innerHTML="";
+  for(let i=0;i<STATE.eventIndex;i++){
+    const evt=SCN.events[i];
+    const cur=(i===STATE.eventIndex-1 && !STATE.finished);
+    const dotColor= evt.isDecision?"var(--reops)":evt.isReflection?"var(--patch)":evt.tags.includes("drift")?"var(--drift)":evt.tags.includes("altcog")?"var(--altcog)":"var(--intel)";
+    const item=el("div","tl-item"+(cur?" current":""));
+    item.innerHTML=`<div class="tl-dot" style="background:${dotColor}"></div>
+      <div class="tl-body">
+        <div class="tl-h"><span>PHASE ${evt.id} \u00b7 ${evt.phase}</span></div>
+        <div class="tl-t">${evt.title}</div>
+        <div class="tl-tags">${evt.tags.map(t=>`<span class="tag ${t}">${t}</span>`).join("")}</div>
+      </div>`;
+    tl.appendChild(item);
+  }
+  if(STATE.finished){
+    const item=el("div","tl-item");
+    item.innerHTML=`<div class="tl-dot" style="background:var(--patch)"></div><div class="tl-body"><div class="tl-h"><span>COMPLETE</span></div><div class="tl-t" style="color:var(--patch)">After Action Report ready</div></div>`;
+    tl.appendChild(item);
+  }
+}
+
+function renderAlerts(){
+  const w=$("#alerts");
+  if(!STATE.alerts.length){ w.innerHTML="<div class='emptynote'>No active alerts.</div>"; return; }
+  w.innerHTML="";
+  STATE.alerts.slice(0,8).forEach(a=>{
+    const e=el("div","alert "+a.level);
+    e.innerHTML=`<span class="ai">[P${a.phase}]</span><span>${a.text}</span>`;
+    w.appendChild(e);
+  });
+}
+
+function renderNarrative(){
+  const n=$("#narrative");
+  const evt=STATE._currentEvent;
+  if(!evt){ n.innerHTML="<div class='emptynote'>Simulation not started.</div>"; return; }
+  let extra="";
+  if(evt.isDecision && STATE.decisionPending && !STATE.decisionChoice){
+    extra=`<div style="margin-top:10px"><button class="btn primary" onclick="openDecision()">&#9878; Open Decision Panel</button></div>`;
+  }
+  if(evt.isReflection && STATE.reflectionReady){
+    extra=`<div style="margin-top:10px"><button class="btn primary" onclick="openReflection()">&#10010; Open Reflection &amp; Patch</button></div>`;
+  }
+  n.innerHTML=evt.narrative+extra;
+}
+
+function renderAltcog(){
+  const list=$("#altcogList"); const o=O();
+  const reached=new Set();
+  const order=["friction","anomaly","weak","cluster","hypothesis","test","alt","promote"];
+  o.altcogs.forEach(a=>{
+    const st = a.stage==="preserve" ? "promote" : a.stage;
+    const idx=order.indexOf(st);
+    for(let i=0;i<=idx;i++)reached.add(order[i]);
+  });
+  $$("#pipeline .st").forEach(s=>{ s.classList.toggle("on", reached.has(s.dataset.p)); });
+
+  const altModels=o.models.filter(m=>m.domain!=="accepted");
+  if(!o.altcogs.length && !altModels.length){ list.innerHTML="<div class='emptynote'>No alternatives in discovery.</div>"; return; }
+  list.innerHTML="";
+  o.altcogs.forEach(a=>{
+    const e=el("div");e.style.cssText="font-size:11px;color:var(--ink-dim);padding:5px 0;border-bottom:1px solid var(--line)";
+    const lab = a.stage==="preserve"?"PRESERVE":a.stage.toUpperCase();
+    e.innerHTML=`<span style="font-family:var(--mono);color:var(--altcog);font-size:9px">${a.id} \u00b7 ${lab}</span><br>${a.name}`;
+    list.appendChild(e);
+  });
+  altModels.forEach(m=>{
+    const e=el("div");e.style.cssText="font-size:11px;color:var(--ink-dim);padding:5px 0;border-bottom:1px solid var(--line)";
+    const sc= m.state==="promoted"?"var(--auth)":m.state==="falsified"?"var(--drift)":m.state==="superseded"?"var(--gray)":m.retention==="preserved"?"var(--altcog)":"var(--intel)";
+    const ret = m.retention==="preserved"?" \u00b7 preserved":"";
+    e.innerHTML=`<span style="font-family:var(--mono);color:${sc};font-size:9px">${m.id} \u00b7 ${m.state.toUpperCase()}${ret} \u00b7 conf ${pct(m.confidence)}</span><br>${m.name}`;
+    list.appendChild(e);
+  });
+}
+
+function renderMemory(){
+  const w=$("#memlist"); const mem=O().memory;
+  if(!mem.length){ w.innerHTML="<div class='emptynote'>No memory records.</div>"; return; }
+  w.innerHTML="";
+  mem.forEach(m=>{
+    const e=el("div","mem "+(m.kind||""));
+    e.innerHTML=`<div class="mk">${(m.kind||"record").toUpperCase()} \u00b7 ${m.id}</div><div class="mt">${m.text}</div>`;
+    w.appendChild(e);
+  });
+}
+
+function renderCerpa(){
+  $$("#cerpa .stage").forEach(s=>{ s.classList.toggle("on", !!STATE.cerpa[s.dataset.st]); });
+}
+
+/* ============================================================
+   DLR VIEW
+   ============================================================ */
+function openDLRView(){
+  const dlr=O().dlrs[0];
+  const b=$("#dlrBody");
+  if(!dlr){ b.innerHTML="<div class='emptynote'>No decision has been sealed yet. The Decision Lineage Record is generated when you seal a decision at Phase 10.</div>"; show("ovDLR"); return; }
+  const field=(k,v)=>`<div class="dlr-field"><div class="k">${k}</div><div class="v">${v}</div></div>`;
+  b.innerHTML=
+    field("Decision", `<b style="color:var(--ink)">${dlr.decision}</b> <span class="hashchip">favors ${dlr.favors}</span>`)+
+    field("DLR ID / Hash", `${dlr.id} <span class="hashchip">hash ${dlr.hash}</span> <span class="hashchip">prev ${dlr.prevHash}</span>`)+
+    field("Timestamp", dlr.timestamp)+
+    field("Owner / Authority", dlr.owner)+
+    field("Objective", dlr.objective)+
+    field("Options Considered", "<ul>"+dlr.optionsConsidered.map(o=>`<li>${o}</li>`).join("")+"</ul>")+
+    field("Selected Option", `<b style="color:var(--patch)">${dlr.selected}</b>`)+
+    field("Rejected (Preserved)", "<ul>"+dlr.rejected.map(o=>`<li><b>${o.name}</b> &mdash; ${o.reason}</li>`).join("")+"</ul>")+
+    field("Evidence Used", dlr.evidenceUsed.join(", "))+
+    field("Assumptions", dlr.assumptions.join(", "))+
+    field("Confidence", pct(dlr.confidence))+
+    field("Expected Outcome", dlr.expectedOutcome)+
+    field("Blast Radius", dlr.blastRadius)+
+    field("Kill Switch", `<span style="color:${dlr.killNone?'var(--drift)':'var(--reflex)'}">${dlr.killSwitch}</span>`)+
+    field("Dual Review", dlr.reviewers
+      ? `<b style="color:var(--patch)">${dlr.reviewers.scientific.approved?'\u2713':'\u2717'}</b> ${dlr.reviewers.scientific.by} <span class="muted">(${dlr.reviewers.scientific.role})</span><br><b style="color:var(--patch)">${dlr.reviewers.authority.approved?'\u2713':'\u2717'}</b> ${dlr.reviewers.authority.by} <span class="muted">(${dlr.reviewers.authority.role})</span>`
+      : "\u2014")+
+    field("Review Date", dlr.reviewDate);
+  show("ovDLR");
+}
+
+/* ============================================================
+   AFTER ACTION REPORT
+   ============================================================ */
+function buildAAR(){
+  const o=O();
+  const choice=STATE.decisionChoice||"(none)";
+  const decName = o.decisions.length? o.decisions[0].name : "(no decision sealed)";
+  const br=STATE._outcomeBranch||{};
+  const bundle=STATE.patchApplied&&STATE.patchApplied.bundle? STATE.patchApplied : null;
+  STATE.aar={
+    generated:new Date().toISOString(),
+    scenario:SCN.name, subtitle:SCN.subtitle,
+    lab:SCN.lab.name, program:SCN.program.name, project:SCN.project.name,
+    initialConditions:{ coherence:SCN.baseline.coherence, confidence:SCN.baseline.confidence, dominantModel:"Thermal-Stability Baseline Model" },
+    finalCoherence:STATE.coherence,
+    groundTruth:"Cross-Domain Material Interaction (Model C) \u2014 hydrogen-assisted microstructural coupling",
+    decision:decName, decisionChoice:choice, decisionCorrect:!!br.correct,
+    keyEvidence:o.evidence.map(e=>({id:e.id,text:e.text,source:e.source})),
+    decisionsMade:o.decisions.map(d=>d.name),
+    assumptionsInvalidated:o.assumptions.filter(a=>a.status==="expired"||a.status==="patched").map(a=>a.id+": "+a.text+" ["+a.status+"]"),
+    contradictionsOpen:o.contradictions.filter(c=>c.status==="open").map(c=>c.id+": "+c.text),
+    contradictionsResolved:o.contradictions.filter(c=>c.status==="resolved").map(c=>({id:c.id,text:c.text,resolution:c.resolution,evidence:c.resolutionEvidence||[]})),
+    modelsEvaluated:o.models.map(m=>({id:m.id,name:m.name,validity:m.state,retention:m.retention||"active",confidence:Math.round(m.confidence*100)+"%"})),
+    altcogMaturation:(getAltcog("AC-1")&&getAltcog("AC-1").stageHistory)||[],
+    patchBundle: bundle? {primary:bundle.primary.title, supporting:bundle.supporting.map(s=>s.title), coherenceDelta:bundle.delta, depsWaived:bundle.depsWaived||[]} : null,
+    governanceWaiver: (bundle&&bundle.depsWaived&&bundle.depsWaived.length)? {waived:bundle.depsWaived, residualPenalty:-2, authority:"Decision authority (Program Director)"} : null,
+    patchesSelected:o.patches.flatMap(p=>p.primary?[p.primary,...(p.supporting||[])]:[p.title]),
+    driftSignatures:o.drift.map(d=>({id:d.id,magnitude:d.magnitude,text:d.text})),
+    coherenceLedger:STATE.cohLedger.map(e=>({phase:e.phase,reason:e.reason,delta:e.delta,index:Math.round(e.running),init:!!e.init})),
+    injectsFired:STATE.injects.used.map(id=>{const i=INJECTS.find(x=>x.id===id);return id+": "+(i?i.name:id);}),
+    institutionalLessons:(STATE._reflection&&STATE._reflection.lessons)||[],
+    missionRisk: br.correct? "None outstanding." : (STATE._reflection&&STATE._reflection.missionRisk? (STATE._requiredPatches&&STATE._requiredPatches.every(r=>(bundle?bundle.ids:[]).includes(r))?"Addressed via required corrective (Model C reopened).":"OUTSTANDING."):"\u2014"),
+    memoryObjectsCreated:o.memory.map(m=>m.id+" ("+m.kind+"): "+m.text),
+    metrics:STATE.metrics,
+    nextTime: br.correct?
+      ["Keep assumption-half-life governance as a standing control.","Escalate friction signals at first reproduction, not third."] :
+      ["Run the discriminating test before sealing a milestone when a load-bearing assumption is expired.","Treat the convenient explanation as a hypothesis to falsify, not a conclusion to adopt.","Preserve and actively monitor rejected alternatives."]
+  };
+}
+
+function renderAAR(){
+  const a=STATE.aar; if(!a)return; const b=$("#aarBody");
+  $("#aarTitle").textContent=a.scenario+" \u2014 After Action Report";
+  const li=arr=>"<ul>"+arr.map(x=>`<li>${typeof x==="string"?x:JSON.stringify(x)}</li>`).join("")+"</ul>";
+  b.innerHTML=`
+    <div class="aar-final">
+      <div class="big" style="color:${cohColor(a.finalCoherence)}">${Math.round(a.finalCoherence)}</div>
+      <div>
+        <div style="font-family:var(--mono);font-size:11px;letter-spacing:1px;color:${cohColor(a.finalCoherence)};text-transform:uppercase">${cohStatus(a.finalCoherence)}</div>
+        <div style="font-size:11px;color:var(--ink-faint);margin-top:3px">Final Coherence Index \u00b7 from baseline ${a.initialConditions.coherence} \u00b7 illustrative aggregate</div>
+        <div style="font-size:11px;margin-top:5px">Decision: <b>${a.decision}</b> \u2014 ${a.decisionCorrect?'<span style="color:var(--patch)">aligned with ground truth</span>':'<span style="color:var(--drift)">diverged from ground truth</span>'}</div>
+      </div>
+    </div>
+    <div class="aar-sec"><h4>Initial Conditions</h4><div class="txt">${a.lab} \u00b7 ${a.program} \u00b7 ${a.project}. Baseline Coherence ${a.initialConditions.coherence}, project confidence ${pct(a.initialConditions.confidence)}, dominant model: ${a.initialConditions.dominantModel}.</div></div>
+    <div class="aar-sec"><h4>Ground Truth (revealed)</h4><div class="txt">${a.groundTruth}</div></div>
+    <div class="aar-sec"><h4>Key Evidence</h4>${li(a.keyEvidence.map(e=>e.id+": "+e.text))}</div>
+    <div class="aar-sec"><h4>Decisions Made</h4>${a.decisionsMade.length?li(a.decisionsMade):"<div class='txt'>None sealed.</div>"}</div>
+    <div class="aar-sec"><h4>Assumptions Invalidated / Patched</h4>${a.assumptionsInvalidated.length?li(a.assumptionsInvalidated):"<div class='txt'>None.</div>"}</div>
+    <div class="aar-sec"><h4>Contradictions \u2014 Open</h4>${a.contradictionsOpen.length?li(a.contradictionsOpen):"<div class='txt'>None outstanding.</div>"}</div>
+    <div class="aar-sec"><h4>Contradictions \u2014 Resolved</h4>${a.contradictionsResolved.length?li(a.contradictionsResolved.map(c=>c.id+": "+c.text+" &mdash; <i>resolved:</i> "+c.resolution+" [evidence: "+c.evidence.join(", ")+"]")):"<div class='txt'>None resolved.</div>"}</div>
+    <div class="aar-sec"><h4>Alternative Models Evaluated</h4>${li(a.modelsEvaluated.map(m=>m.id+" "+m.name+" \u2014 validity: "+m.validity+" / retention: "+m.retention+" ("+m.confidence+")"))}</div>
+    <div class="aar-sec"><h4>AltCog Maturation Path</h4><div class="txt" style="font-family:var(--mono);font-size:11px">${a.altcogMaturation.join(" \u2192 ")||"\u2014"}</div></div>
+    <div class="aar-sec"><h4>Drift Signatures</h4>${a.driftSignatures.length?li(a.driftSignatures.map(d=>d.id+" ["+d.magnitude+"]: "+d.text)):"<div class='txt'>None.</div>"}</div>
+    <div class="aar-sec"><h4>Coherence Patch Bundle</h4>${a.patchBundle?("<div class='txt'><b>Primary:</b> "+a.patchBundle.primary+"<br><b>Supporting:</b> "+(a.patchBundle.supporting.length?a.patchBundle.supporting.join("; "):"\u2014")+"<br><b>Coherence \u0394:</b> "+(a.patchBundle.coherenceDelta>=0?"+":"")+a.patchBundle.coherenceDelta+"</div>"):"<div class='txt'>No bundle applied.</div>"}</div>
+    <div class="aar-sec"><h4>Governance Waiver</h4>${a.governanceWaiver?("<div class='txt' style='color:var(--reops)'>Dependencies waived by "+a.governanceWaiver.authority+": "+a.governanceWaiver.waived.join(", ")+". Residual-risk penalty applied: "+a.governanceWaiver.residualPenalty+" coherence.</div>"):"<div class='txt'>None. All dependencies satisfied.</div>"}</div>
+    <div class="aar-sec"><h4>Mission Risk</h4><div class="txt" style="color:${/OUTSTANDING/.test(a.missionRisk)?'var(--drift)':'var(--ink-dim)'}">${a.missionRisk}</div></div>
+    <div class="aar-sec"><h4>Scenario Injects Fired</h4>${a.injectsFired.length?li(a.injectsFired):"<div class='txt'>None.</div>"}</div>
+    <div class="aar-sec"><h4>Coherence Calculation Ledger</h4><div class="ledger show" style="max-height:220px"><table><thead><tr><th>Phase</th><th>Reason</th><th>&Delta;</th><th>Index</th></tr></thead><tbody>${a.coherenceLedger.map(e=>`<tr><td>P${e.phase}</td><td>${e.reason}</td><td class="${e.init?'':e.delta>0?'d-pos':e.delta<0?'d-neg':''}">${e.init?'set':((e.delta>0?'+':'')+e.delta)}</td><td class="run">${e.index}</td></tr>`).join("")}</tbody></table></div></div>
+    <div class="aar-sec"><h4>Institutional Lessons</h4>${li(a.institutionalLessons)}</div>
+    <div class="aar-sec"><h4>Memory Objects Created</h4>${li(a.memoryObjectsCreated)}</div>
+    <div class="aar-sec"><h4>What the Laboratory Would Do Differently</h4>${li(a.nextTime)}</div>`;
+}
+
+function aarToText(){
+  const a=STATE.aar; if(!a)return "";
+  const L=[]; const line=s=>L.push(s);
+  line("DEEP SIGMA NAT LAB SIM — AFTER ACTION REPORT");
+  line("SYNTHETIC & ILLUSTRATIVE");
+  line("Generated: "+a.generated);
+  line("="
+.repeat(60));
+  line("Scenario: "+a.scenario+" — "+a.subtitle);
+  line(a.lab+" · "+a.program+" · "+a.project);
+  line("");
+  line("FINAL COHERENCE INDEX: "+Math.round(a.finalCoherence)+" ("+cohStatus(a.finalCoherence)+")  [illustrative aggregate]");
+  line("Baseline Coherence: "+a.initialConditions.coherence);
+  line("Decision: "+a.decision+"  ["+(a.decisionCorrect?"ALIGNED with ground truth":"DIVERGED from ground truth")+"]");
+  line("");
+  line("GROUND TRUTH: "+a.groundTruth);
+  line("");
+  line("KEY EVIDENCE:");a.keyEvidence.forEach(e=>line("  - "+e.id+": "+e.text+" ["+e.source+"]"));
+  line("");
+  line("ASSUMPTIONS INVALIDATED/PATCHED:");a.assumptionsInvalidated.forEach(x=>line("  - "+x));
+  line("");
+  line("CONTRADICTIONS — OPEN:");(a.contradictionsOpen.length?a.contradictionsOpen:["(none)"]).forEach(x=>line("  - "+x));
+  line("");
+  line("CONTRADICTIONS — RESOLVED:");(a.contradictionsResolved.length?a.contradictionsResolved.map(c=>c.id+": "+c.text+" — resolved: "+c.resolution+" [evidence: "+c.evidence.join(", ")+"]"):["(none)"]).forEach(x=>line("  - "+x));
+  line("");
+  line("MODELS EVALUATED:");a.modelsEvaluated.forEach(m=>line("  - "+m.id+" "+m.name+" — validity: "+m.validity+" / retention: "+m.retention+" ("+m.confidence+")"));
+  line("");
+  line("ALTCOG MATURATION PATH: "+(a.altcogMaturation.join(" -> ")||"—"));
+  line("");
+  line("DRIFT SIGNATURES:");a.driftSignatures.forEach(d=>line("  - "+d.id+" ["+d.magnitude+"]: "+d.text));
+  line("");
+  line("COHERENCE PATCH BUNDLE:");
+  if(a.patchBundle){ line("  Primary: "+a.patchBundle.primary); line("  Supporting: "+(a.patchBundle.supporting.join("; ")||"—")); line("  Coherence delta: "+(a.patchBundle.coherenceDelta>=0?"+":"")+a.patchBundle.coherenceDelta); }
+  else line("  (none applied)");
+  line("");
+  line("GOVERNANCE WAIVER: "+(a.governanceWaiver?("dependencies "+a.governanceWaiver.waived.join(", ")+" waived by "+a.governanceWaiver.authority+"; residual penalty "+a.governanceWaiver.residualPenalty):"none"));
+  line("");
+  line("MISSION RISK: "+a.missionRisk);
+  line("");
+  line("SCENARIO INJECTS FIRED:");(a.injectsFired.length?a.injectsFired:["(none)"]).forEach(x=>line("  - "+x));
+  line("");
+  line("INSTITUTIONAL LESSONS:");a.institutionalLessons.forEach(x=>line("  - "+x));
+  line("");
+  line("MEMORY OBJECTS CREATED:");a.memoryObjectsCreated.forEach(x=>line("  - "+x));
+  line("");
+  line("COHERENCE CALCULATION LEDGER:");
+  a.coherenceLedger.forEach(e=>line("  P"+e.phase+"  "+(e.init?"set":((e.delta>0?"+":"")+e.delta))+"  ["+e.index+"]  "+e.reason));
+  line("");
+  line("WHAT THE LABORATORY WOULD DO DIFFERENTLY:");a.nextTime.forEach(x=>line("  - "+x));
+  line("");
+  line("HARD GATES (discrete, never averaged):");
+  line("  Chain Integrity: "+a.metrics.gateChain+" | Dual-Review: "+a.metrics.gateDualReview+" | Reversibility: "+a.metrics.gateReversibility);
+  return L.join("\n");
+}
+
+function download(filename, text, mime){
+  try{
+    const blob=new Blob([text],{type:mime||"text/plain"});
+    const url=URL.createObjectURL(blob);
+    const a=el("a"); a.href=url; a.download=filename; document.body.appendChild(a); a.click();
+    setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},100);
+  }catch(e){ console.error("download failed",e); }
+}
+
+/* ============================================================
+   OVERLAYS / CONTROLS
+   ============================================================ */
+function show(id){ const o=$("#"+id); if(o)o.classList.add("show"); }
+function hide(id){ const o=$("#"+id); if(o)o.classList.remove("show"); }
+function closeAll(){ $$(".overlay").forEach(o=>o.classList.remove("show")); }
+
+function updateControls(){
+  const started=STATE.eventIndex>0;
+  const done=STATE.finished;
+  $("#btnStart").disabled=started;
+  $("#btnStart").textContent= started? "\u25B6 Running" : "\u25B6 Start Simulation";
+  $("#btnAdvance").disabled=!started||done||STATE.auto||(STATE.decisionPending&&!STATE.decisionChoice)||(STATE.reflectionReady);
+  $("#btnPause").disabled=!STATE.auto;
+  $("#btnAuto").disabled=!started||done||(STATE.decisionPending&&!STATE.decisionChoice)||STATE.reflectionReady;
+  $("#btnAuto").textContent= STATE.auto? "\u23F8 Auto Running" : "\u26A1 Auto Run";
+  $("#btnInject").disabled=!started||done||STATE.injects.used.length>=INJECTS.length;
+  $("#btnInject").textContent="\u26A0 Inject Scenario ("+STATE.injects.used.length+"/"+INJECTS.length+")";
+  $("#btnDecision").disabled=!started;
+  $("#btnPatch").disabled=!STATE.reflectionReady;
+  $("#btnAAR").disabled=!done;
+  $("#btnReset").disabled=!started;
+}
+
+/* ---------- wiring ---------- */
+function wire(){
+  $("#btnStart").addEventListener("click",startSim);
+  $("#btnAdvance").addEventListener("click",advanceEvent);
+  $("#btnPause").addEventListener("click",pauseAuto);
+  $("#btnAuto").addEventListener("click",toggleAuto);
+  $("#btnReset").addEventListener("click",resetSim);
+  $("#btnInject").addEventListener("click",injectScenario);
+  $("#btnDecision").addEventListener("click",openDLRView);
+  $("#btnPatch").addEventListener("click",openReflection);
+  $("#btnAAR").addEventListener("click",()=>{renderAAR();show("ovAAR");});
+  $("#btnSeal").addEventListener("click",sealDecision);
+  $("#btnApplyPatch").addEventListener("click",applyPatch);
+  $("#btnExportJSON").addEventListener("click",()=>download("Helios_AAR.json",JSON.stringify(STATE.aar,null,2),"application/json"));
+  $("#btnExportText").addEventListener("click",()=>download("Helios_AAR.txt",aarToText(),"text/plain"));
+  $$("[data-close]").forEach(b=>b.addEventListener("click",()=>hide(b.dataset.close)));
+  $$(".overlay").forEach(o=>o.addEventListener("click",e=>{ if(e.target===o)o.classList.remove("show"); }));
+  $("#speedSel").addEventListener("change",()=>{ if(STATE.auto){ pauseAuto(); toggleAuto(); } });
+  $("#ledgerToggle").addEventListener("click",()=>{ $("#ledger").classList.toggle("show"); });
+
+  // tooltips
+  const tip=$("#tipbox");
+  document.addEventListener("mouseover",e=>{
+    const t=e.target.closest("[data-tip]");
+    if(t){ tip.textContent=t.getAttribute("data-tip"); tip.style.display="block";
+      const r=t.getBoundingClientRect(); tip.style.left=Math.min(r.left,window.innerWidth-300)+"px"; tip.style.top=(r.bottom+6)+"px"; }
+  });
+  document.addEventListener("mouseout",e=>{ if(e.target.closest("[data-tip]"))tip.style.display="none"; });
+
+  // keyboard
+  document.addEventListener("keydown",e=>{
+    if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA")return;
+    if(e.key==="Escape")closeAll();
+    if(e.key===" "&&!$("#btnAdvance").disabled){ e.preventDefault(); advanceEvent(); }
+  });
+}
+
+/* ---------- Inject Scenario (one-use registry) ---------- */
+function injectScenario(){
+  if(STATE.finished)return;
+  const next=INJECTS.find(i=>!STATE.injects.used.includes(i.id));
+  if(!next){ return; }
+  STATE.injects.used.push(next.id);
+  O().reflex.push({id:next.id,text:"Injected: "+next.name,type:"ReflexTrigger"});
+  O().memory.push({id:"MEM-"+next.id,kind:next.memKind||"record",text:next.mem});
+  STATE.alerts.unshift({text:"Scenario inject ["+next.id+"]: "+next.name+". "+(next.alert||""),level:"warn",phase:STATE.eventIndex});
+  STATE.log.unshift({text:"INJECT ["+next.id+"]: "+next.name,kind:"reops",phase:STATE.eventIndex});
+  adjustCoherence(next.cohDelta, "Inject: "+next.name, {phase:STATE.eventIndex});
+  STATE.coherenceHistory.push({phase:STATE.eventIndex+0.15+0.05*STATE.injects.used.length, value:STATE.coherence});
+  recomputeMetrics(); renderAll(); updateControls();
+}
+
+/* ---------- boot ---------- */
+function boot(){ wire(); renderAll(); updateControls(); }
+
+// expose API for verification / programmatic control
+const SIM = { startSim, advanceEvent, resetSim, sealDecision, applyPatch:applyPatchBundle, buildAAR, aarToText, injectScenario,
+  decide:(id)=>{STATE._pendingChoice=id;sealDecision();},
+  patch:(ids)=>{ if(typeof ids==="string")ids=[ids]; STATE._selectedPatches=ids.slice(); applyPatchBundle(); },
+  get state(){return STATE;}, openDecision, openReflection };
+if(typeof window!=="undefined"){ window.SIM=SIM; window.openDecision=openDecision; window.openReflection=openReflection;
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot); else boot();
+}
+</script>
+</body>
+</html>
