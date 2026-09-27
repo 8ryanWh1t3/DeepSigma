@@ -1,0 +1,39 @@
+{
+  "id": "EP-001",
+  "title": "Stable coverage",
+  "claim": "Sensor coverage is sufficient.",
+  "decision": "Maintain current posture.",
+  "rationale": "Coverage telemetry met threshold.",
+  "assumptions": [
+    {
+      "id": "A1",
+      "statement": "Sensor A is continuously available",
+      "confidence": 0.9
+    }
+  ],
+  "outcome": {
+    "status": "SUCCESS",
+    "summary": "Coverage remained stable.",
+    "metrics": {
+      "coverage": 0.96
+    }
+  },
+  "evidence": [
+    {
+      "id": "EV-1",
+      "uri": "memory://ev-1",
+      "weight": 0.9
+    }
+  ],
+  "tags": [
+    "C-UAS",
+    "coverage"
+  ],
+  "entities": [
+    "Sensor-A",
+    "Sector-1"
+  ],
+  "metadata": {
+    "weather": "clear"
+  }
+}

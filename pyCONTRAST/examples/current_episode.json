@@ -1,0 +1,39 @@
+{
+  "id": "EP-002",
+  "title": "Coverage degradation",
+  "claim": "Sensor coverage is sufficient.",
+  "decision": "Maintain current posture.",
+  "rationale": "Historical coverage had been stable.",
+  "assumptions": [
+    {
+      "id": "A1",
+      "statement": "Sensor A is continuously available",
+      "confidence": 0.4
+    }
+  ],
+  "outcome": {
+    "status": "DEGRADED",
+    "summary": "Coverage gap emerged.",
+    "metrics": {
+      "coverage": 0.68
+    }
+  },
+  "evidence": [
+    {
+      "id": "EV-2",
+      "uri": "memory://ev-2",
+      "weight": 0.95
+    }
+  ],
+  "tags": [
+    "C-UAS",
+    "coverage"
+  ],
+  "entities": [
+    "Sensor-A",
+    "Sector-1"
+  ],
+  "metadata": {
+    "weather": "heavy-rain"
+  }
+}
