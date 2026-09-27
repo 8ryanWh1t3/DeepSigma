@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "deep-sigma-vsa"
+version = "0.1.0"
+description = "Deep Sigma Voice Semantic Adapter: voice/transcript to governed semantic objects."
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "Proprietary - Deep Sigma"}
+authors = [{name = "Deep Sigma"}]
+dependencies = []
+keywords = ["deep-sigma", "voice", "semantics", "knowledge-graph", "provenance", "governance"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+rdf = ["rdflib>=7.0"]
+
+[project.scripts]
+deep-sigma-vsa = "deep_sigma_vsa.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/deep_sigma_vsa"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
