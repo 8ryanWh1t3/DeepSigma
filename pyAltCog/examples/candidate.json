@@ -1,0 +1,35 @@
+{
+  "id": "ACP-DEMO",
+  "stream_id": "C-UAS-BLUE-01",
+  "cluster_id": "ECC-DEMO",
+  "dominant_model": "Identity resets are random sensor noise.",
+  "hypothesis": "Identity resets correlate with a recurring handoff condition.",
+  "created_at": "2026-09-27T12:10:00+00:00",
+  "kind": "structural",
+  "maturity": "AC4",
+  "signal_ids": ["FSR-001", "FSR-002"],
+  "evidence": [
+    {
+      "id": "EVID-001",
+      "statement": "Two handoff events produced the same reset pattern.",
+      "source": "exercise-log",
+      "supports_alternative": true,
+      "confidence": 0.9
+    }
+  ],
+  "predictions": [
+    {
+      "variable": "reset_rate_after_handoff",
+      "dominant_expected": "no systematic increase",
+      "alternative_expected": "measurable increase",
+      "observation_window": "next 10 handoff events",
+      "success_condition": "reset rate after handoff exceeds baseline"
+    }
+  ],
+  "falsification_conditions": [
+    "No association between handoff events and reset rate in the next observation window."
+  ],
+  "mission_relevance": 0.9,
+  "owner": "BLUE-TEAM",
+  "revisit_trigger": "next handoff event"
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "FSR-001",
+    "stream_id": "C-UAS-BLUE-01",
+    "surface": "outcome_mismatch",
+    "statement": "Expected track continuity; identity reset after handoff.",
+    "source": "exercise-log",
+    "detected_at": "2026-09-27T12:00:00+00:00",
+    "maturity": "AC2",
+    "strength": 0.82,
+    "tags": ["track", "identity", "handoff"],
+    "domain": "C-UAS"
+  },
+  {
+    "id": "FSR-002",
+    "stream_id": "C-UAS-BLUE-01",
+    "surface": "repeated_exception",
+    "statement": "Repeated identity reset following handoff condition.",
+    "source": "exercise-log",
+    "detected_at": "2026-09-27T12:05:00+00:00",
+    "maturity": "AC2",
+    "strength": 0.88,
+    "tags": ["identity", "handoff", "reset"],
+    "domain": "C-UAS"
+  }
+]

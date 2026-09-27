@@ -1,0 +1,85 @@
+{
+  "candidate": {
+    "archived_reason": "",
+    "cluster_id": "ECC-92d9e5df09c40d22",
+    "created_at": "2026-09-27T16:35:07.727099+00:00",
+    "dominant_model": "Identity resets are random sensor noise.",
+    "evidence": [
+      {
+        "confidence": 0.9,
+        "id": "EVID-DEMO-1",
+        "metadata": {},
+        "provenance": [],
+        "source": "demo-log",
+        "statement": "Two independent handoff events produced the same reset pattern.",
+        "supports_alternative": true
+      }
+    ],
+    "falsification_conditions": [
+      "Alternative is weakened if observation of 'reset_rate_after_handoff' matches dominant expectation 'no systematic increase'."
+    ],
+    "hypothesis": "Identity resets correlate with a recurring handoff condition.",
+    "id": "ACP-8321df1af4d8b912",
+    "kind": "structural",
+    "maturity": "AC6",
+    "metadata": {},
+    "mission_relevance": 0.9,
+    "owner": "BLUE-TEAM",
+    "predictions": [
+      {
+        "alternative_expected": "measurable increase",
+        "dominant_expected": "no systematic increase",
+        "observation_window": "",
+        "success_condition": "",
+        "variable": "reset_rate_after_handoff"
+      }
+    ],
+    "revisit_trigger": "next handoff event",
+    "score": {
+      "contradiction_resilience": 0.5,
+      "distinct_prediction": 1.0,
+      "evidence": 0.9,
+      "falsifiability": 1.0,
+      "mission_relevance": 0.9,
+      "ownership": 1.0,
+      "rationale": [
+        "evidence=0.90 \u00d7 0.24",
+        "distinct_prediction=1.00 \u00d7 0.16",
+        "falsifiability=1.00 \u00d7 0.16",
+        "mission_relevance=0.90 \u00d7 0.16",
+        "contradiction_resilience=0.50 \u00d7 0.10",
+        "ownership=1.00 \u00d7 0.09",
+        "revisitability=1.00 \u00d7 0.09"
+      ],
+      "revisitability": 1.0,
+      "total": 0.91
+    },
+    "signal_ids": [
+      "FSR-0d3291b4dcf3cfd5",
+      "FSR-531e894b1483836e"
+    ],
+    "stream_id": "DEMO-01",
+    "validation": null
+  },
+  "ledger_verified": true,
+  "plan": {
+    "candidate_id": "ACP-8321df1af4d8b912",
+    "created_at": "2026-09-27T16:35:07.727256+00:00",
+    "due_at": "",
+    "falsification_condition": "Alternative is weakened if observation of 'reset_rate_after_handoff' matches dominant expectation 'no systematic increase'.",
+    "id": "DEP-50991d7561515d47",
+    "metadata": {},
+    "owner": "BLUE-TEAM",
+    "requests": [
+      {
+        "alternative_prediction": "measurable increase",
+        "decision_rule": "Observe 'reset_rate_after_handoff': evidence closer to 'measurable increase' supports the alternative; evidence closer to 'no systematic increase' supports the dominant model.",
+        "dominant_prediction": "no systematic increase",
+        "id": "REQ-45be0697c968e36a",
+        "priority": 1,
+        "request": "Collect discriminating observation for reset_rate_after_handoff",
+        "variable": "reset_rate_after_handoff"
+      }
+    ]
+  }
+}
