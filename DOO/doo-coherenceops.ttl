@@ -1,0 +1,46 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix doo: <https://decisionoperations.org/ontology/core#> .
+
+@prefix co: <https://coherenceops.io/ontology#> .
+@prefix ds: <https://deepsigma.io/ontology/decision-operations#> .
+
+<https://decisionoperations.org/ontology/profile/coherence-ops> a owl:Ontology ;
+  dcterms:title "DOO Profile — Deep Sigma Coherence Ops"@en ;
+  dcterms:description "Optional mapping profile connecting vendor-neutral DOO concepts to Deep Sigma Coherence Ops, CERPA, and canonical DLR/RS/DS/MG artifacts."@en ;
+  owl:imports <https://decisionoperations.org/ontology/all>, <https://coherenceops.io/ontology> ;
+  owl:versionInfo "0.2.0-draft" .
+
+doo:Decision owl:equivalentClass co:Decision .
+doo:Claim owl:equivalentClass co:Claim .
+doo:Evidence owl:equivalentClass co:Evidence .
+doo:Assumption owl:equivalentClass co:Assumption .
+doo:Patch owl:equivalentClass co:Patch .
+doo:DriftSignal owl:equivalentClass co:DriftSignal .
+doo:Contradiction owl:equivalentClass co:Contradiction .
+doo:DecisionLineageRecord owl:equivalentClass co:DecisionLogicRecord ; skos:altLabel "DLR"@en .
+
+doo:ReflectionRecord skos:altLabel "RS"@en .
+doo:DriftRecord skos:altLabel "DS"@en .
+doo:DecisionMemoryGraph skos:altLabel "MG"@en .
+
+# Compatibility with the original Deep Sigma DOO v0.1 namespace.
+ds:Decision owl:equivalentClass doo:Decision .
+ds:DecisionEpisode owl:equivalentClass doo:DecisionEpisode .
+ds:DecisionProblem owl:equivalentClass doo:DecisionProblem .
+ds:DecisionOption owl:equivalentClass doo:DecisionOption .
+ds:Claim owl:equivalentClass doo:Claim .
+ds:Evidence owl:equivalentClass doo:Evidence .
+ds:Assumption owl:equivalentClass doo:Assumption .
+ds:Authority owl:equivalentClass doo:Authority .
+ds:Action owl:equivalentClass doo:Action .
+ds:Outcome owl:equivalentClass doo:Outcome .
+ds:Review owl:equivalentClass doo:Review .
+ds:DriftSignal owl:equivalentClass doo:DriftSignal .
+ds:Patch owl:equivalentClass doo:Patch .
+ds:DecisionPacket owl:equivalentClass doo:DecisionPacket .
+ds:DecisionLineageRecord owl:equivalentClass doo:DecisionLineageRecord .

@@ -1,0 +1,21 @@
+{
+  "@context": {
+    "doo": "https://decisionoperations.org/ontology/core#",
+    "id": "@id",
+    "type": "@type",
+    "identifier": "doo:identifier",
+    "title": "doo:title",
+    "description": "doo:description",
+    "framesProblem": {"@id": "doo:framesProblem", "@type": "@id"},
+    "hasContext": {"@id": "doo:hasContext", "@type": "@id"},
+    "hasOption": {"@id": "doo:hasOption", "@type": "@id"},
+    "resultsInDecision": {"@id": "doo:resultsInDecision", "@type": "@id"},
+    "selectsOption": {"@id": "doo:selectsOption", "@type": "@id"},
+    "rejectsOption": {"@id": "doo:rejectsOption", "@type": "@id"},
+    "producesAction": {"@id": "doo:producesAction", "@type": "@id"},
+    "producesOutcome": {"@id": "doo:producesOutcome", "@type": "@id"},
+    "hasParticipant": {"@id": "doo:hasParticipant", "@type": "@id"},
+    "whySummary": "doo:whySummary",
+    "decisionTime": {"@id": "doo:decisionTime", "@type": "http://www.w3.org/2001/XMLSchema#dateTime"}
+  }
+}

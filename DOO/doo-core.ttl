@@ -1,0 +1,55 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix doo: <https://decisionoperations.org/ontology/core#> .
+
+@prefix dooc: <https://decisionoperations.org/ontology/core#> .
+
+<https://decisionoperations.org/ontology/core> a owl:Ontology ;
+  dcterms:title "Decision Operations Ontology — Core"@en ;
+  dcterms:description "Vendor-neutral semantic kernel for representing decision episodes, problems, options, decisions, actions, outcomes, and participating actors."@en ;
+  dcterms:created "2026-09-27"^^xsd:date ;
+  dcterms:creator "Decision Operations Ontology Project" ;
+  owl:versionInfo "0.2.0-draft" .
+
+doo:DecisionOperationsObject a owl:Class ; rdfs:label "Decision Operations Object"@en .
+doo:DecisionEpisode a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ;
+  rdfs:label "Decision Episode"@en ;
+  rdfs:comment "A bounded lifecycle in which a problem is framed, options are considered, a decision is made, actions occur, and outcomes are observed."@en .
+doo:DecisionContext a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Decision Context"@en .
+doo:DecisionProblem a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Decision Problem"@en .
+doo:DecisionCriterion a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Decision Criterion"@en .
+doo:DecisionOption a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Decision Option"@en .
+doo:Decision a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Decision"@en .
+doo:Action a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Action"@en .
+doo:Outcome a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Outcome"@en .
+doo:Actor a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Actor"@en .
+doo:HumanActor a owl:Class ; rdfs:subClassOf doo:Actor ; rdfs:label "Human Actor"@en .
+doo:AutomatedActor a owl:Class ; rdfs:subClassOf doo:Actor ; rdfs:label "Automated Actor"@en .
+doo:Organization a owl:Class ; rdfs:subClassOf doo:Actor ; rdfs:label "Organization"@en .
+
+doo:framesProblem a owl:ObjectProperty ; rdfs:domain doo:DecisionEpisode ; rdfs:range doo:DecisionProblem ; rdfs:label "frames problem"@en .
+doo:hasContext a owl:ObjectProperty ; rdfs:domain doo:DecisionEpisode ; rdfs:range doo:DecisionContext ; rdfs:label "has context"@en .
+doo:hasCriterion a owl:ObjectProperty ; rdfs:domain doo:DecisionEpisode ; rdfs:range doo:DecisionCriterion ; rdfs:label "has criterion"@en .
+doo:hasOption a owl:ObjectProperty ; rdfs:domain doo:DecisionEpisode ; rdfs:range doo:DecisionOption ; rdfs:label "has option"@en .
+doo:resultsInDecision a owl:ObjectProperty ; rdfs:domain doo:DecisionEpisode ; rdfs:range doo:Decision ; rdfs:label "results in decision"@en .
+doo:selectsOption a owl:ObjectProperty ; rdfs:domain doo:Decision ; rdfs:range doo:DecisionOption ; rdfs:label "selects option"@en .
+doo:rejectsOption a owl:ObjectProperty ; rdfs:domain doo:Decision ; rdfs:range doo:DecisionOption ; rdfs:label "rejects option"@en .
+doo:producesAction a owl:ObjectProperty ; rdfs:domain doo:Decision ; rdfs:range doo:Action ; rdfs:label "produces action"@en .
+doo:producesOutcome a owl:ObjectProperty ; rdfs:domain doo:Action ; rdfs:range doo:Outcome ; rdfs:label "produces outcome"@en .
+doo:hasParticipant a owl:ObjectProperty ; rdfs:domain doo:DecisionEpisode ; rdfs:range doo:Actor ; rdfs:label "has participant"@en .
+doo:relatedTo a owl:ObjectProperty, owl:SymmetricProperty ; rdfs:domain doo:DecisionOperationsObject ; rdfs:range doo:DecisionOperationsObject ; rdfs:label "related to"@en .
+doo:dependsOn a owl:ObjectProperty, owl:TransitiveProperty ; rdfs:domain doo:DecisionOperationsObject ; rdfs:range doo:DecisionOperationsObject ; rdfs:label "depends on"@en .
+
+doo:identifier a owl:DatatypeProperty ; rdfs:domain doo:DecisionOperationsObject ; rdfs:range xsd:string ; rdfs:label "identifier"@en .
+doo:title a owl:DatatypeProperty ; rdfs:domain doo:DecisionOperationsObject ; rdfs:range xsd:string ; rdfs:label "title"@en .
+doo:description a owl:DatatypeProperty ; rdfs:domain doo:DecisionOperationsObject ; rdfs:range xsd:string ; rdfs:label "description"@en .
+doo:createdAt a owl:DatatypeProperty ; rdfs:domain doo:DecisionOperationsObject ; rdfs:range xsd:dateTime ; rdfs:label "created at"@en .
+doo:decisionTime a owl:DatatypeProperty ; rdfs:domain doo:Decision ; rdfs:range xsd:dateTime ; rdfs:label "decision time"@en .
+doo:expectedOutcome a owl:DatatypeProperty ; rdfs:domain doo:Decision ; rdfs:range xsd:string ; rdfs:label "expected outcome"@en .
+doo:observedOutcome a owl:DatatypeProperty ; rdfs:domain doo:Outcome ; rdfs:range xsd:string ; rdfs:label "observed outcome"@en .
+doo:whySummary a owl:DatatypeProperty ; rdfs:domain doo:Decision ; rdfs:range xsd:string ; rdfs:label "why summary"@en .
+doo:version a owl:DatatypeProperty ; rdfs:domain doo:DecisionOperationsObject ; rdfs:range xsd:string ; rdfs:label "version"@en .

@@ -1,0 +1,33 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix doo: <https://decisionoperations.org/ontology/core#> .
+
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+<https://decisionoperations.org/ontology/shapes> a owl:Ontology ;
+  dcterms:title "Decision Operations Ontology — SHACL Baseline Shapes"@en ;
+  dcterms:description "Conservative validation profile for portable Decision Operations implementations."@en ;
+  owl:versionInfo "0.2.0-draft" .
+
+doo:DecisionEpisodeShape a sh:NodeShape ;
+  sh:targetClass doo:DecisionEpisode ;
+  sh:property [ sh:path doo:identifier ; sh:minCount 1 ; sh:severity sh:Violation ; sh:message "DecisionEpisode requires an identifier."@en ] ;
+  sh:property [ sh:path doo:framesProblem ; sh:minCount 1 ; sh:class doo:DecisionProblem ; sh:severity sh:Violation ; sh:message "DecisionEpisode must frame at least one DecisionProblem."@en ] ;
+  sh:property [ sh:path doo:resultsInDecision ; sh:minCount 1 ; sh:class doo:Decision ; sh:severity sh:Violation ; sh:message "DecisionEpisode must result in at least one Decision."@en ] .
+
+doo:DecisionShape a sh:NodeShape ;
+  sh:targetClass doo:Decision ;
+  sh:property [ sh:path doo:identifier ; sh:minCount 1 ; sh:severity sh:Violation ] ;
+  sh:property [ sh:path doo:whySummary ; sh:minCount 1 ; sh:severity sh:Warning ; sh:message "Portable decisions should preserve a concise rationale/why summary."@en ] .
+
+doo:ClaimShape a sh:NodeShape ;
+  sh:targetClass doo:Claim ;
+  sh:property [ sh:path doo:supportedBy ; sh:minCount 1 ; sh:severity sh:Warning ; sh:message "Claims should link to supporting evidence when available."@en ] .
+
+doo:AuthorityShape a sh:NodeShape ;
+  sh:targetClass doo:Authority ;
+  sh:property [ sh:path doo:exercisedBy ; sh:minCount 1 ; sh:class doo:Actor ; sh:severity sh:Warning ; sh:message "Authority should identify the actor exercising it."@en ] .
