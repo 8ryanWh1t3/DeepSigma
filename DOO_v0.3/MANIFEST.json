@@ -1,0 +1,39 @@
+{
+  "name": "Decision Operations Ontology (DOO)",
+  "version": "0.3.0-draft",
+  "status": "portable interoperability draft",
+  "namespace": "https://decisionoperations.org/ontology/core#",
+  "namespaceStatus": "proposed; bind to controlled persistent URI before 1.0",
+  "licenseIntent": "CC0-1.0 subject to project/legal approval",
+  "modules": [
+    "doo-core.ttl",
+    "doo-anatomy.ttl",
+    "doo-evidence.ttl",
+    "doo-authority.ttl",
+    "doo-lifecycle.ttl",
+    "doo-memory.ttl",
+    "doo-provenance.ttl",
+    "doo-profiles.ttl"
+  ],
+  "shapeGraphs": [
+    "doo-shapes-core.ttl",
+    "doo-shapes-evidence.ttl",
+    "doo-shapes-governed.ttl",
+    "doo-shapes-replay.ttl",
+    "doo-shapes.ttl"
+  ],
+  "profiles": [
+    "CORE",
+    "EVIDENCE",
+    "GOVERNED",
+    "REPLAY"
+  ],
+  "optionalProfiles": [
+    "doo-coherenceops.ttl"
+  ],
+  "examples": [
+    "examples/minimal-decision.ttl",
+    "examples/governed-decision.ttl",
+    "examples/minimal-decision.jsonld"
+  ]
+}

@@ -1,0 +1,30 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix doo: <https://decisionoperations.org/ontology/core#> .
+
+<https://decisionoperations.org/ontology/memory> a owl:Ontology ;
+  dcterms:title "Decision Operations Ontology — Memory"@en ;
+  dcterms:description "Portable decision-memory records preserving rationale, reflection, drift, lineage, and replayable decision packets."@en ;
+  owl:imports <https://decisionoperations.org/ontology/core>, <https://decisionoperations.org/ontology/anatomy>, <https://decisionoperations.org/ontology/evidence>, <https://decisionoperations.org/ontology/lifecycle> ; owl:versionInfo "0.3.0-draft" .
+
+doo:MemoryRecord a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Memory Record"@en .
+doo:DecisionLineageRecord a owl:Class ; rdfs:subClassOf doo:MemoryRecord ; rdfs:label "Decision Lineage Record"@en .
+doo:ReflectionRecord a owl:Class ; rdfs:subClassOf doo:MemoryRecord ; rdfs:label "Reflection Record"@en .
+doo:DriftRecord a owl:Class ; rdfs:subClassOf doo:MemoryRecord ; rdfs:label "Drift Record"@en .
+doo:DecisionMemoryGraph a owl:Class ; rdfs:subClassOf doo:MemoryRecord ; rdfs:label "Decision Memory Graph"@en .
+doo:DecisionPacket a owl:Class ; rdfs:subClassOf doo:MemoryRecord ; rdfs:label "Decision Packet"@en ;
+  rdfs:comment "Portable package containing enough decision context, evidence, authority, lifecycle state, and provenance to inspect or replay a decision episode."@en .
+
+doo:hasLineageRecord a owl:ObjectProperty ; rdfs:domain doo:DecisionEpisode ; rdfs:range doo:DecisionLineageRecord ; rdfs:label "has lineage record"@en .
+doo:hasReflectionRecord a owl:ObjectProperty ; rdfs:domain doo:DecisionEpisode ; rdfs:range doo:ReflectionRecord ; rdfs:label "has reflection record"@en .
+doo:hasDriftRecord a owl:ObjectProperty ; rdfs:domain doo:DecisionEpisode ; rdfs:range doo:DriftRecord ; rdfs:label "has drift record"@en .
+doo:hasMemoryGraph a owl:ObjectProperty ; rdfs:domain doo:DecisionEpisode ; rdfs:range doo:DecisionMemoryGraph ; rdfs:label "has memory graph"@en .
+doo:packagedAs a owl:ObjectProperty ; rdfs:domain doo:DecisionEpisode ; rdfs:range doo:DecisionPacket ; rdfs:label "packaged as"@en .
+doo:capturesEpisode a owl:ObjectProperty ; rdfs:domain doo:MemoryRecord ; rdfs:range doo:DecisionEpisode ; rdfs:label "captures episode"@en .
+doo:capturesDecision a owl:ObjectProperty ; rdfs:domain doo:MemoryRecord ; rdfs:range doo:Decision ; rdfs:label "captures decision"@en .
+doo:containsObject a owl:ObjectProperty ; rdfs:domain doo:DecisionPacket ; rdfs:range doo:DecisionOperationsObject ; rdfs:label "contains object"@en .
+doo:memorySummary a owl:DatatypeProperty ; rdfs:domain doo:MemoryRecord ; rdfs:range xsd:string ; rdfs:label "memory summary"@en .

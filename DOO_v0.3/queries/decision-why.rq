@@ -1,0 +1,2 @@
+PREFIX doo: <https://decisionoperations.org/ontology/core#>
+SELECT ?decision ?why ?rationale WHERE { ?decision a doo:Decision . OPTIONAL { ?decision doo:whySummary ?why } OPTIONAL { ?decision doo:hasRationale/doo:rationaleText ?rationale } }

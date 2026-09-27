@@ -1,0 +1,68 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix doo: <https://decisionoperations.org/ontology/core#> .
+
+<https://decisionoperations.org/ontology/lifecycle> a owl:Ontology ;
+  dcterms:title "Decision Operations Ontology — Lifecycle"@en ;
+  dcterms:description "Decision state, review, triggers, drift, contradiction response, governed change, patching, invalidation, and supersession."@en ;
+  owl:imports <https://decisionoperations.org/ontology/core>, <https://decisionoperations.org/ontology/evidence> ; owl:versionInfo "0.3.0-draft" .
+
+doo:DecisionState a owl:Class ; rdfs:label "Decision State"@en .
+doo:ReviewDisposition a owl:Class ; rdfs:label "Review Disposition"@en .
+doo:OptionDisposition a owl:Class ; rdfs:label "Option Disposition"@en .
+doo:Trigger a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Trigger"@en .
+doo:Review a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Review"@en .
+doo:DriftSignal a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Drift Signal"@en .
+doo:Patch a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Patch"@en .
+doo:GovernedChange a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Governed Change"@en .
+
+# Controlled vocabularies are OWL individuals and SKOS concepts for easy RDF/graph interchange.
+doo:DecisionStateScheme a skos:ConceptScheme ; skos:prefLabel "Decision State Scheme"@en .
+doo:ReviewDispositionScheme a skos:ConceptScheme ; skos:prefLabel "Review Disposition Scheme"@en .
+doo:OptionDispositionScheme a skos:ConceptScheme ; skos:prefLabel "Option Disposition Scheme"@en .
+
+doo:Draft a owl:NamedIndividual, doo:DecisionState, skos:Concept ; skos:inScheme doo:DecisionStateScheme ; skos:notation "DRAFT" ; skos:prefLabel "Draft"@en .
+doo:UnderReview a owl:NamedIndividual, doo:DecisionState, skos:Concept ; skos:inScheme doo:DecisionStateScheme ; skos:notation "UNDER_REVIEW" ; skos:prefLabel "Under Review"@en .
+doo:Approved a owl:NamedIndividual, doo:DecisionState, skos:Concept ; skos:inScheme doo:DecisionStateScheme ; skos:notation "APPROVED" ; skos:prefLabel "Approved"@en .
+doo:Committed a owl:NamedIndividual, doo:DecisionState, skos:Concept ; skos:inScheme doo:DecisionStateScheme ; skos:notation "COMMITTED" ; skos:prefLabel "Committed"@en .
+doo:Active a owl:NamedIndividual, doo:DecisionState, skos:Concept ; skos:inScheme doo:DecisionStateScheme ; skos:notation "ACTIVE" ; skos:prefLabel "Active"@en .
+doo:Suspended a owl:NamedIndividual, doo:DecisionState, skos:Concept ; skos:inScheme doo:DecisionStateScheme ; skos:notation "SUSPENDED" ; skos:prefLabel "Suspended"@en .
+doo:Superseded a owl:NamedIndividual, doo:DecisionState, skos:Concept ; skos:inScheme doo:DecisionStateScheme ; skos:notation "SUPERSEDED" ; skos:prefLabel "Superseded"@en .
+doo:Revoked a owl:NamedIndividual, doo:DecisionState, skos:Concept ; skos:inScheme doo:DecisionStateScheme ; skos:notation "REVOKED" ; skos:prefLabel "Revoked"@en .
+doo:Closed a owl:NamedIndividual, doo:DecisionState, skos:Concept ; skos:inScheme doo:DecisionStateScheme ; skos:notation "CLOSED" ; skos:prefLabel "Closed"@en .
+
+doo:Affirm a owl:NamedIndividual, doo:ReviewDisposition, skos:Concept ; skos:inScheme doo:ReviewDispositionScheme ; skos:notation "AFFIRM" ; skos:prefLabel "Affirm"@en .
+doo:Modify a owl:NamedIndividual, doo:ReviewDisposition, skos:Concept ; skos:inScheme doo:ReviewDispositionScheme ; skos:notation "MODIFY" ; skos:prefLabel "Modify"@en .
+doo:Escalate a owl:NamedIndividual, doo:ReviewDisposition, skos:Concept ; skos:inScheme doo:ReviewDispositionScheme ; skos:notation "ESCALATE" ; skos:prefLabel "Escalate"@en .
+doo:Invalidate a owl:NamedIndividual, doo:ReviewDisposition, skos:Concept ; skos:inScheme doo:ReviewDispositionScheme ; skos:notation "INVALIDATE" ; skos:prefLabel "Invalidate"@en .
+
+doo:Selected a owl:NamedIndividual, doo:OptionDisposition, skos:Concept ; skos:inScheme doo:OptionDispositionScheme ; skos:notation "SELECTED" ; skos:prefLabel "Selected"@en .
+doo:Rejected a owl:NamedIndividual, doo:OptionDisposition, skos:Concept ; skos:inScheme doo:OptionDispositionScheme ; skos:notation "REJECTED" ; skos:prefLabel "Rejected"@en .
+doo:Deferred a owl:NamedIndividual, doo:OptionDisposition, skos:Concept ; skos:inScheme doo:OptionDispositionScheme ; skos:notation "DEFERRED" ; skos:prefLabel "Deferred"@en .
+doo:NotViable a owl:NamedIndividual, doo:OptionDisposition, skos:Concept ; skos:inScheme doo:OptionDispositionScheme ; skos:notation "NOT_VIABLE" ; skos:prefLabel "Not Viable"@en .
+
+doo:hasDecisionState a owl:ObjectProperty ; rdfs:domain doo:Decision ; rdfs:range doo:DecisionState ; rdfs:label "has decision state"@en .
+doo:hasOptionDisposition a owl:ObjectProperty ; rdfs:domain doo:DecisionOption ; rdfs:range doo:OptionDisposition ; rdfs:label "has option disposition"@en .
+doo:hasReview a owl:ObjectProperty ; rdfs:domain doo:DecisionEpisode ; rdfs:range doo:Review ; rdfs:label "has review"@en .
+doo:reviewsDecision a owl:ObjectProperty ; rdfs:domain doo:Review ; rdfs:range doo:Decision ; rdfs:label "reviews decision"@en .
+doo:hasReviewDisposition a owl:ObjectProperty ; rdfs:domain doo:Review ; rdfs:range doo:ReviewDisposition ; rdfs:label "has review disposition"@en .
+doo:triggeredBy a owl:ObjectProperty ; rdfs:domain doo:DecisionOperationsObject ; rdfs:range doo:Trigger ; rdfs:label "triggered by"@en .
+doo:detectsDrift a owl:ObjectProperty ; rdfs:domain doo:Review ; rdfs:range doo:DriftSignal ; rdfs:label "detects drift"@en .
+doo:detectsContradiction a owl:ObjectProperty ; rdfs:domain doo:Review ; rdfs:range doo:Contradiction ; rdfs:label "detects contradiction"@en .
+doo:generatesPatch a owl:ObjectProperty ; rdfs:domain doo:Review ; rdfs:range doo:Patch ; rdfs:label "generates patch"@en .
+doo:patches a owl:ObjectProperty ; rdfs:domain doo:Patch ; rdfs:range doo:DecisionOperationsObject ; rdfs:label "patches"@en .
+doo:supersedes a owl:ObjectProperty, owl:TransitiveProperty ; rdfs:domain doo:DecisionOperationsObject ; rdfs:range doo:DecisionOperationsObject ; rdfs:label "supersedes"@en .
+doo:supersededBy a owl:ObjectProperty ; owl:inverseOf doo:supersedes ; rdfs:domain doo:DecisionOperationsObject ; rdfs:range doo:DecisionOperationsObject ; rdfs:label "superseded by"@en .
+doo:invalidates a owl:ObjectProperty ; rdfs:domain doo:DecisionOperationsObject ; rdfs:range doo:DecisionOperationsObject ; rdfs:label "invalidates"@en .
+
+doo:reviewDueAt a owl:DatatypeProperty ; rdfs:domain doo:Decision ; rdfs:range xsd:dateTime ; rdfs:label "review due at"@en .
+doo:reviewedAt a owl:DatatypeProperty ; rdfs:domain doo:Review ; rdfs:range xsd:dateTime ; rdfs:label "reviewed at"@en .
+doo:effectiveAt a owl:DatatypeProperty ; rdfs:domain doo:Decision ; rdfs:range xsd:dateTime ; rdfs:label "effective at"@en .
+doo:closedAt a owl:DatatypeProperty ; rdfs:domain doo:DecisionEpisode ; rdfs:range xsd:dateTime ; rdfs:label "closed at"@en .
+doo:triggerCondition a owl:DatatypeProperty ; rdfs:domain doo:Trigger ; rdfs:range xsd:string ; rdfs:label "trigger condition"@en .
+doo:severity a owl:DatatypeProperty ; rdfs:domain doo:DecisionOperationsObject ; rdfs:range xsd:string ; rdfs:label "severity"@en .
+doo:priority a owl:DatatypeProperty ; rdfs:domain doo:DecisionOperationsObject ; rdfs:range xsd:string ; rdfs:label "priority"@en .

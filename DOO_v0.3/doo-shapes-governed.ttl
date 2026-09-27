@@ -1,0 +1,22 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix doo: <https://decisionoperations.org/ontology/core#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+<https://decisionoperations.org/ontology/shapes/governed> a owl:Ontology ; dcterms:title "DOO SHACL — Governed Profile"@en ; owl:versionInfo "0.3.0-draft" .
+
+doo:GovernedDecisionShape a sh:NodeShape ; sh:targetClass doo:Decision ;
+  sh:property [ sh:path doo:authorizedBy ; sh:minCount 1 ; sh:class doo:Authority ; sh:severity sh:Violation ; sh:message "Governed decisions require represented authority."@en ] ;
+  sh:property [ sh:path doo:hasDecisionState ; sh:minCount 1 ; sh:maxCount 1 ; sh:class doo:DecisionState ; sh:severity sh:Violation ] .
+
+doo:AuthorityShape a sh:NodeShape ; sh:targetClass doo:Authority ;
+  sh:property [ sh:path doo:exercisedBy ; sh:minCount 1 ; sh:class doo:Actor ; sh:severity sh:Violation ] ;
+  sh:property [ sh:path doo:hasAuthorityScope ; sh:minCount 1 ; sh:class doo:AuthorityScope ; sh:severity sh:Warning ] .
+
+doo:ApprovalShape a sh:NodeShape ; sh:targetClass doo:Approval ;
+  sh:property [ sh:path doo:approvedBy ; sh:minCount 1 ; sh:class doo:Actor ; sh:severity sh:Violation ] ;
+  sh:property [ sh:path doo:approvalTime ; sh:minCount 1 ; sh:datatype xsd:dateTime ; sh:severity sh:Violation ] .

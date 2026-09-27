@@ -1,0 +1,47 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix doo: <https://decisionoperations.org/ontology/core#> .
+@prefix ex: <https://example.org/decision/> .
+
+ex:episode-100 a doo:DecisionEpisode ;
+  doo:identifier "EP-100" ; doo:title "Adopt managed service" ;
+  doo:framesProblem ex:problem-100 ; doo:hasOption ex:opt-managed, ex:opt-build ;
+  doo:resultsInDecision ex:decision-100 ; doo:hasParticipant ex:owner, ex:approver ;
+  doo:hasClaim ex:claim-100 ; doo:hasAssumption ex:assumption-100 ;
+  doo:hasLineageRecord ex:dlr-100 ; doo:packagedAs ex:packet-100 .
+
+ex:problem-100 a doo:DecisionProblem ; doo:identifier "PROB-100" ; doo:description "Choose service delivery approach." .
+ex:opt-managed a doo:DecisionOption ; doo:identifier "OPT-M" ; doo:description "Use managed service." ; doo:hasOptionDisposition doo:Selected .
+ex:opt-build a doo:DecisionOption ; doo:identifier "OPT-B" ; doo:description "Build internally." ; doo:hasOptionDisposition doo:Rejected .
+
+ex:decision-100 a doo:Decision ; doo:identifier "DEC-100" ; doo:addressesProblem ex:problem-100 ;
+  doo:selectsOption ex:opt-managed ; doo:rejectsOption ex:opt-build ; doo:madeBy ex:owner ;
+  doo:hasRationale ex:rationale-100 ; doo:anticipatesOutcome ex:expected-100 ;
+  doo:authorizedBy ex:authority-100 ; doo:recordsApproval ex:approval-100 ; doo:hasDecisionState doo:Committed ;
+  doo:whySummary "Managed service met the requirement with lower integration and sustainment burden." ;
+  doo:decisionTime "2026-09-27T12:00:00-04:00"^^xsd:dateTime .
+
+ex:rationale-100 a doo:DecisionRationale ; doo:identifier "RAT-100" ; doo:rationaleText "Option M best satisfied cost, time, and sustainment criteria." .
+ex:expected-100 a doo:ExpectedOutcome ; doo:identifier "EXP-100" ; doo:expectedOutcomeText "Operational capability available within 90 days." .
+
+ex:claim-100 a doo:Claim ; doo:identifier "CLM-100" ; doo:statementText "Managed service can meet the required operating window." ;
+  doo:confidence "0.85"^^xsd:decimal ; doo:supportedBy ex:evidence-100 ; doo:informsDecision ex:decision-100 .
+ex:evidence-100 a doo:Evidence ; doo:identifier "EVD-100" ; doo:description "Validated service performance report." ; doo:derivedFromSource ex:source-100 .
+ex:source-100 a doo:Source ; doo:identifier "SRC-100" ; doo:sourceType "report" .
+ex:assumption-100 a doo:Assumption ; doo:identifier "ASM-100" ; doo:statementText "Funding remains available through execution." ;
+  doo:confidence "0.70"^^xsd:decimal ; doo:validUntil "2026-12-31T23:59:59Z"^^xsd:dateTime .
+
+ex:owner a doo:HumanActor ; doo:identifier "ACTOR-OWNER" .
+ex:approver a doo:HumanActor ; doo:identifier "ACTOR-APPROVER" .
+ex:authority-100 a doo:Authority ; doo:identifier "AUTH-100" ; doo:exercisedBy ex:approver ; doo:hasAuthorityScope ex:scope-100 .
+ex:scope-100 a doo:AuthorityScope ; doo:identifier "SCOPE-100" ; doo:scopeText "Service delivery decisions within program scope." .
+ex:approval-100 a doo:Approval ; doo:identifier "APR-100" ; doo:approvedBy ex:approver ; doo:approvalTime "2026-09-27T12:05:00-04:00"^^xsd:dateTime .
+
+ex:dlr-100 a doo:DecisionLineageRecord ; doo:identifier "DLR-100" ; doo:capturesEpisode ex:episode-100 ; doo:capturesDecision ex:decision-100 ;
+  doo:memorySummary "Decision, rationale, evidence, assumption, authority, and approval preserved." .
+ex:packet-100 a doo:DecisionPacket ; doo:identifier "PKT-100" ; doo:capturesEpisode ex:episode-100 ;
+  doo:containsObject ex:problem-100, ex:opt-managed, ex:opt-build, ex:decision-100, ex:rationale-100, ex:claim-100, ex:evidence-100, ex:assumption-100, ex:authority-100, ex:approval-100 .

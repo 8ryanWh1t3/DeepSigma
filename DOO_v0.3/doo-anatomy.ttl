@@ -1,0 +1,48 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix doo: <https://decisionoperations.org/ontology/core#> .
+
+<https://decisionoperations.org/ontology/anatomy> a owl:Ontology ;
+  dcterms:title "Decision Operations Ontology — Decision Anatomy"@en ;
+  dcterms:description "Portable anatomy of a decision: intent, rationale, expected outcomes, risks, tradeoffs, dependencies, and option evaluation."@en ;
+  owl:imports <https://decisionoperations.org/ontology/core> ;
+  owl:versionInfo "0.3.0-draft" .
+
+doo:DecisionIntent a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Decision Intent"@en .
+doo:DecisionRationale a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Decision Rationale"@en .
+doo:ExpectedOutcome a owl:Class ; rdfs:subClassOf doo:Outcome ; rdfs:label "Expected Outcome"@en .
+doo:ObservedOutcome a owl:Class ; rdfs:subClassOf doo:Outcome ; rdfs:label "Observed Outcome"@en .
+doo:Risk a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Risk"@en .
+doo:Tradeoff a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Tradeoff"@en .
+doo:Dependency a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Dependency"@en .
+doo:CriterionAssessment a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Criterion Assessment"@en .
+
+doo:hasIntent a owl:ObjectProperty ; rdfs:domain doo:DecisionEpisode ; rdfs:range doo:DecisionIntent ; rdfs:label "has intent"@en .
+doo:hasRationale a owl:ObjectProperty ; rdfs:domain doo:Decision ; rdfs:range doo:DecisionRationale ; rdfs:label "has rationale"@en .
+doo:anticipatesOutcome a owl:ObjectProperty ; rdfs:domain doo:Decision ; rdfs:range doo:ExpectedOutcome ; rdfs:label "anticipates outcome"@en .
+doo:observesOutcome a owl:ObjectProperty ; rdfs:domain doo:DecisionEpisode ; rdfs:range doo:ObservedOutcome ; rdfs:label "observes outcome"@en .
+doo:hasRisk a owl:ObjectProperty ; rdfs:domain doo:DecisionOperationsObject ; rdfs:range doo:Risk ; rdfs:label "has risk"@en .
+doo:hasTradeoff a owl:ObjectProperty ; rdfs:domain doo:Decision ; rdfs:range doo:Tradeoff ; rdfs:label "has tradeoff"@en .
+doo:hasDependency a owl:ObjectProperty ; rdfs:domain doo:DecisionOperationsObject ; rdfs:range doo:Dependency ; rdfs:label "has dependency"@en .
+doo:dependencyTarget a owl:ObjectProperty ; rdfs:domain doo:Dependency ; rdfs:range doo:DecisionOperationsObject ; rdfs:label "dependency target"@en .
+doo:hasCriterionAssessment a owl:ObjectProperty ; rdfs:domain doo:DecisionOption ; rdfs:range doo:CriterionAssessment ; rdfs:label "has criterion assessment"@en .
+doo:assessesCriterion a owl:ObjectProperty ; rdfs:domain doo:CriterionAssessment ; rdfs:range doo:DecisionCriterion ; rdfs:label "assesses criterion"@en .
+
+doo:rationaleText a owl:DatatypeProperty ; rdfs:domain doo:DecisionRationale ; rdfs:range xsd:string ; rdfs:label "rationale text"@en .
+doo:intentText a owl:DatatypeProperty ; rdfs:domain doo:DecisionIntent ; rdfs:range xsd:string ; rdfs:label "intent text"@en .
+doo:expectedOutcomeText a owl:DatatypeProperty ; rdfs:domain doo:ExpectedOutcome ; rdfs:range xsd:string ; rdfs:label "expected outcome text"@en .
+doo:observedOutcomeText a owl:DatatypeProperty ; rdfs:domain doo:ObservedOutcome ; rdfs:range xsd:string ; rdfs:label "observed outcome text"@en .
+doo:riskLikelihood a owl:DatatypeProperty ; rdfs:domain doo:Risk ; rdfs:range xsd:decimal ; rdfs:label "risk likelihood"@en ; rdfs:comment "Recommended normalized range is 0.0 to 1.0."@en .
+doo:riskImpact a owl:DatatypeProperty ; rdfs:domain doo:Risk ; rdfs:range xsd:decimal ; rdfs:label "risk impact"@en ; rdfs:comment "Recommended normalized range is 0.0 to 1.0."@en .
+doo:tradeoffText a owl:DatatypeProperty ; rdfs:domain doo:Tradeoff ; rdfs:range xsd:string ; rdfs:label "tradeoff text"@en .
+doo:dependencyType a owl:DatatypeProperty ; rdfs:domain doo:Dependency ; rdfs:range xsd:string ; rdfs:label "dependency type"@en .
+doo:criterionScore a owl:DatatypeProperty ; rdfs:domain doo:CriterionAssessment ; rdfs:range xsd:decimal ; rdfs:label "criterion score"@en .
+doo:criterionWeight a owl:DatatypeProperty ; rdfs:domain doo:DecisionCriterion ; rdfs:range xsd:decimal ; rdfs:label "criterion weight"@en .
+doo:optionReason a owl:DatatypeProperty ; rdfs:domain doo:DecisionOption ; rdfs:range xsd:string ; rdfs:label "option reason"@en .
+
+# v0.2 compatibility term retained but deprecated in favor of ExpectedOutcome objects.
+doo:expectedOutcome a owl:DatatypeProperty ; rdfs:domain doo:Decision ; rdfs:range xsd:string ; rdfs:label "expected outcome (deprecated)"@en ; owl:deprecated true .

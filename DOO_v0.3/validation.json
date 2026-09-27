@@ -1,0 +1,115 @@
+{
+  "parse": {
+    "doo-all.ttl": {
+      "status": "PASS",
+      "triples": 12
+    },
+    "doo-anatomy.ttl": {
+      "status": "PASS",
+      "triples": 120
+    },
+    "doo-authority.ttl": {
+      "status": "PASS",
+      "triples": 102
+    },
+    "doo-coherenceops.ttl": {
+      "status": "PASS",
+      "triples": 36
+    },
+    "doo-core.ttl": {
+      "status": "PASS",
+      "triples": 160
+    },
+    "doo-evidence.ttl": {
+      "status": "PASS",
+      "triples": 108
+    },
+    "doo-lifecycle.ttl": {
+      "status": "PASS",
+      "triples": 217
+    },
+    "doo-memory.ttl": {
+      "status": "PASS",
+      "triples": 63
+    },
+    "doo-profiles.ttl": {
+      "status": "PASS",
+      "triples": 49
+    },
+    "doo-provenance.ttl": {
+      "status": "PASS",
+      "triples": 36
+    },
+    "doo-shapes-core.ttl": {
+      "status": "PASS",
+      "triples": 58
+    },
+    "doo-shapes-evidence.ttl": {
+      "status": "PASS",
+      "triples": 42
+    },
+    "doo-shapes-governed.ttl": {
+      "status": "PASS",
+      "triples": 41
+    },
+    "doo-shapes-replay.ttl": {
+      "status": "PASS",
+      "triples": 29
+    },
+    "doo-shapes.ttl": {
+      "status": "PASS",
+      "triples": 7
+    },
+    "examples/governed-decision.ttl": {
+      "status": "PASS",
+      "triples": 94
+    },
+    "examples/minimal-decision.ttl": {
+      "status": "PASS",
+      "triples": 27
+    },
+    "migration/v0.1-to-v0.3.ttl": {
+      "status": "PASS",
+      "triples": 18
+    }
+  },
+  "checks": {
+    "neutral:doo-all.ttl": "PASS",
+    "neutral:doo-anatomy.ttl": "PASS",
+    "neutral:doo-authority.ttl": "PASS",
+    "neutral:doo-core.ttl": "PASS",
+    "neutral:doo-evidence.ttl": "PASS",
+    "neutral:doo-lifecycle.ttl": "PASS",
+    "neutral:doo-memory.ttl": "PASS",
+    "neutral:doo-profiles.ttl": "PASS",
+    "neutral:doo-provenance.ttl": "PASS",
+    "neutral:doo-shapes-core.ttl": "PASS",
+    "neutral:doo-shapes-evidence.ttl": "PASS",
+    "neutral:doo-shapes-governed.ttl": "PASS",
+    "neutral:doo-shapes-replay.ttl": "PASS",
+    "neutral:doo-shapes.ttl": "PASS",
+    "term:DecisionEpisode": "PASS",
+    "term:Decision": "PASS",
+    "term:DecisionProblem": "PASS",
+    "term:DecisionOption": "PASS",
+    "term:Actor": "PASS",
+    "term:DecisionRationale": "PASS",
+    "term:Claim": "PASS",
+    "term:Evidence": "PASS",
+    "term:Assumption": "PASS",
+    "term:Authority": "PASS",
+    "term:Review": "PASS",
+    "term:Patch": "PASS",
+    "term:DecisionPacket": "PASS"
+  },
+  "examples": {
+    "examples/minimal-decision.ttl": {
+      "status": "PASS",
+      "errors": []
+    },
+    "examples/governed-decision.ttl": {
+      "status": "PASS",
+      "errors": []
+    }
+  }
+}

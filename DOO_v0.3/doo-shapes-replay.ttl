@@ -1,0 +1,18 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix doo: <https://decisionoperations.org/ontology/core#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+<https://decisionoperations.org/ontology/shapes/replay> a owl:Ontology ; dcterms:title "DOO SHACL — Replay Profile"@en ; owl:versionInfo "0.3.0-draft" .
+
+doo:ReplayEpisodeShape a sh:NodeShape ; sh:targetClass doo:DecisionEpisode ;
+  sh:property [ sh:path doo:hasLineageRecord ; sh:minCount 1 ; sh:class doo:DecisionLineageRecord ; sh:severity sh:Warning ; sh:message "Replay profile episodes should preserve a lineage record."@en ] ;
+  sh:property [ sh:path doo:packagedAs ; sh:minCount 1 ; sh:class doo:DecisionPacket ; sh:severity sh:Warning ; sh:message "Replay profile episodes should be exportable as a DecisionPacket."@en ] .
+
+doo:DecisionPacketShape a sh:NodeShape ; sh:targetClass doo:DecisionPacket ;
+  sh:property [ sh:path doo:capturesEpisode ; sh:minCount 1 ; sh:class doo:DecisionEpisode ; sh:severity sh:Violation ] ;
+  sh:property [ sh:path doo:containsObject ; sh:minCount 1 ; sh:class doo:DecisionOperationsObject ; sh:severity sh:Violation ] .

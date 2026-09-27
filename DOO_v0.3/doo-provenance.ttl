@@ -1,0 +1,43 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix doo: <https://decisionoperations.org/ontology/core#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+
+<https://decisionoperations.org/ontology/provenance> a owl:Ontology ;
+  dcterms:title "Decision Operations Ontology — PROV-O Alignment"@en ;
+  dcterms:description "Alignment of DOO concepts to W3C PROV-O. Provenance is reused rather than redefined."@en ;
+  owl:imports <https://decisionoperations.org/ontology/core>, <https://decisionoperations.org/ontology/anatomy>, <https://decisionoperations.org/ontology/evidence>, <https://decisionoperations.org/ontology/lifecycle>, <https://decisionoperations.org/ontology/memory>, <http://www.w3.org/ns/prov-o#> ;
+  owl:versionInfo "0.3.0-draft" .
+
+doo:DecisionEpisode rdfs:subClassOf prov:Activity .
+doo:Action rdfs:subClassOf prov:Activity .
+doo:Review rdfs:subClassOf prov:Activity .
+doo:GovernedChange rdfs:subClassOf prov:Activity .
+doo:Actor rdfs:subClassOf prov:Agent .
+doo:HumanActor rdfs:subClassOf prov:Person .
+doo:Organization rdfs:subClassOf prov:Organization .
+doo:Decision rdfs:subClassOf prov:Entity .
+doo:DecisionProblem rdfs:subClassOf prov:Entity .
+doo:DecisionOption rdfs:subClassOf prov:Entity .
+doo:DecisionRationale rdfs:subClassOf prov:Entity .
+doo:Claim rdfs:subClassOf prov:Entity .
+doo:Evidence rdfs:subClassOf prov:Entity .
+doo:Assumption rdfs:subClassOf prov:Entity .
+doo:Observation rdfs:subClassOf prov:Entity .
+doo:Outcome rdfs:subClassOf prov:Entity .
+doo:Patch rdfs:subClassOf prov:Entity .
+doo:Source rdfs:subClassOf prov:Entity .
+doo:MemoryRecord rdfs:subClassOf prov:Entity .
+doo:DecisionPacket rdfs:subClassOf prov:Bundle .
+
+doo:resultsInDecision rdfs:subPropertyOf prov:generated .
+doo:producesOutcome rdfs:subPropertyOf prov:generated .
+doo:supportedBy rdfs:subPropertyOf prov:wasDerivedFrom .
+doo:derivedFromSource rdfs:subPropertyOf prov:wasDerivedFrom .
+doo:hasParticipant rdfs:subPropertyOf prov:wasAssociatedWith .
+doo:madeBy rdfs:subPropertyOf prov:wasAttributedTo .

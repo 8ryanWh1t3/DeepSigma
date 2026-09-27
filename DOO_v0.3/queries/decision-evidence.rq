@@ -1,0 +1,2 @@
+PREFIX doo: <https://decisionoperations.org/ontology/core#>
+SELECT ?decision ?claim ?claimText ?evidence WHERE { ?claim a doo:Claim ; doo:informsDecision ?decision . OPTIONAL { ?claim doo:statementText ?claimText } OPTIONAL { ?claim doo:supportedBy ?evidence } }

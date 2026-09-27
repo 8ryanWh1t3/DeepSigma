@@ -1,0 +1,21 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix doo: <https://decisionoperations.org/ontology/core#> .
+
+<https://decisionoperations.org/ontology/all> a owl:Ontology ;
+  dcterms:title "Decision Operations Ontology — Complete Vendor-Neutral Import"@en ;
+  dcterms:description "Convenience ontology importing all vendor-neutral DOO semantic modules. Validation shapes remain a separate import."@en ;
+  owl:imports
+    <https://decisionoperations.org/ontology/core>,
+    <https://decisionoperations.org/ontology/anatomy>,
+    <https://decisionoperations.org/ontology/evidence>,
+    <https://decisionoperations.org/ontology/authority>,
+    <https://decisionoperations.org/ontology/lifecycle>,
+    <https://decisionoperations.org/ontology/memory>,
+    <https://decisionoperations.org/ontology/provenance>,
+    <https://decisionoperations.org/ontology/profiles> ;
+  owl:versionInfo "0.3.0-draft" .

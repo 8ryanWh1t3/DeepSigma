@@ -1,0 +1,34 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix doo: <https://decisionoperations.org/ontology/core#> .
+
+<https://decisionoperations.org/ontology/profiles> a owl:Ontology ;
+  dcterms:title "Decision Operations Ontology — Conformance Profiles"@en ;
+  dcterms:description "Machine-readable deployment profiles for interoperable DOO implementations."@en ;
+  owl:imports <https://decisionoperations.org/ontology/core> ; owl:versionInfo "0.3.0-draft" .
+
+doo:ConformanceProfile a owl:Class ; rdfs:label "Conformance Profile"@en .
+doo:requiresModule a owl:ObjectProperty ; rdfs:domain doo:ConformanceProfile ; rdfs:range owl:Ontology ; rdfs:label "requires module"@en .
+doo:extendsProfile a owl:ObjectProperty ; rdfs:domain doo:ConformanceProfile ; rdfs:range doo:ConformanceProfile ; rdfs:label "extends profile"@en .
+doo:profileCode a owl:DatatypeProperty ; rdfs:domain doo:ConformanceProfile ; rdfs:range xsd:string ; rdfs:label "profile code"@en .
+doo:profileDescription a owl:DatatypeProperty ; rdfs:domain doo:ConformanceProfile ; rdfs:range xsd:string ; rdfs:label "profile description"@en .
+
+doo:CoreProfile a owl:NamedIndividual, doo:ConformanceProfile ;
+  doo:profileCode "CORE" ; doo:profileDescription "Minimum portable decision capture and interchange." ;
+  doo:requiresModule <https://decisionoperations.org/ontology/core>, <https://decisionoperations.org/ontology/anatomy> .
+
+doo:EvidenceProfile a owl:NamedIndividual, doo:ConformanceProfile ;
+  doo:profileCode "EVIDENCE" ; doo:profileDescription "Core decision semantics plus claims, evidence, assumptions, and uncertainty." ;
+  doo:extendsProfile doo:CoreProfile ; doo:requiresModule <https://decisionoperations.org/ontology/evidence> .
+
+doo:GovernedProfile a owl:NamedIndividual, doo:ConformanceProfile ;
+  doo:profileCode "GOVERNED" ; doo:profileDescription "Evidence-backed decisions with represented authority and lifecycle controls." ;
+  doo:extendsProfile doo:EvidenceProfile ; doo:requiresModule <https://decisionoperations.org/ontology/authority>, <https://decisionoperations.org/ontology/lifecycle> .
+
+doo:ReplayProfile a owl:NamedIndividual, doo:ConformanceProfile ;
+  doo:profileCode "REPLAY" ; doo:profileDescription "Governed decisions with institutional memory and PROV-O alignment for lineage and replay." ;
+  doo:extendsProfile doo:GovernedProfile ; doo:requiresModule <https://decisionoperations.org/ontology/memory>, <https://decisionoperations.org/ontology/provenance> .

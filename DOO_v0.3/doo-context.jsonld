@@ -1,0 +1,102 @@
+{
+  "@context": {
+    "doo": "https://decisionoperations.org/ontology/core#",
+    "id": "@id",
+    "type": "@type",
+    "identifier": "doo:identifier",
+    "title": "doo:title",
+    "description": "doo:description",
+    "version": "doo:version",
+    "framesProblem": {
+      "@id": "doo:framesProblem",
+      "@type": "@id"
+    },
+    "hasContext": {
+      "@id": "doo:hasContext",
+      "@type": "@id"
+    },
+    "hasOption": {
+      "@id": "doo:hasOption",
+      "@type": "@id"
+    },
+    "resultsInDecision": {
+      "@id": "doo:resultsInDecision",
+      "@type": "@id"
+    },
+    "addressesProblem": {
+      "@id": "doo:addressesProblem",
+      "@type": "@id"
+    },
+    "selectsOption": {
+      "@id": "doo:selectsOption",
+      "@type": "@id"
+    },
+    "rejectsOption": {
+      "@id": "doo:rejectsOption",
+      "@type": "@id"
+    },
+    "madeBy": {
+      "@id": "doo:madeBy",
+      "@type": "@id"
+    },
+    "hasRationale": {
+      "@id": "doo:hasRationale",
+      "@type": "@id"
+    },
+    "anticipatesOutcome": {
+      "@id": "doo:anticipatesOutcome",
+      "@type": "@id"
+    },
+    "hasClaim": {
+      "@id": "doo:hasClaim",
+      "@type": "@id"
+    },
+    "hasAssumption": {
+      "@id": "doo:hasAssumption",
+      "@type": "@id"
+    },
+    "supportedBy": {
+      "@id": "doo:supportedBy",
+      "@type": "@id"
+    },
+    "authorizedBy": {
+      "@id": "doo:authorizedBy",
+      "@type": "@id"
+    },
+    "hasDecisionState": {
+      "@id": "doo:hasDecisionState",
+      "@type": "@id"
+    },
+    "producesAction": {
+      "@id": "doo:producesAction",
+      "@type": "@id"
+    },
+    "producesOutcome": {
+      "@id": "doo:producesOutcome",
+      "@type": "@id"
+    },
+    "hasReview": {
+      "@id": "doo:hasReview",
+      "@type": "@id"
+    },
+    "generatesPatch": {
+      "@id": "doo:generatesPatch",
+      "@type": "@id"
+    },
+    "supersedes": {
+      "@id": "doo:supersedes",
+      "@type": "@id"
+    },
+    "whySummary": "doo:whySummary",
+    "rationaleText": "doo:rationaleText",
+    "statementText": "doo:statementText",
+    "decisionTime": {
+      "@id": "doo:decisionTime",
+      "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+    },
+    "confidence": {
+      "@id": "doo:confidence",
+      "@type": "http://www.w3.org/2001/XMLSchema#decimal"
+    }
+  }
+}

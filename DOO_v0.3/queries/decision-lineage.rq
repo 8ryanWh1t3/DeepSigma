@@ -1,0 +1,2 @@
+PREFIX doo: <https://decisionoperations.org/ontology/core#>
+SELECT ?newer ?older WHERE { ?newer doo:supersedes+ ?older . }

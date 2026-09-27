@@ -1,0 +1,2 @@
+PREFIX doo: <https://decisionoperations.org/ontology/core#>
+SELECT ?decision ?authority ?actor ?scope WHERE { ?decision a doo:Decision ; doo:authorizedBy ?authority . OPTIONAL { ?authority doo:exercisedBy ?actor } OPTIONAL { ?authority doo:hasAuthorityScope/doo:scopeText ?scope } }

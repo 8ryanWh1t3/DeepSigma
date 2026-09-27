@@ -1,0 +1,42 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix doo: <https://decisionoperations.org/ontology/core#> .
+
+<https://decisionoperations.org/ontology/evidence> a owl:Ontology ;
+  dcterms:title "Decision Operations Ontology — Evidence"@en ;
+  dcterms:description "Claims, evidence, assumptions, observations, uncertainty, contradictions, and evidentiary relationships used by decision operations."@en ;
+  owl:imports <https://decisionoperations.org/ontology/core> ; owl:versionInfo "0.3.0-draft" .
+
+doo:Claim a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Claim"@en .
+doo:Evidence a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Evidence"@en .
+doo:Assumption a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Assumption"@en .
+doo:Observation a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Observation"@en .
+doo:Uncertainty a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Uncertainty"@en .
+doo:Contradiction a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Contradiction"@en .
+doo:Source a owl:Class ; rdfs:subClassOf doo:DecisionOperationsObject ; rdfs:label "Source"@en .
+
+doo:hasClaim a owl:ObjectProperty ; rdfs:domain doo:DecisionEpisode ; rdfs:range doo:Claim ; rdfs:label "has claim"@en .
+doo:hasAssumption a owl:ObjectProperty ; rdfs:domain doo:DecisionEpisode ; rdfs:range doo:Assumption ; rdfs:label "has assumption"@en .
+doo:hasEvidence a owl:ObjectProperty ; rdfs:domain doo:DecisionEpisode ; rdfs:range doo:Evidence ; rdfs:label "has evidence"@en .
+doo:hasObservation a owl:ObjectProperty ; rdfs:domain doo:DecisionEpisode ; rdfs:range doo:Observation ; rdfs:label "has observation"@en .
+doo:supportedBy a owl:ObjectProperty ; rdfs:domain doo:Claim ; rdfs:range doo:Evidence ; rdfs:label "supported by"@en .
+doo:challenges a owl:ObjectProperty ; rdfs:domain doo:Evidence ; rdfs:range doo:Claim ; rdfs:label "challenges"@en .
+doo:derivedFromSource a owl:ObjectProperty ; rdfs:domain doo:Evidence ; rdfs:range doo:Source ; rdfs:label "derived from source"@en .
+doo:contradicts a owl:ObjectProperty, owl:SymmetricProperty ; rdfs:domain doo:DecisionOperationsObject ; rdfs:range doo:DecisionOperationsObject ; rdfs:label "contradicts"@en .
+doo:qualifiesClaim a owl:ObjectProperty ; rdfs:domain doo:Uncertainty ; rdfs:range doo:Claim ; rdfs:label "qualifies claim"@en .
+doo:observedIn a owl:ObjectProperty ; rdfs:domain doo:Observation ; rdfs:range doo:Outcome ; rdfs:label "observed in"@en .
+doo:informsOption a owl:ObjectProperty ; rdfs:domain doo:Claim ; rdfs:range doo:DecisionOption ; rdfs:label "informs option"@en .
+doo:informsDecision a owl:ObjectProperty ; rdfs:domain doo:Claim ; rdfs:range doo:Decision ; rdfs:label "informs decision"@en .
+
+doo:statementText a owl:DatatypeProperty ; rdfs:domain doo:DecisionOperationsObject ; rdfs:range xsd:string ; rdfs:label "statement text"@en .
+doo:confidence a owl:DatatypeProperty ; rdfs:domain doo:DecisionOperationsObject ; rdfs:range xsd:decimal ; rdfs:label "confidence"@en ; rdfs:comment "Recommended normalized confidence range is 0.0 to 1.0."@en .
+doo:assumptionHalfLifeDays a owl:DatatypeProperty ; rdfs:domain doo:Assumption ; rdfs:range xsd:decimal ; rdfs:label "assumption half-life days"@en .
+doo:validFrom a owl:DatatypeProperty ; rdfs:domain doo:DecisionOperationsObject ; rdfs:range xsd:dateTime ; rdfs:label "valid from"@en .
+doo:validUntil a owl:DatatypeProperty ; rdfs:domain doo:DecisionOperationsObject ; rdfs:range xsd:dateTime ; rdfs:label "valid until"@en .
+doo:evidenceHash a owl:DatatypeProperty ; rdfs:domain doo:Evidence ; rdfs:range xsd:string ; rdfs:label "evidence hash"@en .
+doo:sourceLocator a owl:DatatypeProperty ; rdfs:domain doo:Source ; rdfs:range xsd:anyURI ; rdfs:label "source locator"@en .
+doo:sourceType a owl:DatatypeProperty ; rdfs:domain doo:Source ; rdfs:range xsd:string ; rdfs:label "source type"@en .

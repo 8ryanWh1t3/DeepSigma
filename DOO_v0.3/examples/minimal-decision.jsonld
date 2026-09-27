@@ -1,0 +1,17 @@
+{
+  "@context": "../doo-context.jsonld",
+  "@id": "https://example.org/decision/decision-001",
+  "@type": "doo:Decision",
+  "identifier": "DEC-001",
+  "addressesProblem": {
+    "@id": "https://example.org/decision/problem-001"
+  },
+  "selectsOption": {
+    "@id": "https://example.org/decision/option-a"
+  },
+  "madeBy": {
+    "@id": "https://example.org/decision/actor-001"
+  },
+  "whySummary": "Existing service meets the mission need with lower integration burden.",
+  "decisionTime": "2026-09-27T12:00:00-04:00"
+}
