@@ -1,0 +1,99 @@
+Metadata-Version: 2.4
+Name: deepsigma-grayzone
+Version: 0.1.0
+Summary: Evidence-led pattern assessment for gray-zone events
+Author: Bryan David White
+License: MIT
+Keywords: deepsigma,provenance,gray-zone,cerpa
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Provides-Extra: excel
+Requires-Dist: openpyxl>=3.1; extra == "excel"
+Provides-Extra: dev
+Requires-Dist: openpyxl>=3.1; extra == "dev"
+Dynamic: license-file
+
+# Deep Sigma · Gray Zone (`deepsigma.grayzone`)
+
+Local, deterministic **pattern triage** for potentially related observations across separate channels. It preserves source hashes and lineage, presents competing explanations, and hands unreviewed claims to people through CERPA. It does **not** infer actor, intent, hostility or a confirmed campaign. It does not collect data, control assets or send messages.
+
+## Install and run
+
+Python 3.10+. From this directory:
+
+```bash
+python -m pip install .
+grayzone examples/synthetic_cuas.lattice.jsonl --lattice --json assessment.json --markdown assessment.md
+```
+
+For the Excel reduction:
+
+```bash
+python -m pip install '.[excel]'
+grayzone examples/synthetic_cuas.lattice.jsonl --lattice --excel assessment.xlsx
+```
+
+This **synthetic** example has three observations associated with `track-17` across three channels and source lineages; the separate maintenance event has only the broad location in common. The output is an **unreviewed candidate**, never a verdict. Source evidence retains SHA-256 hashes of canonicalized parsed records and input line locators; it does not sign raw file bytes. No real C-UAS location, asset relationship or Lattice schema is represented.
+
+## Python API
+
+```python
+from deepsigma.grayzone import GrayZoneEpisode, load_lattice_jsonl
+
+events = load_lattice_jsonl("examples/synthetic_cuas.lattice.jsonl")
+assessment = GrayZoneEpisode(events, window="30d").assess()
+for candidate in assessment.hypotheses:
+    print(candidate.id, candidate.priority_score, candidate.event_ids)
+    print(candidate.alternatives, candidate.collection_gaps)
+```
+
+The `priority_score` is an explicit deterministic **review ordering** formula. It is not a probability, calibrated confidence, or evidence of coordination. Minimum gates: 3 observations, 2 channels, and 2 declared independent source lineage groups. Links require an identical entity or asset ID, or a shared location **and** tag within 72 hours. Location alone never creates a link. Connected components can chain indirect links, so every underlying pair and alternative must be reviewed.
+
+## Connect an approved export
+
+`--lattice` selects the **illustrative local field map** in `lattice.py`. Anduril Lattice schemas vary by export and permissions; this package does not assert a vendor contract. Use an approved log export, inspect its fields, and pass a site-specific dot-path map. String lists in CSV use `|` separators. All timestamps need an ISO 8601 offset.
+
+```bash
+grayzone approved_events.jsonl --map examples/example_map.json \
+  --json assessment.json --markdown report.md --graph graph.json --rdf graph.nt
+```
+
+The map can override `event_id`, `occurred_at`, `kind`, `channel`, `summary`, `source_id`, `record_id`, `lineage_group`, `entities`, `assets`, `location`, and `tags`. The default generic JSON/CSV contract uses those same names. `--map` overrides the default map; with `--lattice`, it overrides the illustrative Lattice-like map. Declare a common `lineage_group` when feeds are copies or derivatives of the same collection stream. If you leave source independence unresolved, candidate gating may overstate diversity. The assessment window ends at the latest input timestamp, not at the wall clock.
+
+## CERPA and Deep Sigma core
+
+`C` = candidate claim; `E` = preserved observations; `R` = human review; `P` = proposed corrective or collection change; `A` = recorded approved application. Excel emits Dashboard, C, E, R, P, A, Memory tabs. R/P/A stay empty or unreviewed until a person supplies them. No patch is executed by this package.
+
+```python
+from deepsigma.grayzone import review_hypothesis, propose_patch, approve_patch, cerpa_packet
+from deepsigma.grayzone.bridge import core_claim, core_event, core_review
+
+candidate = assessment.hypotheses[0]
+review = review_hypothesis(
+    assessment, candidate.id, reviewer="exercise-analyst", verdict="inconclusive",
+    rationale="Check exercise schedule and source lineage before attribution.",
+    reviewed_at="2026-09-18T14:00:00Z",
+)
+patch = propose_patch(review, proposer="exercise-analyst", action="collect",
+                      description="Request original collection records for review.")
+print(cerpa_packet(assessment, review, patch))
+print(core_claim(candidate, assessment), core_event(assessment.events[0]), core_review(review))
+```
+
+An authorized approver can call `approve_patch(patch, approver=..., approved_at=...)`; after a separate real-world action, `record_apply(...)` records its outcome. Neither function performs the action.
+
+`core_claim` / `core_event` / `core_review` return dictionaries accepted by the **attached Deep Sigma snapshot's** `core.cerpa.models` constructors. The core auto-cycle's generic rule engine is not used to adjudicate these assessments. Mapping a review verdict to the core representation is an interoperability step, not an automatic analytic finding.
+
+`exposed_dependencies(start, graph)` traverses **only manually supplied** `node -> dependents` edges and returns paths. It cannot discover missing infrastructure relationships. `compare(baseline, current)` shows event and candidate membership changes without causal attribution. `graph_json()` and `ntriples()` export observations and support relations; N-Triples uses a small local vocabulary and does not claim to implement the supplied Coherence Ops OWL ontology.
+
+## Scope and limits
+
+- Exact identifier equality is required. There is no entity resolution, anomaly model, independent-source validation, external baseline, automated drift detection, or calibrated probability in v0.1.
+- Pairwise analysis is bounded at 5,000 events for local runs; large streams need indexed storage, authorization controls, and deployment-specific review.
+- Input/output files may contain sensitive operational data. Use only approved local exports and authorized storage. The included example is synthetic.
+- Packaging is a standalone PEP 420 namespace extension. The supplied archived repo publishes distribution `deepsigma` with import package `core`; this distribution is `deepsigma-grayzone` with import package `deepsigma.grayzone` to avoid replacing that core. Incorporation into the live repo is a separate integration step.
+
+Run focused verification with `PYTHONPATH=src python -m unittest discover -s tests -v`. The optional Excel check runs when `openpyxl` is installed.

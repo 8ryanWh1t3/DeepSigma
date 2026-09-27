@@ -1,0 +1,133 @@
+{
+  "nodes": [
+    {
+      "id": "obs-001",
+      "type": "event",
+      "kind": "track_observation"
+    },
+    {
+      "id": "obs-002",
+      "type": "event",
+      "kind": "operator_report"
+    },
+    {
+      "id": "obs-003",
+      "type": "event",
+      "kind": "spectrum_observation"
+    },
+    {
+      "id": "obs-004",
+      "type": "event",
+      "kind": "maintenance"
+    },
+    {
+      "id": "hyp-cbfd923415a5",
+      "type": "hypothesis",
+      "status": "unreviewed"
+    },
+    {
+      "id": "record:maintenance-D:d-004",
+      "type": "source_record",
+      "sha256": "d72261b4d1a178626260162f923ce5f50b9101774e52981604fb2aaa405c4518",
+      "lineage_group": "collection-4",
+      "locator": "synthetic_cuas.lattice.jsonl:4"
+    },
+    {
+      "id": "record:observer-B:b-002",
+      "type": "source_record",
+      "sha256": "b776ec2184b560f7fbc5d3381a350013139eceab4ad655aebbef7e8bd5158cff",
+      "lineage_group": "collection-2",
+      "locator": "synthetic_cuas.lattice.jsonl:2"
+    },
+    {
+      "id": "record:sensor-A:a-001",
+      "type": "source_record",
+      "sha256": "7e4d3158a5568e6a3b63b8e8cd1d36dc6ce64e6917373572bab7ea3e74c7c47d",
+      "lineage_group": "collection-1",
+      "locator": "synthetic_cuas.lattice.jsonl:1"
+    },
+    {
+      "id": "record:spectrum-C:c-003",
+      "type": "source_record",
+      "sha256": "464e4990bd131c26bf39dcea6ac11fb40871f73416c5012c657389570ec0f665",
+      "lineage_group": "collection-3",
+      "locator": "synthetic_cuas.lattice.jsonl:3"
+    }
+  ],
+  "edges": [
+    {
+      "source": "obs-001",
+      "target": "obs-002",
+      "type": "related_observation",
+      "score": 1,
+      "reasons": [
+        "shared entity: track-17",
+        "shared location: exercise-sector-A",
+        "shared tag: unidentified-track",
+        "within 3 days, 0:00:00",
+        "different channels"
+      ]
+    },
+    {
+      "source": "obs-001",
+      "target": "obs-003",
+      "type": "related_observation",
+      "score": 1,
+      "reasons": [
+        "shared entity: track-17",
+        "shared location: exercise-sector-A",
+        "shared tag: unidentified-track",
+        "within 3 days, 0:00:00",
+        "different channels"
+      ]
+    },
+    {
+      "source": "obs-002",
+      "target": "obs-003",
+      "type": "related_observation",
+      "score": 1,
+      "reasons": [
+        "shared entity: track-17",
+        "shared location: exercise-sector-A",
+        "shared tag: unidentified-track",
+        "within 3 days, 0:00:00",
+        "different channels"
+      ]
+    },
+    {
+      "source": "hyp-cbfd923415a5",
+      "target": "obs-001",
+      "type": "supported_by"
+    },
+    {
+      "source": "hyp-cbfd923415a5",
+      "target": "obs-002",
+      "type": "supported_by"
+    },
+    {
+      "source": "hyp-cbfd923415a5",
+      "target": "obs-003",
+      "type": "supported_by"
+    },
+    {
+      "source": "obs-001",
+      "target": "record:sensor-A:a-001",
+      "type": "derived_from"
+    },
+    {
+      "source": "obs-002",
+      "target": "record:observer-B:b-002",
+      "type": "derived_from"
+    },
+    {
+      "source": "obs-003",
+      "target": "record:spectrum-C:c-003",
+      "type": "derived_from"
+    },
+    {
+      "source": "obs-004",
+      "target": "record:maintenance-D:d-004",
+      "type": "derived_from"
+    }
+  ]
+}

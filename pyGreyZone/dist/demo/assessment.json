@@ -1,0 +1,259 @@
+{
+  "id": "assessment-dd2335d20392b65c",
+  "window_start": "2026-08-19T13:50:00Z",
+  "window_end": "2026-09-18T13:50:00Z",
+  "events": [
+    {
+      "id": "obs-001",
+      "occurred_at": "2026-09-18T13:00:00Z",
+      "kind": "track_observation",
+      "channel": "sensor",
+      "summary": "Unidentified track observed in exercise sector A.",
+      "sources": [
+        {
+          "source_id": "sensor-A",
+          "record_id": "a-001",
+          "sha256": "7e4d3158a5568e6a3b63b8e8cd1d36dc6ce64e6917373572bab7ea3e74c7c47d",
+          "lineage_group": "collection-1",
+          "locator": "synthetic_cuas.lattice.jsonl:1"
+        }
+      ],
+      "entities": [
+        "track-17"
+      ],
+      "assets": [],
+      "location": "exercise-sector-A",
+      "tags": [
+        "unidentified-track"
+      ]
+    },
+    {
+      "id": "obs-002",
+      "occurred_at": "2026-09-18T13:20:00Z",
+      "kind": "operator_report",
+      "channel": "human_report",
+      "summary": "Operator independently reported track-17 in exercise sector A.",
+      "sources": [
+        {
+          "source_id": "observer-B",
+          "record_id": "b-002",
+          "sha256": "b776ec2184b560f7fbc5d3381a350013139eceab4ad655aebbef7e8bd5158cff",
+          "lineage_group": "collection-2",
+          "locator": "synthetic_cuas.lattice.jsonl:2"
+        }
+      ],
+      "entities": [
+        "track-17"
+      ],
+      "assets": [],
+      "location": "exercise-sector-A",
+      "tags": [
+        "unidentified-track"
+      ]
+    },
+    {
+      "id": "obs-003",
+      "occurred_at": "2026-09-18T13:42:00Z",
+      "kind": "spectrum_observation",
+      "channel": "spectrum",
+      "summary": "Exercise spectrum log contains a record associated with track-17.",
+      "sources": [
+        {
+          "source_id": "spectrum-C",
+          "record_id": "c-003",
+          "sha256": "464e4990bd131c26bf39dcea6ac11fb40871f73416c5012c657389570ec0f665",
+          "lineage_group": "collection-3",
+          "locator": "synthetic_cuas.lattice.jsonl:3"
+        }
+      ],
+      "entities": [
+        "track-17"
+      ],
+      "assets": [],
+      "location": "exercise-sector-A",
+      "tags": [
+        "unidentified-track"
+      ]
+    },
+    {
+      "id": "obs-004",
+      "occurred_at": "2026-09-18T13:50:00Z",
+      "kind": "maintenance",
+      "channel": "maintenance",
+      "summary": "Scheduled diagnostic in exercise sector A.",
+      "sources": [
+        {
+          "source_id": "maintenance-D",
+          "record_id": "d-004",
+          "sha256": "d72261b4d1a178626260162f923ce5f50b9101774e52981604fb2aaa405c4518",
+          "lineage_group": "collection-4",
+          "locator": "synthetic_cuas.lattice.jsonl:4"
+        }
+      ],
+      "entities": [],
+      "assets": [],
+      "location": "exercise-sector-A",
+      "tags": [
+        "diagnostic"
+      ]
+    }
+  ],
+  "links": [
+    {
+      "left": "obs-001",
+      "right": "obs-002",
+      "score": 1,
+      "reasons": [
+        "shared entity: track-17",
+        "shared location: exercise-sector-A",
+        "shared tag: unidentified-track",
+        "within 3 days, 0:00:00",
+        "different channels"
+      ]
+    },
+    {
+      "left": "obs-001",
+      "right": "obs-003",
+      "score": 1,
+      "reasons": [
+        "shared entity: track-17",
+        "shared location: exercise-sector-A",
+        "shared tag: unidentified-track",
+        "within 3 days, 0:00:00",
+        "different channels"
+      ]
+    },
+    {
+      "left": "obs-002",
+      "right": "obs-003",
+      "score": 1,
+      "reasons": [
+        "shared entity: track-17",
+        "shared location: exercise-sector-A",
+        "shared tag: unidentified-track",
+        "within 3 days, 0:00:00",
+        "different channels"
+      ]
+    }
+  ],
+  "weak_signals": [
+    {
+      "id": "weak-cbfd923415a5",
+      "event_ids": [
+        "obs-001",
+        "obs-002",
+        "obs-003"
+      ],
+      "observation": "Linked observations require source and benign-explanation review."
+    },
+    {
+      "id": "repeat-a7e8906cf8e9",
+      "event_ids": [
+        "obs-001",
+        "obs-002",
+        "obs-003"
+      ],
+      "observation": "Repeated tag 'unidentified-track'; frequency is uncalibrated without a baseline."
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "hyp-cbfd923415a5",
+      "event_ids": [
+        "obs-001",
+        "obs-002",
+        "obs-003"
+      ],
+      "link_ids": [
+        [
+          "obs-001",
+          "obs-002"
+        ],
+        [
+          "obs-001",
+          "obs-003"
+        ],
+        [
+          "obs-002",
+          "obs-003"
+        ]
+      ],
+      "source_groups": [
+        "collection-1",
+        "collection-2",
+        "collection-3"
+      ],
+      "channels": [
+        "human_report",
+        "sensor",
+        "spectrum"
+      ],
+      "priority_score": 92,
+      "statement": "Possible related pattern across observations; coordination remains unproven.",
+      "alternatives": [
+        {
+          "explanation": "Routine operations, maintenance, training or environmental conditions",
+          "discriminating_check": "Compare approved activity schedule and ordinary-rate baseline for the same period."
+        },
+        {
+          "explanation": "Common upstream feed or duplicate reporting makes events appear independent",
+          "discriminating_check": "Trace record identifiers and lineage groups to the original collection path."
+        },
+        {
+          "explanation": "Unrelated events share a label, entity alias or broad location",
+          "discriminating_check": "Verify entity resolution and seek discriminating observations across sources."
+        }
+      ],
+      "collection_gaps": [
+        "Establish an ordinary-rate baseline before interpreting recurrence.",
+        "Validate source independence and original record lineage.",
+        "Seek disconfirming observations for each competing explanation."
+      ],
+      "status": "unreviewed"
+    }
+  ],
+  "method": "rules-v0.1",
+  "limitations": [
+    "Priority score is a deterministic review order, not a probability or intent assessment.",
+    "A candidate pattern does not establish coordination, actor identity, or hostility.",
+    "Completeness depends on the supplied feeds, source lineage, identifiers, and baseline."
+  ],
+  "evidence_index": {
+    "obs-001": [
+      {
+        "source_id": "sensor-A",
+        "record_id": "a-001",
+        "lineage_group": "collection-1",
+        "sha256": "7e4d3158a5568e6a3b63b8e8cd1d36dc6ce64e6917373572bab7ea3e74c7c47d",
+        "locator": "synthetic_cuas.lattice.jsonl:1"
+      }
+    ],
+    "obs-002": [
+      {
+        "source_id": "observer-B",
+        "record_id": "b-002",
+        "lineage_group": "collection-2",
+        "sha256": "b776ec2184b560f7fbc5d3381a350013139eceab4ad655aebbef7e8bd5158cff",
+        "locator": "synthetic_cuas.lattice.jsonl:2"
+      }
+    ],
+    "obs-003": [
+      {
+        "source_id": "spectrum-C",
+        "record_id": "c-003",
+        "lineage_group": "collection-3",
+        "sha256": "464e4990bd131c26bf39dcea6ac11fb40871f73416c5012c657389570ec0f665",
+        "locator": "synthetic_cuas.lattice.jsonl:3"
+      }
+    ],
+    "obs-004": [
+      {
+        "source_id": "maintenance-D",
+        "record_id": "d-004",
+        "lineage_group": "collection-4",
+        "sha256": "d72261b4d1a178626260162f923ce5f50b9101774e52981604fb2aaa405c4518",
+        "locator": "synthetic_cuas.lattice.jsonl:4"
+      }
+    ]
+  }
+}

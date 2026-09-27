@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deepsigma-grayzone"
+version = "0.1.0"
+description = "Evidence-led pattern assessment for gray-zone events"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Bryan David White" }]
+keywords = ["deepsigma", "provenance", "gray-zone", "cerpa"]
+classifiers = ["Programming Language :: Python :: 3", "License :: OSI Approved :: MIT License"]
+dependencies = []
+
+[project.optional-dependencies]
+excel = ["openpyxl>=3.1"]
+dev = ["openpyxl>=3.1"]
+
+[project.scripts]
+grayzone = "deepsigma.grayzone.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+namespaces = true
+include = ["deepsigma.grayzone*"]
+
+[tool.setuptools.package-data]
+"deepsigma.grayzone" = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
