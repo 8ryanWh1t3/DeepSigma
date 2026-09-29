@@ -1,0 +1,80 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deepsigma"
+version = "2.1.2"
+description = "DeepSigma Core - Drift to Patch governed execution"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Bryan David White", email = "8ryanWh1t3@gmail.com"},
+]
+keywords = ["governance", "coherence-ops", "drift-patch"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+dependencies = [
+    "jsonschema",
+    "referencing>=0.35.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "pyright",
+    "pre-commit",
+]
+excel = [
+    "openpyxl>=3.1.0",
+]
+openshell = [
+    "openshell; python_version >= '3.11'",
+]
+
+[project.urls]
+Homepage = "https://github.com/8ryanWh1t3/DeepSigma"
+Repository = "https://github.com/8ryanWh1t3/DeepSigma"
+Issues = "https://github.com/8ryanWh1t3/DeepSigma/issues"
+
+[project.scripts]
+coherence = "core.cli:main"
+deepsigma-openshell = "core.openshell.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = [
+    "core*",
+]
+
+[tool.setuptools.package-data]
+core = ["schemas/*.schema.json", "schemas/feeds/*.schema.json", "schemas/jrm/*.schema.json", "fixtures/feeds/*.json", "fixtures/jrm/*", "fixtures/*.json", "examples/*.json", "py.typed"]
+
+[tool.ruff]
+select = ["E", "F", "W"]
+ignore = ["E501"]
+
+[tool.pyright]
+include = ["src/core"]
+exclude = ["src/core/examples"]
+pythonVersion = "3.10"
+typeCheckingMode = "basic"
+reportMissingTypeStubs = false
+reportMissingImports = "warning"
+reportOptionalMemberAccess = "warning"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

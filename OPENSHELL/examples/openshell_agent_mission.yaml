@@ -1,0 +1,41 @@
+contract_id: AMC-CUAS-001
+episode_id: EP-CUAS-001
+mission: Nano Sigma C-UAS Lattice Analysis
+objective: Analyze bounded Lattice mission logs and produce a provenance-preserving risk assessment without changing source evidence.
+agent_id: nano-resonator-01
+actor_id: agent-nano-resonator-01
+role: analyst-agent
+authority_scope: cuas/lattice/read-analysis
+blast_radius_tier: small
+command: [python, -m, nano_sigma]
+include_workdir: true
+read_only_paths:
+  - /mission/lattice
+read_write_paths:
+  - /sandbox/output
+assumptions:
+  - Lattice logs are the authoritative mission input for this episode.
+evidence_refs:
+  - LATTICE-LOG-30D
+kill_conditions:
+  - Stop if requested access exceeds the mission contract.
+  - Stop if source provenance cannot be preserved.
+expected_outputs:
+  - bounded risk findings
+  - CERPA event stream
+  - VINCULUM replay packet
+human_approval_required: true
+endpoints:
+  - name: local-inference
+    host: inference.local
+    port: 443
+    protocol: rest
+    enforcement: enforce
+    tls: terminate
+    access: read-only
+    binaries:
+      - /usr/bin/python
+    credential_bound: false
+metadata:
+  deep_sigma_layer: Nano Sigma
+  enforcement_layer: OpenShell

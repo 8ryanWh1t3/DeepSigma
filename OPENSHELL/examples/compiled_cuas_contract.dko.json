@@ -1,0 +1,69 @@
+{
+  "agent": {
+    "actor_id": "agent-nano-resonator-01",
+    "command": [
+      "python",
+      "-m",
+      "nano_sigma"
+    ],
+    "id": "nano-resonator-01",
+    "role": "analyst-agent"
+  },
+  "assumptions": [
+    "Lattice logs are the authoritative mission input for this episode."
+  ],
+  "authority": {
+    "blast_radius_tier": "small",
+    "human_approval_required": true,
+    "scope": "cuas/lattice/read-analysis"
+  },
+  "contract_hash": "sha256:90f9bd84e60a0c93d9f41447542b94551a04df06e66ab2e8be6faafb726682ea",
+  "episode": "EP-CUAS-001",
+  "evidence": [
+    "LATTICE-LOG-30D"
+  ],
+  "id": "AMC-CUAS-001",
+  "kill_conditions": [
+    "Stop if requested access exceeds the mission contract.",
+    "Stop if source provenance cannot be preserved."
+  ],
+  "kind": "AgentMissionContract",
+  "metadata": {
+    "deep_sigma_layer": "Nano Sigma",
+    "enforcement_layer": "OpenShell"
+  },
+  "mission": {
+    "expected_outputs": [
+      "bounded risk findings",
+      "CERPA event stream",
+      "VINCULUM replay packet"
+    ],
+    "name": "Nano Sigma C-UAS Lattice Analysis",
+    "objective": "Analyze bounded Lattice mission logs and produce a provenance-preserving risk assessment without changing source evidence."
+  },
+  "openshell_projection": {
+    "endpoints": [
+      {
+        "access": "read-only",
+        "binaries": [
+          "/usr/bin/python"
+        ],
+        "credential_bound": false,
+        "description": "",
+        "enforcement": "enforce",
+        "host": "inference.local",
+        "name": "local-inference",
+        "port": 443,
+        "protocol": "rest",
+        "rules": [],
+        "tls": "terminate"
+      }
+    ],
+    "read_only_paths": [
+      "/mission/lattice"
+    ],
+    "read_write_paths": [
+      "/sandbox/output"
+    ]
+  }
+}

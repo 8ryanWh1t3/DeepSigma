@@ -1,0 +1,2167 @@
+--- /mnt/data/DeepSigma_orig/DeepSigma-main/pyproject.toml	2026-03-07 14:45:44.000000000 +0000
++++ /mnt/data/DeepSigma_work/DeepSigma-main/pyproject.toml	2026-09-28 20:37:22.213925831 +0000
+@@ -41,6 +41,9 @@
+ excel = [
+     "openpyxl>=3.1.0",
+ ]
++openshell = [
++    "openshell; python_version >= '3.11'",
++]
+ 
+ [project.urls]
+ Homepage = "https://github.com/8ryanWh1t3/DeepSigma"
+@@ -49,6 +52,7 @@
+ 
+ [project.scripts]
+ coherence = "core.cli:main"
++deepsigma-openshell = "core.openshell.cli:main"
+ 
+ [tool.setuptools.packages.find]
+ where = ["src"]
+--- /mnt/data/DeepSigma_orig/DeepSigma-main/CHANGELOG.md	2026-03-07 14:45:44.000000000 +0000
++++ /mnt/data/DeepSigma_work/DeepSigma-main/CHANGELOG.md	2026-09-28 20:37:22.349144650 +0000
+@@ -567,3 +567,11 @@
+                                                                                       [0.4.0]: https://github.com/8ryanWh1t3/DeepSigma/compare/v0.1.0...v0.4.0
+ [0.2.0]: https://github.com/8ryanWh1t3/DeepSigma/compare/v0.1.0...v0.2.0
+ [0.1.0]: https://github.com/8ryanWh1t3/DeepSigma/releases/tag/v0.1.0
++
++## Unreleased — OpenShell governed runtime bridge
++
++- Added `core.openshell` v0.1.0: AgentMissionContract → OpenShell policy projection.
++- Added permission-expansion and static/dynamic policy delta classification.
++- Added AuthorityOps, CERPA, OCSF and VINCULUM integration adapters.
++- Added documented CLI runtime adapter and optional official OpenShell Python SDK probe.
++- Added human-gated access expansion and explicit sandbox recreation for static policy changes.
+--- /mnt/data/DeepSigma_orig/DeepSigma-main/docs/architecture/openshell_integration.md	1970-01-01 00:00:00.000000000 +0000
++++ /mnt/data/DeepSigma_work/DeepSigma-main/docs/architecture/openshell_integration.md	2026-09-28 20:37:21.727125858 +0000
+@@ -0,0 +1,116 @@
++# Deep Sigma ↔ NVIDIA OpenShell
++
++**Status:** integration library v0.1.0  
++**Principle:** **OpenShell contains the agent. Deep Sigma contains the consequences.**
++
++## Boundary
++
++OpenShell is the enforcement substrate. Deep Sigma remains the mission, semantic, authority, judgment, provenance, drift, and institutional-memory layer.
++
++```text
++Agent Mission Intent
++        ↓
++DKO / DSAL-ready AgentMissionContract
++        ↓
++PATHFINDER / AuthorityOps
++        ↓
++RESONATOR-facing semantic checks
++        ↓
++COMPOSER projection boundary
++        ↓
++OpenShell policy YAML
++        ↓
++OpenShell sandbox / kernel / network enforcement
++        ↓
++OCSF runtime evidence
++        ↓
++CERPA: Claim → Event → Review → Patch → Apply
++        ↓
++VINCULUM replay / institutional memory
++```
++
++The integration deliberately does **not** create a Deep Sigma sandbox engine.
++
++## What the Python library provides
++
++`core.openshell` adds:
++
++- `AgentMissionContract` — governed DKO-shaped mission contract.
++- `OpenShellPolicyCompiler` — deterministic mission-contract → OpenShell YAML projection.
++- `OpenShellSemanticValidator` — conservative RESONATOR-facing preflight checks.
++- `DeepSigmaAuthorityAdapter` — routes proposed runtime changes through existing AuthorityOps `RuntimeGate`.
++- `diff_policies()` — detects static changes, hot-reloadable changes, and permission expansion.
++- `GovernedOpenShellController` — blocks, escalates, requests human approval, recreates or hot-reloads as appropriate.
++- `OpenShellCliRuntime` — uses the documented OpenShell CLI for create/get/set/prove/exec/delete.
++- `OpenShellSdkProbe` — optional official Python SDK health/exec support without guessing undocumented policy methods.
++- `normalize_ocsf_event()` — converts OpenShell OCSF JSON into a stable Deep Sigma runtime event.
++- CERPA bridge — converts policy plans and runtime denials into Claim/Event/Review/Patch/Apply cycles.
++- VINCULUM projection — replay-safe normalized runtime events with contract and policy hashes.
++
++## Governance invariants
++
++1. **Technical permission is not mission authorization.** OpenShell policy proof never substitutes for Deep Sigma authority.
++2. **Access expansion requires review.** New filesystem/network access, broader write access, or new allow rules are marked as expansion.
++3. **Medium/large blast radius requires a human gate.** Semantic validation fails closed otherwise.
++4. **Static OpenShell controls require recreation.** Filesystem, Landlock and process changes are not hot-reloaded.
++5. **Dynamic network policy can be hot-reloaded.** The controller treats it separately from static policy.
++6. **Credential-bound endpoints require exact hostnames.** Wildcard DNS authorization is rejected by the contract validator.
++7. **Denied runtime behavior becomes evidence.** OpenShell denials feed CERPA rather than being silently patched around.
++8. **The agent never rewrites its own authority.** The controller is outside the sandbox/runtime action loop.
++
++## Install
++
++Deep Sigma continues to support Python 3.10+. The OpenShell Python SDK itself requires Python 3.11+, so it is optional. The CLI adapter can be used independently.
++
++```bash
++pip install -e .
++# Optional on Python 3.11+
++pip install openshell
++```
++
++The OpenShell CLI/gateway are installed separately according to NVIDIA's installation instructions.
++
++## Compile a mission contract
++
++```bash
++deepsigma-openshell compile examples/openshell_agent_mission.yaml \
++  --out /tmp/cu-as-policy.yaml \
++  --dko-out /tmp/cu-as-contract.dko.json
++```
++
++## Programmatic flow
++
++```python
++from core.openshell import (
++    DeepSigmaAuthorityAdapter,
++    GovernedOpenShellController,
++    OpenShellCliRuntime,
++    load_contract,
++)
++
++contract = load_contract("examples/openshell_agent_mission.yaml")
++runtime = OpenShellCliRuntime()
++authority = DeepSigmaAuthorityAdapter(authority_context)
++controller = GovernedOpenShellController(runtime, authority)
++
++plan = controller.plan(contract, sandbox_name="nano-cuas")
++
++# A permission expansion will normally remain pending until a human identity
++# is supplied through the host-side governed workflow.
++plan = controller.apply(plan, approved_by="ROLE:MISSION-AUTHORITY")
++```
++
++## OpenShell source alignment
++
++This adapter follows current OpenShell behavior documented by NVIDIA:
++
++- policy schema version `1`;
++- filesystem/Landlock/process are startup-time controls;
++- network policies are dynamic/hot-reloadable;
++- `openshell policy set ... --wait` replaces the complete sandbox policy;
++- policy changes are validated before loading;
++- the default posture denies outbound network access unless permitted;
++- OCSF records provide runtime audit evidence;
++- the official Python SDK package is `openshell` and currently requires Python 3.11+.
++
++Because OpenShell is actively developed, the integration isolates syntax in `OpenShellPolicyCompiler` and runtime calls in `OpenShellCliRuntime` so upstream changes do not contaminate Deep Sigma semantics.
+--- /mnt/data/DeepSigma_orig/DeepSigma-main/examples/openshell_agent_mission.yaml	1970-01-01 00:00:00.000000000 +0000
++++ /mnt/data/DeepSigma_work/DeepSigma-main/examples/openshell_agent_mission.yaml	2026-09-28 20:37:21.726393214 +0000
+@@ -0,0 +1,41 @@
++contract_id: AMC-CUAS-001
++episode_id: EP-CUAS-001
++mission: Nano Sigma C-UAS Lattice Analysis
++objective: Analyze bounded Lattice mission logs and produce a provenance-preserving risk assessment without changing source evidence.
++agent_id: nano-resonator-01
++actor_id: agent-nano-resonator-01
++role: analyst-agent
++authority_scope: cuas/lattice/read-analysis
++blast_radius_tier: small
++command: [python, -m, nano_sigma]
++include_workdir: true
++read_only_paths:
++  - /mission/lattice
++read_write_paths:
++  - /sandbox/output
++assumptions:
++  - Lattice logs are the authoritative mission input for this episode.
++evidence_refs:
++  - LATTICE-LOG-30D
++kill_conditions:
++  - Stop if requested access exceeds the mission contract.
++  - Stop if source provenance cannot be preserved.
++expected_outputs:
++  - bounded risk findings
++  - CERPA event stream
++  - VINCULUM replay packet
++human_approval_required: true
++endpoints:
++  - name: local-inference
++    host: inference.local
++    port: 443
++    protocol: rest
++    enforcement: enforce
++    tls: terminate
++    access: read-only
++    binaries:
++      - /usr/bin/python
++    credential_bound: false
++metadata:
++  deep_sigma_layer: Nano Sigma
++  enforcement_layer: OpenShell
+--- /mnt/data/DeepSigma_orig/DeepSigma-main/tests/test_openshell_integration.py	1970-01-01 00:00:00.000000000 +0000
++++ /mnt/data/DeepSigma_work/DeepSigma-main/tests/test_openshell_integration.py	2026-09-28 20:37:21.727934877 +0000
+@@ -0,0 +1,337 @@
++from __future__ import annotations
++
++import json
++from pathlib import Path
++
++import pytest
++import yaml
++
++from core.openshell import (
++    AccessMode,
++    AgentMissionContract,
++    AllowAuthorityAdapter,
++    ContractValidationError,
++    EndpointPermission,
++    GovernanceError,
++    GovernedOpenShellController,
++    L7Rule,
++    OpenShellPolicyCompiler,
++    OpenShellSemanticValidator,
++    diff_policies,
++    normalize_ocsf_event,
++    run_runtime_event_cycle,
++    to_cerpa_event,
++    to_vinculum_event,
++)
++from core.openshell.loader import contract_from_dict
++
++
++def make_contract(**overrides):
++    data = dict(
++        contract_id="AMC-001",
++        episode_id="EP-001",
++        mission="C-UAS analysis",
++        objective="Analyze bounded Lattice evidence",
++        agent_id="agent-01",
++        actor_id="agent-001",
++        command=["python", "-m", "worker"],
++        authority_scope="cuas/read",
++        blast_radius_tier="small",
++        read_only_paths=["/mission/lattice"],
++        read_write_paths=["/sandbox/output"],
++        evidence_refs=["EV-1"],
++        kill_conditions=["stop on authority expansion"],
++        endpoints=[
++            EndpointPermission(
++                name="github-read",
++                host="api.github.com",
++                access=AccessMode.READ_ONLY.value,
++                binaries=["/usr/bin/curl"],
++            )
++        ],
++        human_approval_required=True,
++    )
++    data.update(overrides)
++    return AgentMissionContract(**data)
++
++
++class FakeRuntime:
++    def __init__(self, exists=False, current=None):
++        self.exists = exists
++        self.current = current
++        self.calls = []
++
++    def sandbox_exists(self, name):
++        return self.exists
++
++    def get_base_policy(self, name):
++        return self.current
++
++    def create_sandbox(self, name, policy_yaml, command, image=None):
++        self.calls.append(("create", name, policy_yaml, list(command), image))
++        self.exists = True
++        self.current = yaml.safe_load(policy_yaml)
++        return {"ok": True, "action": "create"}
++
++    def apply_policy(self, name, policy_yaml, *, wait=True):
++        self.calls.append(("set", name, policy_yaml, wait))
++        self.current = yaml.safe_load(policy_yaml)
++        return {"ok": True, "action": "set"}
++
++    def exec(self, name, argv):
++        self.calls.append(("exec", name, argv))
++        return {"stdout": "ok"}
++
++    def delete(self, name):
++        self.calls.append(("delete", name))
++        self.exists = False
++        return {"ok": True}
++
++
++class TestContract:
++    def test_hash_deterministic(self):
++        c = make_contract()
++        assert c.canonical_hash() == c.canonical_hash()
++        assert c.canonical_hash().startswith("sha256:")
++
++    def test_reject_relative_path(self):
++        c = make_contract(read_only_paths=["relative/path"])
++        with pytest.raises(ContractValidationError):
++            c.validate()
++
++    def test_reject_ro_rw_overlap(self):
++        c = make_contract(read_only_paths=["/x"], read_write_paths=["/x"])
++        with pytest.raises(ContractValidationError):
++            c.validate()
++
++    def test_reject_credential_wildcard(self):
++        ep = EndpointPermission(
++            name="bad",
++            host="*.example.com",
++            credential_bound=True,
++            binaries=["/usr/bin/python"],
++        )
++        c = make_contract(endpoints=[ep])
++        with pytest.raises(ContractValidationError):
++            c.validate()
++
++    def test_dko_contains_authority_and_projection(self):
++        dko = make_contract().to_dko()
++        assert dko["kind"] == "AgentMissionContract"
++        assert dko["authority"]["scope"] == "cuas/read"
++        assert dko["openshell_projection"]["endpoints"][0]["host"] == "api.github.com"
++
++
++class TestCompiler:
++    def test_compile_policy(self):
++        p = OpenShellPolicyCompiler().compile(make_contract())
++        assert p.policy["version"] == 1
++        assert "/mission/lattice" in p.policy["filesystem_policy"]["read_only"]
++        assert p.policy["network_policies"]["github-read"]["endpoints"][0]["access"] == "read-only"
++        assert p.policy_hash.startswith("sha256:")
++
++    def test_compile_l7_rules(self):
++        ep = EndpointPermission(
++            name="git-clone",
++            host="github.com",
++            protocol="rest",
++            access=None,
++            binaries=["/usr/bin/git"],
++            rules=[
++                L7Rule("GET", "/**/info/refs*"),
++                L7Rule("POST", "/**/git-upload-pack"),
++            ],
++        )
++        p = OpenShellPolicyCompiler().compile(make_contract(endpoints=[ep]))
++        endpoint = p.policy["network_policies"]["git-clone"]["endpoints"][0]
++        assert "access" not in endpoint
++        assert endpoint["rules"][1]["allow"]["method"] == "POST"
++
++    def test_yaml_roundtrip(self):
++        p = OpenShellPolicyCompiler().compile(make_contract())
++        assert yaml.safe_load(p.yaml_text) == p.policy
++
++
++class TestDelta:
++    def test_added_endpoint_is_expansion(self):
++        compiler = OpenShellPolicyCompiler()
++        old = compiler.compile(make_contract(endpoints=[])).policy
++        new = compiler.compile(make_contract()).policy
++        d = diff_policies(old, new)
++        assert d.dynamic_changed
++        assert d.expands_access
++        assert any(r.startswith("network_endpoint_added") for r in d.reasons)
++
++    def test_write_path_is_static_expansion(self):
++        compiler = OpenShellPolicyCompiler()
++        old = compiler.compile(make_contract(read_write_paths=[])).policy
++        new = compiler.compile(make_contract(read_write_paths=["/sandbox/output", "/mission/patch"])).policy
++        d = diff_policies(old, new)
++        assert d.static_changed
++        assert d.requires_recreate
++        assert d.expands_access
++
++    def test_contraction_not_expansion(self):
++        compiler = OpenShellPolicyCompiler()
++        old = compiler.compile(make_contract()).policy
++        new = compiler.compile(make_contract(endpoints=[])).policy
++        d = diff_policies(old, new)
++        assert d.dynamic_changed
++        assert not d.expands_access
++
++    def test_read_only_to_full_is_expansion(self):
++        compiler = OpenShellPolicyCompiler()
++        old = compiler.compile(make_contract()).policy
++        ep = EndpointPermission(
++            name="github-read",
++            host="api.github.com",
++            access="full",
++            binaries=["/usr/bin/curl"],
++        )
++        new = compiler.compile(make_contract(endpoints=[ep])).policy
++        d = diff_policies(old, new)
++        assert d.expands_access
++        assert any(r.startswith("network_access_expanded") for r in d.reasons)
++
++
++class TestSemantic:
++    def test_medium_requires_human_gate(self):
++        c = make_contract(blast_radius_tier="medium", human_approval_required=False)
++        p = OpenShellPolicyCompiler().compile(c)
++        a = OpenShellSemanticValidator().assess(c, p)
++        assert not a.passed
++        assert any(f.code == "HUMAN_GATE_REQUIRED" for f in a.findings)
++
++    def test_broad_write_warns_but_does_not_fail_small_contract(self):
++        ep = EndpointPermission(
++            name="writer",
++            host="api.example.com",
++            access="full",
++            binaries=["/usr/bin/python"],
++        )
++        c = make_contract(endpoints=[ep])
++        p = OpenShellPolicyCompiler().compile(c)
++        a = OpenShellSemanticValidator().assess(c, p)
++        assert a.passed
++        assert any(f.code == "BROAD_NETWORK_WRITE" for f in a.findings)
++
++
++class TestController:
++    def test_new_permissions_wait_for_human(self):
++        rt = FakeRuntime(exists=False)
++        ctl = GovernedOpenShellController(rt, AllowAuthorityAdapter())
++        plan = ctl.plan(make_contract(), sandbox_name="nano")
++        assert plan.requires_human_approval
++        assert plan.status == "pending_approval"
++        with pytest.raises(GovernanceError):
++            ctl.apply(plan)
++
++    def test_approved_plan_creates_sandbox(self):
++        rt = FakeRuntime(exists=False)
++        ctl = GovernedOpenShellController(rt, AllowAuthorityAdapter())
++        plan = ctl.plan(make_contract(), sandbox_name="nano")
++        applied = ctl.apply(plan, approved_by="ROLE:MISSION-AUTHORITY")
++        assert applied.status == "applied"
++        assert rt.calls[0][0] == "create"
++
++    def test_dynamic_contraction_hot_reloads(self):
++        compiler = OpenShellPolicyCompiler()
++        current = compiler.compile(make_contract()).policy
++        rt = FakeRuntime(exists=True, current=current)
++        ctl = GovernedOpenShellController(rt, AllowAuthorityAdapter())
++        c = make_contract(endpoints=[], human_approval_required=False)
++        plan = ctl.plan(c, sandbox_name="nano")
++        assert plan.status == "ready"
++        assert not plan.delta.static_changed
++        applied = ctl.apply(plan)
++        assert applied.status == "applied"
++        assert rt.calls[-1][0] == "set"
++
++    def test_static_change_requires_recreate(self):
++        compiler = OpenShellPolicyCompiler()
++        current = compiler.compile(make_contract(read_write_paths=[])).policy
++        rt = FakeRuntime(exists=True, current=current)
++        ctl = GovernedOpenShellController(rt, AllowAuthorityAdapter())
++        c = make_contract(read_write_paths=["/sandbox/output", "/new-write"])
++        plan = ctl.plan(c, sandbox_name="nano")
++        assert plan.status == "requires_recreate"
++        same = ctl.apply(plan, approved_by="ROLE:MISSION-AUTHORITY", recreate=False)
++        assert same.status == "requires_recreate"
++        assert not rt.calls
++
++    def test_static_change_can_recreate_with_explicit_flag(self):
++        compiler = OpenShellPolicyCompiler()
++        current = compiler.compile(make_contract(read_write_paths=[])).policy
++        rt = FakeRuntime(exists=True, current=current)
++        ctl = GovernedOpenShellController(rt, AllowAuthorityAdapter())
++        c = make_contract(read_write_paths=["/sandbox/output", "/new-write"])
++        plan = ctl.plan(c, sandbox_name="nano")
++        applied = ctl.apply(plan, approved_by="ROLE:MISSION-AUTHORITY", recreate=True)
++        assert applied.status == "applied"
++        assert [x[0] for x in rt.calls] == ["delete", "create"]
++
++
++class TestAudit:
++    def test_normalize_denial(self):
++        raw = {
++            "timestamp": "2026-09-28T20:00:00Z",
++            "decision": "DENIED",
++            "action": "HTTP:POST",
++            "process": {"file": {"path": "/usr/bin/curl"}},
++            "dst_endpoint": {"hostname": "api.github.com", "port": 443},
++            "http_request": {"http_method": "POST", "url": {"path": "/repos/x/y/issues"}},
++            "policy": {"rule": "github_api", "reason": "method denied"},
++        }
++        event = normalize_ocsf_event(raw, sandbox_name="nano")
++        assert event.denied
++        assert event.host == "api.github.com"
++        assert event.method == "POST"
++
++        ce = to_cerpa_event(event, contract_id="AMC-001", episode_id="EP-001")
++        assert ce.metadata["violation"] is True
++        assert ce.observed_state["status"] == "violated"
++
++        ve = to_vinculum_event(event, contract_hash="sha256:c", policy_hash="sha256:p")
++        assert ve["contract_hash"] == "sha256:c"
++        assert ve["resource"]["path"] == "/repos/x/y/issues"
++
++    def test_denial_runs_cerpa_cycle(self):
++        event = normalize_ocsf_event({"decision": "DENIED", "action": "NET:OPEN", "reason": "blocked"})
++        cycle = run_runtime_event_cycle(make_contract(), event)
++        assert cycle.review.drift_detected is True
++        assert cycle.patch is not None
++
++
++class TestLoader:
++    def test_from_dict_rules(self):
++        c = contract_from_dict({
++            "contract_id": "A",
++            "episode_id": "E",
++            "mission": "M",
++            "objective": "O",
++            "agent_id": "G",
++            "actor_id": "ACT",
++            "command": ["python"],
++            "authority_scope": "scope",
++            "endpoints": [{
++                "name": "x",
++                "host": "api.example.com",
++                "binaries": ["/usr/bin/python"],
++                "rules": [{"method": "GET", "path": "/v1/**"}],
++            }],
++        })
++        assert c.endpoints[0].rules[0].method == "GET"
++
++    def test_source_extensions_preserved(self):
++        c = contract_from_dict({
++            "contract_id": "A",
++            "episode_id": "E",
++            "mission": "M",
++            "objective": "O",
++            "agent_id": "G",
++            "actor_id": "ACT",
++            "command": ["python"],
++            "authority_scope": "scope",
++            "future_field": {"x": 1},
++        })
++        assert c.metadata["source_extensions"]["future_field"] == {"x": 1}
+--- /mnt/data/DeepSigma_orig/DeepSigma-main/src/core/openshell/__init__.py	1970-01-01 00:00:00.000000000 +0000
++++ /mnt/data/DeepSigma_work/DeepSigma-main/src/core/openshell/__init__.py	2026-09-28 20:37:21.725149918 +0000
+@@ -0,0 +1,66 @@
++"""Deep Sigma ↔ NVIDIA OpenShell governed runtime bridge.
++
++OpenShell contains the agent. Deep Sigma contains the consequences.
++"""
++
++from .audit import normalize_ocsf_event, normalize_ocsf_stream, to_cerpa_event, to_vinculum_event
++from .authority import AllowAuthorityAdapter, DeepSigmaAuthorityAdapter
++from .cerpa_bridge import contract_claim, policy_plan_event, run_plan_cycle, run_runtime_event_cycle
++from .compiler import OpenShellPolicyCompiler, diff_policies
++from .controller import GovernanceError, GovernedOpenShellController
++from .loader import contract_from_dict, load_contract
++from .models import (
++    AccessMode,
++    AgentMissionContract,
++    AuthorityDecision,
++    ContractValidationError,
++    EndpointPermission,
++    GovernedPlan,
++    L7Rule,
++    OpenShellAuditEvent,
++    PlanStatus,
++    PolicyDelta,
++    PolicyProjection,
++    SemanticAssessment,
++    SemanticFinding,
++)
++from .runtime import OpenShellCliRuntime, OpenShellRuntimeError, OpenShellSdkProbe
++from .semantic import OpenShellSemanticValidator
++
++__version__ = "0.1.0"
++
++__all__ = [
++    "AccessMode",
++    "AgentMissionContract",
++    "AllowAuthorityAdapter",
++    "AuthorityDecision",
++    "ContractValidationError",
++    "DeepSigmaAuthorityAdapter",
++    "EndpointPermission",
++    "GovernanceError",
++    "GovernedOpenShellController",
++    "GovernedPlan",
++    "L7Rule",
++    "OpenShellAuditEvent",
++    "OpenShellCliRuntime",
++    "OpenShellPolicyCompiler",
++    "OpenShellRuntimeError",
++    "OpenShellSdkProbe",
++    "OpenShellSemanticValidator",
++    "PlanStatus",
++    "PolicyDelta",
++    "PolicyProjection",
++    "SemanticAssessment",
++    "SemanticFinding",
++    "contract_claim",
++    "contract_from_dict",
++    "diff_policies",
++    "load_contract",
++    "normalize_ocsf_event",
++    "normalize_ocsf_stream",
++    "policy_plan_event",
++    "run_plan_cycle",
++    "run_runtime_event_cycle",
++    "to_cerpa_event",
++    "to_vinculum_event",
++]
+--- /mnt/data/DeepSigma_orig/DeepSigma-main/src/core/openshell/audit.py	1970-01-01 00:00:00.000000000 +0000
++++ /mnt/data/DeepSigma_work/DeepSigma-main/src/core/openshell/audit.py	2026-09-28 20:37:21.722034405 +0000
+@@ -0,0 +1,143 @@
++"""Normalize OpenShell OCSF/log events for CERPA and VINCULUM replay."""
++
++from __future__ import annotations
++
++import uuid
++from datetime import datetime, timezone
++from typing import Any, Dict, Iterable, List
++
++from core.cerpa.models import Event
++
++from .models import OpenShellAuditEvent
++
++
++def normalize_ocsf_event(raw: Dict[str, Any], *, sandbox_name: str = "") -> OpenShellAuditEvent:
++    """Best-effort normalization of an OpenShell OCSF JSON record.
++
++    OpenShell's OCSF export is richer than this projection.  The raw record is
++    always preserved so no evidence is lost if upstream field names evolve.
++    """
++    ts = _first(raw, "time", "timestamp", "event_time", "metadata.logged_time")
++    if ts is None:
++        ts = datetime.now(timezone.utc).isoformat()
++    else:
++        ts = str(ts)
++
++    decision = str(_first(raw, "decision", "disposition", "status", "policy.decision") or "UNKNOWN")
++    action = str(_first(raw, "activity_name", "activity", "action", "event_name", "message") or "runtime_event")
++    binary = str(_first(raw, "process.file.path", "process.executable", "binary", "process.name") or "")
++    host = str(_first(raw, "dst_endpoint.hostname", "destination.hostname", "host", "http_request.url.hostname") or "")
++    port_raw = _first(raw, "dst_endpoint.port", "destination.port", "port")
++    try:
++        port = int(port_raw) if port_raw is not None else None
++    except (TypeError, ValueError):
++        port = None
++    method = str(_first(raw, "http_request.http_method", "http.method", "method") or "")
++    path = str(_first(raw, "http_request.url.path", "http.path", "path") or "")
++    rule = str(_first(raw, "policy.rule", "policy_name", "rule") or "")
++    reason = str(_first(raw, "status_detail", "policy.reason", "reason", "message") or "")
++    sandbox = sandbox_name or str(_first(raw, "sandbox", "sandbox_name", "metadata.sandbox") or "")
++
++    return OpenShellAuditEvent(
++        event_id=f"OSEVT-{uuid.uuid4().hex[:12]}",
++        timestamp=ts,
++        sandbox_name=sandbox,
++        decision=decision,
++        action=action,
++        binary=binary,
++        host=host,
++        port=port,
++        method=method,
++        path=path,
++        rule=rule,
++        reason=reason,
++        raw=dict(raw),
++    )
++
++
++def to_cerpa_event(event: OpenShellAuditEvent, *, contract_id: str = "", episode_id: str = "") -> Event:
++    """Project an OpenShell runtime event into the CERPA Event primitive."""
++    target = event.host
++    if event.port:
++        target = f"{target}:{event.port}" if target else str(event.port)
++    request = " ".join(x for x in [event.method, event.path] if x)
++    text = f"OpenShell {event.decision}: {event.action}"
++    if target:
++        text += f" -> {target}"
++    if request:
++        text += f" ({request})"
++
++    return Event(
++        id=event.event_id,
++        text=text,
++        domain="authorityops",
++        source="openshell",
++        timestamp=event.timestamp,
++        observed_state={
++            "status": "violated" if event.denied else "observed",
++            "decision": event.decision,
++            "sandbox": event.sandbox_name,
++            "host": event.host,
++            "port": event.port,
++            "method": event.method,
++            "path": event.path,
++            "binary": event.binary,
++            "rule": event.rule,
++        },
++        related_ids=[x for x in [contract_id, episode_id] if x],
++        metadata={
++            "violation": event.denied,
++            "violation_detail": event.reason if event.denied else "",
++            "raw_ocsf": event.raw,
++        },
++    )
++
++
++def to_vinculum_event(event: OpenShellAuditEvent, *, contract_hash: str = "", policy_hash: str = "") -> Dict[str, Any]:
++    """Produce a replay-safe VINCULUM event projection."""
++    return {
++        "kind": "openshell_runtime_event",
++        "event_id": event.event_id,
++        "timestamp": event.timestamp,
++        "sandbox": event.sandbox_name,
++        "decision": event.decision,
++        "action": event.action,
++        "resource": {
++            "host": event.host,
++            "port": event.port,
++            "method": event.method,
++            "path": event.path,
++        },
++        "binary": event.binary,
++        "rule": event.rule,
++        "reason": event.reason,
++        "contract_hash": contract_hash,
++        "policy_hash": policy_hash,
++        "source": "openshell",
++    }
++
++
++def normalize_ocsf_stream(records: Iterable[Dict[str, Any]], *, sandbox_name: str = "") -> List[OpenShellAuditEvent]:
++    return [normalize_ocsf_event(r, sandbox_name=sandbox_name) for r in records]
++
++
++def _first(data: Dict[str, Any], *paths: str) -> Any:
++    for path in paths:
++        current: Any = data
++        ok = True
++        for part in path.split("."):
++            if not isinstance(current, dict) or part not in current:
++                ok = False
++                break
++            current = current[part]
++        if ok and current is not None:
++            return current
++    return None
++
++
++__all__ = [
++    "normalize_ocsf_event",
++    "normalize_ocsf_stream",
++    "to_cerpa_event",
++    "to_vinculum_event",
++]
+--- /mnt/data/DeepSigma_orig/DeepSigma-main/src/core/openshell/authority.py	1970-01-01 00:00:00.000000000 +0000
++++ /mnt/data/DeepSigma_work/DeepSigma-main/src/core/openshell/authority.py	2026-09-28 20:37:21.720399339 +0000
+@@ -0,0 +1,75 @@
++"""PATHFINDER/AuthorityOps bridge for OpenShell actions."""
++
++from __future__ import annotations
++
++import uuid
++from typing import Any, Dict, Optional
++
++from core.authority.models import CompiledPolicy
++from core.authority.runtime_gate import RuntimeGate
++
++from .models import AgentMissionContract, AuthorityDecision
++
++
++class DeepSigmaAuthorityAdapter:
++    """Evaluate OpenShell changes with the existing Deep Sigma RuntimeGate."""
++
++    def __init__(
++        self,
++        context: Dict[str, Any],
++        compiled_policy: Optional[CompiledPolicy] = None,
++        runtime_gate: Optional[RuntimeGate] = None,
++    ) -> None:
++        self.context = context
++        self.compiled_policy = compiled_policy
++        self.runtime_gate = runtime_gate or RuntimeGate()
++
++    def evaluate(
++        self,
++        contract: AgentMissionContract,
++        *,
++        sandbox_name: str,
++        action_type: str = "openshell_policy_change",
++    ) -> AuthorityDecision:
++        request = {
++            "actionId": f"OSACT-{uuid.uuid4().hex[:12]}",
++            "actionType": action_type,
++            "actorId": contract.actor_id,
++            "resourceRef": f"openshell:{sandbox_name}",
++            "episodeId": contract.episode_id,
++            "blastRadiusTier": contract.blast_radius_tier,
++            "authorityScope": contract.authority_scope,
++            "contractId": contract.contract_id,
++        }
++        # RuntimeGate mutates context by attaching _compiled, so isolate callers.
++        context = dict(self.context)
++        if self.compiled_policy is not None:
++            result = self.runtime_gate.evaluate(self.compiled_policy, request, context)
++        else:
++            result = self.runtime_gate.evaluate_raw(request, context)
++
++        reason = result.failed_reason or (
++            "authority allowed" if result.verdict == "ALLOW" else "authority gate denied or escalated"
++        )
++        return AuthorityDecision(
++            verdict=result.verdict,
++            gate_id=result.gate_id,
++            reason=reason,
++            passed_checks=list(result.passed_checks),
++            failed_checks=list(result.failed_checks),
++            escalation_target=result.escalation_target,
++        )
++
++
++class AllowAuthorityAdapter:
++    """Explicit development adapter; never use as a hidden production default."""
++
++    def evaluate(self, contract: AgentMissionContract, *, sandbox_name: str, action_type: str = "openshell_policy_change") -> AuthorityDecision:
++        return AuthorityDecision(
++            verdict="ALLOW",
++            gate_id="DEV-ALLOW",
++            reason="explicit AllowAuthorityAdapter",
++        )
++
++
++__all__ = ["AllowAuthorityAdapter", "DeepSigmaAuthorityAdapter"]
+--- /mnt/data/DeepSigma_orig/DeepSigma-main/src/core/openshell/cerpa_bridge.py	1970-01-01 00:00:00.000000000 +0000
++++ /mnt/data/DeepSigma_work/DeepSigma-main/src/core/openshell/cerpa_bridge.py	2026-09-28 20:37:21.723536664 +0000
+@@ -0,0 +1,93 @@
++"""CERPA integration for OpenShell policy/runtime changes."""
++
++from __future__ import annotations
++
++import uuid
++from datetime import datetime, timezone
++from typing import Optional
++
++from core.cerpa.engine import run_cerpa_cycle
++from core.cerpa.models import CerpaCycle, Claim, Event
++
++from .models import AgentMissionContract, GovernedPlan, OpenShellAuditEvent
++from .audit import to_cerpa_event
++
++
++def _now() -> str:
++    return datetime.now(timezone.utc).isoformat()
++
++
++def contract_claim(contract: AgentMissionContract) -> Claim:
++    """Represent the governing mission contract as a CERPA claim."""
++    return Claim(
++        id=f"OSCLAIM-{contract.contract_id}",
++        text=(
++            f"Agent {contract.agent_id} is authorized only within mission "
++            f"{contract.mission!r} and authority scope {contract.authority_scope!r}."
++        ),
++        domain="authorityops",
++        source="deepsigma.openshell",
++        timestamp=_now(),
++        assumptions=list(contract.assumptions),
++        authority=contract.authority_scope,
++        provenance=[{"type": "mission_contract", "ref": contract.contract_id, "hash": contract.canonical_hash()}],
++        related_ids=[contract.episode_id],
++        metadata={
++            "blast_radius_tier": contract.blast_radius_tier,
++            "kill_conditions": list(contract.kill_conditions),
++        },
++    )
++
++
++def policy_plan_event(plan: GovernedPlan) -> Event:
++    """Create a CERPA event for a proposed/applied OpenShell policy state."""
++    violation = plan.status == "blocked"
++    return Event(
++        id=f"OSEVT-PLAN-{uuid.uuid4().hex[:10]}",
++        text=f"OpenShell policy plan {plan.plan_id} status={plan.status}",
++        domain="authorityops",
++        source="deepsigma.openshell",
++        timestamp=_now(),
++        observed_state={
++            "status": "violated" if violation else "observed",
++            "plan_status": plan.status,
++            "policy_hash": plan.projection.policy_hash,
++            "expands_access": plan.delta.expands_access,
++            "static_changed": plan.delta.static_changed,
++            "dynamic_changed": plan.delta.dynamic_changed,
++        },
++        provenance=[
++            {"type": "mission_contract", "hash": plan.projection.contract_hash},
++            {"type": "openshell_policy", "hash": plan.projection.policy_hash},
++        ],
++        related_ids=[plan.contract.contract_id, plan.contract.episode_id],
++        metadata={
++            "violation": violation,
++            "violation_detail": "; ".join(plan.reasons) if violation else "",
++            "authority_verdict": plan.authority.verdict,
++        },
++    )
++
++
++def run_plan_cycle(plan: GovernedPlan) -> CerpaCycle:
++    return run_cerpa_cycle(contract_claim(plan.contract), policy_plan_event(plan))
++
++
++def run_runtime_event_cycle(
++    contract: AgentMissionContract,
++    runtime_event: OpenShellAuditEvent,
++) -> CerpaCycle:
++    event = to_cerpa_event(
++        runtime_event,
++        contract_id=contract.contract_id,
++        episode_id=contract.episode_id,
++    )
++    return run_cerpa_cycle(contract_claim(contract), event)
++
++
++__all__ = [
++    "contract_claim",
++    "policy_plan_event",
++    "run_plan_cycle",
++    "run_runtime_event_cycle",
++]
+--- /mnt/data/DeepSigma_orig/DeepSigma-main/src/core/openshell/cli.py	1970-01-01 00:00:00.000000000 +0000
++++ /mnt/data/DeepSigma_work/DeepSigma-main/src/core/openshell/cli.py	2026-09-28 20:37:21.724910669 +0000
+@@ -0,0 +1,67 @@
++"""CLI for the Deep Sigma OpenShell bridge."""
++
++from __future__ import annotations
++
++import argparse
++import json
++from pathlib import Path
++
++import yaml
++
++from .compiler import OpenShellPolicyCompiler, diff_policies
++from .loader import load_contract
++
++
++def build_parser() -> argparse.ArgumentParser:
++    p = argparse.ArgumentParser(prog="deepsigma-openshell")
++    sub = p.add_subparsers(dest="command", required=True)
++
++    c = sub.add_parser("compile", help="compile a mission contract to OpenShell policy YAML")
++    c.add_argument("contract")
++    c.add_argument("--out", required=True)
++    c.add_argument("--dko-out")
++
++    d = sub.add_parser("diff", help="classify an OpenShell policy delta")
++    d.add_argument("old")
++    d.add_argument("new")
++
++    return p
++
++
++def main(argv: list[str] | None = None) -> int:
++    args = build_parser().parse_args(argv)
++    if args.command == "compile":
++        contract = load_contract(args.contract)
++        projection = OpenShellPolicyCompiler().compile(contract)
++        Path(args.out).write_text(projection.yaml_text, encoding="utf-8")
++        if args.dko_out:
++            Path(args.dko_out).write_text(
++                json.dumps(contract.to_dko(), indent=2, sort_keys=True),
++                encoding="utf-8",
++            )
++        print(json.dumps({
++            "contract_id": contract.contract_id,
++            "contract_hash": projection.contract_hash,
++            "policy_hash": projection.policy_hash,
++            "out": str(Path(args.out)),
++        }, indent=2))
++        return 0
++
++    if args.command == "diff":
++        old = yaml.safe_load(Path(args.old).read_text(encoding="utf-8")) or {}
++        new = yaml.safe_load(Path(args.new).read_text(encoding="utf-8")) or {}
++        delta = diff_policies(old, new)
++        print(json.dumps({
++            "static_changed": delta.static_changed,
++            "dynamic_changed": delta.dynamic_changed,
++            "expands_access": delta.expands_access,
++            "requires_recreate": delta.requires_recreate,
++            "reasons": delta.reasons,
++        }, indent=2))
++        return 0
++
++    return 2
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+--- /mnt/data/DeepSigma_orig/DeepSigma-main/src/core/openshell/compiler.py	1970-01-01 00:00:00.000000000 +0000
++++ /mnt/data/DeepSigma_work/DeepSigma-main/src/core/openshell/compiler.py	2026-09-28 20:37:21.718667645 +0000
+@@ -0,0 +1,260 @@
++"""Compile Deep Sigma AgentMissionContract objects to OpenShell policy YAML."""
++
++from __future__ import annotations
++
++from copy import deepcopy
++from typing import Any, Dict, Iterable, List, Set, Tuple
++
++import yaml
++
++from .models import (
++    AccessMode,
++    AgentMissionContract,
++    EndpointPermission,
++    PolicyDelta,
++    PolicyProjection,
++    canonical_hash,
++    _safe_key,
++)
++
++# Conservative runtime paths based on OpenShell's documented default/baseline
++# policy.  Mission-specific paths are appended, never inferred.
++_BASE_READ_ONLY = [
++    "/bin",
++    "/usr",
++    "/lib",
++    "/proc",
++    "/etc",
++    "/var/log",
++    "/dev/urandom",
++]
++_BASE_READ_WRITE = ["/tmp", "/dev/null"]
++
++
++class OpenShellPolicyCompiler:
++    """One-way projection from Deep Sigma mission semantics to enforcement."""
++
++    def compile(self, contract: AgentMissionContract) -> PolicyProjection:
++        contract.validate()
++
++        filesystem = {
++            "include_workdir": bool(contract.include_workdir),
++            "read_only": _unique(_BASE_READ_ONLY + list(contract.read_only_paths)),
++            "read_write": _unique(_BASE_READ_WRITE + list(contract.read_write_paths)),
++        }
++        policy: Dict[str, Any] = {
++            "version": 1,
++            "filesystem_policy": filesystem,
++            "landlock": {"compatibility": "best_effort"},
++        }
++
++        if contract.process_user or contract.process_group:
++            process: Dict[str, str] = {}
++            if contract.process_user:
++                process["run_as_user"] = contract.process_user
++            if contract.process_group:
++                process["run_as_group"] = contract.process_group
++            policy["process"] = process
++
++        if contract.endpoints:
++            network: Dict[str, Any] = {}
++            for permission in contract.endpoints:
++                network[_safe_key(permission.name)] = self._compile_endpoint(permission)
++            policy["network_policies"] = network
++
++        static_surface = {
++            "filesystem_policy": policy.get("filesystem_policy", {}),
++            "landlock": policy.get("landlock", {}),
++            "process": policy.get("process", {}),
++        }
++        dynamic_surface = {
++            "network_policies": policy.get("network_policies", {}),
++            "network_middlewares": policy.get("network_middlewares", {}),
++        }
++        yaml_text = yaml.safe_dump(policy, sort_keys=False, default_flow_style=False)
++        return PolicyProjection(
++            contract_id=contract.contract_id,
++            contract_hash=contract.canonical_hash(),
++            policy=policy,
++            yaml_text=yaml_text,
++            policy_hash=canonical_hash(policy),
++            static_hash=canonical_hash(static_surface),
++            dynamic_hash=canonical_hash(dynamic_surface),
++        )
++
++    def _compile_endpoint(self, permission: EndpointPermission) -> Dict[str, Any]:
++        permission.validate()
++        endpoint: Dict[str, Any] = {
++            "host": permission.host,
++            "port": int(permission.port),
++        }
++        if permission.protocol:
++            endpoint["protocol"] = permission.protocol
++        if permission.tls:
++            endpoint["tls"] = permission.tls
++        if permission.enforcement:
++            endpoint["enforcement"] = permission.enforcement
++
++        if permission.rules:
++            rules: List[Dict[str, Any]] = []
++            for rule in permission.rules:
++                rules.append(
++                    {
++                        "allow" if rule.allow else "deny": {
++                            "method": rule.method.upper(),
++                            "path": rule.path,
++                        }
++                    }
++                )
++            endpoint["rules"] = rules
++        elif permission.access:
++            endpoint["access"] = permission.access
++
++        result: Dict[str, Any] = {
++            "name": permission.name,
++            "endpoints": [endpoint],
++            "binaries": [{"path": p} for p in _unique(permission.binaries)],
++        }
++        return result
++
++
++def diff_policies(old: Dict[str, Any] | None, new: Dict[str, Any]) -> PolicyDelta:
++    """Classify an OpenShell policy change for Deep Sigma governance.
++
++    OpenShell has startup-time static controls and hot-reloadable dynamic network
++    controls.  Deep Sigma additionally asks whether the proposed delta *expands*
++    what the agent can touch, because expansion should normally require explicit
++    authority/human review.
++    """
++    old = deepcopy(old or {"version": 1})
++    new = deepcopy(new)
++
++    static_keys = ("filesystem_policy", "landlock", "process")
++    dynamic_keys = ("network_policies", "network_middlewares")
++    static_changed = any(old.get(k, {}) != new.get(k, {}) for k in static_keys)
++    dynamic_changed = any(old.get(k, {}) != new.get(k, {}) for k in dynamic_keys)
++
++    reasons: List[str] = []
++    expands = False
++
++    old_fs = old.get("filesystem_policy", {}) or {}
++    new_fs = new.get("filesystem_policy", {}) or {}
++    old_ro, old_rw = set(old_fs.get("read_only", []) or []), set(old_fs.get("read_write", []) or [])
++    new_ro, new_rw = set(new_fs.get("read_only", []) or []), set(new_fs.get("read_write", []) or [])
++
++    added_rw = new_rw - old_rw
++    if added_rw:
++        expands = True
++        reasons.append("filesystem_write_added:" + ",".join(sorted(added_rw)))
++    promoted_rw = (new_rw & old_ro) - old_rw
++    if promoted_rw:
++        expands = True
++        reasons.append("filesystem_promoted_to_write:" + ",".join(sorted(promoted_rw)))
++    added_ro = new_ro - old_ro - old_rw
++    if added_ro:
++        expands = True
++        reasons.append("filesystem_read_added:" + ",".join(sorted(added_ro)))
++    if bool(new_fs.get("include_workdir")) and not bool(old_fs.get("include_workdir")):
++        expands = True
++        reasons.append("workdir_access_enabled")
++
++    old_network = _network_capabilities(old.get("network_policies", {}) or {})
++    new_network = _network_capabilities(new.get("network_policies", {}) or {})
++
++    old_hosts = {(x[0], x[1], x[2]) for x in old_network}
++    new_hosts = {(x[0], x[1], x[2]) for x in new_network}
++    added_hosts = new_hosts - old_hosts
++    if added_hosts:
++        expands = True
++        reasons.append(
++            "network_endpoint_added:"
++            + ",".join(f"{h}:{p}/{proto or 'tcp'}" for h, p, proto in sorted(added_hosts))
++        )
++
++    old_strength = _max_access_by_endpoint(old_network)
++    new_strength = _max_access_by_endpoint(new_network)
++    for endpoint, strength in new_strength.items():
++        if strength > old_strength.get(endpoint, -1):
++            expands = True
++            if endpoint in old_strength:
++                reasons.append(
++                    f"network_access_expanded:{endpoint[0]}:{endpoint[1]}:{old_strength[endpoint]}->{strength}"
++                )
++
++    old_rules = _rule_set(old_network)
++    new_rules = _rule_set(new_network)
++    added_allow = {r for r in new_rules - old_rules if r[3] == "allow"}
++    if added_allow:
++        expands = True
++        reasons.append(f"network_allow_rules_added:{len(added_allow)}")
++
++    return PolicyDelta(
++        static_changed=static_changed,
++        dynamic_changed=dynamic_changed,
++        expands_access=expands,
++        reasons=reasons,
++    )
++
++
++def _network_capabilities(policies: Dict[str, Any]) -> List[Tuple[str, int, str, str, Tuple[Tuple[str, str, str], ...]]]:
++    result: List[Tuple[str, int, str, str, Tuple[Tuple[str, str, str], ...]]] = []
++    for body in policies.values():
++        for endpoint in body.get("endpoints", []) or []:
++            rules: List[Tuple[str, str, str]] = []
++            for item in endpoint.get("rules", []) or []:
++                for kind in ("allow", "deny"):
++                    rule = item.get(kind)
++                    if rule:
++                        rules.append((kind, str(rule.get("method", "*")).upper(), str(rule.get("path", "/**"))))
++            result.append(
++                (
++                    str(endpoint.get("host", "")),
++                    int(endpoint.get("port", 0) or 0),
++                    str(endpoint.get("protocol", "")),
++                    str(endpoint.get("access", "")),
++                    tuple(sorted(rules)),
++                )
++            )
++    return result
++
++
++def _access_strength(access: str) -> int:
++    return {
++        "": 0,
++        AccessMode.READ_ONLY.value: 1,
++        AccessMode.READ_WRITE.value: 2,
++        AccessMode.FULL.value: 3,
++    }.get(access, 2)
++
++
++def _max_access_by_endpoint(items: Iterable[Tuple[str, int, str, str, tuple]]) -> Dict[Tuple[str, int, str], int]:
++    out: Dict[Tuple[str, int, str], int] = {}
++    for host, port, protocol, access, rules in items:
++        key = (host, port, protocol)
++        # Explicit allow rules are treated as scoped access, not zero access.
++        strength = _access_strength(access)
++        if rules and any(r[0] == "allow" for r in rules):
++            strength = max(strength, 1)
++        out[key] = max(out.get(key, -1), strength)
++    return out
++
++
++def _rule_set(items: Iterable[Tuple[str, int, str, str, tuple]]) -> Set[Tuple[str, int, str, str, str, str]]:
++    out: Set[Tuple[str, int, str, str, str, str]] = set()
++    for host, port, protocol, _access, rules in items:
++        for kind, method, path in rules:
++            out.add((host, port, protocol, kind, method, path))
++    return out
++
++
++def _unique(values: Iterable[str]) -> List[str]:
++    seen: Set[str] = set()
++    result: List[str] = []
++    for value in values:
++        if value not in seen:
++            seen.add(value)
++            result.append(value)
++    return result
++
++
++__all__ = ["OpenShellPolicyCompiler", "diff_policies"]
+--- /mnt/data/DeepSigma_orig/DeepSigma-main/src/core/openshell/controller.py	1970-01-01 00:00:00.000000000 +0000
++++ /mnt/data/DeepSigma_work/DeepSigma-main/src/core/openshell/controller.py	2026-09-28 20:37:21.722838896 +0000
+@@ -0,0 +1,150 @@
++"""Governed orchestration for Deep Sigma ↔ OpenShell."""
++
++from __future__ import annotations
++
++import uuid
++from datetime import datetime, timezone
++from typing import Any, Dict, Optional
++
++from .compiler import OpenShellPolicyCompiler, diff_policies
++from .models import (
++    AgentMissionContract,
++    GovernedPlan,
++    PlanStatus,
++)
++from .semantic import OpenShellSemanticValidator
++
++
++def _now() -> str:
++    return datetime.now(timezone.utc).isoformat()
++
++
++class GovernanceError(RuntimeError):
++    pass
++
++
++class GovernedOpenShellController:
++    """Coordinate semantic, authority, human and runtime boundaries.
++
++    Important invariant: the controller never treats an OpenShell technical
++    policy proof as mission authorization.  Semantic/authority/human gates must
++    pass independently before an access expansion is applied.
++    """
++
++    def __init__(
++        self,
++        runtime: Any,
++        authority_adapter: Any,
++        *,
++        compiler: Optional[OpenShellPolicyCompiler] = None,
++        semantic_validator: Optional[OpenShellSemanticValidator] = None,
++    ) -> None:
++        self.runtime = runtime
++        self.authority_adapter = authority_adapter
++        self.compiler = compiler or OpenShellPolicyCompiler()
++        self.semantic_validator = semantic_validator or OpenShellSemanticValidator()
++
++    def plan(
++        self,
++        contract: AgentMissionContract,
++        *,
++        sandbox_name: str,
++        current_policy: Optional[Dict[str, Any]] = None,
++    ) -> GovernedPlan:
++        projection = self.compiler.compile(contract)
++        semantic = self.semantic_validator.assess(contract, projection)
++        authority = self.authority_adapter.evaluate(
++            contract,
++            sandbox_name=sandbox_name,
++            action_type="openshell_policy_change",
++        )
++
++        if current_policy is None and self.runtime.sandbox_exists(sandbox_name):
++            current_policy = self.runtime.get_base_policy(sandbox_name)
++        delta = diff_policies(current_policy, projection.policy)
++
++        reasons = list(delta.reasons)
++        blocked = not semantic.passed or authority.verdict in {
++            "BLOCK",
++            "EXPIRED",
++            "MISSING_REASONING",
++            "KILL_SWITCH_ACTIVE",
++        }
++        if not semantic.passed:
++            reasons.extend(f"semantic:{f.code}" for f in semantic.findings if f.severity == "critical")
++        if authority.verdict != "ALLOW":
++            reasons.append(f"authority:{authority.verdict}")
++
++        requires_human = bool(
++            contract.human_approval_required
++            or delta.expands_access
++            or authority.verdict == "ESCALATE"
++        )
++
++        if blocked:
++            status = PlanStatus.BLOCKED.value
++        elif delta.requires_recreate and self.runtime.sandbox_exists(sandbox_name):
++            # Still may require approval; caller gets an explicit structural state.
++            status = PlanStatus.REQUIRES_RECREATE.value
++        elif requires_human:
++            status = PlanStatus.PENDING_APPROVAL.value
++        else:
++            status = PlanStatus.READY.value
++
++        return GovernedPlan(
++            plan_id=f"OSPLAN-{uuid.uuid4().hex[:12]}",
++            sandbox_name=sandbox_name,
++            contract=contract,
++            projection=projection,
++            semantic=semantic,
++            authority=authority,
++            delta=delta,
++            status=status,
++            requires_human_approval=requires_human,
++            created_at=_now(),
++            reasons=reasons,
++        )
++
++    def apply(
++        self,
++        plan: GovernedPlan,
++        *,
++        approved_by: Optional[str] = None,
++        recreate: bool = False,
++    ) -> GovernedPlan:
++        if plan.status == PlanStatus.BLOCKED.value:
++            raise GovernanceError("plan is blocked and cannot be applied")
++        if plan.requires_human_approval and not approved_by:
++            raise GovernanceError("human approval is required before this access change can be applied")
++        if approved_by:
++            plan.approved_by = approved_by
++
++        exists = self.runtime.sandbox_exists(plan.sandbox_name)
++        if exists and plan.delta.requires_recreate:
++            if not recreate:
++                plan.status = PlanStatus.REQUIRES_RECREATE.value
++                return plan
++            self.runtime.delete(plan.sandbox_name)
++            exists = False
++
++        if exists:
++            receipt = self.runtime.apply_policy(
++                plan.sandbox_name,
++                plan.projection.yaml_text,
++                wait=True,
++            )
++        else:
++            receipt = self.runtime.create_sandbox(
++                plan.sandbox_name,
++                plan.projection.yaml_text,
++                plan.contract.command,
++                image=plan.contract.sandbox_image,
++            )
++
++        plan.runtime_receipt = receipt
++        plan.applied_at = _now()
++        plan.status = PlanStatus.APPLIED.value
++        return plan
++
++
++__all__ = ["GovernanceError", "GovernedOpenShellController"]
+--- /mnt/data/DeepSigma_orig/DeepSigma-main/src/core/openshell/loader.py	1970-01-01 00:00:00.000000000 +0000
++++ /mnt/data/DeepSigma_work/DeepSigma-main/src/core/openshell/loader.py	2026-09-28 20:37:21.724194619 +0000
+@@ -0,0 +1,93 @@
++"""YAML/JSON loaders for AgentMissionContract."""
++
++from __future__ import annotations
++
++import json
++from pathlib import Path
++from typing import Any, Dict
++
++import yaml
++
++from .models import AgentMissionContract, EndpointPermission, L7Rule
++
++
++def contract_from_dict(data: Dict[str, Any]) -> AgentMissionContract:
++    endpoints = []
++    for raw in data.get("endpoints", []) or []:
++        rules = [
++            L7Rule(
++                method=str(r.get("method", "")),
++                path=str(r.get("path", "")),
++                allow=bool(r.get("allow", True)),
++            )
++            for r in raw.get("rules", []) or []
++        ]
++        endpoints.append(
++            EndpointPermission(
++                name=str(raw.get("name", "")),
++                host=str(raw.get("host", "")),
++                port=int(raw.get("port", 443)),
++                protocol=raw.get("protocol", "rest"),
++                enforcement=raw.get("enforcement", "enforce"),
++                tls=raw.get("tls", "terminate"),
++                access=raw.get("access", "read-only"),
++                binaries=list(raw.get("binaries", []) or []),
++                rules=rules,
++                credential_bound=bool(raw.get("credential_bound", False)),
++                description=str(raw.get("description", "")),
++            )
++        )
++
++    known = {
++        "contract_id", "episode_id", "mission", "objective", "agent_id", "actor_id",
++        "command", "authority_scope", "role", "blast_radius_tier", "read_only_paths",
++        "read_write_paths", "endpoints", "include_workdir", "process_user", "process_group",
++        "assumptions", "evidence_refs", "kill_conditions", "expected_outputs",
++        "human_approval_required", "sandbox_image", "metadata",
++    }
++    contract = AgentMissionContract(
++        contract_id=str(data.get("contract_id", "")),
++        episode_id=str(data.get("episode_id", "")),
++        mission=str(data.get("mission", "")),
++        objective=str(data.get("objective", "")),
++        agent_id=str(data.get("agent_id", "")),
++        actor_id=str(data.get("actor_id", "")),
++        command=list(data.get("command", []) or []),
++        authority_scope=str(data.get("authority_scope", "")),
++        role=str(data.get("role", "agent")),
++        blast_radius_tier=str(data.get("blast_radius_tier", "small")),
++        read_only_paths=list(data.get("read_only_paths", []) or []),
++        read_write_paths=list(data.get("read_write_paths", []) or []),
++        endpoints=endpoints,
++        include_workdir=bool(data.get("include_workdir", True)),
++        process_user=data.get("process_user"),
++        process_group=data.get("process_group"),
++        assumptions=list(data.get("assumptions", []) or []),
++        evidence_refs=list(data.get("evidence_refs", []) or []),
++        kill_conditions=list(data.get("kill_conditions", []) or []),
++        expected_outputs=list(data.get("expected_outputs", []) or []),
++        human_approval_required=bool(data.get("human_approval_required", False)),
++        sandbox_image=data.get("sandbox_image"),
++        metadata=dict(data.get("metadata", {}) or {}),
++    )
++    # Preserve unknown top-level fields without silently discarding source intent.
++    extras = {k: v for k, v in data.items() if k not in known}
++    if extras:
++        contract.metadata.setdefault("source_extensions", {}).update(extras)
++    contract.validate()
++    return contract
++
++
++def load_contract(path: str | Path) -> AgentMissionContract:
++    path = Path(path)
++    text = path.read_text(encoding="utf-8")
++    if path.suffix.lower() == ".json":
++        data = json.loads(text)
++    else:
++        data = yaml.safe_load(text)
++    if not isinstance(data, dict):
++        raise ValueError("mission contract must be a YAML/JSON mapping")
++    return contract_from_dict(data)
++
++
++__all__ = ["contract_from_dict", "load_contract"]
+--- /mnt/data/DeepSigma_orig/DeepSigma-main/src/core/openshell/models.py	1970-01-01 00:00:00.000000000 +0000
++++ /mnt/data/DeepSigma_work/DeepSigma-main/src/core/openshell/models.py	2026-09-28 20:37:21.717742029 +0000
+@@ -0,0 +1,343 @@
++"""Typed models for the Deep Sigma ↔ NVIDIA OpenShell integration.
++
++The objects in this module intentionally keep Deep Sigma mission/authority
++semantics separate from OpenShell's enforcement syntax.  The compiler is the
++one-way boundary that projects a governed mission contract into an OpenShell
++policy.
++"""
++
++from __future__ import annotations
++
++import hashlib
++import json
++import re
++from dataclasses import asdict, dataclass, field
++from enum import Enum
++from typing import Any, Dict, List, Optional
++
++
++class ContractValidationError(ValueError):
++    """Raised when a mission contract cannot be projected safely."""
++
++
++class AccessMode(str, Enum):
++    """OpenShell endpoint access presets used by the compiler."""
++
++    READ_ONLY = "read-only"
++    READ_WRITE = "read-write"
++    FULL = "full"
++
++
++class PlanStatus(str, Enum):
++    """Lifecycle state for a governed OpenShell plan."""
++
++    BLOCKED = "blocked"
++    PENDING_APPROVAL = "pending_approval"
++    READY = "ready"
++    APPLIED = "applied"
++    REQUIRES_RECREATE = "requires_recreate"
++
++
++@dataclass(frozen=True)
++class L7Rule:
++    """Fine-grained HTTP rule for an inspected REST endpoint."""
++
++    method: str
++    path: str
++    allow: bool = True
++
++    def validate(self) -> None:
++        if not self.method or not self.path:
++            raise ContractValidationError("L7 rules require method and path")
++        if not self.path.startswith("/"):
++            raise ContractValidationError("L7 rule path must begin with '/'")
++
++
++@dataclass(frozen=True)
++class EndpointPermission:
++    """A network destination an agent may reach from an OpenShell sandbox."""
++
++    name: str
++    host: str
++    port: int = 443
++    protocol: Optional[str] = "rest"
++    enforcement: Optional[str] = "enforce"
++    tls: Optional[str] = "terminate"
++    access: Optional[str] = AccessMode.READ_ONLY.value
++    binaries: List[str] = field(default_factory=list)
++    rules: List[L7Rule] = field(default_factory=list)
++    credential_bound: bool = False
++    description: str = ""
++
++    def validate(self) -> None:
++        if not self.name.strip():
++            raise ContractValidationError("endpoint permission requires a name")
++        if not self.host.strip():
++            raise ContractValidationError("endpoint permission requires a host")
++        if not 1 <= int(self.port) <= 65535:
++            raise ContractValidationError(f"invalid endpoint port: {self.port}")
++        if self.access not in {
++            None,
++            AccessMode.READ_ONLY.value,
++            AccessMode.READ_WRITE.value,
++            AccessMode.FULL.value,
++        }:
++            raise ContractValidationError(f"unsupported access preset: {self.access}")
++        # NVIDIA explicitly recommends exact hostnames because wildcard DNS names
++        # increase exfiltration surface.  Make that mandatory when credentials bind.
++        if self.credential_bound and ("*" in self.host or "?" in self.host):
++            raise ContractValidationError(
++                "credential-bound endpoints must use an exact hostname"
++            )
++        for rule in self.rules:
++            rule.validate()
++        if self.rules and self.protocol not in {"rest", "sql", "graphql", "jsonrpc", "mcp"}:
++            raise ContractValidationError(
++                "L7 rules require an inspectable application protocol"
++            )
++
++
++@dataclass
++class AgentMissionContract:
++    """Deep Sigma mission contract projected into OpenShell enforcement.
++
++    This is the DKO/DSAL-facing boundary.  It records *why* access exists before
++    the compiler translates it into the lower-level OpenShell policy that says
++    *what* can be touched.
++    """
++
++    contract_id: str
++    episode_id: str
++    mission: str
++    objective: str
++    agent_id: str
++    actor_id: str
++    command: List[str]
++    authority_scope: str
++    role: str = "agent"
++    blast_radius_tier: str = "small"
++    read_only_paths: List[str] = field(default_factory=list)
++    read_write_paths: List[str] = field(default_factory=list)
++    endpoints: List[EndpointPermission] = field(default_factory=list)
++    include_workdir: bool = True
++    process_user: Optional[str] = None
++    process_group: Optional[str] = None
++    assumptions: List[str] = field(default_factory=list)
++    evidence_refs: List[str] = field(default_factory=list)
++    kill_conditions: List[str] = field(default_factory=list)
++    expected_outputs: List[str] = field(default_factory=list)
++    human_approval_required: bool = False
++    sandbox_image: Optional[str] = None
++    metadata: Dict[str, Any] = field(default_factory=dict)
++
++    def validate(self) -> None:
++        required = {
++            "contract_id": self.contract_id,
++            "episode_id": self.episode_id,
++            "mission": self.mission,
++            "objective": self.objective,
++            "agent_id": self.agent_id,
++            "actor_id": self.actor_id,
++            "authority_scope": self.authority_scope,
++        }
++        missing = [k for k, v in required.items() if not str(v).strip()]
++        if missing:
++            raise ContractValidationError(
++                "missing required mission contract fields: " + ", ".join(missing)
++            )
++        if not self.command or not all(str(x).strip() for x in self.command):
++            raise ContractValidationError("command must contain at least one non-empty token")
++        if self.blast_radius_tier not in {"tiny", "small", "medium", "large"}:
++            raise ContractValidationError(
++                f"unsupported blast radius tier: {self.blast_radius_tier}"
++            )
++        ro = set(self.read_only_paths)
++        rw = set(self.read_write_paths)
++        overlap = sorted(ro & rw)
++        if overlap:
++            raise ContractValidationError(
++                "paths cannot be both read-only and read-write: " + ", ".join(overlap)
++            )
++        for path in ro | rw:
++            if not path.startswith("/"):
++                raise ContractValidationError(
++                    f"filesystem policy paths must be absolute: {path}"
++                )
++        endpoint_names: set[str] = set()
++        for endpoint in self.endpoints:
++            endpoint.validate()
++            key = _safe_key(endpoint.name)
++            if key in endpoint_names:
++                raise ContractValidationError(
++                    f"duplicate endpoint permission name after normalization: {endpoint.name}"
++                )
++            endpoint_names.add(key)
++
++    def to_dict(self) -> Dict[str, Any]:
++        data = asdict(self)
++        return data
++
++    def canonical_hash(self) -> str:
++        payload = json.dumps(
++            self.to_dict(), sort_keys=True, separators=(",", ":"), ensure_ascii=True
++        )
++        return "sha256:" + hashlib.sha256(payload.encode("utf-8")).hexdigest()
++
++    def to_dko(self) -> Dict[str, Any]:
++        """Project the contract into a portable DKO-shaped object.
++
++        This does not claim to be the final DSAL grammar.  It preserves the
++        semantic fields required for a later lossless DSAL encoding.
++        """
++        return {
++            "kind": "AgentMissionContract",
++            "id": self.contract_id,
++            "episode": self.episode_id,
++            "mission": {
++                "name": self.mission,
++                "objective": self.objective,
++                "expected_outputs": list(self.expected_outputs),
++            },
++            "agent": {
++                "id": self.agent_id,
++                "actor_id": self.actor_id,
++                "role": self.role,
++                "command": list(self.command),
++            },
++            "authority": {
++                "scope": self.authority_scope,
++                "blast_radius_tier": self.blast_radius_tier,
++                "human_approval_required": self.human_approval_required,
++            },
++            "evidence": list(self.evidence_refs),
++            "assumptions": list(self.assumptions),
++            "kill_conditions": list(self.kill_conditions),
++            "openshell_projection": {
++                "read_only_paths": list(self.read_only_paths),
++                "read_write_paths": list(self.read_write_paths),
++                "endpoints": [asdict(e) for e in self.endpoints],
++            },
++            "contract_hash": self.canonical_hash(),
++            "metadata": dict(self.metadata),
++        }
++
++
++@dataclass(frozen=True)
++class PolicyProjection:
++    contract_id: str
++    contract_hash: str
++    policy: Dict[str, Any]
++    yaml_text: str
++    policy_hash: str
++    static_hash: str
++    dynamic_hash: str
++
++
++@dataclass(frozen=True)
++class PolicyDelta:
++    static_changed: bool
++    dynamic_changed: bool
++    expands_access: bool
++    reasons: List[str] = field(default_factory=list)
++
++    @property
++    def requires_recreate(self) -> bool:
++        return self.static_changed
++
++
++@dataclass(frozen=True)
++class SemanticFinding:
++    code: str
++    severity: str
++    message: str
++
++
++@dataclass(frozen=True)
++class SemanticAssessment:
++    passed: bool
++    findings: List[SemanticFinding] = field(default_factory=list)
++
++
++@dataclass(frozen=True)
++class AuthorityDecision:
++    verdict: str
++    gate_id: str = ""
++    reason: str = ""
++    passed_checks: List[str] = field(default_factory=list)
++    failed_checks: List[str] = field(default_factory=list)
++    escalation_target: Optional[str] = None
++
++    @property
++    def allowed(self) -> bool:
++        return self.verdict == "ALLOW"
++
++
++@dataclass
++class GovernedPlan:
++    plan_id: str
++    sandbox_name: str
++    contract: AgentMissionContract
++    projection: PolicyProjection
++    semantic: SemanticAssessment
++    authority: AuthorityDecision
++    delta: PolicyDelta
++    status: str
++    requires_human_approval: bool
++    created_at: str
++    reasons: List[str] = field(default_factory=list)
++    applied_at: Optional[str] = None
++    approved_by: Optional[str] = None
++    runtime_receipt: Dict[str, Any] = field(default_factory=dict)
++
++
++@dataclass(frozen=True)
++class OpenShellAuditEvent:
++    event_id: str
++    timestamp: str
++    sandbox_name: str
++    decision: str
++    action: str
++    binary: str = ""
++    host: str = ""
++    port: Optional[int] = None
++    method: str = ""
++    path: str = ""
++    rule: str = ""
++    reason: str = ""
++    source: str = "openshell"
++    raw: Dict[str, Any] = field(default_factory=dict)
++
++    @property
++    def denied(self) -> bool:
++        return self.decision.upper() in {"DENY", "DENIED", "BLOCK", "BLOCKED"}
++
++
++def canonical_hash(value: Any) -> str:
++    payload = json.dumps(value, sort_keys=True, separators=(",", ":"), default=str)
++    return "sha256:" + hashlib.sha256(payload.encode("utf-8")).hexdigest()
++
++
++def _safe_key(value: str) -> str:
++    value = value.strip().lower()
++    value = re.sub(r"[^a-z0-9_-]+", "_", value)
++    value = re.sub(r"_+", "_", value).strip("_")
++    return value or "rule"
++
++
++__all__ = [
++    "AccessMode",
++    "AgentMissionContract",
++    "AuthorityDecision",
++    "ContractValidationError",
++    "EndpointPermission",
++    "GovernedPlan",
++    "L7Rule",
++    "OpenShellAuditEvent",
++    "PlanStatus",
++    "PolicyDelta",
++    "PolicyProjection",
++    "SemanticAssessment",
++    "SemanticFinding",
++    "canonical_hash",
++    "_safe_key",
++]
+--- /mnt/data/DeepSigma_orig/DeepSigma-main/src/core/openshell/runtime.py	1970-01-01 00:00:00.000000000 +0000
++++ /mnt/data/DeepSigma_work/DeepSigma-main/src/core/openshell/runtime.py	2026-09-28 20:37:21.721114308 +0000
+@@ -0,0 +1,202 @@
++"""OpenShell runtime adapters.
++
++The CLI adapter is deliberately primary because NVIDIA documents policy create,
++get, set, update and prove operations there.  The optional SDK probe exposes the
++official Python SDK for health and exec without guessing undocumented policy APIs.
++"""
++
++from __future__ import annotations
++
++import json
++import shutil
++import subprocess
++import tempfile
++from dataclasses import dataclass
++from pathlib import Path
++from typing import Any, Dict, List, Optional, Protocol
++
++import yaml
++
++
++class OpenShellRuntimeError(RuntimeError):
++    pass
++
++
++class OpenShellRuntime(Protocol):
++    def sandbox_exists(self, name: str) -> bool: ...
++    def get_base_policy(self, name: str) -> Optional[Dict[str, Any]]: ...
++    def create_sandbox(self, name: str, policy_yaml: str, command: List[str], image: Optional[str] = None) -> Dict[str, Any]: ...
++    def apply_policy(self, name: str, policy_yaml: str, *, wait: bool = True) -> Dict[str, Any]: ...
++    def exec(self, name: str, argv: List[str]) -> Dict[str, Any]: ...
++    def delete(self, name: str) -> Dict[str, Any]: ...
++
++
++@dataclass
++class CommandResult:
++    argv: List[str]
++    returncode: int
++    stdout: str
++    stderr: str
++
++    def to_dict(self) -> Dict[str, Any]:
++        return {
++            "argv": self.argv,
++            "returncode": self.returncode,
++            "stdout": self.stdout,
++            "stderr": self.stderr,
++        }
++
++
++class OpenShellCliRuntime:
++    """Production-friendly adapter over the documented ``openshell`` CLI."""
++
++    def __init__(self, binary: str = "openshell", *, workspace: Optional[str] = None) -> None:
++        self.binary = binary
++        self.workspace = workspace
++
++    def available(self) -> bool:
++        return shutil.which(self.binary) is not None
++
++    def sandbox_exists(self, name: str) -> bool:
++        result = self._run(["sandbox", "get", name], check=False)
++        return result.returncode == 0
++
++    def get_base_policy(self, name: str) -> Optional[Dict[str, Any]]:
++        if not self.sandbox_exists(name):
++            return None
++        result = self._run(["policy", "get", name, "--base"])
++        return _extract_yaml_mapping(result.stdout)
++
++    def create_sandbox(
++        self,
++        name: str,
++        policy_yaml: str,
++        command: List[str],
++        image: Optional[str] = None,
++    ) -> Dict[str, Any]:
++        with _policy_file(policy_yaml) as path:
++            args = ["sandbox", "create", "--name", name, "--policy", str(path)]
++            if image:
++                args += ["--from", image]
++            if self.workspace:
++                args += ["--workspace", self.workspace]
++            args += ["--"] + list(command)
++            return self._run(args).to_dict()
++
++    def apply_policy(self, name: str, policy_yaml: str, *, wait: bool = True) -> Dict[str, Any]:
++        with _policy_file(policy_yaml) as path:
++            args = ["policy", "set", name, "--policy", str(path)]
++            if wait:
++                args.append("--wait")
++            return self._run(args).to_dict()
++
++    def prove_policy(self, policy_yaml: str) -> Dict[str, Any]:
++        with _policy_file(policy_yaml) as path:
++            result = self._run(["policy", "prove", "--policy", str(path)])
++            return result.to_dict()
++
++    def exec(self, name: str, argv: List[str]) -> Dict[str, Any]:
++        return self._run(["sandbox", "exec", "-n", name, "--"] + list(argv)).to_dict()
++
++    def delete(self, name: str) -> Dict[str, Any]:
++        return self._run(["sandbox", "delete", name]).to_dict()
++
++    def _run(self, args: List[str], *, check: bool = True) -> CommandResult:
++        if not self.available():
++            raise OpenShellRuntimeError(
++                f"OpenShell CLI not found: {self.binary!r}. Install NVIDIA OpenShell first."
++            )
++        proc = subprocess.run(
++            [self.binary] + args,
++            text=True,
++            capture_output=True,
++            check=False,
++        )
++        result = CommandResult(
++            argv=[self.binary] + args,
++            returncode=proc.returncode,
++            stdout=proc.stdout,
++            stderr=proc.stderr,
++        )
++        if check and proc.returncode != 0:
++            raise OpenShellRuntimeError(
++                f"OpenShell command failed ({proc.returncode}): {' '.join(result.argv)}\n{proc.stderr.strip()}"
++            )
++        return result
++
++
++class OpenShellSdkProbe:
++    """Small wrapper around NVIDIA's official Python SDK.
++
++    It intentionally does not invent policy-management methods that are not part
++    of the documented Python SDK examples.  Use OpenShellCliRuntime for policy
++    lifecycle and this class for health/exec automation when desired.
++    """
++
++    def __init__(self, *, workspace: str = "default") -> None:
++        self.workspace = workspace
++
++    def health(self) -> Dict[str, Any]:
++        SandboxClient = _sandbox_client()
++        with SandboxClient.from_active_cluster() as client:
++            health = client.health()
++            return {"version": getattr(health, "version", None)}
++
++    def exec(self, sandbox_name: str, argv: List[str]) -> Dict[str, Any]:
++        SandboxClient = _sandbox_client()
++        with SandboxClient.from_active_cluster() as client:
++            result = client.exec(sandbox_name, list(argv), workspace=self.workspace)
++            return {
++                "stdout": getattr(result, "stdout", ""),
++                "stderr": getattr(result, "stderr", ""),
++                "returncode": getattr(result, "returncode", getattr(result, "exit_code", None)),
++            }
++
++
++def _sandbox_client():
++    try:
++        from openshell import SandboxClient
++    except ImportError as exc:  # pragma: no cover - depends on optional package
++        raise OpenShellRuntimeError(
++            "NVIDIA OpenShell Python SDK is not installed. On Python 3.11+, install with: pip install openshell"
++        ) from exc
++    return SandboxClient
++
++
++class _policy_file:
++    def __init__(self, payload: str) -> None:
++        self.payload = payload
++        self.path: Optional[Path] = None
++
++    def __enter__(self) -> Path:
++        fd, raw = tempfile.mkstemp(prefix="deepsigma-openshell-", suffix=".yaml")
++        Path(raw).write_text(self.payload, encoding="utf-8")
++        # mkstemp fd is no longer needed after Path.write_text opens the file itself.
++        import os
++        os.close(fd)
++        self.path = Path(raw)
++        return self.path
++
++    def __exit__(self, exc_type, exc, tb) -> None:
++        if self.path:
++            self.path.unlink(missing_ok=True)
++
++
++def _extract_yaml_mapping(text: str) -> Dict[str, Any]:
++    """Extract a YAML policy mapping from CLI output that may include headers."""
++    # Prefer the first 'version:' line because ``policy get`` may print revision
++    # metadata before the YAML body.
++    idx = text.find("version:")
++    candidate = text[idx:] if idx >= 0 else text
++    data = yaml.safe_load(candidate) or {}
++    if not isinstance(data, dict):
++        raise OpenShellRuntimeError("OpenShell policy output did not contain a YAML mapping")
++    return data
++
++
++__all__ = [
++    "OpenShellCliRuntime",
++    "OpenShellRuntime",
++    "OpenShellRuntimeError",
++    "OpenShellSdkProbe",
++]
+--- /mnt/data/DeepSigma_orig/DeepSigma-main/src/core/openshell/semantic.py	1970-01-01 00:00:00.000000000 +0000
++++ /mnt/data/DeepSigma_work/DeepSigma-main/src/core/openshell/semantic.py	2026-09-28 20:37:21.719528800 +0000
+@@ -0,0 +1,105 @@
++"""Deterministic semantic checks before an OpenShell policy reaches runtime.
++
++This is intentionally a conservative RESONATOR-facing adapter, not a claim that
++it replaces the full RESONATOR engine.  It generates machine-readable findings
++that RESONATOR can ingest or supersede later.
++"""
++
++from __future__ import annotations
++
++from .models import (
++    AccessMode,
++    AgentMissionContract,
++    PolicyProjection,
++    SemanticAssessment,
++    SemanticFinding,
++)
++
++
++class OpenShellSemanticValidator:
++    """Check mission intent for risky or incoherent permission patterns."""
++
++    def assess(
++        self,
++        contract: AgentMissionContract,
++        projection: PolicyProjection,
++    ) -> SemanticAssessment:
++        findings: list[SemanticFinding] = []
++
++        # Mission contract validation is first and deterministic.
++        try:
++            contract.validate()
++        except ValueError as exc:
++            findings.append(
++                SemanticFinding("CONTRACT_INVALID", "critical", str(exc))
++            )
++            return SemanticAssessment(False, findings)
++
++        if not contract.evidence_refs:
++            findings.append(
++                SemanticFinding(
++                    "EVIDENCE_GAP",
++                    "warning",
++                    "Mission contract has no evidence_refs; provenance is weak.",
++                )
++            )
++
++        if not contract.kill_conditions:
++            findings.append(
++                SemanticFinding(
++                    "KILL_CONDITION_GAP",
++                    "warning",
++                    "No explicit kill condition is attached to the agent mission.",
++                )
++            )
++
++        if contract.blast_radius_tier in {"medium", "large"} and not contract.human_approval_required:
++            findings.append(
++                SemanticFinding(
++                    "HUMAN_GATE_REQUIRED",
++                    "critical",
++                    "Medium/large blast-radius contracts must require human approval.",
++                )
++            )
++
++        for endpoint in contract.endpoints:
++            if endpoint.access in {AccessMode.READ_WRITE.value, AccessMode.FULL.value}:
++                if not endpoint.rules:
++                    findings.append(
++                        SemanticFinding(
++                            "BROAD_NETWORK_WRITE",
++                            "warning",
++                            f"{endpoint.name} grants {endpoint.access} without path-scoped L7 rules.",
++                        )
++                    )
++            if "*" in endpoint.host or "?" in endpoint.host:
++                findings.append(
++                    SemanticFinding(
++                        "WILDCARD_NETWORK_SCOPE",
++                        "warning",
++                        f"{endpoint.name} uses wildcard host {endpoint.host!r}.",
++                    )
++                )
++            if endpoint.credential_bound and endpoint.protocol != "rest":
++                findings.append(
++                    SemanticFinding(
++                        "CREDENTIAL_BOUNDARY_WEAK",
++                        "critical",
++                        f"{endpoint.name} is credential-bound without REST inspection.",
++                    )
++                )
++
++        if set(contract.read_write_paths) & set(contract.read_only_paths):
++            findings.append(
++                SemanticFinding(
++                    "FILESYSTEM_CONTRADICTION",
++                    "critical",
++                    "A filesystem path appears in both read-only and read-write sets.",
++                )
++            )
++
++        critical = [f for f in findings if f.severity == "critical"]
++        return SemanticAssessment(passed=not critical, findings=findings)
++
++
++__all__ = ["OpenShellSemanticValidator"]

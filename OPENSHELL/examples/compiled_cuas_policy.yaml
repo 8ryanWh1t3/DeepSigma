@@ -1,0 +1,30 @@
+version: 1
+filesystem_policy:
+  include_workdir: true
+  read_only:
+  - /bin
+  - /usr
+  - /lib
+  - /proc
+  - /etc
+  - /var/log
+  - /dev/urandom
+  - /mission/lattice
+  read_write:
+  - /tmp
+  - /dev/null
+  - /sandbox/output
+landlock:
+  compatibility: best_effort
+network_policies:
+  local-inference:
+    name: local-inference
+    endpoints:
+    - host: inference.local
+      port: 443
+      protocol: rest
+      tls: terminate
+      enforcement: enforce
+      access: read-only
+    binaries:
+    - path: /usr/bin/python
