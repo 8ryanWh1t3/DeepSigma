@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deep-sigma-p2pc2"
+version = "0.1.0"
+description = "Offline-first peer-to-peer command-and-control coherence primitives for Deep Sigma prototypes."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{name = "Deep Sigma"}]
+license = {text = "Proprietary prototype"}
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+ds-p2pc2 = "deep_sigma_p2pc2.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
