@@ -1,0 +1,57 @@
+{
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "The candidate satisfies the bounded operating condition.",
+      "probability": 0.74,
+      "source": "analyst+model",
+      "payload": {
+        "distance": {"value": 90, "unit": "ft"},
+        "approved": true,
+        "confidence_source_count": 5
+      },
+      "metadata": {"episode": "DEMO-001"}
+    },
+    {
+      "id": "H2",
+      "statement": "A more confident candidate that violates a hard constraint.",
+      "probability": 0.91,
+      "source": "analyst+model",
+      "payload": {
+        "distance": {"value": 60, "unit": "ft"},
+        "approved": true,
+        "confidence_source_count": 8
+      },
+      "metadata": {"episode": "DEMO-001"}
+    }
+  ],
+  "constraints": [
+    {
+      "id": "D1",
+      "field": "distance",
+      "op": "gte",
+      "expected": {"value": 82, "unit": "ft"},
+      "hard": true,
+      "weight": 2.0,
+      "description": "Hard geometry/operating bound"
+    },
+    {
+      "id": "D2",
+      "field": "approved",
+      "op": "eq",
+      "expected": true,
+      "hard": true,
+      "weight": 1.0,
+      "description": "Explicit authorization flag"
+    },
+    {
+      "id": "D3",
+      "field": "confidence_source_count",
+      "op": "gte",
+      "expected": 4,
+      "hard": false,
+      "weight": 0.5,
+      "description": "Preferred evidence diversity"
+    }
+  ]
+}

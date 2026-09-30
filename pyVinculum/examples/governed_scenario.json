@@ -1,0 +1,104 @@
+{
+  "context": {
+    "id": "DEMO-CTX-001",
+    "metadata": {
+      "purpose": "VINCULUM v0.2 governed example"
+    }
+  },
+  "governance_policy": {
+    "mode": "strict"
+  },
+  "evidence": [
+    {
+      "id": "E-OBS-001",
+      "kind": "OBSERVATION",
+      "source": "sensor-A",
+      "payload": {
+        "distance_ft": 90,
+        "quality": "verified"
+      }
+    }
+  ],
+  "provenance": [
+    {
+      "id": "PROV-SENSOR-A",
+      "kind": "SOURCE",
+      "source": "sensor-registry",
+      "version": "1",
+      "payload": {
+        "sensor": "A",
+        "calibration": "2026-Q3"
+      }
+    },
+    {
+      "id": "PROV-RUN-017",
+      "kind": "MODEL_RUN",
+      "source": "fusion-runtime",
+      "version": "17",
+      "parent_ids": ["PROV-SENSOR-A"],
+      "payload": {
+        "run": "R-17",
+        "model": "M-2"
+      }
+    },
+    {
+      "id": "PROV-POLICY-004",
+      "kind": "POLICY",
+      "source": "composer://policy/installation-cuas",
+      "version": "4",
+      "payload": {
+        "clause": "minimum standoff distance >= 82ft"
+      }
+    },
+    {
+      "id": "PROV-AUTH-012",
+      "kind": "SOURCE",
+      "source": "authority-ledger",
+      "version": "12",
+      "payload": {
+        "principal": "P-1",
+        "role": "PolicyOwner"
+      }
+    }
+  ],
+  "authorities": [
+    {
+      "id": "AUTH-POLICY-OWNER",
+      "principal_id": "P-1",
+      "role": "PolicyOwner",
+      "actions": ["DEFINE_CONSTRAINT"],
+      "scopes": ["policy:cuas:*"],
+      "provenance_ref": "PROV-AUTH-012"
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "The object meets the governed standoff requirement.",
+      "probability": 0.83,
+      "payload": {
+        "distance": {
+          "value": 90,
+          "unit": "ft"
+        }
+      },
+      "evidence_refs": ["E-OBS-001"],
+      "provenance_ref": "PROV-RUN-017"
+    }
+  ],
+  "constraints": [
+    {
+      "id": "D-STANDOFF",
+      "field": "distance",
+      "op": "gte",
+      "expected": {
+        "value": 82,
+        "unit": "ft"
+      },
+      "hard": true,
+      "provenance_ref": "PROV-POLICY-004",
+      "authority_ref": "AUTH-POLICY-OWNER",
+      "authority_scope": "policy:cuas:standoff"
+    }
+  ]
+}
