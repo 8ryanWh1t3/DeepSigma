@@ -1,0 +1,67 @@
+{
+  "missions": [
+    {"id": "M1", "name": "Mission Readiness Reporting", "outcome": "Leadership receives timely, defensible readiness status."}
+  ],
+  "authorities": [
+    {"id": "A1", "name": "Enterprise Reporting Authority", "level": "enterprise", "source": "Directive 100"}
+  ],
+  "policies": [
+    {"id": "P1", "title": "Monthly Readiness Reporting", "authority_id": "A1", "requirements": ["Produce a validated monthly readiness report"]}
+  ],
+  "systems": [
+    {"id": "S1", "name": "Legacy Intake Portal", "kind": "web"},
+    {"id": "S2", "name": "Spreadsheet Tracker", "kind": "spreadsheet"},
+    {"id": "S3", "name": "Executive Dashboard", "kind": "analytics"}
+  ],
+  "roles": [
+    {"id": "R1", "name": "Analyst", "fte": 6, "loaded_hourly_cost": 95},
+    {"id": "R2", "name": "Reviewer", "fte": 2, "loaded_hourly_cost": 125}
+  ],
+  "work": [
+    {
+      "id": "W1", "name": "Collect readiness submissions", "mission_id": "M1", "policy_ids": ["P1"],
+      "system_ids": ["S1"], "role_ids": ["R1"], "depends_on": [],
+      "steps": ["request", "receive", "validate"], "outputs": ["validated readiness submissions"],
+      "volume_per_month": 120, "touch_time_hours": 0.5, "cycle_time_hours": 48,
+      "rework_rate": 0.18, "approval_steps": 1, "rule_defined": true, "mission_critical": false
+    },
+    {
+      "id": "W2", "name": "Re-enter readiness submissions into tracker", "mission_id": "M1", "policy_ids": ["P1"],
+      "system_ids": ["S1", "S2"], "role_ids": ["R1"], "depends_on": ["W1"],
+      "steps": ["open submission", "copy fields", "paste fields", "check totals"], "outputs": ["readiness tracker rows"],
+      "volume_per_month": 120, "touch_time_hours": 0.4, "cycle_time_hours": 8,
+      "rework_rate": 0.12, "approval_steps": 0, "rule_defined": true, "mission_critical": false
+    },
+    {
+      "id": "W3", "name": "Prepare monthly readiness summary", "mission_id": "M1", "policy_ids": ["P1"],
+      "system_ids": ["S2"], "role_ids": ["R1"], "depends_on": ["W2"],
+      "steps": ["aggregate", "analyze", "draft"], "outputs": ["monthly readiness summary"],
+      "volume_per_month": 1, "touch_time_hours": 20, "cycle_time_hours": 96,
+      "rework_rate": 0.25, "approval_steps": 4, "rule_defined": false, "mission_critical": true
+    },
+    {
+      "id": "W4", "name": "Build monthly readiness report", "mission_id": "M1", "policy_ids": ["P1"],
+      "system_ids": ["S2"], "role_ids": ["R1"], "depends_on": ["W2"],
+      "steps": ["aggregate", "summarize", "format"], "outputs": ["monthly readiness summary"],
+      "volume_per_month": 1, "touch_time_hours": 18, "cycle_time_hours": 84,
+      "rework_rate": 0.20, "approval_steps": 3, "rule_defined": false, "mission_critical": true
+    },
+    {
+      "id": "W5", "name": "Publish executive dashboard", "mission_id": "M1", "policy_ids": ["P1"],
+      "system_ids": ["S3"], "role_ids": ["R2"], "depends_on": ["W3"],
+      "steps": ["approve", "publish"], "outputs": ["executive readiness dashboard"],
+      "volume_per_month": 1, "touch_time_hours": 2, "cycle_time_hours": 24,
+      "rework_rate": 0.05, "approval_steps": 2, "rule_defined": true, "mission_critical": true
+    },
+    {
+      "id": "W6", "name": "Weekly courtesy spreadsheet", "mission_id": null, "policy_ids": [],
+      "system_ids": ["S2"], "role_ids": ["R1"], "depends_on": [],
+      "steps": ["copy data", "email spreadsheet"], "outputs": ["courtesy spreadsheet"],
+      "volume_per_month": 4, "touch_time_hours": 3, "cycle_time_hours": 4,
+      "rework_rate": 0.05, "approval_steps": 0, "rule_defined": true, "mission_critical": false
+    }
+  ],
+  "outcomes": [
+    {"work_id": "W5", "expected": "Dashboard published by day 3", "observed": "Dashboard published by day 7", "variance": 1.33, "period": "2026-08"}
+  ]
+}

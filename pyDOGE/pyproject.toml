@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deep-sigma-pydoge"
+version = "0.1.0"
+description = "Work-system diagnostics for mission, authority, policy, workflow, dependencies, systems, and outcomes."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Deep Sigma"}]
+keywords = ["systems-thinking", "workflow", "governance", "process-improvement", "decision-intelligence"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
+
+[project.scripts]
+pydoge = "pydoge.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

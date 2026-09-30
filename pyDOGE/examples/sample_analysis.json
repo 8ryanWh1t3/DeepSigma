@@ -1,0 +1,187 @@
+{
+  "findings": {
+    "automation_candidates": [
+      {
+        "guardrail": "Validate policy, authority, exceptions, and human decision rights before automation.",
+        "reasons": [
+          "high recurring volume",
+          "rule-defined steps",
+          "bounded touch time",
+          "few approval gates",
+          "rework suggests standardization opportunity"
+        ],
+        "score": 8,
+        "type": "AUTOMATION_CANDIDATE",
+        "work_id": "W1"
+      },
+      {
+        "guardrail": "Validate policy, authority, exceptions, and human decision rights before automation.",
+        "reasons": [
+          "high recurring volume",
+          "rule-defined steps",
+          "bounded touch time",
+          "few approval gates",
+          "rework suggests standardization opportunity"
+        ],
+        "score": 8,
+        "type": "AUTOMATION_CANDIDATE",
+        "work_id": "W2"
+      }
+    ],
+    "dependency_cycles": [],
+    "duplicate_work": [
+      {
+        "reason": "Similar work/output within the same mission context; human review required before consolidation.",
+        "similarity": 0.85,
+        "type": "DUPLICATE_CANDIDATE",
+        "work_a": "W3",
+        "work_b": "W4"
+      }
+    ],
+    "handoff_latency": [
+      {
+        "approval_steps": 1,
+        "cycle_time_hours": 48,
+        "touch_time_hours": 0.5,
+        "type": "HANDOFF_LATENCY",
+        "wait_ratio": 0.99,
+        "wait_time_hours": 47.5,
+        "work_id": "W1"
+      },
+      {
+        "approval_steps": 0,
+        "cycle_time_hours": 8,
+        "touch_time_hours": 0.4,
+        "type": "HANDOFF_LATENCY",
+        "wait_ratio": 0.95,
+        "wait_time_hours": 7.6,
+        "work_id": "W2"
+      },
+      {
+        "approval_steps": 2,
+        "cycle_time_hours": 24,
+        "touch_time_hours": 2,
+        "type": "HANDOFF_LATENCY",
+        "wait_ratio": 0.917,
+        "wait_time_hours": 22,
+        "work_id": "W5"
+      },
+      {
+        "approval_steps": 4,
+        "cycle_time_hours": 96,
+        "touch_time_hours": 20,
+        "type": "HANDOFF_LATENCY",
+        "wait_ratio": 0.792,
+        "wait_time_hours": 76,
+        "work_id": "W3"
+      },
+      {
+        "approval_steps": 3,
+        "cycle_time_hours": 84,
+        "touch_time_hours": 18,
+        "type": "HANDOFF_LATENCY",
+        "wait_ratio": 0.786,
+        "wait_time_hours": 66,
+        "work_id": "W4"
+      }
+    ],
+    "orphan_work": [
+      {
+        "reasons": [
+          "no mission binding",
+          "no policy/requirement binding"
+        ],
+        "type": "ORPHAN_WORK",
+        "work_id": "W6"
+      }
+    ],
+    "outcome_drift": [
+      {
+        "expected": "Dashboard published by day 3",
+        "observed": "Dashboard published by day 7",
+        "period": "2026-08",
+        "type": "OUTCOME_DRIFT",
+        "variance": 1.33,
+        "work_id": "W5"
+      }
+    ],
+    "rework": [
+      {
+        "monthly_rework_hours": 10.8,
+        "rework_rate": 0.18,
+        "type": "REWORK",
+        "work_id": "W1"
+      },
+      {
+        "monthly_rework_hours": 5.0,
+        "rework_rate": 0.25,
+        "type": "REWORK",
+        "work_id": "W3"
+      },
+      {
+        "monthly_rework_hours": 3.6,
+        "rework_rate": 0.2,
+        "type": "REWORK",
+        "work_id": "W4"
+      }
+    ]
+  },
+  "guardrail": "pyDOGE does not rank or score individual employees.",
+  "metrics": {
+    "labor_cost": {
+      "estimated_monthly_labor_cost": 17719.7,
+      "hours_without_cost_binding": 0.0,
+      "note": "Architecture-level estimate; not an employee performance score."
+    },
+    "workload": {
+      "calendar_wait_hours_per_month": 6780.0,
+      "rework_hours_per_month": 25.86,
+      "touch_hours_per_month": 160.0
+    }
+  },
+  "sequence": [
+    {
+      "action": "VALIDATE",
+      "count": 1,
+      "sequence": 1,
+      "target": "orphan work",
+      "why": "Prove mission/policy necessity before optimizing it."
+    },
+    {
+      "action": "CONSOLIDATE",
+      "count": 1,
+      "sequence": 2,
+      "target": "duplicate candidates",
+      "why": "Remove redundant work only after human validation."
+    },
+    {
+      "action": "REDESIGN",
+      "count": 5,
+      "sequence": 3,
+      "target": "handoff/approval latency",
+      "why": "Reduce waiting and routing before reducing capacity."
+    },
+    {
+      "action": "PATCH",
+      "count": 3,
+      "sequence": 4,
+      "target": "rework loops",
+      "why": "Correct causes of repeated work."
+    },
+    {
+      "action": "AUTOMATE",
+      "count": 2,
+      "sequence": 5,
+      "target": "bounded work candidates",
+      "why": "Automate only after authority, exceptions, and decision rights are understood."
+    },
+    {
+      "action": "SIZE",
+      "count": null,
+      "sequence": 6,
+      "target": "workforce capacity",
+      "why": "Determine capacity requirements from the redesigned work, not as the opening assumption."
+    }
+  ],
+  "thesis": "Make the system explainable before optimizing it."
+}
