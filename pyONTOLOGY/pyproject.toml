@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deep-sigma-pyontology"
+version = "0.1.0"
+description = "Federated modular ontology fabric for preventing semantic silos"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Deep Sigma"}]
+dependencies = ["rdflib>=7.0"]
+
+[project.optional-dependencies]
+shacl = ["pyshacl>=0.30"]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+pyontology = "pyontology.cli:main"
+
+[tool.setuptools]
+packages = ["pyontology"]

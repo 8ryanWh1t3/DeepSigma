@@ -1,0 +1,1007 @@
+@prefix : <https://coherenceops.io/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix time: <http://www.w3.org/2006/time#> .
+
+@base <https://coherenceops.io/ontology> .
+
+# =============================================================================
+# COHERENCE OPS ONTOLOGY
+# Version: 2.0
+# Description: Formal OWL/RDF ontology for institutional coherence management
+#              Extended with operational Functions and Events per domain
+# =============================================================================
+
+<https://coherenceops.io/ontology> rdf:type owl:Ontology ;
+    owl:versionInfo "2.0.0" ;
+    dcterms:title "Coherence Ops Ontology"@en ;
+    dcterms:description """An ontology for managing institutional coherence across decisions, 
+beliefs, and narratives. Defines the object model for the Memory Graph, Coherence Index, 
+and the three operational domains: ReOps (Decision Management), IntelOps (Truth Management), 
+and FranOps (Story Management). Version 2.0 adds Functions (capabilities) and Events 
+(occurrences) for each domain."""@en ;
+    dcterms:creator "Deep Sigma - Coherence Ops Division" ;
+    dcterms:created "2024-12-25"^^xsd:date ;
+    dcterms:modified "2024-12-25"^^xsd:date ;
+    owl:priorVersion <https://coherenceops.io/ontology/1.0> ;
+    dcterms:license <https://creativecommons.org/licenses/by/4.0/> .
+
+
+# =============================================================================
+# PART 1: CORE ABSTRACT CLASSES
+# =============================================================================
+
+:CoherenceObject rdf:type owl:Class ;
+    rdfs:label "Coherence Object"@en ;
+    rdfs:comment "Abstract base class for all objects in the Coherence Ops system."@en .
+
+:TemporalObject rdf:type owl:Class ;
+    rdfs:label "Temporal Object"@en ;
+    rdfs:comment "Objects with time-dependent validity, including half-life decay."@en ;
+    rdfs:subClassOf :CoherenceObject .
+
+:VersionedObject rdf:type owl:Class ;
+    rdfs:label "Versioned Object"@en ;
+    rdfs:comment "Objects that maintain version history with immutable snapshots."@en ;
+    rdfs:subClassOf :CoherenceObject .
+
+
+# =============================================================================
+# PART 2: OPERATIONAL DOMAINS (NEW IN V2)
+# =============================================================================
+
+:OperationalDomain rdf:type owl:Class ;
+    rdfs:label "Operational Domain"@en ;
+    rdfs:comment "One of the three pillars of Coherence Operations."@en ;
+    rdfs:subClassOf :CoherenceObject .
+
+:IntelOps rdf:type owl:Class , owl:NamedIndividual ;
+    rdfs:label "IntelOps"@en ;
+    rdfs:comment "Truth Management domain. Manages claims, assumptions, evidence provenance, and confidence calibration."@en ;
+    rdf:type :OperationalDomain ;
+    :hasMission "Truth Management"@en ;
+    :hasIcon "🔮"@en ;
+    skos:definition "The operational domain responsible for maintaining epistemic coherence - what the organization believes to be true and why."@en .
+
+:FranOps rdf:type owl:Class , owl:NamedIndividual ;
+    rdfs:label "FranOps"@en ;
+    rdfs:comment "Story Management domain. Manages canon, narrative consistency, timeline validity, and character/tone fidelity."@en ;
+    rdf:type :OperationalDomain ;
+    :hasMission "Story Management"@en ;
+    :hasIcon "💡"@en ;
+    skos:definition "The operational domain responsible for maintaining narrative coherence - what the organization says publicly and the consistency of its institutional story."@en .
+
+:ReOps rdf:type owl:Class , owl:NamedIndividual ;
+    rdfs:label "ReOps"@en ;
+    rdfs:comment "Decision Management domain. Manages decisions, DLRs, assumptions, kill switches, and review schedules."@en ;
+    rdf:type :OperationalDomain ;
+    :hasMission "Decision Management"@en ;
+    :hasIcon "☀️"@en ;
+    skos:definition "The operational domain responsible for maintaining decision coherence - what the organization has decided and the logic behind those decisions."@en .
+
+
+# =============================================================================
+# PART 3: FUNCTIONS (CAPABILITIES)
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 3.1 Function Base Class
+# -----------------------------------------------------------------------------
+
+:Function rdf:type owl:Class ;
+    rdfs:label "Function"@en ;
+    rdfs:comment "A capability or service provided by an operational domain."@en ;
+    rdfs:subClassOf :CoherenceObject .
+
+:IntelOpsFunction rdf:type owl:Class ;
+    rdfs:label "IntelOps Function"@en ;
+    rdfs:subClassOf :Function ;
+    :belongsToDomain :IntelOps .
+
+:FranOpsFunction rdf:type owl:Class ;
+    rdfs:label "FranOps Function"@en ;
+    rdfs:subClassOf :Function ;
+    :belongsToDomain :FranOps .
+
+:ReOpsFunction rdf:type owl:Class ;
+    rdfs:label "ReOps Function"@en ;
+    rdfs:subClassOf :Function ;
+    :belongsToDomain :ReOps .
+
+
+# -----------------------------------------------------------------------------
+# 3.2 IntelOps Functions (Truth Management)
+# -----------------------------------------------------------------------------
+
+:ClaimRegistry rdf:type owl:Class , :IntelOpsFunction ;
+    rdfs:label "Claim Registry"@en ;
+    rdfs:comment "Central repository for all claims with confidence scores, sources, and validation status."@en ;
+    :functionID "INTEL-F01" .
+
+:EvidenceProvenanceLedger rdf:type owl:Class , :IntelOpsFunction ;
+    rdfs:label "Evidence-Provenance Ledger"@en ;
+    rdfs:comment "Immutable record of evidence chain linking claims to original sources."@en ;
+    :functionID "INTEL-F02" .
+
+:AssumptionHalfLifeEngine rdf:type owl:Class , :IntelOpsFunction ;
+    rdfs:label "Assumption Half-Life Engine"@en ;
+    rdfs:comment "Tracks temporal validity of assumptions and triggers alerts as expiry approaches."@en ;
+    :functionID "INTEL-F03" .
+
+:ConfidenceCalibration rdf:type owl:Class , :IntelOpsFunction ;
+    rdfs:label "Confidence Calibration"@en ;
+    rdfs:comment "Ensures confidence scores are well-calibrated against actual outcomes."@en ;
+    :functionID "INTEL-F04" .
+
+:ContradictionGraph rdf:type owl:Class , :IntelOpsFunction ;
+    rdfs:label "Contradiction Graph"@en ;
+    rdfs:comment "Maps logical inconsistencies between claims and tracks resolution status."@en ;
+    :functionID "INTEL-F05" .
+
+:BlastRadiusSimulation_Intel rdf:type owl:Class , :IntelOpsFunction ;
+    rdfs:label "Blast Radius Simulation (Intel)"@en ;
+    rdfs:comment "Models downstream impact of changes to claims or assumptions."@en ;
+    :functionID "INTEL-F06" .
+
+:MemoryGraphLineage_Intel rdf:type owl:Class , :IntelOpsFunction ;
+    rdfs:label "Memory Graph Lineage"@en ;
+    rdfs:comment "Tracks the evolution and derivation of beliefs over time."@en ;
+    :functionID "INTEL-F07" .
+
+:PrimePacketGenerator rdf:type owl:Class , :IntelOpsFunction ;
+    rdfs:label "Prime Packet Generator"@en ;
+    rdfs:comment "Produces authoritative intelligence packages with sealed provenance for stakeholder consumption."@en ;
+    :functionID "INTEL-F08" .
+
+:SafeSummaryDowngradeControl rdf:type owl:Class , :IntelOpsFunction ;
+    rdfs:label "Safe Summary/Downgrade Control"@en ;
+    rdfs:comment "Generates classification-appropriate summaries while protecting sources and methods."@en ;
+    :functionID "INTEL-F09" .
+
+:CollectionGapAutopilot rdf:type owl:Class , :IntelOpsFunction ;
+    rdfs:label "Collection Gap Autopilot"@en ;
+    rdfs:comment "Automatically identifies intelligence gaps and prioritizes collection requirements."@en ;
+    :functionID "INTEL-F10" .
+
+:MultiLLMConsensusMonitor rdf:type owl:Class , :IntelOpsFunction ;
+    rdfs:label "Multi-LLM Consensus Monitor"@en ;
+    rdfs:comment "Validates claims across multiple AI models to detect hallucination and bias."@en ;
+    :functionID "INTEL-F11" .
+
+:PatchVersionGovernance_Intel rdf:type owl:Class , :IntelOpsFunction ;
+    rdfs:label "Patch & Version Governance"@en ;
+    rdfs:comment "Manages updates to claims and assumptions with audit trail."@en ;
+    :functionID "INTEL-F12" .
+
+
+# -----------------------------------------------------------------------------
+# 3.3 FranOps Functions (Story Management)
+# -----------------------------------------------------------------------------
+
+:CanonRegistry rdf:type owl:Class , :FranOpsFunction ;
+    rdfs:label "Canon Registry (Source of Truth)"@en ;
+    rdfs:comment "Authoritative record of all official institutional facts and commitments."@en ;
+    :functionID "FRAN-F01" .
+
+:LoreGraphEngine rdf:type owl:Class , :FranOpsFunction ;
+    rdfs:label "Lore Graph Engine"@en ;
+    rdfs:comment "Knowledge graph representing the interconnected narrative universe of the organization."@en ;
+    :functionID "FRAN-F02" .
+
+:TimelineValidityEngine rdf:type owl:Class , :FranOpsFunction ;
+    rdfs:label "Timeline Validity Engine"@en ;
+    rdfs:comment "Ensures chronological consistency across all narrative elements."@en ;
+    :functionID "FRAN-F03" .
+
+:CharacterFidelityModel rdf:type owl:Class , :FranOpsFunction ;
+    rdfs:label "Character Fidelity Model"@en ;
+    rdfs:comment "Tracks consistency of organizational personas and spokesperson positioning."@en ;
+    :functionID "FRAN-F04" .
+
+:ToneFidelityModel rdf:type owl:Class , :FranOpsFunction ;
+    rdfs:label "Tone Fidelity Model"@en ;
+    rdfs:comment "Ensures consistent voice and tone across institutional communications."@en ;
+    :functionID "FRAN-F05" .
+
+:OnboardingClarityAnalyzer rdf:type owl:Class , :FranOpsFunction ;
+    rdfs:label "Onboarding Clarity Analyzer"@en ;
+    rdfs:comment "Measures how easily new stakeholders can understand the institutional story."@en ;
+    :functionID "FRAN-F06" .
+
+:CoherenceMetricsDriftRadar rdf:type owl:Class , :FranOpsFunction ;
+    rdfs:label "Coherence Metrics + Drift Radar"@en ;
+    rdfs:comment "Real-time monitoring of narrative coherence with early warning detection."@en ;
+    :functionID "FRAN-F07" .
+
+:CanonControl rdf:type owl:Class , :FranOpsFunction ;
+    rdfs:label "Canon Control (Version+Governance)"@en ;
+    rdfs:comment "Change management for canon with approval workflows and version control."@en ;
+    :functionID "FRAN-F08" .
+
+:ImpactRadiusSimulator rdf:type owl:Class , :FranOpsFunction ;
+    rdfs:label "Impact Radius Simulator"@en ;
+    rdfs:comment "Models downstream effects of canon changes on narrative coherence."@en ;
+    :functionID "FRAN-F09" .
+
+:RetconProtocol rdf:type owl:Class , :FranOpsFunction ;
+    rdfs:label "Retcon Protocol (Incident Response)"@en ;
+    rdfs:comment "Emergency procedure for addressing and repairing narrative breaks."@en ;
+    :functionID "FRAN-F10" .
+
+:ArtifactPipeline rdf:type owl:Class , :FranOpsFunction ;
+    rdfs:label "Artifact Pipeline (Lore → Product)"@en ;
+    rdfs:comment "Transforms canonical lore into consumable artifacts for different audiences."@en ;
+    :functionID "FRAN-F11" .
+
+:CanonRetrievalWhyLookup rdf:type owl:Class , :FranOpsFunction ;
+    rdfs:label "Canon Retrieval + Why Lookup"@en ;
+    rdfs:comment "Fast retrieval of canon with associated rationale (<60s target)."@en ;
+    :functionID "FRAN-F12" .
+
+
+# -----------------------------------------------------------------------------
+# 3.4 ReOps Functions (Decision Management)
+# -----------------------------------------------------------------------------
+
+:DecisionEpisodeOrchestration rdf:type owl:Class , :ReOpsFunction ;
+    rdfs:label "Decision Episode Orchestration"@en ;
+    rdfs:comment "Manages the full lifecycle of a decision from initiation through review."@en ;
+    :functionID "RE-F01" .
+
+:DLRCaptureEngine rdf:type owl:Class , :ReOpsFunction ;
+    rdfs:label "DLR Capture Engine"@en ;
+    rdfs:comment "Captures and structures Decision Logic Records during decision-making."@en ;
+    :functionID "RE-F02" .
+
+:SealProvenanceControl rdf:type owl:Class , :ReOpsFunction ;
+    rdfs:label "Seal & Provenance Control"@en ;
+    rdfs:comment "Cryptographically seals decisions and maintains immutable provenance chain."@en ;
+    :functionID "RE-F03" .
+
+:AssumptionHalfLifeTracking rdf:type owl:Class , :ReOpsFunction ;
+    rdfs:label "Assumption Half-Life Tracking"@en ;
+    rdfs:comment "Monitors assumptions underlying decisions and alerts as they approach expiry."@en ;
+    :functionID "RE-F04" .
+
+:BlastRadiusEstimator rdf:type owl:Class , :ReOpsFunction ;
+    rdfs:label "Blast Radius Estimator"@en ;
+    rdfs:comment "Estimates the scope of impact from decision changes or invalidations."@en ;
+    :functionID "RE-F05" .
+
+:DriftDetectionPipeline rdf:type owl:Class , :ReOpsFunction ;
+    rdfs:label "Drift Detection Pipeline"@en ;
+    rdfs:comment "Continuous monitoring for decision drift and coherence degradation."@en ;
+    :functionID "RE-F06" .
+
+:SeverityScoringEscalationLogic rdf:type owl:Class , :ReOpsFunction ;
+    rdfs:label "Severity Scoring & Escalation Logic"@en ;
+    rdfs:comment "Classifies drift signals by severity and routes to appropriate escalation paths."@en ;
+    :functionID "RE-F07" .
+
+:RSCaptureLearningSturcturer rdf:type owl:Class , :ReOpsFunction ;
+    rdfs:label "RS Capture & Learning Structurer"@en ;
+    rdfs:comment "Captures Review Session outcomes and structures them for organizational learning."@en ;
+    :functionID "RE-F08" .
+
+:PatchMechanism rdf:type owl:Class , :ReOpsFunction ;
+    rdfs:label "Patch Mechanism"@en ;
+    rdfs:comment "Applies corrective patches to decisions and tracks resolution of drift signals."@en ;
+    :functionID "RE-F09" .
+
+:MemoryGraphLineageBuilder rdf:type owl:Class , :ReOpsFunction ;
+    rdfs:label "Memory Graph Lineage Builder"@en ;
+    rdfs:comment "Constructs and maintains the decision lineage graph over time."@en ;
+    :functionID "RE-F10" .
+
+:WhyRetrievalFunction rdf:type owl:Class , :ReOpsFunction ;
+    rdfs:label "Why Retrieval (<60s)"@en ;
+    rdfs:comment "Fast retrieval of decision rationale with <60 second target response time."@en ;
+    :functionID "RE-F11" .
+
+:NonCoercionGuardrails rdf:type owl:Class , :ReOpsFunction ;
+    rdfs:label "Non-Coercion Guardrails"@en ;
+    rdfs:comment "Ensures decision-making processes respect autonomy and avoid coercive patterns."@en ;
+    :functionID "RE-F12" .
+
+
+# =============================================================================
+# PART 4: EVENTS (OCCURRENCES)
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 4.1 Event Base Class
+# -----------------------------------------------------------------------------
+
+:Event rdf:type owl:Class ;
+    rdfs:label "Event"@en ;
+    rdfs:comment "A significant occurrence within an operational domain that may trigger responses."@en ;
+    rdfs:subClassOf :CoherenceObject ;
+    rdfs:subClassOf [
+        rdf:type owl:Restriction ;
+        owl:onProperty :occurredAt ;
+        owl:cardinality "1"^^xsd:nonNegativeInteger
+    ] .
+
+:IntelOpsEvent rdf:type owl:Class ;
+    rdfs:label "IntelOps Event"@en ;
+    rdfs:subClassOf :Event ;
+    :belongsToDomain :IntelOps .
+
+:FranOpsEvent rdf:type owl:Class ;
+    rdfs:label "FranOps Event"@en ;
+    rdfs:subClassOf :Event ;
+    :belongsToDomain :FranOps .
+
+:ReOpsEvent rdf:type owl:Class ;
+    rdfs:label "ReOps Event"@en ;
+    rdfs:subClassOf :Event ;
+    :belongsToDomain :ReOps .
+
+
+# -----------------------------------------------------------------------------
+# 4.2 IntelOps Events (Truth Management)
+# -----------------------------------------------------------------------------
+
+:ClaimCreated rdf:type owl:Class , :IntelOpsEvent ;
+    rdfs:label "Claim Created"@en ;
+    rdfs:comment "A new claim has been registered in the system."@en ;
+    :eventID "INTEL-E01" .
+
+:EvidenceAttachedUpdated rdf:type owl:Class , :IntelOpsEvent ;
+    rdfs:label "Evidence Attached/Updated"@en ;
+    rdfs:comment "Evidence has been linked to or updated for a claim."@en ;
+    :eventID "INTEL-E02" .
+
+:SourceCredibilityShift rdf:type owl:Class , :IntelOpsEvent ;
+    rdfs:label "Source Credibility Shift"@en ;
+    rdfs:comment "A source's reliability rating has changed significantly."@en ;
+    :eventID "INTEL-E03" .
+
+:AssumptionNearExpiry_Intel rdf:type owl:Class , :IntelOpsEvent ;
+    rdfs:label "Assumption Near Expiry"@en ;
+    rdfs:comment "An assumption is approaching its half-life threshold."@en ;
+    :eventID "INTEL-E04" .
+
+:AssumptionExpired_Intel rdf:type owl:Class , :IntelOpsEvent ;
+    rdfs:label "Assumption Expired"@en ;
+    rdfs:comment "An assumption has exceeded its validity period."@en ;
+    :eventID "INTEL-E05" .
+
+:ContradictionDetected_Intel rdf:type owl:Class , :IntelOpsEvent ;
+    rdfs:label "Contradiction Detected"@en ;
+    rdfs:comment "A logical inconsistency between claims has been identified."@en ;
+    :eventID "INTEL-E06" .
+
+:ConfidenceDrop rdf:type owl:Class , :IntelOpsEvent ;
+    rdfs:label "Confidence Drop"@en ;
+    rdfs:comment "A claim's confidence score has decreased below a threshold."@en ;
+    :eventID "INTEL-E07" .
+
+:ModelConsensusSplit rdf:type owl:Class , :IntelOpsEvent ;
+    rdfs:label "Model Consensus Split"@en ;
+    rdfs:comment "Multiple AI models disagree on a claim's validity."@en ;
+    :eventID "INTEL-E08" .
+
+:BlastRadiusEscalation rdf:type owl:Class , :IntelOpsEvent ;
+    rdfs:label "Blast Radius Escalation"@en ;
+    rdfs:comment "A change's impact has exceeded expected bounds."@en ;
+    :eventID "INTEL-E09" .
+
+:PrimePacketSealed rdf:type owl:Class , :IntelOpsEvent ;
+    rdfs:label "Prime Packet Sealed"@en ;
+    rdfs:comment "An authoritative intelligence package has been finalized."@en ;
+    :eventID "INTEL-E10" .
+
+:PatchIssued_Intel rdf:type owl:Class , :IntelOpsEvent ;
+    rdfs:label "Patch Issued"@en ;
+    rdfs:comment "A corrective update has been applied to claims or assumptions."@en ;
+    :eventID "INTEL-E11" .
+
+:NarrativeAttackDetected rdf:type owl:Class , :IntelOpsEvent ;
+    rdfs:label "Narrative Attack Detected (optional but lethal)"@en ;
+    rdfs:comment "Coordinated external effort to inject false claims detected."@en ;
+    :eventID "INTEL-E12" ;
+    :severityLevel :SEV1 ;
+    skos:note "Marked as 'optional but lethal' - high impact if ignored."@en .
+
+
+# -----------------------------------------------------------------------------
+# 4.3 FranOps Events (Story Management)
+# -----------------------------------------------------------------------------
+
+:CanonChangeProposed rdf:type owl:Class , :FranOpsEvent ;
+    rdfs:label "Canon Change Proposed"@en ;
+    rdfs:comment "A modification to official canon has been submitted for review."@en ;
+    :eventID "FRAN-E01" .
+
+:CanonChangeApproved rdf:type owl:Class , :FranOpsEvent ;
+    rdfs:label "Canon Change Approved"@en ;
+    rdfs:comment "A proposed canon modification has been accepted."@en ;
+    :eventID "FRAN-E02" .
+
+:CanonChangeRejected rdf:type owl:Class , :FranOpsEvent ;
+    rdfs:label "Canon Change Rejected"@en ;
+    rdfs:comment "A proposed canon modification has been denied."@en ;
+    :eventID "FRAN-E03" .
+
+:ContradictionDetected_Fran rdf:type owl:Class , :FranOpsEvent ;
+    rdfs:label "Contradiction Detected"@en ;
+    rdfs:comment "An inconsistency within canon has been identified."@en ;
+    :eventID "FRAN-E04" .
+
+:TimelineBreakDetected rdf:type owl:Class , :FranOpsEvent ;
+    rdfs:label "Timeline Break Detected"@en ;
+    rdfs:comment "A chronological inconsistency in the narrative has been found."@en ;
+    :eventID "FRAN-E05" .
+
+:CharacterFidelityViolation rdf:type owl:Class , :FranOpsEvent ;
+    rdfs:label "Character Fidelity Violation"@en ;
+    rdfs:comment "An institutional persona has acted inconsistently with established character."@en ;
+    :eventID "FRAN-E06" .
+
+:ToneDriftSignal rdf:type owl:Class , :FranOpsEvent ;
+    rdfs:label "Tone Drift Signal"@en ;
+    rdfs:comment "Communications have deviated from established institutional tone."@en ;
+    :eventID "FRAN-E07" .
+
+:OnboardingFrictionSpike rdf:type owl:Class , :FranOpsEvent ;
+    rdfs:label "Onboarding Friction Spike"@en ;
+    rdfs:comment "New stakeholder comprehension metrics have degraded."@en ;
+    :eventID "FRAN-E08" .
+
+:NarrativeSaturationThreshold rdf:type owl:Class , :FranOpsEvent ;
+    rdfs:label "Narrative Saturation Threshold"@en ;
+    rdfs:comment "The narrative has become too complex for effective communication."@en ;
+    :eventID "FRAN-E09" .
+
+:CanonInflationEvent rdf:type owl:Class , :FranOpsEvent ;
+    rdfs:label "Canon Inflation Event"@en ;
+    rdfs:comment "Canon size has grown beyond sustainable management thresholds."@en ;
+    :eventID "FRAN-E10" .
+
+:RetconDeclared rdf:type owl:Class , :FranOpsEvent ;
+    rdfs:label "Retcon Declared (Incident)"@en ;
+    rdfs:comment "A retroactive continuity change has been declared as an incident."@en ;
+    :eventID "FRAN-E11" ;
+    :severityLevel :SEV1 .
+
+:RetconPatchShipped rdf:type owl:Class , :FranOpsEvent ;
+    rdfs:label "Retcon Patch Shipped"@en ;
+    rdfs:comment "A narrative repair has been deployed."@en ;
+    :eventID "FRAN-E12" .
+
+:ImpactRadiusReportGenerated rdf:type owl:Class , :FranOpsEvent ;
+    rdfs:label "Impact Radius Report Generated"@en ;
+    rdfs:comment "Analysis of change impact on narrative has been completed."@en ;
+    :eventID "FRAN-E13" .
+
+:ArtifactPipelineRelease rdf:type owl:Class , :FranOpsEvent ;
+    rdfs:label "Artifact Pipeline Release"@en ;
+    rdfs:comment "New narrative artifacts have been published to consumers."@en ;
+    :eventID "FRAN-E14" .
+
+
+# -----------------------------------------------------------------------------
+# 4.4 ReOps Events (Decision Management)
+# -----------------------------------------------------------------------------
+
+:DecisionInitiated rdf:type owl:Class , :ReOpsEvent ;
+    rdfs:label "Decision Initiated"@en ;
+    rdfs:comment "A new decision episode has begun."@en ;
+    :eventID "RE-E01" .
+
+:DecisionCommitted rdf:type owl:Class , :ReOpsEvent ;
+    rdfs:label "Decision Committed"@en ;
+    rdfs:comment "A decision has been sealed and is now active."@en ;
+    :eventID "RE-E02" .
+
+:OptionRejected rdf:type owl:Class , :ReOpsEvent ;
+    rdfs:label "Option Rejected"@en ;
+    rdfs:comment "An alternative option was considered and rejected."@en ;
+    :eventID "RE-E03" .
+
+:AssumptionNearExpiry_Re rdf:type owl:Class , :ReOpsEvent ;
+    rdfs:label "Assumption Near Expiry"@en ;
+    rdfs:comment "An assumption underlying a decision is approaching expiry."@en ;
+    :eventID "RE-E04" .
+
+:AssumptionExpired_Re rdf:type owl:Class , :ReOpsEvent ;
+    rdfs:label "Assumption Expired"@en ;
+    rdfs:comment "An assumption underlying a decision has expired."@en ;
+    :eventID "RE-E05" .
+
+:DriftDetected rdf:type owl:Class , :ReOpsEvent ;
+    rdfs:label "Drift Detected"@en ;
+    rdfs:comment "Decision coherence has degraded beyond acceptable thresholds."@en ;
+    :eventID "RE-E06" .
+
+:ThresholdBreach rdf:type owl:Class , :ReOpsEvent ;
+    rdfs:label "Threshold Breach"@en ;
+    rdfs:comment "A monitored metric has exceeded critical bounds."@en ;
+    :eventID "RE-E07" .
+
+:KillSwitchActivated rdf:type owl:Class , :ReOpsEvent ;
+    rdfs:label "Kill Switch Activated"@en ;
+    rdfs:comment "A pre-defined condition has triggered decision invalidation."@en ;
+    :eventID "RE-E08" ;
+    :severityLevel :SEV1 .
+
+:OutcomeObserved rdf:type owl:Class , :ReOpsEvent ;
+    rdfs:label "Outcome Observed"@en ;
+    rdfs:comment "Results of a decision have been recorded for learning."@en ;
+    :eventID "RE-E09" .
+
+:ReflectionSessionCompleted rdf:type owl:Class , :ReOpsEvent ;
+    rdfs:label "Reflection Session Completed"@en ;
+    rdfs:comment "A formal review of decision outcomes has concluded."@en ;
+    :eventID "RE-E10" .
+
+:PatchIssued_Re rdf:type owl:Class , :ReOpsEvent ;
+    rdfs:label "Patch Issued"@en ;
+    rdfs:comment "A corrective action has been applied to a decision."@en ;
+    :eventID "RE-E11" .
+
+:MemoryGraphUpdated rdf:type owl:Class , :ReOpsEvent ;
+    rdfs:label "Memory Graph Updated"@en ;
+    rdfs:comment "The decision lineage graph has been modified."@en ;
+    :eventID "RE-E12" .
+
+
+# =============================================================================
+# PART 5: DOMAIN OBJECTS (From V1, Updated)
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 5.1 ReOps Domain Objects
+# -----------------------------------------------------------------------------
+
+:Decision rdf:type owl:Class ;
+    rdfs:label "Decision"@en ;
+    rdfs:comment "A sealed choice with recorded rationale, assumptions, and kill switches."@en ;
+    rdfs:subClassOf :TemporalObject , :VersionedObject ;
+    :belongsToDomain :ReOps .
+
+:DecisionLogicRecord rdf:type owl:Class ;
+    rdfs:label "Decision Logic Record (DLR)"@en ;
+    rdfs:comment "The formal documentation of why a decision was made."@en ;
+    rdfs:subClassOf :CoherenceObject ;
+    :belongsToDomain :ReOps .
+
+:Rationale rdf:type owl:Class ;
+    rdfs:label "Rationale"@en ;
+    rdfs:comment "The reasoning and justification for a decision."@en ;
+    rdfs:subClassOf :CoherenceObject ;
+    :belongsToDomain :ReOps .
+
+:KillSwitch rdf:type owl:Class ;
+    rdfs:label "Kill Switch"@en ;
+    rdfs:comment "A pre-defined condition that, when triggered, invalidates a decision."@en ;
+    rdfs:subClassOf :CoherenceObject ;
+    :belongsToDomain :ReOps .
+
+:ReviewSchedule rdf:type owl:Class ;
+    rdfs:label "Review Schedule (RS)"@en ;
+    rdfs:comment "The mandatory future review point for a decision."@en ;
+    rdfs:subClassOf :CoherenceObject ;
+    :belongsToDomain :ReOps .
+
+
+# -----------------------------------------------------------------------------
+# 5.2 IntelOps Domain Objects
+# -----------------------------------------------------------------------------
+
+:Claim rdf:type owl:Class ;
+    rdfs:label "Claim"@en ;
+    rdfs:comment "A statement about the world with associated confidence and validation status."@en ;
+    rdfs:subClassOf :TemporalObject , :VersionedObject ;
+    :belongsToDomain :IntelOps .
+
+:Assumption rdf:type owl:Class ;
+    rdfs:label "Assumption"@en ;
+    rdfs:comment "A belief taken as given that underlies decisions or claims."@en ;
+    rdfs:subClassOf :TemporalObject ;
+    :belongsToDomain :IntelOps .
+
+:Source rdf:type owl:Class ;
+    rdfs:label "Source"@en ;
+    rdfs:comment "The origin of information supporting a claim."@en ;
+    rdfs:subClassOf :CoherenceObject ;
+    :belongsToDomain :IntelOps .
+
+:Evidence rdf:type owl:Class ;
+    rdfs:label "Evidence"@en ;
+    rdfs:comment "Specific data or observations that support or contradict a claim."@en ;
+    rdfs:subClassOf :CoherenceObject ;
+    :belongsToDomain :IntelOps .
+
+:PrimePacket rdf:type owl:Class ;
+    rdfs:label "Prime Packet"@en ;
+    rdfs:comment "An authoritative intelligence package with sealed provenance."@en ;
+    rdfs:subClassOf :CoherenceObject , :VersionedObject ;
+    :belongsToDomain :IntelOps .
+
+
+# -----------------------------------------------------------------------------
+# 5.3 FranOps Domain Objects
+# -----------------------------------------------------------------------------
+
+:CanonEntry rdf:type owl:Class ;
+    rdfs:label "Canon Entry"@en ;
+    rdfs:comment "An officially declared fact or commitment that constitutes institutional truth."@en ;
+    rdfs:subClassOf :TemporalObject , :VersionedObject ;
+    :belongsToDomain :FranOps .
+
+:Narrative rdf:type owl:Class ;
+    rdfs:label "Narrative"@en ;
+    rdfs:comment "A coherent story constructed from canon entries."@en ;
+    rdfs:subClassOf :CoherenceObject ;
+    :belongsToDomain :FranOps .
+
+:Commitment rdf:type owl:Class ;
+    rdfs:label "Commitment"@en ;
+    rdfs:comment "A public or private promise that creates expectations."@en ;
+    rdfs:subClassOf :CanonEntry ;
+    :belongsToDomain :FranOps .
+
+:Statement rdf:type owl:Class ;
+    rdfs:label "Statement"@en ;
+    rdfs:comment "An official communication that becomes part of institutional record."@en ;
+    rdfs:subClassOf :CanonEntry ;
+    :belongsToDomain :FranOps .
+
+:LoreNode rdf:type owl:Class ;
+    rdfs:label "Lore Node"@en ;
+    rdfs:comment "A node in the Lore Graph representing a narrative element."@en ;
+    rdfs:subClassOf :CoherenceObject ;
+    :belongsToDomain :FranOps .
+
+:Artifact rdf:type owl:Class ;
+    rdfs:label "Artifact"@en ;
+    rdfs:comment "A consumable product derived from canonical lore."@en ;
+    rdfs:subClassOf :CoherenceObject ;
+    :belongsToDomain :FranOps .
+
+
+# =============================================================================
+# PART 6: OPERATIONAL OBJECTS (Shared)
+# =============================================================================
+
+:DriftSignal rdf:type owl:Class ;
+    rdfs:label "Drift Signal"@en ;
+    rdfs:comment "An alert indicating detected incoherence requiring attention."@en ;
+    rdfs:subClassOf :CoherenceObject .
+
+:Contradiction rdf:type owl:Class ;
+    rdfs:label "Contradiction"@en ;
+    rdfs:comment "A detected logical inconsistency between coherence objects."@en ;
+    rdfs:subClassOf :DriftSignal .
+
+:Patch rdf:type owl:Class ;
+    rdfs:label "Patch"@en ;
+    rdfs:comment "A corrective action that resolves a drift signal."@en ;
+    rdfs:subClassOf :CoherenceObject .
+
+:BlastRadius rdf:type owl:Class ;
+    rdfs:label "Blast Radius"@en ;
+    rdfs:comment "The set of objects and stakeholders affected by a change."@en ;
+    rdfs:subClassOf :CoherenceObject .
+
+:CoherenceIndex rdf:type owl:Class ;
+    rdfs:label "Coherence Index"@en ;
+    rdfs:comment "Composite metric (0-100) measuring overall system coherence."@en ;
+    rdfs:subClassOf :CoherenceObject .
+
+:CoherenceProtocol rdf:type owl:Class ;
+    rdfs:label "Coherence Protocol"@en ;
+    rdfs:comment "Emergency procedure to restore system coherence when CI drops critically."@en ;
+    rdfs:subClassOf :CoherenceObject .
+
+
+# =============================================================================
+# PART 7: ACTORS
+# =============================================================================
+
+:Stakeholder rdf:type owl:Class ;
+    rdfs:label "Stakeholder"@en ;
+    rdfs:comment "An actor who consumes, produces, or is affected by coherence objects."@en ;
+    rdfs:subClassOf prov:Agent .
+
+:StakeholderTier rdf:type owl:Class ;
+    rdfs:label "Stakeholder Tier"@en ;
+    rdfs:comment "A grouping of stakeholders by role or access level."@en ;
+    rdfs:subClassOf :CoherenceObject .
+
+:Organization rdf:type owl:Class ;
+    rdfs:label "Organization"@en ;
+    rdfs:comment "An institutional entity maintaining coherence."@en ;
+    rdfs:subClassOf :Stakeholder .
+
+
+# =============================================================================
+# PART 8: STATUS ENUMERATIONS
+# =============================================================================
+
+:ValidationStatus rdf:type owl:Class ;
+    rdfs:label "Validation Status"@en ;
+    owl:equivalentClass [
+        rdf:type owl:Class ;
+        owl:oneOf ( :Active :Stale :Expired :Contested :Invalidated :Warning )
+    ] .
+
+:Active rdf:type :ValidationStatus , owl:NamedIndividual ;
+    rdfs:label "Active"@en .
+
+:Stale rdf:type :ValidationStatus , owl:NamedIndividual ;
+    rdfs:label "Stale"@en .
+
+:Expired rdf:type :ValidationStatus , owl:NamedIndividual ;
+    rdfs:label "Expired"@en .
+
+:Contested rdf:type :ValidationStatus , owl:NamedIndividual ;
+    rdfs:label "Contested"@en .
+
+:Invalidated rdf:type :ValidationStatus , owl:NamedIndividual ;
+    rdfs:label "Invalidated"@en .
+
+:Warning rdf:type :ValidationStatus , owl:NamedIndividual ;
+    rdfs:label "Warning"@en .
+
+:SeverityLevel rdf:type owl:Class ;
+    rdfs:label "Severity Level"@en ;
+    owl:equivalentClass [
+        rdf:type owl:Class ;
+        owl:oneOf ( :SEV1 :SEV2 :SEV3 )
+    ] .
+
+:SEV1 rdf:type :SeverityLevel , owl:NamedIndividual ;
+    rdfs:label "SEV-1"@en ;
+    rdfs:comment "Critical - 1 hour response required"@en .
+
+:SEV2 rdf:type :SeverityLevel , owl:NamedIndividual ;
+    rdfs:label "SEV-2"@en ;
+    rdfs:comment "High - 8 hour response required"@en .
+
+:SEV3 rdf:type :SeverityLevel , owl:NamedIndividual ;
+    rdfs:label "SEV-3"@en ;
+    rdfs:comment "Medium - 24 hour response required"@en .
+
+:CIStatus rdf:type owl:Class ;
+    rdfs:label "CI Status"@en ;
+    owl:equivalentClass [
+        rdf:type owl:Class ;
+        owl:oneOf ( :Excellent :Good :WarningCI :Critical :Emergency :Failure )
+    ] .
+
+:Excellent rdf:type :CIStatus , owl:NamedIndividual ;
+    rdfs:label "Excellent"@en ;
+    :ciRange "90-100" .
+
+:Good rdf:type :CIStatus , owl:NamedIndividual ;
+    rdfs:label "Good"@en ;
+    :ciRange "75-89" .
+
+:WarningCI rdf:type :CIStatus , owl:NamedIndividual ;
+    rdfs:label "Warning"@en ;
+    :ciRange "60-74" .
+
+:Critical rdf:type :CIStatus , owl:NamedIndividual ;
+    rdfs:label "Critical"@en ;
+    :ciRange "40-59" .
+
+:Emergency rdf:type :CIStatus , owl:NamedIndividual ;
+    rdfs:label "Emergency"@en ;
+    :ciRange "20-39" .
+
+:Failure rdf:type :CIStatus , owl:NamedIndividual ;
+    rdfs:label "Failure"@en ;
+    :ciRange "0-19" .
+
+
+# =============================================================================
+# PART 9: PROPERTIES
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 9.1 Domain Properties
+# -----------------------------------------------------------------------------
+
+:belongsToDomain rdf:type owl:ObjectProperty ;
+    rdfs:label "belongs to domain"@en ;
+    rdfs:domain :CoherenceObject ;
+    rdfs:range :OperationalDomain .
+
+:hasMission rdf:type owl:DatatypeProperty ;
+    rdfs:label "has mission"@en ;
+    rdfs:domain :OperationalDomain ;
+    rdfs:range xsd:string .
+
+:hasIcon rdf:type owl:DatatypeProperty ;
+    rdfs:label "has icon"@en ;
+    rdfs:domain :OperationalDomain ;
+    rdfs:range xsd:string .
+
+:functionID rdf:type owl:DatatypeProperty ;
+    rdfs:label "function ID"@en ;
+    rdfs:domain :Function ;
+    rdfs:range xsd:string .
+
+:eventID rdf:type owl:DatatypeProperty ;
+    rdfs:label "event ID"@en ;
+    rdfs:domain :Event ;
+    rdfs:range xsd:string .
+
+# -----------------------------------------------------------------------------
+# 9.2 Object Properties
+# -----------------------------------------------------------------------------
+
+:hasIdentifier rdf:type owl:DatatypeProperty ;
+    rdfs:domain :CoherenceObject ;
+    rdfs:range xsd:string .
+
+:createdAt rdf:type owl:DatatypeProperty ;
+    rdfs:domain :CoherenceObject ;
+    rdfs:range xsd:dateTime .
+
+:occurredAt rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Event ;
+    rdfs:range xsd:dateTime .
+
+:hasConfidence rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Claim ;
+    rdfs:range xsd:decimal .
+
+:hasHalfLife rdf:type owl:DatatypeProperty ;
+    rdfs:domain :TemporalObject ;
+    rdfs:range xsd:duration .
+
+:hasVersion rdf:type owl:DatatypeProperty ;
+    rdfs:domain :VersionedObject ;
+    rdfs:range xsd:string .
+
+:hasCoherenceIndex rdf:type owl:DatatypeProperty ;
+    rdfs:domain :CoherenceIndex ;
+    rdfs:range xsd:integer .
+
+:severityLevel rdf:type owl:ObjectProperty ;
+    rdfs:domain :DriftSignal ;
+    rdfs:range :SeverityLevel .
+
+:hasValidationStatus rdf:type owl:ObjectProperty ;
+    rdfs:domain :TemporalObject ;
+    rdfs:range :ValidationStatus .
+
+:hasDLR rdf:type owl:ObjectProperty ;
+    rdfs:domain :Decision ;
+    rdfs:range :DecisionLogicRecord .
+
+:documentsDecision rdf:type owl:ObjectProperty ;
+    rdfs:domain :DecisionLogicRecord ;
+    rdfs:range :Decision ;
+    owl:inverseOf :hasDLR .
+
+:hasKillSwitch rdf:type owl:ObjectProperty ;
+    rdfs:domain :Decision ;
+    rdfs:range :KillSwitch .
+
+:basedOnAssumption rdf:type owl:ObjectProperty ;
+    rdfs:domain :Decision ;
+    rdfs:range :Assumption .
+
+:basedOnClaim rdf:type owl:ObjectProperty ;
+    rdfs:domain :Decision ;
+    rdfs:range :Claim .
+
+:hasSource rdf:type owl:ObjectProperty ;
+    rdfs:domain :Claim ;
+    rdfs:range :Source .
+
+:hasEvidence rdf:type owl:ObjectProperty ;
+    rdfs:domain :Claim ;
+    rdfs:range :Evidence .
+
+:corroborates rdf:type owl:ObjectProperty ;
+    rdfs:domain :Claim ;
+    rdfs:range :Claim .
+
+:contradicts rdf:type owl:ObjectProperty ;
+    rdfs:domain :CoherenceObject ;
+    rdfs:range :CoherenceObject ;
+    rdf:type owl:SymmetricProperty .
+
+:supersedes rdf:type owl:ObjectProperty ;
+    rdfs:domain :VersionedObject ;
+    rdfs:range :VersionedObject .
+
+:triggeredBy rdf:type owl:ObjectProperty ;
+    rdfs:domain :Event ;
+    rdfs:range :CoherenceObject .
+
+:affects rdf:type owl:ObjectProperty ;
+    rdfs:domain :DriftSignal ;
+    rdfs:range :CoherenceObject .
+
+:resolvedBy rdf:type owl:ObjectProperty ;
+    rdfs:domain :DriftSignal ;
+    rdfs:range :Patch .
+
+:hasBlastRadius rdf:type owl:ObjectProperty ;
+    rdfs:domain :CoherenceObject ;
+    rdfs:range :BlastRadius .
+
+:invokesFunction rdf:type owl:ObjectProperty ;
+    rdfs:label "invokes function"@en ;
+    rdfs:domain :Event ;
+    rdfs:range :Function .
+
+:generatesEvent rdf:type owl:ObjectProperty ;
+    rdfs:label "generates event"@en ;
+    rdfs:domain :Function ;
+    rdfs:range :Event .
+
+
+# =============================================================================
+# PART 10: COHERENCE INDEX DIMENSIONS
+# =============================================================================
+
+:CIDimension rdf:type owl:Class ;
+    rdfs:label "CI Dimension"@en ;
+    rdfs:comment "A component dimension of the Coherence Index."@en .
+
+:DriftVelocity rdf:type :CIDimension , owl:NamedIndividual ;
+    rdfs:label "Drift Velocity"@en ;
+    :weight "0.20"^^xsd:decimal ;
+    :calculation "Inverse of unresolved drift signals" .
+
+:DecisionCoverage rdf:type :CIDimension , owl:NamedIndividual ;
+    rdfs:label "Decision Coverage"@en ;
+    :weight "0.15"^^xsd:decimal ;
+    :calculation "% decisions with complete DLRs" .
+
+:AssumptionHealth rdf:type :CIDimension , owl:NamedIndividual ;
+    rdfs:label "Assumption Health"@en ;
+    :weight "0.15"^^xsd:decimal ;
+    :calculation "% assumptions valid within half-life" .
+
+:ContradictionRate rdf:type :CIDimension , owl:NamedIndividual ;
+    rdfs:label "Contradiction Rate"@en ;
+    :weight "0.15"^^xsd:decimal ;
+    :calculation "Inverse of contradictions per 1000 edges" .
+
+:ProvenanceCoverage rdf:type :CIDimension , owl:NamedIndividual ;
+    rdfs:label "Provenance Coverage"@en ;
+    :weight "0.10"^^xsd:decimal ;
+    :calculation "% claims with verified source chains" .
+
+:LoopClosure rdf:type :CIDimension , owl:NamedIndividual ;
+    rdfs:label "Loop Closure"@en ;
+    :weight "0.10"^^xsd:decimal ;
+    :calculation "% decisions with completed reviews" .
+
+:PatchLatency rdf:type :CIDimension , owl:NamedIndividual ;
+    rdfs:label "Patch Latency"@en ;
+    :weight "0.10"^^xsd:decimal ;
+    :calculation "Inverse of avg drift resolution time" .
+
+:Calibration rdf:type :CIDimension , owl:NamedIndividual ;
+    rdfs:label "Calibration"@en ;
+    :weight "0.05"^^xsd:decimal ;
+    :calculation "Accuracy of confidence estimates" .
+
+:weight rdf:type owl:DatatypeProperty ;
+    rdfs:domain :CIDimension ;
+    rdfs:range xsd:decimal .
+
+:calculation rdf:type owl:DatatypeProperty ;
+    rdfs:domain :CIDimension ;
+    rdfs:range xsd:string .
+
+
+# =============================================================================
+# END OF ONTOLOGY
+# =============================================================================

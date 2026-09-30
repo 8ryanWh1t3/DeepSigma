@@ -1,0 +1,459 @@
+@prefix : <https://coherenceops.io/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+
+@base <https://coherenceops.io/ontology> .
+
+# =============================================================================
+# COHERENCE OPS ONTOLOGY — 6 LENSES EXTENSION
+# Version: 2.1
+# Description: Extends v2.0 with the 6 Language Lenses operating model
+# =============================================================================
+
+<https://coherenceops.io/ontology/lenses> rdf:type owl:Ontology ;
+    owl:versionInfo "2.1.0" ;
+    owl:imports <https://coherenceops.io/ontology> ;
+    dcterms:title "Coherence Ops — 6 Lenses Extension"@en ;
+    dcterms:description """The 6 Lenses provide a second axis to the Coherence Ops framework,
+defining WHO operates at each layer and WHY it sticks. Each lens intersects with all three
+operational domains (IntelOps, FranOps, ReOps) creating an 18-cell operating matrix."""@en ;
+    dcterms:created "2024-12-25"^^xsd:date .
+
+
+# =============================================================================
+# PART 1: LENS CLASS HIERARCHY
+# =============================================================================
+
+:Lens rdf:type owl:Class ;
+    rdfs:label "Lens"@en ;
+    rdfs:comment "A language lens representing a specific operational perspective in the Coherence Ops framework."@en ;
+    rdfs:subClassOf :CoherenceObject .
+
+:GovernanceLens rdf:type owl:Class ;
+    rdfs:label "Governance Lens"@en ;
+    rdfs:comment "Lenses that operate at the constitutional/governance layer (slow, rare changes)."@en ;
+    rdfs:subClassOf :Lens .
+
+:OperatingLens rdf:type owl:Class ;
+    rdfs:label "Operating Lens"@en ;
+    rdfs:comment "Lenses that form the daily operating rhythm."@en ;
+    rdfs:subClassOf :Lens .
+
+:RitualLens rdf:type owl:Class ;
+    rdfs:label "Ritual Lens"@en ;
+    rdfs:comment "Lenses that operate at the ritual/recognition layer (fast, constant)."@en ;
+    rdfs:subClassOf :Lens .
+
+
+# =============================================================================
+# PART 2: THE 6 LENSES (Individuals)
+# =============================================================================
+
+:Prime rdf:type owl:NamedIndividual , :GovernanceLens ;
+    rdfs:label "PRIME"@en ;
+    :lensColor "🟦" ;
+    :lensHex "#3B82F6" ;
+    :lensFunction "Define canon primitives + governance invariants (the constitution)"@en ;
+    :lensFailureMode "Constitutional drift — the rules themselves become incoherent"@en ;
+    :lensOrder 1 ;
+    skos:definition "The foundational lens that establishes the invariants and governance rules that all other lenses operate within."@en .
+
+:Executive rdf:type owl:NamedIndividual , :OperatingLens ;
+    rdfs:label "EXECUTIVE"@en ;
+    :lensColor "🟥" ;
+    :lensHex "#EF4444" ;
+    :lensFunction "Convert complexity into decision-ready truth + risk + accountability"@en ;
+    :lensFailureMode "Decision quality collapse — leaders get noise, not signal"@en ;
+    :lensOrder 2 ;
+    skos:definition "The lens that packages coherence artifacts for executive decision-making."@en .
+
+:Operations rdf:type owl:NamedIndividual , :OperatingLens ;
+    rdfs:label "OPERATIONS"@en ;
+    :lensColor "🟨" ;
+    :lensHex "#EAB308" ;
+    :lensFunction "Run the loop daily: assess → decide → execute → learn → patch"@en ;
+    :lensFailureMode "Loop closure failure — tasks spawn but never complete"@en ;
+    :lensOrder 3 ;
+    skos:definition "The lens that operates the daily coherence maintenance cycle."@en .
+
+:AITech rdf:type owl:NamedIndividual , :OperatingLens ;
+    rdfs:label "AI/TECH"@en ;
+    :lensColor "🟩" ;
+    :lensHex "#22C55E" ;
+    :lensFunction "Automate detection, scoring, retrieval, and safe outputs"@en ;
+    :lensFailureMode "Automation blindness — alerts fatigue or miss; humans route around"@en ;
+    :lensOrder 4 ;
+    skos:definition "The lens that handles automated monitoring, detection, and response."@en .
+
+:Human rdf:type owl:NamedIndividual , :OperatingLens ;
+    rdfs:label "HUMAN"@en ;
+    :lensColor "🟪" ;
+    :lensHex "#A855F7" ;
+    :lensFunction "Adoption + behavior change without coercion (trust + habit)"@en ;
+    :lensFailureMode "Adoption collapse — system exists but nobody uses it under pressure"@en ;
+    :lensOrder 5 ;
+    skos:definition "The lens that ensures human adoption and behavioral integration."@en .
+
+:Icon rdf:type owl:NamedIndividual , :RitualLens ;
+    rdfs:label "ICON"@en ;
+    :lensColor "⚫" ;
+    :lensHex "#1F2937" ;
+    :lensFunction "Ultra-fast recognition & ritualization (stickiness + speed)"@en ;
+    :lensFailureMode "Ritual decay — symbols lose meaning; speed drops; memory fades"@en ;
+    :lensOrder 6 ;
+    skos:definition "The lens that provides visual recognition, badges, and ritual markers."@en .
+
+
+# =============================================================================
+# PART 3: LENS PROPERTIES
+# =============================================================================
+
+:lensColor rdf:type owl:DatatypeProperty ;
+    rdfs:label "lens color"@en ;
+    rdfs:domain :Lens ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The emoji color indicator for this lens."@en .
+
+:lensHex rdf:type owl:DatatypeProperty ;
+    rdfs:label "lens hex color"@en ;
+    rdfs:domain :Lens ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The hex color code for this lens."@en .
+
+:lensFunction rdf:type owl:DatatypeProperty ;
+    rdfs:label "lens function"@en ;
+    rdfs:domain :Lens ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The primary function this lens serves."@en .
+
+:lensFailureMode rdf:type owl:DatatypeProperty ;
+    rdfs:label "lens failure mode"@en ;
+    rdfs:domain :Lens ;
+    rdfs:range xsd:string ;
+    rdfs:comment "What fails when this lens is neglected."@en .
+
+:lensOrder rdf:type owl:DatatypeProperty ;
+    rdfs:label "lens order"@en ;
+    rdfs:domain :Lens ;
+    rdfs:range xsd:integer ;
+    rdfs:comment "The position in the lens sequence (1-6)."@en .
+
+:operatesAtLens rdf:type owl:ObjectProperty ;
+    rdfs:label "operates at lens"@en ;
+    rdfs:domain :Event ;
+    rdfs:range :Lens ;
+    rdfs:comment "Links an event to the lens layer at which it operates."@en .
+
+:producesOutput rdf:type owl:ObjectProperty ;
+    rdfs:label "produces output"@en ;
+    rdfs:domain :LensCell ;
+    rdfs:range :CoherenceObject ;
+    rdfs:comment "Links a lens cell to the outputs it produces."@en .
+
+
+# =============================================================================
+# PART 4: LENS CELLS (The 18-Cell Matrix)
+# =============================================================================
+
+:LensCell rdf:type owl:Class ;
+    rdfs:label "Lens Cell"@en ;
+    rdfs:comment "A cell in the 6×3 matrix where a Lens intersects with a Domain."@en ;
+    rdfs:subClassOf :CoherenceObject ;
+    rdfs:subClassOf [
+        rdf:type owl:Restriction ;
+        owl:onProperty :hasLens ;
+        owl:cardinality "1"^^xsd:nonNegativeInteger
+    ] ;
+    rdfs:subClassOf [
+        rdf:type owl:Restriction ;
+        owl:onProperty :hasDomain ;
+        owl:cardinality "1"^^xsd:nonNegativeInteger
+    ] .
+
+:hasLens rdf:type owl:ObjectProperty ;
+    rdfs:label "has lens"@en ;
+    rdfs:domain :LensCell ;
+    rdfs:range :Lens .
+
+:hasDomain rdf:type owl:ObjectProperty ;
+    rdfs:label "has domain"@en ;
+    rdfs:domain :LensCell ;
+    rdfs:range :OperationalDomain .
+
+:cellFunction rdf:type owl:DatatypeProperty ;
+    rdfs:label "cell function"@en ;
+    rdfs:domain :LensCell ;
+    rdfs:range xsd:string .
+
+:cellEvent rdf:type owl:DatatypeProperty ;
+    rdfs:label "cell event"@en ;
+    rdfs:domain :LensCell ;
+    rdfs:range xsd:string .
+
+
+# -----------------------------------------------------------------------------
+# 4.1 PRIME Lens Cells
+# -----------------------------------------------------------------------------
+
+:Prime_IntelOps rdf:type owl:NamedIndividual , :LensCell ;
+    rdfs:label "PRIME × IntelOps"@en ;
+    :hasLens :Prime ;
+    :hasDomain :IntelOps ;
+    :cellFunction "Define truth types, confidence scale, half-life defaults"@en ;
+    :cellEvent "Doctrine Update"@en ;
+    :cellEventID "LENS-P-I" .
+
+:Prime_ReOps rdf:type owl:NamedIndividual , :LensCell ;
+    rdfs:label "PRIME × ReOps"@en ;
+    :hasLens :Prime ;
+    :hasDomain :ReOps ;
+    :cellFunction "Define DLR/RS/DS/MG schema + sealing rules"@en ;
+    :cellEvent "Artifact Standard Update"@en ;
+    :cellEventID "LENS-P-R" .
+
+:Prime_FranOps rdf:type owl:NamedIndividual , :LensCell ;
+    rdfs:label "PRIME × FranOps"@en ;
+    :hasLens :Prime ;
+    :hasDomain :FranOps ;
+    :cellFunction "Define primary/secondary/soft canon + conflict precedence"@en ;
+    :cellEvent "Canon Tier Update"@en ;
+    :cellEventID "LENS-P-F" .
+
+
+# -----------------------------------------------------------------------------
+# 4.2 EXECUTIVE Lens Cells
+# -----------------------------------------------------------------------------
+
+:Executive_IntelOps rdf:type owl:NamedIndividual , :LensCell ;
+    rdfs:label "EXECUTIVE × IntelOps"@en ;
+    :hasLens :Executive ;
+    :hasDomain :IntelOps ;
+    :cellFunction "Package top claims + confidence + blast radius for leaders"@en ;
+    :cellEvent "Prime Packet Brief"@en ;
+    :cellEventID "LENS-E-I" .
+
+:Executive_ReOps rdf:type owl:NamedIndividual , :LensCell ;
+    rdfs:label "EXECUTIVE × ReOps"@en ;
+    :hasLens :Executive ;
+    :hasDomain :ReOps ;
+    :cellFunction "Present options, rationale, kill-switch, owner for decision gates"@en ;
+    :cellEvent "Decision Gate Review"@en ;
+    :cellEventID "LENS-E-R" .
+
+:Executive_FranOps rdf:type owl:NamedIndividual , :LensCell ;
+    rdfs:label "EXECUTIVE × FranOps"@en ;
+    :hasLens :Executive ;
+    :hasDomain :FranOps ;
+    :cellFunction "Assess impact radius + SEV rating + release exposure"@en ;
+    :cellEvent "Canon Change Approval"@en ;
+    :cellEventID "LENS-E-F" .
+
+
+# -----------------------------------------------------------------------------
+# 4.3 OPERATIONS Lens Cells
+# -----------------------------------------------------------------------------
+
+:Operations_IntelOps rdf:type owl:NamedIndividual , :LensCell ;
+    rdfs:label "OPERATIONS × IntelOps"@en ;
+    :hasLens :Operations ;
+    :hasDomain :IntelOps ;
+    :cellFunction "Spawn collection tasks when gaps detected"@en ;
+    :cellEvent "Collection Task Spawn"@en ;
+    :cellEventID "LENS-O-I" .
+
+:Operations_ReOps rdf:type owl:NamedIndividual , :LensCell ;
+    rdfs:label "OPERATIONS × ReOps"@en ;
+    :hasLens :Operations ;
+    :hasDomain :ReOps ;
+    :cellFunction "File RS; log expectation vs reality"@en ;
+    :cellEvent "Outcome Review"@en ;
+    :cellEventID "LENS-O-R" .
+
+:Operations_FranOps rdf:type owl:NamedIndividual , :LensCell ;
+    rdfs:label "OPERATIONS × FranOps"@en ;
+    :hasLens :Operations ;
+    :hasDomain :FranOps ;
+    :cellFunction "Diff new content; flag contradictions"@en ;
+    :cellEvent "Continuity Check Run"@en ;
+    :cellEventID "LENS-O-F" .
+
+
+# -----------------------------------------------------------------------------
+# 4.4 AI/TECH Lens Cells
+# -----------------------------------------------------------------------------
+
+:AITech_IntelOps rdf:type owl:NamedIndividual , :LensCell ;
+    rdfs:label "AI/TECH × IntelOps"@en ;
+    :hasLens :AITech ;
+    :hasDomain :IntelOps ;
+    :cellFunction "Trigger alerts when assumptions hit half-life"@en ;
+    :cellEvent "Assumption Expiry Alert"@en ;
+    :cellEventID "LENS-A-I" .
+
+:AITech_ReOps rdf:type owl:NamedIndividual , :LensCell ;
+    rdfs:label "AI/TECH × ReOps"@en ;
+    :hasLens :AITech ;
+    :hasDomain :ReOps ;
+    :cellFunction "Detect template bloat / intent drift / outcome drift"@en ;
+    :cellEvent "Drift Trigger"@en ;
+    :cellEventID "LENS-A-R" .
+
+:AITech_FranOps rdf:type owl:NamedIndividual , :LensCell ;
+    rdfs:label "AI/TECH × FranOps"@en ;
+    :hasLens :AITech ;
+    :hasDomain :FranOps ;
+    :cellFunction "Spike when timeline/character/tone conflicts exceed threshold"@en ;
+    :cellEvent "Contradiction Graph Spike"@en ;
+    :cellEventID "LENS-A-F" .
+
+
+# -----------------------------------------------------------------------------
+# 4.5 HUMAN Lens Cells
+# -----------------------------------------------------------------------------
+
+:Human_IntelOps rdf:type owl:NamedIndividual , :LensCell ;
+    rdfs:label "HUMAN × IntelOps"@en ;
+    :hasLens :Human ;
+    :hasDomain :IntelOps ;
+    :cellFunction "Review analyst confidence accuracy; audit for bias"@en ;
+    :cellEvent "Analyst Calibration Check"@en ;
+    :cellEventID "LENS-H-I" .
+
+:Human_ReOps rdf:type owl:NamedIndividual , :LensCell ;
+    rdfs:label "HUMAN × ReOps"@en ;
+    :hasLens :Human ;
+    :hasDomain :ReOps ;
+    :cellFunction "Log when new hire retrieves 'why' in <60s"@en ;
+    :cellEvent "Onboarding Recall Win"@en ;
+    :cellEventID "LENS-H-R" .
+
+:Human_FranOps rdf:type owl:NamedIndividual , :LensCell ;
+    rdfs:label "HUMAN × FranOps"@en ;
+    :hasLens :Human ;
+    :hasDomain :FranOps ;
+    :cellFunction "Sync tone/intent with creators; address lore debt"@en ;
+    :cellEvent "Creator Alignment Session"@en ;
+    :cellEventID "LENS-H-F" .
+
+
+# -----------------------------------------------------------------------------
+# 4.6 ICON Lens Cells
+# -----------------------------------------------------------------------------
+
+:Icon_IntelOps rdf:type owl:NamedIndividual , :LensCell ;
+    rdfs:label "ICON × IntelOps"@en ;
+    :hasLens :Icon ;
+    :hasDomain :IntelOps ;
+    :cellFunction "Display 🟢🟡🔴 confidence state visibly"@en ;
+    :cellEvent "Truth Status Light"@en ;
+    :cellEventID "LENS-I-I" ;
+    :iconSet "🟢 High confidence | 🟡 Medium confidence | 🔴 Low confidence"@en .
+
+:Icon_ReOps rdf:type owl:NamedIndividual , :LensCell ;
+    rdfs:label "ICON × ReOps"@en ;
+    :hasLens :Icon ;
+    :hasDomain :ReOps ;
+    :cellFunction "Show 🧾 sealed decision; 🛠️ patch deployed badges"@en ;
+    :cellEvent "Seal / Patch Badge"@en ;
+    :cellEventID "LENS-I-R" ;
+    :iconSet "🧾 Sealed | 🛠️ Patched | ⚠️ Drift | 🔒 Kill Switch"@en .
+
+:Icon_FranOps rdf:type owl:NamedIndividual , :LensCell ;
+    rdfs:label "ICON × FranOps"@en ;
+    :hasLens :Icon ;
+    :hasDomain :FranOps ;
+    :cellFunction "Display 🚨 SEV-1/2/3 event markers for teams"@en ;
+    :cellEvent "SEV Retcon Banner"@en ;
+    :cellEventID "LENS-I-F" ;
+    :iconSet "🚨 SEV-1 | ⚠️ SEV-2 | 📋 SEV-3 | ✅ Resolved"@en .
+
+
+# =============================================================================
+# PART 5: OUTPUT OBJECTS BY DOMAIN
+# =============================================================================
+
+# These link the outputs each domain emits
+
+:IntelOpsOutputs rdf:type owl:NamedIndividual ;
+    rdfs:label "IntelOps Output Objects"@en ;
+    :emitsObject :Claim , :Evidence , :Source , :PrimePacket , :BlastRadius ;
+    :emitsMetric "Confidence"@en , "Half-life"@en .
+
+:ReOpsOutputs rdf:type owl:NamedIndividual ;
+    rdfs:label "ReOps Output Objects"@en ;
+    :emitsObject :DecisionLogicRecord , :ReviewSchedule , :DriftSignal , :Patch ;
+    :emitsStructure "Memory Graph node/edge"@en .
+
+:FranOpsOutputs rdf:type owl:NamedIndividual ;
+    rdfs:label "FranOps Output Objects"@en ;
+    :emitsObject :CanonEntry , :Contradiction , :Artifact ;
+    :emitsStructure "Diff"@en , "Impact Radius"@en , "Retcon Ticket"@en , "Release Inheritance Map"@en .
+
+:emitsObject rdf:type owl:ObjectProperty ;
+    rdfs:label "emits object"@en ;
+    rdfs:comment "Links a domain to the objects it produces."@en .
+
+:emitsMetric rdf:type owl:DatatypeProperty ;
+    rdfs:label "emits metric"@en ;
+    rdfs:comment "Links a domain to the metrics it produces."@en .
+
+:emitsStructure rdf:type owl:DatatypeProperty ;
+    rdfs:label "emits structure"@en ;
+    rdfs:comment "Links a domain to the data structures it produces."@en .
+
+:cellEventID rdf:type owl:DatatypeProperty ;
+    rdfs:label "cell event ID"@en ;
+    rdfs:domain :LensCell ;
+    rdfs:range xsd:string .
+
+:iconSet rdf:type owl:DatatypeProperty ;
+    rdfs:label "icon set"@en ;
+    rdfs:domain :LensCell ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The set of icons used by this ICON lens cell."@en .
+
+
+# =============================================================================
+# PART 6: LENS FLOW RELATIONSHIPS
+# =============================================================================
+
+# Define the operating flow between lenses
+
+:flowsTo rdf:type owl:ObjectProperty ;
+    rdfs:label "flows to"@en ;
+    rdfs:domain :Lens ;
+    rdfs:range :Lens ;
+    rdfs:comment "Indicates the next lens in the operating sequence."@en .
+
+:Prime :flowsTo :Executive .
+:Executive :flowsTo :Operations .
+:Operations :flowsTo :AITech .
+:AITech :flowsTo :Human .
+:Human :flowsTo :Icon .
+:Icon :flowsTo :Executive .  # Loop back (Icon reinforces Executive decisions)
+
+:governsAll rdf:type owl:ObjectProperty ;
+    rdfs:label "governs all"@en ;
+    rdfs:domain :GovernanceLens ;
+    rdfs:range :OperatingLens ;
+    rdfs:comment "Indicates that governance lens rules apply to operating lenses."@en .
+
+:Prime :governsAll :Executive , :Operations , :AITech , :Human .
+
+:reinforces rdf:type owl:ObjectProperty ;
+    rdfs:label "reinforces"@en ;
+    rdfs:domain :RitualLens ;
+    rdfs:range :OperatingLens ;
+    rdfs:comment "Indicates that ritual lens makes operating lens behaviors sticky."@en .
+
+:Icon :reinforces :Executive , :Operations , :AITech , :Human .
+
+
+# =============================================================================
+# END OF 6 LENSES EXTENSION
+# =============================================================================
