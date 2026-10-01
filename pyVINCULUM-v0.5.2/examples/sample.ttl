@@ -1,0 +1,11 @@
+@prefix ex: <https://example.org/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:Claim1 a ex:Claim ;
+    ex:confidence "0.82"^^xsd:decimal ;
+    ex:subject ex:Track204 ;
+    skos:prefLabel "Track likely represents a UAS"@en .
+
+ex:Track204 a ex:Track ;
+    ex:speedMps "41.2"^^xsd:decimal .
