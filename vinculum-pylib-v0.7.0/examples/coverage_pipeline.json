@@ -1,0 +1,89 @@
+{
+  "schema": "vinculum.pipeline.job/1",
+  "id": "CODEC-COVERAGE-MISMATCH",
+  "lexicon": [
+    {
+      "id": "all-covered",
+      "pattern": "Entire sector observed",
+      "concept": "urn:metric:coverage",
+      "unit": "%",
+      "quantity": {
+        "lower": "100",
+        "upper": "100"
+      },
+      "basis": "synthetic explicit domain definition: complete coverage = 100 percent",
+      "semantic_strength": 0.95
+    }
+  ],
+  "ontology": {
+    "turtle": "@prefix skos: <http://www.w3.org/2004/02/skos/core#> . <urn:metric:coverage> skos:prefLabel \"sensor coverage\"@en .",
+    "resolve_labels": true
+  },
+  "sources": [
+    {
+      "id": "generated-claim",
+      "format": "txt",
+      "data": "Entire sector observed",
+      "mapping": {
+        "side": "L",
+        "order": 1,
+        "columns": {
+          "text": "text"
+        },
+        "defaults": {
+          "entity": "Bravo",
+          "scope": {
+            "scope_id": "sector-bravo-demo",
+            "population": "observed sector area",
+            "denominator": "entire declared sector",
+            "granularity": "coverage fraction",
+            "window": {
+              "start": "2026-10-02T14:32:00Z",
+              "end": "2026-10-02T14:32:30Z"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "recorded-coverage",
+      "format": "json",
+      "data": [
+        {
+          "metric": "sensor coverage",
+          "coverage": 0.6,
+          "quality": 0.99
+        }
+      ],
+      "mapping": {
+        "side": "M",
+        "order": 4,
+        "columns": {
+          "concept": "metric",
+          "value": "coverage",
+          "defense": "quality"
+        },
+        "defaults": {
+          "entity": "Bravo",
+          "unit": "ratio",
+          "scope": {
+            "scope_id": "sector-bravo-demo",
+            "population": "observed sector area",
+            "denominator": "entire declared sector",
+            "granularity": "coverage fraction",
+            "window": {
+              "start": "2026-10-02T14:32:00Z",
+              "end": "2026-10-02T14:32:30Z"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "pairing": {
+    "mode": "auto",
+    "policy_id": "sector-coverage-v1",
+    "basis": "same sector, same window, same coverage metric after explicit SKOS mapping"
+  },
+  "require_registered_sources": true
+}

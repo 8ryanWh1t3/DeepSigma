@@ -1,0 +1,57 @@
+{
+  "schema": "vinculum.pipeline.job/1",
+  "id": "BAKERS-DOZEN-PIPELINE",
+  "sources": [
+    {
+      "id": "order-words",
+      "format": "txt",
+      "data": "baker's dozen",
+      "mapping": {
+        "side": "L",
+        "columns": {
+          "text": "text"
+        },
+        "defaults": {
+          "entity": "order-001",
+          "scope": {
+            "scope_id": "bakery-order-001",
+            "population": "cookies",
+            "denominator": "one order",
+            "granularity": "receipt line",
+            "timeless": true
+          }
+        }
+      }
+    },
+    {
+      "id": "receipt",
+      "format": "csv",
+      "data": "quantity,defense\n12,0.99\n",
+      "mapping": {
+        "side": "M",
+        "columns": {
+          "value": "quantity",
+          "defense": "defense"
+        },
+        "defaults": {
+          "entity": "order-001",
+          "concept": "item_count",
+          "unit": "count",
+          "scope": {
+            "scope_id": "bakery-order-001",
+            "population": "cookies",
+            "denominator": "one order",
+            "granularity": "receipt line",
+            "timeless": true
+          }
+        }
+      }
+    }
+  ],
+  "pairing": {
+    "mode": "auto",
+    "policy_id": "same-order-line-v1",
+    "basis": "select only unique exact-entity, concept, unit and transaction-scope matches"
+  },
+  "require_registered_sources": true
+}

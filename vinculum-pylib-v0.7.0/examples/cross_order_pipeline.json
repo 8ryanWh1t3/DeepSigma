@@ -1,0 +1,1222 @@
+{
+  "schema": "vinculum.pipeline.job/1",
+  "id": "CROSS-ORDER-STRESS-PIPELINE",
+  "scenario": {
+    "schema": "vinculum.crossorder.scenario/1",
+    "id": "SYNTHETIC-CODEC-LIMIT-TEST",
+    "orders_l": 5,
+    "orders_m": 5,
+    "representations": [
+      {
+        "id": "L1-coverage",
+        "side": "L",
+        "order": 1,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "observed_coverage",
+        "quantity": {
+          "lower": "100",
+          "upper": "100",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "%",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "The entire sector was observed.",
+        "pd": {
+          "probabilistic": 0.0,
+          "deterministic": 1.0,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 1.0,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "generated-summary"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "L1-detections",
+        "side": "L",
+        "order": 1,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "detected_track_count",
+        "quantity": {
+          "lower": "0",
+          "upper": "0",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "count",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "No tracks were detected.",
+        "pd": {
+          "probabilistic": 0.0,
+          "deterministic": 1.0,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 0.99,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "generated-summary"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "L1-presence",
+        "side": "L",
+        "order": 1,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "aircraft_present_count",
+        "quantity": {
+          "lower": "0",
+          "upper": "0",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "count",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "No aircraft were present.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 0.95,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "generated-summary"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "L2-confidence",
+        "side": "L",
+        "order": 2,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "validation_hit_rate",
+        "quantity": {
+          "lower": "95",
+          "upper": null,
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "%",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "At least 95% in the declared validation metric.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 0.95,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "generated-summary"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "L2-coverage-bound",
+        "side": "L",
+        "order": 2,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "observed_coverage",
+        "quantity": {
+          "lower": "50",
+          "upper": null,
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "%",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "At least half the sector was observed.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 1.0,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "generated-summary"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "L3-trial-count",
+        "side": "L",
+        "order": 3,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "validation_case_count",
+        "quantity": {
+          "lower": "100",
+          "upper": "100",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "count",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "The description is supported by 100 cases.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 1.0,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "synthetic-source"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "L4-age-limit",
+        "side": "L",
+        "order": 4,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "record_age",
+        "quantity": {
+          "lower": "0",
+          "upper": "30",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "s",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "The snapshot is at most 30 seconds old.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 1.0,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "synthetic-source"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "L5-sources",
+        "side": "L",
+        "order": 5,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "independent_source_count",
+        "quantity": {
+          "lower": "2",
+          "upper": "2",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "count",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "Two independent sources corroborate this.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 1.0,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "synthetic-source"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "M1-age",
+        "side": "M",
+        "order": 1,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "record_age",
+        "quantity": {
+          "lower": "90",
+          "upper": "90",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "s",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "Age field is 90 seconds in this fixture.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 1.0,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "synthetic-source"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "M1-detections",
+        "side": "M",
+        "order": 1,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "detected_track_count",
+        "quantity": {
+          "lower": "0",
+          "upper": "0",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "count",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "No tracks were detected in this 30-second window.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 0.99,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "synthetic-source"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "M2-count-interval",
+        "side": "M",
+        "order": 2,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "detected_track_count",
+        "quantity": {
+          "lower": "0",
+          "upper": "1",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "count",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "Possible count under the declared interval model is between 0 and 1.",
+        "pd": {
+          "probabilistic": 0.8,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 0.42,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "synthetic-source"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "M3-hit-rate",
+        "side": "M",
+        "order": 3,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "validation_hit_rate",
+        "quantity": {
+          "lower": "72",
+          "upper": "72",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "%",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "The fixture validation hit rate is 72%.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 0.9,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "synthetic-source"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "M3-trial-count",
+        "side": "M",
+        "order": 3,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "validation_case_count",
+        "quantity": {
+          "lower": "100",
+          "upper": "100",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "count",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "100 fixture validation cases.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 1.0,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "synthetic-source"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "M4-coverage",
+        "side": "M",
+        "order": 4,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "observed_coverage",
+        "quantity": {
+          "lower": "60",
+          "upper": "60",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "%",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "Sensor coverage was 60%.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 0.98,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "synthetic-source"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "M5-source-count",
+        "side": "M",
+        "order": 5,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "independent_source_count",
+        "quantity": {
+          "lower": "1",
+          "upper": "1",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "count",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "Two displays trace to one declared source root.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 1.0,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "synthetic-source"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      }
+    ],
+    "pairs": [
+      {
+        "id": "confidence-overclaim",
+        "left_id": "L2-confidence",
+        "right_id": "M3-hit-rate",
+        "rationale": "explicit synthetic test pairing; applicability must be checked",
+        "hinge_orders": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "alignment_support": 1.0,
+        "alignment_basis": "fixture-provided pairing, not learned confidence",
+        "distance_scale": null,
+        "weight": 1.0,
+        "hinge_states": []
+      },
+      {
+        "id": "coverage-overclaim",
+        "left_id": "L1-coverage",
+        "right_id": "M4-coverage",
+        "rationale": "explicit synthetic test pairing; applicability must be checked",
+        "hinge_orders": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "alignment_support": 1.0,
+        "alignment_basis": "fixture-provided pairing, not learned confidence",
+        "distance_scale": null,
+        "weight": 1.0,
+        "hinge_states": []
+      },
+      {
+        "id": "dependence-overclaim",
+        "left_id": "L5-sources",
+        "right_id": "M5-source-count",
+        "rationale": "explicit synthetic test pairing; applicability must be checked",
+        "hinge_orders": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "alignment_support": 1.0,
+        "alignment_basis": "fixture-provided pairing, not learned confidence",
+        "distance_scale": null,
+        "weight": 1.0,
+        "hinge_states": []
+      },
+      {
+        "id": "freshness-claim",
+        "left_id": "L4-age-limit",
+        "right_id": "M1-age",
+        "rationale": "explicit synthetic test pairing; applicability must be checked",
+        "hinge_orders": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "alignment_support": 1.0,
+        "alignment_basis": "fixture-provided pairing, not learned confidence",
+        "distance_scale": null,
+        "weight": 1.0,
+        "hinge_states": []
+      },
+      {
+        "id": "qualified-coverage",
+        "left_id": "L2-coverage-bound",
+        "right_id": "M4-coverage",
+        "rationale": "explicit synthetic test pairing; applicability must be checked",
+        "hinge_orders": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "alignment_support": 1.0,
+        "alignment_basis": "fixture-provided pairing, not learned confidence",
+        "distance_scale": null,
+        "weight": 1.0,
+        "hinge_states": []
+      },
+      {
+        "id": "support-case-count",
+        "left_id": "L3-trial-count",
+        "right_id": "M3-trial-count",
+        "rationale": "explicit synthetic test pairing; applicability must be checked",
+        "hinge_orders": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "alignment_support": 1.0,
+        "alignment_basis": "fixture-provided pairing, not learned confidence",
+        "distance_scale": null,
+        "weight": 1.0,
+        "hinge_states": []
+      },
+      {
+        "id": "uncertain-count",
+        "left_id": "L1-detections",
+        "right_id": "M2-count-interval",
+        "rationale": "explicit synthetic test pairing; applicability must be checked",
+        "hinge_orders": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "alignment_support": 1.0,
+        "alignment_basis": "fixture-provided pairing, not learned confidence",
+        "distance_scale": null,
+        "weight": 1.0,
+        "hinge_states": []
+      },
+      {
+        "id": "unsupported-absence",
+        "left_id": "L1-presence",
+        "right_id": "M1-detections",
+        "rationale": "explicit synthetic test pairing; applicability must be checked",
+        "hinge_orders": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "alignment_support": 1.0,
+        "alignment_basis": "fixture-provided pairing, not learned confidence",
+        "distance_scale": null,
+        "weight": 1.0,
+        "hinge_states": []
+      },
+      {
+        "id": "zero-preserved",
+        "left_id": "L1-detections",
+        "right_id": "M1-detections",
+        "rationale": "explicit synthetic test pairing; applicability must be checked",
+        "hinge_orders": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "alignment_support": 1.0,
+        "alignment_basis": "fixture-provided pairing, not learned confidence",
+        "distance_scale": null,
+        "weight": 1.0,
+        "hinge_states": []
+      }
+    ],
+    "groups": [
+      {
+        "id": "analysis-document",
+        "kind": "document",
+        "members": [
+          "M1-detections",
+          "M2-count-interval",
+          "M3-hit-rate",
+          "M3-trial-count",
+          "M4-coverage",
+          "M1-age",
+          "M5-source-count",
+          "L1-detections",
+          "L1-coverage",
+          "L1-presence",
+          "L2-confidence",
+          "L2-coverage-bound",
+          "L3-trial-count",
+          "L4-age-limit",
+          "L5-sources"
+        ],
+        "children": [
+          "codec-episode"
+        ]
+      },
+      {
+        "id": "codec-episode",
+        "kind": "episode",
+        "members": [
+          "M1-detections",
+          "M4-coverage",
+          "L1-detections",
+          "L1-coverage",
+          "L1-presence"
+        ],
+        "children": []
+      },
+      {
+        "id": "corpus",
+        "kind": "corpus",
+        "members": [],
+        "children": [
+          "analysis-document"
+        ]
+      }
+    ],
+    "policy": {
+      "id": "strict-pair-v1",
+      "require_time": true,
+      "required_context": [
+        "scope_id",
+        "population",
+        "denominator",
+        "granularity"
+      ],
+      "require_same_method": false,
+      "max_age_seconds": null,
+      "as_of": null,
+      "support_aggregation": "minimum",
+      "product_basis": null
+    },
+    "units": [
+      {
+        "symbol": "%",
+        "dimension": "ratio",
+        "factor": "0.01",
+        "offset": "0"
+      },
+      {
+        "symbol": "C",
+        "dimension": "temperature",
+        "factor": "1",
+        "offset": "273.15"
+      },
+      {
+        "symbol": "EUR",
+        "dimension": "currency:EUR",
+        "factor": "1",
+        "offset": "0"
+      },
+      {
+        "symbol": "F",
+        "dimension": "temperature",
+        "factor": "5/9",
+        "offset": "45967/180"
+      },
+      {
+        "symbol": "K",
+        "dimension": "temperature",
+        "factor": "1",
+        "offset": "0"
+      },
+      {
+        "symbol": "USD",
+        "dimension": "currency:USD",
+        "factor": "1",
+        "offset": "0"
+      },
+      {
+        "symbol": "USD_cent",
+        "dimension": "currency:USD",
+        "factor": "0.01",
+        "offset": "0"
+      },
+      {
+        "symbol": "cm",
+        "dimension": "length",
+        "factor": "0.01",
+        "offset": "0"
+      },
+      {
+        "symbol": "count",
+        "dimension": "count",
+        "factor": "1",
+        "offset": "0"
+      },
+      {
+        "symbol": "day",
+        "dimension": "time",
+        "factor": "86400",
+        "offset": "0"
+      },
+      {
+        "symbol": "ft",
+        "dimension": "length",
+        "factor": "0.3048",
+        "offset": "0"
+      },
+      {
+        "symbol": "h",
+        "dimension": "time",
+        "factor": "3600",
+        "offset": "0"
+      },
+      {
+        "symbol": "in",
+        "dimension": "length",
+        "factor": "0.0254",
+        "offset": "0"
+      },
+      {
+        "symbol": "item",
+        "dimension": "count",
+        "factor": "1",
+        "offset": "0"
+      },
+      {
+        "symbol": "km",
+        "dimension": "length",
+        "factor": "1000",
+        "offset": "0"
+      },
+      {
+        "symbol": "km/h",
+        "dimension": "speed",
+        "factor": "5/18",
+        "offset": "0"
+      },
+      {
+        "symbol": "m",
+        "dimension": "length",
+        "factor": "1",
+        "offset": "0"
+      },
+      {
+        "symbol": "m/s",
+        "dimension": "speed",
+        "factor": "1",
+        "offset": "0"
+      },
+      {
+        "symbol": "min",
+        "dimension": "time",
+        "factor": "60",
+        "offset": "0"
+      },
+      {
+        "symbol": "mph",
+        "dimension": "speed",
+        "factor": "0.44704",
+        "offset": "0"
+      },
+      {
+        "symbol": "ratio",
+        "dimension": "ratio",
+        "factor": "1",
+        "offset": "0"
+      },
+      {
+        "symbol": "s",
+        "dimension": "time",
+        "factor": "1",
+        "offset": "0"
+      }
+    ],
+    "transformations": [
+      {
+        "id": "SUMMARY-TRANSFORM",
+        "source_ids": [
+          "M1-detections",
+          "M4-coverage"
+        ],
+        "target_ids": [
+          "L1-detections",
+          "L1-coverage",
+          "L1-presence"
+        ],
+        "description": "Source: zero detections, 60% coverage. Summary: entire sector observed, no aircraft present."
+      }
+    ],
+    "context": {
+      "title": "From origin to representation; from description to presence",
+      "origin_path": [
+        "God",
+        "Big Bang",
+        "Nature / physical reality",
+        "Cellular / divisional reality",
+        "Human experience",
+        "Language and mathematics as representations"
+      ],
+      "retreat_path": [
+        "Names, numbers and divisions",
+        "Human experience",
+        "Nature",
+        "Stillness before description",
+        "God"
+      ],
+      "attribution": "User's philosophical/theological framing; not a scientific inference or scored claim."
+    }
+  },
+  "pairing": {
+    "mode": "manual"
+  },
+  "evidence": [
+    {
+      "id": "generated-summary",
+      "sha256": null,
+      "basis": "synthetic fixture source reference, not real operational evidence",
+      "parents": [],
+      "locator": null,
+      "media_type": "application/octet-stream"
+    },
+    {
+      "id": "synthetic-source",
+      "sha256": null,
+      "basis": "synthetic fixture source reference, not real operational evidence",
+      "parents": [],
+      "locator": null,
+      "media_type": "application/octet-stream"
+    }
+  ],
+  "require_registered_sources": true
+}
