@@ -1,0 +1,43 @@
+{
+  "version": "0.7.0",
+  "core": "typed pair-owned cross-order hinges",
+  "input": {
+    "built_in": [
+      "txt",
+      "md",
+      "json",
+      "jsonl",
+      "csv",
+      "native scenario Turtle"
+    ],
+    "optional": [
+      "yaml (PyYAML)",
+      "pdf text (pypdf)",
+      "docx (python-docx)",
+      "xlsx (artifact_tool host)",
+      "parquet (pyarrow)"
+    ]
+  },
+  "pairing": [
+    "manual",
+    "guided selection",
+    "explicit-policy unique exact-metadata auto"
+  ],
+  "output": [
+    "JSON",
+    "CSV",
+    "Markdown",
+    "Turtle",
+    "offline HTML",
+    "optional PDF",
+    "optional host XLSX"
+  ],
+  "network": "optional stateless FastAPI facade; no remote source fetch",
+  "not_implemented": [
+    "live Lattice/Foundry/Vantage/OnBase connectors",
+    "generic semantic AI",
+    "production IAM",
+    "OCR",
+    "automatic command action"
+  ]
+}

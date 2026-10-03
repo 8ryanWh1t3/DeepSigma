@@ -1,0 +1,10 @@
+﻿Pair ID,Left,Right,L order,M order,Status,Comparable,Signed delta (base unit),Raw collision /100,Support-weighted /100,Joint support,Alignment metadata coverage,Dependency warnings
+confidence-overclaim,L2-confidence,M3-hit-rate,2,3,CONFLICT,True,,100.0,90.0,0.9,1.0,
+coverage-overclaim,L1-coverage,M4-coverage,1,4,CONFLICT,True,'-0.4,100.0,98.0,0.98,1.0,
+dependence-overclaim,L5-sources,M5-source-count,5,5,CONFLICT,True,'-1,100.0,100.0,1.0,1.0,shared source roots: synthetic-source; registered evidence shared roots: synthetic-source
+freshness-claim,L4-age-limit,M1-age,4,1,CONFLICT,True,,100.0,100.0,1.0,1.0,shared source roots: synthetic-source; registered evidence shared roots: synthetic-source
+qualified-coverage,L2-coverage-bound,M4-coverage,2,4,ALIGNED,True,,0.0,0.0,0.98,1.0,
+support-case-count,L3-trial-count,M3-trial-count,3,3,ALIGNED,True,0,0.0,0.0,1.0,1.0,shared source roots: synthetic-source; registered evidence shared roots: synthetic-source
+uncertain-count,L1-detections,M2-count-interval,1,2,PARTIAL,True,,,,0.42,1.0,
+unsupported-absence,L1-presence,M1-detections,1,1,NOT_COMPARABLE,False,,,,0.95,1.0,
+zero-preserved,L1-detections,M1-detections,1,1,ALIGNED,True,0,0.0,0.0,0.99,1.0,

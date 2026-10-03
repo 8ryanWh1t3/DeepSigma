@@ -1,0 +1,3571 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'"><title>VINCULUM — Cross-order report</title><style>body{overflow-wrap:anywhere;box-sizing:border-box;font:16px/1.55 system-ui,sans-serif;max-width:1500px;margin:auto;padding:2rem}h1{font-size:2.6rem;line-height:1.1}h2{margin-top:2rem}table{border-collapse:collapse;font-size:.9rem;width:100%}td,th{border:1px solid;padding:.65rem;vertical-align:top;text-align:left;overflow-wrap:anywhere}th{font-weight:700}details{border:1px solid;padding:1rem;margin:.6rem 0}summary{cursor:pointer;font-weight:650}.scroll{overflow:auto}small{display:block}pre{white-space:pre-wrap;overflow-wrap:anywhere}code{font-size:.9em;overflow-wrap:anywhere}.lead{font-size:1.1rem;max-width:70ch}.matrix td{min-width:8rem}nav a{margin-right:1rem}@media print{body{padding:0}details{break-inside:avoid}.scroll{overflow:visible}}</style><style>body{background:#A5C7D0;color:#06132F}a{color:inherit}header{padding:1.4rem;border:2px solid}th{background:#06132F;color:#A5C7D0}.stageflow{display:flex;gap:.7rem;flex-wrap:wrap}.stageflow section{border:1px solid;padding:1rem;flex:1;min-width:9rem}.tag{font-weight:bold}details{background:transparent}h3{margin-top:0}</style></head><body><header><small>DEEP SIGMA / VINCULUM pyLib 0.7.0</small><h1>When words and numbers collide.</h1><p class="lead">Each representation carries its own orders. A hinge exists only for a selected pair. Comparability, discrepancy, support and coverage remain separate.</p><p><strong>SYNTHETIC-CODEC-LIMIT-TEST</strong> · Overall: <strong>CONFLICT</strong> · Selected pairs: 9</p><nav><a href="#matrix">Order matrix</a><a href="#pairs">Pair detail</a><a href="#nodes">Representations</a><a href="#boundary">Limits</a></nav></header><h2 id="matrix">Cross-order L × M matrix</h2><p>Blank comparisons are UNPAIRED, not agreement. Same-side codec pairs are listed below, outside this L × M view. A cell can summarize multiple pairs; inspect its links for individual outcomes. A cell-level UNRESOLVED summary does not imply that every pair in it has that status.</p><div class="scroll"><table class="matrix"><thead><tr><th>L / M</th><th>M1<small>Value</small></th><th>M2<small>Uncertainty</small></th><th>M3<small>Support / model</small></th><th>M4<small>Applicability</small></th><th>M5<small>Dependence</small></th></tr></thead><tbody><tr><th>L1<small>Content</small></th><td><strong>UNRESOLVED</strong><br><a href="#pair-7">unsupported-absence</a><br><a href="#pair-8">zero-preserved</a></td><td><strong>PARTIAL</strong><br><a href="#pair-6">uncertain-count</a></td><td><strong>UNPAIRED</strong><br></td><td><strong>CONFLICT</strong><br><a href="#pair-1">coverage-overclaim</a></td><td><strong>UNPAIRED</strong><br></td></tr><tr><th>L2<small>Qualification</small></th><td><strong>UNPAIRED</strong><br></td><td><strong>UNPAIRED</strong><br></td><td><strong>CONFLICT</strong><br><a href="#pair-0">confidence-overclaim</a></td><td><strong>ALIGNED</strong><br><a href="#pair-4">qualified-coverage</a></td><td><strong>UNPAIRED</strong><br></td></tr><tr><th>L3<small>Support</small></th><td><strong>UNPAIRED</strong><br></td><td><strong>UNPAIRED</strong><br></td><td><strong>ALIGNED</strong><br><a href="#pair-5">support-case-count</a></td><td><strong>UNPAIRED</strong><br></td><td><strong>UNPAIRED</strong><br></td></tr><tr><th>L4<small>Context</small></th><td><strong>CONFLICT</strong><br><a href="#pair-3">freshness-claim</a></td><td><strong>UNPAIRED</strong><br></td><td><strong>UNPAIRED</strong><br></td><td><strong>UNPAIRED</strong><br></td><td><strong>UNPAIRED</strong><br></td></tr><tr><th>L5<small>Dependence</small></th><td><strong>UNPAIRED</strong><br></td><td><strong>UNPAIRED</strong><br></td><td><strong>UNPAIRED</strong><br></td><td><strong>UNPAIRED</strong><br></td><td><strong>CONFLICT</strong><br><a href="#pair-2">dependence-overclaim</a></td></tr></tbody></table></div><h2 id="pairs">Pair-specific hinges</h2><details id="pair-0" open><summary>confidence-overclaim — CONFLICT</summary><p>L2-confidence ↔ M3-hit-rate · Raw collision: 100.0 /100 · Support-weighted: 90.0 /100</p><p>Lower support does not resolve a disagreement. Missing support is not zero risk.</p><div class="scroll"><table><thead><tr><th>Check</th><th>Order</th><th>State</th><th>Required</th><th>Reason</th></tr></thead><tbody><tr><td>entity</td><td>1</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>concept</td><td>1</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>scope_id</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>population</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>denominator</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>granularity</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>location</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>definition_version</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>units</td><td>2</td><td>PASS</td><td>True</td><td>dimensions match; exact registered conversion applied</td></tr><tr><td>time</td><td>4</td><td>PASS</td><td>True</td><td>same UTC interval; unequal aggregate windows are not interchangeable</td></tr><tr><td>numeric_meaning</td><td>1</td><td>PASS</td><td>True</td><td>both quantities represented as explicit admissible numeric sets</td></tr><tr><td>method</td><td>3</td><td>UNKNOWN</td><td>False</td><td>method metadata incomplete</td></tr><tr><td>dependence</td><td>5</td><td>PASS</td><td>False</td><td>no declared shared roots detected; independence not proven</td></tr><tr><td>registered_evidence</td><td>3</td><td>PASS</td><td>True</td><td>source IDs registered; factual accuracy/authenticity not established</td></tr></tbody></table></div><details><summary>Discrepancy, support, coverage and fingerprints</summary><pre>{
+  &quot;pair_id&quot;: &quot;confidence-overclaim&quot;,
+  &quot;left_id&quot;: &quot;L2-confidence&quot;,
+  &quot;right_id&quot;: &quot;M3-hit-rate&quot;,
+  &quot;left_side&quot;: &quot;L&quot;,
+  &quot;right_side&quot;: &quot;M&quot;,
+  &quot;language_order&quot;: 2,
+  &quot;mathematics_order&quot;: 3,
+  &quot;hinge_orders&quot;: [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  &quot;status&quot;: &quot;CONFLICT&quot;,
+  &quot;comparable&quot;: true,
+  &quot;checks&quot;: [
+    {
+      &quot;name&quot;: &quot;entity&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;concept&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;scope_id&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;population&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;denominator&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;granularity&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;location&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;definition_version&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;units&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;dimensions match; exact registered conversion applied&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;time&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;same UTC interval; unequal aggregate windows are not interchangeable&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;numeric_meaning&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;both quantities represented as explicit admissible numeric sets&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;method&quot;,
+      &quot;order&quot;: 3,
+      &quot;state&quot;: &quot;UNKNOWN&quot;,
+      &quot;reason&quot;: &quot;method metadata incomplete&quot;,
+      &quot;required&quot;: false
+    },
+    {
+      &quot;name&quot;: &quot;dependence&quot;,
+      &quot;order&quot;: 5,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;no declared shared roots detected; independence not proven&quot;,
+      &quot;required&quot;: false
+    },
+    {
+      &quot;name&quot;: &quot;registered_evidence&quot;,
+      &quot;order&quot;: 3,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;source IDs registered; factual accuracy/authenticity not established&quot;,
+      &quot;required&quot;: true
+    }
+  ],
+  &quot;discrepancy&quot;: {
+    &quot;expected_normalized&quot;: {
+      &quot;lower&quot;: &quot;0.95&quot;,
+      &quot;upper&quot;: null,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;observed_normalized&quot;: {
+      &quot;lower&quot;: &quot;0.72&quot;,
+      &quot;upper&quot;: &quot;0.72&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;signed_delta&quot;: null,
+    &quot;boundary_gap&quot;: &quot;0.23&quot;,
+    &quot;normalized_magnitude&quot;: null,
+    &quot;normalization_scale&quot;: null,
+    &quot;relation&quot;: &quot;DISJOINT&quot;,
+    &quot;raw_conflict&quot;: true,
+    &quot;interpretation&quot;: &quot;comparison of representations; not an adjudication of physical truth&quot;,
+    &quot;original_expected&quot;: {
+      &quot;lower&quot;: &quot;95&quot;,
+      &quot;upper&quot;: null,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;original_observed&quot;: {
+      &quot;lower&quot;: &quot;72&quot;,
+      &quot;upper&quot;: &quot;72&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;left_unit&quot;: &quot;%&quot;,
+    &quot;right_unit&quot;: &quot;%&quot;,
+    &quot;signed_delta_left_unit&quot;: null,
+    &quot;boundary_gap_left_unit&quot;: &quot;23&quot;,
+    &quot;dimension&quot;: &quot;ratio&quot;,
+    &quot;unit_note&quot;: &quot;values/deltas in the registered base unit; raw source values retained in nodes&quot;
+  },
+  &quot;support&quot;: {
+    &quot;left&quot;: {
+      &quot;strength&quot;: 0.95,
+      &quot;known_bottleneck&quot;: 0.95,
+      &quot;coverage&quot;: 1.0,
+      &quot;known_factors&quot;: 1,
+      &quot;expected_factors&quot;: 1,
+      &quot;dependency_groups&quot;: 1,
+      &quot;aggregation&quot;: &quot;minimum/bottleneck&quot;,
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 0.95,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ]
+    },
+    &quot;right&quot;: {
+      &quot;strength&quot;: 0.9,
+      &quot;known_bottleneck&quot;: 0.9,
+      &quot;coverage&quot;: 1.0,
+      &quot;known_factors&quot;: 1,
+      &quot;expected_factors&quot;: 1,
+      &quot;dependency_groups&quot;: 1,
+      &quot;aggregation&quot;: &quot;minimum/bottleneck&quot;,
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 0.9,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ]
+    },
+    &quot;alignment_strength&quot;: 1.0,
+    &quot;alignment_basis&quot;: &quot;fixture-provided pairing, not learned confidence&quot;,
+    &quot;joint_strength&quot;: 0.9,
+    &quot;aggregation&quot;: &quot;minimum&quot;,
+    &quot;product_basis&quot;: null,
+    &quot;interpretation&quot;: &quot;declared support indicator, not probability of truth or operational risk&quot;,
+    &quot;missing_dependencies&quot;: false,
+    &quot;declared_higher_order_hinge_strengths&quot;: [],
+    &quot;registered_evidence&quot;: {
+      &quot;left&quot;: {
+        &quot;roots&quot;: [
+          &quot;generated-summary&quot;
+        ],
+        &quot;missing&quot;: [],
+        &quot;unhashed&quot;: [
+          &quot;generated-summary&quot;
+        ],
+        &quot;complete&quot;: true,
+        &quot;meaning&quot;: &quot;registered source closure, not source accuracy or authenticity&quot;
+      },
+      &quot;right&quot;: {
+        &quot;roots&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;missing&quot;: [],
+        &quot;unhashed&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;complete&quot;: true,
+        &quot;meaning&quot;: &quot;registered source closure, not source accuracy or authenticity&quot;
+      },
+      &quot;shared_roots&quot;: []
+    }
+  },
+  &quot;coverage&quot;: {
+    &quot;alignment_metadata&quot;: 1.0,
+    &quot;left_support&quot;: 1.0,
+    &quot;right_support&quot;: 1.0,
+    &quot;comparison_performed&quot;: true
+  },
+  &quot;raw_collision_score&quot;: 100.0,
+  &quot;supported_collision_score&quot;: 90.0,
+  &quot;dependency_warnings&quot;: [],
+  &quot;input_fingerprint&quot;: &quot;c5fc09c84831ab007e55224903f3257254743f7b18a83f9f7123cf3b5b2b9e68&quot;,
+  &quot;weight&quot;: 1.0,
+  &quot;hinge_assessments&quot;: [
+    {
+      &quot;notation&quot;: &quot;H(L2,M3;1)&quot;,
+      &quot;order&quot;: 1,
+      &quot;pair_id&quot;: &quot;confidence-overclaim&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;entity&quot;,
+        &quot;concept&quot;,
+        &quot;numeric_meaning&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L2,M3;2)&quot;,
+      &quot;order&quot;: 2,
+      &quot;pair_id&quot;: &quot;confidence-overclaim&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;population&quot;,
+        &quot;denominator&quot;,
+        &quot;granularity&quot;,
+        &quot;units&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L2,M3;3)&quot;,
+      &quot;order&quot;: 3,
+      &quot;pair_id&quot;: &quot;confidence-overclaim&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;method&quot;,
+        &quot;registered_evidence&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L2,M3;4)&quot;,
+      &quot;order&quot;: 4,
+      &quot;pair_id&quot;: &quot;confidence-overclaim&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;scope_id&quot;,
+        &quot;location&quot;,
+        &quot;definition_version&quot;,
+        &quot;time&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L2,M3;5)&quot;,
+      &quot;order&quot;: 5,
+      &quot;pair_id&quot;: &quot;confidence-overclaim&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;dependence&quot;
+      ]
+    }
+  ]
+}</pre></details></details><details id="pair-1" open><summary>coverage-overclaim — CONFLICT</summary><p>L1-coverage ↔ M4-coverage · Raw collision: 100.0 /100 · Support-weighted: 98.0 /100</p><p>Lower support does not resolve a disagreement. Missing support is not zero risk.</p><div class="scroll"><table><thead><tr><th>Check</th><th>Order</th><th>State</th><th>Required</th><th>Reason</th></tr></thead><tbody><tr><td>entity</td><td>1</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>concept</td><td>1</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>scope_id</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>population</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>denominator</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>granularity</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>location</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>definition_version</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>units</td><td>2</td><td>PASS</td><td>True</td><td>dimensions match; exact registered conversion applied</td></tr><tr><td>time</td><td>4</td><td>PASS</td><td>True</td><td>same UTC interval; unequal aggregate windows are not interchangeable</td></tr><tr><td>numeric_meaning</td><td>1</td><td>PASS</td><td>True</td><td>both quantities represented as explicit admissible numeric sets</td></tr><tr><td>method</td><td>3</td><td>UNKNOWN</td><td>False</td><td>method metadata incomplete</td></tr><tr><td>dependence</td><td>5</td><td>PASS</td><td>False</td><td>no declared shared roots detected; independence not proven</td></tr><tr><td>registered_evidence</td><td>3</td><td>PASS</td><td>True</td><td>source IDs registered; factual accuracy/authenticity not established</td></tr></tbody></table></div><details><summary>Discrepancy, support, coverage and fingerprints</summary><pre>{
+  &quot;pair_id&quot;: &quot;coverage-overclaim&quot;,
+  &quot;left_id&quot;: &quot;L1-coverage&quot;,
+  &quot;right_id&quot;: &quot;M4-coverage&quot;,
+  &quot;left_side&quot;: &quot;L&quot;,
+  &quot;right_side&quot;: &quot;M&quot;,
+  &quot;language_order&quot;: 1,
+  &quot;mathematics_order&quot;: 4,
+  &quot;hinge_orders&quot;: [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  &quot;status&quot;: &quot;CONFLICT&quot;,
+  &quot;comparable&quot;: true,
+  &quot;checks&quot;: [
+    {
+      &quot;name&quot;: &quot;entity&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;concept&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;scope_id&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;population&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;denominator&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;granularity&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;location&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;definition_version&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;units&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;dimensions match; exact registered conversion applied&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;time&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;same UTC interval; unequal aggregate windows are not interchangeable&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;numeric_meaning&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;both quantities represented as explicit admissible numeric sets&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;method&quot;,
+      &quot;order&quot;: 3,
+      &quot;state&quot;: &quot;UNKNOWN&quot;,
+      &quot;reason&quot;: &quot;method metadata incomplete&quot;,
+      &quot;required&quot;: false
+    },
+    {
+      &quot;name&quot;: &quot;dependence&quot;,
+      &quot;order&quot;: 5,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;no declared shared roots detected; independence not proven&quot;,
+      &quot;required&quot;: false
+    },
+    {
+      &quot;name&quot;: &quot;registered_evidence&quot;,
+      &quot;order&quot;: 3,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;source IDs registered; factual accuracy/authenticity not established&quot;,
+      &quot;required&quot;: true
+    }
+  ],
+  &quot;discrepancy&quot;: {
+    &quot;expected_normalized&quot;: {
+      &quot;lower&quot;: &quot;1&quot;,
+      &quot;upper&quot;: &quot;1&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;observed_normalized&quot;: {
+      &quot;lower&quot;: &quot;0.6&quot;,
+      &quot;upper&quot;: &quot;0.6&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;signed_delta&quot;: &quot;-0.4&quot;,
+    &quot;boundary_gap&quot;: &quot;0.4&quot;,
+    &quot;normalized_magnitude&quot;: null,
+    &quot;normalization_scale&quot;: null,
+    &quot;relation&quot;: &quot;DISJOINT&quot;,
+    &quot;raw_conflict&quot;: true,
+    &quot;interpretation&quot;: &quot;comparison of representations; not an adjudication of physical truth&quot;,
+    &quot;original_expected&quot;: {
+      &quot;lower&quot;: &quot;100&quot;,
+      &quot;upper&quot;: &quot;100&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;original_observed&quot;: {
+      &quot;lower&quot;: &quot;60&quot;,
+      &quot;upper&quot;: &quot;60&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;left_unit&quot;: &quot;%&quot;,
+    &quot;right_unit&quot;: &quot;%&quot;,
+    &quot;signed_delta_left_unit&quot;: &quot;-40&quot;,
+    &quot;boundary_gap_left_unit&quot;: &quot;40&quot;,
+    &quot;dimension&quot;: &quot;ratio&quot;,
+    &quot;unit_note&quot;: &quot;values/deltas in the registered base unit; raw source values retained in nodes&quot;
+  },
+  &quot;support&quot;: {
+    &quot;left&quot;: {
+      &quot;strength&quot;: 1.0,
+      &quot;known_bottleneck&quot;: 1.0,
+      &quot;coverage&quot;: 1.0,
+      &quot;known_factors&quot;: 1,
+      &quot;expected_factors&quot;: 1,
+      &quot;dependency_groups&quot;: 1,
+      &quot;aggregation&quot;: &quot;minimum/bottleneck&quot;,
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 1.0,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ]
+    },
+    &quot;right&quot;: {
+      &quot;strength&quot;: 0.98,
+      &quot;known_bottleneck&quot;: 0.98,
+      &quot;coverage&quot;: 1.0,
+      &quot;known_factors&quot;: 1,
+      &quot;expected_factors&quot;: 1,
+      &quot;dependency_groups&quot;: 1,
+      &quot;aggregation&quot;: &quot;minimum/bottleneck&quot;,
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 0.98,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ]
+    },
+    &quot;alignment_strength&quot;: 1.0,
+    &quot;alignment_basis&quot;: &quot;fixture-provided pairing, not learned confidence&quot;,
+    &quot;joint_strength&quot;: 0.98,
+    &quot;aggregation&quot;: &quot;minimum&quot;,
+    &quot;product_basis&quot;: null,
+    &quot;interpretation&quot;: &quot;declared support indicator, not probability of truth or operational risk&quot;,
+    &quot;missing_dependencies&quot;: false,
+    &quot;declared_higher_order_hinge_strengths&quot;: [],
+    &quot;registered_evidence&quot;: {
+      &quot;left&quot;: {
+        &quot;roots&quot;: [
+          &quot;generated-summary&quot;
+        ],
+        &quot;missing&quot;: [],
+        &quot;unhashed&quot;: [
+          &quot;generated-summary&quot;
+        ],
+        &quot;complete&quot;: true,
+        &quot;meaning&quot;: &quot;registered source closure, not source accuracy or authenticity&quot;
+      },
+      &quot;right&quot;: {
+        &quot;roots&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;missing&quot;: [],
+        &quot;unhashed&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;complete&quot;: true,
+        &quot;meaning&quot;: &quot;registered source closure, not source accuracy or authenticity&quot;
+      },
+      &quot;shared_roots&quot;: []
+    }
+  },
+  &quot;coverage&quot;: {
+    &quot;alignment_metadata&quot;: 1.0,
+    &quot;left_support&quot;: 1.0,
+    &quot;right_support&quot;: 1.0,
+    &quot;comparison_performed&quot;: true
+  },
+  &quot;raw_collision_score&quot;: 100.0,
+  &quot;supported_collision_score&quot;: 98.0,
+  &quot;dependency_warnings&quot;: [],
+  &quot;input_fingerprint&quot;: &quot;a421c20d514c1668b7ca4f051364b184ea8963ceda4f8d258d2cb03bbbe2fa7e&quot;,
+  &quot;weight&quot;: 1.0,
+  &quot;hinge_assessments&quot;: [
+    {
+      &quot;notation&quot;: &quot;H(L1,M4;1)&quot;,
+      &quot;order&quot;: 1,
+      &quot;pair_id&quot;: &quot;coverage-overclaim&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;entity&quot;,
+        &quot;concept&quot;,
+        &quot;numeric_meaning&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L1,M4;2)&quot;,
+      &quot;order&quot;: 2,
+      &quot;pair_id&quot;: &quot;coverage-overclaim&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;population&quot;,
+        &quot;denominator&quot;,
+        &quot;granularity&quot;,
+        &quot;units&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L1,M4;3)&quot;,
+      &quot;order&quot;: 3,
+      &quot;pair_id&quot;: &quot;coverage-overclaim&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;method&quot;,
+        &quot;registered_evidence&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L1,M4;4)&quot;,
+      &quot;order&quot;: 4,
+      &quot;pair_id&quot;: &quot;coverage-overclaim&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;scope_id&quot;,
+        &quot;location&quot;,
+        &quot;definition_version&quot;,
+        &quot;time&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L1,M4;5)&quot;,
+      &quot;order&quot;: 5,
+      &quot;pair_id&quot;: &quot;coverage-overclaim&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;dependence&quot;
+      ]
+    }
+  ]
+}</pre></details></details><details id="pair-2" open><summary>dependence-overclaim — CONFLICT</summary><p>L5-sources ↔ M5-source-count · Raw collision: 100.0 /100 · Support-weighted: 100.0 /100</p><p>Lower support does not resolve a disagreement. Missing support is not zero risk.</p><div class="scroll"><table><thead><tr><th>Check</th><th>Order</th><th>State</th><th>Required</th><th>Reason</th></tr></thead><tbody><tr><td>entity</td><td>1</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>concept</td><td>1</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>scope_id</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>population</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>denominator</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>granularity</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>location</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>definition_version</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>units</td><td>2</td><td>PASS</td><td>True</td><td>dimensions match; exact registered conversion applied</td></tr><tr><td>time</td><td>4</td><td>PASS</td><td>True</td><td>same UTC interval; unequal aggregate windows are not interchangeable</td></tr><tr><td>numeric_meaning</td><td>1</td><td>PASS</td><td>True</td><td>both quantities represented as explicit admissible numeric sets</td></tr><tr><td>method</td><td>3</td><td>UNKNOWN</td><td>False</td><td>method metadata incomplete</td></tr><tr><td>dependence</td><td>5</td><td>UNKNOWN</td><td>False</td><td>shared source roots: synthetic-source; registered evidence shared roots: synthetic-source</td></tr><tr><td>registered_evidence</td><td>3</td><td>PASS</td><td>True</td><td>source IDs registered; factual accuracy/authenticity not established; shared evidence roots: synthetic-source</td></tr></tbody></table></div><details><summary>Discrepancy, support, coverage and fingerprints</summary><pre>{
+  &quot;pair_id&quot;: &quot;dependence-overclaim&quot;,
+  &quot;left_id&quot;: &quot;L5-sources&quot;,
+  &quot;right_id&quot;: &quot;M5-source-count&quot;,
+  &quot;left_side&quot;: &quot;L&quot;,
+  &quot;right_side&quot;: &quot;M&quot;,
+  &quot;language_order&quot;: 5,
+  &quot;mathematics_order&quot;: 5,
+  &quot;hinge_orders&quot;: [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  &quot;status&quot;: &quot;CONFLICT&quot;,
+  &quot;comparable&quot;: true,
+  &quot;checks&quot;: [
+    {
+      &quot;name&quot;: &quot;entity&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;concept&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;scope_id&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;population&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;denominator&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;granularity&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;location&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;definition_version&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;units&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;dimensions match; exact registered conversion applied&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;time&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;same UTC interval; unequal aggregate windows are not interchangeable&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;numeric_meaning&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;both quantities represented as explicit admissible numeric sets&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;method&quot;,
+      &quot;order&quot;: 3,
+      &quot;state&quot;: &quot;UNKNOWN&quot;,
+      &quot;reason&quot;: &quot;method metadata incomplete&quot;,
+      &quot;required&quot;: false
+    },
+    {
+      &quot;name&quot;: &quot;dependence&quot;,
+      &quot;order&quot;: 5,
+      &quot;state&quot;: &quot;UNKNOWN&quot;,
+      &quot;reason&quot;: &quot;shared source roots: synthetic-source; registered evidence shared roots: synthetic-source&quot;,
+      &quot;required&quot;: false
+    },
+    {
+      &quot;name&quot;: &quot;registered_evidence&quot;,
+      &quot;order&quot;: 3,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;source IDs registered; factual accuracy/authenticity not established; shared evidence roots: synthetic-source&quot;,
+      &quot;required&quot;: true
+    }
+  ],
+  &quot;discrepancy&quot;: {
+    &quot;expected_normalized&quot;: {
+      &quot;lower&quot;: &quot;2&quot;,
+      &quot;upper&quot;: &quot;2&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;observed_normalized&quot;: {
+      &quot;lower&quot;: &quot;1&quot;,
+      &quot;upper&quot;: &quot;1&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;signed_delta&quot;: &quot;-1&quot;,
+    &quot;boundary_gap&quot;: &quot;1&quot;,
+    &quot;normalized_magnitude&quot;: null,
+    &quot;normalization_scale&quot;: null,
+    &quot;relation&quot;: &quot;DISJOINT&quot;,
+    &quot;raw_conflict&quot;: true,
+    &quot;interpretation&quot;: &quot;comparison of representations; not an adjudication of physical truth&quot;,
+    &quot;original_expected&quot;: {
+      &quot;lower&quot;: &quot;2&quot;,
+      &quot;upper&quot;: &quot;2&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;original_observed&quot;: {
+      &quot;lower&quot;: &quot;1&quot;,
+      &quot;upper&quot;: &quot;1&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;left_unit&quot;: &quot;count&quot;,
+    &quot;right_unit&quot;: &quot;count&quot;,
+    &quot;signed_delta_left_unit&quot;: &quot;-1&quot;,
+    &quot;boundary_gap_left_unit&quot;: &quot;1&quot;,
+    &quot;dimension&quot;: &quot;count&quot;,
+    &quot;unit_note&quot;: &quot;values/deltas in the registered base unit; raw source values retained in nodes&quot;
+  },
+  &quot;support&quot;: {
+    &quot;left&quot;: {
+      &quot;strength&quot;: 1.0,
+      &quot;known_bottleneck&quot;: 1.0,
+      &quot;coverage&quot;: 1.0,
+      &quot;known_factors&quot;: 1,
+      &quot;expected_factors&quot;: 1,
+      &quot;dependency_groups&quot;: 1,
+      &quot;aggregation&quot;: &quot;minimum/bottleneck&quot;,
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 1.0,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ]
+    },
+    &quot;right&quot;: {
+      &quot;strength&quot;: 1.0,
+      &quot;known_bottleneck&quot;: 1.0,
+      &quot;coverage&quot;: 1.0,
+      &quot;known_factors&quot;: 1,
+      &quot;expected_factors&quot;: 1,
+      &quot;dependency_groups&quot;: 1,
+      &quot;aggregation&quot;: &quot;minimum/bottleneck&quot;,
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 1.0,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ]
+    },
+    &quot;alignment_strength&quot;: 1.0,
+    &quot;alignment_basis&quot;: &quot;fixture-provided pairing, not learned confidence&quot;,
+    &quot;joint_strength&quot;: 1.0,
+    &quot;aggregation&quot;: &quot;minimum&quot;,
+    &quot;product_basis&quot;: null,
+    &quot;interpretation&quot;: &quot;declared support indicator, not probability of truth or operational risk&quot;,
+    &quot;missing_dependencies&quot;: false,
+    &quot;declared_higher_order_hinge_strengths&quot;: [],
+    &quot;registered_evidence&quot;: {
+      &quot;left&quot;: {
+        &quot;roots&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;missing&quot;: [],
+        &quot;unhashed&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;complete&quot;: true,
+        &quot;meaning&quot;: &quot;registered source closure, not source accuracy or authenticity&quot;
+      },
+      &quot;right&quot;: {
+        &quot;roots&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;missing&quot;: [],
+        &quot;unhashed&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;complete&quot;: true,
+        &quot;meaning&quot;: &quot;registered source closure, not source accuracy or authenticity&quot;
+      },
+      &quot;shared_roots&quot;: [
+        &quot;synthetic-source&quot;
+      ]
+    }
+  },
+  &quot;coverage&quot;: {
+    &quot;alignment_metadata&quot;: 1.0,
+    &quot;left_support&quot;: 1.0,
+    &quot;right_support&quot;: 1.0,
+    &quot;comparison_performed&quot;: true
+  },
+  &quot;raw_collision_score&quot;: 100.0,
+  &quot;supported_collision_score&quot;: 100.0,
+  &quot;dependency_warnings&quot;: [
+    &quot;shared source roots: synthetic-source&quot;,
+    &quot;registered evidence shared roots: synthetic-source&quot;
+  ],
+  &quot;input_fingerprint&quot;: &quot;8bc5a7eed761dbf86721dbdea497de586e82f257be8e46d397e3c5bc04655e0c&quot;,
+  &quot;weight&quot;: 1.0,
+  &quot;hinge_assessments&quot;: [
+    {
+      &quot;notation&quot;: &quot;H(L5,M5;1)&quot;,
+      &quot;order&quot;: 1,
+      &quot;pair_id&quot;: &quot;dependence-overclaim&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;entity&quot;,
+        &quot;concept&quot;,
+        &quot;numeric_meaning&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L5,M5;2)&quot;,
+      &quot;order&quot;: 2,
+      &quot;pair_id&quot;: &quot;dependence-overclaim&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;population&quot;,
+        &quot;denominator&quot;,
+        &quot;granularity&quot;,
+        &quot;units&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L5,M5;3)&quot;,
+      &quot;order&quot;: 3,
+      &quot;pair_id&quot;: &quot;dependence-overclaim&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;method&quot;,
+        &quot;registered_evidence&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L5,M5;4)&quot;,
+      &quot;order&quot;: 4,
+      &quot;pair_id&quot;: &quot;dependence-overclaim&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;scope_id&quot;,
+        &quot;location&quot;,
+        &quot;definition_version&quot;,
+        &quot;time&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L5,M5;5)&quot;,
+      &quot;order&quot;: 5,
+      &quot;pair_id&quot;: &quot;dependence-overclaim&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;dependence&quot;
+      ]
+    }
+  ]
+}</pre></details></details><details id="pair-3" open><summary>freshness-claim — CONFLICT</summary><p>L4-age-limit ↔ M1-age · Raw collision: 100.0 /100 · Support-weighted: 100.0 /100</p><p>Lower support does not resolve a disagreement. Missing support is not zero risk.</p><div class="scroll"><table><thead><tr><th>Check</th><th>Order</th><th>State</th><th>Required</th><th>Reason</th></tr></thead><tbody><tr><td>entity</td><td>1</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>concept</td><td>1</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>scope_id</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>population</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>denominator</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>granularity</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>location</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>definition_version</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>units</td><td>2</td><td>PASS</td><td>True</td><td>dimensions match; exact registered conversion applied</td></tr><tr><td>time</td><td>4</td><td>PASS</td><td>True</td><td>same UTC interval; unequal aggregate windows are not interchangeable</td></tr><tr><td>numeric_meaning</td><td>1</td><td>PASS</td><td>True</td><td>both quantities represented as explicit admissible numeric sets</td></tr><tr><td>method</td><td>3</td><td>UNKNOWN</td><td>False</td><td>method metadata incomplete</td></tr><tr><td>dependence</td><td>5</td><td>UNKNOWN</td><td>False</td><td>shared source roots: synthetic-source; registered evidence shared roots: synthetic-source</td></tr><tr><td>registered_evidence</td><td>3</td><td>PASS</td><td>True</td><td>source IDs registered; factual accuracy/authenticity not established; shared evidence roots: synthetic-source</td></tr></tbody></table></div><details><summary>Discrepancy, support, coverage and fingerprints</summary><pre>{
+  &quot;pair_id&quot;: &quot;freshness-claim&quot;,
+  &quot;left_id&quot;: &quot;L4-age-limit&quot;,
+  &quot;right_id&quot;: &quot;M1-age&quot;,
+  &quot;left_side&quot;: &quot;L&quot;,
+  &quot;right_side&quot;: &quot;M&quot;,
+  &quot;language_order&quot;: 4,
+  &quot;mathematics_order&quot;: 1,
+  &quot;hinge_orders&quot;: [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  &quot;status&quot;: &quot;CONFLICT&quot;,
+  &quot;comparable&quot;: true,
+  &quot;checks&quot;: [
+    {
+      &quot;name&quot;: &quot;entity&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;concept&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;scope_id&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;population&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;denominator&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;granularity&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;location&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;definition_version&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;units&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;dimensions match; exact registered conversion applied&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;time&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;same UTC interval; unequal aggregate windows are not interchangeable&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;numeric_meaning&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;both quantities represented as explicit admissible numeric sets&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;method&quot;,
+      &quot;order&quot;: 3,
+      &quot;state&quot;: &quot;UNKNOWN&quot;,
+      &quot;reason&quot;: &quot;method metadata incomplete&quot;,
+      &quot;required&quot;: false
+    },
+    {
+      &quot;name&quot;: &quot;dependence&quot;,
+      &quot;order&quot;: 5,
+      &quot;state&quot;: &quot;UNKNOWN&quot;,
+      &quot;reason&quot;: &quot;shared source roots: synthetic-source; registered evidence shared roots: synthetic-source&quot;,
+      &quot;required&quot;: false
+    },
+    {
+      &quot;name&quot;: &quot;registered_evidence&quot;,
+      &quot;order&quot;: 3,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;source IDs registered; factual accuracy/authenticity not established; shared evidence roots: synthetic-source&quot;,
+      &quot;required&quot;: true
+    }
+  ],
+  &quot;discrepancy&quot;: {
+    &quot;expected_normalized&quot;: {
+      &quot;lower&quot;: &quot;0&quot;,
+      &quot;upper&quot;: &quot;30&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;observed_normalized&quot;: {
+      &quot;lower&quot;: &quot;90&quot;,
+      &quot;upper&quot;: &quot;90&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;signed_delta&quot;: null,
+    &quot;boundary_gap&quot;: &quot;60&quot;,
+    &quot;normalized_magnitude&quot;: null,
+    &quot;normalization_scale&quot;: null,
+    &quot;relation&quot;: &quot;DISJOINT&quot;,
+    &quot;raw_conflict&quot;: true,
+    &quot;interpretation&quot;: &quot;comparison of representations; not an adjudication of physical truth&quot;,
+    &quot;original_expected&quot;: {
+      &quot;lower&quot;: &quot;0&quot;,
+      &quot;upper&quot;: &quot;30&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;original_observed&quot;: {
+      &quot;lower&quot;: &quot;90&quot;,
+      &quot;upper&quot;: &quot;90&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;left_unit&quot;: &quot;s&quot;,
+    &quot;right_unit&quot;: &quot;s&quot;,
+    &quot;signed_delta_left_unit&quot;: null,
+    &quot;boundary_gap_left_unit&quot;: &quot;60&quot;,
+    &quot;dimension&quot;: &quot;time&quot;,
+    &quot;unit_note&quot;: &quot;values/deltas in the registered base unit; raw source values retained in nodes&quot;
+  },
+  &quot;support&quot;: {
+    &quot;left&quot;: {
+      &quot;strength&quot;: 1.0,
+      &quot;known_bottleneck&quot;: 1.0,
+      &quot;coverage&quot;: 1.0,
+      &quot;known_factors&quot;: 1,
+      &quot;expected_factors&quot;: 1,
+      &quot;dependency_groups&quot;: 1,
+      &quot;aggregation&quot;: &quot;minimum/bottleneck&quot;,
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 1.0,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ]
+    },
+    &quot;right&quot;: {
+      &quot;strength&quot;: 1.0,
+      &quot;known_bottleneck&quot;: 1.0,
+      &quot;coverage&quot;: 1.0,
+      &quot;known_factors&quot;: 1,
+      &quot;expected_factors&quot;: 1,
+      &quot;dependency_groups&quot;: 1,
+      &quot;aggregation&quot;: &quot;minimum/bottleneck&quot;,
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 1.0,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ]
+    },
+    &quot;alignment_strength&quot;: 1.0,
+    &quot;alignment_basis&quot;: &quot;fixture-provided pairing, not learned confidence&quot;,
+    &quot;joint_strength&quot;: 1.0,
+    &quot;aggregation&quot;: &quot;minimum&quot;,
+    &quot;product_basis&quot;: null,
+    &quot;interpretation&quot;: &quot;declared support indicator, not probability of truth or operational risk&quot;,
+    &quot;missing_dependencies&quot;: false,
+    &quot;declared_higher_order_hinge_strengths&quot;: [],
+    &quot;registered_evidence&quot;: {
+      &quot;left&quot;: {
+        &quot;roots&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;missing&quot;: [],
+        &quot;unhashed&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;complete&quot;: true,
+        &quot;meaning&quot;: &quot;registered source closure, not source accuracy or authenticity&quot;
+      },
+      &quot;right&quot;: {
+        &quot;roots&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;missing&quot;: [],
+        &quot;unhashed&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;complete&quot;: true,
+        &quot;meaning&quot;: &quot;registered source closure, not source accuracy or authenticity&quot;
+      },
+      &quot;shared_roots&quot;: [
+        &quot;synthetic-source&quot;
+      ]
+    }
+  },
+  &quot;coverage&quot;: {
+    &quot;alignment_metadata&quot;: 1.0,
+    &quot;left_support&quot;: 1.0,
+    &quot;right_support&quot;: 1.0,
+    &quot;comparison_performed&quot;: true
+  },
+  &quot;raw_collision_score&quot;: 100.0,
+  &quot;supported_collision_score&quot;: 100.0,
+  &quot;dependency_warnings&quot;: [
+    &quot;shared source roots: synthetic-source&quot;,
+    &quot;registered evidence shared roots: synthetic-source&quot;
+  ],
+  &quot;input_fingerprint&quot;: &quot;961cfa5f113b474dcf5c771345ff48675f65efdb90efdfb6c7b92b28779bbae8&quot;,
+  &quot;weight&quot;: 1.0,
+  &quot;hinge_assessments&quot;: [
+    {
+      &quot;notation&quot;: &quot;H(L4,M1;1)&quot;,
+      &quot;order&quot;: 1,
+      &quot;pair_id&quot;: &quot;freshness-claim&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;entity&quot;,
+        &quot;concept&quot;,
+        &quot;numeric_meaning&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L4,M1;2)&quot;,
+      &quot;order&quot;: 2,
+      &quot;pair_id&quot;: &quot;freshness-claim&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;population&quot;,
+        &quot;denominator&quot;,
+        &quot;granularity&quot;,
+        &quot;units&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L4,M1;3)&quot;,
+      &quot;order&quot;: 3,
+      &quot;pair_id&quot;: &quot;freshness-claim&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;method&quot;,
+        &quot;registered_evidence&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L4,M1;4)&quot;,
+      &quot;order&quot;: 4,
+      &quot;pair_id&quot;: &quot;freshness-claim&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;scope_id&quot;,
+        &quot;location&quot;,
+        &quot;definition_version&quot;,
+        &quot;time&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L4,M1;5)&quot;,
+      &quot;order&quot;: 5,
+      &quot;pair_id&quot;: &quot;freshness-claim&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;dependence&quot;
+      ]
+    }
+  ]
+}</pre></details></details><details id="pair-4" open><summary>qualified-coverage — ALIGNED</summary><p>L2-coverage-bound ↔ M4-coverage · Raw collision: 0.0 /100 · Support-weighted: 0.0 /100</p><p>Lower support does not resolve a disagreement. Missing support is not zero risk.</p><div class="scroll"><table><thead><tr><th>Check</th><th>Order</th><th>State</th><th>Required</th><th>Reason</th></tr></thead><tbody><tr><td>entity</td><td>1</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>concept</td><td>1</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>scope_id</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>population</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>denominator</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>granularity</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>location</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>definition_version</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>units</td><td>2</td><td>PASS</td><td>True</td><td>dimensions match; exact registered conversion applied</td></tr><tr><td>time</td><td>4</td><td>PASS</td><td>True</td><td>same UTC interval; unequal aggregate windows are not interchangeable</td></tr><tr><td>numeric_meaning</td><td>1</td><td>PASS</td><td>True</td><td>both quantities represented as explicit admissible numeric sets</td></tr><tr><td>method</td><td>3</td><td>UNKNOWN</td><td>False</td><td>method metadata incomplete</td></tr><tr><td>dependence</td><td>5</td><td>PASS</td><td>False</td><td>no declared shared roots detected; independence not proven</td></tr><tr><td>registered_evidence</td><td>3</td><td>PASS</td><td>True</td><td>source IDs registered; factual accuracy/authenticity not established</td></tr></tbody></table></div><details><summary>Discrepancy, support, coverage and fingerprints</summary><pre>{
+  &quot;pair_id&quot;: &quot;qualified-coverage&quot;,
+  &quot;left_id&quot;: &quot;L2-coverage-bound&quot;,
+  &quot;right_id&quot;: &quot;M4-coverage&quot;,
+  &quot;left_side&quot;: &quot;L&quot;,
+  &quot;right_side&quot;: &quot;M&quot;,
+  &quot;language_order&quot;: 2,
+  &quot;mathematics_order&quot;: 4,
+  &quot;hinge_orders&quot;: [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  &quot;status&quot;: &quot;ALIGNED&quot;,
+  &quot;comparable&quot;: true,
+  &quot;checks&quot;: [
+    {
+      &quot;name&quot;: &quot;entity&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;concept&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;scope_id&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;population&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;denominator&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;granularity&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;location&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;definition_version&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;units&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;dimensions match; exact registered conversion applied&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;time&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;same UTC interval; unequal aggregate windows are not interchangeable&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;numeric_meaning&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;both quantities represented as explicit admissible numeric sets&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;method&quot;,
+      &quot;order&quot;: 3,
+      &quot;state&quot;: &quot;UNKNOWN&quot;,
+      &quot;reason&quot;: &quot;method metadata incomplete&quot;,
+      &quot;required&quot;: false
+    },
+    {
+      &quot;name&quot;: &quot;dependence&quot;,
+      &quot;order&quot;: 5,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;no declared shared roots detected; independence not proven&quot;,
+      &quot;required&quot;: false
+    },
+    {
+      &quot;name&quot;: &quot;registered_evidence&quot;,
+      &quot;order&quot;: 3,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;source IDs registered; factual accuracy/authenticity not established&quot;,
+      &quot;required&quot;: true
+    }
+  ],
+  &quot;discrepancy&quot;: {
+    &quot;expected_normalized&quot;: {
+      &quot;lower&quot;: &quot;0.5&quot;,
+      &quot;upper&quot;: null,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;observed_normalized&quot;: {
+      &quot;lower&quot;: &quot;0.6&quot;,
+      &quot;upper&quot;: &quot;0.6&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;signed_delta&quot;: null,
+    &quot;boundary_gap&quot;: &quot;0&quot;,
+    &quot;normalized_magnitude&quot;: null,
+    &quot;normalization_scale&quot;: null,
+    &quot;relation&quot;: &quot;OBSERVATION_WITHIN_EXPECTATION&quot;,
+    &quot;raw_conflict&quot;: false,
+    &quot;interpretation&quot;: &quot;comparison of representations; not an adjudication of physical truth&quot;,
+    &quot;original_expected&quot;: {
+      &quot;lower&quot;: &quot;50&quot;,
+      &quot;upper&quot;: null,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;original_observed&quot;: {
+      &quot;lower&quot;: &quot;60&quot;,
+      &quot;upper&quot;: &quot;60&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;left_unit&quot;: &quot;%&quot;,
+    &quot;right_unit&quot;: &quot;%&quot;,
+    &quot;signed_delta_left_unit&quot;: null,
+    &quot;boundary_gap_left_unit&quot;: &quot;0&quot;,
+    &quot;dimension&quot;: &quot;ratio&quot;,
+    &quot;unit_note&quot;: &quot;values/deltas in the registered base unit; raw source values retained in nodes&quot;
+  },
+  &quot;support&quot;: {
+    &quot;left&quot;: {
+      &quot;strength&quot;: 1.0,
+      &quot;known_bottleneck&quot;: 1.0,
+      &quot;coverage&quot;: 1.0,
+      &quot;known_factors&quot;: 1,
+      &quot;expected_factors&quot;: 1,
+      &quot;dependency_groups&quot;: 1,
+      &quot;aggregation&quot;: &quot;minimum/bottleneck&quot;,
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 1.0,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ]
+    },
+    &quot;right&quot;: {
+      &quot;strength&quot;: 0.98,
+      &quot;known_bottleneck&quot;: 0.98,
+      &quot;coverage&quot;: 1.0,
+      &quot;known_factors&quot;: 1,
+      &quot;expected_factors&quot;: 1,
+      &quot;dependency_groups&quot;: 1,
+      &quot;aggregation&quot;: &quot;minimum/bottleneck&quot;,
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 0.98,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ]
+    },
+    &quot;alignment_strength&quot;: 1.0,
+    &quot;alignment_basis&quot;: &quot;fixture-provided pairing, not learned confidence&quot;,
+    &quot;joint_strength&quot;: 0.98,
+    &quot;aggregation&quot;: &quot;minimum&quot;,
+    &quot;product_basis&quot;: null,
+    &quot;interpretation&quot;: &quot;declared support indicator, not probability of truth or operational risk&quot;,
+    &quot;missing_dependencies&quot;: false,
+    &quot;declared_higher_order_hinge_strengths&quot;: [],
+    &quot;registered_evidence&quot;: {
+      &quot;left&quot;: {
+        &quot;roots&quot;: [
+          &quot;generated-summary&quot;
+        ],
+        &quot;missing&quot;: [],
+        &quot;unhashed&quot;: [
+          &quot;generated-summary&quot;
+        ],
+        &quot;complete&quot;: true,
+        &quot;meaning&quot;: &quot;registered source closure, not source accuracy or authenticity&quot;
+      },
+      &quot;right&quot;: {
+        &quot;roots&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;missing&quot;: [],
+        &quot;unhashed&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;complete&quot;: true,
+        &quot;meaning&quot;: &quot;registered source closure, not source accuracy or authenticity&quot;
+      },
+      &quot;shared_roots&quot;: []
+    }
+  },
+  &quot;coverage&quot;: {
+    &quot;alignment_metadata&quot;: 1.0,
+    &quot;left_support&quot;: 1.0,
+    &quot;right_support&quot;: 1.0,
+    &quot;comparison_performed&quot;: true
+  },
+  &quot;raw_collision_score&quot;: 0.0,
+  &quot;supported_collision_score&quot;: 0.0,
+  &quot;dependency_warnings&quot;: [],
+  &quot;input_fingerprint&quot;: &quot;16c5cbbeebf03df43a0b7663da4eeceb88ce60a2f2010eb616f48e25a64f0f32&quot;,
+  &quot;weight&quot;: 1.0,
+  &quot;hinge_assessments&quot;: [
+    {
+      &quot;notation&quot;: &quot;H(L2,M4;1)&quot;,
+      &quot;order&quot;: 1,
+      &quot;pair_id&quot;: &quot;qualified-coverage&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;entity&quot;,
+        &quot;concept&quot;,
+        &quot;numeric_meaning&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L2,M4;2)&quot;,
+      &quot;order&quot;: 2,
+      &quot;pair_id&quot;: &quot;qualified-coverage&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;population&quot;,
+        &quot;denominator&quot;,
+        &quot;granularity&quot;,
+        &quot;units&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L2,M4;3)&quot;,
+      &quot;order&quot;: 3,
+      &quot;pair_id&quot;: &quot;qualified-coverage&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;method&quot;,
+        &quot;registered_evidence&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L2,M4;4)&quot;,
+      &quot;order&quot;: 4,
+      &quot;pair_id&quot;: &quot;qualified-coverage&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;scope_id&quot;,
+        &quot;location&quot;,
+        &quot;definition_version&quot;,
+        &quot;time&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L2,M4;5)&quot;,
+      &quot;order&quot;: 5,
+      &quot;pair_id&quot;: &quot;qualified-coverage&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;dependence&quot;
+      ]
+    }
+  ]
+}</pre></details></details><details id="pair-5" open><summary>support-case-count — ALIGNED</summary><p>L3-trial-count ↔ M3-trial-count · Raw collision: 0.0 /100 · Support-weighted: 0.0 /100</p><p>Lower support does not resolve a disagreement. Missing support is not zero risk.</p><div class="scroll"><table><thead><tr><th>Check</th><th>Order</th><th>State</th><th>Required</th><th>Reason</th></tr></thead><tbody><tr><td>entity</td><td>1</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>concept</td><td>1</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>scope_id</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>population</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>denominator</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>granularity</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>location</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>definition_version</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>units</td><td>2</td><td>PASS</td><td>True</td><td>dimensions match; exact registered conversion applied</td></tr><tr><td>time</td><td>4</td><td>PASS</td><td>True</td><td>same UTC interval; unequal aggregate windows are not interchangeable</td></tr><tr><td>numeric_meaning</td><td>1</td><td>PASS</td><td>True</td><td>both quantities represented as explicit admissible numeric sets</td></tr><tr><td>method</td><td>3</td><td>UNKNOWN</td><td>False</td><td>method metadata incomplete</td></tr><tr><td>dependence</td><td>5</td><td>UNKNOWN</td><td>False</td><td>shared source roots: synthetic-source; registered evidence shared roots: synthetic-source</td></tr><tr><td>registered_evidence</td><td>3</td><td>PASS</td><td>True</td><td>source IDs registered; factual accuracy/authenticity not established; shared evidence roots: synthetic-source</td></tr></tbody></table></div><details><summary>Discrepancy, support, coverage and fingerprints</summary><pre>{
+  &quot;pair_id&quot;: &quot;support-case-count&quot;,
+  &quot;left_id&quot;: &quot;L3-trial-count&quot;,
+  &quot;right_id&quot;: &quot;M3-trial-count&quot;,
+  &quot;left_side&quot;: &quot;L&quot;,
+  &quot;right_side&quot;: &quot;M&quot;,
+  &quot;language_order&quot;: 3,
+  &quot;mathematics_order&quot;: 3,
+  &quot;hinge_orders&quot;: [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  &quot;status&quot;: &quot;ALIGNED&quot;,
+  &quot;comparable&quot;: true,
+  &quot;checks&quot;: [
+    {
+      &quot;name&quot;: &quot;entity&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;concept&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;scope_id&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;population&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;denominator&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;granularity&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;location&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;definition_version&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;units&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;dimensions match; exact registered conversion applied&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;time&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;same UTC interval; unequal aggregate windows are not interchangeable&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;numeric_meaning&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;both quantities represented as explicit admissible numeric sets&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;method&quot;,
+      &quot;order&quot;: 3,
+      &quot;state&quot;: &quot;UNKNOWN&quot;,
+      &quot;reason&quot;: &quot;method metadata incomplete&quot;,
+      &quot;required&quot;: false
+    },
+    {
+      &quot;name&quot;: &quot;dependence&quot;,
+      &quot;order&quot;: 5,
+      &quot;state&quot;: &quot;UNKNOWN&quot;,
+      &quot;reason&quot;: &quot;shared source roots: synthetic-source; registered evidence shared roots: synthetic-source&quot;,
+      &quot;required&quot;: false
+    },
+    {
+      &quot;name&quot;: &quot;registered_evidence&quot;,
+      &quot;order&quot;: 3,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;source IDs registered; factual accuracy/authenticity not established; shared evidence roots: synthetic-source&quot;,
+      &quot;required&quot;: true
+    }
+  ],
+  &quot;discrepancy&quot;: {
+    &quot;expected_normalized&quot;: {
+      &quot;lower&quot;: &quot;100&quot;,
+      &quot;upper&quot;: &quot;100&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;observed_normalized&quot;: {
+      &quot;lower&quot;: &quot;100&quot;,
+      &quot;upper&quot;: &quot;100&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;signed_delta&quot;: &quot;0&quot;,
+    &quot;boundary_gap&quot;: &quot;0&quot;,
+    &quot;normalized_magnitude&quot;: null,
+    &quot;normalization_scale&quot;: null,
+    &quot;relation&quot;: &quot;OBSERVATION_WITHIN_EXPECTATION&quot;,
+    &quot;raw_conflict&quot;: false,
+    &quot;interpretation&quot;: &quot;comparison of representations; not an adjudication of physical truth&quot;,
+    &quot;original_expected&quot;: {
+      &quot;lower&quot;: &quot;100&quot;,
+      &quot;upper&quot;: &quot;100&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;original_observed&quot;: {
+      &quot;lower&quot;: &quot;100&quot;,
+      &quot;upper&quot;: &quot;100&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;left_unit&quot;: &quot;count&quot;,
+    &quot;right_unit&quot;: &quot;count&quot;,
+    &quot;signed_delta_left_unit&quot;: &quot;0&quot;,
+    &quot;boundary_gap_left_unit&quot;: &quot;0&quot;,
+    &quot;dimension&quot;: &quot;count&quot;,
+    &quot;unit_note&quot;: &quot;values/deltas in the registered base unit; raw source values retained in nodes&quot;
+  },
+  &quot;support&quot;: {
+    &quot;left&quot;: {
+      &quot;strength&quot;: 1.0,
+      &quot;known_bottleneck&quot;: 1.0,
+      &quot;coverage&quot;: 1.0,
+      &quot;known_factors&quot;: 1,
+      &quot;expected_factors&quot;: 1,
+      &quot;dependency_groups&quot;: 1,
+      &quot;aggregation&quot;: &quot;minimum/bottleneck&quot;,
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 1.0,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ]
+    },
+    &quot;right&quot;: {
+      &quot;strength&quot;: 1.0,
+      &quot;known_bottleneck&quot;: 1.0,
+      &quot;coverage&quot;: 1.0,
+      &quot;known_factors&quot;: 1,
+      &quot;expected_factors&quot;: 1,
+      &quot;dependency_groups&quot;: 1,
+      &quot;aggregation&quot;: &quot;minimum/bottleneck&quot;,
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 1.0,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ]
+    },
+    &quot;alignment_strength&quot;: 1.0,
+    &quot;alignment_basis&quot;: &quot;fixture-provided pairing, not learned confidence&quot;,
+    &quot;joint_strength&quot;: 1.0,
+    &quot;aggregation&quot;: &quot;minimum&quot;,
+    &quot;product_basis&quot;: null,
+    &quot;interpretation&quot;: &quot;declared support indicator, not probability of truth or operational risk&quot;,
+    &quot;missing_dependencies&quot;: false,
+    &quot;declared_higher_order_hinge_strengths&quot;: [],
+    &quot;registered_evidence&quot;: {
+      &quot;left&quot;: {
+        &quot;roots&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;missing&quot;: [],
+        &quot;unhashed&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;complete&quot;: true,
+        &quot;meaning&quot;: &quot;registered source closure, not source accuracy or authenticity&quot;
+      },
+      &quot;right&quot;: {
+        &quot;roots&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;missing&quot;: [],
+        &quot;unhashed&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;complete&quot;: true,
+        &quot;meaning&quot;: &quot;registered source closure, not source accuracy or authenticity&quot;
+      },
+      &quot;shared_roots&quot;: [
+        &quot;synthetic-source&quot;
+      ]
+    }
+  },
+  &quot;coverage&quot;: {
+    &quot;alignment_metadata&quot;: 1.0,
+    &quot;left_support&quot;: 1.0,
+    &quot;right_support&quot;: 1.0,
+    &quot;comparison_performed&quot;: true
+  },
+  &quot;raw_collision_score&quot;: 0.0,
+  &quot;supported_collision_score&quot;: 0.0,
+  &quot;dependency_warnings&quot;: [
+    &quot;shared source roots: synthetic-source&quot;,
+    &quot;registered evidence shared roots: synthetic-source&quot;
+  ],
+  &quot;input_fingerprint&quot;: &quot;744e8a8fd8bdc412fe9f04072977a785a84cd73ad5e498dfd8040647ee3ef1d8&quot;,
+  &quot;weight&quot;: 1.0,
+  &quot;hinge_assessments&quot;: [
+    {
+      &quot;notation&quot;: &quot;H(L3,M3;1)&quot;,
+      &quot;order&quot;: 1,
+      &quot;pair_id&quot;: &quot;support-case-count&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;entity&quot;,
+        &quot;concept&quot;,
+        &quot;numeric_meaning&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L3,M3;2)&quot;,
+      &quot;order&quot;: 2,
+      &quot;pair_id&quot;: &quot;support-case-count&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;population&quot;,
+        &quot;denominator&quot;,
+        &quot;granularity&quot;,
+        &quot;units&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L3,M3;3)&quot;,
+      &quot;order&quot;: 3,
+      &quot;pair_id&quot;: &quot;support-case-count&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;method&quot;,
+        &quot;registered_evidence&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L3,M3;4)&quot;,
+      &quot;order&quot;: 4,
+      &quot;pair_id&quot;: &quot;support-case-count&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;scope_id&quot;,
+        &quot;location&quot;,
+        &quot;definition_version&quot;,
+        &quot;time&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L3,M3;5)&quot;,
+      &quot;order&quot;: 5,
+      &quot;pair_id&quot;: &quot;support-case-count&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;dependence&quot;
+      ]
+    }
+  ]
+}</pre></details></details><details id="pair-6" open><summary>uncertain-count — PARTIAL</summary><p>L1-detections ↔ M2-count-interval · Raw collision: — /100 · Support-weighted: — /100</p><p>Lower support does not resolve a disagreement. Missing support is not zero risk.</p><div class="scroll"><table><thead><tr><th>Check</th><th>Order</th><th>State</th><th>Required</th><th>Reason</th></tr></thead><tbody><tr><td>entity</td><td>1</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>concept</td><td>1</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>scope_id</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>population</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>denominator</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>granularity</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>location</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>definition_version</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>units</td><td>2</td><td>PASS</td><td>True</td><td>dimensions match; exact registered conversion applied</td></tr><tr><td>time</td><td>4</td><td>PASS</td><td>True</td><td>same UTC interval; unequal aggregate windows are not interchangeable</td></tr><tr><td>numeric_meaning</td><td>1</td><td>PASS</td><td>True</td><td>both quantities represented as explicit admissible numeric sets</td></tr><tr><td>method</td><td>3</td><td>UNKNOWN</td><td>False</td><td>method metadata incomplete</td></tr><tr><td>dependence</td><td>5</td><td>PASS</td><td>False</td><td>no declared shared roots detected; independence not proven</td></tr><tr><td>registered_evidence</td><td>3</td><td>PASS</td><td>True</td><td>source IDs registered; factual accuracy/authenticity not established</td></tr></tbody></table></div><details><summary>Discrepancy, support, coverage and fingerprints</summary><pre>{
+  &quot;pair_id&quot;: &quot;uncertain-count&quot;,
+  &quot;left_id&quot;: &quot;L1-detections&quot;,
+  &quot;right_id&quot;: &quot;M2-count-interval&quot;,
+  &quot;left_side&quot;: &quot;L&quot;,
+  &quot;right_side&quot;: &quot;M&quot;,
+  &quot;language_order&quot;: 1,
+  &quot;mathematics_order&quot;: 2,
+  &quot;hinge_orders&quot;: [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  &quot;status&quot;: &quot;PARTIAL&quot;,
+  &quot;comparable&quot;: true,
+  &quot;checks&quot;: [
+    {
+      &quot;name&quot;: &quot;entity&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;concept&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;scope_id&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;population&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;denominator&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;granularity&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;location&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;definition_version&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;units&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;dimensions match; exact registered conversion applied&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;time&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;same UTC interval; unequal aggregate windows are not interchangeable&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;numeric_meaning&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;both quantities represented as explicit admissible numeric sets&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;method&quot;,
+      &quot;order&quot;: 3,
+      &quot;state&quot;: &quot;UNKNOWN&quot;,
+      &quot;reason&quot;: &quot;method metadata incomplete&quot;,
+      &quot;required&quot;: false
+    },
+    {
+      &quot;name&quot;: &quot;dependence&quot;,
+      &quot;order&quot;: 5,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;no declared shared roots detected; independence not proven&quot;,
+      &quot;required&quot;: false
+    },
+    {
+      &quot;name&quot;: &quot;registered_evidence&quot;,
+      &quot;order&quot;: 3,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;source IDs registered; factual accuracy/authenticity not established&quot;,
+      &quot;required&quot;: true
+    }
+  ],
+  &quot;discrepancy&quot;: {
+    &quot;expected_normalized&quot;: {
+      &quot;lower&quot;: &quot;0&quot;,
+      &quot;upper&quot;: &quot;0&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;observed_normalized&quot;: {
+      &quot;lower&quot;: &quot;0&quot;,
+      &quot;upper&quot;: &quot;1&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;signed_delta&quot;: null,
+    &quot;boundary_gap&quot;: &quot;0&quot;,
+    &quot;normalized_magnitude&quot;: null,
+    &quot;normalization_scale&quot;: null,
+    &quot;relation&quot;: &quot;OVERLAP_NOT_CONTAINED&quot;,
+    &quot;raw_conflict&quot;: false,
+    &quot;interpretation&quot;: &quot;comparison of representations; not an adjudication of physical truth&quot;,
+    &quot;original_expected&quot;: {
+      &quot;lower&quot;: &quot;0&quot;,
+      &quot;upper&quot;: &quot;0&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;original_observed&quot;: {
+      &quot;lower&quot;: &quot;0&quot;,
+      &quot;upper&quot;: &quot;1&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;left_unit&quot;: &quot;count&quot;,
+    &quot;right_unit&quot;: &quot;count&quot;,
+    &quot;signed_delta_left_unit&quot;: null,
+    &quot;boundary_gap_left_unit&quot;: &quot;0&quot;,
+    &quot;dimension&quot;: &quot;count&quot;,
+    &quot;unit_note&quot;: &quot;values/deltas in the registered base unit; raw source values retained in nodes&quot;
+  },
+  &quot;support&quot;: {
+    &quot;left&quot;: {
+      &quot;strength&quot;: 0.99,
+      &quot;known_bottleneck&quot;: 0.99,
+      &quot;coverage&quot;: 1.0,
+      &quot;known_factors&quot;: 1,
+      &quot;expected_factors&quot;: 1,
+      &quot;dependency_groups&quot;: 1,
+      &quot;aggregation&quot;: &quot;minimum/bottleneck&quot;,
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 0.99,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ]
+    },
+    &quot;right&quot;: {
+      &quot;strength&quot;: 0.42,
+      &quot;known_bottleneck&quot;: 0.42,
+      &quot;coverage&quot;: 1.0,
+      &quot;known_factors&quot;: 1,
+      &quot;expected_factors&quot;: 1,
+      &quot;dependency_groups&quot;: 1,
+      &quot;aggregation&quot;: &quot;minimum/bottleneck&quot;,
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 0.42,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ]
+    },
+    &quot;alignment_strength&quot;: 1.0,
+    &quot;alignment_basis&quot;: &quot;fixture-provided pairing, not learned confidence&quot;,
+    &quot;joint_strength&quot;: 0.42,
+    &quot;aggregation&quot;: &quot;minimum&quot;,
+    &quot;product_basis&quot;: null,
+    &quot;interpretation&quot;: &quot;declared support indicator, not probability of truth or operational risk&quot;,
+    &quot;missing_dependencies&quot;: false,
+    &quot;declared_higher_order_hinge_strengths&quot;: [],
+    &quot;registered_evidence&quot;: {
+      &quot;left&quot;: {
+        &quot;roots&quot;: [
+          &quot;generated-summary&quot;
+        ],
+        &quot;missing&quot;: [],
+        &quot;unhashed&quot;: [
+          &quot;generated-summary&quot;
+        ],
+        &quot;complete&quot;: true,
+        &quot;meaning&quot;: &quot;registered source closure, not source accuracy or authenticity&quot;
+      },
+      &quot;right&quot;: {
+        &quot;roots&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;missing&quot;: [],
+        &quot;unhashed&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;complete&quot;: true,
+        &quot;meaning&quot;: &quot;registered source closure, not source accuracy or authenticity&quot;
+      },
+      &quot;shared_roots&quot;: []
+    }
+  },
+  &quot;coverage&quot;: {
+    &quot;alignment_metadata&quot;: 1.0,
+    &quot;left_support&quot;: 1.0,
+    &quot;right_support&quot;: 1.0,
+    &quot;comparison_performed&quot;: true
+  },
+  &quot;raw_collision_score&quot;: null,
+  &quot;supported_collision_score&quot;: null,
+  &quot;dependency_warnings&quot;: [],
+  &quot;input_fingerprint&quot;: &quot;edf24b6e3ff9764a638acb55df55ac7c4da922d04987489c4e56191005429e5c&quot;,
+  &quot;weight&quot;: 1.0,
+  &quot;hinge_assessments&quot;: [
+    {
+      &quot;notation&quot;: &quot;H(L1,M2;1)&quot;,
+      &quot;order&quot;: 1,
+      &quot;pair_id&quot;: &quot;uncertain-count&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;entity&quot;,
+        &quot;concept&quot;,
+        &quot;numeric_meaning&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L1,M2;2)&quot;,
+      &quot;order&quot;: 2,
+      &quot;pair_id&quot;: &quot;uncertain-count&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;population&quot;,
+        &quot;denominator&quot;,
+        &quot;granularity&quot;,
+        &quot;units&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L1,M2;3)&quot;,
+      &quot;order&quot;: 3,
+      &quot;pair_id&quot;: &quot;uncertain-count&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;method&quot;,
+        &quot;registered_evidence&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L1,M2;4)&quot;,
+      &quot;order&quot;: 4,
+      &quot;pair_id&quot;: &quot;uncertain-count&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;scope_id&quot;,
+        &quot;location&quot;,
+        &quot;definition_version&quot;,
+        &quot;time&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L1,M2;5)&quot;,
+      &quot;order&quot;: 5,
+      &quot;pair_id&quot;: &quot;uncertain-count&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;dependence&quot;
+      ]
+    }
+  ]
+}</pre></details></details><details id="pair-7" open><summary>unsupported-absence — NOT_COMPARABLE</summary><p>L1-presence ↔ M1-detections · Raw collision: — /100 · Support-weighted: — /100</p><p>Lower support does not resolve a disagreement. Missing support is not zero risk.</p><div class="scroll"><table><thead><tr><th>Check</th><th>Order</th><th>State</th><th>Required</th><th>Reason</th></tr></thead><tbody><tr><td>entity</td><td>1</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>concept</td><td>1</td><td>FAIL</td><td>True</td><td>declared identities or scopes differ; not a numeric contradiction</td></tr><tr><td>scope_id</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>population</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>denominator</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>granularity</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>location</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>definition_version</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>units</td><td>2</td><td>PASS</td><td>True</td><td>dimensions match; exact registered conversion applied</td></tr><tr><td>time</td><td>4</td><td>PASS</td><td>True</td><td>same UTC interval; unequal aggregate windows are not interchangeable</td></tr><tr><td>numeric_meaning</td><td>1</td><td>PASS</td><td>True</td><td>both quantities represented as explicit admissible numeric sets</td></tr><tr><td>method</td><td>3</td><td>UNKNOWN</td><td>False</td><td>method metadata incomplete</td></tr><tr><td>dependence</td><td>5</td><td>PASS</td><td>False</td><td>no declared shared roots detected; independence not proven</td></tr><tr><td>registered_evidence</td><td>3</td><td>PASS</td><td>True</td><td>source IDs registered; factual accuracy/authenticity not established</td></tr></tbody></table></div><details><summary>Discrepancy, support, coverage and fingerprints</summary><pre>{
+  &quot;pair_id&quot;: &quot;unsupported-absence&quot;,
+  &quot;left_id&quot;: &quot;L1-presence&quot;,
+  &quot;right_id&quot;: &quot;M1-detections&quot;,
+  &quot;left_side&quot;: &quot;L&quot;,
+  &quot;right_side&quot;: &quot;M&quot;,
+  &quot;language_order&quot;: 1,
+  &quot;mathematics_order&quot;: 1,
+  &quot;hinge_orders&quot;: [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  &quot;status&quot;: &quot;NOT_COMPARABLE&quot;,
+  &quot;comparable&quot;: false,
+  &quot;checks&quot;: [
+    {
+      &quot;name&quot;: &quot;entity&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;concept&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;FAIL&quot;,
+      &quot;reason&quot;: &quot;declared identities or scopes differ; not a numeric contradiction&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;scope_id&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;population&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;denominator&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;granularity&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;location&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;definition_version&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;units&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;dimensions match; exact registered conversion applied&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;time&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;same UTC interval; unequal aggregate windows are not interchangeable&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;numeric_meaning&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;both quantities represented as explicit admissible numeric sets&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;method&quot;,
+      &quot;order&quot;: 3,
+      &quot;state&quot;: &quot;UNKNOWN&quot;,
+      &quot;reason&quot;: &quot;method metadata incomplete&quot;,
+      &quot;required&quot;: false
+    },
+    {
+      &quot;name&quot;: &quot;dependence&quot;,
+      &quot;order&quot;: 5,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;no declared shared roots detected; independence not proven&quot;,
+      &quot;required&quot;: false
+    },
+    {
+      &quot;name&quot;: &quot;registered_evidence&quot;,
+      &quot;order&quot;: 3,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;source IDs registered; factual accuracy/authenticity not established&quot;,
+      &quot;required&quot;: true
+    }
+  ],
+  &quot;discrepancy&quot;: {
+    &quot;relation&quot;: &quot;NOT_EVALUATED&quot;,
+    &quot;signed_delta&quot;: null,
+    &quot;boundary_gap&quot;: null,
+    &quot;normalized_magnitude&quot;: null,
+    &quot;raw_conflict&quot;: null
+  },
+  &quot;support&quot;: {
+    &quot;left&quot;: {
+      &quot;strength&quot;: 0.95,
+      &quot;known_bottleneck&quot;: 0.95,
+      &quot;coverage&quot;: 1.0,
+      &quot;known_factors&quot;: 1,
+      &quot;expected_factors&quot;: 1,
+      &quot;dependency_groups&quot;: 1,
+      &quot;aggregation&quot;: &quot;minimum/bottleneck&quot;,
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 0.95,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ]
+    },
+    &quot;right&quot;: {
+      &quot;strength&quot;: 0.99,
+      &quot;known_bottleneck&quot;: 0.99,
+      &quot;coverage&quot;: 1.0,
+      &quot;known_factors&quot;: 1,
+      &quot;expected_factors&quot;: 1,
+      &quot;dependency_groups&quot;: 1,
+      &quot;aggregation&quot;: &quot;minimum/bottleneck&quot;,
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 0.99,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ]
+    },
+    &quot;alignment_strength&quot;: 1.0,
+    &quot;alignment_basis&quot;: &quot;fixture-provided pairing, not learned confidence&quot;,
+    &quot;joint_strength&quot;: 0.95,
+    &quot;aggregation&quot;: &quot;minimum&quot;,
+    &quot;product_basis&quot;: null,
+    &quot;interpretation&quot;: &quot;declared support indicator, not probability of truth or operational risk&quot;,
+    &quot;missing_dependencies&quot;: false,
+    &quot;declared_higher_order_hinge_strengths&quot;: [],
+    &quot;registered_evidence&quot;: {
+      &quot;left&quot;: {
+        &quot;roots&quot;: [
+          &quot;generated-summary&quot;
+        ],
+        &quot;missing&quot;: [],
+        &quot;unhashed&quot;: [
+          &quot;generated-summary&quot;
+        ],
+        &quot;complete&quot;: true,
+        &quot;meaning&quot;: &quot;registered source closure, not source accuracy or authenticity&quot;
+      },
+      &quot;right&quot;: {
+        &quot;roots&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;missing&quot;: [],
+        &quot;unhashed&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;complete&quot;: true,
+        &quot;meaning&quot;: &quot;registered source closure, not source accuracy or authenticity&quot;
+      },
+      &quot;shared_roots&quot;: []
+    }
+  },
+  &quot;coverage&quot;: {
+    &quot;alignment_metadata&quot;: 1.0,
+    &quot;left_support&quot;: 1.0,
+    &quot;right_support&quot;: 1.0,
+    &quot;comparison_performed&quot;: false
+  },
+  &quot;raw_collision_score&quot;: null,
+  &quot;supported_collision_score&quot;: null,
+  &quot;dependency_warnings&quot;: [],
+  &quot;input_fingerprint&quot;: &quot;71d12856efff9a6692477d603599dea6c70e18079200f45cbd7b1a056d9d3df8&quot;,
+  &quot;weight&quot;: 1.0,
+  &quot;hinge_assessments&quot;: [
+    {
+      &quot;notation&quot;: &quot;H(L1,M1;1)&quot;,
+      &quot;order&quot;: 1,
+      &quot;pair_id&quot;: &quot;unsupported-absence&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;entity&quot;,
+        &quot;concept&quot;,
+        &quot;numeric_meaning&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L1,M1;2)&quot;,
+      &quot;order&quot;: 2,
+      &quot;pair_id&quot;: &quot;unsupported-absence&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;population&quot;,
+        &quot;denominator&quot;,
+        &quot;granularity&quot;,
+        &quot;units&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L1,M1;3)&quot;,
+      &quot;order&quot;: 3,
+      &quot;pair_id&quot;: &quot;unsupported-absence&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;method&quot;,
+        &quot;registered_evidence&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L1,M1;4)&quot;,
+      &quot;order&quot;: 4,
+      &quot;pair_id&quot;: &quot;unsupported-absence&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;scope_id&quot;,
+        &quot;location&quot;,
+        &quot;definition_version&quot;,
+        &quot;time&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L1,M1;5)&quot;,
+      &quot;order&quot;: 5,
+      &quot;pair_id&quot;: &quot;unsupported-absence&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;dependence&quot;
+      ]
+    }
+  ]
+}</pre></details></details><details id="pair-8" open><summary>zero-preserved — ALIGNED</summary><p>L1-detections ↔ M1-detections · Raw collision: 0.0 /100 · Support-weighted: 0.0 /100</p><p>Lower support does not resolve a disagreement. Missing support is not zero risk.</p><div class="scroll"><table><thead><tr><th>Check</th><th>Order</th><th>State</th><th>Required</th><th>Reason</th></tr></thead><tbody><tr><td>entity</td><td>1</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>concept</td><td>1</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>scope_id</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>population</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>denominator</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>granularity</td><td>2</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>location</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>definition_version</td><td>4</td><td>PASS</td><td>True</td><td>exact match in supplied representations</td></tr><tr><td>units</td><td>2</td><td>PASS</td><td>True</td><td>dimensions match; exact registered conversion applied</td></tr><tr><td>time</td><td>4</td><td>PASS</td><td>True</td><td>same UTC interval; unequal aggregate windows are not interchangeable</td></tr><tr><td>numeric_meaning</td><td>1</td><td>PASS</td><td>True</td><td>both quantities represented as explicit admissible numeric sets</td></tr><tr><td>method</td><td>3</td><td>UNKNOWN</td><td>False</td><td>method metadata incomplete</td></tr><tr><td>dependence</td><td>5</td><td>PASS</td><td>False</td><td>no declared shared roots detected; independence not proven</td></tr><tr><td>registered_evidence</td><td>3</td><td>PASS</td><td>True</td><td>source IDs registered; factual accuracy/authenticity not established</td></tr></tbody></table></div><details><summary>Discrepancy, support, coverage and fingerprints</summary><pre>{
+  &quot;pair_id&quot;: &quot;zero-preserved&quot;,
+  &quot;left_id&quot;: &quot;L1-detections&quot;,
+  &quot;right_id&quot;: &quot;M1-detections&quot;,
+  &quot;left_side&quot;: &quot;L&quot;,
+  &quot;right_side&quot;: &quot;M&quot;,
+  &quot;language_order&quot;: 1,
+  &quot;mathematics_order&quot;: 1,
+  &quot;hinge_orders&quot;: [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  &quot;status&quot;: &quot;ALIGNED&quot;,
+  &quot;comparable&quot;: true,
+  &quot;checks&quot;: [
+    {
+      &quot;name&quot;: &quot;entity&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;concept&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;scope_id&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;population&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;denominator&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;granularity&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;location&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;definition_version&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;exact match in supplied representations&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;units&quot;,
+      &quot;order&quot;: 2,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;dimensions match; exact registered conversion applied&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;time&quot;,
+      &quot;order&quot;: 4,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;same UTC interval; unequal aggregate windows are not interchangeable&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;numeric_meaning&quot;,
+      &quot;order&quot;: 1,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;both quantities represented as explicit admissible numeric sets&quot;,
+      &quot;required&quot;: true
+    },
+    {
+      &quot;name&quot;: &quot;method&quot;,
+      &quot;order&quot;: 3,
+      &quot;state&quot;: &quot;UNKNOWN&quot;,
+      &quot;reason&quot;: &quot;method metadata incomplete&quot;,
+      &quot;required&quot;: false
+    },
+    {
+      &quot;name&quot;: &quot;dependence&quot;,
+      &quot;order&quot;: 5,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;no declared shared roots detected; independence not proven&quot;,
+      &quot;required&quot;: false
+    },
+    {
+      &quot;name&quot;: &quot;registered_evidence&quot;,
+      &quot;order&quot;: 3,
+      &quot;state&quot;: &quot;PASS&quot;,
+      &quot;reason&quot;: &quot;source IDs registered; factual accuracy/authenticity not established&quot;,
+      &quot;required&quot;: true
+    }
+  ],
+  &quot;discrepancy&quot;: {
+    &quot;expected_normalized&quot;: {
+      &quot;lower&quot;: &quot;0&quot;,
+      &quot;upper&quot;: &quot;0&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;observed_normalized&quot;: {
+      &quot;lower&quot;: &quot;0&quot;,
+      &quot;upper&quot;: &quot;0&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;signed_delta&quot;: &quot;0&quot;,
+    &quot;boundary_gap&quot;: &quot;0&quot;,
+    &quot;normalized_magnitude&quot;: null,
+    &quot;normalization_scale&quot;: null,
+    &quot;relation&quot;: &quot;OBSERVATION_WITHIN_EXPECTATION&quot;,
+    &quot;raw_conflict&quot;: false,
+    &quot;interpretation&quot;: &quot;comparison of representations; not an adjudication of physical truth&quot;,
+    &quot;original_expected&quot;: {
+      &quot;lower&quot;: &quot;0&quot;,
+      &quot;upper&quot;: &quot;0&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;original_observed&quot;: {
+      &quot;lower&quot;: &quot;0&quot;,
+      &quot;upper&quot;: &quot;0&quot;,
+      &quot;lower_inclusive&quot;: true,
+      &quot;upper_inclusive&quot;: true
+    },
+    &quot;left_unit&quot;: &quot;count&quot;,
+    &quot;right_unit&quot;: &quot;count&quot;,
+    &quot;signed_delta_left_unit&quot;: &quot;0&quot;,
+    &quot;boundary_gap_left_unit&quot;: &quot;0&quot;,
+    &quot;dimension&quot;: &quot;count&quot;,
+    &quot;unit_note&quot;: &quot;values/deltas in the registered base unit; raw source values retained in nodes&quot;
+  },
+  &quot;support&quot;: {
+    &quot;left&quot;: {
+      &quot;strength&quot;: 0.99,
+      &quot;known_bottleneck&quot;: 0.99,
+      &quot;coverage&quot;: 1.0,
+      &quot;known_factors&quot;: 1,
+      &quot;expected_factors&quot;: 1,
+      &quot;dependency_groups&quot;: 1,
+      &quot;aggregation&quot;: &quot;minimum/bottleneck&quot;,
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 0.99,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ]
+    },
+    &quot;right&quot;: {
+      &quot;strength&quot;: 0.99,
+      &quot;known_bottleneck&quot;: 0.99,
+      &quot;coverage&quot;: 1.0,
+      &quot;known_factors&quot;: 1,
+      &quot;expected_factors&quot;: 1,
+      &quot;dependency_groups&quot;: 1,
+      &quot;aggregation&quot;: &quot;minimum/bottleneck&quot;,
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 0.99,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ]
+    },
+    &quot;alignment_strength&quot;: 1.0,
+    &quot;alignment_basis&quot;: &quot;fixture-provided pairing, not learned confidence&quot;,
+    &quot;joint_strength&quot;: 0.99,
+    &quot;aggregation&quot;: &quot;minimum&quot;,
+    &quot;product_basis&quot;: null,
+    &quot;interpretation&quot;: &quot;declared support indicator, not probability of truth or operational risk&quot;,
+    &quot;missing_dependencies&quot;: false,
+    &quot;declared_higher_order_hinge_strengths&quot;: [],
+    &quot;registered_evidence&quot;: {
+      &quot;left&quot;: {
+        &quot;roots&quot;: [
+          &quot;generated-summary&quot;
+        ],
+        &quot;missing&quot;: [],
+        &quot;unhashed&quot;: [
+          &quot;generated-summary&quot;
+        ],
+        &quot;complete&quot;: true,
+        &quot;meaning&quot;: &quot;registered source closure, not source accuracy or authenticity&quot;
+      },
+      &quot;right&quot;: {
+        &quot;roots&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;missing&quot;: [],
+        &quot;unhashed&quot;: [
+          &quot;synthetic-source&quot;
+        ],
+        &quot;complete&quot;: true,
+        &quot;meaning&quot;: &quot;registered source closure, not source accuracy or authenticity&quot;
+      },
+      &quot;shared_roots&quot;: []
+    }
+  },
+  &quot;coverage&quot;: {
+    &quot;alignment_metadata&quot;: 1.0,
+    &quot;left_support&quot;: 1.0,
+    &quot;right_support&quot;: 1.0,
+    &quot;comparison_performed&quot;: true
+  },
+  &quot;raw_collision_score&quot;: 0.0,
+  &quot;supported_collision_score&quot;: 0.0,
+  &quot;dependency_warnings&quot;: [],
+  &quot;input_fingerprint&quot;: &quot;17456b23683d0271b3684d1bf3efd21f06c13bbd511b523d7d45ccde8878a83e&quot;,
+  &quot;weight&quot;: 1.0,
+  &quot;hinge_assessments&quot;: [
+    {
+      &quot;notation&quot;: &quot;H(L1,M1;1)&quot;,
+      &quot;order&quot;: 1,
+      &quot;pair_id&quot;: &quot;zero-preserved&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;entity&quot;,
+        &quot;concept&quot;,
+        &quot;numeric_meaning&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L1,M1;2)&quot;,
+      &quot;order&quot;: 2,
+      &quot;pair_id&quot;: &quot;zero-preserved&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;population&quot;,
+        &quot;denominator&quot;,
+        &quot;granularity&quot;,
+        &quot;units&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L1,M1;3)&quot;,
+      &quot;order&quot;: 3,
+      &quot;pair_id&quot;: &quot;zero-preserved&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;method&quot;,
+        &quot;registered_evidence&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L1,M1;4)&quot;,
+      &quot;order&quot;: 4,
+      &quot;pair_id&quot;: &quot;zero-preserved&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;scope_id&quot;,
+        &quot;location&quot;,
+        &quot;definition_version&quot;,
+        &quot;time&quot;
+      ]
+    },
+    {
+      &quot;notation&quot;: &quot;H(L1,M1;5)&quot;,
+      &quot;order&quot;: 5,
+      &quot;pair_id&quot;: &quot;zero-preserved&quot;,
+      &quot;pd&quot;: null,
+      &quot;support&quot;: null,
+      &quot;note&quot;: &quot;no extra higher-order coefficient asserted&quot;,
+      &quot;checks&quot;: [
+        &quot;dependence&quot;
+      ]
+    }
+  ]
+}</pre></details></details><h2 id="nodes">Representations and higher-order factors</h2><details><summary>Representations</summary><div class="scroll"><table><thead><tr><th>Node ID</th><th>Side</th><th>Order</th><th>Entity</th><th>Concept</th><th>Unit</th><th>Numeric range</th><th>P</th><th>D</th><th>Text</th><th>Sources</th><th>Dependencies</th></tr></thead><tbody><tr><td>L1-coverage</td><td>L</td><td>1</td><td>SYNTHETIC-SECTOR</td><td>observed_coverage</td><td>%</td><td>{&quot;lower&quot;:&quot;100&quot;,&quot;lower_inclusive&quot;:true,&quot;upper&quot;:&quot;100&quot;,&quot;upper_inclusive&quot;:true}</td><td>0.0</td><td>1.0</td><td>The entire sector was observed.</td><td>generated-summary</td><td></td></tr><tr><td>L1-detections</td><td>L</td><td>1</td><td>SYNTHETIC-SECTOR</td><td>detected_track_count</td><td>count</td><td>{&quot;lower&quot;:&quot;0&quot;,&quot;lower_inclusive&quot;:true,&quot;upper&quot;:&quot;0&quot;,&quot;upper_inclusive&quot;:true}</td><td>0.0</td><td>1.0</td><td>No tracks were detected.</td><td>generated-summary</td><td></td></tr><tr><td>L1-presence</td><td>L</td><td>1</td><td>SYNTHETIC-SECTOR</td><td>aircraft_present_count</td><td>count</td><td>{&quot;lower&quot;:&quot;0&quot;,&quot;lower_inclusive&quot;:true,&quot;upper&quot;:&quot;0&quot;,&quot;upper_inclusive&quot;:true}</td><td>0.1</td><td>0.9</td><td>No aircraft were present.</td><td>generated-summary</td><td></td></tr><tr><td>L2-confidence</td><td>L</td><td>2</td><td>SYNTHETIC-SECTOR</td><td>validation_hit_rate</td><td>%</td><td>{&quot;lower&quot;:&quot;95&quot;,&quot;lower_inclusive&quot;:true,&quot;upper&quot;:null,&quot;upper_inclusive&quot;:true}</td><td>0.1</td><td>0.9</td><td>At least 95% in the declared validation metric.</td><td>generated-summary</td><td></td></tr><tr><td>L2-coverage-bound</td><td>L</td><td>2</td><td>SYNTHETIC-SECTOR</td><td>observed_coverage</td><td>%</td><td>{&quot;lower&quot;:&quot;50&quot;,&quot;lower_inclusive&quot;:true,&quot;upper&quot;:null,&quot;upper_inclusive&quot;:true}</td><td>0.1</td><td>0.9</td><td>At least half the sector was observed.</td><td>generated-summary</td><td></td></tr><tr><td>L3-trial-count</td><td>L</td><td>3</td><td>SYNTHETIC-SECTOR</td><td>validation_case_count</td><td>count</td><td>{&quot;lower&quot;:&quot;100&quot;,&quot;lower_inclusive&quot;:true,&quot;upper&quot;:&quot;100&quot;,&quot;upper_inclusive&quot;:true}</td><td>0.1</td><td>0.9</td><td>The description is supported by 100 cases.</td><td>synthetic-source</td><td></td></tr><tr><td>L4-age-limit</td><td>L</td><td>4</td><td>SYNTHETIC-SECTOR</td><td>record_age</td><td>s</td><td>{&quot;lower&quot;:&quot;0&quot;,&quot;lower_inclusive&quot;:true,&quot;upper&quot;:&quot;30&quot;,&quot;upper_inclusive&quot;:true}</td><td>0.1</td><td>0.9</td><td>The snapshot is at most 30 seconds old.</td><td>synthetic-source</td><td></td></tr><tr><td>L5-sources</td><td>L</td><td>5</td><td>SYNTHETIC-SECTOR</td><td>independent_source_count</td><td>count</td><td>{&quot;lower&quot;:&quot;2&quot;,&quot;lower_inclusive&quot;:true,&quot;upper&quot;:&quot;2&quot;,&quot;upper_inclusive&quot;:true}</td><td>0.1</td><td>0.9</td><td>Two independent sources corroborate this.</td><td>synthetic-source</td><td></td></tr><tr><td>M1-age</td><td>M</td><td>1</td><td>SYNTHETIC-SECTOR</td><td>record_age</td><td>s</td><td>{&quot;lower&quot;:&quot;90&quot;,&quot;lower_inclusive&quot;:true,&quot;upper&quot;:&quot;90&quot;,&quot;upper_inclusive&quot;:true}</td><td>0.1</td><td>0.9</td><td>Age field is 90 seconds in this fixture.</td><td>synthetic-source</td><td></td></tr><tr><td>M1-detections</td><td>M</td><td>1</td><td>SYNTHETIC-SECTOR</td><td>detected_track_count</td><td>count</td><td>{&quot;lower&quot;:&quot;0&quot;,&quot;lower_inclusive&quot;:true,&quot;upper&quot;:&quot;0&quot;,&quot;upper_inclusive&quot;:true}</td><td>0.1</td><td>0.9</td><td>No tracks were detected in this 30-second window.</td><td>synthetic-source</td><td></td></tr><tr><td>M2-count-interval</td><td>M</td><td>2</td><td>SYNTHETIC-SECTOR</td><td>detected_track_count</td><td>count</td><td>{&quot;lower&quot;:&quot;0&quot;,&quot;lower_inclusive&quot;:true,&quot;upper&quot;:&quot;1&quot;,&quot;upper_inclusive&quot;:true}</td><td>0.8</td><td>0.9</td><td>Possible count under the declared interval model is between 0 and 1.</td><td>synthetic-source</td><td></td></tr><tr><td>M3-hit-rate</td><td>M</td><td>3</td><td>SYNTHETIC-SECTOR</td><td>validation_hit_rate</td><td>%</td><td>{&quot;lower&quot;:&quot;72&quot;,&quot;lower_inclusive&quot;:true,&quot;upper&quot;:&quot;72&quot;,&quot;upper_inclusive&quot;:true}</td><td>0.1</td><td>0.9</td><td>The fixture validation hit rate is 72%.</td><td>synthetic-source</td><td></td></tr><tr><td>M3-trial-count</td><td>M</td><td>3</td><td>SYNTHETIC-SECTOR</td><td>validation_case_count</td><td>count</td><td>{&quot;lower&quot;:&quot;100&quot;,&quot;lower_inclusive&quot;:true,&quot;upper&quot;:&quot;100&quot;,&quot;upper_inclusive&quot;:true}</td><td>0.1</td><td>0.9</td><td>100 fixture validation cases.</td><td>synthetic-source</td><td></td></tr><tr><td>M4-coverage</td><td>M</td><td>4</td><td>SYNTHETIC-SECTOR</td><td>observed_coverage</td><td>%</td><td>{&quot;lower&quot;:&quot;60&quot;,&quot;lower_inclusive&quot;:true,&quot;upper&quot;:&quot;60&quot;,&quot;upper_inclusive&quot;:true}</td><td>0.1</td><td>0.9</td><td>Sensor coverage was 60%.</td><td>synthetic-source</td><td></td></tr><tr><td>M5-source-count</td><td>M</td><td>5</td><td>SYNTHETIC-SECTOR</td><td>independent_source_count</td><td>count</td><td>{&quot;lower&quot;:&quot;1&quot;,&quot;lower_inclusive&quot;:true,&quot;upper&quot;:&quot;1&quot;,&quot;upper_inclusive&quot;:true}</td><td>0.1</td><td>0.9</td><td>Two displays trace to one declared source root.</td><td>synthetic-source</td><td></td></tr></tbody></table></div></details><details><summary>Support</summary><div class="scroll"><table><thead><tr><th>Node ID</th><th>Factor</th><th>Order</th><th>Value</th><th>Basis</th><th>Source</th><th>Dependence group</th><th>Kind</th></tr></thead><tbody><tr><td>L1-coverage</td><td>representation_support</td><td>2</td><td>1.0</td><td>synthetic demonstration coefficient; not an empirical probability</td><td>—</td><td>—</td><td>assumed</td></tr><tr><td>L1-detections</td><td>representation_support</td><td>2</td><td>0.99</td><td>synthetic demonstration coefficient; not an empirical probability</td><td>—</td><td>—</td><td>assumed</td></tr><tr><td>L1-presence</td><td>representation_support</td><td>2</td><td>0.95</td><td>synthetic demonstration coefficient; not an empirical probability</td><td>—</td><td>—</td><td>assumed</td></tr><tr><td>L2-confidence</td><td>representation_support</td><td>2</td><td>0.95</td><td>synthetic demonstration coefficient; not an empirical probability</td><td>—</td><td>—</td><td>assumed</td></tr><tr><td>L2-coverage-bound</td><td>representation_support</td><td>2</td><td>1.0</td><td>synthetic demonstration coefficient; not an empirical probability</td><td>—</td><td>—</td><td>assumed</td></tr><tr><td>L3-trial-count</td><td>representation_support</td><td>2</td><td>1.0</td><td>synthetic demonstration coefficient; not an empirical probability</td><td>—</td><td>—</td><td>assumed</td></tr><tr><td>L4-age-limit</td><td>representation_support</td><td>2</td><td>1.0</td><td>synthetic demonstration coefficient; not an empirical probability</td><td>—</td><td>—</td><td>assumed</td></tr><tr><td>L5-sources</td><td>representation_support</td><td>2</td><td>1.0</td><td>synthetic demonstration coefficient; not an empirical probability</td><td>—</td><td>—</td><td>assumed</td></tr><tr><td>M1-age</td><td>representation_support</td><td>2</td><td>1.0</td><td>synthetic demonstration coefficient; not an empirical probability</td><td>—</td><td>—</td><td>assumed</td></tr><tr><td>M1-detections</td><td>representation_support</td><td>2</td><td>0.99</td><td>synthetic demonstration coefficient; not an empirical probability</td><td>—</td><td>—</td><td>assumed</td></tr><tr><td>M2-count-interval</td><td>representation_support</td><td>2</td><td>0.42</td><td>synthetic demonstration coefficient; not an empirical probability</td><td>—</td><td>—</td><td>assumed</td></tr><tr><td>M3-hit-rate</td><td>representation_support</td><td>2</td><td>0.9</td><td>synthetic demonstration coefficient; not an empirical probability</td><td>—</td><td>—</td><td>assumed</td></tr><tr><td>M3-trial-count</td><td>representation_support</td><td>2</td><td>1.0</td><td>synthetic demonstration coefficient; not an empirical probability</td><td>—</td><td>—</td><td>assumed</td></tr><tr><td>M4-coverage</td><td>representation_support</td><td>2</td><td>0.98</td><td>synthetic demonstration coefficient; not an empirical probability</td><td>—</td><td>—</td><td>assumed</td></tr><tr><td>M5-source-count</td><td>representation_support</td><td>2</td><td>1.0</td><td>synthetic demonstration coefficient; not an empirical probability</td><td>—</td><td>—</td><td>assumed</td></tr></tbody></table></div></details><details><summary>Coverage, groups and known gaps</summary><pre>{
+  &quot;summary&quot;: {
+    &quot;status&quot;: &quot;CONFLICT&quot;,
+    &quot;selected_pairs&quot;: 9,
+    &quot;status_counts&quot;: {
+      &quot;ALIGNED&quot;: 3,
+      &quot;PARTIAL&quot;: 1,
+      &quot;CONFLICT&quot;: 4,
+      &quot;UNRESOLVED&quot;: 0,
+      &quot;NOT_COMPARABLE&quot;: 1
+    },
+    &quot;resolved_pair_coverage&quot;: 0.7777777777777778,
+    &quot;support_assessed_pair_coverage&quot;: 0.7777777777777778,
+    &quot;unpaired_material_nodes&quot;: [],
+    &quot;max_raw_collision_score&quot;: 100.0,
+    &quot;weighted_mean_raw_collision_score&quot;: 57.142857142857146,
+    &quot;max_supported_collision_score&quot;: 100.0,
+    &quot;has_gaps&quot;: true,
+    &quot;note&quot;: &quot;means use assessed selected pairs only; maxima, counts and gaps remain visible; no cross-unit delta sum&quot;
+  },
+  &quot;groups&quot;: {
+    &quot;analysis-document&quot;: {
+      &quot;kind&quot;: &quot;document&quot;,
+      &quot;members&quot;: [
+        &quot;L1-coverage&quot;,
+        &quot;L1-detections&quot;,
+        &quot;L1-presence&quot;,
+        &quot;L2-confidence&quot;,
+        &quot;L2-coverage-bound&quot;,
+        &quot;L3-trial-count&quot;,
+        &quot;L4-age-limit&quot;,
+        &quot;L5-sources&quot;,
+        &quot;M1-age&quot;,
+        &quot;M1-detections&quot;,
+        &quot;M2-count-interval&quot;,
+        &quot;M3-hit-rate&quot;,
+        &quot;M3-trial-count&quot;,
+        &quot;M4-coverage&quot;,
+        &quot;M5-source-count&quot;
+      ],
+      &quot;pair_ids&quot;: [
+        &quot;confidence-overclaim&quot;,
+        &quot;coverage-overclaim&quot;,
+        &quot;dependence-overclaim&quot;,
+        &quot;freshness-claim&quot;,
+        &quot;qualified-coverage&quot;,
+        &quot;support-case-count&quot;,
+        &quot;uncertain-count&quot;,
+        &quot;unsupported-absence&quot;,
+        &quot;zero-preserved&quot;
+      ],
+      &quot;summary&quot;: {
+        &quot;status&quot;: &quot;CONFLICT&quot;,
+        &quot;selected_pairs&quot;: 9,
+        &quot;status_counts&quot;: {
+          &quot;ALIGNED&quot;: 3,
+          &quot;PARTIAL&quot;: 1,
+          &quot;CONFLICT&quot;: 4,
+          &quot;UNRESOLVED&quot;: 0,
+          &quot;NOT_COMPARABLE&quot;: 1
+        },
+        &quot;resolved_pair_coverage&quot;: 0.7777777777777778,
+        &quot;support_assessed_pair_coverage&quot;: 0.7777777777777778,
+        &quot;unpaired_material_nodes&quot;: [],
+        &quot;max_raw_collision_score&quot;: 100.0,
+        &quot;weighted_mean_raw_collision_score&quot;: 57.142857142857146,
+        &quot;max_supported_collision_score&quot;: 100.0,
+        &quot;has_gaps&quot;: true,
+        &quot;note&quot;: &quot;means use assessed selected pairs only; maxima, counts and gaps remain visible; no cross-unit delta sum&quot;
+      }
+    },
+    &quot;codec-episode&quot;: {
+      &quot;kind&quot;: &quot;episode&quot;,
+      &quot;members&quot;: [
+        &quot;L1-coverage&quot;,
+        &quot;L1-detections&quot;,
+        &quot;L1-presence&quot;,
+        &quot;M1-detections&quot;,
+        &quot;M4-coverage&quot;
+      ],
+      &quot;pair_ids&quot;: [
+        &quot;coverage-overclaim&quot;,
+        &quot;unsupported-absence&quot;,
+        &quot;zero-preserved&quot;
+      ],
+      &quot;summary&quot;: {
+        &quot;status&quot;: &quot;CONFLICT&quot;,
+        &quot;selected_pairs&quot;: 3,
+        &quot;status_counts&quot;: {
+          &quot;ALIGNED&quot;: 1,
+          &quot;PARTIAL&quot;: 0,
+          &quot;CONFLICT&quot;: 1,
+          &quot;UNRESOLVED&quot;: 0,
+          &quot;NOT_COMPARABLE&quot;: 1
+        },
+        &quot;resolved_pair_coverage&quot;: 0.6666666666666666,
+        &quot;support_assessed_pair_coverage&quot;: 0.6666666666666666,
+        &quot;unpaired_material_nodes&quot;: [],
+        &quot;max_raw_collision_score&quot;: 100.0,
+        &quot;weighted_mean_raw_collision_score&quot;: 50.0,
+        &quot;max_supported_collision_score&quot;: 98.0,
+        &quot;has_gaps&quot;: true,
+        &quot;note&quot;: &quot;means use assessed selected pairs only; maxima, counts and gaps remain visible; no cross-unit delta sum&quot;
+      }
+    },
+    &quot;corpus&quot;: {
+      &quot;kind&quot;: &quot;corpus&quot;,
+      &quot;members&quot;: [
+        &quot;L1-coverage&quot;,
+        &quot;L1-detections&quot;,
+        &quot;L1-presence&quot;,
+        &quot;L2-confidence&quot;,
+        &quot;L2-coverage-bound&quot;,
+        &quot;L3-trial-count&quot;,
+        &quot;L4-age-limit&quot;,
+        &quot;L5-sources&quot;,
+        &quot;M1-age&quot;,
+        &quot;M1-detections&quot;,
+        &quot;M2-count-interval&quot;,
+        &quot;M3-hit-rate&quot;,
+        &quot;M3-trial-count&quot;,
+        &quot;M4-coverage&quot;,
+        &quot;M5-source-count&quot;
+      ],
+      &quot;pair_ids&quot;: [
+        &quot;confidence-overclaim&quot;,
+        &quot;coverage-overclaim&quot;,
+        &quot;dependence-overclaim&quot;,
+        &quot;freshness-claim&quot;,
+        &quot;qualified-coverage&quot;,
+        &quot;support-case-count&quot;,
+        &quot;uncertain-count&quot;,
+        &quot;unsupported-absence&quot;,
+        &quot;zero-preserved&quot;
+      ],
+      &quot;summary&quot;: {
+        &quot;status&quot;: &quot;CONFLICT&quot;,
+        &quot;selected_pairs&quot;: 9,
+        &quot;status_counts&quot;: {
+          &quot;ALIGNED&quot;: 3,
+          &quot;PARTIAL&quot;: 1,
+          &quot;CONFLICT&quot;: 4,
+          &quot;UNRESOLVED&quot;: 0,
+          &quot;NOT_COMPARABLE&quot;: 1
+        },
+        &quot;resolved_pair_coverage&quot;: 0.7777777777777778,
+        &quot;support_assessed_pair_coverage&quot;: 0.7777777777777778,
+        &quot;unpaired_material_nodes&quot;: [],
+        &quot;max_raw_collision_score&quot;: 100.0,
+        &quot;weighted_mean_raw_collision_score&quot;: 57.142857142857146,
+        &quot;max_supported_collision_score&quot;: 100.0,
+        &quot;has_gaps&quot;: true,
+        &quot;note&quot;: &quot;means use assessed selected pairs only; maxima, counts and gaps remain visible; no cross-unit delta sum&quot;
+      }
+    }
+  }
+}</pre></details><h2>Codec preservation audit</h2><pre>{
+  &quot;transformation_id&quot;: &quot;SUMMARY-TRANSFORM&quot;,
+  &quot;status&quot;: &quot;DISTORTION_OR_SUPPORT_GAP&quot;,
+  &quot;findings&quot;: [
+    {
+      &quot;kind&quot;: &quot;VALUE_CHANGED&quot;,
+      &quot;source_id&quot;: &quot;M4-coverage&quot;,
+      &quot;target_id&quot;: &quot;L1-coverage&quot;,
+      &quot;pair_id&quot;: &quot;coverage-overclaim&quot;,
+      &quot;reason&quot;: &quot;paired source and target have disjoint numeric states&quot;
+    },
+    {
+      &quot;kind&quot;: &quot;SUPPORT_INCREASE_REQUIRES_EVIDENCE&quot;,
+      &quot;source_id&quot;: &quot;M4-coverage&quot;,
+      &quot;target_id&quot;: &quot;L1-coverage&quot;,
+      &quot;pair_id&quot;: &quot;coverage-overclaim&quot;,
+      &quot;reason&quot;: &quot;higher target support is not established by rewording alone&quot;
+    },
+    {
+      &quot;kind&quot;: &quot;SCOPE_OR_MEANING_CHANGED&quot;,
+      &quot;source_id&quot;: &quot;M1-detections&quot;,
+      &quot;target_id&quot;: &quot;L1-presence&quot;,
+      &quot;pair_id&quot;: &quot;unsupported-absence&quot;,
+      &quot;reason&quot;: &quot;not equivalent under the declared contract: concept&quot;
+    },
+    {
+      &quot;kind&quot;: &quot;NUMERIC_CONTENT_PRESERVED&quot;,
+      &quot;source_id&quot;: &quot;M1-detections&quot;,
+      &quot;target_id&quot;: &quot;L1-detections&quot;,
+      &quot;pair_id&quot;: &quot;zero-preserved&quot;,
+      &quot;reason&quot;: &quot;same admissible numeric set after exact unit conversion&quot;
+    }
+  ],
+  &quot;material_source_coverage&quot;: 1.0,
+  &quot;material_target_coverage&quot;: 1.0,
+  &quot;graph_fingerprint&quot;: &quot;68b2dfd93ece7a64f8f4f0edfbaaa2fa9f2ce89be9786d9ad95aab85b6b140fc&quot;,
+  &quot;limitations&quot;: &quot;Coverage is over declared material nodes, not all semantics in the original documents.&quot;
+}</pre><h2>Optional narrative context — not scored</h2><p>User&#x27;s philosophical/theological framing; not a scientific inference or scored claim.</p><p><strong>Origin:</strong> God → Big Bang → Nature / physical reality → Cellular / divisional reality → Human experience → Language and mathematics as representations</p><p><strong>Retreat:</strong> Names, numbers and divisions → Human experience → Nature → Stillness before description → God</p><h2 id="boundary">Boundary</h2><p>The map is not the territory. VINCULUM tests representations. This is neither a truth oracle nor a decision or command system. Domain definitions, source reliability and selected pairings require appropriate human review. The reference monitor is not a live operational integration.</p><p>Input fingerprint: <code>68b2dfd93ece7a64f8f4f0edfbaaa2fa9f2ce89be9786d9ad95aab85b6b140fc</code> (content identity, not a signature)</p><h2>Pipeline audit and review queue</h2><h2>INPUT → RUNTIME → OUTPUT</h2><div class="stageflow"><section><h3>INPUT</h3>sources: 0<br>parsed records: 0</section><section><h3>INGEST</h3>evidence sources: 2<br>warnings: 0</section><section><h3>REPRESENT</h3>nodes: 15<br>unresolved numeric meanings: 0</section><section><h3>PAIR</h3>candidates: 0<br>selected pairs: 9<br>deferred: 0</section><section><h3>EVALUATE</h3>evaluated pairs: 9<br>status: CONFLICT</section><section><h3>AGGREGATE</h3>groups: 3<br>codec audits: 1</section><section><h3>OUTPUT</h3>review findings: 7<br>automatic actions: 0</section></div><p>Automatic operational actions: <strong>0</strong>. “Decide” means findings for human/application review.</p><details><summary>Pair proposals and selection</summary><pre>{
+  &quot;mode&quot;: &quot;manual&quot;,
+  &quot;policy_id&quot;: null,
+  &quot;candidates&quot;: [],
+  &quot;selected_pair_ids&quot;: [],
+  &quot;deferred_candidate_ids&quot;: [],
+  &quot;unmatched_node_ids&quot;: [],
+  &quot;input_graph_fingerprint&quot;: &quot;ffc917b5455457de8f2344f003bd87b14b1414589c269907e80c8978633f1225&quot;,
+  &quot;policy_fingerprint&quot;: &quot;1d6d6ba4bbaabe92fd4f6f09b5f9646bb23affff3aebb5c65adaf832493f21b1&quot;
+}</pre></details><details><summary>Review findings</summary><pre>[
+  {
+    &quot;id&quot;: &quot;finding:confidence-overclaim&quot;,
+    &quot;pair_id&quot;: &quot;confidence-overclaim&quot;,
+    &quot;category&quot;: &quot;REVIEW_DISCREPANCY&quot;,
+    &quot;reason&quot;: &quot;Comparable representations have disjoint admissible values; inspect both sources.&quot;,
+    &quot;status&quot;: &quot;CONFLICT&quot;,
+    &quot;raw_collision_score&quot;: 100.0,
+    &quot;support&quot;: 0.9,
+    &quot;numeric_values_preserved&quot;: true,
+    &quot;unknown_checks&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;finding:coverage-overclaim&quot;,
+    &quot;pair_id&quot;: &quot;coverage-overclaim&quot;,
+    &quot;category&quot;: &quot;REVIEW_DISCREPANCY&quot;,
+    &quot;reason&quot;: &quot;Comparable representations have disjoint admissible values; inspect both sources.&quot;,
+    &quot;status&quot;: &quot;CONFLICT&quot;,
+    &quot;raw_collision_score&quot;: 100.0,
+    &quot;support&quot;: 0.98,
+    &quot;numeric_values_preserved&quot;: true,
+    &quot;unknown_checks&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;finding:dependence-overclaim&quot;,
+    &quot;pair_id&quot;: &quot;dependence-overclaim&quot;,
+    &quot;category&quot;: &quot;REVIEW_DISCREPANCY&quot;,
+    &quot;reason&quot;: &quot;Comparable representations have disjoint admissible values; inspect both sources.&quot;,
+    &quot;status&quot;: &quot;CONFLICT&quot;,
+    &quot;raw_collision_score&quot;: 100.0,
+    &quot;support&quot;: 1.0,
+    &quot;numeric_values_preserved&quot;: true,
+    &quot;unknown_checks&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;finding:freshness-claim&quot;,
+    &quot;pair_id&quot;: &quot;freshness-claim&quot;,
+    &quot;category&quot;: &quot;REVIEW_DISCREPANCY&quot;,
+    &quot;reason&quot;: &quot;Comparable representations have disjoint admissible values; inspect both sources.&quot;,
+    &quot;status&quot;: &quot;CONFLICT&quot;,
+    &quot;raw_collision_score&quot;: 100.0,
+    &quot;support&quot;: 1.0,
+    &quot;numeric_values_preserved&quot;: true,
+    &quot;unknown_checks&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;finding:uncertain-count&quot;,
+    &quot;pair_id&quot;: &quot;uncertain-count&quot;,
+    &quot;category&quot;: &quot;RESOLVE_OVERLAP&quot;,
+    &quot;reason&quot;: &quot;The observation allows both satisfying and nonsatisfying cases; obtain tighter evidence.&quot;,
+    &quot;status&quot;: &quot;PARTIAL&quot;,
+    &quot;raw_collision_score&quot;: null,
+    &quot;support&quot;: 0.42,
+    &quot;numeric_values_preserved&quot;: true,
+    &quot;unknown_checks&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;finding:unsupported-absence&quot;,
+    &quot;pair_id&quot;: &quot;unsupported-absence&quot;,
+    &quot;category&quot;: &quot;REPAIR_PAIRING&quot;,
+    &quot;reason&quot;: &quot;Revise the pairing contract or provide a justified inference bridge; do not call this numerical agreement.&quot;,
+    &quot;status&quot;: &quot;NOT_COMPARABLE&quot;,
+    &quot;raw_collision_score&quot;: null,
+    &quot;support&quot;: 0.95,
+    &quot;numeric_values_preserved&quot;: true,
+    &quot;unknown_checks&quot;: []
+  },
+  {
+    &quot;id&quot;: &quot;codec:SUMMARY-TRANSFORM&quot;,
+    &quot;category&quot;: &quot;REVIEW_TRANSFORMATION&quot;,
+    &quot;reason&quot;: &quot;Material meaning, scope, uncertainty or support was not shown to be preserved.&quot;,
+    &quot;codec_status&quot;: &quot;DISTORTION_OR_SUPPORT_GAP&quot;
+  }
+]</pre></details><details><summary>Source identities</summary><pre>[
+  {
+    &quot;id&quot;: &quot;generated-summary&quot;,
+    &quot;sha256&quot;: null,
+    &quot;basis&quot;: &quot;synthetic fixture source reference, not real operational evidence&quot;,
+    &quot;parents&quot;: [],
+    &quot;locator&quot;: null,
+    &quot;media_type&quot;: &quot;application/octet-stream&quot;
+  },
+  {
+    &quot;id&quot;: &quot;synthetic-source&quot;,
+    &quot;sha256&quot;: null,
+    &quot;basis&quot;: &quot;synthetic fixture source reference, not real operational evidence&quot;,
+    &quot;parents&quot;: [],
+    &quot;locator&quot;: null,
+    &quot;media_type&quot;: &quot;application/octet-stream&quot;
+  }
+]</pre></details><details><summary>Extraction coverage and limitations</summary><pre>[]</pre></details><details><summary>Extraction trace</summary><pre>[]</pre></details><details><summary>Ontology normalization</summary><pre>[]</pre></details><details><summary>Higher-order support diagnostics</summary><pre>{
+  &quot;confidence-overclaim&quot;: {
+    &quot;left&quot;: {
+      &quot;strength&quot;: 0.95,
+      &quot;aggregation&quot;: &quot;minimum&quot;,
+      &quot;basis&quot;: null,
+      &quot;groups&quot;: {
+        &quot;factor:representation_support&quot;: 0.95
+      },
+      &quot;missing&quot;: [],
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 0.95,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ],
+      &quot;factor_coverage&quot;: 1.0,
+      &quot;interpretation&quot;: &quot;support index; not probability, truth, safety, or a rescaled measurement&quot;
+    },
+    &quot;right&quot;: {
+      &quot;strength&quot;: 0.9,
+      &quot;aggregation&quot;: &quot;minimum&quot;,
+      &quot;basis&quot;: null,
+      &quot;groups&quot;: {
+        &quot;factor:representation_support&quot;: 0.9
+      },
+      &quot;missing&quot;: [],
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 0.9,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ],
+      &quot;factor_coverage&quot;: 1.0,
+      &quot;interpretation&quot;: &quot;support index; not probability, truth, safety, or a rescaled measurement&quot;
+    },
+    &quot;hinge&quot;: [],
+    &quot;alignment_support&quot;: 1.0,
+    &quot;joint_strength&quot;: 0.9,
+    &quot;joint_aggregation&quot;: &quot;minimum&quot;,
+    &quot;dependency_adjusted&quot;: false,
+    &quot;product_basis&quot;: null,
+    &quot;raw_collision_score&quot;: 100.0,
+    &quot;diagnostic_supported_score&quot;: 90.0,
+    &quot;raw_value_unchanged&quot;: true,
+    &quot;orders_are_not_certainty_rankings&quot;: true,
+    &quot;dependency_warnings&quot;: []
+  },
+  &quot;coverage-overclaim&quot;: {
+    &quot;left&quot;: {
+      &quot;strength&quot;: 1.0,
+      &quot;aggregation&quot;: &quot;minimum&quot;,
+      &quot;basis&quot;: null,
+      &quot;groups&quot;: {
+        &quot;factor:representation_support&quot;: 1.0
+      },
+      &quot;missing&quot;: [],
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 1.0,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ],
+      &quot;factor_coverage&quot;: 1.0,
+      &quot;interpretation&quot;: &quot;support index; not probability, truth, safety, or a rescaled measurement&quot;
+    },
+    &quot;right&quot;: {
+      &quot;strength&quot;: 0.98,
+      &quot;aggregation&quot;: &quot;minimum&quot;,
+      &quot;basis&quot;: null,
+      &quot;groups&quot;: {
+        &quot;factor:representation_support&quot;: 0.98
+      },
+      &quot;missing&quot;: [],
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 0.98,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ],
+      &quot;factor_coverage&quot;: 1.0,
+      &quot;interpretation&quot;: &quot;support index; not probability, truth, safety, or a rescaled measurement&quot;
+    },
+    &quot;hinge&quot;: [],
+    &quot;alignment_support&quot;: 1.0,
+    &quot;joint_strength&quot;: 0.98,
+    &quot;joint_aggregation&quot;: &quot;minimum&quot;,
+    &quot;dependency_adjusted&quot;: false,
+    &quot;product_basis&quot;: null,
+    &quot;raw_collision_score&quot;: 100.0,
+    &quot;diagnostic_supported_score&quot;: 98.0,
+    &quot;raw_value_unchanged&quot;: true,
+    &quot;orders_are_not_certainty_rankings&quot;: true,
+    &quot;dependency_warnings&quot;: []
+  },
+  &quot;dependence-overclaim&quot;: {
+    &quot;left&quot;: {
+      &quot;strength&quot;: 1.0,
+      &quot;aggregation&quot;: &quot;minimum&quot;,
+      &quot;basis&quot;: null,
+      &quot;groups&quot;: {
+        &quot;factor:representation_support&quot;: 1.0
+      },
+      &quot;missing&quot;: [],
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 1.0,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ],
+      &quot;factor_coverage&quot;: 1.0,
+      &quot;interpretation&quot;: &quot;support index; not probability, truth, safety, or a rescaled measurement&quot;
+    },
+    &quot;right&quot;: {
+      &quot;strength&quot;: 1.0,
+      &quot;aggregation&quot;: &quot;minimum&quot;,
+      &quot;basis&quot;: null,
+      &quot;groups&quot;: {
+        &quot;factor:representation_support&quot;: 1.0
+      },
+      &quot;missing&quot;: [],
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 1.0,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ],
+      &quot;factor_coverage&quot;: 1.0,
+      &quot;interpretation&quot;: &quot;support index; not probability, truth, safety, or a rescaled measurement&quot;
+    },
+    &quot;hinge&quot;: [],
+    &quot;alignment_support&quot;: 1.0,
+    &quot;joint_strength&quot;: 1.0,
+    &quot;joint_aggregation&quot;: &quot;minimum&quot;,
+    &quot;dependency_adjusted&quot;: true,
+    &quot;product_basis&quot;: null,
+    &quot;raw_collision_score&quot;: 100.0,
+    &quot;diagnostic_supported_score&quot;: 100.0,
+    &quot;raw_value_unchanged&quot;: true,
+    &quot;orders_are_not_certainty_rankings&quot;: true,
+    &quot;dependency_warnings&quot;: [
+      &quot;shared source roots: synthetic-source&quot;,
+      &quot;registered evidence shared roots: synthetic-source&quot;
+    ]
+  },
+  &quot;freshness-claim&quot;: {
+    &quot;left&quot;: {
+      &quot;strength&quot;: 1.0,
+      &quot;aggregation&quot;: &quot;minimum&quot;,
+      &quot;basis&quot;: null,
+      &quot;groups&quot;: {
+        &quot;factor:representation_support&quot;: 1.0
+      },
+      &quot;missing&quot;: [],
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 1.0,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ],
+      &quot;factor_coverage&quot;: 1.0,
+      &quot;interpretation&quot;: &quot;support index; not probability, truth, safety, or a rescaled measurement&quot;
+    },
+    &quot;right&quot;: {
+      &quot;strength&quot;: 1.0,
+      &quot;aggregation&quot;: &quot;minimum&quot;,
+      &quot;basis&quot;: null,
+      &quot;groups&quot;: {
+        &quot;factor:representation_support&quot;: 1.0
+      },
+      &quot;missing&quot;: [],
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 1.0,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ],
+      &quot;factor_coverage&quot;: 1.0,
+      &quot;interpretation&quot;: &quot;support index; not probability, truth, safety, or a rescaled measurement&quot;
+    },
+    &quot;hinge&quot;: [],
+    &quot;alignment_support&quot;: 1.0,
+    &quot;joint_strength&quot;: 1.0,
+    &quot;joint_aggregation&quot;: &quot;minimum&quot;,
+    &quot;dependency_adjusted&quot;: true,
+    &quot;product_basis&quot;: null,
+    &quot;raw_collision_score&quot;: 100.0,
+    &quot;diagnostic_supported_score&quot;: 100.0,
+    &quot;raw_value_unchanged&quot;: true,
+    &quot;orders_are_not_certainty_rankings&quot;: true,
+    &quot;dependency_warnings&quot;: [
+      &quot;shared source roots: synthetic-source&quot;,
+      &quot;registered evidence shared roots: synthetic-source&quot;
+    ]
+  },
+  &quot;qualified-coverage&quot;: {
+    &quot;left&quot;: {
+      &quot;strength&quot;: 1.0,
+      &quot;aggregation&quot;: &quot;minimum&quot;,
+      &quot;basis&quot;: null,
+      &quot;groups&quot;: {
+        &quot;factor:representation_support&quot;: 1.0
+      },
+      &quot;missing&quot;: [],
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 1.0,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ],
+      &quot;factor_coverage&quot;: 1.0,
+      &quot;interpretation&quot;: &quot;support index; not probability, truth, safety, or a rescaled measurement&quot;
+    },
+    &quot;right&quot;: {
+      &quot;strength&quot;: 0.98,
+      &quot;aggregation&quot;: &quot;minimum&quot;,
+      &quot;basis&quot;: null,
+      &quot;groups&quot;: {
+        &quot;factor:representation_support&quot;: 0.98
+      },
+      &quot;missing&quot;: [],
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 0.98,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ],
+      &quot;factor_coverage&quot;: 1.0,
+      &quot;interpretation&quot;: &quot;support index; not probability, truth, safety, or a rescaled measurement&quot;
+    },
+    &quot;hinge&quot;: [],
+    &quot;alignment_support&quot;: 1.0,
+    &quot;joint_strength&quot;: 0.98,
+    &quot;joint_aggregation&quot;: &quot;minimum&quot;,
+    &quot;dependency_adjusted&quot;: false,
+    &quot;product_basis&quot;: null,
+    &quot;raw_collision_score&quot;: 0.0,
+    &quot;diagnostic_supported_score&quot;: 0.0,
+    &quot;raw_value_unchanged&quot;: true,
+    &quot;orders_are_not_certainty_rankings&quot;: true,
+    &quot;dependency_warnings&quot;: []
+  },
+  &quot;support-case-count&quot;: {
+    &quot;left&quot;: {
+      &quot;strength&quot;: 1.0,
+      &quot;aggregation&quot;: &quot;minimum&quot;,
+      &quot;basis&quot;: null,
+      &quot;groups&quot;: {
+        &quot;factor:representation_support&quot;: 1.0
+      },
+      &quot;missing&quot;: [],
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 1.0,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ],
+      &quot;factor_coverage&quot;: 1.0,
+      &quot;interpretation&quot;: &quot;support index; not probability, truth, safety, or a rescaled measurement&quot;
+    },
+    &quot;right&quot;: {
+      &quot;strength&quot;: 1.0,
+      &quot;aggregation&quot;: &quot;minimum&quot;,
+      &quot;basis&quot;: null,
+      &quot;groups&quot;: {
+        &quot;factor:representation_support&quot;: 1.0
+      },
+      &quot;missing&quot;: [],
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 1.0,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ],
+      &quot;factor_coverage&quot;: 1.0,
+      &quot;interpretation&quot;: &quot;support index; not probability, truth, safety, or a rescaled measurement&quot;
+    },
+    &quot;hinge&quot;: [],
+    &quot;alignment_support&quot;: 1.0,
+    &quot;joint_strength&quot;: 1.0,
+    &quot;joint_aggregation&quot;: &quot;minimum&quot;,
+    &quot;dependency_adjusted&quot;: true,
+    &quot;product_basis&quot;: null,
+    &quot;raw_collision_score&quot;: 0.0,
+    &quot;diagnostic_supported_score&quot;: 0.0,
+    &quot;raw_value_unchanged&quot;: true,
+    &quot;orders_are_not_certainty_rankings&quot;: true,
+    &quot;dependency_warnings&quot;: [
+      &quot;shared source roots: synthetic-source&quot;,
+      &quot;registered evidence shared roots: synthetic-source&quot;
+    ]
+  },
+  &quot;uncertain-count&quot;: {
+    &quot;left&quot;: {
+      &quot;strength&quot;: 0.99,
+      &quot;aggregation&quot;: &quot;minimum&quot;,
+      &quot;basis&quot;: null,
+      &quot;groups&quot;: {
+        &quot;factor:representation_support&quot;: 0.99
+      },
+      &quot;missing&quot;: [],
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 0.99,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ],
+      &quot;factor_coverage&quot;: 1.0,
+      &quot;interpretation&quot;: &quot;support index; not probability, truth, safety, or a rescaled measurement&quot;
+    },
+    &quot;right&quot;: {
+      &quot;strength&quot;: 0.42,
+      &quot;aggregation&quot;: &quot;minimum&quot;,
+      &quot;basis&quot;: null,
+      &quot;groups&quot;: {
+        &quot;factor:representation_support&quot;: 0.42
+      },
+      &quot;missing&quot;: [],
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 0.42,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ],
+      &quot;factor_coverage&quot;: 1.0,
+      &quot;interpretation&quot;: &quot;support index; not probability, truth, safety, or a rescaled measurement&quot;
+    },
+    &quot;hinge&quot;: [],
+    &quot;alignment_support&quot;: 1.0,
+    &quot;joint_strength&quot;: 0.42,
+    &quot;joint_aggregation&quot;: &quot;minimum&quot;,
+    &quot;dependency_adjusted&quot;: false,
+    &quot;product_basis&quot;: null,
+    &quot;raw_collision_score&quot;: null,
+    &quot;diagnostic_supported_score&quot;: null,
+    &quot;raw_value_unchanged&quot;: true,
+    &quot;orders_are_not_certainty_rankings&quot;: true,
+    &quot;dependency_warnings&quot;: []
+  },
+  &quot;unsupported-absence&quot;: {
+    &quot;left&quot;: {
+      &quot;strength&quot;: 0.95,
+      &quot;aggregation&quot;: &quot;minimum&quot;,
+      &quot;basis&quot;: null,
+      &quot;groups&quot;: {
+        &quot;factor:representation_support&quot;: 0.95
+      },
+      &quot;missing&quot;: [],
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 0.95,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ],
+      &quot;factor_coverage&quot;: 1.0,
+      &quot;interpretation&quot;: &quot;support index; not probability, truth, safety, or a rescaled measurement&quot;
+    },
+    &quot;right&quot;: {
+      &quot;strength&quot;: 0.99,
+      &quot;aggregation&quot;: &quot;minimum&quot;,
+      &quot;basis&quot;: null,
+      &quot;groups&quot;: {
+        &quot;factor:representation_support&quot;: 0.99
+      },
+      &quot;missing&quot;: [],
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 0.99,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ],
+      &quot;factor_coverage&quot;: 1.0,
+      &quot;interpretation&quot;: &quot;support index; not probability, truth, safety, or a rescaled measurement&quot;
+    },
+    &quot;hinge&quot;: [],
+    &quot;alignment_support&quot;: 1.0,
+    &quot;joint_strength&quot;: 0.95,
+    &quot;joint_aggregation&quot;: &quot;minimum&quot;,
+    &quot;dependency_adjusted&quot;: false,
+    &quot;product_basis&quot;: null,
+    &quot;raw_collision_score&quot;: null,
+    &quot;diagnostic_supported_score&quot;: null,
+    &quot;raw_value_unchanged&quot;: true,
+    &quot;orders_are_not_certainty_rankings&quot;: true,
+    &quot;dependency_warnings&quot;: []
+  },
+  &quot;zero-preserved&quot;: {
+    &quot;left&quot;: {
+      &quot;strength&quot;: 0.99,
+      &quot;aggregation&quot;: &quot;minimum&quot;,
+      &quot;basis&quot;: null,
+      &quot;groups&quot;: {
+        &quot;factor:representation_support&quot;: 0.99
+      },
+      &quot;missing&quot;: [],
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 0.99,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ],
+      &quot;factor_coverage&quot;: 1.0,
+      &quot;interpretation&quot;: &quot;support index; not probability, truth, safety, or a rescaled measurement&quot;
+    },
+    &quot;right&quot;: {
+      &quot;strength&quot;: 0.99,
+      &quot;aggregation&quot;: &quot;minimum&quot;,
+      &quot;basis&quot;: null,
+      &quot;groups&quot;: {
+        &quot;factor:representation_support&quot;: 0.99
+      },
+      &quot;missing&quot;: [],
+      &quot;factors&quot;: [
+        {
+          &quot;name&quot;: &quot;representation_support&quot;,
+          &quot;value&quot;: 0.99,
+          &quot;basis&quot;: &quot;synthetic demonstration coefficient; not an empirical probability&quot;,
+          &quot;order&quot;: 2,
+          &quot;source_id&quot;: null,
+          &quot;dependency_group&quot;: null,
+          &quot;kind&quot;: &quot;assumed&quot;
+        }
+      ],
+      &quot;factor_coverage&quot;: 1.0,
+      &quot;interpretation&quot;: &quot;support index; not probability, truth, safety, or a rescaled measurement&quot;
+    },
+    &quot;hinge&quot;: [],
+    &quot;alignment_support&quot;: 1.0,
+    &quot;joint_strength&quot;: 0.99,
+    &quot;joint_aggregation&quot;: &quot;minimum&quot;,
+    &quot;dependency_adjusted&quot;: false,
+    &quot;product_basis&quot;: null,
+    &quot;raw_collision_score&quot;: 0.0,
+    &quot;diagnostic_supported_score&quot;: 0.0,
+    &quot;raw_value_unchanged&quot;: true,
+    &quot;orders_are_not_certainty_rankings&quot;: true,
+    &quot;dependency_warnings&quot;: []
+  }
+}</pre></details><p>Job fingerprint: <code>b94876c006e4cb8a08986bf8775993c44cfe42a17af74485e0dc597b8e66ca66</code></p></body></html>

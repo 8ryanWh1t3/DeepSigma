@@ -1,0 +1,4818 @@
+{
+  "schema": "vinculum.pipeline.result/1",
+  "engine_version": "0.7.0",
+  "job_fingerprint": "b94876c006e4cb8a08986bf8775993c44cfe42a17af74485e0dc597b8e66ca66",
+  "ontology_fingerprint": "db6521e9a67da489997317ee5d5f21583827cc488c804cf0f3b7f57a4abc5452",
+  "report": {
+    "schema": "vinculum.crossorder.report/1",
+    "engine_version": "0.7.0",
+    "graph_id": "SYNTHETIC-CODEC-LIMIT-TEST",
+    "representations": [
+      {
+        "id": "L1-coverage",
+        "side": "L",
+        "order": 1,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "observed_coverage",
+        "quantity": {
+          "lower": "100",
+          "upper": "100",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "%",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "The entire sector was observed.",
+        "pd": {
+          "probabilistic": 0.0,
+          "deterministic": 1.0,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 1.0,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "generated-summary"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "L1-detections",
+        "side": "L",
+        "order": 1,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "detected_track_count",
+        "quantity": {
+          "lower": "0",
+          "upper": "0",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "count",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "No tracks were detected.",
+        "pd": {
+          "probabilistic": 0.0,
+          "deterministic": 1.0,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 0.99,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "generated-summary"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "L1-presence",
+        "side": "L",
+        "order": 1,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "aircraft_present_count",
+        "quantity": {
+          "lower": "0",
+          "upper": "0",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "count",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "No aircraft were present.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 0.95,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "generated-summary"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "L2-confidence",
+        "side": "L",
+        "order": 2,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "validation_hit_rate",
+        "quantity": {
+          "lower": "95",
+          "upper": null,
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "%",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "At least 95% in the declared validation metric.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 0.95,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "generated-summary"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "L2-coverage-bound",
+        "side": "L",
+        "order": 2,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "observed_coverage",
+        "quantity": {
+          "lower": "50",
+          "upper": null,
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "%",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "At least half the sector was observed.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 1.0,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "generated-summary"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "L3-trial-count",
+        "side": "L",
+        "order": 3,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "validation_case_count",
+        "quantity": {
+          "lower": "100",
+          "upper": "100",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "count",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "The description is supported by 100 cases.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 1.0,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "synthetic-source"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "L4-age-limit",
+        "side": "L",
+        "order": 4,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "record_age",
+        "quantity": {
+          "lower": "0",
+          "upper": "30",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "s",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "The snapshot is at most 30 seconds old.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 1.0,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "synthetic-source"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "L5-sources",
+        "side": "L",
+        "order": 5,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "independent_source_count",
+        "quantity": {
+          "lower": "2",
+          "upper": "2",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "count",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "Two independent sources corroborate this.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 1.0,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "synthetic-source"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "M1-age",
+        "side": "M",
+        "order": 1,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "record_age",
+        "quantity": {
+          "lower": "90",
+          "upper": "90",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "s",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "Age field is 90 seconds in this fixture.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 1.0,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "synthetic-source"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "M1-detections",
+        "side": "M",
+        "order": 1,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "detected_track_count",
+        "quantity": {
+          "lower": "0",
+          "upper": "0",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "count",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "No tracks were detected in this 30-second window.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 0.99,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "synthetic-source"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "M2-count-interval",
+        "side": "M",
+        "order": 2,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "detected_track_count",
+        "quantity": {
+          "lower": "0",
+          "upper": "1",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "count",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "Possible count under the declared interval model is between 0 and 1.",
+        "pd": {
+          "probabilistic": 0.8,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 0.42,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "synthetic-source"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "M3-hit-rate",
+        "side": "M",
+        "order": 3,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "validation_hit_rate",
+        "quantity": {
+          "lower": "72",
+          "upper": "72",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "%",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "The fixture validation hit rate is 72%.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 0.9,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "synthetic-source"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "M3-trial-count",
+        "side": "M",
+        "order": 3,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "validation_case_count",
+        "quantity": {
+          "lower": "100",
+          "upper": "100",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "count",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "100 fixture validation cases.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 1.0,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "synthetic-source"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "M4-coverage",
+        "side": "M",
+        "order": 4,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "observed_coverage",
+        "quantity": {
+          "lower": "60",
+          "upper": "60",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "%",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "Sensor coverage was 60%.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 0.98,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "synthetic-source"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      },
+      {
+        "id": "M5-source-count",
+        "side": "M",
+        "order": 5,
+        "entity": "SYNTHETIC-SECTOR",
+        "concept": "independent_source_count",
+        "quantity": {
+          "lower": "1",
+          "upper": "1",
+          "lower_inclusive": true,
+          "upper_inclusive": true
+        },
+        "unit": "count",
+        "scope": {
+          "scope_id": "sector-bravo/demo",
+          "population": "aircraft in the declared sector",
+          "denominator": "one declared sector",
+          "granularity": "sector aggregate",
+          "location": "synthetic-sector",
+          "definition_version": "demo/v1",
+          "window": {
+            "start": "2026-10-02T14:31:30Z",
+            "end": "2026-10-02T14:32:00Z"
+          },
+          "timeless": false
+        },
+        "text": "Two displays trace to one declared source root.",
+        "pd": {
+          "probabilistic": 0.1,
+          "deterministic": 0.9,
+          "basis": "synthetic explicit P/D descriptors at this order"
+        },
+        "support": {
+          "factors": [
+            {
+              "name": "representation_support",
+              "value": 1.0,
+              "basis": "synthetic demonstration coefficient; not an empirical probability",
+              "order": 2,
+              "source_id": null,
+              "dependency_group": null,
+              "kind": "assumed"
+            }
+          ]
+        },
+        "source_ids": [
+          "synthetic-source"
+        ],
+        "depends_on": [],
+        "method": null,
+        "material": true,
+        "definition_id": null
+      }
+    ],
+    "pairs": [
+      {
+        "pair_id": "confidence-overclaim",
+        "left_id": "L2-confidence",
+        "right_id": "M3-hit-rate",
+        "left_side": "L",
+        "right_side": "M",
+        "language_order": 2,
+        "mathematics_order": 3,
+        "hinge_orders": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "status": "CONFLICT",
+        "comparable": true,
+        "checks": [
+          {
+            "name": "entity",
+            "order": 1,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "concept",
+            "order": 1,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "scope_id",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "population",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "denominator",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "granularity",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "location",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "definition_version",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "units",
+            "order": 2,
+            "state": "PASS",
+            "reason": "dimensions match; exact registered conversion applied",
+            "required": true
+          },
+          {
+            "name": "time",
+            "order": 4,
+            "state": "PASS",
+            "reason": "same UTC interval; unequal aggregate windows are not interchangeable",
+            "required": true
+          },
+          {
+            "name": "numeric_meaning",
+            "order": 1,
+            "state": "PASS",
+            "reason": "both quantities represented as explicit admissible numeric sets",
+            "required": true
+          },
+          {
+            "name": "method",
+            "order": 3,
+            "state": "UNKNOWN",
+            "reason": "method metadata incomplete",
+            "required": false
+          },
+          {
+            "name": "dependence",
+            "order": 5,
+            "state": "PASS",
+            "reason": "no declared shared roots detected; independence not proven",
+            "required": false
+          },
+          {
+            "name": "registered_evidence",
+            "order": 3,
+            "state": "PASS",
+            "reason": "source IDs registered; factual accuracy/authenticity not established",
+            "required": true
+          }
+        ],
+        "discrepancy": {
+          "expected_normalized": {
+            "lower": "0.95",
+            "upper": null,
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "observed_normalized": {
+            "lower": "0.72",
+            "upper": "0.72",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "signed_delta": null,
+          "boundary_gap": "0.23",
+          "normalized_magnitude": null,
+          "normalization_scale": null,
+          "relation": "DISJOINT",
+          "raw_conflict": true,
+          "interpretation": "comparison of representations; not an adjudication of physical truth",
+          "original_expected": {
+            "lower": "95",
+            "upper": null,
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "original_observed": {
+            "lower": "72",
+            "upper": "72",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "left_unit": "%",
+          "right_unit": "%",
+          "signed_delta_left_unit": null,
+          "boundary_gap_left_unit": "23",
+          "dimension": "ratio",
+          "unit_note": "values/deltas in the registered base unit; raw source values retained in nodes"
+        },
+        "support": {
+          "left": {
+            "strength": 0.95,
+            "known_bottleneck": 0.95,
+            "coverage": 1.0,
+            "known_factors": 1,
+            "expected_factors": 1,
+            "dependency_groups": 1,
+            "aggregation": "minimum/bottleneck",
+            "factors": [
+              {
+                "name": "representation_support",
+                "value": 0.95,
+                "basis": "synthetic demonstration coefficient; not an empirical probability",
+                "order": 2,
+                "source_id": null,
+                "dependency_group": null,
+                "kind": "assumed"
+              }
+            ]
+          },
+          "right": {
+            "strength": 0.9,
+            "known_bottleneck": 0.9,
+            "coverage": 1.0,
+            "known_factors": 1,
+            "expected_factors": 1,
+            "dependency_groups": 1,
+            "aggregation": "minimum/bottleneck",
+            "factors": [
+              {
+                "name": "representation_support",
+                "value": 0.9,
+                "basis": "synthetic demonstration coefficient; not an empirical probability",
+                "order": 2,
+                "source_id": null,
+                "dependency_group": null,
+                "kind": "assumed"
+              }
+            ]
+          },
+          "alignment_strength": 1.0,
+          "alignment_basis": "fixture-provided pairing, not learned confidence",
+          "joint_strength": 0.9,
+          "aggregation": "minimum",
+          "product_basis": null,
+          "interpretation": "declared support indicator, not probability of truth or operational risk",
+          "missing_dependencies": false,
+          "declared_higher_order_hinge_strengths": [],
+          "registered_evidence": {
+            "left": {
+              "roots": [
+                "generated-summary"
+              ],
+              "missing": [],
+              "unhashed": [
+                "generated-summary"
+              ],
+              "complete": true,
+              "meaning": "registered source closure, not source accuracy or authenticity"
+            },
+            "right": {
+              "roots": [
+                "synthetic-source"
+              ],
+              "missing": [],
+              "unhashed": [
+                "synthetic-source"
+              ],
+              "complete": true,
+              "meaning": "registered source closure, not source accuracy or authenticity"
+            },
+            "shared_roots": []
+          }
+        },
+        "coverage": {
+          "alignment_metadata": 1.0,
+          "left_support": 1.0,
+          "right_support": 1.0,
+          "comparison_performed": true
+        },
+        "raw_collision_score": 100.0,
+        "supported_collision_score": 90.0,
+        "dependency_warnings": [],
+        "input_fingerprint": "c5fc09c84831ab007e55224903f3257254743f7b18a83f9f7123cf3b5b2b9e68",
+        "weight": 1.0,
+        "hinge_assessments": [
+          {
+            "notation": "H(L2,M3;1)",
+            "order": 1,
+            "pair_id": "confidence-overclaim",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "entity",
+              "concept",
+              "numeric_meaning"
+            ]
+          },
+          {
+            "notation": "H(L2,M3;2)",
+            "order": 2,
+            "pair_id": "confidence-overclaim",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "population",
+              "denominator",
+              "granularity",
+              "units"
+            ]
+          },
+          {
+            "notation": "H(L2,M3;3)",
+            "order": 3,
+            "pair_id": "confidence-overclaim",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "method",
+              "registered_evidence"
+            ]
+          },
+          {
+            "notation": "H(L2,M3;4)",
+            "order": 4,
+            "pair_id": "confidence-overclaim",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "scope_id",
+              "location",
+              "definition_version",
+              "time"
+            ]
+          },
+          {
+            "notation": "H(L2,M3;5)",
+            "order": 5,
+            "pair_id": "confidence-overclaim",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "dependence"
+            ]
+          }
+        ]
+      },
+      {
+        "pair_id": "coverage-overclaim",
+        "left_id": "L1-coverage",
+        "right_id": "M4-coverage",
+        "left_side": "L",
+        "right_side": "M",
+        "language_order": 1,
+        "mathematics_order": 4,
+        "hinge_orders": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "status": "CONFLICT",
+        "comparable": true,
+        "checks": [
+          {
+            "name": "entity",
+            "order": 1,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "concept",
+            "order": 1,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "scope_id",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "population",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "denominator",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "granularity",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "location",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "definition_version",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "units",
+            "order": 2,
+            "state": "PASS",
+            "reason": "dimensions match; exact registered conversion applied",
+            "required": true
+          },
+          {
+            "name": "time",
+            "order": 4,
+            "state": "PASS",
+            "reason": "same UTC interval; unequal aggregate windows are not interchangeable",
+            "required": true
+          },
+          {
+            "name": "numeric_meaning",
+            "order": 1,
+            "state": "PASS",
+            "reason": "both quantities represented as explicit admissible numeric sets",
+            "required": true
+          },
+          {
+            "name": "method",
+            "order": 3,
+            "state": "UNKNOWN",
+            "reason": "method metadata incomplete",
+            "required": false
+          },
+          {
+            "name": "dependence",
+            "order": 5,
+            "state": "PASS",
+            "reason": "no declared shared roots detected; independence not proven",
+            "required": false
+          },
+          {
+            "name": "registered_evidence",
+            "order": 3,
+            "state": "PASS",
+            "reason": "source IDs registered; factual accuracy/authenticity not established",
+            "required": true
+          }
+        ],
+        "discrepancy": {
+          "expected_normalized": {
+            "lower": "1",
+            "upper": "1",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "observed_normalized": {
+            "lower": "0.6",
+            "upper": "0.6",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "signed_delta": "-0.4",
+          "boundary_gap": "0.4",
+          "normalized_magnitude": null,
+          "normalization_scale": null,
+          "relation": "DISJOINT",
+          "raw_conflict": true,
+          "interpretation": "comparison of representations; not an adjudication of physical truth",
+          "original_expected": {
+            "lower": "100",
+            "upper": "100",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "original_observed": {
+            "lower": "60",
+            "upper": "60",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "left_unit": "%",
+          "right_unit": "%",
+          "signed_delta_left_unit": "-40",
+          "boundary_gap_left_unit": "40",
+          "dimension": "ratio",
+          "unit_note": "values/deltas in the registered base unit; raw source values retained in nodes"
+        },
+        "support": {
+          "left": {
+            "strength": 1.0,
+            "known_bottleneck": 1.0,
+            "coverage": 1.0,
+            "known_factors": 1,
+            "expected_factors": 1,
+            "dependency_groups": 1,
+            "aggregation": "minimum/bottleneck",
+            "factors": [
+              {
+                "name": "representation_support",
+                "value": 1.0,
+                "basis": "synthetic demonstration coefficient; not an empirical probability",
+                "order": 2,
+                "source_id": null,
+                "dependency_group": null,
+                "kind": "assumed"
+              }
+            ]
+          },
+          "right": {
+            "strength": 0.98,
+            "known_bottleneck": 0.98,
+            "coverage": 1.0,
+            "known_factors": 1,
+            "expected_factors": 1,
+            "dependency_groups": 1,
+            "aggregation": "minimum/bottleneck",
+            "factors": [
+              {
+                "name": "representation_support",
+                "value": 0.98,
+                "basis": "synthetic demonstration coefficient; not an empirical probability",
+                "order": 2,
+                "source_id": null,
+                "dependency_group": null,
+                "kind": "assumed"
+              }
+            ]
+          },
+          "alignment_strength": 1.0,
+          "alignment_basis": "fixture-provided pairing, not learned confidence",
+          "joint_strength": 0.98,
+          "aggregation": "minimum",
+          "product_basis": null,
+          "interpretation": "declared support indicator, not probability of truth or operational risk",
+          "missing_dependencies": false,
+          "declared_higher_order_hinge_strengths": [],
+          "registered_evidence": {
+            "left": {
+              "roots": [
+                "generated-summary"
+              ],
+              "missing": [],
+              "unhashed": [
+                "generated-summary"
+              ],
+              "complete": true,
+              "meaning": "registered source closure, not source accuracy or authenticity"
+            },
+            "right": {
+              "roots": [
+                "synthetic-source"
+              ],
+              "missing": [],
+              "unhashed": [
+                "synthetic-source"
+              ],
+              "complete": true,
+              "meaning": "registered source closure, not source accuracy or authenticity"
+            },
+            "shared_roots": []
+          }
+        },
+        "coverage": {
+          "alignment_metadata": 1.0,
+          "left_support": 1.0,
+          "right_support": 1.0,
+          "comparison_performed": true
+        },
+        "raw_collision_score": 100.0,
+        "supported_collision_score": 98.0,
+        "dependency_warnings": [],
+        "input_fingerprint": "a421c20d514c1668b7ca4f051364b184ea8963ceda4f8d258d2cb03bbbe2fa7e",
+        "weight": 1.0,
+        "hinge_assessments": [
+          {
+            "notation": "H(L1,M4;1)",
+            "order": 1,
+            "pair_id": "coverage-overclaim",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "entity",
+              "concept",
+              "numeric_meaning"
+            ]
+          },
+          {
+            "notation": "H(L1,M4;2)",
+            "order": 2,
+            "pair_id": "coverage-overclaim",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "population",
+              "denominator",
+              "granularity",
+              "units"
+            ]
+          },
+          {
+            "notation": "H(L1,M4;3)",
+            "order": 3,
+            "pair_id": "coverage-overclaim",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "method",
+              "registered_evidence"
+            ]
+          },
+          {
+            "notation": "H(L1,M4;4)",
+            "order": 4,
+            "pair_id": "coverage-overclaim",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "scope_id",
+              "location",
+              "definition_version",
+              "time"
+            ]
+          },
+          {
+            "notation": "H(L1,M4;5)",
+            "order": 5,
+            "pair_id": "coverage-overclaim",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "dependence"
+            ]
+          }
+        ]
+      },
+      {
+        "pair_id": "dependence-overclaim",
+        "left_id": "L5-sources",
+        "right_id": "M5-source-count",
+        "left_side": "L",
+        "right_side": "M",
+        "language_order": 5,
+        "mathematics_order": 5,
+        "hinge_orders": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "status": "CONFLICT",
+        "comparable": true,
+        "checks": [
+          {
+            "name": "entity",
+            "order": 1,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "concept",
+            "order": 1,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "scope_id",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "population",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "denominator",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "granularity",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "location",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "definition_version",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "units",
+            "order": 2,
+            "state": "PASS",
+            "reason": "dimensions match; exact registered conversion applied",
+            "required": true
+          },
+          {
+            "name": "time",
+            "order": 4,
+            "state": "PASS",
+            "reason": "same UTC interval; unequal aggregate windows are not interchangeable",
+            "required": true
+          },
+          {
+            "name": "numeric_meaning",
+            "order": 1,
+            "state": "PASS",
+            "reason": "both quantities represented as explicit admissible numeric sets",
+            "required": true
+          },
+          {
+            "name": "method",
+            "order": 3,
+            "state": "UNKNOWN",
+            "reason": "method metadata incomplete",
+            "required": false
+          },
+          {
+            "name": "dependence",
+            "order": 5,
+            "state": "UNKNOWN",
+            "reason": "shared source roots: synthetic-source; registered evidence shared roots: synthetic-source",
+            "required": false
+          },
+          {
+            "name": "registered_evidence",
+            "order": 3,
+            "state": "PASS",
+            "reason": "source IDs registered; factual accuracy/authenticity not established; shared evidence roots: synthetic-source",
+            "required": true
+          }
+        ],
+        "discrepancy": {
+          "expected_normalized": {
+            "lower": "2",
+            "upper": "2",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "observed_normalized": {
+            "lower": "1",
+            "upper": "1",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "signed_delta": "-1",
+          "boundary_gap": "1",
+          "normalized_magnitude": null,
+          "normalization_scale": null,
+          "relation": "DISJOINT",
+          "raw_conflict": true,
+          "interpretation": "comparison of representations; not an adjudication of physical truth",
+          "original_expected": {
+            "lower": "2",
+            "upper": "2",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "original_observed": {
+            "lower": "1",
+            "upper": "1",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "left_unit": "count",
+          "right_unit": "count",
+          "signed_delta_left_unit": "-1",
+          "boundary_gap_left_unit": "1",
+          "dimension": "count",
+          "unit_note": "values/deltas in the registered base unit; raw source values retained in nodes"
+        },
+        "support": {
+          "left": {
+            "strength": 1.0,
+            "known_bottleneck": 1.0,
+            "coverage": 1.0,
+            "known_factors": 1,
+            "expected_factors": 1,
+            "dependency_groups": 1,
+            "aggregation": "minimum/bottleneck",
+            "factors": [
+              {
+                "name": "representation_support",
+                "value": 1.0,
+                "basis": "synthetic demonstration coefficient; not an empirical probability",
+                "order": 2,
+                "source_id": null,
+                "dependency_group": null,
+                "kind": "assumed"
+              }
+            ]
+          },
+          "right": {
+            "strength": 1.0,
+            "known_bottleneck": 1.0,
+            "coverage": 1.0,
+            "known_factors": 1,
+            "expected_factors": 1,
+            "dependency_groups": 1,
+            "aggregation": "minimum/bottleneck",
+            "factors": [
+              {
+                "name": "representation_support",
+                "value": 1.0,
+                "basis": "synthetic demonstration coefficient; not an empirical probability",
+                "order": 2,
+                "source_id": null,
+                "dependency_group": null,
+                "kind": "assumed"
+              }
+            ]
+          },
+          "alignment_strength": 1.0,
+          "alignment_basis": "fixture-provided pairing, not learned confidence",
+          "joint_strength": 1.0,
+          "aggregation": "minimum",
+          "product_basis": null,
+          "interpretation": "declared support indicator, not probability of truth or operational risk",
+          "missing_dependencies": false,
+          "declared_higher_order_hinge_strengths": [],
+          "registered_evidence": {
+            "left": {
+              "roots": [
+                "synthetic-source"
+              ],
+              "missing": [],
+              "unhashed": [
+                "synthetic-source"
+              ],
+              "complete": true,
+              "meaning": "registered source closure, not source accuracy or authenticity"
+            },
+            "right": {
+              "roots": [
+                "synthetic-source"
+              ],
+              "missing": [],
+              "unhashed": [
+                "synthetic-source"
+              ],
+              "complete": true,
+              "meaning": "registered source closure, not source accuracy or authenticity"
+            },
+            "shared_roots": [
+              "synthetic-source"
+            ]
+          }
+        },
+        "coverage": {
+          "alignment_metadata": 1.0,
+          "left_support": 1.0,
+          "right_support": 1.0,
+          "comparison_performed": true
+        },
+        "raw_collision_score": 100.0,
+        "supported_collision_score": 100.0,
+        "dependency_warnings": [
+          "shared source roots: synthetic-source",
+          "registered evidence shared roots: synthetic-source"
+        ],
+        "input_fingerprint": "8bc5a7eed761dbf86721dbdea497de586e82f257be8e46d397e3c5bc04655e0c",
+        "weight": 1.0,
+        "hinge_assessments": [
+          {
+            "notation": "H(L5,M5;1)",
+            "order": 1,
+            "pair_id": "dependence-overclaim",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "entity",
+              "concept",
+              "numeric_meaning"
+            ]
+          },
+          {
+            "notation": "H(L5,M5;2)",
+            "order": 2,
+            "pair_id": "dependence-overclaim",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "population",
+              "denominator",
+              "granularity",
+              "units"
+            ]
+          },
+          {
+            "notation": "H(L5,M5;3)",
+            "order": 3,
+            "pair_id": "dependence-overclaim",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "method",
+              "registered_evidence"
+            ]
+          },
+          {
+            "notation": "H(L5,M5;4)",
+            "order": 4,
+            "pair_id": "dependence-overclaim",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "scope_id",
+              "location",
+              "definition_version",
+              "time"
+            ]
+          },
+          {
+            "notation": "H(L5,M5;5)",
+            "order": 5,
+            "pair_id": "dependence-overclaim",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "dependence"
+            ]
+          }
+        ]
+      },
+      {
+        "pair_id": "freshness-claim",
+        "left_id": "L4-age-limit",
+        "right_id": "M1-age",
+        "left_side": "L",
+        "right_side": "M",
+        "language_order": 4,
+        "mathematics_order": 1,
+        "hinge_orders": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "status": "CONFLICT",
+        "comparable": true,
+        "checks": [
+          {
+            "name": "entity",
+            "order": 1,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "concept",
+            "order": 1,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "scope_id",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "population",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "denominator",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "granularity",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "location",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "definition_version",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "units",
+            "order": 2,
+            "state": "PASS",
+            "reason": "dimensions match; exact registered conversion applied",
+            "required": true
+          },
+          {
+            "name": "time",
+            "order": 4,
+            "state": "PASS",
+            "reason": "same UTC interval; unequal aggregate windows are not interchangeable",
+            "required": true
+          },
+          {
+            "name": "numeric_meaning",
+            "order": 1,
+            "state": "PASS",
+            "reason": "both quantities represented as explicit admissible numeric sets",
+            "required": true
+          },
+          {
+            "name": "method",
+            "order": 3,
+            "state": "UNKNOWN",
+            "reason": "method metadata incomplete",
+            "required": false
+          },
+          {
+            "name": "dependence",
+            "order": 5,
+            "state": "UNKNOWN",
+            "reason": "shared source roots: synthetic-source; registered evidence shared roots: synthetic-source",
+            "required": false
+          },
+          {
+            "name": "registered_evidence",
+            "order": 3,
+            "state": "PASS",
+            "reason": "source IDs registered; factual accuracy/authenticity not established; shared evidence roots: synthetic-source",
+            "required": true
+          }
+        ],
+        "discrepancy": {
+          "expected_normalized": {
+            "lower": "0",
+            "upper": "30",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "observed_normalized": {
+            "lower": "90",
+            "upper": "90",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "signed_delta": null,
+          "boundary_gap": "60",
+          "normalized_magnitude": null,
+          "normalization_scale": null,
+          "relation": "DISJOINT",
+          "raw_conflict": true,
+          "interpretation": "comparison of representations; not an adjudication of physical truth",
+          "original_expected": {
+            "lower": "0",
+            "upper": "30",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "original_observed": {
+            "lower": "90",
+            "upper": "90",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "left_unit": "s",
+          "right_unit": "s",
+          "signed_delta_left_unit": null,
+          "boundary_gap_left_unit": "60",
+          "dimension": "time",
+          "unit_note": "values/deltas in the registered base unit; raw source values retained in nodes"
+        },
+        "support": {
+          "left": {
+            "strength": 1.0,
+            "known_bottleneck": 1.0,
+            "coverage": 1.0,
+            "known_factors": 1,
+            "expected_factors": 1,
+            "dependency_groups": 1,
+            "aggregation": "minimum/bottleneck",
+            "factors": [
+              {
+                "name": "representation_support",
+                "value": 1.0,
+                "basis": "synthetic demonstration coefficient; not an empirical probability",
+                "order": 2,
+                "source_id": null,
+                "dependency_group": null,
+                "kind": "assumed"
+              }
+            ]
+          },
+          "right": {
+            "strength": 1.0,
+            "known_bottleneck": 1.0,
+            "coverage": 1.0,
+            "known_factors": 1,
+            "expected_factors": 1,
+            "dependency_groups": 1,
+            "aggregation": "minimum/bottleneck",
+            "factors": [
+              {
+                "name": "representation_support",
+                "value": 1.0,
+                "basis": "synthetic demonstration coefficient; not an empirical probability",
+                "order": 2,
+                "source_id": null,
+                "dependency_group": null,
+                "kind": "assumed"
+              }
+            ]
+          },
+          "alignment_strength": 1.0,
+          "alignment_basis": "fixture-provided pairing, not learned confidence",
+          "joint_strength": 1.0,
+          "aggregation": "minimum",
+          "product_basis": null,
+          "interpretation": "declared support indicator, not probability of truth or operational risk",
+          "missing_dependencies": false,
+          "declared_higher_order_hinge_strengths": [],
+          "registered_evidence": {
+            "left": {
+              "roots": [
+                "synthetic-source"
+              ],
+              "missing": [],
+              "unhashed": [
+                "synthetic-source"
+              ],
+              "complete": true,
+              "meaning": "registered source closure, not source accuracy or authenticity"
+            },
+            "right": {
+              "roots": [
+                "synthetic-source"
+              ],
+              "missing": [],
+              "unhashed": [
+                "synthetic-source"
+              ],
+              "complete": true,
+              "meaning": "registered source closure, not source accuracy or authenticity"
+            },
+            "shared_roots": [
+              "synthetic-source"
+            ]
+          }
+        },
+        "coverage": {
+          "alignment_metadata": 1.0,
+          "left_support": 1.0,
+          "right_support": 1.0,
+          "comparison_performed": true
+        },
+        "raw_collision_score": 100.0,
+        "supported_collision_score": 100.0,
+        "dependency_warnings": [
+          "shared source roots: synthetic-source",
+          "registered evidence shared roots: synthetic-source"
+        ],
+        "input_fingerprint": "961cfa5f113b474dcf5c771345ff48675f65efdb90efdfb6c7b92b28779bbae8",
+        "weight": 1.0,
+        "hinge_assessments": [
+          {
+            "notation": "H(L4,M1;1)",
+            "order": 1,
+            "pair_id": "freshness-claim",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "entity",
+              "concept",
+              "numeric_meaning"
+            ]
+          },
+          {
+            "notation": "H(L4,M1;2)",
+            "order": 2,
+            "pair_id": "freshness-claim",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "population",
+              "denominator",
+              "granularity",
+              "units"
+            ]
+          },
+          {
+            "notation": "H(L4,M1;3)",
+            "order": 3,
+            "pair_id": "freshness-claim",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "method",
+              "registered_evidence"
+            ]
+          },
+          {
+            "notation": "H(L4,M1;4)",
+            "order": 4,
+            "pair_id": "freshness-claim",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "scope_id",
+              "location",
+              "definition_version",
+              "time"
+            ]
+          },
+          {
+            "notation": "H(L4,M1;5)",
+            "order": 5,
+            "pair_id": "freshness-claim",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "dependence"
+            ]
+          }
+        ]
+      },
+      {
+        "pair_id": "qualified-coverage",
+        "left_id": "L2-coverage-bound",
+        "right_id": "M4-coverage",
+        "left_side": "L",
+        "right_side": "M",
+        "language_order": 2,
+        "mathematics_order": 4,
+        "hinge_orders": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "status": "ALIGNED",
+        "comparable": true,
+        "checks": [
+          {
+            "name": "entity",
+            "order": 1,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "concept",
+            "order": 1,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "scope_id",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "population",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "denominator",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "granularity",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "location",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "definition_version",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "units",
+            "order": 2,
+            "state": "PASS",
+            "reason": "dimensions match; exact registered conversion applied",
+            "required": true
+          },
+          {
+            "name": "time",
+            "order": 4,
+            "state": "PASS",
+            "reason": "same UTC interval; unequal aggregate windows are not interchangeable",
+            "required": true
+          },
+          {
+            "name": "numeric_meaning",
+            "order": 1,
+            "state": "PASS",
+            "reason": "both quantities represented as explicit admissible numeric sets",
+            "required": true
+          },
+          {
+            "name": "method",
+            "order": 3,
+            "state": "UNKNOWN",
+            "reason": "method metadata incomplete",
+            "required": false
+          },
+          {
+            "name": "dependence",
+            "order": 5,
+            "state": "PASS",
+            "reason": "no declared shared roots detected; independence not proven",
+            "required": false
+          },
+          {
+            "name": "registered_evidence",
+            "order": 3,
+            "state": "PASS",
+            "reason": "source IDs registered; factual accuracy/authenticity not established",
+            "required": true
+          }
+        ],
+        "discrepancy": {
+          "expected_normalized": {
+            "lower": "0.5",
+            "upper": null,
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "observed_normalized": {
+            "lower": "0.6",
+            "upper": "0.6",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "signed_delta": null,
+          "boundary_gap": "0",
+          "normalized_magnitude": null,
+          "normalization_scale": null,
+          "relation": "OBSERVATION_WITHIN_EXPECTATION",
+          "raw_conflict": false,
+          "interpretation": "comparison of representations; not an adjudication of physical truth",
+          "original_expected": {
+            "lower": "50",
+            "upper": null,
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "original_observed": {
+            "lower": "60",
+            "upper": "60",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "left_unit": "%",
+          "right_unit": "%",
+          "signed_delta_left_unit": null,
+          "boundary_gap_left_unit": "0",
+          "dimension": "ratio",
+          "unit_note": "values/deltas in the registered base unit; raw source values retained in nodes"
+        },
+        "support": {
+          "left": {
+            "strength": 1.0,
+            "known_bottleneck": 1.0,
+            "coverage": 1.0,
+            "known_factors": 1,
+            "expected_factors": 1,
+            "dependency_groups": 1,
+            "aggregation": "minimum/bottleneck",
+            "factors": [
+              {
+                "name": "representation_support",
+                "value": 1.0,
+                "basis": "synthetic demonstration coefficient; not an empirical probability",
+                "order": 2,
+                "source_id": null,
+                "dependency_group": null,
+                "kind": "assumed"
+              }
+            ]
+          },
+          "right": {
+            "strength": 0.98,
+            "known_bottleneck": 0.98,
+            "coverage": 1.0,
+            "known_factors": 1,
+            "expected_factors": 1,
+            "dependency_groups": 1,
+            "aggregation": "minimum/bottleneck",
+            "factors": [
+              {
+                "name": "representation_support",
+                "value": 0.98,
+                "basis": "synthetic demonstration coefficient; not an empirical probability",
+                "order": 2,
+                "source_id": null,
+                "dependency_group": null,
+                "kind": "assumed"
+              }
+            ]
+          },
+          "alignment_strength": 1.0,
+          "alignment_basis": "fixture-provided pairing, not learned confidence",
+          "joint_strength": 0.98,
+          "aggregation": "minimum",
+          "product_basis": null,
+          "interpretation": "declared support indicator, not probability of truth or operational risk",
+          "missing_dependencies": false,
+          "declared_higher_order_hinge_strengths": [],
+          "registered_evidence": {
+            "left": {
+              "roots": [
+                "generated-summary"
+              ],
+              "missing": [],
+              "unhashed": [
+                "generated-summary"
+              ],
+              "complete": true,
+              "meaning": "registered source closure, not source accuracy or authenticity"
+            },
+            "right": {
+              "roots": [
+                "synthetic-source"
+              ],
+              "missing": [],
+              "unhashed": [
+                "synthetic-source"
+              ],
+              "complete": true,
+              "meaning": "registered source closure, not source accuracy or authenticity"
+            },
+            "shared_roots": []
+          }
+        },
+        "coverage": {
+          "alignment_metadata": 1.0,
+          "left_support": 1.0,
+          "right_support": 1.0,
+          "comparison_performed": true
+        },
+        "raw_collision_score": 0.0,
+        "supported_collision_score": 0.0,
+        "dependency_warnings": [],
+        "input_fingerprint": "16c5cbbeebf03df43a0b7663da4eeceb88ce60a2f2010eb616f48e25a64f0f32",
+        "weight": 1.0,
+        "hinge_assessments": [
+          {
+            "notation": "H(L2,M4;1)",
+            "order": 1,
+            "pair_id": "qualified-coverage",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "entity",
+              "concept",
+              "numeric_meaning"
+            ]
+          },
+          {
+            "notation": "H(L2,M4;2)",
+            "order": 2,
+            "pair_id": "qualified-coverage",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "population",
+              "denominator",
+              "granularity",
+              "units"
+            ]
+          },
+          {
+            "notation": "H(L2,M4;3)",
+            "order": 3,
+            "pair_id": "qualified-coverage",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "method",
+              "registered_evidence"
+            ]
+          },
+          {
+            "notation": "H(L2,M4;4)",
+            "order": 4,
+            "pair_id": "qualified-coverage",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "scope_id",
+              "location",
+              "definition_version",
+              "time"
+            ]
+          },
+          {
+            "notation": "H(L2,M4;5)",
+            "order": 5,
+            "pair_id": "qualified-coverage",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "dependence"
+            ]
+          }
+        ]
+      },
+      {
+        "pair_id": "support-case-count",
+        "left_id": "L3-trial-count",
+        "right_id": "M3-trial-count",
+        "left_side": "L",
+        "right_side": "M",
+        "language_order": 3,
+        "mathematics_order": 3,
+        "hinge_orders": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "status": "ALIGNED",
+        "comparable": true,
+        "checks": [
+          {
+            "name": "entity",
+            "order": 1,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "concept",
+            "order": 1,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "scope_id",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "population",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "denominator",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "granularity",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "location",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "definition_version",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "units",
+            "order": 2,
+            "state": "PASS",
+            "reason": "dimensions match; exact registered conversion applied",
+            "required": true
+          },
+          {
+            "name": "time",
+            "order": 4,
+            "state": "PASS",
+            "reason": "same UTC interval; unequal aggregate windows are not interchangeable",
+            "required": true
+          },
+          {
+            "name": "numeric_meaning",
+            "order": 1,
+            "state": "PASS",
+            "reason": "both quantities represented as explicit admissible numeric sets",
+            "required": true
+          },
+          {
+            "name": "method",
+            "order": 3,
+            "state": "UNKNOWN",
+            "reason": "method metadata incomplete",
+            "required": false
+          },
+          {
+            "name": "dependence",
+            "order": 5,
+            "state": "UNKNOWN",
+            "reason": "shared source roots: synthetic-source; registered evidence shared roots: synthetic-source",
+            "required": false
+          },
+          {
+            "name": "registered_evidence",
+            "order": 3,
+            "state": "PASS",
+            "reason": "source IDs registered; factual accuracy/authenticity not established; shared evidence roots: synthetic-source",
+            "required": true
+          }
+        ],
+        "discrepancy": {
+          "expected_normalized": {
+            "lower": "100",
+            "upper": "100",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "observed_normalized": {
+            "lower": "100",
+            "upper": "100",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "signed_delta": "0",
+          "boundary_gap": "0",
+          "normalized_magnitude": null,
+          "normalization_scale": null,
+          "relation": "OBSERVATION_WITHIN_EXPECTATION",
+          "raw_conflict": false,
+          "interpretation": "comparison of representations; not an adjudication of physical truth",
+          "original_expected": {
+            "lower": "100",
+            "upper": "100",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "original_observed": {
+            "lower": "100",
+            "upper": "100",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "left_unit": "count",
+          "right_unit": "count",
+          "signed_delta_left_unit": "0",
+          "boundary_gap_left_unit": "0",
+          "dimension": "count",
+          "unit_note": "values/deltas in the registered base unit; raw source values retained in nodes"
+        },
+        "support": {
+          "left": {
+            "strength": 1.0,
+            "known_bottleneck": 1.0,
+            "coverage": 1.0,
+            "known_factors": 1,
+            "expected_factors": 1,
+            "dependency_groups": 1,
+            "aggregation": "minimum/bottleneck",
+            "factors": [
+              {
+                "name": "representation_support",
+                "value": 1.0,
+                "basis": "synthetic demonstration coefficient; not an empirical probability",
+                "order": 2,
+                "source_id": null,
+                "dependency_group": null,
+                "kind": "assumed"
+              }
+            ]
+          },
+          "right": {
+            "strength": 1.0,
+            "known_bottleneck": 1.0,
+            "coverage": 1.0,
+            "known_factors": 1,
+            "expected_factors": 1,
+            "dependency_groups": 1,
+            "aggregation": "minimum/bottleneck",
+            "factors": [
+              {
+                "name": "representation_support",
+                "value": 1.0,
+                "basis": "synthetic demonstration coefficient; not an empirical probability",
+                "order": 2,
+                "source_id": null,
+                "dependency_group": null,
+                "kind": "assumed"
+              }
+            ]
+          },
+          "alignment_strength": 1.0,
+          "alignment_basis": "fixture-provided pairing, not learned confidence",
+          "joint_strength": 1.0,
+          "aggregation": "minimum",
+          "product_basis": null,
+          "interpretation": "declared support indicator, not probability of truth or operational risk",
+          "missing_dependencies": false,
+          "declared_higher_order_hinge_strengths": [],
+          "registered_evidence": {
+            "left": {
+              "roots": [
+                "synthetic-source"
+              ],
+              "missing": [],
+              "unhashed": [
+                "synthetic-source"
+              ],
+              "complete": true,
+              "meaning": "registered source closure, not source accuracy or authenticity"
+            },
+            "right": {
+              "roots": [
+                "synthetic-source"
+              ],
+              "missing": [],
+              "unhashed": [
+                "synthetic-source"
+              ],
+              "complete": true,
+              "meaning": "registered source closure, not source accuracy or authenticity"
+            },
+            "shared_roots": [
+              "synthetic-source"
+            ]
+          }
+        },
+        "coverage": {
+          "alignment_metadata": 1.0,
+          "left_support": 1.0,
+          "right_support": 1.0,
+          "comparison_performed": true
+        },
+        "raw_collision_score": 0.0,
+        "supported_collision_score": 0.0,
+        "dependency_warnings": [
+          "shared source roots: synthetic-source",
+          "registered evidence shared roots: synthetic-source"
+        ],
+        "input_fingerprint": "744e8a8fd8bdc412fe9f04072977a785a84cd73ad5e498dfd8040647ee3ef1d8",
+        "weight": 1.0,
+        "hinge_assessments": [
+          {
+            "notation": "H(L3,M3;1)",
+            "order": 1,
+            "pair_id": "support-case-count",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "entity",
+              "concept",
+              "numeric_meaning"
+            ]
+          },
+          {
+            "notation": "H(L3,M3;2)",
+            "order": 2,
+            "pair_id": "support-case-count",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "population",
+              "denominator",
+              "granularity",
+              "units"
+            ]
+          },
+          {
+            "notation": "H(L3,M3;3)",
+            "order": 3,
+            "pair_id": "support-case-count",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "method",
+              "registered_evidence"
+            ]
+          },
+          {
+            "notation": "H(L3,M3;4)",
+            "order": 4,
+            "pair_id": "support-case-count",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "scope_id",
+              "location",
+              "definition_version",
+              "time"
+            ]
+          },
+          {
+            "notation": "H(L3,M3;5)",
+            "order": 5,
+            "pair_id": "support-case-count",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "dependence"
+            ]
+          }
+        ]
+      },
+      {
+        "pair_id": "uncertain-count",
+        "left_id": "L1-detections",
+        "right_id": "M2-count-interval",
+        "left_side": "L",
+        "right_side": "M",
+        "language_order": 1,
+        "mathematics_order": 2,
+        "hinge_orders": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "status": "PARTIAL",
+        "comparable": true,
+        "checks": [
+          {
+            "name": "entity",
+            "order": 1,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "concept",
+            "order": 1,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "scope_id",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "population",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "denominator",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "granularity",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "location",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "definition_version",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "units",
+            "order": 2,
+            "state": "PASS",
+            "reason": "dimensions match; exact registered conversion applied",
+            "required": true
+          },
+          {
+            "name": "time",
+            "order": 4,
+            "state": "PASS",
+            "reason": "same UTC interval; unequal aggregate windows are not interchangeable",
+            "required": true
+          },
+          {
+            "name": "numeric_meaning",
+            "order": 1,
+            "state": "PASS",
+            "reason": "both quantities represented as explicit admissible numeric sets",
+            "required": true
+          },
+          {
+            "name": "method",
+            "order": 3,
+            "state": "UNKNOWN",
+            "reason": "method metadata incomplete",
+            "required": false
+          },
+          {
+            "name": "dependence",
+            "order": 5,
+            "state": "PASS",
+            "reason": "no declared shared roots detected; independence not proven",
+            "required": false
+          },
+          {
+            "name": "registered_evidence",
+            "order": 3,
+            "state": "PASS",
+            "reason": "source IDs registered; factual accuracy/authenticity not established",
+            "required": true
+          }
+        ],
+        "discrepancy": {
+          "expected_normalized": {
+            "lower": "0",
+            "upper": "0",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "observed_normalized": {
+            "lower": "0",
+            "upper": "1",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "signed_delta": null,
+          "boundary_gap": "0",
+          "normalized_magnitude": null,
+          "normalization_scale": null,
+          "relation": "OVERLAP_NOT_CONTAINED",
+          "raw_conflict": false,
+          "interpretation": "comparison of representations; not an adjudication of physical truth",
+          "original_expected": {
+            "lower": "0",
+            "upper": "0",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "original_observed": {
+            "lower": "0",
+            "upper": "1",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "left_unit": "count",
+          "right_unit": "count",
+          "signed_delta_left_unit": null,
+          "boundary_gap_left_unit": "0",
+          "dimension": "count",
+          "unit_note": "values/deltas in the registered base unit; raw source values retained in nodes"
+        },
+        "support": {
+          "left": {
+            "strength": 0.99,
+            "known_bottleneck": 0.99,
+            "coverage": 1.0,
+            "known_factors": 1,
+            "expected_factors": 1,
+            "dependency_groups": 1,
+            "aggregation": "minimum/bottleneck",
+            "factors": [
+              {
+                "name": "representation_support",
+                "value": 0.99,
+                "basis": "synthetic demonstration coefficient; not an empirical probability",
+                "order": 2,
+                "source_id": null,
+                "dependency_group": null,
+                "kind": "assumed"
+              }
+            ]
+          },
+          "right": {
+            "strength": 0.42,
+            "known_bottleneck": 0.42,
+            "coverage": 1.0,
+            "known_factors": 1,
+            "expected_factors": 1,
+            "dependency_groups": 1,
+            "aggregation": "minimum/bottleneck",
+            "factors": [
+              {
+                "name": "representation_support",
+                "value": 0.42,
+                "basis": "synthetic demonstration coefficient; not an empirical probability",
+                "order": 2,
+                "source_id": null,
+                "dependency_group": null,
+                "kind": "assumed"
+              }
+            ]
+          },
+          "alignment_strength": 1.0,
+          "alignment_basis": "fixture-provided pairing, not learned confidence",
+          "joint_strength": 0.42,
+          "aggregation": "minimum",
+          "product_basis": null,
+          "interpretation": "declared support indicator, not probability of truth or operational risk",
+          "missing_dependencies": false,
+          "declared_higher_order_hinge_strengths": [],
+          "registered_evidence": {
+            "left": {
+              "roots": [
+                "generated-summary"
+              ],
+              "missing": [],
+              "unhashed": [
+                "generated-summary"
+              ],
+              "complete": true,
+              "meaning": "registered source closure, not source accuracy or authenticity"
+            },
+            "right": {
+              "roots": [
+                "synthetic-source"
+              ],
+              "missing": [],
+              "unhashed": [
+                "synthetic-source"
+              ],
+              "complete": true,
+              "meaning": "registered source closure, not source accuracy or authenticity"
+            },
+            "shared_roots": []
+          }
+        },
+        "coverage": {
+          "alignment_metadata": 1.0,
+          "left_support": 1.0,
+          "right_support": 1.0,
+          "comparison_performed": true
+        },
+        "raw_collision_score": null,
+        "supported_collision_score": null,
+        "dependency_warnings": [],
+        "input_fingerprint": "edf24b6e3ff9764a638acb55df55ac7c4da922d04987489c4e56191005429e5c",
+        "weight": 1.0,
+        "hinge_assessments": [
+          {
+            "notation": "H(L1,M2;1)",
+            "order": 1,
+            "pair_id": "uncertain-count",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "entity",
+              "concept",
+              "numeric_meaning"
+            ]
+          },
+          {
+            "notation": "H(L1,M2;2)",
+            "order": 2,
+            "pair_id": "uncertain-count",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "population",
+              "denominator",
+              "granularity",
+              "units"
+            ]
+          },
+          {
+            "notation": "H(L1,M2;3)",
+            "order": 3,
+            "pair_id": "uncertain-count",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "method",
+              "registered_evidence"
+            ]
+          },
+          {
+            "notation": "H(L1,M2;4)",
+            "order": 4,
+            "pair_id": "uncertain-count",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "scope_id",
+              "location",
+              "definition_version",
+              "time"
+            ]
+          },
+          {
+            "notation": "H(L1,M2;5)",
+            "order": 5,
+            "pair_id": "uncertain-count",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "dependence"
+            ]
+          }
+        ]
+      },
+      {
+        "pair_id": "unsupported-absence",
+        "left_id": "L1-presence",
+        "right_id": "M1-detections",
+        "left_side": "L",
+        "right_side": "M",
+        "language_order": 1,
+        "mathematics_order": 1,
+        "hinge_orders": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "status": "NOT_COMPARABLE",
+        "comparable": false,
+        "checks": [
+          {
+            "name": "entity",
+            "order": 1,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "concept",
+            "order": 1,
+            "state": "FAIL",
+            "reason": "declared identities or scopes differ; not a numeric contradiction",
+            "required": true
+          },
+          {
+            "name": "scope_id",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "population",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "denominator",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "granularity",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "location",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "definition_version",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "units",
+            "order": 2,
+            "state": "PASS",
+            "reason": "dimensions match; exact registered conversion applied",
+            "required": true
+          },
+          {
+            "name": "time",
+            "order": 4,
+            "state": "PASS",
+            "reason": "same UTC interval; unequal aggregate windows are not interchangeable",
+            "required": true
+          },
+          {
+            "name": "numeric_meaning",
+            "order": 1,
+            "state": "PASS",
+            "reason": "both quantities represented as explicit admissible numeric sets",
+            "required": true
+          },
+          {
+            "name": "method",
+            "order": 3,
+            "state": "UNKNOWN",
+            "reason": "method metadata incomplete",
+            "required": false
+          },
+          {
+            "name": "dependence",
+            "order": 5,
+            "state": "PASS",
+            "reason": "no declared shared roots detected; independence not proven",
+            "required": false
+          },
+          {
+            "name": "registered_evidence",
+            "order": 3,
+            "state": "PASS",
+            "reason": "source IDs registered; factual accuracy/authenticity not established",
+            "required": true
+          }
+        ],
+        "discrepancy": {
+          "relation": "NOT_EVALUATED",
+          "signed_delta": null,
+          "boundary_gap": null,
+          "normalized_magnitude": null,
+          "raw_conflict": null
+        },
+        "support": {
+          "left": {
+            "strength": 0.95,
+            "known_bottleneck": 0.95,
+            "coverage": 1.0,
+            "known_factors": 1,
+            "expected_factors": 1,
+            "dependency_groups": 1,
+            "aggregation": "minimum/bottleneck",
+            "factors": [
+              {
+                "name": "representation_support",
+                "value": 0.95,
+                "basis": "synthetic demonstration coefficient; not an empirical probability",
+                "order": 2,
+                "source_id": null,
+                "dependency_group": null,
+                "kind": "assumed"
+              }
+            ]
+          },
+          "right": {
+            "strength": 0.99,
+            "known_bottleneck": 0.99,
+            "coverage": 1.0,
+            "known_factors": 1,
+            "expected_factors": 1,
+            "dependency_groups": 1,
+            "aggregation": "minimum/bottleneck",
+            "factors": [
+              {
+                "name": "representation_support",
+                "value": 0.99,
+                "basis": "synthetic demonstration coefficient; not an empirical probability",
+                "order": 2,
+                "source_id": null,
+                "dependency_group": null,
+                "kind": "assumed"
+              }
+            ]
+          },
+          "alignment_strength": 1.0,
+          "alignment_basis": "fixture-provided pairing, not learned confidence",
+          "joint_strength": 0.95,
+          "aggregation": "minimum",
+          "product_basis": null,
+          "interpretation": "declared support indicator, not probability of truth or operational risk",
+          "missing_dependencies": false,
+          "declared_higher_order_hinge_strengths": [],
+          "registered_evidence": {
+            "left": {
+              "roots": [
+                "generated-summary"
+              ],
+              "missing": [],
+              "unhashed": [
+                "generated-summary"
+              ],
+              "complete": true,
+              "meaning": "registered source closure, not source accuracy or authenticity"
+            },
+            "right": {
+              "roots": [
+                "synthetic-source"
+              ],
+              "missing": [],
+              "unhashed": [
+                "synthetic-source"
+              ],
+              "complete": true,
+              "meaning": "registered source closure, not source accuracy or authenticity"
+            },
+            "shared_roots": []
+          }
+        },
+        "coverage": {
+          "alignment_metadata": 1.0,
+          "left_support": 1.0,
+          "right_support": 1.0,
+          "comparison_performed": false
+        },
+        "raw_collision_score": null,
+        "supported_collision_score": null,
+        "dependency_warnings": [],
+        "input_fingerprint": "71d12856efff9a6692477d603599dea6c70e18079200f45cbd7b1a056d9d3df8",
+        "weight": 1.0,
+        "hinge_assessments": [
+          {
+            "notation": "H(L1,M1;1)",
+            "order": 1,
+            "pair_id": "unsupported-absence",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "entity",
+              "concept",
+              "numeric_meaning"
+            ]
+          },
+          {
+            "notation": "H(L1,M1;2)",
+            "order": 2,
+            "pair_id": "unsupported-absence",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "population",
+              "denominator",
+              "granularity",
+              "units"
+            ]
+          },
+          {
+            "notation": "H(L1,M1;3)",
+            "order": 3,
+            "pair_id": "unsupported-absence",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "method",
+              "registered_evidence"
+            ]
+          },
+          {
+            "notation": "H(L1,M1;4)",
+            "order": 4,
+            "pair_id": "unsupported-absence",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "scope_id",
+              "location",
+              "definition_version",
+              "time"
+            ]
+          },
+          {
+            "notation": "H(L1,M1;5)",
+            "order": 5,
+            "pair_id": "unsupported-absence",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "dependence"
+            ]
+          }
+        ]
+      },
+      {
+        "pair_id": "zero-preserved",
+        "left_id": "L1-detections",
+        "right_id": "M1-detections",
+        "left_side": "L",
+        "right_side": "M",
+        "language_order": 1,
+        "mathematics_order": 1,
+        "hinge_orders": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "status": "ALIGNED",
+        "comparable": true,
+        "checks": [
+          {
+            "name": "entity",
+            "order": 1,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "concept",
+            "order": 1,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "scope_id",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "population",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "denominator",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "granularity",
+            "order": 2,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "location",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "definition_version",
+            "order": 4,
+            "state": "PASS",
+            "reason": "exact match in supplied representations",
+            "required": true
+          },
+          {
+            "name": "units",
+            "order": 2,
+            "state": "PASS",
+            "reason": "dimensions match; exact registered conversion applied",
+            "required": true
+          },
+          {
+            "name": "time",
+            "order": 4,
+            "state": "PASS",
+            "reason": "same UTC interval; unequal aggregate windows are not interchangeable",
+            "required": true
+          },
+          {
+            "name": "numeric_meaning",
+            "order": 1,
+            "state": "PASS",
+            "reason": "both quantities represented as explicit admissible numeric sets",
+            "required": true
+          },
+          {
+            "name": "method",
+            "order": 3,
+            "state": "UNKNOWN",
+            "reason": "method metadata incomplete",
+            "required": false
+          },
+          {
+            "name": "dependence",
+            "order": 5,
+            "state": "PASS",
+            "reason": "no declared shared roots detected; independence not proven",
+            "required": false
+          },
+          {
+            "name": "registered_evidence",
+            "order": 3,
+            "state": "PASS",
+            "reason": "source IDs registered; factual accuracy/authenticity not established",
+            "required": true
+          }
+        ],
+        "discrepancy": {
+          "expected_normalized": {
+            "lower": "0",
+            "upper": "0",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "observed_normalized": {
+            "lower": "0",
+            "upper": "0",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "signed_delta": "0",
+          "boundary_gap": "0",
+          "normalized_magnitude": null,
+          "normalization_scale": null,
+          "relation": "OBSERVATION_WITHIN_EXPECTATION",
+          "raw_conflict": false,
+          "interpretation": "comparison of representations; not an adjudication of physical truth",
+          "original_expected": {
+            "lower": "0",
+            "upper": "0",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "original_observed": {
+            "lower": "0",
+            "upper": "0",
+            "lower_inclusive": true,
+            "upper_inclusive": true
+          },
+          "left_unit": "count",
+          "right_unit": "count",
+          "signed_delta_left_unit": "0",
+          "boundary_gap_left_unit": "0",
+          "dimension": "count",
+          "unit_note": "values/deltas in the registered base unit; raw source values retained in nodes"
+        },
+        "support": {
+          "left": {
+            "strength": 0.99,
+            "known_bottleneck": 0.99,
+            "coverage": 1.0,
+            "known_factors": 1,
+            "expected_factors": 1,
+            "dependency_groups": 1,
+            "aggregation": "minimum/bottleneck",
+            "factors": [
+              {
+                "name": "representation_support",
+                "value": 0.99,
+                "basis": "synthetic demonstration coefficient; not an empirical probability",
+                "order": 2,
+                "source_id": null,
+                "dependency_group": null,
+                "kind": "assumed"
+              }
+            ]
+          },
+          "right": {
+            "strength": 0.99,
+            "known_bottleneck": 0.99,
+            "coverage": 1.0,
+            "known_factors": 1,
+            "expected_factors": 1,
+            "dependency_groups": 1,
+            "aggregation": "minimum/bottleneck",
+            "factors": [
+              {
+                "name": "representation_support",
+                "value": 0.99,
+                "basis": "synthetic demonstration coefficient; not an empirical probability",
+                "order": 2,
+                "source_id": null,
+                "dependency_group": null,
+                "kind": "assumed"
+              }
+            ]
+          },
+          "alignment_strength": 1.0,
+          "alignment_basis": "fixture-provided pairing, not learned confidence",
+          "joint_strength": 0.99,
+          "aggregation": "minimum",
+          "product_basis": null,
+          "interpretation": "declared support indicator, not probability of truth or operational risk",
+          "missing_dependencies": false,
+          "declared_higher_order_hinge_strengths": [],
+          "registered_evidence": {
+            "left": {
+              "roots": [
+                "generated-summary"
+              ],
+              "missing": [],
+              "unhashed": [
+                "generated-summary"
+              ],
+              "complete": true,
+              "meaning": "registered source closure, not source accuracy or authenticity"
+            },
+            "right": {
+              "roots": [
+                "synthetic-source"
+              ],
+              "missing": [],
+              "unhashed": [
+                "synthetic-source"
+              ],
+              "complete": true,
+              "meaning": "registered source closure, not source accuracy or authenticity"
+            },
+            "shared_roots": []
+          }
+        },
+        "coverage": {
+          "alignment_metadata": 1.0,
+          "left_support": 1.0,
+          "right_support": 1.0,
+          "comparison_performed": true
+        },
+        "raw_collision_score": 0.0,
+        "supported_collision_score": 0.0,
+        "dependency_warnings": [],
+        "input_fingerprint": "17456b23683d0271b3684d1bf3efd21f06c13bbd511b523d7d45ccde8878a83e",
+        "weight": 1.0,
+        "hinge_assessments": [
+          {
+            "notation": "H(L1,M1;1)",
+            "order": 1,
+            "pair_id": "zero-preserved",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "entity",
+              "concept",
+              "numeric_meaning"
+            ]
+          },
+          {
+            "notation": "H(L1,M1;2)",
+            "order": 2,
+            "pair_id": "zero-preserved",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "population",
+              "denominator",
+              "granularity",
+              "units"
+            ]
+          },
+          {
+            "notation": "H(L1,M1;3)",
+            "order": 3,
+            "pair_id": "zero-preserved",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "method",
+              "registered_evidence"
+            ]
+          },
+          {
+            "notation": "H(L1,M1;4)",
+            "order": 4,
+            "pair_id": "zero-preserved",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "scope_id",
+              "location",
+              "definition_version",
+              "time"
+            ]
+          },
+          {
+            "notation": "H(L1,M1;5)",
+            "order": 5,
+            "pair_id": "zero-preserved",
+            "pd": null,
+            "support": null,
+            "note": "no extra higher-order coefficient asserted",
+            "checks": [
+              "dependence"
+            ]
+          }
+        ]
+      }
+    ],
+    "matrix": {
+      "rows": 5,
+      "columns": 5,
+      "possible_order_slots": 25,
+      "evaluated_order_slots": 8,
+      "cells": [
+        {
+          "language_order": 1,
+          "mathematics_order": 1,
+          "pair_ids": [
+            "unsupported-absence",
+            "zero-preserved"
+          ],
+          "status": "UNRESOLVED",
+          "max_raw_collision_score": 0.0,
+          "max_supported_collision_score": 0.0
+        },
+        {
+          "language_order": 1,
+          "mathematics_order": 2,
+          "pair_ids": [
+            "uncertain-count"
+          ],
+          "status": "PARTIAL",
+          "max_raw_collision_score": null,
+          "max_supported_collision_score": null
+        },
+        {
+          "language_order": 1,
+          "mathematics_order": 3,
+          "pair_ids": [],
+          "status": "UNPAIRED",
+          "max_raw_collision_score": null,
+          "max_supported_collision_score": null
+        },
+        {
+          "language_order": 1,
+          "mathematics_order": 4,
+          "pair_ids": [
+            "coverage-overclaim"
+          ],
+          "status": "CONFLICT",
+          "max_raw_collision_score": 100.0,
+          "max_supported_collision_score": 98.0
+        },
+        {
+          "language_order": 1,
+          "mathematics_order": 5,
+          "pair_ids": [],
+          "status": "UNPAIRED",
+          "max_raw_collision_score": null,
+          "max_supported_collision_score": null
+        },
+        {
+          "language_order": 2,
+          "mathematics_order": 1,
+          "pair_ids": [],
+          "status": "UNPAIRED",
+          "max_raw_collision_score": null,
+          "max_supported_collision_score": null
+        },
+        {
+          "language_order": 2,
+          "mathematics_order": 2,
+          "pair_ids": [],
+          "status": "UNPAIRED",
+          "max_raw_collision_score": null,
+          "max_supported_collision_score": null
+        },
+        {
+          "language_order": 2,
+          "mathematics_order": 3,
+          "pair_ids": [
+            "confidence-overclaim"
+          ],
+          "status": "CONFLICT",
+          "max_raw_collision_score": 100.0,
+          "max_supported_collision_score": 90.0
+        },
+        {
+          "language_order": 2,
+          "mathematics_order": 4,
+          "pair_ids": [
+            "qualified-coverage"
+          ],
+          "status": "ALIGNED",
+          "max_raw_collision_score": 0.0,
+          "max_supported_collision_score": 0.0
+        },
+        {
+          "language_order": 2,
+          "mathematics_order": 5,
+          "pair_ids": [],
+          "status": "UNPAIRED",
+          "max_raw_collision_score": null,
+          "max_supported_collision_score": null
+        },
+        {
+          "language_order": 3,
+          "mathematics_order": 1,
+          "pair_ids": [],
+          "status": "UNPAIRED",
+          "max_raw_collision_score": null,
+          "max_supported_collision_score": null
+        },
+        {
+          "language_order": 3,
+          "mathematics_order": 2,
+          "pair_ids": [],
+          "status": "UNPAIRED",
+          "max_raw_collision_score": null,
+          "max_supported_collision_score": null
+        },
+        {
+          "language_order": 3,
+          "mathematics_order": 3,
+          "pair_ids": [
+            "support-case-count"
+          ],
+          "status": "ALIGNED",
+          "max_raw_collision_score": 0.0,
+          "max_supported_collision_score": 0.0
+        },
+        {
+          "language_order": 3,
+          "mathematics_order": 4,
+          "pair_ids": [],
+          "status": "UNPAIRED",
+          "max_raw_collision_score": null,
+          "max_supported_collision_score": null
+        },
+        {
+          "language_order": 3,
+          "mathematics_order": 5,
+          "pair_ids": [],
+          "status": "UNPAIRED",
+          "max_raw_collision_score": null,
+          "max_supported_collision_score": null
+        },
+        {
+          "language_order": 4,
+          "mathematics_order": 1,
+          "pair_ids": [
+            "freshness-claim"
+          ],
+          "status": "CONFLICT",
+          "max_raw_collision_score": 100.0,
+          "max_supported_collision_score": 100.0
+        },
+        {
+          "language_order": 4,
+          "mathematics_order": 2,
+          "pair_ids": [],
+          "status": "UNPAIRED",
+          "max_raw_collision_score": null,
+          "max_supported_collision_score": null
+        },
+        {
+          "language_order": 4,
+          "mathematics_order": 3,
+          "pair_ids": [],
+          "status": "UNPAIRED",
+          "max_raw_collision_score": null,
+          "max_supported_collision_score": null
+        },
+        {
+          "language_order": 4,
+          "mathematics_order": 4,
+          "pair_ids": [],
+          "status": "UNPAIRED",
+          "max_raw_collision_score": null,
+          "max_supported_collision_score": null
+        },
+        {
+          "language_order": 4,
+          "mathematics_order": 5,
+          "pair_ids": [],
+          "status": "UNPAIRED",
+          "max_raw_collision_score": null,
+          "max_supported_collision_score": null
+        },
+        {
+          "language_order": 5,
+          "mathematics_order": 1,
+          "pair_ids": [],
+          "status": "UNPAIRED",
+          "max_raw_collision_score": null,
+          "max_supported_collision_score": null
+        },
+        {
+          "language_order": 5,
+          "mathematics_order": 2,
+          "pair_ids": [],
+          "status": "UNPAIRED",
+          "max_raw_collision_score": null,
+          "max_supported_collision_score": null
+        },
+        {
+          "language_order": 5,
+          "mathematics_order": 3,
+          "pair_ids": [],
+          "status": "UNPAIRED",
+          "max_raw_collision_score": null,
+          "max_supported_collision_score": null
+        },
+        {
+          "language_order": 5,
+          "mathematics_order": 4,
+          "pair_ids": [],
+          "status": "UNPAIRED",
+          "max_raw_collision_score": null,
+          "max_supported_collision_score": null
+        },
+        {
+          "language_order": 5,
+          "mathematics_order": 5,
+          "pair_ids": [
+            "dependence-overclaim"
+          ],
+          "status": "CONFLICT",
+          "max_raw_collision_score": 100.0,
+          "max_supported_collision_score": 100.0
+        }
+      ]
+    },
+    "summary": {
+      "status": "CONFLICT",
+      "selected_pairs": 9,
+      "status_counts": {
+        "ALIGNED": 3,
+        "PARTIAL": 1,
+        "CONFLICT": 4,
+        "UNRESOLVED": 0,
+        "NOT_COMPARABLE": 1
+      },
+      "resolved_pair_coverage": 0.7777777777777778,
+      "support_assessed_pair_coverage": 0.7777777777777778,
+      "unpaired_material_nodes": [],
+      "max_raw_collision_score": 100.0,
+      "weighted_mean_raw_collision_score": 57.142857142857146,
+      "max_supported_collision_score": 100.0,
+      "has_gaps": true,
+      "note": "means use assessed selected pairs only; maxima, counts and gaps remain visible; no cross-unit delta sum"
+    },
+    "groups": {
+      "analysis-document": {
+        "kind": "document",
+        "members": [
+          "L1-coverage",
+          "L1-detections",
+          "L1-presence",
+          "L2-confidence",
+          "L2-coverage-bound",
+          "L3-trial-count",
+          "L4-age-limit",
+          "L5-sources",
+          "M1-age",
+          "M1-detections",
+          "M2-count-interval",
+          "M3-hit-rate",
+          "M3-trial-count",
+          "M4-coverage",
+          "M5-source-count"
+        ],
+        "pair_ids": [
+          "confidence-overclaim",
+          "coverage-overclaim",
+          "dependence-overclaim",
+          "freshness-claim",
+          "qualified-coverage",
+          "support-case-count",
+          "uncertain-count",
+          "unsupported-absence",
+          "zero-preserved"
+        ],
+        "summary": {
+          "status": "CONFLICT",
+          "selected_pairs": 9,
+          "status_counts": {
+            "ALIGNED": 3,
+            "PARTIAL": 1,
+            "CONFLICT": 4,
+            "UNRESOLVED": 0,
+            "NOT_COMPARABLE": 1
+          },
+          "resolved_pair_coverage": 0.7777777777777778,
+          "support_assessed_pair_coverage": 0.7777777777777778,
+          "unpaired_material_nodes": [],
+          "max_raw_collision_score": 100.0,
+          "weighted_mean_raw_collision_score": 57.142857142857146,
+          "max_supported_collision_score": 100.0,
+          "has_gaps": true,
+          "note": "means use assessed selected pairs only; maxima, counts and gaps remain visible; no cross-unit delta sum"
+        }
+      },
+      "codec-episode": {
+        "kind": "episode",
+        "members": [
+          "L1-coverage",
+          "L1-detections",
+          "L1-presence",
+          "M1-detections",
+          "M4-coverage"
+        ],
+        "pair_ids": [
+          "coverage-overclaim",
+          "unsupported-absence",
+          "zero-preserved"
+        ],
+        "summary": {
+          "status": "CONFLICT",
+          "selected_pairs": 3,
+          "status_counts": {
+            "ALIGNED": 1,
+            "PARTIAL": 0,
+            "CONFLICT": 1,
+            "UNRESOLVED": 0,
+            "NOT_COMPARABLE": 1
+          },
+          "resolved_pair_coverage": 0.6666666666666666,
+          "support_assessed_pair_coverage": 0.6666666666666666,
+          "unpaired_material_nodes": [],
+          "max_raw_collision_score": 100.0,
+          "weighted_mean_raw_collision_score": 50.0,
+          "max_supported_collision_score": 98.0,
+          "has_gaps": true,
+          "note": "means use assessed selected pairs only; maxima, counts and gaps remain visible; no cross-unit delta sum"
+        }
+      },
+      "corpus": {
+        "kind": "corpus",
+        "members": [
+          "L1-coverage",
+          "L1-detections",
+          "L1-presence",
+          "L2-confidence",
+          "L2-coverage-bound",
+          "L3-trial-count",
+          "L4-age-limit",
+          "L5-sources",
+          "M1-age",
+          "M1-detections",
+          "M2-count-interval",
+          "M3-hit-rate",
+          "M3-trial-count",
+          "M4-coverage",
+          "M5-source-count"
+        ],
+        "pair_ids": [
+          "confidence-overclaim",
+          "coverage-overclaim",
+          "dependence-overclaim",
+          "freshness-claim",
+          "qualified-coverage",
+          "support-case-count",
+          "uncertain-count",
+          "unsupported-absence",
+          "zero-preserved"
+        ],
+        "summary": {
+          "status": "CONFLICT",
+          "selected_pairs": 9,
+          "status_counts": {
+            "ALIGNED": 3,
+            "PARTIAL": 1,
+            "CONFLICT": 4,
+            "UNRESOLVED": 0,
+            "NOT_COMPARABLE": 1
+          },
+          "resolved_pair_coverage": 0.7777777777777778,
+          "support_assessed_pair_coverage": 0.7777777777777778,
+          "unpaired_material_nodes": [],
+          "max_raw_collision_score": 100.0,
+          "weighted_mean_raw_collision_score": 57.142857142857146,
+          "max_supported_collision_score": 100.0,
+          "has_gaps": true,
+          "note": "means use assessed selected pairs only; maxima, counts and gaps remain visible; no cross-unit delta sum"
+        }
+      }
+    },
+    "contract": {
+      "graph_structure_fingerprint": "ffc917b5455457de8f2344f003bd87b14b1414589c269907e80c8978633f1225",
+      "policy": {
+        "id": "strict-pair-v1",
+        "require_time": true,
+        "required_context": [
+          "scope_id",
+          "population",
+          "denominator",
+          "granularity"
+        ],
+        "require_same_method": false,
+        "max_age_seconds": null,
+        "as_of": null,
+        "support_aggregation": "minimum",
+        "product_basis": null
+      },
+      "units": [
+        {
+          "symbol": "%",
+          "dimension": "ratio",
+          "factor": "0.01",
+          "offset": "0"
+        },
+        {
+          "symbol": "C",
+          "dimension": "temperature",
+          "factor": "1",
+          "offset": "273.15"
+        },
+        {
+          "symbol": "EUR",
+          "dimension": "currency:EUR",
+          "factor": "1",
+          "offset": "0"
+        },
+        {
+          "symbol": "F",
+          "dimension": "temperature",
+          "factor": "5/9",
+          "offset": "45967/180"
+        },
+        {
+          "symbol": "K",
+          "dimension": "temperature",
+          "factor": "1",
+          "offset": "0"
+        },
+        {
+          "symbol": "USD",
+          "dimension": "currency:USD",
+          "factor": "1",
+          "offset": "0"
+        },
+        {
+          "symbol": "USD_cent",
+          "dimension": "currency:USD",
+          "factor": "0.01",
+          "offset": "0"
+        },
+        {
+          "symbol": "cm",
+          "dimension": "length",
+          "factor": "0.01",
+          "offset": "0"
+        },
+        {
+          "symbol": "count",
+          "dimension": "count",
+          "factor": "1",
+          "offset": "0"
+        },
+        {
+          "symbol": "day",
+          "dimension": "time",
+          "factor": "86400",
+          "offset": "0"
+        },
+        {
+          "symbol": "ft",
+          "dimension": "length",
+          "factor": "0.3048",
+          "offset": "0"
+        },
+        {
+          "symbol": "h",
+          "dimension": "time",
+          "factor": "3600",
+          "offset": "0"
+        },
+        {
+          "symbol": "in",
+          "dimension": "length",
+          "factor": "0.0254",
+          "offset": "0"
+        },
+        {
+          "symbol": "item",
+          "dimension": "count",
+          "factor": "1",
+          "offset": "0"
+        },
+        {
+          "symbol": "km",
+          "dimension": "length",
+          "factor": "1000",
+          "offset": "0"
+        },
+        {
+          "symbol": "km/h",
+          "dimension": "speed",
+          "factor": "5/18",
+          "offset": "0"
+        },
+        {
+          "symbol": "m",
+          "dimension": "length",
+          "factor": "1",
+          "offset": "0"
+        },
+        {
+          "symbol": "m/s",
+          "dimension": "speed",
+          "factor": "1",
+          "offset": "0"
+        },
+        {
+          "symbol": "min",
+          "dimension": "time",
+          "factor": "60",
+          "offset": "0"
+        },
+        {
+          "symbol": "mph",
+          "dimension": "speed",
+          "factor": "0.44704",
+          "offset": "0"
+        },
+        {
+          "symbol": "ratio",
+          "dimension": "ratio",
+          "factor": "1",
+          "offset": "0"
+        },
+        {
+          "symbol": "s",
+          "dimension": "time",
+          "factor": "1",
+          "offset": "0"
+        }
+      ],
+      "core_rule": "only explicit pairs are evaluated; orders are examination levels, not certainty rankings",
+      "score_semantics": "raw collision and support-weighted indication are separate; not truth, safety or permission"
+    },
+    "input_fingerprint": "68b2dfd93ece7a64f8f4f0edfbaaa2fa9f2ce89be9786d9ad95aab85b6b140fc"
+  },
+  "codec_reports": [
+    {
+      "transformation_id": "SUMMARY-TRANSFORM",
+      "status": "DISTORTION_OR_SUPPORT_GAP",
+      "findings": [
+        {
+          "kind": "VALUE_CHANGED",
+          "source_id": "M4-coverage",
+          "target_id": "L1-coverage",
+          "pair_id": "coverage-overclaim",
+          "reason": "paired source and target have disjoint numeric states"
+        },
+        {
+          "kind": "SUPPORT_INCREASE_REQUIRES_EVIDENCE",
+          "source_id": "M4-coverage",
+          "target_id": "L1-coverage",
+          "pair_id": "coverage-overclaim",
+          "reason": "higher target support is not established by rewording alone"
+        },
+        {
+          "kind": "SCOPE_OR_MEANING_CHANGED",
+          "source_id": "M1-detections",
+          "target_id": "L1-presence",
+          "pair_id": "unsupported-absence",
+          "reason": "not equivalent under the declared contract: concept"
+        },
+        {
+          "kind": "NUMERIC_CONTENT_PRESERVED",
+          "source_id": "M1-detections",
+          "target_id": "L1-detections",
+          "pair_id": "zero-preserved",
+          "reason": "same admissible numeric set after exact unit conversion"
+        }
+      ],
+      "material_source_coverage": 1.0,
+      "material_target_coverage": 1.0,
+      "graph_fingerprint": "68b2dfd93ece7a64f8f4f0edfbaaa2fa9f2ce89be9786d9ad95aab85b6b140fc",
+      "limitations": "Coverage is over declared material nodes, not all semantics in the original documents."
+    }
+  ],
+  "pairing": {
+    "mode": "manual",
+    "policy_id": null,
+    "candidates": [],
+    "selected_pair_ids": [],
+    "deferred_candidate_ids": [],
+    "unmatched_node_ids": [],
+    "input_graph_fingerprint": "ffc917b5455457de8f2344f003bd87b14b1414589c269907e80c8978633f1225",
+    "policy_fingerprint": "1d6d6ba4bbaabe92fd4f6f09b5f9646bb23affff3aebb5c65adaf832493f21b1"
+  },
+  "sources": [
+    {
+      "id": "generated-summary",
+      "sha256": null,
+      "basis": "synthetic fixture source reference, not real operational evidence",
+      "parents": [],
+      "locator": null,
+      "media_type": "application/octet-stream"
+    },
+    {
+      "id": "synthetic-source",
+      "sha256": null,
+      "basis": "synthetic fixture source reference, not real operational evidence",
+      "parents": [],
+      "locator": null,
+      "media_type": "application/octet-stream"
+    }
+  ],
+  "extraction": [],
+  "normalization": [],
+  "source_summaries": [],
+  "stage_trace": [
+    {
+      "stage": "INPUT",
+      "sources": 0,
+      "parsed_records": 0
+    },
+    {
+      "stage": "INGEST",
+      "evidence_sources": 2,
+      "warnings": 0
+    },
+    {
+      "stage": "REPRESENT",
+      "nodes": 15,
+      "unresolved_numeric_meanings": 0
+    },
+    {
+      "stage": "PAIR",
+      "candidates": 0,
+      "selected_pairs": 9,
+      "deferred": 0
+    },
+    {
+      "stage": "EVALUATE",
+      "evaluated_pairs": 9,
+      "status": "CONFLICT"
+    },
+    {
+      "stage": "AGGREGATE",
+      "groups": 3,
+      "codec_audits": 1
+    },
+    {
+      "stage": "OUTPUT",
+      "review_findings": 7,
+      "automatic_actions": 0
+    }
+  ],
+  "higher_order": {
+    "confidence-overclaim": {
+      "left": {
+        "strength": 0.95,
+        "aggregation": "minimum",
+        "basis": null,
+        "groups": {
+          "factor:representation_support": 0.95
+        },
+        "missing": [],
+        "factors": [
+          {
+            "name": "representation_support",
+            "value": 0.95,
+            "basis": "synthetic demonstration coefficient; not an empirical probability",
+            "order": 2,
+            "source_id": null,
+            "dependency_group": null,
+            "kind": "assumed"
+          }
+        ],
+        "factor_coverage": 1.0,
+        "interpretation": "support index; not probability, truth, safety, or a rescaled measurement"
+      },
+      "right": {
+        "strength": 0.9,
+        "aggregation": "minimum",
+        "basis": null,
+        "groups": {
+          "factor:representation_support": 0.9
+        },
+        "missing": [],
+        "factors": [
+          {
+            "name": "representation_support",
+            "value": 0.9,
+            "basis": "synthetic demonstration coefficient; not an empirical probability",
+            "order": 2,
+            "source_id": null,
+            "dependency_group": null,
+            "kind": "assumed"
+          }
+        ],
+        "factor_coverage": 1.0,
+        "interpretation": "support index; not probability, truth, safety, or a rescaled measurement"
+      },
+      "hinge": [],
+      "alignment_support": 1.0,
+      "joint_strength": 0.9,
+      "joint_aggregation": "minimum",
+      "dependency_adjusted": false,
+      "product_basis": null,
+      "raw_collision_score": 100.0,
+      "diagnostic_supported_score": 90.0,
+      "raw_value_unchanged": true,
+      "orders_are_not_certainty_rankings": true,
+      "dependency_warnings": []
+    },
+    "coverage-overclaim": {
+      "left": {
+        "strength": 1.0,
+        "aggregation": "minimum",
+        "basis": null,
+        "groups": {
+          "factor:representation_support": 1.0
+        },
+        "missing": [],
+        "factors": [
+          {
+            "name": "representation_support",
+            "value": 1.0,
+            "basis": "synthetic demonstration coefficient; not an empirical probability",
+            "order": 2,
+            "source_id": null,
+            "dependency_group": null,
+            "kind": "assumed"
+          }
+        ],
+        "factor_coverage": 1.0,
+        "interpretation": "support index; not probability, truth, safety, or a rescaled measurement"
+      },
+      "right": {
+        "strength": 0.98,
+        "aggregation": "minimum",
+        "basis": null,
+        "groups": {
+          "factor:representation_support": 0.98
+        },
+        "missing": [],
+        "factors": [
+          {
+            "name": "representation_support",
+            "value": 0.98,
+            "basis": "synthetic demonstration coefficient; not an empirical probability",
+            "order": 2,
+            "source_id": null,
+            "dependency_group": null,
+            "kind": "assumed"
+          }
+        ],
+        "factor_coverage": 1.0,
+        "interpretation": "support index; not probability, truth, safety, or a rescaled measurement"
+      },
+      "hinge": [],
+      "alignment_support": 1.0,
+      "joint_strength": 0.98,
+      "joint_aggregation": "minimum",
+      "dependency_adjusted": false,
+      "product_basis": null,
+      "raw_collision_score": 100.0,
+      "diagnostic_supported_score": 98.0,
+      "raw_value_unchanged": true,
+      "orders_are_not_certainty_rankings": true,
+      "dependency_warnings": []
+    },
+    "dependence-overclaim": {
+      "left": {
+        "strength": 1.0,
+        "aggregation": "minimum",
+        "basis": null,
+        "groups": {
+          "factor:representation_support": 1.0
+        },
+        "missing": [],
+        "factors": [
+          {
+            "name": "representation_support",
+            "value": 1.0,
+            "basis": "synthetic demonstration coefficient; not an empirical probability",
+            "order": 2,
+            "source_id": null,
+            "dependency_group": null,
+            "kind": "assumed"
+          }
+        ],
+        "factor_coverage": 1.0,
+        "interpretation": "support index; not probability, truth, safety, or a rescaled measurement"
+      },
+      "right": {
+        "strength": 1.0,
+        "aggregation": "minimum",
+        "basis": null,
+        "groups": {
+          "factor:representation_support": 1.0
+        },
+        "missing": [],
+        "factors": [
+          {
+            "name": "representation_support",
+            "value": 1.0,
+            "basis": "synthetic demonstration coefficient; not an empirical probability",
+            "order": 2,
+            "source_id": null,
+            "dependency_group": null,
+            "kind": "assumed"
+          }
+        ],
+        "factor_coverage": 1.0,
+        "interpretation": "support index; not probability, truth, safety, or a rescaled measurement"
+      },
+      "hinge": [],
+      "alignment_support": 1.0,
+      "joint_strength": 1.0,
+      "joint_aggregation": "minimum",
+      "dependency_adjusted": true,
+      "product_basis": null,
+      "raw_collision_score": 100.0,
+      "diagnostic_supported_score": 100.0,
+      "raw_value_unchanged": true,
+      "orders_are_not_certainty_rankings": true,
+      "dependency_warnings": [
+        "shared source roots: synthetic-source",
+        "registered evidence shared roots: synthetic-source"
+      ]
+    },
+    "freshness-claim": {
+      "left": {
+        "strength": 1.0,
+        "aggregation": "minimum",
+        "basis": null,
+        "groups": {
+          "factor:representation_support": 1.0
+        },
+        "missing": [],
+        "factors": [
+          {
+            "name": "representation_support",
+            "value": 1.0,
+            "basis": "synthetic demonstration coefficient; not an empirical probability",
+            "order": 2,
+            "source_id": null,
+            "dependency_group": null,
+            "kind": "assumed"
+          }
+        ],
+        "factor_coverage": 1.0,
+        "interpretation": "support index; not probability, truth, safety, or a rescaled measurement"
+      },
+      "right": {
+        "strength": 1.0,
+        "aggregation": "minimum",
+        "basis": null,
+        "groups": {
+          "factor:representation_support": 1.0
+        },
+        "missing": [],
+        "factors": [
+          {
+            "name": "representation_support",
+            "value": 1.0,
+            "basis": "synthetic demonstration coefficient; not an empirical probability",
+            "order": 2,
+            "source_id": null,
+            "dependency_group": null,
+            "kind": "assumed"
+          }
+        ],
+        "factor_coverage": 1.0,
+        "interpretation": "support index; not probability, truth, safety, or a rescaled measurement"
+      },
+      "hinge": [],
+      "alignment_support": 1.0,
+      "joint_strength": 1.0,
+      "joint_aggregation": "minimum",
+      "dependency_adjusted": true,
+      "product_basis": null,
+      "raw_collision_score": 100.0,
+      "diagnostic_supported_score": 100.0,
+      "raw_value_unchanged": true,
+      "orders_are_not_certainty_rankings": true,
+      "dependency_warnings": [
+        "shared source roots: synthetic-source",
+        "registered evidence shared roots: synthetic-source"
+      ]
+    },
+    "qualified-coverage": {
+      "left": {
+        "strength": 1.0,
+        "aggregation": "minimum",
+        "basis": null,
+        "groups": {
+          "factor:representation_support": 1.0
+        },
+        "missing": [],
+        "factors": [
+          {
+            "name": "representation_support",
+            "value": 1.0,
+            "basis": "synthetic demonstration coefficient; not an empirical probability",
+            "order": 2,
+            "source_id": null,
+            "dependency_group": null,
+            "kind": "assumed"
+          }
+        ],
+        "factor_coverage": 1.0,
+        "interpretation": "support index; not probability, truth, safety, or a rescaled measurement"
+      },
+      "right": {
+        "strength": 0.98,
+        "aggregation": "minimum",
+        "basis": null,
+        "groups": {
+          "factor:representation_support": 0.98
+        },
+        "missing": [],
+        "factors": [
+          {
+            "name": "representation_support",
+            "value": 0.98,
+            "basis": "synthetic demonstration coefficient; not an empirical probability",
+            "order": 2,
+            "source_id": null,
+            "dependency_group": null,
+            "kind": "assumed"
+          }
+        ],
+        "factor_coverage": 1.0,
+        "interpretation": "support index; not probability, truth, safety, or a rescaled measurement"
+      },
+      "hinge": [],
+      "alignment_support": 1.0,
+      "joint_strength": 0.98,
+      "joint_aggregation": "minimum",
+      "dependency_adjusted": false,
+      "product_basis": null,
+      "raw_collision_score": 0.0,
+      "diagnostic_supported_score": 0.0,
+      "raw_value_unchanged": true,
+      "orders_are_not_certainty_rankings": true,
+      "dependency_warnings": []
+    },
+    "support-case-count": {
+      "left": {
+        "strength": 1.0,
+        "aggregation": "minimum",
+        "basis": null,
+        "groups": {
+          "factor:representation_support": 1.0
+        },
+        "missing": [],
+        "factors": [
+          {
+            "name": "representation_support",
+            "value": 1.0,
+            "basis": "synthetic demonstration coefficient; not an empirical probability",
+            "order": 2,
+            "source_id": null,
+            "dependency_group": null,
+            "kind": "assumed"
+          }
+        ],
+        "factor_coverage": 1.0,
+        "interpretation": "support index; not probability, truth, safety, or a rescaled measurement"
+      },
+      "right": {
+        "strength": 1.0,
+        "aggregation": "minimum",
+        "basis": null,
+        "groups": {
+          "factor:representation_support": 1.0
+        },
+        "missing": [],
+        "factors": [
+          {
+            "name": "representation_support",
+            "value": 1.0,
+            "basis": "synthetic demonstration coefficient; not an empirical probability",
+            "order": 2,
+            "source_id": null,
+            "dependency_group": null,
+            "kind": "assumed"
+          }
+        ],
+        "factor_coverage": 1.0,
+        "interpretation": "support index; not probability, truth, safety, or a rescaled measurement"
+      },
+      "hinge": [],
+      "alignment_support": 1.0,
+      "joint_strength": 1.0,
+      "joint_aggregation": "minimum",
+      "dependency_adjusted": true,
+      "product_basis": null,
+      "raw_collision_score": 0.0,
+      "diagnostic_supported_score": 0.0,
+      "raw_value_unchanged": true,
+      "orders_are_not_certainty_rankings": true,
+      "dependency_warnings": [
+        "shared source roots: synthetic-source",
+        "registered evidence shared roots: synthetic-source"
+      ]
+    },
+    "uncertain-count": {
+      "left": {
+        "strength": 0.99,
+        "aggregation": "minimum",
+        "basis": null,
+        "groups": {
+          "factor:representation_support": 0.99
+        },
+        "missing": [],
+        "factors": [
+          {
+            "name": "representation_support",
+            "value": 0.99,
+            "basis": "synthetic demonstration coefficient; not an empirical probability",
+            "order": 2,
+            "source_id": null,
+            "dependency_group": null,
+            "kind": "assumed"
+          }
+        ],
+        "factor_coverage": 1.0,
+        "interpretation": "support index; not probability, truth, safety, or a rescaled measurement"
+      },
+      "right": {
+        "strength": 0.42,
+        "aggregation": "minimum",
+        "basis": null,
+        "groups": {
+          "factor:representation_support": 0.42
+        },
+        "missing": [],
+        "factors": [
+          {
+            "name": "representation_support",
+            "value": 0.42,
+            "basis": "synthetic demonstration coefficient; not an empirical probability",
+            "order": 2,
+            "source_id": null,
+            "dependency_group": null,
+            "kind": "assumed"
+          }
+        ],
+        "factor_coverage": 1.0,
+        "interpretation": "support index; not probability, truth, safety, or a rescaled measurement"
+      },
+      "hinge": [],
+      "alignment_support": 1.0,
+      "joint_strength": 0.42,
+      "joint_aggregation": "minimum",
+      "dependency_adjusted": false,
+      "product_basis": null,
+      "raw_collision_score": null,
+      "diagnostic_supported_score": null,
+      "raw_value_unchanged": true,
+      "orders_are_not_certainty_rankings": true,
+      "dependency_warnings": []
+    },
+    "unsupported-absence": {
+      "left": {
+        "strength": 0.95,
+        "aggregation": "minimum",
+        "basis": null,
+        "groups": {
+          "factor:representation_support": 0.95
+        },
+        "missing": [],
+        "factors": [
+          {
+            "name": "representation_support",
+            "value": 0.95,
+            "basis": "synthetic demonstration coefficient; not an empirical probability",
+            "order": 2,
+            "source_id": null,
+            "dependency_group": null,
+            "kind": "assumed"
+          }
+        ],
+        "factor_coverage": 1.0,
+        "interpretation": "support index; not probability, truth, safety, or a rescaled measurement"
+      },
+      "right": {
+        "strength": 0.99,
+        "aggregation": "minimum",
+        "basis": null,
+        "groups": {
+          "factor:representation_support": 0.99
+        },
+        "missing": [],
+        "factors": [
+          {
+            "name": "representation_support",
+            "value": 0.99,
+            "basis": "synthetic demonstration coefficient; not an empirical probability",
+            "order": 2,
+            "source_id": null,
+            "dependency_group": null,
+            "kind": "assumed"
+          }
+        ],
+        "factor_coverage": 1.0,
+        "interpretation": "support index; not probability, truth, safety, or a rescaled measurement"
+      },
+      "hinge": [],
+      "alignment_support": 1.0,
+      "joint_strength": 0.95,
+      "joint_aggregation": "minimum",
+      "dependency_adjusted": false,
+      "product_basis": null,
+      "raw_collision_score": null,
+      "diagnostic_supported_score": null,
+      "raw_value_unchanged": true,
+      "orders_are_not_certainty_rankings": true,
+      "dependency_warnings": []
+    },
+    "zero-preserved": {
+      "left": {
+        "strength": 0.99,
+        "aggregation": "minimum",
+        "basis": null,
+        "groups": {
+          "factor:representation_support": 0.99
+        },
+        "missing": [],
+        "factors": [
+          {
+            "name": "representation_support",
+            "value": 0.99,
+            "basis": "synthetic demonstration coefficient; not an empirical probability",
+            "order": 2,
+            "source_id": null,
+            "dependency_group": null,
+            "kind": "assumed"
+          }
+        ],
+        "factor_coverage": 1.0,
+        "interpretation": "support index; not probability, truth, safety, or a rescaled measurement"
+      },
+      "right": {
+        "strength": 0.99,
+        "aggregation": "minimum",
+        "basis": null,
+        "groups": {
+          "factor:representation_support": 0.99
+        },
+        "missing": [],
+        "factors": [
+          {
+            "name": "representation_support",
+            "value": 0.99,
+            "basis": "synthetic demonstration coefficient; not an empirical probability",
+            "order": 2,
+            "source_id": null,
+            "dependency_group": null,
+            "kind": "assumed"
+          }
+        ],
+        "factor_coverage": 1.0,
+        "interpretation": "support index; not probability, truth, safety, or a rescaled measurement"
+      },
+      "hinge": [],
+      "alignment_support": 1.0,
+      "joint_strength": 0.99,
+      "joint_aggregation": "minimum",
+      "dependency_adjusted": false,
+      "product_basis": null,
+      "raw_collision_score": 0.0,
+      "diagnostic_supported_score": 0.0,
+      "raw_value_unchanged": true,
+      "orders_are_not_certainty_rankings": true,
+      "dependency_warnings": []
+    }
+  },
+  "findings": [
+    {
+      "id": "finding:confidence-overclaim",
+      "pair_id": "confidence-overclaim",
+      "category": "REVIEW_DISCREPANCY",
+      "reason": "Comparable representations have disjoint admissible values; inspect both sources.",
+      "status": "CONFLICT",
+      "raw_collision_score": 100.0,
+      "support": 0.9,
+      "numeric_values_preserved": true,
+      "unknown_checks": []
+    },
+    {
+      "id": "finding:coverage-overclaim",
+      "pair_id": "coverage-overclaim",
+      "category": "REVIEW_DISCREPANCY",
+      "reason": "Comparable representations have disjoint admissible values; inspect both sources.",
+      "status": "CONFLICT",
+      "raw_collision_score": 100.0,
+      "support": 0.98,
+      "numeric_values_preserved": true,
+      "unknown_checks": []
+    },
+    {
+      "id": "finding:dependence-overclaim",
+      "pair_id": "dependence-overclaim",
+      "category": "REVIEW_DISCREPANCY",
+      "reason": "Comparable representations have disjoint admissible values; inspect both sources.",
+      "status": "CONFLICT",
+      "raw_collision_score": 100.0,
+      "support": 1.0,
+      "numeric_values_preserved": true,
+      "unknown_checks": []
+    },
+    {
+      "id": "finding:freshness-claim",
+      "pair_id": "freshness-claim",
+      "category": "REVIEW_DISCREPANCY",
+      "reason": "Comparable representations have disjoint admissible values; inspect both sources.",
+      "status": "CONFLICT",
+      "raw_collision_score": 100.0,
+      "support": 1.0,
+      "numeric_values_preserved": true,
+      "unknown_checks": []
+    },
+    {
+      "id": "finding:uncertain-count",
+      "pair_id": "uncertain-count",
+      "category": "RESOLVE_OVERLAP",
+      "reason": "The observation allows both satisfying and nonsatisfying cases; obtain tighter evidence.",
+      "status": "PARTIAL",
+      "raw_collision_score": null,
+      "support": 0.42,
+      "numeric_values_preserved": true,
+      "unknown_checks": []
+    },
+    {
+      "id": "finding:unsupported-absence",
+      "pair_id": "unsupported-absence",
+      "category": "REPAIR_PAIRING",
+      "reason": "Revise the pairing contract or provide a justified inference bridge; do not call this numerical agreement.",
+      "status": "NOT_COMPARABLE",
+      "raw_collision_score": null,
+      "support": 0.95,
+      "numeric_values_preserved": true,
+      "unknown_checks": []
+    },
+    {
+      "id": "codec:SUMMARY-TRANSFORM",
+      "category": "REVIEW_TRANSFORMATION",
+      "reason": "Material meaning, scope, uncertainty or support was not shown to be preserved.",
+      "codec_status": "DISTORTION_OR_SUPPORT_GAP"
+    }
+  ],
+  "warnings": [],
+  "boundary": "representation evaluation, not truth, authority, safety certification, or automatic action"
+}

@@ -1,0 +1,83 @@
+@prefix vr: <urn:deep-sigma:vinculum:result:> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+vr:b94876c006e4cb8a08986bf8775993c44cfe42a17af74485e0dc597b8e66ca66 a vr:Evaluation ;
+    vr:pair <urn:deep-sigma:vinculum:result:b94876c006e4cb8a08986bf8775993c44cfe42a17af74485e0dc597b8e66ca66:pair:1adcff2d2ea908cbe55e5b93627c8688fe61d968fc5ad934d98d9086c0b16611>,
+        <urn:deep-sigma:vinculum:result:b94876c006e4cb8a08986bf8775993c44cfe42a17af74485e0dc597b8e66ca66:pair:2be2a99f35f7fd3e3720e03e0d836a3551c837bc16601b827ed0eafbc0a6055f>,
+        <urn:deep-sigma:vinculum:result:b94876c006e4cb8a08986bf8775993c44cfe42a17af74485e0dc597b8e66ca66:pair:400d0571fa93ad95218143af6a63ec3461da6dfc2a18d9de3bb281e8a2830da4>,
+        <urn:deep-sigma:vinculum:result:b94876c006e4cb8a08986bf8775993c44cfe42a17af74485e0dc597b8e66ca66:pair:4b05e00fe6bbb14ff9edef24585352f8da8ecdf06b837adcc5d45e97580999a8>,
+        <urn:deep-sigma:vinculum:result:b94876c006e4cb8a08986bf8775993c44cfe42a17af74485e0dc597b8e66ca66:pair:83025eac2209d3b0a96fdac3521b374d58c25ec68aa61b60aa8161aa9e1cb27e>,
+        <urn:deep-sigma:vinculum:result:b94876c006e4cb8a08986bf8775993c44cfe42a17af74485e0dc597b8e66ca66:pair:97bb2113c19d9ec5c28f6525bef55fbbb0b1fc79f4ce94335ca5769cc8dedde8>,
+        <urn:deep-sigma:vinculum:result:b94876c006e4cb8a08986bf8775993c44cfe42a17af74485e0dc597b8e66ca66:pair:be4b0a2d62b61edad7fd60a4cc4afb46e7707b90a8d7b10be6d25c59a551f42c>,
+        <urn:deep-sigma:vinculum:result:b94876c006e4cb8a08986bf8775993c44cfe42a17af74485e0dc597b8e66ca66:pair:d94062fd945a56045780bb5b1dbd632a016a81c9b6d9c7a4669f54d12deee22a>,
+        <urn:deep-sigma:vinculum:result:b94876c006e4cb8a08986bf8775993c44cfe42a17af74485e0dc597b8e66ca66:pair:f67966ed1913aa7255d183ec888da163273dda34bc7f837ab71235472ebeabe6> ;
+    vr:version "0.7.0" .
+
+<urn:deep-sigma:vinculum:result:b94876c006e4cb8a08986bf8775993c44cfe42a17af74485e0dc597b8e66ca66:pair:1adcff2d2ea908cbe55e5b93627c8688fe61d968fc5ad934d98d9086c0b16611> a vr:PairResult ;
+    vr:identifier "support-case-count" ;
+    vr:left "L3-trial-count" ;
+    vr:rawCollision 0.0 ;
+    vr:right "M3-trial-count" ;
+    vr:status "ALIGNED" ;
+    vr:supportedCollision 0.0 .
+
+<urn:deep-sigma:vinculum:result:b94876c006e4cb8a08986bf8775993c44cfe42a17af74485e0dc597b8e66ca66:pair:2be2a99f35f7fd3e3720e03e0d836a3551c837bc16601b827ed0eafbc0a6055f> a vr:PairResult ;
+    vr:identifier "confidence-overclaim" ;
+    vr:left "L2-confidence" ;
+    vr:rawCollision 100.0 ;
+    vr:right "M3-hit-rate" ;
+    vr:status "CONFLICT" ;
+    vr:supportedCollision 90.0 .
+
+<urn:deep-sigma:vinculum:result:b94876c006e4cb8a08986bf8775993c44cfe42a17af74485e0dc597b8e66ca66:pair:400d0571fa93ad95218143af6a63ec3461da6dfc2a18d9de3bb281e8a2830da4> a vr:PairResult ;
+    vr:identifier "coverage-overclaim" ;
+    vr:left "L1-coverage" ;
+    vr:rawCollision 100.0 ;
+    vr:right "M4-coverage" ;
+    vr:status "CONFLICT" ;
+    vr:supportedCollision 98.0 .
+
+<urn:deep-sigma:vinculum:result:b94876c006e4cb8a08986bf8775993c44cfe42a17af74485e0dc597b8e66ca66:pair:4b05e00fe6bbb14ff9edef24585352f8da8ecdf06b837adcc5d45e97580999a8> a vr:PairResult ;
+    vr:identifier "qualified-coverage" ;
+    vr:left "L2-coverage-bound" ;
+    vr:rawCollision 0.0 ;
+    vr:right "M4-coverage" ;
+    vr:status "ALIGNED" ;
+    vr:supportedCollision 0.0 .
+
+<urn:deep-sigma:vinculum:result:b94876c006e4cb8a08986bf8775993c44cfe42a17af74485e0dc597b8e66ca66:pair:83025eac2209d3b0a96fdac3521b374d58c25ec68aa61b60aa8161aa9e1cb27e> a vr:PairResult ;
+    vr:identifier "unsupported-absence" ;
+    vr:left "L1-presence" ;
+    vr:right "M1-detections" ;
+    vr:status "NOT_COMPARABLE" .
+
+<urn:deep-sigma:vinculum:result:b94876c006e4cb8a08986bf8775993c44cfe42a17af74485e0dc597b8e66ca66:pair:97bb2113c19d9ec5c28f6525bef55fbbb0b1fc79f4ce94335ca5769cc8dedde8> a vr:PairResult ;
+    vr:identifier "zero-preserved" ;
+    vr:left "L1-detections" ;
+    vr:rawCollision 0.0 ;
+    vr:right "M1-detections" ;
+    vr:status "ALIGNED" ;
+    vr:supportedCollision 0.0 .
+
+<urn:deep-sigma:vinculum:result:b94876c006e4cb8a08986bf8775993c44cfe42a17af74485e0dc597b8e66ca66:pair:be4b0a2d62b61edad7fd60a4cc4afb46e7707b90a8d7b10be6d25c59a551f42c> a vr:PairResult ;
+    vr:identifier "uncertain-count" ;
+    vr:left "L1-detections" ;
+    vr:right "M2-count-interval" ;
+    vr:status "PARTIAL" .
+
+<urn:deep-sigma:vinculum:result:b94876c006e4cb8a08986bf8775993c44cfe42a17af74485e0dc597b8e66ca66:pair:d94062fd945a56045780bb5b1dbd632a016a81c9b6d9c7a4669f54d12deee22a> a vr:PairResult ;
+    vr:identifier "dependence-overclaim" ;
+    vr:left "L5-sources" ;
+    vr:rawCollision 100.0 ;
+    vr:right "M5-source-count" ;
+    vr:status "CONFLICT" ;
+    vr:supportedCollision 100.0 .
+
+<urn:deep-sigma:vinculum:result:b94876c006e4cb8a08986bf8775993c44cfe42a17af74485e0dc597b8e66ca66:pair:f67966ed1913aa7255d183ec888da163273dda34bc7f837ab71235472ebeabe6> a vr:PairResult ;
+    vr:identifier "freshness-claim" ;
+    vr:left "L4-age-limit" ;
+    vr:rawCollision 100.0 ;
+    vr:right "M1-age" ;
+    vr:status "CONFLICT" ;
+    vr:supportedCollision 100.0 .
+
