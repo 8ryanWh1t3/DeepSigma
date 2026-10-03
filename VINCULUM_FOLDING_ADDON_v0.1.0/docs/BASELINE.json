@@ -1,0 +1,56 @@
+{
+  "addon": {
+    "distribution": "vinculum-folding",
+    "version": "0.1.0",
+    "namespace": "vinculum_folding"
+  },
+  "host": {
+    "repository": "8ryanWh1t3/DeepSigma",
+    "commit": "6c4dd7ebacda4c3eb2cb505224c28348410bd05e",
+    "directory": "vinculum-pylib-v0.7.0",
+    "version": "0.7.0"
+  },
+  "source_inspection": [
+    {
+      "file": "src/vinculum/pipeline.py",
+      "git_blob_sha": "3dbfe67f18c7d0323bbe67d44de7be4c24a74d42",
+      "reviewed": "full"
+    },
+    {
+      "file": "src/vinculum/serialization.py",
+      "git_blob_sha": "fcd8713dcc7f9bf6f16a8e0090c7067ae20347ad",
+      "reviewed": "full"
+    },
+    {
+      "file": "src/vinculum/core.py",
+      "git_blob_sha": "d814175aa3b0e02d866b394928804b32165b5919",
+      "reviewed_lines": [
+        1,
+        310
+      ]
+    },
+    {
+      "file": "src/vinculum/matrix.py",
+      "git_blob_sha": "1d7658c2bddbead1ca1724c4b1cecc0bcac32f21",
+      "reviewed_lines": [
+        1,
+        210
+      ]
+    }
+  ],
+  "source_inspection_tool": "GitHub connector",
+  "host_package_installed_in_build_runtime": false,
+  "original_host_regression_run": false,
+  "host_kernel_modified": false,
+  "host_test_basis": "Source-inspected contract plus synthetic serialization fixture; real-host smoke test skipped.",
+  "project_sources": [
+    {
+      "name": "COHERENCE OPS COMPLETE",
+      "basis": "DLR Decision Lineage Record; RS Reflection Summary; DS Drift Signature; MG Memory Graph; non-coercion"
+    },
+    {
+      "name": "Current conversation: The Fold, Origami Folding Maximum, JIT 4D, VINCULUM",
+      "basis": "New additive feature requirements and explicit role boundaries"
+    }
+  ]
+}

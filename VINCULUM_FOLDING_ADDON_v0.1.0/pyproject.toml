@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vinculum-folding"
+version = "0.1.0"
+description = "Navigable Fold and four-lens JIT sidecar for VINCULUM pyLib"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{name = "Deep Sigma"}]
+dependencies = []
+
+[project.scripts]
+vinculum-fold = "vinculum_folding.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+vinculum_folding = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

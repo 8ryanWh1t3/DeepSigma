@@ -1,0 +1,37 @@
+{
+  "product": "VINCULUM Navigable Fold Add-on",
+  "addon_version": "0.1.0",
+  "release_status": "ADDON_TESTED_HOST_INTEGRATION_PENDING",
+  "source_tests": {
+    "passed": 154,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 1
+  },
+  "installed_wheel_tests": {
+    "passed": 154,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 1
+  },
+  "host_integration": {
+    "executed": false,
+    "skipped_test": "test_real_pipeline_capture_is_non_mutating",
+    "reason": "The actual VINCULUM distribution could not be retrieved into this runtime. Source was inspected through GitHub; adapter fixture tests are synthetic."
+  },
+  "original_host_regression_run": false,
+  "host_kernel_modified": false,
+  "tested_python": "3.13.5",
+  "python_3_10_syntax_check": true,
+  "other_python_runtimes_tested": false,
+  "runtime_dependencies": [],
+  "installed_package_source_hashes_match": true,
+  "installed_console_demo_and_verify": "PASS",
+  "wheel_sha256": "21f8f7c45d49a8a9d14f6e1800a5f2be9d4cab9d72e2e6c6a3cf898d05809239",
+  "limits": [
+    "No live VINCULUM World/Studio UI wiring or native Trinity/CERPA connection.",
+    "JIT assessments are attributed data; no truth/permission scores or automatic actions.",
+    "SQLite history is local and unsigned; independent protected tips are needed to detect complete rollback/substitution.",
+    "No Windows/macOS execution, power-loss certification or operational validation."
+  ]
+}
