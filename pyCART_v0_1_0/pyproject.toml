@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deepsigma-cartography"
+version = "0.1.0"
+description = "Deep Sigma governed semantic cartography: traceable maps, gaps, folding, and editions"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Bryan David White"}]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7", "coverage>=7"]
+
+[project.scripts]
+sigma-cartography = "deepsigma_cartography.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+deepsigma_cartography = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

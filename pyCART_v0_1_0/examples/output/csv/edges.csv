@@ -1,0 +1,9 @@
+id,source,predicate,target,status,confidence,evidence_ids,valid_from,valid_to,attributes
+edge:01,mission:readiness,requires,capability:intake,asserted,,"[""ev:scenario""]",,,{}
+edge:02,capability:intake,depends_on,claim:current,asserted,,"[""ev:scenario""]",,,{}
+edge:03,claim:current,supported_by,evidence:report,asserted,,"[""ev:report""]",,,{}
+edge:04,claim:current,depends_on,assumption:standard,asserted,,"[""ev:scenario""]",,,{}
+edge:05,decision:publish,depends_on,claim:current,asserted,,"[""ev:scenario""]",,,{}
+edge:06,decision:publish,implements,policy:review,asserted,,"[""ev:scenario""]",,,{}
+edge:07,policy:review,authorized_by,authority:reviewer,asserted,,"[""ev:scenario""]",,,{}
+edge:08,event:review,relates_to,decision:publish,asserted,,"[""ev:scenario""]",,,{}

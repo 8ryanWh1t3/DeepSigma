@@ -1,0 +1,232 @@
+<urn:deep-sigma:cartography:edge:edge%3A01> <http://www.w3.org/1999/02/22-rdf-syntax-ns#object> <urn:deep-sigma:cartography:node:capability%3Aintake> .
+<urn:deep-sigma:cartography:edge:edge%3A01> <http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate> <urn:deep-sigma:cartography:predicate:requires> .
+<urn:deep-sigma:cartography:edge:edge%3A01> <http://www.w3.org/1999/02/22-rdf-syntax-ns#subject> <urn:deep-sigma:cartography:node:mission%3Areadiness> .
+<urn:deep-sigma:cartography:edge:edge%3A01> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement> .
+<urn:deep-sigma:cartography:edge:edge%3A01> <urn:deep-sigma:cartography:id> "edge:01" .
+<urn:deep-sigma:cartography:edge:edge%3A01> <urn:deep-sigma:cartography:recordJSON> "{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:scenario\"],\"id\":\"edge:01\",\"predicate\":\"requires\",\"source\":\"mission:readiness\",\"status\":\"asserted\",\"target\":\"capability:intake\",\"valid_from\":null,\"valid_to\":null}" .
+<urn:deep-sigma:cartography:edge:edge%3A01> <urn:deep-sigma:cartography:status> "asserted" .
+<urn:deep-sigma:cartography:edge:edge%3A02> <http://www.w3.org/1999/02/22-rdf-syntax-ns#object> <urn:deep-sigma:cartography:node:claim%3Acurrent> .
+<urn:deep-sigma:cartography:edge:edge%3A02> <http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate> <urn:deep-sigma:cartography:predicate:depends_on> .
+<urn:deep-sigma:cartography:edge:edge%3A02> <http://www.w3.org/1999/02/22-rdf-syntax-ns#subject> <urn:deep-sigma:cartography:node:capability%3Aintake> .
+<urn:deep-sigma:cartography:edge:edge%3A02> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement> .
+<urn:deep-sigma:cartography:edge:edge%3A02> <urn:deep-sigma:cartography:id> "edge:02" .
+<urn:deep-sigma:cartography:edge:edge%3A02> <urn:deep-sigma:cartography:recordJSON> "{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:scenario\"],\"id\":\"edge:02\",\"predicate\":\"depends_on\",\"source\":\"capability:intake\",\"status\":\"asserted\",\"target\":\"claim:current\",\"valid_from\":null,\"valid_to\":null}" .
+<urn:deep-sigma:cartography:edge:edge%3A02> <urn:deep-sigma:cartography:status> "asserted" .
+<urn:deep-sigma:cartography:edge:edge%3A03> <http://www.w3.org/1999/02/22-rdf-syntax-ns#object> <urn:deep-sigma:cartography:node:evidence%3Areport> .
+<urn:deep-sigma:cartography:edge:edge%3A03> <http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate> <urn:deep-sigma:cartography:predicate:supported_by> .
+<urn:deep-sigma:cartography:edge:edge%3A03> <http://www.w3.org/1999/02/22-rdf-syntax-ns#subject> <urn:deep-sigma:cartography:node:claim%3Acurrent> .
+<urn:deep-sigma:cartography:edge:edge%3A03> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement> .
+<urn:deep-sigma:cartography:edge:edge%3A03> <urn:deep-sigma:cartography:id> "edge:03" .
+<urn:deep-sigma:cartography:edge:edge%3A03> <urn:deep-sigma:cartography:recordJSON> "{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:report\"],\"id\":\"edge:03\",\"predicate\":\"supported_by\",\"source\":\"claim:current\",\"status\":\"asserted\",\"target\":\"evidence:report\",\"valid_from\":null,\"valid_to\":null}" .
+<urn:deep-sigma:cartography:edge:edge%3A03> <urn:deep-sigma:cartography:status> "asserted" .
+<urn:deep-sigma:cartography:edge:edge%3A04> <http://www.w3.org/1999/02/22-rdf-syntax-ns#object> <urn:deep-sigma:cartography:node:assumption%3Astandard> .
+<urn:deep-sigma:cartography:edge:edge%3A04> <http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate> <urn:deep-sigma:cartography:predicate:depends_on> .
+<urn:deep-sigma:cartography:edge:edge%3A04> <http://www.w3.org/1999/02/22-rdf-syntax-ns#subject> <urn:deep-sigma:cartography:node:claim%3Acurrent> .
+<urn:deep-sigma:cartography:edge:edge%3A04> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement> .
+<urn:deep-sigma:cartography:edge:edge%3A04> <urn:deep-sigma:cartography:id> "edge:04" .
+<urn:deep-sigma:cartography:edge:edge%3A04> <urn:deep-sigma:cartography:recordJSON> "{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:scenario\"],\"id\":\"edge:04\",\"predicate\":\"depends_on\",\"source\":\"claim:current\",\"status\":\"asserted\",\"target\":\"assumption:standard\",\"valid_from\":null,\"valid_to\":null}" .
+<urn:deep-sigma:cartography:edge:edge%3A04> <urn:deep-sigma:cartography:status> "asserted" .
+<urn:deep-sigma:cartography:edge:edge%3A05> <http://www.w3.org/1999/02/22-rdf-syntax-ns#object> <urn:deep-sigma:cartography:node:claim%3Acurrent> .
+<urn:deep-sigma:cartography:edge:edge%3A05> <http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate> <urn:deep-sigma:cartography:predicate:depends_on> .
+<urn:deep-sigma:cartography:edge:edge%3A05> <http://www.w3.org/1999/02/22-rdf-syntax-ns#subject> <urn:deep-sigma:cartography:node:decision%3Apublish> .
+<urn:deep-sigma:cartography:edge:edge%3A05> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement> .
+<urn:deep-sigma:cartography:edge:edge%3A05> <urn:deep-sigma:cartography:id> "edge:05" .
+<urn:deep-sigma:cartography:edge:edge%3A05> <urn:deep-sigma:cartography:recordJSON> "{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:scenario\"],\"id\":\"edge:05\",\"predicate\":\"depends_on\",\"source\":\"decision:publish\",\"status\":\"asserted\",\"target\":\"claim:current\",\"valid_from\":null,\"valid_to\":null}" .
+<urn:deep-sigma:cartography:edge:edge%3A05> <urn:deep-sigma:cartography:status> "asserted" .
+<urn:deep-sigma:cartography:edge:edge%3A06> <http://www.w3.org/1999/02/22-rdf-syntax-ns#object> <urn:deep-sigma:cartography:node:policy%3Areview> .
+<urn:deep-sigma:cartography:edge:edge%3A06> <http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate> <urn:deep-sigma:cartography:predicate:implements> .
+<urn:deep-sigma:cartography:edge:edge%3A06> <http://www.w3.org/1999/02/22-rdf-syntax-ns#subject> <urn:deep-sigma:cartography:node:decision%3Apublish> .
+<urn:deep-sigma:cartography:edge:edge%3A06> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement> .
+<urn:deep-sigma:cartography:edge:edge%3A06> <urn:deep-sigma:cartography:id> "edge:06" .
+<urn:deep-sigma:cartography:edge:edge%3A06> <urn:deep-sigma:cartography:recordJSON> "{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:scenario\"],\"id\":\"edge:06\",\"predicate\":\"implements\",\"source\":\"decision:publish\",\"status\":\"asserted\",\"target\":\"policy:review\",\"valid_from\":null,\"valid_to\":null}" .
+<urn:deep-sigma:cartography:edge:edge%3A06> <urn:deep-sigma:cartography:status> "asserted" .
+<urn:deep-sigma:cartography:edge:edge%3A07> <http://www.w3.org/1999/02/22-rdf-syntax-ns#object> <urn:deep-sigma:cartography:node:authority%3Areviewer> .
+<urn:deep-sigma:cartography:edge:edge%3A07> <http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate> <urn:deep-sigma:cartography:predicate:authorized_by> .
+<urn:deep-sigma:cartography:edge:edge%3A07> <http://www.w3.org/1999/02/22-rdf-syntax-ns#subject> <urn:deep-sigma:cartography:node:policy%3Areview> .
+<urn:deep-sigma:cartography:edge:edge%3A07> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement> .
+<urn:deep-sigma:cartography:edge:edge%3A07> <urn:deep-sigma:cartography:id> "edge:07" .
+<urn:deep-sigma:cartography:edge:edge%3A07> <urn:deep-sigma:cartography:recordJSON> "{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:scenario\"],\"id\":\"edge:07\",\"predicate\":\"authorized_by\",\"source\":\"policy:review\",\"status\":\"asserted\",\"target\":\"authority:reviewer\",\"valid_from\":null,\"valid_to\":null}" .
+<urn:deep-sigma:cartography:edge:edge%3A07> <urn:deep-sigma:cartography:status> "asserted" .
+<urn:deep-sigma:cartography:edge:edge%3A08> <http://www.w3.org/1999/02/22-rdf-syntax-ns#object> <urn:deep-sigma:cartography:node:decision%3Apublish> .
+<urn:deep-sigma:cartography:edge:edge%3A08> <http://www.w3.org/1999/02/22-rdf-syntax-ns#predicate> <urn:deep-sigma:cartography:predicate:relates_to> .
+<urn:deep-sigma:cartography:edge:edge%3A08> <http://www.w3.org/1999/02/22-rdf-syntax-ns#subject> <urn:deep-sigma:cartography:node:event%3Areview> .
+<urn:deep-sigma:cartography:edge:edge%3A08> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Statement> .
+<urn:deep-sigma:cartography:edge:edge%3A08> <urn:deep-sigma:cartography:id> "edge:08" .
+<urn:deep-sigma:cartography:edge:edge%3A08> <urn:deep-sigma:cartography:recordJSON> "{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:scenario\"],\"id\":\"edge:08\",\"predicate\":\"relates_to\",\"source\":\"event:review\",\"status\":\"asserted\",\"target\":\"decision:publish\",\"valid_from\":null,\"valid_to\":null}" .
+<urn:deep-sigma:cartography:edge:edge%3A08> <urn:deep-sigma:cartography:status> "asserted" .
+<urn:deep-sigma:cartography:evidence:ev%3Areport> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Evidence> .
+<urn:deep-sigma:cartography:evidence:ev%3Areport> <urn:deep-sigma:cartography:id> "ev:report" .
+<urn:deep-sigma:cartography:evidence:ev%3Areport> <urn:deep-sigma:cartography:recordJSON> "{\"attributes\":{},\"id\":\"ev:report\",\"locator\":\"Synthetic review report, section 2\",\"sha256\":null,\"source\":\"synthetic://cartography/review-report\",\"valid_from\":\"2026-09-01T00:00:00.000000Z\",\"valid_to\":\"2026-10-02T00:00:00.000000Z\"}" .
+<urn:deep-sigma:cartography:evidence:ev%3Areport> <urn:deep-sigma:cartography:source> "synthetic://cartography/review-report" .
+<urn:deep-sigma:cartography:evidence:ev%3Ascenario> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Evidence> .
+<urn:deep-sigma:cartography:evidence:ev%3Ascenario> <urn:deep-sigma:cartography:id> "ev:scenario" .
+<urn:deep-sigma:cartography:evidence:ev%3Ascenario> <urn:deep-sigma:cartography:recordJSON> "{\"attributes\":{},\"id\":\"ev:scenario\",\"locator\":\"Explicit synthetic scenario authored for tests\",\"sha256\":null,\"source\":\"synthetic://cartography/example\",\"valid_from\":null,\"valid_to\":null}" .
+<urn:deep-sigma:cartography:evidence:ev%3Ascenario> <urn:deep-sigma:cartography:source> "synthetic://cartography/example" .
+<urn:deep-sigma:cartography:node:assumption%3Astandard> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Node> .
+<urn:deep-sigma:cartography:node:assumption%3Astandard> <http://www.w3.org/2000/01/rdf-schema#label> "Review standard remains applicable" .
+<urn:deep-sigma:cartography:node:assumption%3Astandard> <urn:deep-sigma:cartography:id> "assumption:standard" .
+<urn:deep-sigma:cartography:node:assumption%3Astandard> <urn:deep-sigma:cartography:kind> "assumption" .
+<urn:deep-sigma:cartography:node:assumption%3Astandard> <urn:deep-sigma:cartography:layer> "meaning" .
+<urn:deep-sigma:cartography:node:assumption%3Astandard> <urn:deep-sigma:cartography:recordJSON> "{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:scenario\"],\"id\":\"assumption:standard\",\"kind\":\"assumption\",\"label\":\"Review standard remains applicable\",\"layer\":\"meaning\",\"review_due\":\"2026-10-01T00:00:00.000000Z\",\"scope\":\"default\",\"status\":\"asserted\",\"valid_from\":null,\"valid_to\":null}" .
+<urn:deep-sigma:cartography:node:assumption%3Astandard> <urn:deep-sigma:cartography:scope> "default" .
+<urn:deep-sigma:cartography:node:assumption%3Astandard> <urn:deep-sigma:cartography:status> "asserted" .
+<urn:deep-sigma:cartography:node:authority%3Areviewer> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Node> .
+<urn:deep-sigma:cartography:node:authority%3Areviewer> <http://www.w3.org/2000/01/rdf-schema#label> "Designated review role" .
+<urn:deep-sigma:cartography:node:authority%3Areviewer> <urn:deep-sigma:cartography:id> "authority:reviewer" .
+<urn:deep-sigma:cartography:node:authority%3Areviewer> <urn:deep-sigma:cartography:kind> "authority" .
+<urn:deep-sigma:cartography:node:authority%3Areviewer> <urn:deep-sigma:cartography:layer> "authority" .
+<urn:deep-sigma:cartography:node:authority%3Areviewer> <urn:deep-sigma:cartography:recordJSON> "{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[],\"id\":\"authority:reviewer\",\"kind\":\"authority\",\"label\":\"Designated review role\",\"layer\":\"authority\",\"review_due\":null,\"scope\":\"default\",\"status\":\"asserted\",\"valid_from\":null,\"valid_to\":null}" .
+<urn:deep-sigma:cartography:node:authority%3Areviewer> <urn:deep-sigma:cartography:scope> "default" .
+<urn:deep-sigma:cartography:node:authority%3Areviewer> <urn:deep-sigma:cartography:status> "asserted" .
+<urn:deep-sigma:cartography:node:capability%3Aintake> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Node> .
+<urn:deep-sigma:cartography:node:capability%3Aintake> <http://www.w3.org/2000/01/rdf-schema#label> "Evidence intake process" .
+<urn:deep-sigma:cartography:node:capability%3Aintake> <urn:deep-sigma:cartography:id> "capability:intake" .
+<urn:deep-sigma:cartography:node:capability%3Aintake> <urn:deep-sigma:cartography:kind> "capability" .
+<urn:deep-sigma:cartography:node:capability%3Aintake> <urn:deep-sigma:cartography:layer> "operations" .
+<urn:deep-sigma:cartography:node:capability%3Aintake> <urn:deep-sigma:cartography:recordJSON> "{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[],\"id\":\"capability:intake\",\"kind\":\"capability\",\"label\":\"Evidence intake process\",\"layer\":\"operations\",\"review_due\":null,\"scope\":\"default\",\"status\":\"asserted\",\"valid_from\":null,\"valid_to\":null}" .
+<urn:deep-sigma:cartography:node:capability%3Aintake> <urn:deep-sigma:cartography:scope> "default" .
+<urn:deep-sigma:cartography:node:capability%3Aintake> <urn:deep-sigma:cartography:status> "asserted" .
+<urn:deep-sigma:cartography:node:claim%3Acurrent> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Node> .
+<urn:deep-sigma:cartography:node:claim%3Acurrent> <http://www.w3.org/2000/01/rdf-schema#label> "The assessment has current evidence" .
+<urn:deep-sigma:cartography:node:claim%3Acurrent> <urn:deep-sigma:cartography:id> "claim:current" .
+<urn:deep-sigma:cartography:node:claim%3Acurrent> <urn:deep-sigma:cartography:kind> "claim" .
+<urn:deep-sigma:cartography:node:claim%3Acurrent> <urn:deep-sigma:cartography:layer> "meaning" .
+<urn:deep-sigma:cartography:node:claim%3Acurrent> <urn:deep-sigma:cartography:recordJSON> "{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[],\"id\":\"claim:current\",\"kind\":\"claim\",\"label\":\"The assessment has current evidence\",\"layer\":\"meaning\",\"review_due\":null,\"scope\":\"default\",\"status\":\"asserted\",\"valid_from\":null,\"valid_to\":null}" .
+<urn:deep-sigma:cartography:node:claim%3Acurrent> <urn:deep-sigma:cartography:scope> "default" .
+<urn:deep-sigma:cartography:node:claim%3Acurrent> <urn:deep-sigma:cartography:status> "asserted" .
+<urn:deep-sigma:cartography:node:claim%3Aunknown> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Node> .
+<urn:deep-sigma:cartography:node:claim%3Aunknown> <http://www.w3.org/2000/01/rdf-schema#label> "Additional source coverage is unknown" .
+<urn:deep-sigma:cartography:node:claim%3Aunknown> <urn:deep-sigma:cartography:id> "claim:unknown" .
+<urn:deep-sigma:cartography:node:claim%3Aunknown> <urn:deep-sigma:cartography:kind> "claim" .
+<urn:deep-sigma:cartography:node:claim%3Aunknown> <urn:deep-sigma:cartography:layer> "meaning" .
+<urn:deep-sigma:cartography:node:claim%3Aunknown> <urn:deep-sigma:cartography:recordJSON> "{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[],\"id\":\"claim:unknown\",\"kind\":\"claim\",\"label\":\"Additional source coverage is unknown\",\"layer\":\"meaning\",\"review_due\":null,\"scope\":\"default\",\"status\":\"unknown\",\"valid_from\":null,\"valid_to\":null}" .
+<urn:deep-sigma:cartography:node:claim%3Aunknown> <urn:deep-sigma:cartography:scope> "default" .
+<urn:deep-sigma:cartography:node:claim%3Aunknown> <urn:deep-sigma:cartography:status> "unknown" .
+<urn:deep-sigma:cartography:node:decision%3Apublish> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Node> .
+<urn:deep-sigma:cartography:node:decision%3Apublish> <http://www.w3.org/2000/01/rdf-schema#label> "Proposed assessment publication" .
+<urn:deep-sigma:cartography:node:decision%3Apublish> <urn:deep-sigma:cartography:id> "decision:publish" .
+<urn:deep-sigma:cartography:node:decision%3Apublish> <urn:deep-sigma:cartography:kind> "decision" .
+<urn:deep-sigma:cartography:node:decision%3Apublish> <urn:deep-sigma:cartography:layer> "decisions" .
+<urn:deep-sigma:cartography:node:decision%3Apublish> <urn:deep-sigma:cartography:recordJSON> "{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:scenario\"],\"id\":\"decision:publish\",\"kind\":\"decision\",\"label\":\"Proposed assessment publication\",\"layer\":\"decisions\",\"review_due\":null,\"scope\":\"default\",\"status\":\"asserted\",\"valid_from\":null,\"valid_to\":null}" .
+<urn:deep-sigma:cartography:node:decision%3Apublish> <urn:deep-sigma:cartography:scope> "default" .
+<urn:deep-sigma:cartography:node:decision%3Apublish> <urn:deep-sigma:cartography:status> "asserted" .
+<urn:deep-sigma:cartography:node:event%3Areview> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Node> .
+<urn:deep-sigma:cartography:node:event%3Areview> <http://www.w3.org/2000/01/rdf-schema#label> "Review window opened" .
+<urn:deep-sigma:cartography:node:event%3Areview> <urn:deep-sigma:cartography:id> "event:review" .
+<urn:deep-sigma:cartography:node:event%3Areview> <urn:deep-sigma:cartography:kind> "event" .
+<urn:deep-sigma:cartography:node:event%3Areview> <urn:deep-sigma:cartography:layer> "events" .
+<urn:deep-sigma:cartography:node:event%3Areview> <urn:deep-sigma:cartography:recordJSON> "{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:scenario\"],\"id\":\"event:review\",\"kind\":\"event\",\"label\":\"Review window opened\",\"layer\":\"events\",\"review_due\":null,\"scope\":\"default\",\"status\":\"observed\",\"valid_from\":null,\"valid_to\":null}" .
+<urn:deep-sigma:cartography:node:event%3Areview> <urn:deep-sigma:cartography:scope> "default" .
+<urn:deep-sigma:cartography:node:event%3Areview> <urn:deep-sigma:cartography:status> "observed" .
+<urn:deep-sigma:cartography:node:evidence%3Areport> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Node> .
+<urn:deep-sigma:cartography:node:evidence%3Areport> <http://www.w3.org/2000/01/rdf-schema#label> "Recorded review report" .
+<urn:deep-sigma:cartography:node:evidence%3Areport> <urn:deep-sigma:cartography:id> "evidence:report" .
+<urn:deep-sigma:cartography:node:evidence%3Areport> <urn:deep-sigma:cartography:kind> "evidence" .
+<urn:deep-sigma:cartography:node:evidence%3Areport> <urn:deep-sigma:cartography:layer> "evidence" .
+<urn:deep-sigma:cartography:node:evidence%3Areport> <urn:deep-sigma:cartography:recordJSON> "{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:report\"],\"id\":\"evidence:report\",\"kind\":\"evidence\",\"label\":\"Recorded review report\",\"layer\":\"evidence\",\"review_due\":null,\"scope\":\"default\",\"status\":\"asserted\",\"valid_from\":null,\"valid_to\":null}" .
+<urn:deep-sigma:cartography:node:evidence%3Areport> <urn:deep-sigma:cartography:scope> "default" .
+<urn:deep-sigma:cartography:node:evidence%3Areport> <urn:deep-sigma:cartography:status> "asserted" .
+<urn:deep-sigma:cartography:node:mission%3Areadiness> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Node> .
+<urn:deep-sigma:cartography:node:mission%3Areadiness> <http://www.w3.org/2000/01/rdf-schema#label> "Prepare a readiness review" .
+<urn:deep-sigma:cartography:node:mission%3Areadiness> <urn:deep-sigma:cartography:id> "mission:readiness" .
+<urn:deep-sigma:cartography:node:mission%3Areadiness> <urn:deep-sigma:cartography:kind> "mission" .
+<urn:deep-sigma:cartography:node:mission%3Areadiness> <urn:deep-sigma:cartography:layer> "mission" .
+<urn:deep-sigma:cartography:node:mission%3Areadiness> <urn:deep-sigma:cartography:recordJSON> "{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[],\"id\":\"mission:readiness\",\"kind\":\"mission\",\"label\":\"Prepare a readiness review\",\"layer\":\"mission\",\"review_due\":null,\"scope\":\"default\",\"status\":\"asserted\",\"valid_from\":null,\"valid_to\":null}" .
+<urn:deep-sigma:cartography:node:mission%3Areadiness> <urn:deep-sigma:cartography:scope> "default" .
+<urn:deep-sigma:cartography:node:mission%3Areadiness> <urn:deep-sigma:cartography:status> "asserted" .
+<urn:deep-sigma:cartography:node:policy%3Areview> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Node> .
+<urn:deep-sigma:cartography:node:policy%3Areview> <http://www.w3.org/2000/01/rdf-schema#label> "Review procedure" .
+<urn:deep-sigma:cartography:node:policy%3Areview> <urn:deep-sigma:cartography:id> "policy:review" .
+<urn:deep-sigma:cartography:node:policy%3Areview> <urn:deep-sigma:cartography:kind> "policy" .
+<urn:deep-sigma:cartography:node:policy%3Areview> <urn:deep-sigma:cartography:layer> "policy" .
+<urn:deep-sigma:cartography:node:policy%3Areview> <urn:deep-sigma:cartography:recordJSON> "{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[],\"id\":\"policy:review\",\"kind\":\"policy\",\"label\":\"Review procedure\",\"layer\":\"policy\",\"review_due\":null,\"scope\":\"default\",\"status\":\"asserted\",\"valid_from\":null,\"valid_to\":null}" .
+<urn:deep-sigma:cartography:node:policy%3Areview> <urn:deep-sigma:cartography:scope> "default" .
+<urn:deep-sigma:cartography:node:policy%3Areview> <urn:deep-sigma:cartography:status> "asserted" .
+<urn:deep-sigma:cartography:predicate:authorized_by> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Predicate> .
+<urn:deep-sigma:cartography:predicate:authorized_by> <http://www.w3.org/2000/01/rdf-schema#label> "Authority reference" .
+<urn:deep-sigma:cartography:predicate:authorized_by> <urn:deep-sigma:cartography:definition> "Source records a reference to an authority; not a verified grant." .
+<urn:deep-sigma:cartography:predicate:authorized_by> <urn:deep-sigma:cartography:dependency> "forward" .
+<urn:deep-sigma:cartography:predicate:authorized_by> <urn:deep-sigma:cartography:id> "authorized_by" .
+<urn:deep-sigma:cartography:predicate:authorized_by> <urn:deep-sigma:cartography:recordJSON> "{\"dependency\":\"forward\",\"description\":\"Source records a reference to an authority; not a verified grant.\",\"evidence_relation\":false,\"id\":\"authorized_by\",\"label\":\"Authority reference\",\"source_kinds\":[],\"target_kinds\":[\"authority\",\"authority_slice\",\"role\"]}" .
+<urn:deep-sigma:cartography:predicate:contradicts> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Predicate> .
+<urn:deep-sigma:cartography:predicate:contradicts> <http://www.w3.org/2000/01/rdf-schema#label> "Recorded contradiction" .
+<urn:deep-sigma:cartography:predicate:contradicts> <urn:deep-sigma:cartography:definition> "A contradiction has been recorded; this is not a text inference." .
+<urn:deep-sigma:cartography:predicate:contradicts> <urn:deep-sigma:cartography:dependency> "none" .
+<urn:deep-sigma:cartography:predicate:contradicts> <urn:deep-sigma:cartography:id> "contradicts" .
+<urn:deep-sigma:cartography:predicate:contradicts> <urn:deep-sigma:cartography:recordJSON> "{\"dependency\":\"none\",\"description\":\"A contradiction has been recorded; this is not a text inference.\",\"evidence_relation\":false,\"id\":\"contradicts\",\"label\":\"Recorded contradiction\",\"source_kinds\":[],\"target_kinds\":[]}" .
+<urn:deep-sigma:cartography:predicate:depends_on> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Predicate> .
+<urn:deep-sigma:cartography:predicate:depends_on> <http://www.w3.org/2000/01/rdf-schema#label> "Depends on" .
+<urn:deep-sigma:cartography:predicate:depends_on> <urn:deep-sigma:cartography:definition> "Source depends on target." .
+<urn:deep-sigma:cartography:predicate:depends_on> <urn:deep-sigma:cartography:dependency> "forward" .
+<urn:deep-sigma:cartography:predicate:depends_on> <urn:deep-sigma:cartography:id> "depends_on" .
+<urn:deep-sigma:cartography:predicate:depends_on> <urn:deep-sigma:cartography:recordJSON> "{\"dependency\":\"forward\",\"description\":\"Source depends on target.\",\"evidence_relation\":false,\"id\":\"depends_on\",\"label\":\"Depends on\",\"source_kinds\":[],\"target_kinds\":[]}" .
+<urn:deep-sigma:cartography:predicate:derived_from> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Predicate> .
+<urn:deep-sigma:cartography:predicate:derived_from> <http://www.w3.org/2000/01/rdf-schema#label> "Derived from" .
+<urn:deep-sigma:cartography:predicate:derived_from> <urn:deep-sigma:cartography:definition> "Source representation derives from target." .
+<urn:deep-sigma:cartography:predicate:derived_from> <urn:deep-sigma:cartography:dependency> "forward" .
+<urn:deep-sigma:cartography:predicate:derived_from> <urn:deep-sigma:cartography:id> "derived_from" .
+<urn:deep-sigma:cartography:predicate:derived_from> <urn:deep-sigma:cartography:recordJSON> "{\"dependency\":\"forward\",\"description\":\"Source representation derives from target.\",\"evidence_relation\":true,\"id\":\"derived_from\",\"label\":\"Derived from\",\"source_kinds\":[],\"target_kinds\":[]}" .
+<urn:deep-sigma:cartography:predicate:evidence_of> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Predicate> .
+<urn:deep-sigma:cartography:predicate:evidence_of> <http://www.w3.org/2000/01/rdf-schema#label> "Evidence of" .
+<urn:deep-sigma:cartography:predicate:evidence_of> <urn:deep-sigma:cartography:definition> "Source evidence relates to target." .
+<urn:deep-sigma:cartography:predicate:evidence_of> <urn:deep-sigma:cartography:dependency> "reverse" .
+<urn:deep-sigma:cartography:predicate:evidence_of> <urn:deep-sigma:cartography:id> "evidence_of" .
+<urn:deep-sigma:cartography:predicate:evidence_of> <urn:deep-sigma:cartography:recordJSON> "{\"dependency\":\"reverse\",\"description\":\"Source evidence relates to target.\",\"evidence_relation\":true,\"id\":\"evidence_of\",\"label\":\"Evidence of\",\"source_kinds\":[],\"target_kinds\":[]}" .
+<urn:deep-sigma:cartography:predicate:implements> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Predicate> .
+<urn:deep-sigma:cartography:predicate:implements> <http://www.w3.org/2000/01/rdf-schema#label> "Implements" .
+<urn:deep-sigma:cartography:predicate:implements> <urn:deep-sigma:cartography:definition> "Source records implementation of target." .
+<urn:deep-sigma:cartography:predicate:implements> <urn:deep-sigma:cartography:dependency> "forward" .
+<urn:deep-sigma:cartography:predicate:implements> <urn:deep-sigma:cartography:id> "implements" .
+<urn:deep-sigma:cartography:predicate:implements> <urn:deep-sigma:cartography:recordJSON> "{\"dependency\":\"forward\",\"description\":\"Source records implementation of target.\",\"evidence_relation\":false,\"id\":\"implements\",\"label\":\"Implements\",\"source_kinds\":[],\"target_kinds\":[]}" .
+<urn:deep-sigma:cartography:predicate:informed_by> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Predicate> .
+<urn:deep-sigma:cartography:predicate:informed_by> <http://www.w3.org/2000/01/rdf-schema#label> "Informed by" .
+<urn:deep-sigma:cartography:predicate:informed_by> <urn:deep-sigma:cartography:definition> "Source records an informational input from target." .
+<urn:deep-sigma:cartography:predicate:informed_by> <urn:deep-sigma:cartography:dependency> "forward" .
+<urn:deep-sigma:cartography:predicate:informed_by> <urn:deep-sigma:cartography:id> "informed_by" .
+<urn:deep-sigma:cartography:predicate:informed_by> <urn:deep-sigma:cartography:recordJSON> "{\"dependency\":\"forward\",\"description\":\"Source records an informational input from target.\",\"evidence_relation\":true,\"id\":\"informed_by\",\"label\":\"Informed by\",\"source_kinds\":[],\"target_kinds\":[]}" .
+<urn:deep-sigma:cartography:predicate:part_of> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Predicate> .
+<urn:deep-sigma:cartography:predicate:part_of> <http://www.w3.org/2000/01/rdf-schema#label> "Part of" .
+<urn:deep-sigma:cartography:predicate:part_of> <urn:deep-sigma:cartography:definition> "Source is represented as a part of target." .
+<urn:deep-sigma:cartography:predicate:part_of> <urn:deep-sigma:cartography:dependency> "none" .
+<urn:deep-sigma:cartography:predicate:part_of> <urn:deep-sigma:cartography:id> "part_of" .
+<urn:deep-sigma:cartography:predicate:part_of> <urn:deep-sigma:cartography:recordJSON> "{\"dependency\":\"none\",\"description\":\"Source is represented as a part of target.\",\"evidence_relation\":false,\"id\":\"part_of\",\"label\":\"Part of\",\"source_kinds\":[],\"target_kinds\":[]}" .
+<urn:deep-sigma:cartography:predicate:produced> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Predicate> .
+<urn:deep-sigma:cartography:predicate:produced> <http://www.w3.org/2000/01/rdf-schema#label> "Produced" .
+<urn:deep-sigma:cartography:predicate:produced> <urn:deep-sigma:cartography:definition> "Source records production of target." .
+<urn:deep-sigma:cartography:predicate:produced> <urn:deep-sigma:cartography:dependency> "none" .
+<urn:deep-sigma:cartography:predicate:produced> <urn:deep-sigma:cartography:id> "produced" .
+<urn:deep-sigma:cartography:predicate:produced> <urn:deep-sigma:cartography:recordJSON> "{\"dependency\":\"none\",\"description\":\"Source records production of target.\",\"evidence_relation\":false,\"id\":\"produced\",\"label\":\"Produced\",\"source_kinds\":[],\"target_kinds\":[]}" .
+<urn:deep-sigma:cartography:predicate:relates_to> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Predicate> .
+<urn:deep-sigma:cartography:predicate:relates_to> <http://www.w3.org/2000/01/rdf-schema#label> "Related to" .
+<urn:deep-sigma:cartography:predicate:relates_to> <urn:deep-sigma:cartography:definition> "A declared relationship without dependency semantics." .
+<urn:deep-sigma:cartography:predicate:relates_to> <urn:deep-sigma:cartography:dependency> "none" .
+<urn:deep-sigma:cartography:predicate:relates_to> <urn:deep-sigma:cartography:id> "relates_to" .
+<urn:deep-sigma:cartography:predicate:relates_to> <urn:deep-sigma:cartography:recordJSON> "{\"dependency\":\"none\",\"description\":\"A declared relationship without dependency semantics.\",\"evidence_relation\":false,\"id\":\"relates_to\",\"label\":\"Related to\",\"source_kinds\":[],\"target_kinds\":[]}" .
+<urn:deep-sigma:cartography:predicate:requires> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Predicate> .
+<urn:deep-sigma:cartography:predicate:requires> <http://www.w3.org/2000/01/rdf-schema#label> "Requires" .
+<urn:deep-sigma:cartography:predicate:requires> <urn:deep-sigma:cartography:definition> "Source requires target." .
+<urn:deep-sigma:cartography:predicate:requires> <urn:deep-sigma:cartography:dependency> "forward" .
+<urn:deep-sigma:cartography:predicate:requires> <urn:deep-sigma:cartography:id> "requires" .
+<urn:deep-sigma:cartography:predicate:requires> <urn:deep-sigma:cartography:recordJSON> "{\"dependency\":\"forward\",\"description\":\"Source requires target.\",\"evidence_relation\":false,\"id\":\"requires\",\"label\":\"Requires\",\"source_kinds\":[],\"target_kinds\":[]}" .
+<urn:deep-sigma:cartography:predicate:supersedes> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Predicate> .
+<urn:deep-sigma:cartography:predicate:supersedes> <http://www.w3.org/2000/01/rdf-schema#label> "Supersedes" .
+<urn:deep-sigma:cartography:predicate:supersedes> <urn:deep-sigma:cartography:definition> "Source records succession of target; no automatic retraction." .
+<urn:deep-sigma:cartography:predicate:supersedes> <urn:deep-sigma:cartography:dependency> "none" .
+<urn:deep-sigma:cartography:predicate:supersedes> <urn:deep-sigma:cartography:id> "supersedes" .
+<urn:deep-sigma:cartography:predicate:supersedes> <urn:deep-sigma:cartography:recordJSON> "{\"dependency\":\"none\",\"description\":\"Source records succession of target; no automatic retraction.\",\"evidence_relation\":false,\"id\":\"supersedes\",\"label\":\"Supersedes\",\"source_kinds\":[],\"target_kinds\":[]}" .
+<urn:deep-sigma:cartography:predicate:supported_by> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Predicate> .
+<urn:deep-sigma:cartography:predicate:supported_by> <http://www.w3.org/2000/01/rdf-schema#label> "Supported by" .
+<urn:deep-sigma:cartography:predicate:supported_by> <urn:deep-sigma:cartography:definition> "Source cites target as support." .
+<urn:deep-sigma:cartography:predicate:supported_by> <urn:deep-sigma:cartography:dependency> "forward" .
+<urn:deep-sigma:cartography:predicate:supported_by> <urn:deep-sigma:cartography:id> "supported_by" .
+<urn:deep-sigma:cartography:predicate:supported_by> <urn:deep-sigma:cartography:recordJSON> "{\"dependency\":\"forward\",\"description\":\"Source cites target as support.\",\"evidence_relation\":true,\"id\":\"supported_by\",\"label\":\"Supported by\",\"source_kinds\":[],\"target_kinds\":[]}" .
+<urn:deep-sigma:cartography:predicate:supports> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:Predicate> .
+<urn:deep-sigma:cartography:predicate:supports> <http://www.w3.org/2000/01/rdf-schema#label> "Supports" .
+<urn:deep-sigma:cartography:predicate:supports> <urn:deep-sigma:cartography:definition> "Source supports target." .
+<urn:deep-sigma:cartography:predicate:supports> <urn:deep-sigma:cartography:dependency> "reverse" .
+<urn:deep-sigma:cartography:predicate:supports> <urn:deep-sigma:cartography:id> "supports" .
+<urn:deep-sigma:cartography:predicate:supports> <urn:deep-sigma:cartography:recordJSON> "{\"dependency\":\"reverse\",\"description\":\"Source supports target.\",\"evidence_relation\":true,\"id\":\"supports\",\"label\":\"Supports\",\"source_kinds\":[],\"target_kinds\":[]}" .
+<urn:deep-sigma:cartography:view:c06a24713513fee5314cb61fb20856d12f86b7f4233c2edd81b08eb4f173279b> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <urn:deep-sigma:cartography:MapView> .
+<urn:deep-sigma:cartography:view:c06a24713513fee5314cb61fb20856d12f86b7f4233c2edd81b08eb4f173279b> <urn:deep-sigma:cartography:asOf> "2026-10-03T12:00:00.000000Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+<urn:deep-sigma:cartography:view:c06a24713513fee5314cb61fb20856d12f86b7f4233c2edd81b08eb4f173279b> <urn:deep-sigma:cartography:authority> "not_evaluated" .
+<urn:deep-sigma:cartography:view:c06a24713513fee5314cb61fb20856d12f86b7f4233c2edd81b08eb4f173279b> <urn:deep-sigma:cartography:viewJSON> "{\"as_of\":\"2026-10-03T12:00:00.000000Z\",\"atlas\":{\"attributes\":{\"episode_id\":\"episode:synthetic-review\",\"purpose\":\"demonstration only\",\"synthetic\":true},\"edges\":[{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:scenario\"],\"id\":\"edge:01\",\"predicate\":\"requires\",\"source\":\"mission:readiness\",\"status\":\"asserted\",\"target\":\"capability:intake\",\"valid_from\":null,\"valid_to\":null},{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:scenario\"],\"id\":\"edge:02\",\"predicate\":\"depends_on\",\"source\":\"capability:intake\",\"status\":\"asserted\",\"target\":\"claim:current\",\"valid_from\":null,\"valid_to\":null},{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:report\"],\"id\":\"edge:03\",\"predicate\":\"supported_by\",\"source\":\"claim:current\",\"status\":\"asserted\",\"target\":\"evidence:report\",\"valid_from\":null,\"valid_to\":null},{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:scenario\"],\"id\":\"edge:04\",\"predicate\":\"depends_on\",\"source\":\"claim:current\",\"status\":\"asserted\",\"target\":\"assumption:standard\",\"valid_from\":null,\"valid_to\":null},{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:scenario\"],\"id\":\"edge:05\",\"predicate\":\"depends_on\",\"source\":\"decision:publish\",\"status\":\"asserted\",\"target\":\"claim:current\",\"valid_from\":null,\"valid_to\":null},{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:scenario\"],\"id\":\"edge:06\",\"predicate\":\"implements\",\"source\":\"decision:publish\",\"status\":\"asserted\",\"target\":\"policy:review\",\"valid_from\":null,\"valid_to\":null},{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:scenario\"],\"id\":\"edge:07\",\"predicate\":\"authorized_by\",\"source\":\"policy:review\",\"status\":\"asserted\",\"target\":\"authority:reviewer\",\"valid_from\":null,\"valid_to\":null},{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:scenario\"],\"id\":\"edge:08\",\"predicate\":\"relates_to\",\"source\":\"event:review\",\"status\":\"asserted\",\"target\":\"decision:publish\",\"valid_from\":null,\"valid_to\":null}],\"evidence\":[{\"attributes\":{},\"id\":\"ev:report\",\"locator\":\"Synthetic review report, section 2\",\"sha256\":null,\"source\":\"synthetic://cartography/review-report\",\"valid_from\":\"2026-09-01T00:00:00.000000Z\",\"valid_to\":\"2026-10-02T00:00:00.000000Z\"},{\"attributes\":{},\"id\":\"ev:scenario\",\"locator\":\"Explicit synthetic scenario authored for tests\",\"sha256\":null,\"source\":\"synthetic://cartography/example\",\"valid_from\":null,\"valid_to\":null}],\"id\":\"atlas:synthetic-review\",\"nodes\":[{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:scenario\"],\"id\":\"assumption:standard\",\"kind\":\"assumption\",\"label\":\"Review standard remains applicable\",\"layer\":\"meaning\",\"review_due\":\"2026-10-01T00:00:00.000000Z\",\"scope\":\"default\",\"status\":\"asserted\",\"valid_from\":null,\"valid_to\":null},{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[],\"id\":\"authority:reviewer\",\"kind\":\"authority\",\"label\":\"Designated review role\",\"layer\":\"authority\",\"review_due\":null,\"scope\":\"default\",\"status\":\"asserted\",\"valid_from\":null,\"valid_to\":null},{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[],\"id\":\"capability:intake\",\"kind\":\"capability\",\"label\":\"Evidence intake process\",\"layer\":\"operations\",\"review_due\":null,\"scope\":\"default\",\"status\":\"asserted\",\"valid_from\":null,\"valid_to\":null},{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[],\"id\":\"claim:current\",\"kind\":\"claim\",\"label\":\"The assessment has current evidence\",\"layer\":\"meaning\",\"review_due\":null,\"scope\":\"default\",\"status\":\"asserted\",\"valid_from\":null,\"valid_to\":null},{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[],\"id\":\"claim:unknown\",\"kind\":\"claim\",\"label\":\"Additional source coverage is unknown\",\"layer\":\"meaning\",\"review_due\":null,\"scope\":\"default\",\"status\":\"unknown\",\"valid_from\":null,\"valid_to\":null},{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:scenario\"],\"id\":\"decision:publish\",\"kind\":\"decision\",\"label\":\"Proposed assessment publication\",\"layer\":\"decisions\",\"review_due\":null,\"scope\":\"default\",\"status\":\"asserted\",\"valid_from\":null,\"valid_to\":null},{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:scenario\"],\"id\":\"event:review\",\"kind\":\"event\",\"label\":\"Review window opened\",\"layer\":\"events\",\"review_due\":null,\"scope\":\"default\",\"status\":\"observed\",\"valid_from\":null,\"valid_to\":null},{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[\"ev:report\"],\"id\":\"evidence:report\",\"kind\":\"evidence\",\"label\":\"Recorded review report\",\"layer\":\"evidence\",\"review_due\":null,\"scope\":\"default\",\"status\":\"asserted\",\"valid_from\":null,\"valid_to\":null},{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[],\"id\":\"mission:readiness\",\"kind\":\"mission\",\"label\":\"Prepare a readiness review\",\"layer\":\"mission\",\"review_due\":null,\"scope\":\"default\",\"status\":\"asserted\",\"valid_from\":null,\"valid_to\":null},{\"attributes\":{},\"confidence\":null,\"evidence_ids\":[],\"id\":\"policy:review\",\"kind\":\"policy\",\"label\":\"Review procedure\",\"layer\":\"policy\",\"review_due\":null,\"scope\":\"default\",\"status\":\"asserted\",\"valid_from\":null,\"valid_to\":null}],\"predicates\":[{\"dependency\":\"forward\",\"description\":\"Source records a reference to an authority; not a verified grant.\",\"evidence_relation\":false,\"id\":\"authorized_by\",\"label\":\"Authority reference\",\"source_kinds\":[],\"target_kinds\":[\"authority\",\"authority_slice\",\"role\"]},{\"dependency\":\"none\",\"description\":\"A contradiction has been recorded; this is not a text inference.\",\"evidence_relation\":false,\"id\":\"contradicts\",\"label\":\"Recorded contradiction\",\"source_kinds\":[],\"target_kinds\":[]},{\"dependency\":\"forward\",\"description\":\"Source depends on target.\",\"evidence_relation\":false,\"id\":\"depends_on\",\"label\":\"Depends on\",\"source_kinds\":[],\"target_kinds\":[]},{\"dependency\":\"forward\",\"description\":\"Source representation derives from target.\",\"evidence_relation\":true,\"id\":\"derived_from\",\"label\":\"Derived from\",\"source_kinds\":[],\"target_kinds\":[]},{\"dependency\":\"reverse\",\"description\":\"Source evidence relates to target.\",\"evidence_relation\":true,\"id\":\"evidence_of\",\"label\":\"Evidence of\",\"source_kinds\":[],\"target_kinds\":[]},{\"dependency\":\"forward\",\"description\":\"Source records implementation of target.\",\"evidence_relation\":false,\"id\":\"implements\",\"label\":\"Implements\",\"source_kinds\":[],\"target_kinds\":[]},{\"dependency\":\"forward\",\"description\":\"Source records an informational input from target.\",\"evidence_relation\":true,\"id\":\"informed_by\",\"label\":\"Informed by\",\"source_kinds\":[],\"target_kinds\":[]},{\"dependency\":\"none\",\"description\":\"Source is represented as a part of target.\",\"evidence_relation\":false,\"id\":\"part_of\",\"label\":\"Part of\",\"source_kinds\":[],\"target_kinds\":[]},{\"dependency\":\"none\",\"description\":\"Source records production of target.\",\"evidence_relation\":false,\"id\":\"produced\",\"label\":\"Produced\",\"source_kinds\":[],\"target_kinds\":[]},{\"dependency\":\"none\",\"description\":\"A declared relationship without dependency semantics.\",\"evidence_relation\":false,\"id\":\"relates_to\",\"label\":\"Related to\",\"source_kinds\":[],\"target_kinds\":[]},{\"dependency\":\"forward\",\"description\":\"Source requires target.\",\"evidence_relation\":false,\"id\":\"requires\",\"label\":\"Requires\",\"source_kinds\":[],\"target_kinds\":[]},{\"dependency\":\"none\",\"description\":\"Source records succession of target; no automatic retraction.\",\"evidence_relation\":false,\"id\":\"supersedes\",\"label\":\"Supersedes\",\"source_kinds\":[],\"target_kinds\":[]},{\"dependency\":\"forward\",\"description\":\"Source cites target as support.\",\"evidence_relation\":true,\"id\":\"supported_by\",\"label\":\"Supported by\",\"source_kinds\":[],\"target_kinds\":[]},{\"dependency\":\"reverse\",\"description\":\"Source supports target.\",\"evidence_relation\":true,\"id\":\"supports\",\"label\":\"Supports\",\"source_kinds\":[],\"target_kinds\":[]}],\"schema\":\"deepsigma.cartography/1\",\"title\":\"Synthetic administrative review | DEEP SIGMA CARTOGRAPHY\"},\"include_inferred\":true,\"layers\":null,\"scopes\":null,\"source_fingerprint\":\"3f2178053fd017c352f87d33df948acb622dfe235dbcc9b7d810e8ccdefc4f2d\"}" .

@@ -1,0 +1,15 @@
+id,label,description,dependency,source_kinds,target_kinds,evidence_relation
+authorized_by,Authority reference,Source records a reference to an authority; not a verified grant.,forward,[],"[""authority"",""authority_slice"",""role""]",False
+contradicts,Recorded contradiction,A contradiction has been recorded; this is not a text inference.,none,[],[],False
+depends_on,Depends on,Source depends on target.,forward,[],[],False
+derived_from,Derived from,Source representation derives from target.,forward,[],[],True
+evidence_of,Evidence of,Source evidence relates to target.,reverse,[],[],True
+implements,Implements,Source records implementation of target.,forward,[],[],False
+informed_by,Informed by,Source records an informational input from target.,forward,[],[],True
+part_of,Part of,Source is represented as a part of target.,none,[],[],False
+produced,Produced,Source records production of target.,none,[],[],False
+relates_to,Related to,A declared relationship without dependency semantics.,none,[],[],False
+requires,Requires,Source requires target.,forward,[],[],False
+supersedes,Supersedes,Source records succession of target; no automatic retraction.,none,[],[],False
+supported_by,Supported by,Source cites target as support.,forward,[],[],True
+supports,Supports,Source supports target.,reverse,[],[],True
