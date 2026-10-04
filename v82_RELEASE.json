@@ -1,0 +1,59 @@
+{
+  "product": "Deep Sigma / VINCULUM pyLib",
+  "distribution": "vinculum-pylib",
+  "version": "0.8.2",
+  "release_status": "candidate",
+  "release_date": null,
+  "title": "Authority Hardening + Containment Candidate",
+  "baseline": {
+    "negative_release": "0.8.0",
+    "negative_release_sha256": "5ccdf80ac06e5fc9dc8a0374757add23a9e11d4bcfbd082a9d5d96f93d982902",
+    "hardening_backlog": "0.8.1 change list incorporated; 0.8.1 not separately shipped"
+  },
+  "authority_model": "model proposes/reviews; attributable human approval required before APPLY; post-Apply check and lesson required before CLOSED",
+  "not_claimed": [
+    "truth, risk, readiness or authorization from a score",
+    "operational certification",
+    "live platform integration",
+    "production IAM or identity authentication",
+    "OS-level sandboxing",
+    "automatic command action",
+    "successful outcome merely because Apply was recorded"
+  ],
+  "wheel": {
+    "filename": "vinculum_pylib-0.8.2-py3-none-any.whl",
+    "sha256": "af8ee9b25bf6f4be276c00a851ef4cc70e601cbd1eacdac5d6e2d403e0449910",
+    "source_python_files_compared_to_wheel": 101,
+    "source_to_wheel_differences": 0
+  },
+  "validation": {
+    "source_tests": {
+      "passed": 485,
+      "failed": 0,
+      "skipped": 1,
+      "skip_reason": "optional PyArrow unavailable"
+    },
+    "installed_wheel_tests": {
+      "passed": 485,
+      "failed": 0,
+      "skipped": 1,
+      "skip_reason": "optional PyArrow unavailable"
+    },
+    "claude_successor_gates": {
+      "pass": 28,
+      "fail": 0,
+      "hold": "same-model reviewer when auditor_model is unset; no authority follows automatically",
+      "skip": "deepsigma==2.1.3 intentionally excluded"
+    },
+    "v082_authority_gates": {
+      "pass": 10,
+      "fail": 0
+    },
+    "negative_baseline_v080": {
+      "pass": 9,
+      "fail": 17,
+      "hold": 3,
+      "skip": 1
+    }
+  }
+}
